@@ -18,6 +18,7 @@
 using BlueControls.Controls;
 using BlueControls.Enums;
 using System;
+using System.Drawing;
 using static BlueBasics.Develop;
 
 namespace BlueControls.Forms {
@@ -68,7 +69,7 @@ namespace BlueControls.Forms {
             Text = AppName();
 
             minWidth = Math.Max(Width, minWidth);
-            Size = new System.Drawing.Size(minWidth, bottomOfLowestControl + butOK.Height + BorderHeight + Skin.Padding);
+            Size = new Size(minWidth, bottomOfLowestControl + butOK.Height + BorderHeight + Skin.Padding);
             if (_cancelPossible) {
                 butAbbrechen.Left = minWidth - Skin.Padding - butAbbrechen.Width - BorderWidth;
                 butOK.Left = butAbbrechen.Left - Skin.Padding - butOK.Width;

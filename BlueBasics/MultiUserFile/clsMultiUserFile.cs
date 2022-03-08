@@ -781,7 +781,8 @@ namespace BlueBasics.MultiUserFile {
             try {
                 var bInhalt = tmpInhalt.UTF8_ToByte();
                 // Nicht modAllgemein, wegen den strengen Datei-Rechten
-                using (FileStream x = new(Blockdateiname(), FileMode.Create, FileAccess.Write, FileShare.None)) {
+                using (FileStream x = new(Blockdateiname(), FileMode.Create, FileAccess.Write,
+                           FileShare.None)) {
                     x.Write(bInhalt, 0, bInhalt.Length);
                     x.Flush();
                     x.Close();

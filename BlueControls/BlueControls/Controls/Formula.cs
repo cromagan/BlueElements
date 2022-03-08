@@ -24,7 +24,6 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.EventArgs;
 using System;
@@ -32,7 +31,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 #nullable enable
 
@@ -490,7 +491,8 @@ namespace BlueControls.Controls {
         private void Control_Create(ColumnViewItem cd, System.Windows.Forms.Control vParent) {
             if (cd?.Column == null) { return; }
             Develop.Debugprint_BackgroundThread();
-            FlexiControlForCell btb = new(cd.Column.Database, cd.Column.Key, cd.ÜberschriftAnordnung) {
+            FlexiControlForCell btb =
+                new(cd.Column.Database, cd.Column.Key, cd.ÜberschriftAnordnung) {
                 TabIndex = TabIndex + 10000,
                 Tag = cd
             };
@@ -501,7 +503,7 @@ namespace BlueControls.Controls {
 
         private void Control_Create_All() {
             var count = -1;
-            _control = new List<FlexiControlForCell?>();
+            _control = new List<FlexiControlForCell>();
             foreach (var thisView in _database.Views) {
                 if (thisView != null) {
                     var index = _database.Views.IndexOf(thisView);
@@ -542,7 +544,8 @@ namespace BlueControls.Controls {
                 var widthInPixelOfColumn = (widthInPixelOfParent - (viewSpalten * Skin.PaddingSmal)) / (viewSpalten + 1);
                 foreach (var thisViewItem in thisView) {
                     if (thisViewItem?.Column != null) {
-                        Rectangle objPx = new() {
+                        Rectangle objPx = new()
+                        {
                             Width = (thisViewItem.Width * widthInPixelOfColumn) + ((thisViewItem.Width - 1) * Skin.PaddingSmal),
                             X = (thisViewItem.Spalte_X1 * widthInPixelOfColumn) + (thisViewItem.Spalte_X1 * Skin.PaddingSmal) + moveIn,
                             Y = moveIn
@@ -635,7 +638,8 @@ namespace BlueControls.Controls {
             foreach (var thisView in _database.Views) {
                 if (thisView != null && thisView != _database.Views[0]) {
                     _tabGeneratorCount++;
-                    System.Windows.Forms.TabPage tempPage = new() {
+                    System.Windows.Forms.TabPage tempPage = new()
+                    {
                         Text = "Seite #" + _tabGeneratorCount
                     };
                     tempPage.Text = thisView.Name;

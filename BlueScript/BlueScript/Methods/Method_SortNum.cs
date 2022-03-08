@@ -65,7 +65,7 @@ namespace BlueScript.Methods {
 
             nums.Sort();
 
-            attvar.Attributes[0].ValueListString = nums.ConvertAll<string>(i => i.ToString());
+            attvar.Attributes[0].ValueListString = nums.ConvertAll<string>(i => i.ToString(Constants.Format_Float1));
             return DoItFeedback.Null();
         }
 

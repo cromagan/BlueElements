@@ -21,7 +21,6 @@ using BlueBasics;
 using BlueControls.Forms;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Windows.Forms;
 using static BlueBasics.BitmapExt;
 
 namespace BlueControls {

@@ -19,11 +19,11 @@ using BlueBasics;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.ItemCollection;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
+using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.FileOperations;
 
 namespace BlueControls.Controls {
@@ -142,7 +142,8 @@ namespace BlueControls.Controls {
                             if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1])) {
                                 show = show + " - " + x[1];
                             }
-                            TextListItem it = new(show, x[0], null, false, true, NR.ToString(Constants.Format_Integer3));
+                            TextListItem it = new(show, x[0], null, false, true,
+                                NR.ToString(Constants.Format_Integer3));
                             List<string> t = new();
                             if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1])) {
                                 t.Add(x[1]);

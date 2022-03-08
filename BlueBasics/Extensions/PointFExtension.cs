@@ -50,7 +50,8 @@ namespace BlueBasics {
             return r.Contains(p);
         }
 
-        public static PointF ZoomAndMove(this PointF p, float zoom, float shiftX, float shiftY) => new((p.X * zoom) - shiftX + (zoom / 2), (p.Y * zoom) - shiftY + (zoom / 2));
+        public static PointF ZoomAndMove(this PointF p, float zoom, float shiftX, float shiftY) =>
+            new((p.X * zoom) - shiftX + (zoom / 2), (p.Y * zoom) - shiftY + (zoom / 2));
 
         #endregion
     }

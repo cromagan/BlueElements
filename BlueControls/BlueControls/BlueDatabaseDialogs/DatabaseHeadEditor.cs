@@ -22,12 +22,13 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
-using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
 using System.IO;
 using System.Linq;
+using BlueControls.ItemCollection.ItemCollectionList;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
@@ -98,7 +99,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // -----------------------------
             txbCaption.Text = _database.Caption;
             tbxReloadVerzoegerung.Text = _database.ReloadDelaySecond.ToString();
-            txbGlobalScale.Text = _database.GlobalScale.ToString();
+            txbGlobalScale.Text = _database.GlobalScale.ToString(Constants.Format_Float1);
             txbAdditionalFiles.Text = _database.AdditionaFilesPfad;
             txbZeilenQuickInfo.Text = _database.ZeilenQuickInfo.Replace("<br>", "\r");
             tbxUndoAnzahl.Text = _database.UndoCount.ToString();

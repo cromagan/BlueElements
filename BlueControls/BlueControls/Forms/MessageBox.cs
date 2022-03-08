@@ -95,7 +95,8 @@ namespace BlueControls.Forms {
                 if (!string.IsNullOrEmpty(names[z])) {
                     erT.TextDimensions = Size.Empty;
                     erT.PlainText = names[z];
-                    Button b = new() {
+                    Button b = new()
+                    {
                         Name = z.ToString(),
                         Text = names[z]
                     };

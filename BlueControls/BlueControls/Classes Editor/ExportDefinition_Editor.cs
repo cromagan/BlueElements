@@ -18,12 +18,12 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.EventArgs;
-using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
 using System.Drawing;
 using System.Linq;
+using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
 using static BlueBasics.FileOperations;
 
@@ -78,8 +78,8 @@ namespace BlueControls.Classes_Editor {
                     return;
             }
             ExportVerzeichnis.Text = Item.Verzeichnis;
-            ExportIntervall.Text = Item.BackupInterval.ToString();
-            ExportAutomatischLöschen.Text = Item.AutoDelete.ToString();
+            ExportIntervall.Text = Item.BackupInterval.ToString(Constants.Format_Float1);
+            ExportAutomatischLöschen.Text = Item.AutoDelete.ToString(Constants.Format_Float1);
             cbxExportFormularID.Text = Item.ExportFormularId;
             ExportSpaltenAnsicht.Text = Item.ExportSpaltenAnsicht.ToString();
             lbxFilter.Item.Clear();

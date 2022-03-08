@@ -23,7 +23,6 @@ using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
@@ -34,7 +33,9 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Windows.Forms;
+using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.FileOperations;
+using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace BlueControls.Controls {
 

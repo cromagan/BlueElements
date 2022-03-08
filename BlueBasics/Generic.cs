@@ -220,9 +220,7 @@ namespace BlueBasics {
         public static double Sigmoid(double x) => 1 / (1 + Math.Exp(-x));
 
         public static void Swap<T>(ref T w1, ref T w2) {
-            var w3 = w1;
-            w1 = w2;
-            w2 = w3;
+            (w1, w2) = (w2, w1);
         }
 
         /// <summary>

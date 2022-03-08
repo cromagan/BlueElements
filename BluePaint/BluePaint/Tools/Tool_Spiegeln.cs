@@ -76,7 +76,8 @@ namespace BluePaint {
             Matrix rotateAtOrigin = new();
             rotateAtOrigin.Rotate(wink);
             // Rotate the image's corners to see how big it will be after rotation.
-            PointF[] p = { new(0, 0), new(pic.Width, 0), new(pic.Width, pic.Height), new(0, pic.Height) };
+            PointF[] p = {new(0, 0), new(pic.Width, 0), new(pic.Width, pic.Height),
+                new(0, pic.Height) };
             rotateAtOrigin.TransformPoints(p);
             var minX = Math.Min(Math.Min(p[0].X, p[1].X), Math.Min(p[2].X, p[3].X));
             var minY = Math.Min(Math.Min(p[0].Y, p[1].Y), Math.Min(p[2].Y, p[3].Y));

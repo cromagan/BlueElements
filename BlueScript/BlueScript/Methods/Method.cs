@@ -164,7 +164,7 @@ namespace BlueScript.Methods {
         public static SplittedAttributesFeedback SplitAttributeToVars(string attributtext, Script s, List<enVariableDataType> types, bool endlessArgs) {
             if (types.Count == 0) {
                 return string.IsNullOrEmpty(attributtext)
-                    ? new SplittedAttributesFeedback(new List<Variable?>())
+                    ? new SplittedAttributesFeedback(new List<Variable>())
                     : new SplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Keine Attribute erwartet, aber erhalten.");
             }
 
@@ -197,7 +197,7 @@ namespace BlueScript.Methods {
                     if (v == null) { return new SplittedAttributesFeedback(enSkriptFehlerTyp.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1)); }
                 } else {
                     v = new Variable("dummy3", attributes[n], s);
-                    if (v == null) { return new SplittedAttributesFeedback(enSkriptFehlerTyp.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1).ToString()); }
+                    if (v == null) { return new SplittedAttributesFeedback(enSkriptFehlerTyp.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1)); }
                 }
 
                 // Den Typ der Variable checken

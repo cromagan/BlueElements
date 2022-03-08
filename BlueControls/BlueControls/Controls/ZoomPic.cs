@@ -103,7 +103,8 @@ namespace BlueControls.Controls {
             //    _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb);
             //}
             //var TMPGR = Graphics.FromImage(_BitmapOfControl);
-            LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray, LinearGradientMode.Vertical);
+            LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray,
+                LinearGradientMode.Vertical);
             gr.FillRectangle(lgb, ClientRectangle);
             if (_bmp != null) {
                 var r = new RectangleF(0, 0, _bmp.Width, _bmp.Height).ZoomAndMoveRect(Zoom, ShiftX, ShiftY, true);

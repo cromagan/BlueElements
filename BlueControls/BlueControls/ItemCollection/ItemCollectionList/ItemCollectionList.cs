@@ -17,6 +17,10 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -25,12 +29,8 @@ using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 
-namespace BlueControls.ItemCollection {
+namespace BlueControls.ItemCollection.ItemCollectionList {
 
     public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
 
@@ -129,7 +129,7 @@ namespace BlueControls.ItemCollection {
                 try {
                     if (string.IsNullOrEmpty(@internal)) { return null; }
 
-                    return this.FirstOrDefault(thisItem => thisItem != null && @internal.ToUpper() == thisItem.Internal.ToUpper());
+                    return this.FirstOrDefault(thisItem => thisItem != null && string.Equals(@internal, thisItem.Internal, StringComparison.CurrentCultureIgnoreCase));
                 } catch {
                     return this[@internal];
                 }
@@ -314,7 +314,8 @@ namespace BlueControls.ItemCollection {
         }
 
         public CellLikeListItem Add(string internalAndReadableText, ColumnItem? columnStyle, enShortenStyle style, enBildTextVerhalten bildTextverhaltent, bool enabled) {
-            CellLikeListItem i = new(internalAndReadableText, columnStyle, style, enabled, bildTextverhaltent);
+            CellLikeListItem i = new(internalAndReadableText, columnStyle, style, enabled,
+                bildTextverhaltent);
             Add(i);
             return i;
         }

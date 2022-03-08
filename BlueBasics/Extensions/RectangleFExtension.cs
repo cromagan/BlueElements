@@ -99,7 +99,7 @@ namespace BlueBasics {
             }
         }
 
-        public static Rectangle ToRect(this RectangleF r) => new((int)r.X, (int)r.Y, (int)r.Width, (int)r.Height);
+        public static Rectangle ToRect(this RectangleF r) => new((int) r.X, (int) r.Y, (int) r.Width, (int) r.Height);
 
         /// <summary>
         ///

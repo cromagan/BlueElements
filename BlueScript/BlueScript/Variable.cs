@@ -15,6 +15,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
+using System;
 using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
@@ -41,14 +44,14 @@ namespace BlueScript {
             }
         }
 
-        public static List<string> AllNames(this List<Variable> vars) => vars.Select(thisvar => thisvar.Name).ToList();
+        public static List<string> AllNames(this List<Variable>? vars) => vars.Select(thisvar => thisvar.Name).ToList();
 
-        public static List<string> AllValues(this List<Variable?>? vars) => vars.Select(thisvar => thisvar.ValueString).ToList();
+        public static List<string> AllValues(this List<Variable>? vars) => vars.Select(thisvar => thisvar.ValueString).ToList();
 
-        public static Variable? Get(this List<Variable?> vars, string name) {
+        public static Variable? Get(this List<Variable>? vars, string name) {
             if (vars == null || vars.Count == 0) { return null; }
 
-            return vars.FirstOrDefault(thisv => !thisv.SystemVariable && thisv.Name.ToLower() == name.ToLower());
+            return vars.FirstOrDefault(thisv => !thisv.SystemVariable && string.Equals(thisv.Name, name, StringComparison.CurrentCultureIgnoreCase));
         }
 
         /// <summary>
@@ -228,8 +231,8 @@ namespace BlueScript {
 
             #region Testen auf Bool
 
-            if (txt.Value.Equals("true", System.StringComparison.InvariantCultureIgnoreCase) ||
-                txt.Value.Equals("false", System.StringComparison.InvariantCultureIgnoreCase)) {
+            if (txt.Value.Equals("true", StringComparison.InvariantCultureIgnoreCase) ||
+                txt.Value.Equals("false", StringComparison.InvariantCultureIgnoreCase)) {
                 if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.Bool) { SetError("Variable ist kein Boolean"); return; }
                 ValueString = txt.Value;
                 Type = enVariableDataType.Bool;

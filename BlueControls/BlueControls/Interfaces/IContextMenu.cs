@@ -16,9 +16,9 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueControls.EventArgs;
-using BlueControls.ItemCollection;
 using System;
 using System.Collections.Generic;
+using BlueControls.ItemCollection.ItemCollectionList;
 
 namespace BlueControls.Interfaces {
 

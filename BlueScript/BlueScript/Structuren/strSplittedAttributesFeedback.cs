@@ -24,7 +24,7 @@ namespace BlueScript.Structuren {
 
         #region Fields
 
-        public List<Variable?>? Attributes;
+        public List<Variable> Attributes;
 
         public string ErrorMessage;
 
@@ -34,14 +34,14 @@ namespace BlueScript.Structuren {
 
         #region Constructors
 
-        public SplittedAttributesFeedback(List<Variable?>? atts) {
+        public SplittedAttributesFeedback(List<Variable> atts) {
             Attributes = atts;
             ErrorMessage = string.Empty;
             FehlerTyp = enSkriptFehlerTyp.ohne;
         }
 
         public SplittedAttributesFeedback(enSkriptFehlerTyp type, string error) {
-            Attributes = null;
+            Attributes = new List<Variable>();
             ErrorMessage = error;
             FehlerTyp = type;
         }

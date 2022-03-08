@@ -59,7 +59,7 @@ namespace BlueDatabase.AdditionalScriptComands {
             var c = db.Column.Exists(attvar.Attributes[2].ValueString);
             if (c == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[2].ValueString); }
 
-            var r = RowCollection.MatchesTo(new FilterItem(db.Column[0], BlueDatabase.Enums.enFilterType.Istgleich_GroßKleinEgal, attvar.Attributes[1].ValueString));
+            var r = RowCollection.MatchesTo(new FilterItem(db.Column[0], Enums.enFilterType.Istgleich_GroßKleinEgal, attvar.Attributes[1].ValueString));
             if (r == null || r.Count == 0) {
                 if (attvar.Attributes.Count > 3) {
                     attvar.Attributes[3].Readonly = false;

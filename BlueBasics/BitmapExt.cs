@@ -101,21 +101,16 @@ namespace BlueBasics {
             var b = Math.Max(brightness, 0.001f);
             ColorMatrix cm = new(new[]
             {
-            new[] {b, 0, 0, 0, 0},
-            new[] {0, b, 0, 0, 0},
-            new[] {0, 0, b, 0, 0},
-            new[] {0, 0, 0, 1f, 0},
-            new[] {0, 0, 0, 0, 1f}
-                });
+                new[] {b, 0, 0, 0, 0}, new[] {0, b, 0, 0, 0}, new[] {0, 0, b, 0, 0}, new[] {0, 0, 0, 1f, 0},
+                new[] {0, 0, 0, 0, 1f}
+            });
             ImageAttributes attributes = new();
             attributes.SetColorMatrix(cm);
             // Draw the image onto the new bitmap while applying
             // the new ColorMatrix.
             Point[] points =
             {
-        new(0, 0),
-        new(image.Width, 0),
-        new(0, image.Height)
+                new(0, 0), new(image.Width, 0), new(0, image.Height)
             };
             Rectangle rect = new(0, 0, image.Width, image.Height);
             // Make the result bitmap.
@@ -296,14 +291,16 @@ namespace BlueBasics {
             return bmp2;
         }
 
-        public static void FillCircle(Bitmap? bMp, Color c, int x, int y, int r) {
+        public static void FillCircle(Bitmap? bmp, Color c, int x, int y, int r) {
+            if (bmp == null) { return; }
+
             for (var adx = -r; adx <= r; adx++) {
                 for (var ady = -r; ady <= r; ady++) {
                     var d = Math.Sqrt(Convert.ToDouble((adx * adx) + (ady * ady))) - 0.5;
                     var px = x + adx;
                     var py = y + ady;
-                    if (px >= 0 && py >= 0 && px < bMp.Width && py < bMp.Height && d <= r) {
-                        bMp.SetPixel(px, py, c);
+                    if (px >= 0 && py >= 0 && px < bmp.Width && py < bmp.Height && d <= r) {
+                        bmp.SetPixel(px, py, c);
                     }
                 }
             }
@@ -412,15 +409,11 @@ namespace BlueBasics {
         public static Bitmap Grayscale(Bitmap original) {
             Bitmap newBitmap = new(original.Width, original.Height);
             var g = Graphics.FromImage(newBitmap);
-            ColorMatrix colorMatrix = new(
-               new[]
-               {
-                   new[] {.3f, .3f, .3f, 0, 0},
-                   new[] {.59f, .59f, .59f, 0, 0},
-                   new[] {.11f, .11f, .11f, 0, 0},
-                   new float[] {0, 0, 0, 1, 0},
-                   new float[] {0, 0, 0, 0, 1}
-               });
+            ColorMatrix colorMatrix = new(new[]
+            {
+                new[] {.3f, .3f, .3f, 0, 0}, new[] {.59f, .59f, .59f, 0, 0}, new[] {.11f, .11f, .11f, 0, 0},
+                new float[] {0, 0, 0, 1, 0}, new float[] {0, 0, 0, 0, 1}
+            });
             ImageAttributes attributes = new();
             attributes.SetColorMatrix(colorMatrix);
             g.DrawImage(original, new Rectangle(0, 0, original.Width, original.Height), 0, 0, original.Width, original.Height, GraphicsUnit.Pixel, attributes);
@@ -545,9 +538,7 @@ namespace BlueBasics {
             return resultBitmap;
         }
 
-        public static implicit operator Bitmap?(BitmapExt? p) {
-            return p?._bitmap;
-        }
+        public static implicit operator Bitmap?(BitmapExt? p) => p?._bitmap;
 
         public static void IntensifyBitmap(ref Bitmap bMp) {
             for (var x = 0; x < bMp.Width; x++) {
@@ -592,11 +583,8 @@ namespace BlueBasics {
             // create the negative color matrix
             ColorMatrix colorMatrix = new(new[]
             {
-                new float[] {-1, 0, 0, 0, 0},
-                new float[] {0, -1, 0, 0, 0},
-                new float[] {0, 0, -1, 0, 0},
-                new float[] {0, 0, 0, 1, 0},
-                new float[] {1, 1, 1, 0, 1}
+                new float[] {-1, 0, 0, 0, 0}, new float[] {0, -1, 0, 0, 0}, new float[] {0, 0, -1, 0, 0},
+                new float[] {0, 0, 0, 1, 0}, new float[] {1, 1, 1, 0, 1}
             });
             // create some image attributes
             ImageAttributes attributes = new();
@@ -679,7 +667,9 @@ namespace BlueBasics {
             return resultBitmap;
         }
 
-        public static unsafe Bitmap ReplaceColor(Bitmap? source, Color toReplace, Color replacement) {
+        public static unsafe Bitmap? ReplaceColor(Bitmap? source, Color toReplace, Color replacement) {
+            if (source == null) { return null; }
+
             // https://stackoverflow.com/questions/17208254/how-to-change-pixel-color-of-an-image-in-c-net
             const int pixelSize = 4; // 32 bits per pixel
             Bitmap target = new(source.Width, source.Height, PixelFormat.Format32bppArgb);
@@ -810,10 +800,8 @@ namespace BlueBasics {
             // ColorMatrix erstellen
             ColorMatrix matrix = new(new[]
             {
-                new[] {1 + contrast, 0, 0, 0, 0},
-                new[] {0, 1 + contrast, 0, 0, 0},
-                new[] {0, 0, 1 + contrast, 0, 0},
-                new float[] {0, 0, 0, 1, 0},
+                new[] {1 + contrast, 0, 0, 0, 0}, new[] {0, 1 + contrast, 0, 0, 0},
+                new[] {0, 0, 1 + contrast, 0, 0}, new float[] {0, 0, 0, 1, 0},
                 new[] {brightness + diff, brightness + diff, brightness + diff, 0, 1}
             });
             // Neue Bitmap erstellen
@@ -838,7 +826,8 @@ namespace BlueBasics {
             List<Bitmap?> l = new();
             var frames = 1;
             try {
-                TiffBitmapDecoder decoder = new(imageStreamSource, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
+                TiffBitmapDecoder decoder = new(imageStreamSource,
+                    BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
                 frames = decoder.Frames.Count;
                 l.AddRange(decoder.Frames.Select(frame => GetBitmap(frame, maxSize)));
             } catch {

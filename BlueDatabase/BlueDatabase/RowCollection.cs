@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
@@ -202,8 +204,9 @@ namespace BlueDatabase {
         /// <param name="filter"></param>
         /// <param name="pinnedRows"></param>
         /// <returns></returns>
-        public List<RowItem?> CalculateFilteredRows(List<FilterItem>? filter) {
-            List<RowItem?> tmpVisibleRows = new();
+        public List<RowItem> CalculateFilteredRows(List<FilterItem>? filter) {
+            List<RowItem> tmpVisibleRows = new();
+            if (Database == null) { return tmpVisibleRows; }
 
             try {
                 var lockMe = new object();
@@ -308,9 +311,9 @@ namespace BlueDatabase {
         /// <param name="filter"></param>
         /// <param name="pinnedRows"></param>
         /// <returns></returns>
-        public List<RowItem?> CalculateVisibleRows(List<FilterItem>? filter, List<RowItem?> pinnedRows) {
-            List<RowItem?> tmpVisibleRows = new();
-            if (pinnedRows == null) { pinnedRows = new List<RowItem?>(); }
+        public List<RowItem> CalculateVisibleRows(List<FilterItem>? filter, List<RowItem>? pinnedRows) {
+            List<RowItem> tmpVisibleRows = new();
+            if (pinnedRows == null) { pinnedRows = new List<RowItem>(); }
 
             var lockMe = new object();
             Parallel.ForEach(Database.Row, thisRowItem => {

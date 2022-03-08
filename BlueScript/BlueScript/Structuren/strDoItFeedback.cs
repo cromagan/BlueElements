@@ -55,7 +55,8 @@ namespace BlueScript.Structuren {
 
         #region Methods
 
-        public static DoItFeedback AttributFehler(Method method, SplittedAttributesFeedback f) => new(f.ErrorMessage + " > " + method.Syntax);
+        public static DoItFeedback AttributFehler(Method method, SplittedAttributesFeedback f) =>
+            new(f.ErrorMessage + " > " + method.Syntax);
 
         public static DoItFeedback Falsch() => new("false", enVariableDataType.Bool);
 

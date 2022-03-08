@@ -266,7 +266,7 @@ namespace BlueDatabase {
             if (bildTextverhalten == enBildTextVerhalten.Nur_Bild) { replacedText = ValueReadable(column, originalText, style, enBildTextVerhalten.Nur_Text, true); }
             if (string.IsNullOrEmpty(replacedText)) { return null; }
 
-            var gr = Math.Truncate(column.Database.GlobalScale * 16).ToString();
+            var gr = Math.Truncate(column.Database.GlobalScale * 16).ToString(Constants.Format_Integer1);
             if (!string.IsNullOrEmpty(column.BildCode_ConstantHeight)) { gr = column.BildCode_ConstantHeight; }
 
             if (replacedText.Contains("|")) {

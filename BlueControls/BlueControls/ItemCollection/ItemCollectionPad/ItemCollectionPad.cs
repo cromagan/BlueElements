@@ -21,7 +21,6 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using System;
@@ -31,6 +30,8 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Windows.Forms;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollection {
 
@@ -53,7 +54,7 @@ namespace BlueControls.ItemCollection {
 
         private float _gridShow = 10;
         private float _gridsnap = 1;
-        private System.Windows.Forms.Padding _randinMm = System.Windows.Forms.Padding.Empty;
+        private Padding _randinMm = Padding.Empty;
         private SizeF _sheetSizeInMm = SizeF.Empty;
         private RowItem? _sheetStyle;
         private float _sheetStyleScale;
@@ -66,7 +67,7 @@ namespace BlueControls.ItemCollection {
         public ItemCollectionPad() : base() {
             if (Skin.StyleDb == null) { Skin.InitStyles(); }
             SheetSizeInMm = Size.Empty;
-            RandinMm = System.Windows.Forms.Padding.Empty;
+            RandinMm = Padding.Empty;
             Caption = "";
             _idCount++;
             Id = "#" + DateTime.UtcNow.ToString(Constants.Format_Date) + _idCount; // # ist die erkennung, dass es kein Dateiname sondern ein Item ist
@@ -211,10 +212,10 @@ namespace BlueControls.ItemCollection {
         [DefaultValue(true)]
         public bool IsSaved { get; set; }
 
-        public System.Windows.Forms.Padding RandinMm {
+        public Padding RandinMm {
             get => _randinMm;
             set {
-                _randinMm = new System.Windows.Forms.Padding(Math.Max(0, value.Left), Math.Max(0, value.Top), Math.Max(0, value.Right), Math.Max(0, value.Bottom));
+                _randinMm = new Padding(Math.Max(0, value.Left), Math.Max(0, value.Top), Math.Max(0, value.Right), Math.Max(0, value.Bottom));
                 GenPoints();
             }
         }
@@ -500,8 +501,8 @@ namespace BlueControls.ItemCollection {
 
                 if (SheetSizeInMm.Width > 0 && SheetSizeInMm.Height > 0) {
                     //Skin.Draw_Back(gr, enDesign.Table_And_Pad, state, DisplayRectangle, this, true);
-                    var ssw = (float)Math.Round(Converter.mmToPixel(SheetSizeInMm.Width, Dpi), 1);
-                    var ssh = (float)Math.Round(Converter.mmToPixel(SheetSizeInMm.Height, Dpi), 1);
+                    var ssw = (float)Math.Round(Converter.MmToPixel(SheetSizeInMm.Width, Dpi), 1);
+                    var ssh = (float)Math.Round(Converter.MmToPixel(SheetSizeInMm.Height, Dpi), 1);
                     var lo = new PointM(0f, 0f).ZoomAndMove(zoom, shiftX, shiftY);
                     var ru = new PointM(ssw, ssh).ZoomAndMove(zoom, shiftX, shiftY);
 
@@ -513,7 +514,8 @@ namespace BlueControls.ItemCollection {
                     if (!showinprintmode) {
                         var rLo = new PointM(PRLo.X, PRLo.Y).ZoomAndMove(zoom, shiftX, shiftY);
                         var rRu = new PointM(PRRu.X, PRRu.Y).ZoomAndMove(zoom, shiftX, shiftY);
-                        Rectangle rr = new((int)rLo.X, (int)rLo.Y, (int)(rRu.X - rLo.X), (int)(rRu.Y - rLo.Y));
+                        Rectangle rr = new((int)rLo.X, (int)rLo.Y, (int)(rRu.X - rLo.X),
+                            (int)(rRu.Y - rLo.Y));
                         gr.DrawRectangle(ZoomPad.PenGray, rr);
                     }
                 } else {
@@ -528,7 +530,7 @@ namespace BlueControls.ItemCollection {
 
                 if (_gridShow > 0.1) {
                     var po = new PointM(0, 0).ZoomAndMove(zoom, shiftX, shiftY);
-                    var mo = Converter.mmToPixel(_gridShow, Dpi) * zoom;
+                    var mo = Converter.MmToPixel(_gridShow, Dpi) * zoom;
 
                     var p = new Pen(Color.FromArgb(10, 0, 0, 0));
                     float ex = 0;
@@ -597,8 +599,8 @@ namespace BlueControls.ItemCollection {
             if (SheetSizeInMm.Width > 0 && SheetSizeInMm.Height > 0) {
                 var x1 = Math.Min(r.Left, 0);
                 var y1 = Math.Min(r.Top, 0);
-                var x2 = Math.Max(r.Right, Converter.mmToPixel(SheetSizeInMm.Width, Dpi));
-                var y2 = Math.Max(r.Bottom, Converter.mmToPixel(SheetSizeInMm.Height, Dpi));
+                var x2 = Math.Max(r.Right, Converter.MmToPixel(SheetSizeInMm.Width, Dpi));
+                var y2 = Math.Max(r.Bottom, Converter.MmToPixel(SheetSizeInMm.Height, Dpi));
                 return new RectangleF(x1, y1, x2 - x1, y2 - y1);
             }
             return r;
@@ -652,12 +654,12 @@ namespace BlueControls.ItemCollection {
                 PRRu = new PointM(this, "Druckbereich RU", 0, 0);
                 PRLu = new PointM(this, "Druckbereich LU", 0, 0);
             }
-            var ssw = (float)Math.Round(Converter.mmToPixel(_sheetSizeInMm.Width, Dpi), 1);
-            var ssh = (float)Math.Round(Converter.mmToPixel(_sheetSizeInMm.Height, Dpi), 1);
-            var rr = (float)Math.Round(Converter.mmToPixel(_randinMm.Right, Dpi), 1);
-            var rl = (float)Math.Round(Converter.mmToPixel(_randinMm.Left, Dpi), 1);
-            var ro = (float)Math.Round(Converter.mmToPixel(_randinMm.Top, Dpi), 1);
-            var ru = (float)Math.Round(Converter.mmToPixel(_randinMm.Bottom, Dpi), 1);
+            var ssw = (float)Math.Round(Converter.MmToPixel(_sheetSizeInMm.Width, Dpi), 1);
+            var ssh = (float)Math.Round(Converter.MmToPixel(_sheetSizeInMm.Height, Dpi), 1);
+            var rr = (float)Math.Round(Converter.MmToPixel(_randinMm.Right, Dpi), 1);
+            var rl = (float)Math.Round(Converter.MmToPixel(_randinMm.Left, Dpi), 1);
+            var ro = (float)Math.Round(Converter.MmToPixel(_randinMm.Top, Dpi), 1);
+            var ru = (float)Math.Round(Converter.MmToPixel(_randinMm.Bottom, Dpi), 1);
             PRLo.SetTo(rl, ro);
             PRRo.SetTo(ssw - rr, ro);
             PRRu.SetTo(ssw - rr, ssh - ru);

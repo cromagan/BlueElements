@@ -56,7 +56,7 @@ namespace BlueControls.ItemCollection {
         #region Methods
 
         public override List<FlexiControl> GetStyleOptions() {
-            ItemCollectionList comms = new()
+            ItemCollectionList.ItemCollectionList comms = new()
             {
                 { "Ohne", ((int)enSymbol.Ohne).ToString(), QuickImage.Get("Datei|32") },
                 { "Rechteck", ((int)enSymbol.Rechteck).ToString(), QuickImage.Get("Stop|32") },

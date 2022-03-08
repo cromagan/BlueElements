@@ -42,7 +42,7 @@ namespace BlueScript {
         public string Feedback = string.Empty;
 
         internal readonly List<Bitmap> BitmapCache;
-        internal Method_BerechneVariable? _berechneVariable; // Paralellisierung löscht ab und zu die Variable
+        internal Method_BerechneVariable? BerechneVariable; // Paralellisierung löscht ab und zu die Variable
         private string _error = string.Empty;
         private string _errorCode = string.Empty;
 
@@ -85,7 +85,7 @@ namespace BlueScript {
                 Comands = GetEnumerableOfType<Method>();
             }
             Variablen = variablen;
-            BitmapCache = new List<Bitmap?>();
+            BitmapCache = new List<Bitmap>();
         }
 
         #endregion
@@ -216,13 +216,13 @@ namespace BlueScript {
             Sub = 0;
             Feedback = string.Empty;
 
-            _berechneVariable = null;
+            BerechneVariable = null;
 
             foreach (var thisC in Comands) {
-                if (thisC is Method_BerechneVariable bv) { _berechneVariable = bv; }
+                if (thisC is Method_BerechneVariable bv) { BerechneVariable = bv; }
             }
 
-            if (_berechneVariable == null) {
+            if (BerechneVariable == null) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Method_BerechneVariable ist nicht definiet.");
             }
 

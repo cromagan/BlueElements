@@ -15,23 +15,23 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
+using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
-using System.Drawing;
 
-namespace BlueControls.ItemCollection {
+namespace BlueControls.ItemCollection.ItemCollectionList {
 
     public class TextListItem : BasicListItem {
 
         #region Constructors
 
-        public TextListItem(string readableText, string internalname, QuickImage? symbol, bool isCaption, bool enabled, string userDefCompareKey) : base(internalname) {
+        public TextListItem(string readableText, string internalname, QuickImage? symbol, bool isCaption, bool enabled, string userDefCompareKey) : base(internalname, enabled) {
             IsCaption = isCaption;
             Text = readableText;
             Symbol = symbol;
-            _Enabled = enabled;
-            //_Format = format;
             UserDefCompareKey = userDefCompareKey;
         }
 
@@ -49,28 +49,28 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        public override object Clone() => new TextListItem(Text, Internal, Symbol, IsCaption, _Enabled, UserDefCompareKey);
+        public override object Clone() => new TextListItem(Text, Internal, Symbol, IsCaption, Enabled, UserDefCompareKey);
 
-        public override bool FilterMatch(string FilterText) => base.FilterMatch(FilterText) || Text.ToUpper().Contains(FilterText.ToUpper());
+        public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Text.ToUpper().Contains(filterText.ToUpper());
 
         public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => SizeUntouchedForListBox().Height;
 
-        protected override Size ComputeSizeUntouchedForListBox() => Skin.FormatedText_NeededSize(Text, Symbol, Skin.GetBlueFont(tempDesign(Parent.ItemDesign), enStates.Standard), 16);
+        protected override Size ComputeSizeUntouchedForListBox() => Skin.FormatedText_NeededSize(Text, Symbol, Skin.GetBlueFont(TempDesign(Parent.ItemDesign), enStates.Standard), 16);
 
-        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign design, enStates vState, bool DrawBorderAndBack, bool Translate) {
-            var tmpd = tempDesign(design);
-            if (DrawBorderAndBack) {
-                Skin.Draw_Back(GR, tmpd, vState, PositionModified, null, false);
+        protected override void DrawExplicit(Graphics gr, Rectangle positionModified, enDesign design, enStates vState, bool drawBorderAndBack, bool translate) {
+            var tmpd = TempDesign(design);
+            if (drawBorderAndBack) {
+                Skin.Draw_Back(gr, tmpd, vState, positionModified, null, false);
             }
-            Skin.Draw_FormatedText(GR, Text, tmpd, vState, Symbol, enAlignment.VerticalCenter_Left, PositionModified, null, false, Translate);
-            if (DrawBorderAndBack) {
-                Skin.Draw_Border(GR, tmpd, vState, PositionModified);
+            Skin.Draw_FormatedText(gr, Text, tmpd, vState, Symbol, enAlignment.VerticalCenter_Left, positionModified, null, false, translate);
+            if (drawBorderAndBack) {
+                Skin.Draw_Border(gr, tmpd, vState, positionModified);
             }
         }
 
         protected override string GetCompareKey() => Internal.CompareKey(enSortierTyp.Sprachneutral_String);
 
-        private enDesign tempDesign(enDesign itemdesign) {
+        private enDesign TempDesign(enDesign itemdesign) {
             if (IsCaption) {
                 switch (itemdesign) {
                     case enDesign.Item_KontextMenu:

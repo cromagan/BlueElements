@@ -97,7 +97,8 @@ namespace BlueControls.ItemCollection {
 
         // Check if polygon A is going to collide with polygon B for the given velocity
         public static StrPolygonCollisionResult PolygonCollision(AbstractPhysicPadItem polygonA, AbstractPhysicPadItem polygonB, PointM? velocity) {
-            StrPolygonCollisionResult result = new() {
+            StrPolygonCollisionResult result = new()
+            {
                 CheckedObjectA = polygonA,
                 CheckedObjectB = polygonB,
                 Intersect = true,

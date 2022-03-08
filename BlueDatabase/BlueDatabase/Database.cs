@@ -486,7 +486,7 @@ namespace BlueDatabase {
         /// <param name="column">Die Spalte, die zurückgegeben wird.</param>
         /// <param name="sortedRows">Die Zeilen, die zurückgegeben werden. NULL gibt alle Zeilen zurück.</param>
         /// <returns></returns>
-        public string Export_CSV(enFirstRow firstRow, ColumnItem? column, List<RowData?> sortedRows) =>
+        public string Export_CSV(enFirstRow firstRow, ColumnItem? column, List<RowData>? sortedRows) =>
             //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
             Export_CSV(firstRow, new List<ColumnItem> { column }, sortedRows);
 
@@ -1298,7 +1298,7 @@ namespace BlueDatabase {
                 SaveToByteList(l, enDatabaseDataType.Tags, Tags.JoinWithCr());
                 SaveToByteList(l, enDatabaseDataType.PermissionGroups_NewRow, PermissionGroupsNewRow.JoinWithCr());
                 SaveToByteList(l, enDatabaseDataType.DatenbankAdmin, DatenbankAdmin.JoinWithCr());
-                SaveToByteList(l, enDatabaseDataType.GlobalScale, _globalScale.ToString());
+                SaveToByteList(l, enDatabaseDataType.GlobalScale, _globalScale.ToString(Constants.Format_Float1));
                 SaveToByteList(l, enDatabaseDataType.Ansicht, ((int)_ansicht).ToString());
                 SaveToByteList(l, enDatabaseDataType.ReloadDelaySecond, base.ReloadDelaySecond.ToString());
                 //SaveToByteList(l, enDatabaseDataType.ImportScript, _ImportScript);

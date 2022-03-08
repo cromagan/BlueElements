@@ -18,8 +18,8 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
-using BlueControls.ItemCollection;
 using System.Collections.Generic;
+using BlueControls.ItemCollection.ItemCollectionList;
 
 namespace BlueControls.Forms {
 
@@ -27,7 +27,7 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private List<string> _giveBack;
+        private List<string>? _giveBack;
 
         #endregion
 
@@ -54,7 +54,7 @@ namespace BlueControls.Forms {
 
         #region Methods
 
-        public static string Show(string txt, List<string> items) {
+        public static string Show(string txt, List<string>? items) {
             if (items == null || items.Count == 0) {
                 return InputBox.Show(txt, "", enVarType.Text);
             }
@@ -67,7 +67,7 @@ namespace BlueControls.Forms {
             return erg is null || erg.Count != 1 ? string.Empty : erg[0];
         }
 
-        public static List<string> Show(string txt, ItemCollectionList? items, enAddType addNewAllowed, bool cancelErl) {
+        public static List<string>? Show(string txt, ItemCollectionList? items, enAddType addNewAllowed, bool cancelErl) {
             InputBoxListBoxStyle mb = new(txt, items, addNewAllowed, cancelErl);
             mb.ShowDialog();
             return mb._giveBack;

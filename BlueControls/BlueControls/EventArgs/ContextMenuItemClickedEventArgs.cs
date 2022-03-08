@@ -23,9 +23,9 @@ namespace BlueControls.EventArgs {
 
         #region Constructors
 
-        public ContextMenuItemClickedEventArgs(string clickedComand, object hotItem, List<string> tags) {
+        public ContextMenuItemClickedEventArgs(string clickedComand, object hotItem, List<string>? tags) {
             HotItem = hotItem;
-            Tags = tags;
+            Tags = tags ?? new List<string>();
             ClickedComand = clickedComand;
         }
 

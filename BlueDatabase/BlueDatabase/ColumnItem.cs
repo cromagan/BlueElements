@@ -103,7 +103,10 @@ namespace BlueDatabase {
         private long _linkedCellRowKeyIsInColumn;
 
         private string _linkedDatabaseFile;
+
+        [Obsolete]
         private string _linkedKeyKennung;
+
         private bool _multiLine;
         private string _name;
         private string _prefix;
@@ -239,7 +242,7 @@ namespace BlueDatabase {
             get => _additionalCheck;
             set {
                 if (_additionalCheck == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_AdditionalCheck, this, ((int)_additionalCheck).ToString(), ((int)value).ToString(), true);
+                Database?.AddPending(enDatabaseDataType.co_AdditionalCheck, this, ((int)_additionalCheck).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
         }
@@ -248,7 +251,7 @@ namespace BlueDatabase {
             get => _adminInfo;
             set {
                 if (_adminInfo == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_AdminInfo, this, _adminInfo, value, true);
+                Database?.AddPending(enDatabaseDataType.co_AdminInfo, this, _adminInfo, value, true);
                 OnChanged();
             }
         }
@@ -257,7 +260,7 @@ namespace BlueDatabase {
             get => _afterEditAutoCorrect;
             set {
                 if (_afterEditAutoCorrect == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_AfterEdit_AutoCorrect, this, _afterEditAutoCorrect.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(enDatabaseDataType.co_AfterEdit_AutoCorrect, this, _afterEditAutoCorrect.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
@@ -266,7 +269,7 @@ namespace BlueDatabase {
             get => _afterEditDoUCase;
             set {
                 if (_afterEditDoUCase == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_AfterEdit_DoUcase, this, _afterEditDoUCase.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(enDatabaseDataType.co_AfterEdit_DoUcase, this, _afterEditDoUCase.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
@@ -275,7 +278,7 @@ namespace BlueDatabase {
             get => _multiLine && _afterEditQuickSortRemoveDouble;
             set {
                 if (_afterEditQuickSortRemoveDouble == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_AfterEdit_QuickSortAndRemoveDouble, this, _afterEditQuickSortRemoveDouble.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(enDatabaseDataType.co_AfterEdit_QuickSortAndRemoveDouble, this, _afterEditQuickSortRemoveDouble.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
@@ -284,7 +287,7 @@ namespace BlueDatabase {
             get => _afterEditRunden;
             set {
                 if (_afterEditRunden == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_AfterEdit_Runden, this, _afterEditRunden.ToString(), value.ToString(), true);
+                Database?.AddPending(enDatabaseDataType.co_AfterEdit_Runden, this, _afterEditRunden.ToString(), value.ToString(), true);
                 OnChanged();
             }
         }
@@ -293,7 +296,7 @@ namespace BlueDatabase {
             get => _align;
             set {
                 if (_align == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_Align, this, ((int)_align).ToString(), ((int)value).ToString(), true);
+                Database?.AddPending(enDatabaseDataType.co_Align, this, ((int)_align).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
         }
@@ -302,7 +305,7 @@ namespace BlueDatabase {
             get => _allowedChars;
             set {
                 if (_allowedChars == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_AllowedChars, this, _allowedChars, value, true);
+                Database?.AddPending(enDatabaseDataType.co_AllowedChars, this, _allowedChars, value, true);
                 OnChanged();
             }
         }
@@ -313,7 +316,7 @@ namespace BlueDatabase {
             get => _autoFilterJoker;
             set {
                 if (_autoFilterJoker == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_AutoFilterJoker, this, _autoFilterJoker, value, true);
+                Database?.AddPending(enDatabaseDataType.co_AutoFilterJoker, this, _autoFilterJoker, value, true);
                 OnChanged();
             }
         }
@@ -322,7 +325,7 @@ namespace BlueDatabase {
             get => _autoRemove;
             set {
                 if (_autoRemove == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_AutoRemove, this, _autoRemove, value, true);
+                Database?.AddPending(enDatabaseDataType.co_AutoRemove, this, _autoRemove, value, true);
                 OnChanged();
             }
         }
@@ -331,7 +334,7 @@ namespace BlueDatabase {
             get => _backColor;
             set {
                 if (_backColor.ToArgb() == value.ToArgb()) { return; }
-                Database.AddPending(enDatabaseDataType.co_BackColor, this, _backColor.ToArgb().ToString(), value.ToArgb().ToString(), true);
+                Database?.AddPending(enDatabaseDataType.co_BackColor, this, _backColor.ToArgb().ToString(), value.ToArgb().ToString(), true);
                 OnChanged();
             }
         }
@@ -340,7 +343,7 @@ namespace BlueDatabase {
             get => _bestFileStandardFolder;
             set {
                 if (_bestFileStandardFolder == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_BestFile_StandardFolder, this, _bestFileStandardFolder, value, true);
+                Database?.AddPending(enDatabaseDataType.co_BestFile_StandardFolder, this, _bestFileStandardFolder, value, true);
                 OnChanged();
             }
         }
@@ -349,7 +352,7 @@ namespace BlueDatabase {
             get => _bestFileStandardSuffix;
             set {
                 if (_bestFileStandardSuffix == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_BestFile_StandardSuffix, this, _bestFileStandardSuffix, value, true);
+                Database?.AddPending(enDatabaseDataType.co_BestFile_StandardSuffix, this, _bestFileStandardSuffix, value, true);
                 OnChanged();
             }
         }
@@ -358,7 +361,7 @@ namespace BlueDatabase {
             get => _bildCodeConstantHeight;
             set {
                 if (_bildCodeConstantHeight == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_BildCode_ConstantHeight, this, _bildCodeConstantHeight, value, true);
+                Database?.AddPending(enDatabaseDataType.co_BildCode_ConstantHeight, this, _bildCodeConstantHeight, value, true);
                 Invalidate_ColumAndContent();
                 OnChanged();
             }
@@ -368,7 +371,7 @@ namespace BlueDatabase {
             get => _bildTextVerhalten;
             set {
                 if (_bildTextVerhalten == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_BildTextVerhalten, this, ((int)_bildTextVerhalten).ToString(), ((int)value).ToString(), true);
+                Database?.AddPending(enDatabaseDataType.co_BildTextVerhalten, this, ((int)_bildTextVerhalten).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
         }
@@ -378,7 +381,7 @@ namespace BlueDatabase {
             set {
                 value = value.Replace("<br>", "\r", RegexOptions.IgnoreCase);
                 if (_caption == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_Caption, this, _caption, value, true);
+                Database?.AddPending(enDatabaseDataType.co_Caption, this, _caption, value, true);
                 Invalidate_TmpVariables();
                 OnChanged();
             }
@@ -388,7 +391,7 @@ namespace BlueDatabase {
             get => _captionBitmapTxt;
             set {
                 if (_captionBitmapTxt == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_CaptionBitmapTXT, this, _captionBitmapTxt, value, false);
+                Database?.AddPending(enDatabaseDataType.co_CaptionBitmapTXT, this, _captionBitmapTxt, value, false);
                 _captionBitmapTxt = value;
                 Invalidate_TmpVariables();
                 OnChanged();
@@ -399,12 +402,12 @@ namespace BlueDatabase {
             get => _cellInitValue;
             set {
                 if (_cellInitValue == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_CellInitValue, this, _cellInitValue, value, true);
+                Database?.AddPending(enDatabaseDataType.co_CellInitValue, this, _cellInitValue, value, true);
                 OnChanged();
             }
         }
 
-        public Database Database { get; private set; }
+        public Database? Database { get; private set; }
 
         //public string Intelligenter_Multifilter
         //{
@@ -424,7 +427,7 @@ namespace BlueDatabase {
             get => _dropdownAllesAbwählenErlaubt;
             set {
                 if (_dropdownAllesAbwählenErlaubt == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_DropdownAllesAbwählenErlaubt, this, _dropdownAllesAbwählenErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(enDatabaseDataType.co_DropdownAllesAbwählenErlaubt, this, _dropdownAllesAbwählenErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
@@ -433,7 +436,7 @@ namespace BlueDatabase {
             get => _dropdownBearbeitungErlaubt;
             set {
                 if (_dropdownBearbeitungErlaubt == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_DropdownBearbeitungErlaubt, this, _dropdownBearbeitungErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(enDatabaseDataType.co_DropdownBearbeitungErlaubt, this, _dropdownBearbeitungErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
@@ -455,7 +458,7 @@ namespace BlueDatabase {
             get => _dropDownKey;
             set {
                 if (_dropDownKey == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_DropDownKey, this, _dropDownKey.ToString(), value.ToString(), true);
+                Database?.AddPending(enDatabaseDataType.co_DropDownKey, this, _dropDownKey.ToString(), value.ToString(), true);
                 OnChanged();
             }
         }
@@ -464,7 +467,7 @@ namespace BlueDatabase {
             get => _dropdownWerteAndererZellenAnzeigen;
             set {
                 if (_dropdownWerteAndererZellenAnzeigen == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_DropdownWerteAndererZellenAnzeigen, this, _dropdownWerteAndererZellenAnzeigen.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(enDatabaseDataType.co_DropdownWerteAndererZellenAnzeigen, this, _dropdownWerteAndererZellenAnzeigen.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
@@ -473,7 +476,7 @@ namespace BlueDatabase {
             get => _editTrotzSperreErlaubt;
             set {
                 if (_editTrotzSperreErlaubt == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_EditTrotzSperreErlaubt, this, _editTrotzSperreErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(enDatabaseDataType.co_EditTrotzSperreErlaubt, this, _editTrotzSperreErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
@@ -482,7 +485,7 @@ namespace BlueDatabase {
             get => _editType;
             set {
                 if (_editType == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_EditType, this, ((int)_editType).ToString(), ((int)value).ToString(), true);
+                Database?.AddPending(enDatabaseDataType.co_EditType, this, ((int)_editType).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
         }
@@ -491,7 +494,7 @@ namespace BlueDatabase {
             get => _filterOptions;
             set {
                 if (_filterOptions == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_FilterOptions, this, ((int)_filterOptions).ToString(), ((int)value).ToString(), true);
+                Database?.AddPending(enDatabaseDataType.co_FilterOptions, this, ((int)_filterOptions).ToString(), ((int)value).ToString(), true);
                 Invalidate_TmpVariables();
                 OnChanged();
             }
@@ -501,7 +504,7 @@ namespace BlueDatabase {
             get => _foreColor;
             set {
                 if (_foreColor.ToArgb() == value.ToArgb()) { return; }
-                Database.AddPending(enDatabaseDataType.co_ForeColor, this, _foreColor.ToArgb().ToString(), value.ToArgb().ToString(), true);
+                Database?.AddPending(enDatabaseDataType.co_ForeColor, this, _foreColor.ToArgb().ToString(), value.ToArgb().ToString(), true);
                 OnChanged();
             }
         }
@@ -510,7 +513,7 @@ namespace BlueDatabase {
             get => _format;
             set {
                 if (_format == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_Format, this, ((int)_format).ToString(), ((int)value).ToString(), true);
+                Database?.AddPending(enDatabaseDataType.co_Format, this, ((int)_format).ToString(), ((int)value).ToString(), true);
                 Invalidate_ColumAndContent();
                 OnChanged();
             }
@@ -520,7 +523,7 @@ namespace BlueDatabase {
             get => _formatierungErlaubt;
             set {
                 if (_formatierungErlaubt == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_FormatierungErlaubt, this, _formatierungErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(enDatabaseDataType.co_FormatierungErlaubt, this, _formatierungErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
@@ -529,7 +532,7 @@ namespace BlueDatabase {
             get => _identifier;
             set {
                 if (_identifier == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_Identifier, this, _identifier, value, true);
+                Database?.AddPending(enDatabaseDataType.co_Identifier, this, _identifier, value, true);
                 OnChanged();
             }
         }
@@ -538,7 +541,7 @@ namespace BlueDatabase {
             get => !_format.Autofilter_möglich() || _ignoreAtRowFilter;
             set {
                 if (_ignoreAtRowFilter == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_BeiZeilenfilterIgnorieren, this, _ignoreAtRowFilter.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(enDatabaseDataType.co_BeiZeilenfilterIgnorieren, this, _ignoreAtRowFilter.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
@@ -552,10 +555,10 @@ namespace BlueDatabase {
             get => _keyColumnKey;
             set {
                 if (_keyColumnKey == value) { return; }
-                var c = Database.Column.SearchByKey(_keyColumnKey);
+                var c = Database?.Column.SearchByKey(_keyColumnKey);
                 c?.CheckIfIAmAKeyColumn();
-                Database.AddPending(enDatabaseDataType.co_KeyColumnKey, this, _keyColumnKey.ToString(), value.ToString(), true);
-                c = Database.Column.SearchByKey(_keyColumnKey);
+                Database?.AddPending(enDatabaseDataType.co_KeyColumnKey, this, _keyColumnKey.ToString(), value.ToString(), true);
+                c = Database?.Column.SearchByKey(_keyColumnKey);
                 c?.CheckIfIAmAKeyColumn();
                 OnChanged();
             }
@@ -565,7 +568,7 @@ namespace BlueDatabase {
             get => _lineLeft;
             set {
                 if (_lineLeft == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_LineLeft, this, ((int)_lineLeft).ToString(), ((int)value).ToString(), true);
+                Database?.AddPending(enDatabaseDataType.co_LineLeft, this, ((int)_lineLeft).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
         }
@@ -574,7 +577,7 @@ namespace BlueDatabase {
             get => _lineRight;
             set {
                 if (_lineRight == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_LinieRight, this, ((int)_lineRight).ToString(), ((int)value).ToString(), true);
+                Database?.AddPending(enDatabaseDataType.co_LinieRight, this, ((int)_lineRight).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
         }
@@ -586,7 +589,7 @@ namespace BlueDatabase {
             get => _linkedCellColumnKeyOfLinkedDatabase;
             set {
                 if (_linkedCellColumnKeyOfLinkedDatabase == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_LinkedCell_ColumnKeyOfLinkedDatabase, this, _linkedCellColumnKeyOfLinkedDatabase.ToString(), value.ToString(), true);
+                Database?.AddPending(enDatabaseDataType.co_LinkedCell_ColumnKeyOfLinkedDatabase, this, _linkedCellColumnKeyOfLinkedDatabase.ToString(), value.ToString(), true);
                 Invalidate_ColumAndContent();
                 OnChanged();
             }
@@ -596,11 +599,12 @@ namespace BlueDatabase {
         /// Die zu suchende Zeile ist in dieser Spalte zu finden.
         /// Ist der Wrt -9999 wird die Verknüpfung über das Script gesetzt.
         /// </summary>
+        [Obsolete]
         public long LinkedCell_RowKeyIsInColumn {
             get => _linkedCellRowKeyIsInColumn;
             set {
                 if (_linkedCellRowKeyIsInColumn == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_LinkedCell_RowKeyIsInColumn, this, _linkedCellRowKeyIsInColumn.ToString(), value.ToString(), true);
+                Database?.AddPending(enDatabaseDataType.co_LinkedCell_RowKeyIsInColumn, this, _linkedCellRowKeyIsInColumn.ToString(), value.ToString(), true);
                 Invalidate_ColumAndContent();
                 OnChanged();
             }
@@ -610,7 +614,7 @@ namespace BlueDatabase {
             get => _linkedDatabaseFile;
             set {
                 if (_linkedDatabaseFile == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_LinkedDatabase, this, _linkedDatabaseFile, value, true);
+                Database?.AddPending(enDatabaseDataType.co_LinkedDatabase, this, _linkedDatabaseFile, value, true);
                 Invalidate_TmpVariables();
                 OnChanged();
             }
@@ -621,7 +625,7 @@ namespace BlueDatabase {
             get => _linkedKeyKennung;
             set {
                 if (_linkedKeyKennung == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_LinkKeyKennung, this, _linkedKeyKennung, value, true);
+                Database?.AddPending(enDatabaseDataType.co_LinkKeyKennung, this, _linkedKeyKennung, value, true);
                 OnChanged();
             }
         }
@@ -631,7 +635,7 @@ namespace BlueDatabase {
             set {
                 if (!_format.MultilinePossible()) { value = false; }
                 if (_multiLine == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_MultiLine, this, _multiLine.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(enDatabaseDataType.co_MultiLine, this, _multiLine.ToPlusMinus(), value.ToPlusMinus(), true);
                 Invalidate_ColumAndContent();
                 OnChanged();
             }
@@ -642,11 +646,11 @@ namespace BlueDatabase {
             set {
                 value = value.ToUpper();
                 if (value == _name.ToUpper()) { return; }
-                if (Database.Column.Exists(value) != null) { return; }
+                if (Database?.Column.Exists(value) != null) { return; }
                 if (string.IsNullOrEmpty(value)) { return; }
                 var old = _name;
-                Database.AddPending(enDatabaseDataType.co_Name, this, _name, value, true);
-                Database.Column_NameChanged(old, this);
+                Database?.AddPending(enDatabaseDataType.co_Name, this, _name, value, true);
+                Database?.Column_NameChanged(old, this);
                 OnChanged();
             }
         }
@@ -655,7 +659,7 @@ namespace BlueDatabase {
             get => _prefix;
             set {
                 if (_prefix == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_Prefix, this, _prefix, value, true);
+                Database?.AddPending(enDatabaseDataType.co_Prefix, this, _prefix, value, true);
                 Invalidate_ColumAndContent();
                 OnChanged();
             }
@@ -665,7 +669,7 @@ namespace BlueDatabase {
             get => _quickInfo;
             set {
                 if (_quickInfo == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_QuickInfo, this, _quickInfo, value, true);
+                Database?.AddPending(enDatabaseDataType.co_QuickInfo, this, _quickInfo, value, true);
                 OnChanged();
             }
         }
@@ -674,7 +678,7 @@ namespace BlueDatabase {
             get => _regex;
             set {
                 if (_regex == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_Regex, this, _regex, value, true);
+                Database?.AddPending(enDatabaseDataType.co_Regex, this, _regex, value, true);
                 OnChanged();
             }
         }
@@ -683,7 +687,7 @@ namespace BlueDatabase {
             get => _saveContent;
             set {
                 if (_saveContent == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_SaveContent, this, _saveContent.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(enDatabaseDataType.co_SaveContent, this, _saveContent.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
@@ -692,7 +696,7 @@ namespace BlueDatabase {
             get => _scriptType;
             set {
                 if (_scriptType == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_ScriptType, this, ((int)_scriptType).ToString(), ((int)value).ToString(), true);
+                Database?.AddPending(enDatabaseDataType.co_ScriptType, this, ((int)_scriptType).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
         }
@@ -701,7 +705,7 @@ namespace BlueDatabase {
             get => _multiLine && _showMultiLineInOneLine;
             set {
                 if (_showMultiLineInOneLine == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_ShowMultiLineInOneLine, this, _showMultiLineInOneLine.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(enDatabaseDataType.co_ShowMultiLineInOneLine, this, _showMultiLineInOneLine.ToPlusMinus(), value.ToPlusMinus(), true);
                 Invalidate_ColumAndContent();
                 OnChanged();
             }
@@ -711,7 +715,7 @@ namespace BlueDatabase {
             get => _showUndo;
             set {
                 if (_showUndo == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_ShowUndo, this, _showUndo.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(enDatabaseDataType.co_ShowUndo, this, _showUndo.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
@@ -720,7 +724,7 @@ namespace BlueDatabase {
             get => _sortType;
             set {
                 if (_sortType == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_SortType, this, ((int)_sortType).ToString(), ((int)value).ToString(), true);
+                Database?.AddPending(enDatabaseDataType.co_SortType, this, ((int)_sortType).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
         }
@@ -729,7 +733,7 @@ namespace BlueDatabase {
             get => _spellCheckingEnabled;
             set {
                 if (_spellCheckingEnabled == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_SpellCheckingEnabled, this, _spellCheckingEnabled.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(enDatabaseDataType.co_SpellCheckingEnabled, this, _spellCheckingEnabled.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
@@ -741,17 +745,17 @@ namespace BlueDatabase {
             get => _suffix;
             set {
                 if (_suffix == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_Suffix, this, _suffix, value, true);
+                Database?.AddPending(enDatabaseDataType.co_Suffix, this, _suffix, value, true);
                 Invalidate_ColumAndContent();
                 OnChanged();
             }
         }
 
         public bool TextBearbeitungErlaubt {
-            get => Database.PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0 || _textBearbeitungErlaubt;
+            get => Database?.PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0 || _textBearbeitungErlaubt;
             set {
                 if (_textBearbeitungErlaubt == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_TextBearbeitungErlaubt, this, _textBearbeitungErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(enDatabaseDataType.co_TextBearbeitungErlaubt, this, _textBearbeitungErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
@@ -760,7 +764,7 @@ namespace BlueDatabase {
             get => _translate;
             set {
                 if (_translate == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_Translate, this, ((int)_translate).ToString(), ((int)value).ToString(), true);
+                Database?.AddPending(enDatabaseDataType.co_Translate, this, ((int)_translate).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
         }
@@ -769,7 +773,7 @@ namespace BlueDatabase {
             get => _ueberschrift1;
             set {
                 if (_ueberschrift1 == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_Ueberschrift1, this, _ueberschrift1, value, true);
+                Database?.AddPending(enDatabaseDataType.co_Ueberschrift1, this, _ueberschrift1, value, true);
                 OnChanged();
             }
         }
@@ -778,7 +782,7 @@ namespace BlueDatabase {
             get => _ueberschrift2;
             set {
                 if (_ueberschrift2 == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_Ueberschrift2, this, _ueberschrift2, value, true);
+                Database?.AddPending(enDatabaseDataType.co_Ueberschrift2, this, _ueberschrift2, value, true);
                 OnChanged();
             }
         }
@@ -787,7 +791,7 @@ namespace BlueDatabase {
             get => _ueberschrift3;
             set {
                 if (_ueberschrift3 == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_Ueberschrift3, this, _ueberschrift3, value, true);
+                Database?.AddPending(enDatabaseDataType.co_Ueberschrift3, this, _ueberschrift3, value, true);
                 OnChanged();
             }
         }
@@ -803,7 +807,7 @@ namespace BlueDatabase {
             get => _vorschlagsColumn;
             set {
                 if (_vorschlagsColumn == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_VorschlagColumn, this, _vorschlagsColumn.ToString(), value.ToString(), true);
+                Database?.AddPending(enDatabaseDataType.co_VorschlagColumn, this, _vorschlagsColumn.ToString(), value.ToString(), true);
                 OnChanged();
             }
         }
@@ -814,8 +818,6 @@ namespace BlueDatabase {
                 Invalidate_TmpVariables();
                 _tmpLinkedDatabase = value;
                 if (_tmpLinkedDatabase != null) {
-                    //_TMP_LinkedDatabase.RowKeyChanged += _TMP_LinkedDatabase_RowKeyChanged;
-                    //_TMP_LinkedDatabase.ColumnKeyChanged += _TMP_LinkedDatabase_ColumnKeyChanged;
                     _tmpLinkedDatabase.ConnectedControlsStopAllWorking += _TMP_LinkedDatabase_ConnectedControlsStopAllWorking;
                     _tmpLinkedDatabase.Cell.CellValueChanged += _TMP_LinkedDatabase_Cell_CellValueChanged;
                     _tmpLinkedDatabase.Disposing += _TMP_LinkedDatabase_Disposing;
@@ -1284,9 +1286,9 @@ namespace BlueDatabase {
         //}
         public void GetUniques(List<RowItem?> rows, out List<string>? einzigartig, out List<string?>? nichtEinzigartig) {
             einzigartig = new List<string>();
-            nichtEinzigartig = new List<string>();
+            nichtEinzigartig = new List<string?>();
             foreach (var thisRow in rows) {
-                var tmp = MultiLine ? thisRow.CellGetList(this) : new List<string> { thisRow.CellGetString(this) };
+                var tmp = MultiLine ? thisRow.CellGetList(this) : new List<string?> { thisRow.CellGetString(this) };
                 foreach (var thisString in tmp) {
                     if (einzigartig.Contains(thisString)) {
                         nichtEinzigartig.AddIfNotExists(thisString);
@@ -1900,14 +1902,14 @@ namespace BlueDatabase {
             }
             var tmpfile = fullFileName.FileNameWithoutSuffix();
             if (string.Equals(tmpfile, fullFileName, StringComparison.CurrentCultureIgnoreCase)) { return tmpfile; }
-            if (BestFile(tmpfile, false).ToLower() == fullFileName.ToLower()) { return tmpfile; }
+            if (string.Equals(BestFile(tmpfile, false), fullFileName, StringComparison.CurrentCultureIgnoreCase)) { return tmpfile; }
             tmpfile = fullFileName.FileNameWithSuffix();
             return string.Equals(tmpfile, fullFileName, StringComparison.CurrentCultureIgnoreCase)
                 ? tmpfile
                 : string.Equals(BestFile(tmpfile, false), fullFileName, StringComparison.CurrentCultureIgnoreCase) ? tmpfile : fullFileName;
         }
 
-        public void Statisik(List<FilterItem>? filter, List<RowItem?> pinnedRows) {
+        public void Statisik(List<FilterItem>? filter, List<RowItem>? pinnedRows) {
             var r = Database.Row.CalculateVisibleRows(filter, pinnedRows);
 
             if (r == null || r.Count < 1) { return; }

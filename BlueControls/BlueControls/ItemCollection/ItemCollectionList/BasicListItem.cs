@@ -15,25 +15,25 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Enums;
 
-namespace BlueControls.ItemCollection {
+namespace BlueControls.ItemCollection.ItemCollectionList {
 
     public static class BasicListItemExtensions {
 
         #region Methods
 
-        public static List<string> ToListOfString(this List<BasicListItem> Items) {
+        public static List<string> ToListOfString(this List<BasicListItem> items) {
             List<string> w = new();
-            if (Items == null) { return w; }
+            if (items == null) { return w; }
 
-            w.AddRange(from ThisItem in Items where ThisItem != null where !string.IsNullOrEmpty(ThisItem.Internal) select ThisItem.Internal);
+            w.AddRange(from thisItem in items where thisItem != null where !string.IsNullOrEmpty(thisItem.Internal) select thisItem.Internal);
             return w;
         }
 
@@ -53,28 +53,29 @@ namespace BlueControls.ItemCollection {
         public object Tag;
 
         /// <summary>
-        /// Ist das Item enabled?
-        /// </summary>
-        /// <remarks></remarks>
-        protected bool _Enabled = true;
-
-        /// <summary>
         /// Ist das Item markiert/selektiert?
         /// </summary>
         /// <remarks></remarks>
-        private bool _Checked;
+        private bool _checked;
 
-        private ItemCollectionList? _Parent;
-        private Size _SizeUntouchedForListBox = Size.Empty;
+        /// <summary>
+        /// Ist das Item enabled?
+        /// </summary>
+        /// <remarks></remarks>
+        private bool _enabled;
+
+        private ItemCollectionList? _parent;
+        private Size _sizeUntouchedForListBox = Size.Empty;
 
         #endregion
 
         #region Constructors
 
-        protected BasicListItem(string internalname) {
+        protected BasicListItem(string internalname, bool enabled) {
             Internal = string.IsNullOrEmpty(internalname) ? BasicPadItem.UniqueInternal() : internalname;
             if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
-            _Checked = false;
+            _checked = false;
+            _enabled = enabled;
             Pos = Rectangle.Empty;
             UserDefCompareKey = string.Empty;
         }
@@ -84,21 +85,21 @@ namespace BlueControls.ItemCollection {
         #region Properties
 
         public bool Checked {
-            get => _Checked;
+            get => _checked;
             set {
                 if (Parent == null) {
-                    _Checked = value;
+                    _checked = value;
                 } else {
-                    Parent?.SetNewCheckState(this, value, ref _Checked);
+                    Parent?.SetNewCheckState(this, value, ref _checked);
                 }
             }
         }
 
         public bool Enabled {
-            get => _Enabled;
+            get => _enabled;
             set {
-                if (_Enabled == value) { return; }
-                _Enabled = value;
+                if (_enabled == value) { return; }
+                _enabled = value;
                 Parent?.OnDoInvalidate();
             }
         }
@@ -108,10 +109,10 @@ namespace BlueControls.ItemCollection {
         public bool IsCaption { get; protected set; }
 
         public ItemCollectionList? Parent {
-            get => _Parent;
+            get => _parent;
             set {
-                if (_Parent == null || _Parent == value) {
-                    _Parent = value;
+                if (_parent == null || _parent == value) {
+                    _parent = value;
                     return;
                 }
 
@@ -163,21 +164,21 @@ namespace BlueControls.ItemCollection {
 
         public bool Contains(int x, int y) => Pos.Contains(x, y);
 
-        public void Draw(Graphics GR, int xModifier, int YModifier, enDesign controldesign, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, string FilterText, bool Translate) {
+        public void Draw(Graphics gr, int xModifier, int yModifier, enDesign controldesign, enDesign itemdesign, enStates vState, bool drawBorderAndBack, string filterText, bool translate) {
             if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent nicht definiert"); }
             if (itemdesign == enDesign.Undefiniert) { return; }
-            Rectangle PositionModified = new(Pos.X - xModifier, Pos.Y - YModifier, Pos.Width, Pos.Height);
-            DrawExplicit(GR, PositionModified, itemdesign, vState, DrawBorderAndBack, Translate);
-            if (DrawBorderAndBack) {
-                if (!string.IsNullOrEmpty(FilterText) && !FilterMatch(FilterText)) {
+            Rectangle positionModified = new(Pos.X - xModifier, Pos.Y - yModifier, Pos.Width, Pos.Height);
+            DrawExplicit(gr, positionModified, itemdesign, vState, drawBorderAndBack, translate);
+            if (drawBorderAndBack) {
+                if (!string.IsNullOrEmpty(filterText) && !FilterMatch(filterText)) {
                     var c1 = Skin.Color_Back(controldesign, enStates.Standard); // Standard als Notlösung, um nicht doppelt checken zu müssen
                     c1 = c1.SetAlpha(160);
-                    GR.FillRectangle(new SolidBrush(c1), PositionModified);
+                    gr.FillRectangle(new SolidBrush(c1), positionModified);
                 }
             }
         }
 
-        public virtual bool FilterMatch(string FilterText) => Internal.ToUpper().Contains(FilterText.ToUpper());
+        public virtual bool FilterMatch(string filterText) => Internal.ToUpper().Contains(filterText.ToUpper());
 
         public abstract int HeightForListBox(enBlueListBoxAppearance style, int columnWidth);
 
@@ -189,10 +190,10 @@ namespace BlueControls.ItemCollection {
         }
 
         public Size SizeUntouchedForListBox() {
-            if (_SizeUntouchedForListBox.IsEmpty) {
-                _SizeUntouchedForListBox = ComputeSizeUntouchedForListBox();
+            if (_sizeUntouchedForListBox.IsEmpty) {
+                _sizeUntouchedForListBox = ComputeSizeUntouchedForListBox();
             }
-            return _SizeUntouchedForListBox;
+            return _sizeUntouchedForListBox;
         }
 
         protected abstract Size ComputeSizeUntouchedForListBox();

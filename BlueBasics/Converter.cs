@@ -43,27 +43,27 @@ namespace BlueBasics {
             }
         }
 
-        public static byte Bin8ToByte(string bIN8) => Convert.ToByte(bIN8, 2);
+        public static byte Bin8ToByte(string bIn8) => Convert.ToByte(bIn8, 2);
 
-        public static string BitmapToBase64(Bitmap? bMP, ImageFormat bFormat) {
-            if (bMP == null) { return string.Empty; }
-            if (bMP.PixelFormat != PixelFormat.Format32bppPArgb) { bMP = Bitmap_ChangePixelFormat(bMP); }
+        public static string BitmapToBase64(Bitmap? bMp, ImageFormat bFormat) {
+            if (bMp == null) { return string.Empty; }
+            if (bMp.PixelFormat != PixelFormat.Format32bppPArgb) { bMp = Bitmap_ChangePixelFormat(bMp); }
             MemoryStream memory = new();
-            bMP.Save(memory, bFormat);
+            bMp.Save(memory, bFormat);
             var base64 = Convert.ToBase64String(memory.ToArray());
             memory.Close();
             return base64;
         }
 
-        public static byte[]? BitmapToByte(Bitmap? bMP, ImageFormat format) {
-            if (bMP == null) { return null; }
-            if (bMP.PixelFormat != PixelFormat.Format32bppPArgb) { bMP = Bitmap_ChangePixelFormat(bMP); }
-            MemoryStream MemSt = new();
-            bMP.Save(MemSt, format);
-            return MemSt.ToArray();
+        public static byte[]? BitmapToByte(Bitmap? bMp, ImageFormat format) {
+            if (bMp == null) { return null; }
+            if (bMp.PixelFormat != PixelFormat.Format32bppPArgb) { bMp = Bitmap_ChangePixelFormat(bMp); }
+            MemoryStream memSt = new();
+            bMp.Save(memSt, format);
+            return memSt.ToArray();
         }
 
-        public static string BitmapToStringUnicode(Bitmap? bMP, ImageFormat format) => bMP == null ? string.Empty : new string(Encoding.Unicode.GetChars(BitmapToByte(bMP, format)));
+        public static string BitmapToStringUnicode(Bitmap? bMp, ImageFormat format) => bMp == null ? string.Empty : new string(Encoding.Unicode.GetChars(BitmapToByte(bMp, format)));
 
         //private static readonly string SerialNr2Path_LastSearch = string.Empty;
         //private static readonly string SerialNr2Path_LastErgebnis = string.Empty;
@@ -124,7 +124,7 @@ namespace BlueBasics {
             return DateTime.Now;
         }
 
-        public static bool DateTimeTryParse(string s, out DateTime result) {
+        public static bool DateTimeTryParse(string? s, out DateTime result) {
             // https://docs.microsoft.com/de-de/dotnet/standard/base-types/standard-date-and-time-format-strings?view=netframework-4.8
             if (s == null || string.IsNullOrEmpty(s)) {
                 result = default;
@@ -273,30 +273,30 @@ namespace BlueBasics {
             return 0;
         }
 
-        public static float mmToPixel(float mM, int dPI) => mM * dPI / 25.4f;
+        public static float MmToPixel(float mM, int dPi) => mM * dPi / 25.4f;
 
-        public static float PixelToMM(float pixel, int dPI) => pixel / dPI * 25.4f;
+        public static float PixelToMm(float pixel, int dPi) => pixel / dPi * 25.4f;
 
         // public static string UTF8toString(string S) {
         // }
-        public static string StringtoUTF8(this string s) => Encoding.Default.GetString(Encoding.UTF8.GetBytes(s));
+        public static string StringtoUtf8(this string s) => Encoding.Default.GetString(Encoding.UTF8.GetBytes(s));
 
-        public static Bitmap? StringUnicodeToBitmap(string unicodeTXT) {
-            if (string.IsNullOrEmpty(unicodeTXT)) {
+        public static Bitmap? StringUnicodeToBitmap(string unicodeTxt) {
+            if (string.IsNullOrEmpty(unicodeTxt)) {
                 return null;
             }
-            var b = unicodeTXT.Unicode_ToByte();
-            var Bmp = ByteToBitmap(b);
-            return Bmp;
+            var b = unicodeTxt.Unicode_ToByte();
+            var bmp = ByteToBitmap(b);
+            return bmp;
         }
 
-        public static Bitmap? StringWIN1252ToBitmap(string tXT) {
-            if (string.IsNullOrEmpty(tXT)) {
+        public static Bitmap? StringWin1252ToBitmap(string tXt) {
+            if (string.IsNullOrEmpty(tXt)) {
                 return null;
             }
-            var b = tXT.WIN1252_toByte();
-            var Bmp = ByteToBitmap(b);
-            return Bmp;
+            var b = tXt.WIN1252_toByte();
+            var bmp = ByteToBitmap(b);
+            return bmp;
         }
 
         private static Bitmap Bitmap_ChangePixelFormat(Bitmap? oldBmp) {

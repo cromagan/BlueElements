@@ -15,19 +15,21 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueScript;
 using FastColoredTextBoxNS;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Extensions;
 
 namespace BlueControls {
@@ -117,7 +119,7 @@ namespace BlueControls {
             base.Dispose(disposing);
         }
 
-        protected virtual Script GenerateAndDoScript() {
+        protected virtual Script? GenerateAndDoScript() {
             var s = new Script(null);
             s.Parse();
             return s;

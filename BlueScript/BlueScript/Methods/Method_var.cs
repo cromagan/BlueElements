@@ -55,7 +55,7 @@ namespace BlueScript.Methods {
             if (v != null) { return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden."); }
             s.Variablen.Add(new Variable(varnam));
 
-            return s._berechneVariable.DoitKomplett(infos.AttributText + ";", s, infos);
+            return s.BerechneVariable.DoitKomplett(infos.AttributText + ";", s, infos);
         }
 
         #endregion

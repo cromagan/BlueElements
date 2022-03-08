@@ -40,14 +40,14 @@ namespace BlueDatabase {
 
         #region Constructors
 
-        public WorkItem(enDatabaseDataType Comand, long ColKey, long RowKey, string PreviousValue, string ChangedTo, string User) {
+        public WorkItem(enDatabaseDataType comand, long colKey, long rowKey, string previousValue, string changedTo, string user) {
             _state = enItemState.Pending;
-            this.Comand = Comand;
-            _colKey = ColKey;
-            _rowKey = RowKey;
-            this.PreviousValue = PreviousValue;
-            _changedTo = ChangedTo;
-            this.User = User;
+            this.Comand = comand;
+            _colKey = colKey;
+            _rowKey = rowKey;
+            this.PreviousValue = previousValue;
+            _changedTo = changedTo;
+            this.User = user;
             Date = DateTime.UtcNow;
         }
 
@@ -124,9 +124,9 @@ namespace BlueDatabase {
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
-        public void Parse(string ToParse) {
+        public void Parse(string toParse) {
             IsParsing = true;
-            foreach (var pair in ToParse.GetAllTags()) {
+            foreach (var pair in toParse.GetAllTags()) {
                 switch (pair.Key) {
                     case "st":
                         _state = (enItemState)int.Parse(pair.Value);
@@ -149,11 +149,11 @@ namespace BlueDatabase {
                         break;
 
                     case "cell":
-                        var _CellKey = pair.Value.TrimStart("{ColumnKey=");
-                        if (_CellKey == "{Disposed}") { _CellKey = "-1|-1"; }
-                        _CellKey = _CellKey.Replace(", RowKey=", "|");
-                        _CellKey = _CellKey.TrimEnd("}");
-                        var x = _CellKey.SplitAndCutBy("|");
+                        var cellKey = pair.Value.TrimStart("{ColumnKey=");
+                        if (cellKey == "{Disposed}") { cellKey = "-1|-1"; }
+                        cellKey = cellKey.Replace(", RowKey=", "|");
+                        cellKey = cellKey.TrimEnd("}");
+                        var x = cellKey.SplitAndCutBy("|");
                         if (x.GetUpperBound(0) == 1) {
                             long.TryParse(x[0], out _colKey);
                             long.TryParse(x[1], out _rowKey);
@@ -161,8 +161,8 @@ namespace BlueDatabase {
                         break;
 
                     case "cellkey":
-                        _CellKey = pair.Value;
-                        var x2 = _CellKey.SplitAndCutBy("|");
+                        cellKey = pair.Value;
+                        var x2 = cellKey.SplitAndCutBy("|");
                         long.TryParse(x2[0], out _colKey);
                         long.TryParse(x2[1], out _rowKey);
                         break;
@@ -229,7 +229,7 @@ namespace BlueDatabase {
             return "<b>alt: </b>" + a + "<b> <IMAGECODE=Pfeil_Rechts_Scrollbar|8|16> neu: </b>" + n + "     <i>(" + Date + ", " + User + ")</i>";
         }
 
-        internal bool LogsUndo(Database database) => database.Column.SearchByKey(ColKey) is ColumnItem C && C.ShowUndo;
+        internal bool LogsUndo(Database database) => database.Column.SearchByKey(ColKey) is ColumnItem c && c.ShowUndo;
 
         #endregion
     }

@@ -15,10 +15,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueControls.Enums;
 using System.Drawing;
+using BlueControls.Enums;
 
-namespace BlueControls.ItemCollection {
+namespace BlueControls.ItemCollection.ItemCollectionList {
 
     // LinenKollision
     //http://www.vb-fun.de/cgi-bin/loadframe.pl?ID=vb/tipps/tip0294.shtml
@@ -27,7 +27,7 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public LineListItem(string internalname, string userDefCompareKey) : base(internalname) => UserDefCompareKey = userDefCompareKey;
+        public LineListItem(string internalname, string userDefCompareKey) : base(internalname, true) => UserDefCompareKey = userDefCompareKey;
 
         #endregion
 

@@ -97,7 +97,7 @@ namespace BlueControls.ItemCollection {
         //}
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new();
-            ItemCollectionList verhalt = new()
+            ItemCollectionList.ItemCollectionList verhalt = new()
             {
                 { "Linie direkt zwischen zwei Punkten", ((int)enConectorStyle.Direct).ToString(), QuickImage.Get(enImageCode.Linie) },
                 { "Linie soll Objekten ausweichen", ((int)enConectorStyle.Ausweichenx).ToString(), QuickImage.Get(enImageCode.Linie) },

@@ -109,7 +109,7 @@ namespace BlueControls.ItemCollection {
                 new FlexiControlForProperty(this, "Datensatz bearbeiten", enImageCode.Stift),
                 new FlexiControl()
             };
-            ItemCollectionList layouts = new();
+            ItemCollectionList.ItemCollectionList layouts = new();
             foreach (var thisLayouts in Row.Database.Layouts) {
                 ItemCollectionPad p = new(thisLayouts, string.Empty);
                 layouts.Add(p.Caption, p.Id, enImageCode.Stern);

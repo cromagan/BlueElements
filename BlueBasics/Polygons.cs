@@ -40,8 +40,10 @@ namespace BlueBasics {
             //         | /
             //         |/
             //
-            PointF plusOben = new((float)(rect.Left + (rect.Width * 0.5)), (float)(rect.PointOf(enAlignment.VerticalCenter_Right).Y - (rect.Height * 0.18)));
-            PointF plusUnten = new((float)(rect.Left + (rect.Width * 0.5)), (float)(rect.PointOf(enAlignment.VerticalCenter_Right).Y + (rect.Height * 0.18)));
+            PointF plusOben = new((float) (rect.Left + (rect.Width * 0.5)),
+                (float) (rect.PointOf(enAlignment.VerticalCenter_Right).Y - (rect.Height * 0.18)));
+            PointF plusUnten = new((float) (rect.Left + (rect.Width * 0.5)),
+                (float) (rect.PointOf(enAlignment.VerticalCenter_Right).Y + (rect.Height * 0.18)));
             p.AddLine(rect.PointOf(enAlignment.VerticalCenter_Right), new PointF(plusUnten.X, rect.Bottom));
             p.AddLine(p.GetLastPoint(), plusUnten);
             p.AddLine(p.GetLastPoint(), new PointF(rect.Left, plusUnten.Y));

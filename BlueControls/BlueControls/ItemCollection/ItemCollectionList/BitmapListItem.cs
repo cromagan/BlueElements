@@ -17,15 +17,15 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Enums;
 using static BlueBasics.FileOperations;
 
-namespace BlueControls.ItemCollection {
+namespace BlueControls.ItemCollection.ItemCollectionList {
 
     public class BitmapListItem : BasicListItem {
 
@@ -51,18 +51,15 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public BitmapListItem(Bitmap? bmp, string internalname, string caption) : base(internalname) {
+        public BitmapListItem(Bitmap? bmp, string internalname, string caption) : base(internalname, true) {
             _caption = caption;
             _captiontmp.Clear();
             _bitmap = bmp;
-            //_ImageFilename = Filename;
-            //_EncryptionKey = encryptionKey;
             Padding = 0;
             _overlays.Clear();
-            //_overlays.ListOrItemChanged += _overlays_ListOrItemChanged;
         }
 
-        public BitmapListItem(string filename, string internalname, string caption, string encryptionKey) : base(internalname) {
+        public BitmapListItem(string filename, string internalname, string caption, string encryptionKey) : base(internalname, true) {
             _caption = caption;
             _captiontmp.Clear();
             //_Bitmap = bmp;
@@ -187,7 +184,9 @@ namespace BlueControls.ItemCollection {
                 foreach (var thisCap in _captiontmp) {
                     c--;
                     var s = Skin.FormatedText_NeededSize(thisCap, null, bFont, 16);
-                    Rectangle r = new((int)(drawingCoordinates.Left + ((drawingCoordinates.Width - s.Width) / 2.0)), drawingCoordinates.Bottom - s.Height - 3, s.Width, s.Height);
+                    Rectangle r =
+                        new((int)(drawingCoordinates.Left + ((drawingCoordinates.Width - s.Width) / 2.0)),
+                            drawingCoordinates.Bottom - s.Height - 3, s.Width, s.Height);
                     r.X -= trp.X;
                     r.Y -= trp.Y;
                     r.Y = r.Y - (ConstMy * c) + ausgl;

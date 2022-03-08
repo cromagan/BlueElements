@@ -79,7 +79,8 @@ namespace BlueBasics {
             while (true) {
                 hh = GetWindow(hh, 2);
                 if (hh.ToInt32() != 0) {
-                    strProcess l = new() {
+                    strProcess l = new()
+                    {
                         MainWindowHandle = hh
                     };
                     GetWindowInfo(ref l);

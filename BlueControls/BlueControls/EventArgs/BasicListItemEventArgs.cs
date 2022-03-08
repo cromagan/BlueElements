@@ -15,7 +15,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueControls.ItemCollection;
+#nullable enable
+
+using BlueControls.ItemCollection.ItemCollectionList;
 
 namespace BlueControls.EventArgs {
 
@@ -23,13 +25,13 @@ namespace BlueControls.EventArgs {
 
         #region Constructors
 
-        public BasicListItemEventArgs(BasicListItem item) => Item = item;
+        public BasicListItemEventArgs(BasicListItem? item) => Item = item;
 
         #endregion
 
         #region Properties
 
-        public BasicListItem Item { get; }
+        public BasicListItem? Item { get; }
 
         #endregion
     }

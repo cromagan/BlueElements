@@ -247,9 +247,7 @@ namespace BlueBasics {
             if (index1 == index2) { return; }
             // Der Swap geht so, und nicht anders! Es müssen die Items im Original-Array geswapt werden!
             // Wichtig auch der Zugriff auf die base (nicht auf this). Dadurch werden keine Add/Remove Event ausgelöst.
-            var tmp = base[index1];
-            base[index1] = base[index2];
-            base[index2] = tmp;
+            (base[index1], base[index2]) = (base[index2], base[index1]);
             OnChanged();
         }
 

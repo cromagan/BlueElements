@@ -70,7 +70,8 @@ namespace BlueControls.Controls {
         protected override void DrawControl(Graphics gr, enStates state) {
             Skin.Draw_Back(gr, enDesign.Progressbar, state, DisplayRectangle, this, true);
             if (_Prozent > 0) {
-                Rectangle r = new(DisplayRectangle.X, DisplayRectangle.Y, (int)Math.Truncate(DisplayRectangle.Width * _Prozent / 100.0), DisplayRectangle.Height);
+                Rectangle r = new(DisplayRectangle.X, DisplayRectangle.Y,
+                    (int) Math.Truncate(DisplayRectangle.Width * _Prozent / 100.0), DisplayRectangle.Height);
                 //r = New Rectangle(DisplayRectangle)
                 //r.Width = CInt(r.Width * wProzent / 100)
                 Skin.Draw_Back(gr, enDesign.Progressbar_Füller, state, r, this, true);

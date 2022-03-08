@@ -1,7 +1,23 @@
-﻿using BlueBasics;
+﻿// Authors:
+// Christian Peter
+//
+// Copyright (c) 2022 Christian Peter
+// https://github.com/cromagan/BlueElements
+//
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
-using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
 using System;
@@ -10,7 +26,10 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
+using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
+
+#nullable enable
 
 namespace BlueControls.Controls {
 
@@ -25,18 +44,9 @@ namespace BlueControls.Controls {
         private string _propertyName;
         private string _propertynamecpl;
         private object? _propertyObject;
-        private PropertyInfo _propInfo;
+        private PropertyInfo? _propInfo;
 
         #endregion
-
-        //private bool _FehlerWennLeer = true;
-        //private bool _alwaysDiabled = false;
-        //private readonly bool _FehlerFormatCheck = true;
-        //private bool _enabled = true;
-        ///// <summary>
-        ///// Die Hauptklasse wird zwar beibehalten, aber Unterklassen müssen evtl. neu definiert werden.
-        ///// </summary>
-        //public event System.EventHandler LoadedFromDisk;
 
         #region Constructors
 
@@ -47,17 +57,13 @@ namespace BlueControls.Controls {
             CheckEnabledState();
         }
 
-        public FlexiControlForProperty(object propertyObject, string propertyName, ItemCollectionList? list) : this(propertyObject, propertyName, 1, list, enImageCode.None) {
-        }
+        public FlexiControlForProperty(object propertyObject, string propertyName, ItemCollectionList? list) : this(propertyObject, propertyName, 1, list, enImageCode.None) { }
 
-        public FlexiControlForProperty(object propertyObject, string propertyName, int rowCount) : this(propertyObject, propertyName, rowCount, null, enImageCode.None) {
-        }
+        public FlexiControlForProperty(object propertyObject, string propertyName, int rowCount) : this(propertyObject, propertyName, rowCount, null, enImageCode.None) { }
 
-        public FlexiControlForProperty(object propertyObject, string propertyName, enImageCode image) : this(propertyObject, propertyName, 1, null, image) {
-        }
+        public FlexiControlForProperty(object propertyObject, string propertyName, enImageCode image) : this(propertyObject, propertyName, 1, null, image) { }
 
-        public FlexiControlForProperty(object propertyObject, string propertyName) : this(propertyObject, propertyName, 1, null, enImageCode.None) {
-        }
+        public FlexiControlForProperty(object propertyObject, string propertyName) : this(propertyObject, propertyName, 1, null, enImageCode.None) { }
 
         public FlexiControlForProperty() : base() {
             GenFehlerText();
@@ -91,31 +97,15 @@ namespace BlueControls.Controls {
             }
         }
 
-        //[DefaultValue(true)]
-        //public new bool Enabled {
-        //    get => _enabled;
-        //    set {
-        //        if (_enabled == value) { return; }
-        //        _enabled = value;
-        //        CheckEnabledState();
-        //        GenFehlerText();
-        //    }
-        //}
         [DefaultValue(null)]
         public object PropertyObject {
             get => _propertyObject;
             set {
                 if (_propertyObject == value) { return; }
                 FillPropertyNow();
-                //if (_propertyObject is IReloadable LS) {
-                //    LS.LoadedFromDisk -= OnLoadedFromDisk;
-                //}
                 _propertyObject = value;
                 UpdateControlData(false, 1, null, enImageCode.None);
                 CheckEnabledState();
-                //if (_propertyObject is IReloadable LSn) {
-                //    LSn.LoadedFromDisk += OnLoadedFromDisk;
-                //}
             }
         }
 
@@ -123,13 +113,14 @@ namespace BlueControls.Controls {
 
         #region Methods
 
-        public static void SetAllFlexControls(Control _in, object _to) {
-            if (_in == null || _in.IsDisposed) { return; }
-            foreach (var thisc in _in.Controls) {
+        public static void SetAllFlexControls(Control? inControl, object toObject) {
+            if (inControl == null || inControl.IsDisposed) { return; }
+
+            foreach (var thisc in inControl.Controls) {
                 if (thisc is FlexiControlForProperty flx) {
-                    flx.PropertyObject = _to;
+                    flx.PropertyObject = toObject;
                 }
-                if (thisc is FlexiControlForCell flxc && _to is DataHolder dh) {
+                if (thisc is FlexiControlForCell flxc && toObject is DataHolder dh) {
                     dh.Column(flxc.ColumnName, "Inkorrecte Zuordnung: " + flxc.ColumnName);
                     flxc.Database = dh.InternalDatabase;
                     flxc.RowKey = dh.Row().Key;
@@ -211,45 +202,44 @@ namespace BlueControls.Controls {
         }
 
         private void FillPropertyNow() {
-            //if (_IsFilling) { return; }
             if (!Allinitialized) { return; }
             if (!CheckEnabledState()) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
             if (_propertyObject == null || string.IsNullOrEmpty(_propertyName) || _propInfo == null || !_propInfo.CanRead) { return; }
-            var OldVal = string.Empty;
+            var oldVal = string.Empty;
             var x = _propInfo.GetValue(_propertyObject, null);
-            object toSet = null;
+            object? toSet = null;
 
             if (x is null) {
-                OldVal = string.Empty;
+                oldVal = string.Empty;
                 toSet = Value; // Wissen wir leider nicht, welcher Typ....
             } else if (x is string s) {
-                OldVal = s;
+                oldVal = s;
                 toSet = Value;
             } else if (x is List<string> ls) {
-                OldVal = ls.JoinWithCr();
+                oldVal = ls.JoinWithCr();
                 toSet = Value.SplitAndCutByCrToList();
             } else if (x is bool bo) {
-                OldVal = bo.ToPlusMinus();
+                oldVal = bo.ToPlusMinus();
                 toSet = Value.FromPlusMinus();
             } else if (x is Color co) {
-                OldVal = co.ToHtmlCode();
+                oldVal = co.ToHtmlCode();
                 toSet = Value.FromHtmlCode();
             } else if (x is int iv) {
-                OldVal = iv.ToString();
+                oldVal = iv.ToString();
                 toSet = IntParse(Value);
             } else if (x is Enum) {
-                OldVal = ((int)x).ToString();
+                oldVal = ((int)x).ToString();
                 toSet = IntParse(Value);
             } else if (x is double db) {
-                OldVal = db.ToString(Constants.Format_Float2);
+                oldVal = db.ToString(Constants.Format_Float2);
                 toSet = DoubleParse(Value);
             } else if (x is float fl) {
-                OldVal = fl.ToString(Constants.Format_Float2);
+                oldVal = fl.ToString(Constants.Format_Float2);
                 toSet = FloatParse(Value);
             } else {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Art unbekannt!");
             }
-            if (OldVal == Value) { return; }
+            if (oldVal == Value) { return; }
             _propInfo.SetValue(_propertyObject, toSet, null);
         }
 
@@ -312,7 +302,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void UpdateControlData(bool withCreate, int TextLines, ItemCollectionList? list, enImageCode image) {
+        private void UpdateControlData(bool withCreate, int textLines, ItemCollectionList? list, enImageCode image) {
 
             #region propInfo & _propertynamecpl befüllen
 
@@ -373,9 +363,9 @@ namespace BlueControls.Controls {
                                 EditType = enEditTypeFormula.Textfeld_mit_Auswahlknopf;
                                 list.Appearance = enBlueListBoxAppearance.ComboBox_Textbox;
                                 var s = BlueFont.MeasureStringOfCaption(_Caption);
-                                var (BiggestItemX, BiggestItemY, _, _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
-                                var x = Math.Max((int)(BiggestItemX + 20 + s.Width), 200);
-                                var y = Math.Max(BiggestItemY + (Skin.PaddingSmal * 2), 24);
+                                var (biggestItemX, biggestItemY, _, _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
+                                var x = Math.Max((int)(biggestItemX + 20 + s.Width), 200);
+                                var y = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
                                 Size = new Size(x, y);
                                 var c = (ComboBox)CreateSubControls();
                                 StyleComboBox(c, list, ComboBoxStyle.DropDownList);
@@ -391,9 +381,9 @@ namespace BlueControls.Controls {
                             else {
                                 _EditType = enEditTypeFormula.Textfeld;
                                 var tmpName = _propInfo.PropertyType.FullName.ToLower();
-                                if (TextLines >= 2) {
+                                if (textLines >= 2) {
                                     _CaptionPosition = enÜberschriftAnordnung.Über_dem_Feld;
-                                    Size = new Size(200, 16 + (24 * TextLines));
+                                    Size = new Size(200, 16 + (24 * textLines));
                                     _MultiLine = true;
                                     tmpName = "system.string";
                                 } else {

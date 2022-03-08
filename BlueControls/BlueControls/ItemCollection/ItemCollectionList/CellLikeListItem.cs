@@ -15,14 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System.Drawing;
 using BlueBasics;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using System.Drawing;
 
-namespace BlueControls.ItemCollection {
+namespace BlueControls.ItemCollection.ItemCollectionList {
 
     public class CellLikeListItem : BasicListItem {
         // Implements IReadableText
@@ -40,16 +40,15 @@ namespace BlueControls.ItemCollection {
         /// Nach welche Spalte sich der Stil richten muss.
         /// Wichtig, dass es ein Spalten-item ist, da bei neuen Datenbanken zwar die Spalte vorhnden ist, aber wenn keine Zeile Vorhanden ist, logischgerweise auch keine Zelle da ist.
         /// </summary>
-        private readonly ColumnItem? _StyleLikeThis;
+        private readonly ColumnItem? _styleLikeThis;
 
         #endregion
 
         #region Constructors
 
-        public CellLikeListItem(string internalAndReadableText, ColumnItem? columnStyle, enShortenStyle style, bool enabled, enBildTextVerhalten bildTextverhalten) : base(internalAndReadableText) {
-            _StyleLikeThis = columnStyle;
+        public CellLikeListItem(string internalAndReadableText, ColumnItem? columnStyle, enShortenStyle style, bool enabled, enBildTextVerhalten bildTextverhalten) : base(internalAndReadableText, enabled) {
+            _styleLikeThis = columnStyle;
             _style = style;
-            _Enabled = enabled;
             _bildTextverhalten = bildTextverhalten;
         }
 
@@ -65,37 +64,37 @@ namespace BlueControls.ItemCollection {
 
         // unveränderter Text
         public override object Clone() {
-            var x = new CellLikeListItem(Internal, _StyleLikeThis, _style, _Enabled, _bildTextverhalten);
+            var x = new CellLikeListItem(Internal, _styleLikeThis, _style, Enabled, _bildTextverhalten);
             x.CloneBasicStatesFrom(this);
             return x;
         }
 
-        public override bool FilterMatch(string FilterText) {
-            if (base.FilterMatch(FilterText)) { return true; }
-            var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.Both, _StyleLikeThis.BildTextVerhalten, true);
-            return txt.ToUpper().Contains(FilterText.ToUpper());
+        public override bool FilterMatch(string filterText) {
+            if (base.FilterMatch(filterText)) { return true; }
+            var txt = CellItem.ValueReadable(_styleLikeThis, Internal, enShortenStyle.Both, _styleLikeThis.BildTextVerhalten, true);
+            return txt.ToUpper().Contains(filterText.ToUpper());
         }
 
         public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => SizeUntouchedForListBox().Height;
 
-        protected override Size ComputeSizeUntouchedForListBox() => Table.FormatedText_NeededSize(_StyleLikeThis, Internal, Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard), _style, 16, _bildTextverhalten);
+        protected override Size ComputeSizeUntouchedForListBox() => Table.FormatedText_NeededSize(_styleLikeThis, Internal, Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard), _style, 16, _bildTextverhalten);
 
-        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate) {
-            if (DrawBorderAndBack) {
-                Skin.Draw_Back(GR, itemdesign, vState, PositionModified, null, false);
+        protected override void DrawExplicit(Graphics gr, Rectangle positionModified, enDesign itemdesign, enStates vState, bool drawBorderAndBack, bool translate) {
+            if (drawBorderAndBack) {
+                Skin.Draw_Back(gr, itemdesign, vState, positionModified, null, false);
             }
-            Table.Draw_FormatedText(GR, Internal, _StyleLikeThis, PositionModified, itemdesign, vState, _style, _bildTextverhalten);
-            if (DrawBorderAndBack) {
-                Skin.Draw_Border(GR, itemdesign, vState, PositionModified);
+            Table.Draw_FormatedText(gr, Internal, _styleLikeThis, positionModified, itemdesign, vState, _style, _bildTextverhalten);
+            if (drawBorderAndBack) {
+                Skin.Draw_Border(gr, itemdesign, vState, positionModified);
             }
         }
 
         protected override string GetCompareKey() {
             // Die hauptklasse frägt nach diesem Kompare-Key
             //var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.HTML, true); // Muss Kompakt sein, um Suffixe zu vermeiden
-            var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.HTML, _bildTextverhalten, true);
+            var txt = CellItem.ValueReadable(_styleLikeThis, Internal, enShortenStyle.HTML, _bildTextverhalten, true);
 
-            return txt.CompareKey(_StyleLikeThis.SortType) + "|" + Internal;
+            return txt.CompareKey(_styleLikeThis.SortType) + "|" + Internal;
             //Internal.CompareKey(_StyleLikeThis.SortType) + "|" + Internal;
         }
 

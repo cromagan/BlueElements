@@ -39,7 +39,8 @@ public static class clsDesignExtensions {
     }
 
     public static void Add(this Dictionary<enStates, clsDesign> dictStats, enStates status, enKontur enKontur, int x1, int y1, int x2, int y2, enHintergrundArt hint, float verlauf, string bc1, string bc2, string bc3, enRahmenArt rahm, string boc1, string boc2, string boc3, string f, string pic) {
-        clsDesign des = new() {
+        clsDesign des = new()
+        {
             Need = true,
             Kontur = enKontur,
             X1 = x1,

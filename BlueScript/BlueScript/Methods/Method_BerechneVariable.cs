@@ -57,14 +57,14 @@ namespace BlueScript.Methods {
         }
 
         internal DoItFeedback DoitKomplett(string newcommand, Script s, CanDoFeedback originalinfos) {
-            var f = s._berechneVariable.CanDo(newcommand, 0, false, s);
+            var f = s.BerechneVariable.CanDo(newcommand, 0, false, s);
             if (!string.IsNullOrEmpty(f.ErrorMessage)) {
                 return new DoItFeedback("Befehl nicht erkannt, " + f.ErrorMessage + ": " + originalinfos.AttributText);
             }
             //if (originalinfos.AttributText.Length != f.ContinueOrErrorPosition - 1) {
             //    return new strDoItFeedback("Falsch gesetztes Semikolon");
             //}
-            var f2 = s._berechneVariable.DoIt(f, s);
+            var f2 = s.BerechneVariable.DoIt(f, s);
 
             return !string.IsNullOrEmpty(f2.ErrorMessage)
                 ? new DoItFeedback("Berechnung fehlerhaft: " + f2.ErrorMessage)

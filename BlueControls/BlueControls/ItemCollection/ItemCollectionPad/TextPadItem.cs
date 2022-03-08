@@ -110,7 +110,7 @@ namespace BlueControls.ItemCollection {
             {
                 new FlexiControlForProperty(this, "Text", 5)
             };
-            ItemCollectionList aursicht = new()
+            ItemCollectionList.ItemCollectionList aursicht = new()
             {
                 { "Linksbündig ausrichten", ((int)enAlignment.Top_Left).ToString(), enImageCode.Linksbündig },
                 { "Zentrieren", ((int)enAlignment.Top_HorizontalCenter).ToString(), enImageCode.Zentrieren },

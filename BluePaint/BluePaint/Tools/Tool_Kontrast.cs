@@ -191,7 +191,7 @@ namespace BluePaint {
             //sldGamma.Value = 1f;
             sldKontrast.Value = 0f;
             sldHelligkeit.Value = 1f;
-            capGamma.Text = sldGamma.Value.ToString();
+            capGamma.Text = sldGamma.Value.ToString(Constants.Format_Float1);
             OnDoInvalidate();
         }
 
@@ -199,7 +199,7 @@ namespace BluePaint {
             sldGamma.Value = 1f;
             sldKontrast.Value = 0f;
             //sldHelligkeit.Value = 0f;
-            capHelligkeit.Text = sldHelligkeit.Value.ToString();
+            capHelligkeit.Text = sldHelligkeit.Value.ToString(Constants.Format_Float1);
             OnDoInvalidate();
         }
 
@@ -207,7 +207,7 @@ namespace BluePaint {
             sldGamma.Value = 1f;
             //sldKontrast.Value = 0f;
             sldHelligkeit.Value = 1f;
-            capKontrast.Text = sldKontrast.Value.ToString();
+            capKontrast.Text = sldKontrast.Value.ToString(Constants.Format_Float1);
             OnDoInvalidate();
         }
 

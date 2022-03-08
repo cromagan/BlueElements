@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -65,7 +67,7 @@ namespace BlueControls {
         private readonly float _oberlänge = -1;
         private readonly Pen _pen;
         private readonly float _widthOf2Points;
-        private readonly int _zeilenabstand = -1;
+        private readonly int _zeilenabstand;
         private QuickImage? _nameInStyleSym;
         private BitmapExt? _sampleTextSym;
         private float _sizeTestedAndFailed = float.MaxValue;
@@ -352,7 +354,8 @@ namespace BlueControls {
                               : new Font("Arial", gr, _fontOl.Style, _fontOl.Unit);
         }
 
-        public Font FontWithoutLinesForCapitals(float zoom) => new(_fontOl.Name, _fontOl.Size * zoom * 0.8F / Skin.Scale, _fontOl.Style, _fontOl.Unit);
+        public Font FontWithoutLinesForCapitals(float zoom) =>
+            new(_fontOl.Name, _fontOl.Size * zoom * 0.8F / Skin.Scale, _fontOl.Style, _fontOl.Unit);
 
         public SizeF MeasureString(string text, StringFormat stringFormat) => MeasureString(text, _fontOl, stringFormat);
 
@@ -571,9 +574,9 @@ namespace BlueControls {
             }
         }
 
-        private BitmapExt? Symbol(string text, bool transparent) {
+        private BitmapExt Symbol(string text, bool transparent) {
             var s = MeasureString(text, Font());
-            BitmapExt? bmp = new((int)(s.Width + 1), (int)(s.Height + 1));
+            BitmapExt bmp = new((int)(s.Width + 1), (int)(s.Height + 1));
             using (var gr = Graphics.FromImage(bmp)) {
                 if (transparent) {
                     gr.Clear(Color.FromArgb(180, 180, 180));

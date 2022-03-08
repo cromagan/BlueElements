@@ -114,7 +114,8 @@ namespace BlueControls.Forms {
         }
 
         private void btnAddText_Click(object sender, System.EventArgs e) {
-            TextPadItem b = new() {
+            TextPadItem b = new()
+            {
                 Text = string.Empty,
                 Stil = PadStyles.Style_Standard
             };

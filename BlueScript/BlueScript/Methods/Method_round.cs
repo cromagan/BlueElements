@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using BlueBasics;
 using BlueScript.Structuren;
 using Skript.Enums;
 
@@ -48,7 +49,7 @@ namespace BlueScript.Methods {
             if (n < 0) { n = 0; }
             if (n > 10) { n = 10; }
             var val = Math.Round(attvar.Attributes[0].ValueDouble, n);
-            return new DoItFeedback(val.ToString(), enVariableDataType.Numeral);
+            return new DoItFeedback(val.ToString(Constants.Format_Float1), enVariableDataType.Numeral);
         }
 
         #endregion

@@ -21,12 +21,12 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
-using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using System;
 using System.Linq;
+using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
 using static BlueBasics.FileOperations;
 
@@ -96,27 +96,27 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnAktuelleAnsichtLoeschen_Click(object sender, System.EventArgs e) {
             if (_tableView?.Database == null || _tableView.Arrangement < 2 || _tableView.Arrangement >= _tableView.Database.ColumnArrangements.Count) { return; }
-            if (MessageBox.Show("Anordung <b>'" + _tableView?.CurrentArrangement.Name + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-            _tableView.Database.ColumnArrangements.RemoveAt(_tableView.Arrangement);
+            if (MessageBox.Show("Anordung <b>'" + _tableView?.CurrentArrangement?.Name + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            _tableView?.Database.ColumnArrangements.RemoveAt(_tableView.Arrangement);
             _tableView.Arrangement = 1;
         }
 
         private void btnAlleSpaltenEinblenden_Click(object sender, System.EventArgs e) {
             if (MessageBox.Show("Alle Spalten anzeigen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-            _tableView.CurrentArrangement.ShowAllColumns();
+            _tableView?.CurrentArrangement?.ShowAllColumns();
         }
 
         private void btnAnsichtUmbenennen_Click(object sender, System.EventArgs e) {
-            var n = InputBox.Show("Umbenennen:", _tableView.CurrentArrangement.Name, enVarType.Text);
+            var n = InputBox.Show("Umbenennen:", _tableView?.CurrentArrangement.Name, enVarType.Text);
             if (!string.IsNullOrEmpty(n)) { _tableView.CurrentArrangement.Name = n; }
         }
 
         private void btnBerechtigungsgruppen_Click(object sender, System.EventArgs e) {
             ItemCollectionList aa = new();
-            aa.AddRange(_tableView.Database.Permission_AllUsed(false));
+            aa.AddRange(_tableView?.Database?.Permission_AllUsed(false));
             aa.Sort();
             aa.CheckBehavior = enCheckBehavior.MultiSelection;
-            aa.Check(_tableView.CurrentArrangement.PermissionGroups_Show, true);
+            aa.Check(_tableView.CurrentArrangement?.PermissionGroups_Show, true);
             var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, enAddType.Text, true);
             if (b == null) { return; }
             _tableView.CurrentArrangement.PermissionGroups_Show.Clear();

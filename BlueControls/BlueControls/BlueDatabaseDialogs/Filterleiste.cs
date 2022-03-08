@@ -28,7 +28,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using ComboBox = BlueControls.Controls.ComboBox;
 using GroupBox = BlueControls.Controls.GroupBox;
 using MessageBox = BlueControls.Forms.MessageBox;
 
@@ -317,7 +316,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             btnAlleFilterAus_Click(null, null);
             foreach (var thiscolumnitem in _ähnliche.Where(thiscolumnitem => thiscolumnitem.Column.AutoFilterSymbolPossible())) {
                 if (r[0].CellIsNullOrEmpty(thiscolumnitem.Column)) {
-                    FilterItem fi = new(thiscolumnitem.Column, enFilterType.Istgleich_UND_GroßKleinEgal, string.Empty);
+                    FilterItem fi = new(thiscolumnitem.Column, enFilterType.Istgleich_UND_GroßKleinEgal,
+                        string.Empty);
                     _tableView.Filter.Add(fi);
                 } else if (thiscolumnitem.Column.MultiLine) {
                     var l = r[0].CellGetList(thiscolumnitem.Column).SortedDistinctList();
@@ -332,15 +332,16 @@ namespace BlueControls.BlueDatabaseDialogs {
             btnÄhnliche.Enabled = false;
         }
 
-        private void btnAlleFilterAus_Click(object sender, System.EventArgs? e) {
+        private void btnAlleFilterAus_Click(object? sender, System.EventArgs? e) {
             _lastLooked = string.Empty;
-            if (_tableView.Database != null) {
+            if (_tableView?.Database != null && _tableView.Filter != null) {
                 _tableView.Filter.Clear();
-                //if (_AutoPin) { _TableView.Pin(null); }
             }
         }
 
-        private void btnPin_Click(object sender, System.EventArgs e) => _tableView?.Pin(_tableView.VisibleUniqueRows());
+        private void btnPin_Click(object sender, System.EventArgs e) {
+            _tableView?.Pin(_tableView.VisibleUniqueRows());
+        }
 
         private void btnPinZurück_Click(object sender, System.EventArgs e) {
             _lastLooked = string.Empty;

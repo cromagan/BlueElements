@@ -522,29 +522,29 @@ namespace BlueDatabase {
             SetValueBehindLinkedValue(column, row, value);
         }
 
-        public void Set(string columnName, RowItem? row, bool value) => Set(_database.Column[columnName], row, value.ToPlusMinus());
+        public void Set(string columnName, RowItem? row, bool value) => Set(_database?.Column[columnName], row, value.ToPlusMinus());
 
         public void Set(ColumnItem? column, RowItem? row, bool value) => Set(column, row, value.ToPlusMinus());
 
-        public void Set(string columnName, RowItem? row, DateTime value) => Set(_database.Column[columnName], row, value.ToString(Constants.Format_Date5));
+        public void Set(string columnName, RowItem? row, DateTime value) => Set(_database?.Column[columnName], row, value.ToString(Constants.Format_Date5));
 
         public void Set(ColumnItem? column, RowItem? row, DateTime value) => Set(column, row, value.ToString(Constants.Format_Date5));
 
-        public void Set(string columnName, RowItem? row, List<string?>? value) => Set(_database.Column[columnName], row, value);
+        public void Set(string columnName, RowItem? row, List<string>? value) => Set(_database?.Column[columnName], row, value);
 
-        public void Set(ColumnItem? column, RowItem? row, List<string?>? value) => Set(column, row, value.JoinWithCr());
+        public void Set(ColumnItem? column, RowItem? row, List<string>? value) => Set(column, row, value.JoinWithCr());
 
-        public void Set(string columnName, RowItem? row, Point value) => Set(_database.Column[columnName], row, value);
+        public void Set(string columnName, RowItem? row, Point value) => Set(_database?.Column[columnName], row, value);
 
         public void Set(ColumnItem? column, RowItem? row, Point value) => Set(column, row, value.ToString());      // Main Method// {X=253,Y=194} MUSS ES SEIN, prüfen
 
-        public void Set(string columnName, RowItem? row, int value) => Set(_database.Column[columnName], row, value.ToString());
+        public void Set(string columnName, RowItem? row, int value) => Set(_database?.Column[columnName], row, value.ToString());
 
         public void Set(ColumnItem? column, RowItem? row, int value) => Set(column, row, value.ToString());
 
-        public void Set(string columnName, RowItem? row, double value) => Set(_database.Column[columnName], row, value.ToString());
+        public void Set(string columnName, RowItem? row, double value) => Set(_database?.Column[columnName], row, value.ToString(Constants.Format_Float1));
 
-        public void Set(ColumnItem? column, RowItem? row, double value) => Set(column, row, value.ToString());
+        public void Set(ColumnItem? column, RowItem? row, double value) => Set(column, row, value.ToString(Constants.Format_Float1));
 
         /// <summary>
         ///

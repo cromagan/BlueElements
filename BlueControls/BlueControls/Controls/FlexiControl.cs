@@ -21,7 +21,6 @@ using BlueBasics.EventArgs;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
@@ -30,6 +29,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using BlueControls.ItemCollection.ItemCollectionList;
 
 namespace BlueControls.Controls {
 
@@ -709,7 +709,8 @@ namespace BlueControls.Controls {
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
         private Button Control_Create_ButtonColor() {
-            Button control = new() {
+            Button control = new()
+            {
                 Enabled = Enabled,
                 Name = "ColorButton",
                 Checked = false,
@@ -724,7 +725,8 @@ namespace BlueControls.Controls {
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
         private Button Control_Create_ButtonComand() {
-            Button control = new() {
+            Button control = new()
+            {
                 Enabled = Enabled,
                 Name = "ComandButton",
                 Checked = false,
@@ -739,7 +741,8 @@ namespace BlueControls.Controls {
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
         private Button Control_Create_ButtonYesNo() {
-            Button control = new() {
+            Button control = new()
+            {
                 Enabled = Enabled,
                 Name = "YesNoButton",
                 ButtonStyle = enButtonStyle.Yes_or_No,
@@ -784,7 +787,8 @@ namespace BlueControls.Controls {
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
         private EasyPic Control_Create_EasyPic() {
-            EasyPic control = new() {
+            EasyPic control = new()
+            {
                 Enabled = Enabled
             };
             StandardBehandlung(control);
@@ -796,7 +800,8 @@ namespace BlueControls.Controls {
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
         private Line Control_Create_Line() {
-            Line control = new() {
+            Line control = new()
+            {
                 Enabled = Enabled,
                 Orientation = enOrientation.Waagerecht
             };
@@ -808,7 +813,8 @@ namespace BlueControls.Controls {
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
         private ListBox Control_Create_ListBox() {
-            ListBox control = new() {
+            ListBox control = new()
+            {
                 Enabled = Enabled
             };
             StyleListBox(control, null);
@@ -819,7 +825,8 @@ namespace BlueControls.Controls {
 
         // Nimmt Teilweise die Routinen der Listbox her
         private SwapListBox Control_Create_SwapListBox() {
-            SwapListBox control = new() {
+            SwapListBox control = new()
+            {
                 Enabled = Enabled
             };
             StyleSwapListBox(control, null);
@@ -873,7 +880,8 @@ namespace BlueControls.Controls {
                 //_InfoCaption = null;
                 _infoCaption.Visible = false;
             } else {
-                _infoCaption = new Caption {
+                _infoCaption = new Caption
+                {
                     Name = "Info",
                     QuickInfo = txt,
                     Enabled = true,

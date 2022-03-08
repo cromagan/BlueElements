@@ -18,6 +18,7 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace BlueControls {
 
@@ -27,18 +28,18 @@ namespace BlueControls {
 
         private bool _keyIsPressing;
 
-        private System.Windows.Forms.Keys _keyLastKey;
+        private Keys _keyLastKey;
 
         private bool _mouseIsPressing;
 
-        private System.Windows.Forms.MouseButtons _mouseLastButton;
+        private MouseButtons _mouseLastButton;
 
         private int _mouseLastX;
 
         private int _mouseLastY;
 
         [AccessedThroughProperty(nameof(Tim))]
-        private System.Windows.Forms.Timer _tim;
+        private Timer _tim;
 
         #endregion
 
@@ -50,21 +51,21 @@ namespace BlueControls {
 
         #region Events
 
-        public event System.EventHandler<System.Windows.Forms.KeyEventArgs> KeyDown;
+        public event System.EventHandler<KeyEventArgs> KeyDown;
 
-        public event System.EventHandler<System.Windows.Forms.KeyEventArgs> KeyUp;
+        public event System.EventHandler<KeyEventArgs> KeyUp;
 
-        public event System.EventHandler<System.Windows.Forms.MouseEventArgs> MouseDown;
+        public event System.EventHandler<MouseEventArgs> MouseDown;
 
-        public event System.EventHandler<System.Windows.Forms.MouseEventArgs> MouseMove;
+        public event System.EventHandler<MouseEventArgs> MouseMove;
 
-        public event System.EventHandler<System.Windows.Forms.MouseEventArgs> MouseUp;
+        public event System.EventHandler<MouseEventArgs> MouseUp;
 
         #endregion
 
         #region Properties
 
-        private System.Windows.Forms.Timer Tim {
+        private Timer Tim {
             [DebuggerNonUserCode]
             get => _tim;
             [MethodImpl(MethodImplOptions.Synchronized)]
@@ -87,189 +88,189 @@ namespace BlueControls {
         public void CheckNow() => Tim_Tick(null, null);
 
         public void DoKeyboard() {
-            var k = System.Windows.Forms.Keys.None;
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.D1) != 0) {
-                k |= System.Windows.Forms.Keys.D1;
+            var k = Keys.None;
+            if (GetAsyncKeyState(Keys.D1) != 0) {
+                k |= Keys.D1;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.D2) != 0) {
-                k |= System.Windows.Forms.Keys.D2;
+            if (GetAsyncKeyState(Keys.D2) != 0) {
+                k |= Keys.D2;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.D3) != 0) {
-                k |= System.Windows.Forms.Keys.D3;
+            if (GetAsyncKeyState(Keys.D3) != 0) {
+                k |= Keys.D3;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.D4) != 0) {
-                k |= System.Windows.Forms.Keys.D4;
+            if (GetAsyncKeyState(Keys.D4) != 0) {
+                k |= Keys.D4;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.D5) != 0) {
-                k |= System.Windows.Forms.Keys.D5;
+            if (GetAsyncKeyState(Keys.D5) != 0) {
+                k |= Keys.D5;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.D6) != 0) {
-                k |= System.Windows.Forms.Keys.D6;
+            if (GetAsyncKeyState(Keys.D6) != 0) {
+                k |= Keys.D6;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.D7) != 0) {
-                k |= System.Windows.Forms.Keys.D7;
+            if (GetAsyncKeyState(Keys.D7) != 0) {
+                k |= Keys.D7;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.D8) != 0) {
-                k |= System.Windows.Forms.Keys.D8;
+            if (GetAsyncKeyState(Keys.D8) != 0) {
+                k |= Keys.D8;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.D9) != 0) {
-                k |= System.Windows.Forms.Keys.D9;
+            if (GetAsyncKeyState(Keys.D9) != 0) {
+                k |= Keys.D9;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.D0) != 0) {
-                k |= System.Windows.Forms.Keys.D0;
+            if (GetAsyncKeyState(Keys.D0) != 0) {
+                k |= Keys.D0;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.NumPad1) != 0) {
-                k |= System.Windows.Forms.Keys.NumPad1;
+            if (GetAsyncKeyState(Keys.NumPad1) != 0) {
+                k |= Keys.NumPad1;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.NumPad2) != 0) {
-                k |= System.Windows.Forms.Keys.NumPad2;
+            if (GetAsyncKeyState(Keys.NumPad2) != 0) {
+                k |= Keys.NumPad2;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.NumPad3) != 0) {
-                k |= System.Windows.Forms.Keys.NumPad3;
+            if (GetAsyncKeyState(Keys.NumPad3) != 0) {
+                k |= Keys.NumPad3;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.NumPad4) != 0) {
-                k |= System.Windows.Forms.Keys.NumPad4;
+            if (GetAsyncKeyState(Keys.NumPad4) != 0) {
+                k |= Keys.NumPad4;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.NumPad5) != 0) {
-                k |= System.Windows.Forms.Keys.NumPad5;
+            if (GetAsyncKeyState(Keys.NumPad5) != 0) {
+                k |= Keys.NumPad5;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.NumPad6) != 0) {
-                k |= System.Windows.Forms.Keys.NumPad6;
+            if (GetAsyncKeyState(Keys.NumPad6) != 0) {
+                k |= Keys.NumPad6;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.NumPad7) != 0) {
-                k |= System.Windows.Forms.Keys.NumPad7;
+            if (GetAsyncKeyState(Keys.NumPad7) != 0) {
+                k |= Keys.NumPad7;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.NumPad8) != 0) {
-                k |= System.Windows.Forms.Keys.NumPad8;
+            if (GetAsyncKeyState(Keys.NumPad8) != 0) {
+                k |= Keys.NumPad8;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.NumPad9) != 0) {
-                k |= System.Windows.Forms.Keys.NumPad9;
+            if (GetAsyncKeyState(Keys.NumPad9) != 0) {
+                k |= Keys.NumPad9;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.NumPad0) != 0) {
-                k |= System.Windows.Forms.Keys.NumPad0;
+            if (GetAsyncKeyState(Keys.NumPad0) != 0) {
+                k |= Keys.NumPad0;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.X) != 0) {
-                k |= System.Windows.Forms.Keys.X;
+            if (GetAsyncKeyState(Keys.X) != 0) {
+                k |= Keys.X;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.V) != 0) {
-                k |= System.Windows.Forms.Keys.V;
+            if (GetAsyncKeyState(Keys.V) != 0) {
+                k |= Keys.V;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.C) != 0) {
-                k |= System.Windows.Forms.Keys.C;
+            if (GetAsyncKeyState(Keys.C) != 0) {
+                k |= Keys.C;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.Tab) != 0) {
-                k |= System.Windows.Forms.Keys.Tab;
+            if (GetAsyncKeyState(Keys.Tab) != 0) {
+                k |= Keys.Tab;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.Enter) != 0) {
-                k |= System.Windows.Forms.Keys.Enter;
+            if (GetAsyncKeyState(Keys.Enter) != 0) {
+                k |= Keys.Enter;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.Return) != 0) {
-                k |= System.Windows.Forms.Keys.Return;
+            if (GetAsyncKeyState(Keys.Return) != 0) {
+                k |= Keys.Return;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.ControlKey) != 0) {
-                k |= System.Windows.Forms.Keys.Control;
+            if (GetAsyncKeyState(Keys.ControlKey) != 0) {
+                k |= Keys.Control;
             }
             //    If GetAsyncKeyState(System.Windows.Forms.Keys.ControlKey) Then k = k Or System.Windows.Forms.Keys.ControlKey
             //   If GetAsyncKeyState(System.Windows.Forms.Keys.Menu) Then k = k Or System.Windows.Forms.Keys.Menu
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.ShiftKey) != 0) {
-                k |= System.Windows.Forms.Keys.Shift;
+            if (GetAsyncKeyState(Keys.ShiftKey) != 0) {
+                k |= Keys.Shift;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.Right) != 0) {
-                k |= System.Windows.Forms.Keys.Right;
+            if (GetAsyncKeyState(Keys.Right) != 0) {
+                k |= Keys.Right;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.Left) != 0) {
-                k |= System.Windows.Forms.Keys.Left;
+            if (GetAsyncKeyState(Keys.Left) != 0) {
+                k |= Keys.Left;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.Up) != 0) {
-                k |= System.Windows.Forms.Keys.Up;
+            if (GetAsyncKeyState(Keys.Up) != 0) {
+                k |= Keys.Up;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.Down) != 0) {
-                k |= System.Windows.Forms.Keys.Down;
+            if (GetAsyncKeyState(Keys.Down) != 0) {
+                k |= Keys.Down;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.Back) != 0) {
-                k |= System.Windows.Forms.Keys.Back;
+            if (GetAsyncKeyState(Keys.Back) != 0) {
+                k |= Keys.Back;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.Delete) != 0) {
-                k |= System.Windows.Forms.Keys.Delete;
+            if (GetAsyncKeyState(Keys.Delete) != 0) {
+                k |= Keys.Delete;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.Space) != 0) {
-                k |= System.Windows.Forms.Keys.Space;
+            if (GetAsyncKeyState(Keys.Space) != 0) {
+                k |= Keys.Space;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.Add) != 0) {
-                k |= System.Windows.Forms.Keys.Add;
+            if (GetAsyncKeyState(Keys.Add) != 0) {
+                k |= Keys.Add;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.Subtract) != 0) {
-                k |= System.Windows.Forms.Keys.Subtract;
+            if (GetAsyncKeyState(Keys.Subtract) != 0) {
+                k |= Keys.Subtract;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.Multiply) != 0) {
-                k |= System.Windows.Forms.Keys.Multiply;
+            if (GetAsyncKeyState(Keys.Multiply) != 0) {
+                k |= Keys.Multiply;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.Divide) != 0) {
-                k |= System.Windows.Forms.Keys.Divide;
+            if (GetAsyncKeyState(Keys.Divide) != 0) {
+                k |= Keys.Divide;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.OemMinus) != 0) {
-                k |= System.Windows.Forms.Keys.OemMinus;
+            if (GetAsyncKeyState(Keys.OemMinus) != 0) {
+                k |= Keys.OemMinus;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.OemPeriod) != 0) {
-                k |= System.Windows.Forms.Keys.OemPeriod;
+            if (GetAsyncKeyState(Keys.OemPeriod) != 0) {
+                k |= Keys.OemPeriod;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.Oemcomma) != 0) {
-                k |= System.Windows.Forms.Keys.Oemcomma;
+            if (GetAsyncKeyState(Keys.Oemcomma) != 0) {
+                k |= Keys.Oemcomma;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.F1) != 0) {
-                k |= System.Windows.Forms.Keys.F1;
+            if (GetAsyncKeyState(Keys.F1) != 0) {
+                k |= Keys.F1;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.F2) != 0) {
-                k |= System.Windows.Forms.Keys.F2;
+            if (GetAsyncKeyState(Keys.F2) != 0) {
+                k |= Keys.F2;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.F3) != 0) {
-                k |= System.Windows.Forms.Keys.F3;
+            if (GetAsyncKeyState(Keys.F3) != 0) {
+                k |= Keys.F3;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.F4) != 0) {
-                k |= System.Windows.Forms.Keys.F4;
+            if (GetAsyncKeyState(Keys.F4) != 0) {
+                k |= Keys.F4;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.F5) != 0) {
-                k |= System.Windows.Forms.Keys.F5;
+            if (GetAsyncKeyState(Keys.F5) != 0) {
+                k |= Keys.F5;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.F6) != 0) {
-                k |= System.Windows.Forms.Keys.F6;
+            if (GetAsyncKeyState(Keys.F6) != 0) {
+                k |= Keys.F6;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.F7) != 0) {
-                k |= System.Windows.Forms.Keys.F7;
+            if (GetAsyncKeyState(Keys.F7) != 0) {
+                k |= Keys.F7;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.F8) != 0) {
-                k |= System.Windows.Forms.Keys.F8;
+            if (GetAsyncKeyState(Keys.F8) != 0) {
+                k |= Keys.F8;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.F9) != 0) {
-                k |= System.Windows.Forms.Keys.F9;
+            if (GetAsyncKeyState(Keys.F9) != 0) {
+                k |= Keys.F9;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.F10) != 0) {
-                k |= System.Windows.Forms.Keys.F10;
+            if (GetAsyncKeyState(Keys.F10) != 0) {
+                k |= Keys.F10;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.F11) != 0) {
-                k |= System.Windows.Forms.Keys.F11;
+            if (GetAsyncKeyState(Keys.F11) != 0) {
+                k |= Keys.F11;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.F12) != 0) {
-                k |= System.Windows.Forms.Keys.F12;
+            if (GetAsyncKeyState(Keys.F12) != 0) {
+                k |= Keys.F12;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.Pause) != 0) {
-                k |= System.Windows.Forms.Keys.Pause;
+            if (GetAsyncKeyState(Keys.Pause) != 0) {
+                k |= Keys.Pause;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.Oem5) != 0) // Zirkumflex ^
+            if (GetAsyncKeyState(Keys.Oem5) != 0) // Zirkumflex ^
             {
-                k |= System.Windows.Forms.Keys.Oem5;
+                k |= Keys.Oem5;
             }
-            System.Windows.Forms.KeyEventArgs kev = new(k);
-            System.Windows.Forms.KeyEventArgs kevold = new(_keyLastKey);
+            KeyEventArgs kev = new(k);
+            KeyEventArgs kevold = new(_keyLastKey);
             if (_keyIsPressing) {
-                if (k == System.Windows.Forms.Keys.None) {
+                if (k == Keys.None) {
                     OnKeyUp(kevold);
                     _keyIsPressing = false;
                 } else if (k != _keyLastKey) {
                     OnKeyDown(kev);
                 }
             } else {
-                if (k != System.Windows.Forms.Keys.None) {
+                if (k != Keys.None) {
                     OnKeyDown(kev);
                     _keyIsPressing = true;
                 }
@@ -278,25 +279,27 @@ namespace BlueControls {
         }
 
         public void DoMouse() {
-            var b = System.Windows.Forms.MouseButtons.None;
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.LButton) != 0) {
-                b |= System.Windows.Forms.MouseButtons.Left;
+            var b = MouseButtons.None;
+            if (GetAsyncKeyState(Keys.LButton) != 0) {
+                b |= MouseButtons.Left;
             }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.RButton) != 0) {
-                b |= System.Windows.Forms.MouseButtons.Right;
+            if (GetAsyncKeyState(Keys.RButton) != 0) {
+                b |= MouseButtons.Right;
             }
-            System.Windows.Forms.MouseEventArgs mev = new(b, 0, System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y, 0);
-            System.Windows.Forms.MouseEventArgs mevold = new(_mouseLastButton, 0, System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y, 0);
+            MouseEventArgs mev = new(b, 0, Cursor.Position.X,
+                Cursor.Position.Y, 0);
+            MouseEventArgs mevold = new(_mouseLastButton, 0,
+                Cursor.Position.X, Cursor.Position.Y, 0);
             if (_mouseLastX != mev.X || _mouseLastY != mev.Y) {
                 OnMouseMove(mev);
             }
             if (_mouseIsPressing) {
-                if (b == System.Windows.Forms.MouseButtons.None) {
+                if (b == MouseButtons.None) {
                     OnMouseUp(mevold);
                     _mouseIsPressing = false;
                 }
             } else {
-                if (b != System.Windows.Forms.MouseButtons.None) {
+                if (b != MouseButtons.None) {
                     OnMouseDown(mev);
                     _mouseIsPressing = true;
                 }
@@ -319,10 +322,10 @@ namespace BlueControls {
         public void RemoveHook() => Tim.Enabled = false;
 
         [DllImport("user32.dll", EntryPoint = "GetAsyncKeyState", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
-        private static extern short GetAsyncKeyState(System.Windows.Forms.Keys nVirtKey);
+        private static extern short GetAsyncKeyState(Keys nVirtKey);
 
         private void Initialize() {
-            Tim = new System.Windows.Forms.Timer {
+            Tim = new Timer {
                 Interval = 1,
                 Enabled = false
             };
@@ -333,15 +336,15 @@ namespace BlueControls {
             _keyLastKey = 0;
         }
 
-        private void OnKeyDown(System.Windows.Forms.KeyEventArgs e) => KeyDown?.Invoke(this, e);
+        private void OnKeyDown(KeyEventArgs e) => KeyDown?.Invoke(this, e);
 
-        private void OnKeyUp(System.Windows.Forms.KeyEventArgs e) => KeyUp?.Invoke(null, e);
+        private void OnKeyUp(KeyEventArgs e) => KeyUp?.Invoke(null, e);
 
-        private void OnMouseDown(System.Windows.Forms.MouseEventArgs e) => MouseDown?.Invoke(null, e);
+        private void OnMouseDown(MouseEventArgs e) => MouseDown?.Invoke(null, e);
 
-        private void OnMouseMove(System.Windows.Forms.MouseEventArgs e) => MouseMove?.Invoke(this, e);
+        private void OnMouseMove(MouseEventArgs e) => MouseMove?.Invoke(this, e);
 
-        private void OnMouseUp(System.Windows.Forms.MouseEventArgs e) => MouseUp?.Invoke(this, e);
+        private void OnMouseUp(MouseEventArgs e) => MouseUp?.Invoke(this, e);
 
         private void Tim_Tick(object? sender, System.EventArgs? e) {
             Tim.Enabled = false;

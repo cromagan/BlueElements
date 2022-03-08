@@ -19,7 +19,6 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Forms;
-using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
@@ -27,6 +26,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
 
 namespace BlueControls.BlueDatabaseDialogs {

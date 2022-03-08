@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
@@ -179,7 +181,7 @@ namespace BlueControls.Controls {
             if (par is enPartentType.Slider) { _buttonStyle = enButtonStyle.SliderButton; }
         }
 
-        internal static void DrawButton(Control? control, Graphics gr, enDesign buttontype, enStates state, QuickImage? pic, enAlignment align, bool picHeight44, ExtText? etxt, string text, Rectangle displayRectangle, bool translate) {
+        internal static void DrawButton(Control control, Graphics gr, enDesign buttontype, enStates state, QuickImage? pic, enAlignment align, bool picHeight44, ExtText etxt, string text, Rectangle displayRectangle, bool translate) {
             var design = Skin.DesignOf(buttontype, state);
             Skin.Draw_Back(gr, design, displayRectangle, control, true);
             Skin.Draw_Border(gr, design, displayRectangle);
@@ -383,10 +385,12 @@ namespace BlueControls.Controls {
                 // Focus egal, DauerFeuerbutton - Slider - Design kann keinen Focus erhalten!
                 _clickFired = false;
                 OnClick(e);
-                if (sender != null) { _clickFirerer.Interval = 100; }
-                _clickFirerer.Enabled = true;
+                if (_clickFirerer != null) {
+                    _clickFirerer.Interval = 100;
+                    _clickFirerer.Enabled = true;
+                }
             } else {
-                _clickFirerer.Enabled = false;
+                if (_clickFirerer != null) { _clickFirerer.Enabled = false; }
             }
         }
 

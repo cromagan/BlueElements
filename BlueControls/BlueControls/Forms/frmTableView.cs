@@ -205,7 +205,8 @@ namespace BlueControls.Forms {
 
         private void AllgemeinerEditor_Click(object sender, System.EventArgs e) {
             Hide();
-            PadEditorWithFileAccess r = new() {
+            PadEditorWithFileAccess r = new()
+            {
                 WindowState = System.Windows.Forms.FormWindowState.Maximized
             };
             r.ShowDialog();

@@ -110,7 +110,7 @@ namespace BlueControls.ItemCollection {
                 new FlexiControlForProperty(this, "Name"),
                 new FlexiControlForProperty(this, "Randfarbe")
             };
-            ItemCollectionList lage = new()
+            ItemCollectionList.ItemCollectionList lage = new()
             {
                 { "ohne", "-1" },
                 { "Links oben", ((int)enAlignment.Top_Left).ToString() }
@@ -301,7 +301,7 @@ namespace BlueControls.ItemCollection {
                     PadInternal.Item.DrawCreativePadToBitmap(_tmpBmp, enStates.Standard, zoomv, slidervalues.X, slidervalues.Y, VisibleItems);
                     if (_tmpBmp != null) {
                         foreach (var thisA in Eingebettete_Ansichten) {
-                            ChildPadItem pad = null;
+                            ChildPadItem? pad = null;
                             foreach (var it in Parent) {
                                 if (it is ChildPadItem cp) {
                                     if (string.Equals(cp.Name, thisA, StringComparison.CurrentCultureIgnoreCase)) {

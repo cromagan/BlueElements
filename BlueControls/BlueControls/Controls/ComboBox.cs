@@ -23,13 +23,13 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
 using BlueControls.Forms;
-using BlueControls.ItemCollection;
 using BlueDatabase.Interfaces;
 using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Design;
 using System.Linq;
+using BlueControls.ItemCollection.ItemCollectionList;
 
 namespace BlueControls.Controls {
 

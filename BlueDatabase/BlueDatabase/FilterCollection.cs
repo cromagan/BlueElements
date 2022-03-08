@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -29,12 +31,12 @@ namespace BlueDatabase {
 
         #region Constructors
 
-        public FilterCollection(Database database) {
+        public FilterCollection(Database? database) {
             Database = database;
             if (Database != null) { Database.Disposing += Database_Disposing; }
         }
 
-        public FilterCollection(Database database, string toParse) : this(database) => Parse(toParse);
+        public FilterCollection(Database? database, string toParse) : this(database) => Parse(toParse);
 
         #endregion
 
@@ -75,11 +77,11 @@ namespace BlueDatabase {
 
         public void Add(enFilterType filterType, List<string> filterBy) => AddIfNotExists(new FilterItem(Database, filterType, filterBy));
 
-        public void Add(string columnName, enFilterType filterType, string filterBy) => Add(Database.Column[columnName], filterType, filterBy);
+        public void Add(string columnName, enFilterType filterType, string filterBy) => Add(Database?.Column[columnName], filterType, filterBy);
 
-        public void Add(string columnName, enFilterType filterType, List<string>? filterBy) => Add(Database.Column[columnName], filterType, filterBy);
+        public void Add(string columnName, enFilterType filterType, List<string> filterBy) => Add(Database?.Column[columnName], filterType, filterBy);
 
-        public void Add(ColumnItem? column, enFilterType filterType, List<string>? filterBy) => AddIfNotExists(new FilterItem(column, filterType, filterBy));
+        public void Add(ColumnItem? column, enFilterType filterType, List<string> filterBy) => AddIfNotExists(new FilterItem(column, filterType, filterBy));
 
         public void Add(ColumnItem? column, enFilterType filterType, string filterBy) => AddIfNotExists(new FilterItem(column, filterType, filterBy));
 

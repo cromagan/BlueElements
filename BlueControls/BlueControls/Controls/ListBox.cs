@@ -23,13 +23,13 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
 using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using BlueControls.ItemCollection.ItemCollectionList;
 
 namespace BlueControls.Controls {
 
@@ -275,8 +275,10 @@ namespace BlueControls.Controls {
             var (biggestItemX, _, heightAdded, senkrechtAllowed) = Item.ItemData();
             Item.ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height - paintModYx), SliderY, biggestItemX, heightAdded, senkrechtAllowed);
             if (SliderY.Visible) { paintModXx = SliderY.Width; }
-            Rectangle borderCoords = new(DisplayRectangle.Left, DisplayRectangle.Top, DisplayRectangle.Width - paintModXx, DisplayRectangle.Height - paintModYx);
-            Rectangle visArea = new(borderCoords.X, (int)(borderCoords.Y + SliderY.Value), borderCoords.Width, borderCoords.Height);
+            Rectangle borderCoords = new(DisplayRectangle.Left, DisplayRectangle.Top,
+                DisplayRectangle.Width - paintModXx, DisplayRectangle.Height - paintModYx);
+            Rectangle visArea = new(borderCoords.X, (int)(borderCoords.Y + SliderY.Value),
+                borderCoords.Width, borderCoords.Height);
             if (borderCoords.Height > 0) {
                 //// Kann sein, wenn PaintModY größer als die Höhe ist
                 //if (_Appearance == enBlueListBoxAppearance.Listbox)

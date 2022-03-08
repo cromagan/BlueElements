@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -23,7 +25,6 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
 using BlueDatabase;
 using System;
 using System.Collections.Generic;
@@ -31,8 +32,10 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.BitmapExt;
 using static BlueBasics.FileOperations;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls {
 
@@ -75,7 +78,7 @@ namespace BlueControls.Controls {
 
         #region Properties
 
-        [DefaultValue((Bitmap)null)]
+        [DefaultValue((Bitmap?)null)]
         public Bitmap? Bitmap {
             get => _bitmap;
             private set {

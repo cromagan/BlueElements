@@ -54,7 +54,7 @@ namespace BlueScript.Methods {
 
             var newcommand = x.ValueString + infos.AttributText.Substring(posgleich) + ";";
 
-            return s._berechneVariable.DoitKomplett(newcommand, s, infos);
+            return s.BerechneVariable.DoitKomplett(newcommand, s, infos);
         }
 
         #endregion

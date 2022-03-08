@@ -26,6 +26,7 @@ using BlueDatabase;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
 
 namespace BlueControls.BlueDatabaseDialogs {

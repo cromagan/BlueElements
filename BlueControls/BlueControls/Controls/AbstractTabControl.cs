@@ -31,7 +31,7 @@ namespace BlueControls.Controls {
 
         #region Fields
 
-        private bool _IndexChanged;
+        private bool _indexChanged;
 
         #endregion
 
@@ -139,10 +139,10 @@ namespace BlueControls.Controls {
         //}
 
         protected override void OnSelectedIndexChanged(System.EventArgs e) {
-            if (_IndexChanged) { return; }
-            _IndexChanged = true;
+            if (_indexChanged) { return; }
+            _indexChanged = true;
             base.OnSelectedIndexChanged(e);
-            _IndexChanged = false;
+            _indexChanged = false;
         }
 
         protected override void OnVisibleChanged(System.EventArgs e) {
@@ -169,8 +169,8 @@ namespace BlueControls.Controls {
                     }
 
                     TabPages.Clear();
-                    foreach (var thisTP in neworder) {
-                        TabPages.Add(thisTP);
+                    foreach (var thisTp in neworder) {
+                        TabPages.Add(thisTp);
                     }
                 }
 

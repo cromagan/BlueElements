@@ -356,15 +356,15 @@ namespace BlueBasics {
             return tXt;
         }
 
-        public static bool IsDateTime(this string txt) => DateTimeTryParse(txt, out _);
+        public static bool IsDateTime(this string? txt) => DateTimeTryParse(txt, out _);
 
-        public static bool IsDouble(this string txt) => txt is not null && double.TryParse(txt.Replace(".", ","), out _);
+        public static bool IsDouble(this string? txt) => txt is not null && double.TryParse(txt.Replace(".", ","), out _);
 
-        public static bool IsHtmlColorCode(this string txt) => !string.IsNullOrEmpty(txt) && txt.Length is 6 or 8 && txt.ContainsOnlyChars(Constants.Char_Numerals + "abcdefABCDEF");
+        public static bool IsHtmlColorCode(this string? txt) => !string.IsNullOrEmpty(txt) && txt.Length is 6 or 8 && txt.ContainsOnlyChars(Constants.Char_Numerals + "abcdefABCDEF");
 
-        public static bool IsLong(this string txt) => txt is not null && long.TryParse(txt, out _);
+        public static bool IsLong(this string? txt) => txt is not null && long.TryParse(txt, out _);
 
-        public static bool IsNumeral(this string txt) => (txt is not null && txt.IsLong()) || txt.IsDouble();
+        public static bool IsNumeral(this string? txt) => txt is not null && (txt.IsLong() || txt.IsDouble());
 
         // public static List<byte> ToByteList(this string TXT) {
         //    var x = new List<byte>();

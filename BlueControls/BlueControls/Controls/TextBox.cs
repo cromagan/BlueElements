@@ -24,13 +24,13 @@ using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using BlueControls.ItemCollection.ItemCollectionList;
 
 namespace BlueControls.Controls {
 
@@ -951,7 +951,8 @@ namespace BlueControls.Controls {
             if (_sliderY != null) {
                 return;
             }
-            _sliderY = new Slider {
+            _sliderY = new Slider
+            {
                 Dock = System.Windows.Forms.DockStyle.Right,
                 LargeChange = 10f,
                 Location = new Point(Width - 18, 0),
@@ -996,7 +997,10 @@ namespace BlueControls.Controls {
             for (var cc = maS; cc <= maE; cc++) {
                 if (cc == maE || _eTxt[cc].Pos.X < _eTxt[tmpcharS].Pos.X || Math.Abs(_eTxt[cc].Pos.Y - _eTxt[tmpcharS].Pos.Y) > 0.001) //Jetzt ist der Zeitpunkt zum Zeichen/start setzen
                 {
-                    Rectangle r = new((int)(_eTxt[tmpcharS].Pos.X + _eTxt.DrawingPos.X), (int)(_eTxt[tmpcharS].Pos.Y + 2 + _eTxt.DrawingPos.Y), (int)(_eTxt[cc - 1].Pos.X + _eTxt[cc - 1].Size.Width - _eTxt[tmpcharS].Pos.X), (int)(_eTxt[cc - 1].Pos.Y + _eTxt[cc - 1].Size.Height - _eTxt[tmpcharS].Pos.Y));
+                    Rectangle r = new((int) (_eTxt[tmpcharS].Pos.X + _eTxt.DrawingPos.X),
+                        (int) (_eTxt[tmpcharS].Pos.Y + 2 + _eTxt.DrawingPos.Y),
+                        (int) (_eTxt[cc - 1].Pos.X + _eTxt[cc - 1].Size.Width - _eTxt[tmpcharS].Pos.X),
+                        (int) (_eTxt[cc - 1].Pos.Y + _eTxt[cc - 1].Size.Height - _eTxt[tmpcharS].Pos.Y));
                     if (r.Width < 2) { r = new Rectangle(r.Left, r.Top, 2, r.Height); }
                     if (_eTxt[tmpcharS].State != enStates.Undefiniert) {
                         Skin.Draw_Back(gr, _eTxt.Design, _eTxt[tmpcharS].State, r, null, false);

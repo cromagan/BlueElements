@@ -15,13 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
-using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
@@ -31,6 +32,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
 using static BlueBasics.FileOperations;
 
@@ -56,7 +58,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Properties
 
-        [DefaultValue((Table)null)]
+        [DefaultValue((Table?)null)]
         public Table? Table {
             get => _tableView;
             set {
@@ -83,8 +85,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         #region Methods
 
         public static void CheckDatabase(object? sender, LoadedEventArgs? e) {
-            var database = (Database)sender;
-            if (database != null && !database.ReadOnly) {
+            if (sender is Database database && !database.ReadOnly) {
                 if (database.IsAdministrator()) {
                     foreach (var thisColumnItem in database.Column) {
                         while (!thisColumnItem.IsOk()) {

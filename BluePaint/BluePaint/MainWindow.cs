@@ -100,7 +100,7 @@ namespace BluePaint {
                         MessageBox.Show("Während einer Aufnahme<br>nicht möglich.", enImageCode.Information, "OK");
                         return;
                     }
-                    _merker.Add(newTool);
+                    _merker?.Add(newTool);
                 }
                 Split.Panel1.Controls.Add(newTool);
                 newTool.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -117,7 +117,7 @@ namespace BluePaint {
                 if (doInitalizingAction) {
                     newTool.ToolFirstShown();
                 }
-                if (_aufnahme && _merker.Contains(newTool)) {
+                if (_merker != null && _aufnahme && _merker.Contains(newTool)) {
                     _merker.Add(newTool);
                 }
             }
@@ -187,7 +187,7 @@ namespace BluePaint {
                 Notification.Show("Abbruch,<br>kein Bild im Zwischenspeicher!", enImageCode.Information);
                 return;
             }
-            SetPic((Bitmap)System.Windows.Forms.Clipboard.GetImage());
+            SetPic(((Bitmap)System.Windows.Forms.Clipboard.GetImage()));
             _isSaved = false;
             _filename = "*";
             P.ZoomFit();
@@ -196,7 +196,7 @@ namespace BluePaint {
         private void btnGrößeÄndern_Click(object sender, System.EventArgs e) => SetTool(new Tool_Resize(), !_aufnahme);
 
         private void btnLetzteDateien_ItemClicked(object sender, BlueControls.EventArgs.BasicListItemEventArgs e) {
-            if (!IsSaved()) { return; }
+            if (!IsSaved() || e.Item == null) { return; }
             LoadFromDisk(e.Item.Internal);
         }
 
@@ -213,7 +213,7 @@ namespace BluePaint {
 
         private void btnSave_Click(object sender, System.EventArgs e) => Speichern();
 
-        private void btnSaveAs_Click(object sender, System.EventArgs e) {
+        private void btnSaveAs_Click(object? sender, System.EventArgs e) {
             SaveTab.ShowDialog();
             if (!PathExists(SaveTab.FileName.FilePath())) { return; }
             if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
@@ -232,7 +232,7 @@ namespace BluePaint {
             btnStop.Enabled = false;
             grpDatei.Enabled = true;
             MessageBox.Show("Aufnahme beendet.", enImageCode.Stop, "Ok");
-            if (_macro.Count > 0) {
+            if (_macro != null && _macro.Count > 0) {
                 _isSaved = true;
                 SetTool(new Tool_Abspielen(_macro, _merker), false);
             }
@@ -244,7 +244,7 @@ namespace BluePaint {
 
         private void CurrentTool_CommandForMacro(object sender, CommandForMacroArgs e) {
             if (!_aufnahme) { return; }
-            _macro.Add(_currentTool.MacroKennung().ToNonCritical() + ";" + e.Command.ToNonCritical());
+            _macro?.Add(_currentTool?.MacroKennung().ToNonCritical() + ";" + e.Command.ToNonCritical());
         }
 
         private void CurrentTool_DoInvalidate(object sender, System.EventArgs e) => P.Invalidate();
@@ -333,11 +333,11 @@ namespace BluePaint {
 
         private void P_ImageMouseMove(object sender, BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e) {
             _currentTool?.MouseMove(e, P.Bmp);
-            if (e.Current.IsInPic) {
+            if (e.Current.IsInPic && P.Bmp != null) {
                 var c = P.Bmp.GetPixel(e.Current.TrimmedX, e.Current.TrimmedY);
                 InfoText.Text = "X: " + e.Current.TrimmedX +
-                               "<br>Y: " + e.Current.TrimmedY +
-                               "<br>Farbe: " + c.ToHtmlCode().ToUpper();
+                                "<br>Y: " + e.Current.TrimmedY +
+                                "<br>Farbe: " + c.ToHtmlCode().ToUpper();
             } else {
                 InfoText.Text = "";
             }

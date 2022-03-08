@@ -127,7 +127,9 @@ namespace BlueControls.Controls {
             OnMouseWheel(x);
         }
 
-        internal PointF SliderValues(RectangleF bounds, float zoomToUse, Point topLeftPos) => new((float)((bounds.Left * zoomToUse) - (topLeftPos.X / 2d)), (float)((bounds.Top * zoomToUse) - (topLeftPos.Y / 2d)));
+        internal PointF SliderValues(RectangleF bounds, float zoomToUse, Point topLeftPos) =>
+            new((float) ((bounds.Left * zoomToUse) - (topLeftPos.X / 2d)),
+                (float) ((bounds.Top * zoomToUse) - (topLeftPos.Y / 2d)));
 
         /// <summary>
         /// Kümmert sich um Slider und Maximal-Setting.
@@ -155,7 +157,9 @@ namespace BlueControls.Controls {
         /// </summary>
         /// <remarks>
         /// </remarks>
-        protected Point KoordinatesUnscaled(MouseEventArgs e) => new((int)Math.Round(((e.X + ShiftX) / Zoom) - 0.5d, 0), (int)Math.Round(((e.Y + ShiftY) / Zoom) - 0.5d, 0));
+        protected Point KoordinatesUnscaled(MouseEventArgs e) =>
+            new((int) Math.Round(((e.X + ShiftX) / Zoom) - 0.5d, 0),
+                (int) Math.Round(((e.Y + ShiftY) / Zoom) - 0.5d, 0));
 
         protected virtual RectangleF MaxBounds() {
             Develop.DebugPrint_RoutineMussUeberschriebenWerden();

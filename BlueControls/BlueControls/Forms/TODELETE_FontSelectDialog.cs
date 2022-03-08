@@ -17,9 +17,9 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.ItemCollection;
 using System;
 using System.Drawing;
+using BlueControls.ItemCollection.ItemCollectionList;
 
 namespace BlueControls.Forms {
 
@@ -96,9 +96,9 @@ namespace BlueControls.Forms {
                 if (FName.Item[value.FontName] == null) { FName.Item.Add(value.FontName, value.FontName, QuickImage.Get(enImageCode.Warnung, 20)); }
                 FName.Item.UncheckAll();
                 FName.Item[value.FontName].Checked = true;
-                if (FSize.Item[value.FontSize.ToString()] == null) { FSize.Item.Add(value.FontSize.ToString()); }
+                if (FSize.Item[value.FontSize.ToString(Constants.Format_Float1)] == null) { FSize.Item.Add(value.FontSize.ToString(Constants.Format_Float1)); }
                 FSize.Item.UncheckAll();
-                FSize.Item[value.FontSize.ToString()].Checked = true;
+                FSize.Item[value.FontSize.ToString(Constants.Format_Float1)].Checked = true;
                 fFett.Checked = value.Bold;
                 fKursiv.Checked = value.Italic;
                 fUnterstrichen.Checked = value.Underline;

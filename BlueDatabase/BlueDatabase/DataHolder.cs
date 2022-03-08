@@ -37,7 +37,7 @@ namespace BlueDatabase {
         /// <param name="id">Die ID, nach der gesucht werden soll.</param>
         /// <returns>Wenn in der Liste die ID vorhanden ist, wird dieses Objekt zurückgegeben, ansonsten wird NULL zurückgegeben.</returns>
         [Obsolete]
-        public static t? GetByID<t>(this List<t?> items, string id) where t : DataHolder => items.FirstOrDefault(thisit => thisit.Id.ToUpper() == id.ToUpper());
+        public static t? GetByID<t>(this List<t?> items, string id) where t : DataHolder => items.FirstOrDefault(thisit => string.Equals(thisit.Id, id, StringComparison.CurrentCultureIgnoreCase));
 
         #endregion
     }
@@ -45,7 +45,7 @@ namespace BlueDatabase {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [Obsolete]
-    public abstract class DataHolder : System.IDisposable {
+    public abstract class DataHolder : IDisposable {
 
         #region Fields
 
@@ -190,7 +190,7 @@ namespace BlueDatabase {
         public void Dispose() {
             // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
             Dispose(true);
-            System.GC.SuppressFinalize(this);
+            GC.SuppressFinalize(this);
         }
 
         public double GetDouble(string dataName) => Row().CellGetDouble(Column(dataName, string.Empty));
@@ -228,10 +228,10 @@ namespace BlueDatabase {
             var ids = GetList(name);
             foreach (var thisId in ids) {
                 if (!separateFiles) {
-                    var v = (Tt)System.Activator.CreateInstance(typeof(Tt), this, thisId.ToUpper());
+                    var v = (Tt)Activator.CreateInstance(typeof(Tt), this, thisId.ToUpper());
                     data.Add(v);
                 } else {
-                    var v = (Tt)System.Activator.CreateInstance(typeof(Tt), thisId.ToUpper());
+                    var v = (Tt)Activator.CreateInstance(typeof(Tt), thisId.ToUpper());
                     data.Add(v);
                 }
             }
@@ -315,8 +315,8 @@ namespace BlueDatabase {
 
         public void SetSynchronizedFiles<Tt>(string dataName, string value, ref Tt synchronData) where Tt : DataHolder {
             Row().CellSet(Column(dataName, string.Empty), value);
-            if (synchronData == null || synchronData.Id.ToUpper() != value.ToUpper()) {
-                synchronData = (Tt)System.Activator.CreateInstance(typeof(Tt), value);
+            if (synchronData == null || !string.Equals(synchronData.Id, value, StringComparison.CurrentCultureIgnoreCase)) {
+                synchronData = (Tt)Activator.CreateInstance(typeof(Tt), value);
             }
         }
 

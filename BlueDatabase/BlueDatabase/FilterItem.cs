@@ -73,17 +73,17 @@ namespace BlueDatabase {
             SearchValue.Changed += SearchValue_ListOrItemChanged;
         }
 
-        public FilterItem(ColumnItem? column, enFilterType filterType, string searchValue) : this(column, filterType, new List<string> { searchValue }, string.Empty) {
-        }
+        public FilterItem(ColumnItem? column, enFilterType filterType, string searchValue) : this(column, filterType, new List<string> { searchValue }, string.Empty) { }
 
-        public FilterItem(ColumnItem? column, enFilterType filterType, string searchValue, string tag) : this(column, filterType, new List<string> { searchValue }, tag) {
-        }
+        public FilterItem(ColumnItem? column, enFilterType filterType, string searchValue, string tag) : this(column, filterType, new List<string> { searchValue }, tag) { }
 
-        public FilterItem(ColumnItem? column, enFilterType filterType, List<string>? searchValue) : this(column, filterType, searchValue, string.Empty) {
-        }
+        public FilterItem(ColumnItem? column, enFilterType filterType, List<string> searchValue) : this(column, filterType, searchValue, string.Empty) { }
 
         public FilterItem(ColumnItem? column, enFilterType filterType, IReadOnlyCollection<string>? searchValue, string herkunft) {
-            if (column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte nicht vorhanden."); }
+            if (column == null) {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Spalte nicht vorhanden.");
+                return;
+            }
             Database = column.Database;
             _column = column;
             _filterType = filterType;
@@ -92,8 +92,7 @@ namespace BlueDatabase {
             SearchValue.Changed += SearchValue_ListOrItemChanged;
         }
 
-        public FilterItem(ColumnItem? column, RowItem rowWithValue) : this(column, enFilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren, rowWithValue.CellGetString(column)) {
-        }
+        public FilterItem(ColumnItem? column, RowItem rowWithValue) : this(column, enFilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren, rowWithValue.CellGetString(column)) { }
 
         #endregion
 

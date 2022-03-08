@@ -123,29 +123,17 @@ namespace BlueControls {
 
         public static PointM Empty() => new(0f, 0f);
 
-        public static implicit operator Point(PointM p) {
-            return new((int)p.X, (int)p.Y);
-        }
+        public static implicit operator Point(PointM p) => new((int)p.X, (int)p.Y);
 
-        public static implicit operator PointF(PointM p) {
-            return new(p.X, p.Y);
-        }
+        public static implicit operator PointF(PointM p) => new(p.X, p.Y);
 
-        public static PointM operator -(PointM? a) {
-            return new(-a._x, -a._y);
-        }
+        public static PointM operator -(PointM? a) => new(-a._x, -a._y);
 
-        public static PointM operator -(PointM? a, PointM? b) {
-            return new(a._x - b._x, a._y - b._y);
-        }
+        public static PointM operator -(PointM? a, PointM? b) => new(a._x - b._x, a._y - b._y);
 
-        public static PointM operator *(PointM? a, float b) {
-            return new(a._x * b, a._y * b);
-        }
+        public static PointM operator *(PointM? a, float b) => new(a._x * b, a._y * b);
 
-        public static PointM operator +(PointM a, PointM b) {
-            return new(a._x + b._x, a._y + b._y);
-        }
+        public static PointM operator +(PointM a, PointM b) => new(a._x + b._x, a._y + b._y);
 
         public float DistanzZuLinie(PointM? P1, PointM? P2) => DistanzZuLinie(P1.X, P1.Y, P2.X, P2.Y);
 
@@ -279,7 +267,8 @@ namespace BlueControls {
 
         public PointF ZoomAndMove(AdditionalDrawing e) => ZoomAndMove(e.Zoom, e.ShiftX, e.ShiftY);
 
-        public PointF ZoomAndMove(float zoom, float shiftX, float shiftY) => new((_x * zoom) - shiftX + (zoom / 2), (_y * zoom) - shiftY + (zoom / 2));
+        public PointF ZoomAndMove(float zoom, float shiftX, float shiftY) =>
+            new((_x * zoom) - shiftX + (zoom / 2), (_y * zoom) - shiftY + (zoom / 2));
 
         #endregion
     }

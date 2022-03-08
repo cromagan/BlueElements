@@ -19,11 +19,11 @@ using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using BlueControls.ItemCollection.ItemCollectionList;
 
 namespace BlueControls.Forms {
 
@@ -114,9 +114,12 @@ namespace BlueControls.Forms {
             }
         }
 
-        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList? items, object tag, Control? connectedControl, bool translate) => new(items, Cursor.Position.X - 8, Cursor.Position.Y - 8, -1, tag, connectedControl, translate);
+        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList? items, object tag, Control? connectedControl, bool translate) =>
+            new(items, Cursor.Position.X - 8, Cursor.Position.Y - 8, -1, tag,
+                connectedControl, translate);
 
-        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList? items, int xpos, int ypos, int steuerWi, object? tag, Control? connectedControl, bool translate) => new(items, xpos, ypos, steuerWi, tag, connectedControl, translate);
+        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList? items, int xpos, int ypos, int steuerWi, object? tag, Control? connectedControl, bool translate) =>
+            new(items, xpos, ypos, steuerWi, tag, connectedControl, translate);
 
         public void Generate_ListBox1(ItemCollectionList? items, int minWidth, enAddType addNewAllowed, bool translate) {
             //var itemsClone = (ItemCollectionList)ItemsOri.Clone();
@@ -189,13 +192,14 @@ namespace BlueControls.Forms {
             // Selectet Chanched bringt nix, da es ja drum geht, ob eine Node angeklickt wurde.
             // Nur Listboxen können überhaupt erst Checked werden!
             // Ob sie Checked wird, ist egal!
-            if (e.Item != null) {
-                // Einen Klick auf Überschriften einfach ignorieren, zB. kontextmenü
-                if (!e.Item.IsClickable()) { return; }
-                if (lstbx.Appearance is not enBlueListBoxAppearance.Listbox and not enBlueListBoxAppearance.Gallery and not enBlueListBoxAppearance.FileSystem) {
-                    OnItemClicked(new ContextMenuItemClickedEventArgs(e.Item.Internal, Tag, null)); // Das Tag hier ist eigentlich das HotItem
-                    if (!IsDisposed) { Close(); }
-                }
+            if (e.Item == null) { return; }
+
+            // Einen Klick auf Überschriften einfach ignorieren, zB. kontextmenü
+            if (!e.Item.IsClickable()) { return; }
+
+            if (lstbx.Appearance is not enBlueListBoxAppearance.Listbox and not enBlueListBoxAppearance.Gallery and not enBlueListBoxAppearance.FileSystem) {
+                OnItemClicked(new ContextMenuItemClickedEventArgs(e.Item.Internal, Tag, null)); // Das Tag hier ist eigentlich das HotItem
+                if (!IsDisposed) { Close(); }
             }
         }
 

@@ -21,6 +21,7 @@ using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.FileOperations;
 
 namespace BlueControls.ItemCollection {
@@ -42,7 +43,7 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public DataListItem(byte[] b, string internalname, string caption) : base(internalname) {
+        public DataListItem(byte[] b, string internalname, string caption) : base(internalname, true) {
             _caption = caption;
             _captiontmp.Clear();
             _bin = b;
@@ -50,7 +51,7 @@ namespace BlueControls.ItemCollection {
             _overlays.Clear();
         }
 
-        public DataListItem(string filename, string internalname, string caption, string encryptionKey) : base(internalname) {
+        public DataListItem(string filename, string internalname, string caption, string encryptionKey) : base(internalname, true) {
             _caption = caption;
             _captiontmp.Clear();
             _filename = filename;
@@ -153,7 +154,9 @@ namespace BlueControls.ItemCollection {
                 foreach (var thisCap in _captiontmp) {
                     c--;
                     var s = Skin.FormatedText_NeededSize(thisCap, null, bFont, 16);
-                    Rectangle r = new((int)(drawingCoordinates.Left + ((drawingCoordinates.Width - s.Width) / 2.0)), drawingCoordinates.Bottom - s.Height - 3, s.Width, s.Height);
+                    Rectangle r =
+                        new((int)(drawingCoordinates.Left + ((drawingCoordinates.Width - s.Width) / 2.0)),
+                            drawingCoordinates.Bottom - s.Height - 3, s.Width, s.Height);
                     r.X -= trp.X;
                     r.Y -= trp.Y;
                     r.Y = r.Y - (ConstMy * c) + ausgl;

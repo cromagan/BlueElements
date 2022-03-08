@@ -15,15 +15,17 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
+using System;
+using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueDatabase;
-using System;
-using System.Drawing;
 
-namespace BlueControls.ItemCollection {
+namespace BlueControls.ItemCollection.ItemCollectionList {
 
     public class RowFormulaListItem : BasicListItem {
 
@@ -39,7 +41,7 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public RowFormulaListItem(RowItem? row, string internalname, string layoutId, string userDefCompareKey) : base(internalname) {
+        public RowFormulaListItem(RowItem? row, string internalname, string layoutId, string userDefCompareKey) : base(internalname, true) {
             _row = row;
             _layoutId = layoutId;
             UserDefCompareKey = userDefCompareKey;
@@ -118,7 +120,10 @@ namespace BlueControls.ItemCollection {
             }
             if (_tmpBmp != null) {
                 var scale = (float)Math.Min(positionModified.Width / (double)_tmpBmp.Width, positionModified.Height / (double)_tmpBmp.Height);
-                RectangleF r2 = new(((positionModified.Width - (_tmpBmp.Width * scale)) / 2) + positionModified.Left, ((positionModified.Height - (_tmpBmp.Height * scale)) / 2) + positionModified.Top, _tmpBmp.Width * scale, _tmpBmp.Height * scale);
+                RectangleF r2 = new(
+                    ((positionModified.Width - (_tmpBmp.Width * scale)) / 2) + positionModified.Left,
+                    ((positionModified.Height - (_tmpBmp.Height * scale)) / 2) + positionModified.Top,
+                    _tmpBmp.Width * scale, _tmpBmp.Height * scale);
                 gr.DrawImage(_tmpBmp, r2, new RectangleF(0, 0, _tmpBmp.Width, _tmpBmp.Height), GraphicsUnit.Pixel);
             }
             if (drawBorderAndBack) {

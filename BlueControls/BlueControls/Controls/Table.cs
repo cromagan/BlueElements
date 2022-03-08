@@ -38,6 +38,7 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
 using static BlueBasics.FileOperations;
 
@@ -62,7 +63,7 @@ namespace BlueControls.Controls {
         private readonly List<string> _collapsed = new();
         private readonly object _lockUserAction = new();
         private int _arrangementNr = 1;
-        private AutoFilter _autoFilter;
+        private AutoFilter? _autoFilter;
         private BlueFont? _cellFont;
         private BlueFont? _chapterFont;
         private BlueFont? _columnFilterFont;
@@ -304,9 +305,9 @@ namespace BlueControls.Controls {
 
                 if (string.IsNullOrEmpty(t1) && string.IsNullOrEmpty(t2)) {
                     return t1 + "<br><hr><br>" + t2;
-                } else {
-                    return t1 + t2; // Eins davon ist leer
                 }
+
+                return t1 + t2; // Eins davon ist leer
             }
         }
 
@@ -784,7 +785,9 @@ namespace BlueControls.Controls {
 
                 #region Spalte mit Bild zeichnen
 
-                Point pos = new((int)viewItem.OrderTmpSpalteX1 + (int)((Column_DrawWidth(viewItem, displayRectangleWoSlider) - fs.Width) / 2.0), 3 + down);
+                Point pos = new(
+                    (int)viewItem.OrderTmpSpalteX1 +
+                    (int)((Column_DrawWidth(viewItem, displayRectangleWoSlider) - fs.Width) / 2.0), 3 + down);
                 gr.DrawImageInRectAspectRatio(viewItem.Column.TmpCaptionBitmap, (int)viewItem.OrderTmpSpalteX1 + 2, (int)(pos.Y + fs.Height), Column_DrawWidth(viewItem, displayRectangleWoSlider) - 4, HeadSize() - (int)(pos.Y + fs.Height) - 6 - 18);
                 // Dann der Text
                 gr.TranslateTransform(pos.X, pos.Y);
@@ -797,7 +800,10 @@ namespace BlueControls.Controls {
 
                 #region Spalte ohne Bild zeichnen
 
-                Point pos = new((int)viewItem.OrderTmpSpalteX1 + (int)((Column_DrawWidth(viewItem, displayRectangleWoSlider) - fs.Height) / 2.0), HeadSize() - 4 - AutoFilterSize);
+                Point pos = new(
+                    (int)viewItem.OrderTmpSpalteX1 +
+                    (int)((Column_DrawWidth(viewItem, displayRectangleWoSlider) - fs.Height) / 2.0),
+                    HeadSize() - 4 - AutoFilterSize);
                 gr.TranslateTransform(pos.X, pos.Y);
                 gr.RotateTransform(-90);
                 //GR.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
@@ -852,7 +858,7 @@ namespace BlueControls.Controls {
         /// Alle gefilteren Zeilen. Jede Zeile ist maximal einmal in dieser Liste vorhanden. Angepinnte Zeilen addiert worden
         /// </summary>
         /// <returns></returns>
-        public List<RowItem?> FilteredRows() {
+        public List<RowItem> FilteredRows() {
             if (_filteredRows != null) { return _filteredRows; }
             _filteredRows = Database.Row.CalculateFilteredRows(Filter);
             return _filteredRows;
@@ -1024,7 +1030,7 @@ namespace BlueControls.Controls {
                     : Database.Row.CalculateSortedRows(FilteredRows(), SortUsed(), PinnedRows, _sortedRowData);
                 if (!_sortedRowData.IsDifferentTo(sortedRowDataNew)) { return _sortedRowData; }
 
-                _sortedRowData = new List<RowData?>();
+                _sortedRowData = new List<RowData>();
 
                 foreach (var thisRow in sortedRowDataNew) {
                     var thisRowData = thisRow;
@@ -1141,8 +1147,8 @@ namespace BlueControls.Controls {
             return x + "}";
         }
 
-        public List<RowItem?> VisibleUniqueRows() {
-            var l = new List<RowItem?>();
+        public List<RowItem> VisibleUniqueRows() {
+            var l = new List<RowItem>();
             var f = FilteredRows();
             var lockMe = new object();
             Parallel.ForEach(Database.Row, thisRowItem => {
@@ -2673,10 +2679,8 @@ namespace BlueControls.Controls {
                 var currentRow = sr[zei];
                 gr.SmoothingMode = SmoothingMode.None;
 
-                Rectangle cellrectangle = new((int)viewItem.OrderTmpSpalteX1,
-                                       DrawY(currentRow),
-                                       Column_DrawWidth(viewItem, displayRectangleWoSlider),
-                                       Math.Max(currentRow.DrawHeight, _pix16));
+                Rectangle cellrectangle = new((int)viewItem.OrderTmpSpalteX1, DrawY(currentRow),
+                    Column_DrawWidth(viewItem, displayRectangleWoSlider), Math.Max(currentRow.DrawHeight, _pix16));
 
                 if (currentRow.Expanded) {
 
@@ -2714,7 +2718,8 @@ namespace BlueControls.Controls {
 
                     if (_unterschiede != null && _unterschiede != currentRow.Row) {
                         if (currentRow.Row.CellGetString(viewItem.Column) != _unterschiede.CellGetString(viewItem.Column)) {
-                            Rectangle tmpr = new((int)viewItem.OrderTmpSpalteX1 + 1, DrawY(currentRow) + 1, Column_DrawWidth(viewItem, displayRectangleWoSlider) - 2, currentRow.DrawHeight - 2);
+                            Rectangle tmpr = new((int)viewItem.OrderTmpSpalteX1 + 1, DrawY(currentRow) + 1,
+                                Column_DrawWidth(viewItem, displayRectangleWoSlider) - 2, currentRow.DrawHeight - 2);
                             gr.DrawRectangle(PenRed1, tmpr);
                         }
                     }
@@ -2813,7 +2818,8 @@ namespace BlueControls.Controls {
             for (var zeiv = vFirstVisibleRow; zeiv <= vLastVisibleRow; zeiv++) {
                 var currentRow = sr[zeiv];
                 var viewItem = _database.ColumnArrangements[0][col];
-                Rectangle r = new(0, DrawY(currentRow), DisplayRectangleWithoutSlider().Width, currentRow.DrawHeight);
+                Rectangle r = new(0, DrawY(currentRow), DisplayRectangleWithoutSlider().Width,
+                    currentRow.DrawHeight);
                 if (_cursorPosColumn != null && _cursorPosRow.Row == currentRow.Row) {
                     itStat |= enStates.Checked;
                 } else {
@@ -2822,10 +2828,8 @@ namespace BlueControls.Controls {
                     }
                 }
 
-                Rectangle cellrectangle = new(0,
-                       DrawY(currentRow),
-                        displayRectangleWoSlider.Width,
-                        Math.Min(currentRow.DrawHeight, 24));
+                Rectangle cellrectangle = new(0, DrawY(currentRow), displayRectangleWoSlider.Width,
+                    Math.Min(currentRow.DrawHeight, 24));
 
                 Draw_CellListBox(gr, viewItem, currentRow, cellrectangle, r, enDesign.Item_Listbox, itStat);
                 if (!currentRow.Row.CellGetBoolean(_database.Column.SysCorrect)) {

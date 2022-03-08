@@ -44,7 +44,7 @@ namespace BluePaint {
                 Notification.Show("Bitte Höhe eingeben.", enImageCode.Information);
                 return;
             }
-            Bitmap newPic = new((int)W, (int)H);
+            Bitmap newPic = new((int) W, (int) H);
             var gr = Graphics.FromImage(newPic);
             gr.Clear(Color.White);
             gr.DrawRectangle(new Pen(Color.Black, 2), 1, 1, newPic.Width - 2, newPic.Height - 2);

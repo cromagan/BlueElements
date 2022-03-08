@@ -22,7 +22,6 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
 using BlueDatabase;
 using System;
 using System.Collections.Generic;
@@ -30,6 +29,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Reflection;
 using System.Windows.Forms;
+using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Polygons;
 
 //  = A3 & ".Design.Add(enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
@@ -867,7 +867,8 @@ namespace BlueControls {
             try {
                 return Design[design][state];
             } catch {
-                clsDesign d = new() {
+                clsDesign d = new()
+                {
                     BackColor1 = Color.White,
                     BorderColor1 = Color.Red,
                     bFont = BlueFont.Get("Arial", 10f, false, false, false, false, false, Color.Red, Color.Black, false, false, false),
@@ -908,7 +909,8 @@ namespace BlueControls {
                         break;
 
                     case enHintergrundArt.Verlauf_Vertical_2:
-                        LinearGradientBrush lgb = new(r, design.BackColor1, design.BackColor2, LinearGradientMode.Vertical);
+                        LinearGradientBrush lgb = new(r, design.BackColor1, design.BackColor2,
+                            LinearGradientMode.Vertical);
                         gr.FillPath(lgb, Kontur(design.Kontur, r));
                         break;
                     //case enHintergrundArt.Verlauf_Vertical_3:

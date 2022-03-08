@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace BlueControls.Designer_Support {
@@ -194,18 +195,18 @@ namespace BlueControls.Designer_Support {
             LB.Anchor = AnchorStyles.Top | AnchorStyles.Bottom
             | AnchorStyles.Left
             | AnchorStyles.Right;
-            LB.Location = new System.Drawing.Point(8, 16);
+            LB.Location = new Point(8, 16);
             LB.Name = "LB";
-            LB.Size = new System.Drawing.Size(192, 303);
+            LB.Size = new Size(192, 303);
             LB.TabIndex = 0;
             LB.DoubleClick += new EventHandler(LB_DoubleClick);
             //
             // ButOK
             //
             ButOK.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            ButOK.Location = new System.Drawing.Point(519, 331);
+            ButOK.Location = new Point(519, 331);
             ButOK.Name = "ButOK";
-            ButOK.Size = new System.Drawing.Size(64, 24);
+            ButOK.Size = new Size(64, 24);
             ButOK.TabIndex = 1;
             ButOK.Text = "OK";
             //
@@ -214,9 +215,9 @@ namespace BlueControls.Designer_Support {
             PicName.Anchor = AnchorStyles.Bottom | AnchorStyles.Left
             | AnchorStyles.Right;
             PicName.BorderStyle = BorderStyle.FixedSingle;
-            PicName.Location = new System.Drawing.Point(8, 334);
+            PicName.Location = new Point(8, 334);
             PicName.Name = "PicName";
-            PicName.Size = new System.Drawing.Size(192, 20);
+            PicName.Size = new Size(192, 20);
             PicName.TabIndex = 2;
             PicName.Text = "PicNam";
             PicName.TextChanged += new EventHandler(SomethingChanged);
@@ -227,9 +228,9 @@ namespace BlueControls.Designer_Support {
             | AnchorStyles.Left;
             GroupBox1.Controls.Add(LB);
             GroupBox1.Controls.Add(PicName);
-            GroupBox1.Location = new System.Drawing.Point(0, 0);
+            GroupBox1.Location = new Point(0, 0);
             GroupBox1.Name = "GroupBox1";
-            GroupBox1.Size = new System.Drawing.Size(208, 358);
+            GroupBox1.Size = new Size(208, 358);
             GroupBox1.TabIndex = 3;
             GroupBox1.TabStop = false;
             GroupBox1.Text = "Name";
@@ -239,9 +240,9 @@ namespace BlueControls.Designer_Support {
             GroupBox2.Controls.Add(GrY);
             GroupBox2.Controls.Add(GrX);
             GroupBox2.Controls.Add(Label1);
-            GroupBox2.Location = new System.Drawing.Point(304, 8);
+            GroupBox2.Location = new Point(304, 8);
             GroupBox2.Name = "GroupBox2";
-            GroupBox2.Size = new System.Drawing.Size(160, 48);
+            GroupBox2.Size = new Size(160, 48);
             GroupBox2.TabIndex = 4;
             GroupBox2.TabStop = false;
             GroupBox2.Text = "Abmessung";
@@ -249,9 +250,9 @@ namespace BlueControls.Designer_Support {
             // GrY
             //
             GrY.BorderStyle = BorderStyle.FixedSingle;
-            GrY.Location = new System.Drawing.Point(88, 16);
+            GrY.Location = new Point(88, 16);
             GrY.Name = "GrY";
-            GrY.Size = new System.Drawing.Size(24, 20);
+            GrY.Size = new Size(24, 20);
             GrY.TabIndex = 2;
             GrY.Text = "16";
             GrY.TextChanged += new EventHandler(SomethingChanged);
@@ -259,27 +260,27 @@ namespace BlueControls.Designer_Support {
             // GrX
             //
             GrX.BorderStyle = BorderStyle.FixedSingle;
-            GrX.Location = new System.Drawing.Point(48, 16);
+            GrX.Location = new Point(48, 16);
             GrX.Name = "GrX";
-            GrX.Size = new System.Drawing.Size(24, 20);
+            GrX.Size = new Size(24, 20);
             GrX.TabIndex = 0;
             GrX.Text = "16";
             GrX.TextChanged += new EventHandler(SomethingChanged);
             //
             // Label1
             //
-            Label1.Location = new System.Drawing.Point(8, 16);
+            Label1.Location = new Point(8, 16);
             Label1.Name = "Label1";
-            Label1.Size = new System.Drawing.Size(144, 16);
+            Label1.Size = new Size(144, 16);
             Label1.TabIndex = 1;
             Label1.Text = "Größe            x            Pixel";
             //
             // chkbDurchgestrichen
             //
             chkbDurchgestrichen.FlatStyle = FlatStyle.Flat;
-            chkbDurchgestrichen.Location = new System.Drawing.Point(8, 16);
+            chkbDurchgestrichen.Location = new Point(8, 16);
             chkbDurchgestrichen.Name = "chkbDurchgestrichen";
-            chkbDurchgestrichen.Size = new System.Drawing.Size(120, 16);
+            chkbDurchgestrichen.Size = new Size(120, 16);
             chkbDurchgestrichen.TabIndex = 0;
             chkbDurchgestrichen.Text = "Durchgestrichen";
             chkbDurchgestrichen.CheckedChanged += new EventHandler(SomethingCheckedChanged);
@@ -287,9 +288,9 @@ namespace BlueControls.Designer_Support {
             // chkbGrauStufen
             //
             chkbGrauStufen.FlatStyle = FlatStyle.Flat;
-            chkbGrauStufen.Location = new System.Drawing.Point(8, 64);
+            chkbGrauStufen.Location = new Point(8, 64);
             chkbGrauStufen.Name = "chkbGrauStufen";
-            chkbGrauStufen.Size = new System.Drawing.Size(152, 16);
+            chkbGrauStufen.Size = new Size(152, 16);
             chkbGrauStufen.TabIndex = 15;
             chkbGrauStufen.Text = "Bild in Graustufen anzeigen";
             chkbGrauStufen.CheckedChanged += new EventHandler(SomethingCheckedChanged);
@@ -297,9 +298,9 @@ namespace BlueControls.Designer_Support {
             // chkbMEDisabled
             //
             chkbMEDisabled.FlatStyle = FlatStyle.Flat;
-            chkbMEDisabled.Location = new System.Drawing.Point(8, 32);
+            chkbMEDisabled.Location = new Point(8, 32);
             chkbMEDisabled.Name = "chkbMEDisabled";
-            chkbMEDisabled.Size = new System.Drawing.Size(136, 16);
+            chkbMEDisabled.Size = new Size(136, 16);
             chkbMEDisabled.TabIndex = 1;
             chkbMEDisabled.Text = "Windows ME disabled";
             chkbMEDisabled.CheckedChanged += new EventHandler(SomethingCheckedChanged);
@@ -307,9 +308,9 @@ namespace BlueControls.Designer_Support {
             // chkbXPDisabled
             //
             chkbXPDisabled.FlatStyle = FlatStyle.Flat;
-            chkbXPDisabled.Location = new System.Drawing.Point(8, 48);
+            chkbXPDisabled.Location = new Point(8, 48);
             chkbXPDisabled.Name = "chkbXPDisabled";
-            chkbXPDisabled.Size = new System.Drawing.Size(136, 16);
+            chkbXPDisabled.Size = new Size(136, 16);
             chkbXPDisabled.TabIndex = 2;
             chkbXPDisabled.Text = "Windows XP disabled";
             chkbXPDisabled.CheckedChanged += new EventHandler(SomethingCheckedChanged);
@@ -320,18 +321,18 @@ namespace BlueControls.Designer_Support {
             GroupBox4.Controls.Add(chkbMEDisabled);
             GroupBox4.Controls.Add(chkbGrauStufen);
             GroupBox4.Controls.Add(chkbDurchgestrichen);
-            GroupBox4.Location = new System.Drawing.Point(216, 88);
+            GroupBox4.Location = new Point(216, 88);
             GroupBox4.Name = "GroupBox4";
-            GroupBox4.Size = new System.Drawing.Size(160, 88);
+            GroupBox4.Size = new Size(160, 88);
             GroupBox4.TabIndex = 7;
             GroupBox4.TabStop = false;
             GroupBox4.Text = "Effekt";
             //
             // Preview
             //
-            Preview.Location = new System.Drawing.Point(216, 8);
+            Preview.Location = new Point(216, 8);
             Preview.Name = "Preview";
-            Preview.Size = new System.Drawing.Size(80, 72);
+            Preview.Size = new Size(80, 72);
             Preview.TabIndex = 8;
             Preview.TabStop = false;
             //
@@ -339,10 +340,10 @@ namespace BlueControls.Designer_Support {
             //
             SAT.AutoSize = false;
             SAT.LargeChange = 1;
-            SAT.Location = new System.Drawing.Point(80, 8);
+            SAT.Location = new Point(80, 8);
             SAT.Maximum = 200;
             SAT.Name = "SAT";
-            SAT.Size = new System.Drawing.Size(240, 32);
+            SAT.Size = new Size(240, 32);
             SAT.TabIndex = 5;
             SAT.TickFrequency = 10;
             SAT.Value = 100;
@@ -350,18 +351,18 @@ namespace BlueControls.Designer_Support {
             //
             // Label2
             //
-            Label2.Location = new System.Drawing.Point(8, 16);
+            Label2.Location = new Point(8, 16);
             Label2.Name = "Label2";
-            Label2.Size = new System.Drawing.Size(56, 16);
+            Label2.Size = new Size(56, 16);
             Label2.TabIndex = 6;
             Label2.Text = "Sättigung:";
             //
             // SATL
             //
-            SATL.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            SATL.Location = new System.Drawing.Point(320, 16);
+            SATL.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            SATL.Location = new Point(320, 16);
             SATL.Name = "SATL";
-            SATL.Size = new System.Drawing.Size(40, 16);
+            SATL.Size = new Size(40, 16);
             SATL.TabIndex = 7;
             SATL.Text = "100%";
             //
@@ -369,10 +370,10 @@ namespace BlueControls.Designer_Support {
             //
             Hell.AutoSize = false;
             Hell.LargeChange = 1;
-            Hell.Location = new System.Drawing.Point(80, 40);
+            Hell.Location = new Point(80, 40);
             Hell.Maximum = 200;
             Hell.Name = "Hell";
-            Hell.Size = new System.Drawing.Size(240, 32);
+            Hell.Size = new Size(240, 32);
             Hell.TabIndex = 8;
             Hell.TickFrequency = 10;
             Hell.Value = 100;
@@ -380,9 +381,9 @@ namespace BlueControls.Designer_Support {
             //
             // Label4
             //
-            Label4.Location = new System.Drawing.Point(8, 40);
+            Label4.Location = new Point(8, 40);
             Label4.Name = "Label4";
-            Label4.Size = new System.Drawing.Size(56, 16);
+            Label4.Size = new Size(56, 16);
             Label4.TabIndex = 9;
             Label4.Text = "Helligkeit:";
             //
@@ -390,71 +391,71 @@ namespace BlueControls.Designer_Support {
             //
             Transp.AutoSize = false;
             Transp.LargeChange = 1;
-            Transp.Location = new System.Drawing.Point(80, 72);
+            Transp.Location = new Point(80, 72);
             Transp.Maximum = 99;
             Transp.Name = "Transp";
-            Transp.Size = new System.Drawing.Size(240, 32);
+            Transp.Size = new Size(240, 32);
             Transp.TabIndex = 8;
             Transp.TickFrequency = 10;
             Transp.ValueChanged += new EventHandler(SomethingChanged);
             //
             // Helll
             //
-            Helll.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            Helll.Location = new System.Drawing.Point(320, 40);
+            Helll.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            Helll.Location = new Point(320, 40);
             Helll.Name = "Helll";
-            Helll.Size = new System.Drawing.Size(40, 16);
+            Helll.Size = new Size(40, 16);
             Helll.TabIndex = 10;
             Helll.Text = "100%";
             //
             // Label6
             //
-            Label6.Location = new System.Drawing.Point(8, 72);
+            Label6.Location = new Point(8, 72);
             Label6.Name = "Label6";
-            Label6.Size = new System.Drawing.Size(72, 16);
+            Label6.Size = new Size(72, 16);
             Label6.TabIndex = 9;
             Label6.Text = "Transparenz:";
             //
             // Transpl
             //
-            Transpl.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            Transpl.Location = new System.Drawing.Point(320, 72);
+            Transpl.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            Transpl.Location = new Point(320, 72);
             Transpl.Name = "Transpl";
-            Transpl.Size = new System.Drawing.Size(40, 16);
+            Transpl.Size = new Size(40, 16);
             Transpl.TabIndex = 10;
             Transpl.Text = "0%";
             //
             // Label3
             //
-            Label3.Location = new System.Drawing.Point(8, 112);
+            Label3.Location = new Point(8, 112);
             Label3.Name = "Label3";
-            Label3.Size = new System.Drawing.Size(56, 16);
+            Label3.Size = new Size(56, 16);
             Label3.TabIndex = 11;
             Label3.Text = "Färbung:";
             //
             // Label5
             //
-            Label5.Location = new System.Drawing.Point(128, 112);
+            Label5.Location = new Point(128, 112);
             Label5.Name = "Label5";
-            Label5.Size = new System.Drawing.Size(72, 16);
+            Label5.Size = new Size(72, 16);
             Label5.TabIndex = 13;
             Label5.Text = "Grün wird zu:";
             //
             // Färb
             //
             Färb.BorderStyle = BorderStyle.FixedSingle;
-            Färb.Location = new System.Drawing.Point(64, 112);
+            Färb.Location = new Point(64, 112);
             Färb.Name = "Färb";
-            Färb.Size = new System.Drawing.Size(48, 20);
+            Färb.Size = new Size(48, 20);
             Färb.TabIndex = 16;
             Färb.TextChanged += new EventHandler(SomethingChanged);
             //
             // grün
             //
             grün.BorderStyle = BorderStyle.FixedSingle;
-            grün.Location = new System.Drawing.Point(200, 112);
+            grün.Location = new Point(200, 112);
             grün.Name = "grün";
-            grün.Size = new System.Drawing.Size(48, 20);
+            grün.Size = new Size(48, 20);
             grün.TabIndex = 17;
             grün.TextChanged += new EventHandler(SomethingChanged);
             //
@@ -475,9 +476,9 @@ namespace BlueControls.Designer_Support {
             GroupBox3.Controls.Add(SATL);
             GroupBox3.Controls.Add(Label2);
             GroupBox3.Controls.Add(SAT);
-            GroupBox3.Location = new System.Drawing.Point(216, 184);
+            GroupBox3.Location = new Point(216, 184);
             GroupBox3.Name = "GroupBox3";
-            GroupBox3.Size = new System.Drawing.Size(368, 144);
+            GroupBox3.Size = new Size(368, 144);
             GroupBox3.TabIndex = 6;
             GroupBox3.TabStop = false;
             GroupBox3.Text = "Color";
@@ -487,9 +488,9 @@ namespace BlueControls.Designer_Support {
             ZweitSymbol.Anchor = AnchorStyles.Top | AnchorStyles.Left
             | AnchorStyles.Right;
             ZweitSymbol.Controls.Add(txbZweitsymbol);
-            ZweitSymbol.Location = new System.Drawing.Point(384, 88);
+            ZweitSymbol.Location = new Point(384, 88);
             ZweitSymbol.Name = "ZweitSymbol";
-            ZweitSymbol.Size = new System.Drawing.Size(200, 88);
+            ZweitSymbol.Size = new Size(200, 88);
             ZweitSymbol.TabIndex = 9;
             ZweitSymbol.TabStop = false;
             ZweitSymbol.Text = "Zweitsymbol";
@@ -497,9 +498,9 @@ namespace BlueControls.Designer_Support {
             // txbZweitsymbol
             //
             txbZweitsymbol.BorderStyle = BorderStyle.FixedSingle;
-            txbZweitsymbol.Location = new System.Drawing.Point(8, 24);
+            txbZweitsymbol.Location = new Point(8, 24);
             txbZweitsymbol.Name = "txbZweitsymbol";
-            txbZweitsymbol.Size = new System.Drawing.Size(184, 20);
+            txbZweitsymbol.Size = new Size(184, 20);
             txbZweitsymbol.TabIndex = 17;
             txbZweitsymbol.TextChanged += new EventHandler(SomethingChanged);
             //
@@ -513,7 +514,7 @@ namespace BlueControls.Designer_Support {
             Controls.Add(GroupBox1);
             Controls.Add(ButOK);
             Name = "QuickPic";
-            Size = new System.Drawing.Size(591, 362);
+            Size = new Size(591, 362);
             GroupBox1.ResumeLayout(false);
             GroupBox1.PerformLayout();
             GroupBox2.ResumeLayout(false);

@@ -19,7 +19,6 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueScript;
 using System;
@@ -29,6 +28,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using static BlueBasics.FileOperations;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollection {
 
@@ -93,7 +93,8 @@ namespace BlueControls.ItemCollection {
             if (Bitmap != null) {
                 if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             }
-            System.Windows.Forms.OpenFileDialog e = new() {
+            System.Windows.Forms.OpenFileDialog e = new()
+            {
                 CheckFileExists = true,
                 Multiselect = false,
                 Title = "Bild wählen:",
@@ -119,7 +120,7 @@ namespace BlueControls.ItemCollection {
                 new FlexiControlForProperty(this, "Platzhalter_für_Layout", 2),
                 new FlexiControl()
             };
-            ItemCollectionList comms = new()
+            ItemCollectionList.ItemCollectionList comms = new()
             {
                 { "Abschneiden", ((int)enSizeModes.BildAbschneiden).ToString(), QuickImage.Get("BildmodusAbschneiden|32") },
                 { "Verzerren", ((int)enSizeModes.Verzerren).ToString(), QuickImage.Get("BildmodusVerzerren|32") },
@@ -225,7 +226,8 @@ namespace BlueControls.ItemCollection {
 
         protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
             drawingCoordinates.Inflate(-Padding, -Padding);
-            RectangleF r1 = new(drawingCoordinates.Left + Padding, drawingCoordinates.Top + Padding, drawingCoordinates.Width - (Padding * 2), drawingCoordinates.Height - (Padding * 2));
+            RectangleF r1 = new(drawingCoordinates.Left + Padding, drawingCoordinates.Top + Padding,
+                drawingCoordinates.Width - (Padding * 2), drawingCoordinates.Height - (Padding * 2));
             RectangleF r2 = new();
             RectangleF r3 = new();
             if (Bitmap != null) {

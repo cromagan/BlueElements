@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueControls.Forms;
 using BluePaint.EventArgs;
@@ -30,13 +32,13 @@ namespace BluePaint {
         #region Fields
 
         private readonly List<string> _macro;
-        private readonly List<GenericTool> _merker;
+        private readonly List<GenericTool>? _merker;
 
         #endregion
 
         #region Constructors
 
-        public Tool_Abspielen(List<string> macro, List<GenericTool> merker) : base() {
+        public Tool_Abspielen(List<string> macro, List<GenericTool>? merker) : base() {
             InitializeComponent();
             OnOverridePic(null);
             _macro = macro;

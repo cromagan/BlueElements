@@ -116,7 +116,7 @@ namespace BlueBasics {
                     var tmp = _currentTraceLogFile;
                     StackTrace strace = new(true);
                     var nr = 100;
-                    List<string>? l = null;
+                    List<string> l = null;
                     Trace.WriteLine("<tr>");
                     switch (art) {
                         case enFehlerArt.DevelopInfo:

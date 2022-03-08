@@ -76,7 +76,7 @@ namespace BlueControls.ItemCollection {
             if (point2 != null) { _point2.SetTo(point2.X, point2.Y); }
             ComputeData();
 
-            var a = PolarToCartesian(Converter.mmToPixel(abstandinMm, ItemCollectionPad.Dpi), _winkel - 90f);
+            var a = PolarToCartesian(Converter.MmToPixel(abstandinMm, ItemCollectionPad.Dpi), _winkel - 90f);
             _textPoint.SetTo(_point1, _länge / 2, _winkel);
             _textPoint.X += a.X;
             _textPoint.Y += a.Y;
@@ -108,7 +108,7 @@ namespace BlueControls.ItemCollection {
 
         #region Properties
 
-        public float Länge_In_Mm => (float)Math.Round(Converter.PixelToMM(_länge, ItemCollectionPad.Dpi), Nachkommastellen);
+        public float Länge_In_Mm => (float)Math.Round(Converter.PixelToMm(_länge, ItemCollectionPad.Dpi), Nachkommastellen);
 
         public int Nachkommastellen { get; set; }
 
@@ -285,14 +285,14 @@ namespace BlueControls.ItemCollection {
             var textWinkel = _winkel % 360;
             if (textWinkel is > 90 and <= 270) { textWinkel = _winkel - 180; }
             if (geszoom < 0.15d) { return; } // Schrift zu klein, würde abstürzen
-            PointM mitte1 = new(mitte, (float)(sz1.Height / 2.1), textWinkel + 90);
+            PointM mitte1 = new(mitte, (float) (sz1.Height / 2.1), textWinkel + 90);
             var x = gr.Save();
             gr.TranslateTransform(mitte1.X, mitte1.Y);
             gr.RotateTransform(-textWinkel);
             gr.FillRectangle(new SolidBrush(Color.White), new RectangleF((int)(-sz1.Width * 0.9 / 2), (int)(-sz1.Height * 0.8 / 2), (int)(sz1.Width * 0.9), (int)(sz1.Height * 0.8)));
             f.DrawString(gr, Angezeigter_Text_Oben(), (float)(-sz1.Width / 2.0), (float)(-sz1.Height / 2.0), geszoom, StringFormat.GenericDefault);
             gr.Restore(x);
-            PointM mitte2 = new(mitte, (float)(sz2.Height / 2.1), textWinkel - 90);
+            PointM mitte2 = new(mitte, (float) (sz2.Height / 2.1), textWinkel - 90);
             x = gr.Save();
             gr.TranslateTransform(mitte2.X, mitte2.Y);
             gr.RotateTransform(-textWinkel);
@@ -305,7 +305,7 @@ namespace BlueControls.ItemCollection {
 
         private void CalculateOtherPoints() {
             var tmppW = -90;
-            var mhlAb = Converter.mmToPixel(1.5f * Skalierung / 3.07f, ItemCollectionPad.Dpi); // Den Abstand der Maßhilsfline, in echten MM
+            var mhlAb = Converter.MmToPixel(1.5f * Skalierung / 3.07f, ItemCollectionPad.Dpi); // Den Abstand der Maßhilsfline, in echten MM
             ComputeData();
 
             //Gegeben sind:

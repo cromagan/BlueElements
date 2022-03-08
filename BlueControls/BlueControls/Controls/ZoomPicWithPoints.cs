@@ -1,9 +1,27 @@
-﻿using BlueBasics;
+﻿// Authors:
+// Christian Peter
+//
+// Copyright (c) 2022 Christian Peter
+// https://github.com/cromagan/BlueElements
+//
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#nullable enable
+
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.ItemCollection;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,6 +29,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.FileOperations;
 
 namespace BlueControls.Controls {
@@ -83,7 +102,7 @@ namespace BlueControls.Controls {
             return GenerateBitmapListItem(bitmap, list);
         }
 
-        public static BitmapListItem GenerateBitmapListItem(Bitmap? bmp, List<string?>? tags) {
+        public static BitmapListItem GenerateBitmapListItem(Bitmap? bmp, List<string> tags) {
             var filenamePng = tags.TagGet("ImageFile");
             BitmapListItem i = new(bmp, filenamePng, filenamePng.FileNameWithoutSuffix()) {
                 Padding = 10,
@@ -92,9 +111,9 @@ namespace BlueControls.Controls {
             return i;
         }
 
-        public static Tuple<Bitmap?, List<string?>?> LoadFromDisk(string pathOfPicture) {
-            Bitmap bmp = null;
-            List<string?> tags = new();
+        public static Tuple<Bitmap?, List<string>> LoadFromDisk(string pathOfPicture) {
+            Bitmap? bmp = null;
+            List<string> tags = new();
             if (FileExists(pathOfPicture)) {
                 bmp = (Bitmap)BitmapExt.Image_FromFile(pathOfPicture);
             }
@@ -103,7 +122,7 @@ namespace BlueControls.Controls {
                 tags = File.ReadAllText(ftxt, System.Text.Encoding.UTF8).SplitAndCutByCrToList();
             }
             tags.TagSet("ImageFile", pathOfPicture);
-            return new Tuple<Bitmap?, List<string?>?>(bmp, tags);
+            return new Tuple<Bitmap?, List<string>>(bmp, tags);
         }
 
         public static Tuple<Bitmap?, List<string>> ResizeData(Bitmap? pic, List<string> tags, int width, int height) {
@@ -313,7 +332,8 @@ namespace BlueControls.Controls {
                 if (!MouseDownPos11.IsEmpty) {
                     var md1 = new PointM(MouseDownPos11).ZoomAndMove(eg);
                     var mc1 = new PointM(e.X, e.Y).ZoomAndMove(eg);
-                    RectangleF r = new(Math.Min(md1.X, e.X), Math.Min(md1.Y, e.Y), Math.Abs(md1.X - mc1.X) + 1, Math.Abs(md1.Y - mc1.Y) + 1);
+                    RectangleF r = new(Math.Min(md1.X, e.X), Math.Min(md1.Y, e.Y),
+                        Math.Abs(md1.X - mc1.X) + 1, Math.Abs(md1.Y - mc1.Y) + 1);
                     eg.G.FillRectangle(BrushRotTransp, r);
                 }
             }

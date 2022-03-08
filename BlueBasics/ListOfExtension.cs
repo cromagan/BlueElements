@@ -104,32 +104,32 @@ namespace BlueBasics {
 
         public static bool RemoveNull<T>(this List<T> l) {
             if (l == null || l.Count == 0) { return false; }
-            var Did = false;
+            var did = false;
             var z = 0;
             while (z < l.Count) {
                 if (l[z] == null || l[z].Equals(default(T))) {
                     l.RemoveAt(z);
-                    Did = true;
+                    did = true;
                 } else {
                     z++;
                 }
             }
-            return Did;
+            return did;
         }
 
         public static bool RemoveNullOrEmpty<T>(this List<T> l) where T : ICanBeEmpty {
             if (l == null || l.Count == 0) { return false; }
-            var Did = false;
+            var did = false;
             var z = 0;
             while (z < l.Count) {
                 if (l[z] == null || l[z].IsNullOrEmpty()) {
                     l.RemoveAt(z);
-                    Did = true;
+                    did = true;
                 } else {
                     z++;
                 }
             }
-            return Did;
+            return did;
         }
 
         ///// <summary>
@@ -236,59 +236,59 @@ namespace BlueBasics {
             list.AddRange(l);
         }
 
-        public static string TagGet(this ICollection<string?>? _String, string tagName) {
-            if (_String == null) { return string.Empty; }
+        public static string TagGet(this ICollection<string>? list, string tagName) {
+            if (list == null) { return string.Empty; }
             var uTagName = tagName.ToUpper().Trim();
-            foreach (var ThisString in _String) {
-                if (ThisString.ToUpper().StartsWith(uTagName)) {
-                    if (ThisString.ToUpper().StartsWith(uTagName + ": ")) { return ThisString.Substring(uTagName.Length + 2); }
-                    if (ThisString.ToUpper().StartsWith(uTagName + ":")) { return ThisString.Substring(uTagName.Length + 1); }
-                    if (ThisString.ToUpper().StartsWith(uTagName + " = ")) { return ThisString.Substring(uTagName.Length + 3); }
-                    if (ThisString.ToUpper().StartsWith(uTagName + "=")) { return ThisString.Substring(uTagName.Length + 1); }
+            foreach (var thisString in list) {
+                if (thisString.ToUpper().StartsWith(uTagName)) {
+                    if (thisString.ToUpper().StartsWith(uTagName + ": ")) { return thisString.Substring(uTagName.Length + 2); }
+                    if (thisString.ToUpper().StartsWith(uTagName + ":")) { return thisString.Substring(uTagName.Length + 1); }
+                    if (thisString.ToUpper().StartsWith(uTagName + " = ")) { return thisString.Substring(uTagName.Length + 3); }
+                    if (thisString.ToUpper().StartsWith(uTagName + "=")) { return thisString.Substring(uTagName.Length + 1); }
                 }
             }
             return string.Empty;
         }
 
-        public static List<string> TagGetAll(this ICollection<string> _String, string tagName) {
+        public static List<string> TagGetAll(this ICollection<string>? list, string tagName) {
             List<string> l = new();
-            if (_String == null) { return l; }
+            if (list == null) { return l; }
             var uTagName = tagName.ToUpper();
-            foreach (var ThisString in _String) {
-                if (ThisString.ToUpper().StartsWith(uTagName)) {
-                    if (ThisString.ToUpper().StartsWith(uTagName + ": ")) {
-                        l.Add(ThisString.Substring(uTagName.Length + 2));
+            foreach (var thisString in list) {
+                if (thisString.ToUpper().StartsWith(uTagName)) {
+                    if (thisString.ToUpper().StartsWith(uTagName + ": ")) {
+                        l.Add(thisString.Substring(uTagName.Length + 2));
                     } else {
-                        if (ThisString.ToUpper().StartsWith(uTagName + ":")) { l.Add(ThisString.Substring(uTagName.Length + 1)); }
+                        if (thisString.ToUpper().StartsWith(uTagName + ":")) { l.Add(thisString.Substring(uTagName.Length + 1)); }
                     }
-                    if (ThisString.ToUpper().StartsWith(uTagName + " = ")) {
-                        l.Add(ThisString.Substring(uTagName.Length + 3));
+                    if (thisString.ToUpper().StartsWith(uTagName + " = ")) {
+                        l.Add(thisString.Substring(uTagName.Length + 3));
                     } else {
-                        if (ThisString.ToUpper().StartsWith(uTagName + "=")) { l.Add(ThisString.Substring(uTagName.Length + 1)); }
+                        if (thisString.ToUpper().StartsWith(uTagName + "=")) { l.Add(thisString.Substring(uTagName.Length + 1)); }
                     }
                 }
             }
             return l;
         }
 
-        public static double TagGetDouble(this ICollection<string?>? col, string tagname) => DoubleParse(TagGet(col, tagname));
+        public static double TagGetDouble(this ICollection<string>? col, string tagname) => DoubleParse(TagGet(col, tagname));
 
-        public static int TagGetInt(this ICollection<string?>? col, string tagname) => IntParse(TagGet(col, tagname));
+        public static int TagGetInt(this ICollection<string>? col, string tagname) => IntParse(TagGet(col, tagname));
 
         public static void TagRemove(this ICollection<string> col, string tagname) {
-            var Found = col.TagGetPosition(tagname);
-            if (Found >= 0) {
-                col.Remove(col.ElementAtOrDefault(Found));
+            var found = col.TagGetPosition(tagname);
+            if (found >= 0) {
+                col.Remove(col.ElementAtOrDefault(found));
             }
         }
 
-        public static void TagSet(this ICollection<string?>? col, string tagname, string value) {
-            var Found = col.TagGetPosition(tagname);
+        public static void TagSet(this ICollection<string> col, string tagname, string value) {
+            var found = col.TagGetPosition(tagname);
             var n = tagname + ": " + value;
 
-            if (Found >= 0) {
-                if (col.ElementAtOrDefault(Found) == n) { return; }
-                col.Remove(col.ElementAtOrDefault(Found));
+            if (found >= 0) {
+                if (col.ElementAtOrDefault(found) == n) { return; }
+                col.Remove(col.ElementAtOrDefault(found));
             }
 
             col.Add(n);
@@ -304,9 +304,9 @@ namespace BlueBasics {
         public static string ToString<T>(this List<T> l, bool removeEmpty) where T : IParseable? {
             // Remove Empty sollte eigentlich selbstverständlich seih. Ist nur als Dummy drinnen, dass der Interpreter zwischen der Internen und Extension unterscheiden kann.
             var tmp = string.Empty;
-            foreach (var Item in l) {
+            foreach (var item in l) {
                 var tmp2 = string.Empty;
-                if (Item != null) { tmp2 = Item.ToString(); }
+                if (item != null) { tmp2 = item.ToString(); }
                 if (tmp2.Contains("\r")) { Develop.DebugPrint(enFehlerArt.Fehler, "List.Tostring hat einen Zeilenumbruch gefunden."); }
                 if (!removeEmpty || !string.IsNullOrEmpty(tmp2)) {
                     tmp = tmp + tmp2 + "\r";
@@ -315,14 +315,14 @@ namespace BlueBasics {
             return tmp.TrimCr();
         }
 
-        private static int TagGetPosition(this ICollection<string?>? col, string tagname) {
-            var UTagName = tagname.ToUpper() + ":";
+        private static int TagGetPosition(this ICollection<string> col, string tagname) {
+            var uTagName = tagname.ToUpper() + ":";
 
             for (var z = 0; z < col.Count; z++) {
-                if (col.ElementAtOrDefault(z)?.Length > UTagName.Length + 1 && col.ElementAtOrDefault(z)?.Substring(0, UTagName.Length + 1).ToUpper() == UTagName + " ") {
+                if (col.ElementAtOrDefault(z)?.Length > uTagName.Length + 1 && col.ElementAtOrDefault(z)?.Substring(0, uTagName.Length + 1).ToUpper() == uTagName + " ") {
                     return z;
                 }
-                if (col.ElementAtOrDefault(z)?.Length > UTagName.Length && col.ElementAtOrDefault(z)?.Substring(0, UTagName.Length).ToUpper() == UTagName) {
+                if (col.ElementAtOrDefault(z)?.Length > uTagName.Length && col.ElementAtOrDefault(z)?.Substring(0, uTagName.Length).ToUpper() == uTagName) {
                     return z;
                 }
             }

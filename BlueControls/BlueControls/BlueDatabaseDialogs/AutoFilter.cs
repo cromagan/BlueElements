@@ -21,12 +21,12 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
-using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BlueControls.ItemCollection.ItemCollectionList;
 
 namespace BlueControls.BlueDatabaseDialogs {
 

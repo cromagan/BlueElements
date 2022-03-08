@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
@@ -25,8 +27,6 @@ using System.Drawing.Drawing2D;
 using System.Reflection;
 using System.Text;
 using static BlueBasics.Converter;
-
-#nullable enable
 
 namespace BlueBasics {
 
@@ -44,8 +44,8 @@ namespace BlueBasics {
         public readonly int Sättigung;
         public readonly int Transparenz;
         public readonly string? Zweitsymbol;
-        private static readonly Dictionary<string, QuickImage?> _pics = new();
         private static readonly object Locker = new();
+        private static readonly Dictionary<string, QuickImage?> Pics = new();
 
         #endregion
 
@@ -88,7 +88,7 @@ namespace BlueBasics {
             Code = Name;
             lock (Locker) {
                 CorrectSize(-1, -1, bmp);
-                _pics.Add(Code, this);
+                Pics.Add(Code, this);
             }
 
             if (bmp == null) {
@@ -118,7 +118,7 @@ namespace BlueBasics {
 
         #region Methods
 
-        public static bool Exists(string imageCode) => !string.IsNullOrEmpty(imageCode) && _pics.ContainsKey(imageCode);
+        public static bool Exists(string imageCode) => !string.IsNullOrEmpty(imageCode) && Pics.ContainsKey(imageCode);
 
         public static enImageCode FileTypeImage(enFileFormat file) {
             switch (file) {
@@ -184,9 +184,9 @@ namespace BlueBasics {
 
             QuickImage? x;
             lock (Locker) {
-                if (_pics.TryGetValue(imageCode, out var p)) { return p; }
+                if (Pics.TryGetValue(imageCode, out var p)) { return p; }
                 x = new QuickImage(imageCode, false);
-                _pics.Add(imageCode, x);
+                Pics.Add(imageCode, x);
             }
 
             x.Generate();
@@ -237,10 +237,10 @@ namespace BlueBasics {
             IsError = true;
 
             EmptyBitmap(Width, Height);
-            using var GR = Graphics.FromImage(this);
-            GR.Clear(Color.Black);
-            GR.DrawLine(new Pen(Color.Red, 3), 0, 0, Width - 1, Height - 1);
-            GR.DrawLine(new Pen(Color.Red, 3), Width - 1, 0, 0, Height - 1);
+            using var gr = Graphics.FromImage(this);
+            gr.Clear(Color.Black);
+            gr.DrawLine(new Pen(Color.Red, 3), 0, 0, Width - 1, Height - 1);
+            gr.DrawLine(new Pen(Color.Red, 3), Width - 1, 0, 0, Height - 1);
         }
 
         public void OnNeedImage(NeedImageEventArgs e) => NeedImage?.Invoke(this, e);
@@ -317,15 +317,15 @@ namespace BlueBasics {
 
             #endregion
 
-            var bmpTMP = new BitmapExt(bmpOri.Width, bmpOri.Height);
+            var bmpTmp = new BitmapExt(bmpOri.Width, bmpOri.Height);
 
             #region Bild Pixelgerecht berechnen
 
-            for (var X = 0; X < bmpOri.Width; X++) {
-                for (var Y = 0; Y < bmpOri.Height; Y++) {
-                    var c = bmpOri.GetPixel(X, Y);
-                    if (bmpSecond != null && X > bmpOri.Width - bmpSecond.Width && Y > bmpOri.Height - bmpSecond.Height) {
-                        var c2 = bmpSecond.GetPixel(X - (bmpOri.Width - bmpSecond.Width), Y - (bmpOri.Height - bmpSecond.Height));
+            for (var x = 0; x < bmpOri.Width; x++) {
+                for (var y = 0; y < bmpOri.Height; y++) {
+                    var c = bmpOri.GetPixel(x, y);
+                    if (bmpSecond != null && x > bmpOri.Width - bmpSecond.Width && y > bmpOri.Height - bmpSecond.Height) {
+                        var c2 = bmpSecond.GetPixel(x - (bmpOri.Width - bmpSecond.Width), y - (bmpOri.Height - bmpSecond.Height));
                         if (!c2.IsMagentaOrTransparent()) { c = c2; }
                     }
                     if (c.IsMagentaOrTransparent()) {
@@ -343,9 +343,9 @@ namespace BlueBasics {
                     }
                     if (Effekt.HasFlag(enImageCodeEffect.Durchgestrichen)) {
                         if (c.IsMagentaOrTransparent()) {
-                            c = bmpKreuz.GetPixel(X, Y);
+                            c = bmpKreuz.GetPixel(x, y);
                         } else {
-                            if (bmpKreuz.GetPixel(X, Y).A > 0) { c = bmpKreuz.GetPixel(X, Y).MixColor(c, 0.5); }
+                            if (bmpKreuz.GetPixel(x, y).A > 0) { c = bmpKreuz.GetPixel(x, y).MixColor(c, 0.5); }
                         }
                     }
                     if (!c.IsMagentaOrTransparent() && Transparenz > 0 && Transparenz < 100) {
@@ -354,33 +354,33 @@ namespace BlueBasics {
                     if (Effekt.HasFlag(enImageCodeEffect.WindowsMEDisabled)) {
                         var c1 = Color.FromArgb(0, 0, 0, 0);
                         if (!c.IsMagentaOrTransparent()) {
-                            var RandPixel = X > 0 && bmpOri.GetPixel(X - 1, Y).IsMagentaOrTransparent() || Y > 0 && bmpOri.GetPixel(X, Y - 1).IsMagentaOrTransparent();
-                            if (X < bmpOri.Width - 1 && bmpOri.GetPixel(X + 1, Y).IsMagentaOrTransparent()) { RandPixel = true; }
-                            if (Y < bmpOri.Height - 1 && bmpOri.GetPixel(X, Y + 1).IsMagentaOrTransparent()) { RandPixel = true; }
-                            if (c.B < 128 || RandPixel) {
+                            var randPixel = x > 0 && bmpOri.GetPixel(x - 1, y).IsMagentaOrTransparent() || y > 0 && bmpOri.GetPixel(x, y - 1).IsMagentaOrTransparent();
+                            if (x < bmpOri.Width - 1 && bmpOri.GetPixel(x + 1, y).IsMagentaOrTransparent()) { randPixel = true; }
+                            if (y < bmpOri.Height - 1 && bmpOri.GetPixel(x, y + 1).IsMagentaOrTransparent()) { randPixel = true; }
+                            if (c.B < 128 || randPixel) {
                                 c1 = SystemColors.ControlDark;
-                                if (X < bmpOri.Width - 1 && Y < bmpOri.Height - 1 && bmpOri.GetPixel(X + 1, Y + 1).IsMagentaOrTransparent()) {
+                                if (x < bmpOri.Width - 1 && y < bmpOri.Height - 1 && bmpOri.GetPixel(x + 1, y + 1).IsMagentaOrTransparent()) {
                                     c1 = SystemColors.ControlLightLight;
                                 }
                             }
                         }
                         c = c1;
                     }
-                    bmpTMP.SetPixel(X, Y, c);
+                    bmpTmp.SetPixel(x, y, c);
                 }
             }
 
             #endregion
 
-            bmpTMP.Resize(Width, Height, enSizeModes.EmptySpace, InterpolationMode.High, false);
-            CloneFromBitmap(bmpTMP);
+            bmpTmp.Resize(Width, Height, enSizeModes.EmptySpace, InterpolationMode.High, false);
+            CloneFromBitmap(bmpTmp);
         }
 
         private Bitmap? GetBitmap(string tmpname) {
             var vbmp = GetEmmbedBitmap(Assembly.GetAssembly(typeof(QuickImage)), tmpname + ".png");
             if (vbmp != null) { return vbmp; }
 
-            if (_pics.TryGetValue(tmpname, out var p) && p != this) {
+            if (Pics.TryGetValue(tmpname, out var p) && p != this) {
                 return p.IsError ? null : (Bitmap)p;
             }
 

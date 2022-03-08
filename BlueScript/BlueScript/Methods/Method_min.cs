@@ -15,8 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System.Collections.Generic;
 using System.Linq;
+using BlueBasics;
 using BlueScript.Structuren;
 using Skript.Enums;
 
@@ -45,7 +48,7 @@ namespace BlueScript.Methods {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
             var val = attvar.Attributes.Select(thisval => thisval.ValueDouble).Prepend(double.MaxValue).Min();
-            return new DoItFeedback(val.ToString(), enVariableDataType.Numeral);
+            return new DoItFeedback(val.ToString(Constants.Format_Float1), enVariableDataType.Numeral);
         }
 
         #endregion
