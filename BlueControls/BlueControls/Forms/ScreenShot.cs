@@ -40,10 +40,10 @@ namespace BlueControls {
         private const int DrawSize = 20;
         private readonly string _drawText = string.Empty;
         private readonly ScreenData _feedBack;
-        private Bitmap _clipedArea;
+        private Bitmap? _clipedArea;
         private bool _mousesWasUp;
 
-        private Bitmap _screenShotBmp;
+        private Bitmap? _screenShotBmp;
 
         #endregion
 

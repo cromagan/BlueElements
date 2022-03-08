@@ -44,7 +44,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private string _ähnlicheAnsichtName = string.Empty;
         private bool _isFilling;
         private string _lastLooked = string.Empty;
-        private Table _tableView;
+        private Table? _tableView;
 
         #endregion
 
@@ -150,7 +150,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             int down;
             int right;
             AnchorStyles anchor;
-            var showPic = false;
 
             #region Variablen für Waagerecht / Senkrecht bestimmen
 
@@ -171,33 +170,9 @@ namespace BlueControls.BlueDatabaseDialogs {
                 right = 0;
                 anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
                 down = txbZeilenFilter.Height + Skin.Padding;
-                showPic = _tableView?.Database != null && !string.IsNullOrEmpty(_tableView.Database.FilterImagePfad);
             }
 
             #endregion Variablen für Waagerecht / Senkrecht bestimmen
-
-            #region Bild bei Bedarf laden und Visble richtig setze
-
-            if (showPic) {
-                pic.Height = (int)Math.Min(pic.Width * 0.7, Height * 0.6);
-                var filename = _tableView.Database.FilterImagePfad;
-                if (pic.Tag is string tx) {
-                    if (tx != filename) { pic.Tag = null; }
-                }
-                if (pic.Tag == null) {
-                    if (FileOperations.FileExists(filename)) {
-                        pic.Image = BitmapExt.Image_FromFile(filename);
-                    }
-                }
-                pic.Tag = filename;
-                pic.Top = down;
-                pic.Visible = true;
-                toppos = pic.Bottom + Skin.Padding;
-            } else {
-                pic.Visible = false;
-            }
-
-            #endregion Bild bei Bedarf laden und Visble richtig setze
 
             List<FlexiControlForFilter> flexsToDelete = new();
 
@@ -270,34 +245,14 @@ namespace BlueControls.BlueDatabaseDialogs {
                             flx.ButtonClicked += Flx_ButtonClicked;
                             Controls.Add(flx);
                         }
-                        if (showPic && !filterItem.Column.DauerFilterPos.IsEmpty && pic.Image != null) {
-                            flx.Height = consthe * 2;
-                            if (flx.GetComboBox() is ComboBox cbx) {
-                                var (biggestItemX, _, _, _) = cbx.Item.ItemData();  // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
-                                var wi = Math.Min(biggestItemX + Skin.Padding + 16, 100);
-                                flx.Width = wi;
-                            } else {
-                                flx.Width = 100;
-                            }
-                            var sc = Math.Min(pic.Width / (float)pic.Image.Width, pic.Height / (float)pic.Image.Height);
-                            var xr = (int)(pic.Image.Width * sc); // x REal angezeigte breite
-                            var xab = (pic.Width - xr) / 2; // x Abstand
-                            var xm = (int)(filterItem.Column.DauerFilterPos.X / 10000f * xr) + xab; // Filter X mitte
-                            flx.Left = xm - (flx.Width / 2) + pic.Left;
-                            var yr = (int)(pic.Image.Height * sc); // Y REal angezeigte breite
-                            var yab = (pic.Height - yr) / 2; // Y Abstand
-                            var ym = (int)(filterItem.Column.DauerFilterPos.Y / 10000f * yr) + yab;
-                            flx.Top = ym - (flx.Height / 2) + pic.Top;
-                            flx.BringToFront();
-                        } else {
-                            flx.Top = toppos;
-                            flx.Left = leftpos;
-                            flx.Width = constwi;
-                            flx.Height = consthe;
-                            flx.Anchor = anchor;
-                            toppos += down;
-                            leftpos += right;
-                        }
+
+                        flx.Top = toppos;
+                        flx.Left = leftpos;
+                        flx.Width = constwi;
+                        flx.Height = consthe;
+                        flx.Anchor = anchor;
+                        toppos += down;
+                        leftpos += right;
                     }
                 }
             }
@@ -437,7 +392,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void Filterleiste_SizeChanged(object sender, System.EventArgs e) {
-            if (pic.Visible || Orientation == enOrientation.Waagerecht) { FillFilters(); }
+            if (Orientation == enOrientation.Waagerecht) { FillFilters(); }
         }
 
         private FlexiControlForFilter? FlexiItemOf(FilterItem filter) {

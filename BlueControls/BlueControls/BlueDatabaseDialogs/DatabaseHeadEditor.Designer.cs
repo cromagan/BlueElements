@@ -48,8 +48,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capAdditional = new BlueControls.Controls.Caption();
             this.txbZeilenQuickInfo = new BlueControls.Controls.TextBox();
             this.capZeilenQuickInfo = new BlueControls.Controls.Caption();
-            this.txbFilterImagePath = new BlueControls.Controls.TextBox();
-            this.capFilterImagePath = new BlueControls.Controls.Caption();
             this.txbGlobalScale = new BlueControls.Controls.TextBox();
             this.caption1 = new BlueControls.Controls.Caption();
             this.cbxVerwaisteDaten = new BlueControls.Controls.ComboBox();
@@ -326,8 +324,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Allgemein.Controls.Add(this.capAdditional);
             this.Tab_Allgemein.Controls.Add(this.txbZeilenQuickInfo);
             this.Tab_Allgemein.Controls.Add(this.capZeilenQuickInfo);
-            this.Tab_Allgemein.Controls.Add(this.txbFilterImagePath);
-            this.Tab_Allgemein.Controls.Add(this.capFilterImagePath);
             this.Tab_Allgemein.Controls.Add(this.txbGlobalScale);
             this.Tab_Allgemein.Controls.Add(this.caption1);
             this.Tab_Allgemein.Controls.Add(this.cbxVerwaisteDaten);
@@ -390,26 +386,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capZeilenQuickInfo.Name = "capZeilenQuickInfo";
             this.capZeilenQuickInfo.Size = new System.Drawing.Size(152, 18);
             this.capZeilenQuickInfo.Text = "Zeilen-Quick-Info: ";
-            // 
-            // txbFilterImagePath
-            // 
-            this.txbFilterImagePath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.txbFilterImagePath.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbFilterImagePath.Location = new System.Drawing.Point(8, 368);
-            this.txbFilterImagePath.Name = "txbFilterImagePath";
-            this.txbFilterImagePath.Size = new System.Drawing.Size(552, 24);
-            this.txbFilterImagePath.TabIndex = 41;
-            this.txbFilterImagePath.Verhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            // 
-            // capFilterImagePath
-            // 
-            this.capFilterImagePath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.capFilterImagePath.CausesValidation = false;
-            this.capFilterImagePath.Location = new System.Drawing.Point(8, 352);
-            this.capFilterImagePath.Name = "capFilterImagePath";
-            this.capFilterImagePath.Size = new System.Drawing.Size(152, 18);
-            this.capFilterImagePath.Text = "Filter-Bild-Datei-Pfad:";
             // 
             // txbGlobalScale
             // 
@@ -820,8 +796,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private TextBox txbGlobalScale;
         private Caption caption1;
         private TabControl GlobalTab;
-        private TextBox txbFilterImagePath;
-        private Caption capFilterImagePath;
         private TextBox txbZeilenQuickInfo;
         private Caption capZeilenQuickInfo;
         private Caption capBinInfo;

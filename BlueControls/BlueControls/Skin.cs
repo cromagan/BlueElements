@@ -840,9 +840,9 @@ namespace BlueControls {
         public static string ErrorFont = "<Name=Arial, Size=8, Color=FF0000>";
         public static bool Inited;
         public static Database? StyleDb;
-        internal static Pen PenLinieDick;
-        internal static Pen PenLinieDünn;
-        internal static Pen PenLinieKräftig;
+        internal static Pen? PenLinieDick;
+        internal static Pen? PenLinieDünn;
+        internal static Pen? PenLinieKräftig;
         private static readonly enImageCodeEffect[] St = new enImageCodeEffect[1];
 
         #endregion

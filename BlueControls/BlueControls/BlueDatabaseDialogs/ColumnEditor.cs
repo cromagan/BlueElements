@@ -369,7 +369,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             txbUeberschift1.Text = _column.Ueberschrift1;
             txbUeberschift2.Text = _column.Ueberschrift2;
             txbUeberschift3.Text = _column.Ueberschrift3;
-            txbDauerFilterPos.Text = _column.DauerFilterPos.ToString();
             txbPrefix.Text = _column.Prefix;
             txbSpaltenbild.Text = _column.CaptionBitmap;
             btnLogUndo.Checked = _column.ShowUndo;
@@ -487,7 +486,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             _column.Ueberschrift3 = txbUeberschift3.Text;
             _column.Prefix = txbPrefix.Text;
             _column.CaptionBitmap = txbSpaltenbild.Text;
-            _column.DauerFilterPos = txbDauerFilterPos.Text.PointParse();
             var newTags = tbxTags.Text.SplitAndCutByCrToList();
             if (newTags.IsDifferentTo(_column.Tags)) {
                 _column.Tags.Clear();

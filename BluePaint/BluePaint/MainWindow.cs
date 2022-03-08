@@ -33,10 +33,10 @@ namespace BluePaint {
 
         #region Fields
 
-        private static List<string> _macro;
+        private static List<string>? _macro;
 
         // Merkt sich im Falle einer Aufnahme die benutzen Tools. So können sie ganz einfach wieder aufgerufen werden
-        private static List<GenericTool> _merker;
+        private static List<GenericTool>? _merker;
 
         private bool _aufnahme;
         private GenericTool? _currentTool;

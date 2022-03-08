@@ -54,20 +54,13 @@ namespace BlueControls.Controls {
         #region Fields
 
         public static SolidBrush BrushYellowTransparent = new(Color.FromArgb(180, 255, 255, 0));
-
         public static Pen PenRed1 = new(Color.Red, 1);
-
         private const int AutoFilterSize = 22;
-
         private const int ColumnCaptionSizeY = 22;
-
         private const int RowCaptionSizeY = 50;
         private static bool _serviceStarted;
         private readonly List<string> _collapsed = new();
-
-        // Die Sortierung der Zeile
         private readonly object _lockUserAction = new();
-
         private int _arrangementNr = 1;
         private AutoFilter _autoFilter;
         private BlueFont? _cellFont;
@@ -78,33 +71,19 @@ namespace BlueControls.Controls {
         private RowData? _cursorPosRow;
         private Database? _database;
         private enBlueTableAppearance _design = enBlueTableAppearance.Standard;
-
-        // Die Sortierung der Zeile
         private List<RowItem>? _filteredRows;
-
         private int? _headSize;
 
         private bool _isinClick;
-
         private bool _isinDoubleClick;
-
         private bool _isinKeyDown;
-
         private bool _isinMouseDown;
-
         private bool _isinMouseEnter;
-
         private bool _isinMouseLeave;
-
         private bool _isinMouseMove;
-
         private bool _isinMouseUp;
-
         private bool _isinMouseWheel;
-
         private bool _isinSizeChanged;
-
-        //private bool ISIN_Resize;
         private bool _isinVisibleChanged;
 
         /// <summary>
@@ -113,21 +92,17 @@ namespace BlueControls.Controls {
         private ColumnItem? _mouseOverColumn;
 
         private RowData? _mouseOverRow;
-        private string _mouseOverText;
+        private string _mouseOverText = string.Empty;
         private BlueFont? _newRowFont;
         private Progressbar? _pg;
 
-        // Die Sortierung der Zeile
         private int _pix16 = 16;
-
         private int _pix18 = 18;
         private int _rowCaptionFontY = 26;
-        private SearchAndReplace _searchAndReplace;
-
-        //private readonly FontSelectDialog _FDia = null;
+        private SearchAndReplace? _searchAndReplace;
         private bool _showNumber;
 
-        private RowSortDefinition _sortDefinitionTemporary;
+        private RowSortDefinition? _sortDefinitionTemporary;
         private List<RowData>? _sortedRowData;
         private string _storedView = string.Empty;
         private Rectangle _tmpCursorRect = Rectangle.Empty;
@@ -863,7 +838,7 @@ namespace BlueControls.Controls {
 
         public string Export_CSV(enFirstRow firstRow, ColumnItem onlyColumn) {
             if (_database == null) { return string.Empty; }
-            List<ColumnItem?> l = new() { onlyColumn };
+            List<ColumnItem> l = new() { onlyColumn };
             return _database.Export_CSV(firstRow, l, SortedRows());
         }
 
@@ -1034,7 +1009,7 @@ namespace BlueControls.Controls {
             OnPinnedChanged();
         }
 
-        public List<RowData>? SortedRows() {
+        public List<RowData> SortedRows() {
             if (_sortedRowData != null) { return _sortedRowData; }
 
             try {

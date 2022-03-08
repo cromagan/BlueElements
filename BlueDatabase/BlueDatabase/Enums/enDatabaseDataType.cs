@@ -112,7 +112,9 @@ namespace BlueDatabase.Enums {
         //ImportScript = 63,
         GlobalScale = 64,
 
+        [Obsolete]
         FilterImagePfad = 65,
+
         ZeilenQuickInfo = 66,
         RulesScript = 67,
         AdditionaFilesPfad = 68,
@@ -243,6 +245,7 @@ namespace BlueDatabase.Enums {
 
         //co_AutoFilter_Dauerfilter = 192,
         //co_Intelligenter_Multifilter = 193,
+        [Obsolete]
         co_DauerFilterPos = 194,
 
         co_AfterEdit_AutoReplace = 195,

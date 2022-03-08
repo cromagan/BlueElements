@@ -99,7 +99,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             txbCaption.Text = _database.Caption;
             tbxReloadVerzoegerung.Text = _database.ReloadDelaySecond.ToString();
             txbGlobalScale.Text = _database.GlobalScale.ToString();
-            txbFilterImagePath.Text = _database.FilterImagePfad;
             txbAdditionalFiles.Text = _database.AdditionaFilesPfad;
             txbZeilenQuickInfo.Text = _database.ZeilenQuickInfo.Replace("<br>", "\r");
             tbxUndoAnzahl.Text = _database.UndoCount.ToString();
@@ -485,7 +484,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             } else {
                 _database.ReloadDelaySecond = 1;
             }
-            _database.FilterImagePfad = txbFilterImagePath.Text;
             _database.AdditionaFilesPfad = txbAdditionalFiles.Text;
             _database.ZeilenQuickInfo = txbZeilenQuickInfo.Text.Replace("\r", "<br>");
             if (tbxTags.Text != _database.Tags.JoinWithCr()) {

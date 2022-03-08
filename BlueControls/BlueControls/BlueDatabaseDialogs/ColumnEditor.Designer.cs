@@ -92,8 +92,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabFilter = new System.Windows.Forms.TabPage();
             this.chkFilterOnlyOr = new BlueControls.Controls.Button();
             this.chkFilterOnlyAND = new BlueControls.Controls.Button();
-            this.capDauerfilterPos = new BlueControls.Controls.Caption();
-            this.txbDauerFilterPos = new BlueControls.Controls.TextBox();
             this.capJokerValue = new BlueControls.Controls.Caption();
             this.tbxJoker = new BlueControls.Controls.TextBox();
             this.btnZeilenFilterIgnorieren = new BlueControls.Controls.Button();
@@ -920,8 +918,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabFilter.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabFilter.Controls.Add(this.chkFilterOnlyOr);
             this.tabFilter.Controls.Add(this.chkFilterOnlyAND);
-            this.tabFilter.Controls.Add(this.capDauerfilterPos);
-            this.tabFilter.Controls.Add(this.txbDauerFilterPos);
             this.tabFilter.Controls.Add(this.capJokerValue);
             this.tabFilter.Controls.Add(this.tbxJoker);
             this.tabFilter.Controls.Add(this.btnZeilenFilterIgnorieren);
@@ -952,23 +948,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.chkFilterOnlyAND.Size = new System.Drawing.Size(192, 16);
             this.chkFilterOnlyAND.TabIndex = 34;
             this.chkFilterOnlyAND.Text = "nur <b>UND</b>-Filterung erlauben";
-            // 
-            // capDauerfilterPos
-            // 
-            this.capDauerfilterPos.CausesValidation = false;
-            this.capDauerfilterPos.Location = new System.Drawing.Point(4, 369);
-            this.capDauerfilterPos.Name = "capDauerfilterPos";
-            this.capDauerfilterPos.Size = new System.Drawing.Size(144, 24);
-            this.capDauerfilterPos.Text = "Dauerfilter-Pos.:";
-            // 
-            // txbDauerFilterPos
-            // 
-            this.txbDauerFilterPos.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbDauerFilterPos.Location = new System.Drawing.Point(156, 369);
-            this.txbDauerFilterPos.Name = "txbDauerFilterPos";
-            this.txbDauerFilterPos.Regex = null;
-            this.txbDauerFilterPos.Size = new System.Drawing.Size(384, 24);
-            this.txbDauerFilterPos.TabIndex = 33;
             // 
             // capJokerValue
             // 
@@ -1858,8 +1837,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private TextBox txbAutoRemove;
         private Caption capAutoRemove;
         private Button butSaveContent;
-        private Caption capDauerfilterPos;
-        private TextBox txbDauerFilterPos;
         private Caption capIntern;
         private Caption caption5;
         private Button butAktuellVor;

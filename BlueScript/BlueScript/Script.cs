@@ -33,7 +33,7 @@ namespace BlueScript {
         #region Fields
 
         public static List<Method>? Comands;
-        public readonly List<Variable> Variablen;
+        public readonly List<Variable>? Variablen;
         public bool EndSkript;
 
         /// <summary>
@@ -43,8 +43,8 @@ namespace BlueScript {
 
         internal readonly List<Bitmap> BitmapCache;
         internal Method_BerechneVariable? _berechneVariable; // Paralellisierung löscht ab und zu die Variable
-        private string _error;
-        private string _errorCode;
+        private string _error = string.Empty;
+        private string _errorCode = string.Empty;
 
         #endregion
 

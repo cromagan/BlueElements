@@ -85,6 +85,8 @@ namespace BlueControls.Forms {
 
         #endregion
 
+        // Nullable wegen Dispose
+
         #region Methods
 
         public static void AddLayoutsOff(ItemCollectionList addHere, Database database, bool addDiskLayouts) {
@@ -117,10 +119,13 @@ namespace BlueControls.Forms {
         /// <param name="startNr"></param>
         /// <param name="layout"></param>
         /// <param name="rowsForExport"></param>
-        /// <returns>Gibt das Item zurück, dass nicht mehr auf den Druckbereich gepasst hat</returns>
-        public static int GeneratePrintPad(CreativePad pad, int startNr, string layout, List<RowItem?> rowsForExport, float abstandMm) {
+        /// <returns>Gibt das Item zurück, dass nicht mehr auf den Druckbereich gepasst hat. -1 falls keine (gültige) Liste übergeben wurde.</returns>
+        public static int GeneratePrintPad(CreativePad pad, int startNr, string layout, List<RowItem>? rowsForExport, float abstandMm) {
             pad.Item.Clear();
             Generic.CollectGarbage();
+
+            if (rowsForExport == null || rowsForExport.Count < 1) { return -1; }
+
             CreativePad tmp = new(new ItemCollectionPad(layout, rowsForExport[0].Database, rowsForExport[0].Key));
             var oneItem = tmp.Item.MaxBounds(null);
             pad.Item.SheetStyle = tmp.Item.SheetStyle;

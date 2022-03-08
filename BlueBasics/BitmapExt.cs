@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
@@ -27,8 +29,6 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using static BlueBasics.FileOperations;
-
-#nullable enable
 
 namespace BlueBasics {
 
@@ -49,7 +49,14 @@ namespace BlueBasics {
         #region Constructors
 
         // public PixelFormat _pixelformat = PixelFormat.Format32bppPArgb;
-        public BitmapExt(string filename) : this((Bitmap)Image_FromFile(filename)) { }
+        public BitmapExt(string filename) {
+            var p = Image_FromFile(filename);
+            if (p is Bitmap bmp) {
+                CloneFromBitmap(bmp);
+            } else {
+                EmptyBitmap(1, 1);
+            }
+        }
 
         public BitmapExt(string filename, bool setDummyPicIfFails) => FromFile(filename, setDummyPicIfFails);
 
@@ -86,7 +93,9 @@ namespace BlueBasics {
 
         #region Methods
 
-        public static Bitmap AdjustBrightness(Bitmap? image, float brightness) {
+        public static Bitmap? AdjustBrightness(Bitmap? image, float brightness) {
+            if (image == null) { return null; }
+
             // http://csharphelper.com/blog/2014/10/use-an-imageattributes-object-to-adjust-an-images-brightness-in-c/
             // Make the ColorMatrix.
             var b = Math.Max(brightness, 0.001f);
@@ -118,10 +127,13 @@ namespace BlueBasics {
             return bm;
         }
 
-        public static Bitmap AdjustContrast(Bitmap? image, float value) {
+        public static Bitmap? AdjustContrast(Bitmap? image, float value) {
+            if (image == null) { return null; }
+
             value = (100.0f + value) / 100.0f;
             value *= value;
             var newBitmap = Image_Clone(image);
+            if (newBitmap == null) { return null; }
             var data = newBitmap.LockBits(new Rectangle(0, 0, newBitmap.Width, newBitmap.Height), ImageLockMode.ReadWrite, newBitmap.PixelFormat);
             var height = newBitmap.Height;
             var width = newBitmap.Width;
@@ -159,21 +171,17 @@ namespace BlueBasics {
             return newBitmap;
         }
 
-        public static Bitmap AdjustGamma(Bitmap? image, float gamma) {
+        public static Bitmap? AdjustGamma(Bitmap? image, float gamma) {
+            if (image == null) { return null; }
+
             // http://csharphelper.com/blog/2016/12/provide-gamma-correction-for-an-image-in-c/
             // Set the ImageAttributes object's gamma value.
             ImageAttributes attributes = new();
             attributes.SetGamma(Math.Max(gamma, 0.001f));
             // Draw the image onto the new bitmap
             // while applying the new gamma value.
-            Point[] points =
-            {
-        new(0, 0),
-        new(image.Width, 0),
-        new(0, image.Height)
-            };
-            Rectangle rect =
-                new(0, 0, image.Width, image.Height);
+            Point[] points = { new(0, 0), new(image.Width, 0), new(0, image.Height) };
+            Rectangle rect = new(0, 0, image.Width, image.Height);
             // Make the result bitmap.
             Bitmap bm = new(image.Width, image.Height);
             using var gr = Graphics.FromImage(bm);
@@ -260,26 +268,29 @@ namespace BlueBasics {
             return Crop(pic, pa.Left, pa.Right, pa.Top, pa.Bottom);
         }
 
-        public static Bitmap? Crop(Bitmap? pic, Rectangle r) => Crop(pic, r.Left, -(pic.Width - r.Right), r.Top, -(pic.Height - r.Bottom));
+        public static Bitmap? Crop(Bitmap? bmp, Rectangle r) {
+            if (bmp == null) { return null; }
+            return Crop(bmp, r.Left, -(bmp.Width - r.Right), r.Top, -(bmp.Height - r.Bottom));
+        }
 
         /// <summary>
         ///
         /// </summary>
-        /// <param name="pic"></param>
+        /// <param name="bmp"></param>
         /// <param name="left">Positiver Wert schneidet diese Anzahl von Pixel vom linken Rand weg.</param>
         /// <param name="right">Negativer Wert schneidet diese Anzahl von Pixel vom rechten Rand weg.</param>
         /// <param name="top">Positiver Wert schneidet diese Anzahl von Pixel vom oberen Rand weg.</param>
         /// <param name="bottom">Negativer Wert schneidet diese Anzahl von Pixel vom unteren Rand weg.</param>
         /// <returns></returns>
-        public static Bitmap? Crop(Bitmap? pic, int left, int right, int top, int bottom) {
-            if (left == 0 && right == 0 && top == 0 && bottom == 0) { return pic; }
-            if (pic == null) { return null; }
+        public static Bitmap? Crop(Bitmap? bmp, int left, int right, int top, int bottom) {
+            if (bmp == null || left == 0 && right == 0 && top == 0 && bottom == 0) { return bmp; }
+
             Generic.CollectGarbage();
-            var w = Math.Max(pic.Width - left + right, 1);
-            var h = Math.Max(pic.Height - top + bottom, 1);
+            var w = Math.Max(bmp.Width - left + right, 1);
+            var h = Math.Max(bmp.Height - top + bottom, 1);
             Bitmap bmp2 = new(w, h);
             using (var gr = Graphics.FromImage(bmp2)) {
-                gr.DrawImage(pic, -left, -top, pic.Width, pic.Height); // Width und Height MUSS angegeben werden. Manche Bilder (Falsches Format?) schlagen fehl, wenn es fehlt.
+                gr.DrawImage(bmp, -left, -top, bmp.Width, bmp.Height); // Width und Height MUSS angegeben werden. Manche Bilder (Falsches Format?) schlagen fehl, wenn es fehlt.
             }
             Generic.CollectGarbage();
             return bmp2;
@@ -428,14 +439,14 @@ namespace BlueBasics {
         /// <summary>
         /// Diese Routine ist genau so schnell wie Image.fromFile, setzt aber KEINEN Datei-Lock.
         /// </summary>
-        /// <param name="dateiName"></param>
+        /// <param name="filename"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static Image? Image_FromFile(string dateiName) {
-            if (string.IsNullOrEmpty(dateiName)) { return null; }
-            if (!FileExists(dateiName)) { return null; }
+        public static Image? Image_FromFile(string filename) {
+            if (string.IsNullOrEmpty(filename)) { return null; }
+            if (!FileExists(filename)) { return null; }
             try {
-                FileStream fs = new(dateiName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                FileStream fs = new(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
                 var im = Image.FromStream(fs);
                 fs.Close();
                 fs.Dispose();
@@ -445,8 +456,10 @@ namespace BlueBasics {
             }
         }
 
-        public static Bitmap? ImageBlurFilter(Bitmap bmp, BlurType blurType) {
-            Bitmap resultBitmap = null;
+        public static Bitmap? ImageBlurFilter(Bitmap? bmp, BlurType blurType) {
+            if (bmp == null) { return null; }
+
+            Bitmap? resultBitmap = null;
             switch (blurType) {
                 case BlurType.Mean3x3:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.Mean3X3, 1.0 / 9.0, 0);

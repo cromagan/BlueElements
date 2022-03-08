@@ -67,7 +67,6 @@ namespace BlueDatabase {
         private string _caption;
         private string _captionBitmapTxt;
         private string _cellInitValue;
-        private Point _dauerFilterPos;
         private bool _disposedValue;
         private bool _dropdownAllesAbwählenErlaubt;
         private bool _dropdownBearbeitungErlaubt;
@@ -109,7 +108,7 @@ namespace BlueDatabase {
         private string _name;
         private string _prefix;
         private string _quickInfo;
-        private string _regex;
+        private string _regex = string.Empty;
         private bool _saveContent;
         private enScriptType _scriptType;
         private bool _showMultiLineInOneLine;
@@ -204,8 +203,6 @@ namespace BlueDatabase {
             _bestFileStandardSuffix = string.Empty;
             _bestFileStandardFolder = string.Empty;
             UcaseNamesSortedByLenght = null;
-            //_Intelligenter_Multifilter = string.Empty;
-            _dauerFilterPos = Point.Empty;
 
             #endregion Standard-Werte
 
@@ -422,14 +419,6 @@ namespace BlueDatabase {
         //        OnChanged();
         //    }
         //}
-        public Point DauerFilterPos {
-            get => _dauerFilterPos;
-            set {
-                if (_dauerFilterPos.ToString() == value.ToString()) { return; }
-                Database.AddPending(enDatabaseDataType.co_DauerFilterPos, this, _dauerFilterPos.ToString(), value.ToString(), true);
-                OnChanged();
-            }
-        }
 
         public bool DropdownAllesAbwählenErlaubt {
             get => _dropdownAllesAbwählenErlaubt;
@@ -1046,7 +1035,6 @@ namespace BlueDatabase {
             Ueberschrift1 = source.Ueberschrift1;
             Ueberschrift2 = source.Ueberschrift2;
             Ueberschrift3 = source.Ueberschrift3;
-            DauerFilterPos = new Point(source.DauerFilterPos.X, source.DauerFilterPos.Y);
             LinkedKeyKennung = source.LinkedKeyKennung;
             LinkedDatabaseFile = source.LinkedDatabaseFile;
             BildTextVerhalten = source.BildTextVerhalten;
@@ -2201,7 +2189,7 @@ namespace BlueDatabase {
                     break;
                 //case enDatabaseDataType.co_Intelligenter_Multifilter: _Intelligenter_Multifilter = Wert; break;
                 case enDatabaseDataType.co_DauerFilterPos:
-                    _dauerFilterPos = wert.PointParse();
+                    //_dauerFilterPos = wert.PointParse();
                     break;
 
                 case enDatabaseDataType.co_Ueberschrift1:
@@ -2539,7 +2527,7 @@ namespace BlueDatabase {
             Database.SaveToByteList(l, enDatabaseDataType.co_Align, ((int)_align).ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_SortType, ((int)_sortType).ToString(), Key);
             //Database.SaveToByteList(l, enDatabaseDataType.co_Intelligenter_Multifilter, _Intelligenter_Multifilter, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_DauerFilterPos, _dauerFilterPos.ToString(), Key);
+            //Database.SaveToByteList(l, enDatabaseDataType.co_DauerFilterPos, _dauerFilterPos.ToString(), Key);
             //Kennung UNBEDINGT zum Schluss, damit die Standard-Werte gesetzt werden können
             Database.SaveToByteList(l, enDatabaseDataType.co_Identifier, _identifier, Key);
         }

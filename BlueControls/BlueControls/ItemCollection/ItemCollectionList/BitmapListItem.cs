@@ -33,7 +33,7 @@ namespace BlueControls.ItemCollection {
 
         private const int ConstMy = 15;
 
-        private readonly string _encryptionKey;
+        private readonly string _encryptionKey = string.Empty;
 
         private readonly ListExt<QuickImage> _overlays = new();
 
@@ -45,7 +45,7 @@ namespace BlueControls.ItemCollection {
 
         private List<string> _captiontmp = new();
 
-        private string _imageFilename;
+        private string _imageFilename = string.Empty;
 
         #endregion
 

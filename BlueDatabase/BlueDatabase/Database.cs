@@ -82,19 +82,19 @@ namespace BlueDatabase {
 
         private enAnsicht _ansicht;
 
-        private string _caption;
+        private string _caption = string.Empty;
 
-        private string _createDate;
+        private string _createDate = string.Empty;
 
-        private string _creator;
+        private string _creator = string.Empty;
 
-        private string _fileEncryptionKey;
+        private string _fileEncryptionKey = string.Empty;
 
-        private string _filterImagePfad;
+        //private string _filterImagePfad;
 
         private double _globalScale;
 
-        private string _globalShowPass;
+        private string _globalShowPass = string.Empty;
 
         //private enJoinTyp _JoinTyp;
 
@@ -103,7 +103,7 @@ namespace BlueDatabase {
         ///// </summary>
         //private string _LastWorkItem = string.Empty;
 
-        private string _rulesScript;
+        private string _rulesScript = string.Empty;
 
         private RowSortDefinition? _sortDefinition;
 
@@ -113,7 +113,7 @@ namespace BlueDatabase {
 
         //private string _WorkItemsBefore = string.Empty;
 
-        private string _zeilenQuickInfo;
+        private string _zeilenQuickInfo = string.Empty;
 
         #endregion
 
@@ -244,17 +244,6 @@ namespace BlueDatabase {
             set {
                 if (_fileEncryptionKey == value) { return; }
                 AddPending(enDatabaseDataType.FileEncryptionKey, -1, -1, _fileEncryptionKey, value, true);
-            }
-        }
-
-        [Browsable(false)]
-        [Description("Ein Bild, das in der senkrechte Filterleiste angezeigt werden kann.")]
-        public string FilterImagePfad {
-            get => _filterImagePfad;
-            set {
-                if (_filterImagePfad == value) { return; }
-                AddPending(enDatabaseDataType.FilterImagePfad, -1, -1, _filterImagePfad, value, true);
-                Cell.InvalidateAllSizes();
             }
         }
 
@@ -499,7 +488,7 @@ namespace BlueDatabase {
         /// <returns></returns>
         public string Export_CSV(enFirstRow firstRow, ColumnItem? column, List<RowData?> sortedRows) =>
             //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-            Export_CSV(firstRow, new List<ColumnItem?> { column }, sortedRows);
+            Export_CSV(firstRow, new List<ColumnItem> { column }, sortedRows);
 
         /// <summary>
         /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
@@ -508,7 +497,7 @@ namespace BlueDatabase {
         /// <param name="columnList">Die Spalten, die zurückgegeben werden. NULL gibt alle Spalten zurück.</param>
         /// <param name="sortedRows">Die Zeilen, die zurückgegeben werden. NULL gibt alle ZEilen zurück.</param>
         /// <returns></returns>
-        public string Export_CSV(enFirstRow firstRow, List<ColumnItem?> columnList, List<RowData?> sortedRows) {
+        public string Export_CSV(enFirstRow firstRow, List<ColumnItem>? columnList, List<RowData>? sortedRows) {
             if (columnList == null) {
                 columnList = Column.Where(thisColumnItem => thisColumnItem != null).ToList();
             }
@@ -574,7 +563,7 @@ namespace BlueDatabase {
         /// <param name="arrangement">Die Spalten, die zurückgegeben werden. NULL gibt alle Spalten zurück.</param>
         /// <param name="sortedRows">Die Zeilen, die zurückgegeben werden. NULL gibt alle ZEilen zurück.</param>
         /// <returns></returns>
-        public string Export_CSV(enFirstRow firstRow, ColumnViewCollection? arrangement, List<RowData>? sortedRows) => Export_CSV(firstRow, arrangement.ListOfUsedColumn(), sortedRows);
+        public string Export_CSV(enFirstRow firstRow, ColumnViewCollection? arrangement, List<RowData>? sortedRows) => Export_CSV(firstRow, arrangement?.ListOfUsedColumn(), sortedRows);
 
         /// <summary>
         /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
@@ -1315,7 +1304,7 @@ namespace BlueDatabase {
                 //SaveToByteList(l, enDatabaseDataType.ImportScript, _ImportScript);
                 SaveToByteList(l, enDatabaseDataType.RulesScript, _rulesScript);
                 //SaveToByteList(l, enDatabaseDataType.BinaryDataInOne, Bins.ToString(true));
-                SaveToByteList(l, enDatabaseDataType.FilterImagePfad, _filterImagePfad);
+                //SaveToByteList(l, enDatabaseDataType.FilterImagePfad, _filterImagePfad);
                 SaveToByteList(l, enDatabaseDataType.AdditionaFilesPfad, _additionaFilesPfad);
                 SaveToByteList(l, enDatabaseDataType.ZeilenQuickInfo, _zeilenQuickInfo);
                 Column.SaveToByteList(l);
@@ -1595,8 +1584,6 @@ namespace BlueDatabase {
 
         private void Initialize() {
             Cell.Initialize();
-            //Column.Initialize();
-            //Row.Initialize();
             Works.Clear();
             ColumnArrangements.Clear();
             Layouts.Clear();
@@ -1604,7 +1591,6 @@ namespace BlueDatabase {
             PermissionGroupsNewRow.Clear();
             Tags.Clear();
             Export.Clear();
-            //Bins.Clear();
             DatenbankAdmin.Clear();
             _globalShowPass = string.Empty;
             _fileEncryptionKey = string.Empty;
@@ -1613,13 +1599,11 @@ namespace BlueDatabase {
             base.ReloadDelaySecond = 600;
             _undoCount = 300;
             _caption = string.Empty;
-            //_JoinTyp = enJoinTyp.Zeilen_verdoppeln;
             _verwaisteDaten = enVerwaisteDaten.Ignorieren;
             LoadedVersion = DatabaseVersion;
             _rulesScript = string.Empty;
             _globalScale = 1f;
             _ansicht = enAnsicht.Unverändert;
-            _filterImagePfad = string.Empty;
             _additionaFilesPfad = "AdditionalFiles";
             _zeilenQuickInfo = string.Empty;
             _sortDefinition = null;
@@ -1737,7 +1721,7 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.FilterImagePfad:
-                    _filterImagePfad = value;
+                    //_filterImagePfad = value;
                     break;
 
                 case enDatabaseDataType.AdditionaFilesPfad:

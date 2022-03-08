@@ -32,9 +32,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnAlleFilterAus = new BlueControls.Controls.Button();
             this.btnPin = new BlueControls.Controls.Button();
             this.btnPinZurück = new BlueControls.Controls.Button();
-            this.pic = new System.Windows.Forms.PictureBox();
             this.btnÄhnliche = new BlueControls.Controls.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.pic)).BeginInit();
             this.SuspendLayout();
             // 
             // btnTextLöschen
@@ -88,19 +86,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnPinZurück.TabIndex = 15;
             this.btnPinZurück.Click += new System.EventHandler(this.btnPinZurück_Click);
             // 
-            // pic
-            // 
-            this.pic.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.pic.BackColor = System.Drawing.Color.White;
-            this.pic.Location = new System.Drawing.Point(8, 40);
-            this.pic.Name = "pic";
-            this.pic.Size = new System.Drawing.Size(936, 104);
-            this.pic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pic.TabIndex = 17;
-            this.pic.TabStop = false;
-            this.pic.Visible = false;
-            // 
             // btnÄhnliche
             // 
             this.btnÄhnliche.ImageCode = "Fernglas|16|||||||||Istgleich";
@@ -117,7 +102,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.Controls.Add(this.btnÄhnliche);
-            this.Controls.Add(this.pic);
             this.Controls.Add(this.btnPinZurück);
             this.Controls.Add(this.btnPin);
             this.Controls.Add(this.btnTextLöschen);
@@ -126,7 +110,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Name = "Filterleiste";
             this.Size = new System.Drawing.Size(951, 53);
             this.SizeChanged += new System.EventHandler(this.Filterleiste_SizeChanged);
-            ((System.ComponentModel.ISupportInitialize)(this.pic)).EndInit();
             this.ResumeLayout(false);
         }
         #endregion
@@ -136,7 +119,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private Controls.Button btnAlleFilterAus;
         private Controls.Button btnPin;
         private Controls.Button btnPinZurück;
-        internal System.Windows.Forms.PictureBox pic;
         private Controls.Button btnÄhnliche;
     }
 }

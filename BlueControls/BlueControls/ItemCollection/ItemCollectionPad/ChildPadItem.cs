@@ -40,7 +40,7 @@ namespace BlueControls.ItemCollection {
 
         private string _name;
 
-        private CreativePad _padInternal;
+        private CreativePad? _padInternal;
 
         private Bitmap? _tmpBmp;
 
