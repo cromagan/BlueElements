@@ -94,7 +94,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 if (_blueTable.CursorPosColumn() == null) {
                     canDo = false;
                 } else {
-                    if (!_blueTable.CursorPosColumn().Format.CanBeChangedByRules()) { canDo = false; }
+                    if (!_blueTable.CursorPosColumn().Format.CanBeCheckedByRules()) { canDo = false; }
                 }
             }
             if (Alt.Text == Neu.Text) {

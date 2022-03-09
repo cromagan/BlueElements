@@ -57,11 +57,11 @@ namespace BlueBasics.Enums {
         // Relation_And_Event_Mixed = 72,
         Link_To_Filesystem = 73,
 
-        [Obsolete]
-        Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert = 74,
+        //[Obsolete]
+        //Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert = 74,
 
-        [Obsolete]
-        Columns_für_LinkedCellDropdown = 75,
+        //[Obsolete]
+        //Columns_für_LinkedCellDropdown = 75,
 
         /// <summary>
         /// Gibt die Werte einer anderen Spalte einer

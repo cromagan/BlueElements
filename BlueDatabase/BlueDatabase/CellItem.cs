@@ -161,7 +161,6 @@ namespace BlueDatabase {
                 case enDataFormat.Link_To_Filesystem:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                 case enDataFormat.RelationText:
-                case enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
                 case enDataFormat.Verknüpfung_zu_anderer_Datenbank: // Bei LinkedCell kommt direkt der Text der verlinkten Zelle an
 
                     //if (column.BildTextVerhalten == enBildTextVerhalten.Interpretiere_Bool) {
@@ -202,16 +201,16 @@ namespace BlueDatabase {
                     //return BlueFont.Get(Txt).ReadableText();
                     return txt;
 
-                case enDataFormat.Columns_für_LinkedCellDropdown:
-                    // Hier kommt die Spalten-ID  an
-                    if (string.IsNullOrEmpty(txt)) { return string.Empty; }
-                    if (!int.TryParse(txt, out var ColKey)) { return "Columkey kann nicht geparsed werden"; }
-                    var LinkedDatabase = column.LinkedDatabase();
-                    if (LinkedDatabase == null) { return "Datenbankverknüpfung fehlt"; }
-                    var C = LinkedDatabase.Column.SearchByKey(ColKey);
-                    if (C == null) { return "Columnkey nicht gefunden"; }
-                    txt = LanguageTool.ColumnReplace(C.ReadableText(), column, style);
-                    break;
+                //case enDataFormat.Columns_für_LinkedCellDropdown:
+                //    // Hier kommt die Spalten-ID  an
+                //    if (string.IsNullOrEmpty(txt)) { return string.Empty; }
+                //    if (!int.TryParse(txt, out var ColKey)) { return "Columkey kann nicht geparsed werden"; }
+                //    var LinkedDatabase = column.LinkedDatabase();
+                //    if (LinkedDatabase == null) { return "Datenbankverknüpfung fehlt"; }
+                //    var C = LinkedDatabase.Column.SearchByKey(ColKey);
+                //    if (C == null) { return "Columnkey nicht gefunden"; }
+                //    txt = LanguageTool.ColumnReplace(C.ReadableText(), column, style);
+                //    break;
 
                 default:
                     Develop.DebugPrint(column.Format);
@@ -234,7 +233,7 @@ namespace BlueDatabase {
         /// </summary>
         /// <returns></returns>
         public static List<string> ValuesReadable(ColumnItem? column, RowItem Row, enShortenStyle Style) {
-            if (column.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (column.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 //var LinkedData = CellCollection.LinkedCellData(column, Row, false, false);
                 //if (LinkedData.Item1 != null && LinkedData.Item2 != null) { return ValuesReadable(LinkedData.Item1, LinkedData.Item2, Style); }
                 //return new List<string>();

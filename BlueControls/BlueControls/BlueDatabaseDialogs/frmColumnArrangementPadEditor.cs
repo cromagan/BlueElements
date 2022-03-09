@@ -196,8 +196,8 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             var verkn = new List<string>();
             foreach (var thisc in Database.Column) {
-                if (thisc.LinkedDatabase() != null) {
-                    var dbN = thisc.LinkedDatabase().Filename + "|" + thisc.LinkedCell_RowKeyIsInColumn;
+                if (thisc.LinkedDatabase != null) {
+                    var dbN = thisc.LinkedDatabase.Filename + "|" + thisc.LinkedCellFilter.JoinWithCr();
                     verkn.AddIfNotExists(dbN);
                 }
             }
@@ -211,9 +211,9 @@ namespace BlueControls.BlueDatabaseDialogs {
                 foreach (var thisc in CurrentArrangement) {
                     var it = (ColumnPadItem)Pad.Item[thisc.Column.Name];
 
-                    if (thisc.Column.LinkedDatabase() != null) {
+                    if (thisc.Column.LinkedDatabase != null) {
                         // String als Namen als eindeutige Kennung
-                        var dbN = thisc.Column.LinkedDatabase().Filename + "|" + thisc.Column.LinkedCell_RowKeyIsInColumn;
+                        var dbN = thisc.Column.LinkedDatabase.Filename + "|" + thisc.Column.LinkedCellFilter.JoinWithCr();
 
                         if (dbN == thiscode) {
 
@@ -221,8 +221,8 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                             var databItem = (GenericConnectebilePadItem)Pad.Item[dbN];
                             if (databItem == null) {
-                                var nam = thisc.Column.LinkedDatabase().Filename.FileNameWithSuffix();
-                                if (thisc.Column.LinkedCell_RowKeyIsInColumn == -9999) { nam += "\r\nSKRIPT"; }
+                                var nam = thisc.Column.LinkedDatabase.Filename.FileNameWithSuffix();
+                                //if (thisc.Column.LinkedCell_RowKeyIsInColumn == -9999) { nam += "\r\nSKRIPT"; }
                                 databItem = new GenericConnectebilePadItem(dbN, nam, new Size(100, 300));
                                 Pad.Item.Add(databItem);
                                 databItem.SetLeftTopPoint(Math.Max(kx, it.UsedArea.Left), 600);
@@ -236,9 +236,9 @@ namespace BlueControls.BlueDatabaseDialogs {
                             #region Key aus eigener Datenbank zur Verknüpften Datenbank zeigen lassen
 
                             // Wenn der Key-Wert aus der Spalte geholt wird (nicht vom Skript gesteuert)....
-                            if (thisc.Column.LinkedCell_RowKeyIsInColumn >= 0) {
+                            if (thisc.Column.LinkedCellFilter.Count > 0) {
                                 ///...Die Spalte ermitteln...
-                                var rkcol = thisc.Column.Database.Column.SearchByKey(thisc.Column.LinkedCell_RowKeyIsInColumn);
+                                ColumnItem rkcol = null; //thisc.Column.Database.Column.SearchByKey(thisc.Column.LinkedCellFilter.JoinWithCr());
 
                                 if (rkcol != null) {
                                     //... das dazugehörige Item ermitteln ...
@@ -253,7 +253,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                             #region Dann die Spalte erzeugen, aus der der der Wert kommt
 
-                            var c2 = thisc.Column.LinkedDatabase().Column.SearchByKey(thisc.Column.LinkedCell_ColumnKeyOfLinkedDatabase);
+                            var c2 = thisc.Column.LinkedDatabase.Column.SearchByKey(thisc.Column.LinkedCell_ColumnKeyOfLinkedDatabase);
                             var it2 = new ColumnPadItem(c2);
                             Pad.Item.Add(it2);
                             it2.SetLeftTopPoint(kx, 600);

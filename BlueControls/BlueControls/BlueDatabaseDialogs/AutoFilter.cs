@@ -85,7 +85,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // lColumn für das Aussehen und Verhalten des FilterDialogs
 
             ColumnItem? lColumn = null;
-            if (_column.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (_column.Format == enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 (lColumn, _, _) = CellCollection.LinkedCellData(_column, null, false, false);
             }
             if (lColumn == null) { lColumn = _column; }

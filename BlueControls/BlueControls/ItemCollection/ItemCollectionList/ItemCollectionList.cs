@@ -159,23 +159,23 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
                 }
             }
             switch (column.Format) {
-                case enDataFormat.Columns_für_LinkedCellDropdown:
-                    var db = column.LinkedDatabase();
-                    if (db != null && !string.IsNullOrEmpty(column.LinkedKeyKennung)) {
-                        foreach (var thisColumn in db.Column) {
-                            if (thisColumn.Name.ToLower().StartsWith(column.LinkedKeyKennung.ToLower())) {
-                                l.Add(thisColumn.Key.ToString());
-                            }
-                        }
-                    }
-                    //l = l.SortedDistinctList(); // Sind nur die Keys....
-                    if (l.Count == 0) {
-                        Notification.Show("Keine Spalten gefunden, die<br>mit '" + column.LinkedKeyKennung + "' beginnen.", enImageCode.Information);
-                    }
-                    break;
+                //case enDataFormat.Columns_für_LinkedCellDropdown:
+                //    var db = column.LinkedDatabase();
+                //    if (db != null && !string.IsNullOrEmpty(column.LinkedKeyKennung)) {
+                //        foreach (var thisColumn in db.Column) {
+                //            if (thisColumn.Name.ToLower().StartsWith(column.LinkedKeyKennung.ToLower())) {
+                //                l.Add(thisColumn.Key.ToString());
+                //            }
+                //        }
+                //    }
+                //    //l = l.SortedDistinctList(); // Sind nur die Keys....
+                //    if (l.Count == 0) {
+                //        Notification.Show("Keine Spalten gefunden, die<br>mit '" + column.LinkedKeyKennung + "' beginnen.", enImageCode.Information);
+                //    }
+                //    break;
 
                 case enDataFormat.Values_für_LinkedCellDropdown:
-                    var db2 = column.LinkedDatabase();
+                    var db2 = column.LinkedDatabase;
                     if (db2 == null) { Notification.Show("Verknüpfte Datenbank nicht vorhanden", enImageCode.Information); return; }
 
                     /// Spalte aus der Ziel-Datenbank ermitteln

@@ -360,7 +360,7 @@ namespace BlueControls.Controls {
         #region Methods
 
         public static Size Cell_ContentSize(Table? table, ColumnItem? column, RowItem? row, BlueFont? cellFont, int pix16) {
-            if (column.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (column.Format == enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 var (lcolumn, lrow, _) = CellCollection.LinkedCellData(column, row, false, false);
                 return lcolumn != null && lrow != null ? Cell_ContentSize(table, lcolumn, lrow, cellFont, pix16) : new Size(pix16, pix16);
             }
@@ -420,7 +420,7 @@ namespace BlueControls.Controls {
         public static void DoUndo(ColumnItem? column, RowItem? row) {
             if (column == null) { return; }
             if (row == null) { return; }
-            if (column.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (column.Format == enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 var (lcolumn, lrow, _) = CellCollection.LinkedCellData(column, row, true, false);
                 if (lcolumn != null && lrow != null) { DoUndo(lcolumn, lrow); }
                 return;
@@ -518,7 +518,7 @@ namespace BlueControls.Controls {
                 }
                 var contentHolderCellColumn = column;
                 var contenHolderCellRow = row?.Row;
-                if (column.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+                if (column.Format == enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                     (contentHolderCellColumn, contenHolderCellRow, _) = CellCollection.LinkedCellData(column, row?.Row, false, false);
                 }
                 var ist1 = string.Empty;
@@ -1429,7 +1429,7 @@ namespace BlueControls.Controls {
                     case System.Windows.Forms.Keys.V:
                         if (e.Modifiers == System.Windows.Forms.Keys.Control) {
                             if (_cursorPosColumn != null && _cursorPosRow != null) {
-                                if (!_cursorPosColumn.Format.TextboxEditPossible() && _cursorPosColumn.Format != enDataFormat.Columns_für_LinkedCellDropdown && _cursorPosColumn.Format != enDataFormat.Values_für_LinkedCellDropdown) {
+                                if (!_cursorPosColumn.Format.TextboxEditPossible() && _cursorPosColumn.Format != enDataFormat.Values_für_LinkedCellDropdown) {
                                     NotEditableInfo("Die Zelle hat kein passendes Format.");
                                     _isinKeyDown = false;
                                     return;
@@ -1529,20 +1529,20 @@ namespace BlueControls.Controls {
                         _mouseOverText = _mouseOverColumn.QuickInfoText(string.Empty);
                     } else if (_mouseOverColumn != null && _mouseOverRow != null) {
                         if (_mouseOverColumn.Format.NeedTargetDatabase()) {
-                            if (_mouseOverColumn.LinkedDatabase() != null) {
+                            if (_mouseOverColumn.LinkedDatabase != null) {
                                 switch (_mouseOverColumn.Format) {
-                                    case enDataFormat.Columns_für_LinkedCellDropdown:
-                                        var txt = _mouseOverRow.Row.CellGetString(_mouseOverColumn);
-                                        if (int.TryParse(txt, out var colKey)) {
-                                            var c = _mouseOverColumn.LinkedDatabase().Column.SearchByKey(colKey);
-                                            if (c != null) { _mouseOverText = c.QuickInfoText(_mouseOverColumn.Caption + ": " + c.Caption); }
-                                        }
-                                        break;
+                                    //case enDataFormat.Columns_für_LinkedCellDropdown:
+                                    //    var txt = _mouseOverRow.Row.CellGetString(_mouseOverColumn);
+                                    //    if (int.TryParse(txt, out var colKey)) {
+                                    //        var c = _mouseOverColumn.LinkedDatabase().Column.SearchByKey(colKey);
+                                    //        if (c != null) { _mouseOverText = c.QuickInfoText(_mouseOverColumn.Caption + ": " + c.Caption); }
+                                    //    }
+                                    //    break;
 
-                                    case enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
+                                    //case enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
                                     case enDataFormat.Verknüpfung_zu_anderer_Datenbank:
                                     case enDataFormat.Values_für_LinkedCellDropdown:
-                                        var (lcolumn, _, info) = CellCollection.LinkedCellData(_mouseOverColumn, _mouseOverRow.Row, false, false);
+                                        var (lcolumn, lrow, info) = CellCollection.LinkedCellData(_mouseOverColumn, _mouseOverRow.Row, true, false);
                                         if (lcolumn != null) { _mouseOverText = lcolumn.QuickInfoText(_mouseOverColumn.ReadableText() + " bei " + lcolumn.ReadableText() + ":"); }
 
                                         if (!string.IsNullOrEmpty(info) && _mouseOverColumn.Database.IsAdministrator()) {
@@ -1758,7 +1758,7 @@ namespace BlueControls.Controls {
                 return;
             }
 
-            if (column.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (column.Format == enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 var (lcolumn, lrow, info) = CellCollection.LinkedCellData(column, row, true, false);
                 if (lcolumn == null || lrow == null) {
                     NotEditableInfo("Zelle in verlinkter Datenbank nicht vorhanden:\r\n" + info);
@@ -2149,7 +2149,7 @@ namespace BlueControls.Controls {
                 return;
             }
 
-            if (cellInThisDatabaseColumn.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (cellInThisDatabaseColumn.Format == enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 string info;
                 (contentHolderCellColumn, contentHolderCellRow, info) = CellCollection.LinkedCellData(cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, true, true);
                 if (contentHolderCellColumn == null || contentHolderCellRow == null) {
@@ -2619,7 +2619,7 @@ namespace BlueControls.Controls {
         private void Draw_CellTransparent(Graphics gr, ColumnViewItem cellInThisDatabaseColumn, RowData cellInThisDatabaseRow, Rectangle cellrectangle, BlueFont? font, enStates state) {
             if (cellInThisDatabaseRow == null) { return; }
 
-            if (cellInThisDatabaseColumn.Column.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (cellInThisDatabaseColumn.Column.Format == enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 var (lcolumn, lrow, _) = CellCollection.LinkedCellData(cellInThisDatabaseColumn.Column, cellInThisDatabaseRow.Row, false, false);
 
                 if (lcolumn != null && lrow != null) {

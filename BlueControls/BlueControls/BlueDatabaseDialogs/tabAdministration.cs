@@ -107,14 +107,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             ColumnItem? columnLinked = null;
             var posError = false;
             switch (column.Format) {
-                case enDataFormat.Columns_für_LinkedCellDropdown:
-                    var txt = row.CellGetString(column);
-                    if (int.TryParse(txt, out var colKey)) {
-                        columnLinked = column.LinkedDatabase().Column.SearchByKey(colKey);
-                    }
-                    break;
+                //case enDataFormat.Columns_für_LinkedCellDropdown:
+                //    var txt = row.CellGetString(column);
+                //    if (int.TryParse(txt, out var colKey)) {
+                //        columnLinked = column.LinkedDatabase().Column.SearchByKey(colKey);
+                //    }
+                //    break;
 
-                case enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
+                //case enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
                 case enDataFormat.Verknüpfung_zu_anderer_Datenbank:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                     (columnLinked, _, _) = CellCollection.LinkedCellData(column, row, true, false);

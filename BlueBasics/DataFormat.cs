@@ -53,37 +53,37 @@ namespace BlueBasics {
         #region Methods
 
         public static bool Autofilter_möglich(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown or enDataFormat.RelationText => true,
+            enDataFormat.Text or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.Verknüpfung_zu_anderer_Datenbank or enDataFormat.Values_für_LinkedCellDropdown or enDataFormat.RelationText => true,
             _ => false
         };
 
         public static bool CanBeChangedByRules(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank => true,
+            enDataFormat.Text or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift => true,
             _ => false
         };
 
         public static bool CanBeCheckedByRules(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown => true,
+            enDataFormat.Text or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.Verknüpfung_zu_anderer_Datenbank or enDataFormat.Values_für_LinkedCellDropdown => true,
             _ => false
         };
 
         public static bool DropdownItemsAllowed(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Link_To_Filesystem or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown or enDataFormat.RelationText => true,
+            enDataFormat.Text or enDataFormat.Link_To_Filesystem or enDataFormat.Values_für_LinkedCellDropdown or enDataFormat.RelationText => true,
             _ => false
         };
 
         public static bool DropdownItemsOfOtherCellsAllowed(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank or enDataFormat.RelationText => true,
+            enDataFormat.Text or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Verknüpfung_zu_anderer_Datenbank or enDataFormat.RelationText => true,
             _ => false
         };
 
         public static bool DropdownUnselectAllAllowed(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank => true,
+            enDataFormat.Text or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.Verknüpfung_zu_anderer_Datenbank => true,
             _ => false
         };
 
         public static bool ExportableForLayout(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown => true,
+            enDataFormat.Text or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.Verknüpfung_zu_anderer_Datenbank or enDataFormat.Values_für_LinkedCellDropdown => true,
             _ => false
         };
 
@@ -108,17 +108,12 @@ namespace BlueBasics {
         //public static bool IsFormat(this string txt, enDataFormat format) => Text_LängeCheck(txt, format) && Text_SchabloneCheck(txt, format) && txt.ContainsOnlyChars(AllowedChars(format)) && Text_ValueCheck(txt, format);
 
         public static bool MultilinePossible(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.RelationText or enDataFormat.Link_To_Filesystem or enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank => true,
-            _ => false
-        };
-
-        public static bool NeedLinkedKeyKennung(this enDataFormat format) => format switch {
-            enDataFormat.Columns_für_LinkedCellDropdown => true,
+            enDataFormat.Text or enDataFormat.RelationText or enDataFormat.Link_To_Filesystem or enDataFormat.Verknüpfung_zu_anderer_Datenbank => true,
             _ => false
         };
 
         public static bool NeedTargetDatabase(this enDataFormat format) => format switch {
-            enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown => true,
+            enDataFormat.Verknüpfung_zu_anderer_Datenbank or enDataFormat.Values_für_LinkedCellDropdown => true,
             _ => false
         };
 
@@ -256,7 +251,7 @@ namespace BlueBasics {
         //}
 
         public static bool TextboxEditPossible(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank or enDataFormat.RelationText => true,
+            enDataFormat.Text or enDataFormat.Verknüpfung_zu_anderer_Datenbank or enDataFormat.RelationText => true,
             _ => false
         };
 

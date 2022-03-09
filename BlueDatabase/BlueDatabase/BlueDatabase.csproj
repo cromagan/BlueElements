@@ -26,7 +26,7 @@
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	<LangVersion>latest</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -36,9 +36,10 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet></CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>
+    </CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-	<LangVersion>latest</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
@@ -51,7 +52,7 @@
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-	<LangVersion>latest</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
@@ -64,7 +65,7 @@
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-	<LangVersion>latest</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
@@ -85,7 +86,6 @@
     <Compile Include="AdditionalScriptComands\Method_RowIsNull.cs" />
     <Compile Include="AdditionalScriptComands\Method_Row.cs" />
     <Compile Include="AdditionalScriptComands\Method_MatchColumnFormat.cs" />
-    <Compile Include="AdditionalScriptComands\Method_SetLink.cs" />
     <Compile Include="AdditionalScriptComands\Method_LookupFilter.cs" />
     <Compile Include="AdditionalScriptComands\Method_Lookup.cs" />
     <Compile Include="AdditionalScriptComands\Method_Filter.cs" />

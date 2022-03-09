@@ -497,7 +497,7 @@ namespace BlueControls.Controls {
         private ColumnItem? GetRealColumn(ColumnItem? column, RowItem? row) {
             ColumnItem? gbColumn;
 
-            if (column?.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (column?.Format == enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 //var skriptgesteuert = column.LinkedCell_RowKey == -9999;
 
                 //if (column.LinkedDatabase() != null && column.LinkedCell_ColumnKey > -1) {
@@ -742,7 +742,6 @@ namespace BlueControls.Controls {
                     //}
                     break;
 
-                case enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
                 case enDataFormat.Verknüpfung_zu_anderer_Datenbank:
                     GetRealColumn(_tmpColumn, _tmpRow);
                     ValueSet(_tmpRow.CellGetString(_tmpColumn), true, true);

@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -103,6 +105,7 @@ namespace BlueDatabase {
         /// <param name="row"></param>
         /// <returns></returns>
         public static List<Variable>? CellToVariable(ColumnItem? column, RowItem? row) {
+            if (column == null || row == null) { return null; }
             if (!column.Format.CanBeCheckedByRules()) { return null; }
             if (!column.SaveContent) { return null; }
 
@@ -124,16 +127,15 @@ namespace BlueDatabase {
             var vars = new List<Variable>();
 
             switch (column.Format) {
-                case enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
-                case enDataFormat.Verknüpfung_zu_anderer_Datenbank:
-                    if (column.LinkedCell_RowKeyIsInColumn == -9999) {
-                        wert = string.Empty; // Beim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss.
-                        vars.Add(new Variable(column.Name + "_link", string.Empty, VariableDataType.String, true, true, "Dieser Wert kann nur mit SetLink verändert werden.\r\nBeim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss."));
-                    } else {
-                        qi = "Spalte: " + column.ReadableText() + "\r\nDer Inhalt wird zur Startzeit des Skripts festgelegt.";
-                        ro = true;
-                    }
-                    break;
+                //case enDataFormat.Verknüpfung_zu_anderer_Datenbank:
+                //    //if (column.LinkedCell_RowKeyIsInColumn == -9999) {
+                //    wert = string.Empty; // Beim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss.
+                //    //vars.Add(new Variable(column.Name + "_link", string.Empty, VariableDataType.String, true, true, "Dieser Wert kann nur mit SetLink verändert werden.\r\nBeim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss."));
+                //    //} else {
+                //    //    qi = "Spalte: " + column.ReadableText() + "\r\nDer Inhalt wird zur Startzeit des Skripts festgelegt.";
+                //    //    ro = true;
+                //    //}
+                //    break;
 
                 case enDataFormat.Link_To_Filesystem:
                     qi = "Spalte: " + column.ReadableText() + "\r\nFalls die Datei auf der Festplatte existiert, wird eine weitere\r\nVariable erzeugt: " + column.Name + "_FileName";
@@ -143,12 +145,12 @@ namespace BlueDatabase {
                     }
                     break;
 
-                case enDataFormat.Columns_für_LinkedCellDropdown:
-                    if (int.TryParse(wert, out var colKey)) {
-                        var c = column.LinkedDatabase().Column.SearchByKey(colKey);
-                        if (c != null) { wert = c.Name; }
-                    }
-                    break;
+                    //case enDataFormat.Columns_für_LinkedCellDropdown:
+                    //    if (int.TryParse(wert, out var colKey)) {
+                    //        var c = column.LinkedDatabase().Column.SearchByKey(colKey);
+                    //        if (c != null) { wert = c.Name; }
+                    //    }
+                    //    break;
             }
 
             switch (column.ScriptType) {
@@ -336,7 +338,7 @@ namespace BlueDatabase {
                 if (fullCheck) {
                     var x = CellGetString(thisColum);
                     var x2 = thisColum.AutoCorrect(x);
-                    if (thisColum.Format is not enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert and not enDataFormat.Verknüpfung_zu_anderer_Datenbank && x != x2) {
+                    if (thisColum.Format is not enDataFormat.Verknüpfung_zu_anderer_Datenbank && x != x2) {
                         Database.Cell.Set(thisColum, this, x2);
                     } else {
                         if (!thisColum.IsFirst()) {
@@ -347,7 +349,7 @@ namespace BlueDatabase {
                     thisColum.Invalidate_TmpColumnContentWidth();
                     doFemdZelleInvalidate = false; // Hier ja schon bei jedem gemacht
                 }
-                if (doFemdZelleInvalidate && thisColum.LinkedDatabase() != null) {
+                if (doFemdZelleInvalidate && thisColum.LinkedDatabase != null) {
                     CellCollection.Invalidate_CellContentSize(thisColum, this);
                     thisColum.Invalidate_TmpColumnContentWidth();
                 }
@@ -561,19 +563,18 @@ namespace BlueDatabase {
         }
 
         private void VariableToCell(ColumnItem? column, List<Variable> vars) {
-            if (Database.ReadOnly) { return; }
+            if (Database == null || Database.ReadOnly) { return; }
 
             var columnVar = vars.Get(column.Name);
-            if (columnVar == null) { return; }
-            if (!column.SaveContent) { return; }
-            if (columnVar.Readonly) { return; }
+            if (columnVar == null || columnVar.Readonly) { return; }
+            if (!column.SaveContent || !column.Format.CanBeChangedByRules()) { return; }
 
-            if (column.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
-                var columnLinkVar = vars.GetSystem(column.Name + "_Link");
-                if (columnLinkVar != null) {
-                    column.Database.Cell.SetValueBehindLinkedValue(column, this, columnLinkVar.ValueString);
-                }
-            }
+            //if (column.Format == enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            //    var columnLinkVar = vars.GetSystem(column.Name + "_Link");
+            //    if (columnLinkVar != null) {
+            //        column.Database.Cell.SetValueBehindLinkedValue(column, this, columnLinkVar.ValueString);
+            //    }
+            //}
 
             if (columnVar.Type == VariableDataType.List) {
                 CellSet(column, columnVar.ValueListString);

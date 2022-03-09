@@ -68,6 +68,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnCanBeEmpty = new BlueControls.Controls.Button();
             this.cbxDropDownKey = new BlueControls.Controls.ComboBox();
             this.capDropDownKey = new BlueControls.Controls.Caption();
+            this.btnLogUndo = new BlueControls.Controls.Button();
             this.btnIgnoreLock = new BlueControls.Controls.Button();
             this.lbxCellEditor = new BlueControls.Controls.ListBox();
             this.btnEditableStandard = new BlueControls.Controls.Button();
@@ -106,7 +107,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnQI_Vorschau = new BlueControls.Controls.Button();
             this.tabSonstiges = new System.Windows.Forms.TabPage();
             this.butSaveContent = new BlueControls.Controls.Button();
-            this.btnLogUndo = new BlueControls.Controls.Button();
             this.tbxTags = new BlueControls.Controls.TextBox();
             this.Caption8 = new BlueControls.Controls.Caption();
             this.cbxSort = new BlueControls.Controls.ComboBox();
@@ -115,8 +115,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capRegex = new BlueControls.Controls.Caption();
             this.tbxAllowedChars = new BlueControls.Controls.TextBox();
             this.Caption13 = new BlueControls.Controls.Caption();
-            this.txbLinkedKeyKennung = new BlueControls.Controls.TextBox();
-            this.capLinkedKeyKennung = new BlueControls.Controls.Caption();
             this.cbxLinkedDatabase = new BlueControls.Controls.ComboBox();
             this.capLinkedDatabase = new BlueControls.Controls.Caption();
             this.capBestFileStandardSuffix = new BlueControls.Controls.Caption();
@@ -152,10 +150,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabSpaltenVerlinkung = new System.Windows.Forms.TabPage();
             this.tblFilterliste = new BlueControls.Controls.Table();
             this.cbxTargetColumn = new BlueControls.Controls.ComboBox();
-            this.grpLinkedDatabase = new BlueControls.Controls.GroupBox();
-            this.grpColumnsForLinkedDatabase = new BlueControls.Controls.GroupBox();
-            this.grpVerlinkteZellen = new BlueControls.Controls.GroupBox();
-            this.capRowKeyInColumn = new BlueControls.Controls.Caption();
             this.capTargetColumn = new BlueControls.Controls.Caption();
             this.capIntern = new BlueControls.Controls.Caption();
             this.caption5 = new BlueControls.Controls.Caption();
@@ -175,9 +169,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabSpezial.SuspendLayout();
             this.grpLinkToFileSystem.SuspendLayout();
             this.tabSpaltenVerlinkung.SuspendLayout();
-            this.grpLinkedDatabase.SuspendLayout();
-            this.grpColumnsForLinkedDatabase.SuspendLayout();
-            this.grpVerlinkteZellen.SuspendLayout();
             this.SuspendLayout();
             // 
             // ColorDia
@@ -692,6 +683,15 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capDropDownKey.Text = "...aber nur, wenn der Inhalt dieser Spalte gleich ist:";
             this.capDropDownKey.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
+            // btnLogUndo
+            // 
+            this.btnLogUndo.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.btnLogUndo.Location = new System.Drawing.Point(592, 376);
+            this.btnLogUndo.Name = "btnLogUndo";
+            this.btnLogUndo.Size = new System.Drawing.Size(288, 16);
+            this.btnLogUndo.TabIndex = 32;
+            this.btnLogUndo.Text = "Undo der Spalte wird geloggt";
+            // 
             // btnIgnoreLock
             // 
             this.btnIgnoreLock.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
@@ -1099,15 +1099,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.butSaveContent.TabIndex = 34;
             this.butSaveContent.Text = "Inhalte der Zellen auf Festplatte speichern und laden";
             // 
-            // btnLogUndo
-            // 
-            this.btnLogUndo.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
-            this.btnLogUndo.Location = new System.Drawing.Point(592, 376);
-            this.btnLogUndo.Name = "btnLogUndo";
-            this.btnLogUndo.Size = new System.Drawing.Size(288, 16);
-            this.btnLogUndo.TabIndex = 32;
-            this.btnLogUndo.Text = "Undo der Spalte wird geloggt";
-            // 
             // tbxTags
             // 
             this.tbxTags.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -1188,23 +1179,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.Caption13.Size = new System.Drawing.Size(352, 24);
             this.Caption13.Text = "Folgende Zeichen können vom Benutzer eingegeben werden:";
             this.Caption13.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            // 
-            // txbLinkedKeyKennung
-            // 
-            this.txbLinkedKeyKennung.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbLinkedKeyKennung.Location = new System.Drawing.Point(240, 24);
-            this.txbLinkedKeyKennung.Name = "txbLinkedKeyKennung";
-            this.txbLinkedKeyKennung.Regex = null;
-            this.txbLinkedKeyKennung.Size = new System.Drawing.Size(232, 24);
-            this.txbLinkedKeyKennung.TabIndex = 40;
-            // 
-            // capLinkedKeyKennung
-            // 
-            this.capLinkedKeyKennung.CausesValidation = false;
-            this.capLinkedKeyKennung.Location = new System.Drawing.Point(8, 24);
-            this.capLinkedKeyKennung.Name = "capLinkedKeyKennung";
-            this.capLinkedKeyKennung.Size = new System.Drawing.Size(224, 16);
-            this.capLinkedKeyKennung.Text = "Verknüpfte Spalten beginnen mit:";
             // 
             // cbxLinkedDatabase
             // 
@@ -1565,7 +1539,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabSpaltenVerlinkung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabSpaltenVerlinkung.Controls.Add(this.tblFilterliste);
             this.tabSpaltenVerlinkung.Controls.Add(this.cbxTargetColumn);
-            this.tabSpaltenVerlinkung.Controls.Add(this.grpLinkedDatabase);
             this.tabSpaltenVerlinkung.Controls.Add(this.capLinkedDatabase);
             this.tabSpaltenVerlinkung.Controls.Add(this.capTargetColumn);
             this.tabSpaltenVerlinkung.Controls.Add(this.cbxLinkedDatabase);
@@ -1583,7 +1556,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tblFilterliste.Location = new System.Drawing.Point(8, 80);
             this.tblFilterliste.Name = "tblFilterliste";
             this.tblFilterliste.ShowWaitScreen = true;
-            this.tblFilterliste.Size = new System.Drawing.Size(968, 200);
+            this.tblFilterliste.Size = new System.Drawing.Size(968, 400);
             this.tblFilterliste.TabIndex = 39;
             // 
             // cbxTargetColumn
@@ -1598,52 +1571,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxTargetColumn.Size = new System.Drawing.Size(752, 24);
             this.cbxTargetColumn.TabIndex = 5;
             this.cbxTargetColumn.TextChanged += new System.EventHandler(this.cbxTargetColumn_TextChanged);
-            // 
-            // grpLinkedDatabase
-            // 
-            this.grpLinkedDatabase.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpLinkedDatabase.CausesValidation = false;
-            this.grpLinkedDatabase.Controls.Add(this.grpColumnsForLinkedDatabase);
-            this.grpLinkedDatabase.Controls.Add(this.grpVerlinkteZellen);
-            this.grpLinkedDatabase.Location = new System.Drawing.Point(8, 288);
-            this.grpLinkedDatabase.Name = "grpLinkedDatabase";
-            this.grpLinkedDatabase.Size = new System.Drawing.Size(888, 192);
-            this.grpLinkedDatabase.TabIndex = 1;
-            this.grpLinkedDatabase.TabStop = false;
-            this.grpLinkedDatabase.Text = "Format: LinkedCell (und dessen Columns / Values)";
-            // 
-            // grpColumnsForLinkedDatabase
-            // 
-            this.grpColumnsForLinkedDatabase.CausesValidation = false;
-            this.grpColumnsForLinkedDatabase.Controls.Add(this.txbLinkedKeyKennung);
-            this.grpColumnsForLinkedDatabase.Controls.Add(this.capLinkedKeyKennung);
-            this.grpColumnsForLinkedDatabase.Location = new System.Drawing.Point(8, 24);
-            this.grpColumnsForLinkedDatabase.Name = "grpColumnsForLinkedDatabase";
-            this.grpColumnsForLinkedDatabase.Size = new System.Drawing.Size(872, 56);
-            this.grpColumnsForLinkedDatabase.TabIndex = 0;
-            this.grpColumnsForLinkedDatabase.TabStop = false;
-            this.grpColumnsForLinkedDatabase.Text = "Format: Columns_für_LinkedCellDropdown";
-            // 
-            // grpVerlinkteZellen
-            // 
-            this.grpVerlinkteZellen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.grpVerlinkteZellen.CausesValidation = false;
-            this.grpVerlinkteZellen.Controls.Add(this.capRowKeyInColumn);
-            this.grpVerlinkteZellen.Location = new System.Drawing.Point(8, 88);
-            this.grpVerlinkteZellen.Name = "grpVerlinkteZellen";
-            this.grpVerlinkteZellen.Size = new System.Drawing.Size(872, 88);
-            this.grpVerlinkteZellen.TabIndex = 1;
-            this.grpVerlinkteZellen.TabStop = false;
-            this.grpVerlinkteZellen.Text = "Format: Verlinkte Zellen";
-            // 
-            // capRowKeyInColumn
-            // 
-            this.capRowKeyInColumn.CausesValidation = false;
-            this.capRowKeyInColumn.Location = new System.Drawing.Point(8, 24);
-            this.capRowKeyInColumn.Name = "capRowKeyInColumn";
-            this.capRowKeyInColumn.Size = new System.Drawing.Size(320, 16);
-            this.capRowKeyInColumn.Text = "Die zu suchende Zeile ist in dieser Spalte zu finden:";
             // 
             // capTargetColumn
             // 
@@ -1722,9 +1649,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabSpezial.ResumeLayout(false);
             this.grpLinkToFileSystem.ResumeLayout(false);
             this.tabSpaltenVerlinkung.ResumeLayout(false);
-            this.grpLinkedDatabase.ResumeLayout(false);
-            this.grpColumnsForLinkedDatabase.ResumeLayout(false);
-            this.grpVerlinkteZellen.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -1795,18 +1719,14 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Caption capBildCodeImageNotfound;
         private Caption capBildCodeConstHeight;
         private TextBox txbBildCodeConstHeight;
-        private TextBox txbLinkedKeyKennung;
-        private Caption capLinkedKeyKennung;
         private ComboBox cbxLinkedDatabase;
         private Caption capLinkedDatabase;
         private Caption capBestFileStandardSuffix;
         private TextBox txbBestFileStandardSuffix;
         private Caption capBestFileStandardFolder;
         private TextBox txbBestFileStandardFolder;
-        private GroupBox grpVerlinkteZellen;
         private ComboBox cbxTargetColumn;
         private Caption capTargetColumn;
-        private Caption capRowKeyInColumn;
         private TextBox txbReplacer;
         private Caption capReplacer;
         private Caption capUeberschrift3;
@@ -1820,10 +1740,8 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Button btnStandard;
         private System.Windows.Forms.TabPage tabSpezial;
         private GroupBox grpLinkToFileSystem;
-        private GroupBox grpLinkedDatabase;
         private ComboBox cbxSchlüsselspalte;
         private Caption capSchlüsselspalte;
-        private GroupBox grpColumnsForLinkedDatabase;
         private Caption capSortiermaske;
         private TextBox txbRegex;
         private Caption capRegex;

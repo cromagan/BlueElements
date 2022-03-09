@@ -235,11 +235,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (!tmpFormat.NeedTargetDatabase()) {
                 cbxLinkedDatabase.Text = string.Empty;
             }
-            // Format: Columns für Linked Database / LinkedKey-Kennung
-            grpColumnsForLinkedDatabase.Enabled = tmpFormat.NeedLinkedKeyKennung();
-            if (!tmpFormat.NeedLinkedKeyKennung()) { txbLinkedKeyKennung.Text = string.Empty; }
+
             // Format: LinkedCell
-            grpVerlinkteZellen.Enabled = tmpFormat is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank;
+            grpVerlinkteZellen.Enabled = tmpFormat is enDataFormat.Verknüpfung_zu_anderer_Datenbank;
         }
 
         private void cbxFormat_TextChanged(object sender, System.EventArgs e) => ButtonCheck();
@@ -254,7 +252,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             cbxTargetColumn.Item.Clear();
 
-            if (_column.LinkedDatabase() != null) {
+            if (_column.LinkedDatabase != null) {
                 //foreach (var ThisColumn in _Column.Database.Column) {
                 //    if (ThisColumn.Format.CanBeCheckedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase()) {
                 //        cbxRowKeyInColumn.Item.Add(ThisColumn);
@@ -263,7 +261,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 //    //    cbxRowKeyInColumn.Item.Add(ThisColumn);
                 //    //}
                 //}
-                foreach (var thisLinkedColumn in _column.LinkedDatabase().Column) {
+                foreach (var thisLinkedColumn in _column.LinkedDatabase.Column) {
                     if (!thisLinkedColumn.IsFirst() && thisLinkedColumn.Format.CanBeChangedByRules() && !thisLinkedColumn.Format.NeedTargetDatabase()) {
                         cbxTargetColumn.Item.Add(thisLinkedColumn);
                     }
@@ -393,7 +391,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             txbBestFileStandardFolder.Text = _column.BestFile_StandardFolder;
             txbBestFileStandardSuffix.Text = _column.BestFile_StandardSuffix;
             cbxLinkedDatabase.Text = _column.LinkedDatabaseFile;
-            txbLinkedKeyKennung.Text = _column.LinkedKeyKennung;
+            //txbLinkedKeyKennung.Text = _column.LinkedKeyKennung;
 
             txbAutoRemove.Text = _column.AutoRemove;
             butSaveContent.Checked = _column.SaveContent;
@@ -505,9 +503,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             _column.BestFile_StandardFolder = txbBestFileStandardFolder.Text;
             _column.BestFile_StandardSuffix = txbBestFileStandardSuffix.Text;
             _column.LinkedDatabaseFile = cbxLinkedDatabase.Text; // Muss vor LinkedCell_RowKey zurückgeschrieben werden
-            _column.LinkedKeyKennung = txbLinkedKeyKennung.Text;
             _column.KeyColumnKey = ColumKeyFrom(_column.Database, cbxSchlüsselspalte.Text);
-            _column.LinkedCell_ColumnKeyOfLinkedDatabase = ColumKeyFrom(_column.LinkedDatabase(), cbxTargetColumn.Text); // LINKED DATABASE
+            _column.LinkedCell_ColumnKeyOfLinkedDatabase = ColumKeyFrom(_column.LinkedDatabase, cbxTargetColumn.Text); // LINKED DATABASE
             _column.DropdownKey = ColumKeyFrom(_column.Database, cbxDropDownKey.Text);
             _column.VorschlagsColumn = ColumKeyFrom(_column.Database, cbxVorschlagSpalte.Text);
             _column.Align = (enAlignmentHorizontal)int.Parse(cbxAlign.Text);
@@ -528,7 +525,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             _column.LinkedDatabaseFile = cbxLinkedDatabase.Text;
 
-            var linkdb = _column.LinkedDatabase();
+            var linkdb = _column.LinkedDatabase;
             if (linkdb == null) { tblFilterliste.Database = null; }
             if (tblFilterliste.Database == null) { tblFilterliste.Database = null; }
 
