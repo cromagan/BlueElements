@@ -42,7 +42,7 @@ namespace BlueScript.Methods {
 
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            return attvar.Attributes == null
+            return attvar.Attributes.Count == 0
                 ? attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden
                     ? DoItFeedback.AttributFehler(this, attvar)
                     : DoItFeedback.Wahr()
