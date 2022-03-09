@@ -17,8 +17,8 @@
 
 using System.Collections.Generic;
 using BlueBasics;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 #nullable enable
 
@@ -28,7 +28,7 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String_or_List, enVariableDataType.String };
+        public override List<VariableDataType> Args => new() { VariableDataType.String_or_List, VariableDataType.String };
 
         public override string Description => "Extrahiert aus dem gegebenen String oder Liste die Schlagwörter und erstellt neue String-Variablen.\r\n" +
             "Das zweite Attribut dient als Erkennungszeichen, welche das Ende eine Schlagwortes angibt. Zuvor extrahierte Variablen werden wieder entfernt.\r\n" +
@@ -37,7 +37,7 @@ namespace BlueScript.Methods {
         public override bool EndlessArgs => true;
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Null;
+        public override VariableDataType Returns => VariableDataType.Null;
         public override string StartSequence => "(";
         public override string Syntax => "ExtractTags(String, Delemiter);";
 
@@ -52,10 +52,10 @@ namespace BlueScript.Methods {
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
             const string coment = "Mit dem Befehl 'ExtractTags' erstellt";
-            s.Variablen.RemoveWithComent(coment);
+            s.Variables.RemoveWithComent(coment);
 
             var tags = new List<string>();
-            if (attvar.Attributes[0].Type == enVariableDataType.String) {
+            if (attvar.Attributes[0].Type == VariableDataType.String) {
                 tags.Add(attvar.Attributes[0].ValueString);
             } else {
                 tags.AddRange(attvar.Attributes[0].ValueListString);
@@ -68,7 +68,7 @@ namespace BlueScript.Methods {
                     var vn = x[0].ToLower().ReduceToChars(Constants.AllowedCharsVariableName);
                     var thisv = x[1].Trim();
                     if (!string.IsNullOrEmpty(vn) && !string.IsNullOrEmpty(thisv)) {
-                        s.Variablen.Add(new Variable("extracted_" + vn, thisv, enVariableDataType.String, true, false, coment));
+                        s.Variables.Add(new Variable("extracted_" + vn, thisv, VariableDataType.String, true, false, coment));
                     }
                 }
             }

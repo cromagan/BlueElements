@@ -20,8 +20,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using BlueBasics;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -29,12 +29,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Numeral };
+        public override List<VariableDataType> Args => new() { VariableDataType.Numeral };
         public override string Description => "Gibt den den angegeben Werten den, mit dem niedrigsten Wert zurück.";
         public override bool EndlessArgs => true;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Numeral;
+        public override VariableDataType Returns => VariableDataType.Numeral;
         public override string StartSequence => "(";
         public override string Syntax => "Min(Value1, Value2, ...)";
 
@@ -48,7 +48,7 @@ namespace BlueScript.Methods {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
             var val = attvar.Attributes.Select(thisval => thisval.ValueDouble).Prepend(double.MaxValue).Min();
-            return new DoItFeedback(val.ToString(Constants.Format_Float1), enVariableDataType.Numeral);
+            return new DoItFeedback(val.ToString(Constants.Format_Float1), VariableDataType.Numeral);
         }
 
         #endregion

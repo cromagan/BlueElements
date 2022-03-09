@@ -17,8 +17,8 @@
 
 using System.Collections.Generic;
 using BlueBasics;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 using static BlueBasics.Converter;
 
 namespace BlueScript.Methods {
@@ -27,12 +27,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String };
+        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.String };
         public override string Description => "Gibt die Differnz in Tagen der beiden Datums als Gleitkommazahl zurück.\rErgebnis = DateTimeString1 - DateTimeString2";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Numeral;
+        public override VariableDataType Returns => VariableDataType.Numeral;
         public override string StartSequence => "(";
         public override string Syntax => "DateTimeDifferenceInDays(DateTimeString1, DateTimeString2)";
 
@@ -54,7 +54,7 @@ namespace BlueScript.Methods {
             var ok2 = DateTimeTryParse(attvar.Attributes[1].ValueString, out var d2);
             return !ok2
                 ? new DoItFeedback("Der Wert '" + attvar.Attributes[1].ValueString + "' wurde nicht als Zeitformat erkannt.")
-                : new DoItFeedback(d1.Subtract(d2).TotalDays.ToString(Constants.Format_Float1), enVariableDataType.Numeral);
+                : new DoItFeedback(d1.Subtract(d2).TotalDays.ToString(Constants.Format_Float1), VariableDataType.Numeral);
         }
 
         #endregion

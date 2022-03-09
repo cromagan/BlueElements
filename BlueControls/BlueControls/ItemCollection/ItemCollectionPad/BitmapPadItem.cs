@@ -93,8 +93,7 @@ namespace BlueControls.ItemCollection {
             if (Bitmap != null) {
                 if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             }
-            System.Windows.Forms.OpenFileDialog e = new()
-            {
+            System.Windows.Forms.OpenFileDialog e = new() {
                 CheckFileExists = true,
                 Multiselect = false,
                 Title = "Bild wählen:",
@@ -166,7 +165,7 @@ namespace BlueControls.ItemCollection {
         public bool ReplaceVariable(Script s, Variable variable) {
             if (string.IsNullOrEmpty(Platzhalter_Für_Layout)) { return false; }
             if ("~" + variable.Name.ToLower() + "~" != Platzhalter_Für_Layout.ToLower()) { return false; }
-            if (variable.Type != Skript.Enums.enVariableDataType.Bitmap) { return false; }
+            if (variable.Type != BlueScript.Enums.VariableDataType.Bitmap) { return false; }
             var ot = variable.ValueBitmap(s);
             if (ot is Bitmap bmp) {
                 Bitmap = bmp;

@@ -18,8 +18,8 @@
 #nullable enable
 
 using System.Collections.Generic;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 
@@ -29,12 +29,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Numeral };
+        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.Numeral };
         public override string Description => "Fügt dem Datum die angegeben Anzahl Tage hinzu. Dabei können auch Gleitkommazahlen benutzt werden, so werden z.B. bei 0.25 nur 6 Stunden hinzugefügt. Der Rückgabwert erfolgt immer im Format " + Format_Date7;
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.String;
+        public override VariableDataType Returns => VariableDataType.String;
         public override string StartSequence => "(";
         public override string Syntax => "AddDays(DateTimeString, Days)";
 
@@ -52,7 +52,7 @@ namespace BlueScript.Methods {
                 return new DoItFeedback("Der Wert '" + attvar.Attributes[0].ValueString + "' wurde nicht als Zeitformat erkannt.");
             }
             d = d.AddDays(attvar.Attributes[1].ValueDouble);
-            return new DoItFeedback(d.ToString(Format_Date7), enVariableDataType.String);
+            return new DoItFeedback(d.ToString(Format_Date7), VariableDataType.String);
         }
 
         #endregion

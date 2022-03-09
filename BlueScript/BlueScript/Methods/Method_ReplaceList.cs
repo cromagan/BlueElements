@@ -19,8 +19,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using BlueBasics;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -28,12 +28,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List, enVariableDataType.Bool, enVariableDataType.Bool, enVariableDataType.String, enVariableDataType.String };
+        public override List<VariableDataType> Args => new() { VariableDataType.Variable_List, VariableDataType.Bool, VariableDataType.Bool, VariableDataType.String, VariableDataType.String };
         public override string Description => "Ersetzt alle Werte in der Liste. Bei Partial=True werden alle Teiltrings in den einzelnen Elementen ausgetauscht.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Null;
+        public override VariableDataType Returns => VariableDataType.Null;
         public override string StartSequence => "(";
         public override string Syntax => "ReplaceList(ListVariable, CaseSensitive, Partial, SearchValue, ReplaceValue);";
 

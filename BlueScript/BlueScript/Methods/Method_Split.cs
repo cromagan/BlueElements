@@ -16,8 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -25,12 +25,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String };
+        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.String };
         public override string Description => "Wandelt einen Text in eine Liste um.\r\nEs trennt den Text dabei mitteles dem angegebenen Trennzeichen.\r\nEs wird dabei immer eine Liste mit mindestens einen Eintrag erzeugt,\r\ndieser kann aber leer sein.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.List;
+        public override VariableDataType Returns => VariableDataType.List;
         public override string StartSequence => "(";
         public override string Syntax => "Split(String, Trennzeichen)";
 
@@ -44,7 +44,7 @@ namespace BlueScript.Methods {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return !string.IsNullOrEmpty(attvar.ErrorMessage)
                 ? DoItFeedback.AttributFehler(this, attvar)
-                : new DoItFeedback(attvar.Attributes[0].ValueString.Replace(attvar.Attributes[1].ValueString, "\r") + "\r", enVariableDataType.List);
+                : new DoItFeedback(attvar.Attributes[0].ValueString.Replace(attvar.Attributes[1].ValueString, "\r") + "\r", VariableDataType.List);
         }
 
         #endregion

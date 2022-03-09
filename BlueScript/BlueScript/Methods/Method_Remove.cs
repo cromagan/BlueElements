@@ -17,8 +17,8 @@
 
 using System.Collections.Generic;
 using BlueBasics;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -26,12 +26,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List, enVariableDataType.Bool, enVariableDataType.String_or_List };
+        public override List<VariableDataType> Args => new() { VariableDataType.Variable_List, VariableDataType.Bool, VariableDataType.String_or_List };
         public override string Description => "Entfernt aus der Liste die angegebenen Werte.";
         public override bool EndlessArgs => true;
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Null;
+        public override VariableDataType Returns => VariableDataType.Null;
         public override string StartSequence => "(";
         public override string Syntax => "Remove(ListVariable, CaseSensitive, Value1, Value2, ...);";
 
@@ -49,10 +49,10 @@ namespace BlueScript.Methods {
 
             var tmpList = attvar.Attributes[0].ValueListString;
             for (var z = 2; z < attvar.Attributes.Count; z++) {
-                if (attvar.Attributes[z].Type == enVariableDataType.String) {
+                if (attvar.Attributes[z].Type == VariableDataType.String) {
                     tmpList.RemoveString(attvar.Attributes[z].ValueString, attvar.Attributes[1].ValueBool);
                 }
-                if (attvar.Attributes[z].Type == enVariableDataType.List) {
+                if (attvar.Attributes[z].Type == VariableDataType.List) {
                     tmpList.RemoveString(attvar.Attributes[z].ValueListString, attvar.Attributes[1].ValueBool);
                 }
             }

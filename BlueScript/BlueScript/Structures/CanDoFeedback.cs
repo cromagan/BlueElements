@@ -17,7 +17,7 @@
 
 using System.Linq;
 
-namespace BlueScript.Structuren {
+namespace BlueScript.Structures {
 
     public struct CanDoFeedback {
 

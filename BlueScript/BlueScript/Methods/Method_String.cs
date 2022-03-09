@@ -16,8 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -25,12 +25,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Numeral };
+        public override List<VariableDataType> Args => new() { VariableDataType.Numeral };
         public override string Description => "Wandelt die Zahl in einen Text um.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.String;
+        public override VariableDataType Returns => VariableDataType.String;
         public override string StartSequence => "(";
         public override string Syntax => "String(numeral)";
 
@@ -43,8 +43,8 @@ namespace BlueScript.Methods {
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-            attvar.Attributes[0].Type = enVariableDataType.String;
-            return new DoItFeedback(attvar.Attributes[0].ValueString, enVariableDataType.String);
+            attvar.Attributes[0].Type = VariableDataType.String;
+            return new DoItFeedback(attvar.Attributes[0].ValueString, VariableDataType.String);
         }
 
         #endregion

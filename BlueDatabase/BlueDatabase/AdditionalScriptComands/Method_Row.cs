@@ -18,8 +18,8 @@
 using System.Collections.Generic;
 using BlueBasics;
 using BlueScript;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueDatabase.AdditionalScriptComands {
 
@@ -27,7 +27,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Object };
+        public override List<VariableDataType> Args => new() { VariableDataType.Object };
 
         public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.";
 
@@ -37,7 +37,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override enVariableDataType Returns => enVariableDataType.Object;
+        public override VariableDataType Returns => VariableDataType.Object;
 
         public override string StartSequence => "(";
 

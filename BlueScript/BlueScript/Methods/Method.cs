@@ -20,8 +20,8 @@ using System.Collections.Generic;
 using System.Linq;
 using BlueBasics;
 using BlueBasics.Interfaces;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 using static BlueBasics.Extensions;
 
 #nullable enable
@@ -32,7 +32,7 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public abstract List<enVariableDataType> Args { get; }
+        public abstract List<VariableDataType> Args { get; }
 
         public abstract string Description { get; }
 
@@ -42,7 +42,7 @@ namespace BlueScript.Methods {
 
         public abstract bool GetCodeBlockAfter { get; }
 
-        public abstract enVariableDataType Returns { get; }
+        public abstract VariableDataType Returns { get; }
 
         public abstract string StartSequence { get; }
 
@@ -84,7 +84,7 @@ namespace BlueScript.Methods {
         public static GetEndFeedback ReplaceComands(string txt, IEnumerable<Method> comands, Script s) {
             List<string> c = new();
             foreach (var thisc in comands) {
-                if (thisc.Returns != enVariableDataType.Null) {
+                if (thisc.Returns != VariableDataType.Null) {
                     c.AddRange(thisc.Comand(s).Select(thiscs => thiscs + thisc.StartSequence));
                 }
             }
@@ -103,7 +103,7 @@ namespace BlueScript.Methods {
 
         public static GetEndFeedback ReplaceVariable(string txt, Script s) {
             var posc = 0;
-            var v = s.Variablen.AllNames();
+            var v = s.Variables.AllNames();
 
             do {
                 var (pos, which) = NextText(txt, posc, v, true, true, KlammernStd);
@@ -122,17 +122,17 @@ namespace BlueScript.Methods {
                     var (pose, _) = NextText(txt, pos + 1, Tilde, false, false, KlammernStd);
                     if (pose <= pos) { return new GetEndFeedback("Variablen-Findung End-~-Zeichen nicht gefunden."); }
                     var x = new Variable("dummy1", txt.Substring(pos + 1, pose - pos - 1), s);
-                    if (x.Type != enVariableDataType.String) { return new GetEndFeedback("Fehler beim Berechnen des Variablen-Namens."); }
-                    thisV = s.Variablen.Get(x.ValueString);
+                    if (x.Type != VariableDataType.String) { return new GetEndFeedback("Fehler beim Berechnen des Variablen-Namens."); }
+                    thisV = s.Variables.Get(x.ValueString);
                     endz = pose + 1;
                 } else {
-                    thisV = s.Variablen.Get(which);
+                    thisV = s.Variables.Get(which);
                     endz = pos + which.Length;
                 }
                 if (thisV == null) { return new GetEndFeedback("Variablen-Fehler " + which); }
 
-                if (thisV.Type == enVariableDataType.NotDefinedYet) { return new GetEndFeedback("Variable " + thisV.Name + " ist keinem Typ zugeordnet"); }
-                if (thisV.Type == enVariableDataType.List && !string.IsNullOrEmpty(thisV.ValueString) && !thisV.ValueString.EndsWith("\r")) { return new GetEndFeedback("List-Variable " + thisV.Name + " fehlerhaft"); }
+                if (thisV.Type == VariableDataType.NotDefinedYet) { return new GetEndFeedback("Variable " + thisV.Name + " ist keinem Typ zugeordnet"); }
+                if (thisV.Type == VariableDataType.List && !string.IsNullOrEmpty(thisV.ValueString) && !thisV.ValueString.EndsWith("\r")) { return new GetEndFeedback("List-Variable " + thisV.Name + " fehlerhaft"); }
 
                 txt = txt.Substring(0, pos) + Variable.ValueForReplace(thisV.ValueString, thisV.Type) + txt.Substring(endz);
                 posc = pos;
@@ -161,17 +161,17 @@ namespace BlueScript.Methods {
             return attributes;
         }
 
-        public static SplittedAttributesFeedback SplitAttributeToVars(string attributtext, Script s, List<enVariableDataType> types, bool endlessArgs) {
+        public static SplittedAttributesFeedback SplitAttributeToVars(string attributtext, Script s, List<VariableDataType> types, bool endlessArgs) {
             if (types.Count == 0) {
                 return string.IsNullOrEmpty(attributtext)
                     ? new SplittedAttributesFeedback(new List<Variable>())
-                    : new SplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Keine Attribute erwartet, aber erhalten.");
+                    : new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Keine Attribute erwartet, aber erhalten.");
             }
 
             var attributes = SplitAttributeToString(attributtext);
-            if (attributes == null || attributes.Count == 0) { return new SplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Allgemeiner Fehler."); }
-            if (attributes.Count < types.Count) { return new SplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Zu wenige Attribute erhalten."); }
-            if (!endlessArgs && attributes.Count > types.Count) { return new SplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Zu viele Attribute erhalten."); }
+            if (attributes == null || attributes.Count == 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Allgemeiner Fehler."); }
+            if (attributes.Count < types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
+            if (!endlessArgs && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu viele Attribute erhalten."); }
 
             //  Variablen und Routinen ersetzen
             List<Variable?> vars = new();
@@ -183,33 +183,33 @@ namespace BlueScript.Methods {
 
                 // Variable ermitteln oder eine Dummy-Variable als Rückgabe ermitteln
                 Variable? v = null;
-                if (exceptetType.HasFlag(enVariableDataType.Variable)) {
+                if (exceptetType.HasFlag(VariableDataType.Variable)) {
                     var varn = attributes[n];
                     if (varn.StartsWith("~") && varn.EndsWith("~")) {
                         var tmp2 = new Variable("dummy2", varn.Substring(1, varn.Length - 2), s);
-                        if (tmp2.Type != enVariableDataType.String) { return new SplittedAttributesFeedback(enSkriptFehlerTyp.VariablenNamenBerechnungFehler, "Variablenname konnte nicht berechnet werden bei Attribut " + (n + 1)); }
+                        if (tmp2.Type != VariableDataType.String) { return new SplittedAttributesFeedback(ScriptIssueType.VariablenNamenBerechnungFehler, "Variablenname konnte nicht berechnet werden bei Attribut " + (n + 1)); }
                         varn = tmp2.ValueString;
                     }
 
-                    if (!Variable.IsValidName(varn)) { return new SplittedAttributesFeedback(enSkriptFehlerTyp.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1)); }
+                    if (!Variable.IsValidName(varn)) { return new SplittedAttributesFeedback(ScriptIssueType.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1)); }
 
-                    if (s != null) { v = s.Variablen.Get(varn); }
-                    if (v == null) { return new SplittedAttributesFeedback(enSkriptFehlerTyp.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1)); }
+                    if (s != null) { v = s.Variables.Get(varn); }
+                    if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1)); }
                 } else {
                     v = new Variable("dummy3", attributes[n], s);
-                    if (v == null) { return new SplittedAttributesFeedback(enSkriptFehlerTyp.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1)); }
+                    if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1)); }
                 }
 
                 // Den Typ der Variable checken
                 if (!exceptetType.HasFlag(v.Type)) {
-                    if (v.Type == enVariableDataType.Error) {
-                        return new SplittedAttributesFeedback(enSkriptFehlerTyp.BerechnungFehlgeschlagen, "Attribut " + (n + 1) + ": " + v.Coment);
+                    if (v.Type == VariableDataType.Error) {
+                        return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Attribut " + (n + 1) + ": " + v.Coment);
                     }
-                    if (exceptetType == enVariableDataType.Integer) {
-                        if (v.Type != enVariableDataType.Numeral) { return new SplittedAttributesFeedback(enSkriptFehlerTyp.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
-                        if (v.ValueDouble != (int)v.ValueDouble) { return new SplittedAttributesFeedback(enSkriptFehlerTyp.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
+                    if (exceptetType == VariableDataType.Integer) {
+                        if (v.Type != VariableDataType.Numeral) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
+                        if (v.ValueDouble != (int)v.ValueDouble) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
                     } else {
-                        return new SplittedAttributesFeedback(enSkriptFehlerTyp.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht der erwartete Typ");
+                        return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht der erwartete Typ");
                     }
                 }
 
@@ -221,10 +221,10 @@ namespace BlueScript.Methods {
         }
 
         public CanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, Script s) {
-            if (!expectedvariablefeedback && Returns != enVariableDataType.Null) {
+            if (!expectedvariablefeedback && Returns != VariableDataType.Null) {
                 return new CanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
             }
-            if (expectedvariablefeedback && Returns == enVariableDataType.Null) {
+            if (expectedvariablefeedback && Returns == VariableDataType.Null) {
                 return new CanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
             }
             var maxl = scriptText.Length;

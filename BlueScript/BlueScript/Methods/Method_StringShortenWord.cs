@@ -17,8 +17,8 @@
 
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods {
@@ -27,12 +27,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String_or_List };
+        public override List<VariableDataType> Args => new() { VariableDataType.String_or_List };
         public override string Description => "Versucht den String zu kürzen, indem Abkürzungen verwendet werden.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.String;
+        public override VariableDataType Returns => VariableDataType.String;
         public override string StartSequence => "(";
         public override string Syntax => "StringShortenWord(String)";
 
@@ -47,7 +47,7 @@ namespace BlueScript.Methods {
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
             var TXT = attvar.Attributes[0].ValueString;
             if (string.IsNullOrEmpty(TXT)) {
-                return new DoItFeedback(TXT, enVariableDataType.String);
+                return new DoItFeedback(TXT, VariableDataType.String);
             }
             //TXT = TXT.HTMLSpecialToNormalChar();
             TXT = TXT.Replace("Sekunden", "Sek.");
@@ -107,7 +107,7 @@ namespace BlueScript.Methods {
             }
             TXT = TXT.Replace("Tiefkühl", "TK-");
             //TXT = TXT.CreateHtmlCodes(true);
-            return new DoItFeedback(TXT, enVariableDataType.String);
+            return new DoItFeedback(TXT, VariableDataType.String);
         }
 
         #endregion

@@ -348,28 +348,28 @@ namespace BlueDatabase {
             DoAutomatic(CalculateVisibleRows(filter, pinned), fullCheck, startroutine);
         }
 
-        public void DoAutomatic(List<RowItem?> x, bool fullCheck, string startroutine) {
-            if (Database.ReadOnly) { return; }
+        public void DoAutomatic(List<RowItem>? rows, bool fullCheck, string startroutine) {
+            if (Database == null || Database.ReadOnly) { return; }
 
-            if (x == null || x.Count == 0) { return; }
+            if (rows == null || rows.Count == 0) { return; }
 
-            Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", 0, x.Count, true, false));
+            Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", 0, rows.Count, true, false));
 
-            var all = x.Count;
-            while (x.Count > 0) {
-                Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", all - x.Count, all, false, false));
+            var all = rows.Count;
+            while (rows.Count > 0) {
+                Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", all - rows.Count, all, false, false));
 
-                var (checkPerformed, _, skript) = x[0].DoAutomatic(true, fullCheck, startroutine);
+                var (checkPerformed, _, s) = rows[0].DoAutomatic(true, fullCheck, startroutine);
 
-                if (skript != null && !string.IsNullOrEmpty(skript.Error)) {
-                    var w = x[0].CellFirstString();
-                    x.Clear();
-                    Database.OnDropMessage(enFehlerArt.Warnung, "Skript fehlerhaft bei " + w + "\r\n" + skript.Error);
+                if (s != null && !string.IsNullOrEmpty(s.Error)) {
+                    var w = rows[0].CellFirstString();
+                    rows.Clear();
+                    Database.OnDropMessage(enFehlerArt.Warnung, "Skript fehlerhaft bei " + w + "\r\n" + s.Error);
                     break;
                 }
-                if (checkPerformed) { x.RemoveAt(0); }
+                if (checkPerformed) { rows.RemoveAt(0); }
             }
-            Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", x.Count, x.Count, false, true));
+            Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", rows.Count, rows.Count, false, true));
         }
 
         public RowItem? First() => _internal.Values.FirstOrDefault(thisRowItem => thisRowItem != null);

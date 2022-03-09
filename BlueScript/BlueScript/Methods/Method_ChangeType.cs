@@ -16,8 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -25,12 +25,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List_String_Numeral_or_Bool, enVariableDataType.String };
+        public override List<VariableDataType> Args => new() { VariableDataType.Variable_List_String_Numeral_or_Bool, VariableDataType.String };
         public override string Description => "Ändert den Variablentyp einfach um. Ohne jegliche Prüfung.\r\nAlle Variablen werden intern als Text gespeichert, weshalb diese Änderung möglich ist.\r\nEvtl. entstehen dadurch Variablen, die an sich kaputt sind, aber nicht als solches markiert sind.\r\nVorsicht bei Listen: Dort werden aus Kompatiblitätsgründen (analog zu Join uns Split) zusätlich ein \\r entfernt bzw. hinzugefügt! Somit ist bei Listen IMMER ein evtl. leerer Index 0 vorhanden.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Null;
+        public override VariableDataType Returns => VariableDataType.Null;
         public override string StartSequence => "(";
         public override string Syntax => "ChangeType(Variable, num / str / dat / bol);";
 
@@ -46,7 +46,7 @@ namespace BlueScript.Methods {
 
             if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
 
-            if (attvar.Attributes[0].Type == enVariableDataType.List) {
+            if (attvar.Attributes[0].Type == VariableDataType.List) {
                 if (attvar.Attributes[0].ValueString.EndsWith("\r")) {
                     attvar.Attributes[0].ValueString = attvar.Attributes[0].ValueString.Substring(0, attvar.Attributes[0].ValueString.Length - 1);
                 }
@@ -54,15 +54,15 @@ namespace BlueScript.Methods {
 
             switch (attvar.Attributes[1].ValueString.ToLower()) {
                 case "num":
-                    attvar.Attributes[0].Type = enVariableDataType.Numeral;
+                    attvar.Attributes[0].Type = VariableDataType.Numeral;
                     break;
 
                 case "str":
-                    attvar.Attributes[0].Type = enVariableDataType.String;
+                    attvar.Attributes[0].Type = VariableDataType.String;
                     break;
 
                 case "lst":
-                    attvar.Attributes[0].Type = enVariableDataType.List;
+                    attvar.Attributes[0].Type = VariableDataType.List;
 
                     if (!attvar.Attributes[0].ValueString.EndsWith("\r")) { attvar.Attributes[0].ValueString += "\r"; }
 
@@ -73,7 +73,7 @@ namespace BlueScript.Methods {
                 //    break;
 
                 case "bol":
-                    attvar.Attributes[0].Type = enVariableDataType.Bool;
+                    attvar.Attributes[0].Type = VariableDataType.Bool;
                     break;
 
                 default:

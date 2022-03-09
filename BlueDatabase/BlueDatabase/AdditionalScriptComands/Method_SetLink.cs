@@ -17,8 +17,8 @@
 
 using System.Collections.Generic;
 using BlueScript;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueDatabase.AdditionalScriptComands {
 
@@ -26,7 +26,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List_Or_String, enVariableDataType.String, enVariableDataType.Object };
+        public override List<VariableDataType> Args => new() { VariableDataType.Variable_List_Or_String, VariableDataType.String, VariableDataType.Object };
 
         public override string Description => "Setzt in der verlinkten Datenbank den Link zur Zelle manuell.\r\n" +
                                               "Ein Filter kann mit dem Befehl 'Filter' erstellt werden.\r\n" +
@@ -39,7 +39,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override enVariableDataType Returns => enVariableDataType.Bool;
+        public override VariableDataType Returns => VariableDataType.Bool;
 
         public override string StartSequence => "(";
 
@@ -92,7 +92,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
             #region Spalte mit den Link-Daten finden: Linkvar
 
-            var Linkvar = s.Variablen.GetSystem(attvar.Attributes[0].Name + "_link");
+            var Linkvar = s.Variables.GetSystem(attvar.Attributes[0].Name + "_link");
             Linkvar.Readonly = false;
 
             #endregion
@@ -123,11 +123,11 @@ namespace BlueDatabase.AdditionalScriptComands {
 
             var tmpv = RowItem.CellToVariable(LinkTaregtColumn, r[0]);
             if (tmpv == null || tmpv.Count != 1) { return new DoItFeedback("Wert konnte nicht erzeugt werden: " + attvar.Attributes[4].ValueString); }
-            tmpv[0].Type = enVariableDataType.List;
+            tmpv[0].Type = VariableDataType.List;
 
             attvar.Attributes[0].ValueString = tmpv[0].ValueString;
 
-            if (attvar.Attributes[0].Type == enVariableDataType.List && !string.IsNullOrEmpty(attvar.Attributes[0].ValueString) && !attvar.Attributes[0].ValueString.EndsWith("\r")) {
+            if (attvar.Attributes[0].Type == VariableDataType.List && !string.IsNullOrEmpty(attvar.Attributes[0].ValueString) && !attvar.Attributes[0].ValueString.EndsWith("\r")) {
                 attvar.Attributes[0].ValueString += "\r";
             }
 

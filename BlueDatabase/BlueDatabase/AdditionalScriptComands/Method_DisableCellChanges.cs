@@ -17,8 +17,8 @@
 
 using System.Collections.Generic;
 using BlueScript;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueDatabase.AdditionalScriptComands {
 
@@ -26,7 +26,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new();
+        public override List<VariableDataType> Args => new();
 
         public override string Description => "Verhindert in dieser Datenbank, dass Änderungen, die im SKript vorgenommen wurden, zurückgespielt werden.\r\nSo können z.B. Variabelen für den Export verändert werden und es hat keine Auswirkungen\r\nauf diese Datenbank.";
 
@@ -36,7 +36,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override enVariableDataType Returns => enVariableDataType.Null;
+        public override VariableDataType Returns => VariableDataType.Null;
 
         public override string StartSequence => "(";
 
@@ -52,7 +52,7 @@ namespace BlueDatabase.AdditionalScriptComands {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            var ve = s.Variablen.GetSystem("CellChangesEnabled");
+            var ve = s.Variables.GetSystem("CellChangesEnabled");
             ve.Readonly = false;
             ve.ValueBool = false;
             ve.Readonly = true;

@@ -16,8 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -25,12 +25,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List_String_Numeral_or_Bool, enVariableDataType.Any };
+        public override List<VariableDataType> Args => new() { VariableDataType.Variable_List_String_Numeral_or_Bool, VariableDataType.Any };
         public override string Description => "Diese Routine setzt den ersten Wert, der keinen Fehler verursacht in die erste Variable.\r\nDabei müssen die Datentypen übereinstimmen.\r\nFalls einer der Werte eine Variable ist, die nicht existiert, wird diese einfach übergangen.";
         public override bool EndlessArgs => true;
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Null;
+        public override VariableDataType Returns => VariableDataType.Null;
         public override string StartSequence => "(";
         public override string Syntax => "SetIfExists(Variable, Werte, ...);";
 
@@ -47,7 +47,7 @@ namespace BlueScript.Methods {
             if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
 
             for (var z = 1; z < attvar.Attributes.Count; z++) {
-                if (attvar.Attributes[z].Type == enVariableDataType.Error) {
+                if (attvar.Attributes[z].Type == VariableDataType.Error) {
                     continue;
                 }
 

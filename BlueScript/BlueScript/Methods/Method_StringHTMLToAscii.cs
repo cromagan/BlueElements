@@ -16,8 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods {
@@ -26,12 +26,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Bool };
+        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.Bool };
         public override string Description => "Ersetzt einen HTML-String zu normalen ASCII-String. Beispiel: Aus &auml; wird ä. Dabei kann der Zeilenumbuch explicit ausgenommen werden.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.String;
+        public override VariableDataType Returns => VariableDataType.String;
         public override string StartSequence => "(";
         public override string Syntax => "StringHTMLToAscii(String, IgnoreBRbool)";
 
@@ -43,7 +43,7 @@ namespace BlueScript.Methods {
 
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            return string.IsNullOrEmpty(attvar.ErrorMessage) ? new DoItFeedback(attvar.Attributes[0].ValueString.HtmlSpecialToNormalChar(attvar.Attributes[1].ValueBool), enVariableDataType.String)
+            return string.IsNullOrEmpty(attvar.ErrorMessage) ? new DoItFeedback(attvar.Attributes[0].ValueString.HtmlSpecialToNormalChar(attvar.Attributes[1].ValueBool), VariableDataType.String)
                                                              : DoItFeedback.AttributFehler(this, attvar);
         }
 

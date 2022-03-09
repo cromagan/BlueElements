@@ -15,32 +15,38 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueScript.Structuren {
+namespace BlueScript.Structures {
 
-    public struct strDoItWithEndedPosFeedback {
+    public struct GetEndFeedback {
 
         #region Fields
 
+        public string AttributeText;
+
+        //public strGetEndFeedback(string errormessage, int continuePosition, string attributetext) {
+        //    ContinuePosition = continuePosition;
+        //    ErrorMessage = errormessage;
+        //    AttributeText = attributetext;
+        //}
+        public int ContinuePosition;
+
         public string ErrorMessage;
-
-        public int Position;
-
-        public string Value;
 
         #endregion
 
         #region Constructors
 
-        public strDoItWithEndedPosFeedback(string errormessage, string value, int endpos) {
+        public GetEndFeedback(string errormessage) {
+            ContinuePosition = 0;
             ErrorMessage = errormessage;
-            Value = value;
-            Position = endpos;
+            AttributeText = string.Empty;
+            //ComandText = string.Empty;
         }
 
-        public strDoItWithEndedPosFeedback(string errormessage) {
-            Position = -1;
-            ErrorMessage = errormessage;
-            Value = string.Empty;
+        public GetEndFeedback(int continuePosition, string attributetext) {
+            ContinuePosition = continuePosition;
+            ErrorMessage = string.Empty;
+            AttributeText = attributetext;
         }
 
         #endregion

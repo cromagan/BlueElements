@@ -16,8 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -25,12 +25,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Any };
+        public override List<VariableDataType> Args => new() { VariableDataType.Any };
         public override string Description => "Bezeichnet den Start einer Subroutine.";
         public override bool EndlessArgs => false;
         public override string EndSequence => "()";
         public override bool GetCodeBlockAfter => true;
-        public override enVariableDataType Returns => enVariableDataType.Null;
+        public override VariableDataType Returns => VariableDataType.Null;
         public override string StartSequence => "";
         public override string Syntax => "Sub SubName() {Code }";
 

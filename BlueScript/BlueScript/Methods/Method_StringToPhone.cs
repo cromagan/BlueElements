@@ -16,8 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -25,12 +25,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String_or_List };
+        public override List<VariableDataType> Args => new() { VariableDataType.String_or_List };
         public override string Description => "Versucht, den String als internationale Telefonnummer zurückzugeben. Schlägt es fehl, wird nicht zurückgegeben.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.List;
+        public override VariableDataType Returns => VariableDataType.List;
         public override string StartSequence => "(";
         public override string Syntax => "StringToPhone(String)";
 
@@ -48,9 +48,9 @@ namespace BlueScript.Methods {
             //    ts3[tz] = CellItem.ValueReadable(null, ts3[tz], enShortenStyle.HTML, enBildTextVerhalten.Nur_Text, true);
             //}
             attvar.Attributes[0].Readonly = false;
-            attvar.Attributes[0].Type = enVariableDataType.Variable_List;
+            attvar.Attributes[0].Type = VariableDataType.Variable_List;
             //attvar.Attributes[0].ValueListString = ts3;
-            //return new strDoItFeedback(attvar.Attributes[0].ValueForReplace, string.Empty);
+            //return new DoItFeedback(attvar.Attributes[0].ValueForReplace, string.Empty);
             return new DoItFeedback("Nicht fertig implementiert");
         }
 

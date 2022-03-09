@@ -18,8 +18,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using BlueBasics;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -27,7 +27,7 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List_Or_String, enVariableDataType.Bool, enVariableDataType.String_or_List };
+        public override List<VariableDataType> Args => new() { VariableDataType.Variable_List_Or_String, VariableDataType.Bool, VariableDataType.String_or_List };
 
         public override string Description => "Bei Listen: Prüft, ob einer der Werte in der Liste steht. Bei String: Prüft ob eine der Zeichenketten vorkommt.";
 
@@ -37,7 +37,7 @@ namespace BlueScript.Methods {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override enVariableDataType Returns => enVariableDataType.Bool;
+        public override VariableDataType Returns => VariableDataType.Bool;
 
         public override string StartSequence => "(";
 
@@ -58,14 +58,14 @@ namespace BlueScript.Methods {
             var wordlist = new List<string>();
 
             for (var z = 2; z < attvar.Attributes.Count; z++) {
-                if (attvar.Attributes[z].Type == enVariableDataType.String) { wordlist.Add(attvar.Attributes[z].ValueString); }
-                if (attvar.Attributes[z].Type == enVariableDataType.List) { wordlist.AddRange(attvar.Attributes[z].ValueListString); }
+                if (attvar.Attributes[z].Type == VariableDataType.String) { wordlist.Add(attvar.Attributes[z].ValueString); }
+                if (attvar.Attributes[z].Type == VariableDataType.List) { wordlist.AddRange(attvar.Attributes[z].ValueListString); }
             }
             wordlist = wordlist.SortedDistinctList();
 
             #endregion
 
-            if (attvar.Attributes[0].Type == enVariableDataType.List) {
+            if (attvar.Attributes[0].Type == VariableDataType.List) {
                 var x = attvar.Attributes[0].ValueListString;
                 if (wordlist.Any(thisW => x.Contains(thisW, attvar.Attributes[1].ValueBool))) {
                     return DoItFeedback.Wahr();
@@ -73,7 +73,7 @@ namespace BlueScript.Methods {
                 return DoItFeedback.Falsch();
             }
 
-            if (attvar.Attributes[0].Type == enVariableDataType.String) {
+            if (attvar.Attributes[0].Type == VariableDataType.String) {
                 foreach (var thisW in wordlist) {
                     if (attvar.Attributes[1].ValueBool) {
                         if (attvar.Attributes[0].ValueString.Contains(thisW)) {

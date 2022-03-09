@@ -16,8 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -25,12 +25,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_Any };
+        public override List<VariableDataType> Args => new() { VariableDataType.Variable_Any };
         public override string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist oder keinen Inhalt hat.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Bool;
+        public override VariableDataType Returns => VariableDataType.Bool;
         public override string StartSequence => "(";
         public override string Syntax => "isNullOrEmpty(Variable)";
 
@@ -43,14 +43,14 @@ namespace BlueScript.Methods {
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return attvar.Attributes == null
-                ? attvar.FehlerTyp != enSkriptFehlerTyp.VariableNichtGefunden
+                ? attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden
                     ? DoItFeedback.AttributFehler(this, attvar)
                     : DoItFeedback.Wahr()
                 : string.IsNullOrEmpty(attvar.Attributes[0].ValueString)
                 ? DoItFeedback.Wahr()
-                : attvar.Attributes[0].Type is enVariableDataType.Null or
-                                             enVariableDataType.Error or
-                                             enVariableDataType.NotDefinedYet
+                : attvar.Attributes[0].Type is VariableDataType.Null or
+                                             VariableDataType.Error or
+                                             VariableDataType.NotDefinedYet
                 ? DoItFeedback.Wahr()
                 : DoItFeedback.Falsch();
         }

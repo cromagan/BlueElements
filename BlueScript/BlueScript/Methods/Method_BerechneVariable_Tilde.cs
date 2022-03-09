@@ -16,8 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods {
@@ -26,12 +26,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Bool_Numeral_String_List_Bitmap_or_Object };
+        public override List<VariableDataType> Args => new() { VariableDataType.Bool_Numeral_String_List_Bitmap_or_Object };
         public override string Description => "Berechnet eine Variable. Der Typ der Variable und des Ergebnisses müssen übereinstimmen.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ";";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Null;
+        public override VariableDataType Returns => VariableDataType.Null;
         public override string StartSequence => string.Empty;
         public override string Syntax => "~Variablennamenberechnung~ = Berechung;";
 
@@ -50,7 +50,7 @@ namespace BlueScript.Methods {
             if (postilde + 1 != posgleich) { return new DoItFeedback("Variablen-Namen-Berechung kein gültiges End-~-Zeichen gefunden."); }
 
             var x = new Variable("dummy4", infos.AttributText.Substring(0, postilde), s);
-            if (x.Type != enVariableDataType.String) { return new DoItFeedback("Fehler beim Berechnen des Variablen-Namens."); }
+            if (x.Type != VariableDataType.String) { return new DoItFeedback("Fehler beim Berechnen des Variablen-Namens."); }
 
             var newcommand = x.ValueString + infos.AttributText.Substring(posgleich) + ";";
 

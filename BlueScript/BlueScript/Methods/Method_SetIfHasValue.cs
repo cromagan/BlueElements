@@ -16,8 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -25,12 +25,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_String_Numeral_or_List, enVariableDataType.Any };
+        public override List<VariableDataType> Args => new() { VariableDataType.Variable_String_Numeral_or_List, VariableDataType.Any };
         public override string Description => "Diese Routine setzt den ersten Wert, der keinen Fehler verursacht und einen Wert enthält in die erste Variable.\r\nDabei müssen die Datentypen übereinstimmen.\r\nFalls einer der Werte ein Variable ist, die nicht existiert, wird diese einfach übergangen.\r\nAls 'kein Wert' wird bei Zahlen ebenfalls 0 gewertet.\r\nListen, die einen Eintrag haben (auch wenn dessen Wert leer ist), zählt >nicht< als kein Eintrag.";
         public override bool EndlessArgs => true;
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Null;
+        public override VariableDataType Returns => VariableDataType.Null;
         public override string StartSequence => "(";
         public override string Syntax => "SetIfHasValue(Variable, Werte, ...);";
 
@@ -47,7 +47,7 @@ namespace BlueScript.Methods {
             if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
 
             for (var z = 1; z < attvar.Attributes.Count; z++) {
-                if (attvar.Attributes[z].Type == enVariableDataType.Error) {
+                if (attvar.Attributes[z].Type == VariableDataType.Error) {
                     continue;
                 }
 
@@ -55,9 +55,9 @@ namespace BlueScript.Methods {
 
                 var hasvalue = false;
 
-                if (attvar.Attributes[z].Type == enVariableDataType.String) { hasvalue = !string.IsNullOrEmpty(attvar.Attributes[z].ValueString); }
-                if (attvar.Attributes[z].Type == enVariableDataType.Numeral) { hasvalue = attvar.Attributes[z].ValueDouble != 0; }
-                if (attvar.Attributes[z].Type == enVariableDataType.List) { hasvalue = attvar.Attributes[z].ValueListString.Count > 0; }
+                if (attvar.Attributes[z].Type == VariableDataType.String) { hasvalue = !string.IsNullOrEmpty(attvar.Attributes[z].ValueString); }
+                if (attvar.Attributes[z].Type == VariableDataType.Numeral) { hasvalue = attvar.Attributes[z].ValueDouble != 0; }
+                if (attvar.Attributes[z].Type == VariableDataType.List) { hasvalue = attvar.Attributes[z].ValueListString.Count > 0; }
 
                 if (hasvalue) {
                     attvar.Attributes[0].ValueString = attvar.Attributes[z].ValueString;

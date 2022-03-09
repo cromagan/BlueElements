@@ -21,8 +21,8 @@ using System.Collections.Generic;
 using System.Linq;
 using BlueDatabase.Interfaces;
 using BlueScript;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 using static BlueBasics.Extensions;
 
 namespace BlueDatabase.AdditionalScriptComands {
@@ -31,12 +31,12 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String_or_List, enVariableDataType.Variable_Any };
+        public override List<VariableDataType> Args => new() { VariableDataType.String_or_List, VariableDataType.Variable_Any };
         public override string Description => "Prüft, ob der Inhalt der Variable mit dem Format der angegebenen Spalte übereinstimmt. Leere Inhalte sind dabei TRUE.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Bool;
+        public override VariableDataType Returns => VariableDataType.Bool;
         public override string StartSequence => "(";
         public override string Syntax => "MatchColumnFormat(Value, Column)";
 
@@ -54,7 +54,7 @@ namespace BlueDatabase.AdditionalScriptComands {
             if (column == null) { return new DoItFeedback("Spalte in Datenbank nicht gefunden"); }
 
             var tocheck = new List<string>();
-            if (attvar.Attributes[0].Type == enVariableDataType.List) {
+            if (attvar.Attributes[0].Type == VariableDataType.List) {
                 tocheck.AddRange(attvar.Attributes[0].ValueListString);
             } else {
                 tocheck.Add(attvar.Attributes[0].ValueString);

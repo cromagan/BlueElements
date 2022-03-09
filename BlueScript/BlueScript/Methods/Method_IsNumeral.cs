@@ -17,8 +17,8 @@
 
 using System.Collections.Generic;
 using BlueBasics;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -26,12 +26,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Nummeral_or_String };
+        public override List<VariableDataType> Args => new() { VariableDataType.Nummeral_or_String };
         public override string Description => "Prüft, ob der Inhalt der Variable eine gültige Zahl ist. ";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Bool;
+        public override VariableDataType Returns => VariableDataType.Bool;
         public override string StartSequence => "(";
         public override string Syntax => "isNumeral(Value)";
 
@@ -44,8 +44,8 @@ namespace BlueScript.Methods {
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.Falsch(); }
-            if (attvar.Attributes[0].Type == enVariableDataType.Numeral) { return DoItFeedback.Wahr(); }
-            if (attvar.Attributes[0].Type == enVariableDataType.String) {
+            if (attvar.Attributes[0].Type == VariableDataType.Numeral) { return DoItFeedback.Wahr(); }
+            if (attvar.Attributes[0].Type == VariableDataType.String) {
                 if (attvar.Attributes[0].ValueString.IsNumeral()) {
                     return DoItFeedback.Wahr();
                 }

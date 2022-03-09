@@ -17,8 +17,8 @@
 
 using System.Collections.Generic;
 using BlueScript;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueDatabase.AdditionalScriptComands {
 
@@ -26,7 +26,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String, enVariableDataType.String, enVariableDataType.String, enVariableDataType.String };
+        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.String, VariableDataType.String, VariableDataType.String, VariableDataType.String };
 
         public override string Description => "Lädt eine andere Datenbank (Database), sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als Liste zurück. Wird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben. Ist der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.";
 
@@ -36,7 +36,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override enVariableDataType Returns => enVariableDataType.List;
+        public override VariableDataType Returns => VariableDataType.List;
 
         public override string StartSequence => "(";
 
@@ -63,16 +63,16 @@ namespace BlueDatabase.AdditionalScriptComands {
             if (r == null || r.Count == 0) {
                 if (attvar.Attributes.Count > 3) {
                     attvar.Attributes[3].Readonly = false;
-                    attvar.Attributes[3].Type = enVariableDataType.List;
-                    return new DoItFeedback(attvar.Attributes[3].ValueString + "\r", enVariableDataType.List);
+                    attvar.Attributes[3].Type = VariableDataType.List;
+                    return new DoItFeedback(attvar.Attributes[3].ValueString + "\r", VariableDataType.List);
                 }
                 return new DoItFeedback(string.Empty);
             }
             if (r.Count > 1) {
                 if (attvar.Attributes.Count > 4) {
                     attvar.Attributes[4].Readonly = false;
-                    attvar.Attributes[4].Type = enVariableDataType.List;
-                    return new DoItFeedback(attvar.Attributes[4].ValueString + "\r", enVariableDataType.List);
+                    attvar.Attributes[4].Type = VariableDataType.List;
+                    return new DoItFeedback(attvar.Attributes[4].ValueString + "\r", VariableDataType.List);
                 }
                 return new DoItFeedback(string.Empty);
             }
@@ -80,9 +80,9 @@ namespace BlueDatabase.AdditionalScriptComands {
             var v = RowItem.CellToVariable(c, r[0]);
             if (v == null || v.Count != 1) { return new DoItFeedback("Wert konnte nicht erzeugt werden: " + attvar.Attributes[2].ValueString); }
 
-            return v[0].Type != enVariableDataType.List
-                ? new DoItFeedback(v[0].ValueString + "\r", enVariableDataType.List)
-                : new DoItFeedback(v[0].ValueString, enVariableDataType.List);
+            return v[0].Type != VariableDataType.List
+                ? new DoItFeedback(v[0].ValueString + "\r", VariableDataType.List)
+                : new DoItFeedback(v[0].ValueString, VariableDataType.List);
         }
 
         #endregion

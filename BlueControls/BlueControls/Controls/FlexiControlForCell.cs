@@ -59,9 +59,10 @@ namespace BlueControls.Controls {
 
         #endregion
 
-        //public FlexiControlForCell() : this(null, -1, enÜberschriftAnordnung.Über_dem_Feld) { }
-
         #region Constructors
+
+        // Für den Designer
+        public FlexiControlForCell() : this(null, -1, enÜberschriftAnordnung.Über_dem_Feld) { }
 
         public FlexiControlForCell(Database database, long columnKey, enÜberschriftAnordnung captionPosition) : base() {
             // Dieser Aufruf ist für den Designer erforderlich.

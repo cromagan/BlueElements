@@ -17,8 +17,8 @@
 
 using System.Collections.Generic;
 using BlueBasics;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -26,12 +26,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String };
+        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.String };
         public override string Description => "Entfernt die angegebenen Texte am Ende des Strings. Groß und Kleinschreibung wird ignoriert.";
         public override bool EndlessArgs => true;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.String;
+        public override VariableDataType Returns => VariableDataType.String;
         public override string StartSequence => "(";
         public override string Syntax => "TrimEnd(String, TexttoTrim, ...)";
 
@@ -55,7 +55,7 @@ namespace BlueScript.Methods {
                 }
             } while (txt != val);
 
-            return new DoItFeedback(val, enVariableDataType.String);
+            return new DoItFeedback(val, VariableDataType.String);
         }
 
         #endregion

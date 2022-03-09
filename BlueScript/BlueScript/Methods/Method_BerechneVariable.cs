@@ -17,8 +17,8 @@
 
 using System.Collections.Generic;
 using BlueBasics;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -26,12 +26,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Bool_Numeral_String_List_Bitmap_or_Object };
+        public override List<VariableDataType> Args => new() { VariableDataType.Bool_Numeral_String_List_Bitmap_or_Object };
         public override string Description => "Berechnet eine Variable. Der Typ der Variable und des Ergebnisses müssen übereinstimmen.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ";";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Null;
+        public override VariableDataType Returns => VariableDataType.Null;
         public override string StartSequence => "=";
         public override string Syntax => "VariablenName = Berechung;";
 
@@ -39,15 +39,15 @@ namespace BlueScript.Methods {
 
         #region Methods
 
-        public override List<string> Comand(Script? s) => s == null ? (new List<string>()) : s.Variablen.AllNames();
+        public override List<string> Comand(Script? s) => s == null ? (new List<string>()) : s.Variables.AllNames();
 
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var variableName = infos.ComandText.ToLower().ReduceToChars(Constants.AllowedCharsVariableName);
-            var variable = s.Variablen.Get(variableName);
+            var variable = s.Variables.Get(variableName);
             if (variable == null) { return new DoItFeedback("Variable '" + variableName + "' nicht gefunden"); }
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-            if (variable.Type != enVariableDataType.NotDefinedYet && attvar.Attributes[0].Type != variable.Type) { return new DoItFeedback("Variable '" + variableName + "' ist nicht der erwartete Typ " + attvar.Attributes[0].Type + ", sondern " + variable.Type); }
+            if (variable.Type != VariableDataType.NotDefinedYet && attvar.Attributes[0].Type != variable.Type) { return new DoItFeedback("Variable '" + variableName + "' ist nicht der erwartete Typ " + attvar.Attributes[0].Type + ", sondern " + variable.Type); }
 
             if (variable.Readonly) { return DoItFeedback.Schreibgschützt(); }
 
@@ -62,7 +62,7 @@ namespace BlueScript.Methods {
                 return new DoItFeedback("Befehl nicht erkannt, " + f.ErrorMessage + ": " + originalinfos.AttributText);
             }
             //if (originalinfos.AttributText.Length != f.ContinueOrErrorPosition - 1) {
-            //    return new strDoItFeedback("Falsch gesetztes Semikolon");
+            //    return new DoItFeedback("Falsch gesetztes Semikolon");
             //}
             var f2 = s.BerechneVariable.DoIt(f, s);
 

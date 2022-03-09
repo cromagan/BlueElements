@@ -17,8 +17,8 @@
 
 using System.Collections.Generic;
 using BlueBasics;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -26,12 +26,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Integer };
+        public override List<VariableDataType> Args => new() { VariableDataType.Integer };
         public override string Description => "Gibt eine nicht negative Zufalls-Ganzzahl zurück,\rdie kleiner als das angegebene Maximum ist.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Numeral;
+        public override VariableDataType Returns => VariableDataType.Numeral;
         public override string StartSequence => "(";
         public override string Syntax => "RandomInt(maxValue)";
 
@@ -46,7 +46,7 @@ namespace BlueScript.Methods {
 
             return !string.IsNullOrEmpty(attvar.ErrorMessage)
                 ? DoItFeedback.AttributFehler(this, attvar)
-                : new DoItFeedback(Constants.GlobalRND.Next(attvar.Attributes[0].ValueInt).ToString(), enVariableDataType.Numeral);
+                : new DoItFeedback(Constants.GlobalRND.Next(attvar.Attributes[0].ValueInt).ToString(), VariableDataType.Numeral);
         }
 
         #endregion

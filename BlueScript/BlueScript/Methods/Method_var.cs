@@ -16,8 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods {
@@ -26,12 +26,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Any };
+        public override List<VariableDataType> Args => new() { VariableDataType.Any };
         public override string Description => "Erstellt eine neue Variable, der Typ wird automtisch bestimmt.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ";";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Null;
+        public override VariableDataType Returns => VariableDataType.Null;
         public override string StartSequence => "";
         public override string Syntax => "var VariablenName = Wert;";
 
@@ -51,9 +51,9 @@ namespace BlueScript.Methods {
             var varnam = infos.AttributText.Substring(0, pos);
 
             if (!Variable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name"); }
-            var v = s.Variablen.Get(varnam);
+            var v = s.Variables.Get(varnam);
             if (v != null) { return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden."); }
-            s.Variablen.Add(new Variable(varnam));
+            s.Variables.Add(new Variable(varnam));
 
             return s.BerechneVariable.DoitKomplett(infos.AttributText + ";", s, infos);
         }

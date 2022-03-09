@@ -18,8 +18,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using BlueScript;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Methods;
+using BlueScript.Enums;
 
 namespace BlueDatabase.AdditionalScriptComands {
 
@@ -27,7 +28,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String, enVariableDataType.Bool };
+        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.String, VariableDataType.Bool };
 
         public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeile. KeyValue muss einen Wert enthalten- zur Not kann UniqueRowId() benutzt werden.";
 
@@ -37,7 +38,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override enVariableDataType Returns => enVariableDataType.Object;
+        public override VariableDataType Returns => VariableDataType.Object;
 
         public override string StartSequence => "(";
 

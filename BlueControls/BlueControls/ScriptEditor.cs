@@ -137,7 +137,7 @@ namespace BlueControls {
                 if (s != null && Script.Comands != null) {
                     foreach (var thisc in Script.Comands) {
                         items.Add(new SnippetAutocompleteItem(thisc.Syntax + " "));
-                        if (thisc.Returns != Skript.Enums.enVariableDataType.Null) {
+                        if (thisc.Returns != BlueScript.Enums.VariableDataType.Null) {
                             items.Add(new SnippetAutocompleteItem("var " + thisc.Returns + " = " + thisc.Syntax + "; "));
                         }
 
@@ -150,8 +150,8 @@ namespace BlueControls {
         }
 
         protected void WriteVariablesToTable(Script s) {
-            if (s?.Variablen != null) {
-                foreach (var thisv in s.Variablen) {
+            if (s?.Variables != null) {
+                foreach (var thisv in s.Variables) {
                     var ro = tableVariablen.Database.Row.Add(thisv.Name);
                     ro.CellSet("typ", thisv.Type.ToString());
                     ro.CellSet("RO", thisv.Readonly);

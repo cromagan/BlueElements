@@ -16,8 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods {
@@ -26,12 +26,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Bool };
+        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.Bool };
         public override string Description => "Ersetzt einen ASCII-String zu einem HTML-String. Beispiel: aus ä wird &auml;  Dabei kann der Zeilenumbuch explicit ausgenommen werden.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.String;
+        public override VariableDataType Returns => VariableDataType.String;
         public override string StartSequence => "(";
         public override string Syntax => "StringAsciiToHTML(String, IgnoreBRbool)";
 
@@ -44,7 +44,7 @@ namespace BlueScript.Methods {
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.AttributFehler(this, attvar)
-                                                              : new DoItFeedback(attvar.Attributes[0].ValueString.CreateHtmlCodes(!attvar.Attributes[1].ValueBool), enVariableDataType.String);
+                                                              : new DoItFeedback(attvar.Attributes[0].ValueString.CreateHtmlCodes(!attvar.Attributes[1].ValueBool), VariableDataType.String);
         }
 
         #endregion

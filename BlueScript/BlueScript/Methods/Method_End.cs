@@ -16,8 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -25,7 +25,7 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new();
+        public override List<VariableDataType> Args => new();
 
         public override string Description => "Beendet das Skript ohne Fehler.";
 
@@ -35,7 +35,7 @@ namespace BlueScript.Methods {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override enVariableDataType Returns => enVariableDataType.Null;
+        public override VariableDataType Returns => VariableDataType.Null;
 
         public override string StartSequence => "";
 
@@ -49,7 +49,7 @@ namespace BlueScript.Methods {
         public override List<string> Comand(Script? s) => new() { "end" };
 
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            s.EndSkript = true;
+            s.EndScript = true;
             return DoItFeedback.Null();
         }
 

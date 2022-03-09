@@ -115,7 +115,7 @@ namespace BlueControls.ItemCollection {
         public string Präfix { get; set; } = string.Empty;
 
         //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
-        // Dim Ausgleich As float = mmToPixel(1 / 72 * 25.4, 300)
+        // Dim Ausgleich As float = MmToPixel(1 / 72 * 25.4, 300)
         public float Skalierung { get; set; } = 3.07f;
 
         public string Suffix { get; set; } = string.Empty;
@@ -285,14 +285,14 @@ namespace BlueControls.ItemCollection {
             var textWinkel = _winkel % 360;
             if (textWinkel is > 90 and <= 270) { textWinkel = _winkel - 180; }
             if (geszoom < 0.15d) { return; } // Schrift zu klein, würde abstürzen
-            PointM mitte1 = new(mitte, (float) (sz1.Height / 2.1), textWinkel + 90);
+            PointM mitte1 = new(mitte, (float)(sz1.Height / 2.1), textWinkel + 90);
             var x = gr.Save();
             gr.TranslateTransform(mitte1.X, mitte1.Y);
             gr.RotateTransform(-textWinkel);
             gr.FillRectangle(new SolidBrush(Color.White), new RectangleF((int)(-sz1.Width * 0.9 / 2), (int)(-sz1.Height * 0.8 / 2), (int)(sz1.Width * 0.9), (int)(sz1.Height * 0.8)));
             f.DrawString(gr, Angezeigter_Text_Oben(), (float)(-sz1.Width / 2.0), (float)(-sz1.Height / 2.0), geszoom, StringFormat.GenericDefault);
             gr.Restore(x);
-            PointM mitte2 = new(mitte, (float) (sz2.Height / 2.1), textWinkel - 90);
+            PointM mitte2 = new(mitte, (float)(sz2.Height / 2.1), textWinkel - 90);
             x = gr.Save();
             gr.TranslateTransform(mitte2.X, mitte2.Y);
             gr.RotateTransform(-textWinkel);

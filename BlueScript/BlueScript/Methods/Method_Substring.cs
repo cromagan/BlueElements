@@ -16,8 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -25,12 +25,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Integer, enVariableDataType.Integer };
+        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.Integer, VariableDataType.Integer };
         public override string Description => "Gibt einen Teilstring zurück. Ist der Start oder das Ende keine gültige Position, wird das bestmögliche zurückgegeben und kein Fehler ausgelöst. Subrtring(\"Hallo\", 2,2) gibt ll zurück.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.String;
+        public override VariableDataType Returns => VariableDataType.String;
         public override string StartSequence => "(";
         public override string Syntax => "Substring(String, Start, Anzahl)";
 
@@ -52,7 +52,7 @@ namespace BlueScript.Methods {
             if (st + en > attvar.Attributes[0].ValueString.Length) {
                 en = attvar.Attributes[0].ValueString.Length - st;
             }
-            return new DoItFeedback(attvar.Attributes[0].ValueString.Substring(st, en), enVariableDataType.String);
+            return new DoItFeedback(attvar.Attributes[0].ValueString.Substring(st, en), VariableDataType.String);
         }
 
         #endregion

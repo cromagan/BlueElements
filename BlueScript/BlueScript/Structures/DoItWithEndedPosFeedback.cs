@@ -15,21 +15,34 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace Skript.Enums {
+namespace BlueScript.Structures {
 
-    public enum enSkriptFehlerTyp {
-        ohne = 0,
-        FalscherDatentyp = 1,
-        AttributAnzahl = 2,
+    public struct DoItWithEndedPosFeedback {
 
-        /// <summary>
-        /// Es ist eine Rechenformel / BoolscheOperation vorhanden und diese ist Fehgeschlagen
-        /// </summary>
-        BerechnungFehlgeschlagen = 3,
+        #region Fields
 
-        VariableNichtGefunden = 4,
-        VariableErwartet = 5,
+        public string ErrorMessage;
 
-        VariablenNamenBerechnungFehler = 6
+        public int Position;
+
+        public string Value;
+
+        #endregion
+
+        #region Constructors
+
+        public DoItWithEndedPosFeedback(string errormessage, string value, int endpos) {
+            ErrorMessage = errormessage;
+            Value = value;
+            Position = endpos;
+        }
+
+        public DoItWithEndedPosFeedback(string errormessage) {
+            Position = -1;
+            ErrorMessage = errormessage;
+            Value = string.Empty;
+        }
+
+        #endregion
     }
 }

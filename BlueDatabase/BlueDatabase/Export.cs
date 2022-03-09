@@ -508,7 +508,7 @@ namespace BlueDatabase {
 
                         var (_, _, script) = thisRow.DoAutomatic("export");
                         if (script == null) { return; }
-                        foreach (var thisV in script.Variablen) {
+                        foreach (var thisV in script.Variables) {
                             tmpBody = thisV.ReplaceInText(tmpBody);
                         }
 

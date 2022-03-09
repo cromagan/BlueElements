@@ -18,8 +18,8 @@
 #nullable enable
 
 using System.Collections.Generic;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -27,12 +27,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List, enVariableDataType.Integer };
+        public override List<VariableDataType> Args => new() { VariableDataType.Variable_List, VariableDataType.Integer };
         public override string Description => "Gibt ein das Element der Liste mit der Indexnummer als Text zurück. Die Liste beginnt mit dem Element 0.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.String;
+        public override VariableDataType Returns => VariableDataType.String;
         public override string StartSequence => "(";
         public override string Syntax => "Element(VariableListe, Indexnummer)";
 
@@ -48,7 +48,7 @@ namespace BlueScript.Methods {
             var i = attvar.Attributes[1].ValueInt;
             var list = attvar.Attributes[0].ValueListString;
             return i < 0 || i >= list.Count ? new DoItFeedback("Element nicht in Liste")
-                                            : new DoItFeedback(list[i], enVariableDataType.String);
+                                            : new DoItFeedback(list[i], VariableDataType.String);
         }
 
         #endregion

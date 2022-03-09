@@ -325,7 +325,7 @@ namespace BlueControls.ItemCollection {
 
         public void OnDoInvalidate() => DoInvalidate?.Invoke(this, System.EventArgs.Empty);
 
-        public bool ParseVariable(string name, string wert) => ParseVariable(null, new BlueScript.Variable(name, wert, Skript.Enums.enVariableDataType.String));
+        public bool ParseVariable(string name, string wert) => ParseVariable(null, new BlueScript.Variable(name, wert, BlueScript.Enums.VariableDataType.String));
 
         public bool ParseVariable(BlueScript.Script? s, BlueScript.Variable variable) {
             var did = false;
@@ -341,7 +341,7 @@ namespace BlueControls.ItemCollection {
             if (row != null) {
                 var (_, _, script) = row.DoAutomatic("export");
                 if (script == null) { return; }
-                foreach (var thisV in script.Variablen) {
+                foreach (var thisV in script.Variables) {
                     ParseVariable(script, thisV);
                 }
             }

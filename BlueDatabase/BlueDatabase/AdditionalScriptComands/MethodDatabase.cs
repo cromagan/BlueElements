@@ -30,7 +30,7 @@ namespace BlueDatabase.AdditionalScriptComands {
         protected ColumnItem? Column(Script s, string name) => MyDatabase(s)?.Column.Exists(name);
 
         protected Database? DatabaseOf(Script s, string name) {
-            var f = s.Variablen.GetSystem("filename");
+            var f = s.Variables.GetSystem("filename");
             if (f == null) { return null; }
 
             var newf = f.ValueString.FilePath() + name + ".mdb";
@@ -39,7 +39,7 @@ namespace BlueDatabase.AdditionalScriptComands {
         }
 
         protected Database? MyDatabase(Script s) {
-            var f = s.Variablen.GetSystem("filename");
+            var f = s.Variables.GetSystem("filename");
             return f == null ? null : Database.GetByFilename(f.ValueString, true, false);
         }
 

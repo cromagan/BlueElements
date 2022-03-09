@@ -18,8 +18,8 @@
 #nullable enable
 
 using System.Collections.Generic;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -27,12 +27,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List, enVariableDataType.String_or_List };
+        public override List<VariableDataType> Args => new() { VariableDataType.Variable_List, VariableDataType.String_or_List };
         public override string Description => "Fügt einer Liste einen oder mehrere Werte hinzu.";
         public override bool EndlessArgs => true;
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Null;
+        public override VariableDataType Returns => VariableDataType.Null;
         public override string StartSequence => "(";
         public override string Syntax => "Add(List-Variable, Value1, Value2, ...);";
 
@@ -50,10 +50,10 @@ namespace BlueScript.Methods {
 
             var tmpList = attvar.Attributes[0].ValueListString;
             for (var z = 1; z < attvar.Attributes.Count; z++) {
-                if (attvar.Attributes[z].Type == enVariableDataType.String) {
+                if (attvar.Attributes[z].Type == VariableDataType.String) {
                     tmpList.Add(attvar.Attributes[z].ValueString);
                 }
-                if (attvar.Attributes[z].Type == enVariableDataType.List) {
+                if (attvar.Attributes[z].Type == VariableDataType.List) {
                     tmpList.AddRange(attvar.Attributes[z].ValueListString);
                 }
             }

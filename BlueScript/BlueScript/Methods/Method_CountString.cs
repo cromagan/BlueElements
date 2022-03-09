@@ -18,8 +18,8 @@
 #nullable enable
 
 using System.Collections.Generic;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods {
@@ -28,12 +28,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String };
+        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.String };
         public override string Description => "Zählt wie oft der Suchsting im Text vorkommt.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Numeral;
+        public override VariableDataType Returns => VariableDataType.Numeral;
         public override string StartSequence => "(";
         public override string Syntax => "CountString(Text, Suchstring)";
 
@@ -47,7 +47,7 @@ namespace BlueScript.Methods {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return !string.IsNullOrEmpty(attvar.ErrorMessage)
                 ? DoItFeedback.AttributFehler(this, attvar)
-                : new DoItFeedback(attvar.Attributes[0].ValueString.CountString(attvar.Attributes[1].ValueString).ToString(), enVariableDataType.Numeral);
+                : new DoItFeedback(attvar.Attributes[0].ValueString.CountString(attvar.Attributes[1].ValueString).ToString(), VariableDataType.Numeral);
         }
 
         #endregion

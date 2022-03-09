@@ -19,8 +19,8 @@
 
 using System.Collections.Generic;
 using BlueBasics;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -28,12 +28,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String };
+        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.String };
         public override string Description => "Entfernt die angegebenen Suffixe und evtl. übrige Leerzeichen. Die Suffixe werden nur entfernt, wenn vor dem Suffix ein Leerzeichen oder eine Zahl ist. Groß- und Kleinschreibung wird ignoriert.";
         public override bool EndlessArgs => true;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.String;
+        public override VariableDataType Returns => VariableDataType.String;
         public override string StartSequence => "(";
         public override string Syntax => "TrimSuffix(string, suffix, ...)";
 
@@ -59,12 +59,12 @@ namespace BlueScript.Methods {
                 if (val.ToLower().EndsWith(suf)) {
                     var c = val.Substring(val.Length - suf.Length - 1, 1);
                     if (tmp.Contains(c)) {
-                        return new DoItFeedback(val.Substring(0, val.Length - suf.Length).TrimEnd(" "), enVariableDataType.String);
+                        return new DoItFeedback(val.Substring(0, val.Length - suf.Length).TrimEnd(" "), VariableDataType.String);
                     }
                 }
             }
 
-            return new DoItFeedback(val, enVariableDataType.String);
+            return new DoItFeedback(val, VariableDataType.String);
         }
 
         #endregion

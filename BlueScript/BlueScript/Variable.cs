@@ -19,12 +19,12 @@
 
 using System;
 using BlueBasics;
-using Skript.Enums;
+using BlueScript.Enums;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using BlueScript.Methods;
-using BlueScript.Structuren;
+using BlueScript.Structures;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 using static BlueScript.Extensions;
@@ -139,7 +139,7 @@ namespace BlueScript {
                 vars.Add(v);
             }
             v.Readonly = false; // sonst werden keine Daten geschrieben
-            v.Type = enVariableDataType.String;
+            v.Type = VariableDataType.String;
             v.ValueString = value;
             v.Readonly = true;
         }
@@ -157,7 +157,7 @@ namespace BlueScript {
                 vars.Add(v);
             }
             v.Readonly = false; // sonst werden keine Daten geschrieben
-            v.Type = enVariableDataType.Numeral;
+            v.Type = VariableDataType.Numeral;
             v.ValueDouble = value;
             v.Readonly = true;
         }
@@ -175,7 +175,7 @@ namespace BlueScript {
                 vars.Add(v);
             }
             v.Readonly = false; // sonst werden keine Daten geschrieben
-            v.Type = enVariableDataType.List;
+            v.Type = VariableDataType.List;
             v.ValueListString = value;
 
             //TODO: 29.09.2021 bei Zeiten wieder entfernen
@@ -197,7 +197,7 @@ namespace BlueScript {
                 vars.Add(v);
             }
             v.Readonly = false; // sonst werden keine Daten geschrieben
-            v.Type = enVariableDataType.Bool;
+            v.Type = VariableDataType.Bool;
             v.ValueString = value ? "true" : "false";
             v.Readonly = true;
         }
@@ -233,9 +233,9 @@ namespace BlueScript {
 
             if (txt.Value.Equals("true", StringComparison.InvariantCultureIgnoreCase) ||
                 txt.Value.Equals("false", StringComparison.InvariantCultureIgnoreCase)) {
-                if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.Bool) { SetError("Variable ist kein Boolean"); return; }
+                if (Type is not VariableDataType.NotDefinedYet and not VariableDataType.Bool) { SetError("Variable ist kein Boolean"); return; }
                 ValueString = txt.Value;
-                Type = enVariableDataType.Bool;
+                Type = VariableDataType.Bool;
                 Readonly = true;
                 return;
             }
@@ -245,12 +245,12 @@ namespace BlueScript {
             #region Testen auf String
 
             if (txt.Value.Length > 1 && txt.Value.StartsWith("\"") && txt.Value.EndsWith("\"")) {
-                if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.String) { SetError("Variable ist kein String"); return; }
+                if (Type is not VariableDataType.NotDefinedYet and not VariableDataType.String) { SetError("Variable ist kein String"); return; }
                 var tmp = txt.Value.Substring(1, txt.Value.Length - 2); // Nicht Trimmen! Ansonsten wird sowas falsch: "X=" + "";
                 //tmp = tmp.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
                 if (tmp.Contains("\"")) { SetError("Verkettungsfehler"); return; } // Beispiel: s ist nicht definiert und "jj" + s + "kk
                 ValueString = tmp;
-                Type = enVariableDataType.String;
+                Type = VariableDataType.String;
                 Readonly = true;
                 return;
             }
@@ -260,9 +260,9 @@ namespace BlueScript {
             #region Testen auf Bitmap
 
             if (txt.Value.Length > 4 && txt.Value.StartsWith(ImageKennung + "\"") && txt.Value.EndsWith("\"" + ImageKennung)) {
-                if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.Bitmap) { SetError("Variable ist kein Bitmap"); return; }
+                if (Type is not VariableDataType.NotDefinedYet and not VariableDataType.Bitmap) { SetError("Variable ist kein Bitmap"); return; }
                 ValueString = txt.Value.Substring(2, txt.Value.Length - 4);
-                Type = enVariableDataType.Bitmap;
+                Type = VariableDataType.Bitmap;
                 Readonly = true;
                 return;
             }
@@ -272,17 +272,17 @@ namespace BlueScript {
             #region Testen auf Liste mit Strings
 
             if (txt.Value.Length > 1 && txt.Value.StartsWith("{") && txt.Value.EndsWith("}")) {
-                if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.List) { SetError("Variable ist keine Liste"); return; }
+                if (Type is not VariableDataType.NotDefinedYet and not VariableDataType.List) { SetError("Variable ist keine Liste"); return; }
                 var t = txt.Value.DeKlammere(false, true, false, true);
 
                 if (string.IsNullOrEmpty(t)) {
                     ValueListString = new List<string>(); // Leere Liste
                 } else {
-                    var l = Method.SplitAttributeToVars(t, s, new List<enVariableDataType> { enVariableDataType.String }, true);
+                    var l = Method.SplitAttributeToVars(t, s, new List<VariableDataType> { VariableDataType.String }, true);
                     if (!string.IsNullOrEmpty(l.ErrorMessage)) { SetError(l.ErrorMessage); return; }
                     ValueListString = l.Attributes.AllValues();
                 }
-                Type = enVariableDataType.List;
+                Type = VariableDataType.List;
                 Readonly = true;
                 return;
             }
@@ -292,9 +292,9 @@ namespace BlueScript {
             #region Testen auf Object
 
             if (txt.Value.Length > 2 && txt.Value.StartsWith(ObjectKennung + "\"") && txt.Value.EndsWith("\"" + ObjectKennung)) {
-                if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.Object) { SetError("Variable ist kein Objekt"); return; }
+                if (Type is not VariableDataType.NotDefinedYet and not VariableDataType.Object) { SetError("Variable ist kein Objekt"); return; }
                 ValueString = txt.Value.Substring(2, txt.Value.Length - 4);
-                Type = enVariableDataType.Object;
+                Type = VariableDataType.Object;
                 Readonly = true;
                 return;
             }
@@ -303,11 +303,11 @@ namespace BlueScript {
 
             #region Testen auf Number
 
-            if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.Numeral) { SetError("Variable ist keine Zahl"); return; }
+            if (Type is not VariableDataType.NotDefinedYet and not VariableDataType.Numeral) { SetError("Variable ist keine Zahl"); return; }
 
             if (txt.Value.IsDouble()) {
                 ValueDouble = DoubleParse(txt.Value);
-                Type = enVariableDataType.Numeral;
+                Type = VariableDataType.Numeral;
                 Readonly = true;
                 return;
             }
@@ -317,7 +317,7 @@ namespace BlueScript {
             SetError("Unbekannter Typ: " + txt.Value);
         }
 
-        public Variable(string name, string value, enVariableDataType type, bool ronly, bool system, string coment) : this(name) {
+        public Variable(string name, string value, VariableDataType type, bool ronly, bool system, string coment) : this(name) {
             Name = system ? "*" + name.ToLower() : name.ToLower();
             ValueString = value;
             Type = type;
@@ -329,13 +329,13 @@ namespace BlueScript {
         public Variable(string name, List<string?>? value, bool ronly, bool system, string coment) : this(name) {
             Name = system ? "*" + name.ToLower() : name.ToLower();
             ValueListString = value;
-            Type = enVariableDataType.List;
+            Type = VariableDataType.List;
             Readonly = ronly;
             SystemVariable = system;
             Coment = coment;
         }
 
-        public Variable(string name, string value, enVariableDataType type) : this(name) {
+        public Variable(string name, string value, VariableDataType type) : this(name) {
             ValueString = value;
             Type = type;
         }
@@ -355,7 +355,7 @@ namespace BlueScript {
 
         public bool SystemVariable { get; set; }
 
-        public enVariableDataType Type { get; set; }
+        public VariableDataType Type { get; set; }
 
         public bool ValueBool {
             get => _valueString == "true";
@@ -491,7 +491,7 @@ namespace BlueScript {
             //(var pos, var _) = NextText(txt, 0, Method_if.VergleichsOperatoren, false, false, KlammernStd);
             //if (pos >= 0) {
             //    var tmp = Method_if.GetBool(txt);
-            //    if (tmp == null) { return new strDoItFeedback("Der Inhalt zwischen den Klammern (" + txt + ") konnte nicht berechnet werden."); }
+            //    if (tmp == null) { return new DoItFeedback("Der Inhalt zwischen den Klammern (" + txt + ") konnte nicht berechnet werden."); }
             //    txt = tmp;
             //}
 
@@ -525,7 +525,7 @@ namespace BlueScript {
                 //(var op, var _) = NextText(txt, 0, Method_if.UndUnd, false, false, KlammernStd);
                 //if (uu > 0) {
                 //    var txt1 = AttributeAuflösen(txt.Substring(0, uu), s);
-                //    return !string.IsNullOrEmpty(txt1.ErrorMessage) ? new strDoItFeedback("Befehls-Berechnungsfehler vor &&: " + txt1.ErrorMessage)
+                //    return !string.IsNullOrEmpty(txt1.ErrorMessage) ? new DoItFeedback("Befehls-Berechnungsfehler vor &&: " + txt1.ErrorMessage)
                 //        : txt1.Value == "false" ? txt1
                 //        : AttributeAuflösen(txt.Substring(uu + 2), s);
                 //}
@@ -570,11 +570,11 @@ namespace BlueScript {
                 // V2 braucht nicht peprüft werden, muss ja eh der gleiche TYpe wie V1 sein
                 if (v1 != null) {
                     if (v1.Type != v2.Type) { return new DoItFeedback("Typen unterschiedlich: " + txt); }
-                    if (v1.Type is not enVariableDataType.Bool and
-                                   not enVariableDataType.Numeral and
-                                   not enVariableDataType.String) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                    if (v1.Type is not VariableDataType.Bool and
+                                   not VariableDataType.Numeral and
+                                   not VariableDataType.String) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
                 } else {
-                    if (v2.Type != enVariableDataType.Bool) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                    if (v2.Type != VariableDataType.Bool) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
                 }
 
                 #endregion
@@ -590,40 +590,40 @@ namespace BlueScript {
                         break;
 
                     case ">=":
-                        if (v1.Type != enVariableDataType.Numeral) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                        if (v1.Type != VariableDataType.Numeral) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
                         if (v1.ValueDouble >= v2.ValueDouble) { replacer = "true"; }
                         break;
 
                     case "<=":
-                        if (v1.Type != enVariableDataType.Numeral) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                        if (v1.Type != VariableDataType.Numeral) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
                         if (v1.ValueDouble <= v2.ValueDouble) { replacer = "true"; }
                         break;
 
                     case "<":
-                        if (v1.Type != enVariableDataType.Numeral) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                        if (v1.Type != VariableDataType.Numeral) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
                         if (v1.ValueDouble < v2.ValueDouble) { replacer = "true"; }
                         break;
 
                     case ">":
-                        if (v1.Type != enVariableDataType.Numeral) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                        if (v1.Type != VariableDataType.Numeral) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
                         if (v1.ValueDouble > v2.ValueDouble) { replacer = "true"; }
                         break;
 
                     case "||":
-                        if (v1.Type != enVariableDataType.Bool) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                        if (v1.Type != VariableDataType.Bool) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
                         replacer = "false";
                         if (v1.ValueBool || v2.ValueBool) { replacer = "true"; }
                         break;
 
                     case "&&":
-                        if (v1.Type != enVariableDataType.Bool) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                        if (v1.Type != VariableDataType.Bool) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
                         if (v1.ValueBool && v2.ValueBool) { replacer = "true"; }
                         break;
 
                     case "!":
                         // S1 dürfte eigentlich nie was sein: !False||!false
                         // entweder ist es ganz am anfang, oder direkt nach einem Trenneichen
-                        if (v2.Type != enVariableDataType.Bool) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                        if (v2.Type != VariableDataType.Bool) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
                         if (!v2.ValueBool) { replacer = "true"; }
                         break;
 
@@ -641,7 +641,7 @@ namespace BlueScript {
             #region testen auf bool
 
             var x = Method_if.GetBool(txt);
-            if (x != null) { return new DoItFeedback(x, enVariableDataType.NotDefinedYet); }
+            if (x != null) { return new DoItFeedback(x, VariableDataType.NotDefinedYet); }
 
             #endregion
 
@@ -652,7 +652,7 @@ namespace BlueScript {
                 tmp = tmp.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
                 return tmp.Contains("\"")
                     ? new DoItFeedback("Verkettungsfehler: " + txt)
-                    : new DoItFeedback("\"" + tmp + "\"", enVariableDataType.NotDefinedYet); // Beispiel: s ist nicht definiert und "jj" + s + "kk
+                    : new DoItFeedback("\"" + tmp + "\"", VariableDataType.NotDefinedYet); // Beispiel: s ist nicht definiert und "jj" + s + "kk
             }
 
             #endregion
@@ -669,7 +669,7 @@ namespace BlueScript {
 
             #endregion
 
-            return new DoItFeedback(txt, enVariableDataType.NotDefinedYet);
+            return new DoItFeedback(txt, VariableDataType.NotDefinedYet);
         }
 
         public static string GenerateObject(string objecttype, string value) => objecttype.ToUpper().ReduceToChars(Constants.Char_AZ + Constants.Char_Numerals) + "&" + value.ToNonCritical();
@@ -681,18 +681,18 @@ namespace BlueScript {
             return v == vo && !string.IsNullOrEmpty(v);
         }
 
-        public static string ValueForReplace(string value, enVariableDataType type) {
+        public static string ValueForReplace(string value, VariableDataType type) {
             switch (type) {
-                case enVariableDataType.String:
+                case VariableDataType.String:
                     return "\"" + value.RemoveCriticalVariableChars() + "\"";
 
-                case enVariableDataType.Bool:
+                case VariableDataType.Bool:
                     return value;
 
-                case enVariableDataType.Numeral:
+                case VariableDataType.Numeral:
                     return value;
 
-                case enVariableDataType.List:
+                case VariableDataType.List:
                     if (string.IsNullOrEmpty(value)) { return "{ }"; }
 
                     if (!value.EndsWith("\r")) {
@@ -702,16 +702,16 @@ namespace BlueScript {
                     var x = value.Substring(0, value.Length - 1);
                     return "{\"" + x.RemoveCriticalVariableChars().SplitByCrToList().JoinWith("\", \"") + "\"}";
 
-                case enVariableDataType.NotDefinedYet: // Wenn ne Routine die Werte einfach ersetzt.
+                case VariableDataType.NotDefinedYet: // Wenn ne Routine die Werte einfach ersetzt.
                     return value;
 
-                case enVariableDataType.Bitmap:
+                case VariableDataType.Bitmap:
                     return ImageKennung + "\"" + value.RemoveCriticalVariableChars() + "\"" + ImageKennung;
 
-                case enVariableDataType.Object:
+                case VariableDataType.Object:
                     return ObjectKennung + "\"" + value.RemoveCriticalVariableChars() + "\"" + ObjectKennung;
 
-                case enVariableDataType.Variable:
+                case VariableDataType.Variable:
                     return value;
 
                 default:
@@ -721,7 +721,7 @@ namespace BlueScript {
         }
 
         public string ObjectData() {
-            if (Type != enVariableDataType.Object) { return string.Empty; }
+            if (Type != VariableDataType.Object) { return string.Empty; }
             var x = _valueString.SplitAndCutBy("&");
             return x == null || x.GetUpperBound(0) != 1
                     ? string.Empty
@@ -729,7 +729,7 @@ namespace BlueScript {
         }
 
         public bool ObjectType(string toCheck) {
-            if (Type != enVariableDataType.Object) { return false; }
+            if (Type != VariableDataType.Object) { return false; }
 
             var x = _valueString.SplitAndCutBy("&");
             return x != null && x.GetUpperBound(0) == 1 && x[0] == toCheck.ToUpper().ReduceToChars(Constants.Char_AZ + Constants.Char_Numerals);
@@ -738,11 +738,11 @@ namespace BlueScript {
         public string ReplaceInText(string txt) {
             if (!txt.ToLower().Contains("~" + Name.ToLower() + "~")) { return txt; }
 
-            return Type is not enVariableDataType.String and
-                        not enVariableDataType.List and
-                        not enVariableDataType.Integer and
-                        not enVariableDataType.Bool and
-                        not enVariableDataType.Numeral
+            return Type is not VariableDataType.String and
+                        not VariableDataType.List and
+                        not VariableDataType.Integer and
+                        not VariableDataType.Bool and
+                        not VariableDataType.Numeral
                 ? txt
                 : txt.Replace("~" + Name + "~", ValueString, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
         }
@@ -751,13 +751,13 @@ namespace BlueScript {
             var zusatz = string.Empty;
             if (Readonly) { zusatz = " [Read Only] "; }
             return Type switch {
-                enVariableDataType.String => "{str} " + zusatz + Name + " = " + ValueString,
-                enVariableDataType.Numeral => "{num} " + zusatz + Name + " = " + ValueString,
-                enVariableDataType.Bool => "{bol} " + zusatz + Name + " = " + ValueString,
-                enVariableDataType.List => "{lst} " + zusatz + Name + " = " + ValueString,
-                enVariableDataType.Bitmap => "{bmp} " + zusatz + Name + " = [BitmapData]",
-                enVariableDataType.Object => "{obj} " + zusatz + Name + " = [ObjectData]",
-                enVariableDataType.Error => "{err} " + zusatz + Name + " = " + ValueString,
+                VariableDataType.String => "{str} " + zusatz + Name + " = " + ValueString,
+                VariableDataType.Numeral => "{num} " + zusatz + Name + " = " + ValueString,
+                VariableDataType.Bool => "{bol} " + zusatz + Name + " = " + ValueString,
+                VariableDataType.List => "{lst} " + zusatz + Name + " = " + ValueString,
+                VariableDataType.Bitmap => "{bmp} " + zusatz + Name + " = [BitmapData]",
+                VariableDataType.Object => "{obj} " + zusatz + Name + " = [ObjectData]",
+                VariableDataType.Error => "{err} " + zusatz + Name + " = " + ValueString,
                 _ => "{ukn} " + zusatz + Name + " = " + ValueString
             };
         }
@@ -766,7 +766,7 @@ namespace BlueScript {
 
         private void SetError(string coment) {
             Readonly = false;
-            Type = enVariableDataType.Error;
+            Type = VariableDataType.Error;
             ValueString = string.Empty;
             Readonly = true;
             Coment = coment;

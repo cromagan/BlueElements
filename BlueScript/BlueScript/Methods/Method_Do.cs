@@ -16,8 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -25,12 +25,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new();
+        public override List<VariableDataType> Args => new();
         public override string Description => "Führt den Codeblock dauerhaft aus, bis der Befehl Break empfangen wurde. Variablen, die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.";
         public override bool EndlessArgs => false;
         public override string EndSequence => string.Empty;
         public override bool GetCodeBlockAfter => true;
-        public override enVariableDataType Returns => enVariableDataType.Null;
+        public override VariableDataType Returns => VariableDataType.Null;
         public override string StartSequence => string.Empty;
         public override string Syntax => "Do { Break; }";
 
@@ -52,13 +52,13 @@ namespace BlueScript.Methods {
                 if (du > 100000) { return new DoItFeedback("Do-Schleife nach 100.000 Durchläufen abgebrochen."); }
 
                 var tmpv = new List<Variable>();
-                tmpv.AddRange(s.Variablen);
+                tmpv.AddRange(s.Variables);
 
                 var (err, _) = s.Parse(infos.CodeBlockAfterText);
                 if (!string.IsNullOrEmpty(err)) { return new DoItFeedback(err); }
 
-                s.Variablen.Clear();
-                s.Variablen.AddRange(tmpv);
+                s.Variables.Clear();
+                s.Variables.AddRange(tmpv);
 
                 if (s.BreakFired) { break; }
             } while (true);

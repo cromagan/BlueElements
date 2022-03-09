@@ -16,9 +16,9 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using Skript.Enums;
+using BlueScript.Enums;
 
-namespace BlueScript.Structuren {
+namespace BlueScript.Structures {
 
     public struct SplittedAttributesFeedback {
 
@@ -28,7 +28,7 @@ namespace BlueScript.Structuren {
 
         public string ErrorMessage;
 
-        public enSkriptFehlerTyp FehlerTyp;
+        public ScriptIssueType FehlerTyp;
 
         #endregion
 
@@ -37,10 +37,10 @@ namespace BlueScript.Structuren {
         public SplittedAttributesFeedback(List<Variable> atts) {
             Attributes = atts;
             ErrorMessage = string.Empty;
-            FehlerTyp = enSkriptFehlerTyp.ohne;
+            FehlerTyp = ScriptIssueType.ohne;
         }
 
-        public SplittedAttributesFeedback(enSkriptFehlerTyp type, string error) {
+        public SplittedAttributesFeedback(ScriptIssueType type, string error) {
             Attributes = new List<Variable>();
             ErrorMessage = error;
             FehlerTyp = type;

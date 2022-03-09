@@ -21,8 +21,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using BlueBasics;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -30,7 +30,7 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String_or_List, enVariableDataType.String_or_List };
+        public override List<VariableDataType> Args => new() { VariableDataType.String_or_List, VariableDataType.String_or_List };
 
         public override string Description => "Prüft ob eine der Zeichenketten als ganzes Wort vorkommt. Gibt dann als Liste alle gefundenen Strings zurück.";
 
@@ -40,7 +40,7 @@ namespace BlueScript.Methods {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override enVariableDataType Returns => enVariableDataType.List;
+        public override VariableDataType Returns => VariableDataType.List;
 
         public override string StartSequence => "(";
 
@@ -63,8 +63,8 @@ namespace BlueScript.Methods {
             var wordlist = new List<string>();
 
             for (var z = 1; z < attvar.Attributes.Count; z++) {
-                if (attvar.Attributes[z].Type == enVariableDataType.String) { wordlist.Add(attvar.Attributes[z].ValueString); }
-                if (attvar.Attributes[z].Type == enVariableDataType.List) { wordlist.AddRange(attvar.Attributes[z].ValueListString); }
+                if (attvar.Attributes[z].Type == VariableDataType.String) { wordlist.Add(attvar.Attributes[z].ValueString); }
+                if (attvar.Attributes[z].Type == VariableDataType.List) { wordlist.AddRange(attvar.Attributes[z].ValueListString); }
             }
             wordlist = wordlist.SortedDistinctList();
 
@@ -77,7 +77,7 @@ namespace BlueScript.Methods {
                 found.AddIfNotExists(thisW);
             }
 
-            return new DoItFeedback(found.JoinWithCr() + "\r", enVariableDataType.List);
+            return new DoItFeedback(found.JoinWithCr() + "\r", VariableDataType.List);
         }
 
         #endregion

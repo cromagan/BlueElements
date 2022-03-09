@@ -17,8 +17,8 @@
 
 using System.Collections.Generic;
 using BlueScript;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 using static BlueBasics.Extensions;
 
 namespace BlueDatabase.AdditionalScriptComands {
@@ -27,7 +27,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Object };
+        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.Object };
 
         public override string Description => "Lädt eine andere Datenbank (die mit den Filtern definiert wurde)\rund gibt aus der angegebenen Spalte alle Einträge (sortiert und einzigartig) als Liste zurück.\rDabei wird der Filter benutzt.\rEin Filter kann mit dem Befehl 'Filter' erstellt werden.";
 
@@ -37,7 +37,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override enVariableDataType Returns => enVariableDataType.List;
+        public override VariableDataType Returns => VariableDataType.List;
 
         public override string StartSequence => "(";
 
@@ -60,7 +60,7 @@ namespace BlueDatabase.AdditionalScriptComands {
             var returncolumn = allFi[0].Database.Column.Exists(attvar.Attributes[0].ValueString);
             if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[0].ValueString); }
             var x = returncolumn.Contents(allFi, null);
-            return new DoItFeedback(x.JoinWithCr() + "\r", enVariableDataType.List);
+            return new DoItFeedback(x.JoinWithCr() + "\r", VariableDataType.List);
         }
 
         #endregion

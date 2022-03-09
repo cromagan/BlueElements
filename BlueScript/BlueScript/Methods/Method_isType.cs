@@ -18,8 +18,8 @@
 #nullable enable
 
 using System.Collections.Generic;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -27,12 +27,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_Any, enVariableDataType.String };
+        public override List<VariableDataType> Args => new() { VariableDataType.Variable_Any, VariableDataType.String };
         public override string Description => "Prüft, ob der Variablenntyp dem hier angegeben Wert entspricht. Es wird keine Inhaltsprüfung ausgeführt!";
         public override bool EndlessArgs => false;
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Null;
+        public override VariableDataType Returns => VariableDataType.Null;
         public override string StartSequence => "(";
         public override string Syntax => "isType(Variable, num / str / lst / bol / err / ukn)";
 
@@ -47,26 +47,26 @@ namespace BlueScript.Methods {
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
             switch (attvar.Attributes[1].ValueString.ToLower()) {
                 case "num":
-                    return attvar.Attributes[0].Type == enVariableDataType.Numeral ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
+                    return attvar.Attributes[0].Type == VariableDataType.Numeral ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
 
                 case "str":
-                    return attvar.Attributes[0].Type == enVariableDataType.String ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
+                    return attvar.Attributes[0].Type == VariableDataType.String ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
 
                 case "lst":
-                    return attvar.Attributes[0].Type == enVariableDataType.List ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
+                    return attvar.Attributes[0].Type == VariableDataType.List ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
                 //
                 case "dat":
-                //    if (attvar.Attributes[0].Type == enVariableDataType.Date) { return strDoItFeedback.Wahr(); }
-                //    return strDoItFeedback.Falsch();
+                //    if (attvar.Attributes[0].Type == enVariableDataType.Date) { return DoItFeedback.Wahr(); }
+                //    return DoItFeedback.Falsch();
 
                 case "bol":
-                    return attvar.Attributes[0].Type == enVariableDataType.Bool ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
+                    return attvar.Attributes[0].Type == VariableDataType.Bool ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
 
                 case "err":
-                    return attvar.Attributes[0].Type == enVariableDataType.Error ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
+                    return attvar.Attributes[0].Type == VariableDataType.Error ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
 
                 case "ukn":
-                    return attvar.Attributes[0].Type == enVariableDataType.NotDefinedYet ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
+                    return attvar.Attributes[0].Type == VariableDataType.NotDefinedYet ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
 
                 default:
                     return new DoItFeedback("Es wir als zweites Attribut ein String mit dem Inhalt num, str, lst, dat, bol, err oder ukn erwartet.");

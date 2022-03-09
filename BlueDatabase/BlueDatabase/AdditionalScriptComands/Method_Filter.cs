@@ -17,8 +17,8 @@
 
 using System.Collections.Generic;
 using BlueScript;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueDatabase.AdditionalScriptComands {
 
@@ -26,7 +26,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String, enVariableDataType.String, enVariableDataType.String };
+        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.String, VariableDataType.String, VariableDataType.String };
 
         public override string Description => "Erstellt einen Filter, der für andere Befehle (z.B. LookupFilter) verwendet werden kann. Aktuell wird nur der FilterTyp 'is' unterstützt. Bei diesem Filter wird die Groß/Kleinschreibung ignoriert.";
 
@@ -36,7 +36,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override enVariableDataType Returns => enVariableDataType.Object;
+        public override VariableDataType Returns => VariableDataType.Object;
 
         public override string StartSequence => "(";
 
@@ -50,14 +50,14 @@ namespace BlueDatabase.AdditionalScriptComands {
             var allFi = new List<FilterItem>();
 
             for (var z = ab; z < attributes.Count; z++) {
-                if (!attributes[z].ObjectType("rowfilter")) { return null; } // new strDoItFeedback("Kein Filter übergeben.");
+                if (!attributes[z].ObjectType("rowfilter")) { return null; } // new DoItFeedback("Kein Filter übergeben.");
 
                 var fi = new FilterItem(attributes[z].ObjectData());
 
-                if (!fi.IsOk()) { return null; }// new strDoItFeedback("Filter fehlerhaft"); }
+                if (!fi.IsOk()) { return null; }// new DoItFeedback("Filter fehlerhaft"); }
 
                 if (z > ab) {
-                    if (fi.Database != allFi[0].Database) { return null; }// new strDoItFeedback("Filter über verschiedene Datenbanken wird nicht unterstützt."); }
+                    if (fi.Database != allFi[0].Database) { return null; }// new DoItFeedback("Filter über verschiedene Datenbanken wird nicht unterstützt."); }
                 }
                 allFi.Add(fi);
             }

@@ -18,8 +18,8 @@
 #nullable enable
 
 using System.Collections.Generic;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 
@@ -29,12 +29,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String };
+        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.String };
         public override string Description => "Gibt einen neuen DateTime-String zurück, der mittels des zweiten String definiert ist.\rBeispiel eines solchen Strings:  " + Format_Date7 + "\rAchtung: Groß-Kleinschreibung ist wichtig!";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.String;
+        public override VariableDataType Returns => VariableDataType.String;
         public override string StartSequence => "(";
         public override string Syntax => "ChangeDateTimeFormat(DateTimeString, string)";
 
@@ -55,7 +55,7 @@ namespace BlueScript.Methods {
                 return new DoItFeedback("Kein Unwandlungs-String erhalten.");
             }
             try {
-                return new DoItFeedback(d.ToString(attvar.Attributes[1].ValueString), enVariableDataType.String);
+                return new DoItFeedback(d.ToString(attvar.Attributes[1].ValueString), VariableDataType.String);
             } catch {
                 return new DoItFeedback("Der Umwandlungs-String '" + attvar.Attributes[1].ValueString + "' ist fehlerhaft.");
             }

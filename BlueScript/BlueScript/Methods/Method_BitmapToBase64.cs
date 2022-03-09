@@ -20,8 +20,8 @@
 using System.Collections.Generic;
 using System.Drawing.Imaging;
 using BlueBasics;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -29,12 +29,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Bitmap, enVariableDataType.String };
+        public override List<VariableDataType> Args => new() { VariableDataType.Bitmap, VariableDataType.String };
         public override string Description => "Konvertiert das Bild in das Base64 Format und gibt dessen String zurück.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.String;
+        public override VariableDataType Returns => VariableDataType.String;
         public override string StartSequence => "(";
         public override string Syntax => "BitmapToBase64(Bitmap, JPG / PNG)";
 
@@ -63,7 +63,7 @@ namespace BlueScript.Methods {
                     return new DoItFeedback("Es wir als zweites Attribut ein String mit dem Inhalt jpg oder png erwartet.");
             }
 
-            return new DoItFeedback(x, enVariableDataType.String);
+            return new DoItFeedback(x, VariableDataType.String);
         }
 
         #endregion

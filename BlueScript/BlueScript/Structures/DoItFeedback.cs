@@ -16,9 +16,9 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Methods;
-using Skript.Enums;
+using BlueScript.Enums;
 
-namespace BlueScript.Structuren {
+namespace BlueScript.Structures {
 
     public struct DoItFeedback {
 
@@ -26,7 +26,7 @@ namespace BlueScript.Structuren {
 
         public string ErrorMessage;
 
-        //public strDoItFeedback(string value, string errormessage) {
+        //public DoItFeedback(string value, string errormessage) {
         //    ErrorMessage = errormessage;
         //    Value = value;
         //}
@@ -41,13 +41,13 @@ namespace BlueScript.Structuren {
             Value = string.Empty;
         }
 
-        public DoItFeedback(string value, enVariableDataType type) {
+        public DoItFeedback(string value, VariableDataType type) {
             Value = Variable.ValueForReplace(value, type);
             ErrorMessage = string.Empty;
         }
 
         public DoItFeedback(string value, string objecttype) {
-            Value = Variable.ValueForReplace(Variable.GenerateObject(objecttype, value), enVariableDataType.Object);
+            Value = Variable.ValueForReplace(Variable.GenerateObject(objecttype, value), VariableDataType.Object);
             ErrorMessage = string.Empty;
         }
 
@@ -58,7 +58,7 @@ namespace BlueScript.Structuren {
         public static DoItFeedback AttributFehler(Method method, SplittedAttributesFeedback f) =>
             new(f.ErrorMessage + " > " + method.Syntax);
 
-        public static DoItFeedback Falsch() => new("false", enVariableDataType.Bool);
+        public static DoItFeedback Falsch() => new("false", VariableDataType.Bool);
 
         public static DoItFeedback FalscherDatentyp() => new("Falscher Datentyp.");
 
@@ -68,7 +68,7 @@ namespace BlueScript.Structuren {
 
         public static DoItFeedback Schreibgschützt() => new("Variable ist schreibgeschützt.");
 
-        public static DoItFeedback Wahr() => new("true", enVariableDataType.Bool);
+        public static DoItFeedback Wahr() => new("true", VariableDataType.Bool);
 
         #endregion
     }

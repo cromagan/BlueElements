@@ -18,8 +18,8 @@
 using System;
 using System.Collections.Generic;
 using BlueBasics;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -27,12 +27,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Numeral, enVariableDataType.Integer };
+        public override List<VariableDataType> Args => new() { VariableDataType.Numeral, VariableDataType.Integer };
         public override string Description => "Rundet den Zahlenwert mathematisch korrekt.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Numeral;
+        public override VariableDataType Returns => VariableDataType.Numeral;
         public override string StartSequence => "(";
         public override string Syntax => "Round(Value, Nachkommastellen)";
 
@@ -49,7 +49,7 @@ namespace BlueScript.Methods {
             if (n < 0) { n = 0; }
             if (n > 10) { n = 10; }
             var val = Math.Round(attvar.Attributes[0].ValueDouble, n);
-            return new DoItFeedback(val.ToString(Constants.Format_Float1), enVariableDataType.Numeral);
+            return new DoItFeedback(val.ToString(Constants.Format_Float1), VariableDataType.Numeral);
         }
 
         #endregion

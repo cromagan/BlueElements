@@ -19,8 +19,8 @@
 
 using System;
 using System.Collections.Generic;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 using static BlueBasics.Constants;
 
 namespace BlueScript.Methods {
@@ -29,12 +29,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new();
+        public override List<VariableDataType> Args => new();
         public override string Description => "Gibt die akutelle UTC-Uhrzeit im Format\r" + Format_Date7 + " zurück.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.String;
+        public override VariableDataType Returns => VariableDataType.String;
         public override string StartSequence => "(";
         public override string Syntax => "DateTimeUTCNow()";
 
@@ -48,7 +48,7 @@ namespace BlueScript.Methods {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return !string.IsNullOrEmpty(attvar.ErrorMessage)
                 ? DoItFeedback.AttributFehler(this, attvar)
-                : new DoItFeedback(DateTime.UtcNow.ToString(Format_Date7), enVariableDataType.String);
+                : new DoItFeedback(DateTime.UtcNow.ToString(Format_Date7), VariableDataType.String);
         }
 
         #endregion

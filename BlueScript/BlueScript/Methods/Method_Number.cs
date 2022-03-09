@@ -17,8 +17,8 @@
 
 using System.Collections.Generic;
 using BlueBasics;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 
@@ -26,12 +26,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Numeral };
+        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.Numeral };
         public override string Description => "Gibt den Text als Zahl zurück. Fall dies keine gültige Zahl ist, wird NaN-Value zurückgegeben.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Numeral;
+        public override VariableDataType Returns => VariableDataType.Numeral;
         public override string StartSequence => "(";
         public override string Syntax => "Number(string, NaNValue)";
 
@@ -44,8 +44,8 @@ namespace BlueScript.Methods {
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.AttributFehler(this, attvar)
-                 : attvar.Attributes[0].ValueString.IsNumeral() ? new DoItFeedback(attvar.Attributes[0].ValueString, enVariableDataType.Numeral)
-                 : new DoItFeedback(attvar.Attributes[1].ValueString, enVariableDataType.Numeral);
+                 : attvar.Attributes[0].ValueString.IsNumeral() ? new DoItFeedback(attvar.Attributes[0].ValueString, VariableDataType.Numeral)
+                 : new DoItFeedback(attvar.Attributes[1].ValueString, VariableDataType.Numeral);
         }
 
         #endregion

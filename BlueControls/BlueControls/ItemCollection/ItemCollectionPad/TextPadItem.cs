@@ -78,7 +78,7 @@ namespace BlueControls.ItemCollection {
         }
 
         //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
-        // Dim Ausgleich As float = mmToPixel(1 / 72 * 25.4, 300)
+        // Dim Ausgleich As float = MmToPixel(1 / 72 * 25.4, 300)
         public float Skalierung { get; set; } = 3.07f;
 
         /// <summary>

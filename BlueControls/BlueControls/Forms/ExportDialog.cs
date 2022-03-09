@@ -138,8 +138,7 @@ namespace BlueControls.Forms {
             for (var x = 0; x < tempVar; x++) {
                 var tempVar2 = Math.Max(1, (int)Math.Floor((druckB.Height / (double)(oneItem.Height + abstand)) + 0.01));
                 for (var y = 0; y < tempVar2; y++) {
-                    ChildPadItem it = new()
-                    {
+                    ChildPadItem it = new() {
                         PadInternal = new CreativePad(new ItemCollectionPad(layout, rowsForExport[startNr].Database, rowsForExport[startNr].Key))
                     };
                     pad.Item.Add(it);

@@ -17,8 +17,8 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using BlueScript.Structuren;
-using Skript.Enums;
+using BlueScript.Structures;
+using BlueScript.Enums;
 using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods {
@@ -27,12 +27,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Any };
+        public override List<VariableDataType> Args => new() { VariableDataType.Any };
         public override string Description => "Ruft eine Subroutine auf";
         public override bool EndlessArgs => false;
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Null;
+        public override VariableDataType Returns => VariableDataType.Null;
         public override string StartSequence => "(";
         public override string Syntax => "Call(SubName);";
 
@@ -44,7 +44,7 @@ namespace BlueScript.Methods {
 
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             //var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            //if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            //if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
             if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback("Kein Text angekommen."); }
 
@@ -69,13 +69,13 @@ namespace BlueScript.Methods {
             s.Sub++;
 
             var tmpv = new List<Variable>();
-            tmpv.AddRange(s.Variablen);
+            tmpv.AddRange(s.Variables);
 
             var (err, _) = s.Parse(item1);
             if (!string.IsNullOrEmpty(err)) { return new DoItFeedback("Subroutine " + infos.AttributText + ": " + err); }
 
-            s.Variablen.Clear();
-            s.Variablen.AddRange(tmpv);
+            s.Variables.Clear();
+            s.Variables.AddRange(tmpv);
             s.Sub--;
 
             if (s.Schleife < 0) { return new DoItFeedback("Subroutinen-Fehler"); }

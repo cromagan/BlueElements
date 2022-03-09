@@ -298,9 +298,9 @@
     <Compile Include="Forms\Notification.Designer.cs">
       <DependentUpon>Notification.cs</DependentUpon>
     </Compile>
-    <Compile Include="ItemCollection\clsConnection.cs" />
-    <Compile Include="ItemCollection\clsPhysicPadItem.cs" />
-    <Compile Include="ItemCollection\clsAbstractPhysicPadItem.cs" />
+    <Compile Include="ItemCollection\ItemConnection.cs" />
+    <Compile Include="ItemCollection\PhysicPadItem.cs" />
+    <Compile Include="ItemCollection\AbstractPhysicPadItem.cs" />
     <Compile Include="ItemCollection\DataListItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\GenericConnectebilePadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\ColumnPadItem.cs" />
