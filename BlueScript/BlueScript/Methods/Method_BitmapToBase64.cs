@@ -22,6 +22,7 @@ using System.Drawing.Imaging;
 using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Enums;
+using BlueScript.Variables;
 
 namespace BlueScript.Methods {
 
@@ -52,11 +53,11 @@ namespace BlueScript.Methods {
 
             switch (((VariableString)attvar.Attributes[1]).ValueString.ToUpper()) {
                 case "JPG":
-                    x = Converter.BitmapToBase64(attvar.Attributes[0].ValueBitmap, ImageFormat.Jpeg);
+                    x = Converter.BitmapToBase64(((VariableBitmap)attvar.Attributes[0]).ValueBitmap, ImageFormat.Jpeg);
                     break;
 
                 case "PNG":
-                    x = Converter.BitmapToBase64(attvar.Attributes[0].ValueBitmap, ImageFormat.Png);
+                    x = Converter.BitmapToBase64(((VariableBitmap)attvar.Attributes[0]).ValueBitmap, ImageFormat.Png);
                     break;
 
                 default:

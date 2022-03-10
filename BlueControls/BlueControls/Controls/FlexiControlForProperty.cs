@@ -226,16 +226,20 @@ namespace BlueControls.Controls {
                 toSet = Value.FromHtmlCode();
             } else if (x is int iv) {
                 oldVal = iv.ToString();
-                toSet = IntParse(Value);
+                IntTryParse(Value, out var i);
+                toSet = i;
             } else if (x is Enum) {
                 oldVal = ((int)x).ToString();
-                toSet = IntParse(Value);
+                IntTryParse(Value, out var i);
+                toSet = i;
             } else if (x is double db) {
                 oldVal = db.ToString(Constants.Format_Float2);
-                toSet = DoubleParse(Value);
+                DoubleTryParse(Value, out var i);
+                toSet = i;
             } else if (x is float fl) {
                 oldVal = fl.ToString(Constants.Format_Float2);
-                toSet = FloatParse(Value);
+                FloatTryParse(Value, out var i);
+                toSet = i;
             } else {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Art unbekannt!");
             }

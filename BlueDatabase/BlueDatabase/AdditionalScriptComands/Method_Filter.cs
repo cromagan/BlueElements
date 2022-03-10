@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Enums;
+using BlueScript.Variables;
 
 namespace BlueDatabase.AdditionalScriptComands {
 
@@ -98,7 +99,7 @@ namespace BlueDatabase.AdditionalScriptComands {
             #endregion
 
             var fii = new FilterItem(filterColumn, filtertype, ((VariableString)attvar.Attributes[3]).ValueString);
-            return new DoItFeedback(fii);
+            return new DoItFeedback(new VariableFilterItem(fii));
         }
 
         #endregion

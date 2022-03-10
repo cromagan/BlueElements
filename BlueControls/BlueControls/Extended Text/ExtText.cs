@@ -549,7 +549,8 @@ namespace BlueControls.Extended_Text {
                     break;
 
                 case "FONTSIZE":
-                    font = BlueFont.Get(font.FontName, Converter.FloatParse(attribut), font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.Color_Main, font.Color_Outline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
+                    Converter.FloatTryParse(attribut, out var fs);
+                    font = BlueFont.Get(font.FontName, fs, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.Color_Main, font.Color_Outline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                     break;
 
                 case "FONTNAME":

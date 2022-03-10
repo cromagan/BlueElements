@@ -435,8 +435,8 @@ namespace BlueDatabase {
             }
         }
 
-        internal static List<RowItem?> MatchesTo(FilterItem filterItem) {
-            List<RowItem?> l = new();
+        internal static List<RowItem>? MatchesTo(FilterItem? filterItem) {
+            List<RowItem> l = new();
 
             if (filterItem == null) { return l; }
 

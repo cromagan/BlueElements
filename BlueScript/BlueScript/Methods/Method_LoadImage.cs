@@ -21,6 +21,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueScript.Structures;
 using BlueScript.Enums;
+using BlueScript.Variables;
 
 namespace BlueScript.Methods {
 

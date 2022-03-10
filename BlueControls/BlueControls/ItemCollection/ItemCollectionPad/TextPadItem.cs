@@ -21,10 +21,10 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Extended_Text;
 using BlueControls.Interfaces;
-using BlueScript;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using BlueScript.Variables;
 
 namespace BlueControls.ItemCollection {
 

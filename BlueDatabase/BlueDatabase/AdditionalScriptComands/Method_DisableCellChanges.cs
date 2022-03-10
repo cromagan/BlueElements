@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Enums;
+using BlueScript.Variables;
 
 namespace BlueDatabase.AdditionalScriptComands {
 
@@ -52,7 +53,7 @@ namespace BlueDatabase.AdditionalScriptComands {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            var ve = s.Variables.GetSystem("CellChangesEnabled");
+            var ve = (VariableBool)s.Variables.GetSystem("CellChangesEnabled");
             ve.Readonly = false;
             ve.ValueBool = false;
             ve.Readonly = true;

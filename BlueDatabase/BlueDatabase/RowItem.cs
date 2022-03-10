@@ -23,13 +23,13 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueScript;
-using BlueScript.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using BlueScript.Variables;
 
 namespace BlueDatabase {
 
@@ -141,7 +141,7 @@ namespace BlueDatabase {
                     qi = "Spalte: " + column.ReadableText() + "\r\nFalls die Datei auf der Festplatte existiert, wird eine weitere\r\nVariable erzeugt: " + column.Name + "_FileName";
                     var f = column.Database.Cell.BestFile(column, row);
                     if (f.FileType() == enFileFormat.Image && FileOperations.FileExists(f)) {
-                        vars.Add(new Variable(column.Name + "_FileName", f, VariableDataType.String, true, false, "Spalte: " + column.ReadableText() + "\r\nEnthält den vollen Dateinamen der Datei der zugehörigen Zelle.\r\nDie Existenz der Datei wurde geprüft und die Datei existert.\r\nAuf die Datei kann evtl. mit LoadImage zugegriffen werden."));
+                        vars.Add(new VariableString(column.Name + "_FileName", f, true, false, "Spalte: " + column.ReadableText() + "\r\nEnthält den vollen Dateinamen der Datei der zugehörigen Zelle.\r\nDie Existenz der Datei wurde geprüft und die Datei existert.\r\nAuf die Datei kann evtl. mit LoadImage zugegriffen werden."));
                     }
                     break;
 
@@ -155,25 +155,25 @@ namespace BlueDatabase {
 
             switch (column.ScriptType) {
                 case enScriptType.Bool:
-                    vars.Add(wert == "+" ?
-                        new Variable(column.Name, "true", VariableDataType.Bool, ro, false, qi) :
-                        new Variable(column.Name, "false", VariableDataType.Bool, ro, false, qi));
+                    vars.Add(new VariableBool(column.Name, wert == "+", ro, false, qi));
+
                     break;
 
                 case enScriptType.List:
-                    vars.Add(new Variable(column.Name, wert.SplitAndCutByCrToList(), ro, false, qi));
+                    vars.Add(new VariableListString(column.Name, wert.SplitAndCutByCrToList(), ro, false, qi));
                     break;
 
                 case enScriptType.Numeral:
-                    vars.Add(new Variable(column.Name, wert, VariableDataType.Numeral, ro, false, qi));
+                    Converter.FloatTryParse(wert, out var f);
+                    vars.Add(new VariableFloat(column.Name, f, ro, false, qi));
                     break;
 
                 case enScriptType.String:
-                    vars.Add(new Variable(column.Name, wert, VariableDataType.String, ro, false, qi));
+                    vars.Add(new VariableString(column.Name, wert, ro, false, qi));
                     break;
 
                 case enScriptType.String_Readonly:
-                    vars.Add(new Variable(column.Name, wert, VariableDataType.String, true, false, qi));
+                    vars.Add(new VariableString(column.Name, wert, true, false, qi));
                     break;
 
                 default:
@@ -331,7 +331,7 @@ namespace BlueDatabase {
                 return (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
             }
 
-            if (!script.Variables.GetSystem("CellChangesEnabled").ValueBool) { return (true, string.Empty, script); }
+            if (!((VariableBool)script.Variables.GetSystem("CellChangesEnabled")).ValueBool) { return (true, string.Empty, script); }
 
             // Dann die Abschließenden Korrekturen vornehmen
             foreach (var thisColum in Database.Column.Where(thisColum => thisColum != null)) {
@@ -495,8 +495,8 @@ namespace BlueDatabase {
             try {
                 List<Variable> vars = new()
                 {
-                    new Variable("Startroutine", startRoutine, VariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen Startroutinenabhängig Werte verändert werden.\r\nMögliche Werte:\r\nnew row\r\nvalue changed\r\nscript testing\r\nmanual check\r\nto be sure\r\nimport\r\nexport\r\nscript"),
-                    new Variable("CellChangesEnabled", "true", VariableDataType.Bool, true, true, "Nur wenn TRUE werden nach dem Skript die Änderungen\r\nin die Datenbank aufgenommen.\r\nKann mit DisableCellChanges umgesetzt werden.")
+                    new VariableString("Startroutine", startRoutine, true, false, "ACHTUNG: Keinesfalls dürfen Startroutinenabhängig Werte verändert werden.\r\nMögliche Werte:\r\nnew row\r\nvalue changed\r\nscript testing\r\nmanual check\r\nto be sure\r\nimport\r\nexport\r\nscript"),
+                    new VariableBool("CellChangesEnabled", true, true, true, "Nur wenn TRUE werden nach dem Skript die Änderungen\r\nin die Datenbank aufgenommen.\r\nKann mit DisableCellChanges umgesetzt werden.")
                 };
 
                 #region Variablen für Skript erstellen
@@ -505,15 +505,10 @@ namespace BlueDatabase {
                     var v = CellToVariable(thisCol, this);
                     if (v != null) { vars.AddRange(v); }
                 }
-                vars.Add(new Variable("User", Generic.UserName(), VariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
-                vars.Add(new Variable("Usergroup", Database.UserGroup, VariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
-                if (Database.IsAdministrator()) {
-                    vars.Add(new Variable("Administrator", "true", VariableDataType.Bool, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
-                } else {
-                    vars.Add(new Variable("Administrator", "false", VariableDataType.Bool, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
-                }
-
-                vars.Add(new Variable("Filename", Database.Filename, VariableDataType.String, true, true, string.Empty));
+                vars.Add(new VariableString("User", Generic.UserName(), true, false, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
+                vars.Add(new VariableString("Usergroup", Database.UserGroup, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
+                vars.Add(new VariableBool("Administrator", Database.IsAdministrator(), true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
+                vars.Add(new VariableString("Filename", Database.Filename, true, true, string.Empty));
 
                 #endregion Variablen für Skript erstellen
 
@@ -526,7 +521,7 @@ namespace BlueDatabase {
 
                 #endregion
 
-                if (startRoutine != "script testing" && vars.GetSystem("CellChangesEnabled").ValueBool) {
+                if (startRoutine != "script testing" && ((VariableBool)vars.GetSystem("CellChangesEnabled")).ValueBool) {
 
                     #region Variablen zurückschreiben und Special Rules ausführen
 
@@ -578,17 +573,19 @@ namespace BlueDatabase {
             //    }
             //}
 
+            if (columnVar is VariableListString vl) {
+                CellSet(column, vl.ValueList);
+                return;
+            }
+
+            if (columnVar is VariableBool vb) {
+                CellSet(column, vb.ValueBool);
+                return;
+            }
             if (columnVar is VariableString vs) {
-                CellSet(column, columnVar.ValueListString);
+                CellSet(column, vs.ValueString);
                 return;
             }
-
-            if (columnVar.Type == VariableDataType.Bool) {
-                CellSet(column, columnVar.ValueBool);
-                return;
-            }
-
-            CellSet(column, columnVar.ValueString);
         }
 
         #endregion

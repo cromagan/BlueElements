@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -66,7 +68,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
         }
 
-        private static int ColumKeyFrom(Database database, string columnKey) => database == null || string.IsNullOrEmpty(columnKey) ? -1 : IntParse(columnKey);
+        private static int ColumKeyFrom(Database? database, string columnKey) {
+            if (database == null || string.IsNullOrEmpty(columnKey)) { return -1; }
+
+            IntTryParse(columnKey, out var c);
+            return c;
+        }
 
         private static void Database_ShouldICancelDiscOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
 

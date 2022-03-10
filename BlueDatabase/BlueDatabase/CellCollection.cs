@@ -725,10 +725,13 @@ namespace BlueDatabase {
 
                 case enFilterType.Between:
                     if (!istValue.IsNumeral()) { return false; }
-                    var ival = DoubleParse(istValue);
+                    DoubleTryParse(istValue, out var ival);
                     var fval = filterValue.SplitAndCutBy("|");
-                    if (ival < DoubleParse(fval[0])) { return false; }
-                    if (ival > DoubleParse(fval[1])) { return false; }
+
+                    DoubleTryParse(fval[0], out var minv);
+                    if (ival < minv) { return false; }
+                    DoubleTryParse(fval[1], out var maxv);
+                    if (ival > maxv) { return false; }
                     //if (double.Parse)
                     //if (string.IsNullOrEmpty(IstValue)) { return false; }
                     //if (!FilterValue.ToUpper().Contains("VALUE")) { return false; }

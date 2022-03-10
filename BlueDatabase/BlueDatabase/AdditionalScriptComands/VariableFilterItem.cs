@@ -19,7 +19,8 @@
 
 using BlueDatabase;
 using BlueScript.Enums;
-using System.Drawing;
+using BlueScript.Structures;
+using BlueScript.Variables;
 
 namespace BlueScript {
 
@@ -33,9 +34,9 @@ namespace BlueScript {
 
         #region Constructors
 
-        public VariableFilterItem(string name, FilterItem value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) {
-            _filter = value;
-        }
+        public VariableFilterItem(string name, FilterItem value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _filter = value;
+
+        public VariableFilterItem(string name) : this(name, null, true, false, string.Empty) { }
 
         public VariableFilterItem(FilterItem value) : this(Variable.DummyName(), value, true, false, string.Empty) { }
 
@@ -52,7 +53,24 @@ namespace BlueScript {
         }
 
         public override string ShortName => "fil";
+        public override bool Stringable => false;
         public override VariableDataType Type => VariableDataType.Object;
+
+        #endregion
+
+        #region Methods
+
+        public override DoItFeedback GetValueFrom(Variable variable) {
+            if (variable is not VariableFilterItem v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
+            if (Readonly) { return DoItFeedback.Schreibgschützt(); }
+            FilterItem = v.FilterItem;
+            return DoItFeedback.Null();
+        }
+
+        protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
+            succesVar = null;
+            return false;
+        }
 
         #endregion
     }

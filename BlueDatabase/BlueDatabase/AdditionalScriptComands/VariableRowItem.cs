@@ -19,7 +19,8 @@
 
 using BlueDatabase;
 using BlueScript.Enums;
-using System.Drawing;
+using BlueScript.Structures;
+using BlueScript.Variables;
 
 namespace BlueScript {
 
@@ -37,6 +38,8 @@ namespace BlueScript {
             _row = value;
         }
 
+        public VariableRowItem(string name) : this(name, null, true, false, string.Empty) { }
+
         public VariableRowItem(RowItem? value) : this(Variable.DummyName(), value, true, false, string.Empty) { }
 
         #endregion
@@ -52,7 +55,24 @@ namespace BlueScript {
         }
 
         public override string ShortName => "row";
+        public override bool Stringable => false;
         public override VariableDataType Type => VariableDataType.Object;
+
+        #endregion
+
+        #region Methods
+
+        public override DoItFeedback GetValueFrom(Variable variable) {
+            if (variable is not VariableRowItem v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
+            if (Readonly) { return DoItFeedback.Schreibgschützt(); }
+            RowItem = v.RowItem;
+            return DoItFeedback.Null();
+        }
+
+        protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
+            succesVar = null;
+            return false;
+        }
 
         #endregion
     }

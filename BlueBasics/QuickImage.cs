@@ -57,10 +57,16 @@ namespace BlueBasics {
         public QuickImage(string imageCode, bool generate) : base() {
             var w = (imageCode + "||||||||||").Split('|');
             Name = w[0];
-            var width = string.IsNullOrEmpty(w[1]) ? -1 : IntParse(w[1]);
-            var height = string.IsNullOrEmpty(w[2]) ? -1 : IntParse(w[2]);
+            var width = -1;
+            if (!string.IsNullOrEmpty(w[1])) { IntTryParse(w[1], out width); }
+            var height = -1;
+            if (!string.IsNullOrEmpty(w[2])) { IntTryParse(w[2], out height); }
             CorrectSize(width, height, null);
-            Effekt = string.IsNullOrEmpty(w[3]) ? enImageCodeEffect.Ohne : (enImageCodeEffect)IntParse(w[3]);
+            Effekt = enImageCodeEffect.Ohne;
+            if (!string.IsNullOrEmpty(w[3])) {
+                IntTryParse(w[3], out var tmp);
+                Effekt = (enImageCodeEffect)tmp;
+            }
             Färbung = w[4];
             ChangeGreenTo = w[5];
             Helligkeit = string.IsNullOrEmpty(w[6]) ? 100 : int.Parse(w[6]);

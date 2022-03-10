@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Enums;
+using BlueScript.Variables;
 
 #nullable enable
 
@@ -68,7 +69,7 @@ namespace BlueScript.Methods {
                     var vn = x[0].ToLower().ReduceToChars(Constants.AllowedCharsVariableName);
                     var thisv = x[1].Trim();
                     if (!string.IsNullOrEmpty(vn) && !string.IsNullOrEmpty(thisv)) {
-                        s.Variables.Add(new Variable("extracted_" + vn, thisv, VariableDataType.String, true, false, coment));
+                        s.Variables.Add(new VariableString("extracted_" + vn, thisv, true, false, coment));
                     }
                 }
             }

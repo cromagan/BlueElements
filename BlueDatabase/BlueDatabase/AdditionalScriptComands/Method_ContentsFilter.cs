@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Enums;
-using static BlueBasics.Extensions;
 
 namespace BlueDatabase.AdditionalScriptComands {
 

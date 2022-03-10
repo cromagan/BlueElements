@@ -18,7 +18,6 @@
 using System.Collections.Generic;
 using BlueScript.Structures;
 using BlueScript.Enums;
-using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods {
 
@@ -44,18 +43,9 @@ namespace BlueScript.Methods {
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback("Kein Text angekommen."); }
 
-            var (pos, _) = NextText(infos.AttributText, 0, Gleich, false, false, null);
+            return Method_BerechneVariable.VariablenBerechnung(infos.AttributText + ";", s, infos, true);
 
-            if (pos < 1 || pos > infos.AttributText.Length - 2) { return new DoItFeedback("Fehler mit = - Zeichen"); }
-
-            var varnam = infos.AttributText.Substring(0, pos);
-
-            if (!Variable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name"); }
-            var v = s.Variables.Get(varnam);
-            if (v != null) { return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden."); }
-            s.Variables.Add(new Variable(varnam));
-
-            return s.BerechneVariable.DoitKomplett(infos.AttributText + ";", s, infos);
+            //return s.BerechneVariable.DoitKomplett(infos.AttributText + ";", s, infos, true);
         }
 
         #endregion

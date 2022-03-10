@@ -20,13 +20,13 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueScript;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using BlueScript.Variables;
 using static BlueBasics.FileOperations;
 using MessageBox = BlueControls.Forms.MessageBox;
 

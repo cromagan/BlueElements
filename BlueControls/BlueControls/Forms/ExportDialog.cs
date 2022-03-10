@@ -163,9 +163,9 @@ namespace BlueControls.Forms {
         private void _Database_Disposing(object sender, System.EventArgs e) => Close();
 
         private void Attribute_Changed(object? sender, System.EventArgs? e) {
-            var b = FloatParse(flxBreite.Value);
-            var h = FloatParse(flxHöhe.Value);
-            var ab = FloatParse(flxAbstand.Value);
+            FloatTryParse(flxBreite.Value, out var b);
+            FloatTryParse(flxHöhe.Value, out var h);
+            FloatTryParse(flxAbstand.Value, out var ab);
             if (ab < 1) { ab = 0; }
             if (b < 10) { b = 10; }
             if (h < 10) { h = 10; }
@@ -199,9 +199,9 @@ namespace BlueControls.Forms {
         }
 
         private void btnSchachtelnSpeichern_Click(object sender, System.EventArgs e) {
-            var b = FloatParse(flxBreite.Value);
-            var h = FloatParse(flxHöhe.Value);
-            var ab = FloatParse(flxAbstand.Value);
+            FloatTryParse(flxBreite.Value, out var b);
+            FloatTryParse(flxHöhe.Value, out var h);
+            FloatTryParse(flxAbstand.Value, out var ab);
             if (ab < 1) { ab = 0; }
             if (b < 10) { b = 10; }
             if (h < 10) { h = 10; }

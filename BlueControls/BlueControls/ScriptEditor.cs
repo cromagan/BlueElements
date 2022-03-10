@@ -30,6 +30,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BlueControls.ItemCollection.ItemCollectionList;
+using BlueScript.Variables;
 using static BlueBasics.Extensions;
 
 namespace BlueControls {
@@ -157,7 +158,7 @@ namespace BlueControls {
                     ro.CellSet("RO", thisv.Readonly);
                     ro.CellSet("System", thisv.SystemVariable);
 
-                    var tmpi = thisv.ValueString;
+                    var tmpi = thisv.ReadableText;
                     if (tmpi.Length > 500) { tmpi = tmpi.Substring(0, 500) + "..."; }
 
                     ro.CellSet("Inhalt", tmpi);
@@ -179,7 +180,7 @@ namespace BlueControls {
 
         private void btnTest_Click(object sender, System.EventArgs e) {
             Message("Starte Skript");
-            tableVariablen.Database.Row.Clear();
+            tableVariablen.Database?.Row.Clear();
 
             var s = GenerateAndDoScript();
 

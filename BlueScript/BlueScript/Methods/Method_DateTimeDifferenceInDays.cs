@@ -16,9 +16,9 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Enums;
+using BlueScript.Variables;
 using static BlueBasics.Converter;
 
 namespace BlueScript.Methods {
@@ -54,7 +54,7 @@ namespace BlueScript.Methods {
             var ok2 = DateTimeTryParse(((VariableString)attvar.Attributes[1]).ValueString, out var d2);
             return !ok2
                 ? new DoItFeedback("Der Wert '" + ((VariableString)attvar.Attributes[1]).ValueString + "' wurde nicht als Zeitformat erkannt.")
-                : new DoItFeedback(d1.Subtract(d2).TotalDays.ToString(Constants.Format_Float1), VariableDataType.Numeral);
+                : new DoItFeedback(d1.Subtract(d2).TotalDays);
         }
 
         #endregion

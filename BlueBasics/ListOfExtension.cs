@@ -24,7 +24,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using static BlueBasics.Converter;
 using static BlueBasics.FileOperations;
 
 namespace BlueBasics {
@@ -271,9 +270,9 @@ namespace BlueBasics {
             return l;
         }
 
-        public static double TagGetDouble(this ICollection<string>? col, string tagname) => DoubleParse(TagGet(col, tagname));
+        //public static double TagGetDouble(this ICollection<string>? col, string tagname) => DoubleParse(TagGet(col, tagname));
 
-        public static int TagGetInt(this ICollection<string>? col, string tagname) => IntParse(TagGet(col, tagname));
+        //public static int TagGetInt(this ICollection<string>? col, string tagname) => IntParse(TagGet(col, tagname));
 
         public static void TagRemove(this ICollection<string> col, string tagname) {
             var found = col.TagGetPosition(tagname);

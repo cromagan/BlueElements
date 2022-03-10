@@ -20,6 +20,7 @@ using System.Linq;
 using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Enums;
+using BlueScript.Variables;
 
 namespace BlueScript.Methods {
 

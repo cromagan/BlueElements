@@ -18,8 +18,9 @@
 #nullable enable
 
 using BlueScript.Enums;
+using BlueScript.Structures;
 
-namespace BlueScript {
+namespace BlueScript.Variables {
 
     public class VariableString : Variable {
 
@@ -47,6 +48,7 @@ namespace BlueScript {
         public override string ReadableText { get => _valueString; }
 
         public override string ShortName => "str";
+        public override bool Stringable => true;
         public override VariableDataType Type => VariableDataType.String;
         public override string ValueForReplace { get => "\"" + _valueString.RemoveCriticalVariableChars() + "\""; }
 
@@ -59,6 +61,31 @@ namespace BlueScript {
                 if (Readonly) { return; }
                 _valueString = value.RestoreCriticalVariableChars(); // Variablen enthalten immer den richtigen Wert und es werden nur beim Ersetzen im Script die kritischen Zeichen entfernt
             }
+        }
+
+        #endregion
+
+        #region Methods
+
+        public override DoItFeedback GetValueFrom(Variable variable) {
+            if (variable is not VariableString v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
+            if (Readonly) { return DoItFeedback.Schreibgschützt(); }
+            ValueString = v.ValueString;
+            return DoItFeedback.Null();
+        }
+
+        protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
+            succesVar = null;
+            if (txt.Length > 1 && txt.StartsWith("\"") && txt.EndsWith("\"")) {
+                var tmp = txt.Substring(1, txt.Length - 2); // Nicht Trimmen! Ansonsten wird sowas falsch: "X=" + "";
+                tmp = tmp.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
+                if (tmp.Contains("\"")) { return false; } //SetError("Verkettungsfehler"); return; } // Beispiel: s ist nicht definiert und "jj" + s + "kk
+
+                succesVar = new VariableString(tmp);
+                return true;
+            }
+
+            return false;
         }
 
         #endregion

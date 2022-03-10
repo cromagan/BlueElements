@@ -99,7 +99,6 @@
     <Compile Include="Methods\Method_StringAsciiToHTML.cs" />
     <Compile Include="Methods\Method_StringHTMLToAscii.cs" />
     <Compile Include="Methods\Method_StringShortenWord.cs" />
-    <Compile Include="Methods\Method_StringToPhone.cs" />
     <Compile Include="Methods\Method_Substring.cs" />
     <Compile Include="Methods\Method_Split.cs" />
     <Compile Include="Methods\Method_String.cs" />

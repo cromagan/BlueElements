@@ -20,6 +20,7 @@
 using BlueBasics;
 using BlueScript;
 using BlueScript.Methods;
+using BlueScript.Variables;
 
 namespace BlueDatabase.AdditionalScriptComands {
 

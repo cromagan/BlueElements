@@ -22,6 +22,7 @@ using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Enums;
+using BlueScript.Variables;
 using static BlueBasics.Extensions;
 
 #nullable enable
@@ -101,9 +102,17 @@ namespace BlueScript.Methods {
             } while (true);
         }
 
+        /// <summary>
+        /// Ersetzt eine Variable an Stelle 0, falls dort eine ist.
+        /// Gibt dann den ersetzten Text zurück.
+        /// Achtung: nur Stringable Variablen werden berücksichtigt.
+        /// </summary>
+        /// <param name="txt"></param>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static GetEndFeedback ReplaceVariable(string txt, Script s) {
             var posc = 0;
-            var v = s.Variables.AllNames();
+            var v = s.Variables.AllStringableNames();
 
             do {
                 var (pos, which) = NextText(txt, posc, v, true, true, KlammernStd);
@@ -121,8 +130,8 @@ namespace BlueScript.Methods {
                 if (which == "~") {
                     var (pose, _) = NextText(txt, pos + 1, Tilde, false, false, KlammernStd);
                     if (pose <= pos) { return new GetEndFeedback("Variablen-Findung End-~-Zeichen nicht gefunden."); }
-                    var x = new Variable("dummy1", txt.Substring(pos + 1, pose - pos - 1), s);
-                    if (x is not VariableString x2) { return new GetEndFeedback("Fehler beim Berechnen des Variablen-Namens."); }
+                    var x = Variable.GetVariableByParsing(txt.Substring(pos + 1, pose - pos - 1), s);
+                    if (x.Variable is not VariableString x2) { return new GetEndFeedback("Fehler beim Berechnen des Variablen-Namens."); }
                     thisV = s.Variables.Get(x2.ValueString);
                     endz = pose + 1;
                 } else {
@@ -131,7 +140,7 @@ namespace BlueScript.Methods {
                 }
                 if (thisV == null) { return new GetEndFeedback("Variablen-Fehler " + which); }
 
-                if (thisV.Type == VariableDataType.NotDefinedYet) { return new GetEndFeedback("Variable " + thisV.Name + " ist keinem Typ zugeordnet"); }
+                //if (thisV.Type == VariableDataType.NotDefinedYet) { return new GetEndFeedback("Variable " + thisV.Name + " ist keinem Typ zugeordnet"); }
                 //if (thisV is VariableListString vl && !string.IsNullOrEmpty(vl.ValueString) && !vl.ValueString.EndsWith("\r")) { return new GetEndFeedback("List-Variable " + thisV.Name + " fehlerhaft"); }
 
                 txt = txt.Substring(0, pos) + thisV.ValueForReplace + txt.Substring(endz);
@@ -174,7 +183,7 @@ namespace BlueScript.Methods {
             if (!endlessArgs && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu viele Attribute erhalten."); }
 
             //  Variablen und Routinen ersetzen
-            List<Variable?> vars = new();
+            List<Variable> vars = new();
             for (var n = 0; n < attributes.Count; n++) {
                 var lb = attributes[n].Count(c => c == '¶'); // Zeilenzähler weitersetzen
                 attributes[n] = attributes[n].RemoveChars("¶"); // Zeilenzähler entfernen
@@ -186,8 +195,8 @@ namespace BlueScript.Methods {
                 if (exceptetType.HasFlag(VariableDataType.Variable)) {
                     var varn = attributes[n];
                     if (varn.StartsWith("~") && varn.EndsWith("~")) {
-                        var tmp2 = new Variable("dummy2", varn.Substring(1, varn.Length - 2), s);
-                        if (tmp2 is not VariableString x) { return new SplittedAttributesFeedback(ScriptIssueType.VariablenNamenBerechnungFehler, "Variablenname konnte nicht berechnet werden bei Attribut " + (n + 1)); }
+                        var tmp2 = Variable.GetVariableByParsing(varn.Substring(1, varn.Length - 2), s);
+                        if (tmp2.Variable is not VariableString x) { return new SplittedAttributesFeedback(ScriptIssueType.VariablenNamenBerechnungFehler, "Variablenname konnte nicht berechnet werden bei Attribut " + (n + 1)); }
                         varn = x.ValueString;
                     }
 
@@ -196,8 +205,9 @@ namespace BlueScript.Methods {
                     if (s != null) { v = s.Variables.Get(varn); }
                     if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1)); }
                 } else {
-                    v = new Variable("dummy3", attributes[n], s);
-                    if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1)); }
+                    var tmp2 = Variable.GetVariableByParsing(attributes[n], s);
+                    if (tmp2.Variable == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1)); }
+                    v = tmp2.Variable;
                 }
 
                 // Den Typ der Variable checken

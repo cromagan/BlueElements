@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Enums;
+using BlueScript.Variables;
 
 namespace BlueScript.Methods {
 
@@ -55,17 +56,26 @@ namespace BlueScript.Methods {
 
         #region Methods
 
-        public static string? GetBool(string txt) {
+        public static bool? GetBool(string txt) {
             txt = txt.DeKlammere(true, false, false, true);
+
+            //            if (txt.Value.Equals("true", StringComparison.InvariantCultureIgnoreCase) ||
+            //                txt.Value.Equals("false", StringComparison.InvariantCultureIgnoreCase)) {
+            //                if (Type is not VariableDataType.NotDefinedYet and not VariableDataType.Bool) { SetError("Variable ist kein Boolean"); return; }
+            //                ValueString = txt.Value;
+            //                Type = VariableDataType.Bool;
+            //                Readonly = true;
+            //                return;
+            //            }
 
             switch (txt.ToLower()) {
                 case "!false":
                 case "true":
-                    return "true";
+                    return true;
 
                 case "!true":
                 case "false":
-                    return "false";
+                    return false;
             }
 
             return null;

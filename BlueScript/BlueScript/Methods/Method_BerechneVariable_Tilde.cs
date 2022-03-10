@@ -18,6 +18,7 @@
 using System.Collections.Generic;
 using BlueScript.Structures;
 using BlueScript.Enums;
+using BlueScript.Variables;
 using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods {
@@ -49,12 +50,14 @@ namespace BlueScript.Methods {
 
             if (postilde + 1 != posgleich) { return new DoItFeedback("Variablen-Namen-Berechung kein gültiges End-~-Zeichen gefunden."); }
 
-            var x = new Variable("dummy4", infos.AttributText.Substring(0, postilde), s);
-            if (x is not VariableString vs) { return new DoItFeedback("Fehler beim Berechnen des Variablen-Namens."); }
+            var x = Variable.GetVariableByParsing(infos.AttributText.Substring(0, postilde), s);
+            if (x.Variable is not VariableString vs) { return new DoItFeedback("Fehler beim Berechnen des Variablen-Namens."); }
 
             var newcommand = vs.ValueString + infos.AttributText.Substring(posgleich) + ";";
 
-            return s.BerechneVariable.DoitKomplett(newcommand, s, infos);
+            return Method_BerechneVariable.VariablenBerechnung(newcommand, s, infos, false);
+
+            //return s.BerechneVariable.DoitKomplett(newcommand, s, infos, false);
         }
 
         #endregion

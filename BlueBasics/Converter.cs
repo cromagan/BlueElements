@@ -150,14 +150,20 @@ namespace BlueBasics {
         /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
         /// </summary>
         /// <param name="s"></param>
+        /// <param name="result"></param>
         /// <returns></returns>
-        public static double DoubleParse(string s) {
-            if (string.IsNullOrEmpty(s)) { return 0; }
-            if (double.TryParse(s, out var result)) { return result; }
-            if (double.TryParse(s.Replace(",", "."), out var result2)) { return result2; }
-            if (double.TryParse(s.Replace(".", ","), out var result3)) { return result3; }
-            Develop.DebugPrint(enFehlerArt.Warnung, "Double kann nicht geparsed werden: " + s);
-            return 0;
+        public static bool DoubleTryParse(string? s, out double result) {
+            result = 0;
+            if (string.IsNullOrEmpty(s)) { return false; }
+
+            return double.TryParse(s, out result)
+                   || double.TryParse(s.Replace(",", "."), out result)
+                   || double.TryParse(s.Replace(".", ","), out result);
+            //if (double.TryParse(s, out var result)) { return result; }
+            //if (double.TryParse(s.Replace(",", "."), out var result2)) { return result2; }
+            //if (double.TryParse(s.Replace(".", ","), out var result3)) { return result3; }
+
+            //return 0;
         }
 
         public static byte[] FileToByte(string dateiname) {
@@ -175,15 +181,43 @@ namespace BlueBasics {
         /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
         /// </summary>
         /// <param name="s"></param>
+        /// <param name="result"></param>
         /// <returns></returns>
-        public static float FloatParse(string s) {
-            if (string.IsNullOrEmpty(s)) { return 0; }
-            if (float.TryParse(s, out var result)) { return result; }
-            if (float.TryParse(s.Replace(",", "."), out var result2)) { return result2; }
-            if (float.TryParse(s.Replace(".", ","), out var result3)) { return result3; }
-            Develop.DebugPrint(enFehlerArt.Warnung, "float kann nicht geparsed werden: " + s);
-            return 0;
+        public static bool FloatTryParse(string? s, out float result) {
+            result = 0;
+            if (string.IsNullOrEmpty(s)) { return false; }
+
+            return float.TryParse(s, out result)
+                   || float.TryParse(s.Replace(",", "."), out result)
+                   || float.TryParse(s.Replace(".", ","), out result);
         }
+
+        /// <summary>
+        /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public static bool IntTryParse(string? s, out int result) {
+            result = 0;
+            if (string.IsNullOrEmpty(s)) { return false; }
+
+            return int.TryParse(s, out result);
+        }
+
+        ///// <summary>
+        ///// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
+        ///// </summary>
+        ///// <param name="s"></param>
+        ///// <returns></returns>
+        //public static float FloatParse(string s) {
+        //    if (string.IsNullOrEmpty(s)) { return 0; }
+        //    if (float.TryParse(s, out var result)) { return result; }
+        //    if (float.TryParse(s.Replace(",", "."), out var result2)) { return result2; }
+        //    if (float.TryParse(s.Replace(".", ","), out var result3)) { return result3; }
+        //    Develop.DebugPrint(enFehlerArt.Warnung, "float kann nicht geparsed werden: " + s);
+        //    return 0;
+        //}
 
         //private static string GetDriveSerialNumber(string drive)
         //{
@@ -254,12 +288,12 @@ namespace BlueBasics {
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static int IntParse(string s) {
-            if (string.IsNullOrEmpty(s)) { return 0; }
-            if (int.TryParse(s, out var result)) { return result; }
-            Develop.DebugPrint(enFehlerArt.Warnung, "Int kann nicht geparsed werden: " + s);
-            return 0;
-        }
+        //public static int IntParse(string s) {
+        //    if (string.IsNullOrEmpty(s)) { return 0; }
+        //    if (int.TryParse(s, out var result)) { return result; }
+        //    Develop.DebugPrint(enFehlerArt.Warnung, "Int kann nicht geparsed werden: " + s);
+        //    return 0;
+        //}
 
         /// <summary>
         /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.

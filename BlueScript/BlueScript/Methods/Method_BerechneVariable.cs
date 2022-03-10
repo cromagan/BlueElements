@@ -16,19 +16,28 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Enums;
+using BlueScript.Variables;
+using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods {
 
     internal class Method_BerechneVariable : Method {
 
+        #region Fields
+
+        public static List<VariableDataType> SArgs = new() { VariableDataType.Bool_Numeral_String_List_Bitmap_or_Object };
+
+        #endregion
+
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Bool_Numeral_String_List_Bitmap_or_Object };
+        public static bool SEndlessArgs => false;
+
+        public override List<VariableDataType> Args => SArgs;
         public override string Description => "Berechnet eine Variable. Der Typ der Variable und des Ergebnisses müssen übereinstimmen.";
-        public override bool EndlessArgs => false;
+        public override bool EndlessArgs => SEndlessArgs;
         public override string EndSequence => ";";
         public override bool GetCodeBlockAfter => false;
         public override VariableDataType Returns => VariableDataType.Null;
@@ -39,36 +48,56 @@ namespace BlueScript.Methods {
 
         #region Methods
 
-        public override List<string> Comand(Script? s) => s == null ? (new List<string>()) : s.Variables.AllNames();
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="newcommand">Erwartet wird: X=5;</param>
+        /// <param name="s"></param>
+        /// <param name="originalinfos"></param>
+        /// <param name="generateVariable"></param>
+        /// <returns></returns>
+        public static DoItFeedback VariablenBerechnung(string newcommand, Script s, CanDoFeedback originalinfos, bool generateVariable) {
+            //if (s.BerechneVariable == null) { return new DoItFeedback("Interner Fehler"); }
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var variableName = infos.ComandText.ToLower().ReduceToChars(Constants.AllowedCharsVariableName);
-            var variable = s.Variables.Get(variableName);
-            if (variable == null) { return new DoItFeedback("Variable '" + variableName + "' nicht gefunden"); }
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-            if (variable.Type != VariableDataType.NotDefinedYet && attvar.Attributes[0].Type != variable.Type) { return new DoItFeedback("Variable '" + variableName + "' ist nicht der erwartete Typ " + attvar.Attributes[0].Type + ", sondern " + variable.Type); }
+            var (pos, _) = NextText(newcommand, 0, Gleich, false, false, null);
 
-            if (variable.Readonly) { return DoItFeedback.Schreibgschützt(); }
+            if (pos < 1 || pos > newcommand.Length - 2) { return new DoItFeedback("Fehler mit = - Zeichen"); }
 
-            variable.ValueString = ((VariableString)attvar.Attributes[0]).ValueString;
-            variable.Type = attvar.Attributes[0].Type;
-            return DoItFeedback.Null();
+            var varnam = newcommand.Substring(0, pos);
+
+            if (!Variable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name"); }
+
+            var v = s.Variables.Get(varnam);
+            if (generateVariable && v != null) {
+                return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.");
+            }
+            if (!generateVariable && v == null) {
+                return new DoItFeedback("Variable " + varnam + " nicht vorhanden.");
+            }
+
+            var attvar = SplitAttributeToVars(newcommand.Substring(pos + 1, newcommand.Length - pos - 2), s, SArgs, SEndlessArgs);
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(new Method_BerechneVariable(), attvar); }
+
+            if (generateVariable) {
+                attvar.Attributes[0].Name = varnam.ToLower();
+                s.Variables.Add(attvar.Attributes[0]);
+                return new DoItFeedback(attvar.Attributes[0]);
+            }
+
+            return v.GetValueFrom(attvar.Attributes[0]);
         }
 
-        internal DoItFeedback DoitKomplett(string newcommand, Script s, CanDoFeedback originalinfos) {
-            var f = s.BerechneVariable.CanDo(newcommand, 0, false, s);
-            if (!string.IsNullOrEmpty(f.ErrorMessage)) {
-                return new DoItFeedback("Befehl nicht erkannt, " + f.ErrorMessage + ": " + originalinfos.AttributText);
-            }
-            //if (originalinfos.AttributText.Length != f.ContinueOrErrorPosition - 1) {
-            //    return new DoItFeedback("Falsch gesetztes Semikolon");
-            //}
-            var f2 = s.BerechneVariable.DoIt(f, s);
+        public override List<string> Comand(Script? s) => s == null ? (new List<string>()) : s.Variables.AllNames();
 
-            return !string.IsNullOrEmpty(f2.ErrorMessage)
-                ? new DoItFeedback("Berechnung fehlerhaft: " + f2.ErrorMessage)
-                : DoItFeedback.Null();
+        /// <summary>
+        /// Berechnet z.B.   X = 5;
+        /// Die Variable, die berechnet werden soll, muss bereits existieren - und wird auch auf Existenz und Datentyp geprüft.
+        /// </summary>
+        /// <param name="infos"></param>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+            return VariablenBerechnung(infos.ComandText, s, infos, false);
         }
 
         #endregion

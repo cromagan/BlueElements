@@ -17,40 +17,58 @@
 
 #nullable enable
 
-using BlueScript.Enums;
 using System.Drawing;
+using BlueScript.Enums;
+using BlueScript.Structures;
 
-namespace BlueScript {
+namespace BlueScript.Variables {
 
     public class VariableBitmap : Variable {
 
         #region Fields
 
-        private Bitmap _bmp;
+        private Bitmap? _bmp;
 
         #endregion
 
         #region Constructors
 
-        public VariableBitmap(string name, Bitmap value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) {
-            _bmp = value;
-        }
+        public VariableBitmap(string name, Bitmap? value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _bmp = value;
 
-        public VariableBitmap(Bitmap value) : this(Variable.DummyName(), value, true, false, string.Empty) { }
+        public VariableBitmap(string name) : this(name, null, true, false, string.Empty) { }
+
+        public VariableBitmap(Bitmap? value) : this(Variable.DummyName(), value, true, false, string.Empty) { }
 
         #endregion
 
         #region Properties
 
         public override string ShortName => "str";
+        public override bool Stringable => false;
         public override VariableDataType Type => VariableDataType.String;
 
-        public Bitmap ValueBitmap {
+        public Bitmap? ValueBitmap {
             get => _bmp;
             set {
                 if (Readonly) { return; }
                 _bmp = value;
             }
+        }
+
+        #endregion
+
+        #region Methods
+
+        public override DoItFeedback GetValueFrom(Variable variable) {
+            if (variable is not VariableBitmap v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
+            if (Readonly) { return DoItFeedback.Schreibgschützt(); }
+            ValueBitmap = v.ValueBitmap;
+            return DoItFeedback.Null();
+        }
+
+        protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
+            succesVar = null;
+            return false;
         }
 
         #endregion

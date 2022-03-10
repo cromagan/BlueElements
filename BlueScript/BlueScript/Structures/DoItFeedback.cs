@@ -15,10 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueScript.Methods;
-using BlueScript.Enums;
-using System;
+using System.Collections.Generic;
 using System.Drawing;
+using BlueScript.Variables;
 
 namespace BlueScript.Structures {
 
@@ -48,6 +50,16 @@ namespace BlueScript.Structures {
             Variable = new VariableString(valueString);
         }
 
+        public DoItFeedback(List<string>? list) {
+            ErrorMessage = string.Empty;
+            Variable = new VariableListString(list);
+        }
+
+        public DoItFeedback(Bitmap bmp) {
+            ErrorMessage = string.Empty;
+            Variable = new VariableBitmap(bmp);
+        }
+
         public DoItFeedback(bool value) {
             ErrorMessage = string.Empty;
             Variable = new VariableBool(value);
@@ -63,19 +75,20 @@ namespace BlueScript.Structures {
             Variable = new VariableFloat(value);
         }
 
-        #endregion
-
-        #region Properties
-
-        [Obsolete]
-        public string Value {
-            get {
-                if (Variable == null) { return string.Empty; }
-                return Variable.ValueForReplace;
-            }
+        public DoItFeedback(string[] list) {
+            ErrorMessage = string.Empty;
+            Variable = new VariableListString(list);
         }
 
         #endregion
+
+        //[Obsolete]
+        //public string Value {
+        //    get {
+        //        if (Variable == null) { return string.Empty; }
+        //        return Variable.ValueForReplace;
+        //    }
+        //}
 
         #region Methods
 
@@ -91,6 +104,10 @@ namespace BlueScript.Structures {
         public static DoItFeedback Null() => new();
 
         public static DoItFeedback Schreibgschützt() => new("Variable ist schreibgeschützt.");
+
+        public static DoItFeedback VerschiedeneTypen(Variable var1, Variable var2) =>
+            new DoItFeedback("Variable '" + var1.Name + "' ist nicht der erwartete Typ {" + var2.ShortName +
+                             "}, sondern {" + var2.ShortName + "}");
 
         public static DoItFeedback Wahr() => new(true);
 

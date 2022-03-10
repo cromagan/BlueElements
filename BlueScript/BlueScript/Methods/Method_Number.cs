@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Enums;
+using BlueScript.Variables;
 
 namespace BlueScript.Methods {
 
@@ -43,9 +44,18 @@ namespace BlueScript.Methods {
 
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.AttributFehler(this, attvar)
-                 : ((VariableString)attvar.Attributes[0]).ValueString.IsNumeral() ? new DoItFeedback(((VariableString)attvar.Attributes[0]).ValueString, VariableDataType.Numeral)
-                 : new DoItFeedback(((VariableString)attvar.Attributes[1]).ValueString, VariableDataType.Numeral);
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+
+            if (attvar.Attributes[0] is VariableFloat vf) { return new DoItFeedback(vf.ValueNum); }
+
+            if (attvar.Attributes[0] is VariableString vs) {
+                if (Converter.DoubleTryParse(vs.ValueString, out var dbl)) {
+                    return new DoItFeedback(dbl);
+                }
+                return new DoItFeedback("'" + vs.ValueString + "' kann nicht als Zahl interpretiert werden.");
+            }
+
+            return new DoItFeedback("Interner Fehler");
         }
 
         #endregion

@@ -31,6 +31,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Windows.Forms;
+using BlueScript.Variables;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollection {
@@ -350,9 +351,9 @@ namespace BlueControls.ItemCollection {
 
         public void OnDoInvalidate() => DoInvalidate?.Invoke(this, System.EventArgs.Empty);
 
-        public bool ParseVariable(string name, string wert) => ParseVariable(new BlueScript.Variable(name, wert, BlueScript.Enums.VariableDataType.String));
+        public bool ParseVariable(string name, string wert) => ParseVariable(new VariableString(name, wert));
 
-        public bool ParseVariable(BlueScript.Variable variable) {
+        public bool ParseVariable(Variable variable) {
             var did = false;
             foreach (var thisItem in this) {
                 if (thisItem is ICanHaveColumnVariables variables) {

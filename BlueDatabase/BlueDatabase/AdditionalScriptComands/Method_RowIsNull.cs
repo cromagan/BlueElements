@@ -52,11 +52,11 @@ namespace BlueDatabase.AdditionalScriptComands {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            if (!attvar.Attributes[0].ObjectType("row")) { return new DoItFeedback("Kein Zeilenobjekt übergeben."); }
+            if (attvar.Attributes[0] is not VariableRowItem vr) { return new DoItFeedback("Kein Zeilenobjekt übergeben."); }
 
-            var r = Method_Row.ObjectToRow(attvar.Attributes[0]);
+            //var r = Method_Row.ObjectToRow(attvar.Attributes[0]);
 
-            return r == null ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
+            return vr.RowItem == null ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
         }
 
         #endregion

@@ -21,10 +21,10 @@ using BlueBasics;
 using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using BlueScript.Methods;
 using BlueScript.Structures;
+using BlueScript.Variables;
 
 namespace BlueScript {
 
@@ -33,6 +33,7 @@ namespace BlueScript {
         #region Fields
 
         public static List<Method>? Comands;
+        public static List<Variable>? VarTypes;
         public readonly List<Variable>? Variables;
         public bool EndScript;
 
@@ -42,7 +43,7 @@ namespace BlueScript {
         public string Feedback = string.Empty;
 
         //internal readonly List<Bitmap> BitmapCache;
-        internal Method_BerechneVariable? BerechneVariable; // Paralellisierung löscht ab und zu die Variable
+        //internal Method_BerechneVariable? BerechneVariable; // Paralellisierung löscht ab und zu die Variable
 
         private string _error = string.Empty;
         private string _errorCode = string.Empty;
@@ -82,9 +83,8 @@ namespace BlueScript {
         //    return objects;
         //}
         public Script(List<Variable>? variablen) {
-            if (Comands == null) {
-                Comands = GetEnumerableOfType<Method>();
-            }
+            if (Comands == null) { Comands = GetEnumerableOfType<Method>(); }
+            if (VarTypes == null) { VarTypes = GetEnumerableOfType<Variable>("NAME"); }
             Variables = variablen;
             //BitmapCache = new List<Bitmap>();
         }
@@ -125,9 +125,12 @@ namespace BlueScript {
         #region Methods
 
         public static DoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, Script s, bool expectedvariablefeedback) {
+            if (Comands == null) { return new DoItWithEndedPosFeedback("Befehle nicht initialisiert"); }
+
             foreach (var thisC in Comands) {
                 var f = thisC.CanDo(txt, pos, expectedvariablefeedback, s);
                 if (f.MustAbort) { return new DoItWithEndedPosFeedback(f.ErrorMessage); }
+
                 if (string.IsNullOrEmpty(f.ErrorMessage)) {
                     var fn = thisC.DoIt(f, s);
                     return new DoItWithEndedPosFeedback(fn.ErrorMessage, fn.Variable, f.ContinueOrErrorPosition);
@@ -137,7 +140,10 @@ namespace BlueScript {
             #region Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
 
             foreach (var f in Comands.Select(thisC => thisC.CanDo(txt, pos, !expectedvariablefeedback, s))) {
-                if (f.MustAbort) { return new DoItWithEndedPosFeedback(f.ErrorMessage); }
+                if (f.MustAbort) {
+                    return new DoItWithEndedPosFeedback(f.ErrorMessage);
+                }
+
                 if (string.IsNullOrEmpty(f.ErrorMessage)) {
                     return expectedvariablefeedback
                         ? new DoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + txt.Substring(pos))
@@ -217,15 +223,19 @@ namespace BlueScript {
             Sub = 0;
             Feedback = string.Empty;
 
-            BerechneVariable = null;
+            //BerechneVariable = null;
 
-            foreach (var thisC in Comands) {
-                if (thisC is Method_BerechneVariable bv) { BerechneVariable = bv; }
-            }
+            //if (Comands != null) {
+            //    foreach (var thisC in Comands) {
+            //        if (thisC is Method_BerechneVariable bv) {
+            //            BerechneVariable = bv;
+            //        }
+            //    }
+            //}
 
-            if (BerechneVariable == null) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Method_BerechneVariable ist nicht definiet.");
-            }
+            //if (BerechneVariable == null) {
+            //    Develop.DebugPrint(enFehlerArt.Fehler, "Method_BerechneVariable ist nicht definiet.");
+            //}
 
             (Error, ErrorCode) = Parse(ReducedScriptText);
             return !string.IsNullOrEmpty(Error);

@@ -17,11 +17,14 @@
 
 #nullable enable
 
+using System;
 using BlueBasics;
 using BlueScript.Enums;
-using System;
+using BlueScript.Structures;
+using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 
-namespace BlueScript {
+namespace BlueScript.Variables {
 
     public class VariableFloat : Variable {
 
@@ -33,7 +36,7 @@ namespace BlueScript {
 
         #region Constructors
 
-        public VariableFloat(string name, double value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) { _double = value; }
+        public VariableFloat(string name, double value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _double = value;
 
         public VariableFloat(double value) : this(Variable.DummyName(), value, true, false, string.Empty) { }
 
@@ -43,12 +46,13 @@ namespace BlueScript {
 
         #region Properties
 
-        public override string ReadableText { get => _double.ToString(Constants.Format_Float1); }
+        public override string ReadableText => _double.ToString(Constants.Format_Float1);
         public override string ShortName => "num";
+        public override bool Stringable => true;
         public override VariableDataType Type => VariableDataType.Numeral;
 
         [Obsolete]
-        public float ValueDouble {
+        public double ValueDouble {
             get => _double;
             set {
                 if (Readonly) { return; }
@@ -56,11 +60,9 @@ namespace BlueScript {
             }
         }
 
-        public override string ValueForReplace { get => ReadableText; }
+        public override string ValueForReplace => ReadableText;
 
-        public int ValueInt {
-            get => (int)_double;
-        }
+        public int ValueInt => (int)_double;
 
         public double ValueNum {
             get => _double;
@@ -68,6 +70,35 @@ namespace BlueScript {
                 if (Readonly) { return; }
                 _double = value;
             }
+        }
+
+        #endregion
+
+        #region Methods
+
+        public override DoItFeedback GetValueFrom(Variable variable) {
+            if (variable is not VariableFloat v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
+            if (Readonly) { return DoItFeedback.Schreibgschützt(); }
+            ValueNum = v.ValueNum;
+            return DoItFeedback.Null();
+        }
+
+        protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
+            succesVar = null;
+
+            var (pos2, _) = NextText(txt, 0, Berechnung.RechenOperatoren, false, false, KlammernStd);
+            if (pos2 >= 0) {
+                var erg = Berechnung.Ergebnis(txt);
+                if (erg == null) { return false; }
+                txt = erg.ToString();
+            }
+
+            if (DoubleTryParse(txt, out var zahl)) {
+                succesVar = new VariableFloat(zahl);
+                return true;
+            }
+
+            return false;
         }
 
         #endregion
