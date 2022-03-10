@@ -46,13 +46,13 @@ namespace BlueScript.Methods {
 
             if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
 
-            var tmp = attvar.Attributes[0].ValueListString;
+            var tmp = ((VariableListString)attvar.Attributes[0]).ValueList;
 
             for (var z = 0; z < tmp.Count; z++) {
-                tmp[z] += attvar.Attributes[1].ValueString;
+                tmp[z] += ((VariableString)attvar.Attributes[1]).ValueString;
             }
 
-            attvar.Attributes[0].ValueListString = tmp;
+            ((VariableListString)attvar.Attributes[0]).ValueList = tmp;
 
             return DoItFeedback.Null();
         }

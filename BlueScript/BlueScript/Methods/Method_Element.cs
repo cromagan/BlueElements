@@ -45,10 +45,10 @@ namespace BlueScript.Methods {
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-            var i = attvar.Attributes[1].ValueInt;
-            var list = attvar.Attributes[0].ValueListString;
+            var i = ((VariableFloat)attvar.Attributes[1]).ValueInt;
+            var list = ((VariableListString)attvar.Attributes[0]).ValueList;
             return i < 0 || i >= list.Count ? new DoItFeedback("Element nicht in Liste")
-                                            : new DoItFeedback(list[i], VariableDataType.String);
+                                            : new DoItFeedback(list[i], string.Empty);
         }
 
         #endregion

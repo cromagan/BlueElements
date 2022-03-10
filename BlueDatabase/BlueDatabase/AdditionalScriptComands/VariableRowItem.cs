@@ -17,47 +17,42 @@
 
 #nullable enable
 
-using System;
+using BlueDatabase;
+using BlueScript.Enums;
+using System.Drawing;
 
-namespace BlueScript.Structures {
+namespace BlueScript {
 
-    public struct DoItWithEndedPosFeedback {
+    public class VariableRowItem : Variable {
 
         #region Fields
 
-        public string ErrorMessage;
-
-        public int Position;
-
-        public Variable? Variable;
+        private RowItem? _row;
 
         #endregion
 
         #region Constructors
 
-        public DoItWithEndedPosFeedback(string errormessage, Variable variable, int endpos) {
-            ErrorMessage = errormessage;
-            Variable = variable;
-            Position = endpos;
+        public VariableRowItem(string name, RowItem? value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) {
+            _row = value;
         }
 
-        public DoItWithEndedPosFeedback(string errormessage) {
-            Position = -1;
-            ErrorMessage = errormessage;
-            Variable = null;
-        }
+        public VariableRowItem(RowItem? value) : this(Variable.DummyName(), value, true, false, string.Empty) { }
 
         #endregion
 
         #region Properties
 
-        [Obsolete]
-        public string Value {
-            get {
-                if (Variable == null) { return string.Empty; }
-                return Variable.ValueForReplace;
+        public RowItem? RowItem {
+            get => _row;
+            set {
+                if (Readonly) { return; }
+                _row = value;
             }
         }
+
+        public override string ShortName => "row";
+        public override VariableDataType Type => VariableDataType.Object;
 
         #endregion
     }

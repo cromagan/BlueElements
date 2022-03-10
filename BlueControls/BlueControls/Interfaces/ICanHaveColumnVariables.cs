@@ -23,7 +23,7 @@ namespace BlueControls.Interfaces {
 
         #region Methods
 
-        bool ReplaceVariable(Script s, Variable variable);
+        bool ReplaceVariable(Variable variable);
 
         bool ResetVariables();
 

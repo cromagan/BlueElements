@@ -15,8 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System;
+
 namespace BlueScript.Enums {
 
+    [Obsolete]
     public enum VariableDataType {
         NotDefinedYet = 0,
         Bool = 1,

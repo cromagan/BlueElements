@@ -46,14 +46,14 @@ namespace BlueScript.Methods {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            var ok1 = DateTimeTryParse(attvar.Attributes[0].ValueString, out var d1);
+            var ok1 = DateTimeTryParse(((VariableString)attvar.Attributes[0]).ValueString, out var d1);
             if (!ok1) {
-                return new DoItFeedback("Der Wert '" + attvar.Attributes[0].ValueString + "' wurde nicht als Zeitformat erkannt.");
+                return new DoItFeedback("Der Wert '" + ((VariableString)attvar.Attributes[0]).ValueString + "' wurde nicht als Zeitformat erkannt.");
             }
 
-            var ok2 = DateTimeTryParse(attvar.Attributes[1].ValueString, out var d2);
+            var ok2 = DateTimeTryParse(((VariableString)attvar.Attributes[1]).ValueString, out var d2);
             return !ok2
-                ? new DoItFeedback("Der Wert '" + attvar.Attributes[1].ValueString + "' wurde nicht als Zeitformat erkannt.")
+                ? new DoItFeedback("Der Wert '" + ((VariableString)attvar.Attributes[1]).ValueString + "' wurde nicht als Zeitformat erkannt.")
                 : new DoItFeedback(d1.Subtract(d2).TotalDays.ToString(Constants.Format_Float1), VariableDataType.Numeral);
         }
 

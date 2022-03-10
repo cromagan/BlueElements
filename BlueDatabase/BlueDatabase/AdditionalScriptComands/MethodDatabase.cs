@@ -33,14 +33,14 @@ namespace BlueDatabase.AdditionalScriptComands {
             var f = s.Variables.GetSystem("filename");
             if (f == null) { return null; }
 
-            var newf = f.ValueString.FilePath() + name + ".mdb";
+            var newf = f.ReadableText.FilePath() + name + ".mdb";
 
             return Database.GetByFilename(newf, true, false);
         }
 
         protected Database? MyDatabase(Script s) {
             var f = s.Variables.GetSystem("filename");
-            return f == null ? null : Database.GetByFilename(f.ValueString, true, false);
+            return f == null ? null : Database.GetByFilename(f.ReadableText, true, false);
         }
 
         #endregion

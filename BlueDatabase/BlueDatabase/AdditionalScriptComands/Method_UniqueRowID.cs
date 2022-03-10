@@ -52,7 +52,7 @@ namespace BlueDatabase.AdditionalScriptComands {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return !string.IsNullOrEmpty(attvar.ErrorMessage)
                 ? DoItFeedback.AttributFehler(this, attvar)
-                : new DoItFeedback(RowCollection.UniqueKeyValue(), VariableDataType.String);
+                : new DoItFeedback(RowCollection.UniqueKeyValue(), string.Empty);
         }
 
         #endregion

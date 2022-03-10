@@ -181,9 +181,9 @@ namespace BlueControls.ItemCollection {
             var generatedBitmap = new Bitmap((int)re.Width, (int)re.Height);
 
             var mb = pad.Item.MaxBounds(null);
-            var zoomv = pad.ZoomFitValue(mb, false, generatedBitmap.Size);
-            var centerpos = pad.CenterPos(mb, false, generatedBitmap.Size, zoomv);
-            var slidervalues = pad.SliderValues(mb, zoomv, centerpos);
+            var zoomv = ItemCollectionPad.ZoomFitValue(mb, 0, 0, generatedBitmap.Size);
+            var centerpos = ItemCollectionPad.CenterPos(mb, 0, 0, generatedBitmap.Size, zoomv);
+            var slidervalues = ItemCollectionPad.SliderValues(mb, zoomv, centerpos);
             pad.ShowInPrintMode = true;
             pad.Unselect();
             if (Parent.SheetStyle != null) { pad.Item.SheetStyle = Parent.SheetStyle; }

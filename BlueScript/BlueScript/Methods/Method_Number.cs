@@ -44,8 +44,8 @@ namespace BlueScript.Methods {
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.AttributFehler(this, attvar)
-                 : attvar.Attributes[0].ValueString.IsNumeral() ? new DoItFeedback(attvar.Attributes[0].ValueString, VariableDataType.Numeral)
-                 : new DoItFeedback(attvar.Attributes[1].ValueString, VariableDataType.Numeral);
+                 : ((VariableString)attvar.Attributes[0]).ValueString.IsNumeral() ? new DoItFeedback(((VariableString)attvar.Attributes[0]).ValueString, VariableDataType.Numeral)
+                 : new DoItFeedback(((VariableString)attvar.Attributes[1]).ValueString, VariableDataType.Numeral);
         }
 
         #endregion

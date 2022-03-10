@@ -53,18 +53,18 @@ namespace BlueDatabase.AdditionalScriptComands {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            var db = DatabaseOf(s, attvar.Attributes[0].ValueString);
-            if (db == null) { return new DoItFeedback("Datenbank '" + attvar.Attributes[0].ValueString + "' nicht gefunden"); }
+            var db = DatabaseOf(s, ((VariableString)attvar.Attributes[0]).ValueString);
+            if (db == null) { return new DoItFeedback("Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden"); }
 
-            var c = db.Column.Exists(attvar.Attributes[2].ValueString);
-            if (c == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[2].ValueString); }
+            var c = db.Column.Exists(((VariableString)attvar.Attributes[2]).ValueString);
+            if (c == null) { return new DoItFeedback("Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[2]).ValueString); }
 
-            var r = RowCollection.MatchesTo(new FilterItem(db.Column[0], Enums.enFilterType.Istgleich_GroßKleinEgal, attvar.Attributes[1].ValueString));
+            var r = RowCollection.MatchesTo(new FilterItem(db.Column[0], Enums.enFilterType.Istgleich_GroßKleinEgal, ((VariableString)attvar.Attributes[1]).ValueString));
             if (r == null || r.Count == 0) {
                 if (attvar.Attributes.Count > 3) {
                     attvar.Attributes[3].Readonly = false;
                     attvar.Attributes[3].Type = VariableDataType.List;
-                    return new DoItFeedback(attvar.Attributes[3].ValueString + "\r", VariableDataType.List);
+                    return new DoItFeedback(((VariableString)attvar.Attributes[3]).ValueString + "\r", VariableDataType.List);
                 }
                 return new DoItFeedback(string.Empty);
             }
@@ -72,13 +72,13 @@ namespace BlueDatabase.AdditionalScriptComands {
                 if (attvar.Attributes.Count > 4) {
                     attvar.Attributes[4].Readonly = false;
                     attvar.Attributes[4].Type = VariableDataType.List;
-                    return new DoItFeedback(attvar.Attributes[4].ValueString + "\r", VariableDataType.List);
+                    return new DoItFeedback(((VariableString)attvar.Attributes[4]).ValueString + "\r", VariableDataType.List);
                 }
                 return new DoItFeedback(string.Empty);
             }
 
             var v = RowItem.CellToVariable(c, r[0]);
-            if (v == null || v.Count != 1) { return new DoItFeedback("Wert konnte nicht erzeugt werden: " + attvar.Attributes[2].ValueString); }
+            if (v == null || v.Count != 1) { return new DoItFeedback("Wert konnte nicht erzeugt werden: " + ((VariableString)attvar.Attributes[2]).ValueString); }
 
             return v[0].Type != VariableDataType.List
                 ? new DoItFeedback(v[0].ValueString + "\r", VariableDataType.List)

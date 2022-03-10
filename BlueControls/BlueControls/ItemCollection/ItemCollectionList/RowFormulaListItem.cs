@@ -138,8 +138,8 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
                 _tmpBmp = QuickImage.Get(enImageCode.Warnung, 128);
                 return;
             }
-            CreativePad pad = new(new ItemCollectionPad(_layoutId, Row.Database, Row.Key));
-            var mb = pad.Item.MaxBounds(null);
+            ItemCollectionPad pad = new(_layoutId, Row.Database, Row.Key);
+            var mb = pad.MaxBounds(null);
             if (_tmpBmp != null) {
                 if (_tmpBmp.Width != mb.Width || _tmpBmp.Height != mb.Height) {
                     RemovePic();
@@ -150,12 +150,12 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
             internalZoom = Math.Min(1, internalZoom);
 
             if (_tmpBmp == null) { _tmpBmp = new Bitmap((int)(mb.Width * internalZoom), (int)(mb.Height * internalZoom)); }
-            var zoomv = pad.ZoomFitValue(mb, false, _tmpBmp.Size);
-            var centerpos = pad.CenterPos(mb, false, _tmpBmp.Size, zoomv);
-            var slidervalues = pad.SliderValues(mb, zoomv, centerpos);
-            pad.ShowInPrintMode = true;
-            pad.Unselect();
-            pad.Item.DrawCreativePadToBitmap(_tmpBmp, enStates.Standard, zoomv, slidervalues.X, slidervalues.Y, null);
+            var zoomv = ItemCollectionPad.ZoomFitValue(mb, 0, 0, _tmpBmp.Size);
+            var centerpos = ItemCollectionPad.CenterPos(mb, 0, 0, _tmpBmp.Size, zoomv);
+            var slidervalues = ItemCollectionPad.SliderValues(mb, zoomv, centerpos);
+            //pad.ShowInPrintMode = true;
+            //pad.Unselect();
+            pad.DrawCreativePadToBitmap(_tmpBmp, enStates.Standard, zoomv, slidervalues.X, slidervalues.Y, null);
         }
 
         private void RemovePic() {

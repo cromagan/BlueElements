@@ -50,9 +50,9 @@ namespace BlueScript.Methods {
             if (postilde + 1 != posgleich) { return new DoItFeedback("Variablen-Namen-Berechung kein gültiges End-~-Zeichen gefunden."); }
 
             var x = new Variable("dummy4", infos.AttributText.Substring(0, postilde), s);
-            if (x.Type != VariableDataType.String) { return new DoItFeedback("Fehler beim Berechnen des Variablen-Namens."); }
+            if (x is not VariableString vs) { return new DoItFeedback("Fehler beim Berechnen des Variablen-Namens."); }
 
-            var newcommand = x.ValueString + infos.AttributText.Substring(posgleich) + ";";
+            var newcommand = vs.ValueString + infos.AttributText.Substring(posgleich) + ";";
 
             return s.BerechneVariable.DoitKomplett(newcommand, s, infos);
         }

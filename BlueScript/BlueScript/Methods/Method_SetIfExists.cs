@@ -52,7 +52,7 @@ namespace BlueScript.Methods {
                 }
 
                 if (attvar.Attributes[z].Type != attvar.Attributes[0].Type) { return new DoItFeedback("Variablentyp zur Ausgangsvariable unterschiedlich."); }
-                attvar.Attributes[0].ValueString = attvar.Attributes[z].ValueString;
+                ((VariableString)attvar.Attributes[0]).ValueString = ((VariableString)attvar.Attributes[z]).ValueString;
                 return DoItFeedback.Null();
             }
 

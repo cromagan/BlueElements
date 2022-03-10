@@ -242,9 +242,9 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
-        public bool ReplaceVariable(Script s, Variable variable) {
+        public bool ReplaceVariable(Variable variable) {
             if (PadInternal == null) { return false; }
-            var b = PadInternal.Item.ParseVariable(s, variable);
+            var b = PadInternal.Item.ParseVariable(variable);
             if (b) { OnChanged(); }
             return b;
         }
@@ -293,9 +293,9 @@ namespace BlueControls.ItemCollection {
                         _tmpBmp = new Bitmap((int)Math.Abs(drawingCoordinates.Width), (int)Math.Abs(drawingCoordinates.Height));
                     }
                     var mb = PadInternal.Item.MaxBounds(ZoomItems);
-                    var zoomv = PadInternal.ZoomFitValue(mb, false, _tmpBmp.Size);
-                    var centerpos = PadInternal.CenterPos(mb, false, _tmpBmp.Size, zoomv);
-                    var slidervalues = PadInternal.SliderValues(mb, zoomv, centerpos);
+                    var zoomv = ItemCollectionPad.ZoomFitValue(mb, 0, 0, _tmpBmp.Size);
+                    var centerpos = ItemCollectionPad.CenterPos(mb, 0, 0, _tmpBmp.Size, zoomv);
+                    var slidervalues = ItemCollectionPad.SliderValues(mb, zoomv, centerpos);
                     PadInternal.ShowInPrintMode = forPrinting;
                     if (forPrinting) { PadInternal.Unselect(); }
                     PadInternal.Item.DrawCreativePadToBitmap(_tmpBmp, enStates.Standard, zoomv, slidervalues.X, slidervalues.Y, VisibleItems);

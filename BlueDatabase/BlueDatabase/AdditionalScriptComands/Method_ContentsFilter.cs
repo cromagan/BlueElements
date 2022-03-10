@@ -57,10 +57,10 @@ namespace BlueDatabase.AdditionalScriptComands {
 
             if (allFi is null) { return new DoItFeedback("Fehler im Filter"); }
 
-            var returncolumn = allFi[0].Database.Column.Exists(attvar.Attributes[0].ValueString);
-            if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[0].ValueString); }
+            var returncolumn = allFi[0].Database.Column.Exists(attvar.Attributes[0].ReadableText);
+            if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[0].ReadableText); }
             var x = returncolumn.Contents(allFi, null);
-            return new DoItFeedback(x.JoinWithCr() + "\r", VariableDataType.List);
+            return new DoItFeedback(x);
         }
 
         #endregion

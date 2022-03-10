@@ -50,20 +50,20 @@ namespace BlueScript.Methods {
 
             string x;
 
-            switch (attvar.Attributes[1].ValueString.ToUpper()) {
+            switch (((VariableString)attvar.Attributes[1]).ValueString.ToUpper()) {
                 case "JPG":
-                    x = Converter.BitmapToBase64(attvar.Attributes[0].ValueBitmap(s), ImageFormat.Jpeg);
+                    x = Converter.BitmapToBase64(attvar.Attributes[0].ValueBitmap, ImageFormat.Jpeg);
                     break;
 
                 case "PNG":
-                    x = Converter.BitmapToBase64(attvar.Attributes[0].ValueBitmap(s), ImageFormat.Png);
+                    x = Converter.BitmapToBase64(attvar.Attributes[0].ValueBitmap, ImageFormat.Png);
                     break;
 
                 default:
                     return new DoItFeedback("Es wir als zweites Attribut ein String mit dem Inhalt jpg oder png erwartet.");
             }
 
-            return new DoItFeedback(x, VariableDataType.String);
+            return new DoItFeedback(x, string.Empty);
         }
 
         #endregion

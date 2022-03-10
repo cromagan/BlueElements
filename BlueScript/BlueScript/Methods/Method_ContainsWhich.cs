@@ -63,21 +63,20 @@ namespace BlueScript.Methods {
             var wordlist = new List<string>();
 
             for (var z = 1; z < attvar.Attributes.Count; z++) {
-                if (attvar.Attributes[z].Type == VariableDataType.String) { wordlist.Add(attvar.Attributes[z].ValueString); }
-                if (attvar.Attributes[z].Type == VariableDataType.List) { wordlist.AddRange(attvar.Attributes[z].ValueListString); }
+                if (attvar.Attributes[z] is VariableString vs) { wordlist.Add(vs.ValueString); }
+                if (attvar.Attributes[z] is VariableListString vl) { wordlist.AddRange(vl.ValueListString); }
             }
             wordlist = wordlist.SortedDistinctList();
 
             #endregion
 
             const RegexOptions rx = RegexOptions.IgnoreCase;
-            //if (attvar.Attributes[1].ValueBool) { rx = RegexOptions.IgnoreCase; }
 
-            foreach (var thisW in wordlist.Where(thisW => attvar.Attributes[0].ValueString.ContainsWord(thisW, rx))) {
+            foreach (var thisW in wordlist.Where(thisW => ((VariableString)attvar.Attributes[0]).ValueString.ContainsWord(thisW, rx))) {
                 found.AddIfNotExists(thisW);
             }
 
-            return new DoItFeedback(found.JoinWithCr() + "\r", VariableDataType.List);
+            return new DoItFeedback(found);
         }
 
         #endregion

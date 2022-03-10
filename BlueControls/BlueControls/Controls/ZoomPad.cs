@@ -17,6 +17,7 @@
 
 using BlueBasics;
 using BlueControls.Designer_Support;
+using BlueControls.ItemCollection;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -71,26 +72,6 @@ namespace BlueControls.Controls {
             return new Rectangle(0, 0, wi, he);
         }
 
-        /// <summary>
-        /// Gibt den Versatz der Linken oben Ecke aller Objekte zurück, um mittig zu sein.
-        /// </summary>
-        /// <param name="sliderShowing"></param>
-        /// <param name="sizeOfPaintArea"></param>
-        /// <param name="zoomToUse"></param>
-        /// <returns></returns>
-        public Point CenterPos(RectangleF maxBounds, bool sliderShowing, Size sizeOfPaintArea, float zoomToUse) {
-            float w;
-            float h;
-            if (sliderShowing) {
-                w = sizeOfPaintArea.Width - SliderY.Width - (maxBounds.Width * zoomToUse);
-                h = sizeOfPaintArea.Height - SliderX.Height - (maxBounds.Height * zoomToUse);
-            } else {
-                w = sizeOfPaintArea.Width - (maxBounds.Width * zoomToUse);
-                h = sizeOfPaintArea.Height - (maxBounds.Height * zoomToUse);
-            }
-            return new Point((int)w, (int)h);
-        }
-
         public void SetZoom(float zoom) {
             Zoom = zoom;
             SliderX.Minimum = 0;
@@ -111,12 +92,6 @@ namespace BlueControls.Controls {
             CalculateZoomFitAndSliders(_ZoomFit);
         }
 
-        public float ZoomFitValue(RectangleF maxBounds, bool sliderShowing, Size sizeOfPaintArea) => maxBounds == null || maxBounds.Width < 0.01f || maxBounds.Height < 0.01f
-? 1f
-: sliderShowing
-? Math.Min((sizeOfPaintArea.Width - SliderY.Width - 32) / maxBounds.Width, (sizeOfPaintArea.Height - SliderX.Height - 32) / maxBounds.Height)
-: Math.Min(sizeOfPaintArea.Width / maxBounds.Width, sizeOfPaintArea.Height / maxBounds.Height);
-
         public void ZoomIn(MouseEventArgs e) {
             MouseEventArgs x = new(e.Button, e.Clicks, e.X, e.Y, 1);
             OnMouseWheel(x);
@@ -127,10 +102,6 @@ namespace BlueControls.Controls {
             OnMouseWheel(x);
         }
 
-        internal PointF SliderValues(RectangleF bounds, float zoomToUse, Point topLeftPos) =>
-            new((float) ((bounds.Left * zoomToUse) - (topLeftPos.X / 2d)),
-                (float) ((bounds.Top * zoomToUse) - (topLeftPos.Y / 2d)));
-
         /// <summary>
         /// Kümmert sich um Slider und Maximal-Setting.
         /// Bei einem negativen Wert wird der neue Zoom nicht gesetzt.
@@ -138,7 +109,7 @@ namespace BlueControls.Controls {
         /// <param name="newzoom"></param>
         protected void CalculateZoomFitAndSliders(float newzoom) {
             var mb = MaxBounds();
-            _ZoomFit = ZoomFitValue(mb, true, Size);
+            _ZoomFit = ItemCollectionPad.ZoomFitValue(mb, SliderY.Width + 32, SliderX.Height + 32, Size);
             if (newzoom >= 0) {
                 Zoom = newzoom;
 
@@ -158,8 +129,8 @@ namespace BlueControls.Controls {
         /// <remarks>
         /// </remarks>
         protected Point KoordinatesUnscaled(MouseEventArgs e) =>
-            new((int) Math.Round(((e.X + ShiftX) / Zoom) - 0.5d, 0),
-                (int) Math.Round(((e.Y + ShiftY) / Zoom) - 0.5d, 0));
+            new((int)Math.Round(((e.X + ShiftX) / Zoom) - 0.5d, 0),
+                (int)Math.Round(((e.Y + ShiftY) / Zoom) - 0.5d, 0));
 
         protected virtual RectangleF MaxBounds() {
             Develop.DebugPrint_RoutineMussUeberschriebenWerden();
@@ -222,8 +193,8 @@ namespace BlueControls.Controls {
 
         private void ComputeSliders(RectangleF maxBounds) {
             if (maxBounds == null || maxBounds.Width == 0) { return; }
-            var p = CenterPos(maxBounds, true, Size, Zoom);
-            var sliderv = SliderValues(maxBounds, Zoom, p);
+            var p = ItemCollectionPad.CenterPos(maxBounds, SliderY.Width, SliderX.Width, Size, Zoom);
+            var sliderv = ItemCollectionPad.SliderValues(maxBounds, Zoom, p);
             if (p.X < 0) {
                 SliderX.Enabled = true;
                 SliderX.Minimum = (float)((maxBounds.Left * Zoom) - (Width * 0.6d));

@@ -383,7 +383,7 @@ namespace BluePaint {
                         _isSaved = true;
                         break;
 
-                    case "Bmp":
+                    case "BMP":
                         P.Bmp.Save(_filename, System.Drawing.Imaging.ImageFormat.Bmp);
                         _isSaved = true;
                         break;

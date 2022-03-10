@@ -51,7 +51,7 @@ namespace BlueScript.Methods {
 
             if (variable.Readonly) { return DoItFeedback.Schreibgschützt(); }
 
-            variable.ValueString = attvar.Attributes[0].ValueString;
+            variable.ValueString = ((VariableString)attvar.Attributes[0]).ValueString;
             variable.Type = attvar.Attributes[0].Type;
             return DoItFeedback.Null();
         }

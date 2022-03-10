@@ -41,8 +41,9 @@ namespace BlueScript {
         /// </summary>
         public string Feedback = string.Empty;
 
-        internal readonly List<Bitmap> BitmapCache;
+        //internal readonly List<Bitmap> BitmapCache;
         internal Method_BerechneVariable? BerechneVariable; // Paralellisierung löscht ab und zu die Variable
+
         private string _error = string.Empty;
         private string _errorCode = string.Empty;
 
@@ -85,7 +86,7 @@ namespace BlueScript {
                 Comands = GetEnumerableOfType<Method>();
             }
             Variables = variablen;
-            BitmapCache = new List<Bitmap>();
+            //BitmapCache = new List<Bitmap>();
         }
 
         #endregion
@@ -129,7 +130,7 @@ namespace BlueScript {
                 if (f.MustAbort) { return new DoItWithEndedPosFeedback(f.ErrorMessage); }
                 if (string.IsNullOrEmpty(f.ErrorMessage)) {
                     var fn = thisC.DoIt(f, s);
-                    return new DoItWithEndedPosFeedback(fn.ErrorMessage, fn.Value, f.ContinueOrErrorPosition);
+                    return new DoItWithEndedPosFeedback(fn.ErrorMessage, fn.Variable, f.ContinueOrErrorPosition);
                 }
             }
 
@@ -230,10 +231,10 @@ namespace BlueScript {
             return !string.IsNullOrEmpty(Error);
         }
 
-        internal int AddBitmapToCache(Bitmap? bmp) {
-            BitmapCache.Add(bmp);
-            return BitmapCache.IndexOf(bmp);
-        }
+        //internal int AddBitmapToCache(Bitmap? bmp) {
+        //    BitmapCache.Add(bmp);
+        //    return BitmapCache.IndexOf(bmp);
+        //}
 
         internal (string, string) Parse(string redScriptText) {
             var pos = 0;

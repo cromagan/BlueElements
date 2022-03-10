@@ -45,8 +45,8 @@ namespace BlueScript.Methods {
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-            var val = attvar.Attributes.Select(thisval => thisval.ValueDouble).Prepend(double.MinValue).Max();
-            return new DoItFeedback(val.ToString(Constants.Format_Float1), VariableDataType.Numeral);
+            var val = attvar.Attributes.Select(thisval => ((VariableFloat)thisval).ValueDouble).Prepend(float.MinValue).Max();
+            return new DoItFeedback(val);
         }
 
         #endregion

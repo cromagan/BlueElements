@@ -47,7 +47,7 @@ namespace BlueScript.Methods {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return !string.IsNullOrEmpty(attvar.ErrorMessage)
                 ? DoItFeedback.AttributFehler(this, attvar)
-                : new DoItFeedback(attvar.Attributes[0].ValueString.CountString(attvar.Attributes[1].ValueString).ToString(), VariableDataType.Numeral);
+                : new DoItFeedback(attvar.Attributes[0].ReadableText.CountString(attvar.Attributes[1].ReadableText));
         }
 
         #endregion

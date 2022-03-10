@@ -56,7 +56,7 @@ namespace BlueDatabase.AdditionalScriptComands {
                 var column = Column(s, attvar.Attributes[z].Name);
                 if (column == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[z].Name); }
 
-                s.Feedback = s.Feedback + attvar.Attributes[z].Name.ToUpper() + "|" + attvar.Attributes[0].ValueString + "\r";
+                s.Feedback = s.Feedback + attvar.Attributes[z].Name.ToUpper() + "|" + ((VariableString)attvar.Attributes[0]).ValueString + "\r";
 
                 //var n = attvar.Attributes[z].Name.ToLower() + "_error";
                 //var ve = s.Variablen.GetSystem(n);
@@ -66,7 +66,7 @@ namespace BlueDatabase.AdditionalScriptComands {
                 //}
                 //ve.Readonly = false;
                 //var l = ve.ValueListString;
-                //l.AddIfNotExists(attvar.Attributes[0].ValueString);
+                //l.AddIfNotExists(((VariableString)attvar.Attributes[0]).ValueString);
                 //ve.ValueListString = l;
                 //ve.Readonly = true;
             }

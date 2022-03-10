@@ -127,10 +127,10 @@ namespace BlueControls.Forms {
 
             if (rowsForExport == null || rowsForExport.Count < 1) { return -1; }
 
-            CreativePad tmp = new(new ItemCollectionPad(layout, rowsForExport[0].Database, rowsForExport[0].Key));
-            var oneItem = tmp.Item.MaxBounds(null);
-            pad.Item.SheetStyle = tmp.Item.SheetStyle;
-            pad.Item.SheetStyleScale = tmp.Item.SheetStyleScale;
+            ItemCollectionPad tmp = new(layout, rowsForExport[0].Database, rowsForExport[0].Key);
+            var oneItem = tmp.MaxBounds(null);
+            pad.Item.SheetStyle = tmp.SheetStyle;
+            pad.Item.SheetStyleScale = tmp.SheetStyleScale;
             tmp.Dispose();
             var druckB = pad.Item.DruckbereichRect();
             var abstand = (float)Math.Round(MmToPixel(abstandMm, ItemCollectionPad.Dpi), 1);

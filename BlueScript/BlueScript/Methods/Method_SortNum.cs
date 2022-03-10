@@ -55,17 +55,17 @@ namespace BlueScript.Methods {
             if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
 
             var nums = new List<double>();
-            foreach (var txt in attvar.Attributes[0].ValueListString) {
+            foreach (var txt in ((VariableListString)attvar.Attributes[0]).ValueList) {
                 if (txt.IsNumeral()) {
                     nums.Add(double.Parse(txt));
                 } else {
-                    nums.Add(attvar.Attributes[1].ValueDouble);
+                    nums.Add(((VariableFloat)attvar.Attributes[1]).ValueNum);
                 }
             }
 
             nums.Sort();
 
-            attvar.Attributes[0].ValueListString = nums.ConvertAll<string>(i => i.ToString(Constants.Format_Float1));
+            ((VariableListString)attvar.Attributes[0]).ValueList = nums.ConvertAll<string>(i => i.ToString(Constants.Format_Float1));
             return DoItFeedback.Null();
         }
 

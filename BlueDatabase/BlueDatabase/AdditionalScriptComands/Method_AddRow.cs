@@ -54,17 +54,17 @@ namespace BlueDatabase.AdditionalScriptComands {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            var db = DatabaseOf(s, attvar.Attributes[0].ValueString);
-            if (db == null) { return new DoItFeedback("Datenbank '" + attvar.Attributes[0].ValueString + "' nicht gefunden"); }
+            var db = DatabaseOf(s, ((VariableString)attvar.Attributes[0]).ValueString);
+            if (db == null) { return new DoItFeedback("Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden"); }
 
             if (db.ReadOnly) { return DoItFeedback.Falsch(); }
 
-            if (string.IsNullOrEmpty(attvar.Attributes[1].ValueString)) { return new DoItFeedback("KeyValue muss einen Wert enthalten."); }
-            //var r = db.Row[attvar.Attributes[1].ValueString];
+            if (string.IsNullOrEmpty(((VariableString)attvar.Attributes[1]).ValueString)) { return new DoItFeedback("KeyValue muss einen Wert enthalten."); }
+            //var r = db.Row[((VariableString)attvar.Attributes[1]).ValueString];
 
-            //if (r != null && !attvar.Attributes[2].ValueBool) { return Method_Row.RowToObject(r); }
+            //if (r != null && !((VariableBool)attvar.Attributes[2]).ValueBool) { return Method_Row.RowToObject(r); }
 
-            if (attvar.Attributes[2].ValueBool) {
+            if (((VariableBool)attvar.Attributes[2]).ValueBool) {
                 StackTrace stackTrace = new();
 
                 if (stackTrace.FrameCount > 400) {
@@ -72,7 +72,7 @@ namespace BlueDatabase.AdditionalScriptComands {
                 }
             }
 
-            var r = db.Row.Add(attvar.Attributes[1].ValueString, attvar.Attributes[2].ValueBool);
+            var r = db.Row.Add(((VariableString)attvar.Attributes[1]).ValueString, ((VariableBool)attvar.Attributes[2]).ValueBool);
 
             return Method_Row.RowToObjectFeedback(r);
         }

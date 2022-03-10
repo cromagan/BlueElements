@@ -231,13 +231,13 @@ namespace BlueControls.BlueDatabaseDialogs {
             //    txbBestFileStandardSuffix.Text = string.Empty;
             //}
             // LinkedDatabase - Verknüpfte Datenbank
-            grpLinkedDatabase.Enabled = tmpFormat.NeedTargetDatabase();
-            if (!tmpFormat.NeedTargetDatabase()) {
-                cbxLinkedDatabase.Text = string.Empty;
-            }
+            //grpLinkedDatabase.Enabled = tmpFormat.NeedTargetDatabase();
+            //if (!tmpFormat.NeedTargetDatabase()) {
+            //    cbxLinkedDatabase.Text = string.Empty;
+            //}
 
-            // Format: LinkedCell
-            grpVerlinkteZellen.Enabled = tmpFormat is enDataFormat.Verknüpfung_zu_anderer_Datenbank;
+            //// Format: LinkedCell
+            //grpVerlinkteZellen.Enabled = tmpFormat is enDataFormat.Verknüpfung_zu_anderer_Datenbank;
         }
 
         private void cbxFormat_TextChanged(object sender, System.EventArgs e) => ButtonCheck();

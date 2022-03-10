@@ -153,7 +153,7 @@ namespace BlueControls.ItemCollection {
         /// <param name="s"></param>
         /// <param name="variable"></param>
         /// <returns></returns>
-        public bool ReplaceVariable(Script s, Variable variable) {
+        public bool ReplaceVariable(Variable variable) {
             var nt = variable.ReplaceInText(_textReplaced);
 
             if (nt is string txt) {

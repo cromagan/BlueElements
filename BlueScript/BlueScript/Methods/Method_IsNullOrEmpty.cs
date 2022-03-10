@@ -46,7 +46,7 @@ namespace BlueScript.Methods {
                 ? attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden
                     ? DoItFeedback.AttributFehler(this, attvar)
                     : DoItFeedback.Wahr()
-                : string.IsNullOrEmpty(attvar.Attributes[0].ValueString)
+                : string.IsNullOrEmpty(((VariableString)attvar.Attributes[0]).ValueString)
                 ? DoItFeedback.Wahr()
                 : attvar.Attributes[0].Type is VariableDataType.Null or
                                              VariableDataType.Error or

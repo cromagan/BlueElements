@@ -47,17 +47,17 @@ namespace BlueScript.Methods {
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-            var ok = DateTimeTryParse(attvar.Attributes[0].ValueString, out var d);
+            var ok = DateTimeTryParse(attvar.Attributes[0].ReadableText, out var d);
             if (!ok) {
-                return new DoItFeedback("Der Wert '" + attvar.Attributes[0].ValueString + "' wurde nicht als Zeitformat erkannt.");
+                return new DoItFeedback("Der Wert '" + attvar.Attributes[0].ReadableText + "' wurde nicht als Zeitformat erkannt.");
             }
-            if (string.IsNullOrEmpty(d.ToString(attvar.Attributes[1].ValueString))) {
+            if (string.IsNullOrEmpty(d.ToString(attvar.Attributes[1].ReadableText))) {
                 return new DoItFeedback("Kein Unwandlungs-String erhalten.");
             }
             try {
-                return new DoItFeedback(d.ToString(attvar.Attributes[1].ValueString), VariableDataType.String);
+                return new DoItFeedback(d.ToString(attvar.Attributes[1].ReadableText), string.Empty);
             } catch {
-                return new DoItFeedback("Der Umwandlungs-String '" + attvar.Attributes[1].ValueString + "' ist fehlerhaft.");
+                return new DoItFeedback("Der Umwandlungs-String '" + attvar.Attributes[1].ReadableText + "' ist fehlerhaft.");
             }
         }
 

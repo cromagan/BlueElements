@@ -56,12 +56,12 @@ namespace BlueDatabase.AdditionalScriptComands {
             var row = Method_Row.ObjectToRow(attvar.Attributes[2]);
             if (row is null) { return new DoItFeedback("Fehler in der Zeile"); }
 
-            var columnToSet = row.Database.Column.Exists(attvar.Attributes[1].ValueString);
-            if (columnToSet == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[1].ValueString); }
+            var columnToSet = row.Database.Column.Exists(((VariableString)attvar.Attributes[1]).ValueString);
+            if (columnToSet == null) { return new DoItFeedback("Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[1]).ValueString); }
 
-            row.CellSet(columnToSet, attvar.Attributes[0].ValueString);
+            row.CellSet(columnToSet, ((VariableString)attvar.Attributes[0]).ValueString);
 
-            return row.CellGetString(columnToSet) == attvar.Attributes[0].ValueString ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
+            return row.CellGetString(columnToSet) == ((VariableString)attvar.Attributes[0]).ValueString ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
         }
 
         #endregion

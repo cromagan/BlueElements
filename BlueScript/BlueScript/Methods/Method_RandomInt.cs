@@ -46,7 +46,7 @@ namespace BlueScript.Methods {
 
             return !string.IsNullOrEmpty(attvar.ErrorMessage)
                 ? DoItFeedback.AttributFehler(this, attvar)
-                : new DoItFeedback(Constants.GlobalRND.Next(attvar.Attributes[0].ValueInt).ToString(), VariableDataType.Numeral);
+                : new DoItFeedback(Constants.GlobalRND.Next(((VariableFloat)attvar.Attributes[0]).ValueInt));
         }
 
         #endregion

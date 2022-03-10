@@ -44,12 +44,12 @@ namespace BlueScript.Methods {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
             for (var z = 2; z < attvar.Attributes.Count; z++) {
-                if (attvar.Attributes[1].ValueBool) {
-                    if (attvar.Attributes[0].ValueString.StartsWith(attvar.Attributes[z].ValueString)) {
+                if (((VariableBool)attvar.Attributes[1]).ValueBool) {
+                    if (((VariableString)attvar.Attributes[0]).ValueString.StartsWith(((VariableString)attvar.Attributes[z]).ValueString)) {
                         return DoItFeedback.Wahr();
                     }
                 } else {
-                    if (attvar.Attributes[0].ValueString.ToLower().StartsWith(attvar.Attributes[z].ValueString.ToLower())) {
+                    if (((VariableString)attvar.Attributes[0]).ValueString.ToLower().StartsWith(((VariableString)attvar.Attributes[z]).ValueString.ToLower())) {
                         return DoItFeedback.Wahr();
                     }
                 }

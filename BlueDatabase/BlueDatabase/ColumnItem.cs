@@ -1208,7 +1208,7 @@ namespace BlueDatabase {
                 if (thisS.ToUpper() == "#ADMINISTRATOR") { return "'#Administrator' bei den Bearbeitern entfernen."; }
             }
             if (_dropdownBearbeitungErlaubt || tmpEditDialog == enEditTypeTable.Dropdown_Single) {
-                if (_format is not enDataFormat.Values_für_LinkedCellDropdown) {
+                if (_format != enDataFormat.Values_für_LinkedCellDropdown) {
                     if (!_dropdownWerteAndererZellenAnzeigen && DropDownItems.Count == 0) { return "Keine Dropdown-Items vorhanden bzw. Alles hinzufügen nicht angewählt."; }
                 }
             } else {
@@ -1540,7 +1540,7 @@ namespace BlueDatabase {
                     if (c != null) {
                         this.GetStyleFrom(c);
                         BildTextVerhalten = c.BildTextVerhalten;
-                        ScriptType = c.ScriptType;
+                        //ScriptType = c.ScriptType;
                         Translate = c.Translate;
                     }
                 }

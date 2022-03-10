@@ -122,8 +122,8 @@ namespace BlueScript.Methods {
                     var (pose, _) = NextText(txt, pos + 1, Tilde, false, false, KlammernStd);
                     if (pose <= pos) { return new GetEndFeedback("Variablen-Findung End-~-Zeichen nicht gefunden."); }
                     var x = new Variable("dummy1", txt.Substring(pos + 1, pose - pos - 1), s);
-                    if (x.Type != VariableDataType.String) { return new GetEndFeedback("Fehler beim Berechnen des Variablen-Namens."); }
-                    thisV = s.Variables.Get(x.ValueString);
+                    if (x is not VariableString x2) { return new GetEndFeedback("Fehler beim Berechnen des Variablen-Namens."); }
+                    thisV = s.Variables.Get(x2.ValueString);
                     endz = pose + 1;
                 } else {
                     thisV = s.Variables.Get(which);
@@ -132,9 +132,9 @@ namespace BlueScript.Methods {
                 if (thisV == null) { return new GetEndFeedback("Variablen-Fehler " + which); }
 
                 if (thisV.Type == VariableDataType.NotDefinedYet) { return new GetEndFeedback("Variable " + thisV.Name + " ist keinem Typ zugeordnet"); }
-                if (thisV.Type == VariableDataType.List && !string.IsNullOrEmpty(thisV.ValueString) && !thisV.ValueString.EndsWith("\r")) { return new GetEndFeedback("List-Variable " + thisV.Name + " fehlerhaft"); }
+                //if (thisV is VariableListString vl && !string.IsNullOrEmpty(vl.ValueString) && !vl.ValueString.EndsWith("\r")) { return new GetEndFeedback("List-Variable " + thisV.Name + " fehlerhaft"); }
 
-                txt = txt.Substring(0, pos) + Variable.ValueForReplace(thisV.ValueString, thisV.Type) + txt.Substring(endz);
+                txt = txt.Substring(0, pos) + thisV.ValueForReplace + txt.Substring(endz);
                 posc = pos;
             } while (true);
         }
@@ -187,8 +187,8 @@ namespace BlueScript.Methods {
                     var varn = attributes[n];
                     if (varn.StartsWith("~") && varn.EndsWith("~")) {
                         var tmp2 = new Variable("dummy2", varn.Substring(1, varn.Length - 2), s);
-                        if (tmp2.Type != VariableDataType.String) { return new SplittedAttributesFeedback(ScriptIssueType.VariablenNamenBerechnungFehler, "Variablenname konnte nicht berechnet werden bei Attribut " + (n + 1)); }
-                        varn = tmp2.ValueString;
+                        if (tmp2 is not VariableString x) { return new SplittedAttributesFeedback(ScriptIssueType.VariablenNamenBerechnungFehler, "Variablenname konnte nicht berechnet werden bei Attribut " + (n + 1)); }
+                        varn = x.ValueString;
                     }
 
                     if (!Variable.IsValidName(varn)) { return new SplittedAttributesFeedback(ScriptIssueType.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1)); }
@@ -206,8 +206,8 @@ namespace BlueScript.Methods {
                         return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Attribut " + (n + 1) + ": " + v.Coment);
                     }
                     if (exceptetType == VariableDataType.Integer) {
-                        if (v.Type != VariableDataType.Numeral) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
-                        if (v.ValueDouble != (int)v.ValueDouble) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
+                        if (v is not VariableFloat vn) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
+                        if (vn.ValueDouble != (int)vn.ValueDouble) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
                     } else {
                         return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht der erwartete Typ");
                     }

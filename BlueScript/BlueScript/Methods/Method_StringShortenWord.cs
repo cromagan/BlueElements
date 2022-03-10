@@ -45,9 +45,9 @@ namespace BlueScript.Methods {
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-            var TXT = attvar.Attributes[0].ValueString;
+            var TXT = ((VariableString)attvar.Attributes[0]).ValueString;
             if (string.IsNullOrEmpty(TXT)) {
-                return new DoItFeedback(TXT, VariableDataType.String);
+                return new DoItFeedback(TXT, string.Empty);
             }
             //TXT = TXT.HTMLSpecialToNormalChar();
             TXT = TXT.Replace("Sekunden", "Sek.");
@@ -107,7 +107,7 @@ namespace BlueScript.Methods {
             }
             TXT = TXT.Replace("Tiefkühl", "TK-");
             //TXT = TXT.CreateHtmlCodes(true);
-            return new DoItFeedback(TXT, VariableDataType.String);
+            return new DoItFeedback(TXT, string.Empty);
         }
 
         #endregion

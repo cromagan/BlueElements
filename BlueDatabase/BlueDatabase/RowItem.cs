@@ -428,6 +428,8 @@ namespace BlueDatabase {
         /// <param name="fulltext">Bei TRUE wird der Text so zurückgegeben, wie er in der Zelle angezeigt werden würde: Mit Suffix und Ersetzungen. Zeilenumbrüche werden eleminiert!</param>
         /// <returns></returns>
         public string ReplaceVariables(string formel, bool fulltext, bool removeLineBreaks) {
+            if (Database == null) { return formel; }
+
             var erg = formel;
             // Variablen ersetzen
             foreach (var thisColumnItem in Database.Column) {
@@ -576,7 +578,7 @@ namespace BlueDatabase {
             //    }
             //}
 
-            if (columnVar.Type == VariableDataType.List) {
+            if (columnVar is VariableString vs) {
                 CellSet(column, columnVar.ValueListString);
                 return;
             }

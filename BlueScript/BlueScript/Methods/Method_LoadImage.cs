@@ -47,22 +47,22 @@ namespace BlueScript.Methods {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            if (attvar.Attributes[0].ValueString.FileType() != enFileFormat.Image) {
-                return new DoItFeedback("Datei ist kein Bildformat: " + attvar.Attributes[0].ValueString);
+            if (((VariableString)attvar.Attributes[0]).ValueString.FileType() != enFileFormat.Image) {
+                return new DoItFeedback("Datei ist kein Bildformat: " + ((VariableString)attvar.Attributes[0]).ValueString);
             }
 
-            if (!FileOperations.FileExists(attvar.Attributes[0].ValueString)) {
-                return new DoItFeedback("Datei nicht gefunden: " + attvar.Attributes[0].ValueString);
+            if (!FileOperations.FileExists(((VariableString)attvar.Attributes[0]).ValueString)) {
+                return new DoItFeedback("Datei nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString);
             }
 
             try {
                 Generic.CollectGarbage();
-                var bmp = (Bitmap)BitmapExt.Image_FromFile(attvar.Attributes[0].ValueString);
-                var nr = s.AddBitmapToCache(bmp);
+                var bmp = (Bitmap)BitmapExt.Image_FromFile(((VariableString)attvar.Attributes[0]).ValueString);
+                //var nr = s.AddBitmapToCache(bmp);
 
-                return new DoItFeedback(nr.ToString(), VariableDataType.Bitmap);
+                return new DoItFeedback(bmp);
             } catch {
-                return new DoItFeedback("Datei konnte nicht geladen werden: " + attvar.Attributes[0].ValueString);
+                return new DoItFeedback("Datei konnte nicht geladen werden: " + ((VariableString)attvar.Attributes[0]).ValueString);
             }
         }
 

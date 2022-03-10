@@ -45,11 +45,11 @@ namespace BlueScript.Methods {
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-            var n = (int)attvar.Attributes[1].ValueDouble;
+            var n = (int)((VariableFloat)attvar.Attributes[1]).ValueNum;
             if (n < 0) { n = 0; }
             if (n > 10) { n = 10; }
-            var val = Math.Round(attvar.Attributes[0].ValueDouble, n);
-            return new DoItFeedback(val.ToString(Constants.Format_Float1), VariableDataType.Numeral);
+            var val = Math.Round(((VariableFloat)attvar.Attributes[0]).ValueNum, n);
+            return new DoItFeedback(val);
         }
 
         #endregion

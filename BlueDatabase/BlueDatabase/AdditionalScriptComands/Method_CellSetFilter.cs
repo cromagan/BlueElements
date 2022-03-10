@@ -58,17 +58,17 @@ namespace BlueDatabase.AdditionalScriptComands {
             var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 2);
             if (allFi is null) { return new DoItFeedback("Fehler im Filter"); }
 
-            var columnToSet = allFi[0].Database.Column.Exists(attvar.Attributes[1].ValueString);
-            if (columnToSet == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[4].ValueString); }
+            var columnToSet = allFi[0].Database.Column.Exists(((VariableString)attvar.Attributes[1]).ValueString);
+            if (columnToSet == null) { return new DoItFeedback("Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[4]).ValueString); }
 
             var r = RowCollection.MatchesTo(allFi);
             if (r == null || r.Count is 0 or > 1) {
                 return DoItFeedback.Falsch();
             }
 
-            r[0].CellSet(columnToSet, attvar.Attributes[0].ValueString);
+            r[0].CellSet(columnToSet, ((VariableString)attvar.Attributes[0]).ValueString);
 
-            return r[0].CellGetString(columnToSet) == attvar.Attributes[0].ValueString ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
+            return r[0].CellGetString(columnToSet) == ((VariableString)attvar.Attributes[0]).ValueString ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
         }
 
         #endregion

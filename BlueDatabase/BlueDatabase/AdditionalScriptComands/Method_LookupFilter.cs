@@ -57,23 +57,23 @@ namespace BlueDatabase.AdditionalScriptComands {
 
             if (allFi is null) { return new DoItFeedback("Fehler im Filter"); }
 
-            var returncolumn = allFi[0].Database.Column.Exists(attvar.Attributes[0].ValueString);
-            if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[0].ValueString); }
+            var returncolumn = allFi[0].Database.Column.Exists(((VariableString)attvar.Attributes[0]).ValueString);
+            if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString); }
 
             var r = RowCollection.MatchesTo(allFi);
             if (r == null || r.Count == 0) {
                 attvar.Attributes[1].Readonly = false; // 5 = NothingFoundValue
                 attvar.Attributes[1].Type = VariableDataType.List;
-                return new DoItFeedback(attvar.Attributes[1].ValueString + "\r", VariableDataType.List);
+                return new DoItFeedback(((VariableString)attvar.Attributes[1]).ValueString + "\r", VariableDataType.List);
             }
             if (r.Count > 1) {
                 attvar.Attributes[2].Readonly = false; // 6 = to MuchFound
                 attvar.Attributes[2].Type = VariableDataType.List;
-                return new DoItFeedback(attvar.Attributes[2].ValueString + "\r", VariableDataType.List);
+                return new DoItFeedback(((VariableString)attvar.Attributes[2]).ValueString + "\r", VariableDataType.List);
             }
 
             var v = RowItem.CellToVariable(returncolumn, r[0]);
-            if (v == null || v.Count != 1) { return new DoItFeedback("Wert konnte nicht erzeugt werden: " + attvar.Attributes[4].ValueString); }
+            if (v == null || v.Count != 1) { return new DoItFeedback("Wert konnte nicht erzeugt werden: " + ((VariableString)attvar.Attributes[4]).ValueString); }
 
             return v[0].Type != VariableDataType.List
                 ? new DoItFeedback(v[0].ValueString + "\r", VariableDataType.List)

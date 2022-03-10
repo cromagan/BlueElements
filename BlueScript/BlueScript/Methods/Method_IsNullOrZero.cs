@@ -44,10 +44,10 @@ namespace BlueScript.Methods {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return attvar.Attributes == null
                 ? attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden ? DoItFeedback.AttributFehler(this, attvar) : DoItFeedback.Wahr()
-                : string.IsNullOrEmpty(attvar.Attributes[0].ValueString) ? DoItFeedback.Wahr()
+                : string.IsNullOrEmpty(((VariableString)attvar.Attributes[0]).ValueString) ? DoItFeedback.Wahr()
                 : attvar.Attributes[0].Type is VariableDataType.Null or VariableDataType.Error or VariableDataType.NotDefinedYet ? DoItFeedback.Wahr()
-                : attvar.Attributes[0].Type != VariableDataType.Numeral ? new DoItFeedback("Variable existiert, ist aber nicht vom Datentyp Numeral.")
-                : attvar.Attributes[0].ValueDouble == 0 ? DoItFeedback.Wahr()
+                : attvar.Attributes[0] is not VariableFloat ? new DoItFeedback("Variable existiert, ist aber nicht vom Datentyp Numeral.")
+                : ((VariableFloat)attvar.Attributes[0]).ValueNum == 0 ? DoItFeedback.Wahr()
                 : DoItFeedback.Falsch();
         }
 

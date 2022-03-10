@@ -48,16 +48,16 @@ namespace BlueScript.Methods {
 
             if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
 
-            var tmpList = attvar.Attributes[0].ValueListString;
+            var tmpList = ((VariableListString)attvar.Attributes[0]).ValueList;
             for (var z = 1; z < attvar.Attributes.Count; z++) {
-                if (attvar.Attributes[z].Type == VariableDataType.String) {
-                    tmpList.Add(attvar.Attributes[z].ValueString);
+                if (attvar.Attributes[z] is VariableString vs) {
+                    tmpList.Add(vs.ValueString);
                 }
-                if (attvar.Attributes[z].Type == VariableDataType.List) {
-                    tmpList.AddRange(attvar.Attributes[z].ValueListString);
+                if (attvar.Attributes[z] is VariableListString vl) {
+                    tmpList.AddRange(vl.ValueList);
                 }
             }
-            attvar.Attributes[0].ValueListString = tmpList;
+           ((VariableListString)attvar.Attributes[0]).ValueList = tmpList;
             return DoItFeedback.Null();
         }
 

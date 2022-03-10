@@ -58,29 +58,29 @@ namespace BlueScript.Methods {
             var wordlist = new List<string>();
 
             for (var z = 2; z < attvar.Attributes.Count; z++) {
-                if (attvar.Attributes[z].Type == VariableDataType.String) { wordlist.Add(attvar.Attributes[z].ValueString); }
-                if (attvar.Attributes[z].Type == VariableDataType.List) { wordlist.AddRange(attvar.Attributes[z].ValueListString); }
+                if (attvar.Attributes[z] is VariableString vsx) { wordlist.Add(vsx.ValueString); }
+                if (attvar.Attributes[z] is VariableListString vlx) { wordlist.AddRange(vlx.ValueList); }
             }
             wordlist = wordlist.SortedDistinctList();
 
             #endregion
 
-            if (attvar.Attributes[0].Type == VariableDataType.List) {
-                var x = attvar.Attributes[0].ValueListString;
-                if (wordlist.Any(thisW => x.Contains(thisW, attvar.Attributes[1].ValueBool))) {
+            if (attvar.Attributes[0] is VariableListString vl) {
+                var x = vl.ValueList;
+                if (wordlist.Any(thisW => x.Contains(thisW, ((VariableBool)attvar.Attributes[1]).ValueBool))) {
                     return DoItFeedback.Wahr();
                 }
                 return DoItFeedback.Falsch();
             }
 
-            if (attvar.Attributes[0].Type == VariableDataType.String) {
+            if (attvar.Attributes[0] is VariableString vs) {
                 foreach (var thisW in wordlist) {
-                    if (attvar.Attributes[1].ValueBool) {
-                        if (attvar.Attributes[0].ValueString.Contains(thisW)) {
+                    if (((VariableBool)attvar.Attributes[1]).ValueBool) {
+                        if (((VariableString)attvar.Attributes[0]).ValueString.Contains(thisW)) {
                             return DoItFeedback.Wahr();
                         }
                     } else {
-                        if (attvar.Attributes[0].ValueString.ToLower().Contains(thisW.ToLower())) {
+                        if (((VariableString)attvar.Attributes[0]).ValueString.ToLower().Contains(thisW.ToLower())) {
                             return DoItFeedback.Wahr();
                         }
                     }

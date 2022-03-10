@@ -17,47 +17,42 @@
 
 #nullable enable
 
-using System;
+using BlueDatabase;
+using BlueScript.Enums;
+using System.Drawing;
 
-namespace BlueScript.Structures {
+namespace BlueScript {
 
-    public struct DoItWithEndedPosFeedback {
+    public class VariableFilterItem : Variable {
 
         #region Fields
 
-        public string ErrorMessage;
-
-        public int Position;
-
-        public Variable? Variable;
+        private FilterItem _filter;
 
         #endregion
 
         #region Constructors
 
-        public DoItWithEndedPosFeedback(string errormessage, Variable variable, int endpos) {
-            ErrorMessage = errormessage;
-            Variable = variable;
-            Position = endpos;
+        public VariableFilterItem(string name, FilterItem value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) {
+            _filter = value;
         }
 
-        public DoItWithEndedPosFeedback(string errormessage) {
-            Position = -1;
-            ErrorMessage = errormessage;
-            Variable = null;
-        }
+        public VariableFilterItem(FilterItem value) : this(Variable.DummyName(), value, true, false, string.Empty) { }
 
         #endregion
 
         #region Properties
 
-        [Obsolete]
-        public string Value {
-            get {
-                if (Variable == null) { return string.Empty; }
-                return Variable.ValueForReplace;
+        public FilterItem FilterItem {
+            get => _filter;
+            set {
+                if (Readonly) { return; }
+                _filter = value;
             }
         }
+
+        public override string ShortName => "fil";
+        public override VariableDataType Type => VariableDataType.Object;
 
         #endregion
     }

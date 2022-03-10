@@ -43,13 +43,13 @@ namespace BlueScript.Methods {
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-            //var ts3 = attvar.Attributes[0].ValueListString;
+            //var ts3 = ((VariableListString)attvar.Attributes[0]).ValueList;
             //for (var tz = 0; tz < ts3.Count; tz++) {
             //    ts3[tz] = CellItem.ValueReadable(null, ts3[tz], enShortenStyle.HTML, enBildTextVerhalten.Nur_Text, true);
             //}
             attvar.Attributes[0].Readonly = false;
             attvar.Attributes[0].Type = VariableDataType.Variable_List;
-            //attvar.Attributes[0].ValueListString = ts3;
+            //((VariableListString)attvar.Attributes[0]).ValueList = ts3;
             //return new DoItFeedback(attvar.Attributes[0].ValueForReplace, string.Empty);
             return new DoItFeedback("Nicht fertig implementiert");
         }

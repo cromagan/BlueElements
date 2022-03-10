@@ -48,7 +48,7 @@ namespace BlueScript.Methods {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return !string.IsNullOrEmpty(attvar.ErrorMessage)
                 ? DoItFeedback.AttributFehler(this, attvar)
-                : new DoItFeedback(DateTime.UtcNow.ToString(Format_Date7), VariableDataType.String);
+                : new DoItFeedback(DateTime.UtcNow.ToString(Format_Date7), string.Empty);
         }
 
         #endregion

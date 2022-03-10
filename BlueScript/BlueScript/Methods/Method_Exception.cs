@@ -44,7 +44,7 @@ namespace BlueScript.Methods {
             if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return attvar.Attributes == null || attvar.Attributes.Count != 1 ? new DoItFeedback("Die Ausführung wurde absichtlich abgebrochen.")
-                                                                             : new DoItFeedback("Exception: " + attvar.Attributes[0].ValueString);
+                                                                             : new DoItFeedback("Exception: " + ((VariableString)attvar.Attributes[0]).ValueString);
         }
 
         #endregion

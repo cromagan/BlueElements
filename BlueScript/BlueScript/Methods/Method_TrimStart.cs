@@ -44,18 +44,18 @@ namespace BlueScript.Methods {
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-            var val = attvar.Attributes[0].ValueString;
+            var val = ((VariableString)attvar.Attributes[0]).ValueString;
 
             string txt;
 
             do {
                 txt = val;
                 for (var z = 1; z < attvar.Attributes.Count; z++) {
-                    val = val.TrimStart(attvar.Attributes[z].ValueString);
+                    val = val.TrimStart(((VariableString)attvar.Attributes[z]).ValueString);
                 }
             } while (txt != val);
 
-            return new DoItFeedback(val, VariableDataType.String);
+            return new DoItFeedback(val, string.Empty);
         }
 
         #endregion

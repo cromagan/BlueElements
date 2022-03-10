@@ -45,15 +45,15 @@ namespace BlueScript.Methods {
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-            switch (attvar.Attributes[1].ValueString.ToLower()) {
+            switch (attvar.Attributes[1].ReadableText.ToLower()) {
                 case "num":
-                    return attvar.Attributes[0].Type == VariableDataType.Numeral ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
+                    return attvar.Attributes[0] is VariableFloat ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
 
                 case "str":
-                    return attvar.Attributes[0].Type == VariableDataType.String ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
+                    return attvar.Attributes[0] is VariableString vs ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
 
                 case "lst":
-                    return attvar.Attributes[0].Type == VariableDataType.List ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
+                    return attvar.Attributes[0] is VariableListString ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
                 //
                 case "dat":
                 //    if (attvar.Attributes[0].Type == enVariableDataType.Date) { return DoItFeedback.Wahr(); }

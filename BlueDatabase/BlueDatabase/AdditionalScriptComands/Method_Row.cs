@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System.Collections.Generic;
 using BlueBasics;
 using BlueScript;
@@ -48,21 +50,21 @@ namespace BlueDatabase.AdditionalScriptComands {
         #region Methods
 
         public static RowItem? ObjectToRow(Variable? attribute) {
-            if (attribute == null || !attribute.ObjectType("row")) { return null; }
+            if (attribute is not VariableRowItem vro) { return null; }
 
-            var d = attribute.ObjectData();
-            if (d.ToUpper() == "NULL") { return null; }
+            //var d = attribute.ObjectData();
+            //if (d.ToUpper() == "NULL") { return null; }
 
-            var d2 = d.SplitAndCutBy("|");
+            //var d2 = d.SplitAndCutBy("|");
 
-            var db = Database.GetByFilename(d2[0], true, false);
+            //var db = Database.GetByFilename(d2[0], true, false);
 
-            return db?.Row.SearchByKey(long.Parse(d2[1]));
+            //return db?.Row.SearchByKey(long.Parse(d2[1]));
+
+            return vro.RowItem;
         }
 
-        public static DoItFeedback RowToObjectFeedback(RowItem? row) => row == null
-? new DoItFeedback("NULL", "row")
-: new DoItFeedback(row.Database.Filename + "|" + row.Key, "row");
+        public static DoItFeedback RowToObjectFeedback(RowItem? row) => new DoItFeedback(new VariableRowItem(row));
 
         public override List<string> Comand(Script? s) => new() { "row" };
 

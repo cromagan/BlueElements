@@ -118,11 +118,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             var ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", "", enVarType.Text);
             if (string.IsNullOrEmpty(ex)) { return; }
             LoadLayout(string.Empty);
-            CreativePad c = new();
-            c.Item.Caption = ex;
-            Database.Layouts.Add(c.Item.ToString());
+
+            ItemCollectionPad c = new();
+            c.Caption = ex;
+            Database.Layouts.Add(c.ToString());
             BefülleLayoutDropdown();
-            LoadLayout(c.Item.Id);
+            LoadLayout(c.Id);
             CheckButtons();
         }
 

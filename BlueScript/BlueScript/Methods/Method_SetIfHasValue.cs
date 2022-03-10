@@ -55,12 +55,12 @@ namespace BlueScript.Methods {
 
                 var hasvalue = false;
 
-                if (attvar.Attributes[z].Type == VariableDataType.String) { hasvalue = !string.IsNullOrEmpty(attvar.Attributes[z].ValueString); }
-                if (attvar.Attributes[z].Type == VariableDataType.Numeral) { hasvalue = attvar.Attributes[z].ValueDouble != 0; }
-                if (attvar.Attributes[z].Type == VariableDataType.List) { hasvalue = attvar.Attributes[z].ValueListString.Count > 0; }
+                if (attvar.Attributes[z] is VariableString vs) { hasvalue = !string.IsNullOrEmpty(((VariableString)attvar.Attributes[z]).ValueString); }
+                if (attvar.Attributes[z] is VariableFloat vf) { hasvalue = vf.ValueDouble != 0; }
+                if (attvar.Attributes[z] is VariableListString vl) { hasvalue = vl.ValueListString.Count > 0; }
 
                 if (hasvalue) {
-                    attvar.Attributes[0].ValueString = attvar.Attributes[z].ValueString;
+                    ((VariableString)attvar.Attributes[0]).ValueString = ((VariableString)attvar.Attributes[z]).ValueString;
                     return DoItFeedback.Null();
                 }
             }

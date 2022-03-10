@@ -17,6 +17,8 @@
 
 using BlueScript.Methods;
 using BlueScript.Enums;
+using System;
+using System.Drawing;
 
 namespace BlueScript.Structures {
 
@@ -25,12 +27,7 @@ namespace BlueScript.Structures {
         #region Fields
 
         public string ErrorMessage;
-
-        //public DoItFeedback(string value, string errormessage) {
-        //    ErrorMessage = errormessage;
-        //    Value = value;
-        //}
-        public string Value;
+        public Variable? Variable;
 
         #endregion
 
@@ -38,17 +35,44 @@ namespace BlueScript.Structures {
 
         public DoItFeedback(string errormessage) {
             ErrorMessage = errormessage;
-            Value = string.Empty;
+            Variable = null;
         }
 
-        public DoItFeedback(string value, VariableDataType type) {
-            Value = Variable.ValueForReplace(value, type);
+        public DoItFeedback(Variable variable) {
             ErrorMessage = string.Empty;
+            Variable = variable;
         }
 
-        public DoItFeedback(string value, string objecttype) {
-            Value = Variable.ValueForReplace(Variable.GenerateObject(objecttype, value), VariableDataType.Object);
+        public DoItFeedback(string valueString, string errormessage) {
+            ErrorMessage = errormessage;
+            Variable = new VariableString(valueString);
+        }
+
+        public DoItFeedback(bool value) {
             ErrorMessage = string.Empty;
+            Variable = new VariableBool(value);
+        }
+
+        public DoItFeedback(double value) {
+            ErrorMessage = string.Empty;
+            Variable = new VariableFloat((float)value);
+        }
+
+        public DoItFeedback(float value) {
+            ErrorMessage = string.Empty;
+            Variable = new VariableFloat(value);
+        }
+
+        #endregion
+
+        #region Properties
+
+        [Obsolete]
+        public string Value {
+            get {
+                if (Variable == null) { return string.Empty; }
+                return Variable.ValueForReplace;
+            }
         }
 
         #endregion
@@ -58,7 +82,7 @@ namespace BlueScript.Structures {
         public static DoItFeedback AttributFehler(Method method, SplittedAttributesFeedback f) =>
             new(f.ErrorMessage + " > " + method.Syntax);
 
-        public static DoItFeedback Falsch() => new("false", VariableDataType.Bool);
+        public static DoItFeedback Falsch() => new(false);
 
         public static DoItFeedback FalscherDatentyp() => new("Falscher Datentyp.");
 
@@ -68,7 +92,7 @@ namespace BlueScript.Structures {
 
         public static DoItFeedback Schreibgschützt() => new("Variable ist schreibgeschützt.");
 
-        public static DoItFeedback Wahr() => new("true", VariableDataType.Bool);
+        public static DoItFeedback Wahr() => new(true);
 
         #endregion
     }

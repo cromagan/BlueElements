@@ -46,12 +46,12 @@ namespace BlueScript.Methods {
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-            var val = attvar.Attributes[0].ValueString;
+            var val = ((VariableString)attvar.Attributes[0]).ValueString;
 
             const string tmp = Constants.Char_Numerals + " ";
 
             for (var z = 1; z < attvar.Attributes.Count; z++) {
-                var suf = attvar.Attributes[z].ValueString.ToLower();
+                var suf = ((VariableString)attvar.Attributes[z]).ValueString.ToLower();
                 if (val.Length <= suf.Length) {
                     continue;
                 }
@@ -59,12 +59,12 @@ namespace BlueScript.Methods {
                 if (val.ToLower().EndsWith(suf)) {
                     var c = val.Substring(val.Length - suf.Length - 1, 1);
                     if (tmp.Contains(c)) {
-                        return new DoItFeedback(val.Substring(0, val.Length - suf.Length).TrimEnd(" "), VariableDataType.String);
+                        return new DoItFeedback(val.Substring(0, val.Length - suf.Length).TrimEnd(" "), string.Empty);
                     }
                 }
             }
 
-            return new DoItFeedback(val, VariableDataType.String);
+            return new DoItFeedback(val, string.Empty);
         }
 
         #endregion

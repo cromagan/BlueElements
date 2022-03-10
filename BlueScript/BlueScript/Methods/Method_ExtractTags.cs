@@ -55,14 +55,14 @@ namespace BlueScript.Methods {
             s.Variables.RemoveWithComent(coment);
 
             var tags = new List<string>();
-            if (attvar.Attributes[0].Type == VariableDataType.String) {
-                tags.Add(attvar.Attributes[0].ValueString);
+            if (attvar.Attributes[0] is VariableString vs) {
+                tags.Add(((VariableString)attvar.Attributes[0]).ValueString);
             } else {
-                tags.AddRange(attvar.Attributes[0].ValueListString);
+                tags.AddRange(((VariableListString)attvar.Attributes[0]).ValueList);
             }
 
             foreach (var thisw in tags) {
-                var x = thisw.SplitBy(attvar.Attributes[1].ValueString);
+                var x = thisw.SplitBy(((VariableString)attvar.Attributes[1]).ValueString);
 
                 if (x.Length == 2) {
                     var vn = x[0].ToLower().ReduceToChars(Constants.AllowedCharsVariableName);

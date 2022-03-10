@@ -90,6 +90,8 @@
     <Compile Include="AdditionalScriptComands\Method_Lookup.cs" />
     <Compile Include="AdditionalScriptComands\Method_Filter.cs" />
     <Compile Include="AdditionalScriptComands\Method_SetError.cs" />
+    <Compile Include="AdditionalScriptComands\VariableRowItem.cs" />
+    <Compile Include="AdditionalScriptComands\VariableFilterItem.cs" />
     <Compile Include="CellCollection.cs" />
     <Compile Include="CellItem.cs" />
     <Compile Include="Enums\enAlignmentHorizontal.cs" />

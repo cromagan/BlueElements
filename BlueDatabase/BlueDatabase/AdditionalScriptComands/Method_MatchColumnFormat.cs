@@ -54,10 +54,10 @@ namespace BlueDatabase.AdditionalScriptComands {
             if (column == null) { return new DoItFeedback("Spalte in Datenbank nicht gefunden"); }
 
             var tocheck = new List<string>();
-            if (attvar.Attributes[0].Type == VariableDataType.List) {
-                tocheck.AddRange(attvar.Attributes[0].ValueListString);
+            if (attvar.Attributes[0] is VariableString vs) {
+                tocheck.AddRange(((VariableListString)attvar.Attributes[0]).ValueList);
             } else {
-                tocheck.Add(attvar.Attributes[0].ValueString);
+                tocheck.Add(((VariableString)attvar.Attributes[0]).ValueString);
             }
 
             tocheck = tocheck.SortedDistinctList();

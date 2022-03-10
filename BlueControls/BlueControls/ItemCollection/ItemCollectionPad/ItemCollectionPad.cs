@@ -288,6 +288,30 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
+        /// <summary>
+        /// Gibt den Versatz der Linken oben Ecke aller Objekte zurück, um mittig zu sein.
+        /// </summary>
+        /// <param name="sliderShowing"></param>
+        /// <param name="sizeOfPaintArea"></param>
+        /// <param name="zoomToUse"></param>
+        /// <returns></returns>
+        public static Point CenterPos(RectangleF maxBounds, int reduceX, int reduceY, Size sizeOfPaintArea, float zoomToUse) {
+            float w = sizeOfPaintArea.Width - reduceX - (maxBounds.Width * zoomToUse);
+            float h = sizeOfPaintArea.Height - reduceY - (maxBounds.Height * zoomToUse);
+            return new Point((int)w, (int)h);
+        }
+
+        public static PointF SliderValues(RectangleF bounds, float zoomToUse, Point topLeftPos) =>
+                                                                                                                                            new((float)((bounds.Left * zoomToUse) - (topLeftPos.X / 2d)),
+        (float)((bounds.Top * zoomToUse) - (topLeftPos.Y / 2d)));
+
+        public static float ZoomFitValue(RectangleF maxBounds, int reduceX, int reduceY, Size sizeOfPaintArea) {
+            if (maxBounds == null || maxBounds.IsEmpty) { return 1f; }
+
+            return Math.Min((sizeOfPaintArea.Width - reduceX) / maxBounds.Width,
+                            (sizeOfPaintArea.Height - reduceY) / maxBounds.Height);
+        }
+
         public void DesignOrStyleChanged() {
             foreach (var thisItem in this) {
                 thisItem?.DesignOrStyleChanged();
@@ -296,6 +320,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public void DrawCreativePadToBitmap(Bitmap? bmp, enStates vState, float zoomf, float x, float y, List<BasicPadItem>? visibleItems) {
+            if (bmp == null) { return; }
             var gr = Graphics.FromImage(bmp);
             DrawCreativePadTo(gr, bmp.Size, vState, zoomf, x, y, visibleItems, true);
             gr.Dispose();
@@ -325,32 +350,33 @@ namespace BlueControls.ItemCollection {
 
         public void OnDoInvalidate() => DoInvalidate?.Invoke(this, System.EventArgs.Empty);
 
-        public bool ParseVariable(string name, string wert) => ParseVariable(null, new BlueScript.Variable(name, wert, BlueScript.Enums.VariableDataType.String));
+        public bool ParseVariable(string name, string wert) => ParseVariable(new BlueScript.Variable(name, wert, BlueScript.Enums.VariableDataType.String));
 
-        public bool ParseVariable(BlueScript.Script? s, BlueScript.Variable variable) {
+        public bool ParseVariable(BlueScript.Variable variable) {
             var did = false;
             foreach (var thisItem in this) {
                 if (thisItem is ICanHaveColumnVariables variables) {
-                    if (variables.ReplaceVariable(s, variable)) { did = true; }
+                    if (variables.ReplaceVariable(variable)) { did = true; }
                 }
             }
             return did;
         }
 
         public void ParseVariable(RowItem? row) {
-            if (row != null) {
-                var (_, _, script) = row.DoAutomatic("export");
-                if (script == null) { return; }
-                foreach (var thisV in script.Variables) {
-                    ParseVariable(script, thisV);
-                }
+            if (row == null) { return; }
+
+            var (_, _, script) = row.DoAutomatic("export");
+            if (script == null || script.Variables == null) { return; }
+            foreach (var thisV in script.Variables) {
+                ParseVariable(thisV);
             }
         }
 
         public void Remove(string internalname) => Remove(this[internalname]);
 
-        public new void Remove(BasicPadItem item) {
+        public new void Remove(BasicPadItem? item) {
             if (item == null || !Contains(item)) { return; }
+
             base.Remove(item);
             if (string.IsNullOrEmpty(item.Gruppenzugehörigkeit)) { return; }
             foreach (var thisToo in this.Where(thisToo => item.Gruppenzugehörigkeit.ToLower() == thisToo.Gruppenzugehörigkeit?.ToLower())) {
@@ -415,7 +441,7 @@ namespace BlueControls.ItemCollection {
                     i.Save(filename, ImageFormat.Png);
                     break;
 
-                case "Bmp":
+                case "BMP":
                     i.Save(filename, ImageFormat.Bmp);
                     break;
 
@@ -595,7 +621,7 @@ namespace BlueControls.ItemCollection {
         }
 
         internal RectangleF MaxBounds(List<BasicPadItem>? zoomItems) {
-            var r = Count == 0 ? new RectangleF(0, 0, 0, 0) : MaximumBounds(zoomItems);
+            var r = MaximumBounds(zoomItems);
             if (SheetSizeInMm.Width > 0 && SheetSizeInMm.Height > 0) {
                 var x1 = Math.Min(r.Left, 0);
                 var y1 = Math.Min(r.Top, 0);
@@ -669,7 +695,6 @@ namespace BlueControls.ItemCollection {
         }
 
         private RectangleF MaximumBounds(List<BasicPadItem>? zoomItems) {
-            if (zoomItems is null) { return RectangleF.Empty; }
             var x1 = float.MaxValue;
             var y1 = float.MaxValue;
             var x2 = float.MinValue;

@@ -44,7 +44,7 @@ namespace BlueScript.Methods {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
             if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
-            attvar.Attributes[0].ValueListString = new List<string>();
+            ((VariableListString)attvar.Attributes[0]).ValueList = new List<string>();
             return DoItFeedback.Null();
         }
 

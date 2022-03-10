@@ -49,10 +49,10 @@ namespace BlueScript.Methods {
 
             if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
 
-            var tmpList = attvar.Attributes[0].ValueListString;
+            var tmpList = ((VariableListString)attvar.Attributes[0]).ValueList;
 
-            if (attvar.Attributes[3].ValueString == attvar.Attributes[4].ValueString) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch."); }
-            if (!attvar.Attributes[1].ValueBool && string.Equals(attvar.Attributes[3].ValueString, attvar.Attributes[4].ValueString, StringComparison.CurrentCultureIgnoreCase)) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch."); }
+            if (((VariableString)attvar.Attributes[3]).ValueString == ((VariableString)attvar.Attributes[4]).ValueString) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch."); }
+            if (!((VariableBool)attvar.Attributes[1]).ValueBool && string.Equals(((VariableString)attvar.Attributes[3]).ValueString, ((VariableString)attvar.Attributes[4]).ValueString, StringComparison.CurrentCultureIgnoreCase)) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch."); }
 
             var ct = 0;
             bool again;
@@ -61,30 +61,30 @@ namespace BlueScript.Methods {
                 if (ct > 10000) { return new DoItFeedback("Überlauf bei ReplaceList."); }
                 again = false;
                 for (var z = 0; z < tmpList.Count; z++) {
-                    if (attvar.Attributes[2].ValueBool) {
+                    if (((VariableBool)attvar.Attributes[2]).ValueBool) {
                         // Teilersetzungen
                         var orignal = tmpList[z];
 
-                        if (attvar.Attributes[1].ValueBool) {
+                        if (((VariableBool)attvar.Attributes[1]).ValueBool) {
                             // Case Sensitive
-                            tmpList[z] = tmpList[z].Replace(attvar.Attributes[3].ValueString, attvar.Attributes[4].ValueString);
+                            tmpList[z] = tmpList[z].Replace(((VariableString)attvar.Attributes[3]).ValueString, ((VariableString)attvar.Attributes[4]).ValueString);
                         } else {
                             // Not Case Sesitive
-                            tmpList[z] = tmpList[z].Replace(attvar.Attributes[3].ValueString, attvar.Attributes[4].ValueString, RegexOptions.IgnoreCase);
+                            tmpList[z] = tmpList[z].Replace(((VariableString)attvar.Attributes[3]).ValueString, ((VariableString)attvar.Attributes[4]).ValueString, RegexOptions.IgnoreCase);
                         }
                         again = tmpList[z] != orignal;
                     } else {
                         // nur Komplett-Ersetzungen
-                        if (attvar.Attributes[1].ValueBool) {
+                        if (((VariableBool)attvar.Attributes[1]).ValueBool) {
                             // Case Sensitive
-                            if (tmpList[z] == attvar.Attributes[3].ValueString) {
-                                tmpList[z] = attvar.Attributes[4].ValueString;
+                            if (tmpList[z] == ((VariableString)attvar.Attributes[3]).ValueString) {
+                                tmpList[z] = ((VariableString)attvar.Attributes[4]).ValueString;
                                 again = true;
                             }
                         } else {
                             // Not Case Sesitive
-                            if (string.Equals(tmpList[z], attvar.Attributes[3].ValueString, StringComparison.CurrentCultureIgnoreCase)) {
-                                tmpList[z] = attvar.Attributes[4].ValueString;
+                            if (string.Equals(tmpList[z], ((VariableString)attvar.Attributes[3]).ValueString, StringComparison.CurrentCultureIgnoreCase)) {
+                                tmpList[z] = ((VariableString)attvar.Attributes[4]).ValueString;
                                 again = true;
                             }
                         }
@@ -92,7 +92,7 @@ namespace BlueScript.Methods {
                 }
             } while (again);
 
-            attvar.Attributes[0].ValueListString = tmpList;
+            ((VariableListString)attvar.Attributes[0]).ValueList = tmpList;
             return DoItFeedback.Null();
         }
 
