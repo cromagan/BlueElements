@@ -76,7 +76,7 @@ namespace BlueScript.Methods {
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-            if (attvar.Attributes[0].ValueBool) {
+            if (((VariableBool)attvar.Attributes[0]).ValueBool) {
                 var (err, _) = s.Parse(infos.CodeBlockAfterText);
                 if (!string.IsNullOrEmpty(err)) { return new DoItFeedback(err); }
             } else {
