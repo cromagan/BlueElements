@@ -43,17 +43,25 @@ namespace BlueScript.Methods {
 
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            return attvar.Attributes.Count == 0
-                ? attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden
-                    ? DoItFeedback.AttributFehler(this, attvar)
-                    : DoItFeedback.Wahr()
-                : string.IsNullOrEmpty(((VariableString)attvar.Attributes[0]).ValueString)
-                ? DoItFeedback.Wahr()
-                : attvar.Attributes[0].Type is VariableDataType.Null or
-                                             VariableDataType.Error or
-                                             VariableDataType.NotDefinedYet
-                ? DoItFeedback.Wahr()
-                : DoItFeedback.Falsch();
+            if (attvar.Attributes.Count == 0) {
+                if (attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden) {
+                    return DoItFeedback.AttributFehler(this, attvar);
+                } else {
+                    return DoItFeedback.Wahr();
+                }
+            } else {
+                if (string.IsNullOrEmpty(((VariableString)attvar.Attributes[0]).ValueString)) {
+                    return DoItFeedback.Wahr();
+                } else {
+                    if (attvar.Attributes[0].Type is VariableDataType.Null or
+                        VariableDataType.Error or
+                        VariableDataType.NotDefinedYet) {
+                        return DoItFeedback.Wahr();
+                    } else {
+                        return DoItFeedback.Falsch();
+                    }
+                }
+            }
         }
 
         #endregion
