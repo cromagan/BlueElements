@@ -152,6 +152,20 @@ namespace BlueBasics {
         /// <param name="s"></param>
         /// <param name="result"></param>
         /// <returns></returns>
+        public static double DoubleParse(string? s) {
+            if (string.IsNullOrEmpty(s)) { return 0; }
+
+            if (DoubleTryParse(s, out var v)) { return v; }
+
+            return 0f;
+        }
+
+        /// <summary>
+        /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
         public static bool DoubleTryParse(string? s, out double result) {
             result = 0;
             if (string.IsNullOrEmpty(s)) { return false; }
@@ -183,6 +197,20 @@ namespace BlueBasics {
         /// <param name="s"></param>
         /// <param name="result"></param>
         /// <returns></returns>
+        public static float FloatParse(string? s) {
+            if (string.IsNullOrEmpty(s)) { return 0; }
+
+            if (FloatTryParse(s, out var v)) { return v; }
+
+            return 0f;
+        }
+
+        /// <summary>
+        /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
         public static bool FloatTryParse(string? s, out float result) {
             result = 0;
             if (string.IsNullOrEmpty(s)) { return false; }
@@ -190,6 +218,20 @@ namespace BlueBasics {
             return float.TryParse(s, out result)
                    || float.TryParse(s.Replace(",", "."), out result)
                    || float.TryParse(s.Replace(".", ","), out result);
+        }
+
+        /// <summary>
+        /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public static int IntParse(string? s) {
+            if (string.IsNullOrEmpty(s)) { return 0; }
+
+            if (IntTryParse(s, out var v)) { return v; }
+
+            return 0;
         }
 
         /// <summary>

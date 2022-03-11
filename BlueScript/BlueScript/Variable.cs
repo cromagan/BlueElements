@@ -83,15 +83,15 @@
 //            return v == null ? 0 : v.ValueInt;
 //        }
 
-//        /// <summary>
-//        /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten eine leere Liste
-//        /// </summary>
-//        /// <param name="vars"></param>
-//        /// <param name="name"></param>
-//        public static List<string> GetList(this List<Variable> vars, string name) {
-//            var v = vars.Get(name);
-//            return v == null ? new List<string>() : v.ValueListString;
-//        }
+/// <summary>
+/// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten eine leere Liste
+/// </summary>
+/// <param name="vars"></param>
+/// <param name="name"></param>
+//public static List<string> GetList(this List<Variable> vars, string name) {
+//    var v = vars.Get(name);
+//    return v == null ? new List<string>() : v.ValueListString;
+//}
 
 //        /// <summary>
 //        /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten string.Empty

@@ -34,7 +34,7 @@ namespace BlueScript.Methods {
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.Bitmap;
+        public override VariableDataType Returns => VariableDataType.Object;
         public override string StartSequence => "(";
         public override string Syntax => "LoadImage(Filename)";
 

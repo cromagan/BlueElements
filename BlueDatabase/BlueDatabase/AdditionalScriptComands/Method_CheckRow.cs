@@ -28,7 +28,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Object };
+        public override List<VariableDataType> Args => new() { VariableDataType.Variable_Object };
 
         public override string Description => "Prüft die angegebene Zeile mit der Startroutine 'script'. Wenn die Zeile Null ist, wird kein Fehler ausgegeben.";
 

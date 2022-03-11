@@ -21,16 +21,17 @@ namespace BlueScript.Enums {
 
     [Obsolete]
     public enum VariableDataType {
-        NotDefinedYet = 0,
+        Null = 0,
+
         Bool = 1,
         Numeral = 2,
         String = 4,
 
-        //Date = 8, // Werden einfach die Strings manipuliert
-        List = 16,
+        List = 8,
 
-        Bitmap = 32,
-        Object = 64,
+        Object = 16,
+
+        Unknown = 32,
 
         /// <summary>
         /// Nur für Attribute
@@ -41,18 +42,14 @@ namespace BlueScript.Enums {
         String_or_List = String | List,
         Bool_Numeral_or_String = Bool | Numeral | String,
         Bool_Numeral_String_or_List = Bool | Numeral | String | List,
-        Bool_Numeral_String_List_or_Bitmap = Bool | Numeral | String | List | Bitmap,
-        Bool_Numeral_String_List_Bitmap_or_Object = Bool | Numeral | String | List | Bitmap | Object,
-        Any = String | List | Numeral | Bool | Error | NotDefinedYet | Object,
-        Variable = 1024,
-        Error = 2048,
-        Null = 4096,
+        Bool_Numeral_String_List_or_Object = Bool | Numeral | String | List | Object,
 
-        //VariableBool = 128,
-        //VariableNum = 256,
-        //VariableString = 512,
+        Any = Bool_Numeral_String_List_or_Object, //String | List | Numeral | Bool | Object,
+        Variable = 1024,
+
         Variable_Numeral = Variable | Numeral,
 
+        Variable_Object = Variable | Object,
         Variable_List = Variable | List,
         Variable_String = Variable | String,
         Variable_List_Or_String = Variable | String | List,
@@ -60,6 +57,6 @@ namespace BlueScript.Enums {
         Variable_List_String_Numeral_or_Bool = Variable | String | List | Numeral | Bool,
         Variable_String_or_Numeral = Variable | String | Numeral,
         Variable_String_Numeral_or_List = Variable | String | List | Numeral,
-        Variable_Any = Variable | String | List | Numeral | Bool | Error | NotDefinedYet | Bitmap | Object
+        Variable_Any = Variable | String | List | Numeral | Bool | Object
     }
 }

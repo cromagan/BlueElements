@@ -46,6 +46,8 @@ namespace BlueScript {
 
         #region Properties
 
+        public override int CheckOrder => 99;
+
         public RowItem? RowItem {
             get => _row;
             set {

@@ -27,7 +27,7 @@ namespace BlueScript.Methods {
 
         #region Fields
 
-        public static List<VariableDataType> SArgs = new() { VariableDataType.Bool_Numeral_String_List_Bitmap_or_Object };
+        public static List<VariableDataType> SArgs = new() { VariableDataType.Bool_Numeral_String_List_or_Object };
 
         #endregion
 

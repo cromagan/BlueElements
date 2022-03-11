@@ -29,7 +29,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Object };
+        public override List<VariableDataType> Args => new() { VariableDataType.Variable_Object };
 
         public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.";
 

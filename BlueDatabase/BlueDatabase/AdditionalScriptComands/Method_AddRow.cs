@@ -38,7 +38,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override VariableDataType Returns => VariableDataType.Object;
+        public override VariableDataType Returns => VariableDataType.Variable_Object;
 
         public override string StartSequence => "(";
 

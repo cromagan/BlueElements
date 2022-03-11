@@ -44,6 +44,8 @@ namespace BlueScript {
 
         #region Properties
 
+        public override int CheckOrder => 99;
+
         public FilterItem FilterItem {
             get => _filter;
             set {

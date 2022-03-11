@@ -212,9 +212,9 @@ namespace BlueScript.Methods {
 
                 // Den Typ der Variable checken
                 if (!exceptetType.HasFlag(v.Type)) {
-                    if (v.Type == VariableDataType.Error) {
-                        return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Attribut " + (n + 1) + ": " + v.Coment);
-                    }
+                    //if (v.Type == VariableDataType.Error) {
+                    //    return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Attribut " + (n + 1) + ": " + v.Coment);
+                    //}
                     if (exceptetType == VariableDataType.Integer) {
                         if (v is not VariableFloat vn) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
                         if (vn.ValueDouble != (int)vn.ValueDouble) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }

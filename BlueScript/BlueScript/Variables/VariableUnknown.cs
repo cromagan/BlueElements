@@ -22,7 +22,7 @@ using BlueScript.Structures;
 
 namespace BlueScript.Variables {
 
-    public class VariableString : Variable {
+    public class VariableUnknown : Variable {
 
         #region Fields
 
@@ -32,27 +32,27 @@ namespace BlueScript.Variables {
 
         #region Constructors
 
-        public VariableString(string name, string value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) { _valueString = value.RestoreCriticalVariableChars(); }
+        public VariableUnknown(string name, string value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) { _valueString = value.RestoreCriticalVariableChars(); }
 
-        public VariableString(string value) : this(Variable.DummyName(), value, true, false, string.Empty) { }
+        public VariableUnknown(string value) : this(Variable.DummyName(), value, true, false, string.Empty) { }
 
-        public VariableString(string name, string value) : this(name, value, true, false, string.Empty) { }
+        public VariableUnknown(string name, string value) : this(name, value, true, false, string.Empty) { }
 
         #endregion
 
         #region Properties
 
-        public override int CheckOrder => 2;
+        public override int CheckOrder => 100;
 
         /// <summary>
         /// Gleichgesetzt mit ValueString
         /// </summary>
         public override string ReadableText { get => _valueString; }
 
-        public override string ShortName => "str";
-        public override bool Stringable => true;
-        public override VariableDataType Type => VariableDataType.String;
-        public override string ValueForReplace { get => "\"" + _valueString.RemoveCriticalVariableChars() + "\""; }
+        public override string ShortName => "ukn";
+        public override bool Stringable => false;
+        public override VariableDataType Type => VariableDataType.Unknown;
+        //public override string ValueForReplace { get => "\"" + _valueString.RemoveCriticalVariableChars() + "\""; }
 
         /// <summary>
         /// Gleichgesetzt mit ReadableText

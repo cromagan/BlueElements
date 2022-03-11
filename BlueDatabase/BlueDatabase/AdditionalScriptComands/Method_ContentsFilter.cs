@@ -26,7 +26,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.Object };
+        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.Variable_Object };
 
         public override string Description => "Lädt eine andere Datenbank (die mit den Filtern definiert wurde)\rund gibt aus der angegebenen Spalte alle Einträge (sortiert und einzigartig) als Liste zurück.\rDabei wird der Filter benutzt.\rEin Filter kann mit dem Befehl 'Filter' erstellt werden.";
 

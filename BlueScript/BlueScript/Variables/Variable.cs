@@ -79,60 +79,90 @@ namespace BlueScript.Variables {
                 !thisv.SystemVariable && string.Equals(thisv.Name, name, StringComparison.CurrentCultureIgnoreCase));
         }
 
-        ///// <summary>
-        ///// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten string.Empty
-        ///// </summary>
-        ///// <param name="vars"></param>
-        ///// <param name="name"></param>
-        ///// <returns></returns>
-        //public static bool GetBool(this List<Variable> vars, string name) {
-        //    var v = vars.Get(name);
-        //    return v != null && v.ValueBool;
-        //}
+        /// <summary>
+        /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten string.Empty
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static bool GetBool(this List<Variable> vars, string name) {
+            var v = vars.Get(name);
 
-        ///// <summary>
-        ///// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten 0
-        ///// </summary>
-        ///// <param name="vars"></param>
-        ///// <param name="name"></param>
-        //public static double GetDouble(this List<Variable> vars, string name) {
-        //    var v = vars.Get(name);
-        //    return v == null ? 0d : v.ValueDouble;
-        //}
+            if (v is not VariableBool vf) {
+                Develop.DebugPrint("Falscher Datentyp");
+                return false;
+            }
 
-        ///// <summary>
-        ///// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten 0
-        ///// </summary>
-        ///// <param name="vars"></param>
-        ///// <param name="name"></param>
-        //public static int GetInt(this List<Variable> vars, string name) {
-        //    var v = vars.Get(name);
-        //    return v == null ? 0 : v.ValueInt;
-        //}
+            return vf.ValueBool;
+        }
 
-        ///// <summary>
-        ///// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten eine leere Liste
-        ///// </summary>
-        ///// <param name="vars"></param>
-        ///// <param name="name"></param>
-        //public static List<string> GetList(this List<Variable> vars, string name) {
-        //    var v = vars.Get(name);
-        //    return v == null ? new List<string>() : v.ValueListString;
-        //}
+        /// <summary>
+        /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten 0
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <param name="name"></param>
+        public static double GetDouble(this List<Variable> vars, string name) {
+            var v = vars.Get(name);
 
-        ///// <summary>
-        ///// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten string.Empty
-        ///// </summary>
-        ///// <param name="vars"></param>
-        ///// <param name="name"></param>
-        ///// <returns></returns>
-        //public static string GetString(this List<Variable> vars, string name) {
-        //    var v = vars.Get(name);
-        //    return v == null ? string.Empty : v.ValueString;
-        //}
+            if (v is not VariableFloat vf) {
+                Develop.DebugPrint("Falscher Datentyp");
+                return 0f;
+            }
+
+            return vf.ValueDouble;
+        }
+
+        /// <summary>
+        /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten 0
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <param name="name"></param>
+        public static int GetInt(this List<Variable> vars, string name) {
+            var v = vars.Get(name);
+
+            if (v is not VariableFloat vf) {
+                Develop.DebugPrint("Falscher Datentyp");
+                return 0;
+            }
+
+            return (int)vf.ValueDouble;
+        }
+
+        /// <summary>
+        /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten eine leere Liste
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <param name="name"></param>
+        public static List<string> GetList(this List<Variable> vars, string name) {
+            var v = vars.Get(name);
+
+            if (v is not VariableListString vf) {
+                Develop.DebugPrint("Falscher Datentyp");
+                return new List<string>();
+            }
+
+            return vf.ValueList;
+        }
+
+        /// <summary>
+        /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten string.Empty
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static string GetString(this List<Variable> vars, string name) {
+            var v = vars.Get(name);
+
+            if (v is not VariableString vf) {
+                Develop.DebugPrint("Falscher Datentyp");
+                return string.Empty;
+            }
+
+            return vf.ValueString;
+        }
 
         public static Variable? GetSystem(this List<Variable> vars, string name) => vars.FirstOrDefault(thisv =>
-                                      thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper());
+                                            thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper());
 
         public static void RemoveWithComent(this List<Variable> vars, string coment) {
             var z = 0;
@@ -145,8 +175,6 @@ namespace BlueScript.Variables {
             } while (z < vars.Count);
         }
 
-        #endregion
-
         //public static void ScriptFinished(this List<Variable> vars) {
         //    if (vars == null || vars.Count == 0) { return; }
         //    foreach (var thisv in vars) {
@@ -154,93 +182,99 @@ namespace BlueScript.Variables {
         //    }
         //}
 
-        ///// <summary>
-        ///// Erstellt bei Bedarf eine neue Variable und setzt den Wert und auch ReadOnly
-        ///// </summary>
-        ///// <param name="vars"></param>
-        ///// <param name="name"></param>
-        ///// <param name="value"></param>
-        //public static void Set(this List<Variable> vars, string name, string value) {
-        //    var v = vars.Get(name);
-        //    if (v == null) {
-        //        v = new VariableString(name, string.empty);
-        //        vars.Add(v);
-        //    }
+        /// <summary>
+        /// Erstellt bei Bedarf eine neue Variable und setzt den Wert und auch ReadOnly
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        public static void Set(this List<Variable> vars, string name, string value) {
+            var v = vars.Get(name);
+            if (v == null) {
+                v = new VariableString(name, string.Empty, false, false, string.Empty);
+                vars.Add(v);
+            }
 
-        //    if (v is not VariableListString vf) {
-        //        Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Warnung, "Variablentyp falsch");
-        //        return;
-        //    }
+            if (v is not VariableString vf) {
+                Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Warnung, "Variablentyp falsch");
+                return;
+            }
 
-        //    vf.Readonly = false; // sonst werden keine Daten geschrieben
-        //    vf.valuestring = value;
-        //    vf.Readonly = true;
-        //}
+            vf.Readonly = false; // sonst werden keine Daten geschrieben
+            vf.ValueString = value;
+            vf.Readonly = true;
+        }
 
-        ///// <summary>
-        ///// Erstellt bei Bedarf eine neue Variable und setzt den Wert und auch ReadOnly
-        ///// </summary>
-        ///// <param name="vars"></param>
-        ///// <param name="name"></param>
-        ///// <param name="value"></param>
-        //public static void Set(this List<Variable> vars, string name, double value) {
-        //    var v = vars.Get(name);
-        //    if (v == null) {
-        //        v = new VariableFloat(name);
-        //        vars.Add(v);
-        //    }
+        /// <summary>
+        /// Erstellt bei Bedarf eine neue Variable und setzt den Wert und auch ReadOnly
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        public static void Set(this List<Variable> vars, string name, double value) {
+            var v = vars.Get(name);
+            if (v == null) {
+                v = new VariableFloat(name);
+                vars.Add(v);
+            }
 
-        //    if (v is not VariableFloat vf) {
-        //        Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Warnung, "Variablentyp falsch");
-        //        return;
-        //    }
+            if (v is not VariableFloat vf) {
+                Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Warnung, "Variablentyp falsch");
+                return;
+            }
 
-        //    vf.Readonly = false; // sonst werden keine Daten geschrieben
-        //    vf.ValueNum = value;
-        //    vf.Readonly = true;
-        //}
+            vf.Readonly = false; // sonst werden keine Daten geschrieben
+            vf.ValueNum = value;
+            vf.Readonly = true;
+        }
 
-        ///// <summary>
-        ///// Erstellt bei Bedarf eine neue Variable und setzt den Wert und auch ReadOnly
-        ///// </summary>
-        ///// <param name="vars"></param>
-        ///// <param name="name"></param>
-        ///// <param name="value"></param>
-        //public static void Set(this List<Variable> vars, string name, List<string> value) {
-        //    var v = vars.Get(name);
-        //    if (v == null) {
-        //        v = new VariableListString(name);
-        //        vars.Add(v);
-        //    }
+        /// <summary>
+        /// Erstellt bei Bedarf eine neue Variable und setzt den Wert und auch ReadOnly
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        public static void Set(this List<Variable> vars, string name, List<string> value) {
+            var v = vars.Get(name);
+            if (v == null) {
+                v = new VariableListString(name);
+                vars.Add(v);
+            }
 
-        //    if (v is not VariableListString vf) {
-        //        Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Warnung, "Variablentyp falsch");
-        //        return;
-        //    }
+            if (v is not VariableListString vf) {
+                Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Warnung, "Variablentyp falsch");
+                return;
+            }
 
-        //    vf.Readonly = false; // sonst werden keine Daten geschrieben
-        //    vf.ValueList = value;
-        //    vf.Readonly = true;
-        //}
+            vf.Readonly = false; // sonst werden keine Daten geschrieben
+            vf.ValueList = value;
+            vf.Readonly = true;
+        }
 
-        ///// <summary>
-        ///// Erstellt bei Bedarf eine neue Variable und setzt den Wert und auch ReadOnly
-        ///// </summary>
-        ///// <param name="vars"></param>
-        ///// <param name="name"></param>
-        ///// <param name="value"></param>
-        //public static void Set(this List<Variable> vars, string name, bool value) {
-        //    var v = vars.Get(name);
-        //    if (v == null) {
-        //        v = new Variable(name);
-        //        vars.Add(v);
-        //    }
+        /// <summary>
+        /// Erstellt bei Bedarf eine neue Variable und setzt den Wert und auch ReadOnly
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        public static void Set(this List<Variable> vars, string name, bool value) {
+            var v = vars.Get(name);
+            if (v == null) {
+                v = new VariableBool(name);
+                vars.Add(v);
+            }
 
-        //    v.Readonly = false; // sonst werden keine Daten geschrieben
-        //    v.Type = VariableDataType.Bool;
-        //    v.ValueString = value ? "true" : "false";
-        //    v.Readonly = true;
-        //}
+            if (v is not VariableBool vf) {
+                Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Warnung, "Variablentyp falsch");
+                return;
+            }
+
+            vf.Readonly = false; // sonst werden keine Daten geschrieben
+            vf.ValueBool = value;
+            vf.Readonly = true;
+        }
+
+        #endregion
     }
 
     public abstract class Variable {
@@ -266,6 +300,7 @@ namespace BlueScript.Variables {
 
         #region Properties
 
+        public abstract int CheckOrder { get; }
         public string Coment { get; set; }
 
         /// <summary>

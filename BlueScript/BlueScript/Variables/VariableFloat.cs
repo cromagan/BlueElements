@@ -46,6 +46,7 @@ namespace BlueScript.Variables {
 
         #region Properties
 
+        public override int CheckOrder => 1;
         public override string ReadableText => _double.ToString(Constants.Format_Float1);
         public override string ShortName => "num";
         public override bool Stringable => true;
