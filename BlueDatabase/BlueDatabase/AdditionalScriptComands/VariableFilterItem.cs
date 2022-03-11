@@ -54,6 +54,7 @@ namespace BlueScript {
             }
         }
 
+        public override bool IsNullOrEmpty => _filter == null;
         public override string ShortName => "fil";
         public override bool Stringable => false;
         public override VariableDataType Type => VariableDataType.Object;

@@ -48,11 +48,9 @@ namespace BlueScript.Methods {
             if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
 
             for (var z = 1; z < attvar.Attributes.Count; z++) {
-                if (attvar.Attributes[z].Type == VariableDataType.Error) {
-                    continue;
-                }
+                if (attvar.Attributes[z] is VariableUnknown) { continue; }
 
-                if (attvar.Attributes[z].Type != attvar.Attributes[0].Type) { return new DoItFeedback("Variablentyp zur Ausgangsvariable unterschiedlich."); }
+                if (attvar.Attributes[z].ShortName != attvar.Attributes[0].ShortName) { return new DoItFeedback("Variablentyp zur Ausgangsvariable unterschiedlich."); }
                 ((VariableString)attvar.Attributes[0]).ValueString = ((VariableString)attvar.Attributes[z]).ValueString;
                 return DoItFeedback.Null();
             }

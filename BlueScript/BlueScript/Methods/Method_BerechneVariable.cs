@@ -80,6 +80,7 @@ namespace BlueScript.Methods {
 
             if (generateVariable) {
                 attvar.Attributes[0].Name = varnam.ToLower();
+                attvar.Attributes[0].Readonly = false;
                 s.Variables.Add(attvar.Attributes[0]);
                 return new DoItFeedback(attvar.Attributes[0]);
             }
@@ -97,7 +98,7 @@ namespace BlueScript.Methods {
         /// <param name="s"></param>
         /// <returns></returns>
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            return VariablenBerechnung(infos.ComandText, s, infos, false);
+            return VariablenBerechnung(infos.ComandText + infos.AttributText + ";", s, infos, false);
         }
 
         #endregion

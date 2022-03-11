@@ -162,7 +162,7 @@ namespace BlueScript.Variables {
         }
 
         public static Variable? GetSystem(this List<Variable> vars, string name) => vars.FirstOrDefault(thisv =>
-                                            thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper());
+                                                        thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper());
 
         public static void RemoveWithComent(this List<Variable> vars, string coment) {
             var z = 0;
@@ -277,7 +277,7 @@ namespace BlueScript.Variables {
         #endregion
     }
 
-    public abstract class Variable {
+    public abstract class Variable : IComparable {
 
         #region Fields
 
@@ -302,6 +302,8 @@ namespace BlueScript.Variables {
 
         public abstract int CheckOrder { get; }
         public string Coment { get; set; }
+
+        public abstract bool IsNullOrEmpty { get; }
 
         /// <summary>
         /// Variablen-Namen werden immer in Kleinbuchstaben gespeichert.
@@ -330,12 +332,6 @@ namespace BlueScript.Variables {
 
         #region Methods
 
-        /// <summary>
-        /// Löst den Text auf, so dass eine Stringable Variable zurückgegeben wird.
-        /// </summary>
-        /// <param name="txt"></param>
-        /// <param name="s"></param>
-        /// <returns></returns>
         public static DoItFeedback GetVariableByParsing(string txt, Script? s) {
 
             #region Prüfen, Ob noch mehre Klammern da sind, oder Anfangs/End-Klammern entfernen
@@ -407,7 +403,7 @@ namespace BlueScript.Variables {
                 if (!string.IsNullOrEmpty(t2.ErrorMessage)) {
                     return new DoItFeedback("Befehls-Berechnungsfehler: " + t2.ErrorMessage);
                 }
-
+                if (t2.Variable != null) { return new DoItFeedback(t2.Variable); }
                 txt = t2.AttributeText;
             }
 
@@ -459,13 +455,15 @@ namespace BlueScript.Variables {
             return v == vo && !string.IsNullOrEmpty(v);
         }
 
-        //private void SetError(string coment) {
-        //    Readonly = false;
-        //    Type = VariableDataType.Error;
-        //    ValueString = string.Empty;
-        //    Readonly = true;
-        //    Coment = coment;
-        //}
+        public int CompareTo(object obj) {
+            if (obj is Variable v) {
+                return CheckOrder.CompareTo(v.CheckOrder);
+            }
+
+            Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
+            return 0;
+        }
+
         public abstract DoItFeedback GetValueFrom(Variable attvarAttribute);
 
         public string ReplaceInText(string txt) {
@@ -479,175 +477,8 @@ namespace BlueScript.Variables {
             return "dummy" + _dummyCount;
         }
 
-        //public Variable(string name, string attributesText, Script? s) : this(name) {
-        //    var txt = AttributeAuflösen(attributesText, s);
-        //    if (!string.IsNullOrEmpty(txt.ErrorMessage)) { SetError(txt.ErrorMessage); return; }
-
-        //    #region Testen auf Bool
-
-        //    if (txt.Value.Equals("true", StringComparison.InvariantCultureIgnoreCase) ||
-        //        txt.Value.Equals("false", StringComparison.InvariantCultureIgnoreCase)) {
-        //        if (Type is not VariableDataType.NotDefinedYet and not VariableDataType.Bool) { SetError("Variable ist kein Boolean"); return; }
-        //        ValueString = txt.Value;
-        //        Type = VariableDataType.Bool;
-        //        Readonly = true;
-        //        return;
-        //    }
-
-        //    #endregion
-
-        //    #region Testen auf String
-
-        //    if (txt.Value.Length > 1 && txt.Value.StartsWith("\"") && txt.Value.EndsWith("\"")) {
-        //        if (Type is not VariableDataType.NotDefinedYet and not VariableDataType.String) { SetError("Variable ist kein String"); return; }
-        //        var tmp = txt.Value.Substring(1, txt.Value.Length - 2); // Nicht Trimmen! Ansonsten wird sowas falsch: "X=" + "";
-        //        //tmp = tmp.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
-        //        if (tmp.Contains("\"")) { SetError("Verkettungsfehler"); return; } // Beispiel: s ist nicht definiert und "jj" + s + "kk
-        //        ValueString = tmp;
-        //        Type = VariableDataType.String;
-        //        Readonly = true;
-        //        return;
-        //    }
-
-        //    #endregion
-
-        //    #region Testen auf Bitmap
-
-        //    if (txt.Value.Length > 4 && txt.Value.StartsWith(ImageKennung + "\"") && txt.Value.EndsWith("\"" + ImageKennung)) {
-        //        if (Type is not VariableDataType.NotDefinedYet and not VariableDataType.Bitmap) { SetError("Variable ist kein Bitmap"); return; }
-        //        ValueString = txt.Value.Substring(2, txt.Value.Length - 4);
-        //        Type = VariableDataType.Bitmap;
-        //        Readonly = true;
-        //        return;
-        //    }
-
-        //    #endregion
-
-        //    #region Testen auf Liste mit Strings
-
-        //    if (txt.Value.Length > 1 && txt.Value.StartsWith("{") && txt.Value.EndsWith("}")) {
-        //        if (Type is not VariableDataType.NotDefinedYet and not VariableDataType.List) { SetError("Variable ist keine Liste"); return; }
-        //        var t = txt.Value.DeKlammere(false, true, false, true);
-
-        //        if (string.IsNullOrEmpty(t)) {
-        //            ValueListString = new List<string>(); // Leere Liste
-        //        } else {
-        //            var l = Method.SplitAttributeToVars(t, s, new List<VariableDataType> { VariableDataType.String }, true);
-        //            if (!string.IsNullOrEmpty(l.ErrorMessage)) { SetError(l.ErrorMessage); return; }
-        //            ValueListString = l.Attributes.AllValues();
-        //        }
-        //        Type = VariableDataType.List;
-        //        Readonly = true;
-        //        return;
-        //    }
-
-        //    #endregion
-
-        //    #region Testen auf Object
-
-        //    if (txt.Value.Length > 2 && txt.Value.StartsWith(ObjectKennung + "\"") && txt.Value.EndsWith("\"" + ObjectKennung)) {
-        //        if (Type is not VariableDataType.NotDefinedYet and not VariableDataType.Object) { SetError("Variable ist kein Objekt"); return; }
-        //        ValueString = txt.Value.Substring(2, txt.Value.Length - 4);
-        //        Type = VariableDataType.Object;
-        //        Readonly = true;
-        //        return;
-        //    }
-
-        //    #endregion
-
-        //    #region Testen auf Number
-
-        //    if (Type is not VariableDataType.NotDefinedYet and not VariableDataType.Numeral) { SetError("Variable ist keine Zahl"); return; }
-
-        //    if (txt.Value.IsDouble()) {
-        //        ValueDouble = DoubleParse(txt.Value);
-        //        Type = VariableDataType.Numeral;
-        //        Readonly = true;
-        //        return;
-        //    }
         protected abstract bool TryParse(string txt, out Variable? succesVar, Script s);
 
         #endregion
-
-        //public static string ValueForReplace(string value, VariableDataType type) {
-        //    switch (type) {
-        //        case VariableDataType.String:
-        //            return "\"" + value.RemoveCriticalVariableChars() + "\"";
-
-        //        case VariableDataType.Bool:
-        //            return value;
-
-        //        case VariableDataType.Numeral:
-        //            return value;
-
-        //        case VariableDataType.List:
-        //            if (string.IsNullOrEmpty(value)) { return "{ }"; }
-
-        //            if (!value.EndsWith("\r")) {
-        //                Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Fehler, "Objekttypfehler: " + value);
-        //            }
-
-        //            var x = value.Substring(0, value.Length - 1);
-        //            return "{\"" + x.RemoveCriticalVariableChars().SplitByCrToList().JoinWith("\", \"") + "\"}";
-
-        //        case VariableDataType.NotDefinedYet: // Wenn ne Routine die Werte einfach ersetzt.
-        //            return value;
-
-        //        case VariableDataType.Bitmap:
-        //            return ImageKennung + "\"" + value.RemoveCriticalVariableChars() + "\"" + ImageKennung;
-
-        //        case VariableDataType.Object:
-        //            return ObjectKennung + "\"" + value.RemoveCriticalVariableChars() + "\"" + ObjectKennung;
-
-        //        case VariableDataType.Variable:
-        //            return value;
-
-        //        default:
-        //            Develop.DebugPrint_NichtImplementiert();
-        //            return value;
-        //    }
-        //}
-
-        //public string ObjectData() {
-        //    if (Type != VariableDataType.Object) { return string.Empty; }
-        //    var x = _valueString.SplitAndCutBy("&");
-        //    return x == null || x.GetUpperBound(0) != 1
-        //            ? string.Empty
-        //            : x[1].FromNonCritical();
-        //}
-
-        //public bool ObjectType(string toCheck) {
-        //    if (Type != VariableDataType.Object) { return false; }
-
-        //    var x = _valueString.SplitAndCutBy("&");
-        //    return x != null && x.GetUpperBound(0) == 1 && x[0] == toCheck.ToUpper().ReduceToChars(Constants.Char_AZ + Constants.Char_Numerals);
-        //}
-
-        //public string ReplaceInText(string txt) {
-        //    if (!txt.ToLower().Contains("~" + Name.ToLower() + "~")) { return txt; }
-
-        //    return Type is not VariableDataType.String and
-        //                not VariableDataType.List and
-        //                not VariableDataType.Integer and
-        //                not VariableDataType.Bool and
-        //                not VariableDataType.Numeral
-        //        ? txt
-        //        : txt.Replace("~" + Name + "~", ValueString, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-        //}
-
-        //public override string ToString() {
-        //    var zusatz = string.Empty;
-        //    if (Readonly) { zusatz = " [Read Only] "; }
-        //    return Type switch {
-        //        VariableDataType.String => "{str} " + zusatz + Name + " = " + ValueString,
-        //        VariableDataType.Numeral => "{num} " + zusatz + Name + " = " + ValueString,
-        //        VariableDataType.Bool => "{bol} " + zusatz + Name + " = " + ValueString,
-        //        VariableDataType.List => "{lst} " + zusatz + Name + " = " + ValueString,
-        //        VariableDataType.Bitmap => "{bmp} " + zusatz + Name + " = [BitmapData]",
-        //        VariableDataType.Object => "{obj} " + zusatz + Name + " = [ObjectData]",
-        //        VariableDataType.Error => "{err} " + zusatz + Name + " = " + ValueString,
-        //        _ => "{ukn} " + zusatz + Name + " = " + ValueString
-        //    };
-        //}
     }
 }

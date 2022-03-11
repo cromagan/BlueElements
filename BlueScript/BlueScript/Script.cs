@@ -84,7 +84,10 @@ namespace BlueScript {
         //}
         public Script(List<Variable>? variablen) {
             if (Comands == null) { Comands = GetEnumerableOfType<Method>(); }
-            if (VarTypes == null) { VarTypes = GetEnumerableOfType<Variable>("NAME"); }
+            if (VarTypes == null) {
+                VarTypes = GetEnumerableOfType<Variable>("NAME");
+                VarTypes.Sort();
+            }
             Variables = variablen;
             //BitmapCache = new List<Bitmap>();
         }

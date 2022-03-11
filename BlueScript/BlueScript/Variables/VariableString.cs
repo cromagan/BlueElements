@@ -43,6 +43,7 @@ namespace BlueScript.Variables {
         #region Properties
 
         public override int CheckOrder => 2;
+        public override bool IsNullOrEmpty => string.IsNullOrEmpty(_valueString);
 
         /// <summary>
         /// Gleichgesetzt mit ValueString

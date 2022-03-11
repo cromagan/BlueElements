@@ -15,6 +15,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics;
+using BlueScript.Variables;
+
 namespace BlueScript.Structures {
 
     public struct GetEndFeedback {
@@ -23,30 +26,36 @@ namespace BlueScript.Structures {
 
         public string AttributeText;
 
-        //public strGetEndFeedback(string errormessage, int continuePosition, string attributetext) {
-        //    ContinuePosition = continuePosition;
-        //    ErrorMessage = errormessage;
-        //    AttributeText = attributetext;
-        //}
         public int ContinuePosition;
 
         public string ErrorMessage;
+
+        public Variable? Variable;
 
         #endregion
 
         #region Constructors
 
+        public GetEndFeedback(Variable variable) {
+            ContinuePosition = 0;
+            ErrorMessage = string.Empty;
+            AttributeText = string.Empty;
+            Variable = variable;
+        }
+
         public GetEndFeedback(string errormessage) {
             ContinuePosition = 0;
             ErrorMessage = errormessage;
             AttributeText = string.Empty;
-            //ComandText = string.Empty;
+            Variable = null;
         }
 
         public GetEndFeedback(int continuePosition, string attributetext) {
             ContinuePosition = continuePosition;
             ErrorMessage = string.Empty;
             AttributeText = attributetext;
+            Variable = null;
+            if (ContinuePosition == attributetext.Length) { Develop.DebugPrint("Müsste das nicht eine Variable sein?"); }
         }
 
         #endregion

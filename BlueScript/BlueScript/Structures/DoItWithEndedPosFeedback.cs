@@ -49,17 +49,5 @@ namespace BlueScript.Structures {
         }
 
         #endregion
-
-        #region Properties
-
-        [Obsolete]
-        public string Value {
-            get {
-                if (Variable == null) { return string.Empty; }
-                return Variable.ValueForReplace;
-            }
-        }
-
-        #endregion
     }
 }

@@ -44,6 +44,8 @@ namespace BlueScript.Variables {
 
         public override int CheckOrder => 100;
 
+        public override bool IsNullOrEmpty => string.IsNullOrEmpty(_valueString);
+
         /// <summary>
         /// Gleichgesetzt mit ValueString
         /// </summary>

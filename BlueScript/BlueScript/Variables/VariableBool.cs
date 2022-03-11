@@ -45,6 +45,8 @@ namespace BlueScript.Variables {
         #region Properties
 
         public override int CheckOrder => 0;
+        public override bool IsNullOrEmpty => false;
+        public override string ReadableText => _valuebool.ToString();
         public override string ShortName => "bol";
         public override bool Stringable => true;
         public override VariableDataType Type => VariableDataType.String;

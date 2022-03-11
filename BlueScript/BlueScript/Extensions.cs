@@ -21,7 +21,7 @@ namespace BlueScript {
 
         #region Fields
 
-        public static readonly string ImageKennung = ((char)9001).ToString();
+        //public static readonly string ImageKennung = ((char)9001).ToString();
         public static readonly string ObjectKennung = ((char)9002).ToString();
 
         internal static readonly string ReplacerForBackSlash = ((char)9003).ToString();

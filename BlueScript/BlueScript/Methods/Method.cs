@@ -94,10 +94,12 @@ namespace BlueScript.Methods {
                 var (pos, _) = NextText(txt, posc, c, true, false, KlammernStd);
                 if (pos < 0) { return new GetEndFeedback(0, txt); }
                 var f = Script.ComandOnPosition(txt, pos, s, true);
-                if (!string.IsNullOrEmpty(f.ErrorMessage)) {
-                    return new GetEndFeedback(f.ErrorMessage);
-                }
-                txt = txt.Substring(0, pos) + f.Value + txt.Substring(f.Position);
+                if (!string.IsNullOrEmpty(f.ErrorMessage)) { return new GetEndFeedback(f.ErrorMessage); }
+
+                if (pos == 0 && txt.Length == f.Position) { return new GetEndFeedback(f.Variable); }
+                if (!f.Variable.Stringable) { return new GetEndFeedback("Variable muss als Objekt behandelt werden"); }
+
+                txt = txt.Substring(0, pos) + f.Variable.ValueForReplace + txt.Substring(f.Position);
                 posc = pos;
             } while (true);
         }

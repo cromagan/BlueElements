@@ -154,7 +154,7 @@ namespace BlueControls {
             if (s?.Variables != null) {
                 foreach (var thisv in s.Variables) {
                     var ro = tableVariablen.Database.Row.Add(thisv.Name);
-                    ro.CellSet("typ", thisv.Type.ToString());
+                    ro.CellSet("typ", thisv.ShortName);
                     ro.CellSet("RO", thisv.Readonly);
                     ro.CellSet("System", thisv.SystemVariable);
 

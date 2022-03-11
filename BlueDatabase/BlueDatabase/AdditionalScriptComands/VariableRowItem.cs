@@ -47,6 +47,7 @@ namespace BlueScript {
         #region Properties
 
         public override int CheckOrder => 99;
+        public override bool IsNullOrEmpty => _row == null;
 
         public RowItem? RowItem {
             get => _row;

@@ -56,6 +56,7 @@ namespace BlueScript.Variables {
         #region Properties
 
         public override int CheckOrder => 3;
+        public override bool IsNullOrEmpty => _list == null || _list.Count == 0;
 
         public override string ReadableText {
             get {

@@ -122,7 +122,6 @@
     <Compile Include="Structures\GetEndFeedback.cs" />
     <Compile Include="Structures\DoItFeedback.cs" />
     <Compile Include="Structures\CanDoFeedback.cs" />
-    <Compile Include="Variable.cs" />
     <Compile Include="Methods\Method_Var.cs" />
     <Compile Include="Variables\VariableBitmap.cs" />
     <Compile Include="Variables\VariableBool.cs" />

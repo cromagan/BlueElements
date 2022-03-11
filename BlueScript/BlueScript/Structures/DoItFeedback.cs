@@ -107,7 +107,7 @@ namespace BlueScript.Structures {
 
         public static DoItFeedback VerschiedeneTypen(Variable var1, Variable var2) =>
             new DoItFeedback("Variable '" + var1.Name + "' ist nicht der erwartete Typ {" + var2.ShortName +
-                             "}, sondern {" + var2.ShortName + "}");
+                             "}, sondern {" + var1.ShortName + "}");
 
         public static DoItFeedback Wahr() => new(true);
 
