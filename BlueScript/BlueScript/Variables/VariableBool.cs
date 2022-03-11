@@ -73,6 +73,11 @@ namespace BlueScript.Variables {
         }
 
         protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
+            var x = Method_if.GetBool(txt);
+            if (x != null) {
+                succesVar = new VariableBool((bool)x);
+                return true;
+            }
             succesVar = null;
 
             #region Auf Restliche Boolsche Operationen testen
@@ -205,14 +210,6 @@ namespace BlueScript.Variables {
             #endregion
 
             return false;
-            //var x = Method_if.GetBool(txt);
-            //if (x != null) {
-            //    succesVar = new VariableBool((bool)x);
-            //    return true;
-            //}
-
-            //succesVar = null;
-            //return false;
         }
 
         #endregion
