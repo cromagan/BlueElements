@@ -46,7 +46,7 @@ namespace BlueScript.Methods {
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-            switch (attvar.Attributes[1].ReadableText.ToLower()) {
+            switch (attvar.Attributes[1].ShortName.ToLower()) {
                 case "num":
                     return attvar.Attributes[0] is VariableFloat ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
 
