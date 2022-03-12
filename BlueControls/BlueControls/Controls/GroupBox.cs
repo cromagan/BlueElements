@@ -29,7 +29,7 @@ namespace BlueControls.Controls {
 
         #region Fields
 
-        private enGroupBoxStyle _GroupBoxStyle = enGroupBoxStyle.Normal;
+        private enGroupBoxStyle _groupBoxStyle = enGroupBoxStyle.Normal;
 
         #endregion
 
@@ -43,10 +43,10 @@ namespace BlueControls.Controls {
 
         [DefaultValue(enGroupBoxStyle.Normal)]
         public enGroupBoxStyle GroupBoxStyle {
-            get => _GroupBoxStyle;
+            get => _groupBoxStyle;
             set {
-                if (_GroupBoxStyle == value) { return; }
-                _GroupBoxStyle = value;
+                if (_groupBoxStyle == value) { return; }
+                _groupBoxStyle = value;
                 SetStandardValues();
                 Invalidate();
             }
@@ -80,12 +80,12 @@ namespace BlueControls.Controls {
             Rectangle r = new(0, 0, Width, Height);
             e.Graphics.Clear(BackColor);
 
-            switch (_GroupBoxStyle) {
+            switch (_groupBoxStyle) {
                 case enGroupBoxStyle.RibbonBar:
                     Skin.Draw_Border(e.Graphics, enDesign.RibbonBar_Frame, state, r);
                     if (!string.IsNullOrEmpty(Text)) {
-                        Rectangle bottomTXT = new(0, 0, Width, Height + 2);
-                        Skin.Draw_FormatedText(e.Graphics, Text, enDesign.RibbonBar_Frame, state, null, enAlignment.Bottom_HorizontalCenter, bottomTXT, this, false, true);
+                        Rectangle bottomTxt = new(0, 0, Width, Height + 2);
+                        Skin.Draw_FormatedText(e.Graphics, Text, enDesign.RibbonBar_Frame, state, null, enAlignment.Bottom_HorizontalCenter, bottomTxt, this, false, true);
                     }
                     break;
 
@@ -93,8 +93,8 @@ namespace BlueControls.Controls {
                     if (Height > 33) {
                         Skin.Draw_Border(e.Graphics, enDesign.GroupBox, state, r);
                         if (!string.IsNullOrEmpty(Text)) {
-                            Rectangle topTXT = new(Skin.Padding, 0, Width, Height);
-                            Skin.Draw_FormatedText(e.Graphics, Text, enDesign.GroupBox, state, null, enAlignment.Top_Left, topTXT, this, true, true);
+                            Rectangle topTxt = new(Skin.Padding, 0, Width, Height);
+                            Skin.Draw_FormatedText(e.Graphics, Text, enDesign.GroupBox, state, null, enAlignment.Top_Left, topTxt, this, true, true);
                         }
                     }
                     break;
@@ -103,8 +103,8 @@ namespace BlueControls.Controls {
                     if (Height > 33) {
                         Skin.Draw_Border(e.Graphics, enDesign.GroupBoxBold, state, r);
                         if (!string.IsNullOrEmpty(Text)) {
-                            Rectangle topTXT = new(Skin.Padding, Skin.PaddingSmal, Width, Height);
-                            Skin.Draw_FormatedText(e.Graphics, Text, enDesign.GroupBoxBold, state, null, enAlignment.Top_Left, topTXT, this, false, true);
+                            Rectangle topTxt = new(Skin.Padding, Skin.PaddingSmal, Width, Height);
+                            Skin.Draw_FormatedText(e.Graphics, Text, enDesign.GroupBoxBold, state, null, enAlignment.Top_Left, topTxt, this, false, true);
                         }
                     }
                     break;
@@ -138,14 +138,14 @@ namespace BlueControls.Controls {
         }
 
         private void ChildControls_RibbonBar() {
-            if (_GroupBoxStyle != enGroupBoxStyle.RibbonBar) { return; }
+            if (_groupBoxStyle != enGroupBoxStyle.RibbonBar) { return; }
             if (Width < 10 || Height < 10) { return; }
             if (Controls.Count == 0) { return; }
 
             foreach (Control thisControl in Controls) {
                 switch (thisControl) {
-                    case Caption Caption:
-                        if (Caption.TextAnzeigeVerhalten == enSteuerelementVerhalten.Steuerelement_Anpassen) { Caption.TextAnzeigeVerhalten = enSteuerelementVerhalten.Text_Abschneiden; }
+                    case Caption caption:
+                        if (caption.TextAnzeigeVerhalten == enSteuerelementVerhalten.Steuerelement_Anpassen) { caption.TextAnzeigeVerhalten = enSteuerelementVerhalten.Text_Abschneiden; }
                         thisControl.Top = ((int)(thisControl.Top / 22.0) * 22) + 2;
                         thisControl.Height = Math.Max((int)(thisControl.Height / 22.0) * 22, 22);
                         break;
@@ -171,7 +171,7 @@ namespace BlueControls.Controls {
 
         private void SetStandardValues() {
             var l = GenericControl.Typ(Parent);
-            if (_GroupBoxStyle == enGroupBoxStyle.RibbonBar) { l = enPartentType.RibbonPage; }
+            if (_groupBoxStyle == enGroupBoxStyle.RibbonBar) { l = enPartentType.RibbonPage; }
             switch (l) {
                 case enPartentType.RibbonPage:
                     GroupBoxStyle = enGroupBoxStyle.RibbonBar;

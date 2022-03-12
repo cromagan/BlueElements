@@ -37,7 +37,7 @@ namespace BlueScript.Variables {
 
         public VariableBitmap(string name) : this(name, null, true, false, string.Empty) { }
 
-        public VariableBitmap(Bitmap? value) : this(Variable.DummyName(), value, true, false, string.Empty) { }
+        public VariableBitmap(Bitmap? value) : this(DummyName(), value, true, false, string.Empty) { }
 
         #endregion
 

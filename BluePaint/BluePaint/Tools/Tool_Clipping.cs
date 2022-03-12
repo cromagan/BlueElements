@@ -33,18 +33,14 @@ namespace BluePaint {
 
         #region Constructors
 
-        public Tool_Clipping(bool aufnahme) : base() {
+        public Tool_Clipping() : base() {
             InitializeComponent();
-            if (!aufnahme) {
-                return;
-            }
 
             CheckMinMax();
             AutoZ_Click(null, null);
             ZuschnittOK_Click(null, null);
             Enabled = false;
             MessageBox.Show("Automatisch zugeschnitten.");
-            OnCommandForMacro("AutoZuschnitt");
         }
 
         #endregion
@@ -100,8 +96,6 @@ namespace BluePaint {
                 DebugPrint_NichtImplementiert();
             }
         }
-
-        public override string MacroKennung() => "Clipping";
 
         public override void MouseDown(MouseEventArgs1_1 e, Bitmap? originalPic) => OnDoInvalidate();
 

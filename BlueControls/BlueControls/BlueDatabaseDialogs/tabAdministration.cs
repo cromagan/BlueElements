@@ -109,7 +109,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             switch (column.Format) {
                 //case enDataFormat.Columns_für_LinkedCellDropdown:
                 //    var txt = row.CellGetString(column);
-                //    if (int.TryParse(txt, out var colKey)) {
+                //    if (IntTryParse(txt, out var colKey)) {
                 //        columnLinked = column.LinkedDatabase().Column.SearchByKey(colKey);
                 //    }
                 //    break;

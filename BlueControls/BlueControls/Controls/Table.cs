@@ -118,7 +118,7 @@ namespace BlueControls.Controls {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            _MouseHighlight = false;
+            MouseHighlight = false;
         }
 
         #endregion
@@ -940,7 +940,7 @@ namespace BlueControls.Controls {
             foreach (var pair in toParse.GetAllTags()) {
                 switch (pair.Key) {
                     case "arrangementnr":
-                        Arrangement = int.Parse(pair.Value);
+                        Arrangement = IntParse(pair.Value);
                         break;
 
                     case "filters":
@@ -948,13 +948,13 @@ namespace BlueControls.Controls {
                         break;
 
                     case "sliderx":
-                        SliderX.Maximum = Math.Max(SliderX.Maximum, int.Parse(pair.Value));
-                        SliderX.Value = int.Parse(pair.Value);
+                        SliderX.Maximum = Math.Max(SliderX.Maximum, IntParse(pair.Value));
+                        SliderX.Value = IntParse(pair.Value);
                         break;
 
                     case "slidery":
-                        SliderY.Maximum = Math.Max(SliderY.Maximum, int.Parse(pair.Value));
-                        SliderY.Value = int.Parse(pair.Value);
+                        SliderY.Maximum = Math.Max(SliderY.Maximum, IntParse(pair.Value));
+                        SliderY.Value = IntParse(pair.Value);
                         break;
 
                     case "cursorpos":
@@ -967,7 +967,7 @@ namespace BlueControls.Controls {
                         break;
 
                     case "pin":
-                        PinnedRows.Add(_database.Row.SearchByKey(long.Parse(pair.Value)));
+                        PinnedRows.Add(_database.Row.SearchByKey(LongParse(pair.Value)));
                         break;
 
                     case "collapsed":
@@ -975,7 +975,7 @@ namespace BlueControls.Controls {
                         break;
 
                     case "reduced":
-                        var c = _database.Column.SearchByKey(long.Parse(pair.Value));
+                        var c = _database.Column.SearchByKey(LongParse(pair.Value));
                         var cv = CurrentArrangement[c];
                         if (cv != null) { cv.TmpReduced = true; }
                         break;
@@ -1533,7 +1533,7 @@ namespace BlueControls.Controls {
                                 switch (_mouseOverColumn.Format) {
                                     //case enDataFormat.Columns_für_LinkedCellDropdown:
                                     //    var txt = _mouseOverRow.Row.CellGetString(_mouseOverColumn);
-                                    //    if (int.TryParse(txt, out var colKey)) {
+                                    //    if (IntTryParse(txt, out var colKey)) {
                                     //        var c = _mouseOverColumn.LinkedDatabase().Column.SearchByKey(colKey);
                                     //        if (c != null) { _mouseOverText = c.QuickInfoText(_mouseOverColumn.Caption + ": " + c.Caption); }
                                     //    }
@@ -1542,7 +1542,7 @@ namespace BlueControls.Controls {
                                     //case enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
                                     case enDataFormat.Verknüpfung_zu_anderer_Datenbank:
                                     case enDataFormat.Values_für_LinkedCellDropdown:
-                                        var (lcolumn, lrow, info) = CellCollection.LinkedCellData(_mouseOverColumn, _mouseOverRow.Row, true, false);
+                                        var (lcolumn, _, info) = CellCollection.LinkedCellData(_mouseOverColumn, _mouseOverRow.Row, true, false);
                                         if (lcolumn != null) { _mouseOverText = lcolumn.QuickInfoText(_mouseOverColumn.ReadableText() + " bei " + lcolumn.ReadableText() + ":"); }
 
                                         if (!string.IsNullOrEmpty(info) && _mouseOverColumn.Database.IsAdministrator()) {

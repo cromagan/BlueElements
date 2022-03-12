@@ -42,7 +42,7 @@ namespace BlueControls.Controls {
 
         public ZoomPic() : base() {
             InitializeComponent();
-            _MouseHighlight = false;
+            MouseHighlight = false;
         }
 
         #endregion

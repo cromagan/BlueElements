@@ -162,7 +162,7 @@ namespace BlueScript.Variables {
         }
 
         public static Variable? GetSystem(this List<Variable> vars, string name) => vars.FirstOrDefault(thisv =>
-                                                        thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper());
+                                                              thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper());
 
         public static void RemoveWithComent(this List<Variable> vars, string coment) {
             var z = 0;
@@ -196,7 +196,7 @@ namespace BlueScript.Variables {
             }
 
             if (v is not VariableString vf) {
-                Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Warnung, "Variablentyp falsch");
+                Develop.DebugPrint(enFehlerArt.Warnung, "Variablentyp falsch");
                 return;
             }
 
@@ -219,7 +219,7 @@ namespace BlueScript.Variables {
             }
 
             if (v is not VariableFloat vf) {
-                Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Warnung, "Variablentyp falsch");
+                Develop.DebugPrint(enFehlerArt.Warnung, "Variablentyp falsch");
                 return;
             }
 
@@ -242,7 +242,7 @@ namespace BlueScript.Variables {
             }
 
             if (v is not VariableListString vf) {
-                Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Warnung, "Variablentyp falsch");
+                Develop.DebugPrint(enFehlerArt.Warnung, "Variablentyp falsch");
                 return;
             }
 
@@ -265,7 +265,7 @@ namespace BlueScript.Variables {
             }
 
             if (v is not VariableBool vf) {
-                Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Warnung, "Variablentyp falsch");
+                Develop.DebugPrint(enFehlerArt.Warnung, "Variablentyp falsch");
                 return;
             }
 
@@ -289,7 +289,7 @@ namespace BlueScript.Variables {
 
         #region Constructors
 
-        public Variable(string name, bool ronly, bool system, string coment) {
+        protected Variable(string name, bool ronly, bool system, string coment) {
             Name = system ? "*" + name.ToLower() : name.ToLower();
             Readonly = ronly;
             SystemVariable = system;
@@ -323,7 +323,7 @@ namespace BlueScript.Variables {
 
         public virtual string ValueForReplace {
             get {
-                if (Stringable) { Develop.DebugPrint(enFehlerArt.Warnung, "Variable kann als String zurückgegeben werden."); }
+                if (Stringable) { Develop.DebugPrint(enFehlerArt.Fehler, "Routine muss überschrieben werden!"); }
                 return ObjectKennung + "\"" + ShortName + ";" + Name + "\"" + ObjectKennung;
             }
         }
@@ -419,14 +419,13 @@ namespace BlueScript.Variables {
                 }
 
                 var tmp = GetVariableByParsing(txt.Substring(posa + 1, pose - posa - 1), s);
-                if (!tmp.Variable.Stringable) {
-                    return new DoItFeedback("Falscher Variablentyp: " + tmp.Variable.ShortName);
-                }
+                if (!tmp.Variable.Stringable) { return new DoItFeedback("Falscher Variablentyp: " + tmp.Variable.ShortName); }
 
-                return !string.IsNullOrEmpty(tmp.ErrorMessage)
-                    ? tmp
-                    : GetVariableByParsing(
-                        txt.Substring(0, posa) + tmp.Variable.ValueForReplace + txt.Substring(pose + 1), s);
+                if (!string.IsNullOrEmpty(tmp.ErrorMessage)) { return tmp; }
+
+                //if (tmp.Variable is VariableUnknown) { return new DoItFeedback("Inhalt unbekannt: " + txt.Substring(posa + 1, pose - posa - 1)); }
+
+                return GetVariableByParsing(txt.Substring(0, posa) + tmp.Variable.ValueForReplace + txt.Substring(pose + 1), s);
             }
 
             #endregion

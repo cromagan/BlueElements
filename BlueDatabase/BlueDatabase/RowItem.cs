@@ -30,6 +30,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using BlueScript.Variables;
+using static BlueBasics.Converter;
 
 namespace BlueDatabase {
 
@@ -146,7 +147,7 @@ namespace BlueDatabase {
                     break;
 
                     //case enDataFormat.Columns_für_LinkedCellDropdown:
-                    //    if (int.TryParse(wert, out var colKey)) {
+                    //    if (IntTryParse(wert, out var colKey)) {
                     //        var c = column.LinkedDatabase().Column.SearchByKey(colKey);
                     //        if (c != null) { wert = c.Name; }
                     //    }
@@ -295,8 +296,8 @@ namespace BlueDatabase {
         /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgefphrt</param>
         /// <param name="tryforsceonds"></param>
         /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
-        public (bool checkPerformed, string error, Script script) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, float tryforsceonds, string startroutine) {
-            if (Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
+        public (bool checkPerformed, string error, Script? script) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, float tryforsceonds, string startroutine) {
+            if (Database == null || Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
             var t = DateTime.Now;
             do {
                 var erg = DoAutomatic(doFemdZelleInvalidate, fullCheck, startroutine);
@@ -312,8 +313,8 @@ namespace BlueDatabase {
         /// <param name="doFemdZelleInvalidate">bei verlinkten Zellen wird der verlinkung geprüft und erneuert.</param>
         /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgeführt</param>
         /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
-        public (bool checkPerformed, string error, Script skript) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, string startroutine) {
-            if (Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
+        public (bool checkPerformed, string error, Script? skript) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, string startroutine) {
+            if (Database == null || Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
 
             var feh = Database.ErrorReason(enErrorReason.EditAcut);
             if (!string.IsNullOrEmpty(feh)) { return (false, feh, null); }
@@ -325,13 +326,13 @@ namespace BlueDatabase {
 
             if (startroutine == "script testing") { return (true, string.Empty, script); }
 
-            /// checkPerformed geht von Dateisystemfehlern aus
+            // checkPerformed geht von Dateisystemfehlern aus
             if (!string.IsNullOrEmpty(script.Error)) {
                 Database.OnScriptError(new RowCancelEventArgs(this, "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode));
                 return (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
             }
 
-            if (!((VariableBool)script.Variables.GetSystem("CellChangesEnabled")).ValueBool) { return (true, string.Empty, script); }
+            if (script?.Variables == null || !((VariableBool)script.Variables.GetSystem("CellChangesEnabled")).ValueBool) { return (true, string.Empty, script); }
 
             // Dann die Abschließenden Korrekturen vornehmen
             foreach (var thisColum in Database.Column.Where(thisColum => thisColum != null)) {
@@ -394,7 +395,9 @@ namespace BlueDatabase {
 
         public bool IsNullOrEmpty(string columnName) => Database.Cell.IsNullOrEmpty(Database.Column[columnName], this);
 
-        public bool MatchesTo(FilterItem filter) {
+        public bool MatchesTo(FilterItem? filter) {
+            if (Database == null) { return false; }
+
             if (filter != null) {
                 if (filter.FilterType is enFilterType.KeinFilter or enFilterType.GroßKleinEgal) { return true; } // Filter ohne Funktion
                 if (filter.Column == null) {
@@ -452,7 +455,7 @@ namespace BlueDatabase {
                         var vals = ww.SplitAndCutBy(",");
                         if (vals.Length != 2) { return formel; }
                         if (vals[0] != "L") { return formel; }
-                        if (!int.TryParse(vals[1], out var stellen)) { return formel; }
+                        if (!IntTryParse(vals[1], out var stellen)) { return formel; }
                         var newW = txt.Substring(0, Math.Min(stellen, txt.Length));
                         erg = erg.Replace(erg.Substring(x, x2 - x + 1), newW);
                     }

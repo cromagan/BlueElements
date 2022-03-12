@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using static BlueBasics.Geometry;
+using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection {
 
@@ -125,7 +126,7 @@ namespace BlueControls.ItemCollection {
             if (base.ParseThis(tag, value)) { return true; }
             switch (tag) {
                 case "connection":
-                    Linien_Verhalten = (enConectorStyle)int.Parse(value);
+                    Linien_Verhalten = (enConectorStyle)IntParse(value);
                     return true;
             }
             return false;

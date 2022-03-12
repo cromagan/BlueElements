@@ -186,7 +186,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             var c = _tableView.CursorPosColumn();
             if (c == null) { return; }
             var p = InputBox.Show("<b>" + _tableView.CursorPosColumn().ReadableText() + "</b><br>Auf welche Position verschieben?<br>Info: Nummerierung beginnt mit 1", "", enVarType.Integer);
-            if (int.TryParse(p, out var index)) {
+            if (IntTryParse(p, out var index)) {
                 if (index < 1) { return; }
                 index--;
                 var viewItem = _tableView.CurrentArrangement[c];
@@ -265,7 +265,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void cbxInternalColumnArrangementSelector_ItemClicked(object sender, BasicListItemEventArgs e) {
             if (string.IsNullOrEmpty(cbxInternalColumnArrangementSelector.Text)) { return; }
-            _tableView.Arrangement = int.Parse(e.Item.Internal);
+            _tableView.Arrangement = IntParse(e.Item.Internal);
             Check_OrderButtons();
         }
 

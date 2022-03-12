@@ -75,9 +75,9 @@ namespace BlueDatabase {
 
         public ColumnItem? this[string columnName] {
             get {
-                Database.BlockReload(false);
+                Database?.BlockReload(false);
                 var colum = Exists(columnName);
-                if (colum is null) { Database.DevelopWarnung("Spalte nicht gefunden: " + columnName); }
+                if (colum is null) { Database?.DevelopWarnung("Spalte nicht gefunden: " + columnName); }
                 return colum;
             }
         }
@@ -360,7 +360,7 @@ namespace BlueDatabase {
         //internal string Load_310(enDatabaseDataType type, string value) {
         //    switch (type) {
         //        case enDatabaseDataType.LastColumnKey:
-        //            _LastColumnKey = int.Parse(value);
+        //            _LastColumnKey = IntParse(value);
         //            break;
 
         //        default:

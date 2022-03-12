@@ -22,6 +22,7 @@ using BlueControls.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection {
 
@@ -101,7 +102,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "rotation":
-                    _drehwinkel = int.Parse(value);
+                    _drehwinkel = IntParse(value);
                     return true;
             }
             return false;

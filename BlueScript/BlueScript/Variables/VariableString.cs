@@ -26,15 +26,15 @@ namespace BlueScript.Variables {
 
         #region Fields
 
-        private string _valueString = string.Empty;
+        private string _valueString;
 
         #endregion
 
         #region Constructors
 
-        public VariableString(string name, string value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) { _valueString = value.RestoreCriticalVariableChars(); }
+        public VariableString(string name, string value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _valueString = value.RestoreCriticalVariableChars();
 
-        public VariableString(string value) : this(Variable.DummyName(), value, true, false, string.Empty) { }
+        public VariableString(string value) : this(DummyName(), value, true, false, string.Empty) { }
 
         public VariableString(string name, string value) : this(name, value, true, false, string.Empty) { }
 
@@ -48,12 +48,12 @@ namespace BlueScript.Variables {
         /// <summary>
         /// Gleichgesetzt mit ValueString
         /// </summary>
-        public override string ReadableText { get => _valueString; }
+        public override string ReadableText => _valueString;
 
         public override string ShortName => "str";
         public override bool Stringable => true;
         public override VariableDataType Type => VariableDataType.String;
-        public override string ValueForReplace { get => "\"" + _valueString.RemoveCriticalVariableChars() + "\""; }
+        public override string ValueForReplace => "\"" + _valueString.RemoveCriticalVariableChars() + "\"";
 
         /// <summary>
         /// Gleichgesetzt mit ReadableText

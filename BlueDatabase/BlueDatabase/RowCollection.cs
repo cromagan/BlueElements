@@ -435,7 +435,7 @@ namespace BlueDatabase {
             }
         }
 
-        internal static List<RowItem>? MatchesTo(FilterItem? filterItem) {
+        internal static List<RowItem> MatchesTo(FilterItem? filterItem) {
             List<RowItem> l = new();
 
             if (filterItem == null) { return l; }
@@ -456,7 +456,7 @@ namespace BlueDatabase {
         //internal string Load_310(enDatabaseDataType type, string value) {
         //    switch (type) {
         //        case enDatabaseDataType.LastRowKey:
-        //            //_LastRowKey = long.Parse(value);
+        //            //_LastRowKey = LongParse(value);
         //            break;
 
         //        default:

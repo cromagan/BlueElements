@@ -218,7 +218,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void ButtonCheck() {
-            var tmpFormat = (enDataFormat)int.Parse(cbxFormat.Text);
+            var tmpFormat = (enDataFormat)IntParse(cbxFormat.Text);
             // Mehrzeilig
             btnMultiline.Enabled = tmpFormat.MultilinePossible();
             if (!tmpFormat.MultilinePossible()) { btnMultiline.Checked = false; }
@@ -432,18 +432,18 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (_column.Database.ReadOnly) { return; }
             _column.Name = tbxName.Text;
             _column.Caption = tbxCaption.Text.Replace("\r\n", "\r").Trim().Trim("\r").Trim();
-            _column.Format = (enDataFormat)int.Parse(cbxFormat.Text);
+            _column.Format = (enDataFormat)IntParse(cbxFormat.Text);
             _column.Quickinfo = tbxQuickinfo.Text.Replace("\r", "<BR>");
             _column.AdminInfo = tbxAdminInfo.Text.Replace("\r", "<BR>");
             _column.Suffix = cbxEinheit.Text;
             _column.BackColor = QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo.FromHtmlCode();
             _column.ForeColor = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo.FromHtmlCode();
-            _column.LineLeft = (enColumnLineStyle)int.Parse(cbxRandLinks.Text);
-            _column.LineRight = (enColumnLineStyle)int.Parse(cbxRandRechts.Text);
+            _column.LineLeft = (enColumnLineStyle)IntParse(cbxRandLinks.Text);
+            _column.LineRight = (enColumnLineStyle)IntParse(cbxRandRechts.Text);
             _column.MultiLine = btnMultiline.Checked;
             _column.AfterEdit_QuickSortRemoveDouble = btnAutoEditAutoSort.Checked;
             if (tbxRunden.Text.IsLong()) {
-                var zahl = int.Parse(tbxRunden.Text);
+                var zahl = IntParse(tbxRunden.Text);
                 if (zahl is > -1 and < 7) { _column.AfterEdit_Runden = zahl; }
             } else {
                 _column.AfterEdit_Runden = -1;
@@ -505,7 +505,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _column.AllowedChars = tbxAllowedChars.Text;
 
             _column.BildCode_ConstantHeight = txbBildCodeConstHeight.Text;
-            int.TryParse(cbxBildTextVerhalten.Text, out var imNf);
+            IntTryParse(cbxBildTextVerhalten.Text, out var imNf);
             _column.BildTextVerhalten = (enBildTextVerhalten)imNf;
             _column.BestFile_StandardFolder = txbBestFileStandardFolder.Text;
             _column.BestFile_StandardSuffix = txbBestFileStandardSuffix.Text;
@@ -514,11 +514,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             _column.LinkedCell_ColumnKeyOfLinkedDatabase = ColumKeyFrom(_column.LinkedDatabase, cbxTargetColumn.Text); // LINKED DATABASE
             _column.DropdownKey = ColumKeyFrom(_column.Database, cbxDropDownKey.Text);
             _column.VorschlagsColumn = ColumKeyFrom(_column.Database, cbxVorschlagSpalte.Text);
-            _column.Align = (enAlignmentHorizontal)int.Parse(cbxAlign.Text);
-            _column.AdditionalCheck = (enAdditionalCheck)int.Parse(cbxAdditionalCheck.Text);
-            _column.ScriptType = (enScriptType)int.Parse(cbxScriptType.Text);
-            _column.Translate = (enTranslationType)int.Parse(cbxTranslate.Text);
-            _column.SortType = (enSortierTyp)int.Parse(cbxSort.Text);
+            _column.Align = (enAlignmentHorizontal)IntParse(cbxAlign.Text);
+            _column.AdditionalCheck = (enAdditionalCheck)IntParse(cbxAdditionalCheck.Text);
+            _column.ScriptType = (enScriptType)IntParse(cbxScriptType.Text);
+            _column.Translate = (enTranslationType)IntParse(cbxTranslate.Text);
+            _column.SortType = (enSortierTyp)IntParse(cbxSort.Text);
             _column.AutoRemove = txbAutoRemove.Text;
             _column.SaveContent = butSaveContent.Checked;
             GetLinkedCellFilter();
@@ -573,7 +573,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             linkdb.RepairAfterParse(); // Dass ja die 0 Ansicht stimmt
 
-            var ok = int.TryParse(cbxTargetColumn.Text, out var key);
+            var ok = IntTryParse(cbxTargetColumn.Text, out var key);
             ColumnItem? spalteauDb = null;
             if (ok) { spalteauDb = linkdb.Column.SearchByKey(key); }
 
@@ -640,7 +640,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 if (x < _column.LinkedCellFilter.Count) {
                     var tmp = _column.LinkedCellFilter[x];
 
-                    if (int.TryParse(tmp, out var key)) {
+                    if (IntTryParse(tmp, out var key)) {
                         var col = _column.Database.Column.SearchByKey(key);
                         tmp = col != null ? "~" + col.Name.ToLower() + "~" : string.Empty;
                     } else {

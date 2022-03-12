@@ -21,6 +21,8 @@ namespace BlueControls {
         protected void WriteComandsToList() {
             lstComands.Item.Clear();
 
+            if (Script.Comands == null) { return; }
+
             foreach (var thisc in Script.Comands) {
                 lstComands.Item.Add(thisc, thisc.Syntax.ToLower());
             }
@@ -30,7 +32,7 @@ namespace BlueControls {
 
         private void lstComands_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) {
             var co = string.Empty;
-            if (e.Item.Tag is Method thisc) {
+            if (e.Item != null && e.Item.Tag is Method thisc) {
                 co += thisc.HintText();
             }
             txbComms.Text = co;

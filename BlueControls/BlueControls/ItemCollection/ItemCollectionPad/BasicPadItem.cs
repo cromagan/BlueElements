@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection {
 
@@ -34,9 +35,9 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
-        public readonly ListExt<PointM?> MovablePoint = new();
+        public readonly ListExt<PointM> MovablePoint = new();
 
-        public readonly List<PointM?> PointsForSuccesfullyMove = new();
+        public readonly List<PointM> PointsForSuccesfullyMove = new();
 
         private static int _uniqueInternalCount;
 
@@ -381,6 +382,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "point":
+
                     foreach (var thisPoint in MovablePoint.Where(thisPoint => value.Contains("Name=" + thisPoint.Name + ","))) {
                         thisPoint.Parse(value);
                     }
@@ -391,7 +393,7 @@ namespace BlueControls.ItemCollection {
                 case "design":
 
                 case "style":
-                    _style = (PadStyles)int.Parse(value);
+                    _style = (PadStyles)IntParse(value);
                     return true;
 
                 case "removetoo": // TODO: Alt, löschen, 02.03.2020
@@ -409,7 +411,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "zoompadding":
-                    _zoomPadding = int.Parse(value);
+                    _zoomPadding = IntParse(value);
                     return true;
 
                 case "quickinfo":

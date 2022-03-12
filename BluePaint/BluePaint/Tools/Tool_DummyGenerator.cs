@@ -34,17 +34,17 @@ namespace BluePaint {
         #region Methods
 
         private void CreateDummy() {
-            var W = Berechnung.Ergebnis(X.Text);
-            var H = Berechnung.Ergebnis(Y.Text);
-            if (W == null || (int)W < 2) {
+            var w = Berechnung.Ergebnis(X.Text);
+            var h = Berechnung.Ergebnis(Y.Text);
+            if (w == null || (int)w < 2) {
                 Notification.Show("Bitte Breite eingeben.", enImageCode.Information);
                 return;
             }
-            if (H == null || (int)H < 2) {
+            if (h == null || (int)h < 2) {
                 Notification.Show("Bitte Höhe eingeben.", enImageCode.Information);
                 return;
             }
-            Bitmap newPic = new((int) W, (int) H);
+            Bitmap newPic = new((int)w, (int)h);
             var gr = Graphics.FromImage(newPic);
             gr.Clear(Color.White);
             gr.DrawRectangle(new Pen(Color.Black, 2), 1, 1, newPic.Width - 2, newPic.Height - 2);

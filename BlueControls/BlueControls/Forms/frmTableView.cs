@@ -31,6 +31,7 @@ using System.IO;
 using System.Linq;
 using static BlueBasics.Develop;
 using static BlueBasics.FileOperations;
+using static BlueBasics.Converter;
 
 #nullable enable
 
@@ -205,8 +206,7 @@ namespace BlueControls.Forms {
 
         private void AllgemeinerEditor_Click(object sender, System.EventArgs e) {
             Hide();
-            PadEditorWithFileAccess r = new()
-            {
+            PadEditorWithFileAccess r = new() {
                 WindowState = System.Windows.Forms.FormWindowState.Maximized
             };
             r.ShowDialog();
@@ -219,7 +219,7 @@ namespace BlueControls.Forms {
         }
 
         private void Ansicht_Click(object sender, System.EventArgs e) {
-            _ansicht = (enAnsicht)int.Parse(((Button)sender).Name.Substring(7, 1));
+            _ansicht = (enAnsicht)IntParse(((Button)sender).Name.Substring(7, 1));
             InitView();
             CheckButtons();
         }
@@ -280,7 +280,7 @@ namespace BlueControls.Forms {
 
         private void cbxColumnArr_ItemClicked(object sender, BasicListItemEventArgs e) {
             if (string.IsNullOrEmpty(cbxColumnArr.Text)) { return; }
-            TableView.Arrangement = int.Parse(e.Item.Internal);
+            TableView.Arrangement = IntParse(e.Item.Internal);
         }
 
         private void Check_SuchButton() => SuchB.Enabled = TableView.Database != null && TableView.Database.Row.Count >= 1 && !string.IsNullOrEmpty(such.Text) && !string.IsNullOrEmpty(such.Text.RemoveChars(" "));

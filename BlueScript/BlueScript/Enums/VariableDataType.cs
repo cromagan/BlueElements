@@ -44,7 +44,7 @@ namespace BlueScript.Enums {
         Bool_Numeral_String_or_List = Bool | Numeral | String | List,
         Bool_Numeral_String_List_or_Object = Bool | Numeral | String | List | Object,
 
-        Any = Bool_Numeral_String_List_or_Object, //String | List | Numeral | Bool | Object,
+        Any = Bool | Numeral | String | List | Object | Unknown,
         Variable = 1024,
 
         Variable_Numeral = Variable | Numeral,
@@ -57,6 +57,7 @@ namespace BlueScript.Enums {
         Variable_List_String_Numeral_or_Bool = Variable | String | List | Numeral | Bool,
         Variable_String_or_Numeral = Variable | String | Numeral,
         Variable_String_Numeral_or_List = Variable | String | List | Numeral,
-        Variable_Any = Variable | String | List | Numeral | Bool | Object
+        Variable_String_Numeral_List_or_Object = Variable | String | List | Numeral | Bool | Object,
+        Variable_Any = Variable | String | List | Numeral | Bool | Object | Unknown
     }
 }

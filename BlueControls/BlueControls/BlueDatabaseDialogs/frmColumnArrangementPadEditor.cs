@@ -157,7 +157,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void cbxInternalColumnArrangementSelector_ItemClicked(object sender, BasicListItemEventArgs e) {
             if (string.IsNullOrEmpty(cbxInternalColumnArrangementSelector.Text)) { return; }
 
-            var tmporder = int.Parse(e.Item.Internal);
+            var tmporder = IntParse(e.Item.Internal);
 
             if (Arrangement == tmporder) { return; }
 

@@ -188,7 +188,7 @@ namespace BlueDatabase {
 
                 //case enDataFormat.FarbeInteger:
                 //    if (!string.IsNullOrEmpty(txt) && txt.IsFormat(enDataFormat.FarbeInteger)) {
-                //        var col = Color.FromArgb(int.Parse(txt));
+                //        var col = Color.FromArgb(IntParse(txt));
                 //        txt = col.ToHTMLCode().ToUpper();
                 //    }
                 //    txt = LanguageTool.ColumnReplace(txt, column, style);
@@ -204,7 +204,7 @@ namespace BlueDatabase {
                 //case enDataFormat.Columns_für_LinkedCellDropdown:
                 //    // Hier kommt die Spalten-ID  an
                 //    if (string.IsNullOrEmpty(txt)) { return string.Empty; }
-                //    if (!int.TryParse(txt, out var ColKey)) { return "Columkey kann nicht geparsed werden"; }
+                //    if (!IntTryParse(txt, out var ColKey)) { return "Columkey kann nicht geparsed werden"; }
                 //    var LinkedDatabase = column.LinkedDatabase();
                 //    if (LinkedDatabase == null) { return "Datenbankverknüpfung fehlt"; }
                 //    var C = LinkedDatabase.Column.SearchByKey(ColKey);

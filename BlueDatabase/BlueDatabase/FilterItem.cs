@@ -23,6 +23,7 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
+using static BlueBasics.Converter;
 
 namespace BlueDatabase {
 
@@ -185,7 +186,7 @@ namespace BlueDatabase {
                         break;
 
                     case "type":
-                        _filterType = (enFilterType)int.Parse(pair.Value);
+                        _filterType = (enFilterType)IntParse(pair.Value);
                         break;
 
                     case "column":
@@ -193,7 +194,7 @@ namespace BlueDatabase {
                         break;
 
                     case "columnkey":
-                        _column = Database.Column.SearchByKey(long.Parse(pair.Value));
+                        _column = Database.Column.SearchByKey(LongParse(pair.Value));
                         break;
 
                     case "value":

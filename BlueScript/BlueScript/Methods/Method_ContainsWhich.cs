@@ -65,7 +65,7 @@ namespace BlueScript.Methods {
 
             for (var z = 1; z < attvar.Attributes.Count; z++) {
                 if (attvar.Attributes[z] is VariableString vs) { wordlist.Add(vs.ValueString); }
-                if (attvar.Attributes[z] is VariableListString vl) { wordlist.AddRange(vl.ValueListString); }
+                if (attvar.Attributes[z] is VariableListString vl) { wordlist.AddRange(vl.ValueList); }
             }
             wordlist = wordlist.SortedDistinctList();
 

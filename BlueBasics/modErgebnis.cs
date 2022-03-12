@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using static BlueBasics.Converter;
 
 namespace BlueBasics {
 
@@ -138,7 +139,7 @@ namespace BlueBasics {
             // --------------------------------------------------------------------------------------------------------------------------------
             // --- Prüfen, ob überhaupt eine Berechnung nötig ist. Z.B. wenn unnötige Klammern aufgelöst wurden. ------------------------------
             // --------------------------------------------------------------------------------------------------------------------------------
-            if (formel.Replace(".", ",").IsNumeral()) { return double.Parse(formel.Replace(".", ",")); }
+            if (formel.Replace(".", ",").IsNumeral()) { return DoubleParse(formel.Replace(".", ",")); }
             // TMP = Math.Max(Math.Max(-1, Formel.LastIndexOf("=")), Math.Max(Formel.LastIndexOf("<"), Formel.LastIndexOf(">")));
             var tmp = Math.Max(formel.LastIndexOf("+"), LastMinusIndex(formel));
             if (tmp < 0) { tmp = Math.Max(formel.LastIndexOf("/"), formel.LastIndexOf("*")); }

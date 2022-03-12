@@ -22,6 +22,7 @@ using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using static BlueBasics.Converter;
@@ -323,17 +324,17 @@ namespace BlueDatabase {
 
                     case "typ":
                     case "type":// ALT, 02.10.2019
-                        _typ = (enExportTyp)int.Parse(pair.Value);
+                        _typ = (enExportTyp)IntParse(pair.Value);
                         break;
 
                     case "itv":
                     case "interval":// ALT, 02.10.2019
-                        _backupInterval = float.Parse(pair.Value.FromNonCritical());
+                        _backupInterval = FloatParse(pair.Value.FromNonCritical());
                         break;
 
                     case "aud":
                     case "autodelete":// ALT, 02.10.2019
-                        _autoDelete = float.Parse(pair.Value.FromNonCritical());
+                        _autoDelete = FloatParse(pair.Value.FromNonCritical());
                         break;
 
                     case "exportformula":
@@ -346,7 +347,7 @@ namespace BlueDatabase {
 
                     case "exc":
                     case "exportcolumnorder": // ALT, 02.10.2019
-                        _exportSpaltenAnsicht = int.Parse(pair.Value);
+                        _exportSpaltenAnsicht = IntParse(pair.Value);
                         break;
 
                     case "flt":
@@ -465,9 +466,9 @@ namespace BlueDatabase {
                 result = result + "dest=" + _verzeichnis.ToNonCritical() + ", ";
                 result = result + "typ=" + (int)_typ + ", ";
                 result = result + "let=" + _lastExportTimeUtc.ToString(Constants.Format_Date5) + ", ";
-                result = result + "itv=" + _backupInterval.ToString().ToNonCritical() + ", ";
+                result = result + "itv=" + _backupInterval.ToString(CultureInfo.InvariantCulture).ToNonCritical() + ", ";
                 if (_typ is enExportTyp.DatenbankCSVFormat or enExportTyp.DatenbankHTMLFormat or enExportTyp.DatenbankOriginalFormat) {
-                    result = result + "aud=" + _autoDelete.ToString().ToNonCritical() + ", ";
+                    result = result + "aud=" + _autoDelete.ToString(CultureInfo.InvariantCulture).ToNonCritical() + ", ";
                     if (_typ != enExportTyp.DatenbankOriginalFormat) {
                         result = result + "exc=" + _exportSpaltenAnsicht + ", ";
                     }
@@ -537,7 +538,7 @@ namespace BlueDatabase {
                     if (worker != null && worker.CancellationPending) { break; }
                     if (!string.IsNullOrEmpty(BereitsExportiert[n])) {
                         var x = BereitsExportiert[n].SplitAndCutBy("|");
-                        if (x.GetUpperBound(0) > 1 && Database.Row.SearchByKey(long.Parse(x[2])) == null) {
+                        if (x.GetUpperBound(0) > 1 && Database.Row.SearchByKey(LongParse(x[2])) == null) {
                             if (FileExists(x[0])) { DeleteFile(x[0], false); }
                         }
                         if (!FileExists(x[0])) {

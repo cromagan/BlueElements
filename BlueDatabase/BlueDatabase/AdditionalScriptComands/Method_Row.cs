@@ -59,12 +59,12 @@ namespace BlueDatabase.AdditionalScriptComands {
 
             //var db = Database.GetByFilename(d2[0], true, false);
 
-            //return db?.Row.SearchByKey(long.Parse(d2[1]));
+            //return db?.Row.SearchByKey(LongParse(d2[1]));
 
             return vro.RowItem;
         }
 
-        public static DoItFeedback RowToObjectFeedback(RowItem? row) => new DoItFeedback(new VariableRowItem(row));
+        public static DoItFeedback RowToObjectFeedback(RowItem? row) => new(new VariableRowItem(row));
 
         public override List<string> Comand(Script? s) => new() { "row" };
 

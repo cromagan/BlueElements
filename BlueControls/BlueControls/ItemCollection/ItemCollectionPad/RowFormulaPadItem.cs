@@ -24,6 +24,7 @@ using BlueDatabase;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection {
 
@@ -133,8 +134,8 @@ namespace BlueControls.ItemCollection {
 
                 case "rowid": // TODO: alt
                 case "rowkey":
-                    _rowKey = long.Parse(value);
-                    //Row = ParseExplicit_TMPDatabase.Row.SearchByKey(long.Parse(value));
+                    _rowKey = LongParse(value);
+                    //Row = ParseExplicit_TMPDatabase.Row.SearchByKey(LongParse(value));
                     //if (_Row != null) { ParseExplicit_TMPDatabase = null; }
                     return true;
 

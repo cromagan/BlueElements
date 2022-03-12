@@ -17,11 +17,13 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using static BlueBasics.Converter;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using System;
 using System.Drawing;
 using System.Drawing.Printing;
+using System.Globalization;
 
 namespace BlueControls.Forms {
 
@@ -87,11 +89,11 @@ namespace BlueControls.Forms {
             if (canceled) { _giveBack = null; return; }
             _giveBack = new PrintDocument();
             _giveBack.DefaultPageSettings.Landscape = Querformat.Checked;
-            _giveBack.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)(float.Parse(Breite.Text) / 0.254), (int)(float.Parse(Höhe.Text) / 0.254));
-            _giveBack.DefaultPageSettings.Margins.Top = (int)(float.Parse(Oben.Text) / 0.254);
-            _giveBack.DefaultPageSettings.Margins.Bottom = (int)(float.Parse(Unten.Text) / 0.254);
-            _giveBack.DefaultPageSettings.Margins.Left = (int)(float.Parse(Links.Text) / 0.254);
-            _giveBack.DefaultPageSettings.Margins.Right = (int)(float.Parse(Rechts.Text) / 0.254);
+            _giveBack.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)(FloatParse(Breite.Text) / 0.254), (int)(FloatParse(Höhe.Text) / 0.254));
+            _giveBack.DefaultPageSettings.Margins.Top = (int)(FloatParse(Oben.Text) / 0.254);
+            _giveBack.DefaultPageSettings.Margins.Bottom = (int)(FloatParse(Unten.Text) / 0.254);
+            _giveBack.DefaultPageSettings.Margins.Left = (int)(FloatParse(Links.Text) / 0.254);
+            _giveBack.DefaultPageSettings.Margins.Right = (int)(FloatParse(Rechts.Text) / 0.254);
         }
 
         private static double Inch1000ToMm(double inch) => inch switch {
@@ -131,19 +133,19 @@ namespace BlueControls.Forms {
             double br = 0;
             double ho = 0;
             if (makeP) {
-                br = double.Parse(Breite.Text);
+                br = DoubleParse(Breite.Text);
                 if (br < 5) { makeP = false; }
-                ho = double.Parse(Höhe.Text);
+                ho = DoubleParse(Höhe.Text);
                 if (ho < 5) { makeP = false; }
             }
             if (Querformat.Checked) { Generic.Swap(ref br, ref ho); }
             if (makeP) {
                 OK_Enabled = true;
                 var z = Math.Min(Sample.Width / br, Sample.Height / ho);
-                var l = (float)(float.Parse(Links.Text) * z);
-                var o = (float)(float.Parse(Oben.Text) * z);
-                var r = (float)(float.Parse(Rechts.Text) * z);
-                var u = (float)(float.Parse(Unten.Text) * z);
+                var l = (float)(FloatParse(Links.Text) * z);
+                var o = (float)(FloatParse(Oben.Text) * z);
+                var r = (float)(FloatParse(Rechts.Text) * z);
+                var u = (float)(FloatParse(Unten.Text) * z);
                 Bitmap i = new((int)((br * z) - 1), (int)((ho * z) - 1));
                 var gr = Graphics.FromImage(i);
                 gr.Clear(Color.White);
@@ -167,8 +169,8 @@ namespace BlueControls.Forms {
                 Format.Text = "neu";
                 Breite.Enabled = true;
                 Höhe.Enabled = true;
-                b = b < 0 && !string.IsNullOrEmpty(Breite.Text) ? double.Parse(Breite.Text) : Inch1000ToMm(b);
-                h = h < 0 && !string.IsNullOrEmpty(Höhe.Text) ? double.Parse(Höhe.Text) : Inch1000ToMm(h);
+                b = b < 0 && !string.IsNullOrEmpty(Breite.Text) ? DoubleParse(Breite.Text) : Inch1000ToMm(b);
+                h = h < 0 && !string.IsNullOrEmpty(Höhe.Text) ? DoubleParse(Höhe.Text) : Inch1000ToMm(h);
             }
             if (Format.Text != "neu") {
                 b = Inch1000ToMm(b);
@@ -201,8 +203,8 @@ namespace BlueControls.Forms {
                         break;
                 }
             }
-            Breite.Text = Math.Round(b, 1).ToString();
-            Höhe.Text = Math.Round(h, 1).ToString();
+            Breite.Text = Math.Round(b, 1).ToString(CultureInfo.InvariantCulture);
+            Höhe.Text = Math.Round(h, 1).ToString(CultureInfo.InvariantCulture);
         }
 
         private void Format_ItemClicked(object sender, BasicListItemEventArgs e) {
@@ -210,7 +212,7 @@ namespace BlueControls.Forms {
             _doing = true;
             if (Format.Text.Contains(";")) {
                 var l = Format.Text.SplitAndCutBy(";");
-                FillHöheBreite(int.Parse(l[0]), int.Parse(l[1]));
+                FillHöheBreite(IntParse(l[0]), IntParse(l[1]));
             } else {
                 Format.Text = "neu";
                 FillHöheBreite(-1, -1);

@@ -262,10 +262,10 @@ namespace BlueDatabase {
         //            }
         //            break;
         //        case "200": // Bildbreite
-        //            Wi = int.Parse(CodeNr.Substring(3));
+        //            Wi = IntParse(CodeNr.Substring(3));
         //            break;
         //        case "201": // Bildhöhe
-        //            He = int.Parse(CodeNr.Substring(3));
+        //            He = IntParse(CodeNr.Substring(3));
         //            break;
         //        case "210": // Maximale Größe
         //            TextReturn = false;

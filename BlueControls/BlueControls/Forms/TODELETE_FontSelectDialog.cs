@@ -15,11 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using System;
 using System.Drawing;
 using BlueControls.ItemCollection.ItemCollectionList;
+using static BlueBasics.Converter;
 
 namespace BlueControls.Forms {
 
@@ -27,9 +30,9 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private static ItemCollectionList FNList;
-        private static ItemCollectionList FSList;
-        private bool Adding;
+        private static ItemCollectionList? _fnList;
+        private static ItemCollectionList? _fsList;
+        private bool _adding;
 
         #endregion
 
@@ -39,8 +42,8 @@ namespace BlueControls.Forms {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            if (FNList == null) {
-                FNList = new ItemCollectionList();
+            if (_fnList == null) {
+                _fnList = new ItemCollectionList();
                 foreach (var f in FontFamily.Families) {
                     if (string.IsNullOrEmpty(f.Name)) {
                         continue;
@@ -50,12 +53,12 @@ namespace BlueControls.Forms {
                         Font fo = new(f.Name, 100);
                         try {
                             BlueFont.MeasureString("T", fo);
-                            FNList.Add(string.Empty, f.Name, BlueFont.Get(f, 12).NameInStyle(), true);
+                            _fnList.Add(string.Empty, f.Name, BlueFont.Get(f, 12).NameInStyle(), true);
                         } catch (Exception) { }
                     }
                 }
-                FNList.Sort();
-                FSList = new ItemCollectionList
+                _fnList.Sort();
+                _fsList = new ItemCollectionList
                 {
                     { "8",enSortierTyp.ZahlenwertFloat },
                     { "9", enSortierTyp.ZahlenwertFloat },
@@ -74,11 +77,11 @@ namespace BlueControls.Forms {
                     { "48", enSortierTyp.ZahlenwertFloat },
                     { "72", enSortierTyp.ZahlenwertFloat }
                 };
-                FSList.Sort();
+                _fsList.Sort();
             }
-            FName.Item.AddRange(FNList);
+            FName.Item.AddRange(_fnList);
             FName.Item.Sort();
-            FSize.Item.AddRange(FSList);
+            FSize.Item.AddRange(_fsList);
             FSize.Item.Sort();
             Font = BlueFont.Get(Skin.DummyStandardFont); //, False, False, False, False, False, "000000", "", False)
             UpdateSampleText();
@@ -89,9 +92,9 @@ namespace BlueControls.Forms {
         #region Properties
 
         public new BlueFont? Font {
-            get => BlueFont.Get(FName.Item.Checked()[0].Internal, float.Parse(FSize.Item.Checked()[0].Internal), fFett.Checked, fKursiv.Checked, fUnterstrichen.Checked, fDurchge.Checked, fOutline.Checked, QuickImage.Get(cFarbe.ImageCode).ChangeGreenTo, QuickImage.Get(cRandF.ImageCode).ChangeGreenTo, fKap.Checked, OnlyUpper.Checked, OnlyLow.Checked);
+            get => BlueFont.Get(FName.Item.Checked()[0].Internal, FloatParse(FSize.Item.Checked()[0].Internal), fFett.Checked, fKursiv.Checked, fUnterstrichen.Checked, fDurchge.Checked, fOutline.Checked, QuickImage.Get(cFarbe.ImageCode).ChangeGreenTo, QuickImage.Get(cRandF.ImageCode).ChangeGreenTo, fKap.Checked, OnlyUpper.Checked, OnlyLow.Checked);
             set {
-                Adding = true;
+                _adding = true;
                 if (value == null) { value = BlueFont.Get(Skin.DummyStandardFont); }
                 if (FName.Item[value.FontName] == null) { FName.Item.Add(value.FontName, value.FontName, QuickImage.Get(enImageCode.Warnung, 20)); }
                 FName.Item.UncheckAll();
@@ -109,7 +112,7 @@ namespace BlueControls.Forms {
                 fKap.Checked = value.Kapitälchen;
                 OnlyLow.Checked = value.OnlyLower;
                 OnlyUpper.Checked = value.OnlyUpper;
-                Adding = false;
+                _adding = false;
                 UpdateSampleText();
             }
         }
@@ -139,7 +142,7 @@ namespace BlueControls.Forms {
         private void Ok_Click(object sender, System.EventArgs e) => Close();
 
         private void UpdateSampleText() {
-            if (Adding) { return; }
+            if (_adding) { return; }
             Sample.Image = Font.SampleText();
         }
 

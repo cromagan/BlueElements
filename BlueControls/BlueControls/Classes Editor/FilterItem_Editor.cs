@@ -13,7 +13,7 @@ namespace BlueControls.Classes_Editor {
     {
         #region Fields
 
-        private AutoFilter _autofilter;
+        private AutoFilter? _autofilter;
 
         #endregion
 
@@ -39,18 +39,19 @@ namespace BlueControls.Classes_Editor {
             cbxColumns.Text = Item.Column.Key.ToString();
         }
 
-        protected override void PrepaireFormula() => cbxColumns.Item.AddRange(Item.Database.Column, true);
+        protected override void PrepaireFormula() {
+            if (Item?.Database?.Column != null) { cbxColumns.Item?.AddRange(Item.Database.Column, true); }
+        }
 
         private void AutoFilter_FilterComand(object sender, FilterComandEventArgs e) {
             if (IsFilling) { return; }
+
             if (e.Comand != "Filter") {
                 Notification.Show("Diese Funktion wird nicht unterstützt,<br>abbruch.");
                 return;
             }
 
-            if (Item == null) {
-                return;
-            }
+            if (Item == null) { return; }
 
             Item.FilterType = e.Filter.FilterType;
             Item.SearchValue.Clear();

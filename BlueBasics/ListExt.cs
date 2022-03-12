@@ -38,7 +38,7 @@ namespace BlueBasics {
 
         public ListExt() { }
 
-        public ListExt(IList<T> list) : base(list) { }
+        public ListExt(IEnumerable<T> list) : base(list) { }
 
         #endregion
 

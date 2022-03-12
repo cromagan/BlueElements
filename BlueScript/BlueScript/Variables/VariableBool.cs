@@ -38,7 +38,7 @@ namespace BlueScript.Variables {
 
         public VariableBool(string name) : this(name, false, true, false, string.Empty) { }
 
-        public VariableBool(bool value) : this(Variable.DummyName(), value, true, false, string.Empty) { }
+        public VariableBool(bool value) : this(DummyName(), value, true, false, string.Empty) { }
 
         #endregion
 

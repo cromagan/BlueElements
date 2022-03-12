@@ -77,11 +77,11 @@ namespace BlueScript.Methods {
             if (attvar.Attributes[0] is VariableString vs) {
                 foreach (var thisW in wordlist) {
                     if (((VariableBool)attvar.Attributes[1]).ValueBool) {
-                        if (((VariableString)attvar.Attributes[0]).ValueString.Contains(thisW)) {
+                        if (vs.ValueString.Contains(thisW)) {
                             return DoItFeedback.Wahr();
                         }
                     } else {
-                        if (((VariableString)attvar.Attributes[0]).ValueString.ToLower().Contains(thisW.ToLower())) {
+                        if (vs.ValueString.ToLower().Contains(thisW.ToLower())) {
                             return DoItFeedback.Wahr();
                         }
                     }

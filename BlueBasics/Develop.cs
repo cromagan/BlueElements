@@ -71,10 +71,11 @@ namespace BlueBasics {
         public static string AppName() {
             try {
                 var exA = Assembly.GetEntryAssembly();
-                return exA.GetName().Name;
-            } catch {
-                return "Programm von Christian Peter";
-            }
+                if (exA != null) {
+                    return exA.GetName().Name;
+                }
+            } catch { }
+            return "Programm von Christian Peter";
         }
 
         public static void CheckStackForOverflow() {

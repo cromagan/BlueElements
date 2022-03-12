@@ -58,7 +58,7 @@ namespace BlueScript.Methods {
                     tmpList.AddRange(vl.ValueList);
                 }
             }
-           ((VariableListString)attvar.Attributes[0]).ValueList = tmpList;
+            ((VariableListString)attvar.Attributes[0]).ValueList = tmpList;
             return DoItFeedback.Null();
         }
 

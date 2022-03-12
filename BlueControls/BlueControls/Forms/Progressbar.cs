@@ -25,12 +25,12 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private readonly Dictionary<int, DateTime> eProgressbar_TimeDic = new();
+        private readonly Dictionary<int, DateTime> _eProgressbarTimeDic = new();
         private string _baseText = string.Empty;
         private int _count;
-        private int eProgressbar_LastCalulatedSeconds = int.MinValue;
-        private int eProgressbar_LastCurrent = int.MaxValue;
-        private DateTime eProgressbar_LastTimeUpdate = DateTime.Now;
+        private int _eProgressbarLastCalulatedSeconds = int.MinValue;
+        private int _eProgressbarLastCurrent = int.MaxValue;
+        private DateTime _eProgressbarLastTimeUpdate = DateTime.Now;
 
         #endregion
 
@@ -38,35 +38,35 @@ namespace BlueControls.Forms {
 
         private Progressbar() : base(Enums.enDesign.Form_BitteWarten) => InitializeComponent();
 
-        private Progressbar(string Text) : this() {
+        private Progressbar(string text) : this() {
             // InitializeComponent();
-            capTXT.Text = Text;
-            var He = Math.Min(capTXT.TextRequiredSize().Height, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
-            var Wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
-            Size = new Size(Wi + (capTXT.Left * 2), He + (capTXT.Top * 2));
+            capTXT.Text = text;
+            var he = Math.Min(capTXT.TextRequiredSize().Height, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
+            var wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
+            Size = new Size(wi + (capTXT.Left * 2), he + (capTXT.Top * 2));
         }
 
         #endregion
 
         #region Methods
 
-        public static Progressbar Show(string Text) {
-            Progressbar P = new(Text) {
-                _baseText = Text
+        public static Progressbar Show(string text) {
+            Progressbar p = new(text) {
+                _baseText = text
             };
-            P.Show();
-            return P;
+            p.Show();
+            return p;
         }
 
-        public static Progressbar Show(string text, int Count) {
-            Progressbar P = new(text) {
+        public static Progressbar Show(string text, int count) {
+            Progressbar p = new(text) {
                 _baseText = text,
-                _count = Count
+                _count = count
             };
-            P.Update(0);
-            P.Show();
-            P.BringToFront();
-            return P;
+            p.Update(0);
+            p.Show();
+            p.BringToFront();
+            return p;
         }
 
         public void Update(string text) {
@@ -83,63 +83,63 @@ namespace BlueControls.Forms {
             UpdateInternal(CalculateText(_baseText, current, _count));
         }
 
-        private string CalculateText(string BaseText, int Current, int Count) {
-            if (Current < eProgressbar_LastCurrent) {
-                eProgressbar_TimeDic.Clear();
-                eProgressbar_LastTimeUpdate = DateTime.Now;
-                eProgressbar_LastCalulatedSeconds = int.MinValue;
+        private string CalculateText(string baseText, int current, int count) {
+            if (current < _eProgressbarLastCurrent) {
+                _eProgressbarTimeDic.Clear();
+                _eProgressbarLastTimeUpdate = DateTime.Now;
+                _eProgressbarLastCalulatedSeconds = int.MinValue;
             }
-            var PR = Current / (double)Count;
-            if (PR > 1) { PR = 1; }
-            if (PR < 0) { PR = 0; }
-            if (double.IsNaN(PR)) { PR = 0; }
+            var pr = current / (double)count;
+            if (pr > 1) { pr = 1; }
+            if (pr < 0) { pr = 0; }
+            if (double.IsNaN(pr)) { pr = 0; }
             int tmpCalculatedSeconds;
-            if (Current > 0) {
-                if (eProgressbar_TimeDic.ContainsKey(Math.Max(0, Current - 100))) {
-                    var d = eProgressbar_TimeDic[Math.Max(0, Current - 100)];
+            if (current > 0) {
+                if (_eProgressbarTimeDic.ContainsKey(Math.Max(0, current - 100))) {
+                    var d = _eProgressbarTimeDic[Math.Max(0, current - 100)];
                     var ts = DateTime.Now.Subtract(d).TotalSeconds;
-                    tmpCalculatedSeconds = (int)(ts / Math.Min(Current, 100) * (Count - Current));
+                    tmpCalculatedSeconds = (int)(ts / Math.Min(current, 100) * (count - current));
                 } else {
                     tmpCalculatedSeconds = int.MinValue;
                 }
             } else {
                 tmpCalculatedSeconds = 0;
             }
-            eProgressbar_LastCurrent = Current;
-            if (!eProgressbar_TimeDic.ContainsKey(Current)) {
-                eProgressbar_TimeDic.Add(Current, DateTime.Now);
+            _eProgressbarLastCurrent = current;
+            if (!_eProgressbarTimeDic.ContainsKey(current)) {
+                _eProgressbarTimeDic.Add(current, DateTime.Now);
             }
-            if (eProgressbar_LastCalulatedSeconds != tmpCalculatedSeconds && DateTime.Now.Subtract(eProgressbar_LastTimeUpdate).TotalSeconds > 5) {
-                eProgressbar_LastTimeUpdate = DateTime.Now;
-                if (Current < 2) {
-                    eProgressbar_LastCalulatedSeconds = tmpCalculatedSeconds;
+            if (_eProgressbarLastCalulatedSeconds != tmpCalculatedSeconds && DateTime.Now.Subtract(_eProgressbarLastTimeUpdate).TotalSeconds > 5) {
+                _eProgressbarLastTimeUpdate = DateTime.Now;
+                if (current < 2) {
+                    _eProgressbarLastCalulatedSeconds = tmpCalculatedSeconds;
                 }
-                if (tmpCalculatedSeconds < eProgressbar_LastCalulatedSeconds * 0.9) {
-                    eProgressbar_LastCalulatedSeconds = tmpCalculatedSeconds;
+                if (tmpCalculatedSeconds < _eProgressbarLastCalulatedSeconds * 0.9) {
+                    _eProgressbarLastCalulatedSeconds = tmpCalculatedSeconds;
                 }
-                if (tmpCalculatedSeconds > eProgressbar_LastCalulatedSeconds * 1.5) {
-                    eProgressbar_LastCalulatedSeconds = tmpCalculatedSeconds;
+                if (tmpCalculatedSeconds > _eProgressbarLastCalulatedSeconds * 1.5) {
+                    _eProgressbarLastCalulatedSeconds = tmpCalculatedSeconds;
                 }
             }
-            var PRT = (int)(PR * 100);
-            if (PRT > 100) { PRT = 100; }
-            if (PRT < 0) { PRT = 0; }
-            return BaseText + "</b></i></u>" +
-                      (Count < 1 ? string.Empty
-                      : Current <= 3 ? "<br>Restzeit wird ermittelt<tab>"
-                      : eProgressbar_LastCalulatedSeconds < -10 ? "<br>Restzeit wird ermittelt<tab>"
-                      : eProgressbar_LastCalulatedSeconds > 94 ? "<br>" + PRT + " % - Geschätzte Restzeit:   " + (eProgressbar_LastCalulatedSeconds / 60) + " Minuten<tab>"
-                      : eProgressbar_LastCalulatedSeconds > 10 ? "<br>" + PRT + " % - Geschätzte Restzeit: " + (eProgressbar_LastCalulatedSeconds / 5 * 5) + " Sekunden<tab>"
-                      : eProgressbar_LastCalulatedSeconds > 0 ? "<br>" + PRT + " % - Geschätzte Restzeit: <<> 10 Sekunden<tab>"
+            var prt = (int)(pr * 100);
+            if (prt > 100) { prt = 100; }
+            if (prt < 0) { prt = 0; }
+            return baseText + "</b></i></u>" +
+                      (count < 1 ? string.Empty
+                      : current <= 3 ? "<br>Restzeit wird ermittelt<tab>"
+                      : _eProgressbarLastCalulatedSeconds < -10 ? "<br>Restzeit wird ermittelt<tab>"
+                      : _eProgressbarLastCalulatedSeconds > 94 ? "<br>" + prt + " % - Geschätzte Restzeit:   " + (_eProgressbarLastCalulatedSeconds / 60) + " Minuten<tab>"
+                      : _eProgressbarLastCalulatedSeconds > 10 ? "<br>" + prt + " % - Geschätzte Restzeit: " + (_eProgressbarLastCalulatedSeconds / 5 * 5) + " Sekunden<tab>"
+                      : _eProgressbarLastCalulatedSeconds > 0 ? "<br>" + prt + " % - Geschätzte Restzeit: <<> 10 Sekunden<tab>"
                       : "<br>100 % - ...abgeschlossen!<tab>");
         }
 
         private void UpdateInternal(string text) {
             if (text != capTXT.Text) {
                 capTXT.Text = text;
-                var Wi = Math.Max(Size.Width, capTXT.Width + (Skin.Padding * 2));
-                var He = Math.Max(Size.Height, capTXT.Height + (Skin.Padding * 2));
-                Size = new Size(Wi, He);
+                var wi = Math.Max(Size.Width, capTXT.Width + (Skin.Padding * 2));
+                var he = Math.Max(Size.Height, capTXT.Height + (Skin.Padding * 2));
+                Size = new Size(wi, he);
                 Refresh();
             }
         }

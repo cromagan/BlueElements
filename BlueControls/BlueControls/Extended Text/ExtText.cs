@@ -27,6 +27,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static BlueBasics.Converter;
 
 // VTextTyp-Hirachie
 // ~~~~~~~~~~~~~~~~~
@@ -635,7 +636,7 @@ namespace BlueControls.Extended_Text {
                     break;
 
                 case "MARKSTATE":
-                    markState = (enMarkState)int.Parse(attribut);
+                    markState = (enMarkState)IntParse(attribut);
                     break;
 
                 case "":
@@ -918,8 +919,8 @@ namespace BlueControls.Extended_Text {
                 if (Ausrichtung.HasFlag(enAlignment.Bottom)) { ky = _textDimensions.Height - (int)_height; }
                 foreach (var t in ri) {
                     var o = t.SplitAndCutBy(";");
-                    var z1 = int.Parse(o[0]);
-                    var z2 = int.Parse(o[1]);
+                    var z1 = IntParse(o[0]);
+                    var z2 = IntParse(o[1]);
                     float kx = 0;
                     if (Ausrichtung.HasFlag(enAlignment.Right)) { kx = _textDimensions.Width - this[z2].Pos.X - this[z2].Size.Width; }
                     if (Ausrichtung.HasFlag(enAlignment.HorizontalCenter)) { kx = (_textDimensions.Width - this[z2].Pos.X - this[z2].Size.Width) / 2; }

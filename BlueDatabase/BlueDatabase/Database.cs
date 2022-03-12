@@ -33,6 +33,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static BlueBasics.FileOperations;
+using static BlueBasics.Converter;
 
 namespace BlueDatabase {
 
@@ -252,7 +253,7 @@ namespace BlueDatabase {
             get => _globalScale;
             set {
                 if (_globalScale == value) { return; }
-                AddPending(enDatabaseDataType.GlobalScale, -1, -1, _globalScale.ToString(), value.ToString(), true);
+                AddPending(enDatabaseDataType.GlobalScale, -1, -1, _globalScale.ToString(CultureInfo.InvariantCulture), value.ToString(CultureInfo.InvariantCulture), true);
                 Cell.InvalidateAllSizes();
             }
         }
@@ -474,7 +475,7 @@ namespace BlueDatabase {
             if (!string.IsNullOrEmpty(f)) { return f; }
             if (mode == enErrorReason.OnlyRead) { return string.Empty; }
 
-            return int.Parse(LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))
+            return IntParse(LoadedVersion.Replace(".", "")) > IntParse(DatabaseVersion.Replace(".", ""))
                 ? "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."
                 : string.Empty;
         }
@@ -1269,7 +1270,7 @@ namespace BlueDatabase {
             oldPendings.Clear();
             ExecutePending();
             Column.ThrowEvents = true;
-            if (int.Parse(LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))) { SetReadOnly(); }
+            if (IntParse(LoadedVersion.Replace(".", "")) > IntParse(DatabaseVersion.Replace(".", ""))) { SetReadOnly(); }
         }
 
         protected override byte[] ToListOfByte() {
@@ -1701,7 +1702,7 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.ReloadDelaySecond:
-                    base.ReloadDelaySecond = int.Parse(value);
+                    base.ReloadDelaySecond = IntParse(value);
                     break;
 
                 case enDatabaseDataType.DatenbankAdmin:
@@ -1717,7 +1718,7 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.GlobalScale:
-                    _globalScale = double.Parse(value);
+                    _globalScale = DoubleParse(value);
                     break;
 
                 case enDatabaseDataType.FilterImagePfad:
@@ -1733,7 +1734,7 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.Ansicht:
-                    _ansicht = (enAnsicht)int.Parse(value);
+                    _ansicht = (enAnsicht)IntParse(value);
                     break;
 
                 case enDatabaseDataType.Tags:
@@ -1825,11 +1826,11 @@ namespace BlueDatabase {
                     break;
 
                 //case enDatabaseDataType.JoinTyp:
-                //    //_JoinTyp = (enJoinTyp)int.Parse(value);
+                //    //_JoinTyp = (enJoinTyp)IntParse(value);
                 //    break;
 
                 case enDatabaseDataType.VerwaisteDaten:
-                    _verwaisteDaten = (enVerwaisteDaten)int.Parse(value);
+                    _verwaisteDaten = (enVerwaisteDaten)IntParse(value);
                     break;
 
                 case (enDatabaseDataType)63://                    enDatabaseDataType.ImportScript:
@@ -1855,7 +1856,7 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.UndoCount:
-                    _undoCount = int.Parse(value);
+                    _undoCount = IntParse(value);
                     break;
 
                 case enDatabaseDataType.UndoInOne:
@@ -1870,22 +1871,22 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.dummyComand_AddRow:
-                    var addRowKey = long.Parse(value);
+                    var addRowKey = LongParse(value);
                     if (Row.SearchByKey(addRowKey) == null) { Row.Add(new RowItem(this, addRowKey)); }
                     break;
 
                 case enDatabaseDataType.AddColumn:
-                    var addColumnKey = long.Parse(value);
+                    var addColumnKey = LongParse(value);
                     if (Column.SearchByKey(addColumnKey) == null) { Column.AddFromParser(new ColumnItem(this, addColumnKey)); }
                     break;
 
                 case enDatabaseDataType.dummyComand_RemoveRow:
-                    var removeRowKey = long.Parse(value);
+                    var removeRowKey = LongParse(value);
                     if (Row.SearchByKey(removeRowKey) is RowItem) { Row.Remove(removeRowKey); }
                     break;
 
                 case enDatabaseDataType.dummyComand_RemoveColumn:
-                    var removeColumnKey = long.Parse(value);
+                    var removeColumnKey = LongParse(value);
                     if (Column.SearchByKey(removeColumnKey) is ColumnItem col) { Column.Remove(col); }
                     break;
 

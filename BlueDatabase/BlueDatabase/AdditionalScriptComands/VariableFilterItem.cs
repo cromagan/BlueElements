@@ -38,7 +38,7 @@ namespace BlueScript {
 
         public VariableFilterItem(string name) : this(name, null, true, false, string.Empty) { }
 
-        public VariableFilterItem(FilterItem value) : this(Variable.DummyName(), value, true, false, string.Empty) { }
+        public VariableFilterItem(FilterItem value) : this(DummyName(), value, true, false, string.Empty) { }
 
         #endregion
 

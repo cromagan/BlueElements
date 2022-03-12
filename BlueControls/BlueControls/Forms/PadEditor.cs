@@ -21,6 +21,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using System.Drawing;
+using static BlueBasics.Converter;
 
 namespace BlueControls.Forms {
 
@@ -95,9 +96,9 @@ namespace BlueControls.Forms {
         }
 
         private void btnAddLine_Click(object sender, System.EventArgs e) {
-            var P = Pad.MiddleOfVisiblesScreen();
+            var p = Pad.MiddleOfVisiblesScreen();
             var w = (int)(300 / Pad.ZoomCurrent());
-            LinePadItem b = new(PadStyles.Style_Standard, new Point(P.X - w, P.Y), new Point(P.X + w, P.Y));
+            LinePadItem b = new(PadStyles.Style_Standard, new Point(p.X - w, p.Y), new Point(p.X + w, p.Y));
             Pad.Item.Add(b);
         }
 
@@ -114,8 +115,7 @@ namespace BlueControls.Forms {
         }
 
         private void btnAddText_Click(object sender, System.EventArgs e) {
-            TextPadItem b = new()
-            {
+            TextPadItem b = new() {
                 Text = string.Empty,
                 Stil = PadStyles.Style_Standard
             };
@@ -143,24 +143,24 @@ namespace BlueControls.Forms {
             Pad.Invalidate();
         }
 
-        private void cbxSchriftGröße_ItemClicked(object sender, BasicListItemEventArgs e) => Pad.Item.SheetStyleScale = float.Parse(cbxSchriftGröße.Text) / 100f;
+        private void cbxSchriftGröße_ItemClicked(object sender, BasicListItemEventArgs e) => Pad.Item.SheetStyleScale = FloatParse(cbxSchriftGröße.Text) / 100f;
 
         private void ckbRaster_CheckedChanged(object sender, System.EventArgs e) => Pad.Item.SnapMode = ckbRaster.Checked ? enSnapMode.SnapToGrid : enSnapMode.Ohne;
 
         private void Pad_ClickedItemChanged(object sender, System.EventArgs e) {
             tabElementEigenschaften.Controls.Clear();
             if (Pad.LastClickedItem == null) { return; }
-            var Flexis = Pad.LastClickedItem.GetStyleOptions();
-            if (Flexis.Count == 0) { return; }
+            var flexis = Pad.LastClickedItem.GetStyleOptions();
+            if (flexis.Count == 0) { return; }
             var top = Skin.Padding;
-            foreach (var ThisFlexi in Flexis) {
-                tabElementEigenschaften.Controls.Add(ThisFlexi);
-                ThisFlexi.DisabledReason = string.Empty;
-                ThisFlexi.Left = Skin.Padding;
-                ThisFlexi.Top = top;
-                ThisFlexi.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-                top = top + Skin.Padding + ThisFlexi.Height;
-                ThisFlexi.Width = tabElementEigenschaften.Width - (Skin.Padding * 4);
+            foreach (var thisFlexi in flexis) {
+                tabElementEigenschaften.Controls.Add(thisFlexi);
+                thisFlexi.DisabledReason = string.Empty;
+                thisFlexi.Left = Skin.Padding;
+                thisFlexi.Top = top;
+                thisFlexi.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+                top = top + Skin.Padding + thisFlexi.Height;
+                thisFlexi.Width = tabElementEigenschaften.Width - (Skin.Padding * 4);
                 //ThisFlexi.ButtonClicked += FlexiButtonClick;
             }
         }
@@ -181,12 +181,12 @@ namespace BlueControls.Forms {
 
         private void txbRasterAnzeige_TextChanged(object sender, System.EventArgs e) {
             if (!txbRasterAnzeige.Text.IsNumeral()) { return; }
-            Pad.Item.GridShow = float.Parse(txbRasterAnzeige.Text);
+            Pad.Item.GridShow = FloatParse(txbRasterAnzeige.Text);
         }
 
         private void txbRasterFangen_TextChanged(object sender, System.EventArgs e) {
             if (!txbRasterFangen.Text.IsNumeral()) { return; }
-            Pad.Item.GridSnap = float.Parse(txbRasterFangen.Text);
+            Pad.Item.GridSnap = FloatParse(txbRasterFangen.Text);
         }
 
         #endregion

@@ -22,6 +22,7 @@ using BlueControls.Enums;
 using BlueControls.Extended_Text;
 using System.Collections.Generic;
 using System.Drawing;
+using static BlueBasics.Converter;
 
 namespace BlueControls.Forms {
 
@@ -84,7 +85,7 @@ namespace BlueControls.Forms {
                     Generic.Pause(0.1, true);
                 }
             }
-            return int.Parse(mb._pressed.Name);
+            return IntParse(mb._pressed.Name);
         }
 
         public List<Button> Generate_Buttons(string[] names) {
@@ -95,8 +96,7 @@ namespace BlueControls.Forms {
                 if (!string.IsNullOrEmpty(names[z])) {
                     erT.TextDimensions = Size.Empty;
                     erT.PlainText = names[z];
-                    Button b = new()
-                    {
+                    Button b = new() {
                         Name = z.ToString(),
                         Text = names[z]
                     };

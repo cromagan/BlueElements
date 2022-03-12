@@ -121,12 +121,12 @@ namespace BlueControls.Controls {
             return false;
         }
 
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? Items, out object? HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
-            HotItem = null;
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
+            hotItem = null;
             if (Filter?.Column == null || !Filter.Column.Database.IsAdministrator()) { return; }
 
-            HotItem = Filter.Column;
-            Items.Add("Spalte bearbeiten", "#ColumnEdit", QuickImage.Get(enImageCode.Spalte));
+            hotItem = Filter.Column;
+            items.Add("Spalte bearbeiten", "#ColumnEdit", QuickImage.Get(enImageCode.Spalte));
 
             //if (Parent is Filterleiste f) {
             //    if (f.pic.Visible) {
@@ -158,7 +158,7 @@ namespace BlueControls.Controls {
             base.OnControlAdded(e);
             e.Control.MouseUp += Control_MouseUp;
             if (e.Control is ComboBox cbx) {
-                ItemCollectionList Item2 = new()
+                ItemCollectionList item2 = new()
                 {
                     { "Keine weiteren Einträge vorhanden", "|~" }
                 };
@@ -167,7 +167,7 @@ namespace BlueControls.Controls {
                 //{
                 //    Item2.Add("|" + thiss, thiss));
                 //}
-                StyleComboBox(cbx, Item2, System.Windows.Forms.ComboBoxStyle.DropDown);
+                StyleComboBox(cbx, item2, System.Windows.Forms.ComboBoxStyle.DropDown);
                 cbx.DropDownShowing += Cbx_DropDownShowing;
             }
             if (e.Control is Button btn) {
@@ -203,11 +203,11 @@ namespace BlueControls.Controls {
                 cbx.Item.Add("Anzeigefehler", "|~", enImageCode.Kreuz, false);
                 return;
             }
-            var List_FilterString = Filter.Column.Autofilter_ItemList(TableView.Filter, TableView.PinnedRows);
-            if (List_FilterString.Count == 0) {
+            var listFilterString = Filter.Column.Autofilter_ItemList(TableView.Filter, TableView.PinnedRows);
+            if (listFilterString.Count == 0) {
                 cbx.Item.Add("Keine weiteren Einträge vorhanden", "|~", enImageCode.Kreuz, false);
-            } else if (List_FilterString.Count < 400) {
-                cbx.Item.AddRange(List_FilterString, Filter.Column, enShortenStyle.Replaced, Filter.Column.BildTextVerhalten);
+            } else if (listFilterString.Count < 400) {
+                cbx.Item.AddRange(listFilterString, Filter.Column, enShortenStyle.Replaced, Filter.Column.BildTextVerhalten);
                 cbx.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
             } else {
                 cbx.Item.Add("Zu viele Einträge", "|~", enImageCode.Kreuz, false);
@@ -238,22 +238,22 @@ namespace BlueControls.Controls {
                 if (!Filter.Column.AutoFilterSymbolPossible()) {
                     EditType = enEditTypeFormula.None;
                 } else {
-                    var ShowDelFilterButton = true;
+                    var showDelFilterButton = true;
                     if (Filter.FilterType == enFilterType.Instr_GroßKleinEgal && Filter.SearchValue != null && Filter.SearchValue.Count == 1) {
                         CaptionPosition = myParent == null || myParent.Orientation == enOrientation.Waagerecht ? enÜberschriftAnordnung.Links_neben_Dem_Feld
                                                                                                                : enÜberschriftAnordnung.Über_dem_Feld;
-                        ShowDelFilterButton = false;
+                        showDelFilterButton = false;
                         Caption = Filter.Column.ReadableText() + ":";
                         EditType = enEditTypeFormula.Textfeld_mit_Auswahlknopf;
                         ValueSet(Filter.SearchValue[0], true, true);
                     }
                     if (Filter.Column.FilterOptions is enFilterOptions.Enabled_OnlyAndAllowed or enFilterOptions.Enabled_OnlyOrAllowed) {
-                        ShowDelFilterButton = false;
+                        showDelFilterButton = false;
                         CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
                         Caption = Filter.Column.ReadableText() + ":";
                         EditType = enEditTypeFormula.Button;
                     }
-                    if (ShowDelFilterButton) {
+                    if (showDelFilterButton) {
                         CaptionPosition = enÜberschriftAnordnung.ohne;
                         EditType = enEditTypeFormula.Button;
                     }

@@ -37,20 +37,20 @@ namespace BlueControls.Controls {
 
         #region Fields
 
-        protected bool _MouseHighlight = true;
+        protected bool MouseHighlight = true;
 
-        private readonly bool _UseBackBitmap;
+        private readonly bool _useBackBitmap;
 
-        private Bitmap? _BitmapOfControl;
+        private Bitmap? _bitmapOfControl;
 
-        private bool _GeneratingBitmapOfControl;
+        private bool _generatingBitmapOfControl;
 
-        private bool _MousePressing;
+        private bool _mousePressing;
 
-        private enPartentType _MyParentType = enPartentType.Unbekannt;
+        private enPartentType _myParentType = enPartentType.Unbekannt;
 
         // Dieser Codeblock ist im Interface IQuickInfo herauskopiert und muss überall Identisch sein.
-        private string _QuickInfo = "";
+        private string _quickInfo = "";
 
         #endregion
 
@@ -73,7 +73,7 @@ namespace BlueControls.Controls {
             if (doubleBuffer) {
                 SetDoubleBuffering();
             }
-            _UseBackBitmap = useBackgroundBitmap;
+            _useBackBitmap = useBackgroundBitmap;
         }
 
         #endregion
@@ -91,17 +91,17 @@ namespace BlueControls.Controls {
         [Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
         [Description("QuickInfo des Steuerelementes - im extTXT-Format")]
         public string QuickInfo {
-            get => _QuickInfo;
+            get => _quickInfo;
             set {
-                if (_QuickInfo != value) {
+                if (_quickInfo != value) {
                     Forms.QuickInfo.Close();
-                    _QuickInfo = value;
+                    _quickInfo = value;
                     OnQuickInfoChanged();
                 }
             }
         }
 
-        public virtual string QuickInfoText => _QuickInfo;
+        public virtual string QuickInfoText => _quickInfo;
 
         protected override bool ScaleChildren => false;
 
@@ -133,9 +133,9 @@ namespace BlueControls.Controls {
                     return enPartentType.Nothing;
 
                 case GroupBox: {
-                        if (control.Parent is System.Windows.Forms.TabPage TP) {
-                            if (TP.Parent == null) { return enPartentType.Unbekannt; }
-                            if (TP.Parent is RibbonBar) { return enPartentType.RibbonGroupBox; }
+                        if (control.Parent is System.Windows.Forms.TabPage tp) {
+                            if (tp.Parent == null) { return enPartentType.Unbekannt; }
+                            if (tp.Parent is RibbonBar) { return enPartentType.RibbonGroupBox; }
                         }
                         return enPartentType.GroupBox;
                     }
@@ -219,17 +219,17 @@ namespace BlueControls.Controls {
         }
 
         public Bitmap? BitmapOfControl() {
-            if (!_UseBackBitmap || _GeneratingBitmapOfControl) { return null; }
-            _GeneratingBitmapOfControl = true;
-            if (_BitmapOfControl == null) { Refresh(); }
-            _GeneratingBitmapOfControl = false;
-            return _BitmapOfControl;
+            if (!_useBackBitmap || _generatingBitmapOfControl) { return null; }
+            _generatingBitmapOfControl = true;
+            if (_bitmapOfControl == null) { Refresh(); }
+            _generatingBitmapOfControl = false;
+            return _bitmapOfControl;
         }
 
         public bool ContainsMouse() => ClientRectangle.Contains(PointToClient(System.Windows.Forms.Cursor.Position));
 
         public void DoQuickInfo() {
-            if (string.IsNullOrEmpty(_QuickInfo) && string.IsNullOrEmpty(QuickInfoText)) {
+            if (string.IsNullOrEmpty(_quickInfo) && string.IsNullOrEmpty(QuickInfoText)) {
                 Forms.QuickInfo.Close();
             } else {
                 if (ContainsMouse()) {
@@ -279,8 +279,8 @@ namespace BlueControls.Controls {
         protected override void Dispose(bool disposing) {
             base.Dispose(disposing);
             if (disposing) {
-                _BitmapOfControl?.Dispose();
-                _BitmapOfControl = null;
+                _bitmapOfControl?.Dispose();
+                _bitmapOfControl = null;
             }
         }
 
@@ -289,7 +289,7 @@ namespace BlueControls.Controls {
         //MyBase.ScaleChildren
         protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) => bounds;
 
-        protected bool MousePressing() => _MousePressing;
+        protected bool MousePressing() => _mousePressing;
 
         protected override void OnEnabledChanged(System.EventArgs e) {
             if (InvokeRequired) {
@@ -330,7 +330,7 @@ namespace BlueControls.Controls {
             if (IsDisposed) { return; }
             if (GetStyle(System.Windows.Forms.ControlStyles.Selectable)) {
                 //if (_MousePressing) { OnMouseUp(new System.Windows.Forms.MouseEventArgs(System.Windows.Forms.MouseButtons.None, 0, 0, 0, 0)); }
-                _MouseHighlight = false;
+                MouseHighlight = false;
                 base.OnLostFocus(e);
                 Invalidate();
             }
@@ -339,8 +339,8 @@ namespace BlueControls.Controls {
         protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
             lock (this) {
                 if (IsDisposed) { return; }
-                if (_MousePressing) { return; }
-                _MousePressing = true;
+                if (_mousePressing) { return; }
+                _mousePressing = true;
                 Forms.QuickInfo.Close();
                 if (Enabled) {
                     if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && Focus()) { Focus(); }
@@ -352,7 +352,7 @@ namespace BlueControls.Controls {
         protected override void OnMouseEnter(System.EventArgs e) {
             if (IsDisposed) { return; }
             base.OnMouseEnter(e);
-            if (!string.IsNullOrEmpty(_QuickInfo) || !string.IsNullOrEmpty(QuickInfoText)) { Forms.QuickInfo.Show(QuickInfoText); }
+            if (!string.IsNullOrEmpty(_quickInfo) || !string.IsNullOrEmpty(QuickInfoText)) { Forms.QuickInfo.Show(QuickInfoText); }
         }
 
         protected override void OnMouseLeave(System.EventArgs e) {
@@ -371,14 +371,14 @@ namespace BlueControls.Controls {
 
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
             if (IsDisposed) { return; }
-            if (!_MousePressing) { return; }
-            _MousePressing = false;
+            if (!_mousePressing) { return; }
+            _mousePressing = false;
             base.OnMouseUp(e);
         }
 
         protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
             if (IsDisposed) { return; }
-            _MousePressing = false;
+            _mousePressing = false;
             base.OnMouseWheel(e);
         }
 
@@ -398,10 +398,10 @@ namespace BlueControls.Controls {
         protected override void OnSizeChanged(System.EventArgs e) {
             if (IsDisposed) { return; }
             Invalidate();
-            if (_BitmapOfControl != null) {
-                if (_BitmapOfControl.Width < Width || _BitmapOfControl.Height < Height) {
-                    _BitmapOfControl.Dispose();
-                    _BitmapOfControl = null;
+            if (_bitmapOfControl != null) {
+                if (_bitmapOfControl.Width < Width || _bitmapOfControl.Height < Height) {
+                    _bitmapOfControl.Dispose();
+                    _bitmapOfControl = null;
                 }
             }
             base.OnSizeChanged(e);
@@ -411,9 +411,9 @@ namespace BlueControls.Controls {
 
         protected enPartentType ParentType() {
             if (Parent == null) { return enPartentType.Unbekannt; }
-            if (_MyParentType != enPartentType.Unbekannt) { return _MyParentType; }
-            _MyParentType = Typ(Parent);
-            return _MyParentType;
+            if (_myParentType != enPartentType.Unbekannt) { return _myParentType; }
+            _myParentType = Typ(Parent);
+            return _myParentType;
         }
 
         protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified) => base.ScaleControl(new SizeF(1, 1), specified);
@@ -457,14 +457,14 @@ namespace BlueControls.Controls {
                 }
                 if (Width < 1 || Height < 1) { return; }
                 try {
-                    if (_UseBackBitmap) {
-                        if (_BitmapOfControl == null) { _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb); }
-                        var TMPGR = Graphics.FromImage(_BitmapOfControl);
-                        DrawControl(TMPGR, IsStatus());
-                        if (_BitmapOfControl != null) {
-                            gr.DrawImage(_BitmapOfControl, 0, 0);
+                    if (_useBackBitmap) {
+                        if (_bitmapOfControl == null) { _bitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb); }
+                        var tmpgr = Graphics.FromImage(_bitmapOfControl);
+                        DrawControl(tmpgr, IsStatus());
+                        if (_bitmapOfControl != null) {
+                            gr.DrawImage(_bitmapOfControl, 0, 0);
                         }
-                        TMPGR.Dispose();
+                        tmpgr.Dispose();
                     } else {
                         DrawControl(gr, IsStatus());
                     }
@@ -473,23 +473,23 @@ namespace BlueControls.Controls {
                 }
                 // UmRandung für DesignMode ------------
                 if (DesignMode) {
-                    using Pen P = new(Color.FromArgb(128, 255, 0, 0));
-                    gr.DrawRectangle(P, 0, 0, Width - 1, Height - 1);
+                    using Pen p = new(Color.FromArgb(128, 255, 0, 0));
+                    gr.DrawRectangle(p, 0, 0, Width - 1, Height - 1);
                 }
             }
         }
 
         private enStates IsStatus() {
             if (!Enabled) { return enStates.Standard_Disabled; }
-            var S = enStates.Standard;
-            if (_MouseHighlight && ContainsMouse()) { S |= enStates.Standard_MouseOver; }
-            if (_MousePressing) {
-                if (_MouseHighlight) { S |= enStates.Standard_MousePressed; }
-                if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && CanFocus) { S |= enStates.Standard_HasFocus; }
+            var s = enStates.Standard;
+            if (MouseHighlight && ContainsMouse()) { s |= enStates.Standard_MouseOver; }
+            if (_mousePressing) {
+                if (MouseHighlight) { s |= enStates.Standard_MousePressed; }
+                if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && CanFocus) { s |= enStates.Standard_HasFocus; }
             } else {
-                if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && CanFocus && Focused) { S |= enStates.Standard_HasFocus; }
+                if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && CanFocus && Focused) { s |= enStates.Standard_HasFocus; }
             }
-            return S;
+            return s;
         }
 
         #endregion

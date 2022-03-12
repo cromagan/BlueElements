@@ -97,9 +97,7 @@ namespace BlueScript.Methods {
         /// <param name="infos"></param>
         /// <param name="s"></param>
         /// <returns></returns>
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            return VariablenBerechnung(infos.ComandText + infos.AttributText + ";", s, infos, false);
-        }
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) => VariablenBerechnung(infos.ComandText + infos.AttributText + ";", s, infos, false);
 
         #endregion
     }

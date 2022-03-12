@@ -26,7 +26,7 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Variable_Any };
+        public override List<VariableDataType> Args => new() { VariableDataType.Variable_String_Numeral_List_or_Object };
 
         public override string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist oder keinen Inhalt hat.";
 
@@ -54,18 +54,18 @@ namespace BlueScript.Methods {
             if (attvar.Attributes.Count == 0) {
                 if (attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden) {
                     return DoItFeedback.AttributFehler(this, attvar);
-                } else {
-                    return DoItFeedback.Wahr();
                 }
+
+                return DoItFeedback.Wahr();
             }
 
             if (attvar.Attributes[0].IsNullOrEmpty) { return DoItFeedback.Wahr(); }
 
             if (attvar.Attributes[0] is VariableUnknown) {
                 return DoItFeedback.Wahr();
-            } else {
-                return DoItFeedback.Falsch();
             }
+
+            return DoItFeedback.Falsch();
         }
 
         #endregion

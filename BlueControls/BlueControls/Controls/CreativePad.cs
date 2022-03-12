@@ -63,7 +63,7 @@ namespace BlueControls.Controls {
             // Initialisierungen nach dem Aufruf InitializeComponent() hinzufügen
             Item = itemCollectionPad;
             Unselect();
-            _MouseHighlight = false;
+            MouseHighlight = false;
         }
 
         public CreativePad() : this(new ItemCollectionPad()) {

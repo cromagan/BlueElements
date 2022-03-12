@@ -79,7 +79,7 @@ namespace BlueBasics {
             switch (format) {
                 case enSortierTyp.ZahlenwertInt:
                     if (string.IsNullOrEmpty(isValue)) { return compareKeySNok + "A0000000000"; }
-                    if (int.TryParse(isValue, out var w)) {
+                    if (IntTryParse(isValue, out var w)) {
                         return w >= 0
                             ? compareKeySOk + "A" + w.ToString(Constants.Format_Integer10)
                             : compareKeySOk + w.ToString(Constants.Format_Integer10);
@@ -98,7 +98,7 @@ namespace BlueBasics {
 
                 case enSortierTyp.ZahlenwertFloat:
                     if (string.IsNullOrEmpty(isValue)) { return "A0000000000,000"; }
-                    if (double.TryParse(isValue, out var dw)) {
+                    if (DoubleTryParse(isValue, out var dw)) {
                         var t = dw.ToString(Constants.Format_Float10_3);
                         if (!t.Contains(",")) { t += ",000"; }
 
@@ -358,11 +358,11 @@ namespace BlueBasics {
 
         public static bool IsDateTime(this string? txt) => DateTimeTryParse(txt, out _);
 
-        public static bool IsDouble(this string? txt) => txt is not null && double.TryParse(txt.Replace(".", ","), out _);
+        public static bool IsDouble(this string? txt) => txt is not null && DoubleTryParse(txt, out _);
 
         public static bool IsHtmlColorCode(this string? txt) => !string.IsNullOrEmpty(txt) && txt.Length is 6 or 8 && txt.ContainsOnlyChars(Constants.Char_Numerals + "abcdefABCDEF");
 
-        public static bool IsLong(this string? txt) => txt is not null && long.TryParse(txt, out _);
+        public static bool IsLong(this string? txt) => txt is not null && LongTryParse(txt, out _);
 
         public static bool IsNumeral(this string? txt) => txt is not null && (txt.IsLong() || txt.IsDouble());
 

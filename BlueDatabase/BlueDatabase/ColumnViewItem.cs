@@ -22,6 +22,7 @@ using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using System;
 using System.Drawing;
+using static BlueBasics.Converter;
 
 namespace BlueDatabase {
 
@@ -93,24 +94,24 @@ namespace BlueDatabase {
                         break;
 
                     case "columnkey":
-                        Column = database.Column.SearchByKey(long.Parse(pair.Value));
+                        Column = database.Column.SearchByKey(LongParse(pair.Value));
                         Column?.Repair(); // Alte Formate reparieren
                         break;
 
                     case "x":
-                        _spalteX1 = int.Parse(pair.Value);
+                        _spalteX1 = IntParse(pair.Value);
                         break;
 
                     case "width":
-                        _spalteWidth = int.Parse(pair.Value);
+                        _spalteWidth = IntParse(pair.Value);
                         break;
 
                     case "height":
-                        _spalteHeight = int.Parse(pair.Value);
+                        _spalteHeight = IntParse(pair.Value);
                         break;
 
                     case "caption": // Todo: Alt 06.09.2019
-                        _überschriftAnordnung = (enÜberschriftAnordnung)int.Parse(pair.Value);
+                        _überschriftAnordnung = (enÜberschriftAnordnung)IntParse(pair.Value);
                         break;
 
                     case "permanent": // Todo: Alten Code Entfernen, Permanent wird nicht mehr verstringt 06.09.2019
@@ -118,7 +119,7 @@ namespace BlueDatabase {
                         break;
 
                     case "type":
-                        _viewType = (enViewType)int.Parse(pair.Value);
+                        _viewType = (enViewType)IntParse(pair.Value);
                         break;
 
                     default:

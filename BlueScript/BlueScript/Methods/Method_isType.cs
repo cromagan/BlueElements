@@ -20,7 +20,6 @@
 using System.Collections.Generic;
 using BlueScript.Structures;
 using BlueScript.Enums;
-using BlueScript.Variables;
 
 namespace BlueScript.Methods {
 
@@ -28,7 +27,7 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Variable_Any, VariableDataType.String };
+        public override List<VariableDataType> Args => new() { VariableDataType.Variable_String_Numeral_List_or_Object, VariableDataType.String };
         public override string Description => "Prüft, ob der Variablenntyp dem hier angegeben Wert entspricht. Es wird keine Inhaltsprüfung ausgeführt!";
         public override bool EndlessArgs => false;
         public override string EndSequence => ");";

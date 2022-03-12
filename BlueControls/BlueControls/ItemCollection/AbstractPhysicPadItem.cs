@@ -68,27 +68,27 @@ namespace BlueControls.ItemCollection {
         // For two vectors in the X-Y plane, the result is a
         // vector with X and Y components 0 so the Z component
         // gives the vector's length and direction.
-        public static float CrossProductLength(float Ax, float Ay, float Bx, float By, float Cx, float Cy) {
+        public static float CrossProductLength(float ax, float ay, float bx, float @by, float cx, float cy) {
             // Get the vectors' coordinates.
-            var BAx = Ax - Bx;
-            var BAy = Ay - By;
-            var BCx = Cx - Bx;
-            var BCy = Cy - By;
+            var bAx = ax - bx;
+            var bAy = ay - @by;
+            var bCx = cx - bx;
+            var bCy = cy - @by;
             // Calculate the Z coordinate of the cross product.
-            return (BAx * BCy) - (BAy * BCx);
+            return (bAx * bCy) - (bAy * bCx);
         }
 
         // Return the angle ABC.
         // Return a value between PI and -PI.
         // Note that the value is the opposite of what you might
         // expect because Y coordinates increase downward.
-        public static float GetAngle(float Ax, float Ay, float Bx, float By, float Cx, float Cy) {
+        public static float GetAngle(float ax, float ay, float bx, float @by, float cx, float cy) {
             // Get the dot product.
-            var dot_product = DotProduct(Ax, Ay, Bx, By, Cx, Cy);
+            var dotProduct = DotProduct(ax, ay, bx, @by, cx, cy);
             // Get the cross product.
-            var cross_product = CrossProductLength(Ax, Ay, Bx, By, Cx, Cy);
+            var crossProduct = CrossProductLength(ax, ay, bx, @by, cx, cy);
             // Calculate the angle.
-            return (float)Math.Atan2(cross_product, dot_product);
+            return (float)Math.Atan2(crossProduct, dotProduct);
         }
 
         // Calculate the distance between [minA, maxA] and [minB, maxB]
@@ -97,8 +97,7 @@ namespace BlueControls.ItemCollection {
 
         // Check if polygon A is going to collide with polygon B for the given velocity
         public static StrPolygonCollisionResult PolygonCollision(AbstractPhysicPadItem polygonA, AbstractPhysicPadItem polygonB, PointM? velocity) {
-            StrPolygonCollisionResult result = new()
-            {
+            StrPolygonCollisionResult result = new() {
                 CheckedObjectA = polygonA,
                 CheckedObjectB = polygonB,
                 Intersect = true,
@@ -212,63 +211,63 @@ namespace BlueControls.ItemCollection {
         // Find the polygon's centroid.
         public PointM FindCentroid() {
             // Add the first point at the end of the array.
-            var num_points = MovablePoint.Count - 1;
-            var pts = new PointM?[num_points + 1];
+            var numPoints = MovablePoint.Count - 1;
+            var pts = new PointM?[numPoints + 1];
             MovablePoint.CopyTo(pts, 0);
-            pts[num_points] = MovablePoint[0];
+            pts[numPoints] = MovablePoint[0];
             // Find the centroid.
-            float X = 0;
-            float Y = 0;
-            for (var i = 0; i < num_points; i++) {
-                var second_factor = (pts[i].X * pts[i + 1].Y) -
+            float x = 0;
+            float y = 0;
+            for (var i = 0; i < numPoints; i++) {
+                var secondFactor = (pts[i].X * pts[i + 1].Y) -
                                     (pts[i + 1].X * pts[i].Y);
-                X += (pts[i].X + pts[i + 1].X) * second_factor;
-                Y += (pts[i].Y + pts[i + 1].Y) * second_factor;
+                x += (pts[i].X + pts[i + 1].X) * secondFactor;
+                y += (pts[i].Y + pts[i + 1].Y) * secondFactor;
             }
             // Divide by 6 times the polygon's area.
-            var polygon_area = PolygonArea();
-            X /= 6 * polygon_area;
-            Y /= 6 * polygon_area;
+            var polygonArea = PolygonArea();
+            x /= 6 * polygonArea;
+            y /= 6 * polygonArea;
             // If the values are negative, the polygon is
             // oriented counterclockwise so reverse the signs.
-            if (X < 0) {
-                X = -X;
-                Y = -Y;
+            if (x < 0) {
+                x = -x;
+                y = -y;
             }
-            return new PointM(X, Y);
+            return new PointM(x, y);
         }
 
         //   http://csharphelper.com/blog/2016/01/find-a-polygon-union-in-c/
         // Return the union of the two polygons.
         public List<PointF> FindPolygonUnion(List<PointF>[] polygons) {
             // Find the lower-leftmost point in either polygon.
-            var cur_pgon = 0;
-            var cur_index = 0;
-            var cur_point = polygons[cur_pgon][cur_index];
+            var curPgon = 0;
+            var curIndex = 0;
+            var curPoint = polygons[curPgon][curIndex];
             for (var pgon = 0; pgon < 2; pgon++) {
                 for (var index = 0; index < polygons[pgon].Count; index++) {
-                    var test_point = polygons[pgon][index];
-                    if ((test_point.X < cur_point.X) ||
-                        ((test_point.X == cur_point.X) &&
-                         (test_point.Y > cur_point.Y))) {
-                        cur_pgon = pgon;
-                        cur_index = index;
-                        cur_point = polygons[cur_pgon][cur_index];
+                    var testPoint = polygons[pgon][index];
+                    if ((testPoint.X < curPoint.X) ||
+                        ((testPoint.X == curPoint.X) &&
+                         (testPoint.Y > curPoint.Y))) {
+                        curPgon = pgon;
+                        curIndex = index;
+                        curPoint = polygons[curPgon][curIndex];
                     }
                 }
             }
             // Create the result polygon.
             List<PointF> union = new();
             // Start here.
-            var start_point = cur_point;
-            union.Add(start_point);
+            var startPoint = curPoint;
+            union.Add(startPoint);
             // Start traversing the polygons.
             // Repeat until we return to the starting point.
             for (; ; )
             {
                 // Find the next point.
-                var next_index = (cur_index + 1) % polygons[cur_pgon].Count;
-                var next_point = polygons[cur_pgon][next_index];
+                var nextIndex = (curIndex + 1) % polygons[curPgon].Count;
+                var nextPoint = polygons[curPgon][nextIndex];
                 // Each time through the loop:
                 //      cur_pgon is the index of the polygon we're following
                 //      cur_point is the last point added to the union
@@ -276,52 +275,52 @@ namespace BlueControls.ItemCollection {
                 //      next_index is the index of next_point
                 // See if this segment intersects
                 // any of the other polygon's segments.
-                var other_pgon = (cur_pgon + 1) % 2;
+                var otherPgon = (curPgon + 1) % 2;
                 // Keep track of the closest intersection.
-                PointF best_intersection = new(0, 0);
-                var best_index1 = -1;
-                var best_t = 2f;
-                for (var index1 = 0; index1 < polygons[other_pgon].Count; index1++) {
+                PointF bestIntersection = new(0, 0);
+                var bestIndex1 = -1;
+                var bestT = 2f;
+                for (var index1 = 0; index1 < polygons[otherPgon].Count; index1++) {
                     // Get the index of the next point in the polygon.
-                    var index2 = (index1 + 1) % polygons[other_pgon].Count;
+                    var index2 = (index1 + 1) % polygons[otherPgon].Count;
                     // See if the segment between points index1
                     // and index2 intersect the current segment.
-                    var point1 = polygons[other_pgon][index1];
-                    var point2 = polygons[other_pgon][index2];
-                    FindIntersection(cur_point, next_point, point1, point2,
-                        out _, out var segments_intersect,
+                    var point1 = polygons[otherPgon][index1];
+                    var point2 = polygons[otherPgon][index2];
+                    FindIntersection(curPoint, nextPoint, point1, point2,
+                        out _, out var segmentsIntersect,
                         out var intersection, out _, out _, out var t1, out _);
-                    if (segments_intersect && // The segments intersect
+                    if (segmentsIntersect && // The segments intersect
                         (t1 > 0.001) &&         // Not at the previous intersection
-                        (t1 < best_t))          // Better than the last intersection found
+                        (t1 < bestT))          // Better than the last intersection found
                     {
                         // See if this is an improvement.
-                        if (t1 < best_t) {
+                        if (t1 < bestT) {
                             // Save this intersection.
-                            best_t = t1;
-                            best_index1 = index1;
-                            best_intersection = intersection;
+                            bestT = t1;
+                            bestIndex1 = index1;
+                            bestIntersection = intersection;
                         }
                     }
                 }
                 // See if we found any intersections.
-                if (best_t < 2f) {
+                if (bestT < 2f) {
                     // We found an intersection. Use it.
-                    union.Add(best_intersection);
+                    union.Add(bestIntersection);
                     // Prepare to search for the next point from here.
                     // Start following the other polygon.
-                    cur_pgon = (cur_pgon + 1) % 2;
-                    cur_point = best_intersection;
-                    cur_index = best_index1;
+                    curPgon = (curPgon + 1) % 2;
+                    curPoint = bestIntersection;
+                    curIndex = bestIndex1;
                 } else {
                     // We didn't find an intersection.
                     // Move to the next point in this polygon.
-                    cur_point = next_point;
-                    cur_index = next_index;
+                    curPoint = nextPoint;
+                    curIndex = nextIndex;
                     // If we've returned to the starting point, we're done.
-                    if (cur_point == start_point) { break; }
+                    if (curPoint == startPoint) { break; }
                     // Add the current point to the union.
-                    union.Add(cur_point);
+                    union.Add(curPoint);
                 }
             }
             return union;
@@ -332,17 +331,17 @@ namespace BlueControls.ItemCollection {
         //http://csharphelper.com/blog/2014/07/determine-whether-a-point-is-inside-a-polygon-in-c/
         // Alternative:  https://stackoverflow.com/questions/4243042/c-sharp-point-in-polygon
         // Return True if the point is in the polygon.
-        public bool PointInPolygon(float X, float Y) {
+        public bool PointInPolygon(float x, float y) {
             // Get the angle between the point and the
             // first and last vertices.
-            var max_point = MovablePoint.Count - 2;
-            var total_angle = GetAngle(MovablePoint[max_point].X, MovablePoint[max_point].Y, X, Y, MovablePoint[0].X, MovablePoint[0].Y);
+            var maxPoint = MovablePoint.Count - 2;
+            var totalAngle = GetAngle(MovablePoint[maxPoint].X, MovablePoint[maxPoint].Y, x, y, MovablePoint[0].X, MovablePoint[0].Y);
             // Add the angles from the point
             // to each other pair of vertices.
-            for (var i = 0; i < max_point; i++) {
-                total_angle += GetAngle(
+            for (var i = 0; i < maxPoint; i++) {
+                totalAngle += GetAngle(
                     MovablePoint[i].X, MovablePoint[i].Y,
-                    X, Y,
+                    x, y,
                     MovablePoint[i + 1].X, MovablePoint[i + 1].Y);
             }
             // The total angle should be 2 * PI or -2 * PI if
@@ -350,7 +349,7 @@ namespace BlueControls.ItemCollection {
             // if the point is outside the polygon.
             // The following statement was changed. See the comments.
             //return (Math.Abs(total_angle) > 0.000001);
-            return Math.Abs(total_angle) > 1;
+            return Math.Abs(totalAngle) > 1;
         }
 
         // Return the polygon's area in "square units."
@@ -369,23 +368,23 @@ namespace BlueControls.ItemCollection {
             // are all positive or negative (depending on the
             // order in which we visit them) so the polygon
             // is convex.
-            var got_negative = false;
-            var got_positive = false;
-            var num_points = MovablePoint.Count - 1;
-            for (var A = 0; A < num_points; A++) {
-                var B = (A + 1) % num_points;
-                var C = (B + 1) % num_points;
-                var cross_product =
+            var gotNegative = false;
+            var gotPositive = false;
+            var numPoints = MovablePoint.Count - 1;
+            for (var a = 0; a < numPoints; a++) {
+                var b = (a + 1) % numPoints;
+                var c = (b + 1) % numPoints;
+                var crossProduct =
                     CrossProductLength(
-                        MovablePoint[A].X, MovablePoint[A].Y,
-                        MovablePoint[B].X, MovablePoint[B].Y,
-                        MovablePoint[C].X, MovablePoint[C].Y);
-                if (cross_product < 0) {
-                    got_negative = true;
-                } else if (cross_product > 0) {
-                    got_positive = true;
+                        MovablePoint[a].X, MovablePoint[a].Y,
+                        MovablePoint[b].X, MovablePoint[b].Y,
+                        MovablePoint[c].X, MovablePoint[c].Y);
+                if (crossProduct < 0) {
+                    gotNegative = true;
+                } else if (crossProduct > 0) {
+                    gotPositive = true;
                 }
-                if (got_negative && got_positive) {
+                if (gotNegative && gotPositive) {
                     return false;
                 }
             }
@@ -423,21 +422,21 @@ namespace BlueControls.ItemCollection {
 
         // Return the dot product AB · BC.
         // Note that AB · BC = |AB| * |BC| * Cos(theta).
-        private static float DotProduct(float Ax, float Ay, float Bx, float By, float Cx, float Cy) {
+        private static float DotProduct(float ax, float ay, float bx, float @by, float cx, float cy) {
             // Get the vectors' coordinates.
-            var BAx = Ax - Bx;
-            var BAy = Ay - By;
-            var BCx = Cx - Bx;
-            var BCy = Cy - By;
+            var bAx = ax - bx;
+            var bAy = ay - @by;
+            var bCx = cx - bx;
+            var bCy = cy - @by;
             // Calculate the dot product.
-            return (BAx * BCx) + (BAy * BCy);
+            return (bAx * bCx) + (bAy * bCy);
         }
 
         // Find the point of intersection between
         // the lines p1 --> p2 and p3 --> p4.
         private static void FindIntersection(PointF p1, PointF p2, PointF p3, PointF p4,
-            out bool lines_intersect, out bool segments_intersect,
-            out PointF intersection, out PointF close_p1, out PointF close_p2,
+            out bool linesIntersect, out bool segmentsIntersect,
+            out PointF intersection, out PointF closeP1, out PointF closeP2,
             out float t1, out float t2) {
             // Get the segments' parameters.
             var dx12 = p2.X - p1.X;
@@ -449,20 +448,20 @@ namespace BlueControls.ItemCollection {
             t1 = (((p1.X - p3.X) * dy34) + ((p3.Y - p1.Y) * dx34)) / denominator;
             if (float.IsInfinity(t1)) {
                 // The lines are parallel (or close enough to it).
-                lines_intersect = false;
-                segments_intersect = false;
+                linesIntersect = false;
+                segmentsIntersect = false;
                 intersection = new PointF(float.NaN, float.NaN);
-                close_p1 = new PointF(float.NaN, float.NaN);
-                close_p2 = new PointF(float.NaN, float.NaN);
+                closeP1 = new PointF(float.NaN, float.NaN);
+                closeP2 = new PointF(float.NaN, float.NaN);
                 t2 = float.PositiveInfinity;
                 return;
             }
-            lines_intersect = true;
+            linesIntersect = true;
             t2 = (((p3.X - p1.X) * dy12) + ((p1.Y - p3.Y) * dx12)) / -denominator;
             // Find the point of intersection.
             intersection = new PointF(p1.X + (dx12 * t1), p1.Y + (dy12 * t1));
             // The segments intersect if t1 and t2 are between 0 and 1.
-            segments_intersect = (t1 >= 0) && (t1 <= 1) && (t2 >= 0) && (t2 <= 1);
+            segmentsIntersect = (t1 >= 0) && (t1 <= 1) && (t2 >= 0) && (t2 <= 1);
             // Find the closest points on the segments.
             if (t1 < 0) {
                 t1 = 0;
@@ -474,19 +473,19 @@ namespace BlueControls.ItemCollection {
             } else if (t2 > 1) {
                 t2 = 1;
             }
-            close_p1 = new PointF(p1.X + (dx12 * t1), p1.Y + (dy12 * t1));
-            close_p2 = new PointF(p3.X + (dx34 * t2), p3.Y + (dy34 * t2));
+            closeP1 = new PointF(p1.X + (dx12 * t1), p1.Y + (dy12 * t1));
+            closeP2 = new PointF(p3.X + (dx34 * t2), p3.Y + (dy34 * t2));
         }
 
         private static float SignedPolygonArea(IList<PointF> points) {
             // Add the first point to the end.
-            var num_points = points.Count;
-            var pts = new PointF[num_points + 1];
+            var numPoints = points.Count;
+            var pts = new PointF[numPoints + 1];
             points.CopyTo(pts, 0);
-            pts[num_points] = points[0];
+            pts[numPoints] = points[0];
             // Get the areas.
             float area = 0;
-            for (var i = 0; i < num_points; i++) {
+            for (var i = 0; i < numPoints; i++) {
                 area +=
                     (pts[i + 1].X - pts[i].X) *
                     (pts[i + 1].Y + pts[i].Y) / 2;
@@ -501,13 +500,13 @@ namespace BlueControls.ItemCollection {
         // oriented clockwise.
         private float SignedPolygonArea() {
             // Add the first point to the end.
-            var num_points = MovablePoint.Count - 1;
-            var pts = new PointM?[num_points + 1];
+            var numPoints = MovablePoint.Count - 1;
+            var pts = new PointM?[numPoints + 1];
             MovablePoint.CopyTo(pts, 0);
-            pts[num_points] = MovablePoint[0];
+            pts[numPoints] = MovablePoint[0];
             // Get the areas.
             float area = 0;
-            for (var i = 0; i < num_points; i++) {
+            for (var i = 0; i < numPoints; i++) {
                 area += (pts[i + 1].X - pts[i].X) * (pts[i + 1].Y + pts[i].Y) / 2;
             }
             // Return the result.

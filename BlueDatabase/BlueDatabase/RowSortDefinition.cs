@@ -15,12 +15,17 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static BlueBasics.Converter;
+
+// ReSharper disable All
 
 namespace BlueDatabase {
 
@@ -28,8 +33,8 @@ namespace BlueDatabase {
 
         #region Fields
 
+        public readonly ListExt<ColumnItem> Columns = new();
         public Database Database;
-        private readonly ListExt<ColumnItem?> _columns = new();
 
         #endregion
 
@@ -64,8 +69,6 @@ namespace BlueDatabase {
 
         #region Properties
 
-        public List<ColumnItem?> Columns => _columns;
-
         public bool IsParsing { get; private set; }
 
         public bool Reverse { get; private set; }
@@ -95,11 +98,12 @@ namespace BlueDatabase {
                     case "column":
 
                     case "columnname": // Columname wichtig wegen CopyLayout
-                        _columns.Add(Database.Column[pair.Value]);
+                        if (Database.Column[pair.Value] is ColumnItem c) { Columns.Add(c); }
+
                         break;
 
                     case "columnkey":
-                        _columns.Add(Database.Column.SearchByKey(long.Parse(pair.Value)));
+                        if (Database.Column.SearchByKey(LongParse(pair.Value)) is ColumnItem c2) { Columns.Add(c2); }
                         break;
 
                     default:
@@ -117,32 +121,32 @@ namespace BlueDatabase {
             } else {
                 result += "Direction=A-Z";
             }
-            if (_columns != null) {
-                foreach (var thisColumn in _columns) {
-                    if (thisColumn != null) {
-                        result = result + ", " + thisColumn.ParsableColumnKey();
-                    }
+
+            foreach (var thisColumn in Columns) {
+                if (thisColumn != null) {
+                    result = result + ", " + thisColumn.ParsableColumnKey();
                 }
             }
+
             return result + "}";
         }
 
         public bool UsedForRowSort(ColumnItem? vcolumn) {
-            if (_columns.Count == 0) { return false; }
+            if (Columns.Count == 0) { return false; }
 
-            return _columns.Any(thisColumn => thisColumn == vcolumn);
+            return Columns.Any(thisColumn => thisColumn == vcolumn);
         }
 
         private void Initialize() {
             Reverse = false;
-            _columns.Clear();
+            Columns.Clear();
         }
 
         private void SetColumn(List<string> names) {
-            _columns.Clear();
+            Columns.Clear();
             foreach (var t in names) {
                 var c = Database.Column.Exists(t);
-                if (c != null) { _columns.Add(c); }
+                if (c != null) { Columns.Add(c); }
             }
         }
 

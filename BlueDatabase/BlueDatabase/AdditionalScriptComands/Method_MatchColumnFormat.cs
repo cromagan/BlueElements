@@ -32,7 +32,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.String_or_List, VariableDataType.Variable_Any };
+        public override List<VariableDataType> Args => new() { VariableDataType.String_or_List, VariableDataType.Variable_String_Numeral_List_or_Object };
         public override string Description => "Prüft, ob der Inhalt der Variable mit dem Format der angegebenen Spalte übereinstimmt. Leere Inhalte sind dabei TRUE.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
@@ -55,11 +55,8 @@ namespace BlueDatabase.AdditionalScriptComands {
             if (column == null) { return new DoItFeedback("Spalte in Datenbank nicht gefunden"); }
 
             var tocheck = new List<string>();
-            if (attvar.Attributes[0] is VariableString vs) {
-                tocheck.AddRange(((VariableListString)attvar.Attributes[0]).ValueList);
-            } else {
-                tocheck.Add(((VariableString)attvar.Attributes[0]).ValueString);
-            }
+            if (attvar.Attributes[0] is VariableListString vl) { tocheck.AddRange(vl.ValueList); }
+            if (attvar.Attributes[0] is VariableString vs) { tocheck.Add(vs.ValueString); }
 
             tocheck = tocheck.SortedDistinctList();
 

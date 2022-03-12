@@ -44,6 +44,8 @@ namespace BluePaint {
         public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap? originalPic) {
             if (!_ausricht) { return; }
             var pic = OnNeedCurrentPic();
+            if (pic == null) { return; }
+
             e.DrawLine(PenRedTransp, -1, e.Current.TrimmedY, pic.Width, e.Current.TrimmedY);
             e.DrawLine(PenRedTransp, e.Current.TrimmedX, -1, e.Current.TrimmedX, pic.Height);
             if (e.Current.Button != System.Windows.Forms.MouseButtons.Left || e.MouseDown == null) {

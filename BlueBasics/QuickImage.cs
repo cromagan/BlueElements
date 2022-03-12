@@ -69,10 +69,10 @@ namespace BlueBasics {
             }
             Färbung = w[4];
             ChangeGreenTo = w[5];
-            Helligkeit = string.IsNullOrEmpty(w[6]) ? 100 : int.Parse(w[6]);
-            Sättigung = string.IsNullOrEmpty(w[7]) ? 100 : int.Parse(w[7]);
-            DrehWinkel = string.IsNullOrEmpty(w[8]) ? 0 : int.Parse(w[8]);
-            Transparenz = string.IsNullOrEmpty(w[9]) ? 0 : int.Parse(w[9]);
+            Helligkeit = string.IsNullOrEmpty(w[6]) ? 100 : IntParse(w[6]);
+            Sättigung = string.IsNullOrEmpty(w[7]) ? 100 : IntParse(w[7]);
+            DrehWinkel = string.IsNullOrEmpty(w[8]) ? 0 : IntParse(w[8]);
+            Transparenz = string.IsNullOrEmpty(w[9]) ? 0 : IntParse(w[9]);
             Zweitsymbol = string.IsNullOrEmpty(w[10]) ? string.Empty : w[10];
 
             //Code = GenerateCode(Name, width, height, Effekt, Färbung, ChangeGreenTo, Sättigung, Helligkeit, DrehWinkel, Transparenz, Zweitsymbol);

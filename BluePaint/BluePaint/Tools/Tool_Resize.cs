@@ -17,6 +17,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using static BlueBasics.Converter;
 
 #nullable enable
 
@@ -46,8 +47,6 @@ namespace BluePaint {
             }
         }
 
-        public override string MacroKennung() => "Resize";
-
         public override void PictureChangedByMainWindow() {
             base.PictureChangedByMainWindow();
             DoCapInfo();
@@ -56,7 +55,7 @@ namespace BluePaint {
         private void btnDoResize_Click(object? sender, System.EventArgs? e) {
             var p = OnNeedCurrentPic();
             if (p == null) { return; }
-            if (!double.TryParse(flxProzent.Value, out var pr)) { return; }
+            if (!DoubleTryParse(flxProzent.Value, out var pr)) { return; }
             pr /= 100;
             var wi = (int)(p.Width * pr);
             var he = (int)(p.Height * pr);
@@ -64,7 +63,6 @@ namespace BluePaint {
             var _Bmp2 = BitmapExt.Resize(p, wi, he, enSizeModes.Verzerren, System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic, true);
             OnOverridePic(_Bmp2);
             OnZoomFit();
-            OnCommandForMacro("ResizeProzent;" + flxProzent.Value);
             DoCapInfo();
         }
 
@@ -74,7 +72,7 @@ namespace BluePaint {
                 capInfo.Text = "Kein Bild gewählt.";
                 return;
             }
-            if (!double.TryParse(flxProzent.Value, out var pr)) {
+            if (!DoubleTryParse(flxProzent.Value, out var pr)) {
                 capInfo.Text = "Keine Prozentzahl angegeben.";
                 return;
             }

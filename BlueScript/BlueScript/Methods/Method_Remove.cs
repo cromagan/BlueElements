@@ -51,10 +51,10 @@ namespace BlueScript.Methods {
             var tmpList = ((VariableListString)attvar.Attributes[0]).ValueList;
             for (var z = 2; z < attvar.Attributes.Count; z++) {
                 if (attvar.Attributes[z] is VariableString vs) {
-                    tmpList.RemoveString(((VariableString)attvar.Attributes[z]).ValueString, ((VariableBool)attvar.Attributes[1]).ValueBool);
+                    tmpList!.RemoveString(vs.ValueString, ((VariableBool)attvar.Attributes[1]).ValueBool);
                 }
                 if (attvar.Attributes[z] is VariableListString vl) {
-                    tmpList.RemoveString(((VariableListString)attvar.Attributes[z]).ValueList, ((VariableBool)attvar.Attributes[1]).ValueBool);
+                    tmpList!.RemoveString(vl.ValueList, ((VariableBool)attvar.Attributes[1]).ValueBool);
                 }
             }
             ((VariableListString)attvar.Attributes[0]).ValueList = tmpList;

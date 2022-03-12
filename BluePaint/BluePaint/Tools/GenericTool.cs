@@ -42,8 +42,6 @@ namespace BluePaint {
 
         #region Events
 
-        public event System.EventHandler<CommandForMacroArgs> CommandForMacro;
-
         public event System.EventHandler DoInvalidate;
 
         public event System.EventHandler ForceUndoSaving;
@@ -69,13 +67,6 @@ namespace BluePaint {
         public virtual void DoAdditionalDrawing(BlueControls.EventArgs.AdditionalDrawing e, Bitmap? originalPic) { }
 
         public virtual void ExcuteCommand(string command) => BlueBasics.Develop.DebugPrint_RoutineMussUeberschriebenWerden();
-
-        /// <summary>
-        /// Falls es während einer Makro aufzeichnung benutzt werden kann, gibt es eine eindeutige Kennung zurück.
-        /// Wenn keine Benutzung möglich ist, wird string.empty zurückgegebenm
-        /// </summary>
-        /// <returns></returns>
-        public virtual string MacroKennung() => string.Empty;
 
         /// <summary>
         ///
@@ -109,8 +100,6 @@ namespace BluePaint {
 
         public virtual void ToolFirstShown() {
         }
-
-        protected virtual void OnCommandForMacro(string command) => CommandForMacro?.Invoke(this, new CommandForMacroArgs(command));
 
         protected virtual void OnDoInvalidate() => DoInvalidate?.Invoke(this, System.EventArgs.Empty);
 

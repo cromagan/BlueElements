@@ -33,6 +33,7 @@ using System.Linq;
 using System.Windows.Forms;
 using BlueScript.Variables;
 using MessageBox = BlueControls.Forms.MessageBox;
+using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection {
 
@@ -117,7 +118,7 @@ namespace BlueControls.ItemCollection {
                         break;
 
                     case "backcolor":
-                        BackColor = Color.FromArgb(int.Parse(pair.Value));
+                        BackColor = Color.FromArgb(IntParse(pair.Value));
                         break;
 
                     case "id":
@@ -130,11 +131,11 @@ namespace BlueControls.ItemCollection {
                         break;
 
                     case "fontscale":
-                        _sheetStyleScale = float.Parse(pair.Value);
+                        _sheetStyleScale = FloatParse(pair.Value);
                         break;
 
                     case "snapmode":
-                        _snapMode = (enSnapMode)int.Parse(pair.Value);
+                        _snapMode = (enSnapMode)IntParse(pair.Value);
                         break;
 
                     case "grid":
@@ -142,11 +143,11 @@ namespace BlueControls.ItemCollection {
                         break;
 
                     case "gridshow":
-                        _gridShow = float.Parse(pair.Value);
+                        _gridShow = FloatParse(pair.Value);
                         break;
 
                     case "gridsnap":
-                        _gridsnap = float.Parse(pair.Value);
+                        _gridsnap = FloatParse(pair.Value);
                         break;
 
                     case "format": //_Format = DirectCast(Integer.Parse(pair.Value.Value), enDataFormat)
@@ -157,7 +158,7 @@ namespace BlueControls.ItemCollection {
                         break;
 
                     case "dpi":
-                        if (int.Parse(pair.Value) != Dpi) {
+                        if (IntParse(pair.Value) != Dpi) {
                             Develop.DebugPrint("Dpi Unterschied: " + Dpi + " <> " + pair.Value);
                         }
                         break;
@@ -168,7 +169,7 @@ namespace BlueControls.ItemCollection {
                         break;
 
                     case "sheetstylescale":
-                        _sheetStyleScale = float.Parse(pair.Value);
+                        _sheetStyleScale = FloatParse(pair.Value);
                         break;
 
                     default:
@@ -292,13 +293,12 @@ namespace BlueControls.ItemCollection {
         /// <summary>
         /// Gibt den Versatz der Linken oben Ecke aller Objekte zurück, um mittig zu sein.
         /// </summary>
-        /// <param name="sliderShowing"></param>
         /// <param name="sizeOfPaintArea"></param>
         /// <param name="zoomToUse"></param>
         /// <returns></returns>
         public static Point CenterPos(RectangleF maxBounds, int reduceX, int reduceY, Size sizeOfPaintArea, float zoomToUse) {
-            float w = sizeOfPaintArea.Width - reduceX - (maxBounds.Width * zoomToUse);
-            float h = sizeOfPaintArea.Height - reduceY - (maxBounds.Height * zoomToUse);
+            var w = sizeOfPaintArea.Width - reduceX - (maxBounds.Width * zoomToUse);
+            var h = sizeOfPaintArea.Height - reduceY - (maxBounds.Height * zoomToUse);
             return new Point((int)w, (int)h);
         }
 
@@ -751,16 +751,16 @@ namespace BlueControls.ItemCollection {
                     //    if (_SheetStyle == null) { _SheetStyle = Skin.StyleDB.Row.First(); }// Einfach die Erste nehmen
                     //    break;
                     //case "fontscale":
-                    //    _SheetStyleScale = float.Parse(pair.Value);
+                    //    _SheetStyleScale = FloatParse(pair.Value);
                     //    break;
                     //case "grid":
                     //    //_Grid = pair.Value.FromPlusMinus();
                     //    break;
                     //case "gridshow":
-                    //    //_GridShow = float.Parse(pair.Value);
+                    //    //_GridShow = FloatParse(pair.Value);
                     //    break;
                     //case "gridsnap":
-                    //    //_Gridsnap = float.Parse(pair.Value);
+                    //    //_Gridsnap = FloatParse(pair.Value);
                     //    break;
                     //case "format": //_Format = DirectCast(Integer.Parse(pair.Value.Value), enDataFormat)
                     //    break;
@@ -770,7 +770,7 @@ namespace BlueControls.ItemCollection {
                         break;
 
                     case "dpi": // TODO: LÖschen 26.02.2020
-                        if (int.Parse(pair.Value) != Dpi) {
+                        if (IntParse(pair.Value) != Dpi) {
                             Develop.DebugPrint("Dpi Unterschied: " + Dpi + " <> " + pair.Value);
                         }
                         break;
@@ -781,7 +781,7 @@ namespace BlueControls.ItemCollection {
                         break;
 
                     case "sheetstylescale": // TODO: LÖschen 26.02.2020
-                        //_SheetStyleScale = float.Parse(pair.Value);
+                        //_SheetStyleScale = FloatParse(pair.Value);
                         break;
 
                     default:

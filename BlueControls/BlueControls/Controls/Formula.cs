@@ -476,14 +476,14 @@ namespace BlueControls.Controls {
 
         private void cbxCaptionPosition_ItemClicked(object sender, BasicListItemEventArgs e) {
             var viewItem = SearchViewItem(EditorSelectedColumn());
-            if (viewItem != null) { viewItem.‹berschriftAnordnung = (en‹berschriftAnordnung)int.Parse(cbxCaptionPosition.Text); }
+            if (viewItem != null) { viewItem.‹berschriftAnordnung = (en‹berschriftAnordnung)IntParse(cbxCaptionPosition.Text); }
             RedoView();
             SortColumnList();
         }
 
         private void cbxControlType_ItemClicked(object sender, BasicListItemEventArgs e) {
             var viewItem = SearchViewItem(EditorSelectedColumn());
-            if (viewItem != null) { viewItem.Column.EditType = (enEditTypeFormula)int.Parse(cbxControlType.Text); }
+            if (viewItem != null) { viewItem.Column.EditType = (enEditTypeFormula)IntParse(cbxControlType.Text); }
             RedoView();
             SortColumnList();
         }

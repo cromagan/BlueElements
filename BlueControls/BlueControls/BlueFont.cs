@@ -26,7 +26,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
+using System.Globalization;
 using System.Linq;
+using static BlueBasics.Converter;
 
 namespace BlueControls {
 
@@ -113,7 +115,7 @@ namespace BlueControls {
                     case "size":
 
                     case "fontsize":
-                        FontSize = float.Parse(pair.Value.FromNonCritical());
+                        FontSize = FloatParse(pair.Value.FromNonCritical());
                         if (FontSize < 0.1F) { Develop.DebugPrint(enFehlerArt.Fehler, "Fontsize=" + FontSize); }
                         break;
 
@@ -253,9 +255,9 @@ namespace BlueControls {
             }
             BlueFont f = new(code);
             FontsAll.Add(f);
-            if (!string.Equals(f._code.Replace(" ", ""), code.Replace(" ", ""), StringComparison.CurrentCultureIgnoreCase)) {
-                Develop.DebugPrint("Schrift-Fehlerhaft: " + code + " (" + f._code + ")");
-            }
+            //if (!string.Equals(f._code.Replace(" ", ""), code.Replace(" ", ""), StringComparison.CurrentCultureIgnoreCase)) {
+            //    Develop.DebugPrint("Schrift-Fehlerhaft: " + code + " (" + f._code + ")");
+            //}
             return f;
         }
 
@@ -541,7 +543,7 @@ namespace BlueControls {
         }
 
         private static string ToString(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, string colorMain, string colorOutline, bool vKapitälchen, bool vonlyuppe, bool vonlylower) {
-            var c = "{Name=" + fontName + ", Size=" + fontSize.ToString().ToNonCritical();
+            var c = "{Name=" + fontName + ", Size=" + fontSize.ToString(CultureInfo.InvariantCulture).ToNonCritical();
             if (bold) { c += ", Bold=True"; }
             if (italic) { c += ", Italic=True"; }
             if (underline) { c += ", Underline=True"; }

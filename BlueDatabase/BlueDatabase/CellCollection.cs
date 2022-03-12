@@ -150,7 +150,7 @@ namespace BlueDatabase {
             var fi = new List<FilterItem>();
 
             for (var z = 0; z < Math.Min(column.LinkedCellFilter.Count, linkedDatabase.Column.Count); z++) {
-                if (int.TryParse(column.LinkedCellFilter[z], out var key)) {
+                if (IntTryParse(column.LinkedCellFilter[z], out var key)) {
                     var c = column.Database.Column.SearchByKey(key);
                     if (c == null) { return (fi, "Eine Spalte, aus der der Zeilenschlüssel kommen soll, existiert nicht."); }
                     var value = row.CellGetString(c);
@@ -213,8 +213,8 @@ namespace BlueDatabase {
 
             var v = key.SplitAndCutBy("|");
             if (v.Length != 2) { return RepairLinkedCellValue(linkedDatabase, column, row, addRowIfNotExists); }
-            var linkedColumn = linkedDatabase.Column.SearchByKey(long.Parse(v[0]));
-            var linkedRow = linkedDatabase.Row.SearchByKey(long.Parse(v[1]));
+            var linkedColumn = linkedDatabase.Column.SearchByKey(LongParse(v[0]));
+            var linkedRow = linkedDatabase.Row.SearchByKey(LongParse(v[1]));
 
             if (KeyOfCell(linkedColumn, linkedRow) == key) { return (linkedColumn, linkedRow, string.Empty); }
 
@@ -257,8 +257,8 @@ namespace BlueDatabase {
             }
             var cd = cellKey.SplitAndCutBy("|");
             if (cd.GetUpperBound(0) != 1) { Develop.DebugPrint(enFehlerArt.Fehler, "Falscher CellKey übergeben: " + cellKey); }
-            column = _database.Column.SearchByKey(long.Parse(cd[0]));
-            row = _database.Row.SearchByKey(long.Parse(cd[1]));
+            column = _database.Column.SearchByKey(LongParse(cd[0]));
+            row = _database.Row.SearchByKey(LongParse(cd[1]));
         }
 
         public void Delete(ColumnItem column, long rowKey) {
@@ -347,7 +347,7 @@ namespace BlueDatabase {
         public double GetDouble(ColumnItem? column, RowItem? row) // Main Method
         {
             var x = GetString(column, row);
-            return string.IsNullOrEmpty(x) ? 0 : double.Parse(x);
+            return string.IsNullOrEmpty(x) ? 0 : DoubleParse(x);
         }
 
         public int GetInteger(string columnName, RowItem? row) => GetInteger(_database.Column[columnName], row);
@@ -355,7 +355,7 @@ namespace BlueDatabase {
         public int GetInteger(ColumnItem? column, RowItem? row) // Main Method
         {
             var x = GetString(column, row);
-            return string.IsNullOrEmpty(x) ? 0 : int.Parse(x);
+            return string.IsNullOrEmpty(x) ? 0 : IntParse(x);
         }
 
         public List<string> GetList(string columnName, RowItem? row) => GetList(_database.Column[columnName], row);
@@ -732,7 +732,7 @@ namespace BlueDatabase {
                     if (ival < minv) { return false; }
                     DoubleTryParse(fval[1], out var maxv);
                     if (ival > maxv) { return false; }
-                    //if (double.Parse)
+                    //if (DoubleParse)
                     //if (string.IsNullOrEmpty(IstValue)) { return false; }
                     //if (!FilterValue.ToUpper().Contains("VALUE")) { return false; }
                     //var d = modErgebnis.Ergebnis(FilterValue.Replace("VALUE", IstValue.Replace(",", "."), RegexOptions.IgnoreCase));
@@ -980,7 +980,7 @@ namespace BlueDatabase {
 
                 if (thisColumn.Format == enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                     foreach (var thisV in thisColumn.LinkedCellFilter) {
-                        if (int.TryParse(thisV, out var key)) {
+                        if (IntTryParse(thisV, out var key)) {
                             if (key == column.Key) { LinkedCellData(thisColumn, ownRow, true, false); break; }
                         }
                     }

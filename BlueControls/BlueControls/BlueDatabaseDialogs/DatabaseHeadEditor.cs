@@ -29,6 +29,7 @@ using System.IO;
 using System.Linq;
 using BlueControls.ItemCollection.ItemCollectionList;
 using MessageBox = BlueControls.Forms.MessageBox;
+using static BlueBasics.Converter;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
@@ -268,7 +269,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             var x = 0;
             var y = 0;
             var inhalt = string.Empty;
-            var such = (enDatabaseDataType)int.Parse(what);
+            var such = (enDatabaseDataType)IntParse(what);
             do {
                 if (pointer > b.Length) { break; }
                 _database.Parse(b, ref pointer, ref art, ref colKey, ref rowKey, ref inhalt, ref x, ref y);
@@ -477,10 +478,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             scriptEditor.WriteScriptBack();
             _database.GlobalShowPass = txbKennwort.Text;
             _database.Caption = txbCaption.Text;
-            _database.UndoCount = tbxUndoAnzahl.Text.IsLong() ? Math.Max(int.Parse(tbxUndoAnzahl.Text), 5) : 5;
-            _database.ReloadDelaySecond = tbxReloadVerzoegerung.Text.IsLong() ? Math.Max(int.Parse(tbxReloadVerzoegerung.Text), 5) : 5;
+            _database.UndoCount = tbxUndoAnzahl.Text.IsLong() ? Math.Max(IntParse(tbxUndoAnzahl.Text), 5) : 5;
+            _database.ReloadDelaySecond = tbxReloadVerzoegerung.Text.IsLong() ? Math.Max(IntParse(tbxReloadVerzoegerung.Text), 5) : 5;
             if (txbGlobalScale.Text.IsDouble()) {
-                _database.GlobalScale = Math.Min(double.Parse(txbGlobalScale.Text), 5);
+                _database.GlobalScale = Math.Min(DoubleParse(txbGlobalScale.Text), 5);
                 _database.GlobalScale = Math.Max(0.5, _database.GlobalScale);
             } else {
                 _database.ReloadDelaySecond = 1;
@@ -500,8 +501,8 @@ namespace BlueControls.BlueDatabaseDialogs {
                 _database.PermissionGroupsNewRow.AddRange(PermissionGroups_NewRow.Item.ToListOfString());
                 _database.PermissionGroupsNewRow.Remove("#Administrator");
             }
-            _database.VerwaisteDaten = (enVerwaisteDaten)int.Parse(cbxVerwaisteDaten.Text);
-            _database.Ansicht = (enAnsicht)int.Parse(cbxAnsicht.Text);
+            _database.VerwaisteDaten = (enVerwaisteDaten)IntParse(cbxVerwaisteDaten.Text);
+            _database.Ansicht = (enAnsicht)IntParse(cbxAnsicht.Text);
 
             #region Sortierung
 

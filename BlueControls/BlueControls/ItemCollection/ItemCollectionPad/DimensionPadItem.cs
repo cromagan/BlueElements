@@ -23,8 +23,10 @@ using BlueControls.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using static BlueBasics.Geometry;
 using static BlueBasics.Polygons;
+using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection {
 
@@ -123,7 +125,7 @@ namespace BlueControls.ItemCollection {
         public string Text_Oben {
             get => _textOben;
             set {
-                if (_textOben == Länge_In_Mm.ToString()) { value = string.Empty; }
+                if (_textOben == Länge_In_Mm.ToString(CultureInfo.InvariantCulture)) { value = string.Empty; }
                 _textOben = value;
                 OnChanged();
             }
@@ -201,7 +203,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "decimal":
-                    Nachkommastellen = int.Parse(value);
+                    Nachkommastellen = IntParse(value);
                     return true;
 
                 case "checked": // TODO: Alt 06.09.2019
@@ -216,7 +218,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "additionalscale":
-                    Skalierung = float.Parse(value.FromNonCritical());
+                    Skalierung = FloatParse(value.FromNonCritical());
                     return true;
             }
             return false;
@@ -233,7 +235,7 @@ namespace BlueControls.ItemCollection {
                    ", Decimal=" + Nachkommastellen +
                    ", Prefix=" + Präfix.ToNonCritical() +
                    ", Suffix=" + Suffix.ToNonCritical() +
-                   ", AdditionalScale=" + Skalierung.ToString().ToNonCritical() + "}";
+                   ", AdditionalScale=" + Skalierung.ToString(CultureInfo.InvariantCulture).ToNonCritical() + "}";
         }
 
         protected override RectangleF CalculateUsedArea() {

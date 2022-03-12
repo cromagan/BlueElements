@@ -22,7 +22,9 @@ using BlueControls.Enums;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Globalization;
 using static BlueBasics.Polygons;
+using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection {
 
@@ -79,7 +81,7 @@ namespace BlueControls.ItemCollection {
             if (base.ParseThis(tag, value)) { return true; }
             switch (tag) {
                 case "symbol":
-                    Symbol = (enSymbol)int.Parse(value);
+                    Symbol = (enSymbol)IntParse(value);
                     return true;
 
                 case "backcolor":
@@ -91,7 +93,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "borderwidth":
-                    float.TryParse(value.FromNonCritical(), out var tRanddicke);
+                    FloatTryParse(value.FromNonCritical(), out var tRanddicke);
                     Randdicke = tRanddicke;
                     return true;
 
@@ -108,7 +110,7 @@ namespace BlueControls.ItemCollection {
             t = t + "Symbol=" + (int)Symbol + ", ";
             t = t + "Backcolor=" + Hintergrundfarbe.ToHtmlCode() + ", ";
             t = t + "BorderColor=" + Randfarbe.ToHtmlCode() + ", ";
-            t = t + "BorderWidth=" + Randdicke.ToString().ToNonCritical() + ", ";
+            t = t + "BorderWidth=" + Randdicke.ToString(CultureInfo.InvariantCulture).ToNonCritical() + ", ";
             return t.Trim(", ") + "}";
         }
 

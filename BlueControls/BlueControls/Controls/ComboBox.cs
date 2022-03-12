@@ -40,18 +40,18 @@ namespace BlueControls.Controls {
         #region Fields
 
         private bool _btnDropDownIsIn;
-        private enComboboxStyle _DrawStyle = enComboboxStyle.TextBox;
-        private System.Windows.Forms.ComboBoxStyle _DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
+        private enComboboxStyle _drawStyle = enComboboxStyle.TextBox;
+        private System.Windows.Forms.ComboBoxStyle _dropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
         private ExtText _eTxt2;
-        private string _ImageCode = string.Empty;
+        private string _imageCode = string.Empty;
 
         /// <summary>
         /// Kümmert sich darum, wenn die ComboBox wie ein Button aussieht, dass immer
         /// der Button-Text stehen bleibt und nicht der Ausgewählte
         /// </summary>
-        private string _Initialtext;
+        private string _initialtext;
 
-        private string _LastClickedText;
+        private string _lastClickedText;
 
         #endregion
 
@@ -61,7 +61,7 @@ namespace BlueControls.Controls {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            _MouseHighlight = true;
+            MouseHighlight = true;
             SetStyle(System.Windows.Forms.ControlStyles.ContainerControl, true);
             Item = new ItemCollectionList(enBlueListBoxAppearance.DropdownSelectbox);
             Item.ItemAdded += _Item_ItemAdded;
@@ -86,10 +86,10 @@ namespace BlueControls.Controls {
 
         [DefaultValue(enComboboxStyle.TextBox)]
         public enComboboxStyle DrawStyle {
-            get => _DrawStyle;
+            get => _drawStyle;
             set {
-                if (_DrawStyle != value) {
-                    _DrawStyle = value;
+                if (_drawStyle != value) {
+                    _drawStyle = value;
                     Invalidate();
                 }
                 SetStyle();
@@ -98,10 +98,10 @@ namespace BlueControls.Controls {
 
         [DefaultValue(System.Windows.Forms.ComboBoxStyle.DropDown)]
         public System.Windows.Forms.ComboBoxStyle DropDownStyle {
-            get => _DropDownStyle;
+            get => _dropDownStyle;
             set {
-                if (value != _DropDownStyle) {
-                    _DropDownStyle = value;
+                if (value != _dropDownStyle) {
+                    _dropDownStyle = value;
                     Invalidate();
                 }
                 SetStyle();
@@ -112,10 +112,10 @@ namespace BlueControls.Controls {
         [Category("Darstellung")]
         [Editor(typeof(QuickPicSelector), typeof(UITypeEditor))]
         public string ImageCode {
-            get => _ImageCode;
+            get => _imageCode;
             set {
-                if (_ImageCode != value) {
-                    _ImageCode = value;
+                if (_imageCode != value) {
+                    _imageCode = value;
                     Invalidate();
                 }
                 SetStyle();
@@ -142,33 +142,33 @@ namespace BlueControls.Controls {
             _btnDropDownIsIn = true;
             OnDropDownShowing();
             if (Item.Count == 0) { _btnDropDownIsIn = false; return; }
-            int X, Y;
-            if (sender is Button But) {
-                X = System.Windows.Forms.Cursor.Position.X - But.MousePos().X - But.Location.X;
-                Y = System.Windows.Forms.Cursor.Position.Y - But.MousePos().Y + Height; //Identisch
+            int x, y;
+            if (sender is Button but) {
+                x = System.Windows.Forms.Cursor.Position.X - but.MousePos().X - but.Location.X;
+                y = System.Windows.Forms.Cursor.Position.Y - but.MousePos().Y + Height; //Identisch
             } else {
-                X = System.Windows.Forms.Cursor.Position.X - MousePos().X;
-                Y = System.Windows.Forms.Cursor.Position.Y - MousePos().Y + Height; //Identisch
+                x = System.Windows.Forms.Cursor.Position.X - MousePos().X;
+                y = System.Windows.Forms.Cursor.Position.Y - MousePos().Y + Height; //Identisch
             }
             Item.UncheckAll();
-            if (_DrawStyle != enComboboxStyle.RibbonBar && Item[Text] != null) { Item[Text].Checked = true; }
-            var DropDownMenu = FloatingInputBoxListBoxStyle.Show(Item, X, Y, Width, null, this, Translate);
-            DropDownMenu.Cancel += DropDownMenu_Cancel;
-            DropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
+            if (_drawStyle != enComboboxStyle.RibbonBar && Item[Text] != null) { Item[Text].Checked = true; }
+            var dropDownMenu = FloatingInputBoxListBoxStyle.Show(Item, x, y, Width, null, this, Translate);
+            dropDownMenu.Cancel += DropDownMenu_Cancel;
+            dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
             _btnDropDownIsIn = false;
         }
 
-        internal bool WasThisValueClicked() => _LastClickedText != null && Text == _LastClickedText;
+        internal bool WasThisValueClicked() => _lastClickedText != null && Text == _lastClickedText;
 
         protected override void DrawControl(Graphics gr, enStates state) {
-            if (_DrawStyle != enComboboxStyle.TextBox) {
-                if (string.IsNullOrEmpty(_Initialtext) && !string.IsNullOrEmpty(Text)) { _Initialtext = Text; }
+            if (_drawStyle != enComboboxStyle.TextBox) {
+                if (string.IsNullOrEmpty(_initialtext) && !string.IsNullOrEmpty(Text)) { _initialtext = Text; }
 
                 if (_eTxt2 == null) {
-                    _eTxt2 = new ExtText((enDesign)_DrawStyle, state);
+                    _eTxt2 = new ExtText((enDesign)_drawStyle, state);
                 }
 
-                Button.DrawButton(this, gr, (enDesign)_DrawStyle, state, QuickImage.Get(_ImageCode), enAlignment.Horizontal_Vertical_Center, true, _eTxt2, _Initialtext, DisplayRectangle, Translate);
+                Button.DrawButton(this, gr, (enDesign)_drawStyle, state, QuickImage.Get(_imageCode), enAlignment.Horizontal_Vertical_Center, true, _eTxt2, _initialtext, DisplayRectangle, Translate);
                 btnDropDown.Invalidate();
                 return;
             }
@@ -187,14 +187,14 @@ namespace BlueControls.Controls {
             }
 
             i.Parent = Item; // Um den Stil zu wissen
-            if (Focused && _DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
+            if (Focused && _dropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
                 // Focused = Bearbeitung erwünscht, Cursor anzeigen und KEINE Items zeichnen
                 base.DrawControl(gr, state);
                 btnDropDown.Invalidate();
                 return;
             }
 
-            if (_DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
+            if (_dropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
                 if (i is TextListItem tempVar2) {
                     if (tempVar2.Symbol == null && tempVar2.IsClickable()) {
                         base.DrawControl(gr, state);
@@ -230,7 +230,7 @@ namespace BlueControls.Controls {
         }
 
         protected override void OnGotFocus(System.EventArgs e) {
-            if (_DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDownList) {
+            if (_dropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDownList) {
                 btnDropDown.Focus();
             } else {
                 base.OnGotFocus(e);
@@ -248,7 +248,7 @@ namespace BlueControls.Controls {
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
             if (e.Button != System.Windows.Forms.MouseButtons.Right) {
                 // nicht bei rechts, ansonsten gibt's evtl. Kontextmenü (von der Textbox aus gesteuert) UND den Auswahldialog
-                if (_DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDownList) {
+                if (_dropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDownList) {
                     ShowMenu(this, e);
                 } else {
                     base.OnMouseUp(e);
@@ -305,7 +305,7 @@ namespace BlueControls.Controls {
             } catch (Exception) { }
         }
 
-        private void DropDownMenu_Cancel(object sender, object MouseOver) {
+        private void DropDownMenu_Cancel(object sender, object mouseOver) {
             Item.UncheckAll();
             FloatingForm.Close(this);
             Focus();
@@ -315,7 +315,7 @@ namespace BlueControls.Controls {
             Item.UncheckAll();
             FloatingForm.Close(this);
             if (!string.IsNullOrEmpty(e.ClickedComand)) {
-                _LastClickedText = e.ClickedComand;
+                _lastClickedText = e.ClickedComand;
                 Text = e.ClickedComand;
                 OnItemClicked(new BasicListItemEventArgs(Item[e.ClickedComand]));
             }
@@ -327,7 +327,7 @@ namespace BlueControls.Controls {
         private void SetStyle() {
             if (DrawStyle != enComboboxStyle.TextBox) {
                 Cursor = System.Windows.Forms.Cursors.Arrow;
-                _DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+                _dropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
                 btnDropDown.Visible = false;
                 // ImageCode = string.Empty; - Egal, wird eh ignoriert wenn es nicht gebraucht wird
             }

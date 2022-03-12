@@ -27,10 +27,10 @@ namespace BlueBasics {
             if (string.IsNullOrEmpty(pass)) { return b; }
             if (end <= start) { return b; }
             for (var z = start; z <= end; z++) {
-                var TMP = b[z] + (pass[z % pass.Length] * direction);
-                if (TMP < 0) { TMP += 256; }
-                if (TMP > 255) { TMP -= 256; }
-                b[z] = (byte)TMP;
+                var tmp = b[z] + (pass[z % pass.Length] * direction);
+                if (tmp < 0) { tmp += 256; }
+                if (tmp > 255) { tmp -= 256; }
+                b[z] = (byte)tmp;
             }
             return b;
         }

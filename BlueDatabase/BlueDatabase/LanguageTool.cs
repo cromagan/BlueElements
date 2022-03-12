@@ -42,6 +42,8 @@ namespace BlueDatabase {
         /// <param name="style"></param>
         /// <returns></returns>
         public static string ColumnReplace(string txt, ColumnItem? column, enShortenStyle style) {
+            if (column == null) { return txt; }
+
             if (!string.IsNullOrEmpty(txt)) {
                 if (!string.IsNullOrEmpty(column.Prefix)) { txt = DoTranslate(column.Prefix, true) + " " + txt; }
                 if (!string.IsNullOrEmpty(column.Suffix)) { txt = txt + " " + DoTranslate(column.Suffix, true); }
@@ -60,7 +62,12 @@ namespace BlueDatabase {
                 }
                 if (x.Length == 1 && !thisString.StartsWith("|")) { txt = txt.Replace(x[0], string.Empty); }
             }
-            return style is enShortenStyle.Replaced or enShortenStyle.HTML || ot == txt ? txt : ot + " (" + txt + ")";
+
+            if (style is enShortenStyle.Replaced or enShortenStyle.HTML || ot == txt) {
+                return txt;
+            }
+
+            return ot + " (" + txt + ")";
         }
 
         public static string DoTranslate(string txt) => DoTranslate(txt, true, EmptyArgs);

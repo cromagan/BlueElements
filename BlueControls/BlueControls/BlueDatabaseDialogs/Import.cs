@@ -33,13 +33,13 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Constructors
 
-        public Import(Database database, string importtext) : base() {
+        public Import(Database? database, string importtext) : base() {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             _originalImportText = importtext.Replace("\r\n", "\r").Trim("\r");
-            var Ein = _originalImportText.SplitAndCutByCrToList();
-            Eintr.Text = Ein.Count + " zum Importieren bereit.";
+            var ein = _originalImportText.SplitAndCutByCrToList();
+            Eintr.Text = ein.Count + " zum Importieren bereit.";
             Database = database;
             if (Database == null) {
                 return;
@@ -53,7 +53,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Properties
 
-        public Database Database { get; }
+        public Database? Database { get; }
 
         #endregion
 

@@ -24,7 +24,9 @@ using BlueControls.Interfaces;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Globalization;
 using BlueScript.Variables;
+using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection {
 
@@ -137,11 +139,11 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "format":
-                    Format = (enDataFormat)int.Parse(value);
+                    Format = (enDataFormat)IntParse(value);
                     return true;
 
                 case "additionalscale":
-                    Skalierung = float.Parse(value.FromNonCritical());
+                    Skalierung = FloatParse(value.FromNonCritical());
                     return true;
             }
             return false;
@@ -186,7 +188,7 @@ namespace BlueControls.ItemCollection {
             if (!string.IsNullOrEmpty(_textOriginal)) { t = t + "ReadableText=" + _textOriginal.ToNonCritical() + ", "; }
             if (Format != enDataFormat.Text) { t = t + "Format=" + (int)Format + ", "; }
             if (_ausrichtung != enAlignment.Top_Left) { t = t + "Alignment=" + (int)_ausrichtung + ", "; }
-            t = t + "AdditionalScale=" + Skalierung.ToString().ToNonCritical() + ", ";
+            t = t + "AdditionalScale=" + Skalierung.ToString(CultureInfo.InvariantCulture).ToNonCritical() + ", ";
             return t.Trim(", ") + "}";
         }
 

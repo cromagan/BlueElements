@@ -40,7 +40,7 @@ namespace BlueControls.Controls {
             //  InitializeComponent()
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             SetNotFocusable();
-            _MouseHighlight = false;
+            MouseHighlight = false;
         }
 
         #endregion

@@ -221,15 +221,16 @@ namespace BlueControls.Classes_Editor {
             }
             Item.Verzeichnis = ExportVerzeichnis.Text;
             if (!string.IsNullOrEmpty(ExportIntervall.Text)) {
-                Item.BackupInterval = float.Parse(ExportIntervall.Text);
+                Item.BackupInterval = FloatParse(ExportIntervall.Text);
             }
             if (!string.IsNullOrEmpty(ExportAutomatischLöschen.Text)) {
-                Item.AutoDelete = float.Parse(ExportAutomatischLöschen.Text);
+                Item.AutoDelete = FloatParse(ExportAutomatischLöschen.Text);
             }
             Item.ExportFormularId = cbxExportFormularID.Text;
-            Item.ExportSpaltenAnsicht = int.Parse(ExportSpaltenAnsicht.Text);
+            Item.ExportSpaltenAnsicht = IntParse(ExportSpaltenAnsicht.Text);
             Item.Filter.Clear();
-            foreach (TextListItem thisFilter in lbxFilter.Item) {
+            foreach (var basicListItem in lbxFilter.Item) {
+                var thisFilter = (TextListItem)basicListItem;
                 Item.Filter.Add((FilterItem)thisFilter.Tag);
             }
             Item.BereitsExportiert.Clear();

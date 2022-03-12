@@ -29,6 +29,7 @@ using System.Drawing.Imaging;
 using BlueScript.Variables;
 using static BlueBasics.FileOperations;
 using MessageBox = BlueControls.Forms.MessageBox;
+using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection {
 
@@ -140,7 +141,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "modus":
-                    Bild_Modus = (enSizeModes)int.Parse(value);
+                    Bild_Modus = (enSizeModes)IntParse(value);
                     return true;
 
                 case "whiteback":
@@ -148,7 +149,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "padding":
-                    Padding = int.Parse(value);
+                    Padding = IntParse(value);
                     return true;
 
                 case "image":
@@ -353,8 +354,8 @@ namespace BlueControls.ItemCollection {
         //        return;
         //    }
         //    Hintergrund_weiß_füllen = Tags.TagGet("Hintergrund weiß füllen").FromPlusMinus();
-        //    Bild_Modus = (enSizeModes)int.Parse(Tags.TagGet("Bild-Modus"));
-        //    Stil = (PadStyles)int.Parse(Tags.TagGet("Umrandung"));
+        //    Bild_Modus = (enSizeModes)IntParse(Tags.TagGet("Bild-Modus"));
+        //    Stil = (PadStyles)IntParse(Tags.TagGet("Umrandung"));
         //    Platzhalter_für_Layout = Tags.TagGet("Platzhalter für Layout").FromNonCritical();
         //}
     }

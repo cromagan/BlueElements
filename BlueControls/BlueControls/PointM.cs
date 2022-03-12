@@ -24,6 +24,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
+using static BlueBasics.Converter;
 using System;
 using System.Drawing;
 using static BlueBasics.Geometry;
@@ -135,11 +136,11 @@ namespace BlueControls {
 
         public static PointM operator +(PointM a, PointM b) => new(a._x + b._x, a._y + b._y);
 
-        public float DistanzZuLinie(PointM? P1, PointM? P2) => DistanzZuLinie(P1.X, P1.Y, P2.X, P2.Y);
+        public float DistanzZuLinie(PointM p1, PointM p2) => DistanzZuLinie(p1.X, p1.Y, p2.X, p2.Y);
 
-        public float DistanzZuLinie(float X1, float Y1, float X2, float Y2) => Länge(this, PointOnLine(this, X1, Y1, X2, Y2));
+        public float DistanzZuLinie(float x1, float y1, float x2, float y2) => Länge(this, PointOnLine(this, x1, y1, x2, y2));
 
-        public float DotProduct(PointM? vector) => (_x * vector._x) + (_y * vector._y);
+        public float DotProduct(PointM vector) => (_x * vector._x) + (_y * vector._y);
 
         public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, enDesign type, enStates state) {
             var tx = (_x * zoom) - shiftX + (zoom / 2);
@@ -187,11 +188,11 @@ namespace BlueControls {
                         break;
 
                     case "x":
-                        _x = float.Parse(pair.Value);
+                        _x = FloatParse(pair.Value);
                         break;
 
                     case "y":
-                        _y = float.Parse(pair.Value);
+                        _y = FloatParse(pair.Value);
                         break;
 
                     case "fix": // TODO: Entfernt, 24.05.2021
@@ -224,14 +225,14 @@ namespace BlueControls {
             OnMoved(new MoveEventArgs(mx, my));
         }
 
-        public void SetTo(PointM? StartPoint, float Länge, float Alpha) {
-            var tempVar = PolarToCartesian(Länge, Alpha);
-            SetTo(StartPoint.X + tempVar.X, Y = StartPoint.Y + tempVar.Y);
+        public void SetTo(PointM? startPoint, float länge, float alpha) {
+            var tempVar = PolarToCartesian(länge, alpha);
+            SetTo(startPoint.X + tempVar.X, Y = startPoint.Y + tempVar.Y);
         }
 
-        public void SetTo(PointF Point) => SetTo(Point.X, Point.Y);
+        public void SetTo(PointF point) => SetTo(point.X, point.Y);
 
-        public void SetTo(PointM Point) => SetTo(Point.X, Point.Y);
+        public void SetTo(PointM point) => SetTo(point.X, point.Y);
 
         public void SetTo(Point point) => SetTo(point.X, (float)point.Y);
 

@@ -47,9 +47,9 @@ namespace BlueScript.Variables {
 
         public VariableListString(string name) : this(name, null, true, false, string.Empty) { }
 
-        public VariableListString(List<string>? value) : this(Variable.DummyName(), value, true, false, string.Empty) { }
+        public VariableListString(List<string>? value) : this(DummyName(), value, true, false, string.Empty) { }
 
-        public VariableListString(string[] value) : this(value.ToList()) { }
+        public VariableListString(IEnumerable<string> value) : this(value.ToList()) { }
 
         #endregion
 
@@ -72,36 +72,15 @@ namespace BlueScript.Variables {
         public override bool Stringable => true;
         public override VariableDataType Type => VariableDataType.List;
 
-        public override string ValueForReplace {
-            get => ReadableText;
-        }
+        public override string ValueForReplace => ReadableText;
 
         public List<string> ValueList {
             get => _list;
             set {
-                if (Readonly) {
-                    return;
-                }
+                if (Readonly) { return; }
 
                 _list = new List<string>();
-                if (value != null) {
-                    _list.AddRange(value);
-                }
-            }
-        }
-
-        [Obsolete]
-        public List<string> ValueListString {
-            get => _list;
-            set {
-                if (Readonly) {
-                    return;
-                }
-
-                _list = new List<string>();
-                if (value != null) {
-                    _list.AddRange(value);
-                }
+                if (value != null) { _list.AddRange(value); }
             }
         }
 

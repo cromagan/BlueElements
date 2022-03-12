@@ -168,15 +168,19 @@ namespace BlueBasics {
             }
         }
 
-        public static void RemoveString(this List<string?>? l, List<string?>? value, bool caseSensitive) {
+        public static void RemoveString(this List<string>? l, List<string>? value, bool caseSensitive) {
+            if (l == null || value == null) { return; }
+
             foreach (var t in value) {
-                l.RemoveString(t, caseSensitive);
+                l!.RemoveString(t, caseSensitive);
             }
         }
 
-        public static void RemoveString(this List<string> l, string[] value, bool caseSensitive) {
+        public static void RemoveString(this List<string>? l, string[]? value, bool caseSensitive) {
+            if (l == null || value == null) { return; }
+
             for (var z = 0; z <= value.GetUpperBound(0); z++) {
-                l.RemoveString(value[z], caseSensitive);
+                l!.RemoveString(value[z], caseSensitive);
             }
         }
 

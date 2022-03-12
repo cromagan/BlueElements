@@ -25,7 +25,7 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Variable_Any };
+        public override List<VariableDataType> Args => new() { VariableDataType.Variable_String_Numeral_List_or_Object };
         public override string Description => "Gibt TRUE zurück, wenn die Variable existiert.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";

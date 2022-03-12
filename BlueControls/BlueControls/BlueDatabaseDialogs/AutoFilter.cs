@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BlueControls.ItemCollection.ItemCollectionList;
+using static BlueBasics.Converter;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
@@ -356,8 +357,8 @@ namespace BlueControls.BlueDatabaseDialogs {
                         var z1 = tmp.Substring(0, l);
                         var z2 = tmp.Substring(l + 1);
                         if (z1.IsDouble() && z2.IsDouble()) {
-                            var zd1 = double.Parse(z1);
-                            var zd2 = double.Parse(z2);
+                            var zd1 = DoubleParse(z1);
+                            var zd2 = DoubleParse(z2);
                             if (zd2 < zd1) {
                                 Generic.Swap(ref zd1, ref zd2);
                             }

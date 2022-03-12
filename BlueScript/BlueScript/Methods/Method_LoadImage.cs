@@ -58,9 +58,7 @@ namespace BlueScript.Methods {
 
             try {
                 Generic.CollectGarbage();
-                var bmp = (Bitmap)BitmapExt.Image_FromFile(((VariableString)attvar.Attributes[0]).ValueString);
-                //var nr = s.AddBitmapToCache(bmp);
-
+                var bmp = (Bitmap)BitmapExt.Image_FromFile(((VariableString)attvar.Attributes[0]).ValueString)!;
                 return new DoItFeedback(bmp);
             } catch {
                 return new DoItFeedback("Datei konnte nicht geladen werden: " + ((VariableString)attvar.Attributes[0]).ValueString);

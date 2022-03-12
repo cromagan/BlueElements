@@ -29,13 +29,8 @@ namespace BluePaint {
 
         #region Constructors
 
-        public Tool_Eraser(bool aufnahme) : base() {
+        public Tool_Eraser() : base() {
             InitializeComponent();
-            DrawBox.Enabled = !aufnahme;
-            Razi.Enabled = !aufnahme;
-            if (aufnahme) {
-                Eleminate.Checked = true;
-            }
         }
 
         #endregion
@@ -76,14 +71,12 @@ namespace BluePaint {
             var c = command.SplitAndCutBy(";");
             if (c[0] == "Replace") {
                 var originalPic = OnNeedCurrentPic();
-                var cc = Color.FromArgb(int.Parse(c[1]));
+                var cc = Color.FromArgb(IntParse(c[1]));
                 OnOverridePic(ReplaceColor(originalPic, cc, Color.Transparent));
             } else {
                 Develop.DebugPrint_NichtImplementiert();
             }
         }
-
-        public override string MacroKennung() => "Eraser";
 
         public override void MouseDown(MouseEventArgs1_1 e, Bitmap? originalPic) {
             OnForceUndoSaving();
@@ -113,7 +106,6 @@ namespace BluePaint {
                 if (e.Current.IsInPic) {
                     var cc = pic.GetPixel(e.Current.X, e.Current.Y);
                     if (cc.ToArgb() == 0) { return; }
-                    OnCommandForMacro("Replace;" + cc.ToArgb());
                     OnOverridePic(ReplaceColor(originalPic, cc, Color.Transparent));
                     return;
                 }

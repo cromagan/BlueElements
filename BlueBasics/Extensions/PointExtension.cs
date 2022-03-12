@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Drawing;
+using static BlueBasics.Converter;
 
 namespace BlueBasics {
 
@@ -32,8 +33,8 @@ namespace BlueBasics {
                 return p;
             }
             var w = code.Split(',');
-            p.X = int.Parse(w[0]);
-            p.Y = int.Parse(w[1]);
+            p.X = IntParse(w[0]);
+            p.Y = IntParse(w[1]);
             return p;
         }
 

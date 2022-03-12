@@ -20,6 +20,7 @@ using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Enums;
 using BlueScript.Variables;
+using static BlueBasics.Converter;
 
 namespace BlueScript.Methods {
 
@@ -58,7 +59,7 @@ namespace BlueScript.Methods {
             var nums = new List<double>();
             foreach (var txt in ((VariableListString)attvar.Attributes[0]).ValueList) {
                 if (txt.IsNumeral()) {
-                    nums.Add(double.Parse(txt));
+                    nums.Add(DoubleParse(txt));
                 } else {
                     nums.Add(((VariableFloat)attvar.Attributes[1]).ValueNum);
                 }

@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using static BlueBasics.Converter;
+
 namespace BlueBasics {
 
     public static partial class Extensions {
@@ -24,12 +26,11 @@ namespace BlueBasics {
         public static System.Windows.Forms.Padding PaddingParse(this string code) {
             code = code.RemoveChars("{}LeftTopRightBm= ");
             var w = code.Split(',');
-            System.Windows.Forms.Padding p = new()
-            {
-                Left = int.Parse(w[0]),
-                Top = int.Parse(w[1]),
-                Right = int.Parse(w[2]),
-                Bottom = int.Parse(w[3])
+            System.Windows.Forms.Padding p = new() {
+                Left = IntParse(w[0]),
+                Top = IntParse(w[1]),
+                Right = IntParse(w[2]),
+                Bottom = IntParse(w[3])
             };
             return p;
         }

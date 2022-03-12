@@ -38,7 +38,7 @@ namespace BlueScript.Variables {
 
         public VariableFloat(string name, double value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _double = value;
 
-        public VariableFloat(double value) : this(Variable.DummyName(), value, true, false, string.Empty) { }
+        public VariableFloat(double value) : this(DummyName(), value, true, false, string.Empty) { }
 
         public VariableFloat(string name) : this(name, 0f, true, false, string.Empty) { }
 

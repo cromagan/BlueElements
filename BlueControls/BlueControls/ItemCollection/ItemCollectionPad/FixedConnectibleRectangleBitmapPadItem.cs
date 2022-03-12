@@ -32,7 +32,7 @@ namespace BlueControls.ItemCollection {
 
         public readonly ListExt<ItemConnection> ConnectsTo = new();
 
-        protected PointM? PL;
+        protected PointM? Pl;
 
         /// <summary>
         /// Dieser Punkt bestimmt die ganzen Koordinaten. Die anderen werden nur mitgeschleift
@@ -41,15 +41,15 @@ namespace BlueControls.ItemCollection {
 
         protected PointM? PLu;
 
-        protected PointM? PO;
+        protected PointM? Po;
 
-        protected PointM? PR;
+        protected PointM? Pr;
 
         protected PointM? PRo;
 
         protected PointM? PRu;
 
-        protected PointM? PU;
+        protected PointM? Pu;
 
         private bool _disposedValue;
         private Bitmap? _generatedBitmap;
@@ -63,18 +63,18 @@ namespace BlueControls.ItemCollection {
             PRo = new PointM(this, "RO", 0, 0);
             PRu = new PointM(this, "RU", 0, 0);
             PLu = new PointM(this, "LU", 0, 0);
-            PL = new PointM(this, "L", 0, 0);
-            PR = new PointM(this, "R", 0, 0);
-            PO = new PointM(this, "O", 0, 0);
-            PU = new PointM(this, "U", 0, 0);
+            Pl = new PointM(this, "L", 0, 0);
+            Pr = new PointM(this, "R", 0, 0);
+            Po = new PointM(this, "O", 0, 0);
+            Pu = new PointM(this, "U", 0, 0);
             MovablePoint.Add(PLo);
             MovablePoint.Add(PRo);
             MovablePoint.Add(PLu);
             MovablePoint.Add(PRu);
-            MovablePoint.Add(PL);
-            MovablePoint.Add(PR);
-            MovablePoint.Add(PU);
-            MovablePoint.Add(PO);
+            MovablePoint.Add(Pl);
+            MovablePoint.Add(Pr);
+            MovablePoint.Add(Pu);
+            MovablePoint.Add(Po);
             PointsForSuccesfullyMove.Add(PLo);
 
             ConnectsTo.ItemAdded += ConnectsTo_ItemAdded;
@@ -121,51 +121,51 @@ namespace BlueControls.ItemCollection {
             if (point == PLo) {
                 if (e.Y) {
                     PRu.Y = y + GeneratedBitmap.Height;
-                    PO.Y = y;
+                    Po.Y = y;
                 }
                 if (e.X) {
                     PRu.X = x + GeneratedBitmap.Width;
-                    PL.X = x;
+                    Pl.X = x;
                 }
             }
 
             if (point == PRu) {
                 if (e.X) {
                     PLo.X = x - GeneratedBitmap.Width;
-                    PR.X = x;
+                    Pr.X = x;
                 }
                 if (e.Y) {
                     PLo.Y = y - GeneratedBitmap.Height;
-                    PU.Y = y;
+                    Pu.Y = y;
                 }
             }
 
             if (point == PRo) {
-                if (e.Y) { PO.Y = y; }
-                if (e.X) { PR.X = x; }
+                if (e.Y) { Po.Y = y; }
+                if (e.X) { Pr.X = x; }
             }
 
             if (point == PLu) {
-                if (e.X) { PL.X = x; }
-                if (e.Y) { PU.Y = y; }
+                if (e.X) { Pl.X = x; }
+                if (e.Y) { Pu.Y = y; }
             }
 
-            if (point == PO && e.Y) {
+            if (point == Po && e.Y) {
                 PLo.Y = y;
                 PRo.Y = y;
             }
 
-            if (point == PU && e.Y) {
+            if (point == Pu && e.Y) {
                 PLu.Y = y;
                 PRu.Y = y;
             }
 
-            if (point == PL && e.X) {
+            if (point == Pl && e.X) {
                 PLo.X = x;
                 PLu.X = x;
             }
 
-            if (point == PR && e.X) {
+            if (point == Pr && e.X) {
                 PRo.X = x;
                 PRu.X = x;
             }
@@ -174,7 +174,7 @@ namespace BlueControls.ItemCollection {
         }
 
         //        case "rotation":
-        //            _drehwinkel = int.Parse(value);
+        //            _drehwinkel = IntParse(value);
         //            return true;
         //    }
         //    return false;
@@ -194,10 +194,10 @@ namespace BlueControls.ItemCollection {
 
         public virtual void SizeChanged() {
             // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
-            PL.SetTo(PLo.X, PLo.Y + ((PLu.Y - PLo.Y) / 2));
-            PR.SetTo(PRo.X, PLo.Y + ((PLu.Y - PLo.Y) / 2));
-            PU.SetTo(PLo.X + ((PRo.X - PLo.X) / 2), PRu.Y);
-            PO.SetTo(PLo.X + ((PRo.X - PLo.X) / 2), PRo.Y);
+            Pl.SetTo(PLo.X, PLo.Y + ((PLu.Y - PLo.Y) / 2));
+            Pr.SetTo(PRo.X, PLo.Y + ((PLu.Y - PLo.Y) / 2));
+            Pu.SetTo(PLo.X + ((PRo.X - PLo.X) / 2), PRu.Y);
+            Po.SetTo(PLo.X + ((PRo.X - PLo.X) / 2), PRo.Y);
         }
 
         protected override RectangleF CalculateUsedArea() {

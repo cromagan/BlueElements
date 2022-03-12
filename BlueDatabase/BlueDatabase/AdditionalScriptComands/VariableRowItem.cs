@@ -34,13 +34,11 @@ namespace BlueScript {
 
         #region Constructors
 
-        public VariableRowItem(string name, RowItem? value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) {
-            _row = value;
-        }
+        public VariableRowItem(string name, RowItem? value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _row = value;
 
         public VariableRowItem(string name) : this(name, null, true, false, string.Empty) { }
 
-        public VariableRowItem(RowItem? value) : this(Variable.DummyName(), value, true, false, string.Empty) { }
+        public VariableRowItem(RowItem? value) : this(DummyName(), value, true, false, string.Empty) { }
 
         #endregion
 

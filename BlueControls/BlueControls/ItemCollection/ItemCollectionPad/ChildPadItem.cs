@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using BlueScript.Variables;
+using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection {
 
@@ -236,7 +237,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "pos":
-                    Textlage = (enAlignment)int.Parse(value);
+                    Textlage = (enAlignment)IntParse(value);
                     return true;
             }
             return false;

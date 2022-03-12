@@ -27,9 +27,11 @@ using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using static BlueBasics.FileOperations;
+using static BlueBasics.Converter;
 
 namespace BlueDatabase {
 
@@ -895,9 +897,9 @@ namespace BlueDatabase {
                 value = l.JoinWithCr();
             }
             if (_afterEditAutoCorrect) { value = KleineFehlerCorrect(value); }
-            if (_afterEditRunden > -1 && double.TryParse(value, out var erg)) {
+            if (_afterEditRunden > -1 && DoubleTryParse(value, out var erg)) {
                 erg = Math.Round(erg, _afterEditRunden);
-                value = erg.ToString();
+                value = erg.ToString(CultureInfo.InvariantCulture);
             }
             if (_afterEditQuickSortRemoveDouble) {
                 var l = new List<string>(value.SplitAndCutByCr()).SortedDistinctList();
@@ -2113,7 +2115,7 @@ namespace BlueDatabase {
 
                 if (thisColumn.Format == enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                     foreach (var thisV in thisColumn.LinkedCellFilter) {
-                        if (int.TryParse(thisV, out var key)) {
+                        if (IntTryParse(thisV, out var key)) {
                             if (key == Key) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; }
                         }
                     }
@@ -2153,23 +2155,23 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.co_Format:
-                    _format = (enDataFormat)int.Parse(wert);
+                    _format = (enDataFormat)IntParse(wert);
                     break;
 
                 case enDatabaseDataType.co_ForeColor:
-                    _foreColor = Color.FromArgb(int.Parse(wert));
+                    _foreColor = Color.FromArgb(IntParse(wert));
                     break;
 
                 case enDatabaseDataType.co_BackColor:
-                    _backColor = Color.FromArgb(int.Parse(wert));
+                    _backColor = Color.FromArgb(IntParse(wert));
                     break;
 
                 case enDatabaseDataType.co_LineLeft:
-                    _lineLeft = (enColumnLineStyle)int.Parse(wert);
+                    _lineLeft = (enColumnLineStyle)IntParse(wert);
                     break;
 
                 case enDatabaseDataType.co_LinieRight:
-                    _lineRight = (enColumnLineStyle)int.Parse(wert);
+                    _lineRight = (enColumnLineStyle)IntParse(wert);
                     break;
 
                 case enDatabaseDataType.co_QuickInfo:
@@ -2205,7 +2207,7 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.co_EditType:
-                    _editType = (enEditTypeFormula)int.Parse(wert);
+                    _editType = (enEditTypeFormula)IntParse(wert);
                     break;
 
                 case enDatabaseDataType.co_MultiLine:
@@ -2249,7 +2251,7 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.co_FilterOptions:
-                    _filterOptions = (enFilterOptions)int.Parse(wert);
+                    _filterOptions = (enFilterOptions)IntParse(wert);
                     break;
 
                 case enDatabaseDataType.co_AutoFilterErlaubt_alt:
@@ -2305,7 +2307,7 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.co_AfterEdit_Runden:
-                    _afterEditRunden = int.Parse(wert);
+                    _afterEditRunden = IntParse(wert);
                     break;
 
                 case enDatabaseDataType.co_AfterEdit_DoUcase:
@@ -2362,19 +2364,19 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.co_Translate:
-                    _translate = (enTranslationType)int.Parse(wert);
+                    _translate = (enTranslationType)IntParse(wert);
                     break;
 
                 case enDatabaseDataType.co_AdditionalCheck:
-                    _additionalCheck = (enAdditionalCheck)int.Parse(wert);
+                    _additionalCheck = (enAdditionalCheck)IntParse(wert);
                     break;
 
                 case enDatabaseDataType.co_ScriptType:
-                    _scriptType = (enScriptType)int.Parse(wert);
+                    _scriptType = (enScriptType)IntParse(wert);
                     break;
 
                 case enDatabaseDataType.co_BildTextVerhalten:
-                    _bildTextVerhalten = (enBildTextVerhalten)int.Parse(wert);
+                    _bildTextVerhalten = (enBildTextVerhalten)IntParse(wert);
                     break;
 
                 case enDatabaseDataType.co_EditTrotzSperreErlaubt:
@@ -2390,15 +2392,15 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.co_KeyColumnKey:
-                    _keyColumnKey = long.Parse(wert);
+                    _keyColumnKey = LongParse(wert);
                     break;
 
                 case enDatabaseDataType.co_LinkedCell_RowKeyIsInColumn:
-                    //_linkedCellRowKeyIsInColumn = long.Parse(wert);
+                    //_linkedCellRowKeyIsInColumn = LongParse(wert);
                     break;
 
                 case enDatabaseDataType.co_LinkedCell_ColumnKeyOfLinkedDatabase:
-                    _linkedCellColumnKeyOfLinkedDatabase = long.Parse(wert);
+                    _linkedCellColumnKeyOfLinkedDatabase = LongParse(wert);
                     break;
 
                 //case enDatabaseDataType.co_LinkedCell_ColumnValueFoundIn:
@@ -2411,21 +2413,21 @@ namespace BlueDatabase {
                     if (string.IsNullOrEmpty(wert)) {
                         _sortType = enSortierTyp.Original_String;
                     } else {
-                        _sortType = (enSortierTyp)long.Parse(wert);
+                        _sortType = (enSortierTyp)LongParse(wert);
                     }
                     break;
 
                 //case enDatabaseDataType.co_ZellenZusammenfassen: _ZellenZusammenfassen = Wert.FromPlusMinus(); break;
                 case enDatabaseDataType.co_DropDownKey:
-                    _dropDownKey = long.Parse(wert);
+                    _dropDownKey = LongParse(wert);
                     break;
 
                 case enDatabaseDataType.co_VorschlagColumn:
-                    _vorschlagsColumn = long.Parse(wert);
+                    _vorschlagsColumn = LongParse(wert);
                     break;
 
                 case enDatabaseDataType.co_Align:
-                    _align = (enAlignmentHorizontal)int.Parse(wert);
+                    _align = (enAlignmentHorizontal)IntParse(wert);
                     if (_align == (enAlignmentHorizontal)(-1)) { _align = enAlignmentHorizontal.Links; }
                     break;
                 //case (enDatabaseDataType)189: break;

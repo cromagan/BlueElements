@@ -46,14 +46,14 @@ namespace BlueControls.Forms {
 
         #region Methods
 
-        public static string Show(string TXT) => Show(TXT, "", enVarType.Text, false);
+        public static string Show(string txt) => Show(txt, "", enVarType.Text, false);
 
-        public static string Show(string TXT, string VorschlagsText, enVarType Textformat) => Show(TXT, VorschlagsText, Textformat, false);
+        public static string Show(string txt, string vorschlagsText, enVarType textformat) => Show(txt, vorschlagsText, textformat, false);
 
-        public static string Show(string TXT, string VorschlagsText, enVarType Textformat, bool BigMultiLineBox) {
-            InputBox MB = new(TXT, VorschlagsText, Textformat, BigMultiLineBox);
-            MB.ShowDialog();
-            return MB._giveBack;
+        public static string Show(string txt, string vorschlagsText, enVarType textformat, bool bigMultiLineBox) {
+            InputBox mb = new(txt, vorschlagsText, textformat, bigMultiLineBox);
+            mb.ShowDialog();
+            return mb._giveBack;
         }
 
         protected override void SetValue(bool canceled) => _giveBack = canceled ? string.Empty : txbText.Text;
