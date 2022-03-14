@@ -52,8 +52,8 @@ namespace BlueScript.Methods {
             if (!ok) {
                 return new DoItFeedback("Der Wert '" + attvar.Attributes[0].ReadableText + "' wurde nicht als Zeitformat erkannt.");
             }
-            d = d.AddDays(((VariableFloat)attvar.Attributes[1]).ValueDouble);
-            return new DoItFeedback(new VariableString(d.ToString(Format_Date7)));
+            d = d.AddDays(((VariableFloat)attvar.Attributes[1]).ValueNum);
+            return new DoItFeedback(new VariableString(Variable.DummyName(), d.ToString(Format_Date7)));
         }
 
         #endregion

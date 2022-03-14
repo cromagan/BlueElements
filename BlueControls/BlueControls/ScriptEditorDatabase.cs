@@ -20,10 +20,11 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueDatabase;
 using BlueScript;
+using static BlueBasics.FileOperations;
 
 namespace BlueControls {
 
-    public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.UserControl
+    public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.UserControl //
        {
         #region Fields
 
@@ -94,6 +95,14 @@ namespace BlueControls {
             }
 
             return s;
+        }
+
+        protected override void OpenAdditionalFileFolder() {
+            if (_database == null) {
+                Message("Keine Datenbank geladen.");
+                return;
+            }
+            if (PathExists(_database.AdditionaFilesPfadWhole())) { ExecuteFile(_database.AdditionaFilesPfadWhole()); }
         }
 
         private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;

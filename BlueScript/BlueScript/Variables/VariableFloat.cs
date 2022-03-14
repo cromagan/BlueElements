@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using System;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
@@ -40,6 +39,10 @@ namespace BlueScript.Variables {
 
         public VariableFloat(double value) : this(DummyName(), value, true, false, string.Empty) { }
 
+        /// <summary>
+        /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
+        /// </summary>
+        /// <param name="name"></param>
         public VariableFloat(string name) : this(name, 0f, true, false, string.Empty) { }
 
         #endregion
@@ -47,20 +50,12 @@ namespace BlueScript.Variables {
         #region Properties
 
         public override int CheckOrder => 1;
+        public override bool GetFromStringPossible => true;
         public override bool IsNullOrEmpty => false;
         public override string ReadableText => _double.ToString(Constants.Format_Float1);
         public override string ShortName => "num";
-        public override bool Stringable => true;
+        public override bool ToStringPossible => true;
         public override VariableDataType Type => VariableDataType.Numeral;
-
-        [Obsolete]
-        public double ValueDouble {
-            get => _double;
-            set {
-                if (Readonly) { return; }
-                _double = value;
-            }
-        }
 
         public override string ValueForReplace => ReadableText;
 

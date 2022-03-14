@@ -16,10 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Enums;
-using BlueScript.Variables;
 
 namespace BlueScript.Methods {
 
@@ -46,7 +44,7 @@ namespace BlueScript.Methods {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            return new DoItFeedback(((VariableFloat)attvar.Attributes[0]).ValueNum.ToString(Constants.Format_Float1));
+            return new DoItFeedback(attvar.Attributes[0].ReadableText, string.Empty);
         }
 
         #endregion

@@ -45,6 +45,7 @@ namespace BlueScript {
         #region Properties
 
         public override int CheckOrder => 99;
+        public override bool GetFromStringPossible => false;
         public override bool IsNullOrEmpty => _row == null;
 
         public RowItem? RowItem {
@@ -56,7 +57,7 @@ namespace BlueScript {
         }
 
         public override string ShortName => "row";
-        public override bool Stringable => false;
+        public override bool ToStringPossible => false;
         public override VariableDataType Type => VariableDataType.Object;
 
         #endregion

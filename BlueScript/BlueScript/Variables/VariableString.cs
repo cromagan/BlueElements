@@ -34,7 +34,11 @@ namespace BlueScript.Variables {
 
         public VariableString(string name, string value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _valueString = value.RestoreCriticalVariableChars();
 
-        public VariableString(string value) : this(DummyName(), value, true, false, string.Empty) { }
+        /// <summary>
+        /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
+        /// </summary>
+        /// <param name="name"></param>
+        public VariableString(string name) : this(name, string.Empty, true, false, string.Empty) { }
 
         public VariableString(string name, string value) : this(name, value, true, false, string.Empty) { }
 
@@ -43,20 +47,25 @@ namespace BlueScript.Variables {
         #region Properties
 
         public override int CheckOrder => 2;
+        public override bool GetFromStringPossible => true;
         public override bool IsNullOrEmpty => string.IsNullOrEmpty(_valueString);
 
         /// <summary>
-        /// Gleichgesetzt mit ValueString
+        /// Der Wert ohne " am Anfang/Ende. Gleichgesetzt mit ValueString
         /// </summary>
         public override string ReadableText => _valueString;
 
         public override string ShortName => "str";
-        public override bool Stringable => true;
+        public override bool ToStringPossible => true;
         public override VariableDataType Type => VariableDataType.String;
+
+        /// <summary>
+        /// Der Wert mit " Aanfang/Ende un entfernten Kritischen Zeichen.
+        /// </summary>
         public override string ValueForReplace => "\"" + _valueString.RemoveCriticalVariableChars() + "\"";
 
         /// <summary>
-        /// Gleichgesetzt mit ReadableText
+        /// Der Wert ohne " am Anfang/Ende. Gleichgesetzt mit ReadableText
         /// </summary>
         public string ValueString {
             get => _valueString;
@@ -84,7 +93,7 @@ namespace BlueScript.Variables {
                 tmp = tmp.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
                 if (tmp.Contains("\"")) { return false; } //SetError("Verkettungsfehler"); return; } // Beispiel: s ist nicht definiert und "jj" + s + "kk
 
-                succesVar = new VariableString(tmp);
+                succesVar = new VariableString(DummyName(), tmp);
                 return true;
             }
 

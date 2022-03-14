@@ -26,7 +26,7 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Any };
+        public override List<VariableDataType> Args => new() { VariableDataType.Sub };
         public override string Description => "Bezeichnet den Start einer Subroutine.";
         public override bool EndlessArgs => false;
         public override string EndSequence => "()";

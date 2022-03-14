@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using BlueScript.Structures;
 using BlueScript.Enums;
 using BlueScript.Variables;
+using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods {
 
@@ -45,12 +46,12 @@ namespace BlueScript.Methods {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            if (string.IsNullOrEmpty(((VariableString)attvar.Attributes[0]).ValueString)) { return new DoItFeedback(string.Empty, string.Empty); }
+            //if (string.IsNullOrEmpty(((VariableString)attvar.Attributes[0]).ValueString)) { return new DoItFeedback(string.Empty, string.Empty); }
 
-            var tmp = ((VariableString)attvar.Attributes[0]).ValueString;
-            tmp = tmp.Substring(0, tmp.Length - 1); // Listen mit Einträgen haben zur Erkennung immer noch einen zusätzlichen Zeilenumbruch
+            var tmp = ((VariableListString)attvar.Attributes[0]).ValueList;
+            //tmp = tmp.Substring(0, tmp.Length - 1); // Listen mit Einträgen haben zur Erkennung immer noch einen zusätzlichen Zeilenumbruch
 
-            return new DoItFeedback(tmp.Replace("\r", ((VariableString)attvar.Attributes[1]).ValueString), string.Empty);
+            return new DoItFeedback(tmp.JoinWith(((VariableString)attvar.Attributes[1]).ValueString), string.Empty);
         }
 
         #endregion

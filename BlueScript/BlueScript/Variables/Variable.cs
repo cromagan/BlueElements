@@ -56,17 +56,22 @@ namespace BlueScript.Variables {
             var l = new List<string>();
             if (vars != null) {
                 foreach (var thisvar in vars) {
-                    if (thisvar.Stringable) { l.Add(thisvar.Name); }
+                    if (thisvar.ToStringPossible) { l.Add(thisvar.Name); }
                 }
             }
             return l;
         }
 
-        public static List<string> AllValues(this List<Variable>? vars) {
+        /// <summary>
+        /// Gibt von allen Variablen, die ein String sind, den Inhalt ohne " am Anfang/Ende zurück.
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
+        public static List<string> AllStringValues(this List<Variable>? vars) {
             var l = new List<string>();
             if (vars != null) {
                 foreach (var thisvar in vars) {
-                    if (thisvar.Stringable) { l.Add(thisvar.ValueForReplace); }
+                    if (thisvar is VariableString vs) { l.Add(vs.ValueString); }
                 }
             }
             return l;
@@ -109,7 +114,7 @@ namespace BlueScript.Variables {
                 return 0f;
             }
 
-            return vf.ValueDouble;
+            return vf.ValueNum;
         }
 
         /// <summary>
@@ -125,7 +130,7 @@ namespace BlueScript.Variables {
                 return 0;
             }
 
-            return (int)vf.ValueDouble;
+            return (int)vf.ValueNum;
         }
 
         /// <summary>
@@ -135,6 +140,7 @@ namespace BlueScript.Variables {
         /// <param name="name"></param>
         public static List<string> GetList(this List<Variable> vars, string name) {
             var v = vars.Get(name);
+            if (v == null) { return new List<string>(); }
 
             if (v is not VariableListString vf) {
                 Develop.DebugPrint("Falscher Datentyp");
@@ -162,7 +168,7 @@ namespace BlueScript.Variables {
         }
 
         public static Variable? GetSystem(this List<Variable> vars, string name) => vars.FirstOrDefault(thisv =>
-                                                              thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper());
+                                                                          thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper());
 
         public static void RemoveWithComent(this List<Variable> vars, string coment) {
             var z = 0;
@@ -303,6 +309,7 @@ namespace BlueScript.Variables {
         public abstract int CheckOrder { get; }
         public string Coment { get; set; }
 
+        public abstract bool GetFromStringPossible { get; }
         public abstract bool IsNullOrEmpty { get; }
 
         /// <summary>
@@ -316,14 +323,14 @@ namespace BlueScript.Variables {
 
         public abstract string ShortName { get; }
 
-        public abstract bool Stringable { get; }
+        public abstract bool ToStringPossible { get; }
 
         [Obsolete]
         public abstract VariableDataType Type { get; }
 
         public virtual string ValueForReplace {
             get {
-                if (Stringable) { Develop.DebugPrint(enFehlerArt.Fehler, "Routine muss überschrieben werden!"); }
+                if (ToStringPossible) { Develop.DebugPrint(enFehlerArt.Fehler, "Routine muss überschrieben werden!"); }
                 return ObjectKennung + "\"" + ShortName + ";" + Name + "\"" + ObjectKennung;
             }
         }
@@ -331,6 +338,12 @@ namespace BlueScript.Variables {
         #endregion
 
         #region Methods
+
+        public static string DummyName() {
+            if (_dummyCount >= long.MaxValue) { _dummyCount = 0; }
+            _dummyCount++;
+            return "dummy" + _dummyCount;
+        }
 
         public static DoItFeedback GetVariableByParsing(string txt, Script? s) {
 
@@ -340,16 +353,17 @@ namespace BlueScript.Variables {
                 var (pose, _) = NextText(txt, 0, KlammerZu, false, false, KlammernStd);
                 if (pose < txt.Length - 1) {
                     // Wir haben so einen Fall: (true) || (true)
-                    var txt1 = GetVariableByParsing(txt.Substring(1, pose - 1), s);
-                    return !string.IsNullOrEmpty(txt1.ErrorMessage)
-                        ? new DoItFeedback("Befehls-Berechnungsfehler in ():" + txt1.ErrorMessage)
-                        : GetVariableByParsing(txt1.Variable.ValueForReplace + txt.Substring(pose + 1), s);
+                    var tmp = GetVariableByParsing(txt.Substring(1, pose - 1), s);
+                    if (!string.IsNullOrEmpty(tmp.ErrorMessage)) { return new DoItFeedback("Befehls-Berechnungsfehler in ():" + tmp.ErrorMessage); }
+                    if (tmp.Variable == null) { return new DoItFeedback("Allgemeiner Befehls-Berechnungsfehler"); }
+                    if (!tmp.Variable.ToStringPossible) { return new DoItFeedback("Falscher Variablentyp: " + tmp.Variable.ShortName); }
+                    return GetVariableByParsing(tmp.Variable.ValueForReplace + txt.Substring(pose + 1), s);
                 }
             }
 
-            txt = txt.DeKlammere(true, false, false, true);
-
             #endregion
+
+            txt = txt.DeKlammere(true, false, false, true);
 
             #region Auf boolsche AndAlso und OrElse prüfen und nur die nötigen ausführen
 
@@ -387,11 +401,9 @@ namespace BlueScript.Variables {
 
             if (s != null) {
                 var t = Method.ReplaceVariable(txt, s);
-                if (!string.IsNullOrEmpty(t.ErrorMessage)) {
-                    return new DoItFeedback("Variablen-Berechnungsfehler: " + t.ErrorMessage);
-                }
-
-                txt = t.AttributeText;
+                if (!string.IsNullOrEmpty(t.ErrorMessage)) { return new DoItFeedback("Variablen-Berechnungsfehler: " + t.ErrorMessage); }
+                if (t.Variable != null) { return new DoItFeedback(t.Variable); }
+                if (txt != t.AttributeText) { return GetVariableByParsing(t.AttributeText, s); }
             }
 
             #endregion
@@ -399,12 +411,10 @@ namespace BlueScript.Variables {
             #region Routinen ersetzen, vor den Klammern, das ansonsten Min(x,y,z) falsch anschlägt
 
             if (s != null) {
-                var t2 = Method.ReplaceComands(txt, Script.Comands, s);
-                if (!string.IsNullOrEmpty(t2.ErrorMessage)) {
-                    return new DoItFeedback("Befehls-Berechnungsfehler: " + t2.ErrorMessage);
-                }
-                if (t2.Variable != null) { return new DoItFeedback(t2.Variable); }
-                txt = t2.AttributeText;
+                var t = Method.ReplaceComands(txt, s);
+                if (!string.IsNullOrEmpty(t.ErrorMessage)) { return new DoItFeedback("Befehls-Berechnungsfehler: " + t.ErrorMessage); }
+                if (t.Variable != null) { return new DoItFeedback(t.Variable); }
+                if (txt != t.AttributeText) { return GetVariableByParsing(t.AttributeText, s); }
             }
 
             #endregion
@@ -414,17 +424,12 @@ namespace BlueScript.Variables {
             var (posa, _) = NextText(txt, 0, KlammerAuf, false, false, KlammernStd);
             if (posa > -1) {
                 var (pose, _) = NextText(txt, posa, KlammerZu, false, false, KlammernStd);
-                if (pose <= posa) {
-                    return DoItFeedback.Klammerfehler();
-                }
+                if (pose <= posa) { return DoItFeedback.Klammerfehler(); }
 
                 var tmp = GetVariableByParsing(txt.Substring(posa + 1, pose - posa - 1), s);
-                if (!tmp.Variable.Stringable) { return new DoItFeedback("Falscher Variablentyp: " + tmp.Variable.ShortName); }
-
-                if (!string.IsNullOrEmpty(tmp.ErrorMessage)) { return tmp; }
-
-                //if (tmp.Variable is VariableUnknown) { return new DoItFeedback("Inhalt unbekannt: " + txt.Substring(posa + 1, pose - posa - 1)); }
-
+                if (!string.IsNullOrEmpty(tmp.ErrorMessage)) { return new DoItFeedback("Befehls-Berechnungsfehler in ():" + tmp.ErrorMessage); }
+                if (tmp.Variable == null) { return new DoItFeedback("Allgemeiner Berechnungsfehler in ()"); }
+                if (!tmp.Variable.ToStringPossible) { return new DoItFeedback("Falscher Variablentyp: " + tmp.Variable.ShortName); }
                 return GetVariableByParsing(txt.Substring(0, posa) + tmp.Variable.ValueForReplace + txt.Substring(pose + 1), s);
             }
 
@@ -435,7 +440,7 @@ namespace BlueScript.Variables {
             if (Script.VarTypes == null) { return new DoItFeedback("Variablentypen nicht initialisiert"); }
 
             foreach (var thisVT in Script.VarTypes) {
-                if (thisVT.Stringable) {
+                if (thisVT.GetFromStringPossible) {
                     if (thisVT.TryParse(txt, out var v, s)) {
                         return new DoItFeedback(v);
                     }
@@ -468,12 +473,6 @@ namespace BlueScript.Variables {
         public string ReplaceInText(string txt) {
             if (!txt.ToLower().Contains("~" + Name.ToLower() + "~")) { return txt; }
             return txt.Replace("~" + Name + "~", ReadableText, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-        }
-
-        protected static string DummyName() {
-            if (_dummyCount >= long.MaxValue) { _dummyCount = 0; }
-            _dummyCount++;
-            return "dummy" + _dummyCount;
         }
 
         protected abstract bool TryParse(string txt, out Variable? succesVar, Script s);

@@ -36,6 +36,10 @@ namespace BlueScript.Variables {
 
         public VariableBool(string name, bool value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _valuebool = value;
 
+        /// <summary>
+        /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
+        /// </summary>
+        /// <param name="name"></param>
         public VariableBool(string name) : this(name, false, true, false, string.Empty) { }
 
         public VariableBool(bool value) : this(DummyName(), value, true, false, string.Empty) { }
@@ -45,11 +49,12 @@ namespace BlueScript.Variables {
         #region Properties
 
         public override int CheckOrder => 0;
+        public override bool GetFromStringPossible => true;
         public override bool IsNullOrEmpty => false;
         public override string ReadableText => _valuebool.ToString();
         public override string ShortName => "bol";
-        public override bool Stringable => true;
-        public override VariableDataType Type => VariableDataType.String;
+        public override bool ToStringPossible => true;
+        public override VariableDataType Type => VariableDataType.Bool;
 
         public bool ValueBool {
             get => _valuebool;
@@ -100,11 +105,12 @@ namespace BlueScript.Variables {
                 var s1 = txt.Substring(0, i);
                 Variable v1 = null;
                 if (!string.IsNullOrEmpty(s1)) {
-                    if (check != "!") { return false; }//new DoItFeedback("Wert vor Operator (" + check + ") nicht gefunden: " + txt);
                     var tmp1 = GetVariableByParsing(s1, s);
                     if (!string.IsNullOrEmpty(tmp1.ErrorMessage)) { return false; }//new DoItFeedback("Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage);
 
                     v1 = tmp1.Variable;
+                } else {
+                    if (check != "!") { return false; }//new DoItFeedback("Wert vor Operator (" + check + ") nicht gefunden: " + txt);
                 }
 
                 #endregion
@@ -128,7 +134,7 @@ namespace BlueScript.Variables {
                 if (v1 != null) {
                     if (v1.ShortName != v2.ShortName) { return false; }// return new DoItFeedback("Typen unterschiedlich: " + txt);
 
-                    if (v1.Stringable) { return false; }// return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                    if (!v1.ToStringPossible) { return false; }// return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
                 } else {
                     if (v2 is not VariableBool) { return false; }// return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
                 }
@@ -149,42 +155,42 @@ namespace BlueScript.Variables {
 
                     case ">=": {
                             if (v1 is not VariableFloat v1fl) { return false; } //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                            if (v1 is not VariableFloat v2fl) { return false; }  //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                            if (v2 is not VariableFloat v2fl) { return false; }  //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
                             if (v1fl.ValueNum >= v2fl.ValueNum) { replacer = "true"; }
                             break;
                         }
 
                     case "<=": {
                             if (v1 is not VariableFloat v1fl) { return false; } //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                            if (v1 is not VariableFloat v2fl) { return false; }  //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                            if (v2 is not VariableFloat v2fl) { return false; }  //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
                             if (v1fl.ValueNum <= v2fl.ValueNum) { replacer = "true"; }
                             break;
                         }
 
                     case "<": {
                             if (v1 is not VariableFloat v1fl) { return false; } //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                            if (v1 is not VariableFloat v2fl) { return false; }  //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                            if (v2 is not VariableFloat v2fl) { return false; }  //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
                             if (v1fl.ValueNum < v2fl.ValueNum) { replacer = "true"; }
                             break;
                         }
 
                     case ">": {
                             if (v1 is not VariableFloat v1fl) { return false; } //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                            if (v1 is not VariableFloat v2fl) { return false; }  //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                            if (v2 is not VariableFloat v2fl) { return false; }  //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
                             if (v1fl.ValueNum > v2fl.ValueNum) { replacer = "true"; }
                             break;
                         }
 
                     case "||": {
                             if (v1 is not VariableBool v1bo) { return false; }                            // return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                            if (v1 is not VariableBool v2bo) { return false; }// return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                            if (v2 is not VariableBool v2bo) { return false; }// return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
                             if (v1bo.ValueBool || v2bo.ValueBool) { replacer = "true"; }
                             break;
                         }
 
                     case "&&": {
                             if (v1 is not VariableBool v1bo) { return false; }  // return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                            if (v1 is not VariableBool v2bo) { return false; }                                // return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                            if (v2 is not VariableBool v2bo) { return false; }                                // return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
                             if (v1bo.ValueBool && v2bo.ValueBool) { replacer = "true"; }
                             break;
                         }

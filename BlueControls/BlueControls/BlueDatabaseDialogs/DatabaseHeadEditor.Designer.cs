@@ -348,8 +348,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // txbAdditionalFiles
             // 
-            this.txbAdditionalFiles.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
             this.txbAdditionalFiles.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbAdditionalFiles.Location = new System.Drawing.Point(8, 416);
             this.txbAdditionalFiles.Name = "txbAdditionalFiles";
@@ -368,8 +366,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // txbZeilenQuickInfo
             // 
-            this.txbZeilenQuickInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
             this.txbZeilenQuickInfo.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbZeilenQuickInfo.Location = new System.Drawing.Point(8, 176);
             this.txbZeilenQuickInfo.MultiLine = true;

@@ -407,6 +407,10 @@ namespace BlueDatabase {
             return null;
         }
 
+        /// <summary>
+        /// Der komplette Pfad mit abschließenden \
+        /// </summary>
+        /// <returns></returns>
         public string AdditionaFilesPfadWhole() {
             // @ ist ein erkennungszeichen, dass der Pfad schon geprüft wurde, aber nicht vorhanden ist
             if (_additionaFilesPfadtmp == "@") { return string.Empty; }

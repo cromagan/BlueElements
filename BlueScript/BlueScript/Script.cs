@@ -25,6 +25,7 @@ using System.Linq;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using static BlueBasics.FileOperations;
 
 namespace BlueScript {
 
@@ -34,6 +35,13 @@ namespace BlueScript {
 
         public static List<Method>? Comands;
         public static List<Variable>? VarTypes;
+
+        /// <summary>
+        /// Bei diesem Pfad können zusätzliche Dateien - wie z.B. Skript-Subroutinen enthalten sein.
+        /// Der Pfad mit abschließenden \
+        /// </summary>
+        public readonly string AdditionalFilesPath = string.Empty;
+
         public readonly List<Variable>? Variables;
         public bool EndScript;
 
@@ -82,13 +90,17 @@ namespace BlueScript {
         //    //   //objects.Sort();
         //    return objects;
         //}
-        public Script(List<Variable>? variablen) {
+        public Script(List<Variable>? variablen, string additionalFilesPath) {
             if (Comands == null) { Comands = GetEnumerableOfType<Method>(); }
             if (VarTypes == null) {
                 VarTypes = GetEnumerableOfType<Variable>("NAME");
                 VarTypes.Sort();
             }
+
             Variables = variablen;
+
+            AdditionalFilesPath = (additionalFilesPath.Trim("\\") + "\\").CheckPath();
+
             //BitmapCache = new List<Bitmap>();
         }
 

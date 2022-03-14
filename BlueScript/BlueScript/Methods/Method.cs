@@ -82,9 +82,11 @@ namespace BlueScript.Methods {
             return (s, string.Empty);
         }
 
-        public static GetEndFeedback ReplaceComands(string txt, IEnumerable<Method> comands, Script s) {
+        public static GetEndFeedback ReplaceComands(string txt, Script s) {
+            if (Script.Comands == null) { return new GetEndFeedback("Interner Fehler: Befehle nicht initialisiert"); }
+
             List<string> c = new();
-            foreach (var thisc in comands) {
+            foreach (var thisc in Script.Comands) {
                 if (thisc.Returns != VariableDataType.Null) {
                     c.AddRange(thisc.Comand(s).Select(thiscs => thiscs + thisc.StartSequence));
                 }
@@ -97,7 +99,7 @@ namespace BlueScript.Methods {
                 if (!string.IsNullOrEmpty(f.ErrorMessage)) { return new GetEndFeedback(f.ErrorMessage); }
 
                 if (pos == 0 && txt.Length == f.Position) { return new GetEndFeedback(f.Variable); }
-                if (!f.Variable.Stringable) { return new GetEndFeedback("Variable muss als Objekt behandelt werden"); }
+                if (!f.Variable.ToStringPossible) { return new GetEndFeedback("Variable muss als Objekt behandelt werden"); }
 
                 txt = txt.Substring(0, pos) + f.Variable.ValueForReplace + txt.Substring(f.Position);
                 posc = pos;
@@ -185,7 +187,7 @@ namespace BlueScript.Methods {
             if (!endlessArgs && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu viele Attribute erhalten."); }
 
             //  Variablen und Routinen ersetzen
-            List<Variable> vars = new();
+            List<Variable> feedbackVariables = new();
             for (var n = 0; n < attributes.Count; n++) {
                 var lb = attributes[n].Count(c => c == '¶'); // Zeilenzähler weitersetzen
                 attributes[n] = attributes[n].RemoveChars("¶"); // Zeilenzähler entfernen
@@ -208,7 +210,7 @@ namespace BlueScript.Methods {
                     if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1)); }
                 } else {
                     var tmp2 = Variable.GetVariableByParsing(attributes[n], s);
-                    if (tmp2.Variable == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1)); }
+                    if (tmp2.Variable == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1) + "\r\n" + " - " + tmp2.ErrorMessage); }
                     v = tmp2.Variable;
                 }
 
@@ -219,17 +221,17 @@ namespace BlueScript.Methods {
                     //}
                     if (exceptetType == VariableDataType.Integer) {
                         if (v is not VariableFloat vn) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
-                        if (vn.ValueDouble != (int)vn.ValueDouble) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
+                        if (vn.ValueNum != vn.ValueInt) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
                     } else {
-                        return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht der erwartete Typ");
+                        return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht der erwartete Typ " + exceptetType.ToString() + ", sondern " + v.ShortName); ;
                     }
                 }
 
-                vars.Add(v);
+                feedbackVariables.Add(v);
 
                 if (s != null) { s.Line += lb; }
             }
-            return new SplittedAttributesFeedback(vars);
+            return new SplittedAttributesFeedback(feedbackVariables);
         }
 
         public CanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, Script s) {

@@ -35,6 +35,10 @@ namespace BlueScript.Variables {
 
         public VariableBitmap(string name, Bitmap? value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _bmp = value;
 
+        /// <summary>
+        /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
+        /// </summary>
+        /// <param name="name"></param>
         public VariableBitmap(string name) : this(name, null, true, false, string.Empty) { }
 
         public VariableBitmap(Bitmap? value) : this(DummyName(), value, true, false, string.Empty) { }
@@ -44,10 +48,11 @@ namespace BlueScript.Variables {
         #region Properties
 
         public override int CheckOrder => 99;
+        public override bool GetFromStringPossible => false;
         public override bool IsNullOrEmpty => _bmp == null;
-        public override string ShortName => "str";
-        public override bool Stringable => false;
-        public override VariableDataType Type => VariableDataType.String;
+        public override string ShortName => "bmp";
+        public override bool ToStringPossible => false;
+        public override VariableDataType Type => VariableDataType.Object;
 
         public Bitmap? ValueBitmap {
             get => _bmp;

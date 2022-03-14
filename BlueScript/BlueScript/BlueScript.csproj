@@ -58,6 +58,7 @@
     <Compile Include="Methods\Method_BerechneVariable_Tilde.cs" />
     <Compile Include="Methods\Method_AddSuffix.cs" />
     <Compile Include="Methods\Method_BitmapToBase64.cs" />
+    <Compile Include="Methods\Method_CallByFilename.cs" />
     <Compile Include="Methods\Method_ContainsWhich.cs" />
     <Compile Include="Methods\Method_RandomInt.cs" />
     <Compile Include="Methods\Method_DateTimeDifferenceInDays.cs" />
@@ -127,6 +128,7 @@
     <Compile Include="Variables\VariableBool.cs" />
     <Compile Include="Variables\VariableListString.cs" />
     <Compile Include="Variables\VariableFloat.cs" />
+    <Compile Include="Variables\VariableSub.cs" />
     <Compile Include="Variables\VariableUnknown.cs" />
     <Compile Include="Variables\VariableString.cs" />
     <Compile Include="Variables\Variable.cs" />

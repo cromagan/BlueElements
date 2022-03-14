@@ -47,7 +47,7 @@ namespace BlueScript.Structures {
 
         public DoItFeedback(string valueString, string errormessage) {
             ErrorMessage = errormessage;
-            Variable = new VariableString(valueString);
+            Variable = new VariableString(Variable.DummyName(), valueString);
         }
 
         public DoItFeedback(List<string>? list) {

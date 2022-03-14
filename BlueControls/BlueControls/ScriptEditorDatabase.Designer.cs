@@ -31,6 +31,7 @@ namespace BlueControls {
             // grpMainBar
             // 
             this.grpMainBar.Controls.Add(this.txbTestZeile);
+            this.grpMainBar.Controls.SetChildIndex(this.btnZusatzDateien, 0);
             this.grpMainBar.Controls.SetChildIndex(this.btnTest, 0);
             this.grpMainBar.Controls.SetChildIndex(this.txbTestZeile, 0);
             this.grpMainBar.Controls.SetChildIndex(this.btnBefehlsUebersicht, 0);
@@ -38,6 +39,10 @@ namespace BlueControls {
             // btnBefehlsUebersicht
             // 
             this.btnBefehlsUebersicht.Location = new System.Drawing.Point(384, 8);
+            // 
+            // btnZusatzDateien
+            // 
+            this.btnZusatzDateien.Location = new System.Drawing.Point(528, 8);
             // 
             // txbTestZeile
             // 

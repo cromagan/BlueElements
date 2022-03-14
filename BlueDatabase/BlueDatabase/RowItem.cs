@@ -517,7 +517,7 @@ namespace BlueDatabase {
 
                 #region Script ausführen
 
-                Script sc = new(vars) {
+                Script sc = new(vars, Database.AdditionaFilesPfadWhole()) {
                     ScriptText = Database.RulesScript
                 };
                 sc.Parse();

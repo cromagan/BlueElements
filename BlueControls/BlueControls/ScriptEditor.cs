@@ -35,7 +35,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueControls {
 
-    public partial class ScriptEditor : GroupBox, IContextMenu, IDisposable //System.Windows.Forms.UserControl, IContextMenu//
+    public partial class ScriptEditor : GroupBox, IContextMenu, IDisposable // System.Windows.Forms.UserControl, IContextMenu//
     {
         #region Fields
 
@@ -121,10 +121,12 @@ namespace BlueControls {
         }
 
         protected virtual Script? GenerateAndDoScript() {
-            var s = new Script(null);
+            var s = new Script(null, string.Empty);
             s.Parse();
             return s;
         }
+
+        protected virtual void OpenAdditionalFileFolder() { }
 
         protected void WriteComandsToList(Script s) {
             if (!_MenuDone) {
@@ -198,6 +200,10 @@ namespace BlueControls {
             } else {
                 Message("Fehler in Zeile: " + s.Line + "\r\n" + s.Error + "\r\n >>> " + s.ErrorCode.RestoreEscape());
             }
+        }
+
+        private void btnZusatzDateien_Click(object sender, System.EventArgs e) {
+            OpenAdditionalFileFolder();
         }
 
         private void GenerateVariableTable() {

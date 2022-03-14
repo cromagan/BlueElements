@@ -20,7 +20,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
-using static BlueBasics.Converter;
 
 namespace BlueBasics {
 

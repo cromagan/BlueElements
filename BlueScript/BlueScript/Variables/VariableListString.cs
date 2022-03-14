@@ -19,7 +19,6 @@
 
 using BlueScript.Enums;
 using BlueScript.Structures;
-using System;
 using BlueBasics;
 using BlueScript.Methods;
 using System.Collections.Generic;
@@ -45,6 +44,11 @@ namespace BlueScript.Variables {
             }
         }
 
+        /// <summary>
+        /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
+        /// </summary>
+        /// <param name="name"></param>
+
         public VariableListString(string name) : this(name, null, true, false, string.Empty) { }
 
         public VariableListString(List<string>? value) : this(DummyName(), value, true, false, string.Empty) { }
@@ -56,20 +60,29 @@ namespace BlueScript.Variables {
         #region Properties
 
         public override int CheckOrder => 3;
+        public override bool GetFromStringPossible => true;
         public override bool IsNullOrEmpty => _list == null || _list.Count == 0;
 
+        /// <summary>
+        /// Die Liste als Text formatiert. z.B. {"A", "B", "C"}
+        /// Kritische Zeichen innerhalb eines Eintrags wurden unschädlich gemacht.
+        /// </summary>
         public override string ReadableText {
             get {
-                if (_list.Count == 0) {
-                    return "{ }";
+                if (_list.Count == 0) { return "{ }"; }
+
+                var s = string.Empty;
+
+                foreach (var thiss in _list) {
+                    s = s + "\"" + thiss.RemoveCriticalVariableChars() + "\", ";
                 }
 
-                return "{\"" + _list.JoinWith("\", \"") + "\"}";
+                return "{" + s.TrimEnd(", ") + "}";
             }
         }
 
         public override string ShortName => "lst";
-        public override bool Stringable => true;
+        public override bool ToStringPossible => true;
         public override VariableDataType Type => VariableDataType.List;
 
         public override string ValueForReplace => ReadableText;
@@ -116,7 +129,7 @@ namespace BlueScript.Variables {
                     return false;
                 }
 
-                succesVar = new VariableListString(l.Attributes.AllValues());
+                succesVar = new VariableListString(l.Attributes.AllStringValues());
                 return true;
             }
 

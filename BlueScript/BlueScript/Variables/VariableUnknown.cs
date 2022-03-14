@@ -28,6 +28,10 @@ namespace BlueScript.Variables {
 
         public VariableUnknown(string name, string value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) { }
 
+        /// <summary>
+        /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
+        /// </summary>
+        /// <param name="name"></param>
         public VariableUnknown(string value) : this(DummyName(), value, true, false, string.Empty) { }
 
         public VariableUnknown(string name, string value) : this(name, value, true, false, string.Empty) { }
@@ -38,6 +42,7 @@ namespace BlueScript.Variables {
 
         public override int CheckOrder => 100;
 
+        public override bool GetFromStringPossible => true;
         public override bool IsNullOrEmpty => false;
 
         /// <summary>
@@ -46,7 +51,7 @@ namespace BlueScript.Variables {
         public override string ReadableText => "[unknown]";
 
         public override string ShortName => "ukn";
-        public override bool Stringable => true; // Muss Stringable sein, dass es alles erhalten kann.
+        public override bool ToStringPossible => false;
         public override VariableDataType Type => VariableDataType.Unknown;
         public override string ValueForReplace => ReadableText;
 

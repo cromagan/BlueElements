@@ -18,7 +18,6 @@
 using System.Collections.Generic;
 using BlueScript.Structures;
 using BlueScript.Enums;
-using BlueScript.Variables;
 
 namespace BlueScript.Methods {
 
@@ -45,7 +44,7 @@ namespace BlueScript.Methods {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return !string.IsNullOrEmpty(attvar.ErrorMessage)
                 ? DoItFeedback.AttributFehler(this, attvar)
-                : new DoItFeedback(((VariableFloat)attvar.Attributes[0]).ValueInt);
+                : new DoItFeedback(attvar.Attributes[0]);
         }
 
         #endregion
