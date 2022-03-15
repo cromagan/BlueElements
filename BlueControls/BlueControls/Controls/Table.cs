@@ -1168,7 +1168,7 @@ namespace BlueControls.Controls {
             _serviceStarted = true;
             BlueBasics.MultiUserFile.MultiUserFile.AllFiles.ItemAdded += AllFiles_ItemAdded;
             BlueBasics.MultiUserFile.MultiUserFile.AllFiles.ItemRemoving += AllFiles_ItemRemoving;
-            Database.DropConstructorMessage += Database_DropConstructorMessage;
+            //Database.DropConstructorMessage += Database_DropConstructorMessage;
         }
 
         internal bool NonPermanentPossible(ColumnViewItem thisViewItem) {
@@ -1690,18 +1690,18 @@ namespace BlueControls.Controls {
             }
         }
 
-        private static void Database_DropConstructorMessage(object sender, MessageEventArgs e) {
-            if (!e.Shown) {
-                e.Shown = true;
-                Notification.Show(e.Message, enImageCode.Datenbank);
-            }
+        //private static void Database_DropConstructorMessage(object sender, MessageEventArgs e) {
+        //    if (!e.Shown) {
+        //        e.Shown = true;
+        //        Notification.Show(e.Message, enImageCode.Datenbank);
+        //    }
 
-            if (e.Type is enFehlerArt.DevelopInfo or enFehlerArt.Info) { return; }
+        //    if (e.Type is enFehlerArt.DevelopInfo or enFehlerArt.Info) { return; }
 
-            if (e.WrittenToLogifile) { return; }
-            e.WrittenToLogifile = true;
-            Develop.DebugPrint(e.Type, e.Message);
-        }
+        //    if (e.WrittenToLogifile) { return; }
+        //    e.WrittenToLogifile = true;
+        //    Develop.DebugPrint(e.Type, e.Message);
+        //}
 
         private static void DB_GenerateLayoutInternal(object sender, GenerateLayoutInternalEventargs e) {
             if (e.Handled) { return; }
@@ -2932,17 +2932,17 @@ namespace BlueControls.Controls {
             var toAdd = e.ClickedComand;
             var toRemove = string.Empty;
             if (toAdd == "#Erweitert") {
-                Cell_Edit(ck.Column, ck.Row, false);
+                Cell_Edit(ck.Column, ck.RowData, false);
                 return;
             }
-            if (ck.Row == null) {
+            if (ck.RowData == null) {
                 // Neue Zeile!
                 UserEdited(this, toAdd, ck.Column, null, string.Empty, false);
                 return;
             }
 
             if (ck.Column.MultiLine) {
-                var li = ck.Row.Row.CellGetList(ck.Column);
+                var li = ck.RowData.Row.CellGetList(ck.Column);
                 if (li.Contains(toAdd, false)) {
                     // Ist das angeklickte Element schon vorhanden, dann soll es wohl abgewählt (gelöscht) werden.
                     if (li.Count > -1 || ck.Column.DropdownAllesAbwählenErlaubt) {
@@ -2952,15 +2952,15 @@ namespace BlueControls.Controls {
                 }
                 if (!string.IsNullOrEmpty(toRemove)) { li.RemoveString(toRemove, false); }
                 if (!string.IsNullOrEmpty(toAdd)) { li.Add(toAdd); }
-                UserEdited(this, li.JoinWithCr(), ck.Column, ck.Row.Row, ck.Row.Chapter, false);
+                UserEdited(this, li.JoinWithCr(), ck.Column, ck.RowData.Row, ck.RowData.Chapter, false);
             } else {
                 if (ck.Column.DropdownAllesAbwählenErlaubt) {
-                    if (toAdd == ck.Row.Row.CellGetString(ck.Column)) {
-                        UserEdited(this, string.Empty, ck.Column, ck.Row.Row, ck.Row.Chapter, false);
+                    if (toAdd == ck.RowData.Row.CellGetString(ck.Column)) {
+                        UserEdited(this, string.Empty, ck.Column, ck.RowData.Row, ck.RowData.Chapter, false);
                         return;
                     }
                 }
-                UserEdited(this, toAdd, ck.Column, ck.Row.Row, ck.Row.Chapter, false);
+                UserEdited(this, toAdd, ck.Column, ck.RowData.Row, ck.RowData.Chapter, false);
             }
         }
 

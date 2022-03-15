@@ -17,6 +17,7 @@
 
 using BlueBasics;
 using BlueControls.Designer_Support;
+using BlueControls.Enums;
 using BlueControls.ItemCollection;
 using System;
 using System.ComponentModel;
@@ -46,13 +47,11 @@ namespace BlueControls.Controls {
 
         protected bool Fitting = true;
 
-        protected float ShiftX = -1;
+        private float _shiftX = -1;
 
-        protected float ShiftY = -1;
-
-        protected float Zoom = 1;
-
-        private float _ZoomFit = 1;
+        private float _shiftY = -1;
+        private float _zoom = 1;
+        private float _zoomFit = 1;
 
         #endregion
 
@@ -62,34 +61,60 @@ namespace BlueControls.Controls {
 
         #endregion
 
+        #region Properties
+
+        public float ShiftX {
+            get => _shiftX;
+            set {
+                if (value == _shiftX) { return; }
+                _shiftX = value;
+                Invalidate();
+            }
+        }
+
+        public float ShiftY {
+            get => _shiftY;
+            set {
+                if (value == _shiftY) { return; }
+                _shiftY = value;
+                Invalidate();
+            }
+        }
+
+        public float Zoom {
+            get => _zoom;
+            set {
+                value = Math.Max(_zoomFit / 10f, value);
+                value = Math.Min(20, value);
+
+                if (value == _zoom) { return; }
+                _zoom = value;
+                Invalidate();
+            }
+        }
+
+        #endregion
+
         #region Methods
 
+        /// <summary>
+        /// Gibt den Zeichenbereich zurück. Entspricht der Control-Größe abzüglich der Slider-Breite/Höhe
+        /// </summary>
+        /// <returns></returns>
         public Rectangle AvailablePaintArea() {
             var wi = Size.Width;
             if (SliderY.Visible) { wi -= SliderY.Width; }
-            var he = Size.Width;
+            var he = Size.Height;
             if (SliderX.Visible) { he -= SliderX.Height; }
             return new Rectangle(0, 0, wi, he);
         }
 
-        public void SetZoom(float zoom) {
-            Zoom = zoom;
-            SliderX.Minimum = 0;
-            SliderX.Maximum = 0;
-            SliderX.Value = 0;
-            SliderY.Minimum = 0;
-            SliderY.Maximum = 0;
-            SliderY.Value = 0;
-            ZoomOrShiftChanged();
-        }
-
-        public void Zoom100() => CalculateZoomFitAndSliders(1f);
-
-        public float ZoomCurrent() => Zoom;
-
         public void ZoomFit() {
-            CalculateZoomFitAndSliders(-1);
-            CalculateZoomFitAndSliders(_ZoomFit);
+            var mb = MaxBounds();
+            var x = AvailablePaintArea();
+            x.Inflate(-16, -16);
+            _zoomFit = ItemCollectionPad.ZoomFitValue(mb, x.Size);
+            Zoom = _zoomFit;
         }
 
         public void ZoomIn(MouseEventArgs e) {
@@ -102,23 +127,60 @@ namespace BlueControls.Controls {
             OnMouseWheel(x);
         }
 
-        /// <summary>
-        /// Kümmert sich um Slider und Maximal-Setting.
-        /// Bei einem negativen Wert wird der neue Zoom nicht gesetzt.
-        /// </summary>
-        /// <param name="newzoom"></param>
-        protected void CalculateZoomFitAndSliders(float newzoom) {
-            var mb = MaxBounds();
-            _ZoomFit = ItemCollectionPad.ZoomFitValue(mb, SliderY.Width + 32, SliderX.Height + 32, Size);
-            if (newzoom >= 0) {
-                Zoom = newzoom;
+        ///// <summary>
+        ///// Kümmert sich um Slider und Maximal-Setting.
+        ///// Bei einem negativen Wert wird der neue Zoom nicht gesetzt.
+        ///// </summary>
+        ///// <param name="newzoom"></param>
+        //protected void CalculateZoomFitAndSliders(float newzoom) {
+        //    var mb = MaxBounds();
+        //    _ZoomFit = ItemCollectionPad.ZoomFitValue(mb, SliderY.Width + 32, SliderX.Height + 32, Size);
+        //    if (newzoom >= 0) {
+        //        Zoom = newzoom;
 
-                Fitting = Math.Abs(Zoom - newzoom) < 0.01;
+        //        Fitting = Math.Abs(Zoom - newzoom) < 0.01;
+        //    }
+        //    ComputeSliders(mb);
+        //    if (newzoom >= 0) {
+        //        ZoomOrShiftChanged();
+        //        Invalidate();
+        //    }
+        //}
+
+        protected override void DrawControl(Graphics gr, enStates state) {
+            //base.DrawControl(gr, state);
+
+            var maxBounds = MaxBounds();
+
+            if (maxBounds == null || maxBounds.Width == 0) { return; }
+            var p = ItemCollectionPad.CenterPos(maxBounds, AvailablePaintArea().Size, Zoom);
+            var sliderv = ItemCollectionPad.SliderValues(maxBounds, Zoom, p);
+            if (p.X < 0) {
+                SliderX.Enabled = true;
+                SliderX.Minimum = (float)((maxBounds.Left * Zoom) - (Width * 0.6d));
+                SliderX.Maximum = (float)((maxBounds.Right * Zoom) - Width + (Width * 0.6d));
+                SliderX.Value = ShiftX;
+            } else {
+                SliderX.Enabled = false;
+                if (MousePressing() == false) {
+                    SliderX.Minimum = sliderv.X;
+                    SliderX.Maximum = sliderv.X;
+                    SliderX.Value = sliderv.X;
+                }
             }
-            ComputeSliders(mb);
-            if (newzoom >= 0) {
-                ZoomOrShiftChanged();
-                Invalidate();
+
+            if (p.Y < 0) {
+                SliderY.Enabled = true;
+                SliderY.Minimum = (float)((maxBounds.Top * Zoom) - (Height * 0.6d));
+                SliderY.Maximum = (float)((maxBounds.Bottom * Zoom) - Height + (Height * 0.6d));
+                SliderY.Value = ShiftY;
+            } else {
+                SliderY.Enabled = false;
+                if (MousePressing() == false) {
+                    SliderY.Minimum = sliderv.Y;
+                    SliderY.Maximum = sliderv.Y;
+                    SliderY.Value = sliderv.Y;
+                }
             }
         }
 
@@ -129,8 +191,8 @@ namespace BlueControls.Controls {
         /// <remarks>
         /// </remarks>
         protected Point KoordinatesUnscaled(MouseEventArgs e) =>
-            new((int)Math.Round(((e.X + ShiftX) / Zoom) - 0.5d, 0),
-                (int)Math.Round(((e.Y + ShiftY) / Zoom) - 0.5d, 0));
+            new((int)Math.Round(((e.X + _shiftX) / Zoom) - 0.5d, 0),
+                (int)Math.Round(((e.Y + _shiftY) / Zoom) - 0.5d, 0));
 
         protected virtual RectangleF MaxBounds() {
             Develop.DebugPrint_RoutineMussUeberschriebenWerden();
@@ -168,17 +230,16 @@ namespace BlueControls.Controls {
             } else {
                 Zoom *= 1f / 1.5f;
             }
-            Zoom = Math.Max(_ZoomFit / 10f, Zoom);
-            Zoom = Math.Min(20, Zoom);
-            var mb = MaxBounds();
-            ComputeSliders(mb);
+
+            //var mb = MaxBounds();
+            //ComputeSliders(mb);
             // M Beeinhaltet den Punkt, wo die Maus hinzeigt Maßstabunabhängig.
             // Der Slider ist abhängig vom Maßsstab - sowie die echten Mauskoordinaten ebenfalls.
             // Deswegen die M mit dem neuen Zoom-Faktor berechnen umrechen, um auch Masstababhängig zu sein
             // Die Verschiebung der echten Mauskoordinaten berechnen und den Slider auf den Wert setzen.
-            SliderX.Value = (m.X * Zoom) - e.X;
-            SliderY.Value = (m.Y * Zoom) - e.Y;
-            ZoomOrShiftChanged();
+            ShiftX = (m.X * Zoom) - e.X;
+            ShiftY = (m.Y * Zoom) - e.Y;
+
             // Alte Berechnung für Mittig Setzen
             //SliderX.Value = (m.X * _Zoom) - (Width / 2) - SliderY.Width
             //SliderY.Value = (m.Y * _Zoom) - (Height / 2) - SliderX.Height
@@ -189,49 +250,12 @@ namespace BlueControls.Controls {
             base.OnSizeChanged(e);
         }
 
-        protected virtual void ZoomOrShiftChanged() { }
-
-        private void ComputeSliders(RectangleF maxBounds) {
-            if (maxBounds == null || maxBounds.Width == 0) { return; }
-            var p = ItemCollectionPad.CenterPos(maxBounds, SliderY.Width, SliderX.Width, Size, Zoom);
-            var sliderv = ItemCollectionPad.SliderValues(maxBounds, Zoom, p);
-            if (p.X < 0) {
-                SliderX.Enabled = true;
-                SliderX.Minimum = (float)((maxBounds.Left * Zoom) - (Width * 0.6d));
-                SliderX.Maximum = (float)((maxBounds.Right * Zoom) - Width + (Width * 0.6d));
-            } else {
-                SliderX.Enabled = false;
-                if (MousePressing() == false) {
-                    SliderX.Minimum = sliderv.X;
-                    SliderX.Maximum = sliderv.X;
-                    SliderX.Value = sliderv.X;
-                }
-            }
-            if (p.Y < 0) {
-                SliderY.Enabled = true;
-                SliderY.Minimum = (float)((maxBounds.Top * Zoom) - (Height * 0.6d));
-                SliderY.Maximum = (float)((maxBounds.Bottom * Zoom) - Height + (Height * 0.6d));
-            } else {
-                SliderY.Enabled = false;
-                if (MousePressing() == false) {
-                    SliderY.Minimum = sliderv.Y;
-                    SliderY.Maximum = sliderv.Y;
-                    SliderY.Value = sliderv.Y;
-                }
-            }
-            Invalidate();
-        }
-
         private void SliderX_ValueChanged(object sender, System.EventArgs e) {
             ShiftX = SliderX.Value;
-            ZoomOrShiftChanged();
-            Invalidate();
         }
 
         private void SliderY_ValueChanged(object sender, System.EventArgs e) {
             ShiftY = SliderY.Value;
-            ZoomOrShiftChanged();
-            Invalidate();
         }
 
         #endregion

@@ -156,7 +156,7 @@ namespace BlueDatabase {
 
             UserGroup = "#Administrator";
             if (!string.IsNullOrEmpty(filename)) {
-                DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + filename.FileNameWithoutSuffix()));
+                //DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + filename.FileNameWithoutSuffix()));
                 Load(filename, create);
             } else if (stream != null) {
                 LoadFromStream(stream);
@@ -169,8 +169,6 @@ namespace BlueDatabase {
         #endregion
 
         #region Events
-
-        public static event EventHandler<MessageEventArgs> DropConstructorMessage;
 
         public event EventHandler<MessageEventArgs> DropMessage;
 

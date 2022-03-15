@@ -28,14 +28,14 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.String };
-        public override string Description => "Ruft eine Subroutine auf. Diese muss auf der Festplatte im UTF8-Format gespeichert sein.";
+        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.Bool };
+        public override string Description => "Ruft eine Subroutine auf. Diese muss auf der Festplatte im UTF8-Format gespeichert sein. Mit KeepVariables kann bestimmt werden, ob die Variablen aus der Subroutine behalten werden sollen.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
         public override VariableDataType Returns => VariableDataType.Null;
         public override string StartSequence => "(";
-        public override string Syntax => "CallByFilename(Filename);";
+        public override string Syntax => "CallByFilename(Filename, KeepVariables);";
 
         #endregion
 
@@ -47,27 +47,19 @@ namespace BlueScript.Methods {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            //if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback("Kein Text angekommen."); }
-
-            //if (!Variable.IsValidName(infos.AttributText)) { return new DoItFeedback(infos.AttributText + " ist kein gültiger Subroutinen-Name."); }
-
-            //var such = new List<string> { "sub" + infos.AttributText.ToLower() + "()" };
-
-            //var (pos, _) = NextText(s.ReducedScriptText.ToLower(), 0, such, true, false, KlammernStd);
-
-            //if (pos < 0) { return new DoItFeedback("Subroutine " + infos.AttributText + " nicht definert."); }
-
-            //var (pos2, _) = NextText(s.ReducedScriptText.ToLower(), pos + 1, such, true, false, KlammernStd);
-            //if (pos2 > 0) { return new DoItFeedback("Subroutine " + infos.AttributText + " mehrfach definert."); }
             var vs = (VariableString)attvar.Attributes[0];
-            var f = string.Empty;
+            string f;
 
-            if (FileExists(vs.ValueString)) {
-                f = File.ReadAllText(vs.ValueString, System.Text.Encoding.UTF8);
-            } else if (FileExists(s.AdditionalFilesPath + vs.ValueString)) {
-                f = File.ReadAllText(s.AdditionalFilesPath + vs.ValueString, System.Text.Encoding.UTF8);
-            } else {
-                return new DoItFeedback("Datei nicht gefunden: " + vs.ValueString);
+            try {
+                if (FileExists(vs.ValueString)) {
+                    f = File.ReadAllText(vs.ValueString, System.Text.Encoding.UTF8);
+                } else if (FileExists(s.AdditionalFilesPath + vs.ValueString)) {
+                    f = File.ReadAllText(s.AdditionalFilesPath + vs.ValueString, System.Text.Encoding.UTF8);
+                } else {
+                    return new DoItFeedback("Datei nicht gefunden: " + vs.ValueString);
+                }
+            } catch {
+                return new DoItFeedback("Fehler beim Lesen der Datei: " + vs.ValueString);
             }
 
             f = Script.ReduceText(f);
@@ -78,14 +70,19 @@ namespace BlueScript.Methods {
 
             s.Sub++;
 
-            var tmpv = new List<Variable>();
-            tmpv.AddRange(s.Variables);
+            if (((VariableBool)attvar.Attributes[1]).ValueBool) {
+                var (err, _) = s.Parse(f);
+                if (!string.IsNullOrEmpty(err)) { return new DoItFeedback("Subroutine " + vs.ValueString + ": " + err); }
+            } else {
+                var tmpv = new List<Variable>();
+                tmpv.AddRange(s.Variables);
 
-            var (err, _) = s.Parse(f);
-            if (!string.IsNullOrEmpty(err)) { return new DoItFeedback("Subroutine " + vs.ValueString + ": " + err); }
+                var (err, _) = s.Parse(f);
+                if (!string.IsNullOrEmpty(err)) { return new DoItFeedback("Subroutine " + vs.ValueString + ": " + err); }
 
-            s.Variables.Clear();
-            s.Variables.AddRange(tmpv);
+                s.Variables.Clear();
+                s.Variables.AddRange(tmpv);
+            }
             s.Sub--;
 
             if (s.Sub < 0) { return new DoItFeedback("Subroutinen-Fehler"); }

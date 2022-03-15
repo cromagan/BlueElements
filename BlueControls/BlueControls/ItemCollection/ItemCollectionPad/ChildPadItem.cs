@@ -134,7 +134,7 @@ namespace BlueControls.ItemCollection {
             var l2 = PadInternal.Item.MaxBounds(ZoomItems);
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }
             var tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height);
-            PadInternal.SetZoom(1);
+            PadInternal.Zoom = 1f;
             // Coordinaten auf Maßstab 1/1 scalieren
             var x = (e.X - l1.X) / tZo;
             var y = (e.Y - l1.Y) / tZo;
@@ -160,7 +160,7 @@ namespace BlueControls.ItemCollection {
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }
             float tZo = 1;
             if (l2.Width > 0 && l2.Height > 0) { tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height); }
-            PadInternal.SetZoom(1);
+            PadInternal.Zoom = 1f;
             // Coordinaten auf Maßstab 1/1 scalieren
             var x = (e.X - l1.X) / tZo;
             var y = (e.Y - l1.Y) / tZo;
@@ -185,7 +185,7 @@ namespace BlueControls.ItemCollection {
             var l2 = PadInternal.Item.MaxBounds(ZoomItems);
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }
             var tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height);
-            PadInternal.SetZoom(1);
+            PadInternal.Zoom = 1f;
             // Coordinaten auf Maßstab 1/1 scalieren
             var x = (e.X - l1.X) / tZo;
             var y = (e.Y - l1.Y) / tZo;
@@ -294,8 +294,8 @@ namespace BlueControls.ItemCollection {
                         _tmpBmp = new Bitmap((int)Math.Abs(drawingCoordinates.Width), (int)Math.Abs(drawingCoordinates.Height));
                     }
                     var mb = PadInternal.Item.MaxBounds(ZoomItems);
-                    var zoomv = ItemCollectionPad.ZoomFitValue(mb, 0, 0, _tmpBmp.Size);
-                    var centerpos = ItemCollectionPad.CenterPos(mb, 0, 0, _tmpBmp.Size, zoomv);
+                    var zoomv = ItemCollectionPad.ZoomFitValue(mb, _tmpBmp.Size);
+                    var centerpos = ItemCollectionPad.CenterPos(mb, _tmpBmp.Size, zoomv);
                     var slidervalues = ItemCollectionPad.SliderValues(mb, zoomv, centerpos);
                     PadInternal.ShowInPrintMode = forPrinting;
                     if (forPrinting) { PadInternal.Unselect(); }

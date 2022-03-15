@@ -45,7 +45,7 @@ namespace BlueControls.Forms {
 
         private void btnVorschauModus_CheckedChanged(object sender, System.EventArgs e) => Pad.ShowInPrintMode = btnVorschauModus.Checked;
 
-        private void btnZoom11_Click(object sender, System.EventArgs e) => Pad.Zoom100();
+        private void btnZoom11_Click(object sender, System.EventArgs e) => Pad.Zoom = 1f;
 
         private void btnZoomFit_Click(object sender, System.EventArgs e) => Pad.ZoomFit();
 

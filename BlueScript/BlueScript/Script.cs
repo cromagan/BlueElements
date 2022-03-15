@@ -278,7 +278,7 @@ namespace BlueScript {
                 } else {
                     var f = ComandOnPosition(redScriptText, pos, this, false);
                     if (!string.IsNullOrEmpty(f.ErrorMessage)) {
-                        return (f.ErrorMessage, ReducedScriptText.Substring(pos, Math.Min(30, ReducedScriptText.Length - pos)));
+                        return (f.ErrorMessage, redScriptText.Substring(pos, Math.Min(30, redScriptText.Length - pos)));
                     }
                     pos = f.Position;
                 }

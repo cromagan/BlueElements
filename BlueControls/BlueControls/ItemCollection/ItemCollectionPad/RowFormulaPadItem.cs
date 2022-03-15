@@ -182,8 +182,8 @@ namespace BlueControls.ItemCollection {
             var generatedBitmap = new Bitmap((int)re.Width, (int)re.Height);
 
             var mb = pad.Item.MaxBounds(null);
-            var zoomv = ItemCollectionPad.ZoomFitValue(mb, 0, 0, generatedBitmap.Size);
-            var centerpos = ItemCollectionPad.CenterPos(mb, 0, 0, generatedBitmap.Size, zoomv);
+            var zoomv = ItemCollectionPad.ZoomFitValue(mb, generatedBitmap.Size);
+            var centerpos = ItemCollectionPad.CenterPos(mb, generatedBitmap.Size, zoomv);
             var slidervalues = ItemCollectionPad.SliderValues(mb, zoomv, centerpos);
             pad.ShowInPrintMode = true;
             pad.Unselect();

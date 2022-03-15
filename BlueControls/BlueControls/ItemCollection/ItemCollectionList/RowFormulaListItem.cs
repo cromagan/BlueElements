@@ -149,8 +149,8 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
             internalZoom = Math.Min(1, internalZoom);
 
             if (_tmpBmp == null) { _tmpBmp = new Bitmap((int)(mb.Width * internalZoom), (int)(mb.Height * internalZoom)); }
-            var zoomv = ItemCollectionPad.ZoomFitValue(mb, 0, 0, _tmpBmp.Size);
-            var centerpos = ItemCollectionPad.CenterPos(mb, 0, 0, _tmpBmp.Size, zoomv);
+            var zoomv = ItemCollectionPad.ZoomFitValue(mb, _tmpBmp.Size);
+            var centerpos = ItemCollectionPad.CenterPos(mb, _tmpBmp.Size, zoomv);
             var slidervalues = ItemCollectionPad.SliderValues(mb, zoomv, centerpos);
             //pad.ShowInPrintMode = true;
             //pad.Unselect();

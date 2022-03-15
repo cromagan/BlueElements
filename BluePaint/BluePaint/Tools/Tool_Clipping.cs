@@ -39,7 +39,6 @@ namespace BluePaint {
             CheckMinMax();
             AutoZ_Click(null, null);
             ZuschnittOK_Click(null, null);
-            Enabled = false;
             MessageBox.Show("Automatisch zugeschnitten.");
         }
 

@@ -98,11 +98,8 @@ namespace BlueControls.Controls {
         }
 
         protected override void DrawControl(Graphics gr, enStates state) {
-            //if (_BitmapOfControl == null)
-            //{
-            //    _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb);
-            //}
-            //var TMPGR = Graphics.FromImage(_BitmapOfControl);
+            base.DrawControl(gr, state);
+
             LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray,
                 LinearGradientMode.Vertical);
             gr.FillRectangle(lgb, ClientRectangle);
@@ -117,14 +114,12 @@ namespace BlueControls.Controls {
                 }
                 gr.PixelOffsetMode = PixelOffsetMode.Half;
                 gr.DrawImage(_bmp, r);
-                //if (OverlayBmp != null)
-                //{
-                //    TMPGR.DrawImage(OverlayBmp, r);
-                //}
             }
             OnDoAdditionalDrawing(new AdditionalDrawing(gr, Zoom, ShiftX, ShiftY, _mouseDown, _mouseCurrent));
-            Skin.Draw_Border(gr, enDesign.Table_And_Pad, state, new Rectangle(1, 1, Size.Width - SliderY.Width, Size.Height - SliderX.Height));
-            //gr.DrawImage(_BitmapOfControl, 0, 0);
+            var apa = AvailablePaintArea();
+            //apa.Width -= 1;
+            //apa.Height -= 1;
+            Skin.Draw_Border(gr, enDesign.Table_And_Pad, state, apa);
         }
 
         protected override RectangleF MaxBounds() => _bmp != null ? new RectangleF(0, 0, _bmp.Width, _bmp.Height) : new RectangleF(0, 0, 0, 0);

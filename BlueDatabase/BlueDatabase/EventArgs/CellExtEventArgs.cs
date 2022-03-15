@@ -23,7 +23,7 @@ namespace BlueDatabase.EventArgs {
 
         public CellExtEventArgs(ColumnItem? column, RowData? row) {
             Column = column;
-            Row = row;
+            RowData = row;
         }
 
         #endregion
@@ -31,7 +31,7 @@ namespace BlueDatabase.EventArgs {
         #region Properties
 
         public ColumnItem? Column { get; set; }
-        public RowData? Row { get; set; }
+        public RowData? RowData { get; set; }
 
         #endregion
     }

@@ -409,6 +409,8 @@ namespace BlueControls.Controls {
             new((int)(((Width / 2) + ShiftX) / Zoom), (int)(((Height / 2) + ShiftY) / Zoom));
 
         protected override void DrawControl(Graphics gr, enStates state) {
+            base.DrawControl(gr, state);
+
             LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray,
                 LinearGradientMode.Vertical);
             gr.FillRectangle(lgb, ClientRectangle);
@@ -461,19 +463,11 @@ namespace BlueControls.Controls {
         protected override void OnMouseUp(MouseEventArgs e) => DoMouseUp(e);
 
         private void _Item_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
-            CalculateZoomFitAndSliders(-1);
             if (_item.Count == 1 || Fitting) { ZoomFit(); }
+            Invalidate();
         }
 
-        // Kann nicht public gemacht werden, deswegen Umleitung
-
-        // Kann nicht public gemacht werden, deswegen Umleitung
-
-        // Kann nicht public gemacht werden, deswegen Umleitung
-
         private void _Item_ItemRemoved(object sender, System.EventArgs e) {
-            CalculateZoomFitAndSliders(-1);
-
             if (Fitting) { ZoomFit(); }
 
             CheckHotItem(null, true);

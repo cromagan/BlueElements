@@ -617,10 +617,10 @@ namespace BlueControls.Forms {
                 Invoke(new Action(() => TableView_CursorPosChanged(sender, e)));
                 return;
             }
-            Formula.ShowingRowKey = e.Column == null || _ansicht == enAnsicht.Nur_Tabelle || e.Row == null ? -1 : e.Row.Row.Key;
+            Formula.ShowingRowKey = e.Column == null || _ansicht == enAnsicht.Nur_Tabelle || e.RowData == null ? -1 : e.RowData.Row.Key;
 
             if (_ansicht == enAnsicht.Überschriften_und_Formular) {
-                TableView.EnsureVisible(e.Column, e.Row);
+                TableView.EnsureVisible(e.Column, e.RowData);
             }
         }
 

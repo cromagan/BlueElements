@@ -576,6 +576,11 @@ namespace BlueDatabase {
             //    }
             //}
 
+            if (columnVar is VariableFloat vf) {
+                CellSet(column, vf.ValueNum);
+                return;
+            }
+
             if (columnVar is VariableListString vl) {
                 CellSet(column, vl.ValueList);
                 return;

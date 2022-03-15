@@ -107,7 +107,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void CursorPosChanged(object sender, CellExtEventArgs e) {
-            _row = e.Row;
+            _row = e.RowData;
             _col = e.Column;
         }
 

@@ -137,7 +137,7 @@ namespace BluePaint {
 
         private void Bruchlinie_Click(object sender, System.EventArgs e) => SetTool(new Tool_Bruchlinie());
 
-        private void btn100_Click(object sender, System.EventArgs e) => P.Zoom100();
+        private void btn100_Click(object sender, System.EventArgs e) => P.Zoom = 1f;
 
         private void btnCopy_Click(object sender, System.EventArgs e) {
             SetTool(null); // um OnToolChangeAuszulösen

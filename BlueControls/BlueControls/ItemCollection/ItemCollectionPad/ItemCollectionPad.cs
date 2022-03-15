@@ -296,21 +296,20 @@ namespace BlueControls.ItemCollection {
         /// <param name="sizeOfPaintArea"></param>
         /// <param name="zoomToUse"></param>
         /// <returns></returns>
-        public static Point CenterPos(RectangleF maxBounds, int reduceX, int reduceY, Size sizeOfPaintArea, float zoomToUse) {
-            var w = sizeOfPaintArea.Width - reduceX - (maxBounds.Width * zoomToUse);
-            var h = sizeOfPaintArea.Height - reduceY - (maxBounds.Height * zoomToUse);
+        public static Point CenterPos(RectangleF maxBounds, Size sizeOfPaintArea, float zoomToUse) {
+            var w = sizeOfPaintArea.Width - (maxBounds.Width * zoomToUse);
+            var h = sizeOfPaintArea.Height - (maxBounds.Height * zoomToUse);
             return new Point((int)w, (int)h);
         }
 
-        public static PointF SliderValues(RectangleF bounds, float zoomToUse, Point topLeftPos) =>
-                                                                                                                                            new((float)((bounds.Left * zoomToUse) - (topLeftPos.X / 2d)),
-        (float)((bounds.Top * zoomToUse) - (topLeftPos.Y / 2d)));
+        public static PointF SliderValues(RectangleF bounds, float zoomToUse, Point topLeftPos) => new((float)((bounds.Left * zoomToUse) - (topLeftPos.X / 2d)),
+                                                                                                        (float)((bounds.Top * zoomToUse) - (topLeftPos.Y / 2d)));
 
-        public static float ZoomFitValue(RectangleF maxBounds, int reduceX, int reduceY, Size sizeOfPaintArea) {
+        public static float ZoomFitValue(RectangleF maxBounds, Size sizeOfPaintArea) {
             if (maxBounds == null || maxBounds.IsEmpty) { return 1f; }
 
-            return Math.Min((sizeOfPaintArea.Width - reduceX) / maxBounds.Width,
-                            (sizeOfPaintArea.Height - reduceY) / maxBounds.Height);
+            return Math.Min(sizeOfPaintArea.Width / maxBounds.Width,
+                            sizeOfPaintArea.Height / maxBounds.Height);
         }
 
         public void DesignOrStyleChanged() {

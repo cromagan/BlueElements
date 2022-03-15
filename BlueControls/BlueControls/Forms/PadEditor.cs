@@ -97,7 +97,7 @@ namespace BlueControls.Forms {
 
         private void btnAddLine_Click(object sender, System.EventArgs e) {
             var p = Pad.MiddleOfVisiblesScreen();
-            var w = (int)(300 / Pad.ZoomCurrent());
+            var w = (int)(300 / Pad.Zoom);
             LinePadItem b = new(PadStyles.Style_Standard, new Point(p.X - w, p.Y), new Point(p.X + w, p.Y));
             Pad.Item.Add(b);
         }
