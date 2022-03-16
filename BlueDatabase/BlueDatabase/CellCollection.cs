@@ -158,12 +158,10 @@ namespace BlueDatabase {
                     fi.Add(new FilterItem(linkedDatabase.Column[z], enFilterType.Istgleich, value));
                 } else if (!string.IsNullOrEmpty(column.LinkedCellFilter[z]) && column.LinkedCellFilter[z].StartsWith("@")) {
                     fi.Add(new FilterItem(linkedDatabase.Column[z], enFilterType.Istgleich, column.LinkedCellFilter[z].Substring(1)));
-                } else {
-                    if (z == 0 && column.Format != enDataFormat.Values_für_LinkedCellDropdown) { return (fi, "Die erste Spalte, aus der der Zeilenschlüssel kommen soll, muss einen Suchwert enthalten."); }
                 }
             }
 
-            if (fi.Count == 0 && column.Format != enDataFormat.Values_für_LinkedCellDropdown) { return (null, "Keine gültigen Suchkriterien definiert."); }
+            if (fi.Count == 0 && column.Format != enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return (null, "Keine gültigen Suchkriterien definiert."); }
 
             return (fi, string.Empty);
         }
@@ -821,7 +819,7 @@ namespace BlueDatabase {
                     return (targetColumn, targetRow, fehler);
                 }
 
-                if (column != null && row != null) { column.Database?.Cell.SetValueBehindLinkedValue(column, row, fehler); }
+                if (column != null && row != null) { column.Database?.Cell.SetValueBehindLinkedValue(column, row, string.Empty); }
                 return (targetColumn, targetRow, fehler);
             }
 

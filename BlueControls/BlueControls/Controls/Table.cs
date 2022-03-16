@@ -1171,22 +1171,6 @@ namespace BlueControls.Controls {
             //Database.DropConstructorMessage += Database_DropConstructorMessage;
         }
 
-        internal bool NonPermanentPossible(ColumnViewItem thisViewItem) {
-            if (_arrangementNr < 1) {
-                return !thisViewItem.Column.IsFirst();
-            }
-            var nx = thisViewItem.NextVisible(CurrentArrangement);
-            return nx == null || Convert.ToBoolean(nx.ViewType != enViewType.PermanentColumn);
-        }
-
-        internal bool PermanentPossible(ColumnViewItem thisViewItem) {
-            if (_arrangementNr < 1) {
-                return thisViewItem.Column.IsFirst();
-            }
-            var prev = thisViewItem.PreviewsVisible(CurrentArrangement);
-            return prev == null || Convert.ToBoolean(prev.ViewType == enViewType.PermanentColumn);
-        }
-
         protected override void DrawControl(Graphics gr, enStates state) {
             if (InvokeRequired) {
                 Invoke(new Action(() => DrawControl(gr, state)));
@@ -1429,7 +1413,7 @@ namespace BlueControls.Controls {
                     case System.Windows.Forms.Keys.V:
                         if (e.Modifiers == System.Windows.Forms.Keys.Control) {
                             if (_cursorPosColumn != null && _cursorPosRow != null) {
-                                if (!_cursorPosColumn.Format.TextboxEditPossible() && _cursorPosColumn.Format != enDataFormat.Values_für_LinkedCellDropdown) {
+                                if (!_cursorPosColumn.Format.TextboxEditPossible() && _cursorPosColumn.Format != enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) {
                                     NotEditableInfo("Die Zelle hat kein passendes Format.");
                                     _isinKeyDown = false;
                                     return;
@@ -1541,7 +1525,7 @@ namespace BlueControls.Controls {
 
                                     //case enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
                                     case enDataFormat.Verknüpfung_zu_anderer_Datenbank:
-                                    case enDataFormat.Values_für_LinkedCellDropdown:
+                                    case enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
                                         var (lcolumn, _, info) = CellCollection.LinkedCellData(_mouseOverColumn, _mouseOverRow.Row, true, false);
                                         if (lcolumn != null) { _mouseOverText = lcolumn.QuickInfoText(_mouseOverColumn.ReadableText() + " bei " + lcolumn.ReadableText() + ":"); }
 

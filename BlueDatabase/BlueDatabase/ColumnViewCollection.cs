@@ -25,7 +25,7 @@ using System.Linq;
 
 namespace BlueDatabase {
 
-    public sealed class ColumnViewCollection : ListExt<ColumnViewItem?>, IParseable {
+    public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable {
         //NICHT IReadableText, das gibt zu viele Probleme (Dropdownboxen)
 
         #region Fields
@@ -85,9 +85,9 @@ namespace BlueDatabase {
 
         public void Add(ColumnItem? column, bool permanent) {
             if (permanent) {
-                Add(new ColumnViewItem(column, enViewType.PermanentColumn));
+                Add(new ColumnViewItem(column, enViewType.PermanentColumn, this));
             } else {
-                Add(new ColumnViewItem(column, enViewType.Column));
+                Add(new ColumnViewItem(column, enViewType.Column, this));
             }
         }
 
@@ -107,7 +107,7 @@ namespace BlueDatabase {
             }
         }
 
-        public void Insert(int index, ColumnItem? column) => Insert(index, new ColumnViewItem(column, enViewType.Column));
+        public void Insert(int index, ColumnItem? column) => Insert(index, new ColumnViewItem(column, enViewType.Column, this));
 
         public void Invalidate_DrawWithOfAllItems() {
             foreach (var thisViewItem in this) {
@@ -164,7 +164,7 @@ namespace BlueDatabase {
                         break;
 
                     case "columndata":
-                        Add(new ColumnViewItem(Database, pair.Value));
+                        Add(new ColumnViewItem(Database, pair.Value, this));
                         break;
 
                     case "permissiongroup":
@@ -220,7 +220,7 @@ namespace BlueDatabase {
             if (ok) { return; }
             Clear();
             foreach (var thisColumnItem in Database.Column.Where(thisColumnItem => thisColumnItem != null)) {
-                Add(new ColumnViewItem(thisColumnItem, enViewType.Column));
+                Add(new ColumnViewItem(thisColumnItem, enViewType.Column, this));
             }
             if (Count > 0) { this[0].ViewType = enViewType.PermanentColumn; }
         }

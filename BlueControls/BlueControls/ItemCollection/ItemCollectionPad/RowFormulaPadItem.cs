@@ -28,7 +28,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection {
 
-    public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
+    public class RowFormulaPadItem : FixedConnectibleRectangleBitmapPadItem {
 
         #region Fields
 
@@ -65,7 +65,9 @@ namespace BlueControls.ItemCollection {
 
         #region Properties
 
-        // Namen so lassen, wegen Kontextmenu
+        /// <summary>
+        /// Namen so lassen, wegen Kontextmenu
+        /// </summary>
         public string Layout_Id {
             get => _layoutId;
             set {
@@ -97,6 +99,9 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
+        /// <summary>
+        /// Wird von Flexoptions aufgerufen
+        /// </summary>
         public void Datensatz_bearbeiten() {
             _tmpQuickInfo = string.Empty; // eigentlich unnötig, da RowChanged anschlagen müsste
             EditBoxRow.Show("Datensatz bearbeiten:", Row, true);

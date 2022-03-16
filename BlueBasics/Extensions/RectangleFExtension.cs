@@ -71,6 +71,12 @@ namespace BlueBasics {
             return p.NearestPoint(pl);
         }
 
+        /// <summary>
+        /// Gibt den Punkt, der am nähesten zu einem der vier Mittelpunkte der Strecken ist, zurück
+        /// </summary>
+        /// <param name="r"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
         public static PointF NearestLineMiddle(this RectangleF r, PointF p) {
             var pl = new List<PointF>
             {
@@ -99,7 +105,7 @@ namespace BlueBasics {
             }
         }
 
-        public static Rectangle ToRect(this RectangleF r) => new((int) r.X, (int) r.Y, (int) r.Width, (int) r.Height);
+        public static Rectangle ToRect(this RectangleF r) => new((int)r.X, (int)r.Y, (int)r.Width, (int)r.Height);
 
         /// <summary>
         ///

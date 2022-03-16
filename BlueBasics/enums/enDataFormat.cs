@@ -65,7 +65,7 @@ namespace BlueBasics.Enums {
         /// Gibt die Werte einer anderen Spalte einer
         /// anderen Datenbank als Dropdown Items wieder
         /// </summary>
-        Values_für_LinkedCellDropdown = 76,
+        Werte_aus_anderer_Datenbank_als_DropDownItems = 76,
 
         RelationText = 77,
 

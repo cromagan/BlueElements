@@ -26,7 +26,7 @@ using System.Drawing;
 
 namespace BlueControls.ItemCollection {
 
-    public abstract class FixedRectangleBitmapPadItem : BasicPadItem, IDisposable {
+    public abstract class FixedConnectibleRectangleBitmapPadItem : BasicPadItem, IDisposable {
 
         #region Fields
 
@@ -58,7 +58,7 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        protected FixedRectangleBitmapPadItem(string internalname) : base(internalname) {
+        protected FixedConnectibleRectangleBitmapPadItem(string internalname) : base(internalname) {
             PLo = new PointM(this, "LO", 0, 0);
             PRo = new PointM(this, "RO", 0, 0);
             PRu = new PointM(this, "RU", 0, 0);
@@ -79,12 +79,21 @@ namespace BlueControls.ItemCollection {
 
             ConnectsTo.ItemAdded += ConnectsTo_ItemAdded;
             ConnectsTo.ItemRemoving += ConnectsTo_ItemRemoving;
+            ConnectsTo.ItemRemoved += ConnectsTo_ItemRemoved;
 
             RemovePic();
             //GeneratePic(true);
         }
 
         #endregion
+
+        //public RectangleF BitmapUsedArea {
+        //    get {
+        //        _ = UsedArea;  // um evtl. die Berechnung anzustoßen;
+
+        //        return _bitmapUsedArea;
+        //    }
+        //}
 
         #region Properties
 
@@ -203,16 +212,18 @@ namespace BlueControls.ItemCollection {
         protected override RectangleF CalculateUsedArea() {
             var bmp = GeneratedBitmap;
             if (bmp == null || PLo == null) { return RectangleF.Empty; }
-            var r = new RectangleF(PLo.X, PLo.Y, bmp.Width, bmp.Height);
+            return new RectangleF(PLo.X, PLo.Y, bmp.Width, bmp.Height);
 
-            if (ConnectsTo == null) { return r; }
+            //if (ConnectsTo == null) { return _bitmapUsedArea; }
 
-            foreach (var thisc in ConnectsTo) {
-                if (thisc.Item != null && !thisc.Item.UsedArea.IsEmpty) {
-                    r = RectangleF.Union(r, thisc.Item.UsedArea);
-                }
-            }
-            return r;
+            //var r = _bitmapUsedArea;
+
+            //foreach (var thisc in ConnectsTo) {
+            //    if (thisc.OtherItem != null && !thisc.OtherItem.UsedArea.IsEmpty) {
+            //        r = RectangleF.Union(r, thisc.OtherItem.UsedArea);
+            //    }
+            //}
+            //return r;
         }
 
         protected virtual void Dispose(bool disposing) {
@@ -222,6 +233,7 @@ namespace BlueControls.ItemCollection {
                     ConnectsTo.ItemAdded -= ConnectsTo_ItemAdded;
                     ConnectsTo.Clear();
                     ConnectsTo.ItemRemoving -= ConnectsTo_ItemRemoving;
+                    ConnectsTo.ItemRemoved -= ConnectsTo_ItemRemoved;
                 }
                 RemovePic();
 
@@ -277,15 +289,15 @@ namespace BlueControls.ItemCollection {
             #region Verknüpfte Pfeile Zeichnen
 
             foreach (var thisV in ConnectsTo) {
-                if (Parent.Contains(thisV.Item) && thisV != null && thisV.Item != this) {
-                    var m1 = UsedArea.PointOf(enAlignment.Horizontal_Vertical_Center);
-                    var m2 = thisV.Item.UsedArea.PointOf(enAlignment.Horizontal_Vertical_Center);
-
-                    var t2 = UsedArea.NearestLineMiddle(m2).ZoomAndMove(zoom, shiftX, shiftY);
-                    var t1 = thisV.Item.UsedArea.NearestLineMiddle(m1).ZoomAndMove(zoom, shiftX, shiftY);
+                if (Parent.Contains(thisV.OtherItem) && thisV != null && thisV.OtherItem != this) {
+                    var t1 = ItemConnection.GetConnectionPoint(this, thisV.MyItemType, thisV.OtherItem).ZoomAndMove(zoom, shiftX, shiftY); ;
+                    var t2 = ItemConnection.GetConnectionPoint(thisV.OtherItem, thisV.OtherItemType, this).ZoomAndMove(zoom, shiftX, shiftY); ;
 
                     if (Geometry.GetLenght(t1, t2) > 1) {
                         gr.DrawLine(new Pen(Color.Gray, line), t1, t2);
+                        var wi = BlueBasics.Geometry.Winkel(t1, t2);
+                        if (thisV.ArrowOnMyItem) { DimensionPadItem.DrawArrow(gr, t1, wi, Color.Gray, zoom * 20); }
+                        if (thisV.ArrowOnOtherItem) { DimensionPadItem.DrawArrow(gr, t2, wi + 180, Color.Gray, zoom * 20); }
                     }
                 }
             }
@@ -323,12 +335,15 @@ namespace BlueControls.ItemCollection {
         private void ConnectsTo_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
             var x = (ItemConnection)e.Item;
 
-            x.Item.Changed += Item_Changed;
+            x.OtherItem.Changed += Item_Changed;
+            OnChanged();
         }
+
+        private void ConnectsTo_ItemRemoved(object sender, System.EventArgs e) => OnChanged();
 
         private void ConnectsTo_ItemRemoving(object sender, BlueBasics.EventArgs.ListEventArgs e) {
             var x = (ItemConnection)e.Item;
-            x.Item.Changed -= Item_Changed;
+            x.OtherItem.Changed -= Item_Changed;
         }
 
         private void Item_Changed(object sender, System.EventArgs e) => OnChanged();

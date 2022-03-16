@@ -30,6 +30,7 @@ namespace BlueDatabase {
 
         #region Fields
 
+        public readonly ColumnViewCollection Parent;
         public int? OrderTmpSpalteX1;
         public Rectangle TmpAutoFilterLocation;
         public int? TmpDrawWidth;
@@ -61,19 +62,21 @@ namespace BlueDatabase {
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
         /// </summary>
-        public ColumnViewItem(ColumnItem? column, enViewType type) {
+        public ColumnViewItem(ColumnItem? column, enViewType type, ColumnViewCollection parent) {
             Initialize();
             Column = column;
             _viewType = type;
+            Parent = parent;
             Column.CheckFormulaEditType();
         }
 
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
         /// </summary>
-        public ColumnViewItem(ColumnItem? column, enÜberschriftAnordnung überschrift) {
+        public ColumnViewItem(ColumnItem? column, enÜberschriftAnordnung überschrift, ColumnViewCollection parent) {
             Initialize();
             Column = column;
+            Parent = parent;
             _viewType = enViewType.Column;
             _überschriftAnordnung = überschrift;
             Column.CheckFormulaEditType();
@@ -82,8 +85,9 @@ namespace BlueDatabase {
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
         /// </summary>
-        public ColumnViewItem(Database database, string codeToParse) {
+        public ColumnViewItem(Database database, string codeToParse, ColumnViewCollection parent) {
             Initialize();
+            Parent = parent;
             foreach (var pair in codeToParse.GetAllTags()) {
                 switch (pair.Key) {
                     case "column":
@@ -148,6 +152,27 @@ namespace BlueDatabase {
             set {
                 if (value == _spalteHeight) { return; }
                 _spalteHeight = value;
+                OnChanged();
+            }
+        }
+
+        /// <summary>
+        /// Für FlexOptions
+        /// </summary>
+        public bool Permanent {
+            get => _viewType == enViewType.PermanentColumn;
+            set {
+                if (!PermanentPossible() && Permanent) { return; }
+                if (!NonPermanentPossible() && !Permanent) { return; }
+
+                if (value == Permanent) { return; }
+
+                if (value) {
+                    _viewType = enViewType.PermanentColumn;
+                } else {
+                    _viewType = enViewType.Column;
+                }
+
                 OnChanged();
             }
         }
@@ -239,6 +264,22 @@ namespace BlueDatabase {
             if (_spalteHeight > 1) { result = result + ", Height=" + _spalteHeight; }
             if (_überschriftAnordnung != enÜberschriftAnordnung.Über_dem_Feld) { result = result + ", Caption=" + (int)_überschriftAnordnung; }
             return result + "}";
+        }
+
+        internal bool NonPermanentPossible() {
+            //if (_arrangementNr < 1) {
+            //    return !thisViewItem.Column.IsFirst();
+            //}
+            var nx = NextVisible(Parent);
+            return nx == null || Convert.ToBoolean(nx.ViewType != enViewType.PermanentColumn);
+        }
+
+        internal bool PermanentPossible() {
+            //if (_arrangementNr < 1) {
+            //    return thisViewItem.Column.IsFirst();
+            //}
+            var prev = PreviewsVisible(Parent);
+            return prev == null || Convert.ToBoolean(prev.ViewType == enViewType.PermanentColumn);
         }
 
         /// <summary>

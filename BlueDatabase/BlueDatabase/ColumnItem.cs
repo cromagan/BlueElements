@@ -835,7 +835,7 @@ namespace BlueDatabase {
             if (!doDropDown && !keybordInputAllowed) { return enEditTypeTable.None; }
 
             switch (format) {
-                case enDataFormat.Values_für_LinkedCellDropdown:
+                case enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
                     return enEditTypeTable.Dropdown_Single;
 
                 case enDataFormat.Link_To_Filesystem:
@@ -1158,7 +1158,7 @@ namespace BlueDatabase {
                 //    }
                 //    break;
 
-                case enDataFormat.Values_für_LinkedCellDropdown:
+                case enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
                     //Develop.DebugPrint("Values_für_LinkedCellDropdown Verwendung bei:" + Database.Filename); //TODO: 29.07.2021 Values_für_LinkedCellDropdown Format entfernen
                     if (!string.IsNullOrEmpty(_cellInitValue)) { return "Dieses Format kann keinen Initial-Text haben."; }
                     if (KeyColumnKey > -1) { return "Dieses Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
@@ -1210,7 +1210,7 @@ namespace BlueDatabase {
                 if (thisS.ToUpper() == "#ADMINISTRATOR") { return "'#Administrator' bei den Bearbeitern entfernen."; }
             }
             if (_dropdownBearbeitungErlaubt || tmpEditDialog == enEditTypeTable.Dropdown_Single) {
-                if (_format != enDataFormat.Values_für_LinkedCellDropdown) {
+                if (_format != enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) {
                     if (!_dropdownWerteAndererZellenAnzeigen && DropDownItems.Count == 0) { return "Keine Dropdown-Items vorhanden bzw. Alles hinzufügen nicht angewählt."; }
                 }
             } else {
@@ -1250,7 +1250,7 @@ namespace BlueDatabase {
             if (IsFirst()) {
                 if (_keyColumnKey > -1) { return "Die (intern) erste Spalte darf keine Verknüpfung zu einer andern Schlüsselspalte haben."; }
             }
-            if (_format is not enDataFormat.Verknüpfung_zu_anderer_Datenbank and not enDataFormat.Values_für_LinkedCellDropdown) {
+            if (_format is not enDataFormat.Verknüpfung_zu_anderer_Datenbank and not enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) {
                 //if (_LinkedCell_RowKeyIsInColumn > -1) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
                 if (_linkedCellColumnKeyOfLinkedDatabase > -1) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
             }
@@ -1519,7 +1519,7 @@ namespace BlueDatabase {
                         break;
 
                     case 75:
-                        _format = enDataFormat.Values_für_LinkedCellDropdown;
+                        _format = enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems;
 
                         break;
                 }
@@ -1538,7 +1538,7 @@ namespace BlueDatabase {
                 }
 
                 if (_format is enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
-                    var c = LinkedDatabase.Column.SearchByKey(_linkedCellColumnKeyOfLinkedDatabase);
+                    var c = LinkedDatabase?.Column.SearchByKey(_linkedCellColumnKeyOfLinkedDatabase);
                     if (c != null) {
                         this.GetStyleFrom(c);
                         BildTextVerhalten = c.BildTextVerhalten;
@@ -2038,7 +2038,7 @@ namespace BlueDatabase {
                     if (col == null) { return false; }
                     return col.UserEditDialogTypeInFormula(editTypeToCheck);
 
-                case enDataFormat.Values_für_LinkedCellDropdown:
+                case enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
                     if (editTypeToCheck == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
                     return false;
 

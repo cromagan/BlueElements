@@ -930,7 +930,7 @@ namespace BlueDatabase {
             var cellKey = CellCollection.KeyOfCell(column, row);
             var t = "";
             for (var z = Works.Count - 1; z >= 0; z--) {
-                if (Works[z].CellKey == cellKey) {
+                if (Works[z] != null && Works[z].CellKey == cellKey) {
                     if (Works[z].HistorischRelevant) {
                         t = t + Works[z].UndoTextTableMouseOver() + "<br>";
                     }
@@ -1329,11 +1329,13 @@ namespace BlueDatabase {
                 // Status des Work-Items ist egal, da es beim LADEN automatisch auf 'Undo' gesetzt wird.
                 List<string> works2 = new();
                 foreach (var thisWorkItem in Works) {
-                    if (thisWorkItem.Comand != enDatabaseDataType.ce_Value_withoutSizeData) {
-                        works2.Add(thisWorkItem.ToString());
-                    } else {
-                        if (thisWorkItem.LogsUndo(this)) {
+                    if (thisWorkItem != null) {
+                        if (thisWorkItem.Comand != enDatabaseDataType.ce_Value_withoutSizeData) {
                             works2.Add(thisWorkItem.ToString());
+                        } else {
+                            if (thisWorkItem.LogsUndo(this)) {
+                                works2.Add(thisWorkItem.ToString());
+                            }
                         }
                     }
                 }
@@ -1398,7 +1400,9 @@ namespace BlueDatabase {
 
         private void ChangeWorkItems(enItemState oldState, enItemState newState) {
             foreach (var thisWork in Works) {
-                if (thisWork.State == oldState) { thisWork.State = newState; }
+                if (thisWork != null) {
+                    if (thisWork.State == oldState) { thisWork.State = newState; }
+                }
             }
         }
 
@@ -1408,12 +1412,12 @@ namespace BlueDatabase {
             if (IsParsing) { return; }
 
             for (var z = 0; z < Math.Max(2, ColumnArrangements.Count); z++) {
-                if (ColumnArrangements.Count < z + 1) { ColumnArrangements.Add(new ColumnViewCollection(this, "")); }
+                if (ColumnArrangements.Count < z + 1) { ColumnArrangements.Add(new ColumnViewCollection(this, string.Empty)); }
                 ColumnArrangements[z].Repair(z, true);
             }
 
             for (var z = 0; z < Math.Max(2, Views.Count); z++) {
-                if (Views.Count < z + 1) { Views.Add(new ColumnViewCollection(this, "")); }
+                if (Views.Count < z + 1) { Views.Add(new ColumnViewCollection(this, string.Empty)); }
                 Views[z].Repair(z, false);
             }
         }

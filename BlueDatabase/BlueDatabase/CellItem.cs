@@ -159,7 +159,7 @@ namespace BlueDatabase {
             switch (column.Format) {
                 case enDataFormat.Text:
                 case enDataFormat.Link_To_Filesystem:
-                case enDataFormat.Values_für_LinkedCellDropdown:
+                case enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
                 case enDataFormat.RelationText:
                 case enDataFormat.Verknüpfung_zu_anderer_Datenbank: // Bei LinkedCell kommt direkt der Text der verlinkten Zelle an
 

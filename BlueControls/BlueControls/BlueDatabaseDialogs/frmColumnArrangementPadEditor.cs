@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -28,6 +30,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
+using BlueBasics.EventArgs;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
@@ -37,6 +40,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         public readonly Database? Database;
 
+        public int Fixing = 0;
         public bool Generating;
 
         public bool Sorting;
@@ -48,8 +52,15 @@ namespace BlueControls.BlueDatabaseDialogs {
         #region Constructors
 
         public frmColumnArrangementPadEditor(Database database) : this() {
+            if (database == null || Database.ReadOnly) {
+                MessageBox.Show("Datenbank schreibgeschützt.", enImageCode.Information, "OK");
+                Close();
+                return;
+            }
+
             Database = database;
-            //AllDatabases.Add(Database.Filename);
+            Pad.Item.ItemAdded += Item_ItemAdded;
+            Pad.Item.ItemRemoved += Item_ItemRemoved;
             Database.ShouldICancelSaveOperations += TmpDatabase_ShouldICancelDiscOperations;
             Arrangement = 1;
             UpdateCombobox();
@@ -133,6 +144,53 @@ namespace BlueControls.BlueDatabaseDialogs {
             ShowOrder();
         }
 
+        private void btnNeueSpalte_Click(object sender, System.EventArgs e) {
+            if (Database == null || Database.ReadOnly) { return; }
+
+            ColumnItem? vorlage = null;
+            if (Pad.LastClickedItem is ColumnPadItem cpi && cpi.Column.Database == Database) {
+                vorlage = cpi.Column;
+            }
+
+            var mitDaten = false;
+            if (vorlage != null && !string.IsNullOrEmpty(vorlage.Identifier)) { vorlage = null; }
+            if (vorlage != null) {
+                switch (MessageBox.Show("Spalte '" + vorlage.ReadableText() + "' als<br>Vorlage verwenden?", enImageCode.Frage, "Ja", "Ja, mit allen Daten", "Nein", "Abbrechen")) {
+                    case 0:
+                        break;
+
+                    case 1:
+                        mitDaten = true;
+                        break;
+
+                    case 2:
+                        vorlage = null;
+                        break;
+
+                    default:
+                        return;
+                }
+            }
+            var newc = Database.Column.Add();
+            if (vorlage != null) {
+                newc.CloneFrom(vorlage);
+                if (mitDaten) {
+                    foreach (var thisR in Database.Row) {
+                        thisR.CellSet(newc, thisR.CellGetString(vorlage));
+                    }
+                }
+            }
+            using (ColumnEditor w = new(newc, null)) {
+                w.ShowDialog();
+                newc.Invalidate_ColumAndContent();
+            }
+            Database.Column.Repair();
+
+            if (Arrangement > 0 && CurrentArrangement != null) { CurrentArrangement.Add(newc, false); }
+
+            Database.RepairAfterParse();
+        }
+
         private void btnSpalteEinblenden_Click(object sender, System.EventArgs e) {
             ItemCollectionList ic = new();
             foreach (var ThisColumnItem in Database.Column) {
@@ -165,40 +223,174 @@ namespace BlueControls.BlueDatabaseDialogs {
             ShowOrder();
         }
 
-        private void Pad_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e) {
+        /// <summary>
+        /// Überträgt die aktuelle Ansicht fest in den Datenbankcode hinein
+        /// </summary>
+        private void FixColumnArrangement() {
             if (Generating || Sorting) { return; }
+
+            var c = CurrentArrangement;
+            if (c == null) { return; }
+            var did = false;
+
+            Fixing++;
+
+            var done = new List<BasicPadItem>();
+            do {
+                var x = LeftestItem(done);
+                if (x == null) { break; }
+
+                if (Arrangement > 0) {
+
+                    #region Code für Ansichten > 0
+
+                    var currentVI = c.IndexOf(c[x.Column]);
+
+                    if (currentVI < 0) {
+                        c.Add(x.Column, false);
+                        currentVI = c.IndexOf(c[x.Column]);
+                        did = true;
+                    }
+
+                    if (currentVI != done.Count) {
+                        var onPosVI = c.IndexOf(c[done.Count]);
+                        c.Swap(c[onPosVI], c[currentVI]);
+                        did = true;
+                    }
+
+                    #endregion
+                } else {
+
+                    #region Code für Ansicht 0
+
+                    var currentC = Database.Column.IndexOf(x.Column);
+                    if (currentC < 0) {
+                        MessageBox.Show("Interner Fehler", enImageCode.Warnung, "OK");
+                        ShowOrder();
+                        Fixing--;
+                        return;
+                    }
+
+                    if (currentC != done.Count) {
+                        var onPosC = Database.Column.IndexOf(c[done.Count].Column);
+                        Database.Column.Swap(Database.Column[onPosC], Database.Column[currentC]);
+                        did = true;
+                    }
+
+                    #endregion
+                }
+
+                done.Add(x);
+            } while (true);
+
+            while (c.Count > done.Count) {
+                if (Arrangement > 0) {
+
+                    #region Code für Ansichten > 0
+
+                    c.RemoveAt(c.Count - 1);
+                    did = true;
+
+                    #endregion
+                } else {
+
+                    #region Code für Ansicht 0
+
+                    var col = Database.Column[c.Count - 1];
+                    if (string.IsNullOrEmpty(col.Identifier) && MessageBox.Show("Spalte <b>" + col.ReadableText() + "</b> endgültig löschen?", enImageCode.Warnung, "Ja", "Nein") == 0) {
+                        Database.Column.Remove(col);
+                    }
+                    did = true;
+                    break;
+
+                    #endregion
+                }
+            }
+
+            Fixing--;
+
+            if (Arrangement == 0 && did) {
+                Database.RepairAfterParse();
+                ShowOrder();
+            }
         }
 
-        private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
-            if (Generating || Sorting) { return; }
+        private void Item_ItemAdded(object sender, ListEventArgs e) {
+            if (e.Item is ColumnPadItem cpi) {
+                cpi.AdditionalStyleOptions = null;
+
+                var c = CurrentArrangement;
+
+                if (c != null && cpi.Column.Database == Database && Arrangement > 0) {
+                    var oo = c[cpi.Column];
+
+                    if (oo != null) {
+                        cpi.AdditionalStyleOptions = new();
+                        cpi.AdditionalStyleOptions.Add(new FlexiControlForProperty(oo, "Permanent"));
+                    }
+                }
+            }
+        }
+
+        private void Item_ItemRemoved(object sender, System.EventArgs e) {
+            Pad_MouseUp(null, null);
+        }
+
+        private ColumnPadItem? LeftestItem(List<BasicPadItem> ignore) {
+            ColumnPadItem? found = null;
+
+            foreach (var thisIt in Pad.Item) {
+                if (!ignore.Contains(thisIt) && thisIt is ColumnPadItem fi) {
+                    if (fi.Column?.Database == Database) {
+                        if (found == null || fi.UsedArea.X < found.UsedArea.X) {
+                            found = fi;
+                        }
+                    }
+                }
+            }
+
+            return found;
+        }
+
+        private void Pad_MouseUp(object? sender, System.Windows.Forms.MouseEventArgs? e) {
+            if (Generating || Sorting || Fixing > 0) { return; }
             SortColumns();
+            FixColumnArrangement();
         }
 
         private void ShowOrder() {
-            if (Generating) { Develop.DebugPrint("Generating falsch!"); }
+            if (Generating || Fixing > 0) { Develop.DebugPrint("Generating falsch!"); }
 
             Generating = true;
             Pad.Item.Clear();
 
+            ColumnPadItem? anyitem = null;
+
+            var ca = CurrentArrangement;
+            if (ca == null) { return; }
+
             #region Erst alle Spalten der eigenen Datenbank erzeugen, um später verweisen zu können
 
             var X = 0f;
-            foreach (var thisc in CurrentArrangement) {
-                var it = new ColumnPadItem(thisc.Column);
+            foreach (var thisc in ca) {
+                var it = new ColumnPadItem(thisc?.Column);
                 Pad.Item.Add(it);
                 it.SetLeftTopPoint(X, 0);
                 X = it.UsedArea.Right;
+                anyitem = it;
             }
 
             #endregion
 
+            if (anyitem == null) { return; }
+
             #region Im zweiten Durchlauf ermitteln, welche Verknüpfungen es gibt
 
-            var verkn = new List<string>();
-            foreach (var thisc in Database.Column) {
+            var dbColumnCombi = new List<string>();
+            foreach (var thisc in Database?.Column) {
                 if (thisc.LinkedDatabase != null) {
                     var dbN = thisc.LinkedDatabase.Filename + "|" + thisc.LinkedCellFilter.JoinWithCr();
-                    verkn.AddIfNotExists(dbN);
+                    dbColumnCombi.AddIfNotExists(dbN);
                 }
             }
 
@@ -207,46 +399,43 @@ namespace BlueControls.BlueDatabaseDialogs {
             #region Im dritten Durchlauf nun die Verknüpfungen erstellen
 
             var kx = 0f;
-            foreach (var thiscode in verkn) {
+            foreach (var thisCombi in dbColumnCombi) {
                 foreach (var thisc in CurrentArrangement) {
                     var it = (ColumnPadItem)Pad.Item[thisc.Column.Name];
 
                     if (thisc.Column.LinkedDatabase != null) {
                         // String als Namen als eindeutige Kennung
-                        var dbN = thisc.Column.LinkedDatabase.Filename + "|" + thisc.Column.LinkedCellFilter.JoinWithCr();
+                        var toCheckCombi = thisc.Column.LinkedDatabase.Filename + "|" + thisc.Column.LinkedCellFilter.JoinWithCr();
 
-                        if (dbN == thiscode) {
+                        if (toCheckCombi == thisCombi) {
 
                             #region Database-Item 'databItem' erzeugen
 
-                            var databItem = (GenericConnectebilePadItem)Pad.Item[dbN];
+                            var databItem = (GenericConnectebilePadItem)Pad.Item[toCheckCombi];
                             if (databItem == null) {
                                 var nam = thisc.Column.LinkedDatabase.Filename.FileNameWithSuffix();
-                                //if (thisc.Column.LinkedCell_RowKeyIsInColumn == -9999) { nam += "\r\nSKRIPT"; }
-                                databItem = new GenericConnectebilePadItem(dbN, nam, new Size(100, 300));
+                                databItem = new GenericConnectebilePadItem(toCheckCombi, nam, new Size((int)(anyitem.UsedArea.Height / 2), (int)anyitem.UsedArea.Height));
                                 Pad.Item.Add(databItem);
-                                databItem.SetLeftTopPoint(Math.Max(kx, it.UsedArea.Left), 600);
+                                databItem.SetLeftTopPoint(Math.Max(kx, it.UsedArea.Left - databItem.UsedArea.Width), 600);
                                 kx = databItem.UsedArea.Right;
                             }
 
                             #endregion
 
-                            #region LinkedDatabase-Items erzeugen
+                            #region LinkedDatabase-ColumnItems erzeugen
 
-                            #region Key aus eigener Datenbank zur Verknüpften Datenbank zeigen lassen
+                            #region ANDERE Spalten (die Filterung der Einträge) aus eigener Datenbank zur Verknüpften Datenbank zeigen lassen
 
-                            // Wenn der Key-Wert aus der Spalte geholt wird (nicht vom Skript gesteuert)....
-                            if (thisc.Column.LinkedCellFilter.Count > 0) {
-                                ///...Die Spalte ermitteln...
-                                ColumnItem rkcol = null; //thisc.Column.Database.Column.SearchByKey(thisc.Column.LinkedCellFilter.JoinWithCr());
-
-                                if (rkcol != null) {
-                                    //... das dazugehörige Item ermitteln ...
-                                    var rkcolit = (ColumnPadItem)Pad.Item[rkcol.Name];
-
-                                    //...und auf die Datenbank zeigen lassen, wenn diese existiert
-                                    rkcolit?.ConnectsTo.AddIfNotExists(new ItemConnection(databItem, enConnectionType.Bottom, enConnectionType.Top));
-                                }
+                            for (var z = 0; z < Math.Min(thisc.Column.LinkedCellFilter.Count, thisc.Column.LinkedDatabase.Column.Count); z++) {
+                                if (IntTryParse(thisc.Column.LinkedCellFilter[z], out var key)) {
+                                    var c = thisc.Column.Database.Column.SearchByKey(key);
+                                    if (c != null) {
+                                        var rkcolit = (ColumnPadItem)Pad.Item[c.Name];
+                                        rkcolit?.ConnectsTo.AddIfNotExists(new ItemConnection(databItem, enConnectionType.Top, enConnectionType.Bottom, false, true));
+                                    }
+                                }// else if (!string.IsNullOrEmpty(column.LinkedCellFilter[z]) && column.LinkedCellFilter[z].StartsWith("@")) {
+                                 //    fi.Add(new FilterItem(linkedDatabase.Column[z], enFilterType.Istgleich, column.LinkedCellFilter[z].Substring(1)));
+                                 //}
                             }
 
                             #endregion
@@ -257,20 +446,20 @@ namespace BlueControls.BlueDatabaseDialogs {
                             var it2 = new ColumnPadItem(c2);
                             Pad.Item.Add(it2);
                             it2.SetLeftTopPoint(kx, 600);
-                            it2.ConnectsTo.Add(new ItemConnection(it, enConnectionType.Left, enConnectionType.Right));
+                            it2.ConnectsTo.Add(new ItemConnection(it, enConnectionType.Bottom, enConnectionType.Top, false, true));
                             kx = it2.UsedArea.Right;
 
-                            // und noch die Datenbank  auf die Spalte zeigen lassem
-                            databItem?.ConnectsTo.AddIfNotExists(new ItemConnection(it, enConnectionType.Bottom, enConnectionType.Top));
-                        }
+                            // und noch die Datenbank auf die Spalte zeigen lassem
+                            databItem?.ConnectsTo.AddIfNotExists(new ItemConnection(it2, enConnectionType.Bottom, enConnectionType.Bottom, false, false));
 
-                        #endregion
+                            #endregion
+
+                            #endregion
+                        }
                     }
                 }
 
                 kx += 30;
-
-                #endregion
             }
 
             #endregion
@@ -281,23 +470,12 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void SortColumns() {
-            if (Sorting) { Develop.DebugPrint("Sorting falsch!"); }
+            if (Sorting || Fixing > 0) { Develop.DebugPrint("Sorting falsch!"); }
             Sorting = true;
             var done = new List<BasicPadItem>();
             var left = 0f;
             do {
-                FixedRectangleBitmapPadItem x = null;
-
-                foreach (var thisIt in Pad.Item) {
-                    if (!done.Contains(thisIt) && thisIt is ColumnPadItem fi) {
-                        if (fi.Column.Database == Database) {
-                            if (x == null || thisIt.UsedArea.X < x.UsedArea.X) {
-                                x = fi;
-                            }
-                        }
-                    }
-                }
-
+                var x = LeftestItem(done);
                 if (x == null) { break; }
                 done.Add(x);
                 x.SetLeftTopPoint(left, 0);

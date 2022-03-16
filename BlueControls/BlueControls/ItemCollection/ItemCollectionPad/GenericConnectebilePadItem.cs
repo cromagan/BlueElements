@@ -21,7 +21,7 @@ using System.Drawing;
 
 namespace BlueControls.ItemCollection {
 
-    public class GenericConnectebilePadItem : FixedRectangleBitmapPadItem {
+    public class GenericConnectebilePadItem : FixedConnectibleRectangleBitmapPadItem {
 
         #region Fields
 

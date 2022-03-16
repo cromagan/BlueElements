@@ -53,7 +53,7 @@ namespace BlueBasics {
         #region Methods
 
         public static bool Autofilter_möglich(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.Verknüpfung_zu_anderer_Datenbank or enDataFormat.Values_für_LinkedCellDropdown or enDataFormat.RelationText => true,
+            enDataFormat.Text or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.Verknüpfung_zu_anderer_Datenbank or enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems or enDataFormat.RelationText => true,
             _ => false
         };
 
@@ -63,12 +63,12 @@ namespace BlueBasics {
         };
 
         public static bool CanBeCheckedByRules(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.Verknüpfung_zu_anderer_Datenbank or enDataFormat.Values_für_LinkedCellDropdown => true,
+            enDataFormat.Text or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.Verknüpfung_zu_anderer_Datenbank or enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems => true,
             _ => false
         };
 
         public static bool DropdownItemsAllowed(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Link_To_Filesystem or enDataFormat.Values_für_LinkedCellDropdown or enDataFormat.RelationText => true,
+            enDataFormat.Text or enDataFormat.Link_To_Filesystem or enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems or enDataFormat.RelationText => true,
             _ => false
         };
 
@@ -83,7 +83,7 @@ namespace BlueBasics {
         };
 
         public static bool ExportableForLayout(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.Verknüpfung_zu_anderer_Datenbank or enDataFormat.Values_für_LinkedCellDropdown => true,
+            enDataFormat.Text or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.Verknüpfung_zu_anderer_Datenbank or enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems => true,
             _ => false
         };
 
@@ -113,12 +113,12 @@ namespace BlueBasics {
         };
 
         public static bool NeedTargetDatabase(this enDataFormat format) => format switch {
-            enDataFormat.Verknüpfung_zu_anderer_Datenbank or enDataFormat.Values_für_LinkedCellDropdown => true,
+            enDataFormat.Verknüpfung_zu_anderer_Datenbank or enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems => true,
             _ => false
         };
 
         public static bool SaveSizeData(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Values_für_LinkedCellDropdown => true,
+            enDataFormat.Text or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems => true,
             _ => false
         };
 

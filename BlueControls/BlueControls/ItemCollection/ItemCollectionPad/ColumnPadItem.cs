@@ -17,15 +17,17 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueDatabase;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection {
 
-    public class ColumnPadItem : FixedRectangleBitmapPadItem {
+    public class ColumnPadItem : FixedConnectibleRectangleBitmapPadItem {
 
         #region Fields
 
@@ -46,7 +48,65 @@ namespace BlueControls.ItemCollection {
 
         #endregion
 
+        #region Properties
+
+        public string Datenbank {
+            get {
+                if (Column == null || Column.Database == null) { return "?"; }
+                return Column.Database.Filename.FileNameWithSuffix();
+            }
+        }
+
+        public string Interner_Name {
+            get {
+                if (Column == null) { return "?"; }
+                return Column.Name;
+            }
+        }
+
+        #endregion
+
         #region Methods
+
+        public override List<FlexiControl> GetStyleOptions() {
+            List<FlexiControl> l = new() { };
+            if (Column == null) { return l; }
+
+            l.Add(new FlexiControlForProperty(this, "Datenbank"));
+            l.Add(new FlexiControlForProperty(this, "Interner Name"));
+            l.Add(new FlexiControlForProperty(this, "Spalte bearbeiten", enImageCode.Spalte));
+            l.Add(new FlexiControl());
+            l.Add(new FlexiControlForProperty(Column, "Caption"));
+            l.Add(new FlexiControl());
+            l.Add(new FlexiControlForProperty(Column, "Ueberschrift1"));
+            l.Add(new FlexiControlForProperty(Column, "Ueberschrift2"));
+            l.Add(new FlexiControlForProperty(Column, "Ueberschrift3"));
+            l.Add(new FlexiControl());
+            l.Add(new FlexiControlForProperty(Column, "Quickinfo"));
+            l.Add(new FlexiControlForProperty(Column, "AdminInfo"));
+
+            if (AdditionalStyleOptions != null) {
+                l.Add(new FlexiControl());
+                l.AddRange(AdditionalStyleOptions);
+            }
+
+            //ItemCollectionList.ItemCollectionList layouts = new();
+            //foreach (var thisLayouts in Row.Database.Layouts) {
+            //    ItemCollectionPad p = new(thisLayouts, string.Empty);
+            //    layouts.Add(p.Caption, p.Id, enImageCode.Stern);
+            //}
+            //l.Add(new FlexiControlForProperty(this, "Layout-ID", layouts));
+            //l.AddRange(base.GetStyleOptions());
+            return l;
+        }
+
+        /// <summary>
+        /// Wird von Flexoptions aufgerufen
+        /// </summary>
+        public void Spalte_bearbeiten() {
+            if (Column == null) { return; }
+            TabAdministration.OpenColumnEditor(Column, null, null);
+        }
 
         public override string ToString() {
             var t = base.ToString();

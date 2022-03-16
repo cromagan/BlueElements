@@ -304,7 +304,7 @@ namespace BlueBasics {
         /// <param name="l"></param>
         /// <param name="removeEmpty"></param>
         /// <returns></returns>
-        public static string ToString<T>(this List<T> l, bool removeEmpty) where T : IParseable? {
+        public static string ToString<T>(this List<T> l, bool removeEmpty) where T : IStringable? {
             // Remove Empty sollte eigentlich selbstverständlich seih. Ist nur als Dummy drinnen, dass der Interpreter zwischen der Internen und Extension unterscheiden kann.
             var tmp = string.Empty;
             foreach (var item in l) {

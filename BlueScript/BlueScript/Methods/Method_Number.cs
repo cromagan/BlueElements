@@ -52,10 +52,10 @@ namespace BlueScript.Methods {
                 if (Converter.DoubleTryParse(vs.ValueString, out var dbl)) {
                     return new DoItFeedback(dbl);
                 }
-                return new DoItFeedback("'" + vs.ValueString + "' kann nicht als Zahl interpretiert werden.");
+                //return new DoItFeedback("'" + vs.ValueString + "' kann nicht als Zahl interpretiert werden.");
             }
 
-            return new DoItFeedback("Interner Fehler");
+            return new DoItFeedback(attvar.Attributes[1]);
         }
 
         #endregion

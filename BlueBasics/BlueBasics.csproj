@@ -52,7 +52,7 @@
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	<LangVersion>latest</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -65,7 +65,7 @@
     <Prefer32Bit>false</Prefer32Bit>
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
-	<LangVersion>latest</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
@@ -80,7 +80,7 @@
     <Optimize>false</Optimize>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Prefer32Bit>false</Prefer32Bit>
-	<LangVersion>latest</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
@@ -92,7 +92,7 @@
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
-	<LangVersion>latest</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
@@ -109,6 +109,7 @@
     <Compile Include="Extensions\RectangleFExtension.cs" />
     <Compile Include="Cryptogaphy.cs" />
     <Compile Include="HTML.cs" />
+    <Compile Include="Interfaces\IStringable.cs" />
     <Compile Include="Interfaces\IReadableText.cs" />
     <Compile Include="Interfaces\IVersionable.cs" />
     <Compile Include="MultiUserFile\clsMultiUserFile.cs" />

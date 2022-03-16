@@ -116,7 +116,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                 //case enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
                 case enDataFormat.Verknüpfung_zu_anderer_Datenbank:
-                case enDataFormat.Values_für_LinkedCellDropdown:
+                case enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
                     (columnLinked, _, _) = CellCollection.LinkedCellData(column, row, true, false);
                     posError = true;
                     break;
@@ -200,13 +200,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void _originalDB_Disposing(object sender, System.EventArgs e) => ChangeDatabase(null);
-
-        private void btnAdminMenu_Click(object sender, System.EventArgs e) {
-            if (_tableView == null) { return; }
-            AdminMenu adm = new(_tableView);
-            adm.Show();
-            adm.BringToFront();
-        }
 
         private void btnClipboardImport_Click(object sender, System.EventArgs e) => _tableView.ImportClipboard();
 

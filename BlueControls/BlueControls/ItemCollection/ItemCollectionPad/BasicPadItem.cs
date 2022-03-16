@@ -39,6 +39,7 @@ namespace BlueControls.ItemCollection {
 
         public readonly List<PointM> PointsForSuccesfullyMove = new();
 
+        public List<FlexiControl>? AdditionalStyleOptions = null;
         private static int _uniqueInternalCount;
 
         private static string _uniqueInternalLastTime = "InitialDummy";
@@ -128,6 +129,7 @@ namespace BlueControls.ItemCollection {
 
         /// <summary>
         /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht.
+        /// nicht berücksichtigt werden z.b. Verbindungslinien zu anderen Objekten
         /// </summary>
         /// <remarks></remarks>
         public RectangleF UsedArea {
@@ -321,6 +323,11 @@ namespace BlueControls.ItemCollection {
                 new FlexiControlForProperty(this, "Gruppenzugehörigkeit"),
                 new FlexiControlForProperty(this, "Bei_Export_sichtbar")
             };
+            if (AdditionalStyleOptions != null) {
+                l.Add(new FlexiControl());
+                l.AddRange(AdditionalStyleOptions);
+            }
+
             return l;
         }
 
@@ -336,14 +343,9 @@ namespace BlueControls.ItemCollection {
             OnChanged();
         }
 
-        ///// <summary>
-        ///// OnChanged wird nicht im Parsing gemacht
-        ///// </summary>
-        //[Obsolete]
-        //public void RecalculateAndOnChanged() {
-        //    CaluclatePointsWORelations();
-        //    if (!IsParsing) { OnChanged(); }
-        //}
+        /// <summary>
+        /// Invalidiert UsedArea und löst das Ereignis Changed aus
+        /// </summary>
         public void OnChanged() {
             //if (this is IParseable O && O.IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             _usedArea = default;

@@ -40,7 +40,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnPowerBearbeitung = new BlueControls.Controls.Button();
             this.btnZeileLöschen = new BlueControls.Controls.Button();
             this.btnDatenüberprüfung = new BlueControls.Controls.Button();
-            this.btnAdminMenu = new BlueControls.Controls.Button();
             this.btnSpaltenanordnung = new BlueControls.Controls.Button();
             this.grpBearbeiten = new BlueControls.Controls.GroupBox();
             this.grpAllgemein.SuspendLayout();
@@ -179,17 +178,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnDatenüberprüfung.Text = "Datenüber-prüfung";
             this.btnDatenüberprüfung.Click += new System.EventHandler(this.btnDatenüberprüfung_Click);
             // 
-            // btnAdminMenu
-            // 
-            this.btnAdminMenu.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
-            this.btnAdminMenu.ImageCode = "Zahnrad||||FF0000";
-            this.btnAdminMenu.Location = new System.Drawing.Point(200, 0);
-            this.btnAdminMenu.Name = "btnAdminMenu";
-            this.btnAdminMenu.Size = new System.Drawing.Size(56, 72);
-            this.btnAdminMenu.TabIndex = 40;
-            this.btnAdminMenu.Text = "Admin-Menu";
-            this.btnAdminMenu.Click += new System.EventHandler(this.btnAdminMenu_Click);
-            // 
             // btnSpaltenanordnung
             // 
             this.btnSpaltenanordnung.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
@@ -206,7 +194,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpBearbeiten.CausesValidation = false;
             this.grpBearbeiten.Controls.Add(this.btnPowerBearbeitung);
             this.grpBearbeiten.Controls.Add(this.btnSpaltenanordnung);
-            this.grpBearbeiten.Controls.Add(this.btnAdminMenu);
             this.grpBearbeiten.Controls.Add(this.btnLayouts);
             this.grpBearbeiten.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpBearbeiten.Location = new System.Drawing.Point(208, 0);
@@ -242,7 +229,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private Button btnVorherigeVersion;
         private GroupBox grpTabellenAnsicht;
         private GroupBox grpZeilen;
-        private Button btnAdminMenu;
         private Button btnDatenüberprüfung;
         private Button btnZeileLöschen;
         private Button btnPowerBearbeitung;

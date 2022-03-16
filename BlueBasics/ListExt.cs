@@ -254,9 +254,9 @@ namespace BlueBasics {
         public override string ToString() {
             Develop.DebugPrint_Disposed(Disposed);
             try {
-                if (typeof(IParseable).IsAssignableFrom(typeof(T))) {
+                if (typeof(IStringable).IsAssignableFrom(typeof(T))) {
                     System.Text.StringBuilder a = new();
-                    foreach (IParseable thisP in this) {
+                    foreach (IStringable thisP in this) {
                         if (thisP != null) {
                             a.Append(thisP.ToString());
                             a.Append("\r");

@@ -17,11 +17,11 @@
 
 namespace BlueBasics.Interfaces {
 
-    public interface IParseable : IChangedFeedback, IStringable {
+    public interface IStringable {
 
         #region Methods
 
-        void Parse(string toParse);
+        string ToString();
 
         #endregion
     }

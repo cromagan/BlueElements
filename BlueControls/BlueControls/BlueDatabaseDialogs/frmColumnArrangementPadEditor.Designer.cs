@@ -24,6 +24,8 @@
         /// </summary>
         private void InitializeComponent() {
             this.tabAnsichten = new System.Windows.Forms.TabPage();
+            this.grpSpalten = new BlueControls.Controls.GroupBox();
+            this.btnNeueSpalte = new BlueControls.Controls.Button();
             this.grpAktuelleAnsicht = new BlueControls.Controls.GroupBox();
             this.btnSystemspaltenAusblenden = new BlueControls.Controls.Button();
             this.btnSpalteEinblenden = new BlueControls.Controls.Button();
@@ -40,25 +42,25 @@
             this.tabStart.SuspendLayout();
             this.grpAssistent.SuspendLayout();
             this.tabAnsichten.SuspendLayout();
+            this.grpSpalten.SuspendLayout();
             this.grpAktuelleAnsicht.SuspendLayout();
             this.grpAnsichtsVerwaltung.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabRightSide
             // 
-            this.tabRightSide.Location = new System.Drawing.Point(428, 110);
+            this.tabRightSide.Location = new System.Drawing.Point(612, 110);
             this.tabRightSide.Size = new System.Drawing.Size(372, 340);
             // 
             // Pad
             // 
-            this.Pad.Size = new System.Drawing.Size(428, 340);
-            this.Pad.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Pad_MouseDown);
+            this.Pad.Size = new System.Drawing.Size(612, 340);
             this.Pad.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Pad_MouseUp);
             // 
             // Ribbon
             // 
             this.Ribbon.Controls.Add(this.tabAnsichten);
-            this.Ribbon.Size = new System.Drawing.Size(800, 110);
+            this.Ribbon.Size = new System.Drawing.Size(984, 110);
             this.Ribbon.TabDefault = this.tabAnsichten;
             this.Ribbon.TabDefaultOrder = new string[] {
         "Ansichten",
@@ -69,18 +71,44 @@
             // 
             // tabStart
             // 
-            this.tabStart.Size = new System.Drawing.Size(792, 81);
+            this.tabStart.Size = new System.Drawing.Size(976, 81);
             // 
             // tabAnsichten
             // 
             this.tabAnsichten.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.tabAnsichten.Controls.Add(this.grpSpalten);
             this.tabAnsichten.Controls.Add(this.grpAktuelleAnsicht);
             this.tabAnsichten.Controls.Add(this.grpAnsichtsVerwaltung);
             this.tabAnsichten.Location = new System.Drawing.Point(4, 25);
             this.tabAnsichten.Name = "tabAnsichten";
-            this.tabAnsichten.Size = new System.Drawing.Size(876, 81);
+            this.tabAnsichten.Size = new System.Drawing.Size(976, 81);
             this.tabAnsichten.TabIndex = 4;
             this.tabAnsichten.Text = "Ansichten";
+            // 
+            // grpSpalten
+            // 
+            this.grpSpalten.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpSpalten.CausesValidation = false;
+            this.grpSpalten.Controls.Add(this.btnNeueSpalte);
+            this.grpSpalten.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpSpalten.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
+            this.grpSpalten.Location = new System.Drawing.Point(696, 0);
+            this.grpSpalten.Name = "grpSpalten";
+            this.grpSpalten.Size = new System.Drawing.Size(168, 81);
+            this.grpSpalten.TabIndex = 6;
+            this.grpSpalten.TabStop = false;
+            this.grpSpalten.Text = "Spalten";
+            // 
+            // btnNeueSpalte
+            // 
+            this.btnNeueSpalte.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnNeueSpalte.ImageCode = "PlusZeichen";
+            this.btnNeueSpalte.Location = new System.Drawing.Point(8, 2);
+            this.btnNeueSpalte.Name = "btnNeueSpalte";
+            this.btnNeueSpalte.Size = new System.Drawing.Size(64, 66);
+            this.btnNeueSpalte.TabIndex = 3;
+            this.btnNeueSpalte.Text = "neue Spalte";
+            this.btnNeueSpalte.Click += new System.EventHandler(this.btnNeueSpalte_Click);
             // 
             // grpAktuelleAnsicht
             // 
@@ -217,15 +245,16 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(984, 450);
             this.Name = "frmColumnArrangementPadEditor";
-            this.Text = "frmColumnArrangementPadEditor";
+            this.Text = "Spalten-Editor";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.grpDesign.ResumeLayout(false);
             this.Ribbon.ResumeLayout(false);
             this.tabStart.ResumeLayout(false);
             this.grpAssistent.ResumeLayout(false);
             this.tabAnsichten.ResumeLayout(false);
+            this.grpSpalten.ResumeLayout(false);
             this.grpAktuelleAnsicht.ResumeLayout(false);
             this.grpAnsichtsVerwaltung.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -246,5 +275,7 @@
         private Controls.Button btnSpalteEinblenden;
         private Controls.Button btnAlleSpaltenEinblenden;
         private Controls.Button btnBerechtigungsgruppen;
+        internal Controls.GroupBox grpSpalten;
+        private Controls.Button btnNeueSpalte;
     }
 }

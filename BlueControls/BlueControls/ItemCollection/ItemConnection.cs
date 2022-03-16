@@ -15,7 +15,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Enums;
 using BlueControls.Enums;
+using System.Drawing;
+using static BlueBasics.Extensions;
 
 namespace BlueControls.ItemCollection {
 
@@ -23,20 +26,46 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
-        public FixedRectangleBitmapPadItem Item;
-
+        public bool ArrowOnMyItem = false;
+        public bool ArrowOnOtherItem = false;
         public enConnectionType MyItemType;
-
+        public FixedConnectibleRectangleBitmapPadItem OtherItem;
         public enConnectionType OtherItemType;
 
         #endregion
 
         #region Constructors
 
-        public ItemConnection(FixedRectangleBitmapPadItem item, enConnectionType otherItemType, enConnectionType myItemType) {
-            Item = item;
+        public ItemConnection(FixedConnectibleRectangleBitmapPadItem otheritem, enConnectionType otherItemType, enConnectionType myItemType, bool arrowOnMyItem, bool arrowOnOtherItem) {
+            OtherItem = otheritem;
             OtherItemType = otherItemType;
             MyItemType = myItemType;
+            ArrowOnMyItem = arrowOnMyItem;
+            ArrowOnOtherItem = arrowOnOtherItem;
+        }
+
+        #endregion
+
+        #region Methods
+
+        public static PointF GetConnectionPoint(FixedConnectibleRectangleBitmapPadItem item, enConnectionType itemc, FixedConnectibleRectangleBitmapPadItem otherItem) {
+            switch (itemc) {
+                case enConnectionType.Top:
+                    return item.UsedArea.PointOf(enAlignment.Top_HorizontalCenter);
+
+                case enConnectionType.Bottom:
+                    return item.UsedArea.PointOf(enAlignment.Bottom_HorizontalCenter);
+
+                case enConnectionType.Left:
+                    return item.UsedArea.PointOf(enAlignment.VerticalCenter_Left);
+
+                case enConnectionType.Right:
+                    return item.UsedArea.PointOf(enAlignment.VerticalCenter_Right);
+
+                default:
+                    var m1 = otherItem.UsedArea.PointOf(enAlignment.Horizontal_Vertical_Center);
+                    return item.UsedArea.NearestLineMiddle(m1);
+            }
         }
 
         #endregion

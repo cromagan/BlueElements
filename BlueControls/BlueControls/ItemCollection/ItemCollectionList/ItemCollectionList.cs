@@ -174,7 +174,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
                 //    }
                 //    break;
 
-                case enDataFormat.Values_für_LinkedCellDropdown:
+                case enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
                     var db2 = column.LinkedDatabase;
                     if (db2 == null) { Notification.Show("Verknüpfte Datenbank nicht vorhanden", enImageCode.Information); return; }
 
