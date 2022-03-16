@@ -12,8 +12,8 @@ namespace BlueControls.Controls {
     {
         #region Fields
 
-        private readonly List<BitmapExt?> _pic = new();
-        private List<string>? _files = new();
+        private readonly List<BitmapExt> _pic = new();
+        private List<string> _files = new();
         private int _nr;
 
         #endregion
@@ -83,7 +83,7 @@ namespace BlueControls.Controls {
         }
 
         private void SetPic() {
-            Bitmap bitmap = null;
+            Bitmap? bitmap = null;
             if (_pic.Count > 0) {
                 if (_pic[_nr] == null) {
                     _pic[_nr] = new BitmapExt(_files[_nr], true);

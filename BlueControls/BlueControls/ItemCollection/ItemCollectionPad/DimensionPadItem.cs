@@ -78,7 +78,7 @@ namespace BlueControls.ItemCollection {
             if (point2 != null) { _point2.SetTo(point2.X, point2.Y); }
             ComputeData();
 
-            var a = PolarToCartesian(Converter.MmToPixel(abstandinMm, ItemCollectionPad.Dpi), _winkel - 90f);
+            var a = PolarToCartesian(MmToPixel(abstandinMm, ItemCollectionPad.Dpi), _winkel - 90f);
             _textPoint.SetTo(_point1, _länge / 2, _winkel);
             _textPoint.X += a.X;
             _textPoint.Y += a.Y;
@@ -87,7 +87,7 @@ namespace BlueControls.ItemCollection {
             Text_Unten = string.Empty;
             Nachkommastellen = 1;
 
-            Stil = PadStyles.Style_StandardAlternativ;
+            Stil = enPadStyles.Style_StandardAlternativ;
             _point1.Parent = this;
             _point2.Parent = this;
             _textPoint.Parent = this;
@@ -110,7 +110,7 @@ namespace BlueControls.ItemCollection {
 
         #region Properties
 
-        public float Länge_In_Mm => (float)Math.Round(Converter.PixelToMm(_länge, ItemCollectionPad.Dpi), Nachkommastellen);
+        public float Länge_In_Mm => (float)Math.Round(PixelToMm(_länge, ItemCollectionPad.Dpi), Nachkommastellen);
 
         public int Nachkommastellen { get; set; }
 
@@ -239,7 +239,7 @@ namespace BlueControls.ItemCollection {
         }
 
         protected override RectangleF CalculateUsedArea() {
-            if (Stil == PadStyles.Undefiniert) { return new RectangleF(0, 0, 0, 0); }
+            if (Stil == enPadStyles.Undefiniert) { return new RectangleF(0, 0, 0, 0); }
             var geszoom = Parent.SheetStyleScale * Skalierung;
             var f = Skin.GetBlueFont(Stil, Parent.SheetStyle);
             var sz1 = BlueFont.MeasureString(Angezeigter_Text_Oben(), f.Font(geszoom));
@@ -258,7 +258,7 @@ namespace BlueControls.ItemCollection {
         protected override string ClassId() => "DIMENSION";
 
         protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
-            if (Stil == PadStyles.Undefiniert) { return; }
+            if (Stil == enPadStyles.Undefiniert) { return; }
             var geszoom = Parent.SheetStyleScale * Skalierung * zoom;
             var f = Skin.GetBlueFont(Stil, Parent.SheetStyle);
             var pfeilG = f.Font(geszoom).Size * 0.8f;
@@ -277,11 +277,11 @@ namespace BlueControls.ItemCollection {
             var p1 = _schnittPunkt1.ZoomAndMove(zoom, shiftX, shiftY);
             var p2 = _schnittPunkt2.ZoomAndMove(zoom, shiftX, shiftY);
             if (sz1.Width + (pfeilG * 2f) < GetLenght(p1, p2)) {
-                DrawArrow(gr, p1, _winkel, f.Color_Main, pfeilG);
-                DrawArrow(gr, p2, _winkel + 180, f.Color_Main, pfeilG);
+                DrawArrow(gr, p1, _winkel, f.ColorMain, pfeilG);
+                DrawArrow(gr, p2, _winkel + 180, f.ColorMain, pfeilG);
             } else {
-                DrawArrow(gr, p1, _winkel + 180, f.Color_Main, pfeilG);
-                DrawArrow(gr, p2, _winkel, f.Color_Main, pfeilG);
+                DrawArrow(gr, p1, _winkel + 180, f.ColorMain, pfeilG);
+                DrawArrow(gr, p2, _winkel, f.ColorMain, pfeilG);
             }
             var mitte = _textPoint.ZoomAndMove(zoom, shiftX, shiftY);
             var textWinkel = _winkel % 360;
@@ -307,7 +307,7 @@ namespace BlueControls.ItemCollection {
 
         private void CalculateOtherPoints() {
             var tmppW = -90;
-            var mhlAb = Converter.MmToPixel(1.5f * Skalierung / 3.07f, ItemCollectionPad.Dpi); // Den Abstand der Maßhilsfline, in echten MM
+            var mhlAb = MmToPixel(1.5f * Skalierung / 3.07f, ItemCollectionPad.Dpi); // Den Abstand der Maßhilsfline, in echten MM
             ComputeData();
 
             //Gegeben sind:

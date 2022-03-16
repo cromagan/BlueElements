@@ -69,7 +69,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 return;
             }
 
-            var ind = Database.Layouts.LayoutIDToIndex(fileOrLayoutId);
+            var ind = Database.Layouts.LayoutIdToIndex(fileOrLayoutId);
             if (ind < 0) {
                 if (fileOrLayoutId.FileSuffix().ToUpper() == "BCR") {
                     LoadFile(fileOrLayoutId, fileOrLayoutId);
@@ -77,7 +77,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                     DisablePad();
                     TextPadItem x = new("x", "Nicht editierbares Layout aus dem Dateisystem");
                     Pad.Item.Add(x);
-                    x.Stil = Enums.PadStyles.Style_Überschrift_Haupt;
+                    x.Stil = Enums.enPadStyles.Style_Überschrift_Haupt;
                     x.SetCoordinates(new RectangleF(0, 0, 1000, 400), true);
                     ItemChanged();
                 }
@@ -128,7 +128,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnLayoutLöschen_Click(object sender, System.EventArgs e) {
             SaveCurrentLayout();
-            var ind = Database.Layouts.LayoutIDToIndex(Pad.Item.Id);
+            var ind = Database.Layouts.LayoutIdToIndex(Pad.Item.Id);
             if (ind < 0) {
                 MessageBox.Show("Layout kann nur manuell gelöscht werden.");
                 return;
@@ -144,7 +144,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnLayoutUmbenennen_Click(object sender, System.EventArgs e) {
             SaveCurrentLayout();
-            var ind = Database.Layouts.LayoutIDToIndex(Pad.Item.Id);
+            var ind = Database.Layouts.LayoutIdToIndex(Pad.Item.Id);
             if (ind < 0) {
                 MessageBox.Show("Layout kann nur manuell umbenannt werden.");
                 return;
@@ -184,7 +184,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 cbxLayout.Text = string.Empty;
                 DisablePad();
             }
-            var ind = Database.Layouts.LayoutIDToIndex(cbxLayout.Text);
+            var ind = Database.Layouts.LayoutIdToIndex(cbxLayout.Text);
             if (ind < 0 && cbxLayout.Text.FileSuffix().ToUpper() != "BCR" && FileExists(cbxLayout.Text)) {
                 btnTextEditor.Enabled = true;
                 btnLayoutOeffnen.Enabled = true;
@@ -214,7 +214,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             scriptEditor.WriteScriptBack();
             if (Database == null) { return; }
             var newl = Pad.Item.ToString();
-            var ind = Database.Layouts.LayoutIDToIndex(Pad.Item.Id);
+            var ind = Database.Layouts.LayoutIdToIndex(Pad.Item.Id);
             if (ind > -1) {
                 if (Database.Layouts[ind] == newl) { return; }
                 Database.Layouts[ind] = newl;

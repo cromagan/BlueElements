@@ -168,7 +168,7 @@ namespace BlueScript.Variables {
         }
 
         public static Variable? GetSystem(this List<Variable> vars, string name) => vars.FirstOrDefault(thisv =>
-                                                                          thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper());
+                                                                                thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper());
 
         public static void RemoveWithComent(this List<Variable> vars, string coment) {
             var z = 0;

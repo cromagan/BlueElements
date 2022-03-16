@@ -2572,7 +2572,9 @@ namespace BlueControls.Controls {
             var s = enStates.Standard;
             if (!Enabled) { s = enStates.Standard_Disabled; }
             if (e.Cecked) { s |= enStates.Checked; }
-            Button.DrawButton(this, gr, enDesign.Button_CheckBox, s, e.Image, enAlignment.Horizontal_Vertical_Center, false, null, e.Text, cellrectangle, true);
+
+            var x = new ExtText(enDesign.Button_CheckBox, s);
+            Button.DrawButton(this, gr, enDesign.Button_CheckBox, s, e.Image, enAlignment.Horizontal_Vertical_Center, false, x, e.Text, cellrectangle, true);
         }
 
         /// <summary>
@@ -2720,12 +2722,15 @@ namespace BlueControls.Controls {
                         var si = gr.MeasureString(currentRow.Chapter, _chapterFont.Font());
                         gr.FillRectangle(new SolidBrush(Skin.Color_Back(enDesign.Table_And_Pad, enStates.Standard).SetAlpha(50)), 1, DrawY(currentRow) - RowCaptionSizeY, displayRectangleWoSlider.Width - 2, RowCaptionSizeY);
                         currentRow.CaptionPos = new Rectangle(1, DrawY(currentRow) - _rowCaptionFontY, (int)si.Width + 28, (int)si.Height);
+
                         if (_collapsed.Contains(currentRow.Chapter)) {
-                            Button.DrawButton(this, gr, enDesign.Button_CheckBox, enStates.Checked, null, enAlignment.Horizontal_Vertical_Center, false, null, string.Empty, currentRow.CaptionPos, false);
-                            gr.DrawImage(QuickImage.Get("Pfeil_Unten_Scrollbar|14|||FF0000||200|200"), 5, DrawY(currentRow) - _rowCaptionFontY + 6);
+                            var x = new ExtText(enDesign.Button_CheckBox, enStates.Checked);
+                            Button.DrawButton(this, gr, enDesign.Button_CheckBox, enStates.Checked, null, enAlignment.Horizontal_Vertical_Center, false, x, string.Empty, currentRow.CaptionPos, false);
+                            gr.DrawImage(QuickImage.Get("Pfeil_Unten_Scrollbar|14|||FF0000||200|200")!, 5, DrawY(currentRow) - _rowCaptionFontY + 6);
                         } else {
-                            Button.DrawButton(this, gr, enDesign.Button_CheckBox, enStates.Standard, null, enAlignment.Horizontal_Vertical_Center, false, null, string.Empty, currentRow.CaptionPos, false);
-                            gr.DrawImage(QuickImage.Get("Pfeil_Rechts_Scrollbar|14|||||0"), 5, DrawY(currentRow) - _rowCaptionFontY + 6);
+                            var x = new ExtText(enDesign.Button_CheckBox, enStates.Standard);
+                            Button.DrawButton(this, gr, enDesign.Button_CheckBox, enStates.Standard, null, enAlignment.Horizontal_Vertical_Center, false, x, string.Empty, currentRow.CaptionPos, false);
+                            gr.DrawImage(QuickImage.Get("Pfeil_Rechts_Scrollbar|14|||||0")!, 5, DrawY(currentRow) - _rowCaptionFontY + 6);
                         }
                         _chapterFont.DrawString(gr, currentRow.Chapter, 23, DrawY(currentRow) - _rowCaptionFontY);
                         gr.DrawLine(Skin.PenLinieDick, 0, DrawY(currentRow), displayRectangleWoSlider.Width, DrawY(currentRow));
@@ -2820,7 +2825,7 @@ namespace BlueControls.Controls {
                     gr.DrawImage(QuickImage.Get("Warnung|16||||||120||50"), new Point(r.Right - 19, (int)(r.Top + ((r.Height - 16) / 2.0))));
                 }
                 if (currentRow.ShowCap) {
-                    BlueFont.DrawString(gr, currentRow.Chapter, _chapterFont.Font(), _chapterFont.Brush_Color_Main, 0, DrawY(currentRow) - _rowCaptionFontY);
+                    BlueFont.DrawString(gr, currentRow.Chapter, _chapterFont.Font(), _chapterFont.BrushColorMain, 0, DrawY(currentRow) - _rowCaptionFontY);
                 }
             }
             Skin.Draw_Border(gr, enDesign.ListBox, state, displayRectangleWoSlider);

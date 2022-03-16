@@ -34,10 +34,10 @@ namespace BlueControls.Controls {
 
         #region Fields
 
-        public string _filename = string.Empty;
-        public int _maxCount = 20;
-        public bool _mustExists = true;
-        private List<string?> LastD = new();
+        private string _filename = string.Empty;
+        private List<string> _lastD = new();
+        private int _maxCount = 20;
+        private bool _mustExists = true;
 
         #endregion
 
@@ -94,12 +94,12 @@ namespace BlueControls.Controls {
             s = s.Replace("\r", ";");
             s = s.Replace("\n", ";");
             if (!_mustExists || FileExists(fileName)) {
-                if (LastD.Count > 0) { LastD.RemoveString(fileName, false); }
-                if (LastD.Count > 0) { LastD.RemoveString(s, false); }
-                LastD.Add(s);
+                if (_lastD.Count > 0) { _lastD.RemoveString(fileName, false); }
+                if (_lastD.Count > 0) { _lastD.RemoveString(s, false); }
+                _lastD.Add(s);
 
                 if (CanWriteInDirectory(SaveFileName().FilePath())) {
-                    LastD.Save(SaveFileName(), System.Text.Encoding.UTF8, false);
+                    _lastD.Save(SaveFileName(), System.Text.Encoding.UTF8, false);
                 }
             }
             GenerateMenu();
@@ -123,17 +123,17 @@ namespace BlueControls.Controls {
         }
 
         private void GenerateMenu() {
-            var NR = -1;
-            var Vis = false;
+            var nr = -1;
+            var vis = false;
             Item.Clear();
-            for (var Z = LastD.Count - 1; Z >= 0; Z--) {
-                var x = LastD[Z].SplitAndCutBy("|");
+            for (var z = _lastD.Count - 1; z >= 0; z--) {
+                var x = _lastD[z].SplitAndCutBy("|");
                 if (x != null && x.GetUpperBound(0) >= 0 && !string.IsNullOrEmpty(x[0]) && Item[x[0]] is null) {
                     if (!_mustExists || FileExists(x[0])) {
-                        NR++;
-                        if (NR < MaxCount) {
-                            Vis = true;
-                            var show = (NR + 1).ToString(Constants.Format_Integer3) + ": ";
+                        nr++;
+                        if (nr < MaxCount) {
+                            vis = true;
+                            var show = (nr + 1).ToString(Constants.Format_Integer3) + ": ";
                             if (_mustExists) {
                                 show += x[0].FileNameWithSuffix();
                             } else {
@@ -143,7 +143,7 @@ namespace BlueControls.Controls {
                                 show = show + " - " + x[1];
                             }
                             TextListItem it = new(show, x[0], null, false, true,
-                                NR.ToString(Constants.Format_Integer3));
+                                nr.ToString(Constants.Format_Integer3));
                             List<string> t = new();
                             if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1])) {
                                 t.Add(x[1]);
@@ -156,15 +156,15 @@ namespace BlueControls.Controls {
                     }
                 }
             }
-            Enabled = Vis;
+            Enabled = vis;
         }
 
         private void LoadFromDisk() {
-            LastD = new List<string?>();
+            _lastD = new List<string?>();
             if (FileExists(SaveFileName())) {
                 var t = File.ReadAllText(SaveFileName(), System.Text.Encoding.UTF8);
                 t = t.RemoveChars("\n");
-                LastD.AddRange(t.SplitAndCutByCr());
+                _lastD.AddRange(t.SplitAndCutByCr());
             }
         }
 

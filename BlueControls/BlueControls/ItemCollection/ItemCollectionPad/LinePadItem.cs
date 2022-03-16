@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -33,9 +35,9 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
-        internal PointM? Point1;
+        private readonly PointM? _point1;
 
-        internal PointM? Point2;
+        private readonly PointM? _point2;
 
         private string _calcTempPointsCode = string.Empty;
         private DateTime _lastRecalc = DateTime.Now.AddHours(-1);
@@ -46,17 +48,17 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public LinePadItem(string internalname) : this(internalname, PadStyles.Style_Standard, Point.Empty, Point.Empty) { }
+        public LinePadItem(string internalname) : this(internalname, enPadStyles.Style_Standard, Point.Empty, Point.Empty) { }
 
-        public LinePadItem(PadStyles format, Point point1, Point point2) : this(string.Empty, format, point1, point2) { }
+        public LinePadItem(enPadStyles format, Point point1, Point point2) : this(string.Empty, format, point1, point2) { }
 
-        public LinePadItem(string internalname, PadStyles format, Point point1, Point point2) : base(internalname) {
-            Point1 = new PointM(this, "Punkt 1", 0, 0);
-            Point2 = new PointM(this, "Punkt 2", 0, 0);
-            Point1.SetTo(point1);
-            Point2.SetTo(point2);
-            MovablePoint.Add(Point1);
-            MovablePoint.Add(Point2);
+        public LinePadItem(string internalname, enPadStyles format, Point point1, Point point2) : base(internalname) {
+            _point1 = new PointM(this, "Punkt 1", 0, 0);
+            _point2 = new PointM(this, "Punkt 2", 0, 0);
+            _point1.SetTo(point1);
+            _point2.SetTo(point2);
+            MovablePoint.Add(_point1);
+            MovablePoint.Add(_point2);
             PointsForSuccesfullyMove.AddRange(MovablePoint);
             Stil = format;
             _tempPoints = new List<PointF>();
@@ -75,7 +77,7 @@ namespace BlueControls.ItemCollection {
 
         public override bool Contains(PointF value, float zoomfactor) {
             var ne = 5 / zoomfactor;
-            if (Point1.X == 0d && Point2.X == 0d && Point1.Y == 0d && Point2.Y == 0d) { return false; }
+            if (_point1.X == 0d && _point2.X == 0d && _point1.Y == 0d && _point2.Y == 0d) { return false; }
             if (_tempPoints != null && _tempPoints.Count == 0) { CalcTempPoints(); }
             if (_tempPoints != null && _tempPoints.Count == 0) { return false; }
             for (var z = 0; z <= _tempPoints.Count - 2; z++) {
@@ -135,8 +137,8 @@ namespace BlueControls.ItemCollection {
         public override void PointMoved(object sender, MoveEventArgs e) => CalcTempPoints();
 
         public void SetCoordinates(float px1, float py1, float px2, float py2) {
-            Point1.SetTo(px1, py1);
-            Point2.SetTo(px2, py2);
+            _point1.SetTo(px1, py1);
+            _point2.SetTo(px2, py2);
             //p_ML.SetTo(r.PointOf(enAlignment.VerticalCenter_Left));
             //p_MR.SetTo(r.PointOf(enAlignment.VerticalCenter_Right));
             //base.SetCoordinates(r);
@@ -150,7 +152,7 @@ namespace BlueControls.ItemCollection {
         }
 
         protected override RectangleF CalculateUsedArea() {
-            if (Point1.X == 0d && Point2.X == 0d && Point1.Y == 0d && Point2.Y == 0d) { return RectangleF.Empty; }
+            if (_point1.X == 0d && _point2.X == 0d && _point1.Y == 0d && _point2.Y == 0d) { return RectangleF.Empty; }
             if (_tempPoints.Count == 0) { CalcTempPoints(); }
             if (_tempPoints.Count == 0) { return RectangleF.Empty; }
             var x1 = float.MaxValue;
@@ -170,7 +172,7 @@ namespace BlueControls.ItemCollection {
         protected override string ClassId() => "LINE";
 
         protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
-            if (Stil == PadStyles.Undefiniert) { return; }
+            if (Stil == enPadStyles.Undefiniert) { return; }
             CalcTempPoints();
             if (_tempPoints.Count == 0) { return; }
             for (var z = 0; z <= _tempPoints.Count - 2; z++) {
@@ -222,7 +224,7 @@ namespace BlueControls.ItemCollection {
         }
 
         private void CalcTempPoints() {
-            var newCode = Point1 + Point2.ToString();
+            var newCode = _point1 + _point2.ToString();
             if (_calcTempPointsCode != newCode) {
                 _calcTempPointsCode = newCode;
                 _tempPoints = null;
@@ -240,8 +242,8 @@ namespace BlueControls.ItemCollection {
             _calcTempPointsCode = newCode;
             _tempPoints = new List<PointF>
             {
-                Point1,
-                Point2
+                _point1,
+                _point2
             };
             if (Linien_Verhalten == enConectorStyle.Direct) { return; }
             var count = 0;
@@ -292,8 +294,8 @@ namespace BlueControls.ItemCollection {
         }
 
         private bool LöscheVerdeckte(int p1) {
-            if (_tempPoints[p1].Equals(Point1)) { return false; }
-            if (_tempPoints[p1].Equals(Point2)) { return false; }
+            if (_tempPoints[p1].Equals(_point1)) { return false; }
+            if (_tempPoints[p1].Equals(_point2)) { return false; }
 
             if (IsVerdeckt(_tempPoints[p1].X, _tempPoints[p1].Y)) {
                 _tempPoints.RemoveAt(p1);

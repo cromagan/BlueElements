@@ -629,7 +629,7 @@ namespace BlueControls.Controls {
         }
 
         private void Marker_DoWork(object sender, DoWorkEventArgs e) {
-            TextBox txb = null;
+            TextBox? txb = null;
 
             foreach (var control in Controls) {
                 if (control is TextBox t) { txb = t; }
@@ -640,7 +640,11 @@ namespace BlueControls.Controls {
             if (_tmpRow == null) { return; }
             if (Marker.CancellationPending) { return; }
             List<string> names = new();
-            names.AddRange(_database.Column[0].GetUcaseNamesSortedByLenght());
+            if (_database == null) { return; }
+
+            var col = _database.Column[0];
+            if (col == null) { return; }
+            names.AddRange(col.GetUcaseNamesSortedByLenght());
             if (Marker.CancellationPending) { return; }
             var myname = _tmpRow.CellFirstString().ToUpper();
             var initT = txb.Text;
@@ -648,10 +652,10 @@ namespace BlueControls.Controls {
 
             do {
                 ok = true;
-                Marker.ReportProgress(0, new List<object> { txb, "Unmark1" });
+                Marker.ReportProgress(0, new List<object?> { txb, "Unmark1" });
                 Develop.DoEvents();
                 if (Marker.CancellationPending || initT != txb.Text) { return; }
-                Marker.ReportProgress(0, new List<object> { txb, "Unmark2" });
+                Marker.ReportProgress(0, new List<object?> { txb, "Unmark2" });
                 Develop.DoEvents();
                 if (Marker.CancellationPending || initT != txb.Text) { return; }
                 try {
@@ -663,9 +667,9 @@ namespace BlueControls.Controls {
                             var fo = initT.IndexOfWord(thisWord, cap, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                             if (fo < 0) { break; }
                             if (thisWord == myname) {
-                                Marker.ReportProgress(0, new List<object> { txb, "Mark1", fo, fo + thisWord.Length - 1 });
+                                Marker.ReportProgress(0, new List<object?> { txb, "Mark1", fo, fo + thisWord.Length - 1 });
                             } else {
-                                Marker.ReportProgress(0, new List<object> { txb, "Mark2", fo, fo + thisWord.Length - 1 });
+                                Marker.ReportProgress(0, new List<object?> { txb, "Mark2", fo, fo + thisWord.Length - 1 });
                             }
                             cap = fo + thisWord.Length;
                         } while (true);

@@ -25,11 +25,11 @@ namespace BlueScript.Structures {
 
         #region Fields
 
-        public string ErrorMessage;
+        internal readonly string ErrorMessage;
 
-        public int Position;
+        internal readonly int Position;
 
-        public Variable? Variable;
+        internal readonly Variable? Variable;
 
         #endregion
 

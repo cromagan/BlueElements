@@ -100,7 +100,6 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EventArgs\CommandForMacroArgs.cs" />
     <Compile Include="EventArgs\BitmapEventArgs.cs" />
     <Compile Include="MainWindow.cs">
       <SubType>Form</SubType>

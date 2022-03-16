@@ -331,18 +331,18 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (string.IsNullOrEmpty(_database.FileEncryptionKey)) {
                 newKey = new string(Enumerable.Repeat("abcdefghijklmnopqrstuvwxyz הצü#_-<>ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 10).Select(s => s[Constants.GlobalRND.Next(s.Length)]).ToArray());
                 foreach (var thisFile in lLCase) {
-                    var b = Converter.FileToByte(thisFile);
+                    var b = FileToByte(thisFile);
                     b = Cryptography.SimpleCrypt(b, newKey, 1);
                     FileOperations.DeleteFile(thisFile, true);
-                    Converter.ByteToFile(thisFile, b);
+                    ByteToFile(thisFile, b);
                 }
             } else {
                 newKey = string.Empty;
                 foreach (var thisFile in lLCase) {
-                    var b = Converter.FileToByte(thisFile);
+                    var b = FileToByte(thisFile);
                     b = Cryptography.SimpleCrypt(b, _database.FileEncryptionKey, -1);
                     FileOperations.DeleteFile(thisFile, true);
-                    Converter.ByteToFile(thisFile, b);
+                    ByteToFile(thisFile, b);
                 }
             }
             _database.FileEncryptionKey = newKey;

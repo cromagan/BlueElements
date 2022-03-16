@@ -27,7 +27,7 @@ namespace BlueDatabase.EventArgs {
 
         #region Properties
 
-        public string CancelReason { get; set; }
+        public string CancelReason { get; }
 
         #endregion
     }

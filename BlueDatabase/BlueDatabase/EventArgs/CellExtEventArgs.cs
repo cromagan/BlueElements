@@ -30,8 +30,8 @@ namespace BlueDatabase.EventArgs {
 
         #region Properties
 
-        public ColumnItem? Column { get; set; }
-        public RowData? RowData { get; set; }
+        public ColumnItem? Column { get; }
+        public RowData? RowData { get; }
 
         #endregion
     }

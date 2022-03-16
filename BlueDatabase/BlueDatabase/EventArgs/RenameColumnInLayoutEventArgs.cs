@@ -34,11 +34,11 @@ namespace BlueDatabase.EventArgs {
 
         //public bool DirectPrint { get; set; }
         //public bool DirectSave { get; set; }
-        public string Filename { get; set; }
+        public string Filename { get; }
 
         public bool Handled { get; set; }
-        public string LayoutId { get; set; }
-        public RowItem Row { get; set; }
+        public string LayoutId { get; }
+        public RowItem Row { get; }
 
         #endregion
     }

@@ -38,9 +38,9 @@ namespace BlueDatabase {
 
         // Info:
         // ExportDialog.AddLayoutsOff wandelt Layouts In Items um
-        public int LayoutIDToIndex(string exportFormularID) {
+        public int LayoutIdToIndex(string exportFormularId) {
             for (var z = 0; z < Count; z++) {
-                if (this[z].Contains("ID=" + exportFormularID + ",")) { return z; }
+                if (this[z].Contains("ID=" + exportFormularId + ",")) { return z; }
             }
             return -1;
         }

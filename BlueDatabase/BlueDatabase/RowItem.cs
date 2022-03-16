@@ -165,7 +165,7 @@ namespace BlueDatabase {
                     break;
 
                 case enScriptType.Numeral:
-                    Converter.FloatTryParse(wert, out var f);
+                    FloatTryParse(wert, out var f);
                     vars.Add(new VariableFloat(column.Name, f, ro, false, qi));
                     break;
 

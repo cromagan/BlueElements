@@ -30,8 +30,8 @@ namespace BlueControls.EventArgs {
 
         #region Properties
 
-        public bool X { get; set; }
-        public bool Y { get; set; }
+        public bool X { get; }
+        public bool Y { get; }
 
         #endregion
     }

@@ -43,7 +43,7 @@ namespace BlueDatabase {
 
         #region Fields
 
-        public static readonly string DatabaseVersion = "4.00";
+        public const string DatabaseVersion = "4.00";
 
         public readonly CellCollection Cell;
 

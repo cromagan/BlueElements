@@ -37,14 +37,14 @@ namespace BlueControls.ItemCollection {
 
         public static BlueFont? ColumnFont = Skin.GetBlueFont(enDesign.Table_Column, enStates.Standard);
 
-        public readonly ColumnItem? Column;
+        public readonly ColumnItem Column;
 
         #endregion
 
         #region Constructors
 
         //public static BlueFont Column_Filter_Font = BlueFont.Get(Column_Font.FontName, Column_Font.FontSize, false, false, false, false, true, Color.White, Color.Red, false, false, false);
-        public ColumnPadItem(ColumnItem? c) : base(c.Name) => Column = c;
+        public ColumnPadItem(ColumnItem c) : base(c.Name) => Column = c;
 
         #endregion
 

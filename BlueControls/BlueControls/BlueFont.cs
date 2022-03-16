@@ -36,20 +36,20 @@ namespace BlueControls {
 
         #region Fields
 
-        public readonly bool Bold;
-        public readonly Brush Brush_Color_Main;
-        public readonly Brush Brush_Color_Outline;
-        public readonly Color Color_Main;
-        public readonly Color Color_Outline;
-        public readonly string FontName;
-        public readonly float FontSize;
-        public readonly bool Italic;
-        public readonly bool Kapitälchen;
-        public readonly bool OnlyLower;
-        public readonly bool OnlyUpper;
-        public readonly bool Outline;
-        public readonly bool StrikeOut;
-        public readonly bool Underline;
+        internal readonly bool Bold;
+        internal readonly Brush BrushColorMain;
+        internal readonly Brush BrushColorOutline;
+        internal readonly Color ColorMain;
+        internal readonly Color ColorOutline;
+        internal readonly string FontName;
+        internal readonly float FontSize;
+        internal readonly bool Italic;
+        internal readonly bool Kapitälchen;
+        internal readonly bool OnlyLower;
+        internal readonly bool OnlyUpper;
+        internal readonly bool Outline;
+        internal readonly bool StrikeOut;
+        internal readonly bool Underline;
         private static readonly List<BlueFont?> FontsAll = new();
 
         private readonly SizeF[] _charSize;
@@ -93,8 +93,8 @@ namespace BlueControls {
             Kapitälchen = false;
             OnlyLower = false;
             OnlyUpper = false;
-            Color_Main = Color.Black;
-            Color_Outline = Color.Magenta;
+            ColorMain = Color.Black;
+            ColorOutline = Color.Magenta;
             _widthOf2Points = 0;
             _charSize = new SizeF[256];
             for (var z = 0; z <= _charSize.GetUpperBound(0); z++) {
@@ -120,7 +120,7 @@ namespace BlueControls {
                         break;
 
                     case "color":
-                        Color_Main = pair.Value.FromHtmlCode();
+                        ColorMain = pair.Value.FromHtmlCode();
                         break;
 
                     case "italic":
@@ -154,7 +154,7 @@ namespace BlueControls {
                         break;
 
                     case "outlinecolor":
-                        Color_Outline = pair.Value.FromHtmlCode();
+                        ColorOutline = pair.Value.FromHtmlCode();
                         break;
 
                     case "onlylower":
@@ -209,9 +209,9 @@ namespace BlueControls {
             ///http://www.typo-info.de/schriftgrad.htm
             _zeilenabstand = _fontOl.Height;
             _pen = GeneratePen(1.0F);
-            Brush_Color_Main = new SolidBrush(Color_Main);
-            Brush_Color_Outline = new SolidBrush(Color_Outline);
-            _code = ToString(FontName, FontSize, Bold, Italic, Underline, StrikeOut, Outline, Color_Main.ToHtmlCode(), Color_Outline.ToHtmlCode(), Kapitälchen, OnlyUpper, OnlyLower);
+            BrushColorMain = new SolidBrush(ColorMain);
+            BrushColorOutline = new SolidBrush(ColorOutline);
+            _code = ToString(FontName, FontSize, Bold, Italic, Underline, StrikeOut, Outline, ColorMain.ToHtmlCode(), ColorOutline.ToHtmlCode(), Kapitälchen, OnlyUpper, OnlyLower);
         }
 
         #endregion
@@ -318,16 +318,16 @@ namespace BlueControls {
             if (Outline) {
                 for (var px = -1; px <= 1; px++) {
                     for (var py = -1; py <= 1; py++) {
-                        DrawString(gr, text, f, Brush_Color_Outline, x + (px * zoom), y + (py * zoom), stringFormat);
+                        DrawString(gr, text, f, BrushColorOutline, x + (px * zoom), y + (py * zoom), stringFormat);
                     }
                 }
             }
 
             if (isCap) {
-                DrawString(gr, text, f, Brush_Color_Main, x + (0.3F * zoom), y, stringFormat);
+                DrawString(gr, text, f, BrushColorMain, x + (0.3F * zoom), y, stringFormat);
             }
 
-            DrawString(gr, text, f, Brush_Color_Main, x, y, stringFormat);
+            DrawString(gr, text, f, BrushColorMain, x, y, stringFormat);
 
             if (StrikeOut) {
                 gr.DrawLine(Pen(zoom), x - 1, (int)(y + (si.Height * 0.55)), (int)(x + 1 + si.Width), (int)(y + (si.Height * 0.55)));
@@ -409,7 +409,7 @@ namespace BlueControls {
 
             BitmapExt bmp = new(32, 12);
             using (var gr = Graphics.FromImage(bmp)) {
-                if (Color_Main.GetBrightness() > 0.9F) {
+                if (ColorMain.GetBrightness() > 0.9F) {
                     gr.Clear(Color.FromArgb(200, 200, 200));
                 } else {
                     gr.Clear(Color.White);
@@ -460,7 +460,7 @@ namespace BlueControls {
 
         internal float Oberlänge(float zoom) => _oberlänge * zoom;
 
-        internal BlueFont? Scale(double zoom) => Math.Abs(1 - zoom) < 0.01 ? this : Get(FontName, (float)(FontSize * zoom), Bold, Italic, Underline, StrikeOut, Outline, Color_Main, Color_Outline, Kapitälchen, OnlyUpper, OnlyLower);
+        internal BlueFont? Scale(double zoom) => Math.Abs(1 - zoom) < 0.01 ? this : Get(FontName, (float)(FontSize * zoom), Bold, Italic, Underline, StrikeOut, Outline, ColorMain, ColorOutline, Kapitälchen, OnlyUpper, OnlyLower);
 
         internal List<string> SplitByWidth(string text, float maxWidth, int maxLines) {
             List<string> broken = new();
@@ -559,7 +559,7 @@ namespace BlueControls {
         private Pen GeneratePen(float zoom) {
             var linDi = _zeilenabstand / 10 * zoom;
             if (Bold) { linDi *= 1.5F; }
-            return new Pen(Color_Main, linDi);
+            return new Pen(ColorMain, linDi);
         }
 
         private bool SizeOk(float sizeToCheck) {
@@ -582,7 +582,7 @@ namespace BlueControls {
             using (var gr = Graphics.FromImage(bmp)) {
                 if (transparent) {
                     gr.Clear(Color.FromArgb(180, 180, 180));
-                } else if (Color_Main.GetBrightness() > 0.9F) {
+                } else if (ColorMain.GetBrightness() > 0.9F) {
                     gr.Clear(Color.FromArgb(200, 200, 200));
                 } else {
                     gr.Clear(Color.White);

@@ -28,24 +28,24 @@ namespace BlueControls.Forms {
         #region Fields
 
         /// <summary>
+        /// Die Dicke des oberen Balkens und unteren Randes einer Form in Pixel
+        /// </summary>
+        public const int BorderHeight = 39;
+
+        /// <summary>
+        /// Die Dicke des linken und rechen Randes einer Form in Pixel
+        /// </summary>
+        public const int BorderWidth = 16;
+
+        /// <summary>
         /// Die Dicke des unteren Rahmens einer Form in Pixel
         /// </summary>
         public static readonly int BorderBottom = 8;
 
         /// <summary>
-        /// Die Dicke des oberen Balkens und unteren Randes einer Form in Pixel
-        /// </summary>
-        public static readonly int BorderHeight = 39;
-
-        /// <summary>
         /// Die Dicke des oberen Balken einer Form in Pixel
         /// </summary>
         public static readonly int BorderTop = 31;
-
-        /// <summary>
-        /// Die Dicke des linken und rechen Randes einer Form in Pixel
-        /// </summary>
-        public static readonly int BorderWidth = 16;
 
         #endregion
 
@@ -86,7 +86,7 @@ namespace BlueControls.Forms {
             get {
                 var oParam = base.CreateParams;
                 if (!CloseButtonEnabled) {
-                    oParam.ClassStyle |= (int)enCS.NOCLOSE;
+                    oParam.ClassStyle |= (int)enCs.NOCLOSE;
                 }
                 return oParam;
             }

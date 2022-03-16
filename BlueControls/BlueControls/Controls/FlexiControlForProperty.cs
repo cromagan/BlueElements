@@ -345,10 +345,10 @@ namespace BlueControls.Controls {
             if (withCreate && _methInfo != null) {
                 EditType = enEditTypeFormula.Button;
                 CaptionPosition = enÜberschriftAnordnung.ohne;
-                var s = BlueFont.MeasureStringOfCaption(_Caption.TrimEnd(":"));
+                var s = BlueFont.MeasureStringOfCaption(Caption.TrimEnd(":"));
                 Size = new Size((int)s.Width + 50 + 22, 30);
                 var c = (Button)CreateSubControls();
-                c.Text = _Caption.TrimEnd(":");
+                c.Text = Caption.TrimEnd(":");
                 if (image != enImageCode.None) {
                     c.ImageCode = QuickImage.Get(image, 22).ToString();
                 }
@@ -357,7 +357,7 @@ namespace BlueControls.Controls {
                 switch (_propInfo.PropertyType.FullName.ToLower()) {
                     case "system.boolean": {
                             EditType = enEditTypeFormula.Ja_Nein_Knopf;
-                            var s = BlueFont.MeasureStringOfCaption(_Caption);
+                            var s = BlueFont.MeasureStringOfCaption(Caption);
                             Size = new Size((int)s.Width + 30, 22);
                             break;
                         }
@@ -366,7 +366,7 @@ namespace BlueControls.Controls {
                             if (list != null) {
                                 EditType = enEditTypeFormula.Textfeld_mit_Auswahlknopf;
                                 list.Appearance = enBlueListBoxAppearance.ComboBox_Textbox;
-                                var s = BlueFont.MeasureStringOfCaption(_Caption);
+                                var s = BlueFont.MeasureStringOfCaption(Caption);
                                 var (biggestItemX, biggestItemY, _, _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
                                 var x = Math.Max((int)(biggestItemX + 20 + s.Width), 200);
                                 var y = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
@@ -383,17 +383,17 @@ namespace BlueControls.Controls {
                             //    c.ImageCode = QuickImage.Get(image).ToString();
                             //}
                             else {
-                                _EditType = enEditTypeFormula.Textfeld;
+                                EditType = enEditTypeFormula.Textfeld;
                                 var tmpName = _propInfo.PropertyType.FullName.ToLower();
                                 if (textLines >= 2) {
-                                    _CaptionPosition = enÜberschriftAnordnung.Über_dem_Feld;
+                                    CaptionPosition = enÜberschriftAnordnung.Über_dem_Feld;
                                     Size = new Size(200, 16 + (24 * textLines));
-                                    _MultiLine = true;
+                                    MultiLine = true;
                                     tmpName = "system.string";
                                 } else {
-                                    _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
+                                    CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
                                     Size = new Size(200, 24);
-                                    _MultiLine = false;
+                                    MultiLine = false;
                                 }
 
                                 switch (tmpName) {

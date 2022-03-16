@@ -98,7 +98,7 @@ namespace BlueControls.Forms {
         private void btnAddLine_Click(object sender, System.EventArgs e) {
             var p = Pad.MiddleOfVisiblesScreen();
             var w = (int)(300 / Pad.Zoom);
-            LinePadItem b = new(PadStyles.Style_Standard, new Point(p.X - w, p.Y), new Point(p.X + w, p.Y));
+            LinePadItem b = new(enPadStyles.Style_Standard, new Point(p.X - w, p.Y), new Point(p.X + w, p.Y));
             Pad.Item.Add(b);
         }
 
@@ -117,7 +117,7 @@ namespace BlueControls.Forms {
         private void btnAddText_Click(object sender, System.EventArgs e) {
             TextPadItem b = new() {
                 Text = string.Empty,
-                Stil = PadStyles.Style_Standard
+                Stil = enPadStyles.Style_Standard
             };
             Pad.Item.Add(b);
             b.SetCoordinates(new RectangleF(10, 10, 200, 200), true);

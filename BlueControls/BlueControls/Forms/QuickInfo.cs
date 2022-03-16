@@ -25,8 +25,8 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        public static string AutoClosedTxt = string.Empty;
-        public static string ShownTxt = string.Empty;
+        private static string AutoClosedTxt = string.Empty;
+        private static string ShownTxt = string.Empty;
         private int _counter;
         private bool _shown;
 

@@ -13,7 +13,7 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        internal static List<FloatingForm> AllBoxes = new();
+        internal static readonly List<FloatingForm> AllBoxes = new();
         private readonly Control? _connectedControl;
 
         #endregion
@@ -120,7 +120,7 @@ namespace BlueControls.Forms {
 
         public new void Show() {
             try {
-                WindowsRemoteControl.ShowWindow(Handle, (int)enSW.ShowNoActivate);
+                WindowsRemoteControl.ShowWindow(Handle, (int)enSw.ShowNoActivate);
             } catch (ObjectDisposedException) {
                 // kommt vor, wenn der Aufbau zu lange dauert. Ignorierbar.
             } catch (Exception ex) {

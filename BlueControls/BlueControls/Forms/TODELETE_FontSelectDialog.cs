@@ -107,8 +107,8 @@ namespace BlueControls.Forms {
                 fUnterstrichen.Checked = value.Underline;
                 fDurchge.Checked = value.StrikeOut;
                 fOutline.Checked = value.Outline;
-                cFarbe.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", value.Color_Main.ToHtmlCode()).ToString();
-                cRandF.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", value.Color_Outline.ToHtmlCode()).ToString();
+                cFarbe.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", value.ColorMain.ToHtmlCode()).ToString();
+                cRandF.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", value.ColorOutline.ToHtmlCode()).ToString();
                 fKap.Checked = value.Kapitälchen;
                 OnlyLow.Checked = value.OnlyLower;
                 OnlyUpper.Checked = value.OnlyUpper;

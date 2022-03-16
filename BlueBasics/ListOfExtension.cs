@@ -101,7 +101,7 @@ namespace BlueBasics {
             do { } while (l.Remove(value));
         }
 
-        public static bool RemoveNull<T>(this List<T> l) {
+        public static bool RemoveNull<T>(this List<T>? l) {
             if (l == null || l.Count == 0) { return false; }
             var did = false;
             var z = 0;

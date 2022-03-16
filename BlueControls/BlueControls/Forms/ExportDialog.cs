@@ -236,7 +236,7 @@ namespace BlueControls.Forms {
         private void Button1_Click(object sender, System.EventArgs e) => ExecuteFile(_zielPfad);
 
         private void cbxLayoutWahl_TextChanged(object sender, System.EventArgs e) {
-            if (Database.Layouts.LayoutIDToIndex(cbxLayoutWahl.Text) > -1) {
+            if (Database.Layouts.LayoutIdToIndex(cbxLayoutWahl.Text) > -1) {
                 padVorschau.ShowInPrintMode = true;
                 padVorschau.Item = new ItemCollectionPad(cbxLayoutWahl.Text, _rowsForExport[0].Database, _rowsForExport[0].Key);
                 padVorschau.ZoomFit();
@@ -256,7 +256,7 @@ namespace BlueControls.Forms {
         private string Fehler() {
             if (_rowsForExport == null || _rowsForExport.Count == 0) { return "Es sind keine Einträge für den Export gewählt."; }
             if (string.IsNullOrEmpty(cbxLayoutWahl.Text)) { return "Es sind keine Layout für den Export gewählt."; }
-            if (Database.Layouts.LayoutIDToIndex(cbxLayoutWahl.Text) > -1) {
+            if (Database.Layouts.LayoutIdToIndex(cbxLayoutWahl.Text) > -1) {
                 if (!optBildSchateln.Checked && !optDrucken.Checked && !optSpeichern.Checked) { return "Das gewählte Layout kann nur gedruckt, geschachtelt oder gespeichtert werden."; }
             } else {
                 if (!optSpezialFormat.Checked && !optSpeichern.Checked) { return "Das gewählte Layout kann nur gespeichtert oder im Spezialformat bearbeitet werden."; }
@@ -346,7 +346,7 @@ namespace BlueControls.Forms {
                 tabStart.Enabled = false; // Geht ja gleich los
                 tabDateiExport.Enabled = true;
                 Tabs.SelectedTab = tabDateiExport;
-                var l = Database.Layouts.LayoutIDToIndex(cbxLayoutWahl.Text) > -1
+                var l = Database.Layouts.LayoutIdToIndex(cbxLayoutWahl.Text) > -1
                     ? Export.SaveAsBitmap(_rowsForExport, cbxLayoutWahl.Text, _zielPfad)
                     : Export.GenerateLayout_FileSystem(_rowsForExport, cbxLayoutWahl.Text, _saveTo, optSpezialFormat.Checked, _zielPfad);
                 lstExported.Item.AddRange(l);

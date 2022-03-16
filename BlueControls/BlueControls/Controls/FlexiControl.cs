@@ -40,12 +40,6 @@ namespace BlueControls.Controls {
 
         #region Fields
 
-        protected string _Caption = string.Empty;
-        protected enÜberschriftAnordnung _CaptionPosition = enÜberschriftAnordnung.ohne;
-        protected string _disabledReason = string.Empty;
-        protected enEditTypeFormula _EditType;
-        protected bool _MultiLine;
-        protected bool _SpellChecking;
         protected bool Allinitialized;
 
         ///// <summary>
@@ -62,19 +56,25 @@ namespace BlueControls.Controls {
         protected bool TranslateCaption = true;
         private enAdditionalCheck _additionalCheck = enAdditionalCheck.None;
         private string _allowedChars = string.Empty;
+        private string _caption = string.Empty;
         private Caption? _captionObject;
+        private enÜberschriftAnordnung _captionPosition = enÜberschriftAnordnung.ohne;
 
         // None ist -1 und muss gesetzt sein!
         private int _controlX = -1;
 
+        private string _disabledReason = string.Empty;
+        private enEditTypeFormula _editType;
         private bool _formatierungErlaubt;
 
         //private enVarType _Format = enVarType.Text;
         private Caption? _infoCaption;
 
         private string _infoText = string.Empty;
+        private bool _multiLine;
         private string _regex = string.Empty;
         private bool _showInfoWhenDisabled;
+        private bool _spellChecking;
         private string _suffix = string.Empty;
 
         #endregion
@@ -85,7 +85,7 @@ namespace BlueControls.Controls {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
 
-            _EditType = enEditTypeFormula.Line;
+            _editType = enEditTypeFormula.Line;
             Size = new Size(200, 8);
         }
 
@@ -95,10 +95,10 @@ namespace BlueControls.Controls {
         /// <param name="captionText"></param>
         public FlexiControl(string captionText) : base(false, false) {
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            _EditType = enEditTypeFormula.None;
-            _Caption = captionText;
-            _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
-            var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
+            _editType = enEditTypeFormula.None;
+            _caption = captionText;
+            _captionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
+            var s = BlueFont.MeasureString(_caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
             Size = new Size((int)(s.Width + 2), (int)(s.Height + 2));
         }
 
@@ -142,21 +142,21 @@ namespace BlueControls.Controls {
 
         [DefaultValue("")]
         public string Caption {
-            get => _Caption;
+            get => _caption;
             set {
-                if (_Caption == value) { return; }
+                if (_caption == value) { return; }
                 RemoveAll(); // Controls and Events entfernen!
-                _Caption = value;
+                _caption = value;
             }
         }
 
         [DefaultValue(enÜberschriftAnordnung.ohne)]
         public enÜberschriftAnordnung CaptionPosition {
-            get => _CaptionPosition;
+            get => _captionPosition;
             set {
-                if (_CaptionPosition == value) { return; }
+                if (_captionPosition == value) { return; }
                 RemoveAll(); // Controls and Events entfernen!
-                _CaptionPosition = value;
+                _captionPosition = value;
             }
         }
 
@@ -191,11 +191,11 @@ namespace BlueControls.Controls {
 
         [DefaultValue(enEditTypeFormula.None)]
         public enEditTypeFormula EditType {
-            get => _EditType;
+            get => _editType;
             set {
-                if (_EditType == value) { return; }
+                if (_editType == value) { return; }
                 RemoveAll(); // Controls and Events entfernen!
-                _EditType = value;
+                _editType = value;
             }
         }
 
@@ -246,10 +246,10 @@ namespace BlueControls.Controls {
         /// </summary>
         [DefaultValue(false)]
         public bool MultiLine {
-            get => _MultiLine;
+            get => _multiLine;
             set {
-                if (_MultiLine == value) { return; }
-                _MultiLine = value;
+                if (_multiLine == value) { return; }
+                _multiLine = value;
                 UpdateControls();
             }
         }
@@ -280,10 +280,10 @@ namespace BlueControls.Controls {
 
         [DefaultValue(false)]
         public bool SpellChecking {
-            get => _SpellChecking;
+            get => _spellChecking;
             set {
-                if (_SpellChecking == value) { return; }
-                _SpellChecking = value;
+                if (_spellChecking == value) { return; }
+                _spellChecking = value;
                 UpdateControls();
             }
         }
@@ -367,7 +367,7 @@ namespace BlueControls.Controls {
 
             Allinitialized = true;
             GenericControl? c = null;
-            switch (_EditType) {
+            switch (_editType) {
                 case enEditTypeFormula.Line:
                     c = Control_Create_Line();
                     break;
@@ -397,7 +397,7 @@ namespace BlueControls.Controls {
                     break;
 
                 case enEditTypeFormula.nur_als_Text_anzeigen:
-                    _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
+                    _captionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
                     Control_Create_Caption();
                     break;
 
@@ -414,7 +414,7 @@ namespace BlueControls.Controls {
                     break;
 
                 default:
-                    Develop.DebugPrint(_EditType);
+                    Develop.DebugPrint(_editType);
                     return null;
             }
             UpdateControls();
@@ -496,7 +496,7 @@ namespace BlueControls.Controls {
                     break;
 
                 case Button button:
-                    switch (_EditType) {
+                    switch (_editType) {
                         case enEditTypeFormula.Ja_Nein_Knopf:
                             button.CheckedChanged += YesNoButton_CheckedChanged;
                             break;
@@ -553,7 +553,7 @@ namespace BlueControls.Controls {
                     break;
 
                 case Button button:
-                    switch (_EditType) {
+                    switch (_editType) {
                         case enEditTypeFormula.Ja_Nein_Knopf:
                             button.CheckedChanged -= YesNoButton_CheckedChanged;
                             break;
@@ -649,7 +649,7 @@ namespace BlueControls.Controls {
             control.AddAllowed = enAddType.UserDef;
             control.FilterAllowed = false;
             control.MoveAllowed = false;
-            switch (_EditType) {
+            switch (_editType) {
                 case enEditTypeFormula.Gallery:
                     control.Appearance = enBlueListBoxAppearance.Gallery;
                     control.RemoveAllowed = true;
@@ -676,7 +676,7 @@ namespace BlueControls.Controls {
         protected void StyleTextBox(TextBox? control) {
             control.Enabled = Enabled;
             control.GetStyleFrom(this);
-            control.Verhalten = _MultiLine || Height > 20
+            control.Verhalten = _multiLine || Height > 20
                 ? enSteuerelementVerhalten.Scrollen_mit_Textumbruch
                 : enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
         }
@@ -701,7 +701,7 @@ namespace BlueControls.Controls {
         private void ColorButton_Click(object sender, System.EventArgs e) => Develop.DebugPrint_NichtImplementiert();
 
         private void ComandButton_Click(object sender, System.EventArgs e) {
-            if (_EditType != enEditTypeFormula.Button) { return; }
+            if (_editType != enEditTypeFormula.Button) { return; }
             ValueSet(true.ToPlusMinus(), false, true); // Geklickt, wurde hiermit vermerkt
             OnButtonClicked();
         }
@@ -730,7 +730,7 @@ namespace BlueControls.Controls {
                 Name = "ComandButton",
                 Checked = false,
                 ButtonStyle = enButtonStyle.Button,
-                Text = _Caption
+                Text = _caption
             };
             StandardBehandlung(control);
             return control;
@@ -753,19 +753,19 @@ namespace BlueControls.Controls {
         }
 
         private void Control_Create_Caption() {
-            if (_CaptionPosition == enÜberschriftAnordnung.ohne) { return; }
+            if (_captionPosition == enÜberschriftAnordnung.ohne) { return; }
             if (_captionObject == null) {
                 _captionObject = new Caption();
                 Controls.Add(_captionObject);
             }
             _captionObject.Enabled = Enabled;
             _captionObject.TextAnzeigeVerhalten = enSteuerelementVerhalten.Text_Abschneiden; // nicht enSteuerelementVerhalten.Steuerelement_Anpassen! weil sonst beim einem Resize die Koordinaten geändert werden und das kann zum Ping Pong führen
-            _captionObject.Text = _Caption.ReplaceLowerSign();
+            _captionObject.Text = _caption.ReplaceLowerSign();
             _captionObject.Size = _captionObject.TextRequiredSize();
             _captionObject.Left = 0;
             _captionObject.Top = 0;
             _captionObject.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-            _captionObject.Visible = _CaptionPosition != enÜberschriftAnordnung.Ohne_mit_Abstand;
+            _captionObject.Visible = _captionPosition != enÜberschriftAnordnung.Ohne_mit_Abstand;
             _captionObject.Translate = TranslateCaption;
             _captionObject.BringToFront();
         }
@@ -919,7 +919,7 @@ namespace BlueControls.Controls {
         /// <param name="control"></param>
         private void StandardBehandlung(GenericControl? control) {
             Control_Create_Caption();
-            switch (_CaptionPosition) {
+            switch (_captionPosition) {
                 case enÜberschriftAnordnung.ohne:
                     control.Left = 0;
                     control.Top = 0;
@@ -945,7 +945,7 @@ namespace BlueControls.Controls {
                     break;
 
                 default:
-                    Develop.DebugPrint(_CaptionPosition);
+                    Develop.DebugPrint(_captionPosition);
                     break;
             }
             control.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
@@ -985,7 +985,7 @@ namespace BlueControls.Controls {
         /// </summary>
         private void UpdateValueTo_Button(Button control) {
             //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling und Creating False!"); }
-            switch (_EditType) {
+            switch (_editType) {
                 case enEditTypeFormula.Ja_Nein_Knopf:
                     control.Checked = Value.FromPlusMinus();
                     break;
@@ -1009,11 +1009,11 @@ namespace BlueControls.Controls {
         private void UpdateValueTo_Caption() {
             //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
             //if (Column == null) { return; } // nur mögloch bei verbundenen Datenbanken
-            if (_EditType != enEditTypeFormula.nur_als_Text_anzeigen) { return; } // und auch dann nur als reine Text anzeige
+            if (_editType != enEditTypeFormula.nur_als_Text_anzeigen) { return; } // und auch dann nur als reine Text anzeige
             if (_captionObject == null) { return; }
             _captionObject.Width = Width;
             _captionObject.Translate = false;
-            _captionObject.Text = _Caption + " <i>" + Value;
+            _captionObject.Text = _caption + " <i>" + Value;
         }
 
         /// <summary>

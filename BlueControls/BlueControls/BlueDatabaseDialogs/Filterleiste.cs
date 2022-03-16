@@ -88,7 +88,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         public enOrientation Orientation { get; set; } = enOrientation.Waagerecht;
 
         [DefaultValue((Table)null)]
-        public Table Table {
+        public Table? Table {
             get => _tableView;
             set {
                 if (_tableView == value) { return; }

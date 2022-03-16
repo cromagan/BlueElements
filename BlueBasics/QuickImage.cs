@@ -45,7 +45,7 @@ namespace BlueBasics {
         public readonly int Transparenz;
         public readonly string? Zweitsymbol;
         private static readonly object Locker = new();
-        private static readonly Dictionary<string, QuickImage?> Pics = new();
+        private static readonly Dictionary<string, QuickImage> Pics = new();
 
         #endregion
 
@@ -302,8 +302,8 @@ namespace BlueBasics {
 
             Color? colgreen = null;
             Color? colfärb = null;
-            Bitmap bmpKreuz = null;
-            Bitmap bmpSecond = null;
+            Bitmap? bmpKreuz = null;
+            Bitmap? bmpSecond = null;
 
             if (!string.IsNullOrEmpty(ChangeGreenTo)) { colgreen = ChangeGreenTo.FromHtmlCode(); }
             if (!string.IsNullOrEmpty(Färbung)) { colfärb = Färbung.FromHtmlCode(); }

@@ -17,7 +17,7 @@
 
 namespace BlueBasics.Enums {
 
-    public enum BlurType {
+    public enum enBlurType {
         Mean3x3,
         Mean5x5,
         Mean7x7,

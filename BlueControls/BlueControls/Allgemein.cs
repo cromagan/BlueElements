@@ -27,7 +27,7 @@ namespace BlueControls {
 
         #region Methods
 
-        public static t? ParentControl<t>(this object o) {
+        public static T? ParentControl<T>(this object o) {
             if (o is not System.Windows.Forms.Control co) {
                 return default;
             }
@@ -38,7 +38,7 @@ namespace BlueControls {
                     case null:
                         return default;
 
-                    case t ctr:
+                    case T ctr:
                         return ctr;
                 }
             } while (true);

@@ -24,13 +24,13 @@ namespace BlueScript.Structures {
 
         #region Fields
 
-        public string AttributeText;
+        internal readonly string AttributeText;
 
-        public int ContinuePosition;
+        internal readonly int ContinuePosition;
 
-        public string ErrorMessage;
+        internal readonly string ErrorMessage;
 
-        public Variable? Variable;
+        internal readonly Variable? Variable;
 
         #endregion
 

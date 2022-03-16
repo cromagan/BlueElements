@@ -60,9 +60,9 @@ namespace BlueScript.Variables {
         public override string ReadableText => SubName;
 
         public override string ShortName => "sub";
-        public string SubCode { get; private set; } = string.Empty;
+        public string SubCode { get; } = string.Empty;
         public string SubName { get; private set; } = string.Empty;
-        public int SubOnLine { get; private set; } = 0;
+        public int SubOnLine { get; } = 0;
         public override bool ToStringPossible => false;
         public override VariableDataType Type => VariableDataType.Sub;
         public override string ValueForReplace => SubName.RemoveCriticalVariableChars();
@@ -83,7 +83,7 @@ namespace BlueScript.Variables {
 
             if (string.IsNullOrEmpty(txt)) { return false; }
 
-            if (!Variable.IsValidName(txt)) { return false; }
+            if (!IsValidName(txt)) { return false; }
 
             var such = new List<string> { "sub" + txt.ToLower() + "()" };
 
@@ -101,7 +101,7 @@ namespace BlueScript.Variables {
 
             var subOnLine = s.ReducedScriptText.Substring(0, pos).Count(c => c == '¶') + 1;
 
-            succesVar = new VariableSub(Variable.DummyName(), txt, subOnLine, item1);
+            succesVar = new VariableSub(DummyName(), txt, subOnLine, item1);
             return true;
         }
 

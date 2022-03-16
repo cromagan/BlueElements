@@ -52,7 +52,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         #region Constructors
 
         public frmColumnArrangementPadEditor(Database database) : this() {
-            if (database == null || Database.ReadOnly) {
+            if (database == null || database.ReadOnly) {
                 MessageBox.Show("Datenbank schreibgeschützt.", enImageCode.Information, "OK");
                 Close();
                 return;
@@ -373,11 +373,13 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             var X = 0f;
             foreach (var thisc in ca) {
-                var it = new ColumnPadItem(thisc?.Column);
-                Pad.Item.Add(it);
-                it.SetLeftTopPoint(X, 0);
-                X = it.UsedArea.Right;
-                anyitem = it;
+                if (thisc?.Column != null) {
+                    var it = new ColumnPadItem(thisc?.Column);
+                    Pad.Item.Add(it);
+                    it.SetLeftTopPoint(X, 0);
+                    X = it.UsedArea.Right;
+                    anyitem = it;
+                }
             }
 
             #endregion
@@ -443,14 +445,18 @@ namespace BlueControls.BlueDatabaseDialogs {
                             #region Dann die Spalte erzeugen, aus der der der Wert kommt
 
                             var c2 = thisc.Column.LinkedDatabase.Column.SearchByKey(thisc.Column.LinkedCell_ColumnKeyOfLinkedDatabase);
-                            var it2 = new ColumnPadItem(c2);
-                            Pad.Item.Add(it2);
-                            it2.SetLeftTopPoint(kx, 600);
-                            it2.ConnectsTo.Add(new ItemConnection(it, enConnectionType.Bottom, enConnectionType.Top, false, true));
-                            kx = it2.UsedArea.Right;
+                            if (c2 != null) {
+                                var it2 = new ColumnPadItem(c2);
+                                Pad.Item.Add(it2);
+                                it2.SetLeftTopPoint(kx, 600);
+                                it2.ConnectsTo.Add(new ItemConnection(it, enConnectionType.Bottom, enConnectionType.Top,
+                                    false, true));
+                                kx = it2.UsedArea.Right;
 
-                            // und noch die Datenbank auf die Spalte zeigen lassem
-                            databItem?.ConnectsTo.AddIfNotExists(new ItemConnection(it2, enConnectionType.Bottom, enConnectionType.Bottom, false, false));
+                                // und noch die Datenbank auf die Spalte zeigen lassem
+                                databItem?.ConnectsTo.AddIfNotExists(new ItemConnection(it2, enConnectionType.Bottom,
+                                    enConnectionType.Bottom, false, false));
+                            }
 
                             #endregion
 

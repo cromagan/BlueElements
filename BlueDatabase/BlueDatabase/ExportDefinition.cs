@@ -277,7 +277,7 @@ namespace BlueDatabase {
                     return "Layout-Vorlage nicht definiert.";
                 }
                 if (_exportFormularId.StartsWith("#")) {
-                    var lNo = Database.Layouts.LayoutIDToIndex(_exportFormularId);
+                    var lNo = Database.Layouts.LayoutIdToIndex(_exportFormularId);
                     if (lNo < 0) {
                         return "Layout-Vorlage nicht vorhanden.";
                     }

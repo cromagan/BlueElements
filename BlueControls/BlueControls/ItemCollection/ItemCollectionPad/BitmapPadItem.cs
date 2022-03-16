@@ -63,7 +63,7 @@ namespace BlueControls.ItemCollection {
             Hintergrund_Weiß_Füllen = true;
             Padding = 0;
             Bild_Modus = enSizeModes.EmptySpace;
-            Stil = PadStyles.Undefiniert; // Kein Rahmen
+            Stil = enPadStyles.Undefiniert; // Kein Rahmen
         }
 
         #endregion
@@ -153,7 +153,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "image":
-                    Bitmap = Converter.Base64ToBitmap(value);
+                    Bitmap = Base64ToBitmap(value);
                     return true;
 
                 case "placeholder":
@@ -200,7 +200,7 @@ namespace BlueControls.ItemCollection {
             }
             t = t + "Padding=" + Padding + ", ";
             if (Bitmap != null) {
-                t = t + "Image=" + Converter.BitmapToBase64(Bitmap, ImageFormat.Png) + ", ";
+                t = t + "Image=" + BitmapToBase64(Bitmap, ImageFormat.Png) + ", ";
             }
             return t.Trim(", ") + "}";
         }
@@ -276,7 +276,7 @@ namespace BlueControls.ItemCollection {
             } catch {
                 Generic.CollectGarbage();
             }
-            if (Stil != PadStyles.Undefiniert) {
+            if (Stil != enPadStyles.Undefiniert) {
                 if (Parent.SheetStyleScale > 0 && Parent.SheetStyle != null) {
                     gr.DrawRectangle(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(zoom * Parent.SheetStyleScale), r1);
                 }

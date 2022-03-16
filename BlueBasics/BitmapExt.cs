@@ -449,89 +449,89 @@ namespace BlueBasics {
             }
         }
 
-        public static Bitmap? ImageBlurFilter(Bitmap? bmp, BlurType blurType) {
+        public static Bitmap? ImageBlurFilter(Bitmap? bmp, enBlurType blurType) {
             if (bmp == null) { return null; }
 
             Bitmap? resultBitmap = null;
             switch (blurType) {
-                case BlurType.Mean3x3:
+                case enBlurType.Mean3x3:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.Mean3X3, 1.0 / 9.0, 0);
                     break;
 
-                case BlurType.Mean5x5:
+                case enBlurType.Mean5x5:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.Mean5X5, 1.0 / 25.0, 0);
                     break;
 
-                case BlurType.Mean7x7:
+                case enBlurType.Mean7x7:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.Mean7X7, 1.0 / 49.0, 0);
                     break;
 
-                case BlurType.Mean9x9:
+                case enBlurType.Mean9x9:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.Mean9X9, 1.0 / 81.0, 0);
 
                     break;
 
-                case BlurType.GaussianBlur3x3:
+                case enBlurType.GaussianBlur3x3:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.GaussianBlur3X3, 1.0 / 16.0, 0);
                     break;
 
-                case BlurType.GaussianBlur5x5:
+                case enBlurType.GaussianBlur5x5:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.GaussianBlur5X5, 1.0 / 159.0, 0);
                     break;
 
-                case BlurType.MotionBlur5x5:
+                case enBlurType.MotionBlur5x5:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur5X5, 1.0 / 10.0, 0);
                     break;
 
-                case BlurType.MotionBlur5x5At45Degrees:
+                case enBlurType.MotionBlur5x5At45Degrees:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur5X5At45Degrees, 1.0 / 5.0, 0);
                     break;
 
-                case BlurType.MotionBlur5x5At135Degrees:
+                case enBlurType.MotionBlur5x5At135Degrees:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur5X5At135Degrees, 1.0 / 5.0, 0);
                     break;
 
-                case BlurType.MotionBlur7x7:
+                case enBlurType.MotionBlur7x7:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur7X7, 1.0 / 14.0, 0);
                     break;
 
-                case BlurType.MotionBlur7x7At45Degrees:
+                case enBlurType.MotionBlur7x7At45Degrees:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur7X7At45Degrees, 1.0 / 7.0, 0);
                     break;
 
-                case BlurType.MotionBlur7x7At135Degrees:
+                case enBlurType.MotionBlur7x7At135Degrees:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur7X7At135Degrees, 1.0 / 7.0, 0);
                     break;
 
-                case BlurType.MotionBlur9x9:
+                case enBlurType.MotionBlur9x9:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur9X9, 1.0 / 18.0, 0);
                     break;
 
-                case BlurType.MotionBlur9x9At45Degrees:
+                case enBlurType.MotionBlur9x9At45Degrees:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur9X9At45Degrees, 1.0 / 9.0, 0);
                     break;
 
-                case BlurType.MotionBlur9x9At135Degrees:
+                case enBlurType.MotionBlur9x9At135Degrees:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur9X9At135Degrees, 1.0 / 9.0, 0);
                     break;
 
-                case BlurType.Median3x3:
+                case enBlurType.Median3x3:
                     resultBitmap = MedianFilter(bmp, 3);
                     break;
 
-                case BlurType.Median5x5:
+                case enBlurType.Median5x5:
                     resultBitmap = MedianFilter(bmp, 5);
                     break;
 
-                case BlurType.Median7x7:
+                case enBlurType.Median7x7:
                     resultBitmap = MedianFilter(bmp, 7);
                     break;
 
-                case BlurType.Median9x9:
+                case enBlurType.Median9x9:
                     resultBitmap = MedianFilter(bmp, 9);
                     break;
 
-                case BlurType.Median11x11:
+                case enBlurType.Median11x11:
                     resultBitmap = MedianFilter(bmp, 11);
                     break;
             }

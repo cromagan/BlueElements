@@ -27,7 +27,7 @@ namespace BlueDatabase.EventArgs {
 
         #region Properties
 
-        public RowItem? Row { get; set; }
+        public RowItem? Row { get; }
 
         #endregion
     }

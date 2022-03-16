@@ -32,7 +32,7 @@ namespace BlueScript.Variables {
         /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
         /// </summary>
         /// <param name="name"></param>
-        public VariableUnknown(string value) : this(DummyName(), value, true, false, string.Empty) { }
+        public VariableUnknown(string name) : this(name, string.Empty, true, false, string.Empty) { }
 
         public VariableUnknown(string name, string value) : this(name, value, true, false, string.Empty) { }
 

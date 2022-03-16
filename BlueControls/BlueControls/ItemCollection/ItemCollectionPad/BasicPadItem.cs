@@ -52,7 +52,7 @@ namespace BlueControls.ItemCollection {
 
         private ItemCollectionPad _parent;
 
-        private PadStyles _style = PadStyles.Style_Standard;
+        private enPadStyles _style = enPadStyles.Style_Standard;
 
         private RectangleF _usedArea;
         private int _zoomPadding;
@@ -112,7 +112,7 @@ namespace BlueControls.ItemCollection {
 
         public virtual string QuickInfo { get; set; } = string.Empty;
 
-        public PadStyles Stil {
+        public enPadStyles Stil {
             get => _style;
             set {
                 if (_style == value) { return; }
@@ -395,7 +395,7 @@ namespace BlueControls.ItemCollection {
                 case "design":
 
                 case "style":
-                    _style = (PadStyles)IntParse(value);
+                    _style = (enPadStyles)IntParse(value);
                     return true;
 
                 case "removetoo": // TODO: Alt, löschen, 02.03.2020

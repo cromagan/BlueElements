@@ -256,9 +256,9 @@ namespace BlueBasics {
             try {
                 if (typeof(IStringable).IsAssignableFrom(typeof(T))) {
                     System.Text.StringBuilder a = new();
-                    foreach (IStringable thisP in this) {
-                        if (thisP != null) {
-                            a.Append(thisP.ToString());
+                    foreach (var thisItem in this) {
+                        if (thisItem is IStringable t) {
+                            a.Append(t.ToString());
                             a.Append("\r");
                         }
                     }

@@ -223,7 +223,7 @@ namespace BlueScript.Methods {
                         if (v is not VariableFloat vn) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
                         if (vn.ValueNum != vn.ValueInt) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
                     } else {
-                        return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht der erwartete Typ " + exceptetType.ToString() + ", sondern " + v.ShortName); ;
+                        return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht der erwartete Typ " + exceptetType.ToString() + ", sondern " + v.ShortName);
                     }
                 }
 

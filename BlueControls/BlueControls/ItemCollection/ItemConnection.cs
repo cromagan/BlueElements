@@ -26,11 +26,11 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
-        public bool ArrowOnMyItem = false;
-        public bool ArrowOnOtherItem = false;
-        public enConnectionType MyItemType;
-        public FixedConnectibleRectangleBitmapPadItem OtherItem;
-        public enConnectionType OtherItemType;
+        internal readonly bool ArrowOnMyItem = false;
+        internal readonly bool ArrowOnOtherItem = false;
+        internal readonly enConnectionType MyItemType;
+        internal readonly FixedConnectibleRectangleBitmapPadItem OtherItem;
+        internal readonly enConnectionType OtherItemType;
 
         #endregion
 
