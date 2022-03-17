@@ -112,7 +112,7 @@
     <Compile Include="Interfaces\IStringable.cs" />
     <Compile Include="Interfaces\IReadableText.cs" />
     <Compile Include="Interfaces\IVersionable.cs" />
-    <Compile Include="MultiUserFile\clsMultiUserFile.cs" />
+    <Compile Include="MultiUserFile\MultiUserFile.cs" />
     <Compile Include="Enums\enSW.cs" />
     <Compile Include="Enums\enDataFormat.cs" />
     <Compile Include="Enums\enFehlerArt.cs" />
@@ -176,8 +176,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="MultiUserFile\clsMultiUserFile.resx">
-      <DependentUpon>clsMultiUserFile.cs</DependentUpon>
+    <EmbeddedResource Include="MultiUserFile\MultiUserFile.resx">
+      <DependentUpon>MultiUserFile.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">

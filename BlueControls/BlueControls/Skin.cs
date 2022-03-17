@@ -1089,6 +1089,8 @@ namespace BlueControls {
         /// <param name="deleteBack"></param>
         public static void Draw_FormatedText(Graphics gr, string txt, Design design, States state, QuickImage? imageCode, enAlignment align, Rectangle fitInRect, Control? child, bool deleteBack, bool translate) => Draw_FormatedText(gr, txt, imageCode, DesignOf(design, state), align, fitInRect, child, deleteBack, translate);
 
+        public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? imageCode, enAlignment align, Rectangle fitInRect, BlueFont? bFont, bool translate) => Draw_FormatedText(gr, txt, imageCode, align, fitInRect, null, false, bFont, translate);
+
         //private static void Draw_Border_DuoColor(Graphics GR, RowItem Row, Rectangle r, bool NurOben) {
         //    var c1 = Color.FromArgb(Value(Row, col_Color_Border_2, 0));
         //    var c2 = Color.FromArgb(Value(Row, col_Color_Border_3, 0));

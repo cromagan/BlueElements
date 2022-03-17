@@ -28,7 +28,7 @@ using static BlueBasics.FileOperations;
 
 namespace BlueBasics {
 
-    public static class ListOfExtension {
+    public static partial class Extensions {
 
         #region Methods
 

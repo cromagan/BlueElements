@@ -79,7 +79,7 @@ namespace BlueBasics.MultiUserFile {
             };
             _backgroundWorker.DoWork += BackgroundWorker_DoWork;
             _checker = new Timer(Checker_Tick);
-            Filename = string.Empty;// KEIN Filename. Ansonsten wird davon ausgegnagen, dass die Datei gleich geladen wird.Dann können abgeleitete Klasse aber keine Initialisierung mehr vornehmen.
+            Filename = string.Empty;// KEIN Filename. Ansonsten wird davon ausgegangen, dass die Datei gleich geladen wird.Dann können abgeleitete Klasse aber keine Initialisierung mehr vornehmen.
             ReCreateWatcher();
             _checkedAndReloadNeed = true;
             _lastSaveCode = string.Empty;
@@ -551,7 +551,8 @@ namespace BlueBasics.MultiUserFile {
         }
 
         /// <summary>
-        ///
+        /// Suht die Datei im Speicher. Wird sie nicht gefunden, wird null zurück gegeben.
+        /// Evtl. besitzen abgeleitete Klassen eine eigene GetByFilename.
         /// </summary>
         /// <param name="filePath"></param>
         /// <param name="checkOnlyFilenameToo">Prüft, ob die Datei ohne Dateipfad - also nur Dateiname und Suffix - existiert und gibt diese zurück.</param>

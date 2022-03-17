@@ -330,6 +330,13 @@ namespace BlueDatabase {
 
         #region Methods
 
+        /// <summary>
+        /// Sucht die Datenbank im Speicher. Wird sie nicht gefunden, wird sie geladen.
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="checkOnlyFilenameToo"></param>
+        /// <param name="readOnly"></param>
+        /// <returns></returns>
         public static Database? GetByFilename(string filename, bool checkOnlyFilenameToo, bool readOnly) {
             var tmpDb = GetByFilename(filename, checkOnlyFilenameToo);
 

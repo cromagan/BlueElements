@@ -115,6 +115,7 @@
       <DependentUpon>Filterleiste.cs</DependentUpon>
     </Compile>
     <Compile Include="BlueFont.cs" />
+    <Compile Include="ConnetedFormula\ConnectedFormula.cs" />
     <Compile Include="Controls\EasyPicMulti.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -192,6 +193,12 @@
     <Compile Include="Extended Text\ExtCharStoreXCode.cs" />
     <Compile Include="Extended Text\ExtCharImageCode.cs" />
     <Compile Include="Extended Text\ExtCharTopCode.cs" />
+    <Compile Include="ConnetedFormula\ConnectedFormulaEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConnetedFormula\ConnectedFormulaEditor.Designer.cs">
+      <DependentUpon>ConnectedFormulaEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\DialogWithOkAndCancel.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -297,6 +304,7 @@
     <Compile Include="Forms\Notification.Designer.cs">
       <DependentUpon>Notification.cs</DependentUpon>
     </Compile>
+    <Compile Include="ItemCollection\ItemCollectionPad\DatabasePadItem.cs" />
     <Compile Include="ItemCollection\ItemConnection.cs" />
     <Compile Include="ItemCollection\PhysicPadItem.cs" />
     <Compile Include="ItemCollection\AbstractPhysicPadItem.cs" />
@@ -680,6 +688,9 @@
     <EmbeddedResource Include="Designer Support\frmQuickPic.resx">
       <DependentUpon>frmQuickPic.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConnetedFormula\ConnectedFormulaEditor.resx">
+      <DependentUpon>ConnectedFormulaEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\DialogWithOkAndCancel.resx">
       <DependentUpon>DialogWithOkAndCancel.cs</DependentUpon>

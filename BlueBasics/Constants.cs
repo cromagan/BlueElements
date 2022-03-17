@@ -15,7 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System;
+using System.Collections.Generic;
+using System.Drawing;
 
 // http://www.carlosag.net/tools/codetranslator/
 // http://converter.telerik.com/
@@ -61,7 +65,6 @@ namespace BlueBasics {
         public const string Format_Date6 = "dd.MM.yyyy";
         public const string Format_Date7 = "dd.MM.yyyy HH:mm:ss.fff";
         public const string Format_Date8 = "HH:mm";
-
         public const string Format_Float1 = "0.#";
         public const string Format_Float10 = "0.##########";
 
@@ -107,7 +110,6 @@ namespace BlueBasics {
         public const string Format_Integer6 = "000000";
         public const string Format_Integer7 = "0000000";
         public const char SecondSortChar = 'X';
-
         public static readonly string Char_NotFromClip = (char)3 + ((char)22).ToString() + (char)24 + "\n";
         public static readonly string Char_Sonderzeichen = "'()+-=$&´`^%˜°•øØμ@\\/*<>|[]{}#~µ_„\"²³€" + (char)0 + beChrW1 + "\t";
 
@@ -126,6 +128,8 @@ namespace BlueBasics {
         //Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         //    var enc1252 = Encoding.GetEncoding(1252);
         public static readonly System.Text.Encoding Win1252 = System.Text.Encoding.GetEncoding(1252);
+
+        public static List<Color> IDColor = new() { Color.Red, Color.Blue, Color.Green, Color.Yellow, Color.Purple, Color.Cyan, Color.Orange, Color.LightBlue, Color.PaleVioletRed, Color.LightGreen, Color.Gray };
 
         #endregion
 
