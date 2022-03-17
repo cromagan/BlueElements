@@ -86,7 +86,7 @@ namespace BlueControls.Forms {
             get {
                 var oParam = base.CreateParams;
                 if (!CloseButtonEnabled) {
-                    oParam.ClassStyle |= (int)enCs.NOCLOSE;
+                    oParam.ClassStyle |= (int)Cs.NOCLOSE;
                 }
                 return oParam;
             }

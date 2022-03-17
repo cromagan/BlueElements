@@ -25,8 +25,8 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private static string AutoClosedTxt = string.Empty;
-        private static string ShownTxt = string.Empty;
+        private static string _autoClosedTxt = string.Empty;
+        private static string _shownTxt = string.Empty;
         private int _counter;
         private bool _shown;
 
@@ -53,20 +53,20 @@ namespace BlueControls.Forms {
         public new static void Close() => Close(false);
 
         public static void Show(string text) {
-            if (text == ShownTxt) { return; }
+            if (text == _shownTxt) { return; }
             Close(false);
-            if (text == AutoClosedTxt) { return; }
-            ShownTxt = text;
+            if (text == _autoClosedTxt) { return; }
+            _shownTxt = text;
             if (string.IsNullOrEmpty(text)) { return; }
             new QuickInfo(text);
         }
 
         private static void Close(bool autoClose) {
             if (autoClose) {
-                AutoClosedTxt = ShownTxt;
+                _autoClosedTxt = _shownTxt;
             } else {
-                ShownTxt = string.Empty;
-                AutoClosedTxt = string.Empty;
+                _shownTxt = string.Empty;
+                _autoClosedTxt = string.Empty;
             }
             foreach (var thisForm in AllBoxes) {
                 if (thisForm.IsDisposed || thisForm is not QuickInfo qi) {

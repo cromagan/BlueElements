@@ -63,12 +63,6 @@ namespace BlueControls.Controls {
 
         #endregion
 
-        #region Events
-
-        public event EventHandler PointSetByUser;
-
-        #endregion
-
         #region Properties
 
         [DefaultValue(Helpers.Ohne)]
@@ -97,12 +91,12 @@ namespace BlueControls.Controls {
 
         public static string FilenameTxt(string pathOfPicture) => pathOfPicture.FilePath() + pathOfPicture.FileNameWithoutSuffix() + ".txt";
 
-        public static BitmapListItem GenerateBitmapListItem(string pathOfPicture) {
+        public static BitmapListItem? GenerateBitmapListItem(string pathOfPicture) {
             var (bitmap, list) = LoadFromDisk(pathOfPicture);
             return GenerateBitmapListItem(bitmap, list);
         }
 
-        public static BitmapListItem GenerateBitmapListItem(Bitmap? bmp, List<string> tags) {
+        public static BitmapListItem? GenerateBitmapListItem(Bitmap? bmp, List<string> tags) {
             var filenamePng = tags.TagGet("ImageFile");
             BitmapListItem i = new(bmp, filenamePng, filenamePng.FileNameWithoutSuffix()) {
                 Padding = 10,
@@ -141,7 +135,7 @@ namespace BlueControls.Controls {
             return new Tuple<Bitmap?, List<string>>(pic2, tags2);
         }
 
-        public BitmapListItem GenerateBitmapListItem() {
+        public BitmapListItem? GenerateBitmapListItem() {
             WritePointsInTags();
             return GenerateBitmapListItem(Bmp, Tags);
         }
@@ -247,7 +241,6 @@ namespace BlueControls.Controls {
             if (_pointAdding && !string.IsNullOrEmpty(Feedback)) {
                 PointSet(Feedback, e.X, e.Y);
                 _pointAdding = false;
-                OnPointSetByUser();
             }
             base.OnImageMouseUp(e); // erst nachher, dass die MouseUpRoutine das Feedback nicht änddern kann
             //Feedback = string.Empty;
@@ -267,8 +260,6 @@ namespace BlueControls.Controls {
             base.OnMouseMove(e);
             Invalidate();
         }
-
-        protected virtual void OnPointSetByUser() => PointSetByUser?.Invoke(this, System.EventArgs.Empty);
 
         //            return PathOfPicture.TrimEnd(".PNG").TrimEnd(".JPG").TrimEnd(".JPG") + ".txt";
         private void DrawMittelLinien(AdditionalDrawing eg) {

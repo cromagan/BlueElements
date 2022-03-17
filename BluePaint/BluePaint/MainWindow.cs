@@ -33,9 +33,6 @@ namespace BluePaint {
 
         #region Fields
 
-        // Merkt sich im Falle einer Aufnahme die benutzen Tools. So können sie ganz einfach wieder aufgerufen werden
-        private static List<GenericTool>? _merker;
-
         private GenericTool? _currentTool;
         private string _filename = string.Empty;
         private bool _isSaved = true;

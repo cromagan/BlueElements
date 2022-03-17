@@ -32,24 +32,24 @@ namespace BlueControls.ItemCollection {
 
         public readonly ListExt<ItemConnection> ConnectsTo = new();
 
-        protected PointM? Pl;
+        private readonly PointM? _pl;
 
         /// <summary>
         /// Dieser Punkt bestimmt die ganzen Koordinaten. Die anderen werden nur mitgeschleift
         /// </summary>
-        protected PointM? PLo;
+        private readonly PointM? _pLo;
 
-        protected PointM? PLu;
+        private readonly PointM? _pLu;
 
-        protected PointM? Po;
+        private readonly PointM? _po;
 
-        protected PointM? Pr;
+        private readonly PointM? _pr;
 
-        protected PointM? PRo;
+        private readonly PointM? _pRo;
 
-        protected PointM? PRu;
+        private readonly PointM? _pRu;
 
-        protected PointM? Pu;
+        private readonly PointM? _pu;
 
         private bool _disposedValue;
         private Bitmap? _generatedBitmap;
@@ -59,23 +59,23 @@ namespace BlueControls.ItemCollection {
         #region Constructors
 
         protected FixedConnectibleRectangleBitmapPadItem(string internalname) : base(internalname) {
-            PLo = new PointM(this, "LO", 0, 0);
-            PRo = new PointM(this, "RO", 0, 0);
-            PRu = new PointM(this, "RU", 0, 0);
-            PLu = new PointM(this, "LU", 0, 0);
-            Pl = new PointM(this, "L", 0, 0);
-            Pr = new PointM(this, "R", 0, 0);
-            Po = new PointM(this, "O", 0, 0);
-            Pu = new PointM(this, "U", 0, 0);
-            MovablePoint.Add(PLo);
-            MovablePoint.Add(PRo);
-            MovablePoint.Add(PLu);
-            MovablePoint.Add(PRu);
-            MovablePoint.Add(Pl);
-            MovablePoint.Add(Pr);
-            MovablePoint.Add(Pu);
-            MovablePoint.Add(Po);
-            PointsForSuccesfullyMove.Add(PLo);
+            _pLo = new PointM(this, "LO", 0, 0);
+            _pRo = new PointM(this, "RO", 0, 0);
+            _pRu = new PointM(this, "RU", 0, 0);
+            _pLu = new PointM(this, "LU", 0, 0);
+            _pl = new PointM(this, "L", 0, 0);
+            _pr = new PointM(this, "R", 0, 0);
+            _po = new PointM(this, "O", 0, 0);
+            _pu = new PointM(this, "U", 0, 0);
+            MovablePoint.Add(_pLo);
+            MovablePoint.Add(_pRo);
+            MovablePoint.Add(_pLu);
+            MovablePoint.Add(_pRu);
+            MovablePoint.Add(_pl);
+            MovablePoint.Add(_pr);
+            MovablePoint.Add(_pu);
+            MovablePoint.Add(_po);
+            PointsForSuccesfullyMove.Add(_pLo);
 
             ConnectsTo.ItemAdded += ConnectsTo_ItemAdded;
             ConnectsTo.ItemRemoving += ConnectsTo_ItemRemoving;
@@ -127,56 +127,56 @@ namespace BlueControls.ItemCollection {
                 y = point.Y;
             }
 
-            if (point == PLo) {
+            if (point == _pLo) {
                 if (e.Y) {
-                    PRu.Y = y + GeneratedBitmap.Height;
-                    Po.Y = y;
+                    _pRu.Y = y + GeneratedBitmap.Height;
+                    _po.Y = y;
                 }
                 if (e.X) {
-                    PRu.X = x + GeneratedBitmap.Width;
-                    Pl.X = x;
+                    _pRu.X = x + GeneratedBitmap.Width;
+                    _pl.X = x;
                 }
             }
 
-            if (point == PRu) {
+            if (point == _pRu) {
                 if (e.X) {
-                    PLo.X = x - GeneratedBitmap.Width;
-                    Pr.X = x;
+                    _pLo.X = x - GeneratedBitmap.Width;
+                    _pr.X = x;
                 }
                 if (e.Y) {
-                    PLo.Y = y - GeneratedBitmap.Height;
-                    Pu.Y = y;
+                    _pLo.Y = y - GeneratedBitmap.Height;
+                    _pu.Y = y;
                 }
             }
 
-            if (point == PRo) {
-                if (e.Y) { Po.Y = y; }
-                if (e.X) { Pr.X = x; }
+            if (point == _pRo) {
+                if (e.Y) { _po.Y = y; }
+                if (e.X) { _pr.X = x; }
             }
 
-            if (point == PLu) {
-                if (e.X) { Pl.X = x; }
-                if (e.Y) { Pu.Y = y; }
+            if (point == _pLu) {
+                if (e.X) { _pl.X = x; }
+                if (e.Y) { _pu.Y = y; }
             }
 
-            if (point == Po && e.Y) {
-                PLo.Y = y;
-                PRo.Y = y;
+            if (point == _po && e.Y) {
+                _pLo.Y = y;
+                _pRo.Y = y;
             }
 
-            if (point == Pu && e.Y) {
-                PLu.Y = y;
-                PRu.Y = y;
+            if (point == _pu && e.Y) {
+                _pLu.Y = y;
+                _pRu.Y = y;
             }
 
-            if (point == Pl && e.X) {
-                PLo.X = x;
-                PLu.X = x;
+            if (point == _pl && e.X) {
+                _pLo.X = x;
+                _pLu.X = x;
             }
 
-            if (point == Pr && e.X) {
-                PRo.X = x;
-                PRu.X = x;
+            if (point == _pr && e.X) {
+                _pRo.X = x;
+                _pRu.X = x;
             }
 
             SizeChanged();
@@ -199,20 +199,20 @@ namespace BlueControls.ItemCollection {
         //        case "fixsize": // TODO: Entfernt am 24.05.2021
         //            //_größe_fixiert = value.FromPlusMinus();
         //            return true;
-        public void SetLeftTopPoint(float x, float y) => PLo.SetTo(x, y);
+        public void SetLeftTopPoint(float x, float y) => _pLo.SetTo(x, y);
 
-        public virtual void SizeChanged() {
+        public void SizeChanged() {
             // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
-            Pl.SetTo(PLo.X, PLo.Y + ((PLu.Y - PLo.Y) / 2));
-            Pr.SetTo(PRo.X, PLo.Y + ((PLu.Y - PLo.Y) / 2));
-            Pu.SetTo(PLo.X + ((PRo.X - PLo.X) / 2), PRu.Y);
-            Po.SetTo(PLo.X + ((PRo.X - PLo.X) / 2), PRo.Y);
+            _pl.SetTo(_pLo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2));
+            _pr.SetTo(_pRo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2));
+            _pu.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRu.Y);
+            _po.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRo.Y);
         }
 
         protected override RectangleF CalculateUsedArea() {
             var bmp = GeneratedBitmap;
-            if (bmp == null || PLo == null) { return RectangleF.Empty; }
-            return new RectangleF(PLo.X, PLo.Y, bmp.Width, bmp.Height);
+            if (bmp == null || _pLo == null) { return RectangleF.Empty; }
+            return new RectangleF(_pLo.X, _pLo.Y, bmp.Width, bmp.Height);
 
             //if (ConnectsTo == null) { return _bitmapUsedArea; }
 
@@ -226,7 +226,7 @@ namespace BlueControls.ItemCollection {
             //return r;
         }
 
-        protected virtual void Dispose(bool disposing) {
+        protected void Dispose(bool disposing) {
             if (!_disposedValue) {
                 if (disposing) {
                     // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen

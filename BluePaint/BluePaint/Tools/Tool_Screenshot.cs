@@ -29,7 +29,7 @@ namespace BluePaint {
 
         #region Methods
 
-        public override void ToolFirstShown() {
+        internal override void ToolFirstShown() {
             DoScreenShot();
             OnZoomFit();
         }

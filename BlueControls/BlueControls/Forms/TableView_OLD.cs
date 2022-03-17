@@ -135,7 +135,7 @@ namespace BlueControls.Forms {
                     break;
 
                 case "SpaltenEigenschaftenBearbeiten":
-                    BlueControls.Forms.TableView.OpenColumnEditor(column, row, Table);
+                    OpenColumnEditor(column, row, Table);
                     CheckButtons();
                     break;
 

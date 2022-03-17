@@ -17,7 +17,7 @@
 
 namespace BlueControls.Enums {
 
-    public enum enCs {
+    public enum Cs {
         DROPSHADOW = 0x20000,
         NOCLOSE = 0x200,
         WS_EX_COMPOSITED = 0x02000000

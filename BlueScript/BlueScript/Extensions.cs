@@ -18,16 +18,15 @@
 namespace BlueScript {
 
     public static class Extensions {
+        //public static readonly string ImageKennung = ((char)9001).ToString();
+        //public static readonly string ObjectKennung = ((char)9002).ToString();
 
         #region Fields
 
-        //public static readonly string ImageKennung = ((char)9001).ToString();
-        public static readonly string ObjectKennung = ((char)9002).ToString();
-
-        internal static readonly string ReplacerForBackSlash = ((char)9003).ToString();
-        internal static readonly string ReplacerForN = ((char)9005).ToString();
-        internal static readonly string ReplacerForQuotes = ((char)9000).ToString();
-        internal static readonly string ReplacerForR = ((char)9004).ToString();
+        private static readonly string ReplacerForBackSlash = ((char)9003).ToString();
+        private static readonly string ReplacerForN = ((char)9005).ToString();
+        private static readonly string ReplacerForQuotes = ((char)9000).ToString();
+        private static readonly string ReplacerForR = ((char)9004).ToString();
 
         #endregion
 

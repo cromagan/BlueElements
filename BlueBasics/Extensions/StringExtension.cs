@@ -31,15 +31,15 @@ namespace BlueBasics {
 
         #region Fields
 
-        public static List<string> GeschKlammerAuf = new() { "{" };
-        public static List<string> GeschKlammerZu = new() { "}" };
-        public static List<string> Gleich = new() { "=" };
-        public static List<string> KlammerAuf = new() { "(" };
-        public static List<List<string>> KlammernGeschweift = new() { new List<string> { "{", "}" } };
-        public static List<List<string>> KlammernStd = new() { new List<string> { "(", ")" }, new List<string> { "{", "}" }, new List<string> { "[", "]" } };
-        public static List<string> KlammerZu = new() { ")" };
-        public static List<string> Komma = new() { "," };
-        public static List<string> Tilde = new() { "~" };
+        public static readonly List<string> GeschKlammerAuf = new() { "{" };
+        public static readonly List<string> GeschKlammerZu = new() { "}" };
+        public static readonly List<string> Gleich = new() { "=" };
+        public static readonly List<string> KlammerAuf = new() { "(" };
+        public static readonly List<List<string>> KlammernGeschweift = new() { new List<string> { "{", "}" } };
+        public static readonly List<List<string>> KlammernStd = new() { new List<string> { "(", ")" }, new List<string> { "{", "}" }, new List<string> { "[", "]" } };
+        public static readonly List<string> KlammerZu = new() { ")" };
+        public static readonly List<string> Komma = new() { "," };
+        public static readonly List<string> Tilde = new() { "~" };
 
         #endregion
 

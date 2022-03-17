@@ -197,7 +197,7 @@ namespace BlueControls.Controls {
                 }
                 AbortSpellChecking();
 
-                lock (Dictionary.Lock_SpellChecking) {
+                lock (Dictionary.LockSpellChecking) {
                     GenerateEtxt(true);
                     if (_formatierungErlaubt) {
                         _eTxt.HtmlText = value;
@@ -395,7 +395,7 @@ namespace BlueControls.Controls {
             if (!MultiLine) { nt = nt.RemoveChars("\r\t"); }
 
             foreach (var t in nt) {
-                if (_eTxt.InsertChar((enAsciiKey)t, _cursorCharPos)) { _cursorCharPos++; }
+                if (_eTxt.InsertChar((AsciiKey)t, _cursorCharPos)) { _cursorCharPos++; }
             }
 
             CheckIfTextIsChanded(_eTxt.HtmlText);
@@ -424,17 +424,17 @@ namespace BlueControls.Controls {
         public void Unmark(MarkState markstate) => _eTxt?.Unmark(markstate);
 
         // Tastatur
-        internal new void KeyPress(enAsciiKey keyAscii) {
+        internal new void KeyPress(AsciiKey keyAscii) {
             // http://www.manderby.com/informatik/allgemeines/ascii.php
             if (_mouseValue != 0) { return; }
 
             switch (keyAscii) {
-                case enAsciiKey.DEL:
+                case AsciiKey.DEL:
                     // Eigentlich auch noch Ascii Code - steht bei ISO als Del
                     Char_DelBereich(_cursorCharPos, _cursorCharPos + 1);
                     break;
 
-                case enAsciiKey.ENTER:
+                case AsciiKey.ENTER:
                     if (MultiLine) {
                         Char_DelBereich(-1, -1);
                         _eTxt.InsertCrlf(_cursorCharPos);
@@ -442,34 +442,34 @@ namespace BlueControls.Controls {
                     }
                     break;
 
-                case enAsciiKey.BackSpace:
+                case AsciiKey.BackSpace:
                     Char_DelBereich(_cursorCharPos - 1, _cursorCharPos);
                     break;
 
-                case enAsciiKey.StrgC:
+                case AsciiKey.StrgC:
                     Clipboard_Copy();
                     return;
 
-                case enAsciiKey.StrgV:
+                case AsciiKey.StrgV:
                     Clipboard_Paste();
                     break;
 
-                case enAsciiKey.StrgX:
+                case AsciiKey.StrgX:
                     Clipboard_Copy();
                     Char_DelBereich(-1, -1);
                     break;
 
-                case enAsciiKey.StrgF:
-                case enAsciiKey.LineFeed:   //Zeilenumbruch, Kommt vor, wen man was aus einem anderen Programm kopiert,
-                case enAsciiKey.TAB:
+                case AsciiKey.StrgF:
+                case AsciiKey.LineFeed:   //Zeilenumbruch, Kommt vor, wen man was aus einem anderen Programm kopiert,
+                case AsciiKey.TAB:
                     return;
 
-                case enAsciiKey.StrgA:
+                case AsciiKey.StrgA:
                     MarkAll();
                     break;
 
                 default:
-                    if (keyAscii >= enAsciiKey.Space) //Ascii-Codes (Außer 127 = DEL)
+                    if (keyAscii >= AsciiKey.Space) //Ascii-Codes (Außer 127 = DEL)
                     {
                         Char_DelBereich(-1, -1);
                         if (_eTxt.InsertChar(keyAscii, _cursorCharPos)) { _cursorCharPos++; }
@@ -660,7 +660,7 @@ namespace BlueControls.Controls {
                     break;
 
                 case System.Windows.Forms.Keys.Delete:
-                    KeyPress(enAsciiKey.DEL);
+                    KeyPress(AsciiKey.DEL);
                     CheckIfTextIsChanded(_eTxt.HtmlText);
                     break;
             }
@@ -673,25 +673,25 @@ namespace BlueControls.Controls {
             base.OnKeyPress(e);
             _lastUserActionForSpellChecking = DateTime.Now;
             if (!Enabled) {
-                if (e.KeyChar != (int)enAsciiKey.StrgX) { e.KeyChar = (char)enAsciiKey.StrgC; }
-                if (e.KeyChar != (int)enAsciiKey.StrgC) { return; }
+                if (e.KeyChar != (int)AsciiKey.StrgX) { e.KeyChar = (char)AsciiKey.StrgC; }
+                if (e.KeyChar != (int)AsciiKey.StrgC) { return; }
             }
-            switch ((enAsciiKey)e.KeyChar) {
-                case enAsciiKey.ENTER:
-                    KeyPress((enAsciiKey)e.KeyChar);
+            switch ((AsciiKey)e.KeyChar) {
+                case AsciiKey.ENTER:
+                    KeyPress((AsciiKey)e.KeyChar);
                     OnEnter();
                     return;
 
-                case enAsciiKey.ESC:
+                case AsciiKey.ESC:
                     OnESC();
                     return;
 
-                case enAsciiKey.TAB:
+                case AsciiKey.TAB:
                     OnTAB();
                     return;
 
                 default:
-                    KeyPress((enAsciiKey)e.KeyChar);
+                    KeyPress((AsciiKey)e.KeyChar);
                     break;
             }
             Invalidate();

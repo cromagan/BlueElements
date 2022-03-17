@@ -122,7 +122,7 @@ namespace BluePaint {
             Unten.Value = bottom;
         }
 
-        public override void ToolFirstShown() {
+        internal override void ToolFirstShown() {
             CheckMinMax();
             AutoZ_Click(null, null);
         }

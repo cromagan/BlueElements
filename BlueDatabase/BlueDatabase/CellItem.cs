@@ -157,11 +157,11 @@ namespace BlueDatabase {
         public static string ValueReadable(ColumnItem? column, string txt, ShortenStyle style, BildTextVerhalten bildTextverhalten, bool removeLineBreaks) {
             if (bildTextverhalten == BildTextVerhalten.Nur_Bild && style != ShortenStyle.HTML) { return string.Empty; }
             switch (column.Format) {
-                case enDataFormat.Text:
-                case enDataFormat.Link_To_Filesystem:
-                case enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
-                case enDataFormat.RelationText:
-                case enDataFormat.Verknüpfung_zu_anderer_Datenbank: // Bei LinkedCell kommt direkt der Text der verlinkten Zelle an
+                case BlueBasics.Enums.DataFormat.Text:
+                case BlueBasics.Enums.DataFormat.Link_To_Filesystem:
+                case BlueBasics.Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
+                case BlueBasics.Enums.DataFormat.RelationText:
+                case BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank: // Bei LinkedCell kommt direkt der Text der verlinkten Zelle an
 
                     //if (column.BildTextVerhalten == BildTextVerhalten.Interpretiere_Bool) {
                     //    if (txt == "+") {
@@ -182,7 +182,7 @@ namespace BlueDatabase {
                     }
                     break;
 
-                case enDataFormat.Button:
+                case BlueBasics.Enums.DataFormat.Button:
                     txt = LanguageTool.ColumnReplace(txt, column, style);
                     break;
 
@@ -194,7 +194,7 @@ namespace BlueDatabase {
                 //    txt = LanguageTool.ColumnReplace(txt, column, style);
                 //    break;
 
-                case enDataFormat.Schrift:
+                case BlueBasics.Enums.DataFormat.Schrift:
                     //    Develop.DebugPrint_NichtImplementiert();
                     //if (string.IsNullOrEmpty(Txt) || Txt.Substring(0, 1) != "{") { return Txt; }
                     //if (CompactView) { return string.Empty; }
@@ -233,7 +233,7 @@ namespace BlueDatabase {
         /// </summary>
         /// <returns></returns>
         public static List<string> ValuesReadable(ColumnItem? column, RowItem Row, ShortenStyle Style) {
-            if (column.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (column.Format is BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 //var LinkedData = CellCollection.LinkedCellData(column, Row, false, false);
                 //if (LinkedData.Item1 != null && LinkedData.Item2 != null) { return ValuesReadable(LinkedData.Item1, LinkedData.Item2, Style); }
                 //return new List<string>();

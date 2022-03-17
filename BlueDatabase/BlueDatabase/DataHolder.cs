@@ -174,7 +174,7 @@ namespace BlueDatabase {
             if (c == null) {
                 c = InternalDatabase.Column.Add(nd);
                 c.Caption = dataName;
-                c.Format = enDataFormat.Text;
+                c.Format = BlueBasics.Enums.DataFormat.Text;
                 c.MultiLine = true;
                 c.TextBearbeitungErlaubt = true;
                 c.PermissionGroupsChangeCell.Add("#Everybody");

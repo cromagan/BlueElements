@@ -27,7 +27,7 @@ namespace BlueDatabase.EventArgs {
 
         #region Properties
 
-        public FilterItem Filter { get; set; }
+        public FilterItem Filter { get; }
 
         #endregion
     }

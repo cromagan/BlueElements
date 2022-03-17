@@ -71,8 +71,6 @@ namespace BlueControls.Controls {
 
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
 
-        public event EventHandler<RowEventArgs> ShowingRowChanged;
-
         #endregion
 
         #region Properties
@@ -153,7 +151,7 @@ namespace BlueControls.Controls {
                         thisFlex.CheckEnabledState();
                     }
                 }
-                OnShowingRowChanged(new RowEventArgs(ShowingRow));
+                //OnShowingRowChanged(new RowEventArgs(ShowingRow));
                 ShowingRow?.DoAutomatic(false, false, "to be sure");
             }
         }
@@ -429,7 +427,7 @@ namespace BlueControls.Controls {
             var column = EditorSelectedColumn();
             var view = SearchColumnView(column);
             var viewItem = SearchViewItem(column);
-            if (viewItem != null) { view.Swap(viewItem, viewItem.PreviewsVisible(view)); }
+            if (viewItem != null) { view.Swap(viewItem, viewItem.PreviewsVisible()); }
             RedoView();
             SortColumnList();
         }
@@ -690,8 +688,6 @@ namespace BlueControls.Controls {
 
         private void lbxColumns_ItemCheckedChanged(object sender, System.EventArgs e) => Editor_CheckButtons(true);
 
-        private void OnShowingRowChanged(RowEventArgs e) => ShowingRowChanged?.Invoke(this, e);
-
         private void RedoView() {
             var i = Tabs.SelectedIndex;
             _inited = false;
@@ -840,7 +836,7 @@ namespace BlueControls.Controls {
             var column = EditorSelectedColumn();
             var view = SearchColumnView(column);
             var viewItem = SearchViewItem(column);
-            if (viewItem != null) { view.Swap(viewItem, viewItem.NextVisible(view)); }
+            if (viewItem != null) { view.Swap(viewItem, viewItem.NextVisible()); }
             RedoView();
             SortColumnList();
         }

@@ -106,9 +106,7 @@ namespace BlueDatabase {
         }
 
         [Obsolete("Direkter Aufruf nicht erlaubt!", true)]
-        public new ColumnItem? Add(ColumnItem column) {
-            return null;
-        }
+        public new ColumnItem? Add(ColumnItem column) => null;
 
         public ColumnItem Add(string internalName) => Add(NextColumnKey(), internalName, internalName, string.Empty, enVarType.Text, string.Empty);
 

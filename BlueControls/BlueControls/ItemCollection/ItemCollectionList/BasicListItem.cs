@@ -100,7 +100,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
             set {
                 if (_enabled == value) { return; }
                 _enabled = value;
-                Parent?.OnDoInvalidate();
+                Parent?.OnChanged();
             }
         }
 
@@ -186,7 +186,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         public void SetCoordinates(Rectangle r) {
             Pos = r;
-            Parent?.OnDoInvalidate();
+            Parent?.OnChanged();
         }
 
         public Size SizeUntouchedForListBox() {

@@ -64,8 +64,6 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         #region Events
 
-        public event EventHandler DoInvalidate;
-
         public event EventHandler ItemCheckedChanged;
 
         #endregion
@@ -79,7 +77,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
                 _appearance = value;
                 GetDesigns();
                 //DesignOrStyleChanged();
-                OnDoInvalidate();
+                OnChanged();
             }
         }
 
@@ -174,7 +172,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
                 //    }
                 //    break;
 
-                case enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
+                case BlueBasics.Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
                     var db2 = column.LinkedDatabase;
                     if (db2 == null) { Notification.Show("Verknüpfte Datenbank nicht vorhanden", enImageCode.Information); return; }
 
@@ -450,7 +448,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         public BasicListItem? Add(string value, ColumnItem? columnStyle, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
             if (this[value] == null) {
-                if (columnStyle.Format == enDataFormat.Link_To_Filesystem && value.FileType() == enFileFormat.Image) {
+                if (columnStyle.Format == BlueBasics.Enums.DataFormat.Link_To_Filesystem && value.FileType() == enFileFormat.Image) {
                     return Add(columnStyle.BestFile(value, false), value, value, columnStyle.Database.FileEncryptionKey);
                 }
 
@@ -608,10 +606,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
         public override void OnChanged() {
             _cellposCorrect = Size.Empty;
             base.OnChanged();
-            OnDoInvalidate();
         }
-
-        public void OnDoInvalidate() => DoInvalidate?.Invoke(this, System.EventArgs.Empty);
 
         //public ListExt<clsNamedBinary> GetNamedBinaries() {
         //    var l = new ListExt<clsNamedBinary>();
@@ -804,7 +799,6 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
             if (_validating) { return; }
             ValidateCheckStates(@this);
             OnItemCheckedChanged();
-            OnDoInvalidate();
         }
 
         internal void SetValuesTo(List<string> values, string fileEncryptionKey) {
@@ -835,7 +829,6 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
             }
             item.Parent = this;
             base.OnItemAdded(item);
-            OnDoInvalidate();
         }
 
         private int CalculateColumnCount(int biggestItemWidth, int allItemsHeight, enOrientation orientation) {
@@ -916,7 +909,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         private void ValidateCheckStates(BasicListItem? thisMustBeChecked) {
             _validating = true;
-            var somethingDonex = false;
+
             var done = false;
             BasicListItem? f = null;
             switch (_checkBehavior) {
@@ -939,14 +932,12 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
                                     } else {
                                         if (thisItem.Checked) {
                                             thisItem.Checked = false;
-                                            somethingDonex = true;
                                         }
                                     }
                                 }
                             } else {
                                 done = true;
                                 if (thisItem != thisMustBeChecked && thisItem.Checked) {
-                                    somethingDonex = true;
                                     thisItem.Checked = false;
                                 }
                             }
@@ -954,7 +945,6 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
                     }
                     if (_checkBehavior == CheckBehavior.AlwaysSingleSelection && !done && f != null && !f.Checked) {
                         f.Checked = true;
-                        somethingDonex = true;
                     }
                     break;
 
@@ -963,7 +953,6 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
                     break;
             }
             _validating = false;
-            if (somethingDonex) { OnDoInvalidate(); }
         }
 
         #endregion

@@ -23,6 +23,7 @@ using BlueDatabase.Enums;
 using System;
 using System.Drawing;
 using static BlueBasics.Converter;
+using DataFormat = BlueBasics.DataFormat;
 
 namespace BlueDatabase {
 
@@ -250,11 +251,11 @@ namespace BlueDatabase {
             OnChanged();
         }
 
-        public ColumnViewItem? NextVisible(ColumnViewCollection? parent) => parent?.NextVisible(this);
+        public ColumnViewItem? NextVisible() => Parent.NextVisible(this);
 
         public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
-        public ColumnViewItem? PreviewsVisible(ColumnViewCollection? parent) => parent?.PreviousVisible(this);
+        public ColumnViewItem? PreviewsVisible() => Parent.PreviousVisible(this);
 
         public override string ToString() {
             var result = "{Type=" + (int)_viewType;
@@ -270,7 +271,7 @@ namespace BlueDatabase {
             //if (_arrangementNr < 1) {
             //    return !thisViewItem.Column.IsFirst();
             //}
-            var nx = NextVisible(Parent);
+            var nx = NextVisible();
             return nx == null || Convert.ToBoolean(nx.ViewType != ViewType.PermanentColumn);
         }
 
@@ -278,7 +279,7 @@ namespace BlueDatabase {
             //if (_arrangementNr < 1) {
             //    return thisViewItem.Column.IsFirst();
             //}
-            var prev = PreviewsVisible(Parent);
+            var prev = PreviewsVisible();
             return prev == null || Convert.ToBoolean(prev.ViewType == ViewType.PermanentColumn);
         }
 

@@ -99,7 +99,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        private enDataFormat Format { get; set; } = enDataFormat.Text;
+        private BlueBasics.Enums.DataFormat Format { get; set; } = BlueBasics.Enums.DataFormat.Text;
 
         #endregion
 
@@ -139,7 +139,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "format":
-                    Format = (enDataFormat)IntParse(value);
+                    Format = (BlueBasics.Enums.DataFormat)IntParse(value);
                     return true;
 
                 case "additionalscale":
@@ -186,7 +186,7 @@ namespace BlueControls.ItemCollection {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
             if (!string.IsNullOrEmpty(_textOriginal)) { t = t + "ReadableText=" + _textOriginal.ToNonCritical() + ", "; }
-            if (Format != enDataFormat.Text) { t = t + "Format=" + (int)Format + ", "; }
+            if (Format != BlueBasics.Enums.DataFormat.Text) { t = t + "Format=" + (int)Format + ", "; }
             if (_ausrichtung != enAlignment.Top_Left) { t = t + "Alignment=" + (int)_ausrichtung + ", "; }
             t = t + "AdditionalScale=" + Skalierung.ToString(CultureInfo.InvariantCulture).ToNonCritical() + ", ";
             return t.Trim(", ") + "}";

@@ -93,7 +93,6 @@ namespace BlueScript.Variables {
 
             var (pos2, _) = NextText(s.ReducedScriptText.ToLower(), pos + 1, such, true, false, KlammernStd);
             if (pos2 > 0) { return false; }//return new DoItFeedback("Subroutine " + infos.AttributText + " mehrfach definert.");
-            var weiterLine = s.Line;
 
             var (item1, item2) = Method.GetCodeBlockText(s.ReducedScriptText, pos + such[0].Length);
 

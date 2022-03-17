@@ -12,7 +12,7 @@ namespace BlueControls.Controls {
     {
         #region Fields
 
-        private readonly List<BitmapExt> _pic = new();
+        private readonly List<BitmapExt?> _pic = new();
         private List<string> _files = new();
         private int _nr;
 
@@ -26,7 +26,7 @@ namespace BlueControls.Controls {
 
         #region Properties
 
-        public List<string>? Files {
+        public List<string> Files {
             get => _files;
             set {
                 _pic.Clear();

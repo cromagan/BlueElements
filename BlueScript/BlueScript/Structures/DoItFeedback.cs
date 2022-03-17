@@ -28,8 +28,8 @@ namespace BlueScript.Structures {
 
         #region Fields
 
+        public readonly Variable? Variable;
         public string ErrorMessage;
-        public Variable? Variable;
 
         #endregion
 

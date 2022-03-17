@@ -20,7 +20,7 @@ namespace BlueControls {
 
         private void lstComands_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) {
             var co = string.Empty;
-            if (e.Item != null && e.Item.Tag is Method thisc) {
+            if (e.Item?.Tag is Method thisc) {
                 co += thisc.HintText();
             }
             txbComms.Text = co;

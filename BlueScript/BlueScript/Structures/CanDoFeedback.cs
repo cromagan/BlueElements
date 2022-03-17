@@ -26,31 +26,31 @@ namespace BlueScript.Structures {
         /// <summary>
         /// Der Text zwischen dem StartString und dem EndString
         /// </summary>
-        public string AttributText;
+        public readonly string AttributText;
 
         /// <summary>
         /// Falls ein Codeblock { } direkt nach dem Befehl beginnt, dessen Inhalt
         /// </summary>
-        public string CodeBlockAfterText;
+        public readonly string CodeBlockAfterText;
 
         /// <summary>
         /// Der Text, mit dem eingestiegen wird. Also der Befehl mit dem StartString.
         /// </summary>
-        public string ComandText;
+        public readonly string ComandText;
 
         /// <summary>
         /// Die Position, wo der Fehler stattgefunfden hat ODER die Position wo weiter geparsesd werden muss
         /// </summary>
-        public int ContinueOrErrorPosition;
+        public readonly int ContinueOrErrorPosition;
 
-        public string ErrorMessage;
+        public readonly string ErrorMessage;
 
-        public int LineBreakInCodeBlock;
+        public readonly int LineBreakInCodeBlock;
 
         /// <summary>
         /// TRUE, wenn der Befehl erkannt wurde, aber nicht ausgeführt werden kann.
         /// </summary>
-        public bool MustAbort;
+        public readonly bool MustAbort;
 
         #endregion
 

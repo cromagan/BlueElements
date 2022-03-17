@@ -28,7 +28,7 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        protected List<string>? FileList;
+        protected readonly List<string>? FileList;
         private int _nr = -1;
 
         #endregion

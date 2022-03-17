@@ -66,7 +66,7 @@ namespace BlueControls.Controls {
         // Für den Designer
         public FlexiControlForCell() : this(null, -1, enÜberschriftAnordnung.Über_dem_Feld) { }
 
-        public FlexiControlForCell(Database database, long columnKey, enÜberschriftAnordnung captionPosition) : base() {
+        public FlexiControlForCell(Database? database, long columnKey, enÜberschriftAnordnung captionPosition) : base() {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -428,7 +428,7 @@ namespace BlueControls.Controls {
             foreach (Control thisControl in Controls) {
                 if (thisControl is EasyPic ep) {
                     if (_tmpColumn == null && _tmpRow == null) { Develop.DebugPrint_NichtImplementiert(); }
-                    if (_tmpColumn.Format != enDataFormat.Link_To_Filesystem) { Develop.DebugPrint_NichtImplementiert(); }
+                    if (_tmpColumn.Format != BlueBasics.Enums.DataFormat.Link_To_Filesystem) { Develop.DebugPrint_NichtImplementiert(); }
                     switch (ep.SorceType) {
                         case SorceType.ScreenShot:
                             var fil = _tmpColumn.BestFile(_tmpColumn.Name + ".png", true);
@@ -476,7 +476,7 @@ namespace BlueControls.Controls {
             var oldVal = _tmpRow.CellGetString(_tmpColumn);
             string newValue;
             switch (_tmpColumn.Format) {
-                case enDataFormat.Link_To_Filesystem:
+                case BlueBasics.Enums.DataFormat.Link_To_Filesystem:
                     var tmp = Value.SplitAndCutByCrToList();
                     var tmp2 = tmp.Select(file => _tmpColumn.SimplyFile(file)).ToList();
                     newValue = tmp2.JoinWithCr();
@@ -499,7 +499,7 @@ namespace BlueControls.Controls {
         private ColumnItem? GetRealColumn(ColumnItem? column, RowItem? row) {
             ColumnItem? gbColumn;
 
-            if (column?.Format == enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (column?.Format == BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 //var skriptgesteuert = column.LinkedCell_RowKey == -9999;
 
                 //if (column.LinkedDatabase() != null && column.LinkedCell_ColumnKey > -1) {
@@ -729,7 +729,7 @@ namespace BlueControls.Controls {
             }
 
             switch (_tmpColumn.Format) {
-                case enDataFormat.Link_To_Filesystem:
+                case BlueBasics.Enums.DataFormat.Link_To_Filesystem:
                     var tmp = _tmpRow.CellGetList(_tmpColumn);
                     List<string> tmp2 = new();
                     foreach (var file in tmp) {
@@ -748,7 +748,7 @@ namespace BlueControls.Controls {
                     //}
                     break;
 
-                case enDataFormat.Verknüpfung_zu_anderer_Datenbank:
+                case BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank:
                     GetRealColumn(_tmpColumn, _tmpRow);
                     ValueSet(_tmpRow.CellGetString(_tmpColumn), true, true);
                     break;
@@ -767,7 +767,7 @@ namespace BlueControls.Controls {
                 Develop.DoEvents();
             }
             if (_tmpColumn == null) { return; }
-            if (_tmpColumn.Format != enDataFormat.RelationText) { return; }
+            if (_tmpColumn.Format != BlueBasics.Enums.DataFormat.RelationText) { return; }
             Marker.RunWorkerAsync();
         }
 

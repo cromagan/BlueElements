@@ -147,8 +147,6 @@ namespace BlueControls.Controls {
 
         public event EventHandler<CellCancelEventArgs> EditBeforeBeginEdit;
 
-        public event EventHandler<RowCancelEventArgs> EditBeforeNewRow;
-
         public event EventHandler FilterChanged;
 
         public event EventHandler<ButtonCellEventArgs> NeedButtonArgs;
@@ -357,13 +355,13 @@ namespace BlueControls.Controls {
         #region Methods
 
         public static Size Cell_ContentSize(Table? table, ColumnItem? column, RowItem? row, BlueFont? cellFont, int pix16) {
-            if (column.Format == enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (column.Format == BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 var (lcolumn, lrow, _) = CellCollection.LinkedCellData(column, row, false, false);
                 return lcolumn != null && lrow != null ? Cell_ContentSize(table, lcolumn, lrow, cellFont, pix16) : new Size(pix16, pix16);
             }
             var contentSize = column.Database.Cell.GetSizeOfCellContent(column, row);
             if (contentSize.Width > 0 && contentSize.Height > 0) { return contentSize; }
-            if (column.Format == enDataFormat.Button) {
+            if (column.Format == BlueBasics.Enums.DataFormat.Button) {
                 if (table is null) {
                     contentSize = new Size(pix16, pix16);
                 } else {
@@ -417,7 +415,7 @@ namespace BlueControls.Controls {
         public static void DoUndo(ColumnItem? column, RowItem? row) {
             if (column == null) { return; }
             if (row == null) { return; }
-            if (column.Format == enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (column.Format == BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 var (lcolumn, lrow, _) = CellCollection.LinkedCellData(column, row, true, false);
                 if (lcolumn != null && lrow != null) { DoUndo(lcolumn, lrow); }
                 return;
@@ -515,7 +513,7 @@ namespace BlueControls.Controls {
                 }
                 var contentHolderCellColumn = column;
                 var contenHolderCellRow = row?.Row;
-                if (column.Format == enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+                if (column.Format == BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                     (contentHolderCellColumn, contenHolderCellRow, _) = CellCollection.LinkedCellData(column, row?.Row, false, false);
                 }
                 var ist1 = string.Empty;
@@ -557,7 +555,7 @@ namespace BlueControls.Controls {
         public static int TmpColumnContentWidth(Table? table, ColumnItem? column, BlueFont? cellFont, int pix16) {
             if (column.TmpColumnContentWidth != null) { return (int)column.TmpColumnContentWidth; }
             column.TmpColumnContentWidth = 0;
-            if (column.Format == enDataFormat.Button) {
+            if (column.Format == BlueBasics.Enums.DataFormat.Button) {
                 // Beim Button reicht eine Abfrage mit Row null
                 column.TmpColumnContentWidth = Cell_ContentSize(table, column, null, cellFont, pix16).Width;
             } else {
@@ -1410,7 +1408,7 @@ namespace BlueControls.Controls {
                     case System.Windows.Forms.Keys.V:
                         if (e.Modifiers == System.Windows.Forms.Keys.Control) {
                             if (_cursorPosColumn != null && _cursorPosRow != null) {
-                                if (!_cursorPosColumn.Format.TextboxEditPossible() && _cursorPosColumn.Format != enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) {
+                                if (!_cursorPosColumn.Format.TextboxEditPossible() && _cursorPosColumn.Format != BlueBasics.Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) {
                                     NotEditableInfo("Die Zelle hat kein passendes Format.");
                                     _isinKeyDown = false;
                                     return;
@@ -1521,8 +1519,8 @@ namespace BlueControls.Controls {
                                     //    break;
 
                                     //case enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
-                                    case enDataFormat.Verknüpfung_zu_anderer_Datenbank:
-                                    case enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
+                                    case BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank:
+                                    case BlueBasics.Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
                                         var (lcolumn, _, info) = CellCollection.LinkedCellData(_mouseOverColumn, _mouseOverRow.Row, true, false);
                                         if (lcolumn != null) { _mouseOverText = lcolumn.QuickInfoText(_mouseOverColumn.ReadableText() + " bei " + lcolumn.ReadableText() + ":"); }
 
@@ -1590,7 +1588,7 @@ namespace BlueControls.Controls {
                             _isinMouseUp = false;
                             return;
                         }
-                        if (_mouseOverRow != null && _mouseOverColumn.Format == enDataFormat.Button) {
+                        if (_mouseOverRow != null && _mouseOverColumn.Format == BlueBasics.Enums.DataFormat.Button) {
                             OnButtonCellClicked(new CellEventArgs(_mouseOverColumn, _mouseOverRow?.Row));
                             Invalidate();
                         }
@@ -1739,7 +1737,7 @@ namespace BlueControls.Controls {
                 return;
             }
 
-            if (column.Format == enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (column.Format == BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 var (lcolumn, lrow, info) = CellCollection.LinkedCellData(column, row, true, false);
                 if (lcolumn == null || lrow == null) {
                     NotEditableInfo("Zelle in verlinkter Datenbank nicht vorhanden:\r\n" + info);
@@ -2130,7 +2128,7 @@ namespace BlueControls.Controls {
                 return;
             }
 
-            if (cellInThisDatabaseColumn.Format == enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (cellInThisDatabaseColumn.Format == BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 string info;
                 (contentHolderCellColumn, contentHolderCellRow, info) = CellCollection.LinkedCellData(cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, true, true);
                 if (contentHolderCellColumn == null || contentHolderCellRow == null) {
@@ -2184,7 +2182,7 @@ namespace BlueControls.Controls {
                 cancel = ed.CancelReason;
             } else {
                 RowCancelEventArgs ed = new(null, cancel);
-                OnEditBeforeNewRow(ed);
+                //OnEditBeforeNewRow(ed);
                 cancel = ed.CancelReason;
             }
             if (!string.IsNullOrEmpty(cancel)) {
@@ -2602,7 +2600,7 @@ namespace BlueControls.Controls {
         private void Draw_CellTransparent(Graphics gr, ColumnViewItem cellInThisDatabaseColumn, RowData cellInThisDatabaseRow, Rectangle cellrectangle, BlueFont? font, States state) {
             if (cellInThisDatabaseRow == null) { return; }
 
-            if (cellInThisDatabaseColumn.Column.Format == enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (cellInThisDatabaseColumn.Column.Format == BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 var (lcolumn, lrow, _) = CellCollection.LinkedCellData(cellInThisDatabaseColumn.Column, cellInThisDatabaseRow.Row, false, false);
 
                 if (lcolumn != null && lrow != null) {
@@ -2630,7 +2628,7 @@ namespace BlueControls.Controls {
         /// <param name="displayRectangleWOSlider"></param>
         /// <param name="font"></param>
         private void Draw_CellTransparentDirect(Graphics gr, ColumnViewItem cellInThisDatabaseColumn, RowData cellInThisDatabaseRow, Rectangle cellrectangle, ColumnItem? contentHolderCellColumn, RowItem? contentHolderCellRow, BlueFont? font, States state) {
-            if (cellInThisDatabaseColumn.Column.Format == enDataFormat.Button) {
+            if (cellInThisDatabaseColumn.Column.Format == BlueBasics.Enums.DataFormat.Button) {
                 Draw_CellAsButton(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle);
                 return;
             }
@@ -3092,7 +3090,7 @@ namespace BlueControls.Controls {
 
         private void OnEditBeforeBeginEdit(CellCancelEventArgs e) => EditBeforeBeginEdit?.Invoke(this, e);
 
-        private void OnEditBeforeNewRow(RowCancelEventArgs e) => EditBeforeNewRow?.Invoke(this, e);
+        //private void OnEditBeforeNewRow(RowCancelEventArgs e) => EditBeforeNewRow?.Invoke(this, e);
 
         private void OnFilterChanged() => FilterChanged?.Invoke(this, System.EventArgs.Empty);
 

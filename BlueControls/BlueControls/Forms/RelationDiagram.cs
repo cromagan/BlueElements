@@ -46,7 +46,7 @@ namespace BlueControls.Forms {
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             Database = database;
             Database.Disposing += Database_Disposing;
-            foreach (var ThisColumnItem in Database.Column.Where(ThisColumnItem => ThisColumnItem != null && ThisColumnItem.Format == enDataFormat.RelationText)) {
+            foreach (var ThisColumnItem in Database.Column.Where(ThisColumnItem => ThisColumnItem != null && ThisColumnItem.Format == BlueBasics.Enums.DataFormat.RelationText)) {
                 _column = ThisColumnItem;
                 break;
             }
@@ -251,7 +251,7 @@ namespace BlueControls.Forms {
                     var newn = FileOperations.TempFile(fl.SelectedPath, no, "png");
                     r.GeneratedBitmap.Save(newn, System.Drawing.Imaging.ImageFormat.Png);
                     foreach (var thisc in r.Row.Database.Column) {
-                        if (thisc.Format == enDataFormat.Link_To_Filesystem) {
+                        if (thisc.Format == BlueBasics.Enums.DataFormat.Link_To_Filesystem) {
                             var l = r.Row.CellGetList(thisc);
                             foreach (var thiss in l) {
                                 var f = thisc.BestFile(thiss, false);

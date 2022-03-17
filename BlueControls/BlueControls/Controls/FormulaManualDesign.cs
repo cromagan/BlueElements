@@ -48,12 +48,6 @@ namespace BlueControls.Controls {
 
         #endregion
 
-        #region Events
-
-        public event EventHandler<RowEventArgs> ShowingRowChanged;
-
-        #endregion
-
         #region Properties
 
         [Browsable(false)]
@@ -122,7 +116,7 @@ namespace BlueControls.Controls {
                     }
                 }
 
-                OnShowingRowChanged(new RowEventArgs(ShowingRow));
+                //OnShowingRowChanged(new RowEventArgs(ShowingRow));
                 ShowingRow?.DoAutomatic(false, false, "to be sure");
             }
         }
@@ -194,8 +188,8 @@ namespace BlueControls.Controls {
             ShowingRowKey = _savedRowKey;
         }
 
-        private void OnShowingRowChanged(RowEventArgs e) => ShowingRowChanged?.Invoke(this, e);
-
         #endregion
+
+        //private void OnShowingRowChanged(RowEventArgs e) => ShowingRowChanged?.Invoke(this, e);
     }
 }

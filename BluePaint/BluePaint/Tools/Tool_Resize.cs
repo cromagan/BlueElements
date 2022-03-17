@@ -47,7 +47,7 @@ namespace BluePaint {
             }
         }
 
-        public override void PictureChangedByMainWindow() {
+        internal override void PictureChangedByMainWindow() {
             base.PictureChangedByMainWindow();
             DoCapInfo();
         }

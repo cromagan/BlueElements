@@ -25,11 +25,11 @@ namespace BlueScript.Structures {
 
         #region Fields
 
-        public List<Variable> Attributes;
+        public readonly List<Variable> Attributes;
 
-        public string ErrorMessage;
+        public readonly string ErrorMessage;
 
-        public ScriptIssueType FehlerTyp;
+        public readonly ScriptIssueType FehlerTyp;
 
         #endregion
 

@@ -41,7 +41,7 @@ using System.Drawing;
 
 namespace BlueControls.Forms {
 
-    public partial class TableView : BlueControls.Forms.Form {
+    public partial class TableView : Form {
 
         #region Fields
 
@@ -87,7 +87,7 @@ namespace BlueControls.Forms {
                 if (database.IsAdministrator()) {
                     foreach (var thisColumnItem in database.Column) {
                         while (!thisColumnItem.IsOk()) {
-                            Develop.DebugPrint(enFehlerArt.Info, "Datenbank:" + database.Filename + "\r\nSpalte:" + thisColumnItem.Name + "\r\nSpaltenfehler: " + thisColumnItem.ErrorReason() + "\r\nUser: " + database.UserName + "\r\nGroup: " + database.UserGroup + "\r\nAdmins: " + database.DatenbankAdmin.JoinWith(";"));
+                            DebugPrint(enFehlerArt.Info, "Datenbank:" + database.Filename + "\r\nSpalte:" + thisColumnItem.Name + "\r\nSpaltenfehler: " + thisColumnItem.ErrorReason() + "\r\nUser: " + database.UserName + "\r\nGroup: " + database.UserGroup + "\r\nAdmins: " + database.DatenbankAdmin.JoinWith(";"));
                             MessageBox.Show("Die folgende Spalte enthält einen Fehler:<br>" + thisColumnItem.ErrorReason() + "<br><br>Bitte reparieren.", enImageCode.Information, "OK");
                             OpenColumnEditor(thisColumnItem, null);
                         }
@@ -113,8 +113,8 @@ namespace BlueControls.Forms {
                 //    break;
 
                 //case enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
-                case enDataFormat.Verknüpfung_zu_anderer_Datenbank:
-                case enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
+                case BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank:
+                case BlueBasics.Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
                     (columnLinked, _, _) = CellCollection.LinkedCellData(column, row, true, false);
                     posError = true;
                     break;
@@ -236,7 +236,7 @@ namespace BlueControls.Forms {
         }
 
         private void btnLayouts_Click(object sender, System.EventArgs e) {
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
+            DebugPrint_InvokeRequired(InvokeRequired, true);
             if (Table.Database == null) { return; }
             OpenLayoutEditor(Table.Database, string.Empty);
         }
@@ -329,9 +329,9 @@ namespace BlueControls.Forms {
             }
 
             if (e.Column != null) { Formula.Database = e.Column.Database; }
-            if (e.RowData != null && e.RowData.Row != null) { Formula.Database = e.RowData.Row.Database; }
+            if (e.RowData?.Row != null) { Formula.Database = e.RowData.Row.Database; }
 
-            Formula.ShowingRowKey = e.Column == null || e.RowData == null || e.RowData.Row == null ? -1 : e.RowData.Row.Key;
+            Formula.ShowingRowKey = e.Column == null || e.RowData?.Row == null ? -1 : e.RowData.Row.Key;
         }
 
         private void Table_VisibleRowsChanged(object sender, System.EventArgs e) {

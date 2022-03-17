@@ -20,13 +20,13 @@ using System.Drawing;
 
 namespace BlueControls.Extended_Text {
 
-    internal class ExtCharCRLFCode : ExtChar {
+    internal class ExtCharCrlfCode : ExtChar {
 
         #region Constructors
 
-        internal ExtCharCRLFCode() : this(Design.TextBox, States.Standard, null, 4) { }
+        internal ExtCharCrlfCode() : this(Design.TextBox, States.Standard, null, 4) { }
 
-        internal ExtCharCRLFCode(Design design, States state, BlueFont? font, int stufe) : base(design, state, font, stufe) { }
+        internal ExtCharCrlfCode(Design design, States state, BlueFont? font, int stufe) : base(design, state, font, stufe) { }
 
         #endregion
 

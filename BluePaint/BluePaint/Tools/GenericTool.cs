@@ -95,19 +95,17 @@ namespace BluePaint {
         /// Z.B: bei Undo
         /// </summary>
         /// <returns></returns>
-        public virtual void PictureChangedByMainWindow() {
-        }
+        internal virtual void PictureChangedByMainWindow() { }
 
-        public virtual void ToolFirstShown() {
-        }
+        internal virtual void ToolFirstShown() { }
 
-        protected virtual void OnDoInvalidate() => DoInvalidate?.Invoke(this, System.EventArgs.Empty);
+        protected void OnDoInvalidate() => DoInvalidate?.Invoke(this, System.EventArgs.Empty);
 
-        protected virtual void OnForceUndoSaving() => ForceUndoSaving?.Invoke(this, System.EventArgs.Empty);
+        protected void OnForceUndoSaving() => ForceUndoSaving?.Invoke(this, System.EventArgs.Empty);
 
-        protected virtual void OnHideMainWindow() => HideMainWindow?.Invoke(this, System.EventArgs.Empty);
+        protected void OnHideMainWindow() => HideMainWindow?.Invoke(this, System.EventArgs.Empty);
 
-        protected virtual Bitmap? OnNeedCurrentPic() {
+        protected Bitmap? OnNeedCurrentPic() {
             BitmapEventArgs e = new(null);
             NeedCurrentPic?.Invoke(this, e);
             return e.Bmp;
@@ -118,11 +116,11 @@ namespace BluePaint {
         /// Wird benutzt, wenn ein neues Bild erstellt wurde und dieses in den Speicher soll.
         /// </summary>
         /// <param name="bmp"></param>
-        protected virtual void OnOverridePic(Bitmap? bmp) => OverridePic?.Invoke(this, new BitmapEventArgs(bmp));
+        protected void OnOverridePic(Bitmap? bmp) => OverridePic?.Invoke(this, new BitmapEventArgs(bmp));
 
-        protected virtual void OnShowMainWindow() => ShowMainWindow?.Invoke(this, System.EventArgs.Empty);
+        protected void OnShowMainWindow() => ShowMainWindow?.Invoke(this, System.EventArgs.Empty);
 
-        protected virtual void OnZoomFit() => ZoomFit?.Invoke(this, System.EventArgs.Empty);
+        protected void OnZoomFit() => ZoomFit?.Invoke(this, System.EventArgs.Empty);
 
         #endregion
     }

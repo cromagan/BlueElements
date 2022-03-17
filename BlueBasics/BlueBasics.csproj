@@ -114,7 +114,7 @@
     <Compile Include="Interfaces\IVersionable.cs" />
     <Compile Include="MultiUserFile\MultiUserFile.cs" />
     <Compile Include="Enums\enSW.cs" />
-    <Compile Include="Enums\enDataFormat.cs" />
+    <Compile Include="Enums\DataFormat.cs" />
     <Compile Include="Enums\enFehlerArt.cs" />
     <Compile Include="EventArgs\MultiUserFileStopWorkingEventArgs.cs" />
     <Compile Include="EventArgs\LoadedEventArgs.cs" />

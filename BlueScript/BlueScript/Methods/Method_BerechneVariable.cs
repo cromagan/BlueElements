@@ -27,7 +27,7 @@ namespace BlueScript.Methods {
 
         #region Fields
 
-        public static List<VariableDataType> SArgs = new() { VariableDataType.Bool_Numeral_String_List_or_Object };
+        private static readonly List<VariableDataType> _args = new() { VariableDataType.Bool_Numeral_String_List_or_Object };
 
         #endregion
 
@@ -35,7 +35,7 @@ namespace BlueScript.Methods {
 
         public static bool SEndlessArgs => false;
 
-        public override List<VariableDataType> Args => SArgs;
+        public override List<VariableDataType> Args => _args;
         public override string Description => "Berechnet eine Variable. Der Typ der Variable und des Ergebnisses müssen übereinstimmen.";
         public override bool EndlessArgs => SEndlessArgs;
         public override string EndSequence => ";";
@@ -75,7 +75,7 @@ namespace BlueScript.Methods {
                 return new DoItFeedback("Variable " + varnam + " nicht vorhanden.");
             }
 
-            var attvar = SplitAttributeToVars(newcommand.Substring(pos + 1, newcommand.Length - pos - 2), s, SArgs, SEndlessArgs);
+            var attvar = SplitAttributeToVars(newcommand.Substring(pos + 1, newcommand.Length - pos - 2), s, _args, SEndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(new Method_BerechneVariable(), attvar); }
 
             if (generateVariable) {

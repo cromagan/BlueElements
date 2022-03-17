@@ -318,7 +318,7 @@ namespace BlueControls.Extended_Text {
             return (int)_height;
         }
 
-        public bool InsertChar(enAsciiKey ascii, int position) {
+        public bool InsertChar(AsciiKey ascii, int position) {
             if ((int)ascii < 13) { return false; }
             var c = new ExtCharAscii((char)ascii, Design, State, null, 4, MarkState.None);
             Insert(position, c);
@@ -373,7 +373,7 @@ namespace BlueControls.Extended_Text {
             }
         }
 
-        internal void InsertCrlf(int position) => Insert(position, new ExtCharCRLFCode());
+        internal void InsertCrlf(int position) => Insert(position, new ExtCharCrlfCode());
 
         internal void Mark(MarkState markstate, int first, int last) {
             try {
@@ -568,7 +568,7 @@ namespace BlueControls.Extended_Text {
 
                 case "BR":
                     position++;
-                    Add(new ExtCharCRLFCode(_design, _state, font, stufe));
+                    Add(new ExtCharCrlfCode(_design, _state, font, stufe));
                     break;
                 //
                 case "HR":

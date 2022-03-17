@@ -119,7 +119,7 @@ namespace BlueDatabase {
 
             #endregion
 
-            if (column.MultiLine && column.Format == enDataFormat.Link_To_Filesystem) { return null; }
+            if (column.MultiLine && column.Format == BlueBasics.Enums.DataFormat.Link_To_Filesystem) { return null; }
             if (column.ScriptType == ScriptType.Nicht_vorhanden) { return null; }
 
             var wert = row.CellGetString(column);
@@ -138,7 +138,7 @@ namespace BlueDatabase {
                 //    //}
                 //    break;
 
-                case enDataFormat.Link_To_Filesystem:
+                case BlueBasics.Enums.DataFormat.Link_To_Filesystem:
                     qi = "Spalte: " + column.ReadableText() + "\r\nFalls die Datei auf der Festplatte existiert, wird eine weitere\r\nVariable erzeugt: " + column.Name + "_FileName";
                     var f = column.Database.Cell.BestFile(column, row);
                     if (f.FileType() == enFileFormat.Image && FileOperations.FileExists(f)) {
@@ -339,7 +339,7 @@ namespace BlueDatabase {
                 if (fullCheck) {
                     var x = CellGetString(thisColum);
                     var x2 = thisColum.AutoCorrect(x);
-                    if (thisColum.Format is not enDataFormat.Verknüpfung_zu_anderer_Datenbank && x != x2) {
+                    if (thisColum.Format is not BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank && x != x2) {
                         Database.Cell.Set(thisColum, this, x2);
                     } else {
                         if (!thisColum.IsFirst()) {

@@ -54,7 +54,7 @@ namespace BlueControls.ItemCollection {
 
         public string Datenbank {
             get {
-                if (Column == null || Column.Database == null) { return "?"; }
+                if (Column?.Database == null) { return "?"; }
                 return Column.Database.Filename.FileNameWithSuffix();
             }
         }
