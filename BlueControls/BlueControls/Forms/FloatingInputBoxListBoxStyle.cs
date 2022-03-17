@@ -42,7 +42,7 @@ namespace BlueControls.Forms {
 
         #region Constructors
 
-        private FloatingInputBoxListBoxStyle() : base(enDesign.Form_QuickInfo) => InitializeComponent();
+        private FloatingInputBoxListBoxStyle() : base(Design.Form_QuickInfo) => InitializeComponent();
 
         private FloatingInputBoxListBoxStyle(ItemCollectionList? items, int xpos, int ypos, int steuerWi, object tag, Control? connectedControl, bool translate) : base(connectedControl, items.ControlDesign) {
             InitializeComponent();
@@ -50,7 +50,7 @@ namespace BlueControls.Forms {
             // Design = Items.ControlDesign;
             xpos -= Skin.PaddingSmal;
             ypos -= Skin.PaddingSmal;
-            Generate_ListBox1(items, steuerWi, enAddType.None, translate);
+            Generate_ListBox1(items, steuerWi, AddType.None, translate);
             //UnloadLostFocus = true;
             Position_SetWindowIntoScreen(Generic.PointOnScreenNr(new Point(xpos, ypos)), xpos, ypos);
             //Develop.DoEvents();
@@ -73,11 +73,11 @@ namespace BlueControls.Forms {
         #region Methods
 
         public static void ContextMenuShow(IContextMenu control, MouseEventArgs? e) {
-            Close(enBlueListBoxAppearance.KontextMenu);
+            Close(BlueListBoxAppearance.KontextMenu);
             Close(control);
 
-            ItemCollectionList thisContextMenu = new(enBlueListBoxAppearance.KontextMenu);
-            ItemCollectionList userMenu = new(enBlueListBoxAppearance.KontextMenu);
+            ItemCollectionList thisContextMenu = new(BlueListBoxAppearance.KontextMenu);
+            ItemCollectionList userMenu = new(BlueListBoxAppearance.KontextMenu);
 
             List<string> tags = new();
             var cancel = false;
@@ -96,10 +96,10 @@ namespace BlueControls.Forms {
             if (thisContextMenu.Count > 0) {
                 if (par != null) {
                     thisContextMenu.AddSeparator();
-                    thisContextMenu.Add(enContextMenuComands.WeitereBefehle);
+                    thisContextMenu.Add(ContextMenuComands.WeitereBefehle);
                 }
                 thisContextMenu.AddSeparator();
-                thisContextMenu.Add(enContextMenuComands.Abbruch);
+                thisContextMenu.Add(ContextMenuComands.Abbruch);
                 List<object?> infos = new()
                 {
                     userMenu,
@@ -123,11 +123,11 @@ namespace BlueControls.Forms {
         public static FloatingInputBoxListBoxStyle Show(ItemCollectionList? items, int xpos, int ypos, int steuerWi, object? tag, Control? connectedControl, bool translate) =>
             new(items, xpos, ypos, steuerWi, tag, connectedControl, translate);
 
-        public void Generate_ListBox1(ItemCollectionList? items, int minWidth, enAddType addNewAllowed, bool translate) {
+        public void Generate_ListBox1(ItemCollectionList? items, int minWidth, AddType addNewAllowed, bool translate) {
             //var itemsClone = (ItemCollectionList)ItemsOri.Clone();
             var (biggestItemX, _, heightAdded, _) = items.ItemData();
-            if (addNewAllowed != enAddType.None) { heightAdded += 24; }
-            lstbx.Appearance = (enBlueListBoxAppearance)items.ControlDesign;
+            if (addNewAllowed != AddType.None) { heightAdded += 24; }
+            lstbx.Appearance = (BlueListBoxAppearance)items.ControlDesign;
             lstbx.Translate = translate;
             //if (data.Item4 == BlueBasics.Enums.enOrientation.Senkrecht)
             //{
@@ -167,7 +167,7 @@ namespace BlueControls.Forms {
             var hotItem = infos[1];
             var tags = (List<string>)infos[2];
             var ob = (IContextMenu)infos[3];
-            Close(enBlueListBoxAppearance.KontextMenu);
+            Close(BlueListBoxAppearance.KontextMenu);
             Close(ob);
             if (e.ClickedComand.ToLower() == "weiterebefehle") {
                 var par = ob.ParentControlWithCommands();
@@ -199,7 +199,7 @@ namespace BlueControls.Forms {
             // Einen Klick auf Überschriften einfach ignorieren, zB. kontextmenü
             if (!e.Item.IsClickable()) { return; }
 
-            if (lstbx.Appearance is not enBlueListBoxAppearance.Listbox and not enBlueListBoxAppearance.Gallery and not enBlueListBoxAppearance.FileSystem) {
+            if (lstbx.Appearance is not BlueListBoxAppearance.Listbox and not BlueListBoxAppearance.Gallery and not BlueListBoxAppearance.FileSystem) {
                 OnItemClicked(new ContextMenuItemClickedEventArgs(e.Item.Internal, Tag, null)); // Das Tag hier ist eigentlich das HotItem
                 if (!IsDisposed) { Close(); }
             }

@@ -63,7 +63,7 @@ namespace BlueControls.ItemCollection {
             Hintergrund_Weiß_Füllen = true;
             Padding = 0;
             Bild_Modus = enSizeModes.EmptySpace;
-            Stil = enPadStyles.Undefiniert; // Kein Rahmen
+            Stil = PadStyles.Undefiniert; // Kein Rahmen
         }
 
         #endregion
@@ -276,7 +276,7 @@ namespace BlueControls.ItemCollection {
             } catch {
                 Generic.CollectGarbage();
             }
-            if (Stil != enPadStyles.Undefiniert) {
+            if (Stil != PadStyles.Undefiniert) {
                 if (Parent.SheetStyleScale > 0 && Parent.SheetStyle != null) {
                     gr.DrawRectangle(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(zoom * Parent.SheetStyleScale), r1);
                 }

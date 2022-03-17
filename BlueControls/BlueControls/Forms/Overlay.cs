@@ -52,7 +52,7 @@ namespace BlueControls {
         protected override System.Windows.Forms.CreateParams CreateParams {
             get {
                 var oParam = base.CreateParams;
-                oParam.ExStyle |= (int)enExStyle.EX_NOACTIVATE | (int)enExStyle.EX_TOOLWINDOW | (int)enExStyle.EX_TOPMOST;
+                oParam.ExStyle |= (int)ExStyle.EX_NOACTIVATE | (int)ExStyle.EX_TOOLWINDOW | (int)ExStyle.EX_TOPMOST;
                 oParam.Parent = IntPtr.Zero;
                 return oParam;
             }

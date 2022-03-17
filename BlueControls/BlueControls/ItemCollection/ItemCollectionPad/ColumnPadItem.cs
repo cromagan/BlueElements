@@ -31,11 +31,11 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
-        public static BlueFont? CellFont = Skin.GetBlueFont(enDesign.Table_Cell, enStates.Standard);
+        public static BlueFont? CellFont = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
 
-        public static BlueFont? ChapterFont = Skin.GetBlueFont(enDesign.Table_Cell_Chapter, enStates.Standard);
+        public static BlueFont? ChapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard);
 
-        public static BlueFont? ColumnFont = Skin.GetBlueFont(enDesign.Table_Column, enStates.Standard);
+        public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
 
         public readonly ColumnItem Column;
 
@@ -105,7 +105,7 @@ namespace BlueControls.ItemCollection {
         /// </summary>
         public void Spalte_bearbeiten() {
             if (Column == null) { return; }
-            TabAdministration.OpenColumnEditor(Column, null, null);
+            BlueControls.Forms.TableView.OpenColumnEditor(Column, null, null);
         }
 
         public override string ToString() {
@@ -153,7 +153,7 @@ namespace BlueControls.ItemCollection {
 
             var r = Column.Database.Row.First();
             if (r != null) {
-                Table.Draw_FormatedText(gr, r.CellGetString(Column), Column, new Rectangle(0, 210, bmp.Width, 90), enDesign.Table_Cell, enStates.Standard, BlueDatabase.Enums.enShortenStyle.Replaced, Column.BildTextVerhalten);
+                Table.Draw_FormatedText(gr, r.CellGetString(Column), Column, new Rectangle(0, 210, bmp.Width, 90), Design.Table_Cell, States.Standard, BlueDatabase.Enums.ShortenStyle.Replaced, Column.BildTextVerhalten);
             }
 
             return bmp;

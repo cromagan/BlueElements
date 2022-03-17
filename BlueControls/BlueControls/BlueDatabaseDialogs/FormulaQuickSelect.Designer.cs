@@ -74,8 +74,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Auswahl
             // 
-            this.Auswahl.AddAllowed = BlueControls.Enums.enAddType.OnlySuggests;
-            this.Auswahl.CheckBehavior = BlueControls.Enums.enCheckBehavior.MultiSelection;
+            this.Auswahl.AddAllowed = BlueControls.Enums.AddType.OnlySuggests;
+            this.Auswahl.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
             this.Auswahl.Location = new System.Drawing.Point(8, 136);
             this.Auswahl.Name = "Auswahl";
             this.Auswahl.Size = new System.Drawing.Size(312, 288);

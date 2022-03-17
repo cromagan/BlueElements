@@ -147,7 +147,7 @@ namespace BlueControls.Controls {
         //    }
         //}
 
-        protected override void DrawControl(Graphics gr, enStates state) {
+        protected override void DrawControl(Graphics gr, States state) {
             //base.DrawControl(gr, state);
 
             var maxBounds = MaxBounds();

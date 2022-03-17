@@ -87,7 +87,7 @@ namespace BlueControls.ItemCollection {
             Text_Unten = string.Empty;
             Nachkommastellen = 1;
 
-            Stil = enPadStyles.Style_StandardAlternativ;
+            Stil = PadStyles.Style_StandardAlternativ;
             _point1.Parent = this;
             _point2.Parent = this;
             _textPoint.Parent = this;
@@ -239,7 +239,7 @@ namespace BlueControls.ItemCollection {
         }
 
         protected override RectangleF CalculateUsedArea() {
-            if (Stil == enPadStyles.Undefiniert) { return new RectangleF(0, 0, 0, 0); }
+            if (Stil == PadStyles.Undefiniert) { return new RectangleF(0, 0, 0, 0); }
             var geszoom = Parent.SheetStyleScale * Skalierung;
             var f = Skin.GetBlueFont(Stil, Parent.SheetStyle);
             var sz1 = BlueFont.MeasureString(Angezeigter_Text_Oben(), f.Font(geszoom));
@@ -258,7 +258,7 @@ namespace BlueControls.ItemCollection {
         protected override string ClassId() => "DIMENSION";
 
         protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
-            if (Stil == enPadStyles.Undefiniert) { return; }
+            if (Stil == PadStyles.Undefiniert) { return; }
             var geszoom = Parent.SheetStyleScale * Skalierung * zoom;
             var f = Skin.GetBlueFont(Stil, Parent.SheetStyle);
             var pfeilG = f.Font(geszoom).Size * 0.8f;

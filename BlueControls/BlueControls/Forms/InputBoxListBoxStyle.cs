@@ -33,11 +33,11 @@ namespace BlueControls.Forms {
 
         #region Constructors
 
-        private InputBoxListBoxStyle() : this(string.Empty, null, enAddType.None, true) { }
+        private InputBoxListBoxStyle() : this(string.Empty, null, AddType.None, true) { }
 
-        private InputBoxListBoxStyle(string txt, ItemCollectionList? itemsOriginal, enAddType addNewAllowed, bool cancelErl) : base(cancelErl, true) {
+        private InputBoxListBoxStyle(string txt, ItemCollectionList? itemsOriginal, AddType addNewAllowed, bool cancelErl) : base(cancelErl, true) {
             InitializeComponent();
-            if (itemsOriginal.Appearance != enBlueListBoxAppearance.Listbox) {
+            if (itemsOriginal.Appearance != BlueListBoxAppearance.Listbox) {
                 Develop.DebugPrint("Design nicht Listbox");
             }
             //var itemsClone = (ItemCollectionList)itemsOriginal.Clone();
@@ -58,16 +58,16 @@ namespace BlueControls.Forms {
             if (items == null || items.Count == 0) {
                 return InputBox.Show(txt, "", enVarType.Text);
             }
-            ItemCollectionList x = new(enBlueListBoxAppearance.Listbox) {
-                CheckBehavior = enCheckBehavior.AlwaysSingleSelection
+            ItemCollectionList x = new(BlueListBoxAppearance.Listbox) {
+                CheckBehavior = CheckBehavior.AlwaysSingleSelection
             };
             x.AddRange(items);
             x.Sort();
-            var erg = Show(txt, x, enAddType.None, true);
+            var erg = Show(txt, x, AddType.None, true);
             return erg is null || erg.Count != 1 ? string.Empty : erg[0];
         }
 
-        public static List<string>? Show(string txt, ItemCollectionList? items, enAddType addNewAllowed, bool cancelErl) {
+        public static List<string>? Show(string txt, ItemCollectionList? items, AddType addNewAllowed, bool cancelErl) {
             InputBoxListBoxStyle mb = new(txt, items, addNewAllowed, cancelErl);
             mb.ShowDialog();
             return mb._giveBack;

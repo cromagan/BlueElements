@@ -28,7 +28,7 @@ namespace BlueControls.Controls {
             Height = 110;
             SendToBack();
             Dock = DockStyle.Top;
-            BackColor = Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard);
+            BackColor = Skin.Color_Back(Design.RibbonBar_Body, States.Standard);
         }
 
         #endregion
@@ -41,11 +41,11 @@ namespace BlueControls.Controls {
                 return;
             }
 
-            tp.BackColor = Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard);
+            tp.BackColor = Skin.Color_Back(Design.RibbonBar_Body, States.Standard);
             Invalidate();
         }
 
-        protected override void OnPaint(PaintEventArgs e) => DrawControl(e, enDesign.RibbonBar_Back);
+        protected override void OnPaint(PaintEventArgs e) => DrawControl(e, Design.RibbonBar_Back);
 
         #endregion
     }

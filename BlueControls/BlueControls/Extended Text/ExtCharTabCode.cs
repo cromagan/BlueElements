@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueControls.Enums;
 using System.Drawing;
 
@@ -24,7 +26,7 @@ namespace BlueControls.Extended_Text {
 
         #region Constructors
 
-        internal ExtCharTabCode(enDesign design, enStates state, BlueFont? font, int stufe) : base(design, state, font, stufe) { }
+        internal ExtCharTabCode(Design design, States state, BlueFont? font, int stufe) : base(design, state, font, stufe) { }
 
         #endregion
 

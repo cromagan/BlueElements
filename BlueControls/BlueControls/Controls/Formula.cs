@@ -111,7 +111,6 @@ namespace BlueControls.Controls {
             }
         }
 
-        // <Obsolete("Database darf nicht im Designer gesetzt werden.", True)>
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -251,7 +250,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        protected override void DrawControl(Graphics gr, enStates state) => Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
+        protected override void DrawControl(Graphics gr, States state) => Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
 
         protected override void OnSizeChanged(System.EventArgs e) {
             if (IsDisposed) { return; }
@@ -446,14 +445,14 @@ namespace BlueControls.Controls {
             var currView = CurrentView();
             ItemCollectionList aa = new();
             aa.AddRange(_database.Permission_AllUsed(false));
-            aa.CheckBehavior = enCheckBehavior.MultiSelection;
+            aa.CheckBehavior = CheckBehavior.MultiSelection;
             aa.Check(currView.PermissionGroups_Show, true);
             if (_database.Views.Count > 1 && currView == _database.Views[1]) {
                 aa["#Everybody"].Enabled = false;
                 aa["#Everybody"].Checked = true;
             }
             aa.Sort();
-            var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, enAddType.Text, true);
+            var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, AddType.Text, true);
             if (b == null) { return; }
             currView.PermissionGroups_Show.Clear();
             currView.PermissionGroups_Show.AddRange(b.ToArray());
@@ -493,9 +492,9 @@ namespace BlueControls.Controls {
             Develop.Debugprint_BackgroundThread();
             FlexiControlForCell btb =
                 new(cd.Column.Database, cd.Column.Key, cd.ÜberschriftAnordnung) {
-                TabIndex = TabIndex + 10000,
-                Tag = cd
-            };
+                    TabIndex = TabIndex + 10000,
+                    Tag = cd
+                };
             btb.NeedRefresh += Btb_IAmInvalid;
             vParent.Controls.Add(btb);
             _control.Add(btb);
@@ -544,8 +543,7 @@ namespace BlueControls.Controls {
                 var widthInPixelOfColumn = (widthInPixelOfParent - (viewSpalten * Skin.PaddingSmal)) / (viewSpalten + 1);
                 foreach (var thisViewItem in thisView) {
                     if (thisViewItem?.Column != null) {
-                        Rectangle objPx = new()
-                        {
+                        Rectangle objPx = new() {
                             Width = (thisViewItem.Width * widthInPixelOfColumn) + ((thisViewItem.Width - 1) * Skin.PaddingSmal),
                             X = (thisViewItem.Spalte_X1 * widthInPixelOfColumn) + (thisViewItem.Spalte_X1 * Skin.PaddingSmal) + moveIn,
                             Y = moveIn
@@ -638,8 +636,7 @@ namespace BlueControls.Controls {
             foreach (var thisView in _database.Views) {
                 if (thisView != null && thisView != _database.Views[0]) {
                     _tabGeneratorCount++;
-                    System.Windows.Forms.TabPage tempPage = new()
-                    {
+                    System.Windows.Forms.TabPage tempPage = new() {
                         Text = "Seite #" + _tabGeneratorCount
                     };
                     tempPage.Text = thisView.Name;

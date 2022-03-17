@@ -81,8 +81,8 @@ namespace BlueControls.Controls {
         public void Scale() { }
 
         //public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
-        protected void DrawControl(PaintEventArgs e, enDesign design) {
-            Skin.Draw_Back(e.Graphics, design, enStates.Standard, new Rectangle(0, 0, Width, Height), this, true);
+        protected void DrawControl(PaintEventArgs e, Design design) {
+            Skin.Draw_Back(e.Graphics, design, States.Standard, new Rectangle(0, 0, Width, Height), this, true);
 
             if (TabCount == 0 && DesignMode) {
                 e.Graphics.DrawRectangle(Pens.Magenta, new Rectangle(0, 0, Width - 1, Height - 1));
@@ -186,37 +186,37 @@ namespace BlueControls.Controls {
         }
 
         private void DrawTabBody(Graphics graphics, int id) {
-            var w = enStates.Standard;
-            if (!TabPages[id].Enabled) { w = enStates.Standard_Disabled; }
+            var w = States.Standard;
+            if (!TabPages[id].Enabled) { w = States.Standard_Disabled; }
             var tabRect = GetTabRect(id);
             Rectangle r = new(0, tabRect.Bottom, Width, Height - tabRect.Bottom);
             if (r.Width < 2 || r.Height < 2) { return; }
             if (this is RibbonBar) {
-                Skin.Draw_Back(graphics, enDesign.RibbonBar_Body, w, r, this, true);
-                Skin.Draw_Border(graphics, enDesign.RibbonBar_Body, w, r);
+                Skin.Draw_Back(graphics, Design.RibbonBar_Body, w, r, this, true);
+                Skin.Draw_Border(graphics, Design.RibbonBar_Body, w, r);
             } else {
-                Skin.Draw_Back(graphics, enDesign.TabStrip_Body, w, r, this, true);
-                Skin.Draw_Border(graphics, enDesign.TabStrip_Body, w, r);
+                Skin.Draw_Back(graphics, Design.TabStrip_Body, w, r, this, true);
+                Skin.Draw_Border(graphics, Design.TabStrip_Body, w, r);
             }
         }
 
         private void DrawTabHead(Graphics graphics, int id) {
             try {
-                var tmpState = enStates.Standard;
-                if (!TabPages[id].Enabled) { tmpState = enStates.Standard_Disabled; }
-                if (id == SelectedIndex) { tmpState |= enStates.Checked; }
-                if (TabPages[id].Enabled && HotTab == TabPages[id]) { tmpState |= enStates.Standard_MouseOver; }
+                var tmpState = States.Standard;
+                if (!TabPages[id].Enabled) { tmpState = States.Standard_Disabled; }
+                if (id == SelectedIndex) { tmpState |= States.Checked; }
+                if (TabPages[id].Enabled && HotTab == TabPages[id]) { tmpState |= States.Standard_MouseOver; }
                 var r = GetTabRect(id);
                 r.Y -= 2;
                 r.X++;
                 if (this is RibbonBar) {
-                    Skin.Draw_Back(graphics, enDesign.RibbonBar_Head, tmpState, r, this, true);
-                    Skin.Draw_FormatedText(graphics, TabPages[id].Text, enDesign.RibbonBar_Head, tmpState, null, enAlignment.Horizontal_Vertical_Center, r, this, false, true);
-                    Skin.Draw_Border(graphics, enDesign.RibbonBar_Head, tmpState, r);
+                    Skin.Draw_Back(graphics, Design.RibbonBar_Head, tmpState, r, this, true);
+                    Skin.Draw_FormatedText(graphics, TabPages[id].Text, Design.RibbonBar_Head, tmpState, null, enAlignment.Horizontal_Vertical_Center, r, this, false, true);
+                    Skin.Draw_Border(graphics, Design.RibbonBar_Head, tmpState, r);
                 } else {
-                    Skin.Draw_Back(graphics, enDesign.TabStrip_Head, tmpState, r, this, true);
-                    Skin.Draw_FormatedText(graphics, TabPages[id].Text, enDesign.TabStrip_Head, tmpState, null, enAlignment.Horizontal_Vertical_Center, r, this, false, true);
-                    Skin.Draw_Border(graphics, enDesign.TabStrip_Head, tmpState, r);
+                    Skin.Draw_Back(graphics, Design.TabStrip_Head, tmpState, r, this, true);
+                    Skin.Draw_FormatedText(graphics, TabPages[id].Text, Design.TabStrip_Head, tmpState, null, enAlignment.Horizontal_Vertical_Center, r, this, false, true);
+                    Skin.Draw_Border(graphics, Design.TabStrip_Head, tmpState, r);
                 }
             } catch { }
         }

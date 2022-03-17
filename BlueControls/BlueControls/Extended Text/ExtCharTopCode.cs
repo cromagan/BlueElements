@@ -24,7 +24,7 @@ namespace BlueControls.Extended_Text {
 
         #region Constructors
 
-        internal ExtCharTopCode(enDesign design, enStates state, BlueFont? font, int stufe) : base(design, state, font, stufe) { }
+        internal ExtCharTopCode(Design design, States state, BlueFont? font, int stufe) : base(design, state, font, stufe) { }
 
         #endregion
 

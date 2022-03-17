@@ -111,7 +111,7 @@ namespace BlueControls {
             if (e.HotItem is string txt) {
                 var c = _database.Column.Exists(txt);
                 if (c is null) { return; }
-                e.UserMenu.Add(enContextMenuComands.SpaltenEigenschaftenBearbeiten);
+                e.UserMenu.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten);
             }
         }
 
@@ -123,7 +123,7 @@ namespace BlueControls {
             switch (e.ClickedComand.ToLower()) {
                 case "spalteneigenschaftenbearbeiten":
                     if (c != null) {
-                        TabAdministration.OpenColumnEditor(c, null, null);
+                        BlueControls.Forms.TableView.OpenColumnEditor(c, null, null);
                     }
 
                     break;

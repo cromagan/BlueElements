@@ -34,7 +34,7 @@ namespace BlueControls.Controls
             //
             //But1
             //
-            this.But1.ButtonStyle = enButtonStyle.SliderButton;
+            this.But1.ButtonStyle = ButtonStyle.SliderButton;
             this.But1.Checked = false;
             this.But1.ImageCode = "Pfeil_Oben_Scrollbar|8|||||0";
             this.But1.ImageCode_Checked = "";
@@ -47,7 +47,7 @@ namespace BlueControls.Controls
             //
             //But2
             //
-            this.But2.ButtonStyle = enButtonStyle.SliderButton;
+            this.But2.ButtonStyle = ButtonStyle.SliderButton;
             this.But2.Checked = false;
             this.But2.ImageCode = "Pfeil_Unten_Scrollbar|8|||||0";
             this.But2.ImageCode_Checked = "";

@@ -82,7 +82,7 @@ namespace BlueControls.Controls {
             switch (e.ClickedComand.ToLower()) {
                 case "#columnedit":
                     if (e.HotItem is ColumnItem col) {
-                        TabAdministration.OpenColumnEditor(col, null);
+                        BlueControls.Forms.TableView.OpenColumnEditor(col, null);
                     }
                     return true;
 
@@ -198,7 +198,7 @@ namespace BlueControls.Controls {
         private void Cbx_DropDownShowing(object sender, System.EventArgs e) {
             var cbx = (ComboBox)sender;
             cbx.Item.Clear();
-            cbx.Item.CheckBehavior = enCheckBehavior.MultiSelection;
+            cbx.Item.CheckBehavior = CheckBehavior.MultiSelection;
             if (TableView == null) {
                 cbx.Item.Add("Anzeigefehler", "|~", enImageCode.Kreuz, false);
                 return;
@@ -207,7 +207,7 @@ namespace BlueControls.Controls {
             if (listFilterString.Count == 0) {
                 cbx.Item.Add("Keine weiteren Einträge vorhanden", "|~", enImageCode.Kreuz, false);
             } else if (listFilterString.Count < 400) {
-                cbx.Item.AddRange(listFilterString, Filter.Column, enShortenStyle.Replaced, Filter.Column.BildTextVerhalten);
+                cbx.Item.AddRange(listFilterString, Filter.Column, ShortenStyle.Replaced, Filter.Column.BildTextVerhalten);
                 cbx.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
             } else {
                 cbx.Item.Add("Zu viele Einträge", "|~", enImageCode.Kreuz, false);
@@ -239,7 +239,7 @@ namespace BlueControls.Controls {
                     EditType = enEditTypeFormula.None;
                 } else {
                     var showDelFilterButton = true;
-                    if (Filter.FilterType == enFilterType.Instr_GroßKleinEgal && Filter.SearchValue != null && Filter.SearchValue.Count == 1) {
+                    if (Filter.FilterType == FilterType.Instr_GroßKleinEgal && Filter.SearchValue != null && Filter.SearchValue.Count == 1) {
                         CaptionPosition = myParent == null || myParent.Orientation == enOrientation.Waagerecht ? enÜberschriftAnordnung.Links_neben_Dem_Feld
                                                                                                                : enÜberschriftAnordnung.Über_dem_Feld;
                         showDelFilterButton = false;
@@ -247,7 +247,7 @@ namespace BlueControls.Controls {
                         EditType = enEditTypeFormula.Textfeld_mit_Auswahlknopf;
                         ValueSet(Filter.SearchValue[0], true, true);
                     }
-                    if (Filter.Column.FilterOptions is enFilterOptions.Enabled_OnlyAndAllowed or enFilterOptions.Enabled_OnlyOrAllowed) {
+                    if (Filter.Column.FilterOptions is FilterOptions.Enabled_OnlyAndAllowed or FilterOptions.Enabled_OnlyOrAllowed) {
                         showDelFilterButton = false;
                         CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
                         Caption = Filter.Column.ReadableText() + ":";

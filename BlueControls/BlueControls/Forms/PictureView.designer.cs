@@ -53,7 +53,7 @@ namespace BlueControls.Forms
             // 
             // btnVor
             // 
-            this.btnVor.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnVor.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnVor.ImageCode = "Pfeil_Rechts";
             this.btnVor.Location = new System.Drawing.Point(56, 2);
             this.btnVor.Name = "btnVor";
@@ -64,7 +64,7 @@ namespace BlueControls.Forms
             // 
             // btnZurueck
             // 
-            this.btnZurueck.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnZurueck.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnZurueck.ImageCode = "Pfeil_Links";
             this.btnZurueck.Location = new System.Drawing.Point(7, 2);
             this.btnZurueck.Name = "btnZurueck";
@@ -75,8 +75,8 @@ namespace BlueControls.Forms
             // 
             // btnZoomOut
             // 
-            this.btnZoomOut.ButtonStyle = ((BlueControls.Enums.enButtonStyle)(((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Button_Big) 
-            | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnZoomOut.ButtonStyle = ((BlueControls.Enums.ButtonStyle)(((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Button_Big) 
+            | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnZoomOut.ImageCode = "LupeMinus";
             this.btnZoomOut.Location = new System.Drawing.Point(120, 2);
             this.btnZoomOut.Name = "btnZoomOut";
@@ -86,8 +86,8 @@ namespace BlueControls.Forms
             // 
             // btnZoomIn
             // 
-            this.btnZoomIn.ButtonStyle = ((BlueControls.Enums.enButtonStyle)(((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Button_Big) 
-            | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnZoomIn.ButtonStyle = ((BlueControls.Enums.ButtonStyle)(((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Button_Big) 
+            | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnZoomIn.ImageCode = "LupePlus";
             this.btnZoomIn.Location = new System.Drawing.Point(176, 2);
             this.btnZoomIn.Name = "btnZoomIn";
@@ -97,7 +97,7 @@ namespace BlueControls.Forms
             // 
             // btnZoomFit
             // 
-            this.btnZoomFit.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnZoomFit.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnZoomFit.ImageCode = "ZoomFit";
             this.btnZoomFit.Location = new System.Drawing.Point(8, 2);
             this.btnZoomFit.Name = "btnZoomFit";
@@ -157,8 +157,8 @@ namespace BlueControls.Forms
             // 
             // btnChoose
             // 
-            this.btnChoose.ButtonStyle = ((BlueControls.Enums.enButtonStyle)(((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Button_Big) 
-            | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnChoose.ButtonStyle = ((BlueControls.Enums.ButtonStyle)(((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Button_Big) 
+            | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnChoose.Checked = true;
             this.btnChoose.ImageCode = "Mauspfeil";
             this.btnChoose.Location = new System.Drawing.Point(64, 2);

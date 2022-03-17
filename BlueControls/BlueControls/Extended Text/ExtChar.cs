@@ -28,12 +28,12 @@ namespace BlueControls.Extended_Text {
 
         public PointF Pos = PointF.Empty;
 
-        private enDesign _design;
+        private Design _design;
 
         private BlueFont? _font;
 
         private SizeF _size;
-        private enStates _state;
+        private States _state;
 
         private int _stufe;
 
@@ -41,7 +41,7 @@ namespace BlueControls.Extended_Text {
 
         #region Constructors
 
-        protected ExtChar(enDesign design, enStates state, BlueFont? font, int stufe) : base() {
+        protected ExtChar(Design design, States state, BlueFont? font, int stufe) : base() {
             _design = design;
             _state = state;
             _stufe = stufe;
@@ -53,7 +53,7 @@ namespace BlueControls.Extended_Text {
 
         #region Properties
 
-        public enDesign Design {
+        public Design Design {
             get => _design;
             set {
                 if (value == _design) { return; }
@@ -67,7 +67,7 @@ namespace BlueControls.Extended_Text {
                     return _font;
                 }
 
-                _font = Design == enDesign.Undefiniert || State == enStates.Undefiniert ? null : Skin.GetBlueFont(Design, State, Stufe);
+                _font = Design == Design.Undefiniert || State == States.Undefiniert ? null : Skin.GetBlueFont(Design, State, Stufe);
                 _size = SizeF.Empty;
                 return _font;
             }
@@ -75,7 +75,7 @@ namespace BlueControls.Extended_Text {
             protected set => _font = value;
         }
 
-        public enMarkState Marking { get; set; }
+        public MarkState Marking { get; set; }
 
         public SizeF Size {
             get {
@@ -84,7 +84,7 @@ namespace BlueControls.Extended_Text {
             }
         }
 
-        public enStates State {
+        public States State {
             get => _state;
             set {
                 if (value == _state) { return; }
@@ -137,7 +137,7 @@ namespace BlueControls.Extended_Text {
 
         protected abstract SizeF CalculateSize();
 
-        private void ChangeState(enDesign design, enStates state, int stufe) {
+        private void ChangeState(Design design, States state, int stufe) {
             if (state == _state && stufe == _stufe && design == _design) { return; }
             _size = SizeF.Empty;
             _design = design;

@@ -67,17 +67,17 @@ namespace BlueControls.Controls {
         //    'Stop
         //End Sub
         // Private Sub EventDrawControl(GR as graphics, vState As enStates) Handles MyBase.DrawControl
-        protected override void DrawControl(Graphics gr, enStates state) {
-            Skin.Draw_Back(gr, enDesign.Progressbar, state, DisplayRectangle, this, true);
+        protected override void DrawControl(Graphics gr, States state) {
+            Skin.Draw_Back(gr, Design.Progressbar, state, DisplayRectangle, this, true);
             if (_prozent > 0) {
                 Rectangle r = new(DisplayRectangle.X, DisplayRectangle.Y,
                     (int)Math.Truncate(DisplayRectangle.Width * _prozent / 100.0), DisplayRectangle.Height);
                 //r = New Rectangle(DisplayRectangle)
                 //r.Width = CInt(r.Width * wProzent / 100)
-                Skin.Draw_Back(gr, enDesign.Progressbar_Füller, state, r, this, true);
-                Skin.Draw_Border(gr, enDesign.Progressbar_Füller, state, r);
+                Skin.Draw_Back(gr, Design.Progressbar_Füller, state, r, this, true);
+                Skin.Draw_Border(gr, Design.Progressbar_Füller, state, r);
             }
-            Skin.Draw_Border(gr, enDesign.Progressbar, state, DisplayRectangle);
+            Skin.Draw_Border(gr, Design.Progressbar, state, DisplayRectangle);
         }
 
         #endregion

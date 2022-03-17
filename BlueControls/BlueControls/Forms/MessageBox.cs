@@ -44,7 +44,7 @@ namespace BlueControls.Forms {
         //        StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
         //    }
         //}
-        private MessageBox(string txt, enImageCode pic, params string[] buttons) : base(enDesign.Form_MsgBox) {
+        private MessageBox(string txt, enImageCode pic, params string[] buttons) : base(Design.Form_MsgBox) {
             InitializeComponent();
             Text = Develop.AppName();
             capText.Text = pic != enImageCode.None
@@ -90,7 +90,7 @@ namespace BlueControls.Forms {
 
         public List<Button> Generate_Buttons(string[] names) {
             var myX = Width - Skin.Padding - BorderWidth;
-            ExtText erT = new(enDesign.Button, enStates.Standard);
+            ExtText erT = new(Design.Button, States.Standard);
             List<Button> buts = new();
             for (var z = names.GetUpperBound(0); z > -1; z--) {
                 if (!string.IsNullOrEmpty(names[z])) {
@@ -144,7 +144,7 @@ namespace BlueControls.Forms {
                     b.Size = new Size(erT.Width() + (Skin.Padding * w), erT.Height() + (Skin.Padding * 2));
                     b.Location = new Point(myX - b.Width, Height - BorderHeight - Skin.Padding - b.Height);
                     myX = b.Location.X - Skin.Padding;
-                    b.ButtonStyle = enButtonStyle.Button;
+                    b.ButtonStyle = ButtonStyle.Button;
                     b.Visible = true;
                     b.Anchor = System.Windows.Forms.AnchorStyles.Right | System.Windows.Forms.AnchorStyles.Bottom;
                     Controls.Add(b);

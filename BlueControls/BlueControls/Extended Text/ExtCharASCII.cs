@@ -34,7 +34,7 @@ namespace BlueControls.Extended_Text {
 
         #region Constructors
 
-        internal ExtCharAscii(char charcode, enDesign design, enStates state, BlueFont? font, int stufe, enMarkState markState) : base(design, state, font, stufe) {
+        internal ExtCharAscii(char charcode, Design design, States state, BlueFont? font, int stufe, MarkState markState) : base(design, state, font, stufe) {
             _char = charcode;
             Marking = markState;
         }

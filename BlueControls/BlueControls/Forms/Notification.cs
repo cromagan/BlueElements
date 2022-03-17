@@ -46,7 +46,7 @@ namespace BlueControls.Forms {
         #region Constructors
 
         // Startzeit für UnloadAfterSek
-        private Notification() : base(Enums.enDesign.Form_DesktopBenachrichtigung) => InitializeComponent();
+        private Notification() : base(Enums.Design.Form_DesktopBenachrichtigung) => InitializeComponent();
 
         private Notification(string text) : this() {
             capTXT.Text = text;

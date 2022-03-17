@@ -86,7 +86,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        protected override void DrawControl(Graphics gr, enStates state) {
+        protected override void DrawControl(Graphics gr, States state) {
             CheckSize();
             Pen DP = new(SystemColors.ControlDark);
             Pen LP = new(SystemColors.ControlLight);

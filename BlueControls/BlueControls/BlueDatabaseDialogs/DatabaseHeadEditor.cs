@@ -71,10 +71,10 @@ namespace BlueControls.BlueDatabaseDialogs {
         protected override void OnLoad(System.EventArgs e) {
             base.OnLoad(e);
             cbxVerwaisteDaten.Item.Clear();
-            cbxVerwaisteDaten.Item.AddRange(typeof(enVerwaisteDaten));
+            cbxVerwaisteDaten.Item.AddRange(typeof(VerwaisteDaten));
             cbxVerwaisteDaten.Text = ((int)_database.VerwaisteDaten).ToString();
             cbxAnsicht.Item.Clear();
-            cbxAnsicht.Item.AddRange(typeof(enAnsicht));
+            cbxAnsicht.Item.AddRange(typeof(Ansicht));
             cbxAnsicht.Text = ((int)_database.Ansicht).ToString();
             PermissionGroups_NewRow.Item.Clear();
             PermissionGroups_NewRow.Item.AddRange(_database.PermissionGroupsNewRow);
@@ -145,32 +145,32 @@ namespace BlueControls.BlueDatabaseDialogs {
                 var neu = work.ChangedTo;
                 var aenderung = work.Comand.ToString();
                 switch (work.Comand) {
-                    case enDatabaseDataType.ce_UTF8Value_withoutSizeData:
-                    case enDatabaseDataType.ce_Value_withoutSizeData:
+                    case DatabaseDataType.ce_UTF8Value_withoutSizeData:
+                    case DatabaseDataType.ce_Value_withoutSizeData:
                         symb = enImageCode.Textfeld;
                         aenderung = "Wert geändert";
                         break;
 
-                    case enDatabaseDataType.AutoExport:
+                    case DatabaseDataType.AutoExport:
                         aenderung = "Export ausgeführt oder geändert";
                         alt = "";
                         neu = "";
                         symb = enImageCode.Karton;
                         break;
 
-                    case enDatabaseDataType.Layouts:
+                    case DatabaseDataType.Layouts:
                         aenderung = "Layouts verändert";
                         alt = "";
                         neu = "";
                         symb = enImageCode.Layout;
                         break;
 
-                    case enDatabaseDataType.dummyComand_AddRow:
+                    case DatabaseDataType.dummyComand_AddRow:
                         aenderung = "Neue Zeile";
                         symb = enImageCode.PlusZeichen;
                         break;
 
-                    case enDatabaseDataType.RulesScript:
+                    case DatabaseDataType.RulesScript:
                         //case enDatabaseDataType.Rules_ALT:
                         aenderung = "Regeln verändert";
                         symb = enImageCode.Formel;
@@ -178,14 +178,14 @@ namespace BlueControls.BlueDatabaseDialogs {
                         neu = "";
                         break;
 
-                    case enDatabaseDataType.ColumnArrangement:
+                    case DatabaseDataType.ColumnArrangement:
                         aenderung = "Spalten-Anordnungen verändert";
                         symb = enImageCode.Spalte;
                         alt = "";
                         neu = "";
                         break;
 
-                    case enDatabaseDataType.dummyComand_RemoveRow:
+                    case DatabaseDataType.dummyComand_RemoveRow:
                         aenderung = "Zeile gelöscht";
                         symb = enImageCode.MinusZeichen;
                         break;
@@ -199,13 +199,13 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnAlleUndos_Click(object sender, System.EventArgs e) {
             btnAlleUndos.Enabled = false;
-            var l = TabAdministration.Vorgängervsersionen(_database);
+            var l = BlueControls.Forms.TableView.Vorgängerversionen(_database);
             if (l.Count < 1) {
                 MessageBox.Show("Keine Vorgänger gefunden.");
                 return;
             }
-            l.CheckBehavior = enCheckBehavior.MultiSelection;
-            var alle = InputBoxListBoxStyle.Show("Datenbaken, die geladen werden sollen, wählen:", l, enAddType.None, true);
+            l.CheckBehavior = CheckBehavior.MultiSelection;
+            var alle = InputBoxListBoxStyle.Show("Datenbaken, die geladen werden sollen, wählen:", l, AddType.None, true);
             if (alle.Count < 1) {
                 MessageBox.Show("Abbruch.");
                 btnAlleUndos.Enabled = true;
@@ -231,7 +231,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             x.Close();
         }
 
-        private void btnClipboard_Click(object sender, System.EventArgs e) => Generic.CopytoClipboard(tblUndo.Export_CSV(enFirstRow.ColumnCaption));
+        private void btnClipboard_Click(object sender, System.EventArgs e) => Generic.CopytoClipboard(tblUndo.Export_CSV(FirstRow.ColumnCaption));
 
         private void btnFremdImport_Click(object sender, System.EventArgs e) {
             if (_database.ReadOnly) { return; }
@@ -248,28 +248,28 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
             ItemCollectionList I = new()
             {
-                { "Anordnungen der Spaltenansichten", ((int)enDatabaseDataType.ColumnArrangement).ToString() },
-                { "Formulare", ((int)enDatabaseDataType.Views).ToString() },
+                { "Anordnungen der Spaltenansichten", ((int)DatabaseDataType.ColumnArrangement).ToString() },
+                { "Formulare", ((int)DatabaseDataType.Views).ToString() },
                 //I.Add("Regeln", ((int)enDatabaseDataType.Rules_ALT).ToString());
-                { "Undo-Speicher", ((int)enDatabaseDataType.UndoInOne).ToString() },
-                { "Auto-Export", ((int)enDatabaseDataType.AutoExport).ToString() },
+                { "Undo-Speicher", ((int)DatabaseDataType.UndoInOne).ToString() },
+                { "Auto-Export", ((int)DatabaseDataType.AutoExport).ToString() },
                 //{ "Binäre Daten im Kopf der Datenbank", ((int)enDatabaseDataType.BinaryDataInOne).ToString() },
-                { "Eingebettete Layouts", ((int)enDatabaseDataType.Layouts).ToString() },
-                { "Tags des Datenbankkopfes", ((int)enDatabaseDataType.Tags).ToString() },
-                { "Standard-Sortierung", ((int)enDatabaseDataType.SortDefinition).ToString() }
+                { "Eingebettete Layouts", ((int)DatabaseDataType.Layouts).ToString() },
+                { "Tags des Datenbankkopfes", ((int)DatabaseDataType.Tags).ToString() },
+                { "Standard-Sortierung", ((int)DatabaseDataType.SortDefinition).ToString() }
             };
             I.Sort();
             var what = InputBoxComboStyle.Show("Welchen Code:", I, false);
             if (string.IsNullOrEmpty(what)) { return; }
             var b = MultiUserFile.UnzipIt(File.ReadAllBytes(getFromFile));
-            enDatabaseDataType art = 0;
+            DatabaseDataType art = 0;
             var pointer = 0;
             long colKey = 0;
             long rowKey = 0;
             var x = 0;
             var y = 0;
             var inhalt = string.Empty;
-            var such = (enDatabaseDataType)IntParse(what);
+            var such = (DatabaseDataType)IntParse(what);
             do {
                 if (pointer > b.Length) { break; }
                 _database.Parse(b, ref pointer, ref art, ref colKey, ref rowKey, ref inhalt, ref x, ref y);
@@ -278,7 +278,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                     //_Database.AddPending(Art, -1, -1, "", Inhalt, true);
                     MessageBox.Show("<b>Importiert:</b><br>" + inhalt, enImageCode.Information, "OK");
                 }
-            } while (art != enDatabaseDataType.EOF);
+            } while (art != DatabaseDataType.EOF);
             RemoveDatabase();
             Close();
         }
@@ -392,7 +392,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 thisColumn.MultiLine = true;
                 thisColumn.TextBearbeitungErlaubt = false;
                 thisColumn.DropdownBearbeitungErlaubt = false;
-                thisColumn.BildTextVerhalten = enBildTextVerhalten.Bild_oder_Text;
+                thisColumn.BildTextVerhalten = BildTextVerhalten.Bild_oder_Text;
             }
             x.RepairAfterParse();
             x.ColumnArrangements[1].ShowAllColumns();
@@ -452,8 +452,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (string.IsNullOrEmpty(cellKey)) { return; }
             bt.Database.Cell.DataOfCellKey(cellKey, out var column, out _);
             e.UserMenu.Add("Sortierung", true);
-            e.UserMenu.Add(enContextMenuComands.SpaltenSortierungAZ, column != null && column.Format.CanBeChangedByRules());
-            e.UserMenu.Add(enContextMenuComands.SpaltenSortierungZA, column != null && column.Format.CanBeChangedByRules());
+            e.UserMenu.Add(ContextMenuComands.SpaltenSortierungAZ, column != null && column.Format.CanBeChangedByRules());
+            e.UserMenu.Add(ContextMenuComands.SpaltenSortierungZA, column != null && column.Format.CanBeChangedByRules());
         }
 
         private void tblUndo_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
@@ -501,8 +501,8 @@ namespace BlueControls.BlueDatabaseDialogs {
                 _database.PermissionGroupsNewRow.AddRange(PermissionGroups_NewRow.Item.ToListOfString());
                 _database.PermissionGroupsNewRow.Remove("#Administrator");
             }
-            _database.VerwaisteDaten = (enVerwaisteDaten)IntParse(cbxVerwaisteDaten.Text);
-            _database.Ansicht = (enAnsicht)IntParse(cbxAnsicht.Text);
+            _database.VerwaisteDaten = (VerwaisteDaten)IntParse(cbxVerwaisteDaten.Text);
+            _database.Ansicht = (Ansicht)IntParse(cbxAnsicht.Text);
 
             #region Sortierung
 

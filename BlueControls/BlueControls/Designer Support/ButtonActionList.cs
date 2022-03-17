@@ -28,7 +28,7 @@ namespace BlueControls.Designer_Support {
 
         #region Properties
 
-        public enButtonStyle ButtonStyle {
+        public ButtonStyle ButtonStyle {
             get => _reverenceControl.ButtonStyle;
             set => SetControlProperty("ButtonStyle", value);
         }
@@ -48,7 +48,7 @@ namespace BlueControls.Designer_Support {
                 new DesignerActionHeaderItem("Allgemein"),
                 new DesignerActionPropertyItem("ButtonStyle", "ButtonStyle", "Allgemein", "Das Verhalten des Buttons.")
             };
-            if ((int)_reverenceControl.ButtonStyle % 1000 is ((int)enButtonStyle.Checkbox) or ((int)enButtonStyle.Yes_or_No) or ((int)enButtonStyle.Pic1_or_Pic2) or ((int)enButtonStyle.Optionbox)) {
+            if ((int)_reverenceControl.ButtonStyle % 1000 is ((int)ButtonStyle.Checkbox) or ((int)ButtonStyle.Yes_or_No) or ((int)ButtonStyle.Pic1_or_Pic2) or ((int)ButtonStyle.Optionbox)) {
                 items.Add(new DesignerActionPropertyItem("Checked", "Checked", "Allgemein", "Der Checked-Status."));
             }
             return items;

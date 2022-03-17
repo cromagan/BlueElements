@@ -113,9 +113,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             ItemCollectionList aa = new();
             aa.AddRange(Database.Permission_AllUsed(false));
             aa.Sort();
-            aa.CheckBehavior = enCheckBehavior.MultiSelection;
+            aa.CheckBehavior = CheckBehavior.MultiSelection;
             aa.Check(CurrentArrangement.PermissionGroups_Show, true);
-            var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, enAddType.Text, true);
+            var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, AddType.Text, true);
             if (b == null) { return; }
             CurrentArrangement.PermissionGroups_Show.Clear();
             CurrentArrangement.PermissionGroups_Show.AddRange(b.ToArray());
@@ -201,7 +201,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 return;
             }
             ic.Sort();
-            var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, enAddType.None, true);
+            var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, AddType.None, true);
             if (r == null || r.Count == 0) { return; }
             CurrentArrangement.Add(Database.Column.SearchByKey(LongParse(r[0])), false);
             ShowOrder();
@@ -433,7 +433,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                                     var c = thisc.Column.Database.Column.SearchByKey(key);
                                     if (c != null) {
                                         var rkcolit = (ColumnPadItem)Pad.Item[c.Name];
-                                        rkcolit?.ConnectsTo.AddIfNotExists(new ItemConnection(databItem, enConnectionType.Top, enConnectionType.Bottom, false, true));
+                                        rkcolit?.ConnectsTo.AddIfNotExists(new ItemConnection(databItem, ConnectionType.Top, ConnectionType.Bottom, false, true));
                                     }
                                 }// else if (!string.IsNullOrEmpty(column.LinkedCellFilter[z]) && column.LinkedCellFilter[z].StartsWith("@")) {
                                  //    fi.Add(new FilterItem(linkedDatabase.Column[z], enFilterType.Istgleich, column.LinkedCellFilter[z].Substring(1)));
@@ -449,13 +449,13 @@ namespace BlueControls.BlueDatabaseDialogs {
                                 var it2 = new ColumnPadItem(c2);
                                 Pad.Item.Add(it2);
                                 it2.SetLeftTopPoint(kx, 600);
-                                it2.ConnectsTo.Add(new ItemConnection(it, enConnectionType.Bottom, enConnectionType.Top,
+                                it2.ConnectsTo.Add(new ItemConnection(it, ConnectionType.Bottom, ConnectionType.Top,
                                     false, true));
                                 kx = it2.UsedArea.Right;
 
                                 // und noch die Datenbank auf die Spalte zeigen lassem
-                                databItem?.ConnectsTo.AddIfNotExists(new ItemConnection(it2, enConnectionType.Bottom,
-                                    enConnectionType.Bottom, false, false));
+                                databItem?.ConnectsTo.AddIfNotExists(new ItemConnection(it2, ConnectionType.Bottom,
+                                    ConnectionType.Bottom, false, false));
                             }
 
                             #endregion

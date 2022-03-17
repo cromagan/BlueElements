@@ -36,15 +36,15 @@ namespace BlueDatabase {
         private ColumnItem? _column;
 
         private bool _disposedValue;
-        private enFilterType _filterType = enFilterType.KeinFilter;
+        private FilterType _filterType = FilterType.KeinFilter;
 
         #endregion
 
         #region Constructors
 
-        public FilterItem(Database? database, enFilterType filterType, string searchValue) : this(database, filterType, new List<string> { searchValue }) { }
+        public FilterItem(Database? database, FilterType filterType, string searchValue) : this(database, filterType, new List<string> { searchValue }) { }
 
-        public FilterItem(Database? database, enFilterType filterType, IReadOnlyCollection<string>? searchValue) {
+        public FilterItem(Database? database, FilterType filterType, IReadOnlyCollection<string>? searchValue) {
             Database = database;
             if (Database != null) {
                 Database.Disposing += Database_Disposing;
@@ -74,13 +74,13 @@ namespace BlueDatabase {
             SearchValue.Changed += SearchValue_ListOrItemChanged;
         }
 
-        public FilterItem(ColumnItem? column, enFilterType filterType, string searchValue) : this(column, filterType, new List<string> { searchValue }, string.Empty) { }
+        public FilterItem(ColumnItem? column, FilterType filterType, string searchValue) : this(column, filterType, new List<string> { searchValue }, string.Empty) { }
 
-        public FilterItem(ColumnItem? column, enFilterType filterType, string searchValue, string tag) : this(column, filterType, new List<string> { searchValue }, tag) { }
+        public FilterItem(ColumnItem? column, FilterType filterType, string searchValue, string tag) : this(column, filterType, new List<string> { searchValue }, tag) { }
 
-        public FilterItem(ColumnItem? column, enFilterType filterType, List<string> searchValue) : this(column, filterType, searchValue, string.Empty) { }
+        public FilterItem(ColumnItem? column, FilterType filterType, List<string> searchValue) : this(column, filterType, searchValue, string.Empty) { }
 
-        public FilterItem(ColumnItem? column, enFilterType filterType, IReadOnlyCollection<string>? searchValue, string herkunft) {
+        public FilterItem(ColumnItem? column, FilterType filterType, IReadOnlyCollection<string>? searchValue, string herkunft) {
             if (column == null) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Spalte nicht vorhanden.");
                 return;
@@ -93,7 +93,7 @@ namespace BlueDatabase {
             SearchValue.Changed += SearchValue_ListOrItemChanged;
         }
 
-        public FilterItem(ColumnItem? column, RowItem rowWithValue) : this(column, enFilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren, rowWithValue.CellGetString(column)) { }
+        public FilterItem(ColumnItem? column, RowItem rowWithValue) : this(column, FilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren, rowWithValue.CellGetString(column)) { }
 
         #endregion
 
@@ -118,7 +118,7 @@ namespace BlueDatabase {
         /// </summary>
         public Database? Database { get; private set; }
 
-        public enFilterType FilterType {
+        public FilterType FilterType {
             get => _filterType;
             set {
                 _filterType = value;
@@ -133,7 +133,7 @@ namespace BlueDatabase {
 
         #region Methods
 
-        public void Changeto(enFilterType type, string searchvalue) {
+        public void Changeto(FilterType type, string searchvalue) {
             SearchValue.ThrowEvents = false;
             SearchValue.Clear();
             SearchValue.Add(searchvalue);
@@ -158,9 +158,9 @@ namespace BlueDatabase {
             GC.SuppressFinalize(this);
         }
 
-        public string ErrorReason() => _filterType == enFilterType.KeinFilter ? "'Kein Filter' angegeben" : string.Empty;
+        public string ErrorReason() => _filterType == FilterType.KeinFilter ? "'Kein Filter' angegeben" : string.Empty;
 
-        public bool IsNullOrEmpty() => _filterType == enFilterType.KeinFilter;
+        public bool IsNullOrEmpty() => _filterType == FilterType.KeinFilter;
 
         public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
 
@@ -186,7 +186,7 @@ namespace BlueDatabase {
                         break;
 
                     case "type":
-                        _filterType = (enFilterType)IntParse(pair.Value);
+                        _filterType = (FilterType)IntParse(pair.Value);
                         break;
 
                     case "column":
@@ -215,55 +215,55 @@ namespace BlueDatabase {
         }
 
         public string ReadableText() {
-            if (_filterType == enFilterType.KeinFilter) { return "Filter ohne Funktion"; }
+            if (_filterType == FilterType.KeinFilter) { return "Filter ohne Funktion"; }
             if (_column == null) { return "Zeilen-Filter"; }
             var nam = _column.ReadableText();
             if (SearchValue == null || SearchValue.Count < 1) { return "#### Filter-Fehler ####"; }
             if (SearchValue.Count > 1) {
                 return _filterType switch {
-                    enFilterType.Istgleich or enFilterType.IstGleich_ODER or enFilterType.Istgleich_GroﬂKleinEgal or enFilterType.Istgleich_ODER_GroﬂKleinEgal => nam + " - eins davon: '" + SearchValue.JoinWith("', '") + "'",
-                    enFilterType.IstGleich_UND or enFilterType.Istgleich_UND_GroﬂKleinEgal => nam + " - alle: '" + SearchValue.JoinWith("', '") + "'",
+                    FilterType.Istgleich or FilterType.IstGleich_ODER or FilterType.Istgleich_GroﬂKleinEgal or FilterType.Istgleich_ODER_GroﬂKleinEgal => nam + " - eins davon: '" + SearchValue.JoinWith("', '") + "'",
+                    FilterType.IstGleich_UND or FilterType.Istgleich_UND_GroﬂKleinEgal => nam + " - alle: '" + SearchValue.JoinWith("', '") + "'",
                     _ => nam + ": Spezial-Filter"
                 };
             }
-            if (_column == Database.Column.SysCorrect && _filterType.HasFlag(enFilterType.Istgleich)) {
+            if (_column == Database.Column.SysCorrect && _filterType.HasFlag(FilterType.Istgleich)) {
                 if (SearchValue[0].FromPlusMinus()) { return "Fehlerfreie Zeilen"; }
                 if (!SearchValue[0].FromPlusMinus()) { return "Fehlerhafte Zeilen"; }
             }
             switch (_filterType) {
-                case enFilterType.Istgleich:
+                case FilterType.Istgleich:
 
-                case enFilterType.Istgleich_GroﬂKleinEgal:
+                case FilterType.Istgleich_GroﬂKleinEgal:
 
-                case enFilterType.Istgleich_ODER_GroﬂKleinEgal:
+                case FilterType.Istgleich_ODER_GroﬂKleinEgal:
 
-                case enFilterType.Istgleich_UND_GroﬂKleinEgal:
+                case FilterType.Istgleich_UND_GroﬂKleinEgal:
                     if (string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss leer sein"; }
-                    return nam + " = " + LanguageTool.ColumnReplace(SearchValue[0], Column, enShortenStyle.Replaced);
+                    return nam + " = " + LanguageTool.ColumnReplace(SearchValue[0], Column, ShortenStyle.Replaced);
 
-                case enFilterType.Ungleich_MultiRowIgnorieren:
+                case FilterType.Ungleich_MultiRowIgnorieren:
 
-                case enFilterType.Ungleich_MultiRowIgnorieren_UND_GroﬂKleinEgal:
+                case FilterType.Ungleich_MultiRowIgnorieren_UND_GroﬂKleinEgal:
 
-                case enFilterType.Ungleich_MultiRowIgnorieren_GroﬂKleinEgal:
+                case FilterType.Ungleich_MultiRowIgnorieren_GroﬂKleinEgal:
                     if (string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss bef¸llt sein"; }
-                    return nam + " <> " + LanguageTool.ColumnReplace(SearchValue[0], Column, enShortenStyle.Replaced);
+                    return nam + " <> " + LanguageTool.ColumnReplace(SearchValue[0], Column, ShortenStyle.Replaced);
 
-                case enFilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren:
+                case FilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren:
 
-                case enFilterType.Istgleich_MultiRowIgnorieren:
+                case FilterType.Istgleich_MultiRowIgnorieren:
                     if (SearchValue.Count == 1 && string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss leer sein"; }
                     return "Spezial-Filter";
 
-                case enFilterType.Instr:
+                case FilterType.Instr:
 
-                case enFilterType.Instr_GroﬂKleinEgal:
+                case FilterType.Instr_GroﬂKleinEgal:
                     if (SearchValue.Count == 0 || string.IsNullOrEmpty(SearchValue[0])) { return "Filter aktuell ohne Funktion"; }
                     return nam + " beinhaltet den Text '" + SearchValue[0] + "'";
 
-                case enFilterType.Between:
+                case FilterType.Between:
 
-                case enFilterType.Between | enFilterType.UND:
+                case FilterType.Between | FilterType.UND:
                     return nam + ": von " + SearchValue[0].Replace("|", " bis ");
 
                 default:

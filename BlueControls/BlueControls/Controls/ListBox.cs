@@ -39,9 +39,9 @@ namespace BlueControls.Controls {
 
         #region Fields
 
-        private enAddType _addAlloweds = enAddType.Text;
+        private AddType _addAlloweds = AddType.Text;
 
-        private enBlueListBoxAppearance _appearance;
+        private BlueListBoxAppearance _appearance;
 
         private bool _filterAllowed;
 
@@ -66,7 +66,7 @@ namespace BlueControls.Controls {
             Item.ItemAdded += _Item_ItemAdded;
             Item.ItemRemoved += _Item_ItemRemoved;
             Item.ItemRemoving += _Item_ItemRemoving;
-            _appearance = enBlueListBoxAppearance.Listbox;
+            _appearance = BlueListBoxAppearance.Listbox;
         }
 
         #endregion
@@ -111,7 +111,7 @@ namespace BlueControls.Controls {
         #region Properties
 
         [DefaultValue(true)]
-        public enAddType AddAllowed {
+        public AddType AddAllowed {
             get => _addAlloweds;
             set {
                 if (_addAlloweds == value) { return; }
@@ -120,8 +120,8 @@ namespace BlueControls.Controls {
             }
         }
 
-        [DefaultValue(enBlueListBoxAppearance.Listbox)]
-        public enBlueListBoxAppearance Appearance {
+        [DefaultValue(BlueListBoxAppearance.Listbox)]
+        public BlueListBoxAppearance Appearance {
             get => _appearance;
             set {
                 if (_appearance == value) { return; }
@@ -130,8 +130,8 @@ namespace BlueControls.Controls {
             }
         }
 
-        [DefaultValue(enCheckBehavior.SingleSelection)]
-        public enCheckBehavior CheckBehavior {
+        [DefaultValue(CheckBehavior.SingleSelection)]
+        public CheckBehavior CheckBehavior {
             get => Item.CheckBehavior;
             set => Item.CheckBehavior = value;
         }
@@ -231,8 +231,8 @@ namespace BlueControls.Controls {
                 MessageBox.Show("Keine (weiteren) Werte vorhanden.", enImageCode.Information, "OK");
                 return;
             }
-            Suggestions.CheckBehavior = enCheckBehavior.SingleSelection;
-            var rück = InputBoxListBoxStyle.Show("Bitte wählen sie einen Wert:", Suggestions, enAddType.None, true);
+            Suggestions.CheckBehavior = CheckBehavior.SingleSelection;
+            var rück = InputBoxListBoxStyle.Show("Bitte wählen sie einen Wert:", Suggestions, AddType.None, true);
 
             if (rück == null || rück.Count == 0) { return; }
 
@@ -257,16 +257,16 @@ namespace BlueControls.Controls {
 
         public void OnListOrItemChanged() => ListOrItemChanged?.Invoke(this, System.EventArgs.Empty);
 
-        protected override void DrawControl(Graphics gr, enStates state) {
+        protected override void DrawControl(Graphics gr, States state) {
             if (Item != null) { Item.Appearance = _appearance; }
-            var tmp = enDesign.ListBox;
-            if (_appearance is not enBlueListBoxAppearance.Gallery and not enBlueListBoxAppearance.FileSystem) { tmp = (enDesign)_appearance; }
+            var tmp = Design.ListBox;
+            if (_appearance is not BlueListBoxAppearance.Gallery and not BlueListBoxAppearance.FileSystem) { tmp = (Design)_appearance; }
             var paintModXx = 0;
             var paintModYx = 0;
             var vStateBox = state;
-            if (Convert.ToBoolean(vStateBox & enStates.Standard_MouseOver)) { vStateBox ^= enStates.Standard_MouseOver; }
-            if (Convert.ToBoolean(vStateBox & enStates.Standard_MousePressed)) { vStateBox ^= enStates.Standard_MousePressed; }
-            if (Convert.ToBoolean(vStateBox & enStates.Standard_HasFocus)) { vStateBox ^= enStates.Standard_HasFocus; }
+            if (Convert.ToBoolean(vStateBox & States.Standard_MouseOver)) { vStateBox ^= States.Standard_MouseOver; }
+            if (Convert.ToBoolean(vStateBox & States.Standard_MousePressed)) { vStateBox ^= States.Standard_MousePressed; }
+            if (Convert.ToBoolean(vStateBox & States.Standard_HasFocus)) { vStateBox ^= States.Standard_HasFocus; }
             if (Item.Count == 0) {
                 SliderY.Visible = false;
                 SliderY.Value = 0;
@@ -295,9 +295,9 @@ namespace BlueControls.Controls {
             System.Threading.Tasks.Parallel.ForEach(Item, thisItem => {
                 if (thisItem.Pos.IntersectsWith(visArea)) {
                     var vStateItem = vStateBox;
-                    if (_mouseOverItem == thisItem && Enabled) { vStateItem |= enStates.Standard_MouseOver; }
-                    if (!thisItem.Enabled) { vStateItem = enStates.Standard_Disabled; }
-                    if (thisItem.Checked) { vStateItem |= enStates.Checked; }
+                    if (_mouseOverItem == thisItem && Enabled) { vStateItem |= States.Standard_MouseOver; }
+                    if (!thisItem.Enabled) { vStateItem = States.Standard_Disabled; }
+                    if (thisItem.Checked) { vStateItem |= States.Checked; }
                     lock (locker) {
                         thisItem.Draw(gr, 0, (int)SliderY.Value, Item.ControlDesign, Item.ItemDesign, vStateItem, true, FilterTxt.Text, false); // Items müssen beim Erstellen ersetzt werden!!!!
                     }
@@ -305,7 +305,7 @@ namespace BlueControls.Controls {
             });
             if (borderCoords.Height > 0) {
                 // Kann sein, wenn PaintModY größer als die Höhe ist
-                if (tmp == enDesign.ListBox) { Skin.Draw_Border(gr, tmp, vStateBox, borderCoords); }
+                if (tmp == Design.ListBox) { Skin.Draw_Border(gr, tmp, vStateBox, borderCoords); }
             }
             if (paintModYx > 0) { Skin.Draw_Back_Transparent(gr, new Rectangle(0, borderCoords.Bottom, Width, paintModYx), this); }
         }
@@ -355,7 +355,7 @@ namespace BlueControls.Controls {
             switch (e.Button) {
                 case System.Windows.Forms.MouseButtons.Left:
                     if (nd != null) {
-                        if (Appearance is enBlueListBoxAppearance.Listbox or enBlueListBoxAppearance.Autofilter or enBlueListBoxAppearance.Gallery or enBlueListBoxAppearance.FileSystem) {
+                        if (Appearance is BlueListBoxAppearance.Listbox or BlueListBoxAppearance.Autofilter or BlueListBoxAppearance.Gallery or BlueListBoxAppearance.FileSystem) {
                             if (nd.IsClickable()) { nd.Checked = !nd.Checked; }
                         }
                         OnItemClicked(new BasicListItemEventArgs(nd));
@@ -432,7 +432,7 @@ namespace BlueControls.Controls {
             var nr = Item.Checked();
             Down.Visible = _moveAllowed;
             Up.Visible = _moveAllowed;
-            Plus.Visible = _addAlloweds != enAddType.None;
+            Plus.Visible = _addAlloweds != AddType.None;
             Minus.Visible = _removeAllowed;
             FilterTxt.Visible = _filterAllowed;
             FilterCap.Visible = _filterAllowed;
@@ -493,21 +493,21 @@ namespace BlueControls.Controls {
         private void Plus_Click(object sender, System.EventArgs e) {
             OnAddClicked();
             switch (_addAlloweds) {
-                case enAddType.UserDef:
+                case AddType.UserDef:
                     break;
 
-                case enAddType.Text:
+                case AddType.Text:
                     Add_Text();
                     break;
 
-                case enAddType.OnlySuggests:
+                case AddType.OnlySuggests:
                     Add_TextBySuggestion();
                     break;
 
-                case enAddType.None:
+                case AddType.None:
                     break;
 
-                case enAddType.BinarysFromFileSystem:
+                case AddType.BinarysFromFileSystem:
                     Add_FromFileSystem();
                     break;
 

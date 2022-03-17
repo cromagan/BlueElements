@@ -67,11 +67,11 @@ namespace BlueDatabase {
 
         #region Methods
 
-        public static Tuple<string, QuickImage> GetDrawingData(ColumnItem? column, string originalText, enShortenStyle style, enBildTextVerhalten bildTextverhalten) {
+        public static Tuple<string, QuickImage> GetDrawingData(ColumnItem? column, string originalText, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
             var tmpText = ValueReadable(column, originalText, style, bildTextverhalten, true);
             var tmpImageCode = StandardImage(column, originalText, tmpText, style, bildTextverhalten);
 
-            if (bildTextverhalten is enBildTextVerhalten.Bild_oder_Text or enBildTextVerhalten.Interpretiere_Bool) {
+            if (bildTextverhalten is BildTextVerhalten.Bild_oder_Text or BildTextVerhalten.Interpretiere_Bool) {
                 if (tmpImageCode != null) { tmpText = string.Empty; }
             }
             return new Tuple<string, QuickImage>(tmpText, tmpImageCode);
@@ -102,30 +102,30 @@ namespace BlueDatabase {
         //    }
         //}
 
-        public static QuickImage? StandardErrorImage(string gr, enBildTextVerhalten bildTextverhalten, string originalText, ColumnItem? column) {
+        public static QuickImage? StandardErrorImage(string gr, BildTextVerhalten bildTextverhalten, string originalText, ColumnItem? column) {
             switch (bildTextverhalten) {
-                case enBildTextVerhalten.Fehlendes_Bild_zeige_Fragezeichen:
+                case BildTextVerhalten.Fehlendes_Bild_zeige_Fragezeichen:
                     return QuickImage.Get("Fragezeichen|" + gr);
 
-                case enBildTextVerhalten.Fehlendes_Bild_zeige_Kreis:
+                case BildTextVerhalten.Fehlendes_Bild_zeige_Kreis:
                     return QuickImage.Get("Kreis2|" + gr);
 
-                case enBildTextVerhalten.Fehlendes_Bild_zeige_Kreuz:
+                case BildTextVerhalten.Fehlendes_Bild_zeige_Kreuz:
                     return QuickImage.Get("Kreuz|" + gr);
 
-                case enBildTextVerhalten.Fehlendes_Bild_zeige_Häkchen:
+                case BildTextVerhalten.Fehlendes_Bild_zeige_Häkchen:
                     return QuickImage.Get("Häkchen|" + gr);
 
-                case enBildTextVerhalten.Fehlendes_Bild_zeige_Infozeichen:
+                case BildTextVerhalten.Fehlendes_Bild_zeige_Infozeichen:
                     return QuickImage.Get("Information|" + gr);
 
-                case enBildTextVerhalten.Fehlendes_Bild_zeige_Warnung:
+                case BildTextVerhalten.Fehlendes_Bild_zeige_Warnung:
                     return QuickImage.Get("Warnung|" + gr);
 
-                case enBildTextVerhalten.Fehlendes_Bild_zeige_Kritischzeichen:
+                case BildTextVerhalten.Fehlendes_Bild_zeige_Kritischzeichen:
                     return QuickImage.Get("Kritisch|" + gr);
 
-                case enBildTextVerhalten.Interpretiere_Bool:
+                case BildTextVerhalten.Interpretiere_Bool:
                     if (originalText == "+") {
                         return column == column.Database.Column.SysCorrect ? QuickImage.Get("Häkchen|" + gr + "||||||||80") : QuickImage.Get("Häkchen|" + gr);
                     } else if (originalText == "-") {
@@ -138,7 +138,7 @@ namespace BlueDatabase {
                     }
                     return null;
 
-                case enBildTextVerhalten.Bild_oder_Text:
+                case BildTextVerhalten.Bild_oder_Text:
                     return null;
 
                 default:
@@ -154,8 +154,8 @@ namespace BlueDatabase {
         /// <param name="style"></param>
         /// <param name="removeLineBreaks">bei TRUE werden Zeilenumbrüche mit Leerzeichen ersetzt</param>
         /// <returns></returns>
-        public static string ValueReadable(ColumnItem? column, string txt, enShortenStyle style, enBildTextVerhalten bildTextverhalten, bool removeLineBreaks) {
-            if (bildTextverhalten == enBildTextVerhalten.Nur_Bild && style != enShortenStyle.HTML) { return string.Empty; }
+        public static string ValueReadable(ColumnItem? column, string txt, ShortenStyle style, BildTextVerhalten bildTextverhalten, bool removeLineBreaks) {
+            if (bildTextverhalten == BildTextVerhalten.Nur_Bild && style != ShortenStyle.HTML) { return string.Empty; }
             switch (column.Format) {
                 case enDataFormat.Text:
                 case enDataFormat.Link_To_Filesystem:
@@ -216,7 +216,7 @@ namespace BlueDatabase {
                     Develop.DebugPrint(column.Format);
                     break;
             }
-            if (style != enShortenStyle.HTML) { return txt; }
+            if (style != ShortenStyle.HTML) { return txt; }
             txt = txt.Replace("\r\n", "<br>");
             txt = txt.Replace("\r", "<br>");
             //if (txt.Contains("\r")) { Develop.DebugPrint(enFehlerArt.Info, "\\r enthalten:" + txt); }
@@ -232,7 +232,7 @@ namespace BlueDatabase {
         /// Jede Zeile für sich richtig formatiert.
         /// </summary>
         /// <returns></returns>
-        public static List<string> ValuesReadable(ColumnItem? column, RowItem Row, enShortenStyle Style) {
+        public static List<string> ValuesReadable(ColumnItem? column, RowItem Row, ShortenStyle Style) {
             if (column.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 //var LinkedData = CellCollection.LinkedCellData(column, Row, false, false);
                 //if (LinkedData.Item1 != null && LinkedData.Item2 != null) { return ValuesReadable(LinkedData.Item1, LinkedData.Item2, Style); }
@@ -257,12 +257,12 @@ namespace BlueDatabase {
 
         internal void InvalidateSize() => Size = Size.Empty;
 
-        private static QuickImage? StandardImage(ColumnItem? column, string originalText, string replacedText, enShortenStyle style, enBildTextVerhalten bildTextverhalten) {
+        private static QuickImage? StandardImage(ColumnItem? column, string originalText, string replacedText, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
             // replacedText kann auch empty sein. z.B. wenn er nicht angezeigt wird
-            if (bildTextverhalten == enBildTextVerhalten.Nur_Text) { return null; }
-            if (style == enShortenStyle.HTML) { return null; }
+            if (bildTextverhalten == BildTextVerhalten.Nur_Text) { return null; }
+            if (style == ShortenStyle.HTML) { return null; }
             if (column == null) { return null; }
-            if (bildTextverhalten == enBildTextVerhalten.Nur_Bild) { replacedText = ValueReadable(column, originalText, style, enBildTextVerhalten.Nur_Text, true); }
+            if (bildTextverhalten == BildTextVerhalten.Nur_Bild) { replacedText = ValueReadable(column, originalText, style, BildTextVerhalten.Nur_Text, true); }
             if (string.IsNullOrEmpty(replacedText)) { return null; }
 
             var gr = Math.Truncate(column.Database.GlobalScale * 16).ToString(Constants.Format_Integer1);

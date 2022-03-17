@@ -105,9 +105,8 @@ namespace BlueDatabase {
             return OriginalString;
         }
 
-        [Obsolete]
-        public new ColumnItem Add(ColumnItem column) {
-            Develop.DebugPrint(enFehlerArt.Fehler, "Direkter Aufruf nicht erlaubt!");
+        [Obsolete("Direkter Aufruf nicht erlaubt!", true)]
+        public new ColumnItem? Add(ColumnItem column) {
             return null;
         }
 
@@ -124,7 +123,7 @@ namespace BlueDatabase {
         public ColumnItem Add(string internalName, string caption, string suffix, enVarType format) => Add(NextColumnKey(), internalName, caption, suffix, format, string.Empty);
 
         public ColumnItem Add(long colKey, string internalName, string caption, string suffix, enVarType format, string quickinfo) {
-            Database.AddPending(enDatabaseDataType.AddColumn, colKey, -1, string.Empty, colKey.ToString(), true);
+            Database.AddPending(DatabaseDataType.AddColumn, colKey, -1, string.Empty, colKey.ToString(), true);
             // Ruft anschließen AddFromParserAuf, der die Spalte endgülrig dazumacht
             var c = SearchByKey(colKey);
             c.Name = internalName;
@@ -284,11 +283,11 @@ namespace BlueDatabase {
                         if (base[s2] != null) {
                             // Evtl. Doppelte Namen einzigartig machen
                             if (string.Equals(base[s1].Name, base[s2].Name, StringComparison.CurrentCultureIgnoreCase)) {
-                                base[s2].Load(enDatabaseDataType.co_Name, base[s2].Name + "0");
+                                base[s2].Load(DatabaseDataType.co_Name, base[s2].Name + "0");
                             }
                             // Evtl. Doppelte Identifier eleminieren
                             if (!string.IsNullOrEmpty(base[s1].Identifier) && string.Equals(base[s1].Identifier, base[s2].Identifier, StringComparison.CurrentCultureIgnoreCase)) {
-                                base[s2].Load(enDatabaseDataType.co_Identifier, string.Empty);
+                                base[s2].Load(DatabaseDataType.co_Identifier, string.Empty);
                             }
                         }
                     }
@@ -394,7 +393,7 @@ namespace BlueDatabase {
                 return;
             }
             var c = Add(identifier);
-            c.Load(enDatabaseDataType.co_Identifier, identifier);
+            c.Load(DatabaseDataType.co_Identifier, identifier);
             c.ResetSystemToDefault(true);
         }
 

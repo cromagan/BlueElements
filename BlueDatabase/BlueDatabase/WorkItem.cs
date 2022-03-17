@@ -34,14 +34,14 @@ namespace BlueDatabase {
 
         private long _rowKey;
 
-        private enItemState _state;
+        private ItemState _state;
 
         #endregion
 
         #region Constructors
 
-        public WorkItem(enDatabaseDataType comand, long colKey, long rowKey, string previousValue, string changedTo, string user) {
-            _state = enItemState.Pending;
+        public WorkItem(DatabaseDataType comand, long colKey, long rowKey, string previousValue, string changedTo, string user) {
+            _state = ItemState.Pending;
             Comand = comand;
             _colKey = colKey;
             _rowKey = rowKey;
@@ -83,9 +83,9 @@ namespace BlueDatabase {
             }
         }
 
-        public enDatabaseDataType Comand { get; private set; }
+        public DatabaseDataType Comand { get; private set; }
         public DateTime Date { get; private set; }
-        public bool HistorischRelevant => State is enItemState.Pending or enItemState.Undo;
+        public bool HistorischRelevant => State is ItemState.Pending or ItemState.Undo;
         public bool IsParsing { get; private set; }
 
         public string PreviousValue { get; private set; }
@@ -101,7 +101,7 @@ namespace BlueDatabase {
 
         public string User { get; private set; }
 
-        internal enItemState State {
+        internal ItemState State {
             get => _state;
             set {
                 if (value == _state) { return; }
@@ -129,11 +129,11 @@ namespace BlueDatabase {
             foreach (var pair in toParse.GetAllTags()) {
                 switch (pair.Key) {
                     case "st":
-                        _state = (enItemState)IntParse(pair.Value);
+                        _state = (ItemState)IntParse(pair.Value);
                         break;
 
                     case "co":
-                        Comand = (enDatabaseDataType)IntParse(pair.Value);
+                        Comand = (DatabaseDataType)IntParse(pair.Value);
                         break;
 
                     case "ck":

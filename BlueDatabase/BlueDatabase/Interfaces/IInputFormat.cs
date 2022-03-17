@@ -27,7 +27,7 @@ namespace BlueDatabase.Interfaces {
 
         #region Properties
 
-        public enAdditionalCheck AdditionalCheck { get; set; }
+        public AdditionalCheck AdditionalCheck { get; set; }
 
         //public enAlignmentHorizontal Align { get; set; }
         public string AllowedChars { get; set; }
@@ -84,18 +84,18 @@ namespace BlueDatabase.Interfaces {
                 if (!string.IsNullOrEmpty(formatToCheck.Regex) && !thisString.RegexMatch(formatToCheck.Regex)) { return false; }
 
                 switch (formatToCheck.AdditionalCheck) {
-                    case enAdditionalCheck.None:
+                    case AdditionalCheck.None:
                         break;
 
-                    case enAdditionalCheck.Integer:
+                    case AdditionalCheck.Integer:
                         if (!thisString.IsLong()) { return false; }
                         break;
 
-                    case enAdditionalCheck.Float:
+                    case AdditionalCheck.Float:
                         if (!thisString.IsDouble()) { return false; }
                         break;
 
-                    case enAdditionalCheck.DateTime:
+                    case AdditionalCheck.DateTime:
                         if (!thisString.IsDateTime()) { return false; }
                         break;
 
@@ -130,7 +130,7 @@ namespace BlueDatabase.Interfaces {
                     t.Suffix = string.Empty;
                     t.Prefix = string.Empty;
                     t.FormatierungErlaubt = false;
-                    t.AdditionalCheck = enAdditionalCheck.None;
+                    t.AdditionalCheck = AdditionalCheck.None;
                     t.SpellChecking = true;
                     t.MultiLine = false;
                     return;
@@ -141,7 +141,7 @@ namespace BlueDatabase.Interfaces {
                     t.Suffix = string.Empty;
                     t.Prefix = string.Empty;
                     t.FormatierungErlaubt = false;
-                    t.AdditionalCheck = enAdditionalCheck.None;
+                    t.AdditionalCheck = AdditionalCheck.None;
                     t.SpellChecking = false;
                     t.MultiLine = false;
                     return;
@@ -152,7 +152,7 @@ namespace BlueDatabase.Interfaces {
                     t.Suffix = string.Empty;
                     t.Prefix = string.Empty;
                     t.FormatierungErlaubt = true;
-                    t.AdditionalCheck = enAdditionalCheck.None;
+                    t.AdditionalCheck = AdditionalCheck.None;
                     t.SpellChecking = true;
                     t.MultiLine = true;
                     return;
@@ -163,7 +163,7 @@ namespace BlueDatabase.Interfaces {
                     t.Suffix = string.Empty;
                     t.Prefix = string.Empty;
                     t.FormatierungErlaubt = false;
-                    t.AdditionalCheck = enAdditionalCheck.DateTime;
+                    t.AdditionalCheck = AdditionalCheck.DateTime;
                     t.SpellChecking = false;
                     t.MultiLine = false;
                     return;
@@ -175,7 +175,7 @@ namespace BlueDatabase.Interfaces {
                     t.Suffix = string.Empty;
                     t.Prefix = string.Empty;
                     t.FormatierungErlaubt = false;
-                    t.AdditionalCheck = enAdditionalCheck.None;
+                    t.AdditionalCheck = AdditionalCheck.None;
                     t.SpellChecking = false;
                     t.MultiLine = false;
                     return;
@@ -187,7 +187,7 @@ namespace BlueDatabase.Interfaces {
                     t.Suffix = string.Empty;
                     t.Prefix = string.Empty;
                     t.FormatierungErlaubt = false;
-                    t.AdditionalCheck = enAdditionalCheck.None;
+                    t.AdditionalCheck = AdditionalCheck.None;
                     t.SpellChecking = false;
                     t.MultiLine = false;
                     return;
@@ -199,7 +199,7 @@ namespace BlueDatabase.Interfaces {
                     t.Suffix = string.Empty;
                     t.Prefix = string.Empty;
                     t.FormatierungErlaubt = false;
-                    t.AdditionalCheck = enAdditionalCheck.Float;
+                    t.AdditionalCheck = AdditionalCheck.Float;
                     t.SpellChecking = false;
                     t.MultiLine = false;
                     return;
@@ -210,7 +210,7 @@ namespace BlueDatabase.Interfaces {
                     t.Suffix = string.Empty;
                     t.Prefix = string.Empty;
                     t.FormatierungErlaubt = false;
-                    t.AdditionalCheck = enAdditionalCheck.Integer;
+                    t.AdditionalCheck = AdditionalCheck.Integer;
                     t.SpellChecking = false;
                     t.MultiLine = false;
                     return;
@@ -222,7 +222,7 @@ namespace BlueDatabase.Interfaces {
                     t.Suffix = string.Empty;
                     t.Prefix = string.Empty;
                     t.FormatierungErlaubt = false;
-                    t.AdditionalCheck = enAdditionalCheck.None;
+                    t.AdditionalCheck = AdditionalCheck.None;
                     t.SpellChecking = false;
                     t.MultiLine = false;
                     return;
@@ -233,7 +233,7 @@ namespace BlueDatabase.Interfaces {
                     t.Suffix = string.Empty;
                     t.Prefix = string.Empty;
                     t.FormatierungErlaubt = false;
-                    t.AdditionalCheck = enAdditionalCheck.DateTime;
+                    t.AdditionalCheck = AdditionalCheck.DateTime;
                     t.SpellChecking = false;
                     t.MultiLine = false;
                     return;

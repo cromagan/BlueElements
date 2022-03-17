@@ -91,7 +91,7 @@
             this.grpSpalten.CausesValidation = false;
             this.grpSpalten.Controls.Add(this.btnNeueSpalte);
             this.grpSpalten.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpSpalten.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
+            this.grpSpalten.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpSpalten.Location = new System.Drawing.Point(696, 0);
             this.grpSpalten.Name = "grpSpalten";
             this.grpSpalten.Size = new System.Drawing.Size(168, 81);
@@ -101,7 +101,7 @@
             // 
             // btnNeueSpalte
             // 
-            this.btnNeueSpalte.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnNeueSpalte.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnNeueSpalte.ImageCode = "PlusZeichen";
             this.btnNeueSpalte.Location = new System.Drawing.Point(8, 2);
             this.btnNeueSpalte.Name = "btnNeueSpalte";
@@ -119,7 +119,7 @@
             this.grpAktuelleAnsicht.Controls.Add(this.btnAlleSpaltenEinblenden);
             this.grpAktuelleAnsicht.Controls.Add(this.btnBerechtigungsgruppen);
             this.grpAktuelleAnsicht.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpAktuelleAnsicht.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
+            this.grpAktuelleAnsicht.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAktuelleAnsicht.Location = new System.Drawing.Point(432, 0);
             this.grpAktuelleAnsicht.Name = "grpAktuelleAnsicht";
             this.grpAktuelleAnsicht.Size = new System.Drawing.Size(264, 81);
@@ -129,7 +129,7 @@
             // 
             // btnSystemspaltenAusblenden
             // 
-            this.btnSystemspaltenAusblenden.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnSystemspaltenAusblenden.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnSystemspaltenAusblenden.ImageCode = "Lupe|16||1";
             this.btnSystemspaltenAusblenden.Location = new System.Drawing.Point(80, 24);
             this.btnSystemspaltenAusblenden.Name = "btnSystemspaltenAusblenden";
@@ -140,7 +140,7 @@
             // 
             // btnSpalteEinblenden
             // 
-            this.btnSpalteEinblenden.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnSpalteEinblenden.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnSpalteEinblenden.ImageCode = "Lupe";
             this.btnSpalteEinblenden.Location = new System.Drawing.Point(8, 2);
             this.btnSpalteEinblenden.Name = "btnSpalteEinblenden";
@@ -151,7 +151,7 @@
             // 
             // btnAlleSpaltenEinblenden
             // 
-            this.btnAlleSpaltenEinblenden.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnAlleSpaltenEinblenden.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnAlleSpaltenEinblenden.ImageCode = "Lupe|16|||FF0000";
             this.btnAlleSpaltenEinblenden.Location = new System.Drawing.Point(80, 2);
             this.btnAlleSpaltenEinblenden.Name = "btnAlleSpaltenEinblenden";
@@ -162,7 +162,7 @@
             // 
             // btnBerechtigungsgruppen
             // 
-            this.btnBerechtigungsgruppen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnBerechtigungsgruppen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnBerechtigungsgruppen.ImageCode = "Schild|16";
             this.btnBerechtigungsgruppen.Location = new System.Drawing.Point(80, 46);
             this.btnBerechtigungsgruppen.Name = "btnBerechtigungsgruppen";
@@ -181,7 +181,7 @@
             this.grpAnsichtsVerwaltung.Controls.Add(this.btnNeueAnsichtErstellen);
             this.grpAnsichtsVerwaltung.Controls.Add(this.btnAktuelleAnsichtLoeschen);
             this.grpAnsichtsVerwaltung.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpAnsichtsVerwaltung.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
+            this.grpAnsichtsVerwaltung.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAnsichtsVerwaltung.Location = new System.Drawing.Point(0, 0);
             this.grpAnsichtsVerwaltung.Name = "grpAnsichtsVerwaltung";
             this.grpAnsichtsVerwaltung.Size = new System.Drawing.Size(432, 81);
@@ -191,7 +191,7 @@
             // 
             // btnAnsichtUmbenennen
             // 
-            this.btnAnsichtUmbenennen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnAnsichtUmbenennen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnAnsichtUmbenennen.ImageCode = "Stift";
             this.btnAnsichtUmbenennen.Location = new System.Drawing.Point(360, 2);
             this.btnAnsichtUmbenennen.Name = "btnAnsichtUmbenennen";
@@ -221,7 +221,7 @@
             // 
             // btnNeueAnsichtErstellen
             // 
-            this.btnNeueAnsichtErstellen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnNeueAnsichtErstellen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnNeueAnsichtErstellen.ImageCode = "PlusZeichen";
             this.btnNeueAnsichtErstellen.Location = new System.Drawing.Point(232, 2);
             this.btnNeueAnsichtErstellen.Name = "btnNeueAnsichtErstellen";
@@ -232,7 +232,7 @@
             // 
             // btnAktuelleAnsichtLoeschen
             // 
-            this.btnAktuelleAnsichtLoeschen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnAktuelleAnsichtLoeschen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnAktuelleAnsichtLoeschen.ImageCode = "MinusZeichen";
             this.btnAktuelleAnsichtLoeschen.Location = new System.Drawing.Point(296, 2);
             this.btnAktuelleAnsichtLoeschen.Name = "btnAktuelleAnsichtLoeschen";

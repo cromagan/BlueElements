@@ -44,10 +44,10 @@ namespace BlueControls.Controls {
 
         #region Methods
 
-        protected override void DrawControl(Graphics gr, enStates vState) {
-            if (Convert.ToBoolean(vState & enStates.Standard_MouseOver)) { vState ^= enStates.Standard_MouseOver; }
-            if (Convert.ToBoolean(vState & enStates.Standard_MousePressed)) { vState ^= enStates.Standard_MousePressed; }
-            Skin.Draw_Back(gr, enDesign.EasyPic, vState, DisplayRectangle, this, true);
+        protected override void DrawControl(Graphics gr, States vState) {
+            if (Convert.ToBoolean(vState & States.Standard_MouseOver)) { vState ^= States.Standard_MouseOver; }
+            if (Convert.ToBoolean(vState & States.Standard_MousePressed)) { vState ^= States.Standard_MousePressed; }
+            Skin.Draw_Back(gr, Design.EasyPic, vState, DisplayRectangle, this, true);
             //Bitmap _Bitmap = null;
             //if (pic.Count > 0) {
             //    if (pic[_nr] == null) {
@@ -58,7 +58,7 @@ namespace BlueControls.Controls {
             //if (_Bitmap != null) {
             //    GR.DrawImageInRectAspectRatio(_Bitmap, 1, pnlControls.Height, Width - 2, Height - 2 - pnlControls.Height);
             //}
-            Skin.Draw_Border(gr, enDesign.EasyPic, vState, DisplayRectangle);
+            Skin.Draw_Border(gr, Design.EasyPic, vState, DisplayRectangle);
         }
 
         private void btnLeft_Click(object sender, System.EventArgs e) {

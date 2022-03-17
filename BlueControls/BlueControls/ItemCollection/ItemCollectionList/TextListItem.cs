@@ -53,11 +53,11 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Text.ToUpper().Contains(filterText.ToUpper());
 
-        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => SizeUntouchedForListBox().Height;
+        public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth) => SizeUntouchedForListBox().Height;
 
-        protected override Size ComputeSizeUntouchedForListBox() => Skin.FormatedText_NeededSize(Text, Symbol, Skin.GetBlueFont(TempDesign(Parent.ItemDesign), enStates.Standard), 16);
+        protected override Size ComputeSizeUntouchedForListBox() => Skin.FormatedText_NeededSize(Text, Symbol, Skin.GetBlueFont(TempDesign(Parent.ItemDesign), States.Standard), 16);
 
-        protected override void DrawExplicit(Graphics gr, Rectangle positionModified, enDesign design, enStates vState, bool drawBorderAndBack, bool translate) {
+        protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design design, States vState, bool drawBorderAndBack, bool translate) {
             var tmpd = TempDesign(design);
             if (drawBorderAndBack) {
                 Skin.Draw_Back(gr, tmpd, vState, positionModified, null, false);
@@ -70,14 +70,14 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         protected override string GetCompareKey() => Internal.CompareKey(enSortierTyp.Sprachneutral_String);
 
-        private enDesign TempDesign(enDesign itemdesign) {
+        private Design TempDesign(Design itemdesign) {
             if (IsCaption) {
                 switch (itemdesign) {
-                    case enDesign.Item_KontextMenu:
-                        return enDesign.Item_KontextMenu_Caption;
+                    case Design.Item_KontextMenu:
+                        return Design.Item_KontextMenu_Caption;
 
-                    case enDesign.Item_Listbox:
-                        return enDesign.Item_Listbox_Caption;
+                    case Design.Item_Listbox:
+                        return Design.Item_Listbox_Caption;
                 }
             }
             return itemdesign;

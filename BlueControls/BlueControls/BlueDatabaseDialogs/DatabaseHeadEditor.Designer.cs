@@ -111,10 +111,10 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // PermissionGroups_NewRow
             // 
-            this.PermissionGroups_NewRow.AddAllowed = BlueControls.Enums.enAddType.Text;
+            this.PermissionGroups_NewRow.AddAllowed = BlueControls.Enums.AddType.Text;
             this.PermissionGroups_NewRow.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.PermissionGroups_NewRow.CheckBehavior = BlueControls.Enums.enCheckBehavior.MultiSelection;
+            this.PermissionGroups_NewRow.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
             this.PermissionGroups_NewRow.FilterAllowed = true;
             this.PermissionGroups_NewRow.Location = new System.Drawing.Point(192, 48);
             this.PermissionGroups_NewRow.Name = "PermissionGroups_NewRow";
@@ -143,10 +143,10 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // DatenbankAdmin
             // 
-            this.DatenbankAdmin.AddAllowed = BlueControls.Enums.enAddType.Text;
+            this.DatenbankAdmin.AddAllowed = BlueControls.Enums.AddType.Text;
             this.DatenbankAdmin.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.DatenbankAdmin.CheckBehavior = BlueControls.Enums.enCheckBehavior.MultiSelection;
+            this.DatenbankAdmin.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
             this.DatenbankAdmin.FilterAllowed = true;
             this.DatenbankAdmin.Location = new System.Drawing.Point(8, 46);
             this.DatenbankAdmin.Name = "DatenbankAdmin";
@@ -195,8 +195,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // lbxSortierSpalten
             // 
-            this.lbxSortierSpalten.AddAllowed = BlueControls.Enums.enAddType.OnlySuggests;
-            this.lbxSortierSpalten.CheckBehavior = BlueControls.Enums.enCheckBehavior.MultiSelection;
+            this.lbxSortierSpalten.AddAllowed = BlueControls.Enums.AddType.OnlySuggests;
+            this.lbxSortierSpalten.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
             this.lbxSortierSpalten.Location = new System.Drawing.Point(16, 32);
             this.lbxSortierSpalten.MoveAllowed = true;
             this.lbxSortierSpalten.Name = "lbxSortierSpalten";
@@ -215,7 +215,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnSortRichtung
             // 
-            this.btnSortRichtung.ButtonStyle = BlueControls.Enums.enButtonStyle.Pic1_or_Pic2;
+            this.btnSortRichtung.ButtonStyle = BlueControls.Enums.ButtonStyle.Pic1_or_Pic2;
             this.btnSortRichtung.ImageCode = "AZ|16|8";
             this.btnSortRichtung.ImageCode_Checked = "ZA|16|8";
             this.btnSortRichtung.Location = new System.Drawing.Point(288, 32);
@@ -591,7 +591,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // lbxExportSets
             // 
-            this.lbxExportSets.AddAllowed = BlueControls.Enums.enAddType.UserDef;
+            this.lbxExportSets.AddAllowed = BlueControls.Enums.AddType.UserDef;
             this.lbxExportSets.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));

@@ -47,8 +47,8 @@ namespace BlueControls {
         public static IContextMenu? ParentControlWithCommands(this object o) {
             var par = o.ParentControl<IContextMenu>();
             if (par == null) { return null; }
-            ItemCollectionList? ThisContextMenu = new(enBlueListBoxAppearance.KontextMenu);
-            ItemCollectionList UserMenu = new(enBlueListBoxAppearance.KontextMenu);
+            ItemCollectionList? ThisContextMenu = new(BlueListBoxAppearance.KontextMenu);
+            ItemCollectionList UserMenu = new(BlueListBoxAppearance.KontextMenu);
             List<string> tags = new();
             var Cancel = false;
             var Translate = true;

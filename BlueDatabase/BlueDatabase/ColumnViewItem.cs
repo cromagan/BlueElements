@@ -53,7 +53,7 @@ namespace BlueDatabase {
         private int _spalteX1;
 
         private enÜberschriftAnordnung _überschriftAnordnung;
-        private enViewType _viewType;
+        private ViewType _viewType;
 
         #endregion
 
@@ -62,7 +62,7 @@ namespace BlueDatabase {
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
         /// </summary>
-        public ColumnViewItem(ColumnItem? column, enViewType type, ColumnViewCollection parent) {
+        public ColumnViewItem(ColumnItem? column, ViewType type, ColumnViewCollection parent) {
             Initialize();
             Column = column;
             _viewType = type;
@@ -77,7 +77,7 @@ namespace BlueDatabase {
             Initialize();
             Column = column;
             Parent = parent;
-            _viewType = enViewType.Column;
+            _viewType = ViewType.Column;
             _überschriftAnordnung = überschrift;
             Column.CheckFormulaEditType();
         }
@@ -119,11 +119,11 @@ namespace BlueDatabase {
                         break;
 
                     case "permanent": // Todo: Alten Code Entfernen, Permanent wird nicht mehr verstringt 06.09.2019
-                        _viewType = enViewType.PermanentColumn;
+                        _viewType = ViewType.PermanentColumn;
                         break;
 
                     case "type":
-                        _viewType = (enViewType)IntParse(pair.Value);
+                        _viewType = (ViewType)IntParse(pair.Value);
                         break;
 
                     default:
@@ -131,8 +131,8 @@ namespace BlueDatabase {
                         break;
                 }
             }
-            if (Column != null && _viewType == enViewType.None) { _viewType = enViewType.Column; }
-            if (Column != null && _viewType != enViewType.None) { Column.CheckFormulaEditType(); }
+            if (Column != null && _viewType == ViewType.None) { _viewType = ViewType.Column; }
+            if (Column != null && _viewType != ViewType.None) { Column.CheckFormulaEditType(); }
         }
 
         #endregion
@@ -160,7 +160,7 @@ namespace BlueDatabase {
         /// Für FlexOptions
         /// </summary>
         public bool Permanent {
-            get => _viewType == enViewType.PermanentColumn;
+            get => _viewType == ViewType.PermanentColumn;
             set {
                 if (!PermanentPossible() && Permanent) { return; }
                 if (!NonPermanentPossible() && !Permanent) { return; }
@@ -168,9 +168,9 @@ namespace BlueDatabase {
                 if (value == Permanent) { return; }
 
                 if (value) {
-                    _viewType = enViewType.PermanentColumn;
+                    _viewType = ViewType.PermanentColumn;
                 } else {
-                    _viewType = enViewType.Column;
+                    _viewType = ViewType.Column;
                 }
 
                 OnChanged();
@@ -198,7 +198,7 @@ namespace BlueDatabase {
             }
         }
 
-        public enViewType ViewType {
+        public ViewType ViewType {
             get => _viewType;
             set {
                 if (value == _viewType) { return; }
@@ -271,7 +271,7 @@ namespace BlueDatabase {
             //    return !thisViewItem.Column.IsFirst();
             //}
             var nx = NextVisible(Parent);
-            return nx == null || Convert.ToBoolean(nx.ViewType != enViewType.PermanentColumn);
+            return nx == null || Convert.ToBoolean(nx.ViewType != ViewType.PermanentColumn);
         }
 
         internal bool PermanentPossible() {
@@ -279,14 +279,14 @@ namespace BlueDatabase {
             //    return thisViewItem.Column.IsFirst();
             //}
             var prev = PreviewsVisible(Parent);
-            return prev == null || Convert.ToBoolean(prev.ViewType == enViewType.PermanentColumn);
+            return prev == null || Convert.ToBoolean(prev.ViewType == ViewType.PermanentColumn);
         }
 
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
         /// </summary>
         private void Initialize() {
-            _viewType = enViewType.None;
+            _viewType = ViewType.None;
             Column = null;
             _spalteX1 = 0;
             _spalteWidth = 1;

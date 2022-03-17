@@ -60,7 +60,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Aufa
             // 
-            this.Aufa.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.Aufa.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
             this.Aufa.Location = new System.Drawing.Point(8, 40);
             this.Aufa.Name = "Aufa";
             this.Aufa.Size = new System.Drawing.Size(376, 16);
@@ -94,7 +94,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // TabStopp
             // 
-            this.TabStopp.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.TabStopp.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
             this.TabStopp.Checked = true;
             this.TabStopp.Location = new System.Drawing.Point(16, 24);
             this.TabStopp.Name = "TabStopp";
@@ -104,7 +104,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Andere
             // 
-            this.Andere.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.Andere.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
             this.Andere.Location = new System.Drawing.Point(16, 120);
             this.Andere.Name = "Andere";
             this.Andere.Size = new System.Drawing.Size(64, 16);
@@ -113,7 +113,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Semikolon
             // 
-            this.Semikolon.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.Semikolon.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
             this.Semikolon.Location = new System.Drawing.Point(16, 72);
             this.Semikolon.Name = "Semikolon";
             this.Semikolon.Size = new System.Drawing.Size(80, 16);
@@ -122,7 +122,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Leerzeichen
             // 
-            this.Leerzeichen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.Leerzeichen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
             this.Leerzeichen.Location = new System.Drawing.Point(16, 48);
             this.Leerzeichen.Name = "Leerzeichen";
             this.Leerzeichen.Size = new System.Drawing.Size(88, 16);
@@ -131,7 +131,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Komma
             // 
-            this.Komma.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.Komma.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
             this.Komma.Location = new System.Drawing.Point(16, 96);
             this.Komma.Name = "Komma";
             this.Komma.Size = new System.Drawing.Size(64, 16);
@@ -150,7 +150,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // AnfTre
             // 
-            this.AnfTre.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.AnfTre.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
             this.AnfTre.Location = new System.Drawing.Point(8, 56);
             this.AnfTre.Name = "AnfTre";
             this.AnfTre.Size = new System.Drawing.Size(224, 16);
@@ -172,7 +172,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // SpalteNachderReihe
             // 
-            this.SpalteNachderReihe.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.SpalteNachderReihe.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
             this.SpalteNachderReihe.Location = new System.Drawing.Point(8, 40);
             this.SpalteNachderReihe.Name = "SpalteNachderReihe";
             this.SpalteNachderReihe.Size = new System.Drawing.Size(600, 24);
@@ -182,7 +182,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // SpalteZuordnen
             // 
-            this.SpalteZuordnen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.SpalteZuordnen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
             this.SpalteZuordnen.Checked = true;
             this.SpalteZuordnen.Location = new System.Drawing.Point(8, 16);
             this.SpalteZuordnen.Name = "SpalteZuordnen";
@@ -216,7 +216,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // ZeilenAlle
             // 
-            this.ZeilenAlle.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.ZeilenAlle.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
             this.ZeilenAlle.Location = new System.Drawing.Point(8, 56);
             this.ZeilenAlle.Name = "ZeilenAlle";
             this.ZeilenAlle.Size = new System.Drawing.Size(608, 24);
@@ -226,7 +226,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // ZeilenZuorden
             // 
-            this.ZeilenZuorden.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.ZeilenZuorden.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
             this.ZeilenZuorden.Checked = true;
             this.ZeilenZuorden.Location = new System.Drawing.Point(8, 24);
             this.ZeilenZuorden.Name = "ZeilenZuorden";

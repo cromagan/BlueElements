@@ -24,7 +24,7 @@ namespace BlueControls.Controls {
 
         #region Constructors
 
-        public TabControl() : base() => BackColor = Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard);
+        public TabControl() : base() => BackColor = Skin.Color_Back(Design.TabStrip_Body, States.Standard);
 
         #endregion
 
@@ -36,11 +36,11 @@ namespace BlueControls.Controls {
                 return;
             }
 
-            tp.BackColor = Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard);
+            tp.BackColor = Skin.Color_Back(Design.TabStrip_Body, States.Standard);
             Invalidate();
         }
 
-        protected override void OnPaint(PaintEventArgs e) => DrawControl(e, enDesign.TabStrip_Back);
+        protected override void OnPaint(PaintEventArgs e) => DrawControl(e, Design.TabStrip_Back);
 
         #endregion
     }

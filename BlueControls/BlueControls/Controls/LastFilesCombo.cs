@@ -105,7 +105,7 @@ namespace BlueControls.Controls {
             GenerateMenu();
         }
 
-        protected override void DrawControl(Graphics gr, enStates state) {
+        protected override void DrawControl(Graphics gr, States state) {
             SetLastFilesStyle();
             base.DrawControl(gr, state);
         }
@@ -171,8 +171,8 @@ namespace BlueControls.Controls {
         private string SaveFileName() => !string.IsNullOrEmpty(_filename) ? _filename.CheckFile() : System.Windows.Forms.Application.StartupPath + "\\" + Name + "-Files.laf";
 
         private void SetLastFilesStyle() {
-            if (DrawStyle == enComboboxStyle.TextBox) {
-                DrawStyle = enComboboxStyle.Button;
+            if (DrawStyle == ComboboxStyle.TextBox) {
+                DrawStyle = ComboboxStyle.Button;
             }
             if (string.IsNullOrEmpty(ImageCode)) { ImageCode = "Ordner"; }
             if (string.IsNullOrEmpty(Text)) { Text = "zuletzt geöffnete Dateien"; }

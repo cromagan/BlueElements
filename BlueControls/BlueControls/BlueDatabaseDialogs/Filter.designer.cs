@@ -32,7 +32,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.filterleiste.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.filterleiste.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.filterleiste.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.filterleiste.Filtertypes = ((BlueControls.Enums.enFilterTypesToShow)((BlueControls.Enums.enFilterTypesToShow.NachDefinierterAnsicht | BlueControls.Enums.enFilterTypesToShow.AktuelleAnsicht_AktiveFilter)));
+            this.filterleiste.Filtertypes = ((BlueControls.Enums.FilterTypesToShow)((BlueControls.Enums.FilterTypesToShow.NachDefinierterAnsicht | BlueControls.Enums.FilterTypesToShow.AktuelleAnsicht_AktiveFilter)));
             this.filterleiste.Location = new System.Drawing.Point(0, 0);
             this.filterleiste.Name = "filterleiste";
             this.filterleiste.Orientation = BlueBasics.Enums.enOrientation.Senkrecht;

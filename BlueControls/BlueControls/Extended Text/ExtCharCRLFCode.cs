@@ -24,9 +24,9 @@ namespace BlueControls.Extended_Text {
 
         #region Constructors
 
-        internal ExtCharCRLFCode() : this(enDesign.TextBox, enStates.Standard, null, 4) { }
+        internal ExtCharCRLFCode() : this(Design.TextBox, States.Standard, null, 4) { }
 
-        internal ExtCharCRLFCode(enDesign design, enStates state, BlueFont? font, int stufe) : base(design, state, font, stufe) { }
+        internal ExtCharCRLFCode(Design design, States state, BlueFont? font, int stufe) : base(design, state, font, stufe) { }
 
         #endregion
 

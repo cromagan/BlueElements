@@ -85,9 +85,9 @@ namespace BlueDatabase {
 
         public void Add(ColumnItem? column, bool permanent) {
             if (permanent) {
-                Add(new ColumnViewItem(column, enViewType.PermanentColumn, this));
+                Add(new ColumnViewItem(column, ViewType.PermanentColumn, this));
             } else {
-                Add(new ColumnViewItem(column, enViewType.Column, this));
+                Add(new ColumnViewItem(column, ViewType.Column, this));
             }
         }
 
@@ -107,7 +107,7 @@ namespace BlueDatabase {
             }
         }
 
-        public void Insert(int index, ColumnItem? column) => Insert(index, new ColumnViewItem(column, enViewType.Column, this));
+        public void Insert(int index, ColumnItem? column) => Insert(index, new ColumnViewItem(column, ViewType.Column, this));
 
         public void Invalidate_DrawWithOfAllItems() {
             foreach (var thisViewItem in this) {
@@ -216,19 +216,19 @@ namespace BlueDatabase {
                     break;
                 }
             }
-            if (Count > 0 && this[0].ViewType != enViewType.PermanentColumn) { ok = false; }
+            if (Count > 0 && this[0].ViewType != ViewType.PermanentColumn) { ok = false; }
             if (ok) { return; }
             Clear();
             foreach (var thisColumnItem in Database.Column.Where(thisColumnItem => thisColumnItem != null)) {
-                Add(new ColumnViewItem(thisColumnItem, enViewType.Column, this));
+                Add(new ColumnViewItem(thisColumnItem, ViewType.Column, this));
             }
-            if (Count > 0) { this[0].ViewType = enViewType.PermanentColumn; }
+            if (Count > 0) { this[0].ViewType = ViewType.PermanentColumn; }
         }
 
         public new void Swap(ColumnViewItem? viewItem1, ColumnViewItem? viewItem2) {
             if (viewItem1 == null || viewItem2 == null) { return; }
             base.Swap(viewItem1, viewItem2);
-            if (viewItem2.ViewType != enViewType.PermanentColumn) { viewItem1.ViewType = enViewType.Column; }
+            if (viewItem2.ViewType != ViewType.PermanentColumn) { viewItem1.ViewType = ViewType.Column; }
         }
 
         public override string ToString() {

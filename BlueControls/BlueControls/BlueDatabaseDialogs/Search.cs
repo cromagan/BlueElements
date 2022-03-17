@@ -68,7 +68,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void btnSuchSpalte_Click(object sender, System.EventArgs e) {
-            if (_blueTable.Design == enBlueTableAppearance.OnlyMainColumnWithoutHead) {
+            if (_blueTable.Design == BlueTableAppearance.OnlyMainColumnWithoutHead) {
                 MessageBox.Show("In dieser Ansicht nicht möglich", enImageCode.Information, "OK");
                 return;
             }

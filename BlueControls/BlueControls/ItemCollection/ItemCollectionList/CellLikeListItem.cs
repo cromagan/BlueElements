@@ -32,9 +32,9 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         #region Fields
 
-        private readonly enBildTextVerhalten _bildTextverhalten;
+        private readonly BildTextVerhalten _bildTextverhalten;
 
-        private readonly enShortenStyle _style;
+        private readonly ShortenStyle _style;
 
         /// <summary>
         /// Nach welche Spalte sich der Stil richten muss.
@@ -46,7 +46,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         #region Constructors
 
-        public CellLikeListItem(string internalAndReadableText, ColumnItem? columnStyle, enShortenStyle style, bool enabled, enBildTextVerhalten bildTextverhalten) : base(internalAndReadableText, enabled) {
+        public CellLikeListItem(string internalAndReadableText, ColumnItem? columnStyle, ShortenStyle style, bool enabled, BildTextVerhalten bildTextverhalten) : base(internalAndReadableText, enabled) {
             _styleLikeThis = columnStyle;
             _style = style;
             _bildTextverhalten = bildTextverhalten;
@@ -71,15 +71,15 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         public override bool FilterMatch(string filterText) {
             if (base.FilterMatch(filterText)) { return true; }
-            var txt = CellItem.ValueReadable(_styleLikeThis, Internal, enShortenStyle.Both, _styleLikeThis.BildTextVerhalten, true);
+            var txt = CellItem.ValueReadable(_styleLikeThis, Internal, ShortenStyle.Both, _styleLikeThis.BildTextVerhalten, true);
             return txt.ToUpper().Contains(filterText.ToUpper());
         }
 
-        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => SizeUntouchedForListBox().Height;
+        public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth) => SizeUntouchedForListBox().Height;
 
-        protected override Size ComputeSizeUntouchedForListBox() => Table.FormatedText_NeededSize(_styleLikeThis, Internal, Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard), _style, 16, _bildTextverhalten);
+        protected override Size ComputeSizeUntouchedForListBox() => Table.FormatedText_NeededSize(_styleLikeThis, Internal, Skin.GetBlueFont(Parent.ItemDesign, States.Standard), _style, 16, _bildTextverhalten);
 
-        protected override void DrawExplicit(Graphics gr, Rectangle positionModified, enDesign itemdesign, enStates vState, bool drawBorderAndBack, bool translate) {
+        protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States vState, bool drawBorderAndBack, bool translate) {
             if (drawBorderAndBack) {
                 Skin.Draw_Back(gr, itemdesign, vState, positionModified, null, false);
             }
@@ -92,7 +92,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
         protected override string GetCompareKey() {
             // Die hauptklasse frägt nach diesem Kompare-Key
             //var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.HTML, true); // Muss Kompakt sein, um Suffixe zu vermeiden
-            var txt = CellItem.ValueReadable(_styleLikeThis, Internal, enShortenStyle.HTML, _bildTextverhalten, true);
+            var txt = CellItem.ValueReadable(_styleLikeThis, Internal, ShortenStyle.HTML, _bildTextverhalten, true);
 
             return txt.CompareKey(_styleLikeThis.SortType) + "|" + Internal;
             //Internal.CompareKey(_StyleLikeThis.SortType) + "|" + Internal;

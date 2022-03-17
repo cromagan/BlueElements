@@ -49,7 +49,7 @@ namespace BlueDatabase {
         private int _exportSpaltenAnsicht;
         private FilterCollection? _filter;
         private DateTime _lastExportTimeUtc;
-        private enExportTyp _typ;
+        private ExportTyp _typ;
         private string _verzeichnis;
 
         #endregion
@@ -64,7 +64,7 @@ namespace BlueDatabase {
         /// <param name="typ"></param>
         /// <param name="backupinterval">Intervall der Backups in Tagen</param>
         /// <param name="autodelete">Das maximale Alter der Backups in Tagen, nachdem sie gelöscht werden</param>
-        public ExportDefinition(Database database, string verzeichnis, enExportTyp typ, float backupinterval, float autodelete) : this(database) {
+        public ExportDefinition(Database database, string verzeichnis, ExportTyp typ, float backupinterval, float autodelete) : this(database) {
             _verzeichnis = verzeichnis;
             _typ = typ;
             _backupInterval = backupinterval;
@@ -77,7 +77,7 @@ namespace BlueDatabase {
             Database = database;
             Database.Disposing += Database_Disposing;
             _verzeichnis = string.Empty;
-            _typ = enExportTyp.DatenbankOriginalFormat;
+            _typ = ExportTyp.DatenbankOriginalFormat;
             _backupInterval = 1;
             _autoDelete = 30;
             _exportFormularId = string.Empty;
@@ -179,7 +179,7 @@ namespace BlueDatabase {
             }
         }
 
-        public enExportTyp Typ {
+        public ExportTyp Typ {
             get => _typ;
             set {
                 if (_typ == value) { return; }
@@ -268,11 +268,11 @@ namespace BlueDatabase {
                 return "Nur von Datenbanken, die auch auf der Festplatte gespeichert sind, kann ein Export stattfinden.";
             }
 
-            if (!string.IsNullOrEmpty(Database.GlobalShowPass) && _typ != enExportTyp.DatenbankOriginalFormat) {
+            if (!string.IsNullOrEmpty(Database.GlobalShowPass) && _typ != ExportTyp.DatenbankOriginalFormat) {
                 return "Von passwortgeschützten Datenbanken können nur Exporte im Originalformat stattfinden.";
             }
 
-            if (_typ == enExportTyp.EinzelnMitFormular) {
+            if (_typ == ExportTyp.EinzelnMitFormular) {
                 if (string.IsNullOrEmpty(_exportFormularId)) {
                     return "Layout-Vorlage nicht definiert.";
                 }
@@ -324,7 +324,7 @@ namespace BlueDatabase {
 
                     case "typ":
                     case "type":// ALT, 02.10.2019
-                        _typ = (enExportTyp)IntParse(pair.Value);
+                        _typ = (ExportTyp)IntParse(pair.Value);
                         break;
 
                     case "itv":
@@ -391,19 +391,19 @@ namespace BlueDatabase {
                 return "Fehler: " + t;
             }
             switch (_typ) {
-                case enExportTyp.DatenbankCSVFormat:
+                case ExportTyp.DatenbankCSVFormat:
                     t = "Gesamte Datenbank als CSV-Datei";
                     break;
 
-                case enExportTyp.DatenbankHTMLFormat:
+                case ExportTyp.DatenbankHTMLFormat:
                     t = "Gesamte Datenbank als HTML-Datei";
                     break;
 
-                case enExportTyp.DatenbankOriginalFormat:
+                case ExportTyp.DatenbankOriginalFormat:
                     t = "Sicherheitskopie im Originalformat";
                     break;
 
-                case enExportTyp.EinzelnMitFormular:
+                case ExportTyp.EinzelnMitFormular:
                     t = "Einzeleinträge";
                     break;
 
@@ -418,7 +418,7 @@ namespace BlueDatabase {
                 t += ", wenn sich was geändert hat";
             }
 
-            if (_typ == enExportTyp.EinzelnMitFormular) {
+            if (_typ == ExportTyp.EinzelnMitFormular) {
                 if (!string.IsNullOrEmpty(_exportFormularId)) {
                     t += " mit einem gewählten Formular. Einträge werden immer aktualisiert und gelöschte Einträge auch gelöscht.";
                 }
@@ -440,16 +440,16 @@ namespace BlueDatabase {
         public QuickImage? SymbolForReadableText() {
             if (!IsOk()) { return QuickImage.Get(enImageCode.Kritisch); }
             switch (_typ) {
-                case enExportTyp.DatenbankCSVFormat:
+                case ExportTyp.DatenbankCSVFormat:
                     return QuickImage.Get(enImageCode.Excel);
 
-                case enExportTyp.DatenbankHTMLFormat:
+                case ExportTyp.DatenbankHTMLFormat:
                     return QuickImage.Get(enImageCode.Globus);
 
-                case enExportTyp.DatenbankOriginalFormat:
+                case ExportTyp.DatenbankOriginalFormat:
                     return QuickImage.Get(enImageCode.Häkchen);
 
-                case enExportTyp.EinzelnMitFormular:
+                case ExportTyp.EinzelnMitFormular:
                     return QuickImage.Get(enImageCode.Stern);
 
                 default:
@@ -467,9 +467,9 @@ namespace BlueDatabase {
                 result = result + "typ=" + (int)_typ + ", ";
                 result = result + "let=" + _lastExportTimeUtc.ToString(Constants.Format_Date5) + ", ";
                 result = result + "itv=" + _backupInterval.ToString(CultureInfo.InvariantCulture).ToNonCritical() + ", ";
-                if (_typ is enExportTyp.DatenbankCSVFormat or enExportTyp.DatenbankHTMLFormat or enExportTyp.DatenbankOriginalFormat) {
+                if (_typ is ExportTyp.DatenbankCSVFormat or ExportTyp.DatenbankHTMLFormat or ExportTyp.DatenbankOriginalFormat) {
                     result = result + "aud=" + _autoDelete.ToString(CultureInfo.InvariantCulture).ToNonCritical() + ", ";
-                    if (_typ != enExportTyp.DatenbankOriginalFormat) {
+                    if (_typ != ExportTyp.DatenbankOriginalFormat) {
                         result = result + "exc=" + _exportSpaltenAnsicht + ", ";
                     }
                 } else {
@@ -496,7 +496,7 @@ namespace BlueDatabase {
         internal bool DeleteOutdatedBackUps(BackgroundWorker worker) {
             var did = false;
             if (!IsOk()) { return false; }
-            if (_typ is enExportTyp.DatenbankCSVFormat or enExportTyp.DatenbankHTMLFormat or enExportTyp.DatenbankOriginalFormat) {
+            if (_typ is ExportTyp.DatenbankCSVFormat or ExportTyp.DatenbankHTMLFormat or ExportTyp.DatenbankOriginalFormat) {
                 for (var n = 0; n < BereitsExportiert.Count; n++) {
                     if (worker != null && worker.CancellationPending) { break; }
                     if (!string.IsNullOrEmpty(BereitsExportiert[n])) {
@@ -571,28 +571,28 @@ namespace BlueDatabase {
             var tim = tim2.ToString(Constants.Format_Date5);
             try {
                 switch (_typ) {
-                    case enExportTyp.DatenbankOriginalFormat:
+                    case ExportTyp.DatenbankOriginalFormat:
                         if (_backupInterval > (float)DateTime.UtcNow.Subtract(_lastExportTimeUtc).TotalDays) { return false; }
                         singleFileExport = TempFile(singleFileExport + ".MDB");
                         if (!FileExists(singleFileExport)) { File.Copy(Database.Filename, singleFileExport); }
                         added.Add(singleFileExport + "|" + tim);
                         break;
 
-                    case enExportTyp.DatenbankCSVFormat:
+                    case ExportTyp.DatenbankCSVFormat:
                         if (_backupInterval > (float)DateTime.UtcNow.Subtract(_lastExportTimeUtc).TotalDays) { return false; }
                         singleFileExport = TempFile(singleFileExport + ".CSV");
-                        if (!FileExists(singleFileExport)) { WriteAllText(singleFileExport, Database.Export_CSV(enFirstRow.ColumnInternalName, _exportSpaltenAnsicht, _filter, null), Constants.Win1252, false); }
+                        if (!FileExists(singleFileExport)) { WriteAllText(singleFileExport, Database.Export_CSV(FirstRow.ColumnInternalName, _exportSpaltenAnsicht, _filter, null), Constants.Win1252, false); }
                         added.Add(singleFileExport + "|" + tim);
                         break;
 
-                    case enExportTyp.DatenbankHTMLFormat:
+                    case ExportTyp.DatenbankHTMLFormat:
                         if (_backupInterval > (float)DateTime.UtcNow.Subtract(_lastExportTimeUtc).TotalDays) { return false; }
                         singleFileExport = TempFile(singleFileExport + ".HTML");
                         if (!FileExists(singleFileExport)) { Database.Export_HTML(singleFileExport, _exportSpaltenAnsicht, _filter, null); }
                         added.Add(singleFileExport + "|" + tim);
                         break;
 
-                    case enExportTyp.EinzelnMitFormular:
+                    case ExportTyp.EinzelnMitFormular:
                         foreach (var thisrow in Database.Row) {
                             if (thisrow != null) {
                                 if (_filter == null || _filter.Count < 1 || thisrow.MatchesTo(_filter)) {

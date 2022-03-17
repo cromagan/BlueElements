@@ -92,7 +92,7 @@ namespace BlueControls.Classes_Editor
             // 
             // lbxFilter
             // 
-            this.lbxFilter.AddAllowed = BlueControls.Enums.enAddType.UserDef;
+            this.lbxFilter.AddAllowed = BlueControls.Enums.AddType.UserDef;
             this.lbxFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lbxFilter.FilterAllowed = true;
@@ -192,7 +192,7 @@ namespace BlueControls.Classes_Editor
             // 
             // ExportOriginalFormat
             // 
-            this.ExportOriginalFormat.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.ExportOriginalFormat.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
             this.ExportOriginalFormat.Location = new System.Drawing.Point(8, 24);
             this.ExportOriginalFormat.Name = "ExportOriginalFormat";
             this.ExportOriginalFormat.Size = new System.Drawing.Size(200, 22);
@@ -202,7 +202,7 @@ namespace BlueControls.Classes_Editor
             // 
             // ExportHTMLFormat
             // 
-            this.ExportHTMLFormat.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.ExportHTMLFormat.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
             this.ExportHTMLFormat.Location = new System.Drawing.Point(8, 46);
             this.ExportHTMLFormat.Name = "ExportHTMLFormat";
             this.ExportHTMLFormat.Size = new System.Drawing.Size(200, 22);
@@ -212,7 +212,7 @@ namespace BlueControls.Classes_Editor
             // 
             // ExportCSVFormat
             // 
-            this.ExportCSVFormat.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.ExportCSVFormat.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
             this.ExportCSVFormat.Location = new System.Drawing.Point(8, 68);
             this.ExportCSVFormat.Name = "ExportCSVFormat";
             this.ExportCSVFormat.Size = new System.Drawing.Size(200, 22);
@@ -222,7 +222,7 @@ namespace BlueControls.Classes_Editor
             // 
             // ExportalsBild
             // 
-            this.ExportalsBild.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.ExportalsBild.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
             this.ExportalsBild.Location = new System.Drawing.Point(8, 90);
             this.ExportalsBild.Name = "ExportalsBild";
             this.ExportalsBild.Size = new System.Drawing.Size(240, 22);
@@ -253,11 +253,11 @@ namespace BlueControls.Classes_Editor
             // 
             // lsbExportDateien
             // 
-            this.lsbExportDateien.AddAllowed = BlueControls.Enums.enAddType.None;
+            this.lsbExportDateien.AddAllowed = BlueControls.Enums.AddType.None;
             this.lsbExportDateien.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lsbExportDateien.CheckBehavior = BlueControls.Enums.enCheckBehavior.MultiSelection;
+            this.lsbExportDateien.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
             this.lsbExportDateien.FilterAllowed = true;
             this.lsbExportDateien.Location = new System.Drawing.Point(8, 24);
             this.lsbExportDateien.Name = "lsbExportDateien";

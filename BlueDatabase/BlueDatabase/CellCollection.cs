@@ -82,8 +82,8 @@ namespace BlueDatabase {
             if (cc == null) { return string.Empty; }
             FilterCollection f = new(column.Database)
             {
-                new FilterItem(cc, enFilterType.Istgleich_GroßKleinEgal, row.CellGetString(cc)),
-                new FilterItem(column, enFilterType.Ungleich_MultiRowIgnorieren, string.Empty)
+                new FilterItem(cc, FilterType.Istgleich_GroßKleinEgal, row.CellGetString(cc)),
+                new FilterItem(column, FilterType.Ungleich_MultiRowIgnorieren, string.Empty)
             };
             var rows = column.Database.Row.CalculateFilteredRows(f);
             rows.Remove(row);
@@ -132,7 +132,7 @@ namespace BlueDatabase {
             if (!column.TextBearbeitungErlaubt && !column.DropdownBearbeitungErlaubt) {
                 return LanguageTool.DoTranslate("Die Inhalte dieser Spalte können nicht manuell bearbeitet werden, da keine Bearbeitungsmethode erlaubt ist.");
             }
-            if (ColumnItem.UserEditDialogTypeInTable(column.Format, false, true, column.MultiLine) == enEditTypeTable.None) {
+            if (ColumnItem.UserEditDialogTypeInTable(column.Format, false, true, column.MultiLine) == EditTypeTable.None) {
                 return "Interner Programm-Fehler: Es ist keine Bearbeitungsmethode für den Typ des Spalteninhalts '" + column.Format + "' definiert.";
             }
             //foreach (var ThisRule in Column.Database.Rules) {
@@ -155,9 +155,9 @@ namespace BlueDatabase {
                     if (c == null) { return (fi, "Eine Spalte, aus der der Zeilenschlüssel kommen soll, existiert nicht."); }
                     var value = row.CellGetString(c);
                     if (string.IsNullOrEmpty(value)) { return (fi, "Leere Suchwerte werden nicht unterstützt."); }
-                    fi.Add(new FilterItem(linkedDatabase.Column[z], enFilterType.Istgleich, value));
+                    fi.Add(new FilterItem(linkedDatabase.Column[z], FilterType.Istgleich, value));
                 } else if (!string.IsNullOrEmpty(column.LinkedCellFilter[z]) && column.LinkedCellFilter[z].StartsWith("@")) {
-                    fi.Add(new FilterItem(linkedDatabase.Column[z], enFilterType.Istgleich, column.LinkedCellFilter[z].Substring(1)));
+                    fi.Add(new FilterItem(linkedDatabase.Column[z], FilterType.Istgleich, column.LinkedCellFilter[z].Substring(1)));
                 }
             }
 
@@ -432,11 +432,11 @@ namespace BlueDatabase {
             try {
                 var typ = filter.FilterType;
                 // Oder-Flag ermitteln --------------------------------------------
-                var oder = typ.HasFlag(enFilterType.ODER);
-                if (oder) { typ ^= enFilterType.ODER; }
+                var oder = typ.HasFlag(FilterType.ODER);
+                if (oder) { typ ^= FilterType.ODER; }
                 // Und-Flag Ermitteln --------------------------------------------
-                var und = typ.HasFlag(enFilterType.UND);
-                if (und) { typ ^= enFilterType.UND; }
+                var und = typ.HasFlag(FilterType.UND);
+                if (und) { typ ^= FilterType.UND; }
                 if (filter.SearchValue.Count < 2) {
                     oder = true;
                     und = false; // Wenn nur EIN Eintrag gecheckt wird, ist es EGAL, ob UND oder ODER.
@@ -456,13 +456,13 @@ namespace BlueDatabase {
                     @string = ContainsKey(cellKey) ? this[cellKey].Value : string.Empty;
                 }
                 if (@string is null) { @string = string.Empty; }
-                if (typ.HasFlag(enFilterType.Instr)) { @string = LanguageTool.ColumnReplace(@string, fColumn, enShortenStyle.Both); }
+                if (typ.HasFlag(FilterType.Instr)) { @string = LanguageTool.ColumnReplace(@string, fColumn, ShortenStyle.Both); }
                 // Multiline-Typ ermitteln  --------------------------------------------
                 var tmpMultiLine = false;
                 if (column != null) { tmpMultiLine = column.MultiLine; }
-                if (typ.HasFlag(enFilterType.MultiRowIgnorieren)) {
+                if (typ.HasFlag(FilterType.MultiRowIgnorieren)) {
                     tmpMultiLine = false;
-                    typ ^= enFilterType.MultiRowIgnorieren;
+                    typ ^= FilterType.MultiRowIgnorieren;
                 }
                 if (tmpMultiLine && !@string.Contains("\r")) { tmpMultiLine = false; } // Zeilen mit nur einem Eintrag können ohne Multiline behandel werden.
                 //if (Typ == enFilterType.KeinFilter)
@@ -558,7 +558,7 @@ namespace BlueDatabase {
             this[cellKey].Size = contentSize;
         }
 
-        public List<string> ValuesReadable(ColumnItem? column, RowItem row, enShortenStyle style) => CellItem.ValuesReadable(column, row, style);
+        public List<string> ValuesReadable(ColumnItem? column, RowItem row, ShortenStyle style) => CellItem.ValuesReadable(column, row, style);
 
         internal static List<RowItem?> ConnectedRowsOfRelations(string completeRelationText, RowItem? row) {
             List<RowItem?> allRows = new();
@@ -678,7 +678,7 @@ namespace BlueDatabase {
             if (value == oldValue) { return; }
 
             _database?.WaitEditable();
-            _database?.AddPending(enDatabaseDataType.ce_Value_withoutSizeData, column.Key, row.Key, oldValue, value, true);
+            _database?.AddPending(DatabaseDataType.ce_Value_withoutSizeData, column.Key, row.Key, oldValue, value, true);
             column.UcaseNamesSortedByLenght = null;
             DoSpecialFormats(column, row.Key, oldValue, false);
             SystemSet(_database?.Column.SysRowChanger, row, _database?.UserName);
@@ -701,27 +701,27 @@ namespace BlueDatabase {
                 Add(cellKey, new CellItem(string.Empty, 0, 0));
             }
             if (value == @string) { return; }
-            _database.AddPending(enDatabaseDataType.ce_Value_withoutSizeData, column.Key, row.Key, @string, value, true);
+            _database.AddPending(DatabaseDataType.ce_Value_withoutSizeData, column.Key, row.Key, @string, value, true);
         }
 
-        private static bool CompareValues(string istValue, string filterValue, enFilterType typ) {
+        private static bool CompareValues(string istValue, string filterValue, FilterType typ) {
             // if (Column.Format == enDataFormat.LinkedCell) { Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Fremdzellenzugriff"); }
-            if (typ.HasFlag(enFilterType.GroßKleinEgal)) {
+            if (typ.HasFlag(FilterType.GroßKleinEgal)) {
                 istValue = istValue.ToUpper();
                 filterValue = filterValue.ToUpper();
-                typ ^= enFilterType.GroßKleinEgal;
+                typ ^= FilterType.GroßKleinEgal;
             }
             switch (typ) {
-                case enFilterType.Istgleich:
+                case FilterType.Istgleich:
                     return Convert.ToBoolean(istValue == filterValue);
 
-                case (enFilterType)2: // Ungleich
+                case (FilterType)2: // Ungleich
                     return Convert.ToBoolean(istValue != filterValue);
 
-                case enFilterType.Instr:
+                case FilterType.Instr:
                     return istValue.Contains(filterValue);
 
-                case enFilterType.Between:
+                case FilterType.Between:
                     if (!istValue.IsNumeral()) { return false; }
                     DoubleTryParse(istValue, out var ival);
                     var fval = filterValue.SplitAndCutBy("|");
@@ -738,11 +738,11 @@ namespace BlueDatabase {
                     //return Convert.ToBoolean(d == -1);
                     return true;
 
-                case enFilterType.KeinFilter:
+                case FilterType.KeinFilter:
                     Develop.DebugPrint("Kein Filter!");
                     return true;
 
-                case enFilterType.BeginntMit:
+                case FilterType.BeginntMit:
                     return istValue.StartsWith(filterValue);
 
                 default: {
@@ -884,7 +884,7 @@ namespace BlueDatabase {
             var ownRow = _database.Row.SearchByKey(rowKey);
             var rows = keyc.Format == enDataFormat.RelationText
                 ? ConnectedRowsOfRelations(ownRow.CellGetString(keyc), ownRow)
-                : RowCollection.MatchesTo(new FilterItem(keyc, enFilterType.Istgleich_GroßKleinEgal, ownRow.CellGetString(keyc)));
+                : RowCollection.MatchesTo(new FilterItem(keyc, FilterType.Istgleich_GroßKleinEgal, ownRow.CellGetString(keyc)));
             rows.Remove(ownRow);
             if (rows.Count < 1) { return; }
             foreach (var thisRow in rows) {
@@ -988,7 +988,7 @@ namespace BlueDatabase {
                     if (rows == null) {
                         rows = column.Format == enDataFormat.RelationText
                             ? ConnectedRowsOfRelations(currentvalue, ownRow)
-                            : RowCollection.MatchesTo(new FilterItem(column, enFilterType.Istgleich_GroßKleinEgal, currentvalue));
+                            : RowCollection.MatchesTo(new FilterItem(column, FilterType.Istgleich_GroßKleinEgal, currentvalue));
                         rows.Remove(ownRow);
                     }
                     if (rows.Count < 1) {

@@ -86,10 +86,10 @@ namespace BlueDatabase.AdditionalScriptComands {
 
             #region Typ ermitteln
 
-            Enums.enFilterType filtertype;
+            Enums.FilterType filtertype;
             switch (((VariableString)attvar.Attributes[2]).ValueString.ToLower()) {
                 case "is":
-                    filtertype = Enums.enFilterType.Istgleich_GroßKleinEgal;
+                    filtertype = Enums.FilterType.Istgleich_GroßKleinEgal;
                     break;
 
                 default:

@@ -306,8 +306,8 @@ namespace BlueControls.Forms {
             ItemCollectionList il = new();
             il.AddRange(Database.Column[0].Contents());
             il.Sort();
-            il.CheckBehavior = enCheckBehavior.SingleSelection;
-            var i = InputBoxListBoxStyle.Show("Objekt hinzufügen:", il, enAddType.None, true);
+            il.CheckBehavior = CheckBehavior.SingleSelection;
+            var i = InputBoxListBoxStyle.Show("Objekt hinzufügen:", il, AddType.None, true);
             if (i == null || i.Count != 1) {
                 return;
             }

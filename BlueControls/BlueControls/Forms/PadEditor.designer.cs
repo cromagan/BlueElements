@@ -104,7 +104,7 @@ namespace BlueControls.Forms {
             // 
             // txbRasterFangen
             // 
-            this.txbRasterFangen.AdditionalCheck = BlueDatabase.Enums.enAdditionalCheck.Float;
+            this.txbRasterFangen.AdditionalCheck = BlueDatabase.Enums.AdditionalCheck.Float;
             this.txbRasterFangen.AllowedChars = "0123456789,";
             this.txbRasterFangen.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbRasterFangen.Location = new System.Drawing.Point(128, 46);
@@ -118,7 +118,7 @@ namespace BlueControls.Forms {
             // 
             // txbRasterAnzeige
             // 
-            this.txbRasterAnzeige.AdditionalCheck = BlueDatabase.Enums.enAdditionalCheck.Float;
+            this.txbRasterAnzeige.AdditionalCheck = BlueDatabase.Enums.AdditionalCheck.Float;
             this.txbRasterAnzeige.AllowedChars = "0123456789,";
             this.txbRasterAnzeige.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbRasterAnzeige.Location = new System.Drawing.Point(128, 24);
@@ -132,8 +132,8 @@ namespace BlueControls.Forms {
             // 
             // ckbRaster
             // 
-            this.ckbRaster.ButtonStyle = ((BlueControls.Enums.enButtonStyle)(((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Button_Big) 
-            | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.ckbRaster.ButtonStyle = ((BlueControls.Enums.ButtonStyle)(((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Button_Big) 
+            | BlueControls.Enums.ButtonStyle.Borderless)));
             this.ckbRaster.ImageCode = "Raster|18";
             this.ckbRaster.Location = new System.Drawing.Point(72, 2);
             this.ckbRaster.Name = "ckbRaster";
@@ -154,7 +154,7 @@ namespace BlueControls.Forms {
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddDimension);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddLine);
             this.grpKomponenteHinzufügen.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpKomponenteHinzufügen.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
+            this.grpKomponenteHinzufügen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpKomponenteHinzufügen.Location = new System.Drawing.Point(496, 0);
             this.grpKomponenteHinzufügen.Name = "grpKomponenteHinzufügen";
             this.grpKomponenteHinzufügen.Size = new System.Drawing.Size(272, 81);
@@ -164,7 +164,7 @@ namespace BlueControls.Forms {
             // 
             // btnAddPhsyik
             // 
-            this.btnAddPhsyik.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnAddPhsyik.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnAddPhsyik.ImageCode = "Formel|16";
             this.btnAddPhsyik.Location = new System.Drawing.Point(176, 24);
             this.btnAddPhsyik.Name = "btnAddPhsyik";
@@ -175,7 +175,7 @@ namespace BlueControls.Forms {
             // 
             // btnAddSymbol
             // 
-            this.btnAddSymbol.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnAddSymbol.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnAddSymbol.ImageCode = "Stern|16|||||137|0";
             this.btnAddSymbol.Location = new System.Drawing.Point(8, 46);
             this.btnAddSymbol.Name = "btnAddSymbol";
@@ -186,7 +186,7 @@ namespace BlueControls.Forms {
             // 
             // btnAddUnterStufe
             // 
-            this.btnAddUnterStufe.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnAddUnterStufe.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnAddUnterStufe.ImageCode = "Datei|16";
             this.btnAddUnterStufe.Location = new System.Drawing.Point(176, 2);
             this.btnAddUnterStufe.Name = "btnAddUnterStufe";
@@ -197,7 +197,7 @@ namespace BlueControls.Forms {
             // 
             // btnAddText
             // 
-            this.btnAddText.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnAddText.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnAddText.ImageCode = "Textfeld|16";
             this.btnAddText.Location = new System.Drawing.Point(8, 2);
             this.btnAddText.Name = "btnAddText";
@@ -208,7 +208,7 @@ namespace BlueControls.Forms {
             // 
             // btnAddImage
             // 
-            this.btnAddImage.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnAddImage.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnAddImage.ImageCode = "Bild|16";
             this.btnAddImage.Location = new System.Drawing.Point(8, 24);
             this.btnAddImage.Name = "btnAddImage";
@@ -219,7 +219,7 @@ namespace BlueControls.Forms {
             // 
             // btnAddDimension
             // 
-            this.btnAddDimension.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnAddDimension.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnAddDimension.ImageCode = "Bemaßung|16";
             this.btnAddDimension.Location = new System.Drawing.Point(96, 2);
             this.btnAddDimension.Name = "btnAddDimension";
@@ -230,7 +230,7 @@ namespace BlueControls.Forms {
             // 
             // btnAddLine
             // 
-            this.btnAddLine.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnAddLine.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnAddLine.ImageCode = "Linie|16";
             this.btnAddLine.Location = new System.Drawing.Point(96, 24);
             this.btnAddLine.Name = "btnAddLine";
@@ -261,7 +261,7 @@ namespace BlueControls.Forms {
             this.grpDesign.Controls.Add(this.PadDesign);
             this.grpDesign.Controls.Add(this.capDesign);
             this.grpDesign.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpDesign.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
+            this.grpDesign.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpDesign.Location = new System.Drawing.Point(0, 0);
             this.grpDesign.Name = "grpDesign";
             this.grpDesign.Size = new System.Drawing.Size(648, 81);
@@ -272,7 +272,7 @@ namespace BlueControls.Forms {
             // btnKeinHintergrund
             // 
             this.btnKeinHintergrund.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnKeinHintergrund.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnKeinHintergrund.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnKeinHintergrund.Location = new System.Drawing.Point(464, 2);
             this.btnKeinHintergrund.Name = "btnKeinHintergrund";
             this.btnKeinHintergrund.Size = new System.Drawing.Size(112, 22);
@@ -283,7 +283,7 @@ namespace BlueControls.Forms {
             // btnHintergrundFarbe
             // 
             this.btnHintergrundFarbe.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnHintergrundFarbe.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnHintergrundFarbe.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnHintergrundFarbe.ImageCode = "Farben";
             this.btnHintergrundFarbe.Location = new System.Drawing.Point(376, 2);
             this.btnHintergrundFarbe.Name = "btnHintergrundFarbe";
@@ -294,7 +294,7 @@ namespace BlueControls.Forms {
             // 
             // btnArbeitsbreichSetup
             // 
-            this.btnArbeitsbreichSetup.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnArbeitsbreichSetup.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnArbeitsbreichSetup.ImageCode = "SeiteEinrichten";
             this.btnArbeitsbreichSetup.Location = new System.Drawing.Point(8, 2);
             this.btnArbeitsbreichSetup.Name = "btnArbeitsbreichSetup";

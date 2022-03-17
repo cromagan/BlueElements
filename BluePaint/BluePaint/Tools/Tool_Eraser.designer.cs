@@ -37,7 +37,7 @@ namespace BluePaint
             // 
             this.Razi.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.Razi.ButtonStyle = enButtonStyle.Optionbox_Text;
+            this.Razi.ButtonStyle = ButtonStyle.Optionbox_Text;
             this.Razi.Location = new System.Drawing.Point(32, 136);
             this.Razi.Name = "Razi";
             this.Razi.Size = new System.Drawing.Size(336, 56);
@@ -49,7 +49,7 @@ namespace BluePaint
             // 
             this.DrawBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.DrawBox.ButtonStyle = enButtonStyle.Optionbox_Text;
+            this.DrawBox.ButtonStyle = ButtonStyle.Optionbox_Text;
             this.DrawBox.Checked = true;
             this.DrawBox.Location = new System.Drawing.Point(32, 96);
             this.DrawBox.Name = "DrawBox";
@@ -62,7 +62,7 @@ namespace BluePaint
             // 
             this.Eleminate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.Eleminate.ButtonStyle = enButtonStyle.Optionbox_Text;
+            this.Eleminate.ButtonStyle = ButtonStyle.Optionbox_Text;
             this.Eleminate.Location = new System.Drawing.Point(32, 56);
             this.Eleminate.Name = "Eleminate";
             this.Eleminate.Size = new System.Drawing.Size(336, 40);

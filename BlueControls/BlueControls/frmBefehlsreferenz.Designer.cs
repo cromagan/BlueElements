@@ -30,7 +30,7 @@ namespace BlueControls {
             // 
             // lstComands
             // 
-            this.lstComands.AddAllowed = BlueControls.Enums.enAddType.None;
+            this.lstComands.AddAllowed = BlueControls.Enums.AddType.None;
             this.lstComands.Dock = System.Windows.Forms.DockStyle.Left;
             this.lstComands.FilterAllowed = true;
             this.lstComands.Location = new System.Drawing.Point(0, 0);

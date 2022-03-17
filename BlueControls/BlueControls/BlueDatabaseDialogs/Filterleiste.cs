@@ -80,11 +80,11 @@ namespace BlueControls.BlueDatabaseDialogs {
         [DefaultValue(false)]
         public bool AutoPin { get; set; }
 
-        [DefaultValue(enFilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter)]
-        public enFilterTypesToShow Filtertypes { get; set; } = enFilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter;
+        [DefaultValue(FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter)]
+        public FilterTypesToShow Filtertypes { get; set; } = FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter;
 
         [DefaultValue(enOrientation.Waagerecht)]
-        [Obsolete]
+        [Obsolete("Wird zukünftig entfernt werden", false)]
         public enOrientation Orientation { get; set; } = enOrientation.Waagerecht;
 
         [DefaultValue((Table)null)]
@@ -220,17 +220,17 @@ namespace BlueControls.BlueDatabaseDialogs {
                     #region Sichtbarkeit des Filterelemts bestimmen
 
                     if (thisColumn.AutoFilterSymbolPossible()) {
-                        if (viewItemOrder != null && Filtertypes.HasFlag(enFilterTypesToShow.NachDefinierterAnsicht)) { showMe = true; }
-                        if (viewItemCurrent != null && filterItem != null && Filtertypes.HasFlag(enFilterTypesToShow.AktuelleAnsicht_AktiveFilter)) { showMe = true; }
+                        if (viewItemOrder != null && Filtertypes.HasFlag(FilterTypesToShow.NachDefinierterAnsicht)) { showMe = true; }
+                        if (viewItemCurrent != null && filterItem != null && Filtertypes.HasFlag(FilterTypesToShow.AktuelleAnsicht_AktiveFilter)) { showMe = true; }
                     }
 
                     #endregion Sichtbarkeit des Filterelemts bestimmen
 
                     if (filterItem == null && showMe) {
                         // Dummy-Filter, nicht in der Collection
-                        filterItem = thisColumn.FilterOptions == enFilterOptions.Enabled_OnlyAndAllowed ? new FilterItem(thisColumn, enFilterType.Istgleich_UND_GroßKleinEgal, string.Empty)
-                                   : thisColumn.FilterOptions == enFilterOptions.Enabled_OnlyOrAllowed ? new FilterItem(thisColumn, enFilterType.Istgleich_ODER_GroßKleinEgal, string.Empty)
-                                   : new FilterItem(thisColumn, enFilterType.Instr_GroßKleinEgal, string.Empty);
+                        filterItem = thisColumn.FilterOptions == FilterOptions.Enabled_OnlyAndAllowed ? new FilterItem(thisColumn, FilterType.Istgleich_UND_GroßKleinEgal, string.Empty)
+                                   : thisColumn.FilterOptions == FilterOptions.Enabled_OnlyOrAllowed ? new FilterItem(thisColumn, FilterType.Istgleich_ODER_GroßKleinEgal, string.Empty)
+                                   : new FilterItem(thisColumn, FilterType.Instr_GroßKleinEgal, string.Empty);
                     }
                     if (filterItem != null && showMe) {
                         var flx = FlexiItemOf(filterItem);
@@ -305,7 +305,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         //}
 
         private void btnÄhnliche_Click(object sender, System.EventArgs e) {
-            List<FilterItem> fl = new() { new FilterItem(_tableView.Database.Column[0], enFilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
+            List<FilterItem> fl = new() { new FilterItem(_tableView.Database.Column[0], FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
 
             var r = _tableView.Database.Row.CalculateFilteredRows(fl);
             if (r == null || r.Count != 1 || _ähnliche == null || _ähnliche.Count == 0) {
@@ -316,16 +316,16 @@ namespace BlueControls.BlueDatabaseDialogs {
             btnAlleFilterAus_Click(null, null);
             foreach (var thiscolumnitem in _ähnliche.Where(thiscolumnitem => thiscolumnitem.Column.AutoFilterSymbolPossible())) {
                 if (r[0].CellIsNullOrEmpty(thiscolumnitem.Column)) {
-                    FilterItem fi = new(thiscolumnitem.Column, enFilterType.Istgleich_UND_GroßKleinEgal,
+                    FilterItem fi = new(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal,
                         string.Empty);
                     _tableView.Filter.Add(fi);
                 } else if (thiscolumnitem.Column.MultiLine) {
                     var l = r[0].CellGetList(thiscolumnitem.Column).SortedDistinctList();
-                    FilterItem fi = new(thiscolumnitem.Column, enFilterType.Istgleich_UND_GroßKleinEgal, l);
+                    FilterItem fi = new(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, l);
                     _tableView.Filter.Add(fi);
                 } else {
                     var l = r[0].CellGetString(thiscolumnitem.Column);
-                    FilterItem fi = new(thiscolumnitem.Column, enFilterType.Istgleich_UND_GroßKleinEgal, l);
+                    FilterItem fi = new(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, l);
                     _tableView.Filter.Add(fi);
                 }
             }
@@ -353,7 +353,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void DoÄhnlich() {
             //_TableView.Database.Column.Count == 0 Ist eine nigelnagelneue Datenbank
             if (_tableView?.Database == null || _tableView.Database.Column.Count == 0) { return; }
-            List<FilterItem> fl = new() { new FilterItem(_tableView.Database.Column[0], enFilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
+            List<FilterItem> fl = new() { new FilterItem(_tableView.Database.Column[0], FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
 
             var r = _tableView.Database.Row.CalculateFilteredRows(fl);
             if (_ähnliche != null) {
@@ -430,7 +430,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 //flx.Filter.Herkunft = "Filterleiste";
                 var v = flx.Value; //.Trim("|");
                 if (_tableView.Filter == null || _tableView.Filter.Count == 0 || !_tableView.Filter.Contains(flx.Filter)) {
-                    if (isFilter) { flx.Filter.FilterType = enFilterType.Istgleich_ODER_GroßKleinEgal; } // Filter noch nicht in der Collection, kann ganz einfach geändert werden
+                    if (isFilter) { flx.Filter.FilterType = FilterType.Istgleich_ODER_GroßKleinEgal; } // Filter noch nicht in der Collection, kann ganz einfach geändert werden
                     flx.Filter.SearchValue[0] = v;
                     _tableView.Filter.Add(flx.Filter);
                     return;
@@ -440,12 +440,12 @@ namespace BlueControls.BlueDatabaseDialogs {
                     return;
                 }
                 if (isFilter) {
-                    flx.Filter.Changeto(enFilterType.Istgleich_ODER_GroßKleinEgal, v);
+                    flx.Filter.Changeto(FilterType.Istgleich_ODER_GroßKleinEgal, v);
                 } else {
                     if (string.IsNullOrEmpty(v)) {
                         _tableView.Filter.Remove(flx.Filter);
                     } else {
-                        flx.Filter.Changeto(enFilterType.Instr_GroßKleinEgal, v);
+                        flx.Filter.Changeto(FilterType.Instr_GroßKleinEgal, v);
                         // flx.Filter.SearchValue[0] =v;
                     }
                 }

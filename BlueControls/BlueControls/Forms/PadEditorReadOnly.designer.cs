@@ -42,8 +42,8 @@ namespace BlueControls.Forms {
             // 
             // btnZoomOut
             // 
-            this.btnZoomOut.ButtonStyle = ((BlueControls.Enums.enButtonStyle)(((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Button_Big) 
-            | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnZoomOut.ButtonStyle = ((BlueControls.Enums.ButtonStyle)(((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Button_Big) 
+            | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnZoomOut.ImageCode = "LupeMinus";
             this.btnZoomOut.Location = new System.Drawing.Point(176, 2);
             this.btnZoomOut.Name = "btnZoomOut";
@@ -53,8 +53,8 @@ namespace BlueControls.Forms {
             // 
             // btnZoomIn
             // 
-            this.btnZoomIn.ButtonStyle = ((BlueControls.Enums.enButtonStyle)(((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Button_Big) 
-            | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnZoomIn.ButtonStyle = ((BlueControls.Enums.ButtonStyle)(((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Button_Big) 
+            | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnZoomIn.ImageCode = "LupePlus";
             this.btnZoomIn.Location = new System.Drawing.Point(232, 2);
             this.btnZoomIn.Name = "btnZoomIn";
@@ -64,7 +64,7 @@ namespace BlueControls.Forms {
             // 
             // btnZoomFit
             // 
-            this.btnZoomFit.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnZoomFit.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnZoomFit.ImageCode = "ZoomFit";
             this.btnZoomFit.Location = new System.Drawing.Point(8, 2);
             this.btnZoomFit.Name = "btnZoomFit";
@@ -114,7 +114,7 @@ namespace BlueControls.Forms {
             this.grpAssistent.CausesValidation = false;
             this.grpAssistent.Controls.Add(this.btnVorschauModus);
             this.grpAssistent.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpAssistent.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
+            this.grpAssistent.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAssistent.Location = new System.Drawing.Point(296, 0);
             this.grpAssistent.Name = "grpAssistent";
             this.grpAssistent.Size = new System.Drawing.Size(72, 81);
@@ -124,8 +124,8 @@ namespace BlueControls.Forms {
             // 
             // btnVorschauModus
             // 
-            this.btnVorschauModus.ButtonStyle = ((BlueControls.Enums.enButtonStyle)(((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Button_Big) 
-            | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnVorschauModus.ButtonStyle = ((BlueControls.Enums.ButtonStyle)(((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Button_Big) 
+            | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnVorschauModus.ImageCode = "Textdatei";
             this.btnVorschauModus.Location = new System.Drawing.Point(8, 2);
             this.btnVorschauModus.Name = "btnVorschauModus";
@@ -144,7 +144,7 @@ namespace BlueControls.Forms {
             this.grpZoom.Controls.Add(this.btnZoomOut);
             this.grpZoom.Controls.Add(this.btnZoomIn);
             this.grpZoom.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpZoom.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
+            this.grpZoom.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpZoom.Location = new System.Drawing.Point(0, 0);
             this.grpZoom.Name = "grpZoom";
             this.grpZoom.Size = new System.Drawing.Size(296, 81);
@@ -154,7 +154,7 @@ namespace BlueControls.Forms {
             // 
             // btnZoom11
             // 
-            this.btnZoom11.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnZoom11.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnZoom11.ImageCode = "Bild||||||149|10";
             this.btnZoom11.Location = new System.Drawing.Point(64, 2);
             this.btnZoom11.Name = "btnZoom11";
@@ -165,8 +165,8 @@ namespace BlueControls.Forms {
             // 
             // btnAuswahl
             // 
-            this.btnAuswahl.ButtonStyle = ((BlueControls.Enums.enButtonStyle)(((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Button_Big) 
-            | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnAuswahl.ButtonStyle = ((BlueControls.Enums.ButtonStyle)(((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Button_Big) 
+            | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnAuswahl.Checked = true;
             this.btnAuswahl.ImageCode = "Mauspfeil";
             this.btnAuswahl.Location = new System.Drawing.Point(120, 2);
@@ -194,7 +194,7 @@ namespace BlueControls.Forms {
             this.grpDrucken.Controls.Add(this.btnAlsBildSpeichern);
             this.grpDrucken.Controls.Add(this.btnDruckerDialog);
             this.grpDrucken.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpDrucken.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
+            this.grpDrucken.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpDrucken.Location = new System.Drawing.Point(0, 0);
             this.grpDrucken.Name = "grpDrucken";
             this.grpDrucken.Size = new System.Drawing.Size(288, 81);
@@ -204,7 +204,7 @@ namespace BlueControls.Forms {
             // 
             // btnVorschau
             // 
-            this.btnVorschau.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnVorschau.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnVorschau.ImageCode = "Datei||||||||||Lupe";
             this.btnVorschau.Location = new System.Drawing.Point(224, 2);
             this.btnVorschau.Name = "btnVorschau";
@@ -215,7 +215,7 @@ namespace BlueControls.Forms {
             // 
             // btnPageSetup
             // 
-            this.btnPageSetup.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnPageSetup.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnPageSetup.ImageCode = "SeiteEinrichten";
             this.btnPageSetup.Location = new System.Drawing.Point(136, 2);
             this.btnPageSetup.Name = "btnPageSetup";
@@ -226,7 +226,7 @@ namespace BlueControls.Forms {
             // 
             // btnAlsBildSpeichern
             // 
-            this.btnAlsBildSpeichern.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnAlsBildSpeichern.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnAlsBildSpeichern.ImageCode = "Bild";
             this.btnAlsBildSpeichern.Location = new System.Drawing.Point(72, 2);
             this.btnAlsBildSpeichern.Name = "btnAlsBildSpeichern";
@@ -237,7 +237,7 @@ namespace BlueControls.Forms {
             // 
             // btnDruckerDialog
             // 
-            this.btnDruckerDialog.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnDruckerDialog.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnDruckerDialog.ImageCode = "Drucker";
             this.btnDruckerDialog.Location = new System.Drawing.Point(8, 2);
             this.btnDruckerDialog.Name = "btnDruckerDialog";

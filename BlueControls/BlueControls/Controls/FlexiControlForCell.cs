@@ -181,7 +181,7 @@ namespace BlueControls.Controls {
             //TableView.Database.Cell.DataOfCellKey(CellKey, out var Column, out var Row);
             switch (e.ClickedComand.ToLower()) {
                 case "spalteneigenschaftenbearbeiten":
-                    TabAdministration.OpenColumnEditor(_tmpColumn, null);
+                    BlueControls.Forms.TableView.OpenColumnEditor(_tmpColumn, null);
                     return true;
 
                 case "vorherigeninhaltwiederherstellen":
@@ -200,13 +200,13 @@ namespace BlueControls.Controls {
         public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
             GetTmpVariables();
             if (_tmpColumn != null && _tmpColumn.Database.IsAdministrator()) {
-                items.Add(enContextMenuComands.SpaltenEigenschaftenBearbeiten);
+                items.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten);
             }
             if (_tmpColumn != null && _tmpRow != null && _tmpColumn.Database.IsAdministrator()) {
-                items.Add(enContextMenuComands.VorherigenInhaltWiederherstellen);
+                items.Add(ContextMenuComands.VorherigenInhaltWiederherstellen);
             }
             if (Parent is Formula f) {
-                ItemCollectionList x = new(enBlueListBoxAppearance.KontextMenu);
+                ItemCollectionList x = new(BlueListBoxAppearance.KontextMenu);
                 f.GetContextMenuItems(null, x, out _, tags, ref cancel, ref translate);
                 if (x.Count > 0) {
                     if (items.Count > 0) {
@@ -245,7 +245,7 @@ namespace BlueControls.Controls {
             switch (e.Control) {
                 case ComboBox comboBox:
                     ItemCollectionList item2 = new();
-                    ItemCollectionList.GetItemCollection(item2, column1, null, enShortenStyle.Replaced, 10000);
+                    ItemCollectionList.GetItemCollection(item2, column1, null, ShortenStyle.Replaced, 10000);
                     if (column1.TextBearbeitungErlaubt) {
                         StyleComboBox(comboBox, item2, ComboBoxStyle.DropDown);
                     } else {
@@ -360,7 +360,7 @@ namespace BlueControls.Controls {
         private static void ListBox_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
             if (e.HotItem is TextListItem t) {
                 if (FileExists(t.Internal)) {
-                    e.UserMenu.Add(enContextMenuComands.DateiÖffnen);
+                    e.UserMenu.Add(ContextMenuComands.DateiÖffnen);
                 }
             }
             if (e.HotItem is BitmapListItem) {
@@ -428,18 +428,18 @@ namespace BlueControls.Controls {
                     if (_tmpColumn == null && _tmpRow == null) { Develop.DebugPrint_NichtImplementiert(); }
                     if (_tmpColumn.Format != enDataFormat.Link_To_Filesystem) { Develop.DebugPrint_NichtImplementiert(); }
                     switch (ep.SorceType) {
-                        case enSorceType.ScreenShot:
+                        case SorceType.ScreenShot:
                             var fil = _tmpColumn.BestFile(_tmpColumn.Name + ".png", true);
                             ep.Bitmap.Save(fil, ImageFormat.Png);
-                            ep.ChangeSource(fil, enSorceType.LoadedFromDisk, false);
+                            ep.ChangeSource(fil, SorceType.LoadedFromDisk, false);
                             ValueSet(fil, false, true);
                             return;
 
-                        case enSorceType.Nichts:
+                        case SorceType.Nichts:
                             ValueSet(string.Empty, false, true);
                             return;
 
-                        case enSorceType.LoadedFromDisk:
+                        case SorceType.LoadedFromDisk:
                             if (ep.SorceName != _tmpColumn.SimplyFile(ep.SorceName)) {
                                 // DEr name kann nur vereifacht werden, wenn es bereits im richtigen Verzeichniss ist. Name wird vereinfacht (ungleich) - bereits im richtigen verzeichniss!
                                 ValueSet(ep.SorceName, false, true);
@@ -451,11 +451,11 @@ namespace BlueControls.Controls {
                             } else {
                                 fil2 = ep.SorceName;
                             }
-                            ep.ChangeSource(fil2, enSorceType.LoadedFromDisk, false);
+                            ep.ChangeSource(fil2, SorceType.LoadedFromDisk, false);
                             ValueSet(fil2, false, true);
                             return;
 
-                        case enSorceType.EntryWithoutPic:
+                        case SorceType.EntryWithoutPic:
                             ValueSet(ep.SorceName, false, true);
                             // Entweder ein Dummy eintrag (Bildzeichen-Liste, wo Haupt das Bild sein sollte, aber eben nur bei den 3 Seitensichten eines da ist
                             // Oder datenbank wird von einem andern PC aus gestartet
@@ -532,9 +532,9 @@ namespace BlueControls.Controls {
 
         private void GetTmpVariables() {
             if (_database != null) {
-                _tmpColumn = !string.IsNullOrEmpty(_columnName)
-                    ? _database.Column[DataHolder.ColumnName(_columnName)]
-                    : _database.Column.SearchByKey(_colKey);
+                _tmpColumn = string.IsNullOrEmpty(_columnName)
+                    ? _database.Column.SearchByKey(_colKey)
+                    : _database.Column[_columnName];
                 _tmpRow = _database.Row.SearchByKey(_rowKey);
             } else {
                 _tmpColumn = null;
@@ -565,26 +565,26 @@ namespace BlueControls.Controls {
             if (lbx == null) { return; }
 
             switch (dia) {
-                case enEditTypeTable.None:
+                case EditTypeTable.None:
                     return;
 
-                case enEditTypeTable.FileHandling_InDateiSystem:
+                case EditTypeTable.FileHandling_InDateiSystem:
                     // korrektheit der Zelle bereits geprüft
                     var l = Table.FileSystem(_tmpColumn);
 
                     if (l == null) { return; }
 
                     foreach (var thisF in l) {
-                        lbx.Item.Add(thisF.FileNameWithSuffix(), _tmpColumn, enShortenStyle.Replaced, _tmpColumn.BildTextVerhalten);
+                        lbx.Item.Add(thisF.FileNameWithSuffix(), _tmpColumn, ShortenStyle.Replaced, _tmpColumn.BildTextVerhalten);
                     }
 
                     return;
 
-                case enEditTypeTable.Textfeld:
+                case EditTypeTable.Textfeld:
                     lbx.Add_Text();
                     return;
 
-                case enEditTypeTable.Listbox:
+                case EditTypeTable.Listbox:
                     lbx.Add_TextBySuggestion();
                     return;
 
@@ -687,22 +687,22 @@ namespace BlueControls.Controls {
             var txb = (TextBox)x[0];
             switch ((string)x[1]) {
                 case "Unmark1":
-                    txb.Unmark(enMarkState.MyOwn);
+                    txb.Unmark(MarkState.MyOwn);
                     txb.Invalidate();
                     break;
 
                 case "Unmark2":
-                    txb.Unmark(enMarkState.Other);
+                    txb.Unmark(MarkState.Other);
                     txb.Invalidate();
                     break;
 
                 case "Mark1":
-                    txb.Mark(enMarkState.MyOwn, (int)x[2], (int)x[3]);
+                    txb.Mark(MarkState.MyOwn, (int)x[2], (int)x[3]);
                     txb.Invalidate();
                     break;
 
                 case "Mark2":
-                    txb.Mark(enMarkState.Other, (int)x[2], (int)x[3]);
+                    txb.Mark(MarkState.Other, (int)x[2], (int)x[3]);
                     txb.Invalidate();
                     break;
 

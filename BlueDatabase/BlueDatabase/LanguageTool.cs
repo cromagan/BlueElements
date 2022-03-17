@@ -41,7 +41,7 @@ namespace BlueDatabase {
         /// <param name="column"></param>
         /// <param name="style"></param>
         /// <returns></returns>
-        public static string ColumnReplace(string txt, ColumnItem? column, enShortenStyle style) {
+        public static string ColumnReplace(string txt, ColumnItem? column, ShortenStyle style) {
             if (column == null) { return txt; }
 
             if (!string.IsNullOrEmpty(txt)) {
@@ -49,7 +49,7 @@ namespace BlueDatabase {
                 if (!string.IsNullOrEmpty(column.Suffix)) { txt = txt + " " + DoTranslate(column.Suffix, true); }
             }
             if (Translation != null) { return ColumnReplaceTranslated(txt, column); }
-            if (style == enShortenStyle.Unreplaced || column.OpticalReplace.Count == 0) { return txt; }
+            if (style == ShortenStyle.Unreplaced || column.OpticalReplace.Count == 0) { return txt; }
             var ot = txt;
             foreach (var thisString in column.OpticalReplace) {
                 var x = thisString.SplitAndCutBy("|");
@@ -63,7 +63,7 @@ namespace BlueDatabase {
                 if (x.Length == 1 && !thisString.StartsWith("|")) { txt = txt.Replace(x[0], string.Empty); }
             }
 
-            if (style is enShortenStyle.Replaced or enShortenStyle.HTML || ot == txt) {
+            if (style is ShortenStyle.Replaced or ShortenStyle.HTML || ot == txt) {
                 return txt;
             }
 
@@ -109,7 +109,7 @@ namespace BlueDatabase {
             }
         }
 
-        private static string ColumnReplaceTranslated(string newTxt, ColumnItem? column) => column.Translate == enTranslationType.Übersetzen ? DoTranslate(newTxt, false) : newTxt;
+        private static string ColumnReplaceTranslated(string newTxt, ColumnItem? column) => column.Translate == TranslationType.Übersetzen ? DoTranslate(newTxt, false) : newTxt;
 
         #endregion
     }

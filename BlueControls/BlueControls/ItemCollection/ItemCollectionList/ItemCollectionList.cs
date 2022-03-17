@@ -36,11 +36,11 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         #region Fields
 
-        private enBlueListBoxAppearance _appearance;
+        private BlueListBoxAppearance _appearance;
         private Size _cellposCorrect;
-        private enCheckBehavior _checkBehavior;
-        private enDesign _controlDesign;
-        private enDesign _itemDesign;
+        private CheckBehavior _checkBehavior;
+        private Design _controlDesign;
+        private Design _itemDesign;
         private SizeF _lastCheckedMaxSize = Size.Empty;
         private bool _validating;
 
@@ -48,14 +48,14 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         #region Constructors
 
-        public ItemCollectionList() : this(enBlueListBoxAppearance.Listbox) { }
+        public ItemCollectionList() : this(BlueListBoxAppearance.Listbox) { }
 
-        public ItemCollectionList(enBlueListBoxAppearance design) : base() {
+        public ItemCollectionList(BlueListBoxAppearance design) : base() {
             _cellposCorrect = Size.Empty;
-            _appearance = enBlueListBoxAppearance.Listbox;
-            _itemDesign = enDesign.Undefiniert;
-            _controlDesign = enDesign.Undefiniert;
-            _checkBehavior = enCheckBehavior.SingleSelection;
+            _appearance = BlueListBoxAppearance.Listbox;
+            _itemDesign = Design.Undefiniert;
+            _controlDesign = Design.Undefiniert;
+            _checkBehavior = CheckBehavior.SingleSelection;
             _appearance = design;
             GetDesigns();
         }
@@ -72,10 +72,10 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         #region Properties
 
-        public enBlueListBoxAppearance Appearance {
+        public BlueListBoxAppearance Appearance {
             get => _appearance;
             set {
-                if (value == _appearance && _itemDesign != enDesign.Undefiniert) { return; }
+                if (value == _appearance && _itemDesign != Design.Undefiniert) { return; }
                 _appearance = value;
                 GetDesigns();
                 //DesignOrStyleChanged();
@@ -85,7 +85,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         public int BreakAfterItems { get; private set; }
 
-        public enCheckBehavior CheckBehavior {
+        public CheckBehavior CheckBehavior {
             get => _checkBehavior;
             set {
                 if (value == _checkBehavior) { return; }
@@ -98,10 +98,10 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
         /// ControlDesign wird durch Appearance gesetzt
         /// </summary>
         /// <returns></returns>
-        public enDesign ControlDesign //Implements IDesignAble.Design
+        public Design ControlDesign //Implements IDesignAble.Design
         {
             get {
-                if (_controlDesign == enDesign.Undefiniert) { Develop.DebugPrint(enFehlerArt.Fehler, "ControlDesign undefiniert!"); }
+                if (_controlDesign == Design.Undefiniert) { Develop.DebugPrint(enFehlerArt.Fehler, "ControlDesign undefiniert!"); }
                 return _controlDesign;
             }
         }
@@ -110,10 +110,10 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
         /// Itemdesign wird durch Appearance gesetzt
         /// </summary>
         /// <returns></returns>
-        public enDesign ItemDesign //Implements IDesignAble.Design
+        public Design ItemDesign //Implements IDesignAble.Design
         {
             get {
-                if (_itemDesign == enDesign.Undefiniert) { Develop.DebugPrint(enFehlerArt.Fehler, "ItemDesign undefiniert!"); }
+                if (_itemDesign == Design.Undefiniert) { Develop.DebugPrint(enFehlerArt.Fehler, "ItemDesign undefiniert!"); }
                 return _itemDesign;
             }
         }
@@ -140,18 +140,18 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         #region Methods
 
-        public static void GetItemCollection(ItemCollectionList? e, ColumnItem? column, RowItem? checkedItemsAtRow, enShortenStyle style, int maxItems) {
+        public static void GetItemCollection(ItemCollectionList? e, ColumnItem? column, RowItem? checkedItemsAtRow, ShortenStyle style, int maxItems) {
             List<string> marked = new();
             List<string> l = new();
             e.Clear();
-            e.CheckBehavior = enCheckBehavior.MultiSelection; // Es kann ja mehr als nur eines angewählt sein, auch wenn nicht erlaubt!
+            e.CheckBehavior = CheckBehavior.MultiSelection; // Es kann ja mehr als nur eines angewählt sein, auch wenn nicht erlaubt!
             l.AddRange(column.DropDownItems);
             if (column.DropdownWerteAndererZellenAnzeigen) {
                 if (column.DropdownKey >= 0 && checkedItemsAtRow != null) {
                     var cc = column.Database.Column.SearchByKey(column.DropdownKey);
                     FilterCollection f = new(column.Database)
                     {
-                        new FilterItem(cc, enFilterType.Istgleich_GroßKleinEgal, checkedItemsAtRow.CellGetString(cc))
+                        new FilterItem(cc, FilterType.Istgleich_GroßKleinEgal, checkedItemsAtRow.CellGetString(cc))
                     };
                     l.AddRange(column.Contents(f, null));
                 } else {
@@ -313,7 +313,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
             return i;
         }
 
-        public CellLikeListItem Add(string internalAndReadableText, ColumnItem? columnStyle, enShortenStyle style, enBildTextVerhalten bildTextverhaltent, bool enabled) {
+        public CellLikeListItem Add(string internalAndReadableText, ColumnItem? columnStyle, ShortenStyle style, BildTextVerhalten bildTextverhaltent, bool enabled) {
             CellLikeListItem i = new(internalAndReadableText, columnStyle, style, enabled,
                 bildTextverhaltent);
             Add(i);
@@ -328,112 +328,112 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
             return i;
         }
 
-        public TextListItem Add(enContextMenuComands comand, bool enabled = true) {
+        public TextListItem Add(ContextMenuComands comand, bool enabled = true) {
             var @internal = comand.ToString();
             QuickImage? symbol;
             string? readableText;
             switch (comand) {
-                case enContextMenuComands.DateiPfadÖffnen:
+                case ContextMenuComands.DateiPfadÖffnen:
                     readableText = "Dateipfad öffnen";
                     symbol = QuickImage.Get("Ordner|16");
                     break;
 
-                case enContextMenuComands.Abbruch:
+                case ContextMenuComands.Abbruch:
                     readableText = "Abbrechen";
                     symbol = QuickImage.Get("TasteESC|16");
                     break;
 
-                case enContextMenuComands.Bearbeiten:
+                case ContextMenuComands.Bearbeiten:
                     readableText = "Bearbeiten";
                     symbol = QuickImage.Get(enImageCode.Stift);
                     break;
 
-                case enContextMenuComands.Kopieren:
+                case ContextMenuComands.Kopieren:
                     readableText = "Kopieren";
                     symbol = QuickImage.Get(enImageCode.Kopieren);
                     break;
 
-                case enContextMenuComands.InhaltLöschen:
+                case ContextMenuComands.InhaltLöschen:
                     readableText = "Inhalt löschen";
                     symbol = QuickImage.Get(enImageCode.Radiergummi);
                     break;
 
-                case enContextMenuComands.ZeileLöschen:
+                case ContextMenuComands.ZeileLöschen:
                     readableText = "Zeile löschen";
                     symbol = QuickImage.Get("Zeile|16|||||||||Kreuz");
                     break;
 
-                case enContextMenuComands.DateiÖffnen:
+                case ContextMenuComands.DateiÖffnen:
                     readableText = "Öffnen / Ausführen";
                     symbol = QuickImage.Get(enImageCode.Blitz);
                     break;
 
-                case enContextMenuComands.SpaltenSortierungAZ:
+                case ContextMenuComands.SpaltenSortierungAZ:
                     readableText = "Nach dieser Spalte aufsteigend sortieren";
                     symbol = QuickImage.Get("AZ|16|8");
                     break;
 
-                case enContextMenuComands.SpaltenSortierungZA:
+                case ContextMenuComands.SpaltenSortierungZA:
                     readableText = "Nach dieser Spalte absteigend sortieren";
                     symbol = QuickImage.Get("ZA|16|8");
                     break;
 
-                case enContextMenuComands.Information:
+                case ContextMenuComands.Information:
                     readableText = "Informationen anzeigen";
                     symbol = QuickImage.Get(enImageCode.Frage);
                     break;
 
-                case enContextMenuComands.ZellenInhaltKopieren:
+                case ContextMenuComands.ZellenInhaltKopieren:
                     readableText = "Zelleninhalt kopieren";
                     symbol = QuickImage.Get(enImageCode.Kopieren);
                     break;
 
-                case enContextMenuComands.ZellenInhaltPaste:
+                case ContextMenuComands.ZellenInhaltPaste:
                     readableText = "In Zelle einfügen";
                     symbol = QuickImage.Get(enImageCode.Clipboard);
                     break;
 
-                case enContextMenuComands.SpaltenEigenschaftenBearbeiten:
+                case ContextMenuComands.SpaltenEigenschaftenBearbeiten:
                     readableText = "Spalteneigenschaften bearbeiten";
                     symbol = QuickImage.Get("Spalte|16|||||||||Stift");
                     break;
 
-                case enContextMenuComands.Speichern:
+                case ContextMenuComands.Speichern:
                     readableText = "Speichern";
                     symbol = QuickImage.Get(enImageCode.Diskette);
                     break;
 
-                case enContextMenuComands.Löschen:
+                case ContextMenuComands.Löschen:
                     readableText = "Löschen";
                     symbol = QuickImage.Get(enImageCode.Kreuz);
                     break;
 
-                case enContextMenuComands.Umbenennen:
+                case ContextMenuComands.Umbenennen:
                     readableText = "Umbenennen";
                     symbol = QuickImage.Get(enImageCode.Stift);
                     break;
 
-                case enContextMenuComands.SuchenUndErsetzen:
+                case ContextMenuComands.SuchenUndErsetzen:
                     readableText = "Suchen und ersetzen";
                     symbol = QuickImage.Get(enImageCode.Fernglas);
                     break;
 
-                case enContextMenuComands.Einfügen:
+                case ContextMenuComands.Einfügen:
                     readableText = "Einfügen";
                     symbol = QuickImage.Get(enImageCode.Clipboard);
                     break;
 
-                case enContextMenuComands.Ausschneiden:
+                case ContextMenuComands.Ausschneiden:
                     readableText = "Ausschneiden";
                     symbol = QuickImage.Get(enImageCode.Schere);
                     break;
 
-                case enContextMenuComands.VorherigenInhaltWiederherstellen:
+                case ContextMenuComands.VorherigenInhaltWiederherstellen:
                     readableText = "Vorherigen Inhalt wieder herstellen";
                     symbol = QuickImage.Get(enImageCode.Undo);
                     break;
 
-                case enContextMenuComands.WeitereBefehle:
+                case ContextMenuComands.WeitereBefehle:
                     readableText = "Weitere Befehle";
                     symbol = QuickImage.Get(enImageCode.Hierarchie);
                     break;
@@ -448,7 +448,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
             return Add(readableText, @internal, symbol, enabled);
         }
 
-        public BasicListItem? Add(string value, ColumnItem? columnStyle, enShortenStyle style, enBildTextVerhalten bildTextverhalten) {
+        public BasicListItem? Add(string value, ColumnItem? columnStyle, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
             if (this[value] == null) {
                 if (columnStyle.Format == enDataFormat.Link_To_Filesystem && value.FileType() == enFileFormat.Image) {
                     return Add(columnStyle.BestFile(value, false), value, value, columnStyle.Database.FileEncryptionKey);
@@ -490,7 +490,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
             }
         }
 
-        public void AddRange(List<string> values, ColumnItem? columnStyle, enShortenStyle style, enBildTextVerhalten bildTextverhalten) {
+        public void AddRange(List<string> values, ColumnItem? columnStyle, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
             if (values == null) { return; }
             if (values.Count > 10000) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Values > 100000");
@@ -653,7 +653,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
                     return Size.Empty;
                 }
                 PreComputeSize();
-                if (_itemDesign == enDesign.Undefiniert) { GetDesigns(); }
+                if (_itemDesign == Design.Undefiniert) { GetDesigns(); }
                 if (BreakAfterItems < 1) { senkrechtAllowed = enOrientation.Waagerecht; }
                 var sliderWidth = 0;
                 if (sliderY != null) {
@@ -663,11 +663,11 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
                 }
                 int colWidth;
                 switch (_appearance) {
-                    case enBlueListBoxAppearance.Gallery:
+                    case BlueListBoxAppearance.Gallery:
                         colWidth = 200;
                         break;
 
-                    case enBlueListBoxAppearance.FileSystem:
+                    case BlueListBoxAppearance.FileSystem:
                         colWidth = 110;
                         break;
 
@@ -794,9 +794,9 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         internal void SetNewCheckState(BasicListItem @this, bool value, ref bool checkVariable) {
             if (!@this.IsClickable()) { value = false; }
-            if (_checkBehavior == enCheckBehavior.NoSelection) {
+            if (_checkBehavior == CheckBehavior.NoSelection) {
                 value = false;
-            } else if (checkVariable && value == false && _checkBehavior == enCheckBehavior.AlwaysSingleSelection) {
+            } else if (checkVariable && value == false && _checkBehavior == CheckBehavior.AlwaysSingleSelection) {
                 if (Checked().Count == 1) { value = true; }
             }
             if (value == checkVariable) { return; }
@@ -863,37 +863,37 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
         }
 
         private void GetDesigns() {
-            _controlDesign = (enDesign)_appearance;
+            _controlDesign = (Design)_appearance;
             switch (_appearance) {
-                case enBlueListBoxAppearance.Autofilter:
-                    _itemDesign = enDesign.Item_Autofilter;
+                case BlueListBoxAppearance.Autofilter:
+                    _itemDesign = Design.Item_Autofilter;
                     break;
 
-                case enBlueListBoxAppearance.DropdownSelectbox:
-                    _itemDesign = enDesign.Item_DropdownMenu;
+                case BlueListBoxAppearance.DropdownSelectbox:
+                    _itemDesign = Design.Item_DropdownMenu;
                     break;
 
-                case enBlueListBoxAppearance.Gallery:
-                    _itemDesign = enDesign.Item_Listbox;
-                    _controlDesign = enDesign.ListBox;
+                case BlueListBoxAppearance.Gallery:
+                    _itemDesign = Design.Item_Listbox;
+                    _controlDesign = Design.ListBox;
                     break;
 
-                case enBlueListBoxAppearance.FileSystem:
-                    _itemDesign = enDesign.Item_Listbox;
-                    _controlDesign = enDesign.ListBox;
+                case BlueListBoxAppearance.FileSystem:
+                    _itemDesign = Design.Item_Listbox;
+                    _controlDesign = Design.ListBox;
                     break;
 
-                case enBlueListBoxAppearance.Listbox:
-                    _itemDesign = enDesign.Item_Listbox;
-                    _controlDesign = enDesign.ListBox;
+                case BlueListBoxAppearance.Listbox:
+                    _itemDesign = Design.Item_Listbox;
+                    _controlDesign = Design.ListBox;
                     break;
 
-                case enBlueListBoxAppearance.KontextMenu:
-                    _itemDesign = enDesign.Item_KontextMenu;
+                case BlueListBoxAppearance.KontextMenu:
+                    _itemDesign = Design.Item_KontextMenu;
                     break;
 
-                case enBlueListBoxAppearance.ComboBox_Textbox:
-                    _itemDesign = enDesign.ComboBox_Textbox;
+                case BlueListBoxAppearance.ComboBox_Textbox:
+                    _itemDesign = Design.ComboBox_Textbox;
                     break;
 
                 default:
@@ -920,15 +920,15 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
             var done = false;
             BasicListItem? f = null;
             switch (_checkBehavior) {
-                case enCheckBehavior.NoSelection:
+                case CheckBehavior.NoSelection:
                     UncheckAll();
                     break;
 
-                case enCheckBehavior.MultiSelection:
+                case CheckBehavior.MultiSelection:
                     break;
 
-                case enCheckBehavior.SingleSelection:
-                case enCheckBehavior.AlwaysSingleSelection:
+                case CheckBehavior.SingleSelection:
+                case CheckBehavior.AlwaysSingleSelection:
                     foreach (var thisItem in this) {
                         if (thisItem != null) {
                             if (thisMustBeChecked == null) {
@@ -952,7 +952,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
                             }
                         }
                     }
-                    if (_checkBehavior == enCheckBehavior.AlwaysSingleSelection && !done && f != null && !f.Checked) {
+                    if (_checkBehavior == CheckBehavior.AlwaysSingleSelection && !done && f != null && !f.Checked) {
                         f.Checked = true;
                         somethingDonex = true;
                     }

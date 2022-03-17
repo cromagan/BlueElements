@@ -75,9 +75,9 @@ namespace BlueControls.Extended_Text {
 
         public bool Multiline;
         private readonly RowItem? _row;
-        private enDesign _design;
+        private Design _design;
         private int? _height;
-        private enStates _state;
+        private States _state;
         private Size _textDimensions;
         private string? _tmpHtmlText;
         private string? _tmpPlainText;
@@ -88,9 +88,9 @@ namespace BlueControls.Extended_Text {
 
         #region Constructors
 
-        public ExtText(enDesign design, enStates state) : base() {
-            _design = enDesign.Undefiniert;
-            _state = enStates.Standard;
+        public ExtText(Design design, States state) : base() {
+            _design = Design.Undefiniert;
+            _state = States.Standard;
             _row = null;
             DrawingPos = new Point(0, 0);
             Ausrichtung = enAlignment.Top_Left;
@@ -108,7 +108,7 @@ namespace BlueControls.Extended_Text {
             _state = state;
         }
 
-        public ExtText(enPadStyles design, RowItem? skinRow) : this((enDesign)design, enStates.Standard) {
+        public ExtText(PadStyles design, RowItem? skinRow) : this((Design)design, States.Standard) {
             _row = skinRow;
 
             if ((int)_design < 10000 || _row == null) {
@@ -120,7 +120,7 @@ namespace BlueControls.Extended_Text {
 
         #region Properties
 
-        public enDesign Design {
+        public Design Design {
             get => _design;
             set {
                 if (value == _design) { return; }
@@ -159,7 +159,7 @@ namespace BlueControls.Extended_Text {
             }
         }
 
-        public enStates State {
+        public States State {
             get => _state;
             set {
                 if (value == _state) { return; }
@@ -241,14 +241,14 @@ namespace BlueControls.Extended_Text {
 
         public void Check(int first, int last, bool checkstate) {
             for (var cc = first; cc <= last; cc++) {
-                if (this[cc].State != enStates.Undefiniert) {
+                if (this[cc].State != States.Undefiniert) {
                     if (checkstate) {
-                        if (!this[cc].State.HasFlag(enStates.Checked)) {
-                            this[cc].State |= enStates.Checked;
+                        if (!this[cc].State.HasFlag(States.Checked)) {
+                            this[cc].State |= States.Checked;
                         }
                     } else {
-                        if (this[cc].State.HasFlag(enStates.Checked)) {
-                            this[cc].State ^= enStates.Checked;
+                        if (this[cc].State.HasFlag(States.Checked)) {
+                            this[cc].State ^= States.Checked;
                         }
                     }
                 }
@@ -320,7 +320,7 @@ namespace BlueControls.Extended_Text {
 
         public bool InsertChar(enAsciiKey ascii, int position) {
             if ((int)ascii < 13) { return false; }
-            var c = new ExtCharAscii((char)ascii, Design, State, null, 4, enMarkState.None);
+            var c = new ExtCharAscii((char)ascii, Design, State, null, 4, MarkState.None);
             Insert(position, c);
             return true;
         }
@@ -375,7 +375,7 @@ namespace BlueControls.Extended_Text {
 
         internal void InsertCrlf(int position) => Insert(position, new ExtCharCRLFCode());
 
-        internal void Mark(enMarkState markstate, int first, int last) {
+        internal void Mark(MarkState markstate, int first, int last) {
             try {
                 for (var z = first; z <= Math.Min(last, Count - 1); z++) {
                     if (!this[z].Marking.HasFlag(markstate)) {
@@ -387,7 +387,7 @@ namespace BlueControls.Extended_Text {
             }
         }
 
-        internal void Unmark(enMarkState markstate) {
+        internal void Unmark(MarkState markstate) {
             foreach (var t in this.Where(t => t.Marking.HasFlag(markstate))) {
                 t.Marking ^= markstate;
             }
@@ -440,10 +440,10 @@ namespace BlueControls.Extended_Text {
             var pos = 0;
             var zeichen = -1;
             var stufe = 4;
-            var markstate = enMarkState.None;
+            var markstate = MarkState.None;
             Clear();
             ResetPosition(true);
-            var bf = (int)_design > 10000 ? Skin.GetBlueFont((enPadStyles)_design, _row) : Skin.GetBlueFont(_design, _state);
+            var bf = (int)_design > 10000 ? Skin.GetBlueFont((PadStyles)_design, _row) : Skin.GetBlueFont(_design, _state);
             if (bf == null) { return; }// Wenn die DAtenbanken entladen wurde, bei Programmende
 
             if (!string.IsNullOrEmpty(cactext)) {
@@ -488,7 +488,7 @@ namespace BlueControls.Extended_Text {
             ResetPosition(true);
         }
 
-        private void DoHtmlCode(string htmlText, int start, ref int position, ref BlueFont? font, ref int stufe, ref enMarkState markState) {
+        private void DoHtmlCode(string htmlText, int start, ref int position, ref BlueFont? font, ref int stufe, ref MarkState markState) {
             if (font == null) { return; }  // wenn die Datenbanken entladen wurden bei Programmende
 
             var endpos = htmlText.IndexOf('>', start + 1);
@@ -636,7 +636,7 @@ namespace BlueControls.Extended_Text {
                     break;
 
                 case "MARKSTATE":
-                    markState = (enMarkState)IntParse(attribut);
+                    markState = (MarkState)IntParse(attribut);
                     break;
 
                 case "":
@@ -645,7 +645,7 @@ namespace BlueControls.Extended_Text {
             }
         }
 
-        private void DoSpecialEntities(string xHtmlTextx, ref int xStartPosx, ref int xPosition, ref BlueFont? f, ref int stufe, ref enMarkState markState) {
+        private void DoSpecialEntities(string xHtmlTextx, ref int xStartPosx, ref int xPosition, ref BlueFont? f, ref int stufe, ref MarkState markState) {
             var endpos = xHtmlTextx.IndexOf(';', xStartPosx + 1);
             xPosition++;
             if (endpos <= xStartPosx || endpos > xStartPosx + 10) {
@@ -730,7 +730,7 @@ namespace BlueControls.Extended_Text {
             xStartPosx = endpos;
         }
 
-        private void DrawState(Graphics gr, float czoom, enMarkState state) {
+        private void DrawState(Graphics gr, float czoom, MarkState state) {
             var tmas = -1;
             for (var pos = 0; pos < Count; pos++) {
                 var tempVar = this[pos];
@@ -753,34 +753,34 @@ namespace BlueControls.Extended_Text {
         }
 
         private void DrawStates(Graphics gr, float czoom) {
-            DrawState(gr, czoom, enMarkState.Field);
-            DrawState(gr, czoom, enMarkState.MyOwn);
-            DrawState(gr, czoom, enMarkState.Other);
-            DrawState(gr, czoom, enMarkState.Ringelchen);
+            DrawState(gr, czoom, MarkState.Field);
+            DrawState(gr, czoom, MarkState.MyOwn);
+            DrawState(gr, czoom, MarkState.Other);
+            DrawState(gr, czoom, MarkState.Ringelchen);
         }
 
-        private void DrawZone(Graphics gr, float czoom, enMarkState thisState, int markStart, int markEnd) {
+        private void DrawZone(Graphics gr, float czoom, MarkState thisState, int markStart, int markEnd) {
             var startX = (this[markStart].Pos.X * czoom) + DrawingPos.X;
             var startY = (this[markStart].Pos.Y * czoom) + DrawingPos.Y;
             var endX = (this[markEnd].Pos.X * czoom) + DrawingPos.X + (this[markEnd].Size.Width * czoom);
             var endy = (this[markEnd].Pos.Y * czoom) + DrawingPos.Y + (this[markEnd].Size.Height * czoom);
             switch (thisState) {
-                case enMarkState.None:
+                case MarkState.None:
                     break;
 
-                case enMarkState.Ringelchen:
+                case MarkState.Ringelchen:
                     gr.DrawLine(new Pen(Color.Red, 3 * czoom), startX, (int)(startY + (this[markStart].Size.Height * czoom * 0.9)), endX, (int)(startY + (this[markStart].Size.Height * czoom * 0.9)));
                     break;
 
-                case enMarkState.Field:
+                case MarkState.Field:
                     gr.FillRectangle(new SolidBrush(Color.FromArgb(80, 128, 128, 128)), startX, startY, endX - startX, endy - startY);
                     break;
 
-                case enMarkState.MyOwn:
+                case MarkState.MyOwn:
                     gr.FillRectangle(new SolidBrush(Color.FromArgb(40, 50, 255, 50)), startX, startY, endX - startX, endy - startY);
                     break;
 
-                case enMarkState.Other:
+                case MarkState.Other:
                     gr.FillRectangle(new SolidBrush(Color.FromArgb(80, 255, 255, 50)), startX, startY, endX - startX, endy - startY);
                     break;
 

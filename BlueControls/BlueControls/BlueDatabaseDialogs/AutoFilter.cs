@@ -47,7 +47,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Constructors
 
-        public AutoFilter(ColumnItem? column, FilterCollection? filter, List<RowItem>? pinned) : base(enDesign.Form_AutoFilter) {
+        public AutoFilter(ColumnItem? column, FilterCollection? filter, List<RowItem>? pinned) : base(Design.Form_AutoFilter) {
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
             //Me.SetNotFocusable()
@@ -79,7 +79,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         public void GenerateAll(FilterCollection? filter, List<RowItem?> pinned) {
             var nochOk = true;
             var listFilterString = _column.Autofilter_ItemList(filter, pinned);
-            var f = Skin.GetBlueFont(enDesign.Table_Cell, enStates.Standard);
+            var f = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
 
             //ACHUNG:
             // Column ist für die Filter in dieser Datenbank zuständig
@@ -93,10 +93,10 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             Width = Math.Max(txbEingabe.Width + (Skin.Padding * 2), Table.TmpColumnContentWidth(null, lColumn, f, 16));
             lsbFilterItems.Item.Clear();
-            lsbFilterItems.CheckBehavior = enCheckBehavior.MultiSelection;
+            lsbFilterItems.CheckBehavior = CheckBehavior.MultiSelection;
 
             if (listFilterString.Count < 400) {
-                lsbFilterItems.Item.AddRange(listFilterString, lColumn, enShortenStyle.Replaced, lColumn.BildTextVerhalten);
+                lsbFilterItems.Item.AddRange(listFilterString, lColumn, ShortenStyle.Replaced, lColumn.BildTextVerhalten);
                 lsbFilterItems.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
             } else {
                 lsbFilterItems.Item.Add("Zu viele Einträge", "x", enImageCode.Kreuz, false);
@@ -111,9 +111,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             lsbFilterItems.Width = Math.Max(lsbFilterItems.Width, Width - (Skin.PaddingSmal * 2));
             lsbFilterItems.Height = Math.Min(lsbFilterItems.Height, 560);
 
-            if (lColumn.FilterOptions is not enFilterOptions.Enabled_OnlyAndAllowed and not enFilterOptions.Enabled_OnlyOrAllowed) {
-                txbEingabe.Enabled = lColumn.FilterOptions.HasFlag(enFilterOptions.TextFilterEnabled);
-                capWas.Enabled = lColumn.FilterOptions.HasFlag(enFilterOptions.TextFilterEnabled);
+            if (lColumn.FilterOptions is not FilterOptions.Enabled_OnlyAndAllowed and not FilterOptions.Enabled_OnlyOrAllowed) {
+                txbEingabe.Enabled = lColumn.FilterOptions.HasFlag(FilterOptions.TextFilterEnabled);
+                capWas.Enabled = lColumn.FilterOptions.HasFlag(FilterOptions.TextFilterEnabled);
                 if (lColumn.SortType is enSortierTyp.ZahlenwertFloat or enSortierTyp.ZahlenwertInt) {
                     capWas.Text = "...oder von-bis:";
                 }
@@ -123,7 +123,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 } else {
                     lsbStandardFilter.Item.Add("Filter löschen", "filterlöschen", QuickImage.Get("Trichter|16||1"), false, Constants.FirstSortChar + "01");
                 }
-                var tmp = CellItem.ValueReadable(lColumn, string.Empty, enShortenStyle.Replaced, enBildTextVerhalten.Nur_Text, true);
+                var tmp = CellItem.ValueReadable(lColumn, string.Empty, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, true);
                 if (string.IsNullOrEmpty(tmp)) {
                     lsbStandardFilter.Item.Add("leere", "filterleere", QuickImage.Get("TasteABC|20|16|1"), true, Constants.FirstSortChar + "02");
                     lsbStandardFilter.Item.Add("nicht leere", "filternichtleere", QuickImage.Get("TasteABC|20|16"), true, Constants.FirstSortChar + "03");
@@ -131,20 +131,20 @@ namespace BlueControls.BlueDatabaseDialogs {
                     lsbStandardFilter.Item.Add(tmp + " (= leere)", "filterleere", QuickImage.Get("TasteABC|20|16|1"), true, Constants.FirstSortChar + "02");
                     lsbStandardFilter.Item.Add("nicht leere", "filternichtleere", QuickImage.Get("TasteABC|20|16"), false, Constants.FirstSortChar + "03");
                 }
-                lsbStandardFilter.Item.Add("aus der Zwischenablage", "clipboard", QuickImage.Get(enImageCode.Clipboard, 17), lColumn.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "05");
-                lsbStandardFilter.Item.Add("NICHT in der Zwischenablage", "nichtclipboard", QuickImage.Get("Clipboard|17||1"), lColumn.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled) && !_column.MultiLine && string.IsNullOrEmpty(tmp), Constants.FirstSortChar + "06");
-                lsbStandardFilter.Item.Add("mehrfache UND-Auswahl aktivieren", "ModusMultiUnd", QuickImage.Get(enImageCode.PlusZeichen, 17, "0000FF", ""), lColumn.MultiLine && lColumn.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled) && nochOk, Constants.FirstSortChar + "07");
-                lsbStandardFilter.Item.Add("mehrfache ODER-Auswahl aktivieren", "ModusMultiOder", QuickImage.Get(enImageCode.PlusZeichen, 17), lColumn.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled) && nochOk, Constants.FirstSortChar + "08");
-                lsbStandardFilter.Item.Add("negativ Auswahl aktivieren", "ModusNegativ", QuickImage.Get(enImageCode.MinusZeichen, 17), !lColumn.MultiLine && lColumn.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled) && nochOk, Constants.FirstSortChar + "09");
-                lsbStandardFilter.Item.Add("Einzigartige Einträge", "Einzigartig", QuickImage.Get(enImageCode.Eins, 17), lColumn.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "10");
-                lsbStandardFilter.Item.Add("Nicht Einzigartige Einträge", "NichtEinzigartig", QuickImage.Get("Eins|17||1"), lColumn.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "11");
-                lsbStandardFilter.Item.Add("Vergleiche mit anderer Spalte", "Spaltenvergleich", QuickImage.Get(enImageCode.Spalte, 17), lColumn.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled) && filter[_column.Database.Column[0]] == null, Constants.FirstSortChar + "12");
+                lsbStandardFilter.Item.Add("aus der Zwischenablage", "clipboard", QuickImage.Get(enImageCode.Clipboard, 17), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "05");
+                lsbStandardFilter.Item.Add("NICHT in der Zwischenablage", "nichtclipboard", QuickImage.Get("Clipboard|17||1"), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && !_column.MultiLine && string.IsNullOrEmpty(tmp), Constants.FirstSortChar + "06");
+                lsbStandardFilter.Item.Add("mehrfache UND-Auswahl aktivieren", "ModusMultiUnd", QuickImage.Get(enImageCode.PlusZeichen, 17, "0000FF", ""), lColumn.MultiLine && lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && nochOk, Constants.FirstSortChar + "07");
+                lsbStandardFilter.Item.Add("mehrfache ODER-Auswahl aktivieren", "ModusMultiOder", QuickImage.Get(enImageCode.PlusZeichen, 17), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && nochOk, Constants.FirstSortChar + "08");
+                lsbStandardFilter.Item.Add("negativ Auswahl aktivieren", "ModusNegativ", QuickImage.Get(enImageCode.MinusZeichen, 17), !lColumn.MultiLine && lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && nochOk, Constants.FirstSortChar + "09");
+                lsbStandardFilter.Item.Add("Einzigartige Einträge", "Einzigartig", QuickImage.Get(enImageCode.Eins, 17), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "10");
+                lsbStandardFilter.Item.Add("Nicht Einzigartige Einträge", "NichtEinzigartig", QuickImage.Get("Eins|17||1"), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "11");
+                lsbStandardFilter.Item.Add("Vergleiche mit anderer Spalte", "Spaltenvergleich", QuickImage.Get(enImageCode.Spalte, 17), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && filter[_column.Database.Column[0]] == null, Constants.FirstSortChar + "12");
             }
             Width = Math.Max(lsbFilterItems.Right + (Skin.PaddingSmal * 2), Width);
             Height = lsbFilterItems.Bottom + Skin.PaddingSmal;
             if (filter != null) {
-                foreach (var thisfilter in filter.Where(thisfilter => thisfilter != null && thisfilter.FilterType != enFilterType.KeinFilter).Where(thisfilter => thisfilter.Column == _column)) {
-                    if (thisfilter.FilterType.HasFlag(enFilterType.Istgleich)) {
+                foreach (var thisfilter in filter.Where(thisfilter => thisfilter != null && thisfilter.FilterType != FilterType.KeinFilter).Where(thisfilter => thisfilter.Column == _column)) {
+                    if (thisfilter.FilterType.HasFlag(FilterType.Istgleich)) {
                         foreach (var thisValue in thisfilter.SearchValue) {
                             if (lsbFilterItems.Item[thisValue] != null) {
                                 lsbFilterItems.Item[thisValue].Checked = true;
@@ -152,7 +152,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                                 lsbStandardFilter.Item["filterleere"].Checked = true;
                             }
                         }
-                    } else if (thisfilter.FilterType.HasFlag(enFilterType.Instr)) {
+                    } else if (thisfilter.FilterType.HasFlag(FilterType.Instr)) {
                         txbEingabe.Text = thisfilter.SearchValue[0];
                     } else if (Convert.ToBoolean((int)thisfilter.FilterType & 2)) {
                         if (thisfilter.SearchValue.Count == 1 && string.IsNullOrEmpty(thisfilter.SearchValue[0])) {
@@ -162,8 +162,8 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
             }
             if (nochOk) {
-                if (lColumn.FilterOptions == enFilterOptions.Enabled_OnlyAndAllowed) { ChangeToMultiUnd(); }
-                if (lColumn.FilterOptions == enFilterOptions.Enabled_OnlyOrAllowed) { ChangeToMultiOder(); }
+                if (lColumn.FilterOptions == FilterOptions.Enabled_OnlyAndAllowed) { ChangeToMultiUnd(); }
+                if (lColumn.FilterOptions == FilterOptions.Enabled_OnlyOrAllowed) { ChangeToMultiOder(); }
             }
         }
 
@@ -179,11 +179,11 @@ namespace BlueControls.BlueDatabaseDialogs {
                 return;
             }
             if (_multiAuswahlOder) {
-                CloseAndDispose("Filter", new FilterItem(_column, enFilterType.Istgleich_ODER_GroßKleinEgal, searchValue));
+                CloseAndDispose("Filter", new FilterItem(_column, FilterType.Istgleich_ODER_GroßKleinEgal, searchValue));
                 return;
             }
             if (_multiAuswahlUnd) {
-                CloseAndDispose("Filter", new FilterItem(_column, enFilterType.Istgleich_UND_GroßKleinEgal, searchValue));
+                CloseAndDispose("Filter", new FilterItem(_column, FilterType.Istgleich_UND_GroßKleinEgal, searchValue));
                 return;
             }
             Develop.DebugPrint("Filter Fehler!");
@@ -201,7 +201,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void ChangeToMultiOder() {
-            var f = Skin.GetBlueFont(enDesign.Caption, enStates.Standard);
+            var f = Skin.GetBlueFont(Design.Caption, States.Standard);
             _multiAuswahlOder = true;
             capInfo.Text = LanguageTool.DoTranslate("<fontsize=15><b><u>ODER-Filterung:</u></b><fontsize=" + f.FontSize + "><br><br>Wählen sie Einträge, von denen <b>einer</b> zutreffen muss:");
             ChangeDesign();
@@ -209,7 +209,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void ChangeToMultiUnd() {
             _multiAuswahlUnd = true;
-            var f = Skin.GetBlueFont(enDesign.Caption, enStates.Standard);
+            var f = Skin.GetBlueFont(Design.Caption, States.Standard);
             capInfo.Text = LanguageTool.DoTranslate("<fontsize=15><b><u>UND-Filterung:</u></b><fontsize=" + f.FontSize + "><br><br>Wählen sie welche Einträge <b>alle</b> zutreffen müssen:");
             ChangeDesign();
         }
@@ -231,9 +231,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (doJoker) { l.Add(_column.AutoFilterJoker); }
             if (_negativAuswahl) {
                 // Nur Ohne Multirow
-                CloseAndDispose("Filter", new FilterItem(_column, enFilterType.Ungleich_MultiRowIgnorieren_GroßKleinEgal, l));
+                CloseAndDispose("Filter", new FilterItem(_column, FilterType.Ungleich_MultiRowIgnorieren_GroßKleinEgal, l));
             } else {
-                CloseAndDispose("Filter", new FilterItem(_column, enFilterType.Istgleich_ODER_GroßKleinEgal, l));
+                CloseAndDispose("Filter", new FilterItem(_column, FilterType.Istgleich_ODER_GroßKleinEgal, l));
             }
         }
 
@@ -242,12 +242,12 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void sFilter_ItemClicked(object sender, BasicListItemEventArgs e) {
             switch (e.Item.Internal.ToLower()) {
                 case "filterleere": {
-                        CloseAndDispose("Filter", new FilterItem(_column, enFilterType.Istgleich | enFilterType.MultiRowIgnorieren, ""));
+                        CloseAndDispose("Filter", new FilterItem(_column, FilterType.Istgleich | FilterType.MultiRowIgnorieren, ""));
                         break;
                     }
 
                 case "filternichtleere": {
-                        CloseAndDispose("Filter", new FilterItem(_column, enFilterType.Ungleich_MultiRowIgnorieren, ""));
+                        CloseAndDispose("Filter", new FilterItem(_column, FilterType.Ungleich_MultiRowIgnorieren, ""));
                         break;
                     }
 
@@ -362,13 +362,13 @@ namespace BlueControls.BlueDatabaseDialogs {
                             if (zd2 < zd1) {
                                 Generic.Swap(ref zd1, ref zd2);
                             }
-                            CloseAndDispose("Filter", new FilterItem(_column, enFilterType.Between | enFilterType.UND, zd1.ToString(Constants.Format_Float9) + "|" + zd2.ToString(Constants.Format_Float9)));
+                            CloseAndDispose("Filter", new FilterItem(_column, FilterType.Between | FilterType.UND, zd1.ToString(Constants.Format_Float9) + "|" + zd2.ToString(Constants.Format_Float9)));
                             return;
                         }
                     }
                 }
             }
-            CloseAndDispose("Filter", new FilterItem(_column, enFilterType.Instr | enFilterType.GroßKleinEgal, txbEingabe.Text));
+            CloseAndDispose("Filter", new FilterItem(_column, FilterType.Instr | FilterType.GroßKleinEgal, txbEingabe.Text));
         }
 
         #endregion

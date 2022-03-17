@@ -20,9 +20,9 @@ namespace BlueControls.Forms {
 
         #region Constructors
 
-        public FloatingForm() : this(enDesign.Form_QuickInfo) { }
+        public FloatingForm() : this(Design.Form_QuickInfo) { }
 
-        protected FloatingForm(enDesign design) : base(design) {
+        protected FloatingForm(Design design) : base(design) {
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
             SetStyle(ControlStyles.Selectable, false);
@@ -42,7 +42,7 @@ namespace BlueControls.Forms {
             AllBoxes.Add(this);
         }
 
-        protected FloatingForm(Control? connectedControl, enDesign design) : this(design) => _connectedControl = connectedControl;
+        protected FloatingForm(Control? connectedControl, Design design) : this(design) => _connectedControl = connectedControl;
 
         #endregion
 
@@ -60,7 +60,7 @@ namespace BlueControls.Forms {
         protected override CreateParams CreateParams {
             get {
                 var oParam = base.CreateParams;
-                oParam.ExStyle |= (int)enExStyle.EX_NOACTIVATE | (int)enExStyle.EX_TOOLWINDOW | (int)enExStyle.EX_TOPMOST;
+                oParam.ExStyle |= (int)ExStyle.EX_NOACTIVATE | (int)ExStyle.EX_TOOLWINDOW | (int)ExStyle.EX_TOPMOST;
                 oParam.Parent = IntPtr.Zero;
                 return oParam;
             }
@@ -130,11 +130,11 @@ namespace BlueControls.Forms {
 
         public new void ShowDialog() => Develop.DebugPrint(enFehlerArt.Fehler, "FloatingForms können nur mit Show aufgerufen werden.");
 
-        internal static void Close(object? connectedControl, enDesign design) {
+        internal static void Close(object? connectedControl, Design design) {
             foreach (var thisForm in AllBoxes) {
                 if (!thisForm.IsDisposed) {
                     if (connectedControl == null || connectedControl == thisForm._connectedControl) {
-                        if (design == enDesign.Undefiniert || thisForm.Design == design) {
+                        if (design == Design.Undefiniert || thisForm.Design == design) {
                             try {
                                 thisForm.Close();
                                 Close(connectedControl, design);
@@ -148,9 +148,9 @@ namespace BlueControls.Forms {
             }
         }
 
-        internal static void Close(enDesign design) => Close(null, design);
+        internal static void Close(Design design) => Close(null, design);
 
-        internal static void Close(object connectedControl) => Close(connectedControl, enDesign.Undefiniert);
+        internal static void Close(object connectedControl) => Close(connectedControl, Design.Undefiniert);
 
         internal static bool IsShowing(object connectedControl) => AllBoxes.Any(thisForm => !thisForm.IsDisposed && connectedControl == thisForm._connectedControl);
 
@@ -161,8 +161,8 @@ namespace BlueControls.Forms {
                 BackgroundImage = new Bitmap(Width, Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
             }
             var tmpgr = Graphics.FromImage(BackgroundImage);
-            Skin.Draw_Back(tmpgr, Design, enStates.Standard, DisplayRectangle, null, false);
-            Skin.Draw_Border(tmpgr, Design, enStates.Standard, DisplayRectangle);
+            Skin.Draw_Back(tmpgr, Design, States.Standard, DisplayRectangle, null, false);
+            Skin.Draw_Border(tmpgr, Design, States.Standard, DisplayRectangle);
         }
 
         private void CheckMaxSize(int screenNr) {

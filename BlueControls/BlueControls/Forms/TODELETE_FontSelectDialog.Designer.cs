@@ -56,8 +56,8 @@ namespace BlueControls.Forms
             // 
             // FName
             // 
-            this.FName.AddAllowed = enAddType.None;
-            this.FName.CheckBehavior = enCheckBehavior.AlwaysSingleSelection;
+            this.FName.AddAllowed = AddType.None;
+            this.FName.CheckBehavior = CheckBehavior.AlwaysSingleSelection;
             this.FName.Location = new Point(8, 32);
             this.FName.Name = "FName";
             this.FName.QuickInfo = "";
@@ -84,8 +84,8 @@ namespace BlueControls.Forms
             // 
             // FSize
             // 
-            this.FSize.AddAllowed = enAddType.Text;
-            this.FSize.CheckBehavior = enCheckBehavior.AlwaysSingleSelection;
+            this.FSize.AddAllowed = AddType.Text;
+            this.FSize.CheckBehavior = CheckBehavior.AlwaysSingleSelection;
             this.FSize.Location = new Point(232, 32);
             this.FSize.Name = "FSize";
             this.FSize.QuickInfo = "";
@@ -112,7 +112,7 @@ namespace BlueControls.Forms
             // 
             // OnlyUpper
             // 
-            this.OnlyUpper.ButtonStyle = enButtonStyle.Checkbox_Text;
+            this.OnlyUpper.ButtonStyle = ButtonStyle.Checkbox_Text;
             this.OnlyUpper.Location = new Point(16, 192);
             this.OnlyUpper.Name = "OnlyUpper";
             this.OnlyUpper.Size = new Size(120, 16);
@@ -121,7 +121,7 @@ namespace BlueControls.Forms
             // 
             // OnlyLow
             // 
-            this.OnlyLow.ButtonStyle = enButtonStyle.Checkbox_Text;
+            this.OnlyLow.ButtonStyle = ButtonStyle.Checkbox_Text;
             this.OnlyLow.Location = new Point(16, 168);
             this.OnlyLow.Name = "OnlyLow";
             this.OnlyLow.Size = new Size(120, 16);
@@ -130,7 +130,7 @@ namespace BlueControls.Forms
             // 
             // fOutline
             // 
-            this.fOutline.ButtonStyle = enButtonStyle.Checkbox_Text;
+            this.fOutline.ButtonStyle = ButtonStyle.Checkbox_Text;
             this.fOutline.Location = new Point(16, 144);
             this.fOutline.Name = "fOutline";
             this.fOutline.Size = new Size(120, 16);
@@ -140,7 +140,7 @@ namespace BlueControls.Forms
             // 
             // fDurchge
             // 
-            this.fDurchge.ButtonStyle = enButtonStyle.Checkbox_Text;
+            this.fDurchge.ButtonStyle = ButtonStyle.Checkbox_Text;
             this.fDurchge.Location = new Point(16, 120);
             this.fDurchge.Name = "fDurchge";
             this.fDurchge.Size = new Size(120, 16);
@@ -150,7 +150,7 @@ namespace BlueControls.Forms
             // 
             // fKap
             // 
-            this.fKap.ButtonStyle = enButtonStyle.Checkbox_Text;
+            this.fKap.ButtonStyle = ButtonStyle.Checkbox_Text;
             this.fKap.Location = new Point(16, 96);
             this.fKap.Name = "fKap";
             this.fKap.Size = new Size(120, 16);
@@ -160,7 +160,7 @@ namespace BlueControls.Forms
             // 
             // fUnterstrichen
             // 
-            this.fUnterstrichen.ButtonStyle = enButtonStyle.Checkbox_Text;
+            this.fUnterstrichen.ButtonStyle = ButtonStyle.Checkbox_Text;
             this.fUnterstrichen.Location = new Point(16, 72);
             this.fUnterstrichen.Name = "fUnterstrichen";
             this.fUnterstrichen.Size = new Size(120, 16);
@@ -170,7 +170,7 @@ namespace BlueControls.Forms
             // 
             // fKursiv
             // 
-            this.fKursiv.ButtonStyle = enButtonStyle.Checkbox_Text;
+            this.fKursiv.ButtonStyle = ButtonStyle.Checkbox_Text;
             this.fKursiv.Location = new Point(16, 48);
             this.fKursiv.Name = "fKursiv";
             this.fKursiv.Size = new Size(120, 16);
@@ -180,7 +180,7 @@ namespace BlueControls.Forms
             // 
             // fFett
             // 
-            this.fFett.ButtonStyle = enButtonStyle.Checkbox_Text;
+            this.fFett.ButtonStyle = ButtonStyle.Checkbox_Text;
             this.fFett.Location = new Point(16, 24);
             this.fFett.Name = "fFett";
             this.fFett.Size = new Size(120, 16);

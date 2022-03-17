@@ -290,13 +290,13 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void Column_DatenAuslesen(ColumnItem? fromColumn) {
             _column = fromColumn;
             cbxFormat.Item.AddRange(typeof(enDataFormat));
-            cbxRandLinks.Item.AddRange(typeof(enColumnLineStyle));
-            cbxRandRechts.Item.AddRange(typeof(enColumnLineStyle));
-            cbxBildTextVerhalten.Item.AddRange(typeof(enBildTextVerhalten));
-            cbxAlign.Item.AddRange(typeof(enAlignmentHorizontal));
-            cbxAdditionalCheck.Item.AddRange(typeof(enAdditionalCheck));
-            cbxScriptType.Item.AddRange(typeof(enScriptType));
-            cbxTranslate.Item.AddRange(typeof(enTranslationType));
+            cbxRandLinks.Item.AddRange(typeof(ColumnLineStyle));
+            cbxRandRechts.Item.AddRange(typeof(ColumnLineStyle));
+            cbxBildTextVerhalten.Item.AddRange(typeof(BildTextVerhalten));
+            cbxAlign.Item.AddRange(typeof(AlignmentHorizontal));
+            cbxAdditionalCheck.Item.AddRange(typeof(AdditionalCheck));
+            cbxScriptType.Item.AddRange(typeof(ScriptType));
+            cbxTranslate.Item.AddRange(typeof(TranslationType));
             cbxSort.Item.AddRange(typeof(enSortierTyp));
             cbxLinkedDatabase.Item.Clear();
             if (!string.IsNullOrEmpty(_column.Database.Filename)) {
@@ -356,11 +356,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             cbxScriptType.Text = ((int)_column.ScriptType).ToString();
             cbxTranslate.Text = ((int)_column.Translate).ToString();
             cbxSort.Text = ((int)_column.SortType).ToString();
-            btnAutoFilterMoeglich.Checked = _column.FilterOptions.HasFlag(enFilterOptions.Enabled);
-            btnAutoFilterTXTErlaubt.Checked = _column.FilterOptions.HasFlag(enFilterOptions.TextFilterEnabled);
-            btnAutoFilterErweitertErlaubt.Checked = _column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled);
-            chkFilterOnlyOr.Checked = _column.FilterOptions.HasFlag(enFilterOptions.OnlyOrAllowed);
-            chkFilterOnlyAND.Checked = _column.FilterOptions.HasFlag(enFilterOptions.OnlyAndAllowed);
+            btnAutoFilterMoeglich.Checked = _column.FilterOptions.HasFlag(FilterOptions.Enabled);
+            btnAutoFilterTXTErlaubt.Checked = _column.FilterOptions.HasFlag(FilterOptions.TextFilterEnabled);
+            btnAutoFilterErweitertErlaubt.Checked = _column.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled);
+            chkFilterOnlyOr.Checked = _column.FilterOptions.HasFlag(FilterOptions.OnlyOrAllowed);
+            chkFilterOnlyAND.Checked = _column.FilterOptions.HasFlag(FilterOptions.OnlyAndAllowed);
             btnZeilenFilterIgnorieren.Checked = _column.IgnoreAtRowFilter;
             btnEditableStandard.Checked = _column.TextBearbeitungErlaubt;
             btnEditableDropdown.Checked = _column.DropdownBearbeitungErlaubt;
@@ -438,8 +438,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             _column.Suffix = cbxEinheit.Text;
             _column.BackColor = QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo.FromHtmlCode();
             _column.ForeColor = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo.FromHtmlCode();
-            _column.LineLeft = (enColumnLineStyle)IntParse(cbxRandLinks.Text);
-            _column.LineRight = (enColumnLineStyle)IntParse(cbxRandRechts.Text);
+            _column.LineLeft = (ColumnLineStyle)IntParse(cbxRandLinks.Text);
+            _column.LineRight = (ColumnLineStyle)IntParse(cbxRandRechts.Text);
             _column.MultiLine = btnMultiline.Checked;
             _column.AfterEdit_QuickSortRemoveDouble = btnAutoEditAutoSort.Checked;
             if (tbxRunden.Text.IsLong()) {
@@ -455,12 +455,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             _column.ShowUndo = btnLogUndo.Checked;
             _column.FormatierungErlaubt = btnFormatierungErlaubt.Checked;
             _column.SpellChecking = btnSpellChecking.Checked;
-            var tmpf = enFilterOptions.None;
-            if (btnAutoFilterMoeglich.Checked) { tmpf |= enFilterOptions.Enabled; }
-            if (btnAutoFilterTXTErlaubt.Checked) { tmpf |= enFilterOptions.TextFilterEnabled; }
-            if (btnAutoFilterErweitertErlaubt.Checked) { tmpf |= enFilterOptions.ExtendedFilterEnabled; }
-            if (chkFilterOnlyOr.Checked) { tmpf |= enFilterOptions.OnlyOrAllowed; }
-            if (chkFilterOnlyAND.Checked) { tmpf |= enFilterOptions.OnlyAndAllowed; }
+            var tmpf = FilterOptions.None;
+            if (btnAutoFilterMoeglich.Checked) { tmpf |= FilterOptions.Enabled; }
+            if (btnAutoFilterTXTErlaubt.Checked) { tmpf |= FilterOptions.TextFilterEnabled; }
+            if (btnAutoFilterErweitertErlaubt.Checked) { tmpf |= FilterOptions.ExtendedFilterEnabled; }
+            if (chkFilterOnlyOr.Checked) { tmpf |= FilterOptions.OnlyOrAllowed; }
+            if (chkFilterOnlyAND.Checked) { tmpf |= FilterOptions.OnlyAndAllowed; }
             //_Column.AutoFilterErlaubt = AutoFilterMöglich.Checked;
             //_Column.FilterOptions.HasFlag(enFilterOptions.TextFilterEnabled) = AutoFilterTXT.Checked;
             //_Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled) = AutoFilterErw.Checked;
@@ -506,7 +506,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             _column.BildCode_ConstantHeight = txbBildCodeConstHeight.Text;
             IntTryParse(cbxBildTextVerhalten.Text, out var imNf);
-            _column.BildTextVerhalten = (enBildTextVerhalten)imNf;
+            _column.BildTextVerhalten = (BildTextVerhalten)imNf;
             _column.BestFile_StandardFolder = txbBestFileStandardFolder.Text;
             _column.BestFile_StandardSuffix = txbBestFileStandardSuffix.Text;
             _column.LinkedDatabaseFile = cbxLinkedDatabase.Text; // Muss vor LinkedCell_RowKey zurückgeschrieben werden
@@ -514,10 +514,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             _column.LinkedCell_ColumnKeyOfLinkedDatabase = ColumKeyFrom(_column.LinkedDatabase, cbxTargetColumn.Text); // LINKED DATABASE
             _column.DropdownKey = ColumKeyFrom(_column.Database, cbxDropDownKey.Text);
             _column.VorschlagsColumn = ColumKeyFrom(_column.Database, cbxVorschlagSpalte.Text);
-            _column.Align = (enAlignmentHorizontal)IntParse(cbxAlign.Text);
-            _column.AdditionalCheck = (enAdditionalCheck)IntParse(cbxAdditionalCheck.Text);
-            _column.ScriptType = (enScriptType)IntParse(cbxScriptType.Text);
-            _column.Translate = (enTranslationType)IntParse(cbxTranslate.Text);
+            _column.Align = (AlignmentHorizontal)IntParse(cbxAlign.Text);
+            _column.AdditionalCheck = (AdditionalCheck)IntParse(cbxAdditionalCheck.Text);
+            _column.ScriptType = (ScriptType)IntParse(cbxScriptType.Text);
+            _column.Translate = (TranslationType)IntParse(cbxTranslate.Text);
             _column.SortType = (enSortierTyp)IntParse(cbxSort.Text);
             _column.AutoRemove = txbAutoRemove.Text;
             _column.SaveContent = butSaveContent.Checked;
@@ -545,7 +545,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 x.Column.Add("count", "count", enVarType.Integer);
                 var vis = x.Column.Add("visible", "visible", enVarType.Bit);
                 var sp = x.Column.Add("Spalte", "Spalte", enVarType.Text);
-                sp.Align = enAlignmentHorizontal.Rechts;
+                sp.Align = AlignmentHorizontal.Rechts;
                 var b = x.Column.Add("Such", "Suchtext", enVarType.Text);
                 b.Quickinfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum suchen<br>Mischen wird nicht unterstützt.";
                 b.MultiLine = false;
@@ -568,7 +568,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                 x.Tags.TagSet("Filename", linkdb.Filename);
 
-                tblFilterliste.Filter.Add(vis, enFilterType.Istgleich, "+");
+                tblFilterliste.Filter.Add(vis, FilterType.Istgleich, "+");
             }
 
             linkdb.RepairAfterParse(); // Dass ja die 0 Ansicht stimmt

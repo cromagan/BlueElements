@@ -29,7 +29,7 @@ namespace BlueControls.Controls {
 
         #region Fields
 
-        private enGroupBoxStyle _groupBoxStyle = enGroupBoxStyle.Normal;
+        private GroupBoxStyle _groupBoxStyle = GroupBoxStyle.Normal;
 
         #endregion
 
@@ -41,8 +41,8 @@ namespace BlueControls.Controls {
 
         #region Properties
 
-        [DefaultValue(enGroupBoxStyle.Normal)]
-        public enGroupBoxStyle GroupBoxStyle {
+        [DefaultValue(GroupBoxStyle.Normal)]
+        public GroupBoxStyle GroupBoxStyle {
             get => _groupBoxStyle;
             set {
                 if (_groupBoxStyle == value) { return; }
@@ -75,36 +75,36 @@ namespace BlueControls.Controls {
         }
 
         protected override void OnPaint(PaintEventArgs e) {
-            var state = enStates.Standard;
-            if (!GenericControl.AllEnabled(Parent)) { state = enStates.Standard_Disabled; }
+            var state = States.Standard;
+            if (!GenericControl.AllEnabled(Parent)) { state = States.Standard_Disabled; }
             Rectangle r = new(0, 0, Width, Height);
             e.Graphics.Clear(BackColor);
 
             switch (_groupBoxStyle) {
-                case enGroupBoxStyle.RibbonBar:
-                    Skin.Draw_Border(e.Graphics, enDesign.RibbonBar_Frame, state, r);
+                case GroupBoxStyle.RibbonBar:
+                    Skin.Draw_Border(e.Graphics, Design.RibbonBar_Frame, state, r);
                     if (!string.IsNullOrEmpty(Text)) {
                         Rectangle bottomTxt = new(0, 0, Width, Height + 2);
-                        Skin.Draw_FormatedText(e.Graphics, Text, enDesign.RibbonBar_Frame, state, null, enAlignment.Bottom_HorizontalCenter, bottomTxt, this, false, true);
+                        Skin.Draw_FormatedText(e.Graphics, Text, Design.RibbonBar_Frame, state, null, enAlignment.Bottom_HorizontalCenter, bottomTxt, this, false, true);
                     }
                     break;
 
-                case enGroupBoxStyle.Normal:
+                case GroupBoxStyle.Normal:
                     if (Height > 33) {
-                        Skin.Draw_Border(e.Graphics, enDesign.GroupBox, state, r);
+                        Skin.Draw_Border(e.Graphics, Design.GroupBox, state, r);
                         if (!string.IsNullOrEmpty(Text)) {
                             Rectangle topTxt = new(Skin.Padding, 0, Width, Height);
-                            Skin.Draw_FormatedText(e.Graphics, Text, enDesign.GroupBox, state, null, enAlignment.Top_Left, topTxt, this, true, true);
+                            Skin.Draw_FormatedText(e.Graphics, Text, Design.GroupBox, state, null, enAlignment.Top_Left, topTxt, this, true, true);
                         }
                     }
                     break;
 
-                case enGroupBoxStyle.NormalBold:
+                case GroupBoxStyle.NormalBold:
                     if (Height > 33) {
-                        Skin.Draw_Border(e.Graphics, enDesign.GroupBoxBold, state, r);
+                        Skin.Draw_Border(e.Graphics, Design.GroupBoxBold, state, r);
                         if (!string.IsNullOrEmpty(Text)) {
                             Rectangle topTxt = new(Skin.Padding, Skin.PaddingSmal, Width, Height);
-                            Skin.Draw_FormatedText(e.Graphics, Text, enDesign.GroupBoxBold, state, null, enAlignment.Top_Left, topTxt, this, false, true);
+                            Skin.Draw_FormatedText(e.Graphics, Text, Design.GroupBoxBold, state, null, enAlignment.Top_Left, topTxt, this, false, true);
                         }
                     }
                     break;
@@ -138,7 +138,7 @@ namespace BlueControls.Controls {
         }
 
         private void ChildControls_RibbonBar() {
-            if (_groupBoxStyle != enGroupBoxStyle.RibbonBar) { return; }
+            if (_groupBoxStyle != GroupBoxStyle.RibbonBar) { return; }
             if (Width < 10 || Height < 10) { return; }
             if (Controls.Count == 0) { return; }
 
@@ -171,19 +171,19 @@ namespace BlueControls.Controls {
 
         private void SetStandardValues() {
             var l = GenericControl.Typ(Parent);
-            if (_groupBoxStyle == enGroupBoxStyle.RibbonBar) { l = enPartentType.RibbonPage; }
+            if (_groupBoxStyle == GroupBoxStyle.RibbonBar) { l = PartentType.RibbonPage; }
             switch (l) {
-                case enPartentType.RibbonPage:
-                    GroupBoxStyle = enGroupBoxStyle.RibbonBar;
-                    BackColor = Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard);
+                case PartentType.RibbonPage:
+                    GroupBoxStyle = GroupBoxStyle.RibbonBar;
+                    BackColor = Skin.Color_Back(Design.RibbonBar_Body, States.Standard);
                     break;
 
-                case enPartentType.TabPage:
-                    BackColor = Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard);
+                case PartentType.TabPage:
+                    BackColor = Skin.Color_Back(Design.TabStrip_Body, States.Standard);
                     break;
 
-                case enPartentType.Form:
-                    BackColor = Skin.Color_Back(enDesign.Form_Standard, enStates.Standard);
+                case PartentType.Form:
+                    BackColor = Skin.Color_Back(Design.Form_Standard, States.Standard);
                     break;
             }
         }

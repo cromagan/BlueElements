@@ -60,7 +60,7 @@ namespace BlueControls.Forms {
             // 
             // ArbeitsbreichSetup
             // 
-            this.btnArbeitsbreichSetup.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
+            this.btnArbeitsbreichSetup.ButtonStyle = BlueControls.Enums.ButtonStyle.Button;
             // 
             // Hinzu
             // 
@@ -77,7 +77,7 @@ namespace BlueControls.Forms {
             this.grpExtras.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpExtras.Controls.Add(this.btnTextExport);
             this.grpExtras.Controls.Add(this.btnBilderExport);
-            this.grpExtras.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
+            this.grpExtras.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpExtras.Location = new System.Drawing.Point(576, 0);
             this.grpExtras.Name = "grpExtras";
             this.grpExtras.Size = new System.Drawing.Size(392, 80);
@@ -87,7 +87,7 @@ namespace BlueControls.Forms {
             // 
             // btnTextExport
             // 
-            this.btnTextExport.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
+            this.btnTextExport.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnTextExport.ImageCode = "Textdatei||||||||||Pfeil_Unten";
             this.btnTextExport.Location = new System.Drawing.Point(80, 2);
             this.btnTextExport.Name = "btnTextExport";
@@ -98,7 +98,7 @@ namespace BlueControls.Forms {
             // 
             // btnBilderExport
             // 
-            this.btnBilderExport.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
+            this.btnBilderExport.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnBilderExport.ImageCode = "Bild||||||||||Pfeil_Unten";
             this.btnBilderExport.Location = new System.Drawing.Point(8, 2);
             this.btnBilderExport.Name = "btnBilderExport";

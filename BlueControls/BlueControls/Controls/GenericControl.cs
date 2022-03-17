@@ -47,7 +47,7 @@ namespace BlueControls.Controls {
 
         private bool _mousePressing;
 
-        private enPartentType _myParentType = enPartentType.Unbekannt;
+        private PartentType _myParentType = PartentType.Unbekannt;
 
         // Dieser Codeblock ist im Interface IQuickInfo herauskopiert und muss überall Identisch sein.
         private string _quickInfo = "";
@@ -127,94 +127,92 @@ namespace BlueControls.Controls {
             } while (true);
         }
 
-        public static enPartentType Typ(System.Windows.Forms.Control control) {
+        public static PartentType Typ(System.Windows.Forms.Control control) {
             switch (control) {
                 case null:
-                    return enPartentType.Nothing;
+                    return PartentType.Nothing;
 
                 case GroupBox: {
                         if (control.Parent is System.Windows.Forms.TabPage tp) {
-                            if (tp.Parent == null) { return enPartentType.Unbekannt; }
-                            if (tp.Parent is RibbonBar) { return enPartentType.RibbonGroupBox; }
+                            if (tp.Parent == null) { return PartentType.Unbekannt; }
+                            if (tp.Parent is RibbonBar) { return PartentType.RibbonGroupBox; }
                         }
-                        return enPartentType.GroupBox;
+                        return PartentType.GroupBox;
                     }
 
                 case LastFilesCombo:
-                    return enPartentType.LastFilesCombo;
+                    return PartentType.LastFilesCombo;
                 //Is = "BlueBasics.ComboBox"
 
-                case ComboBox box when box.ParentType() == enPartentType.RibbonPage:
-                    return enPartentType.RibbonBarCombobox;
+                case ComboBox box when box.ParentType() == PartentType.RibbonPage:
+                    return PartentType.RibbonBarCombobox;
 
                 case ComboBox:
-                    return enPartentType.ComboBox;
+                    return PartentType.ComboBox;
                 // Is = "BlueBasics.TabControl"
 
                 case RibbonBar:
-                    return enPartentType.RibbonControl;
+                    return PartentType.RibbonControl;
 
                 case TabControl:
-                    return enPartentType.TabControl;
+                    return PartentType.TabControl;
                 // Is = "BlueBasics.TabPage"
 
-                case TabAdministration:
-
                 case System.Windows.Forms.TabPage when control.Parent is RibbonBar:
-                    return enPartentType.RibbonPage;
+                    return PartentType.RibbonPage;
 
                 case System.Windows.Forms.TabPage:
-                    return enPartentType.TabPage;
+                    return PartentType.TabPage;
                 //Is = "BlueBasics.Slider"
 
                 case Slider:
-                    return enPartentType.Slider;
+                    return PartentType.Slider;
                 //Is = "FRMMSGBOX"
 
                 case FloatingForm:
-                    return enPartentType.MsgBox;
+                    return PartentType.MsgBox;
 
                 case DialogWithOkAndCancel:
-                    return enPartentType.MsgBox;
+                    return PartentType.MsgBox;
 
                 case TextBox:
-                    return enPartentType.TextBox;
+                    return PartentType.TextBox;
 
                 case ListBox:
-                    return enPartentType.ListBox;
+                    return PartentType.ListBox;
 
                 case EasyPic:
-                    return enPartentType.EasyPic;
+                    return PartentType.EasyPic;
 
                 case Button:
-                    return enPartentType.Button;
+                    return PartentType.Button;
 
                 case Line:
-                    return enPartentType.Line;
+                    return PartentType.Line;
 
                 case Caption:
-                    return enPartentType.Caption;
+                    return PartentType.Caption;
 
                 case Formula:
-                    return enPartentType.Formula;
+                    return PartentType.Formula;
 
                 case Form:
-                    return enPartentType.Form;
+                    return PartentType.Form;
 
                 case Table:
-                    return enPartentType.Table;
+                    return PartentType.Table;
 
                 case System.Windows.Forms.Panel:
-                    return enPartentType.Panel;
+                    return PartentType.Panel;
 
                 case FlexiControlForCell:
-                    return enPartentType.FlexiControlForCell;
+                    return PartentType.FlexiControlForCell;
 
                 case FlexiControl:
-                    return enPartentType.FlexiControl;
+                    return PartentType.FlexiControl;
 
                 default:
-                    return enPartentType.Nothing;
+                    return PartentType.Nothing;
             }
         }
 
@@ -284,7 +282,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        protected virtual void DrawControl(Graphics gr, enStates state) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
+        protected virtual void DrawControl(Graphics gr, States state) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
 
         //MyBase.ScaleChildren
         protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) => bounds;
@@ -409,9 +407,9 @@ namespace BlueControls.Controls {
 
         protected System.Windows.Forms.Form? ParentForm() => ParentForm(Parent);
 
-        protected enPartentType ParentType() {
-            if (Parent == null) { return enPartentType.Unbekannt; }
-            if (_myParentType != enPartentType.Unbekannt) { return _myParentType; }
+        protected PartentType ParentType() {
+            if (Parent == null) { return PartentType.Unbekannt; }
+            if (_myParentType != PartentType.Unbekannt) { return _myParentType; }
             _myParentType = Typ(Parent);
             return _myParentType;
         }
@@ -479,15 +477,15 @@ namespace BlueControls.Controls {
             }
         }
 
-        private enStates IsStatus() {
-            if (!Enabled) { return enStates.Standard_Disabled; }
-            var s = enStates.Standard;
-            if (MouseHighlight && ContainsMouse()) { s |= enStates.Standard_MouseOver; }
+        private States IsStatus() {
+            if (!Enabled) { return States.Standard_Disabled; }
+            var s = States.Standard;
+            if (MouseHighlight && ContainsMouse()) { s |= States.Standard_MouseOver; }
             if (_mousePressing) {
-                if (MouseHighlight) { s |= enStates.Standard_MousePressed; }
-                if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && CanFocus) { s |= enStates.Standard_HasFocus; }
+                if (MouseHighlight) { s |= States.Standard_MousePressed; }
+                if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && CanFocus) { s |= States.Standard_HasFocus; }
             } else {
-                if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && CanFocus && Focused) { s |= enStates.Standard_HasFocus; }
+                if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && CanFocus && Focused) { s |= States.Standard_HasFocus; }
             }
             return s;
         }

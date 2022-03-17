@@ -110,11 +110,11 @@ namespace BlueControls.Controls
             // 
             // lbxColumns
             // 
-            this.lbxColumns.AddAllowed = BlueControls.Enums.enAddType.None;
+            this.lbxColumns.AddAllowed = BlueControls.Enums.AddType.None;
             this.lbxColumns.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbxColumns.CheckBehavior = BlueControls.Enums.enCheckBehavior.AlwaysSingleSelection;
+            this.lbxColumns.CheckBehavior = BlueControls.Enums.CheckBehavior.AlwaysSingleSelection;
             this.lbxColumns.Location = new System.Drawing.Point(8, 328);
             this.lbxColumns.Name = "lbxColumns";
             this.lbxColumns.QuickInfo = "";

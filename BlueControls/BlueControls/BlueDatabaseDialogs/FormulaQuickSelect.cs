@@ -93,7 +93,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                             if (thisView != null) {
                                 if (_row.Database.PermissionCheck(thisView.PermissionGroups_Show, null)) {
                                     ItemCollectionList dummy = new();
-                                    ItemCollectionList.GetItemCollection(dummy, thisColumn, _row, enShortenStyle.Replaced, 1000);
+                                    ItemCollectionList.GetItemCollection(dummy, thisColumn, _row, ShortenStyle.Replaced, 1000);
                                     if (dummy.Count > 0) {
                                         foreach (var thisItem in dummy) {
                                             if (thisItem.Internal.ToLower().Contains(t)) {

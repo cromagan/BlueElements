@@ -84,7 +84,7 @@ namespace BlueControls.Forms {
             this.grpDateiSystem.Controls.Add(this.btnOeffnen);
             this.grpDateiSystem.Controls.Add(this.btnSpeichern);
             this.grpDateiSystem.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpDateiSystem.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
+            this.grpDateiSystem.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpDateiSystem.Location = new System.Drawing.Point(3, 3);
             this.grpDateiSystem.Name = "grpDateiSystem";
             this.grpDateiSystem.Size = new System.Drawing.Size(376, 75);
@@ -94,7 +94,7 @@ namespace BlueControls.Forms {
             // 
             // btnImport
             // 
-            this.btnImport.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnImport.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnImport.ImageCode = "Textdatei||||||||||Pfeil_Links";
             this.btnImport.Location = new System.Drawing.Point(240, 2);
             this.btnImport.Name = "btnImport";
@@ -107,7 +107,7 @@ namespace BlueControls.Forms {
             // btnLastFiles
             // 
             this.btnLastFiles.Cursor = System.Windows.Forms.Cursors.Arrow;
-            this.btnLastFiles.DrawStyle = BlueControls.Enums.enComboboxStyle.RibbonBar;
+            this.btnLastFiles.DrawStyle = BlueControls.Enums.ComboboxStyle.RibbonBar;
             this.btnLastFiles.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.btnLastFiles.Enabled = false;
             this.btnLastFiles.ImageCode = "Ordner";
@@ -121,7 +121,7 @@ namespace BlueControls.Forms {
             // 
             // btnNeu
             // 
-            this.btnNeu.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnNeu.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnNeu.ImageCode = "Datei";
             this.btnNeu.Location = new System.Drawing.Point(8, 2);
             this.btnNeu.Name = "btnNeu";
@@ -133,7 +133,7 @@ namespace BlueControls.Forms {
             // 
             // btnOeffnen
             // 
-            this.btnOeffnen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnOeffnen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnOeffnen.ImageCode = "Ordner";
             this.btnOeffnen.Location = new System.Drawing.Point(72, 2);
             this.btnOeffnen.Name = "btnOeffnen";
@@ -145,7 +145,7 @@ namespace BlueControls.Forms {
             // 
             // btnSpeichern
             // 
-            this.btnSpeichern.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnSpeichern.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnSpeichern.ImageCode = "Diskette";
             this.btnSpeichern.Location = new System.Drawing.Point(304, 2);
             this.btnSpeichern.Name = "btnSpeichern";

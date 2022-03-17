@@ -45,7 +45,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // SucheExact
             // 
-            this.SucheExact.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Text;
+            this.SucheExact.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
             this.SucheExact.Location = new System.Drawing.Point(24, 40);
             this.SucheExact.Name = "SucheExact";
             this.SucheExact.QuickInfo = "Trifft zu, wenn der eingegebene Text<br><b>exact dem Zelleninhalt</b>entspricht.";
@@ -56,7 +56,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // NurinAktuellerSpalte
             // 
-            this.NurinAktuellerSpalte.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.NurinAktuellerSpalte.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
             this.NurinAktuellerSpalte.Checked = true;
             this.NurinAktuellerSpalte.Location = new System.Drawing.Point(16, 32);
             this.NurinAktuellerSpalte.Name = "NurinAktuellerSpalte";
@@ -67,7 +67,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // ErsetzeMit
             // 
-            this.ErsetzeMit.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Text;
+            this.ErsetzeMit.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
             this.ErsetzeMit.Checked = true;
             this.ErsetzeMit.Location = new System.Drawing.Point(8, 16);
             this.ErsetzeMit.Name = "ErsetzeMit";
@@ -79,7 +79,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // AktuelleFilterung
             // 
-            this.AktuelleFilterung.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.AktuelleFilterung.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
             this.AktuelleFilterung.Checked = true;
             this.AktuelleFilterung.Location = new System.Drawing.Point(16, 16);
             this.AktuelleFilterung.Name = "AktuelleFilterung";
@@ -118,7 +118,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // SucheNach
             // 
-            this.SucheNach.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Text;
+            this.SucheNach.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
             this.SucheNach.Checked = true;
             this.SucheNach.Location = new System.Drawing.Point(24, 16);
             this.SucheNach.Name = "SucheNach";
@@ -142,7 +142,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // InhaltEgal
             // 
-            this.InhaltEgal.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Text;
+            this.InhaltEgal.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
             this.InhaltEgal.Location = new System.Drawing.Point(24, 72);
             this.InhaltEgal.Name = "InhaltEgal";
             this.InhaltEgal.QuickInfo = "Trifft immer zu";
@@ -165,7 +165,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // FügeHinzu
             // 
-            this.FügeHinzu.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Text;
+            this.FügeHinzu.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
             this.FügeHinzu.Location = new System.Drawing.Point(8, 88);
             this.FügeHinzu.Name = "FügeHinzu";
             this.FügeHinzu.QuickInfo = "Fügt den Text als neuen Eintrag hinzu.";
@@ -175,7 +175,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // ErsetzeKomplett
             // 
-            this.ErsetzeKomplett.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Text;
+            this.ErsetzeKomplett.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
             this.ErsetzeKomplett.Location = new System.Drawing.Point(8, 40);
             this.ErsetzeKomplett.Name = "ErsetzeKomplett";
             this.ErsetzeKomplett.QuickInfo = "Ersetzt den <b>kompletten Zelleninhalt</b><br>mit dem eingegebenen Text.";
@@ -197,7 +197,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // AbgeschlosseZellen
             // 
-            this.AbgeschlosseZellen.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.AbgeschlosseZellen.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
             this.AbgeschlosseZellen.Checked = true;
             this.AbgeschlosseZellen.Location = new System.Drawing.Point(16, 48);
             this.AbgeschlosseZellen.Name = "AbgeschlosseZellen";

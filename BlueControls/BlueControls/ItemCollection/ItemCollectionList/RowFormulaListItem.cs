@@ -90,7 +90,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
             return x;
         }
 
-        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) {
+        public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth) {
             if (_tmpBmp == null) { GeneratePic(); }
             return _tmpBmp == null ? 200 : _tmpBmp.Height;
 
@@ -112,7 +112,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
             //return new Size(300, (int)(sc * 300));
         }
 
-        protected override void DrawExplicit(Graphics gr, Rectangle positionModified, enDesign itemdesign, enStates vState, bool drawBorderAndBack, bool translate) {
+        protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States vState, bool drawBorderAndBack, bool translate) {
             if (_tmpBmp == null) { GeneratePic(); }
             if (drawBorderAndBack) {
                 Skin.Draw_Back(gr, itemdesign, vState, positionModified, null, false);
@@ -154,7 +154,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
             var slidervalues = ItemCollectionPad.SliderValues(mb, zoomv, centerpos);
             //pad.ShowInPrintMode = true;
             //pad.Unselect();
-            pad.DrawCreativePadToBitmap(_tmpBmp, enStates.Standard, zoomv, slidervalues.X, slidervalues.Y, null);
+            pad.DrawCreativePadToBitmap(_tmpBmp, States.Standard, zoomv, slidervalues.X, slidervalues.Y, null);
         }
 
         private void RemovePic() {

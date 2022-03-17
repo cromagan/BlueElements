@@ -25,20 +25,20 @@ public static class clsDesignExtensions {
 
     #region Methods
 
-    public static void Add(this Dictionary<enDesign, Dictionary<enStates, clsDesign>> dictControl, enDesign ds, enStates status, enKontur enKontur, int x1, int y1, int x2, int y2, enHintergrundArt hint, float verlauf, string bc1, string bc2, string bc3, enRahmenArt rahm, string boc1, string boc2, string boc3, string f, string pic) {
-        Dictionary<enStates, clsDesign> dictState;
+    public static void Add(this Dictionary<Design, Dictionary<States, clsDesign>> dictControl, Design ds, States status, Kontur enKontur, int x1, int y1, int x2, int y2, HintergrundArt hint, float verlauf, string bc1, string bc2, string bc3, RahmenArt rahm, string boc1, string boc2, string boc3, string f, string pic) {
+        Dictionary<States, clsDesign> dictState;
 
         if (dictControl.TryGetValue(ds, out var existingDictOfControl)) {
             dictState = existingDictOfControl;
         } else {
-            dictState = new Dictionary<enStates, clsDesign>();
+            dictState = new Dictionary<States, clsDesign>();
             dictControl.Add(ds, dictState);
         }
 
         dictState.Add(status, enKontur, x1, y1, x2, y2, hint, verlauf, bc1, bc2, bc3, rahm, boc1, boc2, boc3, f, pic);
     }
 
-    public static void Add(this Dictionary<enStates, clsDesign> dictStats, enStates status, enKontur enKontur, int x1, int y1, int x2, int y2, enHintergrundArt hint, float verlauf, string bc1, string bc2, string bc3, enRahmenArt rahm, string boc1, string boc2, string boc3, string f, string pic) {
+    public static void Add(this Dictionary<States, clsDesign> dictStats, States status, Kontur enKontur, int x1, int y1, int x2, int y2, HintergrundArt hint, float verlauf, string bc1, string bc2, string bc3, RahmenArt rahm, string boc1, string boc2, string boc3, string f, string pic) {
         clsDesign des = new()
         {
             Need = true,
@@ -65,7 +65,7 @@ public static class clsDesignExtensions {
         dictStats.Add(status, des);
     }
 
-    public static void Remove(this Dictionary<enDesign, Dictionary<enStates, clsDesign>> dictControl, enDesign ds, enStates status) {
+    public static void Remove(this Dictionary<Design, Dictionary<States, clsDesign>> dictControl, Design ds, States status) {
         if (dictControl.TryGetValue(ds, out var existingDictOfControl)) {
             existingDictOfControl.Remove(status);
         }
@@ -85,12 +85,12 @@ public class clsDesign {
     public Color BorderColor1;
     public Color BorderColor2;
     public Color BorderColor3;
-    public enHintergrundArt HintergrundArt;
+    public HintergrundArt HintergrundArt;
     public string Image;
-    public enKontur Kontur;
+    public Kontur Kontur;
     public bool Need;
-    public enRahmenArt RahmenArt;
-    public enStates Status;
+    public RahmenArt RahmenArt;
+    public States Status;
     public float Verlauf;
     public int X1;
     public int X2;

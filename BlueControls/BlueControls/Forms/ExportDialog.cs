@@ -270,7 +270,7 @@ namespace BlueControls.Forms {
             Enabled = false;
             var n = cbxLayoutWahl.Text;
             cbxLayoutWahl.Text = string.Empty;
-            TabAdministration.OpenLayoutEditor(Database, n);
+            BlueControls.Forms.TableView.OpenLayoutEditor(Database, n);
             BefülleLayoutDropdowns();
             if (cbxLayoutWahl.Item[n] != null) {
                 cbxLayoutWahl.Text = n;
@@ -279,8 +279,8 @@ namespace BlueControls.Forms {
         }
 
         private void lstExported_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-            e.UserMenu.Add(enContextMenuComands.DateiPfadÖffnen);
-            e.UserMenu.Add(enContextMenuComands.Kopieren);
+            e.UserMenu.Add(ContextMenuComands.DateiPfadÖffnen);
+            e.UserMenu.Add(ContextMenuComands.Kopieren);
         }
 
         private void lstExported_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {

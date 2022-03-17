@@ -120,11 +120,11 @@ namespace BlueControls.Controls {
                 if (thisc is FlexiControlForProperty flx) {
                     flx.PropertyObject = toObject;
                 }
-                if (thisc is FlexiControlForCell flxc && toObject is DataHolder dh) {
-                    dh.Column(flxc.ColumnName, "Inkorrecte Zuordnung: " + flxc.ColumnName);
-                    flxc.Database = dh.InternalDatabase;
-                    flxc.RowKey = dh.Row().Key;
-                }
+                //if (thisc is FlexiControlForCell flxc && toObject is DataHolder dh) {
+                //    dh.Column(flxc.ColumnName, "Inkorrecte Zuordnung: " + flxc.ColumnName);
+                //    flxc.Database = dh.InternalDatabase;
+                //    flxc.RowKey = dh.Row().Key;
+                //}
             }
         }
 
@@ -365,7 +365,7 @@ namespace BlueControls.Controls {
                         {
                             if (list != null) {
                                 EditType = enEditTypeFormula.Textfeld_mit_Auswahlknopf;
-                                list.Appearance = enBlueListBoxAppearance.ComboBox_Textbox;
+                                list.Appearance = BlueListBoxAppearance.ComboBox_Textbox;
                                 var s = BlueFont.MeasureStringOfCaption(Caption);
                                 var (biggestItemX, biggestItemY, _, _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
                                 var x = Math.Max((int)(biggestItemX + 20 + s.Width), 200);

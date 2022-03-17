@@ -97,7 +97,7 @@ namespace BlueControls.Controls {
             return new Point(x, y);
         }
 
-        protected override void DrawControl(Graphics gr, enStates state) {
+        protected override void DrawControl(Graphics gr, States state) {
             base.DrawControl(gr, state);
 
             LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray,
@@ -119,7 +119,7 @@ namespace BlueControls.Controls {
             var apa = AvailablePaintArea();
             //apa.Width -= 1;
             //apa.Height -= 1;
-            Skin.Draw_Border(gr, enDesign.Table_And_Pad, state, apa);
+            Skin.Draw_Border(gr, Design.Table_And_Pad, state, apa);
         }
 
         protected override RectangleF MaxBounds() => _bmp != null ? new RectangleF(0, 0, _bmp.Width, _bmp.Height) : new RectangleF(0, 0, 0, 0);

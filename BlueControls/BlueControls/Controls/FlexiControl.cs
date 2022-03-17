@@ -54,7 +54,7 @@ namespace BlueControls.Controls {
         protected DateTime? LastTextChange;
 
         protected bool TranslateCaption = true;
-        private enAdditionalCheck _additionalCheck = enAdditionalCheck.None;
+        private AdditionalCheck _additionalCheck = AdditionalCheck.None;
         private string _allowedChars = string.Empty;
         private string _caption = string.Empty;
         private Caption? _captionObject;
@@ -98,7 +98,7 @@ namespace BlueControls.Controls {
             _editType = enEditTypeFormula.None;
             _caption = captionText;
             _captionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
-            var s = BlueFont.MeasureString(_caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
+            var s = BlueFont.MeasureString(_caption, Skin.GetBlueFont(Design.Caption, States.Standard).Font());
             Size = new Size((int)(s.Width + 2), (int)(s.Height + 2));
         }
 
@@ -111,7 +111,7 @@ namespace BlueControls.Controls {
         //public event EventHandler RemovingAll;
         public event EventHandler NeedRefresh;
 
-        [Obsolete]
+        [Obsolete("Value Changed benutzen", true)]
         public new event EventHandler TextChanged;
 
         public event EventHandler ValueChanged;
@@ -120,8 +120,8 @@ namespace BlueControls.Controls {
 
         #region Properties
 
-        [DefaultValue(enAdditionalCheck.None)]
-        public enAdditionalCheck AdditionalCheck {
+        [DefaultValue(AdditionalCheck.None)]
+        public AdditionalCheck AdditionalCheck {
             get => _additionalCheck;
             set {
                 if (_additionalCheck == value) { return; }
@@ -304,7 +304,7 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Value benutzen!
         /// </summary>
-        [Obsolete]
+        [Obsolete("Value anstelle Text benutzen", true)]
         [DefaultValue("")]
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -421,9 +421,9 @@ namespace BlueControls.Controls {
             return c;
         }
 
-        protected override void DrawControl(Graphics gr, enStates state) {
+        protected override void DrawControl(Graphics gr, States state) {
             // Enabled wurde verdeckt!
-            if (!Enabled) { state = enStates.Standard_Disabled; }
+            if (!Enabled) { state = States.Standard_Disabled; }
             Skin.Draw_Back_Transparent(gr, ClientRectangle, this);
             //if (_Color.A != 0) {
             //    if (state.HasFlag(enStates.Standard_Disabled)) {
@@ -453,7 +453,7 @@ namespace BlueControls.Controls {
             if (!string.IsNullOrEmpty(_disabledReason)) {
                 DoInfoTextCaption(_disabledReason);
             } else {
-                if (state.HasFlag(enStates.Standard_Disabled)) {
+                if (state.HasFlag(States.Standard_Disabled)) {
                     DoInfoTextCaption("Übergeordnetes Steuerlement ist deaktiviert.");
                 } else {
                     DoInfoTextCaption(string.Empty);
@@ -627,11 +627,11 @@ namespace BlueControls.Controls {
         protected void StyleListBox(ListBox? control, ColumnItem? column) {
             control.Enabled = Enabled;
             control.Item.Clear();
-            control.Item.CheckBehavior = enCheckBehavior.MultiSelection;
+            control.Item.CheckBehavior = CheckBehavior.MultiSelection;
             if (column == null) { return; }
             ItemCollectionList item = new();
             if (column.DropdownBearbeitungErlaubt) {
-                ItemCollectionList.GetItemCollection(item, column, null, enShortenStyle.Replaced, 10000);
+                ItemCollectionList.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
                 if (!column.DropdownWerteAndererZellenAnzeigen) {
                     bool again;
                     do {
@@ -646,18 +646,18 @@ namespace BlueControls.Controls {
                     } while (again);
                 }
             }
-            control.AddAllowed = enAddType.UserDef;
+            control.AddAllowed = AddType.UserDef;
             control.FilterAllowed = false;
             control.MoveAllowed = false;
             switch (_editType) {
                 case enEditTypeFormula.Gallery:
-                    control.Appearance = enBlueListBoxAppearance.Gallery;
+                    control.Appearance = BlueListBoxAppearance.Gallery;
                     control.RemoveAllowed = true;
                     break;
 
                 case enEditTypeFormula.Listbox:
                     control.RemoveAllowed = true;
-                    control.Appearance = enBlueListBoxAppearance.Listbox;
+                    control.Appearance = BlueListBoxAppearance.Listbox;
                     break;
             }
         }
@@ -665,12 +665,12 @@ namespace BlueControls.Controls {
         protected void StyleSwapListBox(SwapListBox? control, ColumnItem? column) {
             control.Enabled = Enabled;
             control.Item.Clear();
-            control.Item.CheckBehavior = enCheckBehavior.NoSelection;
+            control.Item.CheckBehavior = CheckBehavior.NoSelection;
             if (column == null) { return; }
             ItemCollectionList item = new();
-            ItemCollectionList.GetItemCollection(item, column, null, enShortenStyle.Replaced, 10000);
+            ItemCollectionList.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
             control.SuggestionsAdd(item);
-            control.AddAllowed = enAddType.UserDef;
+            control.AddAllowed = AddType.UserDef;
         }
 
         protected void StyleTextBox(TextBox? control) {
@@ -714,7 +714,7 @@ namespace BlueControls.Controls {
                 Enabled = Enabled,
                 Name = "ColorButton",
                 Checked = false,
-                ButtonStyle = enButtonStyle.Button,
+                ButtonStyle = ButtonStyle.Button,
                 Text = string.Empty
             };
             StandardBehandlung(control);
@@ -729,7 +729,7 @@ namespace BlueControls.Controls {
                 Enabled = Enabled,
                 Name = "ComandButton",
                 Checked = false,
-                ButtonStyle = enButtonStyle.Button,
+                ButtonStyle = ButtonStyle.Button,
                 Text = _caption
             };
             StandardBehandlung(control);
@@ -743,7 +743,7 @@ namespace BlueControls.Controls {
             Button control = new() {
                 Enabled = Enabled,
                 Name = "YesNoButton",
-                ButtonStyle = enButtonStyle.Yes_or_No,
+                ButtonStyle = ButtonStyle.Yes_or_No,
                 Text = "",
                 ImageCode = ""
             };

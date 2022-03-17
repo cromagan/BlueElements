@@ -82,7 +82,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnAehnliches
             // 
-            this.btnAehnliches.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.btnAehnliches.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
             this.btnAehnliches.Location = new System.Drawing.Point(192, 56);
             this.btnAehnliches.Name = "btnAehnliches";
             this.btnAehnliches.Size = new System.Drawing.Size(384, 16);

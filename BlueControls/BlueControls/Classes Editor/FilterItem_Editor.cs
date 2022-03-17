@@ -63,7 +63,7 @@ namespace BlueControls.Classes_Editor {
             var c = Item.Database.Column.SearchByKey(LongParse(cbxColumns.Text));
             if (c == null || !c.AutoFilterSymbolPossible()) { return; }
             FilterCollection tmpfc = new(Item.Database);
-            if (Item.FilterType != enFilterType.KeinFilter) { tmpfc.Add(Item); }
+            if (Item.FilterType != FilterType.KeinFilter) { tmpfc.Add(Item); }
             _autofilter = new AutoFilter(c, tmpfc, null);
             var p = btnFilterWahl.PointToScreen(Point.Empty);
             _autofilter.Position_LocateToPosition(new Point(p.X, p.Y + btnFilterWahl.Height));
@@ -77,7 +77,7 @@ namespace BlueControls.Classes_Editor {
             var c = Item.Database.Column.SearchByKey(LongParse(cbxColumns.Text));
             btnFilterWahl.Enabled = c == null || c.AutoFilterSymbolPossible() || true;
             Item.Column = c;
-            Item.FilterType = enFilterType.KeinFilter;
+            Item.FilterType = FilterType.KeinFilter;
             Item.SearchValue.Clear();
             OnChanged(Item);
         }

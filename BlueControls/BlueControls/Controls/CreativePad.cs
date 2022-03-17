@@ -197,7 +197,7 @@ namespace BlueControls.Controls {
                 if (_givesMouseComandsTo.KeyUp(this, e, Zoom, ShiftX, ShiftY)) { return; }
             }
             var multi = 1f;
-            if (Item.SnapMode == enSnapMode.SnapToGrid) {
+            if (Item.SnapMode == SnapMode.SnapToGrid) {
                 multi = Converter.MmToPixel(Item.GridSnap, ItemCollectionPad.Dpi);
             }
             if (multi < 1) { multi = 1f; }
@@ -408,7 +408,7 @@ namespace BlueControls.Controls {
         internal Point MiddleOfVisiblesScreen() =>
             new((int)(((Width / 2) + ShiftX) / Zoom), (int)(((Height / 2) + ShiftY) / Zoom));
 
-        protected override void DrawControl(Graphics gr, enStates state) {
+        protected override void DrawControl(Graphics gr, States state) {
             base.DrawControl(gr, state);
 
             LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray,
@@ -421,16 +421,16 @@ namespace BlueControls.Controls {
             foreach (var thisItem in _itemsToMove) {
                 if (thisItem is BasicPadItem bpi) {
                     foreach (var p in bpi.MovablePoint) {
-                        p.Draw(gr, Zoom, ShiftX, ShiftY, enDesign.Button_EckpunktSchieber, enStates.Standard);
+                        p.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber, States.Standard);
                     }
                 }
                 if (thisItem is PointM p2) {
                     if (p2.Parent is BasicPadItem bpi2) {
                         foreach (var p in bpi2.MovablePoint) {
-                            p.Draw(gr, Zoom, ShiftX, ShiftY, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard);
+                            p.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber_Phantom, States.Standard);
                         }
                     }
-                    p2.Draw(gr, Zoom, ShiftX, ShiftY, enDesign.Button_EckpunktSchieber, enStates.Standard);
+                    p2.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber, States.Standard);
                 }
             }
             if (_givesMouseComandsTo is BasicPadItem pa) {
@@ -440,7 +440,7 @@ namespace BlueControls.Controls {
 
             #endregion
 
-            Skin.Draw_Border(gr, enDesign.Table_And_Pad, state, DisplayRectangle);
+            Skin.Draw_Border(gr, Design.Table_And_Pad, state, DisplayRectangle);
         }
 
         protected override bool IsInputKey(Keys keyData) =>
@@ -577,7 +577,7 @@ namespace BlueControls.Controls {
         }
 
         private float SnapToGrid(bool doX, PointM? movedPoint, float mouseMovedTo) {
-            if (Item.SnapMode != enSnapMode.SnapToGrid || Math.Abs(Item.GridSnap) < 0.001) { return mouseMovedTo; }
+            if (Item.SnapMode != SnapMode.SnapToGrid || Math.Abs(Item.GridSnap) < 0.001) { return mouseMovedTo; }
             if (movedPoint is null) { return 0f; }
 
             var multi = Converter.MmToPixel(Item.GridSnap, ItemCollectionPad.Dpi);

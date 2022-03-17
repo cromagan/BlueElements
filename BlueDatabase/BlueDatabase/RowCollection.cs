@@ -91,7 +91,7 @@ namespace BlueDatabase {
         /// </summary>
         /// <param name="primärSchlüssel">Der Primärschlüssel, nach dem gesucht werden soll. Groß/Kleinschreibung wird ignoriert.</param>
         /// <returns>Die Zeile, dessen erste Spalte den Primärschlüssel enthält oder - falls nicht gefunden - NULL.</returns>
-        public RowItem this[string primärSchlüssel] => this[new FilterItem(Database.Column[0], enFilterType.Istgleich_GroßKleinEgal | enFilterType.MultiRowIgnorieren, primärSchlüssel)];
+        public RowItem this[string primärSchlüssel] => this[new FilterItem(Database.Column[0], FilterType.Istgleich_GroßKleinEgal | FilterType.MultiRowIgnorieren, primärSchlüssel)];
 
         public RowItem? this[params FilterItem[]? filter] {
             get {
@@ -158,7 +158,7 @@ namespace BlueDatabase {
                     if (first != null) { return null; }
                     first = thisfi.SearchValue;
                 }
-                if (thisfi.FilterType != enFilterType.Istgleich) { return null; }
+                if (thisfi.FilterType != FilterType.Istgleich) { return null; }
                 if (thisfi.Column == null) { return null; }
                 if (thisfi.Column.Database != Database) { return null; }
             }

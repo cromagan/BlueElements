@@ -25,7 +25,7 @@ using System.ComponentModel;
 
 namespace BlueControls.Controls {
 
-    [Obsolete]
+    [Obsolete("Wird zukünftig entfernt werden", false)]
     public partial class FormulaManualDesign : System.Windows.Forms.Panel {
 
         #region Fields

@@ -25,6 +25,7 @@ using System.Linq;
 
 namespace BlueDatabase {
 
+    [Obsolete("Wird zukünftig entfernt werden", true)]
     public static class DataHolderExtensions {
 
         #region Methods
@@ -36,7 +37,7 @@ namespace BlueDatabase {
         /// <param name="items">Die Items, in denen gesucht werden soll.</param>
         /// <param name="id">Die ID, nach der gesucht werden soll.</param>
         /// <returns>Wenn in der Liste die ID vorhanden ist, wird dieses Objekt zurückgegeben, ansonsten wird NULL zurückgegeben.</returns>
-        [Obsolete]
+        [Obsolete("Wird zukünftig entfernt werden", true)]
         public static t? GetByID<t>(this List<t?> items, string id) where t : DataHolder => items.FirstOrDefault(thisit => string.Equals(thisit.Id, id, StringComparison.CurrentCultureIgnoreCase));
 
         #endregion
@@ -44,7 +45,7 @@ namespace BlueDatabase {
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete]
+    [Obsolete("Wird zukünftig entfernt werden", true)]
     public abstract class DataHolder : IDisposable {
 
         #region Fields

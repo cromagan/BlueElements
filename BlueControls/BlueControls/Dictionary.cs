@@ -56,7 +56,7 @@ namespace BlueControls {
             if (Word != Word.ToLower() && Word != Word.ToUpper() && Word != Word.Substring(0, 1).ToUpper() + Word.Substring(1).ToLower()) { return false; }
             if (Word == Word.ToLower()) {
                 // Wenn ein Wort klein geschrieben ist, mu0ß auch das kleingeschriebene in der Datenbank sein!
-                return _DictWords.Row[new FilterItem(_DictWords.Column[0], enFilterType.Istgleich, Word)] != null;
+                return _DictWords.Row[new FilterItem(_DictWords.Column[0], FilterType.Istgleich, Word)] != null;
             }
             return _DictWords.Row[Word] != null;
         }

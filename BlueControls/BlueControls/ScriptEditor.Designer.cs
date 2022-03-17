@@ -88,7 +88,7 @@ namespace BlueControls {
             // 
             this.grpCode.Controls.Add(this.txtSkript);
             this.grpCode.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.grpCode.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.NormalBold;
+            this.grpCode.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.NormalBold;
             this.grpCode.Location = new System.Drawing.Point(0, 0);
             this.grpCode.Name = "grpCode";
             this.grpCode.Size = new System.Drawing.Size(535, 154);
@@ -143,7 +143,7 @@ namespace BlueControls {
             // 
             this.grpRoutinen.Controls.Add(this.lstFunktionen);
             this.grpRoutinen.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.grpRoutinen.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.NormalBold;
+            this.grpRoutinen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.NormalBold;
             this.grpRoutinen.Location = new System.Drawing.Point(0, 0);
             this.grpRoutinen.Name = "grpRoutinen";
             this.grpRoutinen.Size = new System.Drawing.Size(60, 154);
@@ -153,11 +153,11 @@ namespace BlueControls {
             // 
             // lstFunktionen
             // 
-            this.lstFunktionen.AddAllowed = BlueControls.Enums.enAddType.None;
+            this.lstFunktionen.AddAllowed = BlueControls.Enums.AddType.None;
             this.lstFunktionen.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lstFunktionen.CheckBehavior = BlueControls.Enums.enCheckBehavior.NoSelection;
+            this.lstFunktionen.CheckBehavior = BlueControls.Enums.CheckBehavior.NoSelection;
             this.lstFunktionen.FilterAllowed = true;
             this.lstFunktionen.Location = new System.Drawing.Point(8, 24);
             this.lstFunktionen.Name = "lstFunktionen";
@@ -171,7 +171,7 @@ namespace BlueControls {
             this.grpVariablen.Controls.Add(this.tableVariablen);
             this.grpVariablen.Controls.Add(this.filterVariablen);
             this.grpVariablen.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.grpVariablen.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.NormalBold;
+            this.grpVariablen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.NormalBold;
             this.grpVariablen.Location = new System.Drawing.Point(0, 0);
             this.grpVariablen.Name = "grpVariablen";
             this.grpVariablen.Size = new System.Drawing.Size(603, 173);
@@ -234,7 +234,7 @@ namespace BlueControls {
             this.grpMainBar.Controls.Add(this.btnBefehlsUebersicht);
             this.grpMainBar.Controls.Add(this.btnTest);
             this.grpMainBar.Dock = System.Windows.Forms.DockStyle.Top;
-            this.grpMainBar.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.Nothing;
+            this.grpMainBar.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.Nothing;
             this.grpMainBar.Location = new System.Drawing.Point(0, 0);
             this.grpMainBar.Name = "grpMainBar";
             this.grpMainBar.Size = new System.Drawing.Size(603, 48);

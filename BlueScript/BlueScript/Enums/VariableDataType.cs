@@ -19,7 +19,7 @@ using System;
 
 namespace BlueScript.Enums {
 
-    [Obsolete]
+    [Obsolete("Wird zukünftig entfernt werden", false)]
     public enum VariableDataType {
         Null = 0,
 

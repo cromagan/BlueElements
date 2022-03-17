@@ -51,15 +51,15 @@ namespace BlueControls.Forms {
 
         #region Constructors
 
-        public Form() : this(enDesign.Form_Standard) {
+        public Form() : this(Design.Form_Standard) {
         }
 
-        public Form(enDesign design) : base() {
+        public Form(Design design) : base() {
             Design = design;
             if (!Skin.Inited) { Skin.LoadSkin(); }
-            BackColor = Skin.Color_Back(Design, enStates.Standard);
+            BackColor = Skin.Color_Back(Design, States.Standard);
             InitializeComponent();
-            BackColor = Skin.Color_Back(Design, enStates.Standard);
+            BackColor = Skin.Color_Back(Design, States.Standard);
         }
 
         #endregion
@@ -75,8 +75,8 @@ namespace BlueControls.Forms {
         [DefaultValue(true)]
         public bool CloseButtonEnabled { get; set; } = true;
 
-        [DefaultValue(enDesign.Form_Standard)]
-        public enDesign Design {
+        [DefaultValue(Design.Form_Standard)]
+        public Design Design {
             get;
         }
 
@@ -132,7 +132,7 @@ namespace BlueControls.Forms {
         }
 
         protected override void OnLoad(System.EventArgs e) {
-            BackColor = Skin.Color_Back(Design, enStates.Standard);
+            BackColor = Skin.Color_Back(Design, States.Standard);
             base.OnLoad(e);
         }
 

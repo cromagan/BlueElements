@@ -33,11 +33,11 @@ namespace BlueControls.Forms {
 
         #region Constructors
 
-        public DialogWithOkAndCancel() : this(enDesign.Form_MsgBox, true, false) { }
+        public DialogWithOkAndCancel() : this(Design.Form_MsgBox, true, false) { }
 
-        public DialogWithOkAndCancel(bool cancelPossible, bool sizeable) : this(enDesign.Form_MsgBox, cancelPossible, sizeable) { }
+        public DialogWithOkAndCancel(bool cancelPossible, bool sizeable) : this(Design.Form_MsgBox, cancelPossible, sizeable) { }
 
-        public DialogWithOkAndCancel(enDesign design, bool cancelPossible, bool sizeable) : base(design) {
+        public DialogWithOkAndCancel(Design design, bool cancelPossible, bool sizeable) : base(design) {
             InitializeComponent();
             SetTopLevel(true);
 

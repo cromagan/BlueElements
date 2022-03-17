@@ -142,7 +142,7 @@ namespace BlueControls {
 
         public float DotProduct(PointM vector) => (_x * vector._x) + (_y * vector._y);
 
-        public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, enDesign type, enStates state) {
+        public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, Design type, States state) {
             var tx = (_x * zoom) - shiftX + (zoom / 2);
             var ty = (_y * zoom) - shiftY + (zoom / 2);
             Rectangle r = new((int)(tx - 4), (int)(ty - 4), 9, 9);

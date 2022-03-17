@@ -114,14 +114,14 @@ namespace BlueControls.ItemCollection {
 
         public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Caption.ToUpper().Contains(filterText.ToUpper()) || _filename.ToUpper().Contains(filterText.ToUpper());
 
-        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => style switch {
-            enBlueListBoxAppearance.FileSystem => 110 + (_captionlines * ConstMy),
+        public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth) => style switch {
+            BlueListBoxAppearance.FileSystem => 110 + (_captionlines * ConstMy),
             _ => (int)(columnWidth * 0.8)
         };
 
         protected override Size ComputeSizeUntouchedForListBox() => new(300, 300);
 
-        protected override void DrawExplicit(Graphics gr, Rectangle positionModified, enDesign itemdesign, enStates state, bool drawBorderAndBack, bool translate) {
+        protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate) {
             if (drawBorderAndBack) { Skin.Draw_Back(gr, itemdesign, state, positionModified, null, false); }
 
             var drawingCoordinates = positionModified;
@@ -163,7 +163,7 @@ namespace BlueControls.ItemCollection {
                     //r = new Rectangle(r.Left - trp.X, r.Top - trp.Y, r.Width, r.Height);
                     //GenericControl.Skin.Draw_Back(GR, enDesign.Item_Listbox_Unterschrift, vState, r, null, false);
                     //GenericControl.Skin.Draw_Border(GR, enDesign.Item_Listbox_Unterschrift, vState, r);
-                    Skin.Draw_FormatedText(gr, thisCap, enDesign.Item_Listbox, state, null, enAlignment.Horizontal_Vertical_Center, r, null, false, false);
+                    Skin.Draw_FormatedText(gr, thisCap, Design.Item_Listbox, state, null, enAlignment.Horizontal_Vertical_Center, r, null, false, false);
                 }
             }
             gr.TranslateTransform(-trp.X, -trp.Y);

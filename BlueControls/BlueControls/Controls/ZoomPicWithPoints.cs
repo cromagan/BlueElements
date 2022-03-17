@@ -49,7 +49,7 @@ namespace BlueControls.Controls {
 
         private readonly List<PointM?> _points = new();
 
-        private enHelpers _helper = enHelpers.Ohne;
+        private Helpers _helper = Helpers.Ohne;
 
         private enOrientation _mittelLinie = enOrientation.Ohne;
 
@@ -71,8 +71,8 @@ namespace BlueControls.Controls {
 
         #region Properties
 
-        [DefaultValue(enHelpers.Ohne)]
-        public enHelpers Helper {
+        [DefaultValue(Helpers.Ohne)]
+        public Helpers Helper {
             get => _helper;
             set {
                 if (_helper == value) { return; }
@@ -148,7 +148,7 @@ namespace BlueControls.Controls {
 
         public PointM? GetPoint(string name) => _points.FirstOrDefault(thisp => thisp != null && string.Equals(thisp.Name, name, StringComparison.CurrentCultureIgnoreCase));
 
-        public void LetUserAddAPoint(string pointName, enHelpers helper, enOrientation mittelline) {
+        public void LetUserAddAPoint(string pointName, Helpers helper, enOrientation mittelline) {
             _mittelLinie = mittelline;
             _helper = helper;
             Feedback = pointName;
@@ -235,10 +235,10 @@ namespace BlueControls.Controls {
             DrawMittelLinien(e);
             /// Punkte
             foreach (var thisPoint in _points) {
-                if (_helper.HasFlag(enHelpers.PointNames)) {
-                    thisPoint.Draw(e.G, e.Zoom, e.ShiftX, e.ShiftY, enDesign.Button_EckpunktSchieber, enStates.Standard);
+                if (_helper.HasFlag(Helpers.PointNames)) {
+                    thisPoint.Draw(e.G, e.Zoom, e.ShiftX, e.ShiftY, Design.Button_EckpunktSchieber, States.Standard);
                 } else {
-                    thisPoint.Draw(e.G, e.Zoom, e.ShiftX, e.ShiftY, enDesign.Button_EckpunktSchieber, enStates.Standard);
+                    thisPoint.Draw(e.G, e.Zoom, e.ShiftX, e.ShiftY, Design.Button_EckpunktSchieber, States.Standard);
                 }
             }
         }
@@ -301,24 +301,24 @@ namespace BlueControls.Controls {
                 eg.G.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
             }
             if (MousePos11.IsEmpty) { return; }
-            if (_helper.HasFlag(enHelpers.HorizontalLine)) {
+            if (_helper.HasFlag(Helpers.HorizontalLine)) {
                 var p1 = new PointM(0, e.Y).ZoomAndMove(eg);
                 var p2 = new PointM(Bmp.Width, e.Y).ZoomAndMove(eg);
                 eg.G.DrawLine(PenRotTransp, p1, p2);
             }
-            if (_helper.HasFlag(enHelpers.VerticalLine)) {
+            if (_helper.HasFlag(Helpers.VerticalLine)) {
                 var p1 = new PointM(e.X, 0).ZoomAndMove(eg);
                 var p2 = new PointM(e.X, Bmp.Height).ZoomAndMove(eg);
                 eg.G.DrawLine(PenRotTransp, p1, p2);
             }
-            if (_helper.HasFlag(enHelpers.SymetricalHorizontal)) {
+            if (_helper.HasFlag(Helpers.SymetricalHorizontal)) {
                 var h = Bmp.Width / 2;
                 var x = Math.Abs(h - e.X);
                 var p1 = new PointM(h - x, e.Y).ZoomAndMove(eg);
                 var p2 = new PointM(h + x, e.Y).ZoomAndMove(eg);
                 eg.G.DrawLine(PenRotTransp, p1, p2);
             }
-            if (_helper.HasFlag(enHelpers.MouseDownPoint)) {
+            if (_helper.HasFlag(Helpers.MouseDownPoint)) {
                 var m1 = new PointM(e.X, e.Y).ZoomAndMove(eg);
                 eg.G.DrawEllipse(PenRotTransp, new RectangleF(m1.X - 3, m1.Y - 3, 6, 6));
                 if (!MouseDownPos11.IsEmpty) {
@@ -328,7 +328,7 @@ namespace BlueControls.Controls {
                     eg.G.DrawLine(PenRotTransp, mc1, md1);
                 }
             }
-            if (_helper.HasFlag(enHelpers.FilledRectancle)) {
+            if (_helper.HasFlag(Helpers.FilledRectancle)) {
                 if (!MouseDownPos11.IsEmpty) {
                     var md1 = new PointM(MouseDownPos11).ZoomAndMove(eg);
                     var mc1 = new PointM(e.X, e.Y).ZoomAndMove(eg);

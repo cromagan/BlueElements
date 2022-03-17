@@ -98,7 +98,7 @@ namespace BlueControls.Forms {
         private void btnAddLine_Click(object sender, System.EventArgs e) {
             var p = Pad.MiddleOfVisiblesScreen();
             var w = (int)(300 / Pad.Zoom);
-            LinePadItem b = new(enPadStyles.Style_Standard, new Point(p.X - w, p.Y), new Point(p.X + w, p.Y));
+            LinePadItem b = new(PadStyles.Style_Standard, new Point(p.X - w, p.Y), new Point(p.X + w, p.Y));
             Pad.Item.Add(b);
         }
 
@@ -117,7 +117,7 @@ namespace BlueControls.Forms {
         private void btnAddText_Click(object sender, System.EventArgs e) {
             TextPadItem b = new() {
                 Text = string.Empty,
-                Stil = enPadStyles.Style_Standard
+                Stil = PadStyles.Style_Standard
             };
             Pad.Item.Add(b);
             b.SetCoordinates(new RectangleF(10, 10, 200, 200), true);
@@ -145,7 +145,7 @@ namespace BlueControls.Forms {
 
         private void cbxSchriftGröße_ItemClicked(object sender, BasicListItemEventArgs e) => Pad.Item.SheetStyleScale = FloatParse(cbxSchriftGröße.Text) / 100f;
 
-        private void ckbRaster_CheckedChanged(object sender, System.EventArgs e) => Pad.Item.SnapMode = ckbRaster.Checked ? enSnapMode.SnapToGrid : enSnapMode.Ohne;
+        private void ckbRaster_CheckedChanged(object sender, System.EventArgs e) => Pad.Item.SnapMode = ckbRaster.Checked ? SnapMode.SnapToGrid : SnapMode.Ohne;
 
         private void Pad_ClickedItemChanged(object sender, System.EventArgs e) {
             tabElementEigenschaften.Controls.Clear();
@@ -171,7 +171,7 @@ namespace BlueControls.Forms {
             txbRasterFangen.Enabled = Pad.Item != null;
 
             if (Pad.Item != null) {
-                ckbRaster.Checked = Pad.Item.SnapMode == enSnapMode.SnapToGrid;
+                ckbRaster.Checked = Pad.Item.SnapMode == SnapMode.SnapToGrid;
                 txbRasterAnzeige.Text = Pad.Item.GridShow.ToString(Constants.Format_Float2);
                 txbRasterFangen.Text = Pad.Item.GridSnap.ToString(Constants.Format_Float2);
             }

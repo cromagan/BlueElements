@@ -51,13 +51,13 @@ namespace BlueDatabase {
         public int? TmpColumnContentWidth;
         public int? TmpIfFilterRemoved = null;
         internal List<string>? UcaseNamesSortedByLenght;
-        private enAdditionalCheck _additionalCheck;
+        private AdditionalCheck _additionalCheck;
         private string _adminInfo;
         private bool _afterEditAutoCorrect;
         private bool _afterEditDoUCase;
         private bool _afterEditQuickSortRemoveDouble;
         private int _afterEditRunden;
-        private enAlignmentHorizontal _align;
+        private AlignmentHorizontal _align;
         private string _allowedChars;
         private string _autoFilterJoker;
         private string _autoRemove;
@@ -65,7 +65,7 @@ namespace BlueDatabase {
         private string _bestFileStandardFolder;
         private string _bestFileStandardSuffix;
         private string _bildCodeConstantHeight;
-        private enBildTextVerhalten _bildTextVerhalten;
+        private BildTextVerhalten _bildTextVerhalten;
         private string _caption;
         private string _captionBitmapTxt;
         private string _cellInitValue;
@@ -79,7 +79,7 @@ namespace BlueDatabase {
         private bool _dropdownWerteAndererZellenAnzeigen;
         private bool _editTrotzSperreErlaubt;
         private enEditTypeFormula _editType;
-        private enFilterOptions _filterOptions;
+        private FilterOptions _filterOptions;
         private Color _foreColor;
         private enDataFormat _format;
         private bool _formatierungErlaubt;
@@ -89,20 +89,13 @@ namespace BlueDatabase {
         //private enDauerfilter _AutoFilter_Dauerfilter;
         private long _keyColumnKey;
 
-        private enColumnLineStyle _lineLeft;
-        private enColumnLineStyle _lineRight;
+        private ColumnLineStyle _lineLeft;
+        private ColumnLineStyle _lineRight;
 
         /// <summary>
         /// Die Quell-Spalte (aus der verlinkten Datenbank) ist immer
         /// </summary>
         private long _linkedCellColumnKeyOfLinkedDatabase;
-
-        ///// <summary>
-        ///// Die zu suchende Zeile ist in dieser Spalte zu finden.
-        ///// Ist der Wrt -9999 wird die Verknüpfung über das Script gesetzt.
-        ///// </summary>
-        //[Obsolete]
-        //private long _linkedCellRowKeyIsInColumn;
 
         private string _linkedDatabaseFile;
 
@@ -112,7 +105,7 @@ namespace BlueDatabase {
         private string _quickInfo;
         private string _regex = string.Empty;
         private bool _saveContent;
-        private enScriptType _scriptType;
+        private ScriptType _scriptType;
         private bool _showMultiLineInOneLine;
         private bool _showUndo;
         private enSortierTyp _sortType;
@@ -120,7 +113,7 @@ namespace BlueDatabase {
         private string _suffix;
         private bool _textBearbeitungErlaubt;
         private Database? _tmpLinkedDatabase;
-        private enTranslationType _translate;
+        private TranslationType _translate;
         private string _ueberschrift1;
         private string _ueberschrift2;
 
@@ -146,8 +139,8 @@ namespace BlueDatabase {
             _caption = string.Empty;
             //_CaptionBitmap = null;
             _format = enDataFormat.Text;
-            _lineLeft = enColumnLineStyle.Dünn;
-            _lineRight = enColumnLineStyle.Ohne;
+            _lineLeft = ColumnLineStyle.Dünn;
+            _lineRight = ColumnLineStyle.Ohne;
             _multiLine = false;
             _quickInfo = string.Empty;
             _ueberschrift1 = string.Empty;
@@ -163,14 +156,14 @@ namespace BlueDatabase {
             //_ZellenZusammenfassen = false;
             _dropDownKey = -1;
             _vorschlagsColumn = -1;
-            _align = enAlignmentHorizontal.Links;
+            _align = AlignmentHorizontal.Links;
             _keyColumnKey = -1;
             _editType = enEditTypeFormula.Textfeld;
             _identifier = string.Empty;
             _allowedChars = string.Empty;
             _adminInfo = string.Empty;
             _captionBitmapTxt = string.Empty;
-            _filterOptions = enFilterOptions.Enabled | enFilterOptions.TextFilterEnabled | enFilterOptions.ExtendedFilterEnabled;
+            _filterOptions = FilterOptions.Enabled | FilterOptions.TextFilterEnabled | FilterOptions.ExtendedFilterEnabled;
             //_AutofilterErlaubt = true;
             //_AutofilterTextFilterErlaubt = true;
             //_AutoFilterErweitertErlaubt = true;
@@ -184,8 +177,8 @@ namespace BlueDatabase {
             _afterEditAutoCorrect = false;
             _afterEditDoUCase = false;
             _formatierungErlaubt = false;
-            _additionalCheck = enAdditionalCheck.None;
-            _scriptType = enScriptType.undefiniert;
+            _additionalCheck = AdditionalCheck.None;
+            _scriptType = ScriptType.undefiniert;
             _autoRemove = string.Empty;
             _autoFilterJoker = string.Empty;
             _saveContent = true;
@@ -193,12 +186,12 @@ namespace BlueDatabase {
             _spellCheckingEnabled = false;
             //_CompactView = true;
             _showUndo = true;
-            _translate = enTranslationType.Original_Anzeigen;
+            _translate = TranslationType.Original_Anzeigen;
             _showMultiLineInOneLine = false;
             _editTrotzSperreErlaubt = false;
             _suffix = string.Empty;
             _linkedDatabaseFile = string.Empty;
-            _bildTextVerhalten = enBildTextVerhalten.Nur_Text;
+            _bildTextVerhalten = BildTextVerhalten.Nur_Text;
             _bildCodeConstantHeight = string.Empty;
             _prefix = string.Empty;
             _bestFileStandardSuffix = string.Empty;
@@ -236,11 +229,11 @@ namespace BlueDatabase {
 
         #region Properties
 
-        public enAdditionalCheck AdditionalCheck {
+        public AdditionalCheck AdditionalCheck {
             get => _additionalCheck;
             set {
                 if (_additionalCheck == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_AdditionalCheck, this, ((int)_additionalCheck).ToString(), ((int)value).ToString(), true);
+                Database?.AddPending(DatabaseDataType.co_AdditionalCheck, this, ((int)_additionalCheck).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
         }
@@ -249,7 +242,7 @@ namespace BlueDatabase {
             get => _adminInfo;
             set {
                 if (_adminInfo == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_AdminInfo, this, _adminInfo, value, true);
+                Database?.AddPending(DatabaseDataType.co_AdminInfo, this, _adminInfo, value, true);
                 OnChanged();
             }
         }
@@ -258,7 +251,7 @@ namespace BlueDatabase {
             get => _afterEditAutoCorrect;
             set {
                 if (_afterEditAutoCorrect == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_AfterEdit_AutoCorrect, this, _afterEditAutoCorrect.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(DatabaseDataType.co_AfterEdit_AutoCorrect, this, _afterEditAutoCorrect.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
@@ -267,7 +260,7 @@ namespace BlueDatabase {
             get => _afterEditDoUCase;
             set {
                 if (_afterEditDoUCase == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_AfterEdit_DoUcase, this, _afterEditDoUCase.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(DatabaseDataType.co_AfterEdit_DoUcase, this, _afterEditDoUCase.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
@@ -276,7 +269,7 @@ namespace BlueDatabase {
             get => _multiLine && _afterEditQuickSortRemoveDouble;
             set {
                 if (_afterEditQuickSortRemoveDouble == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_AfterEdit_QuickSortAndRemoveDouble, this, _afterEditQuickSortRemoveDouble.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(DatabaseDataType.co_AfterEdit_QuickSortAndRemoveDouble, this, _afterEditQuickSortRemoveDouble.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
@@ -285,16 +278,16 @@ namespace BlueDatabase {
             get => _afterEditRunden;
             set {
                 if (_afterEditRunden == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_AfterEdit_Runden, this, _afterEditRunden.ToString(), value.ToString(), true);
+                Database?.AddPending(DatabaseDataType.co_AfterEdit_Runden, this, _afterEditRunden.ToString(), value.ToString(), true);
                 OnChanged();
             }
         }
 
-        public enAlignmentHorizontal Align {
+        public AlignmentHorizontal Align {
             get => _align;
             set {
                 if (_align == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_Align, this, ((int)_align).ToString(), ((int)value).ToString(), true);
+                Database?.AddPending(DatabaseDataType.co_Align, this, ((int)_align).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
         }
@@ -303,7 +296,7 @@ namespace BlueDatabase {
             get => _allowedChars;
             set {
                 if (_allowedChars == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_AllowedChars, this, _allowedChars, value, true);
+                Database?.AddPending(DatabaseDataType.co_AllowedChars, this, _allowedChars, value, true);
                 OnChanged();
             }
         }
@@ -314,7 +307,7 @@ namespace BlueDatabase {
             get => _autoFilterJoker;
             set {
                 if (_autoFilterJoker == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_AutoFilterJoker, this, _autoFilterJoker, value, true);
+                Database?.AddPending(DatabaseDataType.co_AutoFilterJoker, this, _autoFilterJoker, value, true);
                 OnChanged();
             }
         }
@@ -323,7 +316,7 @@ namespace BlueDatabase {
             get => _autoRemove;
             set {
                 if (_autoRemove == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_AutoRemove, this, _autoRemove, value, true);
+                Database?.AddPending(DatabaseDataType.co_AutoRemove, this, _autoRemove, value, true);
                 OnChanged();
             }
         }
@@ -332,7 +325,7 @@ namespace BlueDatabase {
             get => _backColor;
             set {
                 if (_backColor.ToArgb() == value.ToArgb()) { return; }
-                Database?.AddPending(enDatabaseDataType.co_BackColor, this, _backColor.ToArgb().ToString(), value.ToArgb().ToString(), true);
+                Database?.AddPending(DatabaseDataType.co_BackColor, this, _backColor.ToArgb().ToString(), value.ToArgb().ToString(), true);
                 OnChanged();
             }
         }
@@ -341,7 +334,7 @@ namespace BlueDatabase {
             get => _bestFileStandardFolder;
             set {
                 if (_bestFileStandardFolder == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_BestFile_StandardFolder, this, _bestFileStandardFolder, value, true);
+                Database?.AddPending(DatabaseDataType.co_BestFile_StandardFolder, this, _bestFileStandardFolder, value, true);
                 OnChanged();
             }
         }
@@ -350,7 +343,7 @@ namespace BlueDatabase {
             get => _bestFileStandardSuffix;
             set {
                 if (_bestFileStandardSuffix == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_BestFile_StandardSuffix, this, _bestFileStandardSuffix, value, true);
+                Database?.AddPending(DatabaseDataType.co_BestFile_StandardSuffix, this, _bestFileStandardSuffix, value, true);
                 OnChanged();
             }
         }
@@ -359,17 +352,17 @@ namespace BlueDatabase {
             get => _bildCodeConstantHeight;
             set {
                 if (_bildCodeConstantHeight == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_BildCode_ConstantHeight, this, _bildCodeConstantHeight, value, true);
+                Database?.AddPending(DatabaseDataType.co_BildCode_ConstantHeight, this, _bildCodeConstantHeight, value, true);
                 Invalidate_ColumAndContent();
                 OnChanged();
             }
         }
 
-        public enBildTextVerhalten BildTextVerhalten {
+        public BildTextVerhalten BildTextVerhalten {
             get => _bildTextVerhalten;
             set {
                 if (_bildTextVerhalten == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_BildTextVerhalten, this, ((int)_bildTextVerhalten).ToString(), ((int)value).ToString(), true);
+                Database?.AddPending(DatabaseDataType.co_BildTextVerhalten, this, ((int)_bildTextVerhalten).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
         }
@@ -379,7 +372,7 @@ namespace BlueDatabase {
             set {
                 value = value.Replace("<br>", "\r", RegexOptions.IgnoreCase);
                 if (_caption == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_Caption, this, _caption, value, true);
+                Database?.AddPending(DatabaseDataType.co_Caption, this, _caption, value, true);
                 Invalidate_TmpVariables();
                 OnChanged();
             }
@@ -389,7 +382,7 @@ namespace BlueDatabase {
             get => _captionBitmapTxt;
             set {
                 if (_captionBitmapTxt == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_CaptionBitmapTXT, this, _captionBitmapTxt, value, false);
+                Database?.AddPending(DatabaseDataType.co_CaptionBitmapTXT, this, _captionBitmapTxt, value, false);
                 _captionBitmapTxt = value;
                 Invalidate_TmpVariables();
                 OnChanged();
@@ -400,7 +393,7 @@ namespace BlueDatabase {
             get => _cellInitValue;
             set {
                 if (_cellInitValue == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_CellInitValue, this, _cellInitValue, value, true);
+                Database?.AddPending(DatabaseDataType.co_CellInitValue, this, _cellInitValue, value, true);
                 OnChanged();
             }
         }
@@ -425,7 +418,7 @@ namespace BlueDatabase {
             get => _dropdownAllesAbwählenErlaubt;
             set {
                 if (_dropdownAllesAbwählenErlaubt == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_DropdownAllesAbwählenErlaubt, this, _dropdownAllesAbwählenErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(DatabaseDataType.co_DropdownAllesAbwählenErlaubt, this, _dropdownAllesAbwählenErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
@@ -434,7 +427,7 @@ namespace BlueDatabase {
             get => _dropdownBearbeitungErlaubt;
             set {
                 if (_dropdownBearbeitungErlaubt == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_DropdownBearbeitungErlaubt, this, _dropdownBearbeitungErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(DatabaseDataType.co_DropdownBearbeitungErlaubt, this, _dropdownBearbeitungErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
@@ -456,7 +449,7 @@ namespace BlueDatabase {
             get => _dropDownKey;
             set {
                 if (_dropDownKey == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_DropDownKey, this, _dropDownKey.ToString(), value.ToString(), true);
+                Database?.AddPending(DatabaseDataType.co_DropDownKey, this, _dropDownKey.ToString(), value.ToString(), true);
                 OnChanged();
             }
         }
@@ -465,7 +458,7 @@ namespace BlueDatabase {
             get => _dropdownWerteAndererZellenAnzeigen;
             set {
                 if (_dropdownWerteAndererZellenAnzeigen == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_DropdownWerteAndererZellenAnzeigen, this, _dropdownWerteAndererZellenAnzeigen.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(DatabaseDataType.co_DropdownWerteAndererZellenAnzeigen, this, _dropdownWerteAndererZellenAnzeigen.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
@@ -474,7 +467,7 @@ namespace BlueDatabase {
             get => _editTrotzSperreErlaubt;
             set {
                 if (_editTrotzSperreErlaubt == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_EditTrotzSperreErlaubt, this, _editTrotzSperreErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(DatabaseDataType.co_EditTrotzSperreErlaubt, this, _editTrotzSperreErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
@@ -483,16 +476,16 @@ namespace BlueDatabase {
             get => _editType;
             set {
                 if (_editType == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_EditType, this, ((int)_editType).ToString(), ((int)value).ToString(), true);
+                Database?.AddPending(DatabaseDataType.co_EditType, this, ((int)_editType).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
         }
 
-        public enFilterOptions FilterOptions {
+        public FilterOptions FilterOptions {
             get => _filterOptions;
             set {
                 if (_filterOptions == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_FilterOptions, this, ((int)_filterOptions).ToString(), ((int)value).ToString(), true);
+                Database?.AddPending(DatabaseDataType.co_FilterOptions, this, ((int)_filterOptions).ToString(), ((int)value).ToString(), true);
                 Invalidate_TmpVariables();
                 OnChanged();
             }
@@ -502,7 +495,7 @@ namespace BlueDatabase {
             get => _foreColor;
             set {
                 if (_foreColor.ToArgb() == value.ToArgb()) { return; }
-                Database?.AddPending(enDatabaseDataType.co_ForeColor, this, _foreColor.ToArgb().ToString(), value.ToArgb().ToString(), true);
+                Database?.AddPending(DatabaseDataType.co_ForeColor, this, _foreColor.ToArgb().ToString(), value.ToArgb().ToString(), true);
                 OnChanged();
             }
         }
@@ -511,7 +504,7 @@ namespace BlueDatabase {
             get => _format;
             set {
                 if (_format == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_Format, this, ((int)_format).ToString(), ((int)value).ToString(), true);
+                Database?.AddPending(DatabaseDataType.co_Format, this, ((int)_format).ToString(), ((int)value).ToString(), true);
                 Invalidate_ColumAndContent();
                 OnChanged();
             }
@@ -521,7 +514,7 @@ namespace BlueDatabase {
             get => _formatierungErlaubt;
             set {
                 if (_formatierungErlaubt == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_FormatierungErlaubt, this, _formatierungErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(DatabaseDataType.co_FormatierungErlaubt, this, _formatierungErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
@@ -530,7 +523,7 @@ namespace BlueDatabase {
             get => _identifier;
             set {
                 if (_identifier == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_Identifier, this, _identifier, value, true);
+                Database?.AddPending(DatabaseDataType.co_Identifier, this, _identifier, value, true);
                 OnChanged();
             }
         }
@@ -539,7 +532,7 @@ namespace BlueDatabase {
             get => !_format.Autofilter_möglich() || _ignoreAtRowFilter;
             set {
                 if (_ignoreAtRowFilter == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_BeiZeilenfilterIgnorieren, this, _ignoreAtRowFilter.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(DatabaseDataType.co_BeiZeilenfilterIgnorieren, this, _ignoreAtRowFilter.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
@@ -555,27 +548,27 @@ namespace BlueDatabase {
                 if (_keyColumnKey == value) { return; }
                 var c = Database?.Column.SearchByKey(_keyColumnKey);
                 c?.CheckIfIAmAKeyColumn();
-                Database?.AddPending(enDatabaseDataType.co_KeyColumnKey, this, _keyColumnKey.ToString(), value.ToString(), true);
+                Database?.AddPending(DatabaseDataType.co_KeyColumnKey, this, _keyColumnKey.ToString(), value.ToString(), true);
                 c = Database?.Column.SearchByKey(_keyColumnKey);
                 c?.CheckIfIAmAKeyColumn();
                 OnChanged();
             }
         }
 
-        public enColumnLineStyle LineLeft {
+        public ColumnLineStyle LineLeft {
             get => _lineLeft;
             set {
                 if (_lineLeft == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_LineLeft, this, ((int)_lineLeft).ToString(), ((int)value).ToString(), true);
+                Database?.AddPending(DatabaseDataType.co_LineLeft, this, ((int)_lineLeft).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
         }
 
-        public enColumnLineStyle LineRight {
+        public ColumnLineStyle LineRight {
             get => _lineRight;
             set {
                 if (_lineRight == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_LinieRight, this, ((int)_lineRight).ToString(), ((int)value).ToString(), true);
+                Database?.AddPending(DatabaseDataType.co_LinieRight, this, ((int)_lineRight).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
         }
@@ -587,26 +580,11 @@ namespace BlueDatabase {
             get => _linkedCellColumnKeyOfLinkedDatabase;
             set {
                 if (_linkedCellColumnKeyOfLinkedDatabase == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_LinkedCell_ColumnKeyOfLinkedDatabase, this, _linkedCellColumnKeyOfLinkedDatabase.ToString(), value.ToString(), true);
+                Database?.AddPending(DatabaseDataType.co_LinkedCell_ColumnKeyOfLinkedDatabase, this, _linkedCellColumnKeyOfLinkedDatabase.ToString(), value.ToString(), true);
                 Invalidate_ColumAndContent();
                 OnChanged();
             }
         }
-
-        ///// <summary>
-        ///// Die zu suchende Zeile ist in dieser Spalte zu finden.
-        ///// Ist der Wrt -9999 wird die Verknüpfung über das Script gesetzt.
-        ///// </summary>
-        //[Obsolete]
-        //public long LinkedCell_RowKeyIsInColumn {
-        //    get => _linkedCellRowKeyIsInColumn;
-        //    set {
-        //        if (_linkedCellRowKeyIsInColumn == value) { return; }
-        //        Database?.AddPending(enDatabaseDataType.co_LinkedCell_RowKeyIsInColumn, this, _linkedCellRowKeyIsInColumn.ToString(), value.ToString(), true);
-        //        Invalidate_ColumAndContent();
-        //        OnChanged();
-        //    }
-        //}
 
         public Database? LinkedDatabase {
             get {
@@ -626,7 +604,7 @@ namespace BlueDatabase {
             get => _linkedDatabaseFile;
             set {
                 if (_linkedDatabaseFile == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_LinkedDatabase, this, _linkedDatabaseFile, value, true);
+                Database?.AddPending(DatabaseDataType.co_LinkedDatabase, this, _linkedDatabaseFile, value, true);
                 Invalidate_TmpVariables();
                 OnChanged();
             }
@@ -637,7 +615,7 @@ namespace BlueDatabase {
             set {
                 if (!_format.MultilinePossible()) { value = false; }
                 if (_multiLine == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_MultiLine, this, _multiLine.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(DatabaseDataType.co_MultiLine, this, _multiLine.ToPlusMinus(), value.ToPlusMinus(), true);
                 Invalidate_ColumAndContent();
                 OnChanged();
             }
@@ -651,7 +629,7 @@ namespace BlueDatabase {
                 if (Database?.Column.Exists(value) != null) { return; }
                 if (string.IsNullOrEmpty(value)) { return; }
                 var old = _name;
-                Database?.AddPending(enDatabaseDataType.co_Name, this, _name, value, true);
+                Database?.AddPending(DatabaseDataType.co_Name, this, _name, value, true);
                 Database?.Column_NameChanged(old, this);
                 OnChanged();
             }
@@ -661,7 +639,7 @@ namespace BlueDatabase {
             get => _prefix;
             set {
                 if (_prefix == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_Prefix, this, _prefix, value, true);
+                Database?.AddPending(DatabaseDataType.co_Prefix, this, _prefix, value, true);
                 Invalidate_ColumAndContent();
                 OnChanged();
             }
@@ -671,7 +649,7 @@ namespace BlueDatabase {
             get => _quickInfo;
             set {
                 if (_quickInfo == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_QuickInfo, this, _quickInfo, value, true);
+                Database?.AddPending(DatabaseDataType.co_QuickInfo, this, _quickInfo, value, true);
                 OnChanged();
             }
         }
@@ -680,7 +658,7 @@ namespace BlueDatabase {
             get => _regex;
             set {
                 if (_regex == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_Regex, this, _regex, value, true);
+                Database?.AddPending(DatabaseDataType.co_Regex, this, _regex, value, true);
                 OnChanged();
             }
         }
@@ -689,16 +667,16 @@ namespace BlueDatabase {
             get => _saveContent;
             set {
                 if (_saveContent == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_SaveContent, this, _saveContent.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(DatabaseDataType.co_SaveContent, this, _saveContent.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
 
-        public enScriptType ScriptType {
+        public ScriptType ScriptType {
             get => _scriptType;
             set {
                 if (_scriptType == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_ScriptType, this, ((int)_scriptType).ToString(), ((int)value).ToString(), true);
+                Database?.AddPending(DatabaseDataType.co_ScriptType, this, ((int)_scriptType).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
         }
@@ -707,7 +685,7 @@ namespace BlueDatabase {
             get => _multiLine && _showMultiLineInOneLine;
             set {
                 if (_showMultiLineInOneLine == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_ShowMultiLineInOneLine, this, _showMultiLineInOneLine.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(DatabaseDataType.co_ShowMultiLineInOneLine, this, _showMultiLineInOneLine.ToPlusMinus(), value.ToPlusMinus(), true);
                 Invalidate_ColumAndContent();
                 OnChanged();
             }
@@ -717,7 +695,7 @@ namespace BlueDatabase {
             get => _showUndo;
             set {
                 if (_showUndo == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_ShowUndo, this, _showUndo.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(DatabaseDataType.co_ShowUndo, this, _showUndo.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
@@ -726,7 +704,7 @@ namespace BlueDatabase {
             get => _sortType;
             set {
                 if (_sortType == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_SortType, this, ((int)_sortType).ToString(), ((int)value).ToString(), true);
+                Database?.AddPending(DatabaseDataType.co_SortType, this, ((int)_sortType).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
         }
@@ -735,7 +713,7 @@ namespace BlueDatabase {
             get => _spellCheckingEnabled;
             set {
                 if (_spellCheckingEnabled == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_SpellCheckingEnabled, this, _spellCheckingEnabled.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(DatabaseDataType.co_SpellCheckingEnabled, this, _spellCheckingEnabled.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
@@ -747,7 +725,7 @@ namespace BlueDatabase {
             get => _suffix;
             set {
                 if (_suffix == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_Suffix, this, _suffix, value, true);
+                Database?.AddPending(DatabaseDataType.co_Suffix, this, _suffix, value, true);
                 Invalidate_ColumAndContent();
                 OnChanged();
             }
@@ -757,16 +735,16 @@ namespace BlueDatabase {
             get => Database?.PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0 || _textBearbeitungErlaubt;
             set {
                 if (_textBearbeitungErlaubt == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_TextBearbeitungErlaubt, this, _textBearbeitungErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
+                Database?.AddPending(DatabaseDataType.co_TextBearbeitungErlaubt, this, _textBearbeitungErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
                 OnChanged();
             }
         }
 
-        public enTranslationType Translate {
+        public TranslationType Translate {
             get => _translate;
             set {
                 if (_translate == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_Translate, this, ((int)_translate).ToString(), ((int)value).ToString(), true);
+                Database?.AddPending(DatabaseDataType.co_Translate, this, ((int)_translate).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
         }
@@ -775,7 +753,7 @@ namespace BlueDatabase {
             get => _ueberschrift1;
             set {
                 if (_ueberschrift1 == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_Ueberschrift1, this, _ueberschrift1, value, true);
+                Database?.AddPending(DatabaseDataType.co_Ueberschrift1, this, _ueberschrift1, value, true);
                 OnChanged();
             }
         }
@@ -784,7 +762,7 @@ namespace BlueDatabase {
             get => _ueberschrift2;
             set {
                 if (_ueberschrift2 == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_Ueberschrift2, this, _ueberschrift2, value, true);
+                Database?.AddPending(DatabaseDataType.co_Ueberschrift2, this, _ueberschrift2, value, true);
                 OnChanged();
             }
         }
@@ -793,7 +771,7 @@ namespace BlueDatabase {
             get => _ueberschrift3;
             set {
                 if (_ueberschrift3 == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_Ueberschrift3, this, _ueberschrift3, value, true);
+                Database?.AddPending(DatabaseDataType.co_Ueberschrift3, this, _ueberschrift3, value, true);
                 OnChanged();
             }
         }
@@ -809,7 +787,7 @@ namespace BlueDatabase {
             get => _vorschlagsColumn;
             set {
                 if (_vorschlagsColumn == value) { return; }
-                Database?.AddPending(enDatabaseDataType.co_VorschlagColumn, this, _vorschlagsColumn.ToString(), value.ToString(), true);
+                Database?.AddPending(DatabaseDataType.co_VorschlagColumn, this, _vorschlagsColumn.ToString(), value.ToString(), true);
                 OnChanged();
             }
         }
@@ -831,41 +809,41 @@ namespace BlueDatabase {
 
         #region Methods
 
-        public static enEditTypeTable UserEditDialogTypeInTable(enDataFormat format, bool doDropDown, bool keybordInputAllowed, bool isMultiline) {
-            if (!doDropDown && !keybordInputAllowed) { return enEditTypeTable.None; }
+        public static EditTypeTable UserEditDialogTypeInTable(enDataFormat format, bool doDropDown, bool keybordInputAllowed, bool isMultiline) {
+            if (!doDropDown && !keybordInputAllowed) { return EditTypeTable.None; }
 
             switch (format) {
                 case enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
-                    return enEditTypeTable.Dropdown_Single;
+                    return EditTypeTable.Dropdown_Single;
 
                 case enDataFormat.Link_To_Filesystem:
-                    return enEditTypeTable.FileHandling_InDateiSystem;
+                    return EditTypeTable.FileHandling_InDateiSystem;
 
                 case enDataFormat.FarbeInteger:
-                    if (doDropDown) { return enEditTypeTable.Dropdown_Single; }
-                    return enEditTypeTable.Farb_Auswahl_Dialog;
+                    if (doDropDown) { return EditTypeTable.Dropdown_Single; }
+                    return EditTypeTable.Farb_Auswahl_Dialog;
 
                 case enDataFormat.Schrift:
-                    if (doDropDown) { return enEditTypeTable.Dropdown_Single; }
-                    return enEditTypeTable.Font_AuswahlDialog;
+                    if (doDropDown) { return EditTypeTable.Dropdown_Single; }
+                    return EditTypeTable.Font_AuswahlDialog;
 
                 case enDataFormat.Button:
-                    return enEditTypeTable.None;
+                    return EditTypeTable.None;
 
                 default:
                     if (format.TextboxEditPossible()) {
                         return !doDropDown
-                            ? enEditTypeTable.Textfeld
+                            ? EditTypeTable.Textfeld
                             : isMultiline
-                            ? enEditTypeTable.Dropdown_Single
-                            : keybordInputAllowed ? enEditTypeTable.Textfeld_mit_Auswahlknopf : enEditTypeTable.Dropdown_Single;
+                            ? EditTypeTable.Dropdown_Single
+                            : keybordInputAllowed ? EditTypeTable.Textfeld_mit_Auswahlknopf : EditTypeTable.Dropdown_Single;
                     }
                     Develop.DebugPrint(format);
-                    return enEditTypeTable.None;
+                    return EditTypeTable.None;
             }
         }
 
-        public static enEditTypeTable UserEditDialogTypeInTable(ColumnItem? column, bool doDropDown) => UserEditDialogTypeInTable(column.Format, doDropDown, column.TextBearbeitungErlaubt, column.MultiLine);
+        public static EditTypeTable UserEditDialogTypeInTable(ColumnItem? column, bool doDropDown) => UserEditDialogTypeInTable(column.Format, doDropDown, column.TextBearbeitungErlaubt, column.MultiLine);
 
         public string AutoCorrect(string value) {
             if (Format == enDataFormat.Link_To_Filesystem) {
@@ -917,7 +895,7 @@ namespace BlueDatabase {
             return Contents(tfilter, pinned);
         }
 
-        public bool AutoFilterSymbolPossible() => FilterOptions.HasFlag(enFilterOptions.Enabled) && Format.Autofilter_möglich();
+        public bool AutoFilterSymbolPossible() => FilterOptions.HasFlag(FilterOptions.Enabled) && Format.Autofilter_möglich();
 
         /// <summary>
         /// Gibt einen Dateinamen mit Pfad und Suffix zurück, der sich aus dem Standard-Angaben der Spalte zusammensetzt.
@@ -964,7 +942,7 @@ namespace BlueDatabase {
                 var ok = true;
                 foreach (var columnitem in Database.Column) {
                     if (columnitem.Format == enDataFormat.Link_To_Filesystem) {
-                        var r = Database.Row[new FilterItem(columnitem, enFilterType.Istgleich_GroßKleinEgal, tmpname)];
+                        var r = Database.Row[new FilterItem(columnitem, FilterType.Istgleich_GroßKleinEgal, tmpname)];
                         if (r != null) {
                             ok = false;
                             break;
@@ -1121,11 +1099,11 @@ namespace BlueDatabase {
                 if (LinkedDatabase == null) { return "Verknüpfte Datenbank fehlt oder existiert nicht."; }
                 if (LinkedDatabase == Database) { return "Zirkelbezug mit verknüpfter Datenbank."; }
             }
-            if (!_format.Autofilter_möglich() && _filterOptions != enFilterOptions.None) { return "Bei diesem Format keine Filterung erlaubt."; }
-            if (_filterOptions != enFilterOptions.None && !_filterOptions.HasFlag(enFilterOptions.Enabled)) { return "Filter Kombination nicht möglich."; }
-            if (_filterOptions != enFilterOptions.Enabled_OnlyAndAllowed && _filterOptions.HasFlag(enFilterOptions.OnlyAndAllowed)) { return "Filter Kombination nicht möglich."; }
-            if (_filterOptions != enFilterOptions.Enabled_OnlyOrAllowed && _filterOptions.HasFlag(enFilterOptions.OnlyOrAllowed)) { return "Filter Kombination nicht möglich."; }
-            if (_filterOptions.HasFlag(enFilterOptions.OnlyAndAllowed) || _filterOptions.HasFlag(enFilterOptions.OnlyOrAllowed)) {
+            if (!_format.Autofilter_möglich() && _filterOptions != FilterOptions.None) { return "Bei diesem Format keine Filterung erlaubt."; }
+            if (_filterOptions != FilterOptions.None && !_filterOptions.HasFlag(FilterOptions.Enabled)) { return "Filter Kombination nicht möglich."; }
+            if (_filterOptions != FilterOptions.Enabled_OnlyAndAllowed && _filterOptions.HasFlag(FilterOptions.OnlyAndAllowed)) { return "Filter Kombination nicht möglich."; }
+            if (_filterOptions != FilterOptions.Enabled_OnlyOrAllowed && _filterOptions.HasFlag(FilterOptions.OnlyOrAllowed)) { return "Filter Kombination nicht möglich."; }
+            if (_filterOptions.HasFlag(FilterOptions.OnlyAndAllowed) || _filterOptions.HasFlag(FilterOptions.OnlyOrAllowed)) {
                 if (!_multiLine) {
                     return "Dieser Filter kann nur bei Mehrzeiligen Spalten benutzt werden.";
                 }
@@ -1188,15 +1166,15 @@ namespace BlueDatabase {
             if (_editTrotzSperreErlaubt && !_textBearbeitungErlaubt && !_dropdownBearbeitungErlaubt) { return "Wenn die Zeilensperre ignoriert werden soll, muss eine Bearbeitungsmethode definiert sein."; }
             var tmpEditDialog = UserEditDialogTypeInTable(_format, false, true, _multiLine);
             if (_textBearbeitungErlaubt) {
-                if (tmpEditDialog == enEditTypeTable.Dropdown_Single) { return "Format unterstützt nur Dropdown-Menü."; }
-                if (tmpEditDialog == enEditTypeTable.None) { return "Format unterstützt keine Standard-Bearbeitung."; }
+                if (tmpEditDialog == EditTypeTable.Dropdown_Single) { return "Format unterstützt nur Dropdown-Menü."; }
+                if (tmpEditDialog == EditTypeTable.None) { return "Format unterstützt keine Standard-Bearbeitung."; }
             } else {
                 if (_vorschlagsColumn > -1) { return "'Vorschlags-Text-Spalte' nur bei Texteingabe möglich."; }
                 //if (!string.IsNullOrEmpty(_AllowedChars)) { return "'Erlaubte Zeichen' nur bei Texteingabe nötig."; }
             }
             if (_dropdownBearbeitungErlaubt) {
                 //if (_SpellCheckingEnabled) { return "Entweder Dropdownmenü oder Rechtschreibprüfung."; }
-                if (tmpEditDialog == enEditTypeTable.None) { return "Format unterstützt keine Auswahlmenü-Bearbeitung."; }
+                if (tmpEditDialog == EditTypeTable.None) { return "Format unterstützt keine Auswahlmenü-Bearbeitung."; }
             }
             if (!_dropdownBearbeitungErlaubt && !_textBearbeitungErlaubt) {
                 if (PermissionGroupsChangeCell.Count > 0) { return "Bearbeitungsberechtigungen entfernen, wenn keine Bearbeitung erlaubt ist."; }
@@ -1209,7 +1187,7 @@ namespace BlueDatabase {
                 if (thisS.Contains("|")) { return "Unerlaubtes Zeichen bei den Gruppen, die eine Zelle bearbeiten dürfen."; }
                 if (thisS.ToUpper() == "#ADMINISTRATOR") { return "'#Administrator' bei den Bearbeitern entfernen."; }
             }
-            if (_dropdownBearbeitungErlaubt || tmpEditDialog == enEditTypeTable.Dropdown_Single) {
+            if (_dropdownBearbeitungErlaubt || tmpEditDialog == EditTypeTable.Dropdown_Single) {
                 if (_format != enDataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) {
                     if (!_dropdownWerteAndererZellenAnzeigen && DropDownItems.Count == 0) { return "Keine Dropdown-Items vorhanden bzw. Alles hinzufügen nicht angewählt."; }
                 }
@@ -1221,7 +1199,7 @@ namespace BlueDatabase {
             if (_dropdownWerteAndererZellenAnzeigen && !_format.DropdownItemsOfOtherCellsAllowed()) { return "'Dropdownmenu alles hinzufügen' bei diesem Format nicht erlaubt."; }
             if (_dropdownAllesAbwählenErlaubt && !_format.DropdownUnselectAllAllowed()) { return "'Dropdownmenu alles abwählen' bei diesem Format nicht erlaubt."; }
             if (DropDownItems.Count > 0 && !_format.DropdownItemsAllowed()) { return "Manuelle 'Dropdow-Items' bei diesem Format nicht erlaubt."; }
-            if (_bildTextVerhalten != enBildTextVerhalten.Nur_Text) {
+            if (_bildTextVerhalten != BildTextVerhalten.Nur_Text) {
                 //if (_Format is enDataFormat.Text) {
                 //    // Performance-Teschnische Gründe
                 //    _BildTextVerhalten = enBildTextVerhalten.Nur_Text;
@@ -1232,14 +1210,14 @@ namespace BlueDatabase {
                 if (_multiLine) { return "Einheiten und Mehrzeilig darf nicht kombiniert werden."; }
             }
             if (_afterEditRunden > 6) { return "Beim Runden maximal 6 Nachkommastellen möglich"; }
-            if (_filterOptions == enFilterOptions.None) {
+            if (_filterOptions == FilterOptions.None) {
                 if (!string.IsNullOrEmpty(_autoFilterJoker)) { return "Wenn kein Autofilter erlaubt ist, immer anzuzeigende Werte entfernen"; }
             }
             //if (string.IsNullOrEmpty(_linkedKeyKennung) && _format.NeedLinkedKeyKennung()) { return "Spaltenkennung für verlinkte Datenbanken fehlt."; }
             if (OpticalReplace.Count > 0) {
                 if (_format is not enDataFormat.Text and
                     not enDataFormat.RelationText) { return "Format unterstützt keine Ersetzungen."; }
-                if (_filterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled)) { return "Entweder 'Ersetzungen' oder 'erweiternden Autofilter'"; }
+                if (_filterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled)) { return "Entweder 'Ersetzungen' oder 'erweiternden Autofilter'"; }
                 if (!string.IsNullOrEmpty(_autoFilterJoker)) { return "Entweder 'Ersetzungen' oder 'Autofilter Joker'"; }
             }
             if (_keyColumnKey > -1) {
@@ -1460,8 +1438,7 @@ namespace BlueDatabase {
             //LinkedCell = 74,
             //Columns_für_LinkedCellDropdown = 75,
 
-            //[Obsolete]
-            //    Values_für_LinkedCellDropdown = 76,
+            //Values_für_LinkedCellDropdown = 76,
 
             //RelationText = 77,
 
@@ -1476,7 +1453,7 @@ namespace BlueDatabase {
             try {
                 switch ((int)_format) {
                     case (int)enDataFormat.Button:
-                        ScriptType = enScriptType.Nicht_vorhanden;
+                        ScriptType = ScriptType.Nicht_vorhanden;
                         break;
 
                     case 21: //Text_Ohne_Kritische_Zeichen
@@ -1524,16 +1501,16 @@ namespace BlueDatabase {
                         break;
                 }
 
-                if (ScriptType == enScriptType.undefiniert) {
+                if (ScriptType == ScriptType.undefiniert) {
                     if (MultiLine) {
-                        ScriptType = enScriptType.List;
+                        ScriptType = ScriptType.List;
                     } else if (Format is enDataFormat.Text or enDataFormat.Link_To_Filesystem) {
                         if (SortType is enSortierTyp.ZahlenwertFloat or enSortierTyp.ZahlenwertInt) {
-                            ScriptType = enScriptType.Numeral;
+                            ScriptType = ScriptType.Numeral;
                         }
-                        ScriptType = enScriptType.String;
+                        ScriptType = ScriptType.String;
                     } else if (Format == enDataFormat.Schrift) {
-                        ScriptType = enScriptType.Nicht_vorhanden;
+                        ScriptType = ScriptType.Nicht_vorhanden;
                     }
                 }
 
@@ -1547,7 +1524,7 @@ namespace BlueDatabase {
                     }
                 }
 
-                if (ScriptType == enScriptType.undefiniert) {
+                if (ScriptType == ScriptType.undefiniert) {
                     Develop.DebugPrint(enFehlerArt.Warnung, "Umsetzung fehlgeschlagen: " + Caption + " " + Database.Filename);
                 }
 
@@ -1562,8 +1539,8 @@ namespace BlueDatabase {
             //if (SetAll && !IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Ausserhalb des parsens!"); }
             // ACHTUNG: Die SetAll Befehle OHNE _, die müssen geloggt werden.
             if (setAll) {
-                LineLeft = enColumnLineStyle.Dünn;
-                LineRight = enColumnLineStyle.Ohne;
+                LineLeft = ColumnLineStyle.Dünn;
+                LineRight = ColumnLineStyle.Ohne;
                 ForeColor = Color.FromArgb(0, 0, 0);
                 //CaptionBitmap = null;
             }
@@ -1588,7 +1565,7 @@ namespace BlueDatabase {
                     _textBearbeitungErlaubt = false;
                     _dropdownBearbeitungErlaubt = false;
                     _showUndo = false;
-                    _scriptType = enScriptType.String_Readonly;
+                    _scriptType = ScriptType.String_Readonly;
                     PermissionGroupsChangeCell.Clear();
                     if (setAll) {
                         Caption = "Änderer";
@@ -1605,7 +1582,7 @@ namespace BlueDatabase {
                         Caption = "Kapitel";
                         ForeColor = Color.FromArgb(0, 0, 0);
                         BackColor = Color.FromArgb(255, 255, 150);
-                        LineLeft = enColumnLineStyle.Dick;
+                        LineLeft = ColumnLineStyle.Dick;
                         if (_multiLine) { _showMultiLineInOneLine = true; }
                     }
                     break;
@@ -1618,7 +1595,7 @@ namespace BlueDatabase {
                         Caption = "Erstell-Datum";
                         ForeColor = Color.FromArgb(0, 0, 128);
                         BackColor = Color.FromArgb(185, 185, 255);
-                        LineLeft = enColumnLineStyle.Dick;
+                        LineLeft = ColumnLineStyle.Dick;
                     }
                     break;
 
@@ -1630,13 +1607,13 @@ namespace BlueDatabase {
                     _textBearbeitungErlaubt = false;
                     _spellCheckingEnabled = false;
                     _dropdownBearbeitungErlaubt = false;
-                    _scriptType = enScriptType.String_Readonly;
+                    _scriptType = ScriptType.String_Readonly;
                     PermissionGroupsChangeCell.Clear();
                     if (setAll) {
                         Caption = "Änder-Datum";
                         ForeColor = Color.FromArgb(0, 128, 0);
                         BackColor = Color.FromArgb(185, 255, 185);
-                        LineLeft = enColumnLineStyle.Dick;
+                        LineLeft = ColumnLineStyle.Dick;
                     }
                     break;
 
@@ -1649,9 +1626,9 @@ namespace BlueDatabase {
                     _autoFilterJoker = string.Empty;
                     //_AutofilterTextFilterErlaubt = false;
                     _ignoreAtRowFilter = true;
-                    _filterOptions = enFilterOptions.Enabled;
-                    _scriptType = enScriptType.Nicht_vorhanden;
-                    _align = enAlignmentHorizontal.Zentriert;
+                    _filterOptions = FilterOptions.Enabled;
+                    _scriptType = ScriptType.Nicht_vorhanden;
+                    _align = AlignmentHorizontal.Zentriert;
                     DropDownItems.Clear();
                     LinkedCellFilter.Clear();
                     PermissionGroupsChangeCell.Clear();
@@ -1661,7 +1638,7 @@ namespace BlueDatabase {
                     if (setAll) {
                         ForeColor = Color.FromArgb(128, 0, 0);
                         BackColor = Color.FromArgb(255, 185, 185);
-                        LineLeft = enColumnLineStyle.Dick;
+                        LineLeft = ColumnLineStyle.Dick;
                     }
                     break;
 
@@ -1669,12 +1646,12 @@ namespace BlueDatabase {
                     _name = "SYS_Locked";
                     _spellCheckingEnabled = false;
                     _format = enDataFormat.Text;
-                    _scriptType = enScriptType.Bool;
-                    _filterOptions = enFilterOptions.Enabled;
+                    _scriptType = ScriptType.Bool;
+                    _filterOptions = FilterOptions.Enabled;
                     _autoFilterJoker = string.Empty;
                     _ignoreAtRowFilter = true;
-                    _bildTextVerhalten = enBildTextVerhalten.Interpretiere_Bool;
-                    _align = enAlignmentHorizontal.Zentriert;
+                    _bildTextVerhalten = BildTextVerhalten.Interpretiere_Bool;
+                    _align = AlignmentHorizontal.Zentriert;
 
                     if (_textBearbeitungErlaubt || _dropdownBearbeitungErlaubt) {
                         _quickInfo = "Eine abgeschlossene Zeile kann<br>nicht mehr bearbeitet werden.";
@@ -1740,24 +1717,24 @@ namespace BlueDatabase {
             ((IInputFormat)this).SetFormat(enVarType.Text); // Standard Verhalten
 
             Format = enDataFormat.Text;
-            Align = enAlignmentHorizontal.Links;
+            Align = AlignmentHorizontal.Links;
             SortType = enSortierTyp.Original_String;
-            Translate = enTranslationType.Original_Anzeigen;
+            Translate = TranslationType.Original_Anzeigen;
             AfterEdit_QuickSortRemoveDouble = false;
-            BildTextVerhalten = enBildTextVerhalten.Bild_oder_Text;
-            ScriptType = enScriptType.String;
+            BildTextVerhalten = BildTextVerhalten.Bild_oder_Text;
+            ScriptType = ScriptType.String;
         }
 
         public void SetFormatForBit() {
             ((IInputFormat)this).SetFormat(enVarType.Bit); // Standard Verhalten
 
             Format = enDataFormat.Text;
-            Align = enAlignmentHorizontal.Zentriert;
+            Align = AlignmentHorizontal.Zentriert;
             SortType = enSortierTyp.Original_String;
-            Translate = enTranslationType.Original_Anzeigen;
+            Translate = TranslationType.Original_Anzeigen;
             AfterEdit_QuickSortRemoveDouble = false;
-            BildTextVerhalten = enBildTextVerhalten.Interpretiere_Bool;
-            ScriptType = enScriptType.Bool;
+            BildTextVerhalten = BildTextVerhalten.Interpretiere_Bool;
+            ScriptType = ScriptType.Bool;
 
             DropdownAllesAbwählenErlaubt = false;
             DropdownBearbeitungErlaubt = true;
@@ -1770,96 +1747,96 @@ namespace BlueDatabase {
             ((IInputFormat)this).SetFormat(enVarType.Date);
 
             Format = enDataFormat.Text;
-            Align = enAlignmentHorizontal.Links;
+            Align = AlignmentHorizontal.Links;
             SortType = enSortierTyp.Datum_Uhrzeit;
-            Translate = enTranslationType.Datum;
+            Translate = TranslationType.Datum;
             AfterEdit_QuickSortRemoveDouble = false;
-            BildTextVerhalten = enBildTextVerhalten.Nur_Text;
-            ScriptType = enScriptType.String;
+            BildTextVerhalten = BildTextVerhalten.Nur_Text;
+            ScriptType = ScriptType.String;
         }
 
         public void SetFormatForDateTime() {
             ((IInputFormat)this).SetFormat(enVarType.DateTime);
 
             Format = enDataFormat.Text;
-            Align = enAlignmentHorizontal.Links;
+            Align = AlignmentHorizontal.Links;
             SortType = enSortierTyp.Datum_Uhrzeit;
-            Translate = enTranslationType.Datum;
+            Translate = TranslationType.Datum;
             AfterEdit_QuickSortRemoveDouble = false;
-            BildTextVerhalten = enBildTextVerhalten.Nur_Text;
-            ScriptType = enScriptType.String;
+            BildTextVerhalten = BildTextVerhalten.Nur_Text;
+            ScriptType = ScriptType.String;
         }
 
         public void SetFormatForEmail() {
             ((IInputFormat)this).SetFormat(enVarType.Email);
 
             Format = enDataFormat.Text;
-            Align = enAlignmentHorizontal.Links;
+            Align = AlignmentHorizontal.Links;
             SortType = enSortierTyp.Original_String;
-            Translate = enTranslationType.Original_Anzeigen;
+            Translate = TranslationType.Original_Anzeigen;
             AfterEdit_QuickSortRemoveDouble = true;
-            BildTextVerhalten = enBildTextVerhalten.Nur_Text;
-            ScriptType = enScriptType.String;
+            BildTextVerhalten = BildTextVerhalten.Nur_Text;
+            ScriptType = ScriptType.String;
         }
 
         public void SetFormatForFloat() {
             ((IInputFormat)this).SetFormat(enVarType.Float);
 
             Format = enDataFormat.Text;
-            Align = enAlignmentHorizontal.Rechts;
-            Translate = enTranslationType.Zahl;
+            Align = AlignmentHorizontal.Rechts;
+            Translate = TranslationType.Zahl;
             SortType = enSortierTyp.ZahlenwertFloat;
             AfterEdit_QuickSortRemoveDouble = false;
-            BildTextVerhalten = enBildTextVerhalten.Nur_Text;
-            ScriptType = enScriptType.Numeral;
+            BildTextVerhalten = BildTextVerhalten.Nur_Text;
+            ScriptType = ScriptType.Numeral;
         }
 
         public void SetFormatForInteger() {
             ((IInputFormat)this).SetFormat(enVarType.Integer);
 
             Format = enDataFormat.Text;
-            Align = enAlignmentHorizontal.Rechts;
+            Align = AlignmentHorizontal.Rechts;
             SortType = enSortierTyp.ZahlenwertInt;
-            Translate = enTranslationType.Original_Anzeigen;
+            Translate = TranslationType.Original_Anzeigen;
             AfterEdit_QuickSortRemoveDouble = false;
-            BildTextVerhalten = enBildTextVerhalten.Nur_Text;
-            ScriptType = enScriptType.Numeral;
+            BildTextVerhalten = BildTextVerhalten.Nur_Text;
+            ScriptType = ScriptType.Numeral;
         }
 
         public void SetFormatForPhoneNumber() {
             ((IInputFormat)this).SetFormat(enVarType.PhoneNumber);
 
             Format = enDataFormat.Text;
-            Align = enAlignmentHorizontal.Links;
+            Align = AlignmentHorizontal.Links;
             SortType = enSortierTyp.Original_String;
-            Translate = enTranslationType.Original_Anzeigen;
+            Translate = TranslationType.Original_Anzeigen;
             AfterEdit_QuickSortRemoveDouble = false;
-            BildTextVerhalten = enBildTextVerhalten.Nur_Text;
-            ScriptType = enScriptType.String;
+            BildTextVerhalten = BildTextVerhalten.Nur_Text;
+            ScriptType = ScriptType.String;
         }
 
         public void SetFormatForText() {
             ((IInputFormat)this).SetFormat(enVarType.Text);
 
             Format = enDataFormat.Text;
-            Align = enAlignmentHorizontal.Links;
+            Align = AlignmentHorizontal.Links;
             SortType = enSortierTyp.Sprachneutral_String;
-            Translate = enTranslationType.Original_Anzeigen;
+            Translate = TranslationType.Original_Anzeigen;
             AfterEdit_QuickSortRemoveDouble = false;
-            BildTextVerhalten = enBildTextVerhalten.Nur_Text;
-            ScriptType = enScriptType.String;
+            BildTextVerhalten = BildTextVerhalten.Nur_Text;
+            ScriptType = ScriptType.String;
         }
 
         public void SetFormatForTextMitFormatierung() {
             ((IInputFormat)this).SetFormat(enVarType.TextMitFormatierung);
 
             Format = enDataFormat.Text;
-            Align = enAlignmentHorizontal.Links;
+            Align = AlignmentHorizontal.Links;
             SortType = enSortierTyp.Sprachneutral_String;
-            Translate = enTranslationType.Original_Anzeigen;
+            Translate = TranslationType.Original_Anzeigen;
             AfterEdit_QuickSortRemoveDouble = false;
-            BildTextVerhalten = enBildTextVerhalten.Nur_Text;
-            ScriptType = enScriptType.String;
+            BildTextVerhalten = BildTextVerhalten.Nur_Text;
+            ScriptType = ScriptType.String;
         }
 
         public void SetFormatForTextOptions() {
@@ -1868,24 +1845,24 @@ namespace BlueDatabase {
             MultiLine = true; // Verhalten von Setformat überschreiben
 
             Format = enDataFormat.Text;
-            Align = enAlignmentHorizontal.Links;
+            Align = AlignmentHorizontal.Links;
             SortType = enSortierTyp.Sprachneutral_String;
-            Translate = enTranslationType.Übersetzen;
+            Translate = TranslationType.Übersetzen;
             AfterEdit_QuickSortRemoveDouble = true;
-            BildTextVerhalten = enBildTextVerhalten.Nur_Text;
-            ScriptType = enScriptType.List;
+            BildTextVerhalten = BildTextVerhalten.Nur_Text;
+            ScriptType = ScriptType.List;
         }
 
         public void SetFormatForUrl() {
             ((IInputFormat)this).SetFormat(enVarType.Url);
 
             Format = enDataFormat.Text;
-            Align = enAlignmentHorizontal.Links;
+            Align = AlignmentHorizontal.Links;
             SortType = enSortierTyp.Original_String;
-            Translate = enTranslationType.Original_Anzeigen;
+            Translate = TranslationType.Original_Anzeigen;
             AfterEdit_QuickSortRemoveDouble = false;
-            BildTextVerhalten = enBildTextVerhalten.Nur_Text;
-            ScriptType = enScriptType.String;
+            BildTextVerhalten = BildTextVerhalten.Nur_Text;
+            ScriptType = ScriptType.String;
         }
 
         public string SimplyFile(string fullFileName) {
@@ -2143,54 +2120,54 @@ namespace BlueDatabase {
             TmpColumnContentWidth = null;
         }
 
-        internal string Load(enDatabaseDataType art, string wert) {
+        internal string Load(DatabaseDataType art, string wert) {
             switch (art) {
-                case enDatabaseDataType.co_Name:
+                case DatabaseDataType.co_Name:
                     _name = wert;
                     Invalidate_TmpVariables();
                     break;
 
-                case enDatabaseDataType.co_Caption:
+                case DatabaseDataType.co_Caption:
                     _caption = wert;
                     break;
 
-                case enDatabaseDataType.co_Format:
+                case DatabaseDataType.co_Format:
                     _format = (enDataFormat)IntParse(wert);
                     break;
 
-                case enDatabaseDataType.co_ForeColor:
+                case DatabaseDataType.co_ForeColor:
                     _foreColor = Color.FromArgb(IntParse(wert));
                     break;
 
-                case enDatabaseDataType.co_BackColor:
+                case DatabaseDataType.co_BackColor:
                     _backColor = Color.FromArgb(IntParse(wert));
                     break;
 
-                case enDatabaseDataType.co_LineLeft:
-                    _lineLeft = (enColumnLineStyle)IntParse(wert);
+                case DatabaseDataType.co_LineLeft:
+                    _lineLeft = (ColumnLineStyle)IntParse(wert);
                     break;
 
-                case enDatabaseDataType.co_LinieRight:
-                    _lineRight = (enColumnLineStyle)IntParse(wert);
+                case DatabaseDataType.co_LinieRight:
+                    _lineRight = (ColumnLineStyle)IntParse(wert);
                     break;
 
-                case enDatabaseDataType.co_QuickInfo:
+                case DatabaseDataType.co_QuickInfo:
                     _quickInfo = wert;
                     break;
                 //case enDatabaseDataType.co_Intelligenter_Multifilter: _Intelligenter_Multifilter = Wert; break;
-                case enDatabaseDataType.co_DauerFilterPos:
+                case DatabaseDataType.co_DauerFilterPos:
                     //_dauerFilterPos = wert.PointParse();
                     break;
 
-                case enDatabaseDataType.co_Ueberschrift1:
+                case DatabaseDataType.co_Ueberschrift1:
                     _ueberschrift1 = wert;
                     break;
 
-                case enDatabaseDataType.co_Ueberschrift2:
+                case DatabaseDataType.co_Ueberschrift2:
                     _ueberschrift2 = wert;
                     break;
 
-                case enDatabaseDataType.co_Ueberschrift3:
+                case DatabaseDataType.co_Ueberschrift3:
                     _ueberschrift3 = wert;
                     break;
 
@@ -2200,206 +2177,206 @@ namespace BlueDatabase {
                 //    }
                 //    break;
 
-                case enDatabaseDataType.co_Identifier:
+                case DatabaseDataType.co_Identifier:
                     _identifier = wert;
                     ResetSystemToDefault(false);
                     Database.Column.GetSystems();
                     break;
 
-                case enDatabaseDataType.co_EditType:
+                case DatabaseDataType.co_EditType:
                     _editType = (enEditTypeFormula)IntParse(wert);
                     break;
 
-                case enDatabaseDataType.co_MultiLine:
+                case DatabaseDataType.co_MultiLine:
                     _multiLine = wert.FromPlusMinus();
                     break;
 
-                case enDatabaseDataType.co_DropDownItems:
+                case DatabaseDataType.co_DropDownItems:
                     DropDownItems.SplitAndCutByCr_QuickSortAndRemoveDouble(wert);
                     break;
 
-                case enDatabaseDataType.co_LinkedCellFilter:
+                case DatabaseDataType.co_LinkedCellFilter:
                     LinkedCellFilter.SplitAndCutByCr(wert);
                     break;
 
-                case enDatabaseDataType.co_OpticalReplace:
+                case DatabaseDataType.co_OpticalReplace:
                     OpticalReplace.SplitAndCutByCr(wert);
                     break;
 
-                case enDatabaseDataType.co_AfterEdit_AutoReplace:
+                case DatabaseDataType.co_AfterEdit_AutoReplace:
                     AfterEditAutoReplace.SplitAndCutByCr(wert);
                     break;
 
-                case enDatabaseDataType.co_Regex:
+                case DatabaseDataType.co_Regex:
                     _regex = wert;
                     break;
 
-                case enDatabaseDataType.co_Tags:
+                case DatabaseDataType.co_Tags:
                     Tags.SplitAndCutByCr(wert);
                     break;
 
-                case enDatabaseDataType.co_AutoFilterJoker:
+                case DatabaseDataType.co_AutoFilterJoker:
                     _autoFilterJoker = wert;
                     break;
 
-                case enDatabaseDataType.co_PermissionGroups_ChangeCell:
+                case DatabaseDataType.co_PermissionGroups_ChangeCell:
                     PermissionGroupsChangeCell.SplitAndCutByCr_QuickSortAndRemoveDouble(wert);
                     break;
 
-                case enDatabaseDataType.co_AllowedChars:
+                case DatabaseDataType.co_AllowedChars:
                     _allowedChars = wert;
                     break;
 
-                case enDatabaseDataType.co_FilterOptions:
-                    _filterOptions = (enFilterOptions)IntParse(wert);
+                case DatabaseDataType.co_FilterOptions:
+                    _filterOptions = (FilterOptions)IntParse(wert);
                     break;
 
-                case enDatabaseDataType.co_AutoFilterErlaubt_alt:
-                    _filterOptions = enFilterOptions.None;
-                    if (wert.FromPlusMinus()) { _filterOptions |= enFilterOptions.Enabled; }
+                case DatabaseDataType.co_AutoFilterErlaubt_alt:
+                    _filterOptions = FilterOptions.None;
+                    if (wert.FromPlusMinus()) { _filterOptions |= FilterOptions.Enabled; }
                     break;
 
-                case enDatabaseDataType.co_AutoFilterTextFilterErlaubt_alt:
-                    if (wert.FromPlusMinus()) { _filterOptions |= enFilterOptions.TextFilterEnabled; }
+                case DatabaseDataType.co_AutoFilterTextFilterErlaubt_alt:
+                    if (wert.FromPlusMinus()) { _filterOptions |= FilterOptions.TextFilterEnabled; }
                     break;
 
-                case enDatabaseDataType.co_AutoFilterErweitertErlaubt_alt:
-                    if (wert.FromPlusMinus()) { _filterOptions |= enFilterOptions.ExtendedFilterEnabled; }
+                case DatabaseDataType.co_AutoFilterErweitertErlaubt_alt:
+                    if (wert.FromPlusMinus()) { _filterOptions |= FilterOptions.ExtendedFilterEnabled; }
                     break;
 
-                case enDatabaseDataType.co_BeiZeilenfilterIgnorieren:
+                case DatabaseDataType.co_BeiZeilenfilterIgnorieren:
                     _ignoreAtRowFilter = wert.FromPlusMinus();
                     break;
 
-                case enDatabaseDataType.co_CompactView_alt:
+                case DatabaseDataType.co_CompactView_alt:
                     break;
 
-                case enDatabaseDataType.co_ShowUndo:
+                case DatabaseDataType.co_ShowUndo:
                     _showUndo = wert.FromPlusMinus();
                     break;
 
-                case enDatabaseDataType.co_ShowMultiLineInOneLine:
+                case DatabaseDataType.co_ShowMultiLineInOneLine:
                     _showMultiLineInOneLine = wert.FromPlusMinus();
                     break;
 
-                case enDatabaseDataType.co_TextBearbeitungErlaubt:
+                case DatabaseDataType.co_TextBearbeitungErlaubt:
                     _textBearbeitungErlaubt = wert.FromPlusMinus();
                     break;
 
-                case enDatabaseDataType.co_DropdownBearbeitungErlaubt:
+                case DatabaseDataType.co_DropdownBearbeitungErlaubt:
                     _dropdownBearbeitungErlaubt = wert.FromPlusMinus();
                     break;
 
-                case enDatabaseDataType.co_SpellCheckingEnabled:
+                case DatabaseDataType.co_SpellCheckingEnabled:
                     _spellCheckingEnabled = wert.FromPlusMinus();
                     break;
 
-                case enDatabaseDataType.co_DropdownAllesAbwählenErlaubt:
+                case DatabaseDataType.co_DropdownAllesAbwählenErlaubt:
                     _dropdownAllesAbwählenErlaubt = wert.FromPlusMinus();
                     break;
 
-                case enDatabaseDataType.co_DropdownWerteAndererZellenAnzeigen:
+                case DatabaseDataType.co_DropdownWerteAndererZellenAnzeigen:
                     _dropdownWerteAndererZellenAnzeigen = wert.FromPlusMinus();
                     break;
 
-                case enDatabaseDataType.co_AfterEdit_QuickSortAndRemoveDouble:
+                case DatabaseDataType.co_AfterEdit_QuickSortAndRemoveDouble:
                     _afterEditQuickSortRemoveDouble = wert.FromPlusMinus();
                     break;
 
-                case enDatabaseDataType.co_AfterEdit_Runden:
+                case DatabaseDataType.co_AfterEdit_Runden:
                     _afterEditRunden = IntParse(wert);
                     break;
 
-                case enDatabaseDataType.co_AfterEdit_DoUcase:
+                case DatabaseDataType.co_AfterEdit_DoUcase:
                     _afterEditDoUCase = wert.FromPlusMinus();
                     break;
 
-                case enDatabaseDataType.co_AfterEdit_AutoCorrect:
+                case DatabaseDataType.co_AfterEdit_AutoCorrect:
                     _afterEditAutoCorrect = wert.FromPlusMinus();
                     break;
 
-                case enDatabaseDataType.co_SaveContent:
+                case DatabaseDataType.co_SaveContent:
                     _saveContent = wert.FromPlusMinus();
                     break;
 
-                case enDatabaseDataType.co_AutoRemove:
+                case DatabaseDataType.co_AutoRemove:
                     _autoRemove = wert;
                     break;
 
-                case enDatabaseDataType.co_AdminInfo:
+                case DatabaseDataType.co_AdminInfo:
                     _adminInfo = wert;
                     break;
 
-                case enDatabaseDataType.co_CaptionBitmapTXT:
+                case DatabaseDataType.co_CaptionBitmapTXT:
                     _captionBitmapTxt = wert;
                     break;
 
-                case enDatabaseDataType.co_Suffix:
+                case DatabaseDataType.co_Suffix:
                     _suffix = wert;
                     break;
 
-                case enDatabaseDataType.co_LinkedDatabase:
+                case DatabaseDataType.co_LinkedDatabase:
                     _linkedDatabaseFile = wert;
                     break;
 
-                case enDatabaseDataType.co_LinkKeyKennung:
+                case DatabaseDataType.co_LinkKeyKennung:
                     //_linkedKeyKennung = wert;
                     break;
 
-                case enDatabaseDataType.co_BestFile_StandardSuffix:
+                case DatabaseDataType.co_BestFile_StandardSuffix:
                     _bestFileStandardSuffix = wert;
                     break;
 
-                case enDatabaseDataType.co_BestFile_StandardFolder:
+                case DatabaseDataType.co_BestFile_StandardFolder:
                     _bestFileStandardFolder = wert;
                     break;
 
-                case enDatabaseDataType.co_BildCode_ConstantHeight:
+                case DatabaseDataType.co_BildCode_ConstantHeight:
                     if (wert == "0") { wert = string.Empty; }
                     _bildCodeConstantHeight = wert;
                     break;
 
-                case enDatabaseDataType.co_Prefix:
+                case DatabaseDataType.co_Prefix:
                     _prefix = wert;
                     break;
 
-                case enDatabaseDataType.co_Translate:
-                    _translate = (enTranslationType)IntParse(wert);
+                case DatabaseDataType.co_Translate:
+                    _translate = (TranslationType)IntParse(wert);
                     break;
 
-                case enDatabaseDataType.co_AdditionalCheck:
-                    _additionalCheck = (enAdditionalCheck)IntParse(wert);
+                case DatabaseDataType.co_AdditionalCheck:
+                    _additionalCheck = (AdditionalCheck)IntParse(wert);
                     break;
 
-                case enDatabaseDataType.co_ScriptType:
-                    _scriptType = (enScriptType)IntParse(wert);
+                case DatabaseDataType.co_ScriptType:
+                    _scriptType = (ScriptType)IntParse(wert);
                     break;
 
-                case enDatabaseDataType.co_BildTextVerhalten:
-                    _bildTextVerhalten = (enBildTextVerhalten)IntParse(wert);
+                case DatabaseDataType.co_BildTextVerhalten:
+                    _bildTextVerhalten = (BildTextVerhalten)IntParse(wert);
                     break;
 
-                case enDatabaseDataType.co_EditTrotzSperreErlaubt:
+                case DatabaseDataType.co_EditTrotzSperreErlaubt:
                     _editTrotzSperreErlaubt = wert.FromPlusMinus();
                     break;
 
-                case enDatabaseDataType.co_FormatierungErlaubt:
+                case DatabaseDataType.co_FormatierungErlaubt:
                     _formatierungErlaubt = wert.FromPlusMinus();
                     break;
 
-                case enDatabaseDataType.co_CellInitValue:
+                case DatabaseDataType.co_CellInitValue:
                     _cellInitValue = wert;
                     break;
 
-                case enDatabaseDataType.co_KeyColumnKey:
+                case DatabaseDataType.co_KeyColumnKey:
                     _keyColumnKey = LongParse(wert);
                     break;
 
-                case enDatabaseDataType.co_LinkedCell_RowKeyIsInColumn:
+                case DatabaseDataType.co_LinkedCell_RowKeyIsInColumn:
                     //_linkedCellRowKeyIsInColumn = LongParse(wert);
                     break;
 
-                case enDatabaseDataType.co_LinkedCell_ColumnKeyOfLinkedDatabase:
+                case DatabaseDataType.co_LinkedCell_ColumnKeyOfLinkedDatabase:
                     _linkedCellColumnKeyOfLinkedDatabase = LongParse(wert);
                     break;
 
@@ -2409,7 +2386,7 @@ namespace BlueDatabase {
                 //case enDatabaseDataType.co_LinkedCell_ColumnValueAdd:
                 //    break;
 
-                case enDatabaseDataType.co_SortType:
+                case DatabaseDataType.co_SortType:
                     if (string.IsNullOrEmpty(wert)) {
                         _sortType = enSortierTyp.Original_String;
                     } else {
@@ -2418,17 +2395,17 @@ namespace BlueDatabase {
                     break;
 
                 //case enDatabaseDataType.co_ZellenZusammenfassen: _ZellenZusammenfassen = Wert.FromPlusMinus(); break;
-                case enDatabaseDataType.co_DropDownKey:
+                case DatabaseDataType.co_DropDownKey:
                     _dropDownKey = LongParse(wert);
                     break;
 
-                case enDatabaseDataType.co_VorschlagColumn:
+                case DatabaseDataType.co_VorschlagColumn:
                     _vorschlagsColumn = LongParse(wert);
                     break;
 
-                case enDatabaseDataType.co_Align:
-                    _align = (enAlignmentHorizontal)IntParse(wert);
-                    if (_align == (enAlignmentHorizontal)(-1)) { _align = enAlignmentHorizontal.Links; }
+                case DatabaseDataType.co_Align:
+                    _align = (AlignmentHorizontal)IntParse(wert);
+                    if (_align == (AlignmentHorizontal)(-1)) { _align = AlignmentHorizontal.Links; }
                     break;
                 //case (enDatabaseDataType)189: break;
                 //case (enDatabaseDataType)192: break;
@@ -2447,79 +2424,79 @@ namespace BlueDatabase {
         internal string ParsableColumnKey() => ColumnCollection.ParsableColumnKey(this);
 
         internal void SaveToByteList(ref List<byte> l) {
-            Database.SaveToByteList(l, enDatabaseDataType.co_Name, _name, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_Caption, _caption, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_Format, ((int)_format).ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_Ueberschrift1, _ueberschrift1, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_Ueberschrift2, _ueberschrift2, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_Ueberschrift3, _ueberschrift3, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_MultiLine, _multiLine.ToPlusMinus(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_CellInitValue, _cellInitValue, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_AfterEdit_QuickSortAndRemoveDouble, _afterEditQuickSortRemoveDouble.ToPlusMinus(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_AfterEdit_DoUcase, _afterEditDoUCase.ToPlusMinus(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_AfterEdit_AutoCorrect, _afterEditAutoCorrect.ToPlusMinus(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_AfterEdit_Runden, _afterEditRunden.ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_AutoRemove, _autoRemove, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_SaveContent, _saveContent.ToPlusMinus(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_FilterOptions, ((int)_filterOptions).ToString(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_Name, _name, Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_Caption, _caption, Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_Format, ((int)_format).ToString(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_Ueberschrift1, _ueberschrift1, Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_Ueberschrift2, _ueberschrift2, Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_Ueberschrift3, _ueberschrift3, Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_MultiLine, _multiLine.ToPlusMinus(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_CellInitValue, _cellInitValue, Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_AfterEdit_QuickSortAndRemoveDouble, _afterEditQuickSortRemoveDouble.ToPlusMinus(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_AfterEdit_DoUcase, _afterEditDoUCase.ToPlusMinus(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_AfterEdit_AutoCorrect, _afterEditAutoCorrect.ToPlusMinus(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_AfterEdit_Runden, _afterEditRunden.ToString(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_AutoRemove, _autoRemove, Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_SaveContent, _saveContent.ToPlusMinus(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_FilterOptions, ((int)_filterOptions).ToString(), Key);
             //Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilter_Dauerfilter, ((int)_AutoFilter_Dauerfilter).ToString(), Key);
             //Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterErlaubt, _AutofilterErlaubt.ToPlusMinus(), Key);
             //Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterTextFilterErlaubt, _AutofilterTextFilterErlaubt.ToPlusMinus(), Key);
             //Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterErweitertErlaubt, _AutoFilterErweitertErlaubt.ToPlusMinus(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterJoker, _autoFilterJoker, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_BeiZeilenfilterIgnorieren, _ignoreAtRowFilter.ToPlusMinus(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_TextBearbeitungErlaubt, _textBearbeitungErlaubt.ToPlusMinus(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_SpellCheckingEnabled, _spellCheckingEnabled.ToPlusMinus(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_AutoFilterJoker, _autoFilterJoker, Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_BeiZeilenfilterIgnorieren, _ignoreAtRowFilter.ToPlusMinus(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_TextBearbeitungErlaubt, _textBearbeitungErlaubt.ToPlusMinus(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_SpellCheckingEnabled, _spellCheckingEnabled.ToPlusMinus(), Key);
             //  Database.SaveToByteList(l, enDatabaseDataType.co_CompactView, _CompactView.ToPlusMinus(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_ShowMultiLineInOneLine, _showMultiLineInOneLine.ToPlusMinus(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_ShowUndo, _showUndo.ToPlusMinus(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_FormatierungErlaubt, _formatierungErlaubt.ToPlusMinus(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_ForeColor, _foreColor.ToArgb().ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_BackColor, _backColor.ToArgb().ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_LineLeft, ((int)_lineLeft).ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_LinieRight, ((int)_lineRight).ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_DropdownBearbeitungErlaubt, _dropdownBearbeitungErlaubt.ToPlusMinus(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_DropDownItems, DropDownItems.JoinWithCr(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCellFilter, LinkedCellFilter.JoinWithCr(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_OpticalReplace, OpticalReplace.JoinWithCr(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_AfterEdit_AutoReplace, AfterEditAutoReplace.JoinWithCr(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_Regex, _regex, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_DropdownAllesAbwählenErlaubt, _dropdownAllesAbwählenErlaubt.ToPlusMinus(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_DropdownWerteAndererZellenAnzeigen, _dropdownWerteAndererZellenAnzeigen.ToPlusMinus(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_QuickInfo, _quickInfo, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_AdminInfo, _adminInfo, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_CaptionBitmapTXT, _captionBitmapTxt, Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_ShowMultiLineInOneLine, _showMultiLineInOneLine.ToPlusMinus(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_ShowUndo, _showUndo.ToPlusMinus(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_FormatierungErlaubt, _formatierungErlaubt.ToPlusMinus(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_ForeColor, _foreColor.ToArgb().ToString(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_BackColor, _backColor.ToArgb().ToString(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_LineLeft, ((int)_lineLeft).ToString(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_LinieRight, ((int)_lineRight).ToString(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_DropdownBearbeitungErlaubt, _dropdownBearbeitungErlaubt.ToPlusMinus(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_DropDownItems, DropDownItems.JoinWithCr(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_LinkedCellFilter, LinkedCellFilter.JoinWithCr(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_OpticalReplace, OpticalReplace.JoinWithCr(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_AfterEdit_AutoReplace, AfterEditAutoReplace.JoinWithCr(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_Regex, _regex, Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_DropdownAllesAbwählenErlaubt, _dropdownAllesAbwählenErlaubt.ToPlusMinus(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_DropdownWerteAndererZellenAnzeigen, _dropdownWerteAndererZellenAnzeigen.ToPlusMinus(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_QuickInfo, _quickInfo, Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_AdminInfo, _adminInfo, Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_CaptionBitmapTXT, _captionBitmapTxt, Key);
             //Database.SaveToByteList(l, enDatabaseDataType.co_CaptionBitmapUTF8, modConverter.BitmapToStringUnicode(_CaptionBitmap, ImageFormat.Png), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_AllowedChars, _allowedChars, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_PermissionGroups_ChangeCell, PermissionGroupsChangeCell.JoinWithCr(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_EditType, ((int)_editType).ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_Tags, Tags.JoinWithCr(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_EditTrotzSperreErlaubt, _editTrotzSperreErlaubt.ToPlusMinus(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_Suffix, _suffix, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_LinkedDatabase, _linkedDatabaseFile, Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_AllowedChars, _allowedChars, Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_PermissionGroups_ChangeCell, PermissionGroupsChangeCell.JoinWithCr(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_EditType, ((int)_editType).ToString(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_Tags, Tags.JoinWithCr(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_EditTrotzSperreErlaubt, _editTrotzSperreErlaubt.ToPlusMinus(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_Suffix, _suffix, Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_LinkedDatabase, _linkedDatabaseFile, Key);
             //Database.SaveToByteList(l, enDatabaseDataType.co_LinkKeyKennung, _linkedKeyKennung, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_BestFile_StandardFolder, _bestFileStandardFolder, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_BestFile_StandardSuffix, _bestFileStandardSuffix, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_BildCode_ConstantHeight, _bildCodeConstantHeight, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_BildTextVerhalten, ((int)_bildTextVerhalten).ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_Translate, ((int)_translate).ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_AdditionalCheck, ((int)_additionalCheck).ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_ScriptType, ((int)_scriptType).ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_Prefix, _prefix, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_KeyColumnKey, _keyColumnKey.ToString(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_BestFile_StandardFolder, _bestFileStandardFolder, Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_BestFile_StandardSuffix, _bestFileStandardSuffix, Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_BildCode_ConstantHeight, _bildCodeConstantHeight, Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_BildTextVerhalten, ((int)_bildTextVerhalten).ToString(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_Translate, ((int)_translate).ToString(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_AdditionalCheck, ((int)_additionalCheck).ToString(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_ScriptType, ((int)_scriptType).ToString(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_Prefix, _prefix, Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_KeyColumnKey, _keyColumnKey.ToString(), Key);
             //Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_RowKeyIsInColumn, _linkedCellRowKeyIsInColumn.ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_ColumnKeyOfLinkedDatabase, _linkedCellColumnKeyOfLinkedDatabase.ToString(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_LinkedCell_ColumnKeyOfLinkedDatabase, _linkedCellColumnKeyOfLinkedDatabase.ToString(), Key);
             //Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_ColumnValueFoundIn, _LinkedCell_ColumnValueFoundIn.ToString(), Key);
             //Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_ColumnValueAdd, _LinkedCell_ColumnValueAdd, Key);
             //Database.SaveToByteList(l, enDatabaseDataType.co_ZellenZusammenfassen, _ZellenZusammenfassen.ToPlusMinus(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_DropDownKey, _dropDownKey.ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_VorschlagColumn, _vorschlagsColumn.ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_Align, ((int)_align).ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_SortType, ((int)_sortType).ToString(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_DropDownKey, _dropDownKey.ToString(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_VorschlagColumn, _vorschlagsColumn.ToString(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_Align, ((int)_align).ToString(), Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_SortType, ((int)_sortType).ToString(), Key);
             //Database.SaveToByteList(l, enDatabaseDataType.co_Intelligenter_Multifilter, _Intelligenter_Multifilter, Key);
             //Database.SaveToByteList(l, enDatabaseDataType.co_DauerFilterPos, _dauerFilterPos.ToString(), Key);
             //Kennung UNBEDINGT zum Schluss, damit die Standard-Werte gesetzt werden können
-            Database.SaveToByteList(l, enDatabaseDataType.co_Identifier, _identifier, Key);
+            Database.SaveToByteList(l, DatabaseDataType.co_Identifier, _identifier, Key);
         }
 
         private void _TMP_LinkedDatabase_Cell_CellValueChanged(object sender, CellEventArgs e) {
@@ -2584,7 +2561,7 @@ namespace BlueDatabase {
         //}
 
         private void AfterEdit_AutoReplace_ListOrItemChanged(object sender, System.EventArgs e) {
-            Database.AddPending(enDatabaseDataType.co_AfterEdit_AutoReplace, Key, AfterEditAutoReplace.JoinWithCr(), false);
+            Database.AddPending(DatabaseDataType.co_AfterEdit_AutoReplace, Key, AfterEditAutoReplace.JoinWithCr(), false);
             OnChanged();
         }
 
@@ -2623,7 +2600,7 @@ namespace BlueDatabase {
         }
 
         private void DropDownItems_ListOrItemChanged(object sender, System.EventArgs e) {
-            Database.AddPending(enDatabaseDataType.co_DropDownItems, Key, DropDownItems.JoinWithCr(), false);
+            Database.AddPending(DatabaseDataType.co_DropDownItems, Key, DropDownItems.JoinWithCr(), false);
             OnChanged();
         }
 
@@ -2703,23 +2680,23 @@ namespace BlueDatabase {
         }
 
         private void LinkedCellFilters_ListOrItemChanged(object sender, System.EventArgs e) {
-            Database.AddPending(enDatabaseDataType.co_LinkedCellFilter, Key, LinkedCellFilter.JoinWithCr(), false);
+            Database.AddPending(DatabaseDataType.co_LinkedCellFilter, Key, LinkedCellFilter.JoinWithCr(), false);
             OnChanged();
         }
 
         private void OpticalReplacer_ListOrItemChanged(object sender, System.EventArgs e) {
-            Database.AddPending(enDatabaseDataType.co_OpticalReplace, Key, OpticalReplace.JoinWithCr(), false);
+            Database.AddPending(DatabaseDataType.co_OpticalReplace, Key, OpticalReplace.JoinWithCr(), false);
             Invalidate_ColumAndContent();
             OnChanged();
         }
 
         private void PermissionGroups_ChangeCell_ListOrItemChanged(object sender, System.EventArgs e) {
-            Database.AddPending(enDatabaseDataType.co_PermissionGroups_ChangeCell, Key, PermissionGroupsChangeCell.JoinWithCr(), false);
+            Database.AddPending(DatabaseDataType.co_PermissionGroups_ChangeCell, Key, PermissionGroupsChangeCell.JoinWithCr(), false);
             OnChanged();
         }
 
         private void Tags_ListOrItemChanged(object sender, System.EventArgs e) {
-            Database.AddPending(enDatabaseDataType.co_Tags, Key, Tags.JoinWithCr(), false);
+            Database.AddPending(DatabaseDataType.co_Tags, Key, Tags.JoinWithCr(), false);
             OnChanged();
         }
 

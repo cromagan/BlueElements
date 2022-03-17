@@ -100,8 +100,8 @@ namespace BlueControls.Controls {
         [DefaultValue("")]
         public string SorceName { get; private set; }
 
-        [DefaultValue(enSorceType.Nichts)]
-        public enSorceType SorceType { get; private set; }
+        [DefaultValue(SorceType.Nichts)]
+        public SorceType SorceType { get; private set; }
 
         [DefaultValue(0)]
         public new int TabIndex {
@@ -120,9 +120,9 @@ namespace BlueControls.Controls {
         #region Methods
 
         public void Clear() {
-            if (_bitmap != null || SorceType != enSorceType.Nichts || !string.IsNullOrEmpty(SorceName)) {
+            if (_bitmap != null || SorceType != SorceType.Nichts || !string.IsNullOrEmpty(SorceName)) {
                 _bitmap = null;
-                SorceType = enSorceType.Nichts;
+                SorceType = SorceType.Nichts;
                 SorceName = string.Empty;
                 ZoomFitInvalidateAndCheckButtons();
                 OnImageChanged();
@@ -161,11 +161,11 @@ namespace BlueControls.Controls {
             var i = Image_Clone(ix);
             if (_maxSize > 0) {
                 _bitmap = BitmapExt.Resize(i, _maxSize, _maxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
-                SorceType = enSorceType.LoadedFromDiskAndResized;
+                SorceType = SorceType.LoadedFromDiskAndResized;
                 SorceName = filename;
             } else {
                 _bitmap = i;
-                SorceType = enSorceType.LoadedFromDisk;
+                SorceType = SorceType.LoadedFromDisk;
                 SorceName = filename;
             }
             ZoomFitInvalidateAndCheckButtons();
@@ -176,7 +176,7 @@ namespace BlueControls.Controls {
             hotItem = null;
             if (_bitmap != null) {
                 items.Add("Externes Fenster öffnen", "ExF");
-                items.Add(enContextMenuComands.Speichern);
+                items.Add(ContextMenuComands.Speichern);
             }
         }
 
@@ -186,7 +186,7 @@ namespace BlueControls.Controls {
 
         public void SetBitmap(Bitmap? bmp) {
             _bitmap = bmp;
-            SorceType = enSorceType.SetedByProperty;
+            SorceType = SorceType.SetedByProperty;
             SorceName = string.Empty;
             ZoomFitInvalidateAndCheckButtons();
             OnImageChanged();
@@ -198,20 +198,20 @@ namespace BlueControls.Controls {
         /// <param name="sorceName"></param>
         /// <param name="sorceType"></param>
         /// <param name="throwEvent"></param>
-        internal void ChangeSource(string sorceName, enSorceType sorceType, bool throwEvent) {
+        internal void ChangeSource(string sorceName, SorceType sorceType, bool throwEvent) {
             SorceName = sorceName;
             SorceType = sorceType;
             if (throwEvent) { OnImageChanged(); }
         }
 
-        protected override void DrawControl(Graphics gr, enStates vState) {
-            if (Convert.ToBoolean(vState & enStates.Standard_MouseOver)) { vState ^= enStates.Standard_MouseOver; }
-            if (Convert.ToBoolean(vState & enStates.Standard_MousePressed)) { vState ^= enStates.Standard_MousePressed; }
-            Skin.Draw_Back(gr, enDesign.EasyPic, vState, DisplayRectangle, this, true);
+        protected override void DrawControl(Graphics gr, States vState) {
+            if (Convert.ToBoolean(vState & States.Standard_MouseOver)) { vState ^= States.Standard_MouseOver; }
+            if (Convert.ToBoolean(vState & States.Standard_MousePressed)) { vState ^= States.Standard_MousePressed; }
+            Skin.Draw_Back(gr, Design.EasyPic, vState, DisplayRectangle, this, true);
             if (_bitmap != null) {
                 gr.DrawImageInRectAspectRatio(_bitmap, 1, 1, Width - 2, Height - 2);
             }
-            Skin.Draw_Border(gr, enDesign.EasyPic, vState, DisplayRectangle);
+            Skin.Draw_Border(gr, Design.EasyPic, vState, DisplayRectangle);
         }
 
         protected override void OnEnabledChanged(System.EventArgs e) {
@@ -320,7 +320,7 @@ namespace BlueControls.Controls {
                 if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             }
             _bitmap = ScreenShot.GrabArea(ParentForm());
-            SorceType = enSorceType.ScreenShot;
+            SorceType = SorceType.ScreenShot;
             SorceName = string.Empty;
             ZoomFitInvalidateAndCheckButtons();
             OnImageChanged();

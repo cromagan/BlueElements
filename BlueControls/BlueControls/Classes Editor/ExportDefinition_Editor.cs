@@ -56,19 +56,19 @@ namespace BlueControls.Classes_Editor {
         protected override void EnabledAndFillFormula() {
             Enabled = true;
             switch (Item.Typ) {
-                case enExportTyp.DatenbankCSVFormat:
+                case ExportTyp.DatenbankCSVFormat:
                     ExportCSVFormat.Checked = true;
                     break;
 
-                case enExportTyp.DatenbankHTMLFormat:
+                case ExportTyp.DatenbankHTMLFormat:
                     ExportHTMLFormat.Checked = true;
                     break;
 
-                case enExportTyp.DatenbankOriginalFormat:
+                case ExportTyp.DatenbankOriginalFormat:
                     ExportOriginalFormat.Checked = true;
                     break;
 
-                case enExportTyp.EinzelnMitFormular:
+                case ExportTyp.EinzelnMitFormular:
                     ExportalsBild.Checked = true;
                     Item.BackupInterval = 0;
                     break;
@@ -209,15 +209,15 @@ namespace BlueControls.Classes_Editor {
             if (MustDeleteAllExportFiles) {
                 Item.DeleteAllBackups();
             }
-            Item.Typ = enExportTyp.DatenbankOriginalFormat;
+            Item.Typ = ExportTyp.DatenbankOriginalFormat;
             if (ExportCSVFormat.Checked) {
-                Item.Typ = enExportTyp.DatenbankCSVFormat;
+                Item.Typ = ExportTyp.DatenbankCSVFormat;
             }
             if (ExportHTMLFormat.Checked) {
-                Item.Typ = enExportTyp.DatenbankHTMLFormat;
+                Item.Typ = ExportTyp.DatenbankHTMLFormat;
             }
             if (ExportalsBild.Checked) {
-                Item.Typ = enExportTyp.EinzelnMitFormular;
+                Item.Typ = ExportTyp.EinzelnMitFormular;
             }
             Item.Verzeichnis = ExportVerzeichnis.Text;
             if (!string.IsNullOrEmpty(ExportIntervall.Text)) {

@@ -72,11 +72,11 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // lsbFilterItems
             // 
-            this.lsbFilterItems.AddAllowed = BlueControls.Enums.enAddType.None;
+            this.lsbFilterItems.AddAllowed = BlueControls.Enums.AddType.None;
             this.lsbFilterItems.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lsbFilterItems.Appearance = BlueControls.Enums.enBlueListBoxAppearance.Autofilter;
+            this.lsbFilterItems.Appearance = BlueControls.Enums.BlueListBoxAppearance.Autofilter;
             this.lsbFilterItems.Location = new System.Drawing.Point(8, 140);
             this.lsbFilterItems.Name = "lsbFilterItems";
             this.lsbFilterItems.Size = new System.Drawing.Size(150, 12);
@@ -86,10 +86,10 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // lsbStandardFilter
             // 
-            this.lsbStandardFilter.AddAllowed = BlueControls.Enums.enAddType.None;
+            this.lsbStandardFilter.AddAllowed = BlueControls.Enums.AddType.None;
             this.lsbStandardFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lsbStandardFilter.Appearance = BlueControls.Enums.enBlueListBoxAppearance.Autofilter;
+            this.lsbStandardFilter.Appearance = BlueControls.Enums.BlueListBoxAppearance.Autofilter;
             this.lsbStandardFilter.Location = new System.Drawing.Point(8, 8);
             this.lsbStandardFilter.Name = "lsbStandardFilter";
             this.lsbStandardFilter.Size = new System.Drawing.Size(150, 72);

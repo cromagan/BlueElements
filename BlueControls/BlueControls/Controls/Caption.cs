@@ -38,7 +38,7 @@ namespace BlueControls.Controls {
 
         #region Fields
 
-        private enDesign _design = enDesign.Undefiniert;
+        private Design _design = Design.Undefiniert;
 
         private ExtText? _eText;
         private string _text = string.Empty;
@@ -162,24 +162,24 @@ namespace BlueControls.Controls {
 
         public Size TextRequiredSize() {
             if (QuickModePossible()) {
-                if (_design == enDesign.Undefiniert) { GetDesign(); }
-                var s = BlueFont.MeasureString(_text, Skin.GetBlueFont(_design, enStates.Standard).Font());
+                if (_design == Design.Undefiniert) { GetDesign(); }
+                var s = BlueFont.MeasureString(_text, Skin.GetBlueFont(_design, States.Standard).Font());
                 return new Size((int)(s.Width + 1), (int)(s.Height + 1));
             }
             if (_eText == null) {
                 if (DesignMode) { Refresh(); }// Damit das skin Geinittet wird
-                DrawControl(null, enStates.Standard);
+                DrawControl(null, States.Standard);
             }
             return _eText != null ? _eText.LastSize() : new Size(1, 1);
         }
 
-        protected override void DrawControl(Graphics? gr, enStates state) {
+        protected override void DrawControl(Graphics? gr, States state) {
             try {
-                if (_design == enDesign.Undefiniert) {
+                if (_design == Design.Undefiniert) {
                     GetDesign();
-                    if (_design == enDesign.Undefiniert) { return; }
+                    if (_design == Design.Undefiniert) { return; }
                 }
-                if (state is not enStates.Standard and not enStates.Standard_Disabled) {
+                if (state is not States.Standard and not States.Standard_Disabled) {
                     Develop.DebugPrint(state);
                     return;
                 }
@@ -230,48 +230,48 @@ namespace BlueControls.Controls {
         }
 
         private void GetDesign() {
-            _design = enDesign.Undefiniert;
+            _design = Design.Undefiniert;
             if (Parent == null) { return; }
             if (Parent is Form fm) { _design = fm.Design; }
             switch (_design) {
-                case enDesign.Form_QuickInfo:
+                case Design.Form_QuickInfo:
 
-                case enDesign.Form_DesktopBenachrichtigung:
+                case Design.Form_DesktopBenachrichtigung:
 
-                case enDesign.Form_BitteWarten:
+                case Design.Form_BitteWarten:
 
-                case enDesign.Form_KontextMenu:
+                case Design.Form_KontextMenu:
 
-                case enDesign.Form_SelectBox_Dropdown:
+                case Design.Form_SelectBox_Dropdown:
 
-                case enDesign.Form_AutoFilter:
+                case Design.Form_AutoFilter:
                     return;
             }
             switch (ParentType()) {
-                case enPartentType.RibbonGroupBox:
+                case PartentType.RibbonGroupBox:
 
-                case enPartentType.RibbonPage:
-                    _design = enDesign.Ribbonbar_Caption;
+                case PartentType.RibbonPage:
+                    _design = Design.Ribbonbar_Caption;
                     break;
 
-                case enPartentType.GroupBox:
+                case PartentType.GroupBox:
 
-                case enPartentType.TabPage:
+                case PartentType.TabPage:
 
-                case enPartentType.Form:
+                case PartentType.Form:
 
-                case enPartentType.FlexiControlForCell:
+                case PartentType.FlexiControlForCell:
 
-                case enPartentType.Unbekannt: // UserForms und anderes
+                case PartentType.Unbekannt: // UserForms und anderes
 
-                case enPartentType.Nothing: // UserForms und anderes
+                case PartentType.Nothing: // UserForms und anderes
 
-                case enPartentType.ListBox:
-                    _design = enDesign.Caption;
+                case PartentType.ListBox:
+                    _design = Design.Caption;
                     return;
 
                 default:
-                    _design = enDesign.Caption;
+                    _design = Design.Caption;
                     break;
             }
         }

@@ -164,14 +164,14 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         public bool Contains(int x, int y) => Pos.Contains(x, y);
 
-        public void Draw(Graphics gr, int xModifier, int yModifier, enDesign controldesign, enDesign itemdesign, enStates vState, bool drawBorderAndBack, string filterText, bool translate) {
+        public void Draw(Graphics gr, int xModifier, int yModifier, Design controldesign, Design itemdesign, States vState, bool drawBorderAndBack, string filterText, bool translate) {
             if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent nicht definiert"); }
-            if (itemdesign == enDesign.Undefiniert) { return; }
+            if (itemdesign == Design.Undefiniert) { return; }
             Rectangle positionModified = new(Pos.X - xModifier, Pos.Y - yModifier, Pos.Width, Pos.Height);
             DrawExplicit(gr, positionModified, itemdesign, vState, drawBorderAndBack, translate);
             if (drawBorderAndBack) {
                 if (!string.IsNullOrEmpty(filterText) && !FilterMatch(filterText)) {
-                    var c1 = Skin.Color_Back(controldesign, enStates.Standard); // Standard als Notlösung, um nicht doppelt checken zu müssen
+                    var c1 = Skin.Color_Back(controldesign, States.Standard); // Standard als Notlösung, um nicht doppelt checken zu müssen
                     c1 = c1.SetAlpha(160);
                     gr.FillRectangle(new SolidBrush(c1), positionModified);
                 }
@@ -180,7 +180,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         public virtual bool FilterMatch(string filterText) => Internal.ToUpper().Contains(filterText.ToUpper());
 
-        public abstract int HeightForListBox(enBlueListBoxAppearance style, int columnWidth);
+        public abstract int HeightForListBox(BlueListBoxAppearance style, int columnWidth);
 
         public virtual bool IsClickable() => !IsCaption;
 
@@ -198,7 +198,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         protected abstract Size ComputeSizeUntouchedForListBox();
 
-        protected abstract void DrawExplicit(Graphics gr, Rectangle positionModified, enDesign itemdesign, enStates state, bool drawBorderAndBack, bool translate);
+        protected abstract void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate);
 
         protected abstract string GetCompareKey();
 

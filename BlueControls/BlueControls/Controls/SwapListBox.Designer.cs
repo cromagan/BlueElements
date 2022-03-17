@@ -51,8 +51,8 @@ namespace BlueControls.Controls {
             // 
             // Main
             // 
-            this.Main.AddAllowed = BlueControls.Enums.enAddType.Text;
-            this.Main.CheckBehavior = BlueControls.Enums.enCheckBehavior.NoSelection;
+            this.Main.AddAllowed = BlueControls.Enums.AddType.Text;
+            this.Main.CheckBehavior = BlueControls.Enums.CheckBehavior.NoSelection;
             this.Main.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Main.Location = new System.Drawing.Point(0, 0);
             this.Main.Name = "Main";
@@ -66,8 +66,8 @@ namespace BlueControls.Controls {
             // 
             // Suggest
             // 
-            this.Suggest.AddAllowed = BlueControls.Enums.enAddType.None;
-            this.Suggest.CheckBehavior = BlueControls.Enums.enCheckBehavior.NoSelection;
+            this.Suggest.AddAllowed = BlueControls.Enums.AddType.None;
+            this.Suggest.CheckBehavior = BlueControls.Enums.CheckBehavior.NoSelection;
             this.Suggest.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Suggest.FilterAllowed = true;
             this.Suggest.Location = new System.Drawing.Point(0, 0);

@@ -150,32 +150,31 @@
     </Compile>
     <Compile Include="Designer Support\TextBoxActionList.cs" />
     <Compile Include="Designer Support\TextBoxDesigner.cs" />
-    <Compile Include="Enums\enConnectionType.cs" />
-    <Compile Include="Enums\enSnapMode.cs" />
-    <Compile Include="Enums\enDesign.cs" />
-    <Compile Include="Enums\enFilterTypesToShow.cs" />
-    <Compile Include="Enums\enGroupBoxStyle.cs" />
-    <Compile Include="Enums\enPartentType.cs" />
-    <Compile Include="Enums\enHelpers.cs" />
+    <Compile Include="Enums\ConnectionType.cs" />
+    <Compile Include="Enums\SnapMode.cs" />
+    <Compile Include="Enums\Design.cs" />
+    <Compile Include="Enums\FilterTypesToShow.cs" />
+    <Compile Include="Enums\GroupBoxStyle.cs" />
+    <Compile Include="Enums\PartentType.cs" />
+    <Compile Include="Enums\Helpers.cs" />
     <Compile Include="Enums\enSymbol.cs" />
     <Compile Include="Enums\enTableDrawColumn.cs" />
     <Compile Include="Enums\enTableDrawType.cs" />
-    <Compile Include="Enums\enSorceType.cs" />
-    <Compile Include="Enums\enConectorStyle.cs" />
-    <Compile Include="Enums\enASCIIKey.cs" />
-    <Compile Include="Enums\enComboboxStyle.cs" />
-    <Compile Include="Enums\enBlueListBoxAppearance.cs" />
-    <Compile Include="Enums\enAddType.cs" />
-    <Compile Include="Enums\enContextMenuComands.cs" />
-    <Compile Include="Enums\enCS.cs" />
-    <Compile Include="Enums\enExStyle.cs" />
-    <Compile Include="Enums\enKontur.cs" />
-    <Compile Include="Enums\enMarkState.cs" />
-    <Compile Include="Enums\enRahmenArt.cs" />
-    <Compile Include="Enums\enStates.cs" />
+    <Compile Include="Enums\SorceType.cs" />
+    <Compile Include="Enums\ConectorStyle.cs" />
+    <Compile Include="Enums\ASCIIKey.cs" />
+    <Compile Include="Enums\ComboboxStyle.cs" />
+    <Compile Include="Enums\BlueListBoxAppearance.cs" />
+    <Compile Include="Enums\AddType.cs" />
+    <Compile Include="Enums\ContextMenuComands.cs" />
+    <Compile Include="Enums\CS.cs" />
+    <Compile Include="Enums\ExStyle.cs" />
+    <Compile Include="Enums\Kontur.cs" />
+    <Compile Include="Enums\MarkState.cs" />
+    <Compile Include="Enums\RahmenArt.cs" />
+    <Compile Include="Enums\States.cs" />
     <Compile Include="Enums\enWndProc.cs" />
     <Compile Include="Enums\PadStyles.cs" />
-    <Compile Include="Enums\TabControlHitTest.cs" />
     <Compile Include="EventArgs\AdditionalDrawing.cs" />
     <Compile Include="EventArgs\ButtonCellEventArgs.cs" />
     <Compile Include="EventArgs\CellDoubleClickEventArgs.cs" />
@@ -205,11 +204,17 @@
     <Compile Include="Forms\EditBoxRow.Designer.cs">
       <DependentUpon>EditBoxRow.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\frmTableView.cs">
+    <Compile Include="Forms\TableView.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\frmTableView.Designer.cs">
-      <DependentUpon>frmTableView.cs</DependentUpon>
+    <Compile Include="Forms\TableView.Designer.cs">
+      <DependentUpon>TableView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\TableView_OLD.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\TableView_OLD.Designer.cs">
+      <DependentUpon>TableView_OLD.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\InputBoxListBoxStyle.cs">
       <SubType>Form</SubType>
@@ -348,10 +353,10 @@
       <DependentUpon>FilterItem_Editor.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\FileDialogs.cs" />
-    <Compile Include="Enums\enBlueTableAppearance.cs" />
-    <Compile Include="Enums\enButtonStyle.cs" />
-    <Compile Include="Enums\enCheckBehavior.cs" />
-    <Compile Include="Enums\enHintergrundArt.cs" />
+    <Compile Include="Enums\BlueTableAppearance.cs" />
+    <Compile Include="Enums\ButtonStyle.cs" />
+    <Compile Include="Enums\CheckBehavior.cs" />
+    <Compile Include="Enums\HintergrundArt.cs" />
     <Compile Include="Enums\enSteuerelementVerhalten.cs" />
     <Compile Include="Extended Text\ExtCharASCII.cs" />
     <Compile Include="Extended Text\ExtText.cs" />
@@ -416,12 +421,6 @@
     </Compile>
     <Compile Include="BlueDatabaseDialogs\SearchAndReplace.designer.cs">
       <DependentUpon>SearchAndReplace.cs</DependentUpon>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\tabAdministration.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\tabAdministration.Designer.cs">
-      <DependentUpon>tabAdministration.cs</DependentUpon>
     </Compile>
     <Compile Include="Dictionary.cs" />
     <Compile Include="Controls\EasyPic.cs">
@@ -655,10 +654,6 @@
       <DependentUpon>SearchAndReplace.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\tabAdministration.resx">
-      <DependentUpon>tabAdministration.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Controls\EasyPic.resx">
       <DependentUpon>EasyPic.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -694,8 +689,11 @@
       <DependentUpon>EditBoxRow.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\frmTableView.resx">
-      <DependentUpon>frmTableView.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\TableView.resx">
+      <DependentUpon>TableView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TableView_OLD.resx">
+      <DependentUpon>TableView_OLD.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\InputBoxListBoxStyle.resx">

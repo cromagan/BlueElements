@@ -41,7 +41,7 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
-        internal const int Dpi = 300;
+        public const int Dpi = 300;
         internal string Caption;
         internal string Id;
 
@@ -60,7 +60,7 @@ namespace BlueControls.ItemCollection {
         private SizeF _sheetSizeInMm = SizeF.Empty;
         private RowItem? _sheetStyle;
         private float _sheetStyleScale;
-        private enSnapMode _snapMode = enSnapMode.SnapToGrid;
+        private SnapMode _snapMode = SnapMode.SnapToGrid;
 
         #endregion
 
@@ -135,7 +135,7 @@ namespace BlueControls.ItemCollection {
                         break;
 
                     case "snapmode":
-                        _snapMode = (enSnapMode)IntParse(pair.Value);
+                        _snapMode = (SnapMode)IntParse(pair.Value);
                         break;
 
                     case "grid":
@@ -259,7 +259,7 @@ namespace BlueControls.ItemCollection {
         }
 
         [DefaultValue(false)]
-        public enSnapMode SnapMode {
+        public SnapMode SnapMode {
             get => _snapMode;
             set {
                 if (_snapMode == value) { return; }
@@ -319,7 +319,7 @@ namespace BlueControls.ItemCollection {
             OnDoInvalidate();
         }
 
-        public void DrawCreativePadToBitmap(Bitmap? bmp, enStates vState, float zoomf, float x, float y, List<BasicPadItem>? visibleItems) {
+        public void DrawCreativePadToBitmap(Bitmap? bmp, States vState, float zoomf, float x, float y, List<BasicPadItem>? visibleItems) {
             if (bmp == null) { return; }
             var gr = Graphics.FromImage(bmp);
             DrawCreativePadTo(gr, bmp.Size, vState, zoomf, x, y, visibleItems, true);
@@ -486,7 +486,7 @@ namespace BlueControls.ItemCollection {
 
             using var gr = Graphics.FromImage(I);
             gr.Clear(BackColor);
-            if (!DrawCreativePadTo(gr, I.Size, enStates.Standard, scale, r.Left * scale, r.Top * scale, null, true)) {
+            if (!DrawCreativePadTo(gr, I.Size, States.Standard, scale, r.Left * scale, r.Top * scale, null, true)) {
                 return ToBitmap(scale);
             }
 
@@ -519,7 +519,7 @@ namespace BlueControls.ItemCollection {
             return t.TrimEnd(", ") + "}";
         }
 
-        internal bool DrawCreativePadTo(Graphics gr, Size sizeOfParentControl, enStates state, float zoom, float shiftX, float shiftY, List<BasicPadItem>? visibleItems, bool showinprintmode) {
+        internal bool DrawCreativePadTo(Graphics gr, Size sizeOfParentControl, States state, float zoom, float shiftX, float shiftY, List<BasicPadItem>? visibleItems, bool showinprintmode) {
             try {
                 gr.PixelOffsetMode = PixelOffsetMode.None;
 

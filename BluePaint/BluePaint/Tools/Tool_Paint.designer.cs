@@ -31,7 +31,7 @@ namespace BluePaint
             //
             //Stift
             //
-            this.Stift.ButtonStyle = enButtonStyle.Optionbox_Text;
+            this.Stift.ButtonStyle = ButtonStyle.Optionbox_Text;
             this.Stift.Checked = true;
             this.Stift.Location = new System.Drawing.Point(24, 64);
             this.Stift.Name = "Stift";

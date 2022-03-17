@@ -82,14 +82,6 @@ namespace BlueScript.Structures {
 
         #endregion
 
-        //[Obsolete]
-        //public string Value {
-        //    get {
-        //        if (Variable == null) { return string.Empty; }
-        //        return Variable.ValueForReplace;
-        //    }
-        //}
-
         #region Methods
 
         public static DoItFeedback AttributFehler(Method method, SplittedAttributesFeedback f) =>

@@ -28,15 +28,15 @@ namespace BlueControls.ItemCollection {
 
         internal readonly bool ArrowOnMyItem = false;
         internal readonly bool ArrowOnOtherItem = false;
-        internal readonly enConnectionType MyItemType;
+        internal readonly ConnectionType MyItemType;
         internal readonly FixedConnectibleRectangleBitmapPadItem OtherItem;
-        internal readonly enConnectionType OtherItemType;
+        internal readonly ConnectionType OtherItemType;
 
         #endregion
 
         #region Constructors
 
-        public ItemConnection(FixedConnectibleRectangleBitmapPadItem otheritem, enConnectionType otherItemType, enConnectionType myItemType, bool arrowOnMyItem, bool arrowOnOtherItem) {
+        public ItemConnection(FixedConnectibleRectangleBitmapPadItem otheritem, ConnectionType otherItemType, ConnectionType myItemType, bool arrowOnMyItem, bool arrowOnOtherItem) {
             OtherItem = otheritem;
             OtherItemType = otherItemType;
             MyItemType = myItemType;
@@ -48,18 +48,18 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        public static PointF GetConnectionPoint(FixedConnectibleRectangleBitmapPadItem item, enConnectionType itemc, FixedConnectibleRectangleBitmapPadItem otherItem) {
+        public static PointF GetConnectionPoint(FixedConnectibleRectangleBitmapPadItem item, ConnectionType itemc, FixedConnectibleRectangleBitmapPadItem otherItem) {
             switch (itemc) {
-                case enConnectionType.Top:
+                case ConnectionType.Top:
                     return item.UsedArea.PointOf(enAlignment.Top_HorizontalCenter);
 
-                case enConnectionType.Bottom:
+                case ConnectionType.Bottom:
                     return item.UsedArea.PointOf(enAlignment.Bottom_HorizontalCenter);
 
-                case enConnectionType.Left:
+                case ConnectionType.Left:
                     return item.UsedArea.PointOf(enAlignment.VerticalCenter_Left);
 
-                case enConnectionType.Right:
+                case ConnectionType.Right:
                     return item.UsedArea.PointOf(enAlignment.VerticalCenter_Right);
 
                 default:

@@ -195,7 +195,7 @@ namespace BlueControls.ItemCollection {
         protected override string ClassId() => "TEXT";
 
         protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
-            if (Stil == enPadStyles.Undefiniert) { return; }
+            if (Stil == PadStyles.Undefiniert) { return; }
             gr.SetClip(drawingCoordinates);
             var trp = drawingCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
             gr.TranslateTransform(trp.X, trp.Y);
@@ -225,7 +225,7 @@ namespace BlueControls.ItemCollection {
 
         private void MakeNewETxt() {
             _txt = null;
-            if (Stil != enPadStyles.Undefiniert) {
+            if (Stil != PadStyles.Undefiniert) {
                 if (Parent == null) {
                     Develop.DebugPrint(enFehlerArt.Fehler, "Parent is Nothing, wurde das Objekt zu einer Collection hinzugefügt?");
                 } else {

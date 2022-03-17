@@ -120,7 +120,7 @@ namespace BlueDatabase {
             #endregion
 
             if (column.MultiLine && column.Format == enDataFormat.Link_To_Filesystem) { return null; }
-            if (column.ScriptType == enScriptType.Nicht_vorhanden) { return null; }
+            if (column.ScriptType == ScriptType.Nicht_vorhanden) { return null; }
 
             var wert = row.CellGetString(column);
             var qi = "Spalte: " + column.ReadableText();
@@ -155,25 +155,25 @@ namespace BlueDatabase {
             }
 
             switch (column.ScriptType) {
-                case enScriptType.Bool:
+                case ScriptType.Bool:
                     vars.Add(new VariableBool(column.Name, wert == "+", ro, false, qi));
 
                     break;
 
-                case enScriptType.List:
+                case ScriptType.List:
                     vars.Add(new VariableListString(column.Name, wert.SplitAndCutByCrToList(), ro, false, qi));
                     break;
 
-                case enScriptType.Numeral:
+                case ScriptType.Numeral:
                     FloatTryParse(wert, out var f);
                     vars.Add(new VariableFloat(column.Name, f, ro, false, qi));
                     break;
 
-                case enScriptType.String:
+                case ScriptType.String:
                     vars.Add(new VariableString(column.Name, wert, ro, false, qi));
                     break;
 
-                case enScriptType.String_Readonly:
+                case ScriptType.String_Readonly:
                     vars.Add(new VariableString(column.Name, wert, true, false, qi));
                     break;
 
@@ -223,7 +223,7 @@ namespace BlueDatabase {
 
         public string CellGetString(ColumnItem? column) => Database.Cell.GetString(column, this);
 
-        public List<string> CellGetValuesReadable(ColumnItem? column, enShortenStyle style) => Database.Cell.ValuesReadable(column, this, style);
+        public List<string> CellGetValuesReadable(ColumnItem? column, ShortenStyle style) => Database.Cell.ValuesReadable(column, this, style);
 
         public bool CellIsNullOrEmpty(string columnName) => Database.Cell.IsNullOrEmpty(Database.Column[columnName], this);
 
@@ -399,10 +399,10 @@ namespace BlueDatabase {
             if (Database == null) { return false; }
 
             if (filter != null) {
-                if (filter.FilterType is enFilterType.KeinFilter or enFilterType.GroﬂKleinEgal) { return true; } // Filter ohne Funktion
+                if (filter.FilterType is FilterType.KeinFilter or FilterType.GroﬂKleinEgal) { return true; } // Filter ohne Funktion
                 if (filter.Column == null) {
-                    if (!filter.FilterType.HasFlag(enFilterType.GroﬂKleinEgal)) { filter.FilterType |= enFilterType.GroﬂKleinEgal; }
-                    if (filter.FilterType is not enFilterType.Instr_GroﬂKleinEgal and not enFilterType.Instr_UND_GroﬂKleinEgal) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeilenfilter nur mit Instr mˆglich!"); }
+                    if (!filter.FilterType.HasFlag(FilterType.GroﬂKleinEgal)) { filter.FilterType |= FilterType.GroﬂKleinEgal; }
+                    if (filter.FilterType is not FilterType.Instr_GroﬂKleinEgal and not FilterType.Instr_UND_GroﬂKleinEgal) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeilenfilter nur mit Instr mˆglich!"); }
                     if (filter.SearchValue.Count < 1) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeilenfilter nur mit mindestens einem Wert mˆglich"); }
 
                     return filter.SearchValue.All(t => RowFilterMatch(t));
@@ -439,7 +439,7 @@ namespace BlueDatabase {
                 if (!erg.Contains("~")) { return erg; }
                 if (thisColumnItem != null) {
                     var txt = CellGetString(thisColumnItem);
-                    if (fulltext) { txt = CellItem.ValueReadable(thisColumnItem, txt, enShortenStyle.Replaced, enBildTextVerhalten.Nur_Text, removeLineBreaks); }
+                    if (fulltext) { txt = CellItem.ValueReadable(thisColumnItem, txt, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, removeLineBreaks); }
                     if (removeLineBreaks && !fulltext) {
                         txt = txt.Replace("\r\n", " ");
                         txt = txt.Replace("\r", " ");
@@ -554,7 +554,7 @@ namespace BlueDatabase {
                 {
                     if (!thisColumnItem.IgnoreAtRowFilter) {
                         var @string = CellGetString(thisColumnItem);
-                        @string = LanguageTool.ColumnReplace(@string, thisColumnItem, enShortenStyle.Both);
+                        @string = LanguageTool.ColumnReplace(@string, thisColumnItem, ShortenStyle.Both);
                         if (!string.IsNullOrEmpty(@string) && @string.ToUpper().Contains(searchText)) { return true; }
                     }
                 }

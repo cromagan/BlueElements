@@ -281,7 +281,7 @@ namespace BlueControls {
             }
         }
 
-        public static SizeF MeasureStringOfCaption(string text) => MeasureString(text, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
+        public static SizeF MeasureStringOfCaption(string text) => MeasureString(text, Skin.GetBlueFont(Design.Caption, States.Standard).Font());
 
         public SizeF CharSize(float dummyWidth) => new(dummyWidth, _zeilenabstand);
 

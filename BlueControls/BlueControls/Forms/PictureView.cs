@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using System;
 using System.Collections.Generic;
@@ -26,7 +28,7 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        protected readonly List<string>? FileList;
+        protected List<string>? FileList;
         private int _nr = -1;
 
         #endregion

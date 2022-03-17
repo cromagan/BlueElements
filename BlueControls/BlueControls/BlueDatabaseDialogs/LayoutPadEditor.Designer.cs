@@ -94,7 +94,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpLayoutSelection.Controls.Add(this.capLayout);
             this.grpLayoutSelection.Controls.Add(this.cbxLayout);
             this.grpLayoutSelection.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpLayoutSelection.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
+            this.grpLayoutSelection.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpLayoutSelection.Location = new System.Drawing.Point(496, 0);
             this.grpLayoutSelection.Name = "grpLayoutSelection";
             this.grpLayoutSelection.Size = new System.Drawing.Size(232, 81);
@@ -104,7 +104,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnCopyID
             // 
-            this.btnCopyID.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnCopyID.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnCopyID.ImageCode = "Clipboard|16";
             this.btnCopyID.Location = new System.Drawing.Point(176, 2);
             this.btnCopyID.Name = "btnCopyID";
@@ -115,7 +115,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnLayoutUmbenennen
             // 
-            this.btnLayoutUmbenennen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnLayoutUmbenennen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnLayoutUmbenennen.ImageCode = "Stift|16";
             this.btnLayoutUmbenennen.Location = new System.Drawing.Point(120, 46);
             this.btnLayoutUmbenennen.Name = "btnLayoutUmbenennen";
@@ -125,7 +125,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnLayoutLöschen
             // 
-            this.btnLayoutLöschen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnLayoutLöschen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnLayoutLöschen.ImageCode = "MinusZeichen|16";
             this.btnLayoutLöschen.Location = new System.Drawing.Point(72, 46);
             this.btnLayoutLöschen.Name = "btnLayoutLöschen";
@@ -135,7 +135,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnLayoutHinzu
             // 
-            this.btnLayoutHinzu.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnLayoutHinzu.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnLayoutHinzu.ImageCode = "PlusZeichen|16";
             this.btnLayoutHinzu.Location = new System.Drawing.Point(40, 46);
             this.btnLayoutHinzu.Name = "btnLayoutHinzu";
@@ -179,7 +179,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpExterneLayouts.Controls.Add(this.btnLayoutVerzeichnis);
             this.grpExterneLayouts.Controls.Add(this.btnLayoutOeffnen);
             this.grpExterneLayouts.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpExterneLayouts.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
+            this.grpExterneLayouts.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpExterneLayouts.Location = new System.Drawing.Point(728, 0);
             this.grpExterneLayouts.Name = "grpExterneLayouts";
             this.grpExterneLayouts.Size = new System.Drawing.Size(336, 81);
@@ -189,7 +189,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnTextEditor
             // 
-            this.btnTextEditor.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnTextEditor.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnTextEditor.ImageCode = "Textdatei";
             this.btnTextEditor.Location = new System.Drawing.Point(8, 2);
             this.btnTextEditor.Name = "btnTextEditor";
@@ -201,7 +201,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnLayoutVerzeichnis
             // 
-            this.btnLayoutVerzeichnis.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnLayoutVerzeichnis.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnLayoutVerzeichnis.ImageCode = "Ordner|16";
             this.btnLayoutVerzeichnis.Location = new System.Drawing.Point(96, 24);
             this.btnLayoutVerzeichnis.Name = "btnLayoutVerzeichnis";
@@ -212,7 +212,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnLayoutOeffnen
             // 
-            this.btnLayoutOeffnen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnLayoutOeffnen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnLayoutOeffnen.ImageCode = "Anwendung|16";
             this.btnLayoutOeffnen.Location = new System.Drawing.Point(96, 2);
             this.btnLayoutOeffnen.Name = "btnLayoutOeffnen";

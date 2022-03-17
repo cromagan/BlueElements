@@ -37,7 +37,7 @@ namespace BlueControls.Controls {
 
         private readonly object _lockUserAction = new();
 
-        private enDesign _backStyle;
+        private Design _backStyle;
 
         private Rectangle _clickArea;
 
@@ -54,7 +54,7 @@ namespace BlueControls.Controls {
 
         private bool _sliderContainsMouse;
 
-        private enDesign _sliderStyle;
+        private Design _sliderStyle;
 
         private float _value;
 
@@ -165,7 +165,7 @@ namespace BlueControls.Controls {
 
         internal void DoMouseWheel(System.Windows.Forms.MouseEventArgs e) => OnMouseWheel(e);
 
-        protected override void DrawControl(Graphics gr, enStates state) {
+        protected override void DrawControl(Graphics gr, States state) {
             var vStateBack = state;
             var vStateSlider = state;
             _clickAreaContainsMouse = _clickArea.Contains(MousePos().X, MousePos().Y);
@@ -180,18 +180,18 @@ namespace BlueControls.Controls {
                 _slider.Height = 0;
                 _sliderContainsMouse = false;
             }
-            if (Convert.ToBoolean(state & enStates.Standard_MouseOver)) {
+            if (Convert.ToBoolean(state & States.Standard_MouseOver)) {
                 if (_sliderContainsMouse) {
-                    vStateBack ^= enStates.Standard_MouseOver;
+                    vStateBack ^= States.Standard_MouseOver;
                 } else {
-                    vStateSlider ^= enStates.Standard_MouseOver;
+                    vStateSlider ^= States.Standard_MouseOver;
                 }
             }
-            if (Convert.ToBoolean(state & enStates.Standard_MousePressed)) {
+            if (Convert.ToBoolean(state & States.Standard_MousePressed)) {
                 if (_sliderContainsMouse) {
-                    vStateBack ^= enStates.Standard_MousePressed;
+                    vStateBack ^= States.Standard_MousePressed;
                 } else {
-                    vStateSlider ^= enStates.Standard_MousePressed;
+                    vStateSlider ^= States.Standard_MousePressed;
                 }
             }
             Skin.Draw_Back(gr, _backStyle, vStateBack, _clickArea, this, true);
@@ -329,16 +329,16 @@ namespace BlueControls.Controls {
             _sliderContainsMouse = false;
             _clickAreaContainsMouse = false;
             if (_orientation == enOrientation.Waagerecht) {
-                _backStyle = enDesign.Slider_Hintergrund_Waagerecht;
-                _sliderStyle = enDesign.Button_Slider_Waagerecht;
+                _backStyle = Design.Slider_Hintergrund_Waagerecht;
+                _sliderStyle = Design.Button_Slider_Waagerecht;
                 But1.SetBounds(0, 0, ButtonSize, Height);
                 But1.ImageCode = "Pfeil_Links_Scrollbar|8|||||0";
                 But2.SetBounds(Width - ButtonSize, 0, ButtonSize, Height);
                 But2.ImageCode = "Pfeil_Rechts_Scrollbar|8|||||0";
                 _clickArea = new Rectangle(DisplayRectangle.Left + But1.Width, DisplayRectangle.Top, DisplayRectangle.Width - But1.Width - But2.Width, DisplayRectangle.Height);
             } else {
-                _backStyle = enDesign.Slider_Hintergrund_Senkrecht;
-                _sliderStyle = enDesign.Button_Slider_Senkrecht;
+                _backStyle = Design.Slider_Hintergrund_Senkrecht;
+                _sliderStyle = Design.Button_Slider_Senkrecht;
                 But1.ImageCode = "Pfeil_Oben_Scrollbar|8|||||0";
                 But1.SetBounds(0, 0, Width, ButtonSize);
                 But2.ImageCode = "Pfeil_Unten_Scrollbar|8|||||0";

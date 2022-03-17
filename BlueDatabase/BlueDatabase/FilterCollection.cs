@@ -58,7 +58,7 @@ namespace BlueDatabase {
                     f.SearchValue[0] = value;
                     return;
                 }
-                FilterItem fi = new(Database, enFilterType.Instr_UND_GroßKleinEgal, value);
+                FilterItem fi = new(Database, FilterType.Instr_UND_GroßKleinEgal, value);
                 Add(fi);
             }
         }
@@ -67,23 +67,23 @@ namespace BlueDatabase {
 
         #region Indexers
 
-        public FilterItem? this[ColumnItem? column] => this.Where(thisFilterItem => thisFilterItem != null && thisFilterItem.FilterType != enFilterType.KeinFilter).FirstOrDefault(thisFilterItem => thisFilterItem.Column == column);
+        public FilterItem? this[ColumnItem? column] => this.Where(thisFilterItem => thisFilterItem != null && thisFilterItem.FilterType != FilterType.KeinFilter).FirstOrDefault(thisFilterItem => thisFilterItem.Column == column);
 
         #endregion
 
         #region Methods
 
-        public void Add(enFilterType filterType, string filterBy) => AddIfNotExists(new FilterItem(Database, filterType, filterBy));
+        public void Add(FilterType filterType, string filterBy) => AddIfNotExists(new FilterItem(Database, filterType, filterBy));
 
-        public void Add(enFilterType filterType, List<string> filterBy) => AddIfNotExists(new FilterItem(Database, filterType, filterBy));
+        public void Add(FilterType filterType, List<string> filterBy) => AddIfNotExists(new FilterItem(Database, filterType, filterBy));
 
-        public void Add(string columnName, enFilterType filterType, string filterBy) => Add(Database?.Column[columnName], filterType, filterBy);
+        public void Add(string columnName, FilterType filterType, string filterBy) => Add(Database?.Column[columnName], filterType, filterBy);
 
-        public void Add(string columnName, enFilterType filterType, List<string> filterBy) => Add(Database?.Column[columnName], filterType, filterBy);
+        public void Add(string columnName, FilterType filterType, List<string> filterBy) => Add(Database?.Column[columnName], filterType, filterBy);
 
-        public void Add(ColumnItem? column, enFilterType filterType, List<string> filterBy) => AddIfNotExists(new FilterItem(column, filterType, filterBy));
+        public void Add(ColumnItem? column, FilterType filterType, List<string> filterBy) => AddIfNotExists(new FilterItem(column, filterType, filterBy));
 
-        public void Add(ColumnItem? column, enFilterType filterType, string filterBy) => AddIfNotExists(new FilterItem(column, filterType, filterBy));
+        public void Add(ColumnItem? column, FilterType filterType, string filterBy) => AddIfNotExists(new FilterItem(column, filterType, filterBy));
 
         public bool Exists(FilterItem filterItem) {
             foreach (var thisFilter in this) {
@@ -137,9 +137,9 @@ namespace BlueDatabase {
 
         public void Remove_RowFilter() => Remove((ColumnItem)null);
 
-        public void RemoveOtherAndAddIfNotExists(ColumnItem? column, enFilterType filterType, string filterBy, string herkunft) => RemoveOtherAndAddIfNotExists(new FilterItem(column, filterType, filterBy, herkunft));
+        public void RemoveOtherAndAddIfNotExists(ColumnItem? column, FilterType filterType, string filterBy, string herkunft) => RemoveOtherAndAddIfNotExists(new FilterItem(column, filterType, filterBy, herkunft));
 
-        public void RemoveOtherAndAddIfNotExists(string columName, enFilterType filterType, string filterBy, string herkunft) {
+        public void RemoveOtherAndAddIfNotExists(string columName, FilterType filterType, string filterBy, string herkunft) {
             var column = Database.Column[columName];
             if (column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + columName + "' nicht vorhanden."); }
             RemoveOtherAndAddIfNotExists(column, filterType, filterBy, herkunft);
@@ -152,7 +152,7 @@ namespace BlueDatabase {
             Add(filterItem);
         }
 
-        public void RemoveOtherAndAddIfNotExists(string columName, enFilterType filterType, List<string>? filterBy, string herkunft) {
+        public void RemoveOtherAndAddIfNotExists(string columName, FilterType filterType, List<string>? filterBy, string herkunft) {
             var tmp = Database.Column[columName];
             if (tmp == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + columName + "' nicht vorhanden."); }
             RemoveOtherAndAddIfNotExists(new FilterItem(tmp, filterType, filterBy, herkunft));

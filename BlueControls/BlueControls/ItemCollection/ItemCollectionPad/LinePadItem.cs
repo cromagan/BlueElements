@@ -48,11 +48,11 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public LinePadItem(string internalname) : this(internalname, enPadStyles.Style_Standard, Point.Empty, Point.Empty) { }
+        public LinePadItem(string internalname) : this(internalname, PadStyles.Style_Standard, Point.Empty, Point.Empty) { }
 
-        public LinePadItem(enPadStyles format, Point point1, Point point2) : this(string.Empty, format, point1, point2) { }
+        public LinePadItem(PadStyles format, Point point1, Point point2) : this(string.Empty, format, point1, point2) { }
 
-        public LinePadItem(string internalname, enPadStyles format, Point point1, Point point2) : base(internalname) {
+        public LinePadItem(string internalname, PadStyles format, Point point1, Point point2) : base(internalname) {
             _point1 = new PointM(this, "Punkt 1", 0, 0);
             _point2 = new PointM(this, "Punkt 2", 0, 0);
             _point1.SetTo(point1);
@@ -62,14 +62,14 @@ namespace BlueControls.ItemCollection {
             PointsForSuccesfullyMove.AddRange(MovablePoint);
             Stil = format;
             _tempPoints = new List<PointF>();
-            Linien_Verhalten = enConectorStyle.Direct;
+            Linien_Verhalten = ConectorStyle.Direct;
         }
 
         #endregion
 
         #region Properties
 
-        public enConectorStyle Linien_Verhalten { get; set; }
+        public ConectorStyle Linien_Verhalten { get; set; }
 
         #endregion
 
@@ -102,9 +102,9 @@ namespace BlueControls.ItemCollection {
             List<FlexiControl> l = new();
             ItemCollectionList.ItemCollectionList verhalt = new()
             {
-                { "Linie direkt zwischen zwei Punkten", ((int)enConectorStyle.Direct).ToString(), QuickImage.Get(enImageCode.Linie) },
-                { "Linie soll Objekten ausweichen", ((int)enConectorStyle.Ausweichenx).ToString(), QuickImage.Get(enImageCode.Linie) },
-                { "Linie soll Objekten ausweichen und rechtwinklig sein", ((int)enConectorStyle.AusweichenUndGerade).ToString(), QuickImage.Get(enImageCode.Linie) }
+                { "Linie direkt zwischen zwei Punkten", ((int)ConectorStyle.Direct).ToString(), QuickImage.Get(enImageCode.Linie) },
+                { "Linie soll Objekten ausweichen", ((int)ConectorStyle.Ausweichenx).ToString(), QuickImage.Get(enImageCode.Linie) },
+                { "Linie soll Objekten ausweichen und rechtwinklig sein", ((int)ConectorStyle.AusweichenUndGerade).ToString(), QuickImage.Get(enImageCode.Linie) }
             };
             l.Add(new FlexiControlForProperty(this, "Linien-Verhalten", verhalt));
             AddLineStyleOption(l);
@@ -128,7 +128,7 @@ namespace BlueControls.ItemCollection {
             if (base.ParseThis(tag, value)) { return true; }
             switch (tag) {
                 case "connection":
-                    Linien_Verhalten = (enConectorStyle)IntParse(value);
+                    Linien_Verhalten = (ConectorStyle)IntParse(value);
                     return true;
             }
             return false;
@@ -147,7 +147,7 @@ namespace BlueControls.ItemCollection {
         public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
-            if (Linien_Verhalten != enConectorStyle.Direct) { t = t + "Connection=" + (int)Linien_Verhalten + ", "; }
+            if (Linien_Verhalten != ConectorStyle.Direct) { t = t + "Connection=" + (int)Linien_Verhalten + ", "; }
             return t.TrimEnd(", ") + "}";
         }
 
@@ -172,7 +172,7 @@ namespace BlueControls.ItemCollection {
         protected override string ClassId() => "LINE";
 
         protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
-            if (Stil == enPadStyles.Undefiniert) { return; }
+            if (Stil == PadStyles.Undefiniert) { return; }
             CalcTempPoints();
             if (_tempPoints.Count == 0) { return; }
             for (var z = 0; z <= _tempPoints.Count - 2; z++) {
@@ -229,7 +229,7 @@ namespace BlueControls.ItemCollection {
                 _calcTempPointsCode = newCode;
                 _tempPoints = null;
             }
-            if (Linien_Verhalten != enConectorStyle.Direct && _tempPoints != null) {
+            if (Linien_Verhalten != ConectorStyle.Direct && _tempPoints != null) {
                 if (DateTime.Now.Subtract(_lastRecalc).TotalSeconds > 5) {
                     if (DateTime.Now.Subtract(_lastRecalc).TotalSeconds > 5 + Constants.GlobalRND.Next(10)) {
                         _tempPoints = null;
@@ -245,7 +245,7 @@ namespace BlueControls.ItemCollection {
                 _point1,
                 _point2
             };
-            if (Linien_Verhalten == enConectorStyle.Direct) { return; }
+            if (Linien_Verhalten == ConectorStyle.Direct) { return; }
             var count = 0;
             do {
                 count++;
@@ -258,11 +258,11 @@ namespace BlueControls.ItemCollection {
                         again = true;
                         break;
                     }
-                    if (Linien_Verhalten == enConectorStyle.AusweichenUndGerade && Begradige(z)) {
+                    if (Linien_Verhalten == ConectorStyle.AusweichenUndGerade && Begradige(z)) {
                         again = true;
                         break;
                     }
-                    if (Linien_Verhalten is enConectorStyle.AusweichenUndGerade or enConectorStyle.Ausweichenx) {
+                    if (Linien_Verhalten is ConectorStyle.AusweichenUndGerade or ConectorStyle.Ausweichenx) {
                         if (WeicheAus(z)) {
                             again = true;
                             break;
@@ -311,7 +311,7 @@ namespace BlueControls.ItemCollection {
         }
 
         private bool Vereinfache(int p1) {
-            if (Linien_Verhalten != enConectorStyle.AusweichenUndGerade) {
+            if (Linien_Verhalten != ConectorStyle.AusweichenUndGerade) {
                 if (p1 > 0 && p1 < _tempPoints.Count - 1) {
                     if (!SchneidetWas(_tempPoints[p1 - 1].X, _tempPoints[p1 - 1].Y, _tempPoints[p1 + 1].X, _tempPoints[p1 + 1].Y)) {
                         _tempPoints.RemoveAt(p1);

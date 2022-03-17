@@ -230,7 +230,7 @@ namespace BlueControls.Forms
             // 
             // Hochformat
             // 
-            this.Hochformat.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Big_Borderless;
+            this.Hochformat.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Big_Borderless;
             this.Hochformat.ImageCode = "Hochformat";
             this.Hochformat.Location = new System.Drawing.Point(8, 16);
             this.Hochformat.Name = "Hochformat";
@@ -241,7 +241,7 @@ namespace BlueControls.Forms
             // 
             // Querformat
             // 
-            this.Querformat.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Big_Borderless;
+            this.Querformat.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Big_Borderless;
             this.Querformat.ImageCode = "Querformat";
             this.Querformat.Location = new System.Drawing.Point(64, 16);
             this.Querformat.Name = "Querformat";

@@ -78,7 +78,7 @@ namespace BlueControls.Controls {
             InitializeComponent();
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
-            _eTxt = new ExtText(GetDesign(), enStates.Standard);
+            _eTxt = new ExtText(GetDesign(), States.Standard);
             _eTxt.Changed += _eTxt_Changed;
 
             MouseHighlight = false;
@@ -106,8 +106,8 @@ namespace BlueControls.Controls {
 
         #region Properties
 
-        [DefaultValue(enAdditionalCheck.None)]
-        public enAdditionalCheck AdditionalCheck { get; set; } = enAdditionalCheck.None;
+        [DefaultValue(AdditionalCheck.None)]
+        public AdditionalCheck AdditionalCheck { get; set; } = AdditionalCheck.None;
 
         [DefaultValue("")]
         public string AllowedChars {
@@ -372,17 +372,17 @@ namespace BlueControls.Controls {
                 }
             }
             if (this is not ComboBox cbx || cbx.DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
-                items.Add(enContextMenuComands.Ausschneiden, Convert.ToBoolean(_markStart >= 0) && Enabled);
-                items.Add(enContextMenuComands.Kopieren, Convert.ToBoolean(_markStart >= 0));
-                items.Add(enContextMenuComands.Einfügen, System.Windows.Forms.Clipboard.ContainsText() && Enabled);
+                items.Add(ContextMenuComands.Ausschneiden, Convert.ToBoolean(_markStart >= 0) && Enabled);
+                items.Add(ContextMenuComands.Kopieren, Convert.ToBoolean(_markStart >= 0));
+                items.Add(ContextMenuComands.Einfügen, System.Windows.Forms.Clipboard.ContainsText() && Enabled);
                 if (_formatierungErlaubt) {
                     items.AddSeparator();
                     items.Add("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(enImageCode.Sonne, 16), _cursorCharPos > -1);
                     if (Convert.ToBoolean(_markEnd > -1)) {
                         items.AddSeparator();
-                        items.Add("Als Überschrift markieren", "#Caption", Skin.GetBlueFont(enDesign.TextBox_Stufe3, enStates.Standard).SymbolForReadableText(), _markEnd > -1);
-                        items.Add("Fettschrift", "#Bold", Skin.GetBlueFont(enDesign.TextBox_Bold, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_markEnd > -1));
-                        items.Add("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont(enDesign.TextBox, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_markEnd > -1));
+                        items.Add("Als Überschrift markieren", "#Caption", Skin.GetBlueFont(Design.TextBox_Stufe3, States.Standard).SymbolForReadableText(), _markEnd > -1);
+                        items.Add("Fettschrift", "#Bold", Skin.GetBlueFont(Design.TextBox_Bold, States.Standard).SymbolForReadableText(), Convert.ToBoolean(_markEnd > -1));
+                        items.Add("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont(Design.TextBox, States.Standard).SymbolForReadableText(), Convert.ToBoolean(_markEnd > -1));
                     }
                 }
             }
@@ -401,7 +401,7 @@ namespace BlueControls.Controls {
             CheckIfTextIsChanded(_eTxt.HtmlText);
         }
 
-        public void Mark(enMarkState markstate, int first, int last) => _eTxt?.Mark(markstate, first, last);
+        public void Mark(MarkState markstate, int first, int last) => _eTxt?.Mark(markstate, first, last);
 
         public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
@@ -421,7 +421,7 @@ namespace BlueControls.Controls {
             return true;
         }
 
-        public void Unmark(enMarkState markstate) => _eTxt?.Unmark(markstate);
+        public void Unmark(MarkState markstate) => _eTxt?.Unmark(markstate);
 
         // Tastatur
         internal new void KeyPress(enAsciiKey keyAscii) {
@@ -497,7 +497,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        protected override void DrawControl(Graphics gr, enStates state) {
+        protected override void DrawControl(Graphics gr, States state) {
             //if (_eTxt == null) { GenerateETXT(true); }
             //if (state == enStates.Checked_Disabled) {
             //    Develop.DebugPrint("Checked Disabled");
@@ -589,16 +589,16 @@ namespace BlueControls.Controls {
                 Rectangle r = new(_eTxt.Width() + _eTxt.DrawingPos.X, _eTxt.DrawingPos.Y, 1000, 1000);
                 if (_eTxt.Count > 0) {
                     r.X += 2;
-                    Skin.Draw_FormatedText(gr, _suffix, _eTxt.Design, enStates.Standard_Disabled, null, enAlignment.Top_Left, r, this, false, false);
+                    Skin.Draw_FormatedText(gr, _suffix, _eTxt.Design, States.Standard_Disabled, null, enAlignment.Top_Left, r, this, false, false);
                 } else {
-                    Skin.Draw_FormatedText(gr, "[in " + _suffix + "]", _eTxt.Design, enStates.Standard_Disabled, null, enAlignment.Top_Left, r, this, false, true);
+                    Skin.Draw_FormatedText(gr, "[in " + _suffix + "]", _eTxt.Design, States.Standard_Disabled, null, enAlignment.Top_Left, r, this, false, true);
                 }
             }
             Skin.Draw_Border(gr, _eTxt.Design, state, DisplayRectangle);
             if (_mustCheck && !Dictionary.IsSpellChecking && Dictionary.DictionaryRunning(true) && !SpellChecker.CancellationPending && !SpellChecker.IsBusy) { SpellChecker.RunWorkerAsync(); }
         }
 
-        protected virtual enDesign GetDesign() => enDesign.TextBox;
+        protected virtual Design GetDesign() => Design.TextBox;
 
         protected override bool IsInputKey(System.Windows.Forms.Keys keyData) =>
             // Ganz wichtig diese Routine!
@@ -785,7 +785,7 @@ namespace BlueControls.Controls {
             var x = _cursorCharPos;
             MultiUserFileGiveBackEventArgs e = new();
             OnNeedDatabaseOfAdditinalSpecialChars(e);
-            ItemCollectionList i = new(enBlueListBoxAppearance.Listbox)
+            ItemCollectionList i = new(BlueListBoxAppearance.Listbox)
             {
                 //if (e.File is Database DB && DB.Bins.Count > 0) {
                 //    foreach (var bmp in DB.Bins) {
@@ -804,7 +804,7 @@ namespace BlueControls.Controls {
                 { "Kritisch", "Kritisch", QuickImage.Get(enImageCode.Kritisch, 20) },
                 { "Frage", "Frage", QuickImage.Get(enImageCode.Frage, 20) }
             };
-            var r = InputBoxListBoxStyle.Show("Wählen sie:", i, enAddType.None, true);
+            var r = InputBoxListBoxStyle.Show("Wählen sie:", i, AddType.None, true);
             _cursorCharPos = x;
             if (r == null || r.Count != 1) { return; }
             Char_DelBereich(-1, -1);
@@ -927,8 +927,8 @@ namespace BlueControls.Controls {
                 return;
             }
 
-            var state = enStates.Standard;
-            if (!Enabled) { state = enStates.Standard_Disabled; }
+            var state = States.Standard;
+            if (!Enabled) { state = States.Standard_Disabled; }
             _eTxt.State = state;
             _eTxt.Design = GetDesign();
 
@@ -1002,7 +1002,7 @@ namespace BlueControls.Controls {
                         (int)(_eTxt[cc - 1].Pos.X + _eTxt[cc - 1].Size.Width - _eTxt[tmpcharS].Pos.X),
                         (int)(_eTxt[cc - 1].Pos.Y + _eTxt[cc - 1].Size.Height - _eTxt[tmpcharS].Pos.Y));
                     if (r.Width < 2) { r = new Rectangle(r.Left, r.Top, 2, r.Height); }
-                    if (_eTxt[tmpcharS].State != enStates.Undefiniert) {
+                    if (_eTxt[tmpcharS].State != States.Undefiniert) {
                         Skin.Draw_Back(gr, _eTxt.Design, _eTxt[tmpcharS].State, r, null, false);
                         Skin.Draw_Border(gr, _eTxt.Design, _eTxt[tmpcharS].State, r);
                     }
@@ -1120,12 +1120,12 @@ namespace BlueControls.Controls {
 
             switch (x[0]) {
                 case "Unmark":
-                    Unmark(enMarkState.Ringelchen);
+                    Unmark(MarkState.Ringelchen);
                     Invalidate();
                     break;
 
                 case "Mark":
-                    Mark(enMarkState.Ringelchen, IntParse(x[1]), IntParse(x[2]));
+                    Mark(MarkState.Ringelchen, IntParse(x[1]), IntParse(x[2]));
                     Invalidate();
                     break;
 

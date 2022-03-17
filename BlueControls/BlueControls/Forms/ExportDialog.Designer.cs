@@ -211,7 +211,7 @@ namespace BlueControls.Forms
             // 
             // optSpezialFormat
             // 
-            this.optSpezialFormat.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.optSpezialFormat.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
             this.optSpezialFormat.ImageCode = "Diskette";
             this.optSpezialFormat.Location = new System.Drawing.Point(8, 168);
             this.optSpezialFormat.Name = "optSpezialFormat";
@@ -222,7 +222,7 @@ namespace BlueControls.Forms
             // 
             // optBildSchateln
             // 
-            this.optBildSchateln.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.optBildSchateln.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
             this.optBildSchateln.ImageCode = "Diskette";
             this.optBildSchateln.Location = new System.Drawing.Point(8, 120);
             this.optBildSchateln.Name = "optBildSchateln";
@@ -232,7 +232,7 @@ namespace BlueControls.Forms
             // 
             // optSpeichern
             // 
-            this.optSpeichern.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.optSpeichern.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
             this.optSpeichern.Checked = true;
             this.optSpeichern.ImageCode = "Diskette";
             this.optSpeichern.Location = new System.Drawing.Point(8, 24);
@@ -243,7 +243,7 @@ namespace BlueControls.Forms
             // 
             // optDrucken
             // 
-            this.optDrucken.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.optDrucken.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
             this.optDrucken.ImageCode = "Drucker";
             this.optDrucken.Location = new System.Drawing.Point(8, 72);
             this.optDrucken.Name = "optDrucken";
@@ -455,11 +455,11 @@ namespace BlueControls.Forms
             // 
             // lstExported
             // 
-            this.lstExported.AddAllowed = BlueControls.Enums.enAddType.None;
+            this.lstExported.AddAllowed = BlueControls.Enums.AddType.None;
             this.lstExported.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lstExported.CheckBehavior = BlueControls.Enums.enCheckBehavior.NoSelection;
+            this.lstExported.CheckBehavior = BlueControls.Enums.CheckBehavior.NoSelection;
             this.lstExported.FilterAllowed = true;
             this.lstExported.Location = new System.Drawing.Point(8, 40);
             this.lstExported.Name = "lstExported";

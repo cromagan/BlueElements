@@ -33,7 +33,7 @@ namespace BlueControls.Controls {
 
         #region Properties
 
-        public enAddType AddAllowed {
+        public AddType AddAllowed {
             get => Main.AddAllowed;
             set => Main.AddAllowed = value;
         }
@@ -57,7 +57,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        protected override void DrawControl(Graphics gr, enStates state) {
+        protected override void DrawControl(Graphics gr, States state) {
         }
 
         protected void MoveItemBetweenList(ListBox Source, ListBox Target, string Internal, bool doRemove) {

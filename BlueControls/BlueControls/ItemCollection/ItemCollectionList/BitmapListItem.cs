@@ -124,8 +124,8 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Caption.ToUpper().Contains(filterText.ToUpper()) || (_imageFilename != null && _imageFilename.ToUpper().Contains(filterText.ToUpper()));
 
-        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) {
-            if (style == enBlueListBoxAppearance.FileSystem) {
+        public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth) {
+            if (style == BlueListBoxAppearance.FileSystem) {
                 return 110 + (_captionlines * ConstMy);
             }
 
@@ -150,7 +150,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
             return new Size(300, (int)(sc * 300));
         }
 
-        protected override void DrawExplicit(Graphics gr, Rectangle positionModified, enDesign itemdesign, enStates state, bool drawBorderAndBack, bool translate) {
+        protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate) {
             if (drawBorderAndBack) { Skin.Draw_Back(gr, itemdesign, state, positionModified, null, false); }
 
             var drawingCoordinates = positionModified;
@@ -193,7 +193,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
                     //r = new Rectangle(r.Left - trp.X, r.Top - trp.Y, r.Width, r.Height);
                     //GenericControl.Skin.Draw_Back(GR, enDesign.Item_Listbox_Unterschrift, vState, r, null, false);
                     //GenericControl.Skin.Draw_Border(GR, enDesign.Item_Listbox_Unterschrift, vState, r);
-                    Skin.Draw_FormatedText(gr, thisCap, enDesign.Item_Listbox, state, null, enAlignment.Horizontal_Vertical_Center, r, null, false, false);
+                    Skin.Draw_FormatedText(gr, thisCap, Design.Item_Listbox, state, null, enAlignment.Horizontal_Vertical_Center, r, null, false, false);
                 }
             }
             gr.TranslateTransform(-trp.X, -trp.Y);
