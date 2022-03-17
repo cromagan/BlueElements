@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueDatabase.EventArgs;
 using System.Collections.Generic;
@@ -307,7 +309,7 @@ namespace BlueDatabase {
         //            q
         //            var ts3 = TXT.SplitAndCutByCr();
         //            for (var tz = 0; tz <= ts3.GetUpperBound(0); tz++) {
-        //                ts3[tz] = CellItem.ValueReadable(column, ts3[tz], enShortenStyle.HTML, enBildTextVerhalten.Nur_Text, true);
+        //                ts3[tz] = CellItem.ValueReadable(column, ts3[tz], ShortenStyle.HTML, BildTextVerhalten.Nur_Text, true);
         //            }
         //            TXT = string.Join("\r", ts3);
         //            break;

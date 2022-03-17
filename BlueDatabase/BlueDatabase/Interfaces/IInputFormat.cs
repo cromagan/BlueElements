@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
@@ -33,7 +35,7 @@ namespace BlueDatabase.Interfaces {
         public string AllowedChars { get; set; }
 
         //public int BildCode_ConstantHeight { get; set; }
-        //public enBildTextVerhalten BildTextVerhalten { get; set; }
+        //public BildTextVerhalten BildTextVerhalten { get; set; }
         public bool FormatierungErlaubt { get; set; }
 
         public bool MultiLine { get; set; }

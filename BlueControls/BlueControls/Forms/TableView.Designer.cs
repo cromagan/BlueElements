@@ -456,7 +456,7 @@ namespace BlueControls.Forms {
         protected Controls.GroupBox grpAdminAllgemein;
         protected Controls.GroupBox grpAdminImport;
         protected Controls.TabControl tbcSidebar;
-        private System.Windows.Forms.TabPage tabFormula;
+        protected System.Windows.Forms.TabPage tabFormula;
         private System.Windows.Forms.Panel pnlStatusBar;
         public Controls.Caption capStatusbar;
         private Controls.Caption capZeilen2;

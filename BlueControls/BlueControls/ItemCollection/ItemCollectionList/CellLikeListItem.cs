@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System.Drawing;
 using BlueBasics;
 using BlueControls.Controls;
@@ -91,7 +93,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         protected override string GetCompareKey() {
             // Die hauptklasse frägt nach diesem Kompare-Key
-            //var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.HTML, true); // Muss Kompakt sein, um Suffixe zu vermeiden
+            //var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, ShortenStyle.HTML, true); // Muss Kompakt sein, um Suffixe zu vermeiden
             var txt = CellItem.ValueReadable(_styleLikeThis, Internal, ShortenStyle.HTML, _bildTextverhalten, true);
 
             return txt.CompareKey(_styleLikeThis.SortType) + "|" + Internal;

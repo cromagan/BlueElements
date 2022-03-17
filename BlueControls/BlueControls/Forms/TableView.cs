@@ -327,6 +327,10 @@ namespace BlueControls.Forms {
                 Invoke(new Action(() => Table_CursorPosChanged(sender, e)));
                 return;
             }
+
+            if (e.Column != null) { Formula.Database = e.Column.Database; }
+            if (e.RowData != null && e.RowData.Row != null) { Formula.Database = e.RowData.Row.Database; }
+
             Formula.ShowingRowKey = e.Column == null || e.RowData == null || e.RowData.Row == null ? -1 : e.RowData.Row.Key;
         }
 

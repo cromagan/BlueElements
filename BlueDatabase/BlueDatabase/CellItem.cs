@@ -77,7 +77,7 @@ namespace BlueDatabase {
             return new Tuple<string, QuickImage>(tmpText, tmpImageCode);
         }
 
-        //public static enAlignment StandardAlignment(ColumnItem column, enBildTextVerhalten bildTextverhalten) {
+        //public static enAlignment StandardAlignment(ColumnItem column, BildTextVerhalten bildTextverhalten) {
         //    switch (column.Align) {
         //        case enAlignmentHorizontal.Links:
         //            return enAlignment.Top_Left;
@@ -94,7 +94,7 @@ namespace BlueDatabase {
         //            return enAlignment.Top_Right;
 
         //        case enDataFormat.Bit:
-        //            if (bildTextverhalten is enBildTextVerhalten.Nur_Bild or enBildTextVerhalten.Bild_oder_Text) { return enAlignment.Top_HorizontalCenter; }
+        //            if (bildTextverhalten is BildTextVerhalten.Nur_Bild or BildTextVerhalten.Bild_oder_Text) { return enAlignment.Top_HorizontalCenter; }
         //            return enAlignment.Top_Left;
 
         //        default:
@@ -163,7 +163,7 @@ namespace BlueDatabase {
                 case enDataFormat.RelationText:
                 case enDataFormat.Verknüpfung_zu_anderer_Datenbank: // Bei LinkedCell kommt direkt der Text der verlinkten Zelle an
 
-                    //if (column.BildTextVerhalten == enBildTextVerhalten.Interpretiere_Bool) {
+                    //if (column.BildTextVerhalten == BildTextVerhalten.Interpretiere_Bool) {
                     //    if (txt == "+") {
                     //        if (column == column.Database.Column.SysCorrect) { return "Ok"; }
                     //        if (column == column.Database.Column.SysLocked) { return "gesperrt"; }

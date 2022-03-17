@@ -1202,7 +1202,7 @@ namespace BlueDatabase {
             if (_bildTextVerhalten != BildTextVerhalten.Nur_Text) {
                 //if (_Format is enDataFormat.Text) {
                 //    // Performance-Teschnische Gründe
-                //    _BildTextVerhalten = enBildTextVerhalten.Nur_Text;
+                //    _BildTextVerhalten = BildTextVerhalten.Nur_Text;
                 //    //return "Bei diesem Format muss das Bild/Text-Verhalten 'Nur Text' sein.";
                 //}
             }
