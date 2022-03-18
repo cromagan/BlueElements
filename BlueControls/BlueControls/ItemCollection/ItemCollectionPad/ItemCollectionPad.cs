@@ -34,6 +34,7 @@ using System.Windows.Forms;
 using BlueScript.Variables;
 using MessageBox = BlueControls.Forms.MessageBox;
 using static BlueBasics.Converter;
+using static BlueBasics.Generic;
 
 namespace BlueControls.ItemCollection {
 
@@ -42,6 +43,7 @@ namespace BlueControls.ItemCollection {
         #region Fields
 
         public const int Dpi = 300;
+        public static List<BasicPadItem>? PadItemTypes;
         internal string Caption;
         internal string Id;
 
@@ -67,6 +69,8 @@ namespace BlueControls.ItemCollection {
         #region Constructors
 
         public ItemCollectionPad() : base() {
+            if (PadItemTypes == null) { PadItemTypes = GetEnumerableOfType<BasicPadItem>("NAME"); }
+
             if (Skin.StyleDb == null) { Skin.InitStyles(); }
             SheetSizeInMm = Size.Empty;
             RandinMm = Padding.Empty;

@@ -297,6 +297,15 @@ namespace BlueControls.ItemCollection {
             base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, forPrinting);
         }
 
+        protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
+            if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
+                var x = new BitmapPadItem(name);
+                x.Parse(toParse);
+                return x;
+            }
+            return null;
+        }
+
         #endregion
 
         // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält

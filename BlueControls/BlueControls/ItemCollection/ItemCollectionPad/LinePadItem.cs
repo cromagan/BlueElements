@@ -182,6 +182,17 @@ namespace BlueControls.ItemCollection {
 
         protected override void ParseFinished() { }
 
+        protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
+            if (id.Equals("blueelements.clsitemline", StringComparison.OrdinalIgnoreCase) ||
+                     id.Equals("blueelements.itemline", StringComparison.OrdinalIgnoreCase) ||
+                     id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
+                var x = new LinePadItem(name);
+                x.Parse(toParse);
+                return x;
+            }
+            return null;
+        }
+
         private static bool SchneidetDas(BasicPadItem thisBasicItem, PointM p1, PointM p2) {
             if (thisBasicItem == null) { return false; }
             if (thisBasicItem is not LinePadItem) {

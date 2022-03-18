@@ -69,6 +69,8 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
+        public DimensionPadItem(string internalname) : this(internalname, null, null, 0) { }
+
         public DimensionPadItem() : this(string.Empty, null, null, 0) { }
 
         public DimensionPadItem(PointM? point1, PointM? point2, float abstandinMm) : this(string.Empty, point1, point2, abstandinMm) { }
@@ -306,6 +308,17 @@ namespace BlueControls.ItemCollection {
         }
 
         protected override void ParseFinished() => CalculateOtherPoints();
+
+        protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
+            if (id.Equals("blueelements.clsitemimage", StringComparison.OrdinalIgnoreCase) ||
+                     id.Equals("blueelements.imageitem", StringComparison.OrdinalIgnoreCase) ||
+                     id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
+                var x = new DimensionPadItem(name);
+                x.Parse(toParse);
+                return x;
+            }
+            return null;
+        }
 
         private void CalculateOtherPoints() {
             var tmppW = -90;

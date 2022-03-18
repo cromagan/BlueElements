@@ -29,14 +29,14 @@ namespace BlueControls.ItemCollection {
         internal readonly bool ArrowOnMyItem = false;
         internal readonly bool ArrowOnOtherItem = false;
         internal readonly ConnectionType MyItemType;
-        internal readonly FixedConnectibleRectangleBitmapPadItem OtherItem;
+        internal readonly BasicPadItem OtherItem;
         internal readonly ConnectionType OtherItemType;
 
         #endregion
 
         #region Constructors
 
-        public ItemConnection(FixedConnectibleRectangleBitmapPadItem otheritem, ConnectionType otherItemType, ConnectionType myItemType, bool arrowOnMyItem, bool arrowOnOtherItem) {
+        public ItemConnection(BasicPadItem otheritem, ConnectionType otherItemType, ConnectionType myItemType, bool arrowOnMyItem, bool arrowOnOtherItem) {
             OtherItem = otheritem;
             OtherItemType = otherItemType;
             MyItemType = myItemType;
@@ -48,7 +48,7 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        public static PointF GetConnectionPoint(FixedConnectibleRectangleBitmapPadItem item, ConnectionType itemc, FixedConnectibleRectangleBitmapPadItem otherItem) {
+        public static PointF GetConnectionPoint(BasicPadItem item, ConnectionType itemc, BasicPadItem otherItem) {
             switch (itemc) {
                 case ConnectionType.Top:
                     return item.UsedArea.PointOf(enAlignment.Top_HorizontalCenter);

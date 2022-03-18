@@ -18,6 +18,7 @@
 using BlueBasics.Enums;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -124,6 +125,22 @@ namespace BlueBasics {
         }
 
         public static Stream GetEmmbedResource(Assembly assembly, string name) => (from thisString in assembly.GetManifestResourceNames() where thisString.EndsWith("." + name) select assembly.GetManifestResourceStream(thisString)).FirstOrDefault();
+
+        public static List<T> GetEnumerableOfType<T>(params object[] constructorArgs) where T : class {
+            List<T> l = new();
+            foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
+                try {
+                    foreach (var thist in thisas.GetTypes()) {
+                        if (thist.IsClass && !thist.IsAbstract && thist.IsSubclassOf(typeof(T))) {
+                            l.Add((T)Activator.CreateInstance(thist, constructorArgs));
+                        }
+                    }
+                } catch (Exception ex) {
+                    Develop.DebugPrint(enFehlerArt.Info, ex);
+                }
+            }
+            return l;
+        }
 
         public static string GetUrlFileDestination(string filename) {
             var d = File.ReadAllText(filename, Encoding.UTF8).SplitAndCutByCrToList();

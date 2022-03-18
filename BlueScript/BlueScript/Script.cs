@@ -26,6 +26,7 @@ using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.FileOperations;
+using static BlueBasics.Generic;
 
 namespace BlueScript {
 
@@ -169,22 +170,6 @@ namespace BlueScript {
             #endregion Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
 
             return new DoItWithEndedPosFeedback("Kann nicht geparsed werden: " + txt.Substring(pos));
-        }
-
-        public static List<T> GetEnumerableOfType<T>(params object[] constructorArgs) where T : class {
-            List<T> l = new();
-            foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
-                try {
-                    foreach (var thist in thisas.GetTypes()) {
-                        if (thist.IsClass && !thist.IsAbstract && thist.IsSubclassOf(typeof(T))) {
-                            l.Add((T)Activator.CreateInstance(thist, constructorArgs));
-                        }
-                    }
-                } catch (Exception ex) {
-                    Develop.DebugPrint(enFehlerArt.Info, ex);
-                }
-            }
-            return l;
         }
 
         public static string ReduceText(string txt) {

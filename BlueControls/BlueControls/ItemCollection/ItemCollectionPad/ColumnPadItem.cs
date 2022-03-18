@@ -29,7 +29,7 @@ using System.Drawing;
 
 namespace BlueControls.ItemCollection {
 
-    public class ColumnPadItem : FixedConnectibleRectangleBitmapPadItem {
+    public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
         #region Fields
 
@@ -39,13 +39,14 @@ namespace BlueControls.ItemCollection {
 
         public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
 
-        public readonly ColumnItem Column;
+        public ColumnItem? Column;
 
         #endregion
 
         #region Constructors
 
-        //public static BlueFont Column_Filter_Font = BlueFont.Get(Column_Font.FontName, Column_Font.FontSize, false, false, false, false, true, Color.White, Color.Red, false, false, false);
+        public ColumnPadItem(string internalname) : base(internalname) { }
+
         public ColumnPadItem(ColumnItem c) : base(c.Name) => Column = c;
 
         #endregion
@@ -159,6 +160,15 @@ namespace BlueControls.ItemCollection {
             }
 
             return bmp;
+        }
+
+        protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
+            if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
+                var x = new ColumnPadItem(name);
+                x.Parse(toParse);
+                return x;
+            }
+            return null;
         }
 
         #endregion

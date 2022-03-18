@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -27,6 +29,7 @@ using System.Drawing;
 using System.Globalization;
 using BlueScript.Variables;
 using static BlueBasics.Converter;
+using System;
 
 namespace BlueControls.ItemCollection {
 
@@ -57,6 +60,8 @@ namespace BlueControls.ItemCollection {
         #region Constructors
 
         public TextPadItem() : this(string.Empty, string.Empty) { }
+
+        public TextPadItem(string internalname) : this(internalname, string.Empty) { }
 
         public TextPadItem(string internalname, string readableText) : base(internalname) {
             _textReplaced = readableText;
@@ -219,6 +224,17 @@ namespace BlueControls.ItemCollection {
         protected override void ParseFinished() {
             base.ParseFinished();
             InvalidateText();
+        }
+
+        protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
+            if (id.Equals("blueelements.clsitemtext", StringComparison.OrdinalIgnoreCase) ||
+                     id.Equals("blueelements.textitem", StringComparison.OrdinalIgnoreCase) ||
+                     id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
+                var x = new TextPadItem(name);
+                x.Parse(toParse);
+                return x;
+            }
+            return null;
         }
 
         private void InvalidateText() => _txt = null;

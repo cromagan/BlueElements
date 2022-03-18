@@ -73,7 +73,7 @@ namespace BlueControls.Forms {
             var db = _cf.Databases[_cf.Databases.Count - 1];
 
             if (db != null) {
-                var dbitem = new BlueControls.ItemCollection.DatabasePaditem(db, _cf.Databases.Count - 1);
+                var dbitem = new BlueControls.ItemCollection.RowWithFilterPaditem(db, _cf.Databases.Count - 1);
                 Pad.Item.Add(dbitem);
             }
         }

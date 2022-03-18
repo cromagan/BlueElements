@@ -29,7 +29,7 @@ using System.Drawing;
 
 namespace BlueControls.ItemCollection {
 
-    public class DatabasePaditem : FixedConnectibleRectangleBitmapPadItem {
+    public class RowWithFilterPaditem : FixedRectangleBitmapPadItem {
 
         #region Fields
 
@@ -39,22 +39,27 @@ namespace BlueControls.ItemCollection {
 
         public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
 
-        public readonly Database Database;
-
         /// <summary>
         /// Laufende Nummer, bestimmt die einfärbung
         /// </summary>
         public readonly int ID;
 
+        public Database? Database;
+        public FilterCollection? Filter;
+
         #endregion
 
         #region Constructors
 
-        //public static BlueFont Column_Filter_Font = BlueFont.Get(Column_Font.FontName, Column_Font.FontSize, false, false, false, false, true, Color.White, Color.Red, false, false, false);
-        public DatabasePaditem(Database db, int id) : base(db.Filename) {
+        public RowWithFilterPaditem(Database? db, int id) : this(UniqueInternal(), db, id) { }
+
+        public RowWithFilterPaditem(string intern, Database? db, int id) : base(intern) {
             Database = db;
+            if (db != null) { Filter = new FilterCollection(db); }
             ID = id;
         }
+
+        public RowWithFilterPaditem(string intern) : this(intern, null, 0) { }
 
         #endregion
 
@@ -74,7 +79,7 @@ namespace BlueControls.ItemCollection {
 
             l.Add(new FlexiControlForProperty(Database, "Caption"));
             l.Add(new FlexiControlForProperty(this, "Datenbankkopf", enImageCode.Datenbank));
-            //l.Add(new FlexiControl());
+            l.Add(new FlexiControl());
             //l.Add(new FlexiControlForProperty(Column, "Caption"));
             //l.Add(new FlexiControl());
             //l.Add(new FlexiControlForProperty(Column, "Ueberschrift1"));
@@ -101,7 +106,7 @@ namespace BlueControls.ItemCollection {
             return t.Trim(", ") + "}";
         }
 
-        protected override string ClassId() => "Database";
+        protected override string ClassId() => "RowWithFilter";
 
         protected override Bitmap GeneratePic() {
             if (Database == null) {
@@ -138,6 +143,15 @@ namespace BlueControls.ItemCollection {
             //}
 
             return bmp;
+        }
+
+        protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
+            if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
+                var x = new RowWithFilterPaditem(name);
+                x.Parse(toParse);
+                return x;
+            }
+            return null;
         }
 
         #endregion

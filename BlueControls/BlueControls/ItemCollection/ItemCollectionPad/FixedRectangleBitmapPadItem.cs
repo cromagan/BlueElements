@@ -26,11 +26,9 @@ using System.Drawing;
 
 namespace BlueControls.ItemCollection {
 
-    public abstract class FixedConnectibleRectangleBitmapPadItem : BasicPadItem, IDisposable {
+    public abstract class FixedRectangleBitmapPadItem : BasicPadItem, IDisposable {
 
         #region Fields
-
-        public readonly ListExt<ItemConnection> ConnectsTo = new();
 
         private readonly PointM? _pl;
 
@@ -58,7 +56,7 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        protected FixedConnectibleRectangleBitmapPadItem(string internalname) : base(internalname) {
+        protected FixedRectangleBitmapPadItem(string internalname) : base(internalname) {
             _pLo = new PointM(this, "LO", 0, 0);
             _pRo = new PointM(this, "RO", 0, 0);
             _pRu = new PointM(this, "RU", 0, 0);
@@ -86,14 +84,6 @@ namespace BlueControls.ItemCollection {
         }
 
         #endregion
-
-        //public RectangleF BitmapUsedArea {
-        //    get {
-        //        _ = UsedArea;  // um evtl. die Berechnung anzustoßen;
-
-        //        return _bitmapUsedArea;
-        //    }
-        //}
 
         #region Properties
 

@@ -28,7 +28,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection {
 
-    public class RowFormulaPadItem : FixedConnectibleRectangleBitmapPadItem {
+    public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
 
         #region Fields
 
@@ -197,6 +197,15 @@ namespace BlueControls.ItemCollection {
             //if (sizeChangeAllowed) { p_RU.SetTo(p_LO.X + GeneratedBitmap.Width, p_LO.Y + GeneratedBitmap.Height); }
             //SizeChanged();
             return generatedBitmap;
+        }
+
+        protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
+            if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
+                var x = new RowFormulaPadItem(name);
+                x.Parse(toParse);
+                return x;
+            }
+            return null;
         }
 
         private void _Database_Disposing(object sender, System.EventArgs e) {

@@ -349,6 +349,17 @@ namespace BlueControls.ItemCollection {
             base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, forPrinting);
         }
 
+        protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
+            if (id.Equals("blueelements.clsitempad", StringComparison.OrdinalIgnoreCase) ||
+                     id.Equals("blueelements.itempad", StringComparison.OrdinalIgnoreCase) ||
+                     id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
+                var x = new ChildPadItem(name);
+                x.Parse(toParse);
+                return x;
+            }
+            return null;
+        }
+
         private void _Pad_DoInvalidate(object sender, System.EventArgs e) {
             if (IsParsing) { return; }
             OnChanged();

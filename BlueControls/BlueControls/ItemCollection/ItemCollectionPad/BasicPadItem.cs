@@ -37,6 +37,7 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
+        public readonly ListExt<ItemConnection> ConnectsTo = new();
         public readonly ListExt<PointM> MovablePoint = new();
 
         public readonly List<PointM> PointsForSuccesfullyMove = new();
@@ -180,71 +181,19 @@ namespace BlueControls.ItemCollection {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Itemname unbekannt: " + code);
                 return null;
             }
-            switch (ding.ToLower()) {
-                case "blueelements.clsitemtext":
-                case "blueelements.textitem":
-                case "text":
-                    i = new TextPadItem(name, string.Empty);
-                    break;
 
-                case "blueelements.clsitemdistanz": // Todo: Entfernt am 24.05.2021
-                case "blueelements.distanzitem": // Todo: Entfernt am 24.05.2021
-                case "spacer": // Todo: Entfernt am 24.05.2021
-                    i = null;
-                    break;
-
-                case "blueelements.clsitemimage":
-                case "blueelements.imageitem":
-                case "image":
-                    i = new BitmapPadItem(name);
-                    break;
-
-                case "blueelements.clsdimensionitem":
-
-                case "blueelements.dimensionitem":
-
-                case "dimension":
-                    i = new DimensionPadItem(name, null, null, 0);
-                    break;
-
-                case "blueelements.clsitemline":
-                case "blueelements.itemline":
-                case "line":
-                    i = new LinePadItem(name);
-                    break;
-
-                case "blueelements.clsitempad":
-                case "blueelements.itempad":
-                case "childpad":
-                    i = new ChildPadItem(name);
-                    break;
-
-                case "blueelements.clsitemgrid": // Todo: Entfernt am 24.05.2021
-                case "blueelements.itemgrid": // Todo: Entfernt am 24.05.2021
-                case "grid": // Todo: Entfernt am 24.05.2021
-                    i = null;// new GridPadItem(parent, name);
-                    break;
-
-                case "blueelements.rowformulaitem":
-                case "row":
-                    i = new RowFormulaPadItem(name);
-                    break;
-
-                case "symbol":
-                    i = new SymbolPadItem(name);
-                    break;
-
-                default:
-                    Develop.DebugPrint(enFehlerArt.Fehler, "Unbekanntes Item: " + code);
-                    break;
+            if (ItemCollectionPad.PadItemTypes != null) {
+                foreach (var thisType in ItemCollectionPad.PadItemTypes) {
+                    i = thisType.TryParse(ding, name, x);
+                    if (i != null) { return i; }
+                }
             }
 
-            i?.Parse(x);
-            return i;
+            return null;
         }
 
         public static string UniqueInternal() {
-            var neueZeit = DateTime.Now + " " + DateTime.Now.Millisecond;
+            var neueZeit = DateTime.UtcNow.ToString(Constants.Format_Date7).ReduceToChars(Constants.Char_Numerals);
             if (neueZeit == _uniqueInternalLastTime) {
                 _uniqueInternalCount++;
             } else {
@@ -500,6 +449,8 @@ namespace BlueControls.ItemCollection {
 || drawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, sizeOfParentControl));
 
         protected abstract void ParseFinished();
+
+        protected abstract BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse);
 
         private void Points_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
             if (e.Item is PointM p) {

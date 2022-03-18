@@ -304,14 +304,14 @@
     <Compile Include="Forms\Notification.Designer.cs">
       <DependentUpon>Notification.cs</DependentUpon>
     </Compile>
-    <Compile Include="ItemCollection\ItemCollectionPad\DatabasePadItem.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\RowWithFilterPadItem.cs" />
     <Compile Include="ItemCollection\ItemConnection.cs" />
-    <Compile Include="ItemCollection\PhysicPadItem.cs" />
-    <Compile Include="ItemCollection\AbstractPhysicPadItem.cs" />
-    <Compile Include="ItemCollection\DataListItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\GenericConnectebilePadItem.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\PhysicPadItem.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\AbstractPhysicPadItem.cs" />
+    <Compile Include="ItemCollection\ItemCollectionList\DataListItem.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\GenericPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\ColumnPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FixedConnectibleRectangleBitmapPadItem.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\FixedRectangleBitmapPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\RectanglePadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\SymbolPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Temporär\clsKraft.cs" />

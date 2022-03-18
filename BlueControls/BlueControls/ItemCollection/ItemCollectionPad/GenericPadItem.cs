@@ -15,13 +15,21 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection {
+    /// <summary>
+    /// Ein einfaches Item, das immer als Rechteck dargestellt wird
+    /// und einen Text enthalten kann.
+    /// </summary>
 
-    public class GenericConnectebilePadItem : FixedConnectibleRectangleBitmapPadItem {
+    public class GenericPadItem : FixedRectangleBitmapPadItem {
 
         #region Fields
 
@@ -32,11 +40,12 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        //public static BlueFont Column_Filter_Font = BlueFont.Get(Column_Font.FontName, Column_Font.FontSize, false, false, false, false, true, Color.White, Color.Red, false, false, false);
-        public GenericConnectebilePadItem(string intern, string text, Size s) : base(intern) {
+        public GenericPadItem(string intern, string text, Size s) : base(intern) {
             Text = text;
             Size = s;
         }
+
+        public GenericPadItem(string intern) : this(intern, string.Empty, new Size(10, 10)) { }
 
         #endregion
 
@@ -72,6 +81,15 @@ namespace BlueControls.ItemCollection {
             gr.DrawRectangle(font.Pen(1), new Rectangle(0, 0, Size.Width, Size.Height));
 
             return bmp;
+        }
+
+        protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
+            if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
+                var x = new GenericPadItem(name);
+                x.Parse(toParse);
+                return x;
+            }
+            return null;
         }
 
         #endregion

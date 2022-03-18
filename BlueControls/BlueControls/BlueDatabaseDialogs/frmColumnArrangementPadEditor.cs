@@ -413,10 +413,10 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                             #region Database-Item 'databItem' erzeugen
 
-                            var databItem = (GenericConnectebilePadItem)Pad.Item[toCheckCombi];
+                            var databItem = (GenericPadItem)Pad.Item[toCheckCombi];
                             if (databItem == null) {
                                 var nam = thisc.Column.LinkedDatabase.Filename.FileNameWithSuffix();
-                                databItem = new GenericConnectebilePadItem(toCheckCombi, nam, new Size((int)(anyitem.UsedArea.Height / 2), (int)anyitem.UsedArea.Height));
+                                databItem = new GenericPadItem(toCheckCombi, nam, new Size((int)(anyitem.UsedArea.Height / 2), (int)anyitem.UsedArea.Height));
                                 Pad.Item.Add(databItem);
                                 databItem.SetLeftTopPoint(Math.Max(kx, it.UsedArea.Left - databItem.UsedArea.Width), 600);
                                 kx = databItem.UsedArea.Right;

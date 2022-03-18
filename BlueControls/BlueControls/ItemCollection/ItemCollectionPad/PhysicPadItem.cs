@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System;
 using System.Collections.Generic;
 
 namespace BlueControls.ItemCollection {
@@ -29,6 +30,8 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
+        public PhysicPadItem(string internalname) : base(internalname) { }
+
         public PhysicPadItem() : base(string.Empty) { }
 
         #endregion
@@ -36,6 +39,15 @@ namespace BlueControls.ItemCollection {
         #region Methods
 
         protected override string ClassId() => "Physics-Object";
+
+        protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
+            if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
+                var x = new PhysicPadItem(name);
+                x.Parse(toParse);
+                return x;
+            }
+            return null;
+        }
 
         #endregion
     }

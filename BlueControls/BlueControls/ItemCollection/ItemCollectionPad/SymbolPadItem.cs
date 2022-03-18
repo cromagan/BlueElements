@@ -25,6 +25,7 @@ using System.Drawing.Drawing2D;
 using System.Globalization;
 using static BlueBasics.Polygons;
 using static BlueBasics.Converter;
+using System;
 
 namespace BlueControls.ItemCollection {
 
@@ -160,6 +161,15 @@ namespace BlueControls.ItemCollection {
             gr.TranslateTransform(-trp.X, -trp.Y);
             gr.ResetTransform();
             base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, forPrinting);
+        }
+
+        protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
+            if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
+                var x = new SymbolPadItem(name);
+                x.Parse(toParse);
+                return x;
+            }
+            return null;
         }
 
         #endregion
