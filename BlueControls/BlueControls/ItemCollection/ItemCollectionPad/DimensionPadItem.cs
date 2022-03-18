@@ -76,7 +76,7 @@ namespace BlueControls.ItemCollection {
         public DimensionPadItem(PointM? point1, PointM? point2, float abstandinMm) : this(string.Empty, point1, point2, abstandinMm) { }
 
         public DimensionPadItem(string internalname, PointM? point1, PointM? point2, float abstandinMm) : base(internalname) {
-            if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
+            if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben."); }
 
             if (point1 != null) { _point1.SetTo(point1.X, point1.Y); }
             if (point2 != null) { _point2.SetTo(point2.X, point2.Y); }

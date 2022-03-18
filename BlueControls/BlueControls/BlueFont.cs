@@ -116,7 +116,7 @@ namespace BlueControls {
 
                     case "fontsize":
                         FontSize = FloatParse(pair.Value.FromNonCritical());
-                        if (FontSize < 0.1F) { Develop.DebugPrint(enFehlerArt.Fehler, "Fontsize=" + FontSize); }
+                        if (FontSize < 0.1F) { Develop.DebugPrint(FehlerArt.Fehler, "Fontsize=" + FontSize); }
                         break;
 
                     case "color":
@@ -166,7 +166,7 @@ namespace BlueControls {
                         break;
 
                     default:
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
+                        Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
                         break;
                 }
             }
@@ -596,7 +596,7 @@ namespace BlueControls {
                 //etxt.MaxWidth = 500;
                 //etxt.PlainText = Text;
                 //etxt.Draw(gr, 1);
-                Skin.Draw_FormatedText(gr, text, null, enAlignment.Top_Left, new Rectangle(0, 0, 1000, 1000), null, false, this, false);
+                Skin.Draw_FormatedText(gr, text, null, Alignment.Top_Left, new Rectangle(0, 0, 1000, 1000), null, false, this, false);
                 // BlueFont.DrawString(GR,"Text", Font(), Brush_Color_Main, 0, 0) ', System.Drawing.StringFormat.GenericTypographic)
             }
             if (transparent) {

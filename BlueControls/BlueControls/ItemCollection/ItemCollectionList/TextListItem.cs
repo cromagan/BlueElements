@@ -62,13 +62,13 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
             if (drawBorderAndBack) {
                 Skin.Draw_Back(gr, tmpd, vState, positionModified, null, false);
             }
-            Skin.Draw_FormatedText(gr, Text, tmpd, vState, Symbol, enAlignment.VerticalCenter_Left, positionModified, null, false, translate);
+            Skin.Draw_FormatedText(gr, Text, tmpd, vState, Symbol, Alignment.VerticalCenter_Left, positionModified, null, false, translate);
             if (drawBorderAndBack) {
                 Skin.Draw_Border(gr, tmpd, vState, positionModified);
             }
         }
 
-        protected override string GetCompareKey() => Internal.CompareKey(enSortierTyp.Sprachneutral_String);
+        protected override string GetCompareKey() => Internal.CompareKey(SortierTyp.Sprachneutral_String);
 
         private Design TempDesign(Design itemdesign) {
             if (IsCaption) {

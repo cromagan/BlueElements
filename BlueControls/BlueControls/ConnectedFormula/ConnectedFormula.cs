@@ -28,6 +28,7 @@ using static BlueBasics.Extensions;
 using static BlueBasics.Develop;
 using BlueDatabase;
 using BlueBasics;
+using static BlueBasics.Converter;
 
 namespace BlueControls.ConnectedFormula {
 
@@ -39,6 +40,10 @@ namespace BlueControls.ConnectedFormula {
 
         public readonly ListExt<string> DatabaseFiles = new();
         public readonly List<Database?> Databases = new();
+
+        private int _id = 0;
+        private string _padData = string.Empty;
+
         private bool _saved = true;
 
         #endregion
@@ -56,6 +61,15 @@ namespace BlueControls.ConnectedFormula {
 
         public string FilePath { get; set; } = string.Empty;
 
+        public string PadData {
+            get => _padData;
+            set {
+                if (value == _padData) { return; }
+                _padData = value;
+                _saved = false;
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -63,6 +77,12 @@ namespace BlueControls.ConnectedFormula {
         public override void DiscardPendingChanges() => _saved = true;
 
         public override bool HasPendingChanges() => !_saved;
+
+        public int NextID() {
+            _id++;
+            _saved = false;
+            return _id;
+        }
 
         public override void RepairAfterParse() { }
 
@@ -93,8 +113,12 @@ namespace BlueControls.ConnectedFormula {
                         DatabaseFiles.AddRange(pair.Value.FromNonCritical().SplitByCrToList());
                         break;
 
+                    case "ID":
+                        _id = IntParse(pair.Value);
+                        break;
+
                     default:
-                        DebugPrint(enFehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
+                        DebugPrint(FehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
                         break;
                 }
             }
@@ -106,6 +130,7 @@ namespace BlueControls.ConnectedFormula {
             t.TagSet("Type", "ConnectedFormula");
             t.TagSet("Version", Version);
             t.TagSet("FilePath", FilePath.ToNonCritical());
+            t.TagSet("ID", _id.ToString());
             t.TagSet("DatabaseFiles", DatabaseFiles.JoinWithCr().ToNonCritical());
 
             return t.JoinWithCr().WIN1252_toByte();

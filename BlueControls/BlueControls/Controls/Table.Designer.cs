@@ -82,7 +82,7 @@ namespace BlueControls.Controls
             this.SliderY.Enabled = false;
             this.SliderY.Location = new Point(1107, 0);
             this.SliderY.Name = "SliderY";
-            this.SliderY.Orientation = enOrientation.Senkrecht;
+            this.SliderY.Orientation = Orientation.Senkrecht;
             this.SliderY.Size = new Size(18, 432);
             this.SliderY.SmallChange = 16f;
             this.SliderY.ValueChanged += new EventHandler(this.SliderY_ValueChanged);

@@ -37,7 +37,7 @@ namespace BlueBasics {
         public readonly string ChangeGreenTo;
         public readonly string Code;
         public readonly int DrehWinkel;
-        public readonly enImageCodeEffect Effekt;
+        public readonly ImageCodeEffect Effekt;
         public readonly string Färbung;
         public readonly int Helligkeit;
         public readonly string Name;
@@ -62,10 +62,10 @@ namespace BlueBasics {
             var height = -1;
             if (!string.IsNullOrEmpty(w[2])) { IntTryParse(w[2], out height); }
             CorrectSize(width, height, null);
-            Effekt = enImageCodeEffect.Ohne;
+            Effekt = ImageCodeEffect.Ohne;
             if (!string.IsNullOrEmpty(w[3])) {
                 IntTryParse(w[3], out var tmp);
-                Effekt = (enImageCodeEffect)tmp;
+                Effekt = (ImageCodeEffect)tmp;
             }
             Färbung = w[4];
             ChangeGreenTo = w[5];
@@ -87,8 +87,8 @@ namespace BlueBasics {
         public QuickImage(string imagecode, Bitmap bmp) {
             if (string.IsNullOrEmpty(imagecode)) { return; }
 
-            if (Exists(imagecode)) { Develop.DebugPrint(enFehlerArt.Warnung, "Doppeltes Bild:" + imagecode); }
-            if (imagecode.Contains("|")) { Develop.DebugPrint(enFehlerArt.Warnung, "Fehlerhafter Name:" + imagecode); }
+            if (Exists(imagecode)) { Develop.DebugPrint(FehlerArt.Warnung, "Doppeltes Bild:" + imagecode); }
+            if (imagecode.Contains("|")) { Develop.DebugPrint(FehlerArt.Warnung, "Fehlerhafter Name:" + imagecode); }
 
             Name = imagecode;
             Code = Name;
@@ -126,36 +126,36 @@ namespace BlueBasics {
 
         public static bool Exists(string imageCode) => !string.IsNullOrEmpty(imageCode) && Pics.ContainsKey(imageCode);
 
-        public static enImageCode FileTypeImage(enFileFormat file) {
+        public static ImageCode FileTypeImage(FileFormat file) {
             switch (file) {
-                case enFileFormat.WordKind: return enImageCode.Word;
-                case enFileFormat.ExcelKind: return enImageCode.Excel;
-                case enFileFormat.PowerPointKind: return enImageCode.PowerPoint;
-                case enFileFormat.Textdocument: return enImageCode.Textdatei;
-                case enFileFormat.EMail: return enImageCode.Brief;
-                case enFileFormat.Pdf: return enImageCode.PDF;
-                case enFileFormat.HTML: return enImageCode.Globus;
-                case enFileFormat.Image: return enImageCode.Bild;
-                case enFileFormat.CompressedArchive: return enImageCode.Karton;
-                case enFileFormat.Movie: return enImageCode.Filmrolle;
-                case enFileFormat.Executable: return enImageCode.Anwendung;
-                case enFileFormat.HelpFile: return enImageCode.Frage;
-                case enFileFormat.Database: return enImageCode.Datenbank;
-                case enFileFormat.XMLFile: return enImageCode.XML;
-                case enFileFormat.Visitenkarte: return enImageCode.Visitenkarte;
-                case enFileFormat.Sound: return enImageCode.Note;
-                case enFileFormat.Unknown: return enImageCode.Datei;
-                case enFileFormat.ProgrammingCode: return enImageCode.Skript;
-                case enFileFormat.Link: return enImageCode.Undo;
-                case enFileFormat.BlueCreativeFile: return enImageCode.Smiley;
-                case enFileFormat.Icon: return enImageCode.Bild;
+                case FileFormat.WordKind: return ImageCode.Word;
+                case FileFormat.ExcelKind: return ImageCode.Excel;
+                case FileFormat.PowerPointKind: return ImageCode.PowerPoint;
+                case FileFormat.Textdocument: return ImageCode.Textdatei;
+                case FileFormat.EMail: return ImageCode.Brief;
+                case FileFormat.Pdf: return ImageCode.PDF;
+                case FileFormat.HTML: return ImageCode.Globus;
+                case FileFormat.Image: return ImageCode.Bild;
+                case FileFormat.CompressedArchive: return ImageCode.Karton;
+                case FileFormat.Movie: return ImageCode.Filmrolle;
+                case FileFormat.Executable: return ImageCode.Anwendung;
+                case FileFormat.HelpFile: return ImageCode.Frage;
+                case FileFormat.Database: return ImageCode.Datenbank;
+                case FileFormat.XMLFile: return ImageCode.XML;
+                case FileFormat.Visitenkarte: return ImageCode.Visitenkarte;
+                case FileFormat.Sound: return ImageCode.Note;
+                case FileFormat.Unknown: return ImageCode.Datei;
+                case FileFormat.ProgrammingCode: return ImageCode.Skript;
+                case FileFormat.Link: return ImageCode.Undo;
+                case FileFormat.BlueCreativeFile: return ImageCode.Smiley;
+                case FileFormat.Icon: return ImageCode.Bild;
                 default:
                     Develop.DebugPrint(file);
-                    return enImageCode.Datei;
+                    return ImageCode.Datei;
             }
         }
 
-        public static string GenerateCode(string name, int width, int height, enImageCodeEffect effekt, string färbung, string changeGreenTo, int sättigung, int helligkeit, int drehwinkel, int transparenz, string? zweitsymbol) {
+        public static string GenerateCode(string name, int width, int height, ImageCodeEffect effekt, string färbung, string changeGreenTo, int sättigung, int helligkeit, int drehwinkel, int transparenz, string? zweitsymbol) {
             var c = new StringBuilder();
 
             c.Append(name);
@@ -164,7 +164,7 @@ namespace BlueBasics {
             c.Append("|");
             if (height > 0 && width != height) { c.Append(height); }
             c.Append("|");
-            if (effekt != enImageCodeEffect.Ohne) { c.Append((int)effekt); }
+            if (effekt != ImageCodeEffect.Ohne) { c.Append((int)effekt); }
             c.Append("|");
             c.Append(färbung);
             c.Append("|");
@@ -182,7 +182,7 @@ namespace BlueBasics {
             return c.ToString().TrimEnd('|');
         }
 
-        public static QuickImage? Get(QuickImage? imageCode, enImageCodeEffect additionalState) => additionalState == enImageCodeEffect.Ohne ? imageCode
+        public static QuickImage? Get(QuickImage? imageCode, ImageCodeEffect additionalState) => additionalState == ImageCodeEffect.Ohne ? imageCode
 : Get(GenerateCode(imageCode.Name, imageCode.Width, imageCode.Height, imageCode.Effekt | additionalState, imageCode.Färbung, imageCode.ChangeGreenTo, imageCode.Sättigung, imageCode.Helligkeit, imageCode.DrehWinkel, imageCode.Transparenz, imageCode.Zweitsymbol));
 
         public static QuickImage? Get(string imageCode) {
@@ -207,18 +207,18 @@ namespace BlueBasics {
                 w[2] = string.Empty;
                 return Get(w.JoinWith("|"));
             }
-            return Get(GenerateCode(image, squareWidth, 0, enImageCodeEffect.Ohne, string.Empty, string.Empty, 100, 100, 0, 0, string.Empty));
+            return Get(GenerateCode(image, squareWidth, 0, ImageCodeEffect.Ohne, string.Empty, string.Empty, 100, 100, 0, 0, string.Empty));
         }
 
-        public static QuickImage? Get(enImageCode image) => Get(image, 16);
+        public static QuickImage? Get(ImageCode image) => Get(image, 16);
 
-        public static QuickImage? Get(enImageCode image, int squareWidth) => image == enImageCode.None ? null
-: Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, enImageCodeEffect.Ohne, string.Empty, string.Empty, 100, 100, 0, 0, string.Empty));
+        public static QuickImage? Get(ImageCode image, int squareWidth) => image == ImageCode.None ? null
+: Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, ImageCodeEffect.Ohne, string.Empty, string.Empty, 100, 100, 0, 0, string.Empty));
 
-        public static QuickImage? Get(enImageCode image, int squareWidth, string färbung, string changeGreenTo) => image == enImageCode.None ? null
-: Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, enImageCodeEffect.Ohne, färbung, changeGreenTo, 100, 100, 0, 0, string.Empty));
+        public static QuickImage? Get(ImageCode image, int squareWidth, Color färbung, Color changeGreenTo) => image == ImageCode.None ? null
+: Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, ImageCodeEffect.Ohne, färbung.ToHtmlCode(), changeGreenTo.ToHtmlCode(), 100, 100, 0, 0, string.Empty));
 
-        public static QuickImage? Get(enFileFormat file, int size) => Get(FileTypeImage(file), size);
+        public static QuickImage? Get(FileFormat file, int size) => Get(FileTypeImage(file), size);
 
         public static implicit operator Bitmap?(QuickImage? p) {
             //if (!p._generated && !p._generating) { p.Generate(); }
@@ -290,9 +290,9 @@ namespace BlueBasics {
 
             #region Bild ohne besonderen Effekte, schnell abhandeln
 
-            if (bmpOri != null && Effekt == enImageCodeEffect.Ohne && string.IsNullOrEmpty(ChangeGreenTo) && string.IsNullOrEmpty(Färbung) && Sättigung == 100 && Helligkeit == 100 && Transparenz == 100 && string.IsNullOrEmpty(Zweitsymbol)) {
+            if (bmpOri != null && Effekt == ImageCodeEffect.Ohne && string.IsNullOrEmpty(ChangeGreenTo) && string.IsNullOrEmpty(Färbung) && Sättigung == 100 && Helligkeit == 100 && Transparenz == 100 && string.IsNullOrEmpty(Zweitsymbol)) {
                 CloneFromBitmap(bmpOri);
-                Resize(Width, Height, enSizeModes.EmptySpace, InterpolationMode.High, false);
+                Resize(Width, Height, SizeModes.EmptySpace, InterpolationMode.High, false);
                 return;
             }
 
@@ -308,12 +308,12 @@ namespace BlueBasics {
             if (!string.IsNullOrEmpty(ChangeGreenTo)) { colgreen = ChangeGreenTo.FromHtmlCode(); }
             if (!string.IsNullOrEmpty(Färbung)) { colfärb = Färbung.FromHtmlCode(); }
 
-            if (Effekt.HasFlag(enImageCodeEffect.Durchgestrichen)) {
-                var tmpEx = Effekt ^ enImageCodeEffect.Durchgestrichen;
+            if (Effekt.HasFlag(ImageCodeEffect.Durchgestrichen)) {
+                var tmpEx = Effekt ^ ImageCodeEffect.Durchgestrichen;
                 var n = "Kreuz|" + bmpOri.Width + "|";
                 if (bmpOri.Width != bmpOri.Height) { n += bmpOri.Height; }
                 n += "|";
-                if (tmpEx != enImageCodeEffect.Ohne) { n += (int)tmpEx; }
+                if (tmpEx != ImageCodeEffect.Ohne) { n += (int)tmpEx; }
                 bmpKreuz = Get(n.Trim("|"));
             }
             if (!string.IsNullOrEmpty(Zweitsymbol)) {
@@ -340,14 +340,14 @@ namespace BlueBasics {
                         if (colgreen != null && c.ToArgb() == -16711936) { c = (Color)colgreen; }
                         if (colfärb != null) { c = ((Color)colfärb).GetHue().FromHsb(((Color)colfärb).GetSaturation(), c.GetBrightness(), c.A); }
                         if (Sättigung != 100 || Helligkeit != 100) { c = c.GetHue().FromHsb(c.GetSaturation() * Sättigung / 100, c.GetBrightness() * Helligkeit / 100, c.A); }
-                        if (Effekt.HasFlag(enImageCodeEffect.WindowsXPDisabled)) {
+                        if (Effekt.HasFlag(ImageCodeEffect.WindowsXPDisabled)) {
                             var w = (int)(c.GetBrightness() * 100);
                             w = (int)(w / 2.8);
                             c = Extensions.FromHsb(0, 0, (float)((w / 100.0) + 0.5), c.A);
                         }
-                        if (Effekt.HasFlag(enImageCodeEffect.Graustufen)) { c = c.ToGrey(); }
+                        if (Effekt.HasFlag(ImageCodeEffect.Graustufen)) { c = c.ToGrey(); }
                     }
-                    if (Effekt.HasFlag(enImageCodeEffect.Durchgestrichen)) {
+                    if (Effekt.HasFlag(ImageCodeEffect.Durchgestrichen)) {
                         if (c.IsMagentaOrTransparent()) {
                             c = bmpKreuz.GetPixel(x, y);
                         } else {
@@ -357,7 +357,7 @@ namespace BlueBasics {
                     if (!c.IsMagentaOrTransparent() && Transparenz > 0 && Transparenz < 100) {
                         c = Color.FromArgb((int)(c.A * (100 - Transparenz) / 100.0), c.R, c.G, c.B);
                     }
-                    if (Effekt.HasFlag(enImageCodeEffect.WindowsMEDisabled)) {
+                    if (Effekt.HasFlag(ImageCodeEffect.WindowsMEDisabled)) {
                         var c1 = Color.FromArgb(0, 0, 0, 0);
                         if (!c.IsMagentaOrTransparent()) {
                             var randPixel = x > 0 && bmpOri.GetPixel(x - 1, y).IsMagentaOrTransparent() || y > 0 && bmpOri.GetPixel(x, y - 1).IsMagentaOrTransparent();
@@ -378,7 +378,7 @@ namespace BlueBasics {
 
             #endregion
 
-            bmpTmp.Resize(Width, Height, enSizeModes.EmptySpace, InterpolationMode.High, false);
+            bmpTmp.Resize(Width, Height, SizeModes.EmptySpace, InterpolationMode.High, false);
             CloneFromBitmap(bmpTmp);
         }
 

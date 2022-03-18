@@ -64,9 +64,9 @@ namespace BlueControls.Controls {
         #region Constructors
 
         // Für den Designer
-        public FlexiControlForCell() : this(null, -1, enÜberschriftAnordnung.Über_dem_Feld) { }
+        public FlexiControlForCell() : this(null, -1, ÜberschriftAnordnung.Über_dem_Feld) { }
 
-        public FlexiControlForCell(Database? database, long columnKey, enÜberschriftAnordnung captionPosition) : base() {
+        public FlexiControlForCell(Database? database, long columnKey, ÜberschriftAnordnung captionPosition) : base() {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -229,7 +229,7 @@ namespace BlueControls.Controls {
                 DisabledReason = "Kein Bezug zu einer Zelle.";
                 return;
             }
-            DisabledReason = CellCollection.ErrorReason(_tmpColumn, _tmpRow, enErrorReason.EditNormaly); // Rechteverwaltung einfliesen lassen.
+            DisabledReason = CellCollection.ErrorReason(_tmpColumn, _tmpRow, ErrorReason.EditNormaly); // Rechteverwaltung einfliesen lassen.
         }
 
         protected override void OnControlAdded(ControlEventArgs e) {
@@ -775,7 +775,7 @@ namespace BlueControls.Controls {
             if (_tmpColumn == null) {
                 if (string.IsNullOrEmpty(_columnName)) {
                     Caption = string.Empty;
-                    EditType = enEditTypeFormula.None;
+                    EditType = EditTypeFormula.None;
                     QuickInfo = string.Empty;
                     FileEncryptionKey = string.Empty;
                 } else {

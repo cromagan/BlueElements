@@ -34,7 +34,7 @@ using BlueBasics.EventArgs;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
-    public partial class frmColumnArrangementPadEditor : PadEditor {
+    public partial class ColumnArrangementPadEditor : PadEditor {
 
         #region Fields
 
@@ -51,23 +51,21 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Constructors
 
-        public frmColumnArrangementPadEditor(Database database) : this() {
+        public ColumnArrangementPadEditor(Database database) : this() {
             if (database == null || database.ReadOnly) {
-                MessageBox.Show("Datenbank schreibgeschützt.", enImageCode.Information, "OK");
+                MessageBox.Show("Datenbank schreibgeschützt.", ImageCode.Information, "OK");
                 Close();
                 return;
             }
 
             Database = database;
-            Pad.Item.ItemAdded += Item_ItemAdded;
-            Pad.Item.ItemRemoved += Item_ItemRemoved;
             Database.ShouldICancelSaveOperations += TmpDatabase_ShouldICancelDiscOperations;
             Arrangement = 1;
             UpdateCombobox();
             ShowOrder();
         }
 
-        private frmColumnArrangementPadEditor() => InitializeComponent();
+        private ColumnArrangementPadEditor() => InitializeComponent();
 
         #endregion
 
@@ -90,7 +88,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnAktuelleAnsichtLoeschen_Click(object sender, System.EventArgs e) {
             if (Database == null || Arrangement < 2 || Arrangement >= Database.ColumnArrangements.Count) { return; }
-            if (MessageBox.Show("Anordung <b>'" + CurrentArrangement.Name + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            if (MessageBox.Show("Anordung <b>'" + CurrentArrangement.Name + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             Database.ColumnArrangements.RemoveAt(Arrangement);
             Arrangement = 1;
             UpdateCombobox();
@@ -98,13 +96,13 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void btnAlleSpaltenEinblenden_Click(object sender, System.EventArgs e) {
-            if (MessageBox.Show("Alle Spalten anzeigen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            if (MessageBox.Show("Alle Spalten anzeigen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             CurrentArrangement.ShowAllColumns();
             ShowOrder();
         }
 
         private void btnAnsichtUmbenennen_Click(object sender, System.EventArgs e) {
-            var n = InputBox.Show("Umbenennen:", CurrentArrangement.Name, enVarType.Text);
+            var n = InputBox.Show("Umbenennen:", CurrentArrangement.Name, VarType.Text);
             if (!string.IsNullOrEmpty(n)) { CurrentArrangement.Name = n; }
             UpdateCombobox();
         }
@@ -125,18 +123,18 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void btnNeueAnsichtErstellen_Click(object sender, System.EventArgs e) {
             var MitVorlage = false;
             if (Arrangement > 0 && CurrentArrangement != null) {
-                MitVorlage = Convert.ToBoolean(MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", enImageCode.Frage, "Ja", "Nein") == 0);
+                MitVorlage = Convert.ToBoolean(MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", ImageCode.Frage, "Ja", "Nein") == 0);
             }
             if (Database.ColumnArrangements.Count < 1) {
                 Database.ColumnArrangements.Add(new ColumnViewCollection(Database, "", ""));
             }
             string newname;
             if (MitVorlage) {
-                newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", "", enVarType.Text);
+                newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", "", VarType.Text);
                 if (string.IsNullOrEmpty(newname)) { return; }
                 Database.ColumnArrangements.Add(new ColumnViewCollection(Database, CurrentArrangement.ToString(), newname));
             } else {
-                newname = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", "", enVarType.Text);
+                newname = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", "", VarType.Text);
                 if (string.IsNullOrEmpty(newname)) { return; }
                 Database.ColumnArrangements.Add(new ColumnViewCollection(Database, "", newname));
             }
@@ -155,7 +153,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             var mitDaten = false;
             if (vorlage != null && !string.IsNullOrEmpty(vorlage.Identifier)) { vorlage = null; }
             if (vorlage != null) {
-                switch (MessageBox.Show("Spalte '" + vorlage.ReadableText() + "' als<br>Vorlage verwenden?", enImageCode.Frage, "Ja", "Ja, mit allen Daten", "Nein", "Abbrechen")) {
+                switch (MessageBox.Show("Spalte '" + vorlage.ReadableText() + "' als<br>Vorlage verwenden?", ImageCode.Frage, "Ja", "Ja, mit allen Daten", "Nein", "Abbrechen")) {
                     case 0:
                         break;
 
@@ -197,7 +195,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 if (ThisColumnItem != null && CurrentArrangement[ThisColumnItem] == null) { ic.Add(ThisColumnItem); }
             }
             if (ic.Count == 0) {
-                MessageBox.Show("Es werden bereits alle<br>Spalten angezeigt.", enImageCode.Information, "Ok");
+                MessageBox.Show("Es werden bereits alle<br>Spalten angezeigt.", ImageCode.Information, "Ok");
                 return;
             }
             ic.Sort();
@@ -265,7 +263,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                     var currentC = Database.Column.IndexOf(x.Column);
                     if (currentC < 0) {
-                        MessageBox.Show("Interner Fehler", enImageCode.Warnung, "OK");
+                        MessageBox.Show("Interner Fehler", ImageCode.Warnung, "OK");
                         ShowOrder();
                         Fixing--;
                         return;
@@ -297,7 +295,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                     #region Code für Ansicht 0
 
                     var col = Database.Column[c.Count - 1];
-                    if (string.IsNullOrEmpty(col.Identifier) && MessageBox.Show("Spalte <b>" + col.ReadableText() + "</b> endgültig löschen?", enImageCode.Warnung, "Ja", "Nein") == 0) {
+                    if (string.IsNullOrEmpty(col.Identifier) && MessageBox.Show("Spalte <b>" + col.ReadableText() + "</b> endgültig löschen?", ImageCode.Warnung, "Ja", "Nein") == 0) {
                         Database.Column.Remove(col);
                     }
                     did = true;

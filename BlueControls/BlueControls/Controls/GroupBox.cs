@@ -85,7 +85,7 @@ namespace BlueControls.Controls {
                     Skin.Draw_Border(e.Graphics, Design.RibbonBar_Frame, state, r);
                     if (!string.IsNullOrEmpty(Text)) {
                         Rectangle bottomTxt = new(0, 0, Width, Height + 2);
-                        Skin.Draw_FormatedText(e.Graphics, Text, Design.RibbonBar_Frame, state, null, enAlignment.Bottom_HorizontalCenter, bottomTxt, this, false, true);
+                        Skin.Draw_FormatedText(e.Graphics, Text, Design.RibbonBar_Frame, state, null, Alignment.Bottom_HorizontalCenter, bottomTxt, this, false, true);
                     }
                     break;
 
@@ -94,7 +94,7 @@ namespace BlueControls.Controls {
                         Skin.Draw_Border(e.Graphics, Design.GroupBox, state, r);
                         if (!string.IsNullOrEmpty(Text)) {
                             Rectangle topTxt = new(Skin.Padding, 0, Width, Height);
-                            Skin.Draw_FormatedText(e.Graphics, Text, Design.GroupBox, state, null, enAlignment.Top_Left, topTxt, this, true, true);
+                            Skin.Draw_FormatedText(e.Graphics, Text, Design.GroupBox, state, null, Alignment.Top_Left, topTxt, this, true, true);
                         }
                     }
                     break;
@@ -104,7 +104,7 @@ namespace BlueControls.Controls {
                         Skin.Draw_Border(e.Graphics, Design.GroupBoxBold, state, r);
                         if (!string.IsNullOrEmpty(Text)) {
                             Rectangle topTxt = new(Skin.Padding, Skin.PaddingSmal, Width, Height);
-                            Skin.Draw_FormatedText(e.Graphics, Text, Design.GroupBoxBold, state, null, enAlignment.Top_Left, topTxt, this, false, true);
+                            Skin.Draw_FormatedText(e.Graphics, Text, Design.GroupBoxBold, state, null, Alignment.Top_Left, topTxt, this, false, true);
                         }
                     }
                     break;

@@ -23,7 +23,7 @@ namespace BlueDatabase.EventArgs {
 
         #region Constructors
 
-        public MessageEventArgs(enFehlerArt type, string message) {
+        public MessageEventArgs(FehlerArt type, string message) {
             Message = message;
             Type = type;
             WrittenToLogifile = false;
@@ -36,7 +36,7 @@ namespace BlueDatabase.EventArgs {
 
         public string Message { get; }
         public bool Shown { get; set; }
-        public enFehlerArt Type { get; }
+        public FehlerArt Type { get; }
         public bool WrittenToLogifile { get; set; }
 
         #endregion

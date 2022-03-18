@@ -91,7 +91,7 @@ namespace BlueControls.Forms {
         }
 
         private void btnAddImage_Click(object sender, System.EventArgs e) {
-            BitmapPadItem b = new(QuickImage.Get(enImageCode.Fragezeichen), new Size(1000, 1000));
+            BitmapPadItem b = new(QuickImage.Get(ImageCode.Fragezeichen), new Size(1000, 1000));
             Pad.Item.Add(b);
         }
 

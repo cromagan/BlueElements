@@ -83,9 +83,9 @@ namespace BlueControls.BlueDatabaseDialogs {
         [DefaultValue(FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter)]
         public FilterTypesToShow Filtertypes { get; set; } = FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter;
 
-        [DefaultValue(enOrientation.Waagerecht)]
+        [DefaultValue(BlueBasics.Enums.Orientation.Waagerecht)]
         [Obsolete("Wird zukünftig entfernt werden", false)]
-        public enOrientation Orientation { get; set; } = enOrientation.Waagerecht;
+        public BlueBasics.Enums.Orientation Orientation { get; set; } = BlueBasics.Enums.Orientation.Waagerecht;
 
         [DefaultValue((Table)null)]
         public Table? Table {
@@ -152,7 +152,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             #region Variablen für Waagerecht / Senkrecht bestimmen
 
-            if (Orientation == enOrientation.Waagerecht) {
+            if (Orientation == BlueBasics.Enums.Orientation.Waagerecht) {
                 toppos = btnAlleFilterAus.Top;
                 var beginnx = btnPinZurück.Right + (Skin.Padding * 3);
                 leftpos = beginnx;
@@ -309,7 +309,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             var r = _tableView.Database.Row.CalculateFilteredRows(fl);
             if (r == null || r.Count != 1 || _ähnliche == null || _ähnliche.Count == 0) {
-                MessageBox.Show("Aktion fehlgeschlagen", enImageCode.Information, "OK");
+                MessageBox.Show("Aktion fehlgeschlagen", ImageCode.Information, "OK");
                 return;
             }
 
@@ -366,7 +366,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (AutoPin && r != null && r.Count == 1) {
                 if (_lastLooked != r[0].CellFirstString()) {
                     if (_tableView.SortedRows().Get(r[0]) == null) {
-                        if (MessageBox.Show("Die Zeile wird durch Filterungen <b>ausgeblendet</b>.<br>Soll sie zusätzlich <b>angepinnt</b> werden?", enImageCode.Pinnadel, "Ja", "Nein") == 0) {
+                        if (MessageBox.Show("Die Zeile wird durch Filterungen <b>ausgeblendet</b>.<br>Soll sie zusätzlich <b>angepinnt</b> werden?", ImageCode.Pinnadel, "Ja", "Nein") == 0) {
                             _tableView.PinAdd(r[0]);
                         }
                         _lastLooked = r[0].CellFirstString();
@@ -393,7 +393,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void Filterleiste_SizeChanged(object sender, System.EventArgs e) {
-            if (Orientation == enOrientation.Waagerecht) { FillFilters(); }
+            if (Orientation == BlueBasics.Enums.Orientation.Waagerecht) { FillFilters(); }
         }
 
         private FlexiControlForFilter? FlexiItemOf(FilterItem filter) {
@@ -407,7 +407,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void Flx_ButtonClicked(object sender, System.EventArgs e) {
             var f = (FlexiControlForFilter)sender;
-            if (f.CaptionPosition == enÜberschriftAnordnung.ohne) {
+            if (f.CaptionPosition == ÜberschriftAnordnung.ohne) {
                 // ein Großer Knopf ohne Überschrift, da wird der evl. Filter gelöscht
                 _tableView.Filter.Remove(((FlexiControlForFilter)sender).Filter);
                 return;
@@ -424,7 +424,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void Flx_ValueChanged(object sender, System.EventArgs e) {
             if (_isFilling) { return; }
             if (sender is FlexiControlForFilter flx) {
-                if (flx.EditType == enEditTypeFormula.Button) { return; }
+                if (flx.EditType == EditTypeFormula.Button) { return; }
                 if (_tableView == null) { return; }
                 var isFilter = flx.WasThisValueClicked(); //  flx.Value.StartsWith("|");
                 //flx.Filter.Herkunft = "Filterleiste";

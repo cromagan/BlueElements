@@ -91,7 +91,7 @@ namespace BlueDatabase {
             if (!OriginalString.Contains(o)) { return OriginalString; }
             var n = ParsableColumnKey(NewKey);
             if (OldKey == NewKey) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Schlüssel gleich:  " + OldKey);
+                Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel gleich:  " + OldKey);
                 return OriginalString;
             }
             OriginalString = OriginalString.Replace(o + "}", n + "}");
@@ -99,7 +99,7 @@ namespace BlueDatabase {
             OriginalString = OriginalString.Replace(o + " ", n + " ");
             if (OriginalString.EndsWith(o)) { OriginalString = OriginalString.TrimEnd(o) + n; }
             if (OriginalString.Contains(o)) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "String nicht ersetzt: " + OriginalString);
+                Develop.DebugPrint(FehlerArt.Fehler, "String nicht ersetzt: " + OriginalString);
                 return OriginalString;
             }
             return OriginalString;
@@ -108,19 +108,19 @@ namespace BlueDatabase {
         [Obsolete("Direkter Aufruf nicht erlaubt!", true)]
         public new ColumnItem? Add(ColumnItem column) => null;
 
-        public ColumnItem Add(string internalName) => Add(NextColumnKey(), internalName, internalName, string.Empty, enVarType.Text, string.Empty);
+        public ColumnItem Add(string internalName) => Add(NextColumnKey(), internalName, internalName, string.Empty, VarType.Text, string.Empty);
 
-        public ColumnItem Add(long colKey) => Add(colKey, string.Empty, string.Empty, string.Empty, enVarType.Text, string.Empty);
+        public ColumnItem Add(long colKey) => Add(colKey, string.Empty, string.Empty, string.Empty, VarType.Text, string.Empty);
 
-        public ColumnItem Add() => Add(NextColumnKey(), string.Empty, string.Empty, string.Empty, enVarType.Text, string.Empty);
+        public ColumnItem Add() => Add(NextColumnKey(), string.Empty, string.Empty, string.Empty, VarType.Text, string.Empty);
 
-        public ColumnItem Add(string internalName, string caption, enVarType format) => Add(NextColumnKey(), internalName, caption, string.Empty, format, string.Empty);
+        public ColumnItem Add(string internalName, string caption, VarType format) => Add(NextColumnKey(), internalName, caption, string.Empty, format, string.Empty);
 
-        public ColumnItem Add(string internalName, string caption, enVarType format, string quickinfo) => Add(NextColumnKey(), internalName, caption, string.Empty, format, quickinfo);
+        public ColumnItem Add(string internalName, string caption, VarType format, string quickinfo) => Add(NextColumnKey(), internalName, caption, string.Empty, format, quickinfo);
 
-        public ColumnItem Add(string internalName, string caption, string suffix, enVarType format) => Add(NextColumnKey(), internalName, caption, suffix, format, string.Empty);
+        public ColumnItem Add(string internalName, string caption, string suffix, VarType format) => Add(NextColumnKey(), internalName, caption, suffix, format, string.Empty);
 
-        public ColumnItem Add(long colKey, string internalName, string caption, string suffix, enVarType format, string quickinfo) {
+        public ColumnItem Add(long colKey, string internalName, string caption, string suffix, VarType format, string quickinfo) {
             Database.AddPending(DatabaseDataType.AddColumn, colKey, -1, string.Empty, colKey.ToString(), true);
             // Ruft anschließen AddFromParserAuf, der die Spalte endgülrig dazumacht
             var c = SearchByKey(colKey);
@@ -138,14 +138,14 @@ namespace BlueDatabase {
         /// <param name="column"></param>
         /// <returns></returns>
         public void AddFromParser(ColumnItem? column) {
-            if (column.Database != Database) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent-Datenbanken unterschiedlich!"); }
-            if (Contains(column)) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte bereits vorhanden!"); }
+            if (column.Database != Database) { Develop.DebugPrint(FehlerArt.Fehler, "Parent-Datenbanken unterschiedlich!"); }
+            if (Contains(column)) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte bereits vorhanden!"); }
             base.Add(column);
         }
 
         public ColumnItem? Exists(string columnName) {
             if (Database == null) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Database ist null bei " + columnName);
+                Develop.DebugPrint(FehlerArt.Fehler, "Database ist null bei " + columnName);
                 return null;
             }
             if (string.IsNullOrEmpty(columnName)) {
@@ -253,7 +253,7 @@ namespace BlueDatabase {
                         break;
 
                     default:
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Unbekannte Kennung: " + ThisColumnItem.Identifier);
+                        Develop.DebugPrint(FehlerArt.Fehler, "Unbekannte Kennung: " + ThisColumnItem.Identifier);
                         break;
                 }
             }

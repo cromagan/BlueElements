@@ -30,6 +30,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
+using System.Drawing;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
@@ -96,7 +97,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 if (string.IsNullOrEmpty(feh)) { feh = _column.ErrorReason(); }
             }
             if (!string.IsNullOrEmpty(feh)) {
-                MessageBox.Show("<b><u>Bitte korrigieren sie zuerst folgenden Fehler:</u></b><br>" + feh, enImageCode.Warnung, "Ok");
+                MessageBox.Show("<b><u>Bitte korrigieren sie zuerst folgenden Fehler:</u></b><br>" + feh, ImageCode.Warnung, "Ok");
                 return false;
             }
 
@@ -107,7 +108,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void btnBackColor_Click(object sender, System.EventArgs e) {
             ColorDia.Color = QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo.FromHtmlCode();
             ColorDia.ShowDialog();
-            btnBackColor.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", ColorDia.Color.ToHtmlCode()).ToString();
+            btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToString();
         }
 
         private void btnOk_Click(object sender, System.EventArgs e) {
@@ -192,7 +193,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void btnTextColor_Click(object sender, System.EventArgs e) {
             ColorDia.Color = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo.FromHtmlCode();
             ColorDia.ShowDialog();
-            btnTextColor.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", ColorDia.Color.ToHtmlCode()).ToString();
+            btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToString();
         }
 
         private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(_column.Verwendung());
@@ -297,7 +298,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             cbxAdditionalCheck.Item.AddRange(typeof(AdditionalCheck));
             cbxScriptType.Item.AddRange(typeof(ScriptType));
             cbxTranslate.Item.AddRange(typeof(TranslationType));
-            cbxSort.Item.AddRange(typeof(enSortierTyp));
+            cbxSort.Item.AddRange(typeof(SortierTyp));
             cbxLinkedDatabase.Item.Clear();
             if (!string.IsNullOrEmpty(_column.Database.Filename)) {
                 var all = Directory.GetFiles(_column.Database.Filename.FilePath(), "*.mdb", SearchOption.TopDirectoryOnly);
@@ -307,22 +308,22 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
             cbxLinkedDatabase.Item.Sort();
             if (cbxEinheit.Item.Count < 1) {
-                cbxEinheit.Item.Add("µm", enImageCode.Lineal);
-                cbxEinheit.Item.Add("mm", enImageCode.Lineal);
-                cbxEinheit.Item.Add("cm", enImageCode.Lineal);
-                cbxEinheit.Item.Add("dm", enImageCode.Lineal);
-                cbxEinheit.Item.Add("m", enImageCode.Lineal);
-                cbxEinheit.Item.Add("km", enImageCode.Lineal);
-                cbxEinheit.Item.Add("mm²", enImageCode.GrößeÄndern);
-                cbxEinheit.Item.Add("m²", enImageCode.GrößeÄndern);
-                cbxEinheit.Item.Add("µg", enImageCode.Gewicht);
-                cbxEinheit.Item.Add("mg", enImageCode.Gewicht);
-                cbxEinheit.Item.Add("g", enImageCode.Gewicht);
-                cbxEinheit.Item.Add("kg", enImageCode.Gewicht);
-                cbxEinheit.Item.Add("t", enImageCode.Gewicht);
-                cbxEinheit.Item.Add("h", enImageCode.Uhr);
-                cbxEinheit.Item.Add("min", enImageCode.Uhr);
-                cbxEinheit.Item.Add("St.", enImageCode.Eins);
+                cbxEinheit.Item.Add("µm", ImageCode.Lineal);
+                cbxEinheit.Item.Add("mm", ImageCode.Lineal);
+                cbxEinheit.Item.Add("cm", ImageCode.Lineal);
+                cbxEinheit.Item.Add("dm", ImageCode.Lineal);
+                cbxEinheit.Item.Add("m", ImageCode.Lineal);
+                cbxEinheit.Item.Add("km", ImageCode.Lineal);
+                cbxEinheit.Item.Add("mm²", ImageCode.GrößeÄndern);
+                cbxEinheit.Item.Add("m²", ImageCode.GrößeÄndern);
+                cbxEinheit.Item.Add("µg", ImageCode.Gewicht);
+                cbxEinheit.Item.Add("mg", ImageCode.Gewicht);
+                cbxEinheit.Item.Add("g", ImageCode.Gewicht);
+                cbxEinheit.Item.Add("kg", ImageCode.Gewicht);
+                cbxEinheit.Item.Add("t", ImageCode.Gewicht);
+                cbxEinheit.Item.Add("h", ImageCode.Uhr);
+                cbxEinheit.Item.Add("min", ImageCode.Uhr);
+                cbxEinheit.Item.Add("St.", ImageCode.Eins);
             }
             lbxCellEditor.Suggestions.Clear();
             lbxCellEditor.Suggestions.AddRange(_column.Database.Permission_AllUsed(true));
@@ -345,8 +346,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             tbxName.Text = _column.Name;
             tbxName.AllowedChars = Constants.AllowedCharsVariableName;
             tbxCaption.Text = _column.Caption;
-            btnBackColor.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", _column.BackColor.ToHtmlCode()).ToString();
-            btnTextColor.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", _column.ForeColor.ToHtmlCode()).ToString();
+            btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, _column.BackColor).ToString();
+            btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, _column.ForeColor).ToString();
             btnMultiline.Checked = _column.MultiLine;
             cbxFormat.Text = ((int)_column.Format).ToString();
             cbxRandLinks.Text = ((int)_column.LineLeft).ToString();
@@ -518,7 +519,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _column.AdditionalCheck = (AdditionalCheck)IntParse(cbxAdditionalCheck.Text);
             _column.ScriptType = (ScriptType)IntParse(cbxScriptType.Text);
             _column.Translate = (TranslationType)IntParse(cbxTranslate.Text);
-            _column.SortType = (enSortierTyp)IntParse(cbxSort.Text);
+            _column.SortType = (SortierTyp)IntParse(cbxSort.Text);
             _column.AutoRemove = txbAutoRemove.Text;
             _column.SaveContent = butSaveContent.Checked;
             GetLinkedCellFilter();
@@ -542,11 +543,11 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (tblFilterliste.Database == null) {
                 Database x = new(false);
-                x.Column.Add("count", "count", enVarType.Integer);
-                var vis = x.Column.Add("visible", "visible", enVarType.Bit);
-                var sp = x.Column.Add("Spalte", "Spalte", enVarType.Text);
+                x.Column.Add("count", "count", VarType.Integer);
+                var vis = x.Column.Add("visible", "visible", VarType.Bit);
+                var sp = x.Column.Add("Spalte", "Spalte", VarType.Text);
                 sp.Align = AlignmentHorizontal.Rechts;
-                var b = x.Column.Add("Such", "Suchtext", enVarType.Text);
+                var b = x.Column.Add("Such", "Suchtext", VarType.Text);
                 b.Quickinfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum suchen<br>Mischen wird nicht unterstützt.";
                 b.MultiLine = false;
                 b.TextBearbeitungErlaubt = true;

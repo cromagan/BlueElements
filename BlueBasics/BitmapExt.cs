@@ -383,7 +383,7 @@ namespace BlueBasics {
                 bitmap = new Bitmap(outStream);
             }
             if (maxSize > 0) {
-                bitmap = Resize(bitmap, maxSize, maxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
+                bitmap = Resize(bitmap, maxSize, maxSize, SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
             }
             return bitmap;
         }
@@ -394,10 +394,10 @@ namespace BlueBasics {
             using var d = Generic.GetEmmbedResource(assembly, name);
             if (d == null) { return null; }
             switch (name.FileType()) {
-                case enFileFormat.Image:
+                case FileFormat.Image:
                     return new BitmapExt(new Bitmap(d));
 
-                case enFileFormat.Icon:
+                case FileFormat.Icon:
                     return new BitmapExt(new Icon(d));
 
                 default:
@@ -449,89 +449,89 @@ namespace BlueBasics {
             }
         }
 
-        public static Bitmap? ImageBlurFilter(Bitmap? bmp, enBlurType blurType) {
+        public static Bitmap? ImageBlurFilter(Bitmap? bmp, BlurType blurType) {
             if (bmp == null) { return null; }
 
             Bitmap? resultBitmap = null;
             switch (blurType) {
-                case enBlurType.Mean3x3:
+                case BlurType.Mean3x3:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.Mean3X3, 1.0 / 9.0, 0);
                     break;
 
-                case enBlurType.Mean5x5:
+                case BlurType.Mean5x5:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.Mean5X5, 1.0 / 25.0, 0);
                     break;
 
-                case enBlurType.Mean7x7:
+                case BlurType.Mean7x7:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.Mean7X7, 1.0 / 49.0, 0);
                     break;
 
-                case enBlurType.Mean9x9:
+                case BlurType.Mean9x9:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.Mean9X9, 1.0 / 81.0, 0);
 
                     break;
 
-                case enBlurType.GaussianBlur3x3:
+                case BlurType.GaussianBlur3x3:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.GaussianBlur3X3, 1.0 / 16.0, 0);
                     break;
 
-                case enBlurType.GaussianBlur5x5:
+                case BlurType.GaussianBlur5x5:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.GaussianBlur5X5, 1.0 / 159.0, 0);
                     break;
 
-                case enBlurType.MotionBlur5x5:
+                case BlurType.MotionBlur5x5:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur5X5, 1.0 / 10.0, 0);
                     break;
 
-                case enBlurType.MotionBlur5x5At45Degrees:
+                case BlurType.MotionBlur5x5At45Degrees:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur5X5At45Degrees, 1.0 / 5.0, 0);
                     break;
 
-                case enBlurType.MotionBlur5x5At135Degrees:
+                case BlurType.MotionBlur5x5At135Degrees:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur5X5At135Degrees, 1.0 / 5.0, 0);
                     break;
 
-                case enBlurType.MotionBlur7x7:
+                case BlurType.MotionBlur7x7:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur7X7, 1.0 / 14.0, 0);
                     break;
 
-                case enBlurType.MotionBlur7x7At45Degrees:
+                case BlurType.MotionBlur7x7At45Degrees:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur7X7At45Degrees, 1.0 / 7.0, 0);
                     break;
 
-                case enBlurType.MotionBlur7x7At135Degrees:
+                case BlurType.MotionBlur7x7At135Degrees:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur7X7At135Degrees, 1.0 / 7.0, 0);
                     break;
 
-                case enBlurType.MotionBlur9x9:
+                case BlurType.MotionBlur9x9:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur9X9, 1.0 / 18.0, 0);
                     break;
 
-                case enBlurType.MotionBlur9x9At45Degrees:
+                case BlurType.MotionBlur9x9At45Degrees:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur9X9At45Degrees, 1.0 / 9.0, 0);
                     break;
 
-                case enBlurType.MotionBlur9x9At135Degrees:
+                case BlurType.MotionBlur9x9At135Degrees:
                     resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur9X9At135Degrees, 1.0 / 9.0, 0);
                     break;
 
-                case enBlurType.Median3x3:
+                case BlurType.Median3x3:
                     resultBitmap = MedianFilter(bmp, 3);
                     break;
 
-                case enBlurType.Median5x5:
+                case BlurType.Median5x5:
                     resultBitmap = MedianFilter(bmp, 5);
                     break;
 
-                case enBlurType.Median7x7:
+                case BlurType.Median7x7:
                     resultBitmap = MedianFilter(bmp, 7);
                     break;
 
-                case enBlurType.Median9x9:
+                case BlurType.Median9x9:
                     resultBitmap = MedianFilter(bmp, 9);
                     break;
 
-                case enBlurType.Median11x11:
+                case BlurType.Median11x11:
                     resultBitmap = MedianFilter(bmp, 11);
                     break;
             }
@@ -621,7 +621,7 @@ namespace BlueBasics {
             gR.PixelOffsetMode = PixelOffsetMode.Half;
             gR.DrawImage(screenshot, r, new Rectangle(point.X - w5, point.Y - w5, (w5 * 2) + 1, (w5 * 2) + 1), GraphicsUnit.Pixel);
             gR.DrawRectangle(Pens.Black, r);
-            var mitte = r.PointOf(enAlignment.Horizontal_Vertical_Center);
+            var mitte = r.PointOf(Alignment.Horizontal_Vertical_Center);
             gR.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), mitte.X, mitte.Y - 7, mitte.X, mitte.Y + 6);
             gR.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), mitte.X - 7, mitte.Y, mitte.X + 6, mitte.Y);
             gR.DrawLine(new Pen(Color.FromArgb(20, 255, 0, 0)), mitte.X, r.Top, mitte.X, r.Bottom);
@@ -705,7 +705,7 @@ namespace BlueBasics {
             return target;
         }
 
-        public static Bitmap? Resize(Bitmap? bmp, int width, int height, enSizeModes sizeMode, InterpolationMode interpolationMode, bool collectGarbage) {
+        public static Bitmap? Resize(Bitmap? bmp, int width, int height, SizeModes sizeMode, InterpolationMode interpolationMode, bool collectGarbage) {
             if (bmp == null) { return null; }
             if (width < 1 && height < 1) { return null; }
             if (collectGarbage) { Generic.CollectGarbage(); }
@@ -714,26 +714,26 @@ namespace BlueBasics {
             var scale = Math.Min(width / (double)bmp.Width, height / (double)bmp.Height);
 
             switch (sizeMode) {
-                case enSizeModes.EmptySpace:
+                case SizeModes.EmptySpace:
                     break;
 
-                case enSizeModes.BildAbschneiden:
+                case SizeModes.BildAbschneiden:
                     break;
 
-                case enSizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern:
+                case SizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern:
                     // Bei diesem Modus werden die Rückgabehöhe oder breite verändert!!!
                     width = (int)(scale * bmp.Width);
                     height = (int)(scale * bmp.Height);
                     break;
 
-                case enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern:
+                case SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern:
                     // Bei diesem Modus werden die Rückgabehöhe oder breite verändert!!!
                     if (scale >= 1) { return bmp; }
                     width = (int)(scale * bmp.Width);
                     height = (int)(scale * bmp.Height);
                     break;
 
-                case enSizeModes.Verzerren:
+                case SizeModes.Verzerren:
                     scale = 1; // Dummy setzen
                     break;
 
@@ -743,7 +743,7 @@ namespace BlueBasics {
             }
             var nw = (int)(bmp.Width * scale);
             var nh = (int)(bmp.Height * scale);
-            if (sizeMode == enSizeModes.Verzerren) {
+            if (sizeMode == SizeModes.Verzerren) {
                 nw = width;
                 nh = height;
             }
@@ -773,7 +773,7 @@ namespace BlueBasics {
                 return imageResize;
             } catch {
                 if (!collectGarbage) { Generic.CollectGarbage(); }
-                return sizeMode == enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern
+                return sizeMode == SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern
                        ? (Bitmap)bmp.GetThumbnailImage(nw, nh, null, IntPtr.Zero)
                        : null;
             }
@@ -835,7 +835,7 @@ namespace BlueBasics {
                     l.Clear();
                     Generic.CollectGarbage();
                     var x = (Bitmap)Image_FromFile(fileName);
-                    l.Add(Resize(x, maxSize, maxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
+                    l.Add(Resize(x, maxSize, maxSize, SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
                     if (frames > 1) {
                         Bitmap x2 = new(200, 200);
                         var gr = Graphics.FromImage(x2);
@@ -909,7 +909,7 @@ namespace BlueBasics {
         public void FromFile(string dateiName, bool setDummyPicIfFails) {
             var x = (Bitmap)Image_FromFile(dateiName);
             if (x == null && setDummyPicIfFails) {
-                x = QuickImage.Get(enImageCode.Warnung);
+                x = QuickImage.Get(ImageCode.Warnung);
             }
             CloneFromBitmap(x);
         }
@@ -918,7 +918,7 @@ namespace BlueBasics {
 
         public void MakeTransparent(Color color) => _bitmap.MakeTransparent(color);
 
-        public void Resize(int width, int height, enSizeModes sizeMode, InterpolationMode interpolationMode, bool collectGarbage) {
+        public void Resize(int width, int height, SizeModes sizeMode, InterpolationMode interpolationMode, bool collectGarbage) {
             if (_bitmap == null) { return; }
             if (collectGarbage) { Generic.CollectGarbage(); }
             if (width < 1) { width = 1; }
@@ -926,26 +926,26 @@ namespace BlueBasics {
             var scale = Math.Min(width / (double)Width, height / (double)Height);
 
             switch (sizeMode) {
-                case enSizeModes.EmptySpace:
+                case SizeModes.EmptySpace:
                     break;
 
-                case enSizeModes.BildAbschneiden:
+                case SizeModes.BildAbschneiden:
                     break;
 
-                case enSizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern:
+                case SizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern:
                     // Bei diesem Modus werden die Rückgabehöhe oder breite verändert!!!
                     width = (int)(scale * Width);
                     height = (int)(scale * Height);
                     break;
 
-                case enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern:
+                case SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern:
                     // Bei diesem Modus werden die Rückgabehöhe oder breite verändert!!!
                     if (scale >= 1) { return; }
                     width = (int)(scale * Width);
                     height = (int)(scale * Height);
                     break;
 
-                case enSizeModes.Verzerren:
+                case SizeModes.Verzerren:
                     scale = 1; // Dummy setzen
                     break;
 
@@ -955,7 +955,7 @@ namespace BlueBasics {
             }
             var nw = (int)(Width * scale);
             var nh = (int)(Height * scale);
-            if (sizeMode == enSizeModes.Verzerren) {
+            if (sizeMode == SizeModes.Verzerren) {
                 nw = width;
                 nh = height;
             }

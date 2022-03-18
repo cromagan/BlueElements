@@ -52,7 +52,7 @@ namespace BlueDatabase {
         /// </summary>
         private int _spalteX1;
 
-        private enÜberschriftAnordnung _überschriftAnordnung;
+        private ÜberschriftAnordnung _überschriftAnordnung;
         private ViewType _viewType;
 
         #endregion
@@ -73,7 +73,7 @@ namespace BlueDatabase {
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
         /// </summary>
-        public ColumnViewItem(ColumnItem? column, enÜberschriftAnordnung überschrift, ColumnViewCollection parent) {
+        public ColumnViewItem(ColumnItem? column, ÜberschriftAnordnung überschrift, ColumnViewCollection parent) {
             Initialize();
             Column = column;
             Parent = parent;
@@ -115,7 +115,7 @@ namespace BlueDatabase {
                         break;
 
                     case "caption": // Todo: Alt 06.09.2019
-                        _überschriftAnordnung = (enÜberschriftAnordnung)IntParse(pair.Value);
+                        _überschriftAnordnung = (ÜberschriftAnordnung)IntParse(pair.Value);
                         break;
 
                     case "permanent": // Todo: Alten Code Entfernen, Permanent wird nicht mehr verstringt 06.09.2019
@@ -127,7 +127,7 @@ namespace BlueDatabase {
                         break;
 
                     default:
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
+                        Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
                         break;
                 }
             }
@@ -189,7 +189,7 @@ namespace BlueDatabase {
             }
         }
 
-        public enÜberschriftAnordnung ÜberschriftAnordnung {
+        public ÜberschriftAnordnung ÜberschriftAnordnung {
             get => _überschriftAnordnung;
             set {
                 if (value == _überschriftAnordnung) { return; }
@@ -262,7 +262,7 @@ namespace BlueDatabase {
             if (_spalteX1 > 0) { result = result + ", X=" + _spalteX1; }
             if (_spalteWidth > 1) { result = result + ", Width=" + _spalteWidth; }
             if (_spalteHeight > 1) { result = result + ", Height=" + _spalteHeight; }
-            if (_überschriftAnordnung != enÜberschriftAnordnung.Über_dem_Feld) { result = result + ", Caption=" + (int)_überschriftAnordnung; }
+            if (_überschriftAnordnung != ÜberschriftAnordnung.Über_dem_Feld) { result = result + ", Caption=" + (int)_überschriftAnordnung; }
             return result + "}";
         }
 
@@ -291,7 +291,7 @@ namespace BlueDatabase {
             _spalteX1 = 0;
             _spalteWidth = 1;
             _spalteHeight = 1;
-            _überschriftAnordnung = enÜberschriftAnordnung.Über_dem_Feld;
+            _überschriftAnordnung = ÜberschriftAnordnung.Über_dem_Feld;
             OrderTmpSpalteX1 = null;
             TmpAutoFilterLocation = Rectangle.Empty;
             TmpReduceLocation = Rectangle.Empty;

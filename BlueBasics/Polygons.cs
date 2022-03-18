@@ -41,10 +41,10 @@ namespace BlueBasics {
             //         |/
             //
             PointF plusOben = new((float) (rect.Left + (rect.Width * 0.5)),
-                (float) (rect.PointOf(enAlignment.VerticalCenter_Right).Y - (rect.Height * 0.18)));
+                (float) (rect.PointOf(Alignment.VerticalCenter_Right).Y - (rect.Height * 0.18)));
             PointF plusUnten = new((float) (rect.Left + (rect.Width * 0.5)),
-                (float) (rect.PointOf(enAlignment.VerticalCenter_Right).Y + (rect.Height * 0.18)));
-            p.AddLine(rect.PointOf(enAlignment.VerticalCenter_Right), new PointF(plusUnten.X, rect.Bottom));
+                (float) (rect.PointOf(Alignment.VerticalCenter_Right).Y + (rect.Height * 0.18)));
+            p.AddLine(rect.PointOf(Alignment.VerticalCenter_Right), new PointF(plusUnten.X, rect.Bottom));
             p.AddLine(p.GetLastPoint(), plusUnten);
             p.AddLine(p.GetLastPoint(), new PointF(rect.Left, plusUnten.Y));
             p.AddLine(p.GetLastPoint(), new PointF(rect.Left, plusOben.Y));
@@ -56,9 +56,9 @@ namespace BlueBasics {
 
         public static GraphicsPath Poly_Bruchlinie(Rectangle rect) {
             GraphicsPath p = new();
-            p.AddLine(rect.PointOf(enAlignment.Top_Left), rect.PointOf(enAlignment.Top_Right));
-            p.AddLine(p.GetLastPoint(), rect.PointOf(enAlignment.Bottom_Right));
-            p.AddLine(p.GetLastPoint(), rect.PointOf(enAlignment.Bottom_Left));
+            p.AddLine(rect.PointOf(Alignment.Top_Left), rect.PointOf(Alignment.Top_Right));
+            p.AddLine(p.GetLastPoint(), rect.PointOf(Alignment.Bottom_Right));
+            p.AddLine(p.GetLastPoint(), rect.PointOf(Alignment.Bottom_Left));
             var versX = rect.Width / 6;
             var versY = -rect.Height / 10;
             var pu = p.GetLastPoint();

@@ -29,7 +29,7 @@ namespace BlueControls.Controls {
 
         #region Fields
 
-        private enOrientation _Orientation = enOrientation.Waagerecht;
+        private Orientation _Orientation = Orientation.Waagerecht;
 
         #endregion
 
@@ -47,8 +47,8 @@ namespace BlueControls.Controls {
 
         #region Properties
 
-        [DefaultValue(enOrientation.Waagerecht)]
-        public enOrientation Orientation {
+        [DefaultValue(Orientation.Waagerecht)]
+        public Orientation Orientation {
             get => _Orientation;
             set {
                 if (value == _Orientation) {
@@ -77,7 +77,7 @@ namespace BlueControls.Controls {
         #region Methods
 
         public void CheckSize() {
-            if (_Orientation == enOrientation.Waagerecht) {
+            if (_Orientation == Orientation.Waagerecht) {
                 if (Width < 10) { Width = 10; }
                 Height = 2;
             } else {
@@ -90,7 +90,7 @@ namespace BlueControls.Controls {
             CheckSize();
             Pen DP = new(SystemColors.ControlDark);
             Pen LP = new(SystemColors.ControlLight);
-            if (_Orientation == enOrientation.Waagerecht) {
+            if (_Orientation == Orientation.Waagerecht) {
                 gr.DrawLine(DP, 0, 0, Width - 1, 0);
                 gr.DrawLine(LP, 1, 1, Width, 1);
             } else {

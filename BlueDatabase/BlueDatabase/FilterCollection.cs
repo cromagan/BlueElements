@@ -115,7 +115,7 @@ namespace BlueDatabase {
                         break;
 
                     default:
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
+                        Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
                         break;
                 }
             }
@@ -131,7 +131,7 @@ namespace BlueDatabase {
 
         public void Remove(string columnName) {
             var tmp = Database.Column[columnName];
-            if (tmp == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); }
+            if (tmp == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); }
             Remove(tmp);
         }
 
@@ -141,7 +141,7 @@ namespace BlueDatabase {
 
         public void RemoveOtherAndAddIfNotExists(string columName, FilterType filterType, string filterBy, string herkunft) {
             var column = Database.Column[columName];
-            if (column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + columName + "' nicht vorhanden."); }
+            if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte '" + columName + "' nicht vorhanden."); }
             RemoveOtherAndAddIfNotExists(column, filterType, filterBy, herkunft);
         }
 
@@ -154,7 +154,7 @@ namespace BlueDatabase {
 
         public void RemoveOtherAndAddIfNotExists(string columName, FilterType filterType, List<string>? filterBy, string herkunft) {
             var tmp = Database.Column[columName];
-            if (tmp == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + columName + "' nicht vorhanden."); }
+            if (tmp == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte '" + columName + "' nicht vorhanden."); }
             RemoveOtherAndAddIfNotExists(new FilterItem(tmp, filterType, filterBy, herkunft));
         }
 

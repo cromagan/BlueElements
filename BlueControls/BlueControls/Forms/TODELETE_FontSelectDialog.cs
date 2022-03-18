@@ -60,22 +60,22 @@ namespace BlueControls.Forms {
                 _fnList.Sort();
                 _fsList = new ItemCollectionList
                 {
-                    { "8",enSortierTyp.ZahlenwertFloat },
-                    { "9", enSortierTyp.ZahlenwertFloat },
-                    { "10", enSortierTyp.ZahlenwertFloat },
-                    { "11", enSortierTyp.ZahlenwertFloat },
-                    { "12", enSortierTyp.ZahlenwertFloat },
-                    { "14", enSortierTyp.ZahlenwertFloat },
-                    { "16", enSortierTyp.ZahlenwertFloat },
-                    { "18", enSortierTyp.ZahlenwertFloat },
-                    { "20", enSortierTyp.ZahlenwertFloat },
-                    { "22", enSortierTyp.ZahlenwertFloat },
-                    { "24", enSortierTyp.ZahlenwertFloat },
-                    { "26", enSortierTyp.ZahlenwertFloat },
-                    { "28", enSortierTyp.ZahlenwertFloat },
-                    { "36", enSortierTyp.ZahlenwertFloat },
-                    { "48", enSortierTyp.ZahlenwertFloat },
-                    { "72", enSortierTyp.ZahlenwertFloat }
+                    { "8",SortierTyp.ZahlenwertFloat },
+                    { "9", SortierTyp.ZahlenwertFloat },
+                    { "10", SortierTyp.ZahlenwertFloat },
+                    { "11", SortierTyp.ZahlenwertFloat },
+                    { "12", SortierTyp.ZahlenwertFloat },
+                    { "14", SortierTyp.ZahlenwertFloat },
+                    { "16", SortierTyp.ZahlenwertFloat },
+                    { "18", SortierTyp.ZahlenwertFloat },
+                    { "20", SortierTyp.ZahlenwertFloat },
+                    { "22", SortierTyp.ZahlenwertFloat },
+                    { "24", SortierTyp.ZahlenwertFloat },
+                    { "26", SortierTyp.ZahlenwertFloat },
+                    { "28", SortierTyp.ZahlenwertFloat },
+                    { "36", SortierTyp.ZahlenwertFloat },
+                    { "48", SortierTyp.ZahlenwertFloat },
+                    { "72", SortierTyp.ZahlenwertFloat }
                 };
                 _fsList.Sort();
             }
@@ -96,7 +96,7 @@ namespace BlueControls.Forms {
             set {
                 _adding = true;
                 if (value == null) { value = BlueFont.Get(Skin.DummyStandardFont); }
-                if (FName.Item[value.FontName] == null) { FName.Item.Add(value.FontName, value.FontName, QuickImage.Get(enImageCode.Warnung, 20)); }
+                if (FName.Item[value.FontName] == null) { FName.Item.Add(value.FontName, value.FontName, QuickImage.Get(ImageCode.Warnung, 20)); }
                 FName.Item.UncheckAll();
                 FName.Item[value.FontName].Checked = true;
                 if (FSize.Item[value.FontSize.ToString(Constants.Format_Float1)] == null) { FSize.Item.Add(value.FontSize.ToString(Constants.Format_Float1)); }
@@ -107,8 +107,8 @@ namespace BlueControls.Forms {
                 fUnterstrichen.Checked = value.Underline;
                 fDurchge.Checked = value.StrikeOut;
                 fOutline.Checked = value.Outline;
-                cFarbe.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", value.ColorMain.ToHtmlCode()).ToString();
-                cRandF.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", value.ColorOutline.ToHtmlCode()).ToString();
+                cFarbe.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, value.ColorMain).ToString();
+                cRandF.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, value.ColorOutline).ToString();
                 fKap.Checked = value.Kapitälchen;
                 OnlyLow.Checked = value.OnlyLower;
                 OnlyUpper.Checked = value.OnlyUpper;
@@ -124,14 +124,14 @@ namespace BlueControls.Forms {
         private void cFarbe_Click(object sender, System.EventArgs e) {
             ColorDia.Color = QuickImage.Get(cFarbe.ImageCode).ChangeGreenTo.FromHtmlCode();
             ColorDia.ShowDialog();
-            cFarbe.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", ColorDia.Color.ToHtmlCode()).ToString();
+            cFarbe.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToString();
             UpdateSampleText();
         }
 
         private void cRandF_Click(object sender, System.EventArgs e) {
             ColorDia.Color = QuickImage.Get(cRandF.ImageCode).ChangeGreenTo.FromHtmlCode();
             ColorDia.ShowDialog();
-            cRandF.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", ColorDia.Color.ToHtmlCode()).ToString();
+            cRandF.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToString();
             UpdateSampleText();
         }
 

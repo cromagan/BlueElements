@@ -68,7 +68,7 @@ namespace BlueDatabase {
         /// <param name="id"></param>
         protected DataHolder(DataHolder parent, string id) {
             if (UseExtraFile()) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Falsche Routine!");
+                Develop.DebugPrint(FehlerArt.Fehler, "Falsche Routine!");
             }
             InternalDatabase = parent.InternalDatabase;
             InternalDatabase.Disposing += InternalDatabase_Disposing;
@@ -82,7 +82,7 @@ namespace BlueDatabase {
         /// <param name="id"></param>
         protected DataHolder(string id) {
             if (!UseExtraFile()) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Falsche Routine!");
+                Develop.DebugPrint(FehlerArt.Fehler, "Falsche Routine!");
             }
             Id = id;
             Typ = "MAIN";
@@ -92,7 +92,7 @@ namespace BlueDatabase {
             if (InternalDatabase == null) {
                 InternalDatabase = new Database(filename, false, true);
                 if (InternalDatabase.Column.Exists("ID") == null) {
-                    InternalDatabase.Column.Add("ID", "ID", enVarType.Text);
+                    InternalDatabase.Column.Add("ID", "ID", VarType.Text);
                     InternalDatabase.RepairAfterParse();
                     InternalDatabase.UndoCount = 50;
                     InternalDatabase.Column.SysCorrect.SaveContent = false;
@@ -182,7 +182,7 @@ namespace BlueDatabase {
                 if (!string.IsNullOrEmpty(message)) {
                     c.Caption = "!!!" + c.Caption;
                     c.Quickinfo = message;
-                    Develop.DebugPrint(enFehlerArt.Warnung, "Erzeugungsfehler: " + message);
+                    Develop.DebugPrint(FehlerArt.Warnung, "Erzeugungsfehler: " + message);
                 }
                 InternalDatabase.ColumnArrangements[1].ShowAllColumns();
                 InternalDatabase.ColumnArrangements[1].HideSystemColumns();
@@ -353,7 +353,7 @@ namespace BlueDatabase {
                     }
                 }
             } else {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Typ");
+                Develop.DebugPrint(FehlerArt.Fehler, "Falscher Typ");
             }
             var name = sender.GetType().ToString();
             Set(name, ids);

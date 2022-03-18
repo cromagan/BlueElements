@@ -167,13 +167,13 @@ namespace BlueControls.ItemCollection {
 
         public void SetCoordinates(RectangleF r, bool overrideFixedSize) {
             if (!overrideFixedSize) {
-                var vr = r.PointOf(enAlignment.Horizontal_Vertical_Center);
+                var vr = r.PointOf(Alignment.Horizontal_Vertical_Center);
                 var ur = UsedArea;
                 _pLo.SetTo(vr.X - (ur.Width / 2), vr.Y - (ur.Height / 2));
                 _pRu.SetTo(_pLo.X + ur.Width, _pLo.Y + ur.Height);
             } else {
-                _pLo.SetTo(r.PointOf(enAlignment.Top_Left));
-                _pRu.SetTo(r.PointOf(enAlignment.Bottom_Right));
+                _pLo.SetTo(r.PointOf(Alignment.Top_Left));
+                _pRu.SetTo(r.PointOf(Alignment.Bottom_Right));
             }
         }
 
@@ -205,7 +205,7 @@ namespace BlueControls.ItemCollection {
                     }
                     if (drawingCoordinates.Width < 1 || drawingCoordinates.Height < 1) {
                         gr.DrawEllipse(new Pen(Color.Gray, 3), drawingCoordinates.Left - 5, drawingCoordinates.Top + 5, 10, 10);
-                        gr.DrawLine(ZoomPad.PenGray, drawingCoordinates.PointOf(enAlignment.Top_Left), drawingCoordinates.PointOf(enAlignment.Bottom_Right));
+                        gr.DrawLine(ZoomPad.PenGray, drawingCoordinates.PointOf(Alignment.Top_Left), drawingCoordinates.PointOf(Alignment.Bottom_Right));
                     }
                 }
             } catch { }

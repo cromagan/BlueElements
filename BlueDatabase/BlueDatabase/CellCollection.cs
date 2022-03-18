@@ -98,8 +98,8 @@ namespace BlueDatabase {
         /// <param name="DateiRechtePrüfen"></param>
         /// <param name="column"></param>
         /// <returns></returns>
-        public static string ErrorReason(ColumnItem? column, RowItem? row, enErrorReason mode) {
-            if (mode == enErrorReason.OnlyRead) { return string.Empty; }
+        public static string ErrorReason(ColumnItem? column, RowItem? row, ErrorReason mode) {
+            if (mode == BlueBasics.Enums.ErrorReason.OnlyRead) { return string.Empty; }
             if (column == null) { return LanguageTool.DoTranslate("Es ist keine Spalte ausgewählt."); }
             var tmpf = column.Database.ErrorReason(mode);
             if (!string.IsNullOrEmpty(tmpf)) { return LanguageTool.DoTranslate(tmpf); }
@@ -227,7 +227,7 @@ namespace BlueDatabase {
         /// <param name="row"></param>
         /// <param name="DateiRechtePrüfen"></param>
         /// <returns></returns>
-        public static bool UserEditPossible(ColumnItem? column, RowItem? row, enErrorReason mode) => string.IsNullOrEmpty(ErrorReason(column, row, mode));
+        public static bool UserEditPossible(ColumnItem? column, RowItem? row, ErrorReason mode) => string.IsNullOrEmpty(ErrorReason(column, row, mode));
 
         /// <summary>
         /// Gibt einen Datainamen/Pfad zurück, der sich aus dem Standard Angaben der Spalte und den Zelleninhalt zusammensetzt.
@@ -254,7 +254,7 @@ namespace BlueDatabase {
                 return;
             }
             var cd = cellKey.SplitAndCutBy("|");
-            if (cd.GetUpperBound(0) != 1) { Develop.DebugPrint(enFehlerArt.Fehler, "Falscher CellKey übergeben: " + cellKey); }
+            if (cd.GetUpperBound(0) != 1) { Develop.DebugPrint(FehlerArt.Fehler, "Falscher CellKey übergeben: " + cellKey); }
             column = _database.Column.SearchByKey(LongParse(cd[0]));
             row = _database.Row.SearchByKey(LongParse(cd[1]));
         }
@@ -281,7 +281,7 @@ namespace BlueDatabase {
         /// <param name="previewsValue"></param>
         /// <param name="doAlways">Auch wenn der PreviewsValue gleich dem CurrentValue ist, wird die Routine durchberechnet</param>
         public void DoSpecialFormats(ColumnItem? column, long rowKey, string previewsValue, bool doAlways) {
-            if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
+            if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
             var currentValue = GetString(column, _database.Row.SearchByKey(rowKey));
             if (!doAlways && currentValue == previewsValue) { return; }
             switch (column.Format) {
@@ -378,8 +378,8 @@ namespace BlueDatabase {
         public string GetString(ColumnItem? column, RowItem? row) // Main Method
         {
             try {
-                if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
-                if (row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeile ungültig!<br>" + _database.Filename); }
+                if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
+                if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + _database.Filename); }
                 if (column.Format is BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                     var (lcolumn, lrow, _) = LinkedCellData(column, row, false, false);
                     return lcolumn != null && lrow != null ? lrow.CellGetString(lcolumn) : string.Empty;
@@ -512,8 +512,8 @@ namespace BlueDatabase {
         public void Set(ColumnItem? column, RowItem? row, string value) // Main Method
         {
             _database.BlockReload(false);
-            if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
-            if (row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeile ungültig!!<br>" + _database.Filename); }
+            if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
+            if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!!<br>" + _database.Filename); }
             if (column.Format is BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 var (lcolumn, lrow, _) = LinkedCellData(column, row, true, !string.IsNullOrEmpty(value));
                 lrow?.CellSet(lcolumn, value);
@@ -604,8 +604,8 @@ namespace BlueDatabase {
         }
 
         internal void Load_310(ColumnItem? column, RowItem? row, string value, int width, int height) {
-            if (row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Row konnte nicht generiert werden."); }
-            if (column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Column konnte nicht generiert werden."); }
+            if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Row konnte nicht generiert werden."); }
+            if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Column konnte nicht generiert werden."); }
             var cellKey = KeyOfCell(column, row);
             if (ContainsKey(cellKey)) {
                 var c = this[cellKey];
@@ -661,12 +661,12 @@ namespace BlueDatabase {
             _database.BlockReload(false);
             if (column == null || _database.Column.SearchByKey(column.Key) == null) {
                 _database?.DevelopWarnung("Spalte ungültig!");
-                Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + _database?.Filename);
+                Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database?.Filename);
                 return;
             }
             if (row == null || _database?.Row.SearchByKey(row.Key) == null) {
                 _database?.DevelopWarnung("Zeile ungültig!!");
-                Develop.DebugPrint(enFehlerArt.Fehler, "Zeile ungültig!!<br>" + _database?.Filename);
+                Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!!<br>" + _database?.Filename);
                 return;
             }
 
@@ -689,9 +689,9 @@ namespace BlueDatabase {
         }
 
         internal void SystemSet(ColumnItem? column, RowItem? row, string value) {
-            if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
-            if (row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeile ungültig!<br>" + _database.Filename); }
-            if (string.IsNullOrEmpty(column.Identifier)) { Develop.DebugPrint(enFehlerArt.Fehler, "SystemSet nur bei System-Spalten möglich: " + ToString()); }
+            if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
+            if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + _database.Filename); }
+            if (string.IsNullOrEmpty(column.Identifier)) { Develop.DebugPrint(FehlerArt.Fehler, "SystemSet nur bei System-Spalten möglich: " + ToString()); }
             if (!column.SaveContent) { return; }
             var cellKey = KeyOfCell(column, row);
             var @string = string.Empty;

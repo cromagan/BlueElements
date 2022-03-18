@@ -37,7 +37,7 @@ namespace BlueBasics {
             }
             if (remo.Count == 0) { return false; }
             foreach (var thisInteger in remo.Where(thisInteger => !l.TryRemove(thisInteger, out _))) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Remove failed: " + thisInteger);
+                Develop.DebugPrint(FehlerArt.Fehler, "Remove failed: " + thisInteger);
             }
             return true;
         }
@@ -47,7 +47,7 @@ namespace BlueBasics {
             var remo = (from pair in l where pair.Value == null || pair.Value.IsNullOrEmpty() select pair.Key).ToList();
             if (remo.Count == 0) { return false; }
             foreach (var thisInteger in remo.Where(thisInteger => !l.TryRemove(thisInteger, out _))) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Remove failed: " + thisInteger);
+                Develop.DebugPrint(FehlerArt.Fehler, "Remove failed: " + thisInteger);
             }
             return true;
         }

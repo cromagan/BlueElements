@@ -269,28 +269,10 @@ namespace BlueControls.ItemCollection {
 
                     if (drawingCoordinates.Width < 1 || drawingCoordinates.Height < 1) {
                         gr.DrawEllipse(new Pen(Color.Gray, 3), drawingCoordinates.Left - 5, drawingCoordinates.Top + 5, 10, 10);
-                        gr.DrawLine(ZoomPad.PenGray, drawingCoordinates.PointOf(enAlignment.Top_Left), drawingCoordinates.PointOf(enAlignment.Bottom_Right));
+                        gr.DrawLine(ZoomPad.PenGray, drawingCoordinates.PointOf(Alignment.Top_Left), drawingCoordinates.PointOf(Alignment.Bottom_Right));
                     }
                 }
             } catch { }
-
-            #endregion
-
-            #region Verknüpfte Pfeile Zeichnen
-
-            foreach (var thisV in ConnectsTo) {
-                if (Parent.Contains(thisV.OtherItem) && thisV != null && thisV.OtherItem != this) {
-                    var t1 = ItemConnection.GetConnectionPoint(this, thisV.MyItemType, thisV.OtherItem).ZoomAndMove(zoom, shiftX, shiftY);
-                    var t2 = ItemConnection.GetConnectionPoint(thisV.OtherItem, thisV.OtherItemType, this).ZoomAndMove(zoom, shiftX, shiftY);
-
-                    if (Geometry.GetLenght(t1, t2) > 1) {
-                        gr.DrawLine(new Pen(Color.Gray, line), t1, t2);
-                        var wi = Geometry.Winkel(t1, t2);
-                        if (thisV.ArrowOnMyItem) { DimensionPadItem.DrawArrow(gr, t1, wi, Color.Gray, zoom * 20); }
-                        if (thisV.ArrowOnOtherItem) { DimensionPadItem.DrawArrow(gr, t2, wi + 180, Color.Gray, zoom * 20); }
-                    }
-                }
-            }
 
             #endregion
         }

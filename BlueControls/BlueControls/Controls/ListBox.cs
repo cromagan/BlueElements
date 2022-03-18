@@ -230,7 +230,7 @@ namespace BlueControls.Controls {
 
         public void Add_TextBySuggestion() {
             if (Suggestions == null || Suggestions.Count == 0) {
-                MessageBox.Show("Keine (weiteren) Werte vorhanden.", enImageCode.Information, "OK");
+                MessageBox.Show("Keine (weiteren) Werte vorhanden.", ImageCode.Information, "OK");
                 return;
             }
             Suggestions.CheckBehavior = CheckBehavior.SingleSelection;

@@ -140,7 +140,7 @@ namespace BlueControls.Controls {
                     System.Windows.Forms.FolderBrowserDialog savOrt = new();
                     savOrt.ShowDialog();
                     if (!PathExists(savOrt.SelectedPath)) {
-                        MessageBox.Show("Abbruch!", enImageCode.Warnung, "OK");
+                        MessageBox.Show("Abbruch!", ImageCode.Warnung, "OK");
                         return true;
                     }
                     var ndt = TempFile(savOrt.SelectedPath + "\\Bild.png");
@@ -160,7 +160,7 @@ namespace BlueControls.Controls {
             var ix = (Bitmap)Image_FromFile(filename);
             var i = Image_Clone(ix);
             if (_maxSize > 0) {
-                _bitmap = BitmapExt.Resize(i, _maxSize, _maxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
+                _bitmap = BitmapExt.Resize(i, _maxSize, _maxSize, SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
                 SorceType = SorceType.LoadedFromDiskAndResized;
                 SorceName = filename;
             } else {
@@ -258,7 +258,7 @@ namespace BlueControls.Controls {
             OnConnectedDatabase(ed);
             if (ed.File is Database db) {
                 if (_bitmap != null) {
-                    if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+                    if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
                 }
 
                 var n = ItemSelect.Show(db.AllConnectedFilesLCase(), db.FileEncryptionKey);
@@ -270,7 +270,7 @@ namespace BlueControls.Controls {
         }
 
         private void DelP_Click(object sender, System.EventArgs e) {
-            if (MessageBox.Show("Bild wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            if (MessageBox.Show("Bild wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             Clear();
         }
 
@@ -310,14 +310,14 @@ namespace BlueControls.Controls {
 
         private void Lade_Click(object sender, System.EventArgs e) {
             if (_bitmap != null) {
-                if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+                if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             }
             OpenDia.ShowDialog();
         }
 
         private void MakePic_Click(object sender, System.EventArgs e) {
             if (_bitmap != null) {
-                if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+                if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             }
             _bitmap = ScreenShot.GrabArea(ParentForm());
             SorceType = SorceType.ScreenShot;

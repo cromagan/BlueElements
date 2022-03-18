@@ -119,7 +119,7 @@ namespace BlueDatabase {
             var x = 9999;
             do {
                 x += 1;
-                if (x > 99999) { Develop.DebugPrint(enFehlerArt.Fehler, "Unique ID konnte nicht erzeugt werden"); }
+                if (x > 99999) { Develop.DebugPrint(FehlerArt.Fehler, "Unique ID konnte nicht erzeugt werden"); }
 
                 var unique = ("X" + DateTime.Now.ToString("mm.fff") + x.ToString(Constants.Format_Integer5)).RemoveChars(Constants.Char_DateiSonderZeichen + ".");
                 var ok = true;
@@ -136,7 +136,7 @@ namespace BlueDatabase {
         }
 
         public void Add(RowItem? row) {
-            if (!_internal.TryAdd(row.Key, row)) { Develop.DebugPrint(enFehlerArt.Fehler, "Add Failed"); }
+            if (!_internal.TryAdd(row.Key, row)) { Develop.DebugPrint(FehlerArt.Fehler, "Add Failed"); }
             OnRowAdded(new RowEventArgs(row));
         }
 
@@ -364,7 +364,7 @@ namespace BlueDatabase {
                 if (s != null && !string.IsNullOrEmpty(s.Error)) {
                     var w = rows[0].CellFirstString();
                     rows.Clear();
-                    Database.OnDropMessage(enFehlerArt.Warnung, "Skript fehlerhaft bei " + w + "\r\n" + s.Error);
+                    Database.OnDropMessage(FehlerArt.Warnung, "Skript fehlerhaft bei " + w + "\r\n" + s.Error);
                     break;
                 }
                 if (checkPerformed) { rows.RemoveAt(0); }
@@ -386,7 +386,7 @@ namespace BlueDatabase {
             foreach (var thisColumnItem in Database.Column.Where(thisColumnItem => thisColumnItem != null)) {
                 Database.Cell.Delete(thisColumnItem, key);
             }
-            if (!_internal.TryRemove(key, out _)) { Develop.DebugPrint(enFehlerArt.Fehler, "Remove Failed"); }
+            if (!_internal.TryRemove(key, out _)) { Develop.DebugPrint(FehlerArt.Fehler, "Remove Failed"); }
             OnRowRemoved();
             return true;
         }

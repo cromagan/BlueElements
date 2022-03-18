@@ -15,9 +15,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueBasics.Enums {
+namespace BlueDatabase.Enums {
 
-    public enum enEditTypeFormula {
+    public enum EditTypeFormula {
         None = -1,
         Textfeld = 0,
         Textfeld_mit_Auswahlknopf = 1,

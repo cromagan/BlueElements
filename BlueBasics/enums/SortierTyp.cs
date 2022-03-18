@@ -17,13 +17,12 @@
 
 namespace BlueBasics.Enums {
 
-    public enum enSizeModes {
-        EmptySpace = 1,
-        BildAbschneiden = 2,
-        Breite_oder_Höhe_Anpassen_OhneVergrößern = 3,
-        Breite_oder_Höhe_Anpassen_MitVergrößern = 4,
-
-        // QuickPicGeneration = 5,
-        Verzerren = 6
+    public enum SortierTyp {
+        Nicht_Erlaubt = -1,
+        Original_String = 0,
+        Sprachneutral_String = 1,
+        ZahlenwertInt = 100,
+        ZahlenwertFloat = 101,
+        Datum_Uhrzeit = 200
     }
 }

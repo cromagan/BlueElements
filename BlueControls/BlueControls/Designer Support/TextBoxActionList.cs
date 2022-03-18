@@ -29,10 +29,10 @@ namespace BlueControls.Designer_Support {
 
         #region Properties
 
-        public enVarType TextFormat {
+        public VarType TextFormat {
             get {
                 for (var z = 0; z < 100; z++) {
-                    var st = (enVarType)z;
+                    var st = (VarType)z;
                     if (st.ToString() == z.ToString()) {
                         continue;
                     }
@@ -41,7 +41,7 @@ namespace BlueControls.Designer_Support {
                     x.SetFormat(st);
                     if (x.IsFormatIdentical(_reverenceControl)) { return st; }
                 }
-                return enVarType.Unbekannt;
+                return VarType.Unbekannt;
             }
             set => _reverenceControl.SetFormat(value);
         }

@@ -37,7 +37,7 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
-        private enAlignment _ausrichtung;
+        private Alignment _ausrichtung;
 
         /// <summary>
         /// Der Original-Text. Bei änderungen deses Textes wird die Variable _text_replaced ebenfalls zurückgesetzt.
@@ -66,7 +66,7 @@ namespace BlueControls.ItemCollection {
         public TextPadItem(string internalname, string readableText) : base(internalname) {
             _textReplaced = readableText;
             _textOriginal = readableText;
-            _ausrichtung = enAlignment.Top_Left;
+            _ausrichtung = Alignment.Top_Left;
             InvalidateText();
         }
 
@@ -74,7 +74,7 @@ namespace BlueControls.ItemCollection {
 
         #region Properties
 
-        public enAlignment Ausrichtung {
+        public Alignment Ausrichtung {
             get => _ausrichtung;
             set {
                 if (value == _ausrichtung) { return; }
@@ -119,9 +119,9 @@ namespace BlueControls.ItemCollection {
             };
             ItemCollectionList.ItemCollectionList aursicht = new()
             {
-                { "Linksbündig ausrichten", ((int)enAlignment.Top_Left).ToString(), enImageCode.Linksbündig },
-                { "Zentrieren", ((int)enAlignment.Top_HorizontalCenter).ToString(), enImageCode.Zentrieren },
-                { "Rechtsbündig ausrichten", ((int)enAlignment.Top_Right).ToString(), enImageCode.Rechtsbündig }
+                { "Linksbündig ausrichten", ((int)Alignment.Top_Left).ToString(), ImageCode.Linksbündig },
+                { "Zentrieren", ((int)Alignment.Top_HorizontalCenter).ToString(), ImageCode.Zentrieren },
+                { "Rechtsbündig ausrichten", ((int)Alignment.Top_Right).ToString(), ImageCode.Rechtsbündig }
             };
             aursicht.Sort();
             l.Add(new FlexiControlForProperty(this, "Ausrichtung", aursicht));
@@ -140,7 +140,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "alignment":
-                    _ausrichtung = (enAlignment)byte.Parse(value);
+                    _ausrichtung = (Alignment)byte.Parse(value);
                     return true;
 
                 case "format":
@@ -192,7 +192,7 @@ namespace BlueControls.ItemCollection {
             t = t.Substring(0, t.Length - 1) + ", ";
             if (!string.IsNullOrEmpty(_textOriginal)) { t = t + "ReadableText=" + _textOriginal.ToNonCritical() + ", "; }
             if (Format != BlueBasics.Enums.DataFormat.Text) { t = t + "Format=" + (int)Format + ", "; }
-            if (_ausrichtung != enAlignment.Top_Left) { t = t + "Alignment=" + (int)_ausrichtung + ", "; }
+            if (_ausrichtung != Alignment.Top_Left) { t = t + "Alignment=" + (int)_ausrichtung + ", "; }
             t = t + "AdditionalScale=" + Skalierung.ToString(CultureInfo.InvariantCulture).ToNonCritical() + ", ";
             return t.Trim(", ") + "}";
         }
@@ -202,7 +202,7 @@ namespace BlueControls.ItemCollection {
         protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
             if (Stil == PadStyles.Undefiniert) { return; }
             gr.SetClip(drawingCoordinates);
-            var trp = drawingCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
+            var trp = drawingCoordinates.PointOf(Alignment.Horizontal_Vertical_Center);
             gr.TranslateTransform(trp.X, trp.Y);
             gr.RotateTransform(-Drehwinkel);
 
@@ -243,7 +243,7 @@ namespace BlueControls.ItemCollection {
             _txt = null;
             if (Stil != PadStyles.Undefiniert) {
                 if (Parent == null) {
-                    Develop.DebugPrint(enFehlerArt.Fehler, "Parent is Nothing, wurde das Objekt zu einer Collection hinzugefügt?");
+                    Develop.DebugPrint(FehlerArt.Fehler, "Parent is Nothing, wurde das Objekt zu einer Collection hinzugefügt?");
                 } else {
                     _txt = new ExtText(Stil, Parent.SheetStyle);
                 }

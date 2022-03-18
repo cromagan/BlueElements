@@ -149,7 +149,7 @@ namespace BlueDatabase {
         }
 
         public override void OnChanged() {
-            if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
+            if (IsParsing) { Develop.DebugPrint(FehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             base.OnChanged();
             //Changed?.Invoke(this, System.EventArgs.Empty);
         }
@@ -174,7 +174,7 @@ namespace BlueDatabase {
                         break;
 
                     default:
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
+                        Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
                         break;
                 }
             }

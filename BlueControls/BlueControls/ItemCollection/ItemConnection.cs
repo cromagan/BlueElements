@@ -51,19 +51,19 @@ namespace BlueControls.ItemCollection {
         public static PointF GetConnectionPoint(BasicPadItem item, ConnectionType itemc, BasicPadItem otherItem) {
             switch (itemc) {
                 case ConnectionType.Top:
-                    return item.UsedArea.PointOf(enAlignment.Top_HorizontalCenter);
+                    return item.UsedArea.PointOf(Alignment.Top_HorizontalCenter);
 
                 case ConnectionType.Bottom:
-                    return item.UsedArea.PointOf(enAlignment.Bottom_HorizontalCenter);
+                    return item.UsedArea.PointOf(Alignment.Bottom_HorizontalCenter);
 
                 case ConnectionType.Left:
-                    return item.UsedArea.PointOf(enAlignment.VerticalCenter_Left);
+                    return item.UsedArea.PointOf(Alignment.VerticalCenter_Left);
 
                 case ConnectionType.Right:
-                    return item.UsedArea.PointOf(enAlignment.VerticalCenter_Right);
+                    return item.UsedArea.PointOf(Alignment.VerticalCenter_Right);
 
                 default:
-                    var m1 = otherItem.UsedArea.PointOf(enAlignment.Horizontal_Vertical_Center);
+                    var m1 = otherItem.UsedArea.PointOf(Alignment.Horizontal_Vertical_Center);
                     return item.UsedArea.NearestLineMiddle(m1);
             }
         }

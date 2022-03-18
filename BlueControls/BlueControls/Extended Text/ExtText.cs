@@ -61,7 +61,7 @@ namespace BlueControls.Extended_Text {
         //public readonly List<ExtChar> Chars = new();
         public string AllowedChars;
 
-        public enAlignment Ausrichtung;
+        public Alignment Ausrichtung;
 
         /// <summary>
         /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaliert sein.
@@ -93,7 +93,7 @@ namespace BlueControls.Extended_Text {
             _state = States.Standard;
             _row = null;
             DrawingPos = new Point(0, 0);
-            Ausrichtung = enAlignment.Top_Left;
+            Ausrichtung = Alignment.Top_Left;
             Multiline = true;
             AllowedChars = string.Empty;
             DrawingArea = new Rectangle(0, 0, -1, -1);
@@ -112,7 +112,7 @@ namespace BlueControls.Extended_Text {
             _row = skinRow;
 
             if ((int)_design < 10000 || _row == null) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Fehler!");
+                Develop.DebugPrint(FehlerArt.Fehler, "Fehler!");
             }
         }
 
@@ -723,7 +723,7 @@ namespace BlueControls.Extended_Text {
                     break;
 
                 default:
-                    Develop.DebugPrint(enFehlerArt.Info, "Unbekannter Code: " + xHtmlTextx.Substring(xStartPosx, endpos - xStartPosx + 1));
+                    Develop.DebugPrint(FehlerArt.Info, "Unbekannter Code: " + xHtmlTextx.Substring(xStartPosx, endpos - xStartPosx + 1));
                     Add(new ExtCharAscii('&', _design, _state, f, stufe, markState));
                     return;
             }
@@ -913,17 +913,17 @@ namespace BlueControls.Extended_Text {
 
             #region enAlignment berechnen -------------------------------------
 
-            if (Ausrichtung != enAlignment.Top_Left) {
+            if (Ausrichtung != Alignment.Top_Left) {
                 var ky = 0f;
-                if (Ausrichtung.HasFlag(enAlignment.VerticalCenter)) { ky = (float)((_textDimensions.Height - (int)_height) / 2.0); }
-                if (Ausrichtung.HasFlag(enAlignment.Bottom)) { ky = _textDimensions.Height - (int)_height; }
+                if (Ausrichtung.HasFlag(Alignment.VerticalCenter)) { ky = (float)((_textDimensions.Height - (int)_height) / 2.0); }
+                if (Ausrichtung.HasFlag(Alignment.Bottom)) { ky = _textDimensions.Height - (int)_height; }
                 foreach (var t in ri) {
                     var o = t.SplitAndCutBy(";");
                     var z1 = IntParse(o[0]);
                     var z2 = IntParse(o[1]);
                     float kx = 0;
-                    if (Ausrichtung.HasFlag(enAlignment.Right)) { kx = _textDimensions.Width - this[z2].Pos.X - this[z2].Size.Width; }
-                    if (Ausrichtung.HasFlag(enAlignment.HorizontalCenter)) { kx = (_textDimensions.Width - this[z2].Pos.X - this[z2].Size.Width) / 2; }
+                    if (Ausrichtung.HasFlag(Alignment.Right)) { kx = _textDimensions.Width - this[z2].Pos.X - this[z2].Size.Width; }
+                    if (Ausrichtung.HasFlag(Alignment.HorizontalCenter)) { kx = (_textDimensions.Width - this[z2].Pos.X - this[z2].Size.Width) / 2; }
                     for (var z3 = z1; z3 <= z2; z3++) {
                         this[z3].Pos.X += kx;
                         this[z3].Pos.Y += ky;

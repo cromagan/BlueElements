@@ -99,7 +99,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
         public Design ControlDesign //Implements IDesignAble.Design
         {
             get {
-                if (_controlDesign == Design.Undefiniert) { Develop.DebugPrint(enFehlerArt.Fehler, "ControlDesign undefiniert!"); }
+                if (_controlDesign == Design.Undefiniert) { Develop.DebugPrint(FehlerArt.Fehler, "ControlDesign undefiniert!"); }
                 return _controlDesign;
             }
         }
@@ -111,7 +111,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
         public Design ItemDesign //Implements IDesignAble.Design
         {
             get {
-                if (_itemDesign == Design.Undefiniert) { Develop.DebugPrint(enFehlerArt.Fehler, "ItemDesign undefiniert!"); }
+                if (_itemDesign == Design.Undefiniert) { Develop.DebugPrint(FehlerArt.Fehler, "ItemDesign undefiniert!"); }
                 return _itemDesign;
             }
         }
@@ -174,7 +174,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
                 case BlueBasics.Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
                     var db2 = column.LinkedDatabase;
-                    if (db2 == null) { Notification.Show("Verknüpfte Datenbank nicht vorhanden", enImageCode.Information); return; }
+                    if (db2 == null) { Notification.Show("Verknüpfte Datenbank nicht vorhanden", ImageCode.Information); return; }
 
                     /// Spalte aus der Ziel-Datenbank ermitteln
                     var targetColumn = db2.Column.SearchByKey(column.LinkedCell_ColumnKeyOfLinkedDatabase);
@@ -182,7 +182,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
                     var (filter, info) = CellCollection.GetFilterFromLinkedCellData(db2, column, checkedItemsAtRow);
                     if (!string.IsNullOrEmpty(info)) {
-                        Notification.Show("Keine Zeilen in der Quell-Datenbank vorhanden.", enImageCode.Information);
+                        Notification.Show("Keine Zeilen in der Quell-Datenbank vorhanden.", ImageCode.Information);
                     }
 
                     //                    var r = LinkedDatabase.Row.CalculateFilteredRows(filter);
@@ -191,7 +191,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
                     l.AddRange(targetColumn.Contents(filter, null));
                     if (l.Count == 0) {
-                        Notification.Show("Keine Zeilen in der Quell-Datenbank vorhanden.", enImageCode.Information);
+                        Notification.Show("Keine Zeilen in der Quell-Datenbank vorhanden.", ImageCode.Information);
                     }
                     break;
             }
@@ -259,15 +259,15 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         public TextListItem Add(string internalAndReadableText, bool isCaption) => Add(internalAndReadableText, internalAndReadableText, null, isCaption, true, string.Empty);
 
-        public TextListItem Add(string internalAndReadableText, enSortierTyp format) => Add(internalAndReadableText, internalAndReadableText, null, false, true, internalAndReadableText.CompareKey(format));
+        public TextListItem Add(string internalAndReadableText, SortierTyp format) => Add(internalAndReadableText, internalAndReadableText, null, false, true, internalAndReadableText.CompareKey(format));
 
-        public TextListItem Add(string internalAndReadableText, enImageCode symbol) => Add(internalAndReadableText, internalAndReadableText, symbol, false, true, string.Empty);
+        public TextListItem Add(string internalAndReadableText, ImageCode symbol) => Add(internalAndReadableText, internalAndReadableText, symbol, false, true, string.Empty);
 
         public TextListItem Add(string readableText, string internalname, bool enabled) => Add(readableText, internalname, null, false, enabled, string.Empty);
 
-        public TextListItem Add(string readableText, string internalname, enImageCode symbol, bool enabled) => Add(readableText, internalname, symbol, false, enabled, string.Empty);
+        public TextListItem Add(string readableText, string internalname, ImageCode symbol, bool enabled) => Add(readableText, internalname, symbol, false, enabled, string.Empty);
 
-        public TextListItem Add(string readableText, string internalname, enImageCode symbol, bool enabled, string userDefCompareKey) => Add(readableText, internalname, symbol, false, enabled, userDefCompareKey);
+        public TextListItem Add(string readableText, string internalname, ImageCode symbol, bool enabled, string userDefCompareKey) => Add(readableText, internalname, symbol, false, enabled, userDefCompareKey);
 
         public TextListItem Add(string readableText, string internalname, QuickImage? symbol, bool enabled) => Add(readableText, internalname, symbol, false, enabled, string.Empty);
 
@@ -275,11 +275,11 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         public TextListItem Add(string readableText, string internalname) => Add(readableText, internalname, null, false, true, string.Empty);
 
-        public TextListItem Add(string readableText, string internalname, enImageCode symbol) => Add(readableText, internalname, symbol, false, true, string.Empty);
+        public TextListItem Add(string readableText, string internalname, ImageCode symbol) => Add(readableText, internalname, symbol, false, true, string.Empty);
 
         public TextListItem Add(string readableText, string internalname, QuickImage? symbol) => Add(readableText, internalname, symbol, false, true, string.Empty);
 
-        public TextListItem Add(string readableText, string internalname, enImageCode symbol, bool isCaption, bool enabled, string userDefCompareKey) => Add(readableText, internalname, QuickImage.Get(symbol, 16), isCaption, enabled, userDefCompareKey);
+        public TextListItem Add(string readableText, string internalname, ImageCode symbol, bool isCaption, bool enabled, string userDefCompareKey) => Add(readableText, internalname, QuickImage.Get(symbol, 16), isCaption, enabled, userDefCompareKey);
 
         public TextListItem Add(string readableText, string internalname, QuickImage? symbol, bool isCaption, bool enabled, string userDefCompareKey) {
             TextListItem x = new(readableText, internalname, symbol, isCaption, enabled, userDefCompareKey);
@@ -300,8 +300,8 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
         }
 
         public new void Add(BasicListItem? item) {
-            if (Contains(item)) { Develop.DebugPrint(enFehlerArt.Fehler, "Bereits vorhanden!"); return; }
-            if (this[item.Internal] != null) { Develop.DebugPrint(enFehlerArt.Warnung, "Name bereits vorhanden: " + item.Internal); return; }
+            if (Contains(item)) { Develop.DebugPrint(FehlerArt.Fehler, "Bereits vorhanden!"); return; }
+            if (this[item.Internal] != null) { Develop.DebugPrint(FehlerArt.Warnung, "Name bereits vorhanden: " + item.Internal); return; }
             base.Add(item);
         }
 
@@ -343,17 +343,17 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
                 case ContextMenuComands.Bearbeiten:
                     readableText = "Bearbeiten";
-                    symbol = QuickImage.Get(enImageCode.Stift);
+                    symbol = QuickImage.Get(ImageCode.Stift);
                     break;
 
                 case ContextMenuComands.Kopieren:
                     readableText = "Kopieren";
-                    symbol = QuickImage.Get(enImageCode.Kopieren);
+                    symbol = QuickImage.Get(ImageCode.Kopieren);
                     break;
 
                 case ContextMenuComands.InhaltLöschen:
                     readableText = "Inhalt löschen";
-                    symbol = QuickImage.Get(enImageCode.Radiergummi);
+                    symbol = QuickImage.Get(ImageCode.Radiergummi);
                     break;
 
                 case ContextMenuComands.ZeileLöschen:
@@ -363,7 +363,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
                 case ContextMenuComands.DateiÖffnen:
                     readableText = "Öffnen / Ausführen";
-                    symbol = QuickImage.Get(enImageCode.Blitz);
+                    symbol = QuickImage.Get(ImageCode.Blitz);
                     break;
 
                 case ContextMenuComands.SpaltenSortierungAZ:
@@ -378,17 +378,17 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
                 case ContextMenuComands.Information:
                     readableText = "Informationen anzeigen";
-                    symbol = QuickImage.Get(enImageCode.Frage);
+                    symbol = QuickImage.Get(ImageCode.Frage);
                     break;
 
                 case ContextMenuComands.ZellenInhaltKopieren:
                     readableText = "Zelleninhalt kopieren";
-                    symbol = QuickImage.Get(enImageCode.Kopieren);
+                    symbol = QuickImage.Get(ImageCode.Kopieren);
                     break;
 
                 case ContextMenuComands.ZellenInhaltPaste:
                     readableText = "In Zelle einfügen";
-                    symbol = QuickImage.Get(enImageCode.Clipboard);
+                    symbol = QuickImage.Get(ImageCode.Clipboard);
                     break;
 
                 case ContextMenuComands.SpaltenEigenschaftenBearbeiten:
@@ -398,57 +398,57 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
                 case ContextMenuComands.Speichern:
                     readableText = "Speichern";
-                    symbol = QuickImage.Get(enImageCode.Diskette);
+                    symbol = QuickImage.Get(ImageCode.Diskette);
                     break;
 
                 case ContextMenuComands.Löschen:
                     readableText = "Löschen";
-                    symbol = QuickImage.Get(enImageCode.Kreuz);
+                    symbol = QuickImage.Get(ImageCode.Kreuz);
                     break;
 
                 case ContextMenuComands.Umbenennen:
                     readableText = "Umbenennen";
-                    symbol = QuickImage.Get(enImageCode.Stift);
+                    symbol = QuickImage.Get(ImageCode.Stift);
                     break;
 
                 case ContextMenuComands.SuchenUndErsetzen:
                     readableText = "Suchen und ersetzen";
-                    symbol = QuickImage.Get(enImageCode.Fernglas);
+                    symbol = QuickImage.Get(ImageCode.Fernglas);
                     break;
 
                 case ContextMenuComands.Einfügen:
                     readableText = "Einfügen";
-                    symbol = QuickImage.Get(enImageCode.Clipboard);
+                    symbol = QuickImage.Get(ImageCode.Clipboard);
                     break;
 
                 case ContextMenuComands.Ausschneiden:
                     readableText = "Ausschneiden";
-                    symbol = QuickImage.Get(enImageCode.Schere);
+                    symbol = QuickImage.Get(ImageCode.Schere);
                     break;
 
                 case ContextMenuComands.VorherigenInhaltWiederherstellen:
                     readableText = "Vorherigen Inhalt wieder herstellen";
-                    symbol = QuickImage.Get(enImageCode.Undo);
+                    symbol = QuickImage.Get(ImageCode.Undo);
                     break;
 
                 case ContextMenuComands.WeitereBefehle:
                     readableText = "Weitere Befehle";
-                    symbol = QuickImage.Get(enImageCode.Hierarchie);
+                    symbol = QuickImage.Get(ImageCode.Hierarchie);
                     break;
 
                 default:
                     Develop.DebugPrint(comand);
                     readableText = @internal;
-                    symbol = QuickImage.Get(enImageCode.Fragezeichen);
+                    symbol = QuickImage.Get(ImageCode.Fragezeichen);
                     break;
             }
-            if (string.IsNullOrEmpty(@internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben:" + comand); }
+            if (string.IsNullOrEmpty(@internal)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben:" + comand); }
             return Add(readableText, @internal, symbol, enabled);
         }
 
         public BasicListItem? Add(string value, ColumnItem? columnStyle, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
             if (this[value] == null) {
-                if (columnStyle.Format == BlueBasics.Enums.DataFormat.Link_To_Filesystem && value.FileType() == enFileFormat.Image) {
+                if (columnStyle.Format == BlueBasics.Enums.DataFormat.Link_To_Filesystem && value.FileType() == FileFormat.Image) {
                     return Add(columnStyle.BestFile(value, false), value, value, columnStyle.Database.FileEncryptionKey);
                 }
 
@@ -491,7 +491,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
         public void AddRange(List<string> values, ColumnItem? columnStyle, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
             if (values == null) { return; }
             if (values.Count > 10000) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Values > 100000");
+                Develop.DebugPrint(FehlerArt.Fehler, "Values > 100000");
                 return;
             }
             foreach (var thisstring in values) {
@@ -547,7 +547,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         public Size CalculateColumnAndSize() {
             var (biggestItemX, _, heightAdded, senkrechtAllowed) = ItemData();
-            if (senkrechtAllowed == enOrientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), null, biggestItemX, heightAdded, senkrechtAllowed); }
+            if (senkrechtAllowed == Orientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), null, biggestItemX, heightAdded, senkrechtAllowed); }
             BreakAfterItems = CalculateColumnCount(biggestItemX, heightAdded, senkrechtAllowed);
             return ComputeAllItemPositions(new Size(1, 30), null, biggestItemX, heightAdded, senkrechtAllowed);
         }
@@ -636,7 +636,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
             }
         }
 
-        internal Size ComputeAllItemPositions(Size controlDrawingArea, Slider? sliderY, int biggestItemX, int heightAdded, enOrientation senkrechtAllowed) {
+        internal Size ComputeAllItemPositions(Size controlDrawingArea, Slider? sliderY, int biggestItemX, int heightAdded, Orientation senkrechtAllowed) {
             try {
                 if (Math.Abs(_lastCheckedMaxSize.Width - controlDrawingArea.Width) > 0.1 || Math.Abs(_lastCheckedMaxSize.Height - controlDrawingArea.Height) > 0.1) {
                     _lastCheckedMaxSize = controlDrawingArea;
@@ -649,7 +649,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
                 }
                 PreComputeSize();
                 if (_itemDesign == Design.Undefiniert) { GetDesigns(); }
-                if (BreakAfterItems < 1) { senkrechtAllowed = enOrientation.Waagerecht; }
+                if (BreakAfterItems < 1) { senkrechtAllowed = Orientation.Waagerecht; }
                 var sliderWidth = 0;
                 if (sliderY != null) {
                     if (BreakAfterItems < 1 && heightAdded > controlDrawingArea.Height) {
@@ -690,14 +690,14 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
                         var wi = colWidth;
                         int he;
                         itenc++;
-                        if (senkrechtAllowed == enOrientation.Waagerecht) {
+                        if (senkrechtAllowed == Orientation.Waagerecht) {
                             if (thisItem.IsCaption) { wi = controlDrawingArea.Width - sliderWidth; }
                             he = thisItem.HeightForListBox(_appearance, wi);
                         } else {
                             he = thisItem.HeightForListBox(_appearance, wi);
                         }
                         if (previtem != null) {
-                            if (senkrechtAllowed == enOrientation.Waagerecht) {
+                            if (senkrechtAllowed == Orientation.Waagerecht) {
                                 if (previtem.Pos.Right + colWidth > controlDrawingArea.Width || thisItem.IsCaption) {
                                     cx = 0;
                                     cy = previtem.Pos.Bottom;
@@ -758,13 +758,13 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
         ///  BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
         /// </summary>
         /// <returns></returns>
-        internal (int BiggestItemX, int BiggestItemY, int HeightAdded, enOrientation SenkrechtAllowed) ItemData() {
+        internal (int BiggestItemX, int BiggestItemY, int HeightAdded, Orientation SenkrechtAllowed) ItemData() {
             try {
                 var w = 16;
                 var h = 0;
                 var hall = 0;
                 var sameh = -1;
-                var or = enOrientation.Senkrecht;
+                var or = Orientation.Senkrecht;
                 PreComputeSize();
                 foreach (var thisItem in this) {
                     if (thisItem != null) {
@@ -775,10 +775,10 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
                         if (sameh < 0) {
                             sameh = thisItem.SizeUntouchedForListBox().Height;
                         } else {
-                            if (sameh != thisItem.SizeUntouchedForListBox().Height) { or = enOrientation.Waagerecht; }
+                            if (sameh != thisItem.SizeUntouchedForListBox().Height) { or = Orientation.Waagerecht; }
                             sameh = thisItem.SizeUntouchedForListBox().Height;
                         }
-                        if (thisItem is not TextListItem and not CellLikeListItem) { or = enOrientation.Waagerecht; }
+                        if (thisItem is not TextListItem and not CellLikeListItem) { or = Orientation.Waagerecht; }
                     }
                 }
                 return (w, h, hall, or);
@@ -812,7 +812,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
             // und die Mains auffüllen
             foreach (var thisString in zuwenig) {
                 if (FileOperations.FileExists(thisString)) {
-                    if (thisString.FileType() == enFileFormat.Image) {
+                    if (thisString.FileType() == FileFormat.Image) {
                         Add(thisString, thisString, thisString.FileNameWithoutSuffix(), fileEncryptionKey);
                     } else {
                         Add(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(thisString.FileType(), 48));
@@ -825,15 +825,15 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         protected override void OnItemAdded(BasicListItem item) {
             if (string.IsNullOrEmpty(item.Internal)) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + item.Internal);
+                Develop.DebugPrint(FehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + item.Internal);
             }
             item.Parent = this;
             base.OnItemAdded(item);
         }
 
-        private int CalculateColumnCount(int biggestItemWidth, int allItemsHeight, enOrientation orientation) {
-            if (orientation != enOrientation.Senkrecht) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Nur 'senkrecht' erlaubt mehrere Spalten");
+        private int CalculateColumnCount(int biggestItemWidth, int allItemsHeight, Orientation orientation) {
+            if (orientation != Orientation.Senkrecht) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Nur 'senkrecht' erlaubt mehrere Spalten");
             }
             if (Count < 12) { return -1; }  // <10 ergibt dividieb by zere, weil es da 0 einträge währen bei 10 Spalten
             var dithemh = allItemsHeight / Count;
@@ -890,7 +890,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
                     break;
 
                 default:
-                    Develop.DebugPrint(enFehlerArt.Fehler, "Unbekanntes Design: " + _appearance);
+                    Develop.DebugPrint(FehlerArt.Fehler, "Unbekanntes Design: " + _appearance);
                     break;
             }
         }

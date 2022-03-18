@@ -168,7 +168,7 @@ namespace BlueScript.Variables {
         }
 
         public static Variable? GetSystem(this List<Variable> vars, string name) => vars.FirstOrDefault(thisv =>
-                                                                                  thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper());
+                                                                                    thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper());
 
         public static void RemoveWithComent(this List<Variable> vars, string coment) {
             var z = 0;
@@ -202,7 +202,7 @@ namespace BlueScript.Variables {
             }
 
             if (v is not VariableString vf) {
-                Develop.DebugPrint(enFehlerArt.Warnung, "Variablentyp falsch");
+                Develop.DebugPrint(FehlerArt.Warnung, "Variablentyp falsch");
                 return;
             }
 
@@ -225,7 +225,7 @@ namespace BlueScript.Variables {
             }
 
             if (v is not VariableFloat vf) {
-                Develop.DebugPrint(enFehlerArt.Warnung, "Variablentyp falsch");
+                Develop.DebugPrint(FehlerArt.Warnung, "Variablentyp falsch");
                 return;
             }
 
@@ -248,7 +248,7 @@ namespace BlueScript.Variables {
             }
 
             if (v is not VariableListString vf) {
-                Develop.DebugPrint(enFehlerArt.Warnung, "Variablentyp falsch");
+                Develop.DebugPrint(FehlerArt.Warnung, "Variablentyp falsch");
                 return;
             }
 
@@ -271,7 +271,7 @@ namespace BlueScript.Variables {
             }
 
             if (v is not VariableBool vf) {
-                Develop.DebugPrint(enFehlerArt.Warnung, "Variablentyp falsch");
+                Develop.DebugPrint(FehlerArt.Warnung, "Variablentyp falsch");
                 return;
             }
 
@@ -330,7 +330,7 @@ namespace BlueScript.Variables {
 
         public virtual string ValueForReplace {
             get {
-                if (ToStringPossible) { Develop.DebugPrint(enFehlerArt.Fehler, "Routine muss überschrieben werden!"); }
+                if (ToStringPossible) { Develop.DebugPrint(FehlerArt.Fehler, "Routine muss überschrieben werden!"); }
 
                 return "\"" + ShortName + ";" + Name + "\"";
             }
@@ -465,7 +465,7 @@ namespace BlueScript.Variables {
                 return CheckOrder.CompareTo(v.CheckOrder);
             }
 
-            Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
+            Develop.DebugPrint(FehlerArt.Fehler, "Falscher Objecttyp!");
             return 0;
         }
 

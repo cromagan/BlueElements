@@ -17,27 +17,13 @@
 
 namespace BlueBasics.Enums {
 
-    public enum enFileFormat {
-        Unknown,
-        WordKind,
-        Textdocument,
-        ExcelKind,
-        PowerPointKind,
-        EMail,
-        Pdf,
-        HTML,
-        Image,
-        CompressedArchive,
-        Movie,
-        Executable,
-        HelpFile,
-        Database,
-        XMLFile,
-        Visitenkarte,
-        Sound,
-        Icon,
-        ProgrammingCode,
-        Link,
-        BlueCreativeFile
+    public enum SizeModes {
+        EmptySpace = 1,
+        BildAbschneiden = 2,
+        Breite_oder_Höhe_Anpassen_OhneVergrößern = 3,
+        Breite_oder_Höhe_Anpassen_MitVergrößern = 4,
+
+        // QuickPicGeneration = 5,
+        Verzerren = 6
     }
 }

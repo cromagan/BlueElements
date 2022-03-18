@@ -141,7 +141,7 @@ namespace BlueDatabase {
                 case BlueBasics.Enums.DataFormat.Link_To_Filesystem:
                     qi = "Spalte: " + column.ReadableText() + "\r\nFalls die Datei auf der Festplatte existiert, wird eine weitere\r\nVariable erzeugt: " + column.Name + "_FileName";
                     var f = column.Database.Cell.BestFile(column, row);
-                    if (f.FileType() == enFileFormat.Image && FileOperations.FileExists(f)) {
+                    if (f.FileType() == FileFormat.Image && FileOperations.FileExists(f)) {
                         vars.Add(new VariableString(column.Name + "_FileName", f, true, false, "Spalte: " + column.ReadableText() + "\r\nEnthält den vollen Dateinamen der Datei der zugehörigen Zelle.\r\nDie Existenz der Datei wurde geprüft und die Datei existert.\r\nAuf die Datei kann evtl. mit LoadImage zugegriffen werden."));
                     }
                     break;
@@ -316,7 +316,7 @@ namespace BlueDatabase {
         public (bool checkPerformed, string error, Script? skript) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, string startroutine) {
             if (Database == null || Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
 
-            var feh = Database.ErrorReason(enErrorReason.EditAcut);
+            var feh = Database.ErrorReason(ErrorReason.EditAcut);
             if (!string.IsNullOrEmpty(feh)) { return (false, feh, null); }
 
             // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
@@ -402,8 +402,8 @@ namespace BlueDatabase {
                 if (filter.FilterType is FilterType.KeinFilter or FilterType.GroßKleinEgal) { return true; } // Filter ohne Funktion
                 if (filter.Column == null) {
                     if (!filter.FilterType.HasFlag(FilterType.GroßKleinEgal)) { filter.FilterType |= FilterType.GroßKleinEgal; }
-                    if (filter.FilterType is not FilterType.Instr_GroßKleinEgal and not FilterType.Instr_UND_GroßKleinEgal) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeilenfilter nur mit Instr möglich!"); }
-                    if (filter.SearchValue.Count < 1) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeilenfilter nur mit mindestens einem Wert möglich"); }
+                    if (filter.FilterType is not FilterType.Instr_GroßKleinEgal and not FilterType.Instr_UND_GroßKleinEgal) { Develop.DebugPrint(FehlerArt.Fehler, "Zeilenfilter nur mit Instr möglich!"); }
+                    if (filter.SearchValue.Count < 1) { Develop.DebugPrint(FehlerArt.Fehler, "Zeilenfilter nur mit mindestens einem Wert möglich"); }
 
                     return filter.SearchValue.All(t => RowFilterMatch(t));
                 }

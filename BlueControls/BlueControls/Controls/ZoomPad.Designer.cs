@@ -44,7 +44,7 @@ namespace BlueControls.Controls
             this.SliderY.Dock = System.Windows.Forms.DockStyle.Right;
             this.SliderY.Location = new System.Drawing.Point(365, 0);
             this.SliderY.Name = "SliderY";
-            this.SliderY.Orientation = BlueBasics.Enums.enOrientation.Senkrecht;
+            this.SliderY.Orientation = BlueBasics.Enums.Orientation.Senkrecht;
             this.SliderY.Size = new System.Drawing.Size(18, 239);
             this.SliderY.ValueChanged += new System.EventHandler(this.SliderY_ValueChanged);
             // 

@@ -128,7 +128,7 @@ namespace BlueControls.Controls {
             if (Filter?.Column == null || !Filter.Column.Database.IsAdministrator()) { return; }
 
             hotItem = Filter.Column;
-            items.Add("Spalte bearbeiten", "#ColumnEdit", QuickImage.Get(enImageCode.Spalte));
+            items.Add("Spalte bearbeiten", "#ColumnEdit", QuickImage.Get(ImageCode.Spalte));
 
             //if (Parent is Filterleiste f) {
             //    if (f.pic.Visible) {
@@ -175,7 +175,7 @@ namespace BlueControls.Controls {
             if (e.Control is Button btn) {
                 btn.Translate = false;
 
-                if (CaptionPosition == enÜberschriftAnordnung.ohne) {
+                if (CaptionPosition == ÜberschriftAnordnung.ohne) {
                     btn.ImageCode = "Trichter|16||1";
                     btn.Text = Filter.ReadableText();
                 } else {
@@ -202,17 +202,17 @@ namespace BlueControls.Controls {
             cbx.Item.Clear();
             cbx.Item.CheckBehavior = CheckBehavior.MultiSelection;
             if (TableView == null) {
-                cbx.Item.Add("Anzeigefehler", "|~", enImageCode.Kreuz, false);
+                cbx.Item.Add("Anzeigefehler", "|~", ImageCode.Kreuz, false);
                 return;
             }
             var listFilterString = Filter.Column.Autofilter_ItemList(TableView.Filter, TableView.PinnedRows);
             if (listFilterString.Count == 0) {
-                cbx.Item.Add("Keine weiteren Einträge vorhanden", "|~", enImageCode.Kreuz, false);
+                cbx.Item.Add("Keine weiteren Einträge vorhanden", "|~", ImageCode.Kreuz, false);
             } else if (listFilterString.Count < 400) {
                 cbx.Item.AddRange(listFilterString, Filter.Column, ShortenStyle.Replaced, Filter.Column.BildTextVerhalten);
                 cbx.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
             } else {
-                cbx.Item.Add("Zu viele Einträge", "|~", enImageCode.Kreuz, false);
+                cbx.Item.Add("Zu viele Einträge", "|~", ImageCode.Kreuz, false);
             }
         }
 
@@ -228,7 +228,7 @@ namespace BlueControls.Controls {
             if (Filter?.Column == null) {
                 DisabledReason = "Bezug zum Filter verloren.";
                 Caption = string.Empty;
-                EditType = enEditTypeFormula.None;
+                EditType = EditTypeFormula.None;
                 QuickInfo = string.Empty;
                 FileEncryptionKey = string.Empty;
                 ValueSet(string.Empty, true, true);
@@ -238,26 +238,26 @@ namespace BlueControls.Controls {
                 QuickInfo = string.IsNullOrEmpty(qi) ? "<b>Filter:</b><br>" + Filter.ReadableText().CreateHtmlCodes(false)
                                                      : "<b>Filter:</b><br>" + Filter.ReadableText().CreateHtmlCodes(false) + "<br><br><b>Info:</b><br>" + qi.CreateHtmlCodes(false);
                 if (!Filter.Column.AutoFilterSymbolPossible()) {
-                    EditType = enEditTypeFormula.None;
+                    EditType = EditTypeFormula.None;
                 } else {
                     var showDelFilterButton = true;
                     if (Filter.FilterType == FilterType.Instr_GroßKleinEgal && Filter.SearchValue != null && Filter.SearchValue.Count == 1) {
-                        CaptionPosition = myParent == null || myParent.Orientation == enOrientation.Waagerecht ? enÜberschriftAnordnung.Links_neben_Dem_Feld
-                                                                                                               : enÜberschriftAnordnung.Über_dem_Feld;
+                        CaptionPosition = myParent == null || myParent.Orientation == Orientation.Waagerecht ? ÜberschriftAnordnung.Links_neben_Dem_Feld
+                                                                                                               : ÜberschriftAnordnung.Über_dem_Feld;
                         showDelFilterButton = false;
                         Caption = Filter.Column.ReadableText() + ":";
-                        EditType = enEditTypeFormula.Textfeld_mit_Auswahlknopf;
+                        EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
                         ValueSet(Filter.SearchValue[0], true, true);
                     }
                     if (Filter.Column.FilterOptions is FilterOptions.Enabled_OnlyAndAllowed or FilterOptions.Enabled_OnlyOrAllowed) {
                         showDelFilterButton = false;
-                        CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
+                        CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
                         Caption = Filter.Column.ReadableText() + ":";
-                        EditType = enEditTypeFormula.Button;
+                        EditType = EditTypeFormula.Button;
                     }
                     if (showDelFilterButton) {
-                        CaptionPosition = enÜberschriftAnordnung.ohne;
-                        EditType = enEditTypeFormula.Button;
+                        CaptionPosition = ÜberschriftAnordnung.ohne;
+                        EditType = EditTypeFormula.Button;
                     }
                 }
             }

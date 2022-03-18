@@ -77,7 +77,7 @@ namespace BlueControls.ItemCollection {
                 return bmp;
             }
 
-            Skin.Draw_FormatedText(gr, Text, null, enAlignment.Horizontal_Vertical_Center, new Rectangle(0, 0, Size.Width, Size.Height), null, false, font, false);
+            Skin.Draw_FormatedText(gr, Text, null, Alignment.Horizontal_Vertical_Center, new Rectangle(0, 0, Size.Width, Size.Height), null, false, font, false);
             gr.DrawRectangle(font.Pen(1), new Rectangle(0, 0, Size.Width, Size.Height));
 
             return bmp;

@@ -27,7 +27,7 @@ namespace BlueBasics {
         #region Methods
 
         public static bool Contains(this ICollection<string> collection, string searchKeyword, bool caseSensitive) {
-            if (caseSensitive) { Develop.DebugPrint(enFehlerArt.Fehler, "CaseSensitive = True"); }
+            if (caseSensitive) { Develop.DebugPrint(FehlerArt.Fehler, "CaseSensitive = True"); }
             return collection.Any(item => string.Equals(item, searchKeyword, System.StringComparison.OrdinalIgnoreCase));
         }
 

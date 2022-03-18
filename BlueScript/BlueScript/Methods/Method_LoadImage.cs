@@ -48,7 +48,7 @@ namespace BlueScript.Methods {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            if (((VariableString)attvar.Attributes[0]).ValueString.FileType() != enFileFormat.Image) {
+            if (((VariableString)attvar.Attributes[0]).ValueString.FileType() != FileFormat.Image) {
                 return new DoItFeedback("Datei ist kein Bildformat: " + ((VariableString)attvar.Attributes[0]).ValueString);
             }
 

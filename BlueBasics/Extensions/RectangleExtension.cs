@@ -26,10 +26,10 @@ namespace BlueBasics {
         #region Methods
 
         public static Point NearestCornerOf(this Rectangle r, Point p) {
-            var lo = r.PointOf(enAlignment.Top_Left);
-            var rO = r.PointOf(enAlignment.Top_Right);
-            var ru = r.PointOf(enAlignment.Bottom_Right);
-            var lu = r.PointOf(enAlignment.Bottom_Left);
+            var lo = r.PointOf(Alignment.Top_Left);
+            var rO = r.PointOf(Alignment.Top_Right);
+            var ru = r.PointOf(Alignment.Bottom_Right);
+            var lu = r.PointOf(Alignment.Bottom_Left);
             var llo = Geometry.GetLenght(p, lo);
             var lro = Geometry.GetLenght(p, rO);
             var llu = Geometry.GetLenght(p, lu);
@@ -38,33 +38,33 @@ namespace BlueBasics {
             return erg == llo ? lo : erg == lro ? rO : erg == llu ? lu : erg == lru ? ru : Point.Empty;
         }
 
-        public static Point PointOf(this Rectangle r, enAlignment p) {
+        public static Point PointOf(this Rectangle r, Alignment p) {
             switch (p) {
-                case enAlignment.Bottom_Left:
+                case Alignment.Bottom_Left:
                     return new Point(r.Left, r.Bottom);
 
-                case enAlignment.Bottom_Right:
+                case Alignment.Bottom_Right:
                     return new Point(r.Right, r.Bottom);
 
-                case enAlignment.Top_Left:
+                case Alignment.Top_Left:
                     return new Point(r.Left, r.Top);
 
-                case enAlignment.Top_Right:
+                case Alignment.Top_Right:
                     return new Point(r.Right, r.Top);
 
-                case enAlignment.Bottom_HorizontalCenter:
+                case Alignment.Bottom_HorizontalCenter:
                     return new Point((int)(r.Left + (r.Width / 2.0)), r.Bottom);
 
-                case enAlignment.Top_HorizontalCenter:
+                case Alignment.Top_HorizontalCenter:
                     return new Point((int)(r.Left + (r.Width / 2.0)), r.Top);
 
-                case enAlignment.VerticalCenter_Left:
+                case Alignment.VerticalCenter_Left:
                     return new Point(r.Left, (int)(r.Top + (r.Height / 2.0)));
 
-                case enAlignment.VerticalCenter_Right:
+                case Alignment.VerticalCenter_Right:
                     return new Point(r.Right, (int)(r.Top + (r.Height / 2.0)));
 
-                case enAlignment.Horizontal_Vertical_Center:
+                case Alignment.Horizontal_Vertical_Center:
                     return new Point((int)(r.Left + (r.Width / 2.0)), (int)(r.Top + (r.Height / 2.0)));
 
                 default:

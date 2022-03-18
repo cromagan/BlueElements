@@ -208,12 +208,12 @@ namespace BlueControls {
 
         private void GenerateVariableTable() {
             Database x = new(true);
-            x.Column.Add("Name", "N", enVarType.Text, "Variablenname");
-            x.Column.Add("Typ", "T", enVarType.Text, "Variablentyp");
-            x.Column.Add("RO", "R", enVarType.Bit, "Readonly, Schreibgeschützt");
-            x.Column.Add("System", "S", enVarType.Bit, "Systemspalte\r\nIm Script nicht verfügbar");
-            x.Column.Add("Inhalt", "I", enVarType.Text, "Inhalt (gekürzte Ansicht)");
-            x.Column.Add("Kommentar", "K", enVarType.Text, "Komentar");
+            x.Column.Add("Name", "N", VarType.Text, "Variablenname");
+            x.Column.Add("Typ", "T", VarType.Text, "Variablentyp");
+            x.Column.Add("RO", "R", VarType.Bit, "Readonly, Schreibgeschützt");
+            x.Column.Add("System", "S", VarType.Bit, "Systemspalte\r\nIm Script nicht verfügbar");
+            x.Column.Add("Inhalt", "I", VarType.Text, "Inhalt (gekürzte Ansicht)");
+            x.Column.Add("Kommentar", "K", VarType.Text, "Komentar");
 
             foreach (var ThisColumn in x.Column.Where(ThisColumn => string.IsNullOrEmpty(ThisColumn.Identifier))) {
                 ThisColumn.MultiLine = true;
@@ -241,7 +241,7 @@ namespace BlueControls {
 
             var (pos, _) = NextText(sc, 0, x, true, false, KlammernStd);
             if (pos < 1) {
-                MessageBox.Show("Routine " + e.Item.Internal + " nicht gefunden.<br>Skript starten, um diese<br>Liste zu aktualisieren.", enImageCode.Information, "OK");
+                MessageBox.Show("Routine " + e.Item.Internal + " nicht gefunden.<br>Skript starten, um diese<br>Liste zu aktualisieren.", ImageCode.Information, "OK");
                 return;
             }
 

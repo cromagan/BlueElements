@@ -1,5 +1,5 @@
 ﻿namespace BlueControls.BlueDatabaseDialogs {
-    partial class frmColumnArrangementPadEditor {
+    partial class ColumnArrangementPadEditor {
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -55,6 +55,8 @@
             // Pad
             // 
             this.Pad.Size = new System.Drawing.Size(612, 340);
+            this.Pad.ItemAdded += new System.EventHandler<BlueBasics.EventArgs.ListEventArgs>(this.Item_ItemAdded);
+            this.Pad.ItemRemoved += new System.EventHandler<System.EventArgs>(this.Item_ItemRemoved);
             this.Pad.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Pad_MouseUp);
             // 
             // Ribbon
@@ -81,7 +83,7 @@
             this.tabAnsichten.Controls.Add(this.grpAnsichtsVerwaltung);
             this.tabAnsichten.Location = new System.Drawing.Point(4, 25);
             this.tabAnsichten.Name = "tabAnsichten";
-            this.tabAnsichten.Size = new System.Drawing.Size(976, 81);
+            this.tabAnsichten.Size = new System.Drawing.Size(876, 81);
             this.tabAnsichten.TabIndex = 4;
             this.tabAnsichten.Text = "Ansichten";
             // 
@@ -241,12 +243,12 @@
             this.btnAktuelleAnsichtLoeschen.Text = "Ansicht löschen";
             this.btnAktuelleAnsichtLoeschen.Click += new System.EventHandler(this.btnAktuelleAnsichtLoeschen_Click);
             // 
-            // frmColumnArrangementPadEditor
+            // ColumnArrangementPadEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(984, 450);
-            this.Name = "frmColumnArrangementPadEditor";
+            this.Name = "ColumnArrangementPadEditor";
             this.Text = "Spalten-Editor";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.grpDesign.ResumeLayout(false);

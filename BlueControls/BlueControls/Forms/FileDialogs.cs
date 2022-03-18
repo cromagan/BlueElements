@@ -61,8 +61,8 @@ namespace BlueControls.Forms {
             if (filelist.Count == 0) { return false; }
             if (meldungen) {
                 buttonNumber = filelist.Count == 1
-                    ? MessageBox.Show("Soll die Datei<br>\"" + filelist[0] + "\"<br>wirklich <b>gelöscht</b> werden?\"", enImageCode.Warnung, "Ja - löschen", "Nein - abbrechen")
-                    : MessageBox.Show("Sollen wirklich " + filelist.Count + " Dateien<br><b>gelöscht</b> werden?\"", enImageCode.Warnung, "Ja - löschen", "Nein - abbrechen");
+                    ? MessageBox.Show("Soll die Datei<br>\"" + filelist[0] + "\"<br>wirklich <b>gelöscht</b> werden?\"", ImageCode.Warnung, "Ja - löschen", "Nein - abbrechen")
+                    : MessageBox.Show("Sollen wirklich " + filelist.Count + " Dateien<br><b>gelöscht</b> werden?\"", ImageCode.Warnung, "Ja - löschen", "Nein - abbrechen");
             }
             return buttonNumber == 0 && FileOperations.DeleteFile(filelist);
         }

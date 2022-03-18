@@ -37,11 +37,11 @@ namespace BluePaint {
             var w = Berechnung.Ergebnis(X.Text);
             var h = Berechnung.Ergebnis(Y.Text);
             if (w == null || (int)w < 2) {
-                Notification.Show("Bitte Breite eingeben.", enImageCode.Information);
+                Notification.Show("Bitte Breite eingeben.", ImageCode.Information);
                 return;
             }
             if (h == null || (int)h < 2) {
-                Notification.Show("Bitte Höhe eingeben.", enImageCode.Information);
+                Notification.Show("Bitte Höhe eingeben.", ImageCode.Information);
                 return;
             }
             Bitmap newPic = new((int)w, (int)h);

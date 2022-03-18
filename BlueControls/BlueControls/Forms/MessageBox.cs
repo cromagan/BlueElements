@@ -46,10 +46,10 @@ namespace BlueControls.Forms {
         //        StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
         //    }
         //}
-        private MessageBox(string txt, enImageCode pic, params string[] buttons) : base(Design.Form_MsgBox) {
+        private MessageBox(string txt, ImageCode pic, params string[] buttons) : base(Design.Form_MsgBox) {
             InitializeComponent();
             Text = Develop.AppName();
-            capText.Text = pic != enImageCode.None
+            capText.Text = pic != ImageCode.None
                 ? "<ImageCode=" + QuickImage.Get(pic, 32) + "> <zbx_store><top>" + BlueDatabase.LanguageTool.DoTranslate(txt, false)
                 : BlueDatabase.LanguageTool.DoTranslate(txt, false);
             Size = new Size((capText.Left * 2) + capText.Width + BorderWidth, (capText.Top * 3) + capText.Height + 35 + BorderHeight);
@@ -71,13 +71,13 @@ namespace BlueControls.Forms {
 
         #region Methods
 
-        public static void Show(string txt) => Show(txt, enImageCode.None, true, "OK");
+        public static void Show(string txt) => Show(txt, ImageCode.None, true, "OK");
 
-        public static void Show(string txt, enImageCode pic, string buttons) => Show(txt, pic, true, buttons);
+        public static void Show(string txt, ImageCode pic, string buttons) => Show(txt, pic, true, buttons);
 
-        public static int Show(string txt, enImageCode pic, params string[] buttons) => Show(txt, pic, true, buttons);
+        public static int Show(string txt, ImageCode pic, params string[] buttons) => Show(txt, pic, true, buttons);
 
-        public static int Show(string txt, enImageCode pic, bool dialog, params string[] buttons) {
+        public static int Show(string txt, ImageCode pic, bool dialog, params string[] buttons) {
             MessageBox mb = new(txt, pic, buttons);
             if (dialog) {
                 mb.ShowDialog();

@@ -30,9 +30,9 @@ namespace BlueControls.Forms {
 
         #region Constructors
 
-        private InputBox() : this(string.Empty, string.Empty, enVarType.Text, false) { }
+        private InputBox() : this(string.Empty, string.Empty, VarType.Text, false) { }
 
-        private InputBox(string txt, string vorschlagsText, enVarType textformat, bool bigMultiLineBox) : base() {
+        private InputBox(string txt, string vorschlagsText, VarType textformat, bool bigMultiLineBox) : base() {
             InitializeComponent();
             txbText.Text = vorschlagsText;
             txbText.SetFormat(textformat);
@@ -46,11 +46,11 @@ namespace BlueControls.Forms {
 
         #region Methods
 
-        public static string Show(string txt) => Show(txt, "", enVarType.Text, false);
+        public static string Show(string txt) => Show(txt, "", VarType.Text, false);
 
-        public static string Show(string txt, string vorschlagsText, enVarType textformat) => Show(txt, vorschlagsText, textformat, false);
+        public static string Show(string txt, string vorschlagsText, VarType textformat) => Show(txt, vorschlagsText, textformat, false);
 
-        public static string Show(string txt, string vorschlagsText, enVarType textformat, bool bigMultiLineBox) {
+        public static string Show(string txt, string vorschlagsText, VarType textformat, bool bigMultiLineBox) {
             InputBox mb = new(txt, vorschlagsText, textformat, bigMultiLineBox);
             mb.ShowDialog();
             return mb._giveBack;

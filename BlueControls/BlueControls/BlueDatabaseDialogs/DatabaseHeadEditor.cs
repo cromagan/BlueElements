@@ -140,14 +140,14 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
                 r.CellSet("Aenderer", work.User);
                 r.CellSet("AenderZeit", work.CompareKey());
-                var symb = enImageCode.Fragezeichen;
+                var symb = ImageCode.Fragezeichen;
                 var alt = work.PreviousValue;
                 var neu = work.ChangedTo;
                 var aenderung = work.Comand.ToString();
                 switch (work.Comand) {
                     case DatabaseDataType.ce_UTF8Value_withoutSizeData:
                     case DatabaseDataType.ce_Value_withoutSizeData:
-                        symb = enImageCode.Textfeld;
+                        symb = ImageCode.Textfeld;
                         aenderung = "Wert geändert";
                         break;
 
@@ -155,39 +155,39 @@ namespace BlueControls.BlueDatabaseDialogs {
                         aenderung = "Export ausgeführt oder geändert";
                         alt = "";
                         neu = "";
-                        symb = enImageCode.Karton;
+                        symb = ImageCode.Karton;
                         break;
 
                     case DatabaseDataType.Layouts:
                         aenderung = "Layouts verändert";
                         alt = "";
                         neu = "";
-                        symb = enImageCode.Layout;
+                        symb = ImageCode.Layout;
                         break;
 
                     case DatabaseDataType.dummyComand_AddRow:
                         aenderung = "Neue Zeile";
-                        symb = enImageCode.PlusZeichen;
+                        symb = ImageCode.PlusZeichen;
                         break;
 
                     case DatabaseDataType.RulesScript:
                         //case enDatabaseDataType.Rules_ALT:
                         aenderung = "Regeln verändert";
-                        symb = enImageCode.Formel;
+                        symb = ImageCode.Formel;
                         alt = "";
                         neu = "";
                         break;
 
                     case DatabaseDataType.ColumnArrangement:
                         aenderung = "Spalten-Anordnungen verändert";
-                        symb = enImageCode.Spalte;
+                        symb = ImageCode.Spalte;
                         alt = "";
                         neu = "";
                         break;
 
                     case DatabaseDataType.dummyComand_RemoveRow:
                         aenderung = "Zeile gelöscht";
-                        symb = enImageCode.MinusZeichen;
+                        symb = ImageCode.MinusZeichen;
                         break;
                 }
                 r.CellSet("Aenderung", aenderung);
@@ -276,7 +276,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 if (such == art) {
                     _database.InjectCommand(art, inhalt);
                     //_Database.AddPending(Art, -1, -1, "", Inhalt, true);
-                    MessageBox.Show("<b>Importiert:</b><br>" + inhalt, enImageCode.Information, "OK");
+                    MessageBox.Show("<b>Importiert:</b><br>" + inhalt, ImageCode.Information, "OK");
                 }
             } while (art != DatabaseDataType.EOF);
             RemoveDatabase();
@@ -305,7 +305,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnSperreAufheben_Click(object sender, System.EventArgs e) {
             _database.UnlockHard();
-            MessageBox.Show("Erledigt.", enImageCode.Information, "OK");
+            MessageBox.Show("Erledigt.", ImageCode.Information, "OK");
         }
 
         private void CryptStatus() {
@@ -374,20 +374,20 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void GenerateUndoTabelle() {
             Database x = new(true);
-            x.Column.Add("hidden", "hidden", enVarType.Text);
-            x.Column.Add("Index", "Index", enVarType.Integer);
-            x.Column.Add("db", "Herkunft", enVarType.Text);
-            x.Column.Add("ColumnKey", "Spalten-<br>Schlüssel", enVarType.Integer);
-            x.Column.Add("ColumnName", "Spalten-<br>Name", enVarType.Text);
-            x.Column.Add("ColumnCaption", "Spalten-<br>Beschriftung", enVarType.Text);
-            x.Column.Add("RowKey", "Zeilen-<br>Schlüssel", enVarType.Integer);
-            x.Column.Add("RowFirst", "Zeile, Wert der<br>1. Spalte", enVarType.Text);
-            x.Column.Add("Aenderzeit", "Änder-<br>Zeit", enVarType.Text);
-            x.Column.Add("Aenderer", "Änderer", enVarType.Text);
-            x.Column.Add("Symbol", "Symbol", enVarType.Text);
-            x.Column.Add("Aenderung", "Änderung", enVarType.Text);
-            x.Column.Add("WertAlt", "Wert alt", enVarType.Text);
-            x.Column.Add("WertNeu", "Wert neu", enVarType.Text);
+            x.Column.Add("hidden", "hidden", VarType.Text);
+            x.Column.Add("Index", "Index", VarType.Integer);
+            x.Column.Add("db", "Herkunft", VarType.Text);
+            x.Column.Add("ColumnKey", "Spalten-<br>Schlüssel", VarType.Integer);
+            x.Column.Add("ColumnName", "Spalten-<br>Name", VarType.Text);
+            x.Column.Add("ColumnCaption", "Spalten-<br>Beschriftung", VarType.Text);
+            x.Column.Add("RowKey", "Zeilen-<br>Schlüssel", VarType.Integer);
+            x.Column.Add("RowFirst", "Zeile, Wert der<br>1. Spalte", VarType.Text);
+            x.Column.Add("Aenderzeit", "Änder-<br>Zeit", VarType.Text);
+            x.Column.Add("Aenderer", "Änderer", VarType.Text);
+            x.Column.Add("Symbol", "Symbol", VarType.Text);
+            x.Column.Add("Aenderung", "Änderung", VarType.Text);
+            x.Column.Add("WertAlt", "Wert alt", VarType.Text);
+            x.Column.Add("WertNeu", "Wert neu", VarType.Text);
             foreach (var thisColumn in x.Column.Where(thisColumn => string.IsNullOrEmpty(thisColumn.Identifier))) {
                 thisColumn.MultiLine = true;
                 thisColumn.TextBearbeitungErlaubt = false;

@@ -99,7 +99,7 @@ namespace BlueBasics {
                 writer.Flush();
                 return true;
             } catch (Exception ex) {
-                Develop.DebugPrint(enFehlerArt.Warnung, ex);
+                Develop.DebugPrint(FehlerArt.Warnung, ex);
                 return false;
             }
         }
@@ -136,7 +136,7 @@ namespace BlueBasics {
                         }
                     }
                 } catch (Exception ex) {
-                    Develop.DebugPrint(enFehlerArt.Info, ex);
+                    Develop.DebugPrint(FehlerArt.Info, ex);
                 }
             }
             return l;

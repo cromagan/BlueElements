@@ -54,13 +54,19 @@ namespace BlueControls.Forms {
 
         #region Methods
 
-        private void btnDatenbankhinzu_Click(object sender, System.EventArgs e) {
+        private void btnFeldHinzu_Click(object sender, System.EventArgs e) {
+            var x = new EditFieldPadItem(_cf.NextID().ToString());
+
+            Pad.Item.Add(x);
+        }
+
+        private void btnZeileHinzu_Click(object sender, System.EventArgs e) {
             var x = Directory.GetFiles(_cf.FilePath, "*.mdb").ToList();
 
-            x.RemoveRange(_cf.DatabaseFiles);
+            //x.RemoveRange(_cf.DatabaseFiles);
 
             if (x == null || x.Count == 0) {
-                MessageBox.Show("Keine Datenbanken (mehr) vorhanden.");
+                MessageBox.Show("Keine Datenbanken vorhanden.");
                 return;
             }
 
@@ -78,7 +84,8 @@ namespace BlueControls.Forms {
             }
         }
 
-        private void btnFreiesFeld_Click(object sender, System.EventArgs e) {
+        private void Pad_Changed(object sender, System.EventArgs e) {
+            _cf.PadData = Pad.ToString();
         }
 
         #endregion

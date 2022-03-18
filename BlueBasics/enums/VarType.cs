@@ -17,7 +17,7 @@
 
 namespace BlueBasics.Enums {
 
-    public enum enVarType {
+    public enum VarType {
         Unbekannt = -1,
         Text = 0,
         Integer = 1,

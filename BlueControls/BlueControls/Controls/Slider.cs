@@ -48,7 +48,7 @@ namespace BlueControls.Controls {
 
         private float _minimum;
 
-        private enOrientation _orientation = enOrientation.Waagerecht;
+        private Orientation _orientation = Orientation.Waagerecht;
 
         private Rectangle _slider;
 
@@ -110,8 +110,8 @@ namespace BlueControls.Controls {
         [DefaultValue(1f)]
         public float MouseChange { get; set; } = 1;
 
-        [DefaultValue(enOrientation.Waagerecht)]
-        public enOrientation Orientation {
+        [DefaultValue(Orientation.Waagerecht)]
+        public Orientation Orientation {
             get => _orientation;
             set {
                 if (value == _orientation) { return; }
@@ -171,7 +171,7 @@ namespace BlueControls.Controls {
             _clickAreaContainsMouse = _clickArea.Contains(MousePos().X, MousePos().Y);
             var proz = (_value - Minimum) / (Maximum - Minimum);
             if (Maximum - Minimum > 0) {
-                _slider = _orientation == enOrientation.Waagerecht
+                _slider = _orientation == Orientation.Waagerecht
                     ? new Rectangle((int)(_clickArea.Left + (proz * (_clickArea.Width - But1.Width))), 0, But1.Width, But1.Height)
                     : new Rectangle(0, (int)(_clickArea.Top + (proz * (_clickArea.Height - But1.Height))), But1.Width, But1.Height);
                 _sliderContainsMouse = _slider.Contains(MousePos());
@@ -314,7 +314,7 @@ namespace BlueControls.Controls {
             if (!_clickAreaContainsMouse && !mouseisMoving) { return; }
             if (_sliderContainsMouse && !mouseisMoving) { return; }
             if (_clickArea.Width <= 0 || _clickArea.Height <= 0) { return; }
-            var testVal = _orientation == enOrientation.Waagerecht
+            var testVal = _orientation == Orientation.Waagerecht
                 ? Minimum + ((e.X - _clickArea.Left - (_slider.Width / 2f)) / (_clickArea.Width - _slider.Width) * (Maximum - Minimum))
                 : Minimum + ((e.Y - _clickArea.Top - (_slider.Height / 2f)) / (_clickArea.Height - _slider.Height) * (Maximum - Minimum));
             testVal = CheckMinMax((int)(testVal / MouseChange) * MouseChange);
@@ -328,7 +328,7 @@ namespace BlueControls.Controls {
         private void GenerateButtons() {
             _sliderContainsMouse = false;
             _clickAreaContainsMouse = false;
-            if (_orientation == enOrientation.Waagerecht) {
+            if (_orientation == Orientation.Waagerecht) {
                 _backStyle = Design.Slider_Hintergrund_Waagerecht;
                 _sliderStyle = Design.Button_Slider_Waagerecht;
                 But1.SetBounds(0, 0, ButtonSize, Height);

@@ -843,13 +843,13 @@ namespace BlueControls {
         internal static Pen? PenLinieDick;
         internal static Pen? PenLinieDünn;
         internal static Pen? PenLinieKräftig;
-        private static readonly enImageCodeEffect[] St = new enImageCodeEffect[1];
+        private static readonly ImageCodeEffect[] St = new ImageCodeEffect[1];
 
         #endregion
 
         #region Methods
 
-        public static enImageCodeEffect AdditionalState(States vState) => vState.HasFlag(States.Standard_Disabled) ? St[0] : enImageCodeEffect.Ohne;
+        public static ImageCodeEffect AdditionalState(States vState) => vState.HasFlag(States.Standard_Disabled) ? St[0] : ImageCodeEffect.Ohne;
 
         public static List<string> AllStyles() {
             if (StyleDb == null) { InitStyles(); }
@@ -1087,9 +1087,9 @@ namespace BlueControls {
         /// <param name="fitInRect"></param>
         /// <param name="child"></param>
         /// <param name="deleteBack"></param>
-        public static void Draw_FormatedText(Graphics gr, string txt, Design design, States state, QuickImage? imageCode, enAlignment align, Rectangle fitInRect, Control? child, bool deleteBack, bool translate) => Draw_FormatedText(gr, txt, imageCode, DesignOf(design, state), align, fitInRect, child, deleteBack, translate);
+        public static void Draw_FormatedText(Graphics gr, string txt, Design design, States state, QuickImage? imageCode, Alignment align, Rectangle fitInRect, Control? child, bool deleteBack, bool translate) => Draw_FormatedText(gr, txt, imageCode, DesignOf(design, state), align, fitInRect, child, deleteBack, translate);
 
-        public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? imageCode, enAlignment align, Rectangle fitInRect, BlueFont? bFont, bool translate) => Draw_FormatedText(gr, txt, imageCode, align, fitInRect, null, false, bFont, translate);
+        public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? imageCode, Alignment align, Rectangle fitInRect, BlueFont? bFont, bool translate) => Draw_FormatedText(gr, txt, imageCode, align, fitInRect, null, false, bFont, translate);
 
         //private static void Draw_Border_DuoColor(Graphics GR, RowItem Row, Rectangle r, bool NurOben) {
         //    var c1 = Color.FromArgb(Value(Row, col_Color_Border_2, 0));
@@ -1117,7 +1117,7 @@ namespace BlueControls {
         /// <param name="fitInRect"></param>
         /// <param name="child"></param>
         /// <param name="deleteBack"></param>
-        public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, clsDesign design, enAlignment align, Rectangle fitInRect, Control? child, bool deleteBack, bool translate) {
+        public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, clsDesign design, Alignment align, Rectangle fitInRect, Control? child, bool deleteBack, bool translate) {
             if (string.IsNullOrEmpty(txt) && qi == null) { return; }
             QuickImage? tmpImage = null;
             if (qi != null) { tmpImage = QuickImage.Get(qi, AdditionalState(design.Status)); }
@@ -1135,7 +1135,7 @@ namespace BlueControls {
         /// <param name="child"></param>
         /// <param name="deleteBack"></param>
         /// <param name="bFont"></param>
-        public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, enAlignment align, Rectangle fitInRect, Control? child, bool deleteBack, BlueFont? bFont, bool translate) {
+        public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, Alignment align, Rectangle fitInRect, Control? child, bool deleteBack, BlueFont? bFont, bool translate) {
             var pSize = SizeF.Empty;
             var tSize = SizeF.Empty;
             float xp = 0;
@@ -1147,13 +1147,13 @@ namespace BlueControls {
                 if (fitInRect.Width > 0) { txt = bFont.TrimByWidth(txt, fitInRect.Width - pSize.Width); }
                 tSize = gr.MeasureString(txt, bFont.Font());
             }
-            if (align.HasFlag(enAlignment.Right)) { xp = fitInRect.Width - pSize.Width - tSize.Width; }
-            if (align.HasFlag(enAlignment.HorizontalCenter)) { xp = (float)((fitInRect.Width - pSize.Width - tSize.Width) / 2.0); }
-            if (align.HasFlag(enAlignment.VerticalCenter)) {
+            if (align.HasFlag(Alignment.Right)) { xp = fitInRect.Width - pSize.Width - tSize.Width; }
+            if (align.HasFlag(Alignment.HorizontalCenter)) { xp = (float)((fitInRect.Width - pSize.Width - tSize.Width) / 2.0); }
+            if (align.HasFlag(Alignment.VerticalCenter)) {
                 yp1 = (float)((fitInRect.Height - pSize.Height) / 2.0);
                 yp2 = (float)((fitInRect.Height - tSize.Height) / 2.0);
             }
-            if (align.HasFlag(enAlignment.Bottom)) {
+            if (align.HasFlag(Alignment.Bottom)) {
                 yp1 = fitInRect.Height - pSize.Height;
                 yp2 = fitInRect.Height - tSize.Height;
             }
@@ -1230,7 +1230,7 @@ namespace BlueControls {
         public static ItemCollectionList GetRahmenArt(RowItem? sheetStyle, bool mitOhne) {
             ItemCollectionList rahms = new();
             if (mitOhne) {
-                rahms.Add("Ohne Rahmen", ((int)PadStyles.Undefiniert).ToString(), enImageCode.Kreuz);
+                rahms.Add("Ohne Rahmen", ((int)PadStyles.Undefiniert).ToString(), ImageCode.Kreuz);
             }
             rahms.Add("Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Haupt).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Haupt, sheetStyle).SymbolOfLine());
             rahms.Add("Untertitel für Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Untertitel).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Untertitel, sheetStyle).SymbolOfLine());
@@ -1241,6 +1241,22 @@ namespace BlueControls {
             rahms.Add("Kleiner Zusatz", ((int)PadStyles.Style_KleinerZusatz).ToString(), GetBlueFont(PadStyles.Style_KleinerZusatz, sheetStyle).SymbolOfLine());
             rahms.Sort();
             return rahms;
+        }
+
+        public static Color IDColor(int id) {
+            switch (id % 10) {
+                case 0: return Color.Red;
+                case 1: return Color.Blue;
+                case 2: return Color.Green;
+                case 3: return Color.Yellow;
+                case 4: return Color.Purple;
+                case 5: return Color.Cyan;
+                case 6: return Color.Orange;
+                case 7: return Color.LightBlue;
+                case 8: return Color.PaleVioletRed;
+                case 9: return Color.LightGreen;
+                default: return Color.Gray;
+            }
         }
 
         public static void InitStyles() => StyleDb = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.MDB", "Styles", true, false);
@@ -1517,7 +1533,7 @@ namespace BlueControls {
             Design.Add(Enums.Design.Table_Cell_Chapter, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, 0, "", "", "", RahmenArt.Ohne, "", "", "", "{Name=Calibri, Size=15,Bold=True,Underline=True}", "");
             Inited = true;
 
-            St[0] = enImageCodeEffect.WindowsXPDisabled;
+            St[0] = ImageCodeEffect.WindowsXPDisabled;
 
             PenLinieDünn = new Pen(Color_Border(Enums.Design.Table_Lines_thin, States.Standard));
             PenLinieKräftig = new Pen(Color_Border(Enums.Design.Table_Lines_thick, States.Standard));
@@ -1676,14 +1692,14 @@ namespace BlueControls {
                     }
                     break;
             }
-            Develop.DebugPrint(enFehlerArt.Fehler, "Stufe " + stufe + " nicht definiert.");
+            Develop.DebugPrint(FehlerArt.Fehler, "Stufe " + stufe + " nicht definiert.");
             return null;
         }
 
         internal static BlueFont? GetBlueFont(Design design, States state, int stufe) {
             if (stufe != 4 && design != Enums.Design.TextBox) {
                 if (design == Enums.Design.Form_QuickInfo) { return GetBlueFont(design, state); } // QuickInfo kann jeden Text enthatlten
-                Develop.DebugPrint(enFehlerArt.Warnung, "Design unbekannt: " + (int)design);
+                Develop.DebugPrint(FehlerArt.Warnung, "Design unbekannt: " + (int)design);
                 return GetBlueFont(design, state);
             }
             switch (stufe) {
@@ -1702,7 +1718,7 @@ namespace BlueControls {
                 case 7:
                     return GetBlueFont(Enums.Design.TextBox_Bold, state);
             }
-            Develop.DebugPrint(enFehlerArt.Fehler, "Stufe " + stufe + " nicht definiert.");
+            Develop.DebugPrint(FehlerArt.Fehler, "Stufe " + stufe + " nicht definiert.");
             return GetBlueFont(design, state);
         }
 

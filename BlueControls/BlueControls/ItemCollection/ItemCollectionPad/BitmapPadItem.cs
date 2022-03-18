@@ -64,7 +64,7 @@ namespace BlueControls.ItemCollection {
             Overlays = new List<QuickImage>();
             Hintergrund_Weiß_Füllen = true;
             Padding = 0;
-            Bild_Modus = enSizeModes.EmptySpace;
+            Bild_Modus = SizeModes.EmptySpace;
             Stil = PadStyles.Undefiniert; // Kein Rahmen
         }
 
@@ -72,7 +72,7 @@ namespace BlueControls.ItemCollection {
 
         #region Properties
 
-        public enSizeModes Bild_Modus { get; set; }
+        public SizeModes Bild_Modus { get; set; }
 
         public Bitmap? Bitmap { get; set; }
 
@@ -87,14 +87,14 @@ namespace BlueControls.ItemCollection {
 
         public void Bildschirmbereich_wählen() {
             if (Bitmap != null) {
-                if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+                if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             }
             Bitmap = ScreenShot.GrabArea(null);
         }
 
         public void Datei_laden() {
             if (Bitmap != null) {
-                if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+                if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             }
             System.Windows.Forms.OpenFileDialog e = new() {
                 CheckFileExists = true,
@@ -116,17 +116,17 @@ namespace BlueControls.ItemCollection {
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new()
             {
-                new FlexiControlForProperty(this, "Bildschirmbereich_wählen", enImageCode.Bild),
-                new FlexiControlForProperty(this, "Datei_laden", enImageCode.Ordner),
+                new FlexiControlForProperty(this, "Bildschirmbereich_wählen", ImageCode.Bild),
+                new FlexiControlForProperty(this, "Datei_laden", ImageCode.Ordner),
                 new FlexiControl(),
                 new FlexiControlForProperty(this, "Platzhalter_für_Layout", 2),
                 new FlexiControl()
             };
             ItemCollectionList.ItemCollectionList comms = new()
             {
-                { "Abschneiden", ((int)enSizeModes.BildAbschneiden).ToString(), QuickImage.Get("BildmodusAbschneiden|32") },
-                { "Verzerren", ((int)enSizeModes.Verzerren).ToString(), QuickImage.Get("BildmodusVerzerren|32") },
-                { "Einpassen", ((int)enSizeModes.EmptySpace).ToString(), QuickImage.Get("BildmodusEinpassen|32") }
+                { "Abschneiden", ((int)SizeModes.BildAbschneiden).ToString(), QuickImage.Get("BildmodusAbschneiden|32") },
+                { "Verzerren", ((int)SizeModes.Verzerren).ToString(), QuickImage.Get("BildmodusVerzerren|32") },
+                { "Einpassen", ((int)SizeModes.EmptySpace).ToString(), QuickImage.Get("BildmodusEinpassen|32") }
             };
             l.Add(new FlexiControlForProperty(this, "Bild-Modus", comms));
             l.Add(new FlexiControl());
@@ -143,7 +143,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "modus":
-                    Bild_Modus = (enSizeModes)IntParse(value);
+                    Bild_Modus = (SizeModes)IntParse(value);
                     return true;
 
                 case "whiteback":
@@ -235,12 +235,12 @@ namespace BlueControls.ItemCollection {
             if (Bitmap != null) {
                 r3 = new RectangleF(0, 0, Bitmap.Width, Bitmap.Height);
                 switch (Bild_Modus) {
-                    case enSizeModes.Verzerren: {
+                    case SizeModes.Verzerren: {
                             r2 = r1;
                             break;
                         }
 
-                    case enSizeModes.BildAbschneiden: {
+                    case SizeModes.BildAbschneiden: {
                             var scale = Math.Max((drawingCoordinates.Width - (Padding * 2)) / Bitmap.Width, (drawingCoordinates.Height - (Padding * 2)) / Bitmap.Height);
                             var tmpw = (drawingCoordinates.Width - (Padding * 2)) / scale;
                             var tmph = (drawingCoordinates.Height - (Padding * 2)) / scale;
@@ -256,7 +256,7 @@ namespace BlueControls.ItemCollection {
                         }
                 }
             }
-            var trp = drawingCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
+            var trp = drawingCoordinates.PointOf(Alignment.Horizontal_Vertical_Center);
             gr.TranslateTransform(trp.X, trp.Y);
             gr.RotateTransform(-Drehwinkel);
             r1 = new RectangleF(r1.Left - trp.X, r1.Top - trp.Y, r1.Width, r1.Height);

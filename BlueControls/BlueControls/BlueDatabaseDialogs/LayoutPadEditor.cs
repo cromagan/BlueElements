@@ -111,12 +111,12 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void btnCopyID_Click(object sender, System.EventArgs e) {
             SaveCurrentLayout();
             Generic.CopytoClipboard(Pad.Item.Id);
-            Notification.Show("ID kopiert.", enImageCode.Clipboard);
+            Notification.Show("ID kopiert.", ImageCode.Clipboard);
         }
 
         private void btnLayoutHinzu_Click(object sender, System.EventArgs e) {
             SaveCurrentLayout();
-            var ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", "", enVarType.Text);
+            var ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", "", VarType.Text);
             if (string.IsNullOrEmpty(ex)) { return; }
             LoadLayout(string.Empty);
 
@@ -135,7 +135,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 MessageBox.Show("Layout kann nur manuell gelöscht werden.");
                 return;
             }
-            if (MessageBox.Show("Layout <b>'" + Pad.Item.Caption + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            if (MessageBox.Show("Layout <b>'" + Pad.Item.Caption + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             Database.Layouts.RemoveAt(ind);
             LoadLayout(string.Empty);
             BefülleLayoutDropdown();
@@ -151,7 +151,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 MessageBox.Show("Layout kann nur manuell umbenannt werden.");
                 return;
             }
-            var ex = InputBox.Show("Namen des Layouts ändern:", Pad.Item.Caption, enVarType.Text);
+            var ex = InputBox.Show("Namen des Layouts ändern:", Pad.Item.Caption, VarType.Text);
             if (string.IsNullOrEmpty(ex)) { return; }
             Pad.Item.Caption = ex;
             SaveCurrentLayout();

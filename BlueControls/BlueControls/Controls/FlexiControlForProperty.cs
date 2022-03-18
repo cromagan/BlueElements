@@ -28,6 +28,7 @@ using System.Reflection;
 using System.Windows.Forms;
 using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
+using BlueDatabase.Enums;
 
 #nullable enable
 
@@ -50,20 +51,20 @@ namespace BlueControls.Controls {
 
         #region Constructors
 
-        public FlexiControlForProperty(object propertyObject, string propertyName, int rowCount, ItemCollectionList? list, enImageCode image) : this() {
+        public FlexiControlForProperty(object propertyObject, string propertyName, int rowCount, ItemCollectionList? list, ImageCode image) : this() {
             _propertyObject = propertyObject;
             _propertyName = propertyName;
             UpdateControlData(true, rowCount, list, image);
             CheckEnabledState();
         }
 
-        public FlexiControlForProperty(object propertyObject, string propertyName, ItemCollectionList? list) : this(propertyObject, propertyName, 1, list, enImageCode.None) { }
+        public FlexiControlForProperty(object propertyObject, string propertyName, ItemCollectionList? list) : this(propertyObject, propertyName, 1, list, ImageCode.None) { }
 
-        public FlexiControlForProperty(object propertyObject, string propertyName, int rowCount) : this(propertyObject, propertyName, rowCount, null, enImageCode.None) { }
+        public FlexiControlForProperty(object propertyObject, string propertyName, int rowCount) : this(propertyObject, propertyName, rowCount, null, ImageCode.None) { }
 
-        public FlexiControlForProperty(object propertyObject, string propertyName, enImageCode image) : this(propertyObject, propertyName, 1, null, image) { }
+        public FlexiControlForProperty(object propertyObject, string propertyName, ImageCode image) : this(propertyObject, propertyName, 1, null, image) { }
 
-        public FlexiControlForProperty(object propertyObject, string propertyName) : this(propertyObject, propertyName, 1, null, enImageCode.None) { }
+        public FlexiControlForProperty(object propertyObject, string propertyName) : this(propertyObject, propertyName, 1, null, ImageCode.None) { }
 
         public FlexiControlForProperty() : base() {
             GenFehlerText();
@@ -74,8 +75,8 @@ namespace BlueControls.Controls {
             //    propChecker.Enabled = true;
             //}
             _IdleTimer.Tick += Checker_Tick;
-            CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
-            EditType = enEditTypeFormula.Textfeld;
+            CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
+            EditType = EditTypeFormula.Textfeld;
             Size = new Size(200, 24);
         }
 
@@ -92,7 +93,7 @@ namespace BlueControls.Controls {
                 if (_propertyName == value) { return; }
                 FillPropertyNow();
                 _propertyName = value;
-                UpdateControlData(false, 1, null, enImageCode.None);
+                UpdateControlData(false, 1, null, ImageCode.None);
                 CheckEnabledState();
             }
         }
@@ -104,7 +105,7 @@ namespace BlueControls.Controls {
                 if (_propertyObject == value) { return; }
                 FillPropertyNow();
                 _propertyObject = value;
-                UpdateControlData(false, 1, null, enImageCode.None);
+                UpdateControlData(false, 1, null, ImageCode.None);
                 CheckEnabledState();
             }
         }
@@ -241,7 +242,7 @@ namespace BlueControls.Controls {
                 FloatTryParse(Value, out var i);
                 toSet = i;
             } else {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Art unbekannt!");
+                Develop.DebugPrint(FehlerArt.Fehler, "Art unbekannt!");
             }
             if (oldVal == Value) { return; }
             _propInfo.SetValue(_propertyObject, toSet, null);
@@ -302,11 +303,11 @@ namespace BlueControls.Controls {
             } else if (x is Color co) {
                 ValueSet(co.ToHtmlCode(), true, false);
             } else {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Art unbekannt!");
+                Develop.DebugPrint(FehlerArt.Fehler, "Art unbekannt!");
             }
         }
 
-        private void UpdateControlData(bool withCreate, int textLines, ItemCollectionList? list, enImageCode image) {
+        private void UpdateControlData(bool withCreate, int textLines, ItemCollectionList? list, ImageCode image) {
 
             #region propInfo & _propertynamecpl befüllen
 
@@ -343,20 +344,20 @@ namespace BlueControls.Controls {
             #region Art des Steuerelements bestimmen
 
             if (withCreate && _methInfo != null) {
-                EditType = enEditTypeFormula.Button;
-                CaptionPosition = enÜberschriftAnordnung.ohne;
+                EditType = EditTypeFormula.Button;
+                CaptionPosition = ÜberschriftAnordnung.ohne;
                 var s = BlueFont.MeasureStringOfCaption(Caption.TrimEnd(":"));
                 Size = new Size((int)s.Width + 50 + 22, 30);
                 var c = (Button)CreateSubControls();
                 c.Text = Caption.TrimEnd(":");
-                if (image != enImageCode.None) {
+                if (image != ImageCode.None) {
                     c.ImageCode = QuickImage.Get(image, 22).ToString();
                 }
             }
             if (withCreate && _propInfo != null) {
                 switch (_propInfo.PropertyType.FullName.ToLower()) {
                     case "system.boolean": {
-                            EditType = enEditTypeFormula.Ja_Nein_Knopf;
+                            EditType = EditTypeFormula.Ja_Nein_Knopf;
                             var s = BlueFont.MeasureStringOfCaption(Caption);
                             Size = new Size((int)s.Width + 30, 22);
                             break;
@@ -364,7 +365,7 @@ namespace BlueControls.Controls {
                     default: // Alle enums sind ein eigener Typ.... deswegen alles in die Textbox
                         {
                             if (list != null) {
-                                EditType = enEditTypeFormula.Textfeld_mit_Auswahlknopf;
+                                EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
                                 list.Appearance = BlueListBoxAppearance.ComboBox_Textbox;
                                 var s = BlueFont.MeasureStringOfCaption(Caption);
                                 var (biggestItemX, biggestItemY, _, _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
@@ -383,26 +384,26 @@ namespace BlueControls.Controls {
                             //    c.ImageCode = QuickImage.Get(image).ToString();
                             //}
                             else {
-                                EditType = enEditTypeFormula.Textfeld;
+                                EditType = EditTypeFormula.Textfeld;
                                 var tmpName = _propInfo.PropertyType.FullName.ToLower();
                                 if (textLines >= 2) {
-                                    CaptionPosition = enÜberschriftAnordnung.Über_dem_Feld;
+                                    CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
                                     Size = new Size(200, 16 + (24 * textLines));
                                     MultiLine = true;
                                     tmpName = "system.string";
                                 } else {
-                                    CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
+                                    CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
                                     Size = new Size(200, 24);
                                     MultiLine = false;
                                 }
 
                                 switch (tmpName) {
-                                    case "system.string": this.SetFormat(enVarType.Text); break;
-                                    case "system.int32": this.SetFormat(enVarType.Integer); break;
-                                    case "system.float": this.SetFormat(enVarType.Float); break;
-                                    case "system.double": this.SetFormat(enVarType.Float); break;
-                                    case "system.drawing.color": this.SetFormat(enVarType.Text); break;
-                                    default: this.SetFormat(enVarType.Text); break;
+                                    case "system.string": this.SetFormat(VarType.Text); break;
+                                    case "system.int32": this.SetFormat(VarType.Integer); break;
+                                    case "system.float": this.SetFormat(VarType.Float); break;
+                                    case "system.double": this.SetFormat(VarType.Float); break;
+                                    case "system.drawing.color": this.SetFormat(VarType.Text); break;
+                                    default: this.SetFormat(VarType.Text); break;
                                 }
 
                                 var c = CreateSubControls();

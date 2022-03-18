@@ -177,17 +177,11 @@ namespace BlueControls.ItemCollection {
                         break;
 
                     default:
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
+                        Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
                         break;
                 }
             }
         }
-
-        #endregion
-
-        #region Events
-
-        public event EventHandler DoInvalidate;
 
         #endregion
 
@@ -201,7 +195,7 @@ namespace BlueControls.ItemCollection {
             set {
                 if (_gridShow == value) { return; }
                 _gridShow = value;
-                OnDoInvalidate();
+                OnChanged();
             }
         }
 
@@ -211,7 +205,7 @@ namespace BlueControls.ItemCollection {
             set {
                 if (_gridsnap == value) { return; }
                 _gridsnap = value;
-                OnDoInvalidate();
+                OnChanged();
             }
         }
 
@@ -244,9 +238,9 @@ namespace BlueControls.ItemCollection {
                 /// /       Item.SheetStyle = Skin.StyleDB.Row[value];
                 //   if (Item.SheetStyle == null) { Item.SheetStyle = Skin.StyleDB.Row.First(); }// Einfach die Erste nehmen
                 _sheetStyle = value;
-                DesignOrStyleChanged();
+                AplyDesignToItems();
                 //RepairAll(0, false);
-                OnDoInvalidate();
+                OnChanged();
             }
         }
 
@@ -257,8 +251,8 @@ namespace BlueControls.ItemCollection {
                 if (value < 0.1d) { value = 0.1f; }
                 if (_sheetStyleScale == value) { return; }
                 _sheetStyleScale = value;
-                DesignOrStyleChanged();
-                OnDoInvalidate();
+                AplyDesignToItems();
+                OnChanged();
             }
         }
 
@@ -268,7 +262,7 @@ namespace BlueControls.ItemCollection {
             set {
                 if (_snapMode == value) { return; }
                 _snapMode = value;
-                OnDoInvalidate();
+                OnChanged();
             }
         }
 
@@ -316,13 +310,6 @@ namespace BlueControls.ItemCollection {
                             sizeOfPaintArea.Height / maxBounds.Height);
         }
 
-        public void DesignOrStyleChanged() {
-            foreach (var thisItem in this) {
-                thisItem?.DesignOrStyleChanged();
-            }
-            OnDoInvalidate();
-        }
-
         public void DrawCreativePadToBitmap(Bitmap? bmp, States vState, float zoomf, float x, float y, List<BasicPadItem>? visibleItems) {
             if (bmp == null) { return; }
             var gr = Graphics.FromImage(bmp);
@@ -349,10 +336,7 @@ namespace BlueControls.ItemCollection {
         public override void OnChanged() {
             base.OnChanged();
             IsSaved = false;
-            OnDoInvalidate();
         }
-
-        public void OnDoInvalidate() => DoInvalidate?.Invoke(this, System.EventArgs.Empty);
 
         public bool ParseVariable(string name, string wert) => ParseVariable(new VariableString(name, wert));
 
@@ -428,7 +412,7 @@ namespace BlueControls.ItemCollection {
                     if (variables.ResetVariables()) { did = true; }
                 }
             }
-            if (did) { OnDoInvalidate(); }
+            if (did) { OnChanged(); }
             return did;
         }
 
@@ -450,7 +434,7 @@ namespace BlueControls.ItemCollection {
                     break;
 
                 default:
-                    MessageBox.Show("Dateiformat unbekannt: " + filename.FileSuffix().ToUpper(), enImageCode.Warnung, "OK");
+                    MessageBox.Show("Dateiformat unbekannt: " + filename.FileSuffix().ToUpper(), ImageCode.Warnung, "OK");
                     return;
             }
         }
@@ -465,7 +449,7 @@ namespace BlueControls.ItemCollection {
 
             item1.Gruppenzugehörigkeit = g1;
             item2.Gruppenzugehörigkeit = g2;
-            OnDoInvalidate();
+            OnChanged();
         }
 
         public Bitmap? ToBitmap(float scale) {
@@ -611,7 +595,6 @@ namespace BlueControls.ItemCollection {
             Remove(thisItem);
             Insert(0, thisItem);
             thisItem.Gruppenzugehörigkeit = g1;
-            OnDoInvalidate();
         }
 
         internal void InDenVordergrund(BasicPadItem thisItem) {
@@ -621,7 +604,6 @@ namespace BlueControls.ItemCollection {
             Remove(thisItem);
             Add(thisItem);
             thisItem.Gruppenzugehörigkeit = g1;
-            OnDoInvalidate();
         }
 
         internal RectangleF MaxBounds(List<BasicPadItem>? zoomItems) {
@@ -640,28 +622,23 @@ namespace BlueControls.ItemCollection {
 
         protected override void OnItemAdded(BasicPadItem item) {
             if (item == null) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Null Item soll hinzugefügt werden!");
+                Develop.DebugPrint(FehlerArt.Fehler, "Null Item soll hinzugefügt werden!");
             }
             if (string.IsNullOrEmpty(item.Internal)) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + item.Internal);
+                Develop.DebugPrint(FehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + item.Internal);
             }
 
             item.Parent = this;
             base.OnItemAdded(item);
 
             IsSaved = false;
-
-            OnDoInvalidate();
         }
 
-        protected override void OnItemRemoved() {
-            base.OnItemRemoved();
-            OnDoInvalidate();
-        }
-
-        protected override void OnItemRemoving(BasicPadItem item) {
-            base.OnItemRemoving(item);
-            OnDoInvalidate();
+        private void AplyDesignToItems() {
+            foreach (var thisItem in this) {
+                thisItem?.DesignOrStyleChanged();
+            }
+            OnChanged();
         }
 
         private void GenPoints() {
@@ -694,8 +671,6 @@ namespace BlueControls.ItemCollection {
             _prRo.SetTo(ssw - rr, ro);
             _prRu.SetTo(ssw - rr, ssh - ru);
             _prLu.SetTo(rl, ssh - ru);
-            OnDoInvalidate();
-            OnDoInvalidate();
         }
 
         private RectangleF MaximumBounds(List<BasicPadItem>? zoomItems) {
@@ -788,7 +763,7 @@ namespace BlueControls.ItemCollection {
                         break;
 
                     default:
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
+                        Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
                         break;
                 }
             }

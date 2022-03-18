@@ -128,7 +128,7 @@ namespace BlueControls.Forms {
             }
         }
 
-        public new void ShowDialog() => Develop.DebugPrint(enFehlerArt.Fehler, "FloatingForms können nur mit Show aufgerufen werden.");
+        public new void ShowDialog() => Develop.DebugPrint(FehlerArt.Fehler, "FloatingForms können nur mit Show aufgerufen werden.");
 
         internal static void Close(object? connectedControl, Design design) {
             foreach (var thisForm in AllBoxes) {

@@ -81,30 +81,30 @@ namespace BlueBasics {
         public static void CheckStackForOverflow() {
             StackTrace stackTrace = new();
             if (stackTrace.FrameCount > 400) {
-                DebugPrint(enFehlerArt.Fehler, "Stack-Overflow abgefangen!");
+                DebugPrint(FehlerArt.Fehler, "Stack-Overflow abgefangen!");
             }
         }
 
-        public static void DebugPrint(string warnung) => DebugPrint(enFehlerArt.Warnung, warnung);
+        public static void DebugPrint(string warnung) => DebugPrint(FehlerArt.Warnung, warnung);
 
-        public static void DebugPrint(enFehlerArt art, Exception ex) {
-            if (art != enFehlerArt.Info && art != enFehlerArt.DevelopInfo && IsHostRunning()) { Debugger.Break(); }
+        public static void DebugPrint(FehlerArt art, Exception ex) {
+            if (art != FehlerArt.Info && art != FehlerArt.DevelopInfo && IsHostRunning()) { Debugger.Break(); }
             DebugPrint(art, "Es wurde ein allgemeiner Fehler abgefangen.\r\nMeldung: " + ex.Message + "\r\n" + ex.StackTrace);
         }
 
-        public static void DebugPrint(Exception warnung) => DebugPrint(enFehlerArt.Warnung, warnung);
+        public static void DebugPrint(Exception warnung) => DebugPrint(FehlerArt.Warnung, warnung);
 
-        public static void DebugPrint(object @enum) => DebugPrint(enFehlerArt.Warnung, "Ein Wert einer Enumeration konnte nicht verarbeitet werden.\r\nEnumeration: " + @enum.GetType().FullName + "\r\nParameter: " + @enum);
+        public static void DebugPrint(object @enum) => DebugPrint(FehlerArt.Warnung, "Ein Wert einer Enumeration konnte nicht verarbeitet werden.\r\nEnumeration: " + @enum.GetType().FullName + "\r\nParameter: " + @enum);
 
-        public static void DebugPrint(enFehlerArt art, string meldung) {
+        public static void DebugPrint(FehlerArt art, string meldung) {
             lock (SyncLockObject) {
                 try {
                     if (_isTraceLogging) {
-                        if (art == enFehlerArt.Fehler) { AbortExe(); }
+                        if (art == FehlerArt.Fehler) { AbortExe(); }
                         return;
                     }
                     _isTraceLogging = true;
-                    if (art == enFehlerArt.Fehler) { _lastDebugMessage = string.Empty; }
+                    if (art == FehlerArt.Fehler) { _lastDebugMessage = string.Empty; }
                     if (DateTime.Now.Subtract(_lastDebugTime).TotalSeconds > 5) { _lastDebugMessage = string.Empty; }
                     var net = art + (";" + meldung);
                     if (net == _lastDebugMessage) {
@@ -120,7 +120,7 @@ namespace BlueBasics {
                     List<string>? l = null;
                     Trace.WriteLine("<tr>");
                     switch (art) {
-                        case enFehlerArt.DevelopInfo:
+                        case FehlerArt.DevelopInfo:
                             if (!IsHostRunning()) {
                                 _isTraceLogging = false;
                                 return;
@@ -129,18 +129,18 @@ namespace BlueBasics {
                             nr = 5;
                             break;
 
-                        case enFehlerArt.Info:
+                        case FehlerArt.Info:
                             Trace.WriteLine("<th><font size = 3>Info");
                             nr = 5;
                             break;
 
-                        case enFehlerArt.Warnung:
+                        case FehlerArt.Warnung:
                             if (IsHostRunning()) { Debugger.Break(); }
                             Trace.WriteLine("<th><font color =777700>Warnung<font color =000000>");
                             _deleteTraceLog = false;
                             break;
 
-                        case enFehlerArt.Fehler:
+                        case FehlerArt.Fehler:
                             if (IsHostRunning()) { Debugger.Break(); }
                             if (!FileExists(tmp)) { l = new List<string>(); }
                             Trace.WriteLine("<th><font color =FF0000>Fehler<font color =000000>");
@@ -166,7 +166,7 @@ namespace BlueBasics {
                     meldung = meldung.Replace("<br>", "\r", RegexOptions.IgnoreCase).CreateHtmlCodes(true);
                     Trace.WriteLine("</th><th ALIGN=LEFT><font size = 3>" + meldung + "</th>");
                     Trace.WriteLine("</tr>");
-                    if (art == enFehlerArt.Fehler) {
+                    if (art == FehlerArt.Fehler) {
                         TraceLogging_End();
                         List<string> endl = new();
                         HTML_AddHead(endl, "Beenden...");
@@ -198,35 +198,35 @@ namespace BlueBasics {
 
         public static void Debugprint_BackgroundThread() {
             if (!Thread.CurrentThread.IsBackground) { return; }
-            DebugPrint(enFehlerArt.Warnung, "Totes Fenster!");
+            DebugPrint(FehlerArt.Warnung, "Totes Fenster!");
         }
 
         public static void DebugPrint_Disposed(bool disposedValue) {
             if (!disposedValue) { return; }
             if (IsHostRunning()) { Debugger.Break(); }
-            DebugPrint(enFehlerArt.Fehler, "Das Objekt wurde zur Laufzeit verworfen.");
+            DebugPrint(FehlerArt.Fehler, "Das Objekt wurde zur Laufzeit verworfen.");
         }
 
         public static void DebugPrint_InvokeRequired(bool invokeRequired, bool fehler) {
             if (!invokeRequired) { return; }
             if (IsHostRunning()) { Debugger.Break(); }
             if (fehler) {
-                DebugPrint(enFehlerArt.Fehler, "Es wird von einem Unterthread zugegriffen.");
+                DebugPrint(FehlerArt.Fehler, "Es wird von einem Unterthread zugegriffen.");
             } else {
-                DebugPrint(enFehlerArt.Warnung, "Es wird von einem Unterthread zugegriffen.");
+                DebugPrint(FehlerArt.Warnung, "Es wird von einem Unterthread zugegriffen.");
             }
         }
 
-        public static void DebugPrint_MissingCommand(string comand) => DebugPrint(enFehlerArt.Warnung, "Ein Wert einer Kontextmenü-Befehls konnte nicht verarbeitet werden.\r\nBefehl: " + comand);
+        public static void DebugPrint_MissingCommand(string comand) => DebugPrint(FehlerArt.Warnung, "Ein Wert einer Kontextmenü-Befehls konnte nicht verarbeitet werden.\r\nBefehl: " + comand);
 
         public static void DebugPrint_NichtImplementiert() {
             if (IsHostRunning()) { Debugger.Break(); }
-            DebugPrint(enFehlerArt.Fehler, "Diese Funktion ist vom Entwickler noch nicht implementiert.");
+            DebugPrint(FehlerArt.Fehler, "Diese Funktion ist vom Entwickler noch nicht implementiert.");
         }
 
         public static void DebugPrint_RoutineMussUeberschriebenWerden() {
             if (IsHostRunning()) { Debugger.Break(); }
-            DebugPrint(enFehlerArt.Warnung, "Diese Funktion muss noch überschrieben werden.");
+            DebugPrint(FehlerArt.Warnung, "Diese Funktion muss noch überschrieben werden.");
         }
 
         public static void DoEvents() => System.Windows.Forms.Application.DoEvents();
@@ -325,7 +325,7 @@ namespace BlueBasics {
         private static void CloseAfter12Hours(object sender, System.EventArgs e) {
             if (DateTime.Now.Subtract(ProgrammStarted).TotalHours > 12) {
                 if (IsHostRunning()) { return; }
-                DebugPrint(enFehlerArt.Info, "Das Programm wird nach 12 Stunden automatisch geschlossen.");
+                DebugPrint(FehlerArt.Info, "Das Programm wird nach 12 Stunden automatisch geschlossen.");
                 TraceLogging_End();
                 AbortExe();
             }

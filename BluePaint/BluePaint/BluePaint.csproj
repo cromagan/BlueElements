@@ -246,6 +246,10 @@
       <Project>{6a9cfa8b-ddf5-4fa2-a110-c87a0ce34347}</Project>
       <Name>BlueControls</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\BlueDatabase\BlueDatabase\BlueDatabase.csproj">
+      <Project>{ce8be078-ddae-47f5-aaa9-685564b898c9}</Project>
+      <Name>BlueDatabase</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

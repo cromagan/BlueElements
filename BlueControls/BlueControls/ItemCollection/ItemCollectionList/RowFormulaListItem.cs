@@ -134,7 +134,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         private void GeneratePic() {
             if (string.IsNullOrEmpty(_layoutId) || !_layoutId.StartsWith("#")) {
-                _tmpBmp = QuickImage.Get(enImageCode.Warnung, 128);
+                _tmpBmp = QuickImage.Get(ImageCode.Warnung, 128);
                 return;
             }
             ItemCollectionPad pad = new(_layoutId, Row.Database, Row.Key);

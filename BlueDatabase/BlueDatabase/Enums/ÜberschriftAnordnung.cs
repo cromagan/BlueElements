@@ -15,14 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueBasics.Enums {
+namespace BlueDatabase.Enums {
 
-    public enum enSortierTyp {
-        Nicht_Erlaubt = -1,
-        Original_String = 0,
-        Sprachneutral_String = 1,
-        ZahlenwertInt = 100,
-        ZahlenwertFloat = 101,
-        Datum_Uhrzeit = 200
+    public enum ÜberschriftAnordnung {
+        ohne = 0,
+        Links_neben_Dem_Feld = 1,
+        Über_dem_Feld = 2,
+        Ohne_mit_Abstand = 3
     }
 }

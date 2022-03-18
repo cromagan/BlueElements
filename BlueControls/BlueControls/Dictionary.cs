@@ -91,7 +91,7 @@ namespace BlueControls {
             var can = Monitor.TryEnter(LockSpellChecking);
             if (can) { Monitor.Exit(LockSpellChecking); }
             if (!can || IsSpellChecking) {
-                MessageBox.Show("Die Rechtschreibprüfung steht<br>nicht zur Verfügung.", enImageCode.Information, "OK");
+                MessageBox.Show("Die Rechtschreibprüfung steht<br>nicht zur Verfügung.", ImageCode.Information, "OK");
                 return;
             }
             lock (LockSpellChecking) {
@@ -107,8 +107,8 @@ namespace BlueControls {
                         var wort = etxt.Word(pos);
                         if (!IsWordOk(wort)) {
                             var butt = wort.ToLower() != wort
-                                ? MessageBox.Show("<b>" + wort + "</b>", enImageCode.Stift, "'" + wort + "' aufnehmen", "'" + wort.ToLower() + "' aufnehmen", "Ignorieren", "Beenden")
-                                : allOk ? 1 : MessageBox.Show("<b>" + wort + "</b>", enImageCode.Stift, "'" + wort + "' aufnehmen", "Ignorieren", "Beenden") + 1;
+                                ? MessageBox.Show("<b>" + wort + "</b>", ImageCode.Stift, "'" + wort + "' aufnehmen", "'" + wort.ToLower() + "' aufnehmen", "Ignorieren", "Beenden")
+                                : allOk ? 1 : MessageBox.Show("<b>" + wort + "</b>", ImageCode.Stift, "'" + wort + "' aufnehmen", "Ignorieren", "Beenden") + 1;
                             switch (butt) {
                                 case 0:
                                     WordAdd(wort);

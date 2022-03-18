@@ -94,7 +94,7 @@ namespace BlueControls.Forms {
             if (database != null) {
                 foreach (var t in database.Layouts) {
                     ItemCollectionPad p = new(t, string.Empty);
-                    addHere.Add(p.Caption, p.Id, enImageCode.Stern);
+                    addHere.Add(p.Caption, p.Id, ImageCode.Stern);
                 }
             }
             if (!addDiskLayouts) { return; }
@@ -105,7 +105,7 @@ namespace BlueControls.Forms {
                 if (PathExists(thisP)) {
                     var e = Directory.GetFiles(thisP);
                     foreach (var thisFile in e) {
-                        if (thisFile.FileType() is enFileFormat.HTML or enFileFormat.Textdocument or enFileFormat.Visitenkarte or enFileFormat.BlueCreativeFile or enFileFormat.XMLFile) {
+                        if (thisFile.FileType() is FileFormat.HTML or FileFormat.Textdocument or FileFormat.Visitenkarte or FileFormat.BlueCreativeFile or FileFormat.XMLFile) {
                             if (addHere[thisFile] == null) { addHere.Add(thisFile.FileNameWithSuffix(), thisFile, QuickImage.Get(thisFile.FileType(), 16)); }
                         }
                     }
@@ -183,7 +183,7 @@ namespace BlueControls.Forms {
         private void btnDrucken_Click(object sender, System.EventArgs e) => padPrint.Print();
 
         private void btnEinstellung_Click(object sender, System.EventArgs e) {
-            switch (MessageBox.Show("Einstellung laden:", enImageCode.Stift, "A4", "Cricut Maker", "Abbrechen")) {
+            switch (MessageBox.Show("Einstellung laden:", ImageCode.Stift, "A4", "Cricut Maker", "Abbrechen")) {
                 case 0:
                     flxBreite.ValueSet("210", true, false);
                     flxHöhe.ValueSet("297", true, false);

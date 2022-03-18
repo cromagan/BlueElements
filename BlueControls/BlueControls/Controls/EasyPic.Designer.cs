@@ -77,7 +77,7 @@ namespace BlueControls.Controls
             this.BlueLine1.CausesValidation = false;
             this.BlueLine1.Location = new Point(112, 3);
             this.BlueLine1.Name = "BlueLine1";
-            this.BlueLine1.Orientation = enOrientation.Senkrecht;
+            this.BlueLine1.Orientation = Orientation.Senkrecht;
             this.BlueLine1.Size = new Size(2, 26);
             // 
             // Lade

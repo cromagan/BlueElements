@@ -310,7 +310,7 @@ namespace BlueBasics {
             foreach (var item in l) {
                 var tmp2 = string.Empty;
                 if (item != null) { tmp2 = item.ToString(); }
-                if (tmp2.Contains("\r")) { Develop.DebugPrint(enFehlerArt.Fehler, "List.Tostring hat einen Zeilenumbruch gefunden."); }
+                if (tmp2.Contains("\r")) { Develop.DebugPrint(FehlerArt.Fehler, "List.Tostring hat einen Zeilenumbruch gefunden."); }
                 if (!removeEmpty || !string.IsNullOrEmpty(tmp2)) {
                     tmp = tmp + tmp2 + "\r";
                 }

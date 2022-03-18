@@ -48,10 +48,10 @@ namespace BlueControls.Forms {
             foreach (PaperSize ps in printDocument1.PrinterSettings.PaperSizes) {
                 var nn = ps.Width + ";" + ps.Height;
                 if (Format.Item[nn] == null) {
-                    Format.Item.Add(ps.PaperName, nn, QuickImage.Get(enImageCode.Datei), true, ps.PaperName);
+                    Format.Item.Add(ps.PaperName, nn, QuickImage.Get(ImageCode.Datei), true, ps.PaperName);
                 }
             }
-            Format.Item.Add("Manuelle Eingabe", "neu", enImageCode.Stern, true, Constants.FirstSortChar.ToString());
+            Format.Item.Add("Manuelle Eingabe", "neu", ImageCode.Stern, true, Constants.FirstSortChar.ToString());
             Format.Item.Sort();
             if (nurHochformat) {
                 Hochformat.Checked = true;

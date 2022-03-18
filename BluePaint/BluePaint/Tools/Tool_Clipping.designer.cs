@@ -53,7 +53,7 @@ namespace BluePaint
             this.Unten.Maximum = 0f;
             this.Unten.Minimum = -500f;
             this.Unten.Name = "Unten";
-            this.Unten.Orientation = enOrientation.Senkrecht;
+            this.Unten.Orientation = Orientation.Senkrecht;
             this.Unten.Size = new System.Drawing.Size(144, 36);
             this.Unten.Text = "Slider1";
             this.Unten.ValueChanged += new System.EventHandler(this.ValueChangedByClicking);
@@ -64,7 +64,7 @@ namespace BluePaint
             this.Oben.Location = new System.Drawing.Point(64, 56);
             this.Oben.Maximum = 500f;
             this.Oben.Name = "Oben";
-            this.Oben.Orientation = enOrientation.Senkrecht;
+            this.Oben.Orientation = Orientation.Senkrecht;
             this.Oben.Size = new System.Drawing.Size(144, 36);
             this.Oben.Text = "Slider1";
             this.Oben.ValueChanged += new System.EventHandler(this.ValueChangedByClicking);

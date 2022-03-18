@@ -20,7 +20,7 @@ using System;
 namespace BlueBasics.Enums {
 
     [Flags]
-    public enum enErrorReason {
+    public enum ErrorReason {
 
         /// <summary>
         /// Ob der Wert gelesen werden kann. Ein Speichern/Bearbeiten ist nicht geplant.

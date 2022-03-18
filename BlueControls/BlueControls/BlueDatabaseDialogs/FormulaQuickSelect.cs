@@ -86,9 +86,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (string.IsNullOrEmpty(t)) { return; }
             t = t.ToLower();
             foreach (var thisColumn in _row.Database.Column) {
-                if (thisColumn?.EditType is enEditTypeFormula.SwapListBox or enEditTypeFormula.Listbox or enEditTypeFormula.Textfeld_mit_Auswahlknopf) {
+                if (thisColumn?.EditType is EditTypeFormula.SwapListBox or EditTypeFormula.Listbox or EditTypeFormula.Textfeld_mit_Auswahlknopf) {
                     if (thisColumn.DropdownBearbeitungErlaubt) {
-                        if (CellCollection.UserEditPossible(thisColumn, _row, enErrorReason.OnlyRead)) {
+                        if (CellCollection.UserEditPossible(thisColumn, _row, ErrorReason.OnlyRead)) {
                             var thisView = Formula.SearchColumnView(thisColumn);
                             if (thisView != null) {
                                 if (_row.Database.PermissionCheck(thisView.PermissionGroups_Show, null)) {

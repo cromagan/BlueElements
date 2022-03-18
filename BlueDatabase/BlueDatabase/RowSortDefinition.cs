@@ -78,7 +78,7 @@ namespace BlueDatabase {
         #region Methods
 
         public void OnChanged() {
-            if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
+            if (IsParsing) { Develop.DebugPrint(FehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
@@ -88,7 +88,7 @@ namespace BlueDatabase {
             foreach (var pair in toParse.GetAllTags()) {
                 switch (pair.Key) {
                     case "identifier":
-                        if (pair.Value != "SortDefinition") { Develop.DebugPrint(enFehlerArt.Fehler, "Identifier fehlerhaft: " + pair.Value); }
+                        if (pair.Value != "SortDefinition") { Develop.DebugPrint(FehlerArt.Fehler, "Identifier fehlerhaft: " + pair.Value); }
                         break;
 
                     case "direction":
@@ -107,7 +107,7 @@ namespace BlueDatabase {
                         break;
 
                     default:
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
+                        Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
                         break;
                 }
             }

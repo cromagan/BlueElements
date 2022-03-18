@@ -66,7 +66,7 @@ namespace BlueControls.ItemCollection {
 
         protected BasicPadItem(string internalname) {
             Internal = string.IsNullOrEmpty(internalname) ? UniqueInternal() : internalname;
-            if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
+            if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben."); }
             MovablePoint.ItemAdded += Points_ItemAdded;
             MovablePoint.ItemRemoving += Points_ItemRemoving;
         }
@@ -109,7 +109,7 @@ namespace BlueControls.ItemCollection {
                     return;
                 }
 
-                Develop.DebugPrint(enFehlerArt.Fehler, "Parent Fehler!");
+                Develop.DebugPrint(FehlerArt.Fehler, "Parent Fehler!");
             }
         }
 
@@ -174,11 +174,11 @@ namespace BlueControls.ItemCollection {
                 }
             }
             if (string.IsNullOrEmpty(ding)) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Itemtyp unbekannt: " + code);
+                Develop.DebugPrint(FehlerArt.Fehler, "Itemtyp unbekannt: " + code);
                 return null;
             }
             if (string.IsNullOrEmpty(name)) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Itemname unbekannt: " + code);
+                Develop.DebugPrint(FehlerArt.Fehler, "Itemname unbekannt: " + code);
                 return null;
             }
 
@@ -220,7 +220,7 @@ namespace BlueControls.ItemCollection {
         public virtual void DesignOrStyleChanged() { }
 
         public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting) {
-            if (_parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent nicht definiert"); }
+            if (_parent == null) { Develop.DebugPrint(FehlerArt.Fehler, "Parent nicht definiert"); }
 
             if (forPrinting && !_beiExportSichtbar) { return; }
 
@@ -233,6 +233,26 @@ namespace BlueControls.ItemCollection {
                     gr.DrawImage(QuickImage.Get("Drucker|16||1"), drawingCoordinates.X, drawingCoordinates.Y);
                 }
             }
+
+            #region Verknüpfte Pfeile Zeichnen
+
+            var line = 1f;
+            if (zoom > 1) { line = zoom; }
+            foreach (var thisV in ConnectsTo) {
+                if (Parent.Contains(thisV.OtherItem) && thisV != null && thisV.OtherItem != this) {
+                    var t1 = ItemConnection.GetConnectionPoint(this, thisV.MyItemType, thisV.OtherItem).ZoomAndMove(zoom, shiftX, shiftY);
+                    var t2 = ItemConnection.GetConnectionPoint(thisV.OtherItem, thisV.OtherItemType, this).ZoomAndMove(zoom, shiftX, shiftY);
+
+                    if (Geometry.GetLenght(t1, t2) > 1) {
+                        gr.DrawLine(new Pen(Color.Gray, line), t1, t2);
+                        var wi = Geometry.Winkel(t1, t2);
+                        if (thisV.ArrowOnMyItem) { DimensionPadItem.DrawArrow(gr, t1, wi, Color.Gray, zoom * 20); }
+                        if (thisV.ArrowOnOtherItem) { DimensionPadItem.DrawArrow(gr, t2, wi + 180, Color.Gray, zoom * 20); }
+                    }
+                }
+            }
+
+            #endregion
         }
 
         /// <summary>
@@ -306,7 +326,7 @@ namespace BlueControls.ItemCollection {
         public void Parse(List<KeyValuePair<string, string>> toParse) {
             IsParsing = true;
             foreach (var pair in toParse.Where(pair => !ParseThis(pair.Key, pair.Value))) {
-                Develop.DebugPrint(enFehlerArt.Warnung, "Kann nicht geparsed werden: " + pair.Key + "/" + pair.Value + "/" + toParse);
+                Develop.DebugPrint(FehlerArt.Warnung, "Kann nicht geparsed werden: " + pair.Key + "/" + pair.Value + "/" + toParse);
             }
 
             ParseFinished();
@@ -359,7 +379,7 @@ namespace BlueControls.ItemCollection {
 
                 case "internalname":
                     if (value != Internal) {
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Namen unterschiedlich: " + value + " / " + Internal);
+                        Develop.DebugPrint(FehlerArt.Fehler, "Namen unterschiedlich: " + value + " / " + Internal);
                     }
                     return true;
 
@@ -421,7 +441,7 @@ namespace BlueControls.ItemCollection {
 
         internal BasicPadItem? Next() {
             var itemCount = _parent.IndexOf(this);
-            if (itemCount < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
+            if (itemCount < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
             do {
                 itemCount++;
                 if (itemCount >= _parent.Count) { return null; }
@@ -431,7 +451,7 @@ namespace BlueControls.ItemCollection {
 
         internal BasicPadItem? Previous() {
             var itemCount = _parent.IndexOf(this);
-            if (itemCount < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
+            if (itemCount < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
             do {
                 itemCount--;
                 if (itemCount < 0) { return null; }

@@ -17,10 +17,10 @@
 
 namespace BlueBasics.Enums {
 
-    public enum enÜberschriftAnordnung {
-        ohne = 0,
-        Links_neben_Dem_Feld = 1,
-        Über_dem_Feld = 2,
-        Ohne_mit_Abstand = 3
+    public enum FehlerArt {
+        Fehler = 1,
+        Warnung = 2,
+        Info = 3,
+        DevelopInfo = 4
     }
 }

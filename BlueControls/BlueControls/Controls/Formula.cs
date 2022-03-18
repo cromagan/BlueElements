@@ -34,6 +34,7 @@ using System.Linq;
 using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
 using MessageBox = BlueControls.Forms.MessageBox;
+using BlueDatabase.Enums;
 
 #nullable enable
 
@@ -132,7 +133,7 @@ namespace BlueControls.Controls {
                 if (value < 0) { value = -1; }
                 if (grpEditor.Visible) { value = -1; }
                 if (value == _showingRowKey) { return; }
-                if (value > -1 && _database == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Database is nothing"); }
+                if (value > -1 && _database == null) { Develop.DebugPrint(FehlerArt.Fehler, "Database is nothing"); }
                 if (!_inited) {
                     if (value < 0) { return; }
                     View_Init();
@@ -218,10 +219,10 @@ namespace BlueControls.Controls {
                 cancel = true;
                 return;
             }
-            items.Add("Allgemeine Schnelleingabe öffnen", "#Schnelleingabe", QuickImage.Get(enImageCode.Lupe), _database != null && ShowingRow != null);
+            items.Add("Allgemeine Schnelleingabe öffnen", "#Schnelleingabe", QuickImage.Get(ImageCode.Lupe), _database != null && ShowingRow != null);
             if (_database.IsAdministrator()) {
                 items.AddSeparator();
-                items.Add("Formular bearbeiten", "#Ansicht", QuickImage.Get(enImageCode.Textfeld), _database != null);
+                items.Add("Formular bearbeiten", "#Ansicht", QuickImage.Get(ImageCode.Textfeld), _database != null);
             }
         }
 
@@ -364,7 +365,7 @@ namespace BlueControls.Controls {
         }
 
         private void btnAnsichtHinzufuegen_Click(object sender, System.EventArgs e) {
-            var ex = InputBox.Show("Geben sie den Namen<br>der neuen Ansicht ein:", "", enVarType.Text);
+            var ex = InputBox.Show("Geben sie den Namen<br>der neuen Ansicht ein:", "", VarType.Text);
             if (string.IsNullOrEmpty(ex)) { return; }
             _database.Views.Add(new ColumnViewCollection(_database, "", ex));
             RedoView();
@@ -376,7 +377,7 @@ namespace BlueControls.Controls {
             if (currView == null) { return; }
             var i = _database.Views.IndexOf(currView);
             if (i < 1) { return; } // 0 darf auch nicht gelöscht werden
-            if (MessageBox.Show("Ansicht <b>'" + currView.Name + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            if (MessageBox.Show("Ansicht <b>'" + currView.Name + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             _database.Views.RemoveAt(i);
             RedoView();
             SortColumnList();
@@ -465,7 +466,7 @@ namespace BlueControls.Controls {
         private void btnRename_Click(object sender, System.EventArgs e) {
             var currView = CurrentView();
             if (currView == null || currView == _database.Views[0]) { return; }
-            var n = InputBox.Show("Umbenennen:", currView.Name, enVarType.Text);
+            var n = InputBox.Show("Umbenennen:", currView.Name, VarType.Text);
             if (!string.IsNullOrEmpty(n)) { currView.Name = n; }
             RedoView();
             SortColumnList();
@@ -473,14 +474,14 @@ namespace BlueControls.Controls {
 
         private void cbxCaptionPosition_ItemClicked(object sender, BasicListItemEventArgs e) {
             var viewItem = SearchViewItem(EditorSelectedColumn());
-            if (viewItem != null) { viewItem.ÜberschriftAnordnung = (enÜberschriftAnordnung)IntParse(cbxCaptionPosition.Text); }
+            if (viewItem != null) { viewItem.ÜberschriftAnordnung = (ÜberschriftAnordnung)IntParse(cbxCaptionPosition.Text); }
             RedoView();
             SortColumnList();
         }
 
         private void cbxControlType_ItemClicked(object sender, BasicListItemEventArgs e) {
             var viewItem = SearchViewItem(EditorSelectedColumn());
-            if (viewItem != null) { viewItem.Column.EditType = (enEditTypeFormula)IntParse(cbxControlType.Text); }
+            if (viewItem != null) { viewItem.Column.EditType = (EditTypeFormula)IntParse(cbxControlType.Text); }
             RedoView();
             SortColumnList();
         }
@@ -552,7 +553,7 @@ namespace BlueControls.Controls {
                         }
                         if (objPx.Y > 0) { objPx.Y += 8; }
                         objPx.Height = (Math.Max(thisViewItem.Height, 0) * 16) + 8;
-                        if (thisViewItem.ÜberschriftAnordnung is enÜberschriftAnordnung.Ohne_mit_Abstand or enÜberschriftAnordnung.Über_dem_Feld) {
+                        if (thisViewItem.ÜberschriftAnordnung is ÜberschriftAnordnung.Ohne_mit_Abstand or ÜberschriftAnordnung.Über_dem_Feld) {
                             objPx.Height += Skin.PaddingSmal + 16;
                         }
                         if (thisViewItem.Height == 31) {
@@ -591,8 +592,8 @@ namespace BlueControls.Controls {
 
         private ColumnViewCollection? CurrentView() {
             if (_database.Views.Count == 0) { return null; }
-            if (Tabs.SelectedIndex + 1 > _database.Views.Count - 1) { Develop.DebugPrint(enFehlerArt.Fehler, "Index zu hoch"); }
-            if (_database.Views[Tabs.SelectedIndex + 1] == null) { Develop.DebugPrint(enFehlerArt.Fehler, "View ist Nothing"); }
+            if (Tabs.SelectedIndex + 1 > _database.Views.Count - 1) { Develop.DebugPrint(FehlerArt.Fehler, "Index zu hoch"); }
+            if (_database.Views[Tabs.SelectedIndex + 1] == null) { Develop.DebugPrint(FehlerArt.Fehler, "View ist Nothing"); }
             return _database.Views[Tabs.SelectedIndex + 1];
         }
 
@@ -612,7 +613,7 @@ namespace BlueControls.Controls {
                     if (blinki) {
                         cbxControlType.Item.Clear();
                         for (var z = 0; z <= 999; z++) {
-                            var w = (enEditTypeFormula)z;
+                            var w = (EditTypeFormula)z;
                             if (w.ToString() != z.ToString()) {
                                 if (viewItem.Column.UserEditDialogTypeInFormula(w)) {
                                     cbxControlType.Item.Add(w.ToString(), z.ToString());
@@ -651,10 +652,10 @@ namespace BlueControls.Controls {
             item.Checked = true;
             var cd = SearchViewItem(_database.Column.SearchByKey(LongParse(item.Internal)));
             if (cd == null) {
-                e.UserMenu.Add("Zum Kopfbereich hinzufügen", "#AddColumnToHead", enImageCode.Sonne);
-                e.UserMenu.Add("Zum Körperbereich hinzufügen", "#AddColumnToBody", enImageCode.Kreis, _database.Views.Count > 1);
+                e.UserMenu.Add("Zum Kopfbereich hinzufügen", "#AddColumnToHead", ImageCode.Sonne);
+                e.UserMenu.Add("Zum Körperbereich hinzufügen", "#AddColumnToBody", ImageCode.Kreis, _database.Views.Count > 1);
             } else {
-                e.UserMenu.Add("Dieses Feld ausblenden", "#RemoveColumnFromView", enImageCode.Kreuz, Convert.ToBoolean(cd != null));
+                e.UserMenu.Add("Dieses Feld ausblenden", "#RemoveColumnFromView", ImageCode.Kreuz, Convert.ToBoolean(cd != null));
             }
         }
 
@@ -767,7 +768,7 @@ namespace BlueControls.Controls {
             lbxColumns.Item.AddRange(_database.Column, false);
             lbxColumns.Item.Sort();
 
-            cbxCaptionPosition.Item.AddRange(typeof(enÜberschriftAnordnung));
+            cbxCaptionPosition.Item.AddRange(typeof(ÜberschriftAnordnung));
             cbxControlType.Item.Clear();
             Editor_CheckButtons(false);
             grpEditor.Visible = true;

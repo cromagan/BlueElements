@@ -26,8 +26,8 @@ namespace BlueControls.Forms {
         private void InitializeComponent() {
             this.tabEditor = new System.Windows.Forms.TabPage();
             this.grpFelder = new BlueControls.Controls.GroupBox();
-            this.btnDatenbankhinzu = new BlueControls.Controls.Button();
-            this.btnFreiesFeld = new BlueControls.Controls.Button();
+            this.btnFeldHinzu = new BlueControls.Controls.Button();
+            this.btnZeileHinzu = new BlueControls.Controls.Button();
             this.grpDesign.SuspendLayout();
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
@@ -44,6 +44,7 @@ namespace BlueControls.Forms {
             // Pad
             // 
             this.Pad.Size = new System.Drawing.Size(602, 389);
+            this.Pad.Changed += new System.EventHandler(this.Pad_Changed);
             // 
             // Ribbon
             // 
@@ -63,10 +64,6 @@ namespace BlueControls.Forms {
             // 
             this.tabStart.Size = new System.Drawing.Size(966, 81);
             // 
-            // tabExport
-            // 
-            this.tabExport.Size = new System.Drawing.Size(966, 81);
-            // 
             // tabEditor
             // 
             this.tabEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
@@ -81,8 +78,8 @@ namespace BlueControls.Forms {
             // grpFelder
             // 
             this.grpFelder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpFelder.Controls.Add(this.btnFreiesFeld);
-            this.grpFelder.Controls.Add(this.btnDatenbankhinzu);
+            this.grpFelder.Controls.Add(this.btnFeldHinzu);
+            this.grpFelder.Controls.Add(this.btnZeileHinzu);
             this.grpFelder.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpFelder.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpFelder.Location = new System.Drawing.Point(3, 3);
@@ -92,38 +89,37 @@ namespace BlueControls.Forms {
             this.grpFelder.TabStop = false;
             this.grpFelder.Text = "Felder";
             // 
-            // btnDatenbankhinzu
+            // btnFeldHinzu
             // 
-            this.btnDatenbankhinzu.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnDatenbankhinzu.ImageCode = "Datenbank|16|||||||||PlusZeichen";
-            this.btnDatenbankhinzu.Location = new System.Drawing.Point(8, 2);
-            this.btnDatenbankhinzu.Name = "btnDatenbankhinzu";
-            this.btnDatenbankhinzu.QuickInfo = "Fügt eine Datenbank hinzu,\r\ndie geladen wird und mit der\r\ninteragiert werden kann" +
-    ".";
-            this.btnDatenbankhinzu.Size = new System.Drawing.Size(64, 66);
-            this.btnDatenbankhinzu.TabIndex = 0;
-            this.btnDatenbankhinzu.Text = "Datenbank hinzufügen";
-            this.btnDatenbankhinzu.Click += new System.EventHandler(this.btnDatenbankhinzu_Click);
+            this.btnFeldHinzu.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnFeldHinzu.ImageCode = "Stift|16|||||||||PlusZeichen";
+            this.btnFeldHinzu.Location = new System.Drawing.Point(80, 2);
+            this.btnFeldHinzu.Name = "btnFeldHinzu";
+            this.btnFeldHinzu.QuickInfo = "Fügt ein Feld hinzu.\r\nDieses kann entweder von einer Zeile\r\nbefüllt werden, oder " +
+    "frei eingegeben werden";
+            this.btnFeldHinzu.Size = new System.Drawing.Size(64, 66);
+            this.btnFeldHinzu.TabIndex = 1;
+            this.btnFeldHinzu.Text = "Feld hinzufügen";
+            this.btnFeldHinzu.Click += new System.EventHandler(this.btnFeldHinzu_Click);
             // 
-            // btnFreiesFeld
+            // btnZeileHinzu
             // 
-            this.btnFreiesFeld.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnFreiesFeld.ImageCode = "Stift|16|||||||||PlusZeichen";
-            this.btnFreiesFeld.Location = new System.Drawing.Point(80, 2);
-            this.btnFreiesFeld.Name = "btnFreiesFeld";
-            this.btnFreiesFeld.QuickInfo = "Fügt ein freies Eingabe-Feld hinzu.\r\nDieses kann datenbank unabhäng\r\nbefüllt werd" +
-    "en.\r\nDatenbanken können diesen Wert\r\naber zur Abfrage benutzen.";
-            this.btnFreiesFeld.Size = new System.Drawing.Size(64, 66);
-            this.btnFreiesFeld.TabIndex = 1;
-            this.btnFreiesFeld.Text = "Freies Feld hinzufügen";
-            this.btnFreiesFeld.Click += new System.EventHandler(this.btnFreiesFeld_Click);
+            this.btnZeileHinzu.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnZeileHinzu.ImageCode = "Zeile|16|||||||||PlusZeichen";
+            this.btnZeileHinzu.Location = new System.Drawing.Point(8, 2);
+            this.btnZeileHinzu.Name = "btnZeileHinzu";
+            this.btnZeileHinzu.QuickInfo = "Fügt eine Zeile einer  Datenbank.\r\nAus dieser könne Felder extrahiert werden.";
+            this.btnZeileHinzu.Size = new System.Drawing.Size(64, 66);
+            this.btnZeileHinzu.TabIndex = 0;
+            this.btnZeileHinzu.Text = "Zeile hinzufügen";
+            this.btnZeileHinzu.Click += new System.EventHandler(this.btnZeileHinzu_Click);
             // 
-            // ConnectedFormula
+            // ConnectedFormulaEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(974, 499);
-            this.Name = "ConnectedFormula";
+            this.Name = "ConnectedFormulaEditor";
             this.Text = "ConnectedFormula";
             this.grpDesign.ResumeLayout(false);
             this.Ribbon.ResumeLayout(false);
@@ -139,7 +135,7 @@ namespace BlueControls.Forms {
 
         private System.Windows.Forms.TabPage tabEditor;
         private Controls.GroupBox grpFelder;
-        private Controls.Button btnDatenbankhinzu;
-        private Controls.Button btnFreiesFeld;
+        private Controls.Button btnZeileHinzu;
+        private Controls.Button btnFeldHinzu;
     }
 }

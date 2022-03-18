@@ -187,7 +187,7 @@ namespace BlueControls.Controls {
                     if (QuickModePossible()) {
                         if (gr == null) { return; }
                         Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
-                        Skin.Draw_FormatedText(gr, _text, _design, state, null, enAlignment.Top_Left, new Rectangle(), null, false, Translate);
+                        Skin.Draw_FormatedText(gr, _text, _design, state, null, Alignment.Top_Left, new Rectangle(), null, false, Translate);
                         return;
                     }
                     if (_eText == null) {

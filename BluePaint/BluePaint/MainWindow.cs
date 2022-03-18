@@ -68,7 +68,7 @@ namespace BluePaint {
 
         public void SetTool(GenericTool? newTool) {
             if (AreSame(newTool, _currentTool)) {
-                MessageBox.Show("Das Werkzeug ist aktuell schon gewählt.", enImageCode.Information, "OK");
+                MessageBox.Show("Das Werkzeug ist aktuell schon gewählt.", ImageCode.Information, "OK");
                 return;
             }
             if (_currentTool != null) {
@@ -140,13 +140,13 @@ namespace BluePaint {
             }
             System.Windows.Forms.Clipboard.SetImage(P.Bmp);
             //System.Windows.Forms.Clipboard.SetDataObject(P.Bmp, false);
-            Notification.Show("Das Bild ist nun<br>in der Zwischenablage.", enImageCode.Clipboard);
+            Notification.Show("Das Bild ist nun<br>in der Zwischenablage.", ImageCode.Clipboard);
         }
 
         private void btnEinfügen_Click(object sender, System.EventArgs e) {
             if (!IsSaved()) { return; }
             if (!System.Windows.Forms.Clipboard.ContainsImage()) {
-                Notification.Show("Abbruch,<br>kein Bild im Zwischenspeicher!", enImageCode.Information);
+                Notification.Show("Abbruch,<br>kein Bild im Zwischenspeicher!", ImageCode.Information);
                 return;
             }
             SetPic(((Bitmap)System.Windows.Forms.Clipboard.GetImage()));
@@ -180,7 +180,7 @@ namespace BluePaint {
             if (!PathExists(SaveTab.FileName.FilePath())) { return; }
             if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
             if (FileExists(SaveTab.FileName)) {
-                if (MessageBox.Show("Datei bereits vorhanden.<br>Überschreiben?", enImageCode.Frage, "Ja", "Nein") != 0) { return; }
+                if (MessageBox.Show("Datei bereits vorhanden.<br>Überschreiben?", ImageCode.Frage, "Ja", "Nein") != 0) { return; }
             }
             _filename = SaveTab.FileName;
             _isSaved = false;
@@ -236,7 +236,7 @@ namespace BluePaint {
         private bool IsSaved() {
             if (_isSaved) { return true; }
             if (string.IsNullOrEmpty(_filename)) { return true; }
-            switch (MessageBox.Show("Es sind ungespeicherte Änderungen vorhanden.<br>Was möchten sie tun?", enImageCode.Diskette, "Speichern", "Verwerfen", "Abbrechen")) {
+            switch (MessageBox.Show("Es sind ungespeicherte Änderungen vorhanden.<br>Was möchten sie tun?", ImageCode.Diskette, "Speichern", "Verwerfen", "Abbrechen")) {
                 case 0:
                     Speichern();
                     break;

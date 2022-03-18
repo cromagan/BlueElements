@@ -112,13 +112,13 @@ namespace BlueControls.ItemCollection {
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new()
             {
-                new FlexiControlForProperty(this, "Datensatz bearbeiten", enImageCode.Stift),
+                new FlexiControlForProperty(this, "Datensatz bearbeiten", ImageCode.Stift),
                 new FlexiControl()
             };
             ItemCollectionList.ItemCollectionList layouts = new();
             foreach (var thisLayouts in Row.Database.Layouts) {
                 ItemCollectionPad p = new(thisLayouts, string.Empty);
-                layouts.Add(p.Caption, p.Id, enImageCode.Stern);
+                layouts.Add(p.Caption, p.Id, ImageCode.Stern);
             }
             l.Add(new FlexiControlForProperty(this, "Layout-ID", layouts));
             l.AddRange(base.GetStyleOptions());
@@ -148,16 +148,16 @@ namespace BlueControls.ItemCollection {
                     var n = value.FromNonCritical();
                     if (Row != null) {
                         if (!string.Equals(Row.CellFirstString(), n, StringComparison.CurrentCultureIgnoreCase)) {
-                            MessageBox.Show("<b><u>Eintrag hat sich geändert:</b></u><br><b>Von: </b> " + n + "<br><b>Nach: </b>" + Row.CellFirstString(), enImageCode.Information, "OK");
+                            MessageBox.Show("<b><u>Eintrag hat sich geändert:</b></u><br><b>Von: </b> " + n + "<br><b>Nach: </b>" + Row.CellFirstString(), ImageCode.Information, "OK");
                         }
                         return true; // Alles beim Alten
                     }
                     var rowtmp = _database.Row[n];
                     if (rowtmp == null) {
-                        MessageBox.Show("<b><u>Eintrag nicht hinzugefügt</b></u><br>" + n, enImageCode.Warnung, "OK");
+                        MessageBox.Show("<b><u>Eintrag nicht hinzugefügt</b></u><br>" + n, ImageCode.Warnung, "OK");
                     } else {
                         _rowKey = rowtmp.Key;
-                        MessageBox.Show("<b><u>Eintrag neu gefunden:</b></u><br>" + n, enImageCode.Warnung, "OK");
+                        MessageBox.Show("<b><u>Eintrag neu gefunden:</b></u><br>" + n, ImageCode.Warnung, "OK");
                     }
                     return true; // Alles beim Alten
             }
@@ -178,7 +178,7 @@ namespace BlueControls.ItemCollection {
 
         protected override Bitmap GeneratePic() {
             if (string.IsNullOrEmpty(_layoutId) || !_layoutId.StartsWith("#")) {
-                return QuickImage.Get(enImageCode.Warnung, 128);
+                return QuickImage.Get(ImageCode.Warnung, 128);
             }
 
             CreativePad pad = new(new ItemCollectionPad(_layoutId, _database, _rowKey));

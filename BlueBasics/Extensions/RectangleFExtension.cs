@@ -63,10 +63,10 @@ namespace BlueBasics {
         public static PointF NearestCornerOf(this RectangleF r, PointF p) {
             var pl = new List<PointF>
             {
-                r.PointOf(enAlignment.Top_Left),
-                r.PointOf(enAlignment.Top_Right),
-                r.PointOf(enAlignment.Bottom_Right),
-                r.PointOf(enAlignment.Bottom_Left)
+                r.PointOf(Alignment.Top_Left),
+                r.PointOf(Alignment.Top_Right),
+                r.PointOf(Alignment.Bottom_Right),
+                r.PointOf(Alignment.Bottom_Left)
             };
             return p.NearestPoint(pl);
         }
@@ -80,25 +80,25 @@ namespace BlueBasics {
         public static PointF NearestLineMiddle(this RectangleF r, PointF p) {
             var pl = new List<PointF>
             {
-                r.PointOf(enAlignment.Bottom_HorizontalCenter),
-                r.PointOf(enAlignment.Top_HorizontalCenter),
-                r.PointOf(enAlignment.VerticalCenter_Left),
-                r.PointOf(enAlignment.VerticalCenter_Right)
+                r.PointOf(Alignment.Bottom_HorizontalCenter),
+                r.PointOf(Alignment.Top_HorizontalCenter),
+                r.PointOf(Alignment.VerticalCenter_Left),
+                r.PointOf(Alignment.VerticalCenter_Right)
             };
             return p.NearestPoint(pl);
         }
 
-        public static PointF PointOf(this RectangleF r, enAlignment p) {
+        public static PointF PointOf(this RectangleF r, Alignment p) {
             switch (p) {
-                case enAlignment.Bottom_Left: return new PointF(r.Left, r.Bottom);
-                case enAlignment.Bottom_Right: return new PointF(r.Right, r.Bottom);
-                case enAlignment.Top_Left: return new PointF(r.Left, r.Top);
-                case enAlignment.Top_Right: return new PointF(r.Right, r.Top);
-                case enAlignment.Bottom_HorizontalCenter: return new PointF((int)(r.Left + (r.Width / 2.0)), r.Bottom);
-                case enAlignment.Top_HorizontalCenter: return new PointF((int)(r.Left + (r.Width / 2.0)), r.Top);
-                case enAlignment.VerticalCenter_Left: return new PointF(r.Left, (int)(r.Top + (r.Height / 2.0)));
-                case enAlignment.VerticalCenter_Right: return new PointF(r.Right, (int)(r.Top + (r.Height / 2.0)));
-                case enAlignment.Horizontal_Vertical_Center: return new Point((int)(r.Left + (r.Width / 2.0)), (int)(r.Top + (r.Height / 2.0)));
+                case Alignment.Bottom_Left: return new PointF(r.Left, r.Bottom);
+                case Alignment.Bottom_Right: return new PointF(r.Right, r.Bottom);
+                case Alignment.Top_Left: return new PointF(r.Left, r.Top);
+                case Alignment.Top_Right: return new PointF(r.Right, r.Top);
+                case Alignment.Bottom_HorizontalCenter: return new PointF((int)(r.Left + (r.Width / 2.0)), r.Bottom);
+                case Alignment.Top_HorizontalCenter: return new PointF((int)(r.Left + (r.Width / 2.0)), r.Top);
+                case Alignment.VerticalCenter_Left: return new PointF(r.Left, (int)(r.Top + (r.Height / 2.0)));
+                case Alignment.VerticalCenter_Right: return new PointF(r.Right, (int)(r.Top + (r.Height / 2.0)));
+                case Alignment.Horizontal_Vertical_Center: return new Point((int)(r.Left + (r.Width / 2.0)), (int)(r.Top + (r.Height / 2.0)));
                 default:
                     Develop.DebugPrint(p);
                     return Point.Empty;

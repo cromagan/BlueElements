@@ -96,7 +96,7 @@ namespace BluePaint {
 
         public override void MouseUp(MouseEventArgs1_1DownAndCurrent e, Bitmap? originalPic) {
             if (e == null) {
-                Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Warnung, "e = null");
+                Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Warnung, "e = null");
                 return;
             }
             if (e.Current.Button != System.Windows.Forms.MouseButtons.Left) { return; }

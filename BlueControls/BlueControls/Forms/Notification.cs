@@ -98,8 +98,8 @@ namespace BlueControls.Forms {
             x.Show();
         }
 
-        public static void Show(string text, enImageCode img) {
-            if (img != enImageCode.None) {
+        public static void Show(string text, ImageCode img) {
+            if (img != ImageCode.None) {
                 text = "<ImageCode=" + Enum.GetName(img.GetType(), img) + "|32> <zbx_store><top>" + text;
             }
             Show(text);

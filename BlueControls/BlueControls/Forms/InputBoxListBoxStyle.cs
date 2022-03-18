@@ -58,7 +58,7 @@ namespace BlueControls.Forms {
 
         public static string Show(string txt, List<string>? items) {
             if (items == null || items.Count == 0) {
-                return InputBox.Show(txt, "", enVarType.Text);
+                return InputBox.Show(txt, "", VarType.Text);
             }
             ItemCollectionList x = new(BlueListBoxAppearance.Listbox) {
                 CheckBehavior = CheckBehavior.AlwaysSingleSelection

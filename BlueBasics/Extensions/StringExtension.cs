@@ -72,12 +72,12 @@ namespace BlueBasics {
             return pose == txt.Length - 1;
         }
 
-        public static string CompareKey(this string isValue, enSortierTyp format) {
+        public static string CompareKey(this string isValue, SortierTyp format) {
             var compareKeySOk = Constants.SecondSortChar + "X";
             var compareKeySNok = Constants.SecondSortChar + "A";
 
             switch (format) {
-                case enSortierTyp.ZahlenwertInt:
+                case SortierTyp.ZahlenwertInt:
                     if (string.IsNullOrEmpty(isValue)) { return compareKeySNok + "A0000000000"; }
                     if (IntTryParse(isValue, out var w)) {
                         return w >= 0
@@ -87,16 +87,16 @@ namespace BlueBasics {
                         return compareKeySNok + isValue;
                     }
 
-                case enSortierTyp.Original_String:
+                case SortierTyp.Original_String:
                     return Constants.SecondSortChar + isValue;
 
-                case enSortierTyp.Sprachneutral_String:
+                case SortierTyp.Sprachneutral_String:
 
                     if (string.IsNullOrEmpty(isValue)) { return string.Empty; }
 
                     return Constants.SecondSortChar + isValue.Sprachneutral();
 
-                case enSortierTyp.ZahlenwertFloat:
+                case SortierTyp.ZahlenwertFloat:
                     if (string.IsNullOrEmpty(isValue)) { return "A0000000000,000"; }
                     if (DoubleTryParse(isValue, out var dw)) {
                         var t = dw.ToString(Constants.Format_Float10_3);
@@ -109,7 +109,7 @@ namespace BlueBasics {
                         return compareKeySNok + isValue;
                     }
 
-                case enSortierTyp.Datum_Uhrzeit:
+                case SortierTyp.Datum_Uhrzeit:
                     return DateTimeTryParse(isValue, out var d) ? compareKeySNok + d.ToString(Constants.Format_Date) : compareKeySNok + isValue;
 
                 default:
@@ -235,7 +235,7 @@ namespace BlueBasics {
                     return false;
 
                 default:
-                    Develop.DebugPrint(enFehlerArt.Warnung, "'" + value + "' unbekannt!");
+                    Develop.DebugPrint(FehlerArt.Warnung, "'" + value + "' unbekannt!");
                     return false;
             }
         }
@@ -265,11 +265,11 @@ namespace BlueBasics {
             do {
                 var (gleichpos, _) = NextText(value, start, Gleich, false, false, KlammernGeschweift);
                 if (gleichpos < 0) {
-                    Develop.DebugPrint(enFehlerArt.Fehler, "Parsen nicht möglich:" + value);
+                    Develop.DebugPrint(FehlerArt.Fehler, "Parsen nicht möglich:" + value);
                 }
                 var tag = value.Substring(start, gleichpos - start).Trim().ToLower();
                 if (string.IsNullOrEmpty(tag)) {
-                    Develop.DebugPrint(enFehlerArt.Fehler, "Parsen nicht möglich:" + value);
+                    Develop.DebugPrint(FehlerArt.Fehler, "Parsen nicht möglich:" + value);
                 }
                 var (kommapos, _) = NextText(value, gleichpos, Komma, false, true, KlammernGeschweift);
                 string tagval;
@@ -318,7 +318,7 @@ namespace BlueBasics {
         }
 
         public static int IndexOfWord(this string input, string value, int startIndex, RegexOptions options) {
-            if (options != RegexOptions.IgnoreCase) { Develop.DebugPrint(enFehlerArt.Fehler, "Regex option nicht erlaubt."); }
+            if (options != RegexOptions.IgnoreCase) { Develop.DebugPrint(FehlerArt.Fehler, "Regex option nicht erlaubt."); }
             value = value.ToUpper();
             input = " " + input.ToUpper() + " ";
             startIndex++;
@@ -517,8 +517,8 @@ namespace BlueBasics {
         public static string RemoveHtmlCodes(this string html) => Regex.Replace(html, "<.*?>", string.Empty);
 
         public static string Replace(this string tXt, string alt, string neu, RegexOptions options) {
-            if (options != RegexOptions.IgnoreCase) { Develop.DebugPrint(enFehlerArt.Fehler, "Regex option nicht erlaubt."); }
-            if (string.IsNullOrEmpty(alt)) { Develop.DebugPrint(enFehlerArt.Fehler, "ALT is Empty"); }
+            if (options != RegexOptions.IgnoreCase) { Develop.DebugPrint(FehlerArt.Fehler, "Regex option nicht erlaubt."); }
+            if (string.IsNullOrEmpty(alt)) { Develop.DebugPrint(FehlerArt.Fehler, "ALT is Empty"); }
             var oldPos = 0;
             while (true) {
                 if (string.IsNullOrEmpty(tXt)) { return tXt; }
@@ -536,7 +536,7 @@ namespace BlueBasics {
 
         public static string ReplaceWord(this string input, string alt, string replacement, RegexOptions options) {
             // return Regex.Replace(input, "\\b" + Alt + "\\b", replacement);
-            if (options != RegexOptions.IgnoreCase) { Develop.DebugPrint(enFehlerArt.Fehler, "Regex option nicht erlaubt."); }
+            if (options != RegexOptions.IgnoreCase) { Develop.DebugPrint(FehlerArt.Fehler, "Regex option nicht erlaubt."); }
             if (replacement.IndexOf(alt, StringComparison.OrdinalIgnoreCase) >= 0) {
                 const string du = "@DUMMY@";
                 input = ReplaceWord(input, alt, du, options);
@@ -774,7 +774,7 @@ namespace BlueBasics {
 
         public static string TrimEnd(this string tXt, string was) {
             if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
-            if (was.Length < 1) { Develop.DebugPrint(enFehlerArt.Fehler, "Trimmen nicht möglich mit: " + was); }
+            if (was.Length < 1) { Develop.DebugPrint(FehlerArt.Fehler, "Trimmen nicht möglich mit: " + was); }
             was = was.ToUpper();
             while (tXt.Length >= was.Length && tXt.Substring(tXt.Length - was.Length).ToUpper() == was) {
                 tXt = tXt.Remove(tXt.Length - was.Length);
@@ -784,7 +784,7 @@ namespace BlueBasics {
 
         public static string TrimStart(this string tXt, string was) {
             if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
-            if (was.Length < 1) { Develop.DebugPrint(enFehlerArt.Fehler, "Trimmen nicht möglich mit: " + was); }
+            if (was.Length < 1) { Develop.DebugPrint(FehlerArt.Fehler, "Trimmen nicht möglich mit: " + was); }
             was = was.ToUpper();
             while (tXt.Length >= was.Length && tXt.Substring(0, was.Length).ToUpper() == was) {
                 tXt = tXt.Remove(0, was.Length);

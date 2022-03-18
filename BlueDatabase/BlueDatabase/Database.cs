@@ -408,7 +408,7 @@ namespace BlueDatabase {
             }
             var d = Generic.GetEmmbedResource(assembly, name);
             if (d != null) { return new Database(d); }
-            if (fehlerAusgeben) { Develop.DebugPrint(enFehlerArt.Fehler, "Ressource konnte nicht initialisiert werden: " + blueBasicsSubDir + " - " + name); }
+            if (fehlerAusgeben) { Develop.DebugPrint(FehlerArt.Fehler, "Ressource konnte nicht initialisiert werden: " + blueBasicsSubDir + " - " + name); }
             return null;
         }
 
@@ -478,11 +478,11 @@ namespace BlueDatabase {
 
         public override void DiscardPendingChanges() => ChangeWorkItems(ItemState.Pending, ItemState.Undo);
 
-        public override string ErrorReason(enErrorReason mode) {
+        public override string ErrorReason(ErrorReason mode) {
             var f = base.ErrorReason(mode);
 
             if (!string.IsNullOrEmpty(f)) { return f; }
-            if (mode == enErrorReason.OnlyRead) { return string.Empty; }
+            if (mode == BlueBasics.Enums.ErrorReason.OnlyRead) { return string.Empty; }
 
             return IntParse(LoadedVersion.Replace(".", "")) > IntParse(DatabaseVersion.Replace(".", ""))
                 ? "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."
@@ -687,7 +687,7 @@ namespace BlueDatabase {
                 zeil.Add(ein[z].SplitAndCutBy(splitChar));
             }
             if (zeil.Count == 0) {
-                OnDropMessage(enFehlerArt.Warnung, "Import kann nicht ausgeführt werden.");
+                OnDropMessage(FehlerArt.Warnung, "Import kann nicht ausgeführt werden.");
                 return "Import kann nicht ausgeführt werden.";
             }
             List<ColumnItem?> columns = new();
@@ -699,7 +699,7 @@ namespace BlueDatabase {
                 startZ = 1;
                 for (var spaltNo = 0; spaltNo < zeil[0].GetUpperBound(0) + 1; spaltNo++) {
                     if (string.IsNullOrEmpty(zeil[0][spaltNo])) {
-                        OnDropMessage(enFehlerArt.Warnung, "Abbruch,<br>leerer Spaltenname.");
+                        OnDropMessage(FehlerArt.Warnung, "Abbruch,<br>leerer Spaltenname.");
                         return "Abbruch,<br>leerer Spaltenname.";
                     }
                     zeil[0][spaltNo] = zeil[0][spaltNo].Replace(" ", "_").ReduceToChars(Constants.AllowedCharsVariableName);
@@ -743,7 +743,7 @@ namespace BlueDatabase {
                     if (row != null && dorowautmatic) { row.DoAutomatic(true, true, "import"); }
                 }
             }
-            OnDropMessage(enFehlerArt.Info, "<b>Import abgeschlossen.</b>\r\n" + neuZ + " neue Zeilen erstellt.");
+            OnDropMessage(FehlerArt.Info, "<b>Import abgeschlossen.</b>\r\n" + neuZ + " neue Zeilen erstellt.");
             return string.Empty;
         }
 
@@ -873,7 +873,7 @@ namespace BlueDatabase {
                         break;
                     }
                 default: {
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Laderoutine nicht definiert: " + bLoaded[pointer]);
+                        Develop.DebugPrint(FehlerArt.Fehler, "Laderoutine nicht definiert: " + bLoaded[pointer]);
                         break;
                     }
             }
@@ -915,7 +915,7 @@ namespace BlueDatabase {
                     return true;
                 }
             } catch (Exception ex) {
-                Develop.DebugPrint(enFehlerArt.Warnung, ex);
+                Develop.DebugPrint(FehlerArt.Warnung, ex);
             }
             return false;
         }
@@ -961,7 +961,7 @@ namespace BlueDatabase {
             if (IsParsing) { return; }
             if (ReadOnly) {
                 if (!string.IsNullOrEmpty(Filename)) {
-                    Develop.DebugPrint(enFehlerArt.Warnung, "Datei ist Readonly, " + comand + ", " + Filename);
+                    Develop.DebugPrint(FehlerArt.Warnung, "Datei ist Readonly, " + comand + ", " + Filename);
                 }
                 return;
             }
@@ -969,8 +969,8 @@ namespace BlueDatabase {
 
             if (comand != DatabaseDataType.AutoExport) { SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
 
-            if (rowKey < -100) { Develop.DebugPrint(enFehlerArt.Fehler, "RowKey darf hier nicht <-100 sein!"); }
-            if (columnKey < -100) { Develop.DebugPrint(enFehlerArt.Fehler, "ColKey darf hier nicht <-100 sein!"); }
+            if (rowKey < -100) { Develop.DebugPrint(FehlerArt.Fehler, "RowKey darf hier nicht <-100 sein!"); }
+            if (columnKey < -100) { Develop.DebugPrint(FehlerArt.Fehler, "ColKey darf hier nicht <-100 sein!"); }
             Works.Add(new WorkItem(comand, columnKey, rowKey, previousValue, changedTo, UserName));
         }
 
@@ -1033,10 +1033,10 @@ namespace BlueDatabase {
                 t += "\r\nRow-Count: " + Row.Count;
                 t += "\r\nFile: " + Filename;
             } catch { }
-            Develop.DebugPrint(enFehlerArt.Warnung, t);
+            Develop.DebugPrint(FehlerArt.Warnung, t);
         }
 
-        internal void OnDropMessage(enFehlerArt type, string message) {
+        internal void OnDropMessage(FehlerArt type, string message) {
             if (Disposed) { return; }
             DropMessage?.Invoke(this, new MessageEventArgs(type, message));
         }
@@ -1489,7 +1489,7 @@ namespace BlueDatabase {
         //    }
         //}
         private void Column_ItemRemoved(object sender, System.EventArgs e) {
-            if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Parsing Falsch!"); }
+            if (IsParsing) { Develop.DebugPrint(FehlerArt.Warnung, "Parsing Falsch!"); }
             CheckViewsAndArrangements();
 
             Layouts.Check();
@@ -1516,7 +1516,7 @@ namespace BlueDatabase {
         }
 
         private void ExecutePending() {
-            if (!IsParsing) { Develop.DebugPrint(enFehlerArt.Fehler, "Nur während des Parsens möglich"); }
+            if (!IsParsing) { Develop.DebugPrint(FehlerArt.Fehler, "Nur während des Parsens möglich"); }
             if (!HasPendingChanges()) { return; }
             // Erst die Neuen Zeilen / Spalten alle neutralisieren
             //var dummy = -1000;
@@ -1910,7 +1910,7 @@ namespace BlueDatabase {
                     if (LoadedVersion == DatabaseVersion) {
                         LoadedVersion = "9.99";
                         if (!ReadOnly) {
-                            Develop.DebugPrint(enFehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Datei: " + Filename);
+                            Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Datei: " + Filename);
                         }
                     }
 

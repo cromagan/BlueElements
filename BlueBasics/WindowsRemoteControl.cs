@@ -66,7 +66,7 @@ namespace BlueBasics {
         #region Methods
 
         // Release key
-        public static void AltRelease() => keybd_event((byte)enTaste.VK_MENU, 0, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+        public static void AltRelease() => keybd_event((byte)KeyCode.VK_MENU, 0, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
 
         /// <summary>
         /// Diese Funktion Sucht alle offenen Fenster.
@@ -134,16 +134,16 @@ namespace BlueBasics {
             wDescr.prid = prid;
         }
 
-        public static void KeyDown(enTaste k) => keybd_event((byte)k, 0, KEYEVENTF_KEYDOWN, 0);
+        public static void KeyDown(KeyCode k) => keybd_event((byte)k, 0, KEYEVENTF_KEYDOWN, 0);
 
-        public static void KeyUp(enTaste k) => keybd_event((byte)k, 0, KEYEVENTF_KEYUP, 0);
+        public static void KeyUp(KeyCode k) => keybd_event((byte)k, 0, KEYEVENTF_KEYUP, 0);
 
         public static string LastMouseButton() => Convert.ToBoolean(GetAsyncKeyState(0x1)) ? "Links"
 : Convert.ToBoolean(GetAsyncKeyState(0x2)) ? "Rechts"
 : Convert.ToBoolean(GetAsyncKeyState(0x4)) ? "Mitte"
 : string.Empty;
 
-        public static void LeftAltRelease() => keybd_event((byte)enTaste.VK_MENU, 0, KEYEVENTF_KEYUP, 0);
+        public static void LeftAltRelease() => keybd_event((byte)KeyCode.VK_MENU, 0, KEYEVENTF_KEYUP, 0);
 
         /// <summary>
         /// Diese Funktion bewegt den Mauscursor an einen bestimmten Punkt.
@@ -181,7 +181,7 @@ namespace BlueBasics {
             Develop.AbortExe();
         }
 
-        public static void ShiftRelease() => keybd_event((byte)enTaste.VK_SHIFT, 0, KEYEVENTF_KEYUP, 0);
+        public static void ShiftRelease() => keybd_event((byte)KeyCode.VK_SHIFT, 0, KEYEVENTF_KEYUP, 0);
 
         [DllImport("user32", EntryPoint = "ShowWindow", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         public static extern int ShowWindow(IntPtr hWnd, int nCmdShow);

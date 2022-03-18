@@ -370,8 +370,8 @@ namespace BlueControls.Forms
             // flxAbstand
             // 
             this.flxAbstand.Caption = "Abstand:";
-            this.flxAbstand.CaptionPosition = BlueBasics.Enums.enÜberschriftAnordnung.Links_neben_Dem_Feld;
-            this.flxAbstand.EditType = BlueBasics.Enums.enEditTypeFormula.Textfeld;
+            this.flxAbstand.CaptionPosition = BlueDatabase.Enums.ÜberschriftAnordnung.Links_neben_Dem_Feld;
+            this.flxAbstand.EditType = BlueDatabase.Enums.EditTypeFormula.Textfeld;
             this.flxAbstand.FileEncryptionKey = null;
             this.flxAbstand.Location = new System.Drawing.Point(296, 8);
             this.flxAbstand.Name = "flxAbstand";
@@ -384,8 +384,8 @@ namespace BlueControls.Forms
             // flxHöhe
             // 
             this.flxHöhe.Caption = "Höhe";
-            this.flxHöhe.CaptionPosition = BlueBasics.Enums.enÜberschriftAnordnung.Links_neben_Dem_Feld;
-            this.flxHöhe.EditType = BlueBasics.Enums.enEditTypeFormula.Textfeld;
+            this.flxHöhe.CaptionPosition = BlueDatabase.Enums.ÜberschriftAnordnung.Links_neben_Dem_Feld;
+            this.flxHöhe.EditType = BlueDatabase.Enums.EditTypeFormula.Textfeld;
             this.flxHöhe.FileEncryptionKey = null;
             this.flxHöhe.Location = new System.Drawing.Point(152, 8);
             this.flxHöhe.Name = "flxHöhe";
@@ -398,8 +398,8 @@ namespace BlueControls.Forms
             // flxBreite
             // 
             this.flxBreite.Caption = "Breite:";
-            this.flxBreite.CaptionPosition = BlueBasics.Enums.enÜberschriftAnordnung.Links_neben_Dem_Feld;
-            this.flxBreite.EditType = BlueBasics.Enums.enEditTypeFormula.Textfeld;
+            this.flxBreite.CaptionPosition = BlueDatabase.Enums.ÜberschriftAnordnung.Links_neben_Dem_Feld;
+            this.flxBreite.EditType = BlueDatabase.Enums.EditTypeFormula.Textfeld;
             this.flxBreite.FileEncryptionKey = null;
             this.flxBreite.Location = new System.Drawing.Point(8, 8);
             this.flxBreite.Name = "flxBreite";

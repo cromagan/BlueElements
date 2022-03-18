@@ -397,19 +397,19 @@ namespace BlueControls.Controls {
                     c = c.Replace("\r\n", "\r");
                     c = c.Replace("\r", "\r\n");
                     Generic.CopytoClipboard(c);
-                    if (meldung) { Notification.Show(LanguageTool.DoTranslate("<b>{0}</b><br>ist nun in der Zwischenablage.", true, c), enImageCode.Kopieren); }
+                    if (meldung) { Notification.Show(LanguageTool.DoTranslate("<b>{0}</b><br>ist nun in der Zwischenablage.", true, c), ImageCode.Kopieren); }
                 } else {
-                    if (meldung) { Notification.Show(LanguageTool.DoTranslate("Bei dieser Spalte nicht möglich."), enImageCode.Warnung); }
+                    if (meldung) { Notification.Show(LanguageTool.DoTranslate("Bei dieser Spalte nicht möglich."), ImageCode.Warnung); }
                 }
             } catch {
-                if (meldung) { Notification.Show(LanguageTool.DoTranslate("Unerwarteter Fehler beim Kopieren."), enImageCode.Warnung); }
+                if (meldung) { Notification.Show(LanguageTool.DoTranslate("Unerwarteter Fehler beim Kopieren."), ImageCode.Warnung); }
             }
         }
 
         public static void Database_NeedPassword(object sender, PasswordEventArgs e) {
             if (e.Handled) { return; }
             e.Handled = true;
-            e.Password = InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Datenbank<br>zu erhalten:", string.Empty, enVarType.Text);
+            e.Password = InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Datenbank<br>zu erhalten:", string.Empty, VarType.Text);
         }
 
         public static void DoUndo(ColumnItem? column, RowItem? row) {
@@ -423,7 +423,7 @@ namespace BlueControls.Controls {
             var cellKey = CellCollection.KeyOfCell(column, row);
             var i = UndoItems(column.Database, cellKey);
             if (i.Count < 1) {
-                MessageBox.Show("Keine vorherigen Inhalte<br>(mehr) vorhanden.", enImageCode.Information, "OK");
+                MessageBox.Show("Keine vorherigen Inhalte<br>(mehr) vorhanden.", ImageCode.Information, "OK");
                 return;
             }
             i.Appearance = BlueListBoxAppearance.Listbox;
@@ -493,7 +493,7 @@ namespace BlueControls.Controls {
             if (column == null) { column = tableView.Database.Column.SysLocked; }
             var rowsChecked = 0;
             if (string.IsNullOrEmpty(searchTxt)) {
-                MessageBox.Show("Bitte Text zum Suchen eingeben.", enImageCode.Information, "OK");
+                MessageBox.Show("Bitte Text zum Suchen eingeben.", ImageCode.Information, "OK");
                 foundColumn = null;
                 foundRow = null;
                 return;
@@ -890,7 +890,7 @@ namespace BlueControls.Controls {
         public void ImportClipboard() {
             Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
             if (!System.Windows.Forms.Clipboard.ContainsText()) {
-                Notification.Show("Abbruch,<br>kein Text im Zwischenspeicher!", enImageCode.Information);
+                Notification.Show("Abbruch,<br>kein Text im Zwischenspeicher!", ImageCode.Information);
                 return;
             }
 
@@ -976,7 +976,7 @@ namespace BlueControls.Controls {
                         break;
 
                     default:
-                        Develop.DebugPrint(enFehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
+                        Develop.DebugPrint(FehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
                         break;
                 }
             }
@@ -1304,8 +1304,8 @@ namespace BlueControls.Controls {
                 switch (e.KeyCode) {
                     case System.Windows.Forms.Keys.Oemcomma: // normales ,
                         if (e.Modifiers == System.Windows.Forms.Keys.Control) {
-                            var lp = CellCollection.ErrorReason(_cursorPosColumn, _cursorPosRow?.Row, enErrorReason.EditGeneral);
-                            Neighbour(_cursorPosColumn, _cursorPosRow, enDirection.Oben, out _, out var newRow);
+                            var lp = CellCollection.ErrorReason(_cursorPosColumn, _cursorPosRow?.Row, ErrorReason.EditGeneral);
+                            Neighbour(_cursorPosColumn, _cursorPosRow, Direction.Oben, out _, out var newRow);
                             if (newRow == _cursorPosRow) { lp = "Das geht nicht bei dieser Zeile."; }
                             if (string.IsNullOrEmpty(lp) && newRow != null) {
                                 UserEdited(this, newRow?.Row.CellGetString(_cursorPosColumn), _cursorPosColumn, _cursorPosRow?.Row, newRow?.Chapter, true);
@@ -1322,7 +1322,7 @@ namespace BlueControls.Controls {
                                 _isinKeyDown = false;
                                 return;
                             }
-                            var l2 = CellCollection.ErrorReason(_cursorPosColumn, _cursorPosRow?.Row, enErrorReason.EditGeneral);
+                            var l2 = CellCollection.ErrorReason(_cursorPosColumn, _cursorPosRow?.Row, ErrorReason.EditGeneral);
                             if (string.IsNullOrEmpty(l2)) {
                                 UserEdited(this, string.Empty, _cursorPosColumn, _cursorPosRow?.Row, _cursorPosRow?.Chapter, true);
                             } else {
@@ -1336,7 +1336,7 @@ namespace BlueControls.Controls {
                             _isinKeyDown = false;
                             return;
                         }
-                        var l = CellCollection.ErrorReason(_cursorPosColumn, _cursorPosRow?.Row, enErrorReason.EditGeneral);
+                        var l = CellCollection.ErrorReason(_cursorPosColumn, _cursorPosRow?.Row, ErrorReason.EditGeneral);
                         if (string.IsNullOrEmpty(l)) {
                             UserEdited(this, string.Empty, _cursorPosColumn, _cursorPosRow?.Row, _cursorPosRow?.Chapter, true);
                         } else {
@@ -1345,19 +1345,19 @@ namespace BlueControls.Controls {
                         break;
 
                     case System.Windows.Forms.Keys.Left:
-                        Cursor_Move(enDirection.Links);
+                        Cursor_Move(Direction.Links);
                         break;
 
                     case System.Windows.Forms.Keys.Right:
-                        Cursor_Move(enDirection.Rechts);
+                        Cursor_Move(Direction.Rechts);
                         break;
 
                     case System.Windows.Forms.Keys.Up:
-                        Cursor_Move(enDirection.Oben);
+                        Cursor_Move(Direction.Oben);
                         break;
 
                     case System.Windows.Forms.Keys.Down:
-                        Cursor_Move(enDirection.Unten);
+                        Cursor_Move(Direction.Unten);
                         break;
 
                     case System.Windows.Forms.Keys.PageDown:
@@ -1423,7 +1423,7 @@ namespace BlueControls.Controls {
                                     _isinKeyDown = false;
                                     return;
                                 }
-                                var l2 = CellCollection.ErrorReason(_cursorPosColumn, _cursorPosRow?.Row, enErrorReason.EditGeneral);
+                                var l2 = CellCollection.ErrorReason(_cursorPosColumn, _cursorPosRow?.Row, ErrorReason.EditGeneral);
                                 if (string.IsNullOrEmpty(l2)) {
                                     UserEdited(this, ntxt, _cursorPosColumn, _cursorPosRow?.Row, _cursorPosRow?.Chapter, true);
                                 } else {
@@ -1720,7 +1720,7 @@ namespace BlueControls.Controls {
             var tmpImageCode = tmpData.Item2;
             if (tmpImageCode != null) { tmpImageCode = QuickImage.Get(tmpImageCode, Skin.AdditionalState(state)); }
 
-            Skin.Draw_FormatedText(gr, tmpData.Item1, tmpImageCode, (enAlignment)contentHolderColumnStyle.Align, r, null, false, font, false);
+            Skin.Draw_FormatedText(gr, tmpData.Item1, tmpImageCode, (Alignment)contentHolderColumnStyle.Align, r, null, false, font, false);
         }
 
         private static int GetPix(int pix, BlueFont? f, double scale) => Skin.FormatedText_NeededSize("@|", null, f, (int)((pix * scale) + 0.5)).Height;
@@ -1729,7 +1729,7 @@ namespace BlueControls.Controls {
 
         private static bool Mouse_IsInRedcueButton(ColumnViewItem viewItem, System.Windows.Forms.MouseEventArgs e) => viewItem != null && viewItem.TmpReduceLocation.Width != 0 && viewItem.TmpReduceLocation.Contains(e.X, e.Y);
 
-        private static void NotEditableInfo(string reason) => Notification.Show(reason, enImageCode.Kreuz);
+        private static void NotEditableInfo(string reason) => Notification.Show(reason, ImageCode.Kreuz);
 
         private static void UserEdited(Table table, string newValue, ColumnItem? column, RowItem? row, string chapter, bool formatWarnung) {
             if (column == null) {
@@ -1765,7 +1765,7 @@ namespace BlueControls.Controls {
             var cancelReason = ed.CancelReason;
             if (string.IsNullOrEmpty(cancelReason) && formatWarnung && !string.IsNullOrEmpty(newValue)) {
                 if (!newValue.IsFormat(column)) {
-                    if (MessageBox.Show("Ihre Eingabe entspricht<br><u>nicht</u> dem erwarteten Format!<br><br>Trotzdem übernehmen?", enImageCode.Information, "Ja", "Nein") != 0) {
+                    if (MessageBox.Show("Ihre Eingabe entspricht<br><u>nicht</u> dem erwarteten Format!<br><br>Trotzdem übernehmen?", ImageCode.Information, "Ja", "Nein") != 0) {
                         cancelReason = "Abbruch, das das erwartete Format nicht eingehalten wurde.";
                     }
                 }
@@ -1773,13 +1773,13 @@ namespace BlueControls.Controls {
 
             if (string.IsNullOrEmpty(cancelReason)) {
                 if (row == null) {
-                    var f = CellCollection.ErrorReason(column.Database.Column[0], null, enErrorReason.EditGeneral);
+                    var f = CellCollection.ErrorReason(column.Database.Column[0], null, ErrorReason.EditGeneral);
                     if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
                     row = column.Database.Row.Add(newValue);
                     if (table.Database == column.Database) {
                         var l = table.FilteredRows();
                         if (!l.Contains(row)) {
-                            if (MessageBox.Show("Die neue Zeile ist ausgeblendet.<br>Soll sie <b>angepinnt</b> werden?", enImageCode.Pinnadel, "anpinnen", "abbrechen") == 0) {
+                            if (MessageBox.Show("Die neue Zeile ist ausgeblendet.<br>Soll sie <b>angepinnt</b> werden?", ImageCode.Pinnadel, "anpinnen", "abbrechen") == 0) {
                                 table.PinAdd(row);
                             }
                         }
@@ -1789,7 +1789,7 @@ namespace BlueControls.Controls {
                         table.CursorPos_Set(table.Database.Column[0], rd, true);
                     }
                 } else {
-                    var f = CellCollection.ErrorReason(column, row, enErrorReason.EditGeneral);
+                    var f = CellCollection.ErrorReason(column, row, ErrorReason.EditGeneral);
                     if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
                     row.CellSet(column, newValue);
                 }
@@ -1968,9 +1968,9 @@ namespace BlueControls.Controls {
                     e.Column.GetUniques(VisibleUniqueRows(), out var einzigartig, out _);
                     if (einzigartig.Count > 0) {
                         Filter.Add(new FilterItem(e.Column, FilterType.Istgleich_ODER_GroßKleinEgal, einzigartig));
-                        Notification.Show("Die aktuell einzigartigen Einträge wurden berechnet<br>und als <b>ODER-Filter</b> gespeichert.", enImageCode.Trichter);
+                        Notification.Show("Die aktuell einzigartigen Einträge wurden berechnet<br>und als <b>ODER-Filter</b> gespeichert.", ImageCode.Trichter);
                     } else {
-                        Notification.Show("Filterung dieser Spalte gelöscht,<br>da <b>alle Einträge</b> mehrfach vorhanden sind.", enImageCode.Trichter);
+                        Notification.Show("Filterung dieser Spalte gelöscht,<br>da <b>alle Einträge</b> mehrfach vorhanden sind.", ImageCode.Trichter);
                     }
                     break;
 
@@ -1979,9 +1979,9 @@ namespace BlueControls.Controls {
                     e.Column.GetUniques(VisibleUniqueRows(), out _, out var xNichtEinzigartig);
                     if (xNichtEinzigartig.Count > 0) {
                         Filter.Add(new FilterItem(e.Column, FilterType.Istgleich_ODER_GroßKleinEgal, xNichtEinzigartig));
-                        Notification.Show("Die aktuell <b>nicht</b> einzigartigen Einträge wurden berechnet<br>und als <b>ODER-Filter</b> gespeichert.", enImageCode.Trichter);
+                        Notification.Show("Die aktuell <b>nicht</b> einzigartigen Einträge wurden berechnet<br>und als <b>ODER-Filter</b> gespeichert.", ImageCode.Trichter);
                     } else {
-                        Notification.Show("Filterung dieser Spalte gelöscht,<br>da <b>alle Einträge</b> einzigartig sind.", enImageCode.Trichter);
+                        Notification.Show("Filterung dieser Spalte gelöscht,<br>da <b>alle Einträge</b> einzigartig sind.", ImageCode.Trichter);
                     }
                     break;
 
@@ -2006,9 +2006,9 @@ namespace BlueControls.Controls {
                         }
                         if (d.Count > 0) {
                             Filter.Add(new FilterItem(e.Column.Database.Column[0], FilterType.Istgleich_ODER_GroßKleinEgal, d));
-                            Notification.Show("Die aktuell <b>unterschiedlichen</b> Einträge wurden berechnet<br>und als <b>ODER-Filter</b> in der <b>ersten Spalte</b> gespeichert.", enImageCode.Trichter);
+                            Notification.Show("Die aktuell <b>unterschiedlichen</b> Einträge wurden berechnet<br>und als <b>ODER-Filter</b> in der <b>ersten Spalte</b> gespeichert.", ImageCode.Trichter);
                         } else {
-                            Notification.Show("Keine Filter verändert,<br>da <b>alle Einträge</b> identisch sind.", enImageCode.Trichter);
+                            Notification.Show("Keine Filter verändert,<br>da <b>alle Einträge</b> identisch sind.", ImageCode.Trichter);
                         }
                         break;
                     }
@@ -2049,7 +2049,7 @@ namespace BlueControls.Controls {
             if (_design == BlueTableAppearance.OnlyMainColumnWithoutHead) { return; }
             if (!columnviewitem.Column.AutoFilterSymbolPossible()) { return; }
             if (Filter.Any(thisFilter => thisFilter != null && thisFilter.Column == columnviewitem.Column && !string.IsNullOrEmpty(thisFilter.Herkunft))) {
-                MessageBox.Show("Dieser Filter wurde<br>automatisch gesetzt.", enImageCode.Information, "OK");
+                MessageBox.Show("Dieser Filter wurde<br>automatisch gesetzt.", ImageCode.Information, "OK");
                 return;
             }
             Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
@@ -2118,7 +2118,7 @@ namespace BlueControls.Controls {
 
             if (Database.ReloadNeeded) { Database.Load_Reload(); }
 
-            var f = Database.ErrorReason(enErrorReason.EditGeneral);
+            var f = Database.ErrorReason(ErrorReason.EditGeneral);
             if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
             if (cellInThisDatabaseColumn == null) { return; }// Klick ins Leere
 
@@ -2146,8 +2146,8 @@ namespace BlueControls.Controls {
                 NotEditableInfo("Diese Spalte kann generell nicht bearbeitet werden.");
                 return;
             }
-            if (!CellCollection.UserEditPossible(contentHolderCellColumn, contentHolderCellRow, enErrorReason.EditGeneral)) {
-                NotEditableInfo(CellCollection.ErrorReason(contentHolderCellColumn, contentHolderCellRow, enErrorReason.EditGeneral));
+            if (!CellCollection.UserEditPossible(contentHolderCellColumn, contentHolderCellRow, ErrorReason.EditGeneral)) {
+                NotEditableInfo(CellCollection.ErrorReason(contentHolderCellColumn, contentHolderCellRow, ErrorReason.EditGeneral));
                 return;
             }
             if (cellInThisDatabaseRow != null) {
@@ -2300,7 +2300,7 @@ namespace BlueControls.Controls {
                     Cell_Edit(cellInThisDatabaseColumn, cellInThisDatabaseRow, false);
                     return;
                 }
-                t.Add("Erweiterte Eingabe", "#Erweitert", QuickImage.Get(enImageCode.Stift), true, Constants.FirstSortChar + "1");
+                t.Add("Erweiterte Eingabe", "#Erweitert", QuickImage.Get(ImageCode.Stift), true, Constants.FirstSortChar + "1");
                 t.AddSeparator(Constants.FirstSortChar + "2");
                 t.Sort();
             }
@@ -2503,10 +2503,10 @@ namespace BlueControls.Controls {
         /// Setzt die Variable CursorPos um X Columns und Y Reihen um. Dabei wird die Columns und Zeilensortierung berücksichtigt.
         /// </summary>
         /// <remarks></remarks>
-        private void Cursor_Move(enDirection richtung) {
+        private void Cursor_Move(Direction richtung) {
             if (_database == null) { return; }
             Neighbour(_cursorPosColumn, _cursorPosRow, richtung, out var newCol, out var newRow);
-            CursorPos_Set(newCol, newRow, richtung != enDirection.Nichts);
+            CursorPos_Set(newCol, newRow, richtung != Direction.Nichts);
         }
 
         private void CursorPos_Set(ColumnItem? column, RowItem? row, bool ensureVisible, string chapter) => CursorPos_Set(column, SortedRows().Get(row, chapter), ensureVisible);
@@ -2569,7 +2569,7 @@ namespace BlueControls.Controls {
             if (e.Cecked) { s |= States.Checked; }
 
             var x = new ExtText(Enums.Design.Button_CheckBox, s);
-            Button.DrawButton(this, gr, Enums.Design.Button_CheckBox, s, e.Image, enAlignment.Horizontal_Vertical_Center, false, x, e.Text, cellrectangle, true);
+            Button.DrawButton(this, gr, Enums.Design.Button_CheckBox, s, e.Image, Alignment.Horizontal_Vertical_Center, false, x, e.Text, cellrectangle, true);
         }
 
         /// <summary>
@@ -2649,7 +2649,7 @@ namespace BlueControls.Controls {
             #region Neue Zeile
 
             if (UserEdit_NewRowAllowed() && viewItem == CurrentArrangement[Database.Column[0]]) {
-                Skin.Draw_FormatedText(gr, "[Neue Zeile]", QuickImage.Get(enImageCode.PlusZeichen, _pix16), enAlignment.Left, new Rectangle((int)viewItem.OrderTmpSpalteX1 + 1, (int)(-SliderY.Value + HeadSize() + 1), (int)viewItem.TmpDrawWidth - 2, 16 - 2), this, false, _newRowFont, Translate);
+                Skin.Draw_FormatedText(gr, "[Neue Zeile]", QuickImage.Get(ImageCode.PlusZeichen, _pix16), Alignment.Left, new Rectangle((int)viewItem.OrderTmpSpalteX1 + 1, (int)(-SliderY.Value + HeadSize() + 1), (int)viewItem.TmpDrawWidth - 2, 16 - 2), this, false, _newRowFont, Translate);
             }
 
             #endregion
@@ -2720,11 +2720,11 @@ namespace BlueControls.Controls {
 
                         if (_collapsed.Contains(currentRow.Chapter)) {
                             var x = new ExtText(Enums.Design.Button_CheckBox, States.Checked);
-                            Button.DrawButton(this, gr, Enums.Design.Button_CheckBox, States.Checked, null, enAlignment.Horizontal_Vertical_Center, false, x, string.Empty, currentRow.CaptionPos, false);
+                            Button.DrawButton(this, gr, Enums.Design.Button_CheckBox, States.Checked, null, Alignment.Horizontal_Vertical_Center, false, x, string.Empty, currentRow.CaptionPos, false);
                             gr.DrawImage(QuickImage.Get("Pfeil_Unten_Scrollbar|14|||FF0000||200|200")!, 5, DrawY(currentRow) - _rowCaptionFontY + 6);
                         } else {
                             var x = new ExtText(Enums.Design.Button_CheckBox, States.Standard);
-                            Button.DrawButton(this, gr, Enums.Design.Button_CheckBox, States.Standard, null, enAlignment.Horizontal_Vertical_Center, false, x, string.Empty, currentRow.CaptionPos, false);
+                            Button.DrawButton(this, gr, Enums.Design.Button_CheckBox, States.Standard, null, Alignment.Horizontal_Vertical_Center, false, x, string.Empty, currentRow.CaptionPos, false);
                             gr.DrawImage(QuickImage.Get("Pfeil_Rechts_Scrollbar|14|||||0")!, 5, DrawY(currentRow) - _rowCaptionFontY + 6);
                         }
                         _chapterFont.DrawString(gr, currentRow.Chapter, 23, DrawY(currentRow) - _rowCaptionFontY);
@@ -2767,7 +2767,7 @@ namespace BlueControls.Controls {
                                     gr.FillRectangle(new SolidBrush(bvi[u].Column.BackColor), r);
                                     gr.FillRectangle(new SolidBrush(Color.FromArgb(80, 200, 200, 200)), r);
                                     gr.DrawRectangle(Skin.PenLinieKräftig, r);
-                                    Skin.Draw_FormatedText(gr, v, null, enAlignment.Horizontal_Vertical_Center, r, this, false, _columnFont, Translate);
+                                    Skin.Draw_FormatedText(gr, v, null, Alignment.Horizontal_Vertical_Center, r, this, false, _columnFont, Translate);
                                 }
                             }
                             bvi[u] = viewItem;
@@ -2855,9 +2855,9 @@ namespace BlueControls.Controls {
                 Draw_Column_Head_Captions(gr);
                 Skin.Draw_Border(gr, Enums.Design.Table_And_Pad, state, displayRectangleWoSlider);
 
-                if (Database.ReloadNeeded) { gr.DrawImage(QuickImage.Get(enImageCode.Uhr, 16), 8, 8); }
-                if (Database.HasPendingChanges()) { gr.DrawImage(QuickImage.Get(enImageCode.Stift, 16), 16, 8); }
-                if (Database.ReadOnly) { gr.DrawImage(QuickImage.Get(enImageCode.Schloss, 32), 16, 8); }
+                if (Database.ReloadNeeded) { gr.DrawImage(QuickImage.Get(ImageCode.Uhr, 16), 8, 8); }
+                if (Database.HasPendingChanges()) { gr.DrawImage(QuickImage.Get(ImageCode.Stift, 16), 16, 8); }
+                if (Database.ReadOnly) { gr.DrawImage(QuickImage.Get(ImageCode.Schloss, 32), 16, 8); }
             } catch {
                 Invalidate();
                 //Develop.DebugPrint(ex);
@@ -2899,7 +2899,7 @@ namespace BlueControls.Controls {
 
             Skin.Draw_Back(gr, Enums.Design.Table_And_Pad, States.Standard_Disabled, base.DisplayRectangle, this, true);
 
-            var i = QuickImage.Get(enImageCode.Uhr, 64);
+            var i = QuickImage.Get(ImageCode.Uhr, 64);
             gr.DrawImage(i, (Width - 64) / 2, (Height - 64) / 2);
             Skin.Draw_Border(gr, Enums.Design.Table_And_Pad, States.Standard_Disabled, base.DisplayRectangle);
         }
@@ -3043,32 +3043,32 @@ namespace BlueControls.Controls {
         /// Gibt des keine Nachbarszelle, wird die Eingangszelle zurückgegeben.
         /// </summary>
         /// <remarks></remarks>
-        private void Neighbour(ColumnItem? column, RowData? row, enDirection direction, out ColumnItem? newColumn, out RowData? newRow) {
+        private void Neighbour(ColumnItem? column, RowData? row, Direction direction, out ColumnItem? newColumn, out RowData? newRow) {
             newColumn = column;
             newRow = row;
             if (_design == BlueTableAppearance.OnlyMainColumnWithoutHead) {
-                if (direction is not enDirection.Oben and not enDirection.Unten) {
+                if (direction is not Direction.Oben and not Direction.Unten) {
                     newColumn = _database.Column[0];
                     return;
                 }
             }
             if (newColumn != null) {
-                if (Convert.ToBoolean(direction & enDirection.Links)) {
+                if (Convert.ToBoolean(direction & Direction.Links)) {
                     if (CurrentArrangement.PreviousVisible(newColumn) != null) {
                         newColumn = CurrentArrangement.PreviousVisible(newColumn);
                     }
                 }
-                if (Convert.ToBoolean(direction & enDirection.Rechts)) {
+                if (Convert.ToBoolean(direction & Direction.Rechts)) {
                     if (CurrentArrangement.NextVisible(newColumn) != null) {
                         newColumn = CurrentArrangement.NextVisible(newColumn);
                     }
                 }
             }
             if (newRow != null) {
-                if (Convert.ToBoolean(direction & enDirection.Oben)) {
+                if (Convert.ToBoolean(direction & Direction.Oben)) {
                     if (View_PreviousRow(newRow) != null) { newRow = View_PreviousRow(newRow); }
                 }
-                if (Convert.ToBoolean(direction & enDirection.Unten)) {
+                if (Convert.ToBoolean(direction & Direction.Unten)) {
                     if (View_NextRow(newRow) != null) { newRow = View_NextRow(newRow); }
                 }
             }
@@ -3205,7 +3205,7 @@ namespace BlueControls.Controls {
 
             if (PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0) { return true; }
 
-            return CellCollection.UserEditPossible(_database.Column[0], null, enErrorReason.EditNormaly);
+            return CellCollection.UserEditPossible(_database.Column[0], null, ErrorReason.EditNormaly);
         }
 
         #endregion

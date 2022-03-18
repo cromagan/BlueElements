@@ -51,7 +51,7 @@ namespace BlueControls.Controls {
 
         private Helpers _helper = Helpers.Ohne;
 
-        private enOrientation _mittelLinie = enOrientation.Ohne;
+        private BlueBasics.Enums.Orientation _mittelLinie = BlueBasics.Enums.Orientation.Ohne;
 
         private bool _pointAdding;
 
@@ -75,8 +75,8 @@ namespace BlueControls.Controls {
             }
         }
 
-        [DefaultValue((enOrientation)(-1))]
-        public enOrientation Mittellinie {
+        [DefaultValue((BlueBasics.Enums.Orientation)(-1))]
+        public BlueBasics.Enums.Orientation Mittellinie {
             get => _mittelLinie;
             set {
                 if (_mittelLinie == value) { return; }
@@ -122,7 +122,7 @@ namespace BlueControls.Controls {
         public static Tuple<Bitmap?, List<string>> ResizeData(Bitmap? pic, List<string> tags, int width, int height) {
             var zoomx = (float)width / pic.Width;
             var zoomy = (float)height / pic.Height;
-            var pic2 = BitmapExt.Resize(pic, width, height, enSizeModes.Verzerren, System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic, true);
+            var pic2 = BitmapExt.Resize(pic, width, height, SizeModes.Verzerren, System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic, true);
             List<string> tags2 = new(tags);
             var names = tags2.TagGet("AllPointNames").FromNonCritical().SplitAndCutBy("|");
             foreach (var thisO in names) {
@@ -142,7 +142,7 @@ namespace BlueControls.Controls {
 
         public PointM? GetPoint(string name) => _points.FirstOrDefault(thisp => thisp != null && string.Equals(thisp.Name, name, StringComparison.CurrentCultureIgnoreCase));
 
-        public void LetUserAddAPoint(string pointName, Helpers helper, enOrientation mittelline) {
+        public void LetUserAddAPoint(string pointName, Helpers helper, BlueBasics.Enums.Orientation mittelline) {
             _mittelLinie = mittelline;
             _helper = helper;
             Feedback = pointName;
@@ -279,15 +279,15 @@ namespace BlueControls.Controls {
             //TMPGR.Clear(Color.Transparent);
             // Mittellinie
             var picturePos = base.MaxBounds();
-            if (_mittelLinie.HasFlag(enOrientation.Waagerecht)) {
-                var p1 = picturePos.PointOf(enAlignment.VerticalCenter_Left).ZoomAndMove(eg.Zoom, eg.ShiftX, eg.ShiftY);
-                var p2 = picturePos.PointOf(enAlignment.VerticalCenter_Right).ZoomAndMove(eg.Zoom, eg.ShiftX, eg.ShiftY);
+            if (_mittelLinie.HasFlag(BlueBasics.Enums.Orientation.Waagerecht)) {
+                var p1 = picturePos.PointOf(Alignment.VerticalCenter_Left).ZoomAndMove(eg.Zoom, eg.ShiftX, eg.ShiftY);
+                var p2 = picturePos.PointOf(Alignment.VerticalCenter_Right).ZoomAndMove(eg.Zoom, eg.ShiftX, eg.ShiftY);
                 eg.G.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
                 eg.G.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
             }
-            if (_mittelLinie.HasFlag(enOrientation.Senkrecht)) {
-                var p1 = picturePos.PointOf(enAlignment.Top_HorizontalCenter).ZoomAndMove(eg.Zoom, eg.ShiftX, eg.ShiftY);
-                var p2 = picturePos.PointOf(enAlignment.Bottom_HorizontalCenter).ZoomAndMove(eg.Zoom, eg.ShiftX, eg.ShiftY);
+            if (_mittelLinie.HasFlag(BlueBasics.Enums.Orientation.Senkrecht)) {
+                var p1 = picturePos.PointOf(Alignment.Top_HorizontalCenter).ZoomAndMove(eg.Zoom, eg.ShiftX, eg.ShiftY);
+                var p2 = picturePos.PointOf(Alignment.Bottom_HorizontalCenter).ZoomAndMove(eg.Zoom, eg.ShiftX, eg.ShiftY);
                 eg.G.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
                 eg.G.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
             }

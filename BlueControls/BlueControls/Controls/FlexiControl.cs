@@ -60,13 +60,13 @@ namespace BlueControls.Controls {
         private string _allowedChars = string.Empty;
         private string _caption = string.Empty;
         private Caption? _captionObject;
-        private enÜberschriftAnordnung _captionPosition = enÜberschriftAnordnung.ohne;
+        private ÜberschriftAnordnung _captionPosition = ÜberschriftAnordnung.ohne;
 
         // None ist -1 und muss gesetzt sein!
         private int _controlX = -1;
 
         private string _disabledReason = string.Empty;
-        private enEditTypeFormula _editType;
+        private EditTypeFormula _editType;
         private bool _formatierungErlaubt;
 
         //private enVarType _Format = enVarType.Text;
@@ -87,7 +87,7 @@ namespace BlueControls.Controls {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
 
-            _editType = enEditTypeFormula.Line;
+            _editType = EditTypeFormula.Line;
             Size = new Size(200, 8);
         }
 
@@ -97,9 +97,9 @@ namespace BlueControls.Controls {
         /// <param name="captionText"></param>
         public FlexiControl(string captionText) : base(false, false) {
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            _editType = enEditTypeFormula.None;
+            _editType = EditTypeFormula.None;
             _caption = captionText;
-            _captionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
+            _captionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
             var s = BlueFont.MeasureString(_caption, Skin.GetBlueFont(Design.Caption, States.Standard).Font());
             Size = new Size((int)(s.Width + 2), (int)(s.Height + 2));
         }
@@ -152,8 +152,8 @@ namespace BlueControls.Controls {
             }
         }
 
-        [DefaultValue(enÜberschriftAnordnung.ohne)]
-        public enÜberschriftAnordnung CaptionPosition {
+        [DefaultValue(ÜberschriftAnordnung.ohne)]
+        public ÜberschriftAnordnung CaptionPosition {
             get => _captionPosition;
             set {
                 if (_captionPosition == value) { return; }
@@ -191,8 +191,8 @@ namespace BlueControls.Controls {
             }
         }
 
-        [DefaultValue(enEditTypeFormula.None)]
-        public enEditTypeFormula EditType {
+        [DefaultValue(EditTypeFormula.None)]
+        public EditTypeFormula EditType {
             get => _editType;
             set {
                 if (_editType == value) { return; }
@@ -358,60 +358,60 @@ namespace BlueControls.Controls {
         /// </summary>
         protected GenericControl? CreateSubControls() {
             if (Allinitialized) {
-                Develop.DebugPrint(enFehlerArt.Warnung, "Bereits initialisiert");
+                Develop.DebugPrint(FehlerArt.Warnung, "Bereits initialisiert");
                 return null;
             }
 
             if (Width < 5 || Height < 5) {
-                Develop.DebugPrint(enFehlerArt.Warnung, "Width / Height zu klein");
+                Develop.DebugPrint(FehlerArt.Warnung, "Width / Height zu klein");
                 return null;
             }
 
             Allinitialized = true;
             GenericControl? c = null;
             switch (_editType) {
-                case enEditTypeFormula.Line:
+                case EditTypeFormula.Line:
                     c = Control_Create_Line();
                     break;
 
-                case enEditTypeFormula.Textfeld:
+                case EditTypeFormula.Textfeld:
                     c = Control_Create_TextBox();
                     break;
 
-                case enEditTypeFormula.EasyPic:
+                case EditTypeFormula.EasyPic:
                     c = Control_Create_EasyPic();
                     break;
 
-                case enEditTypeFormula.Gallery:
-                case enEditTypeFormula.Listbox:
+                case EditTypeFormula.Gallery:
+                case EditTypeFormula.Listbox:
                     c = Control_Create_ListBox();
                     break;
 
-                case enEditTypeFormula.Textfeld_mit_Auswahlknopf:
+                case EditTypeFormula.Textfeld_mit_Auswahlknopf:
                     c = Control_Create_ComboBox();
                     break;
 
-                case enEditTypeFormula.Ja_Nein_Knopf:
+                case EditTypeFormula.Ja_Nein_Knopf:
                     c = Control_Create_ButtonYesNo();
                     break;
 
-                case enEditTypeFormula.None:
+                case EditTypeFormula.None:
                     break;
 
-                case enEditTypeFormula.nur_als_Text_anzeigen:
-                    _captionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
+                case EditTypeFormula.nur_als_Text_anzeigen:
+                    _captionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
                     Control_Create_Caption();
                     break;
 
-                case enEditTypeFormula.Farb_Auswahl_Dialog:
+                case EditTypeFormula.Farb_Auswahl_Dialog:
                     c = Control_Create_ButtonColor();
                     break;
 
-                case enEditTypeFormula.Button:
+                case EditTypeFormula.Button:
                     c = Control_Create_ButtonComand();
                     break;
 
-                case enEditTypeFormula.SwapListBox:
+                case EditTypeFormula.SwapListBox:
                     c = Control_Create_SwapListBox();
                     break;
 
@@ -499,15 +499,15 @@ namespace BlueControls.Controls {
 
                 case Button button:
                     switch (_editType) {
-                        case enEditTypeFormula.Ja_Nein_Knopf:
+                        case EditTypeFormula.Ja_Nein_Knopf:
                             button.CheckedChanged += YesNoButton_CheckedChanged;
                             break;
 
-                        case enEditTypeFormula.Button:
+                        case EditTypeFormula.Button:
                             button.Click += ComandButton_Click;
                             break;
 
-                        case enEditTypeFormula.Farb_Auswahl_Dialog:
+                        case EditTypeFormula.Farb_Auswahl_Dialog:
                             button.Click += ColorButton_Click;
                             break;
 
@@ -556,15 +556,15 @@ namespace BlueControls.Controls {
 
                 case Button button:
                     switch (_editType) {
-                        case enEditTypeFormula.Ja_Nein_Knopf:
+                        case EditTypeFormula.Ja_Nein_Knopf:
                             button.CheckedChanged -= YesNoButton_CheckedChanged;
                             break;
 
-                        case enEditTypeFormula.Button:
+                        case EditTypeFormula.Button:
                             button.Click -= ComandButton_Click;
                             break;
 
-                        case enEditTypeFormula.Farb_Auswahl_Dialog:
+                        case EditTypeFormula.Farb_Auswahl_Dialog:
                             button.Click -= ColorButton_Click;
                             break;
 
@@ -652,12 +652,12 @@ namespace BlueControls.Controls {
             control.FilterAllowed = false;
             control.MoveAllowed = false;
             switch (_editType) {
-                case enEditTypeFormula.Gallery:
+                case EditTypeFormula.Gallery:
                     control.Appearance = BlueListBoxAppearance.Gallery;
                     control.RemoveAllowed = true;
                     break;
 
-                case enEditTypeFormula.Listbox:
+                case EditTypeFormula.Listbox:
                     control.RemoveAllowed = true;
                     control.Appearance = BlueListBoxAppearance.Listbox;
                     break;
@@ -703,7 +703,7 @@ namespace BlueControls.Controls {
         private void ColorButton_Click(object sender, System.EventArgs e) => Develop.DebugPrint_NichtImplementiert();
 
         private void ComandButton_Click(object sender, System.EventArgs e) {
-            if (_editType != enEditTypeFormula.Button) { return; }
+            if (_editType != EditTypeFormula.Button) { return; }
             ValueSet(true.ToPlusMinus(), false, true); // Geklickt, wurde hiermit vermerkt
             OnButtonClicked();
         }
@@ -755,7 +755,7 @@ namespace BlueControls.Controls {
         }
 
         private void Control_Create_Caption() {
-            if (_captionPosition == enÜberschriftAnordnung.ohne) { return; }
+            if (_captionPosition == ÜberschriftAnordnung.ohne) { return; }
             if (_captionObject == null) {
                 _captionObject = new Caption();
                 Controls.Add(_captionObject);
@@ -767,7 +767,7 @@ namespace BlueControls.Controls {
             _captionObject.Left = 0;
             _captionObject.Top = 0;
             _captionObject.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-            _captionObject.Visible = _captionPosition != enÜberschriftAnordnung.Ohne_mit_Abstand;
+            _captionObject.Visible = _captionPosition != ÜberschriftAnordnung.Ohne_mit_Abstand;
             _captionObject.Translate = TranslateCaption;
             _captionObject.BringToFront();
         }
@@ -801,7 +801,7 @@ namespace BlueControls.Controls {
         private Line Control_Create_Line() {
             Line control = new() {
                 Enabled = Enabled,
-                Orientation = enOrientation.Waagerecht
+                Orientation = BlueBasics.Enums.Orientation.Waagerecht
             };
             StandardBehandlung(control);
             return control;
@@ -922,14 +922,14 @@ namespace BlueControls.Controls {
         private void StandardBehandlung(GenericControl? control) {
             Control_Create_Caption();
             switch (_captionPosition) {
-                case enÜberschriftAnordnung.ohne:
+                case ÜberschriftAnordnung.ohne:
                     control.Left = 0;
                     control.Top = 0;
                     control.Width = Width;
                     control.Height = Height;
                     break;
 
-                case enÜberschriftAnordnung.Links_neben_Dem_Feld:
+                case ÜberschriftAnordnung.Links_neben_Dem_Feld:
                     control.Left = Math.Max(_controlX, _captionObject.Width);
                     control.Top = 0;
                     control.Width = Width - control.Left;
@@ -937,8 +937,8 @@ namespace BlueControls.Controls {
                     if (_captionObject.Width < 4) { Develop.DebugPrint("Caption Width zu klein"); }
                     break;
 
-                case enÜberschriftAnordnung.Über_dem_Feld:
-                case enÜberschriftAnordnung.Ohne_mit_Abstand:
+                case ÜberschriftAnordnung.Über_dem_Feld:
+                case ÜberschriftAnordnung.Ohne_mit_Abstand:
                     control.Left = 0;
                     control.Top = _captionObject.Height;
                     control.Width = Width;
@@ -988,14 +988,14 @@ namespace BlueControls.Controls {
         private void UpdateValueTo_Button(Button control) {
             //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling und Creating False!"); }
             switch (_editType) {
-                case enEditTypeFormula.Ja_Nein_Knopf:
+                case EditTypeFormula.Ja_Nein_Knopf:
                     control.Checked = Value.FromPlusMinus();
                     break;
 
-                case enEditTypeFormula.Button:
+                case EditTypeFormula.Button:
                     break;
 
-                case enEditTypeFormula.Farb_Auswahl_Dialog:
+                case EditTypeFormula.Farb_Auswahl_Dialog:
                     control.ImageCode = string.IsNullOrEmpty(Value) ? "Fragezeichen|24" : "Kreis|24|||" + Color.FromArgb(IntParse(Value)).ToHtmlCode();
                     break;
 
@@ -1011,7 +1011,7 @@ namespace BlueControls.Controls {
         private void UpdateValueTo_Caption() {
             //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
             //if (Column == null) { return; } // nur mögloch bei verbundenen Datenbanken
-            if (_editType != enEditTypeFormula.nur_als_Text_anzeigen) { return; } // und auch dann nur als reine Text anzeige
+            if (_editType != EditTypeFormula.nur_als_Text_anzeigen) { return; } // und auch dann nur als reine Text anzeige
             if (_captionObject == null) { return; }
             _captionObject.Width = Width;
             _captionObject.Translate = false;
@@ -1083,7 +1083,7 @@ namespace BlueControls.Controls {
 
                     case Line:
                         if (!string.IsNullOrEmpty(Value)) {
-                            Develop.DebugPrint(enFehlerArt.Fehler, "Line kann keine Value erhalten: '" + Value + "'");
+                            Develop.DebugPrint(FehlerArt.Fehler, "Line kann keine Value erhalten: '" + Value + "'");
                         }
                         break;
 

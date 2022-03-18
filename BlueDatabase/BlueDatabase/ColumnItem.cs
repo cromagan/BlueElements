@@ -78,7 +78,7 @@ namespace BlueDatabase {
 
         private bool _dropdownWerteAndererZellenAnzeigen;
         private bool _editTrotzSperreErlaubt;
-        private enEditTypeFormula _editType;
+        private EditTypeFormula _editType;
         private FilterOptions _filterOptions;
         private Color _foreColor;
         private BlueBasics.Enums.DataFormat _format;
@@ -108,7 +108,7 @@ namespace BlueDatabase {
         private ScriptType _scriptType;
         private bool _showMultiLineInOneLine;
         private bool _showUndo;
-        private enSortierTyp _sortType;
+        private SortierTyp _sortType;
         private bool _spellCheckingEnabled;
         private string _suffix;
         private bool _textBearbeitungErlaubt;
@@ -128,9 +128,9 @@ namespace BlueDatabase {
         public ColumnItem(Database database, long columnkey) {
             Database = database;
             Database.Disposing += Database_Disposing;
-            if (columnkey < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "ColumnKey <0"); }
+            if (columnkey < 0) { Develop.DebugPrint(FehlerArt.Fehler, "ColumnKey <0"); }
             var ex = Database.Column.SearchByKey(columnkey);
-            if (ex != null) { Develop.DebugPrint(enFehlerArt.Fehler, "Key existiert bereits"); }
+            if (ex != null) { Develop.DebugPrint(FehlerArt.Fehler, "Key existiert bereits"); }
             Key = columnkey;
 
             #region Standard-Werte
@@ -152,13 +152,13 @@ namespace BlueDatabase {
             _cellInitValue = string.Empty;
             //_linkedCellRowKeyIsInColumn = -1;
             _linkedCellColumnKeyOfLinkedDatabase = -1;
-            _sortType = enSortierTyp.Original_String;
+            _sortType = SortierTyp.Original_String;
             //_ZellenZusammenfassen = false;
             _dropDownKey = -1;
             _vorschlagsColumn = -1;
             _align = AlignmentHorizontal.Links;
             _keyColumnKey = -1;
-            _editType = enEditTypeFormula.Textfeld;
+            _editType = EditTypeFormula.Textfeld;
             _identifier = string.Empty;
             _allowedChars = string.Empty;
             _adminInfo = string.Empty;
@@ -472,7 +472,7 @@ namespace BlueDatabase {
             }
         }
 
-        public enEditTypeFormula EditType {
+        public EditTypeFormula EditType {
             get => _editType;
             set {
                 if (_editType == value) { return; }
@@ -700,7 +700,7 @@ namespace BlueDatabase {
             }
         }
 
-        public enSortierTyp SortType {
+        public SortierTyp SortType {
             get => _sortType;
             set {
                 if (_sortType == value) { return; }
@@ -910,7 +910,7 @@ namespace BlueDatabase {
         /// <param name="mustBeFree">Wenn True wird ein Dateiname zurückgegeben, der noch nicht im Verzeichnis vorhanden ist.</param>
         /// <returns> Gibt den Dateinamen mit Pfad und Suffix zurück</returns>
         public string BestFile(string filename, bool mustBeFree) {
-            if (_format != BlueBasics.Enums.DataFormat.Link_To_Filesystem) { Develop.DebugPrint(enFehlerArt.Fehler, "Nur bei Link_To_Filesystem erlaubt!"); }
+            if (_format != BlueBasics.Enums.DataFormat.Link_To_Filesystem) { Develop.DebugPrint(FehlerArt.Fehler, "Nur bei Link_To_Filesystem erlaubt!"); }
 
             if (string.IsNullOrEmpty(filename)) {
                 if (!mustBeFree) { return string.Empty; }
@@ -1505,7 +1505,7 @@ namespace BlueDatabase {
                     if (MultiLine) {
                         ScriptType = ScriptType.List;
                     } else if (Format is BlueBasics.Enums.DataFormat.Text or BlueBasics.Enums.DataFormat.Link_To_Filesystem) {
-                        if (SortType is enSortierTyp.ZahlenwertFloat or enSortierTyp.ZahlenwertInt) {
+                        if (SortType is SortierTyp.ZahlenwertFloat or SortierTyp.ZahlenwertInt) {
                             ScriptType = ScriptType.Numeral;
                         }
                         ScriptType = ScriptType.String;
@@ -1525,7 +1525,7 @@ namespace BlueDatabase {
                 }
 
                 if (ScriptType == ScriptType.undefiniert) {
-                    Develop.DebugPrint(enFehlerArt.Warnung, "Umsetzung fehlgeschlagen: " + Caption + " " + Database.Filename);
+                    Develop.DebugPrint(FehlerArt.Warnung, "Umsetzung fehlgeschlagen: " + Caption + " " + Database.Filename);
                 }
 
                 ResetSystemToDefault(false);
@@ -1695,30 +1695,30 @@ namespace BlueDatabase {
             }
         }
 
-        public void SetFormat(enVarType format) {
+        public void SetFormat(VarType format) {
             switch (format) {
-                case enVarType.Text: SetFormatForText(); break;
-                case enVarType.Date: SetFormatForDate(); break;
-                case enVarType.DateTime: SetFormatForDateTime(); break;
-                case enVarType.Email: SetFormatForEmail(); break;
-                case enVarType.Float: SetFormatForFloat(); break;
-                case enVarType.Integer: SetFormatForInteger(); break;
-                case enVarType.PhoneNumber: SetFormatForPhoneNumber(); break;
-                case enVarType.TextMitFormatierung: SetFormatForTextMitFormatierung(); break;
-                case enVarType.Url: SetFormatForUrl(); break;
-                case enVarType.Bit: SetFormatForBit(); break;
+                case VarType.Text: SetFormatForText(); break;
+                case VarType.Date: SetFormatForDate(); break;
+                case VarType.DateTime: SetFormatForDateTime(); break;
+                case VarType.Email: SetFormatForEmail(); break;
+                case VarType.Float: SetFormatForFloat(); break;
+                case VarType.Integer: SetFormatForInteger(); break;
+                case VarType.PhoneNumber: SetFormatForPhoneNumber(); break;
+                case VarType.TextMitFormatierung: SetFormatForTextMitFormatierung(); break;
+                case VarType.Url: SetFormatForUrl(); break;
+                case VarType.Bit: SetFormatForBit(); break;
                 default:
-                    Develop.DebugPrint(enFehlerArt.Warnung);
+                    Develop.DebugPrint(FehlerArt.Warnung);
                     break;
             }
         }
 
         public void SetFormatForBildCode() {
-            ((IInputFormat)this).SetFormat(enVarType.Text); // Standard Verhalten
+            ((IInputFormat)this).SetFormat(VarType.Text); // Standard Verhalten
 
             Format = BlueBasics.Enums.DataFormat.Text;
             Align = AlignmentHorizontal.Links;
-            SortType = enSortierTyp.Original_String;
+            SortType = SortierTyp.Original_String;
             Translate = TranslationType.Original_Anzeigen;
             AfterEdit_QuickSortRemoveDouble = false;
             BildTextVerhalten = BildTextVerhalten.Bild_oder_Text;
@@ -1726,11 +1726,11 @@ namespace BlueDatabase {
         }
 
         public void SetFormatForBit() {
-            ((IInputFormat)this).SetFormat(enVarType.Bit); // Standard Verhalten
+            ((IInputFormat)this).SetFormat(VarType.Bit); // Standard Verhalten
 
             Format = BlueBasics.Enums.DataFormat.Text;
             Align = AlignmentHorizontal.Zentriert;
-            SortType = enSortierTyp.Original_String;
+            SortType = SortierTyp.Original_String;
             Translate = TranslationType.Original_Anzeigen;
             AfterEdit_QuickSortRemoveDouble = false;
             BildTextVerhalten = BildTextVerhalten.Interpretiere_Bool;
@@ -1744,11 +1744,11 @@ namespace BlueDatabase {
         }
 
         public void SetFormatForDate() {
-            ((IInputFormat)this).SetFormat(enVarType.Date);
+            ((IInputFormat)this).SetFormat(VarType.Date);
 
             Format = BlueBasics.Enums.DataFormat.Text;
             Align = AlignmentHorizontal.Links;
-            SortType = enSortierTyp.Datum_Uhrzeit;
+            SortType = SortierTyp.Datum_Uhrzeit;
             Translate = TranslationType.Datum;
             AfterEdit_QuickSortRemoveDouble = false;
             BildTextVerhalten = BildTextVerhalten.Nur_Text;
@@ -1756,11 +1756,11 @@ namespace BlueDatabase {
         }
 
         public void SetFormatForDateTime() {
-            ((IInputFormat)this).SetFormat(enVarType.DateTime);
+            ((IInputFormat)this).SetFormat(VarType.DateTime);
 
             Format = BlueBasics.Enums.DataFormat.Text;
             Align = AlignmentHorizontal.Links;
-            SortType = enSortierTyp.Datum_Uhrzeit;
+            SortType = SortierTyp.Datum_Uhrzeit;
             Translate = TranslationType.Datum;
             AfterEdit_QuickSortRemoveDouble = false;
             BildTextVerhalten = BildTextVerhalten.Nur_Text;
@@ -1768,11 +1768,11 @@ namespace BlueDatabase {
         }
 
         public void SetFormatForEmail() {
-            ((IInputFormat)this).SetFormat(enVarType.Email);
+            ((IInputFormat)this).SetFormat(VarType.Email);
 
             Format = BlueBasics.Enums.DataFormat.Text;
             Align = AlignmentHorizontal.Links;
-            SortType = enSortierTyp.Original_String;
+            SortType = SortierTyp.Original_String;
             Translate = TranslationType.Original_Anzeigen;
             AfterEdit_QuickSortRemoveDouble = true;
             BildTextVerhalten = BildTextVerhalten.Nur_Text;
@@ -1780,23 +1780,23 @@ namespace BlueDatabase {
         }
 
         public void SetFormatForFloat() {
-            ((IInputFormat)this).SetFormat(enVarType.Float);
+            ((IInputFormat)this).SetFormat(VarType.Float);
 
             Format = BlueBasics.Enums.DataFormat.Text;
             Align = AlignmentHorizontal.Rechts;
             Translate = TranslationType.Zahl;
-            SortType = enSortierTyp.ZahlenwertFloat;
+            SortType = SortierTyp.ZahlenwertFloat;
             AfterEdit_QuickSortRemoveDouble = false;
             BildTextVerhalten = BildTextVerhalten.Nur_Text;
             ScriptType = ScriptType.Numeral;
         }
 
         public void SetFormatForInteger() {
-            ((IInputFormat)this).SetFormat(enVarType.Integer);
+            ((IInputFormat)this).SetFormat(VarType.Integer);
 
             Format = BlueBasics.Enums.DataFormat.Text;
             Align = AlignmentHorizontal.Rechts;
-            SortType = enSortierTyp.ZahlenwertInt;
+            SortType = SortierTyp.ZahlenwertInt;
             Translate = TranslationType.Original_Anzeigen;
             AfterEdit_QuickSortRemoveDouble = false;
             BildTextVerhalten = BildTextVerhalten.Nur_Text;
@@ -1804,11 +1804,11 @@ namespace BlueDatabase {
         }
 
         public void SetFormatForPhoneNumber() {
-            ((IInputFormat)this).SetFormat(enVarType.PhoneNumber);
+            ((IInputFormat)this).SetFormat(VarType.PhoneNumber);
 
             Format = BlueBasics.Enums.DataFormat.Text;
             Align = AlignmentHorizontal.Links;
-            SortType = enSortierTyp.Original_String;
+            SortType = SortierTyp.Original_String;
             Translate = TranslationType.Original_Anzeigen;
             AfterEdit_QuickSortRemoveDouble = false;
             BildTextVerhalten = BildTextVerhalten.Nur_Text;
@@ -1816,11 +1816,11 @@ namespace BlueDatabase {
         }
 
         public void SetFormatForText() {
-            ((IInputFormat)this).SetFormat(enVarType.Text);
+            ((IInputFormat)this).SetFormat(VarType.Text);
 
             Format = BlueBasics.Enums.DataFormat.Text;
             Align = AlignmentHorizontal.Links;
-            SortType = enSortierTyp.Sprachneutral_String;
+            SortType = SortierTyp.Sprachneutral_String;
             Translate = TranslationType.Original_Anzeigen;
             AfterEdit_QuickSortRemoveDouble = false;
             BildTextVerhalten = BildTextVerhalten.Nur_Text;
@@ -1828,11 +1828,11 @@ namespace BlueDatabase {
         }
 
         public void SetFormatForTextMitFormatierung() {
-            ((IInputFormat)this).SetFormat(enVarType.TextMitFormatierung);
+            ((IInputFormat)this).SetFormat(VarType.TextMitFormatierung);
 
             Format = BlueBasics.Enums.DataFormat.Text;
             Align = AlignmentHorizontal.Links;
-            SortType = enSortierTyp.Sprachneutral_String;
+            SortType = SortierTyp.Sprachneutral_String;
             Translate = TranslationType.Original_Anzeigen;
             AfterEdit_QuickSortRemoveDouble = false;
             BildTextVerhalten = BildTextVerhalten.Nur_Text;
@@ -1840,13 +1840,13 @@ namespace BlueDatabase {
         }
 
         public void SetFormatForTextOptions() {
-            ((IInputFormat)this).SetFormat(enVarType.Text);
+            ((IInputFormat)this).SetFormat(VarType.Text);
 
             MultiLine = true; // Verhalten von Setformat überschreiben
 
             Format = BlueBasics.Enums.DataFormat.Text;
             Align = AlignmentHorizontal.Links;
-            SortType = enSortierTyp.Sprachneutral_String;
+            SortType = SortierTyp.Sprachneutral_String;
             Translate = TranslationType.Übersetzen;
             AfterEdit_QuickSortRemoveDouble = true;
             BildTextVerhalten = BildTextVerhalten.Nur_Text;
@@ -1854,11 +1854,11 @@ namespace BlueDatabase {
         }
 
         public void SetFormatForUrl() {
-            ((IInputFormat)this).SetFormat(enVarType.Url);
+            ((IInputFormat)this).SetFormat(VarType.Url);
 
             Format = BlueBasics.Enums.DataFormat.Text;
             Align = AlignmentHorizontal.Links;
-            SortType = enSortierTyp.Original_String;
+            SortType = SortierTyp.Original_String;
             Translate = TranslationType.Original_Anzeigen;
             AfterEdit_QuickSortRemoveDouble = false;
             BildTextVerhalten = BildTextVerhalten.Nur_Text;
@@ -1867,7 +1867,7 @@ namespace BlueDatabase {
 
         public string SimplyFile(string fullFileName) {
             if (_format != BlueBasics.Enums.DataFormat.Link_To_Filesystem) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Nur bei Link_To_Filesystem erlaubt!");
+                Develop.DebugPrint(FehlerArt.Fehler, "Nur bei Link_To_Filesystem erlaubt!");
             }
             var tmpfile = fullFileName.FileNameWithoutSuffix();
             if (string.Equals(tmpfile, fullFileName, StringComparison.CurrentCultureIgnoreCase)) { return tmpfile; }
@@ -1948,17 +1948,17 @@ namespace BlueDatabase {
         }
 
         public QuickImage? SymbolForReadableText() => this == Database.Column.SysRowChanger
-? QuickImage.Get(enImageCode.Person)
+? QuickImage.Get(ImageCode.Person)
 : this == Database.Column.SysRowCreator
-? QuickImage.Get(enImageCode.Person)
+? QuickImage.Get(ImageCode.Person)
 : _format switch {
-    BlueBasics.Enums.DataFormat.Link_To_Filesystem => QuickImage.Get(enImageCode.Datei, 16),
-    BlueBasics.Enums.DataFormat.RelationText => QuickImage.Get(enImageCode.Herz, 16),
-    BlueBasics.Enums.DataFormat.FarbeInteger => QuickImage.Get(enImageCode.Pinsel, 16),
-    BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank => QuickImage.Get(enImageCode.Fernglas, 16),
-    BlueBasics.Enums.DataFormat.Button => QuickImage.Get(enImageCode.Kugel, 16),
+    BlueBasics.Enums.DataFormat.Link_To_Filesystem => QuickImage.Get(ImageCode.Datei, 16),
+    BlueBasics.Enums.DataFormat.RelationText => QuickImage.Get(ImageCode.Herz, 16),
+    BlueBasics.Enums.DataFormat.FarbeInteger => QuickImage.Get(ImageCode.Pinsel, 16),
+    BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank => QuickImage.Get(ImageCode.Fernglas, 16),
+    BlueBasics.Enums.DataFormat.Button => QuickImage.Get(ImageCode.Kugel, 16),
     _ => _format.TextboxEditPossible()
-    ? _multiLine ? QuickImage.Get(enImageCode.Textfeld, 16, "FF0000", "") : QuickImage.Get(enImageCode.Textfeld)
+    ? _multiLine ? QuickImage.Get(ImageCode.Textfeld, 16, Color.Red, Color.Transparent) : QuickImage.Get(ImageCode.Textfeld)
     : QuickImage.Get("Pfeil_Unten_Scrollbar|14|||||0")
 };
 
@@ -1979,27 +1979,27 @@ namespace BlueDatabase {
                     return _ueberschrift3;
 
                 default:
-                    Develop.DebugPrint(enFehlerArt.Warnung, "Nummer " + nummer + " nicht erlaubt.");
+                    Develop.DebugPrint(FehlerArt.Warnung, "Nummer " + nummer + " nicht erlaubt.");
                     return string.Empty;
             }
         }
 
-        public bool UserEditDialogTypeInFormula(enEditTypeFormula editTypeToCheck) {
+        public bool UserEditDialogTypeInFormula(EditTypeFormula editTypeToCheck) {
             switch (_format) {
                 case BlueBasics.Enums.DataFormat.Text:
                 case BlueBasics.Enums.DataFormat.RelationText:
-                    if (editTypeToCheck == enEditTypeFormula.Textfeld) { return true; } // Textfeld immer erlauben auch wenn beide Bearbeitungen nicht erlaubt sind. Einfach der Übersichtlichktei
-                    if (_multiLine && editTypeToCheck == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return false; }
-                    if (_dropdownBearbeitungErlaubt && editTypeToCheck == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
-                    if (_dropdownBearbeitungErlaubt && _dropdownWerteAndererZellenAnzeigen && editTypeToCheck == enEditTypeFormula.SwapListBox) { return true; }
+                    if (editTypeToCheck == EditTypeFormula.Textfeld) { return true; } // Textfeld immer erlauben auch wenn beide Bearbeitungen nicht erlaubt sind. Einfach der Übersichtlichktei
+                    if (_multiLine && editTypeToCheck == EditTypeFormula.Textfeld_mit_Auswahlknopf) { return false; }
+                    if (_dropdownBearbeitungErlaubt && editTypeToCheck == EditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
+                    if (_dropdownBearbeitungErlaubt && _dropdownWerteAndererZellenAnzeigen && editTypeToCheck == EditTypeFormula.SwapListBox) { return true; }
                     //if (_MultiLine && _DropdownBearbeitungErlaubt && EditType_To_Check == enEditTypeFormula.Listbox_3_Zeilen) { return true; }
-                    if (_multiLine && _dropdownBearbeitungErlaubt && editTypeToCheck == enEditTypeFormula.Listbox) { return true; }
-                    if (editTypeToCheck == enEditTypeFormula.nur_als_Text_anzeigen) { return true; }
-                    if (!_multiLine && editTypeToCheck == enEditTypeFormula.Ja_Nein_Knopf) { return true; }
+                    if (_multiLine && _dropdownBearbeitungErlaubt && editTypeToCheck == EditTypeFormula.Listbox) { return true; }
+                    if (editTypeToCheck == EditTypeFormula.nur_als_Text_anzeigen) { return true; }
+                    if (!_multiLine && editTypeToCheck == EditTypeFormula.Ja_Nein_Knopf) { return true; }
                     return false;
 
                 case BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank:
-                    if (editTypeToCheck == enEditTypeFormula.None) { return true; }
+                    if (editTypeToCheck == EditTypeFormula.None) { return true; }
                     //if (EditType_To_Check != enEditTypeFormula.Textfeld &&
                     //    EditType_To_Check != enEditTypeFormula.nur_als_Text_anzeigen) { return false; }
                     if (Database.IsParsing) { return true; }
@@ -2016,7 +2016,7 @@ namespace BlueDatabase {
                     return col.UserEditDialogTypeInFormula(editTypeToCheck);
 
                 case BlueBasics.Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
-                    if (editTypeToCheck == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
+                    if (editTypeToCheck == EditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
                     return false;
 
                 //case enDataFormat.Bit:
@@ -2030,9 +2030,9 @@ namespace BlueDatabase {
                 case BlueBasics.Enums.DataFormat.Link_To_Filesystem:
                     if (_multiLine) {
                         //if (EditType_To_Check == enEditType.Listbox) { return true; }
-                        if (editTypeToCheck == enEditTypeFormula.Gallery) { return true; }
+                        if (editTypeToCheck == EditTypeFormula.Gallery) { return true; }
                     } else {
-                        if (editTypeToCheck == enEditTypeFormula.EasyPic) { return true; }
+                        if (editTypeToCheck == EditTypeFormula.EasyPic) { return true; }
                     }
                     return false;
                 //case enDataFormat.Relation:
@@ -2046,10 +2046,10 @@ namespace BlueDatabase {
                 //            return false;
                 //    }
                 case BlueBasics.Enums.DataFormat.FarbeInteger:
-                    return editTypeToCheck == enEditTypeFormula.Farb_Auswahl_Dialog;
+                    return editTypeToCheck == EditTypeFormula.Farb_Auswahl_Dialog;
 
                 case BlueBasics.Enums.DataFormat.Schrift:
-                    return editTypeToCheck == enEditTypeFormula.Font_AuswahlDialog;
+                    return editTypeToCheck == EditTypeFormula.Font_AuswahlDialog;
 
                 case BlueBasics.Enums.DataFormat.Button:
                     //if (EditType_To_Check == enEditTypeFormula.Button) { return true; }
@@ -2072,7 +2072,7 @@ namespace BlueDatabase {
         internal void CheckFormulaEditType() {
             if (UserEditDialogTypeInFormula(_editType)) { return; }// Alles OK!
             for (var z = 0; z <= 999; z++) {
-                var w = (enEditTypeFormula)z;
+                var w = (EditTypeFormula)z;
                 if (w.ToString() != z.ToString()) {
                     if (UserEditDialogTypeInFormula(w)) {
                         _editType = w;
@@ -2080,7 +2080,7 @@ namespace BlueDatabase {
                     }
                 }
             }
-            _editType = enEditTypeFormula.None;
+            _editType = EditTypeFormula.None;
         }
 
         internal void CheckIfIAmAKeyColumn() {
@@ -2184,7 +2184,7 @@ namespace BlueDatabase {
                     break;
 
                 case DatabaseDataType.co_EditType:
-                    _editType = (enEditTypeFormula)IntParse(wert);
+                    _editType = (EditTypeFormula)IntParse(wert);
                     break;
 
                 case DatabaseDataType.co_MultiLine:
@@ -2388,9 +2388,9 @@ namespace BlueDatabase {
 
                 case DatabaseDataType.co_SortType:
                     if (string.IsNullOrEmpty(wert)) {
-                        _sortType = enSortierTyp.Original_String;
+                        _sortType = SortierTyp.Original_String;
                     } else {
-                        _sortType = (enSortierTyp)LongParse(wert);
+                        _sortType = (SortierTyp)LongParse(wert);
                     }
                     break;
 

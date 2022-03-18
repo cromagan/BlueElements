@@ -17,7 +17,7 @@
 
 namespace BlueBasics.Enums {
 
-    public enum enImageCode {
+    public enum ImageCode {
         None,
         Abspielen,
         Anwendung,

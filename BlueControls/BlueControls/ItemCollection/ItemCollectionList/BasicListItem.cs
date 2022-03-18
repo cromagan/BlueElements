@@ -73,7 +73,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         protected BasicListItem(string internalname, bool enabled) {
             Internal = string.IsNullOrEmpty(internalname) ? BasicPadItem.UniqueInternal() : internalname;
-            if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
+            if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben."); }
             _checked = false;
             _enabled = enabled;
             Pos = Rectangle.Empty;
@@ -116,7 +116,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
                     return;
                 }
 
-                Develop.DebugPrint(enFehlerArt.Fehler, "Parent Fehler!");
+                Develop.DebugPrint(FehlerArt.Fehler, "Parent Fehler!");
             }
         }
 
@@ -158,14 +158,14 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
                 return CompareKey().CompareTo(tobj.CompareKey());
             }
 
-            Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
+            Develop.DebugPrint(FehlerArt.Fehler, "Falscher Objecttyp!");
             return 0;
         }
 
         public bool Contains(int x, int y) => Pos.Contains(x, y);
 
         public void Draw(Graphics gr, int xModifier, int yModifier, Design controldesign, Design itemdesign, States vState, bool drawBorderAndBack, string filterText, bool translate) {
-            if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent nicht definiert"); }
+            if (Parent == null) { Develop.DebugPrint(FehlerArt.Fehler, "Parent nicht definiert"); }
             if (itemdesign == Design.Undefiniert) { return; }
             Rectangle positionModified = new(Pos.X - xModifier, Pos.Y - yModifier, Pos.Width, Pos.Height);
             DrawExplicit(gr, positionModified, itemdesign, vState, drawBorderAndBack, translate);

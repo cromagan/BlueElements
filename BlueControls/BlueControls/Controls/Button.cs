@@ -181,7 +181,7 @@ namespace BlueControls.Controls {
             if (par is PartentType.Slider) { _buttonStyle = ButtonStyle.SliderButton; }
         }
 
-        internal static void DrawButton(Control control, Graphics gr, Design buttontype, States state, QuickImage? pic, enAlignment align, bool picHeight44, ExtText etxt, string text, Rectangle displayRectangle, bool translate) {
+        internal static void DrawButton(Control control, Graphics gr, Design buttontype, States state, QuickImage? pic, Alignment align, bool picHeight44, ExtText etxt, string text, Rectangle displayRectangle, bool translate) {
             var design = Skin.DesignOf(buttontype, state);
             Skin.Draw_Back(gr, design, displayRectangle, control, true);
             Skin.Draw_Border(gr, design, displayRectangle);
@@ -193,7 +193,7 @@ namespace BlueControls.Controls {
                 //if (pic.Width != -1 || pic.Height != -1) { Develop.DebugPrint("Bei Bildcode " + pic + " die Größenangabe entfernen, da es ein grosses Bild wird!"); }
                 //var Zoom = Math.Min((control.Width - 6) / (double)pic.Width, 28 / (double)pic.Height);
                 var tmpPic = QuickImage.Get(QuickImage.GenerateCode(pic.Name, control.Width - 6, 28, pic.Effekt, pic.Färbung, pic.ChangeGreenTo, pic.Sättigung, pic.Helligkeit, pic.DrehWinkel, pic.Transparenz, pic.Zweitsymbol));
-                Skin.Draw_FormatedText(gr, string.Empty, tmpPic, design, enAlignment.Horizontal_Vertical_Center, new Rectangle(0, 0, control.Width, 44), control, false, translate);
+                Skin.Draw_FormatedText(gr, string.Empty, tmpPic, design, Alignment.Horizontal_Vertical_Center, new Rectangle(0, 0, control.Width, 44), control, false, translate);
 
                 var tt = BlueDatabase.LanguageTool.DoTranslate(text, translate);
 
@@ -204,7 +204,7 @@ namespace BlueControls.Controls {
                     etxt.Zeilenabstand = 0.65f;
                     etxt.DrawingPos = new Point(0, 43);
                     etxt.TextDimensions = new Size(displayRectangle.Width - (Skin.PaddingSmal / 2), 22);
-                    etxt.Ausrichtung = enAlignment.Horizontal_Vertical_Center;
+                    etxt.Ausrichtung = Alignment.Horizontal_Vertical_Center;
                     etxt.HtmlText = tt;
                     etxt.Draw(gr, 1);
                 }
@@ -231,7 +231,7 @@ namespace BlueControls.Controls {
         protected override void DrawControl(Graphics gr, States state) {
             try {
                 var pic = (ButtonStyle)((int)_buttonStyle % 1000) switch {
-                    ButtonStyle.Yes_or_No => _checked || MousePressing() ? QuickImage.Get(enImageCode.Häkchen) : QuickImage.Get(enImageCode.Kreuz),
+                    ButtonStyle.Yes_or_No => _checked || MousePressing() ? QuickImage.Get(BlueBasics.Enums.ImageCode.Häkchen) : QuickImage.Get(BlueBasics.Enums.ImageCode.Kreuz),
                     ButtonStyle.Pic1_or_Pic2 => _checked || MousePressing() ? QuickImage.Get(_imageCodeChecked) : QuickImage.Get(_imageCode),
                     _ => string.IsNullOrEmpty(ImageCode) ? null : QuickImage.Get(_imageCode)
                 };
@@ -250,53 +250,53 @@ namespace BlueControls.Controls {
                     case ButtonStyle.Text:
                     case ButtonStyle.Borderless:
                     case ButtonStyle.Button:
-                        DrawButton(this, gr, Design.Button, state, pic, enAlignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
+                        DrawButton(this, gr, Design.Button, state, pic, Alignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
                         break;
 
                     case ButtonStyle.Button_Big_Borderless:
-                        DrawButton(this, gr, Design.Ribbonbar_Button, state, pic, enAlignment.VerticalCenter_Left, true, _etxt, _text, DisplayRectangle, Translate);
+                        DrawButton(this, gr, Design.Ribbonbar_Button, state, pic, Alignment.VerticalCenter_Left, true, _etxt, _text, DisplayRectangle, Translate);
                         break;
 
                     case ButtonStyle.Button_Big:
-                        DrawButton(this, gr, Design.Button, state, pic, enAlignment.VerticalCenter_Left, true, _etxt, _text, DisplayRectangle, Translate);
+                        DrawButton(this, gr, Design.Button, state, pic, Alignment.VerticalCenter_Left, true, _etxt, _text, DisplayRectangle, Translate);
                         break;
 
                     case ButtonStyle.SliderButton:
-                        DrawButton(this, gr, Design.Button_SliderDesign, state, pic, enAlignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
+                        DrawButton(this, gr, Design.Button_SliderDesign, state, pic, Alignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
                         break;
 
                     case ButtonStyle.Yes_or_No:
                     case ButtonStyle.Pic1_or_Pic2:
                     case ButtonStyle.Checkbox:
-                        DrawButton(this, gr, Design.Button_CheckBox, state, pic, enAlignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
+                        DrawButton(this, gr, Design.Button_CheckBox, state, pic, Alignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
                         break;
 
                     case ButtonStyle.Checkbox_Big_Borderless:
-                        DrawButton(this, gr, Design.Ribbonbar_Button_CheckBox, state, pic, enAlignment.VerticalCenter_Left, true, _etxt, _text, DisplayRectangle, Translate);
+                        DrawButton(this, gr, Design.Ribbonbar_Button_CheckBox, state, pic, Alignment.VerticalCenter_Left, true, _etxt, _text, DisplayRectangle, Translate);
                         break;
 
                     case ButtonStyle.Checkbox_Text:
-                        DrawButton(this, gr, Design.CheckBox_TextStyle, state, pic, enAlignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
+                        DrawButton(this, gr, Design.CheckBox_TextStyle, state, pic, Alignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
                         break;
 
                     case ButtonStyle.Optionbox:
-                        DrawButton(this, gr, Design.Button_OptionButton, state, pic, enAlignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
+                        DrawButton(this, gr, Design.Button_OptionButton, state, pic, Alignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
                         break;
 
                     case ButtonStyle.Optionbox_Big_Borderless:
-                        DrawButton(this, gr, Design.Ribbonbar_Button_OptionButton, state, pic, enAlignment.VerticalCenter_Left, true, _etxt, _text, DisplayRectangle, Translate);
+                        DrawButton(this, gr, Design.Ribbonbar_Button_OptionButton, state, pic, Alignment.VerticalCenter_Left, true, _etxt, _text, DisplayRectangle, Translate);
                         break;
 
                     case ButtonStyle.Optionbox_Text:
-                        DrawButton(this, gr, Design.OptionButton_TextStyle, state, pic, enAlignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
+                        DrawButton(this, gr, Design.OptionButton_TextStyle, state, pic, Alignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
                         break;
 
                     case ButtonStyle.ComboBoxButton:
-                        DrawButton(this, gr, Design.Button_ComboBox, state, pic, enAlignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
+                        DrawButton(this, gr, Design.Button_ComboBox, state, pic, Alignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
                         break;
 
                     case ButtonStyle.ComboBoxButton_Borderless:
-                        DrawButton(this, gr, Design.Ribbonbar_Button_Combobox, state, pic, enAlignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
+                        DrawButton(this, gr, Design.Ribbonbar_Button_Combobox, state, pic, Alignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
                         break;
 
                     default:

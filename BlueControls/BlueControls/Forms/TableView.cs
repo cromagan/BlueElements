@@ -87,8 +87,8 @@ namespace BlueControls.Forms {
                 if (database.IsAdministrator()) {
                     foreach (var thisColumnItem in database.Column) {
                         while (!thisColumnItem.IsOk()) {
-                            DebugPrint(enFehlerArt.Info, "Datenbank:" + database.Filename + "\r\nSpalte:" + thisColumnItem.Name + "\r\nSpaltenfehler: " + thisColumnItem.ErrorReason() + "\r\nUser: " + database.UserName + "\r\nGroup: " + database.UserGroup + "\r\nAdmins: " + database.DatenbankAdmin.JoinWith(";"));
-                            MessageBox.Show("Die folgende Spalte enthält einen Fehler:<br>" + thisColumnItem.ErrorReason() + "<br><br>Bitte reparieren.", enImageCode.Information, "OK");
+                            DebugPrint(FehlerArt.Info, "Datenbank:" + database.Filename + "\r\nSpalte:" + thisColumnItem.Name + "\r\nSpaltenfehler: " + thisColumnItem.ErrorReason() + "\r\nUser: " + database.UserName + "\r\nGroup: " + database.UserGroup + "\r\nAdmins: " + database.DatenbankAdmin.JoinWith(";"));
+                            MessageBox.Show("Die folgende Spalte enthält einen Fehler:<br>" + thisColumnItem.ErrorReason() + "<br><br>Bitte reparieren.", ImageCode.Information, "OK");
                             OpenColumnEditor(thisColumnItem, null);
                         }
                     }
@@ -123,10 +123,10 @@ namespace BlueControls.Forms {
             var bearbColumn = column;
             if (columnLinked != null) {
                 columnLinked.Repair();
-                if (MessageBox.Show("Welche Spalte bearbeiten?", enImageCode.Frage, "Spalte in dieser Datenbank", "Verlinkte Spalte") == 1) { bearbColumn = columnLinked; }
+                if (MessageBox.Show("Welche Spalte bearbeiten?", ImageCode.Frage, "Spalte in dieser Datenbank", "Verlinkte Spalte") == 1) { bearbColumn = columnLinked; }
             } else {
                 if (posError) {
-                    Notification.Show("Keine aktive Verlinkung.<br>Spalte in dieser Datenbank wird angezeigt.<br><br>Ist die Ziel-Zelle in der Ziel-Datenbank vorhanden?", enImageCode.Information);
+                    Notification.Show("Keine aktive Verlinkung.<br>Spalte in dieser Datenbank wird angezeigt.<br><br>Ist die Ziel-Zelle in der Ziel-Datenbank vorhanden?", ImageCode.Information);
                 }
             }
             column.Repair();
@@ -153,7 +153,7 @@ namespace BlueControls.Forms {
         }
 
         public static void OpenLayoutEditor(Database db, string layoutToOpen) {
-            var x = db.ErrorReason(enErrorReason.EditNormaly);
+            var x = db.ErrorReason(ErrorReason.EditNormaly);
             if (!string.IsNullOrEmpty(x)) {
                 MessageBox.Show(x);
                 return;
@@ -173,9 +173,9 @@ namespace BlueControls.Forms {
                     Parallel.ForEach(thisExport.BereitsExportiert, (thisString, _) => {
                         var t = thisString.SplitAndCutBy("|");
                         if (FileExists(t[0])) {
-                            var q1 = QuickImage.Get(enImageCode.Kugel, 16, Color.Red.MixColor(Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / thisExport.AutoDelete).ToHtmlCode(), "");
+                            var q1 = QuickImage.Get(ImageCode.Kugel, 16, Color.Red.MixColor(Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / thisExport.AutoDelete), Color.Transparent);
                             lock (lockMe) {
-                                l.Add(t[1], t[0], q1, true, t[1].CompareKey(enSortierTyp.Datum_Uhrzeit));
+                                l.Add(t[1], t[0], q1, true, t[1].CompareKey(SortierTyp.Datum_Uhrzeit));
                             }
                         }
                     });
@@ -191,7 +191,7 @@ namespace BlueControls.Forms {
                 }
             }
             foreach (var thisString in zusatz.Where(thisString => l[thisString] == null)) {
-                l.Add(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(enImageCode.Warnung), true, new FileInfo(thisString).CreationTime.ToString().CompareKey(enSortierTyp.Datum_Uhrzeit));
+                l.Add(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(ImageCode.Warnung), true, new FileInfo(thisString).CreationTime.ToString().CompareKey(SortierTyp.Datum_Uhrzeit));
             }
             l.Sort();
             return l;
@@ -246,12 +246,12 @@ namespace BlueControls.Forms {
         }
 
         private void btnPowerBearbeitung_Click(object sender, System.EventArgs e) {
-            Notification.Show("20 Sekunden (fast) rechtefreies<br>Vearbeiten akiviert.", enImageCode.Stift);
+            Notification.Show("20 Sekunden (fast) rechtefreies<br>Vearbeiten akiviert.", ImageCode.Stift);
             Table.PowerEdit = DateTime.Now.AddSeconds(20);
         }
 
         private void btnSpaltenanordnung_Click(object sender, System.EventArgs e) {
-            var x = new frmColumnArrangementPadEditor(Table.Database);
+            var x = new ColumnArrangementPadEditor(Table.Database);
             x.ShowDialog();
             Table.Database.ColumnArrangements[0].ShowAllColumns();
             Table.Invalidate_HeadSize();
@@ -275,7 +275,7 @@ namespace BlueControls.Forms {
             var merker = Table.Database;
             var l = Vorgängerversionen(Table.Database);
             if (l.Count == 0) {
-                MessageBox.Show("Kein Backup vorhanden.", enImageCode.Information, "OK");
+                MessageBox.Show("Kein Backup vorhanden.", ImageCode.Information, "OK");
                 btnVorherigeVersion.Enabled = true;
                 return;
             }
@@ -294,7 +294,7 @@ namespace BlueControls.Forms {
 
         private void btnZeileLöschen_Click(object sender, System.EventArgs e) {
             if (!Table.Database.IsAdministrator()) { return; }
-            var m = MessageBox.Show("Angezeigte Zeilen löschen?", enImageCode.Warnung, "Ja", "Nein");
+            var m = MessageBox.Show("Angezeigte Zeilen löschen?", ImageCode.Warnung, "Ja", "Nein");
             if (m != 0) { return; }
             Table.Database.Row.Remove(Table.Filter, Table.PinnedRows);
         }

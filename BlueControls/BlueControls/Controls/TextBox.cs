@@ -377,7 +377,7 @@ namespace BlueControls.Controls {
                 items.Add(ContextMenuComands.Einfügen, System.Windows.Forms.Clipboard.ContainsText() && Enabled);
                 if (_formatierungErlaubt) {
                     items.AddSeparator();
-                    items.Add("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(enImageCode.Sonne, 16), _cursorCharPos > -1);
+                    items.Add("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(ImageCode.Sonne, 16), _cursorCharPos > -1);
                     if (Convert.ToBoolean(_markEnd > -1)) {
                         items.AddSeparator();
                         items.Add("Als Überschrift markieren", "#Caption", Skin.GetBlueFont(Design.TextBox_Stufe3, States.Standard).SymbolForReadableText(), _markEnd > -1);
@@ -415,7 +415,7 @@ namespace BlueControls.Controls {
         /// <remarks></remarks>
         public bool Text_IsOkay(bool mitMeldung) {
             if (!_eTxt.PlainText.IsFormat(this)) {
-                if (mitMeldung) { MessageBox.Show("Ihre Eingabe entspricht nicht<br>dem erwarteten Format.", enImageCode.Warnung, "OK"); }
+                if (mitMeldung) { MessageBox.Show("Ihre Eingabe entspricht nicht<br>dem erwarteten Format.", ImageCode.Warnung, "OK"); }
                 return false;
             }
             return true;
@@ -589,9 +589,9 @@ namespace BlueControls.Controls {
                 Rectangle r = new(_eTxt.Width() + _eTxt.DrawingPos.X, _eTxt.DrawingPos.Y, 1000, 1000);
                 if (_eTxt.Count > 0) {
                     r.X += 2;
-                    Skin.Draw_FormatedText(gr, _suffix, _eTxt.Design, States.Standard_Disabled, null, enAlignment.Top_Left, r, this, false, false);
+                    Skin.Draw_FormatedText(gr, _suffix, _eTxt.Design, States.Standard_Disabled, null, Alignment.Top_Left, r, this, false, false);
                 } else {
-                    Skin.Draw_FormatedText(gr, "[in " + _suffix + "]", _eTxt.Design, States.Standard_Disabled, null, enAlignment.Top_Left, r, this, false, true);
+                    Skin.Draw_FormatedText(gr, "[in " + _suffix + "]", _eTxt.Design, States.Standard_Disabled, null, Alignment.Top_Left, r, this, false, true);
                 }
             }
             Skin.Draw_Border(gr, _eTxt.Design, state, DisplayRectangle);
@@ -798,11 +798,11 @@ namespace BlueControls.Controls {
                 //    }
                 //    i.AddSeparator();
                 //}
-                { "Kugel", "sphere", QuickImage.Get(enImageCode.Kugel, 20) },
-                { "Warnung", "Warnung", QuickImage.Get(enImageCode.Warnung, 20) },
-                { "Information", "Information", QuickImage.Get(enImageCode.Information, 20) },
-                { "Kritisch", "Kritisch", QuickImage.Get(enImageCode.Kritisch, 20) },
-                { "Frage", "Frage", QuickImage.Get(enImageCode.Frage, 20) }
+                { "Kugel", "sphere", QuickImage.Get(ImageCode.Kugel, 20) },
+                { "Warnung", "Warnung", QuickImage.Get(ImageCode.Warnung, 20) },
+                { "Information", "Information", QuickImage.Get(ImageCode.Information, 20) },
+                { "Kritisch", "Kritisch", QuickImage.Get(ImageCode.Kritisch, 20) },
+                { "Frage", "Frage", QuickImage.Get(ImageCode.Frage, 20) }
             };
             var r = InputBoxListBoxStyle.Show("Wählen sie:", i, AddType.None, true);
             _cursorCharPos = x;
@@ -960,7 +960,7 @@ namespace BlueControls.Controls {
                 Minimum = 0f,
                 MouseChange = 1f,
                 Name = "SliderY",
-                Orientation = enOrientation.Senkrecht,
+                Orientation = Orientation.Senkrecht,
                 Size = new Size(18, Height),
                 SmallChange = 48f,
                 TabIndex = 0,

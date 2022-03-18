@@ -379,7 +379,7 @@ namespace BlueDatabase {
                         break;
 
                     default:
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
+                        Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
                         break;
                 }
             }
@@ -440,23 +440,23 @@ namespace BlueDatabase {
         }
 
         public QuickImage? SymbolForReadableText() {
-            if (!IsOk()) { return QuickImage.Get(enImageCode.Kritisch); }
+            if (!IsOk()) { return QuickImage.Get(ImageCode.Kritisch); }
             switch (_typ) {
                 case ExportTyp.DatenbankCSVFormat:
-                    return QuickImage.Get(enImageCode.Excel);
+                    return QuickImage.Get(ImageCode.Excel);
 
                 case ExportTyp.DatenbankHTMLFormat:
-                    return QuickImage.Get(enImageCode.Globus);
+                    return QuickImage.Get(ImageCode.Globus);
 
                 case ExportTyp.DatenbankOriginalFormat:
-                    return QuickImage.Get(enImageCode.Häkchen);
+                    return QuickImage.Get(ImageCode.Häkchen);
 
                 case ExportTyp.EinzelnMitFormular:
-                    return QuickImage.Get(enImageCode.Stern);
+                    return QuickImage.Get(ImageCode.Stern);
 
                 default:
                     Develop.DebugPrint(_typ);
-                    return QuickImage.Get(enImageCode.Kritisch);
+                    return QuickImage.Get(ImageCode.Kritisch);
             }
         }
 

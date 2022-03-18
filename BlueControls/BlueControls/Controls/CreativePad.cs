@@ -36,12 +36,14 @@ using System.Windows.Forms;
 using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Geometry;
 using PageSetupDialog = BlueControls.Forms.PageSetupDialog;
+using BlueBasics.Interfaces;
+using BlueBasics.EventArgs;
 
 namespace BlueControls.Controls {
 
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("Click")]
-    public sealed partial class CreativePad : ZoomPad, IContextMenu {
+    public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedback {
 
         #region Fields
 
@@ -68,14 +70,15 @@ namespace BlueControls.Controls {
             MouseHighlight = false;
         }
 
-        public CreativePad() : this(new ItemCollectionPad()) {
-        }
+        public CreativePad() : this(new ItemCollectionPad()) { }
 
         #endregion
 
         #region Events
 
         public event PrintEventHandler BeginnPrint;
+
+        public event EventHandler Changed;
 
         public event EventHandler ClickedItemChanged;
 
@@ -86,6 +89,14 @@ namespace BlueControls.Controls {
         public event PrintEventHandler EndPrint;
 
         public event EventHandler GotNewItemCollection;
+
+        public event EventHandler<ListEventArgs> ItemAdded;
+
+        public event EventHandler<ListEventArgs> ItemInternalChanged;
+
+        public event EventHandler<System.EventArgs> ItemRemoved;
+
+        public event EventHandler<ListEventArgs> ItemRemoving;
 
         public event EventHandler PreviewModeChanged;
 
@@ -109,17 +120,20 @@ namespace BlueControls.Controls {
                 if (_item == value) { return; }
                 if (_item != null) {
                     _item.ItemRemoved -= _Item_ItemRemoved;
+                    _item.ItemRemoving -= _Item_ItemRemoving;
                     _item.ItemAdded -= _Item_ItemAdded;
-                    _item.DoInvalidate -= Item_DoInvalidate;
+                    _item.Changed -= Item_Changed;
+                    _item.ItemInternalChanged -= _item_ItemInternalChanged;
                 }
                 _item = value;
                 if (_item != null) {
                     _item.ItemRemoved += _Item_ItemRemoved;
+                    _item.ItemRemoving += _Item_ItemRemoving;
                     _item.ItemAdded += _Item_ItemAdded;
-                    _item.DoInvalidate += Item_DoInvalidate;
-                    _item.OnDoInvalidate();
+                    _item.Changed += Item_Changed;
+                    _item.ItemInternalChanged += _item_ItemInternalChanged;
                 }
-
+                Invalidate();
                 OnGotNewItemCollection();
             }
         }
@@ -238,14 +252,14 @@ namespace BlueControls.Controls {
             selectedHotItem = HotItem;
             if (selectedHotItem != null) {
                 items.Add("Allgemeine Element-Aktionen", true);
-                items.Add("Objekt bearbeiten", "#Erweitert", enImageCode.Stift);
+                items.Add("Objekt bearbeiten", "#Erweitert", ImageCode.Stift);
                 items.AddSeparator();
-                items.Add("Objekt duplizieren", "#Duplicate", enImageCode.Kopieren, selectedHotItem is ICloneable);
+                items.Add("Objekt duplizieren", "#Duplicate", ImageCode.Kopieren, selectedHotItem is ICloneable);
                 items.AddSeparator();
-                items.Add("In den Vordergrund", "#Vordergrund", enImageCode.InDenVordergrund);
-                items.Add("In den Hintergrund", "#Hintergrund", enImageCode.InDenHintergrund);
-                items.Add("Eine Ebene nach vorne", "#Vorne", enImageCode.EbeneNachVorne);
-                items.Add("Eine Ebene nach hinten", "#Hinten", enImageCode.EbeneNachHinten);
+                items.Add("In den Vordergrund", "#Vordergrund", ImageCode.InDenVordergrund);
+                items.Add("In den Hintergrund", "#Hintergrund", ImageCode.InDenHintergrund);
+                items.Add("Eine Ebene nach vorne", "#Vorne", ImageCode.EbeneNachVorne);
+                items.Add("Eine Ebene nach hinten", "#Hinten", ImageCode.EbeneNachHinten);
             }
         }
 
@@ -255,9 +269,19 @@ namespace BlueControls.Controls {
             return _item.Where(thisItem => thisItem != null && thisItem.Contains(p, Zoom)).ToList();
         }
 
+        public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+
         public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
         public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
+
+        public void OnItemAdded(BlueBasics.EventArgs.ListEventArgs e) => ItemAdded?.Invoke(this, e);
+
+        public void OnItemInternalChanged(BlueBasics.EventArgs.ListEventArgs e) => ItemInternalChanged?.Invoke(this, e);
+
+        public void OnItemRemoved() => ItemRemoved?.Invoke(this, System.EventArgs.Empty);
+
+        public void OnItemRemoving(ListEventArgs e) => ItemRemoving?.Invoke(this, e);
 
         public void OpenSaveDialog(string title) {
             title = title.RemoveChars(Constants.Char_DateiSonderZeichen);
@@ -467,7 +491,10 @@ namespace BlueControls.Controls {
         private void _Item_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
             if (_item.Count == 1 || Fitting) { ZoomFit(); }
             Invalidate();
+            OnItemAdded(e);
         }
+
+        private void _item_ItemInternalChanged(object sender, BlueBasics.EventArgs.ListEventArgs e) => OnItemInternalChanged(e);
 
         private void _Item_ItemRemoved(object sender, System.EventArgs e) {
             if (Fitting) { ZoomFit(); }
@@ -476,7 +503,10 @@ namespace BlueControls.Controls {
             Unselect();
             ZoomFit();
             Invalidate();
+            OnItemRemoved();
         }
+
+        private void _Item_ItemRemoving(object sender, ListEventArgs e) => OnItemRemoving(e);
 
         private void CheckHotItem(MouseEventArgs? e, bool doLastClicked) {
             var oldClicked = LastClickedItem;
@@ -511,7 +541,9 @@ namespace BlueControls.Controls {
             e.Graphics.DrawImageInRectAspectRatio(i, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
         }
 
-        private void Item_DoInvalidate(object sender, System.EventArgs e) => Invalidate();
+        private void Item_Changed(object sender, System.EventArgs e) {
+            Invalidate();
+        }
 
         private void MoveItems(float x, float y, bool doSnap, bool modifyMouseDown) {
             PointM? pointToMove = null;

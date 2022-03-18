@@ -56,7 +56,7 @@ namespace BlueControls.ItemCollection {
             VisibleItems = null;
             ZoomItems = null;
             _name = string.Empty;
-            Textlage = (enAlignment)(-1);
+            Textlage = (Alignment)(-1);
             Randfarbe = Color.Transparent;
             Eingebettete_Ansichten = new List<string>();
         }
@@ -82,18 +82,18 @@ namespace BlueControls.ItemCollection {
             get => _padInternal;
             set {
                 if (_padInternal != null) {
-                    _padInternal.Item.DoInvalidate -= _Pad_DoInvalidate;
+                    _padInternal.Item.Changed -= _Pad_DoInvalidate;
                 }
                 _padInternal = value;
                 if (value != null) {
-                    _padInternal.Item.DoInvalidate += _Pad_DoInvalidate;
+                    _padInternal.Item.Changed += _Pad_DoInvalidate;
                 }
             }
         }
 
         public Color Randfarbe { get; set; }
 
-        public enAlignment Textlage { get; set; }
+        public Alignment Textlage { get; set; }
 
         #endregion
 
@@ -114,7 +114,7 @@ namespace BlueControls.ItemCollection {
             ItemCollectionList.ItemCollectionList lage = new()
             {
                 { "ohne", "-1" },
-                { "Links oben", ((int)enAlignment.Top_Left).ToString() }
+                { "Links oben", ((int)Alignment.Top_Left).ToString() }
             };
             l.Add(new FlexiControlForProperty(this, "Textlage", lage));
             l.Add(new FlexiControlForProperty(this, "Eingebettete Ansichten", 5));
@@ -237,7 +237,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "pos":
-                    Textlage = (enAlignment)IntParse(value);
+                    Textlage = (Alignment)IntParse(value);
                     return true;
             }
             return false;
@@ -262,7 +262,7 @@ namespace BlueControls.ItemCollection {
             t = t.Substring(0, t.Length - 1) + ", ";
             if (!string.IsNullOrEmpty(_name)) { t = t + "Name=" + _name.ToNonCritical() + ", "; }
             //if (!string.IsNullOrEmpty(_ReadableText)) { t = t + "ReadableText=" + _ReadableText.ToNonCritical() + ", "; }
-            if (Textlage != (enAlignment)(-1)) { t = t + "Pos=" + (int)Textlage + ", "; }
+            if (Textlage != (Alignment)(-1)) { t = t + "Pos=" + (int)Textlage + ", "; }
             if (Eingebettete_Ansichten.Count > 0) { t = t + "Embedded=" + Eingebettete_Ansichten.JoinWithCr().ToNonCritical() + ", "; }
             t = t + "Color=" + Randfarbe.ToHtmlCode() + ", ";
             if (PadInternal != null) {
@@ -275,7 +275,7 @@ namespace BlueControls.ItemCollection {
 
         protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
             try {
-                var trp = drawingCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
+                var trp = drawingCoordinates.PointOf(Alignment.Horizontal_Vertical_Center);
                 gr.TranslateTransform(trp.X, trp.Y);
                 gr.RotateTransform(-Drehwinkel);
                 Font font = new("Arial", 30 * zoom);
@@ -321,7 +321,7 @@ namespace BlueControls.ItemCollection {
                                 var dc2 = mb2.ZoomAndMoveRect(zoomv, slidervalues.X, slidervalues.Y, false);
                                 tmpG.DrawRectangle(p2, dc2);
                                 tmpG.DrawRectangle(p, dc2);
-                                if (pad.Textlage != (enAlignment)(-1)) {
+                                if (pad.Textlage != (Alignment)(-1)) {
                                     var s = tmpG.MeasureString(pad.Name, font);
                                     tmpG.FillRectangle(Brushes.White, new RectangleF(dc2.Left, dc2.Top - s.Height - (9f * zoom), s.Width, s.Height));
                                     BlueFont.DrawString(tmpG, pad.Name, font, new SolidBrush(pad.Randfarbe), dc2.Left, dc2.Top - s.Height - (9f * zoom));
@@ -336,7 +336,7 @@ namespace BlueControls.ItemCollection {
                 if (!forPrinting) {
                     BlueFont.DrawString(gr, Name, font, Brushes.Gray, drawingCoordinates.Left, drawingCoordinates.Top);
                 }
-                if (Textlage != (enAlignment)(-1)) {
+                if (Textlage != (Alignment)(-1)) {
                     Pen p = new(Randfarbe, (float)(8.7d * zoom)) {
                         DashPattern = new float[] { 10, 2, 1, 2 }
                     };

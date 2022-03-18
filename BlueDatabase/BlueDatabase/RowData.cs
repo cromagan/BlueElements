@@ -111,13 +111,13 @@ namespace BlueDatabase {
                 return CompareKey().CompareTo(robj.CompareKey());
             }
 
-            Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
+            Develop.DebugPrint(FehlerArt.Fehler, "Falscher Objecttyp!");
             return 0;
         }
 
         public void GetDataFrom(RowData thisRowData) {
             if (Row != thisRowData.Row || Chapter != thisRowData.Chapter) {
-                Develop.DebugPrint(enFehlerArt.Warnung, "RowData Kopie fehlgeschlagen!");
+                Develop.DebugPrint(FehlerArt.Warnung, "RowData Kopie fehlgeschlagen!");
             }
 
             AdditinalSort = thisRowData.AdditinalSort;

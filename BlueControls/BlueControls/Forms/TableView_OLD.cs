@@ -67,12 +67,12 @@ namespace BlueControls.Forms {
             //var newbmp = BlueBasics.modConverter.StringUnicodeToBitmap(newstUTF8);
             Copyright.Text = "(c) 2010-" + DateTime.Now.Year + " Christian Peter";
             btnDrucken.Item.Clear();
-            btnDrucken.Item.Add("Drucken bzw. Export", "erweitert", QuickImage.Get(enImageCode.Drucker, 28));
+            btnDrucken.Item.Add("Drucken bzw. Export", "erweitert", QuickImage.Get(ImageCode.Drucker, 28));
             btnDrucken.Item.AddSeparator();
-            btnDrucken.Item.Add("CSV-Format für Excel in die Zwischenablage", "csv", QuickImage.Get(enImageCode.Excel, 28));
-            btnDrucken.Item.Add("HTML-Format für Internet-Seiten", "html", QuickImage.Get(enImageCode.Globus, 28));
+            btnDrucken.Item.Add("CSV-Format für Excel in die Zwischenablage", "csv", QuickImage.Get(ImageCode.Excel, 28));
+            btnDrucken.Item.Add("HTML-Format für Internet-Seiten", "html", QuickImage.Get(ImageCode.Globus, 28));
             btnDrucken.Item.AddSeparator();
-            btnDrucken.Item.Add("Layout-Editor öffnen", "editor", QuickImage.Get(enImageCode.Layout, 28));
+            btnDrucken.Item.Add("Layout-Editor öffnen", "editor", QuickImage.Get(ImageCode.Layout, 28));
             if (!adminTabVisible) {
                 grpAdminAllgemein.Visible = false;
                 grpBearbeitung.Visible = false;
@@ -91,12 +91,12 @@ namespace BlueControls.Forms {
             Formula.HideViewEditor();
             if (Ansicht1.Checked) {
                 if (Formula.ShowingRow == null) {
-                    MessageBox.Show("Kein Eintrag gewählt.", enImageCode.Information, "OK");
+                    MessageBox.Show("Kein Eintrag gewählt.", ImageCode.Information, "OK");
                     return;
                 }
                 var tmpr = Formula.ShowingRow;
-                if (MessageBox.Show("Soll der Eintrag<br><b>" + tmpr.CellFirstString() + "</b><br>wirklich <b>gelöscht</b> werden?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-                SuchEintragNoSave(enDirection.Unten, out var column, out var row);
+                if (MessageBox.Show("Soll der Eintrag<br><b>" + tmpr.CellFirstString() + "</b><br>wirklich <b>gelöscht</b> werden?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+                SuchEintragNoSave(Direction.Unten, out var column, out var row);
                 Table.CursorPos_Set(column, row, false);
                 Table.Database.Row.Remove(tmpr);
             } else {
@@ -124,7 +124,7 @@ namespace BlueControls.Forms {
 
                 case "ZeileLöschen":
                     if (row != null) {
-                        if (MessageBox.Show("Zeile löschen?", enImageCode.Frage, "Ja", "Nein") == 0) {
+                        if (MessageBox.Show("Zeile löschen?", ImageCode.Frage, "Ja", "Nein") == 0) {
                             bt.Database.Row.Remove(row);
                         }
                     }
@@ -154,9 +154,9 @@ namespace BlueControls.Forms {
                 case "Summe":
                     var summe = column.Summe(Table.Filter);
                     if (!summe.HasValue) {
-                        MessageBox.Show("Die Summe konnte nicht berechnet werden.", enImageCode.Summe, "OK");
+                        MessageBox.Show("Die Summe konnte nicht berechnet werden.", ImageCode.Summe, "OK");
                     } else {
-                        MessageBox.Show("Summe dieser Spalte, nur angezeigte Zeilen: <br><b>" + summe, enImageCode.Summe, "OK");
+                        MessageBox.Show("Summe dieser Spalte, nur angezeigte Zeilen: <br><b>" + summe, ImageCode.Summe, "OK");
                     }
                     break;
 
@@ -174,7 +174,7 @@ namespace BlueControls.Forms {
 
                 case "ColumnContentDelete":
                     if (column != null) {
-                        if (MessageBox.Show("Angezeite Inhalte dieser Spalte löschen?", enImageCode.Frage, "Ja", "Nein") == 0) {
+                        if (MessageBox.Show("Angezeite Inhalte dieser Spalte löschen?", ImageCode.Frage, "Ja", "Nein") == 0) {
                             column.DeleteContents(Table.Filter, Table.PinnedRows);
                         }
                     }
@@ -227,7 +227,7 @@ namespace BlueControls.Forms {
                     break;
 
                 default:
-                    DebugPrint(enFehlerArt.Fehler, "Ungültiger Aufruf!");
+                    DebugPrint(FehlerArt.Fehler, "Ungültiger Aufruf!");
                     break;
             }
             SaveTab.ShowDialog();
@@ -319,7 +319,7 @@ namespace BlueControls.Forms {
 
                 case "csv":
                     Generic.CopytoClipboard(Table.Export_CSV(FirstRow.ColumnCaption));
-                    MessageBox.Show("Die gewünschten Daten<br>sind nun im Zwischenspeicher.", enImageCode.Clipboard, "Ok");
+                    MessageBox.Show("Die gewünschten Daten<br>sind nun im Zwischenspeicher.", ImageCode.Clipboard, "Ok");
                     break;
 
                 case "html":
@@ -419,7 +419,7 @@ namespace BlueControls.Forms {
         }
 
         private void Neu_Click(object sender, System.EventArgs e) {
-            var r = Table.Database.Column.First().SortType == enSortierTyp.Datum_Uhrzeit
+            var r = Table.Database.Column.First().SortType == SortierTyp.Datum_Uhrzeit
                 ? Table.Database.Row.Add(NameRepair(DateTime.Now.ToString(Constants.Format_Date5), null))
                 : Table.Database.Row.Add(NameRepair("Neuer Eintrag", null));
             Table.CursorPos_Set(Table.Database.Column.First(), Table.SortedRows().Get(r), true);
@@ -443,7 +443,7 @@ namespace BlueControls.Forms {
             Formula.HideViewEditor();
             var suchtT = such.Text.Trim();
             if (string.IsNullOrEmpty(suchtT)) {
-                MessageBox.Show("Bitte Text zum Suchen eingeben.", enImageCode.Information, "OK");
+                MessageBox.Show("Bitte Text zum Suchen eingeben.", ImageCode.Information, "OK");
                 return;
             }
             Table.SearchNextText(suchtT, Table, null, Table.CursorPosRow(), out _, out var gefRow, true);
@@ -494,26 +494,26 @@ namespace BlueControls.Forms {
             //    }
             //} while (true);
             if (gefRow == null) {
-                MessageBox.Show("Kein Eintrag gefunden!", enImageCode.Information, "OK");
+                MessageBox.Show("Kein Eintrag gefunden!", ImageCode.Information, "OK");
             } else {
                 if (gefRow?.Row == Formula.ShowingRow) {
-                    MessageBox.Show("Text nur im <b>aktuellen Eintrag</b> gefunden,<br>aber sonst keine weiteren Einträge!", enImageCode.Information, "OK");
+                    MessageBox.Show("Text nur im <b>aktuellen Eintrag</b> gefunden,<br>aber sonst keine weiteren Einträge!", ImageCode.Information, "OK");
                 } else {
                     Table.CursorPos_Set(Table.Database.Column[0], gefRow, true);
                 }
             }
         }
 
-        private void SuchEintragNoSave(enDirection richtung, out ColumnItem? column, out RowData? row) {
+        private void SuchEintragNoSave(Direction richtung, out ColumnItem? column, out RowData? row) {
             column = Table.Database.Column[0];
             row = null;
             if (Table.Database.Row.Count < 1) { return; }
             // Temporär berechnen, um geflacker zu vermeiden (Endabled - > Disabled bei Nothing)
-            if (Convert.ToBoolean(richtung & enDirection.Unten)) {
+            if (Convert.ToBoolean(richtung & Direction.Unten)) {
                 row = Table.View_NextRow(Table.CursorPosRow());
                 if (row == null) { row = Table.View_RowFirst(); }
             }
-            if (Convert.ToBoolean(richtung & enDirection.Oben)) {
+            if (Convert.ToBoolean(richtung & Direction.Oben)) {
                 row = Table.View_PreviousRow(Table.CursorPosRow());
                 if (row == null) { row = Table.View_RowLast(); }
             }
@@ -533,22 +533,22 @@ namespace BlueControls.Forms {
                 e.UserMenu.Add(ContextMenuComands.SpaltenSortierungZA, column != null && column.Format.CanBeCheckedByRules());
                 e.UserMenu.AddSeparator();
                 e.UserMenu.Add("Zelle", true);
-                e.UserMenu.Add("Inhalt Kopieren", "ContentCopy", enImageCode.Kopieren, column != null && column.Format.CanBeChangedByRules());
-                e.UserMenu.Add("Inhalt Einfügen", "ContentPaste", enImageCode.Clipboard, column != null && column.Format.CanBeChangedByRules());
-                e.UserMenu.Add("Inhalt löschen", "ContentDelete", enImageCode.Radiergummi, column != null && column.Format.CanBeChangedByRules());
+                e.UserMenu.Add("Inhalt Kopieren", "ContentCopy", ImageCode.Kopieren, column != null && column.Format.CanBeChangedByRules());
+                e.UserMenu.Add("Inhalt Einfügen", "ContentPaste", ImageCode.Clipboard, column != null && column.Format.CanBeChangedByRules());
+                e.UserMenu.Add("Inhalt löschen", "ContentDelete", ImageCode.Radiergummi, column != null && column.Format.CanBeChangedByRules());
                 e.UserMenu.Add(ContextMenuComands.VorherigenInhaltWiederherstellen, column != null && column.Format.CanBeChangedByRules() && column.ShowUndo);
                 e.UserMenu.Add(ContextMenuComands.SuchenUndErsetzen, column != null && column.Format.CanBeChangedByRules());
                 e.UserMenu.AddSeparator();
                 e.UserMenu.Add("Spalte", true);
                 e.UserMenu.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten, column != null);
-                e.UserMenu.Add("Statistik", "Statistik", QuickImage.Get(enImageCode.Balken, 16), column != null);
-                e.UserMenu.Add("Inhalte aller angezeigten Zellen dieser Spalte löschen", "ColumnContentDelete", enImageCode.Radiergummi, column != null && column.Format.CanBeChangedByRules());
-                e.UserMenu.Add("Summe", "Summe", enImageCode.Summe, column != null);
+                e.UserMenu.Add("Statistik", "Statistik", QuickImage.Get(ImageCode.Balken, 16), column != null);
+                e.UserMenu.Add("Inhalte aller angezeigten Zellen dieser Spalte löschen", "ColumnContentDelete", ImageCode.Radiergummi, column != null && column.Format.CanBeChangedByRules());
+                e.UserMenu.Add("Summe", "Summe", ImageCode.Summe, column != null);
                 e.UserMenu.AddSeparator();
             }
             e.UserMenu.Add("Zeile", true);
             e.UserMenu.Add(ContextMenuComands.ZeileLöschen, row != null);
-            e.UserMenu.Add("Zeile prüfen", "Fehlersuche", enImageCode.Zeile, row != null);
+            e.UserMenu.Add("Zeile prüfen", "Fehlersuche", ImageCode.Zeile, row != null);
         }
 
         private void TableView_EditBeforeBeginEdit(object sender, CellCancelEventArgs e) {
@@ -569,18 +569,18 @@ namespace BlueControls.Forms {
 
         private void ÜberDiesesProgramm_Click(object sender, System.EventArgs e) {
             BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-            MessageBox.Show("(c) Christian Peter<br>V " + Version, enImageCode.Information, "OK");
+            MessageBox.Show("(c) Christian Peter<br>V " + Version, ImageCode.Information, "OK");
         }
 
         private void vor_Click(object sender, System.EventArgs e) {
             Formula.HideViewEditor();
-            SuchEintragNoSave(enDirection.Unten, out var column, out var row);
+            SuchEintragNoSave(Direction.Unten, out var column, out var row);
             Table.CursorPos_Set(column, row, false);
         }
 
         private void zurück_Click(object sender, System.EventArgs e) {
             Formula.HideViewEditor();
-            SuchEintragNoSave(enDirection.Oben, out var column, out var row);
+            SuchEintragNoSave(Direction.Oben, out var column, out var row);
             Table.CursorPos_Set(column, row, false);
         }
 

@@ -102,9 +102,9 @@ namespace BlueControls.ItemCollection {
             List<FlexiControl> l = new();
             ItemCollectionList.ItemCollectionList verhalt = new()
             {
-                { "Linie direkt zwischen zwei Punkten", ((int)ConectorStyle.Direct).ToString(), QuickImage.Get(enImageCode.Linie) },
-                { "Linie soll Objekten ausweichen", ((int)ConectorStyle.Ausweichenx).ToString(), QuickImage.Get(enImageCode.Linie) },
-                { "Linie soll Objekten ausweichen und rechtwinklig sein", ((int)ConectorStyle.AusweichenUndGerade).ToString(), QuickImage.Get(enImageCode.Linie) }
+                { "Linie direkt zwischen zwei Punkten", ((int)ConectorStyle.Direct).ToString(), QuickImage.Get(ImageCode.Linie) },
+                { "Linie soll Objekten ausweichen", ((int)ConectorStyle.Ausweichenx).ToString(), QuickImage.Get(ImageCode.Linie) },
+                { "Linie soll Objekten ausweichen und rechtwinklig sein", ((int)ConectorStyle.AusweichenUndGerade).ToString(), QuickImage.Get(ImageCode.Linie) }
             };
             l.Add(new FlexiControlForProperty(this, "Linien-Verhalten", verhalt));
             AddLineStyleOption(l);
@@ -202,10 +202,10 @@ namespace BlueControls.ItemCollection {
 
                     PointF tP1 = p1;
                     PointF tP2 = p2;
-                    var lo = a.PointOf(enAlignment.Top_Left);
-                    var ro = a.PointOf(enAlignment.Top_Right);
-                    var lu = a.PointOf(enAlignment.Bottom_Left);
-                    var ru = a.PointOf(enAlignment.Bottom_Right);
+                    var lo = a.PointOf(Alignment.Top_Left);
+                    var ro = a.PointOf(Alignment.Top_Right);
+                    var lu = a.PointOf(Alignment.Bottom_Left);
+                    var ru = a.PointOf(Alignment.Bottom_Right);
                     if (!LinesIntersect(tP1, tP2, lo, ro, true).IsEmpty ||
                         !LinesIntersect(tP1, tP2, lu, ru, true).IsEmpty ||
                         !LinesIntersect(tP1, tP2, lo, lu, true).IsEmpty ||
@@ -380,10 +380,10 @@ namespace BlueControls.ItemCollection {
                         var a = thisItemBasic.UsedArea;
                         if (a.Width > 0 && a.Height > 0) {
                             a.Inflate(2, 2);
-                            var lo = a.PointOf(enAlignment.Top_Left);
-                            var ro = a.PointOf(enAlignment.Top_Right);
-                            var lu = a.PointOf(enAlignment.Bottom_Left);
-                            var ru = a.PointOf(enAlignment.Bottom_Right);
+                            var lo = a.PointOf(Alignment.Top_Left);
+                            var ro = a.PointOf(Alignment.Top_Right);
+                            var lu = a.PointOf(Alignment.Bottom_Left);
+                            var ru = a.PointOf(Alignment.Bottom_Right);
                             var tOben = LinesIntersect(_tempPoints[p1], _tempPoints[p1 + 1], lo, ro, true);
                             var tUnten = LinesIntersect(_tempPoints[p1], _tempPoints[p1 + 1], lu, ru, true);
                             var tLinks = LinesIntersect(_tempPoints[p1], _tempPoints[p1 + 1], lo, lu, true);
@@ -391,10 +391,10 @@ namespace BlueControls.ItemCollection {
                             //    If DirectCast(Object2, RowFormulaItem).Row.CellFirst().String.Contains("Lilo") AndAlso DirectCast(Object1, RowFormulaItem).Row.CellFirst().String.Contains("Karl") Then Stop
                             if (tOben != null || tUnten != null || tLinks != null || trechts != null) {
                                 a.Inflate(-50, -50);
-                                lo = a.PointOf(enAlignment.Top_Left);
-                                ro = a.PointOf(enAlignment.Top_Right);
-                                lu = a.PointOf(enAlignment.Bottom_Left);
-                                ru = a.PointOf(enAlignment.Bottom_Right);
+                                lo = a.PointOf(Alignment.Top_Left);
+                                ro = a.PointOf(Alignment.Top_Right);
+                                lu = a.PointOf(Alignment.Bottom_Left);
+                                ru = a.PointOf(Alignment.Bottom_Right);
                                 var oben = LinesIntersect(_tempPoints[p1], _tempPoints[p1 + 1], lo, ro, true);
                                 var unten = LinesIntersect(_tempPoints[p1], _tempPoints[p1 + 1], lu, ru, true);
                                 var links = LinesIntersect(_tempPoints[p1], _tempPoints[p1 + 1], lo, lu, true);

@@ -97,13 +97,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="BitmapExt.cs" />
+    <Compile Include="Enums\SortierTyp.cs" />
     <Compile Include="ImageMatrix.cs" />
-    <Compile Include="Enums\enBlurType.cs" />
-    <Compile Include="Enums\enVarType.cs" />
-    <Compile Include="Enums\enEditTypeFormula.cs" />
-    <Compile Include="Enums\enErrorReason.cs" />
-    <Compile Include="Enums\enSortierTyp.cs" />
-    <Compile Include="Enums\enÜberschriftAnordnung.cs" />
+    <Compile Include="Enums\BlurType.cs" />
+    <Compile Include="Enums\VarType.cs" />
+    <Compile Include="Enums\ErrorReason.cs" />
     <Compile Include="EventArgs\NeedImageEventArgs.cs" />
     <Compile Include="EventArgs\MultiUserFileGiveBackEventArgs.cs" />
     <Compile Include="Extensions\RectangleFExtension.cs" />
@@ -113,9 +111,9 @@
     <Compile Include="Interfaces\IReadableText.cs" />
     <Compile Include="Interfaces\IVersionable.cs" />
     <Compile Include="MultiUserFile\MultiUserFile.cs" />
-    <Compile Include="Enums\enSW.cs" />
+    <Compile Include="Enums\SW.cs" />
     <Compile Include="Enums\DataFormat.cs" />
-    <Compile Include="Enums\enFehlerArt.cs" />
+    <Compile Include="Enums\FehlerArt.cs" />
     <Compile Include="EventArgs\MultiUserFileStopWorkingEventArgs.cs" />
     <Compile Include="EventArgs\LoadedEventArgs.cs" />
     <Compile Include="EventArgs\LoadingEventArgs.cs" />
@@ -129,13 +127,13 @@
     <Compile Include="Extensions\ConcurrentDictionaryExtension.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Develop.cs" />
-    <Compile Include="Enums\enAlignment.cs" />
-    <Compile Include="Enums\enDirection.cs" />
-    <Compile Include="Enums\enFileFormat.cs" />
-    <Compile Include="Enums\enImageCode.cs" />
-    <Compile Include="Enums\enImageCodeEffect.cs" />
-    <Compile Include="Enums\enOrientation.cs" />
-    <Compile Include="Enums\enTaste.cs" />
+    <Compile Include="Enums\Alignment.cs" />
+    <Compile Include="Enums\Direction.cs" />
+    <Compile Include="Enums\FileFormat.cs" />
+    <Compile Include="Enums\ImageCode.cs" />
+    <Compile Include="Enums\ImageCodeEffect.cs" />
+    <Compile Include="Enums\Orientation.cs" />
+    <Compile Include="Enums\KeyCode.cs" />
     <Compile Include="FileOperations.cs" />
     <Compile Include="Interfaces\IChangedFeedback.cs" />
     <Compile Include="Extensions\CollectionExtension.cs" />
@@ -156,7 +154,7 @@
     <Compile Include="Interfaces\ICanBeEmpty.cs" />
     <Compile Include="Generic.cs" />
     <Compile Include="WindowsRemoteControl.cs" />
-    <Compile Include="Enums\enSizeModes.cs" />
+    <Compile Include="Enums\SizeModes.cs" />
     <Compile Include="Extensions\ColorExtension.cs" />
     <Compile Include="Converter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

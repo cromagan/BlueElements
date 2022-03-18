@@ -35,7 +35,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.filterleiste.Filtertypes = ((BlueControls.Enums.FilterTypesToShow)((BlueControls.Enums.FilterTypesToShow.NachDefinierterAnsicht | BlueControls.Enums.FilterTypesToShow.AktuelleAnsicht_AktiveFilter)));
             this.filterleiste.Location = new System.Drawing.Point(0, 0);
             this.filterleiste.Name = "filterleiste";
-            this.filterleiste.Orientation = BlueBasics.Enums.enOrientation.Senkrecht;
+            this.filterleiste.Orientation = BlueBasics.Enums.Orientation.Senkrecht;
             this.filterleiste.Size = new System.Drawing.Size(710, 560);
             this.filterleiste.TabIndex = 0;
             this.filterleiste.TabStop = false;

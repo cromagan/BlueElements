@@ -20,7 +20,7 @@ using System;
 namespace BlueBasics.Enums {
 
     [Flags]
-    public enum enImageCodeEffect {
+    public enum ImageCodeEffect {
         Undefiniert = -1,
         Ohne = 0,
         Durchgestrichen = 1,

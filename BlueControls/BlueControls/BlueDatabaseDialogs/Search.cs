@@ -60,7 +60,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (string.IsNullOrEmpty(suchtT)) { return; }
             Table.SearchNextText(suchtT, _blueTable, _col, _blueTable.CursorPosRow(), out var found, out var gefRow, btnAehnliches.Checked);
             if (found == null) {
-                MessageBox.Show("Text nicht gefunden", enImageCode.Information, "OK");
+                MessageBox.Show("Text nicht gefunden", ImageCode.Information, "OK");
                 return;
             }
             _blueTable.CursorPos_Set(found, gefRow, true);
@@ -69,7 +69,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnSuchSpalte_Click(object sender, System.EventArgs e) {
             if (_blueTable.Design == BlueTableAppearance.OnlyMainColumnWithoutHead) {
-                MessageBox.Show("In dieser Ansicht nicht möglich", enImageCode.Information, "OK");
+                MessageBox.Show("In dieser Ansicht nicht möglich", ImageCode.Information, "OK");
                 return;
             }
             var searchT = SuchText();
@@ -99,7 +99,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
             } while (true);
             if (found == null) {
-                MessageBox.Show("Text in den Spalten nicht gefunden.", enImageCode.Information, "OK");
+                MessageBox.Show("Text in den Spalten nicht gefunden.", ImageCode.Information, "OK");
                 return;
             }
             _blueTable.CursorPos_Set(found, _row, true);
@@ -116,7 +116,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private string SuchText() {
             var suchtT = txbSuchText.Text.Trim();
             if (string.IsNullOrEmpty(suchtT)) {
-                MessageBox.Show("Bitte Text zum Suchen eingeben.", enImageCode.Information, "OK");
+                MessageBox.Show("Bitte Text zum Suchen eingeben.", ImageCode.Information, "OK");
                 return string.Empty;
             }
             return suchtT.Replace(";cr;", "\r").Replace(";tab;", "\t").ToLower();

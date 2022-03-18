@@ -251,30 +251,30 @@ namespace BlueBasics {
             return string.IsNullOrEmpty(l) ? string.Empty : l.Substring(1).ToUpper();
         }
 
-        public static enFileFormat FileType(this string filename) => string.IsNullOrEmpty(filename)
-? enFileFormat.Unknown
+        public static FileFormat FileType(this string filename) => string.IsNullOrEmpty(filename)
+? FileFormat.Unknown
 : filename.FileSuffix() switch {
-    "DOC" or "DOCX" or "RTF" or "ODT" => enFileFormat.WordKind,
-    "TXT" or "INI" or "INFO" => enFileFormat.Textdocument,
-    "XLS" or "CSV" or "XLA" or "XLSX" or "XLSM" or "ODS" => enFileFormat.ExcelKind,
-    "PPT" or "PPS" or "PPA" => enFileFormat.PowerPointKind,
-    "MSG" or "EML" => enFileFormat.EMail,
-    "PDF" => enFileFormat.Pdf,
-    "HTM" or "HTML" => enFileFormat.HTML,
-    "JPG" or "JPEG" or "BMP" or "TIFF" or "TIF" or "GIF" or "PNG" => enFileFormat.Image,
-    "ICO" => enFileFormat.Icon,
-    "ZIP" or "RAR" or "7Z" => enFileFormat.CompressedArchive,
-    "AVI" or "DIVX" or "MPG" or "MPEG" or "WMV" or "FLV" or "MP4" or "MKV" or "M4V" => enFileFormat.Movie,
-    "EXE" or "BAT" or "SCR" => enFileFormat.Executable,
-    "CHM" => enFileFormat.HelpFile,
-    "XML" => enFileFormat.XMLFile,
-    "VCF" => enFileFormat.Visitenkarte,
-    "MP3" or "WAV" or "AAC" => enFileFormat.Sound,
-    "B4A" or "BAS" or "CS" => enFileFormat.ProgrammingCode,// case "DLL":
-    "DB" or "MDB" => enFileFormat.Database,
-    "LNK" or "URL" => enFileFormat.Link,
-    "BCR" => enFileFormat.BlueCreativeFile,
-    _ => enFileFormat.Unknown
+    "DOC" or "DOCX" or "RTF" or "ODT" => FileFormat.WordKind,
+    "TXT" or "INI" or "INFO" => FileFormat.Textdocument,
+    "XLS" or "CSV" or "XLA" or "XLSX" or "XLSM" or "ODS" => FileFormat.ExcelKind,
+    "PPT" or "PPS" or "PPA" => FileFormat.PowerPointKind,
+    "MSG" or "EML" => FileFormat.EMail,
+    "PDF" => FileFormat.Pdf,
+    "HTM" or "HTML" => FileFormat.HTML,
+    "JPG" or "JPEG" or "BMP" or "TIFF" or "TIF" or "GIF" or "PNG" => FileFormat.Image,
+    "ICO" => FileFormat.Icon,
+    "ZIP" or "RAR" or "7Z" => FileFormat.CompressedArchive,
+    "AVI" or "DIVX" or "MPG" or "MPEG" or "WMV" or "FLV" or "MP4" or "MKV" or "M4V" => FileFormat.Movie,
+    "EXE" or "BAT" or "SCR" => FileFormat.Executable,
+    "CHM" => FileFormat.HelpFile,
+    "XML" => FileFormat.XMLFile,
+    "VCF" => FileFormat.Visitenkarte,
+    "MP3" or "WAV" or "AAC" => FileFormat.Sound,
+    "B4A" or "BAS" or "CS" => FileFormat.ProgrammingCode,// case "DLL":
+    "DB" or "MDB" => FileFormat.Database,
+    "LNK" or "URL" => FileFormat.Link,
+    "BCR" => FileFormat.BlueCreativeFile,
+    _ => FileFormat.Unknown
 };
 
         public static string Folder(this string pathx) {
@@ -452,7 +452,7 @@ namespace BlueBasics {
                 tries++;
                 if (tries > 5) {
                     if (!toBeSure) { return false; }
-                    if (DateTime.Now.Subtract(startTime).TotalSeconds > 60) { Develop.DebugPrint(enFehlerArt.Fehler, "Datei-Befehl konnte nicht ausgeführt werden:\r\n" + file1 + "\r\n" + file2); }
+                    if (DateTime.Now.Subtract(startTime).TotalSeconds > 60) { Develop.DebugPrint(FehlerArt.Fehler, "Datei-Befehl konnte nicht ausgeführt werden:\r\n" + file1 + "\r\n" + file2); }
                 }
                 Pause(0.2, false);
             }

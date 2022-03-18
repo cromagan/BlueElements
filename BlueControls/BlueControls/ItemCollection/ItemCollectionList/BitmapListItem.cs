@@ -169,7 +169,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
                                                     _bitmap.Width * scale,
                                                     _bitmap.Height * scale);
             }
-            var trp = drawingCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
+            var trp = drawingCoordinates.PointOf(Alignment.Horizontal_Vertical_Center);
             scaledImagePosition = new RectangleF(scaledImagePosition.Left - trp.X, scaledImagePosition.Top - trp.Y, scaledImagePosition.Width, scaledImagePosition.Height);
             lock (gr) {
                 gr.TranslateTransform(trp.X, trp.Y);
@@ -193,7 +193,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
                     //r = new Rectangle(r.Left - trp.X, r.Top - trp.Y, r.Width, r.Height);
                     //GenericControl.Skin.Draw_Back(GR, enDesign.Item_Listbox_Unterschrift, vState, r, null, false);
                     //GenericControl.Skin.Draw_Border(GR, enDesign.Item_Listbox_Unterschrift, vState, r);
-                    Skin.Draw_FormatedText(gr, thisCap, Design.Item_Listbox, state, null, enAlignment.Horizontal_Vertical_Center, r, null, false, false);
+                    Skin.Draw_FormatedText(gr, thisCap, Design.Item_Listbox, state, null, Alignment.Horizontal_Vertical_Center, r, null, false, false);
                 }
             }
             gr.TranslateTransform(-trp.X, -trp.Y);

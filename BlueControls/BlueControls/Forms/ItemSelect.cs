@@ -70,7 +70,7 @@ namespace BlueControls.Forms {
             var items = new List<BasicListItem?>();
 
             foreach (var thisString in files) {
-                if (thisString.FileType() == enFileFormat.Image) {
+                if (thisString.FileType() == FileFormat.Image) {
                     items.Add(new BitmapListItem(thisString, thisString, thisString.FileNameWithoutSuffix(), fileEncryptionKey));
                 }
             }

@@ -112,14 +112,14 @@ namespace BlueControls.Designer_Support {
         }
 
         public string ICode() {
-            var e = (enImageCodeEffect)(((chkbGrauStufen.Checked ? -1 : 0) * -(int)enImageCodeEffect.Graustufen) | ((chkbDurchgestrichen.Checked ? -1 : 0) * -(int)enImageCodeEffect.Durchgestrichen) | ((chkbMEDisabled.Checked ? -1 : 0) * -(int)enImageCodeEffect.WindowsMEDisabled) | ((chkbXPDisabled.Checked ? -1 : 0) * -(int)enImageCodeEffect.WindowsXPDisabled));
+            var e = (ImageCodeEffect)(((chkbGrauStufen.Checked ? -1 : 0) * -(int)ImageCodeEffect.Graustufen) | ((chkbDurchgestrichen.Checked ? -1 : 0) * -(int)ImageCodeEffect.Durchgestrichen) | ((chkbMEDisabled.Checked ? -1 : 0) * -(int)ImageCodeEffect.WindowsMEDisabled) | ((chkbXPDisabled.Checked ? -1 : 0) * -(int)ImageCodeEffect.WindowsXPDisabled));
             return QuickImage.GenerateCode(PicName.Text, IntParse(GrX.Text), IntParse(GrY.Text), e, Färb.Text, grün.Text, SAT.Value, Hell.Value, 0, Transp.Value, txbZweitsymbol.Text);
         }
 
         public void StartAll(string qicode) {
             LB.Items.Clear();
-            const enImageCode tempVar = (enImageCode)9999;
-            for (enImageCode z = 0; z <= tempVar; z++) {
+            const ImageCode tempVar = (ImageCode)9999;
+            for (ImageCode z = 0; z <= tempVar; z++) {
                 var w = Enum.GetName(z.GetType(), z);
                 if (!string.IsNullOrEmpty(w)) { LB.Items.Add(w); }
             }
@@ -127,14 +127,14 @@ namespace BlueControls.Designer_Support {
             PicName.Text = l.Name;
             Färb.Text = l.Färbung;
             grün.Text = l.ChangeGreenTo;
-            chkbGrauStufen.Checked = Convert.ToBoolean(l.Effekt & enImageCodeEffect.Graustufen);
+            chkbGrauStufen.Checked = Convert.ToBoolean(l.Effekt & ImageCodeEffect.Graustufen);
             SAT.Value = l.Sättigung;
             Hell.Value = l.Helligkeit;
             Transp.Value = l.Transparenz;
             //if (l.Effekt < 0) { l.Effekt =  enImageCodeEffect.Ohne; }
-            chkbDurchgestrichen.Checked = Convert.ToBoolean(l.Effekt & enImageCodeEffect.Durchgestrichen);
-            chkbMEDisabled.Checked = Convert.ToBoolean(l.Effekt & enImageCodeEffect.WindowsMEDisabled);
-            chkbXPDisabled.Checked = Convert.ToBoolean(l.Effekt & enImageCodeEffect.WindowsXPDisabled);
+            chkbDurchgestrichen.Checked = Convert.ToBoolean(l.Effekt & ImageCodeEffect.Durchgestrichen);
+            chkbMEDisabled.Checked = Convert.ToBoolean(l.Effekt & ImageCodeEffect.WindowsMEDisabled);
+            chkbXPDisabled.Checked = Convert.ToBoolean(l.Effekt & ImageCodeEffect.WindowsXPDisabled);
             GrX.Text = l.Width.ToString();
             GrY.Text = l.Height.ToString();
             txbZweitsymbol.Text = l.Zweitsymbol;

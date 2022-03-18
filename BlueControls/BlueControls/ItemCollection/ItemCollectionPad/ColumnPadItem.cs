@@ -77,7 +77,7 @@ namespace BlueControls.ItemCollection {
 
             l.Add(new FlexiControlForProperty(this, "Datenbank"));
             l.Add(new FlexiControlForProperty(this, "Interner Name"));
-            l.Add(new FlexiControlForProperty(this, "Spalte bearbeiten", enImageCode.Spalte));
+            l.Add(new FlexiControlForProperty(this, "Spalte bearbeiten", ImageCode.Spalte));
             l.Add(new FlexiControl());
             l.Add(new FlexiControlForProperty(Column, "Caption"));
             l.Add(new FlexiControl());
@@ -126,7 +126,7 @@ namespace BlueControls.ItemCollection {
 
         protected override Bitmap GeneratePic() {
             if (Column == null) {
-                return QuickImage.Get(enImageCode.Warnung, 128);
+                return QuickImage.Get(ImageCode.Warnung, 128);
             }
 
             var wi = Table.TmpColumnContentWidth(null, Column, CellFont, 16);
@@ -141,13 +141,13 @@ namespace BlueControls.ItemCollection {
             for (var z = 0; z < 3; z++) {
                 var n = Column.Ueberschrift(z);
                 if (!string.IsNullOrEmpty(n)) {
-                    Skin.Draw_FormatedText(gr, n, null, enAlignment.Horizontal_Vertical_Center, new Rectangle(0, z * 16, bmp.Width, 61), null, false, ColumnFont, true);
+                    Skin.Draw_FormatedText(gr, n, null, Alignment.Horizontal_Vertical_Center, new Rectangle(0, z * 16, bmp.Width, 61), null, false, ColumnFont, true);
                 }
             }
 
             gr.TranslateTransform(bmp.Width / 2, 50);
             gr.RotateTransform(-90);
-            Skin.Draw_FormatedText(gr, Column.Caption, null, enAlignment.VerticalCenter_Left, new Rectangle(-150, -150, 300, 300), null, false, ColumnFont, true);
+            Skin.Draw_FormatedText(gr, Column.Caption, null, Alignment.VerticalCenter_Left, new Rectangle(-150, -150, 300, 300), null, false, ColumnFont, true);
 
             gr.TranslateTransform(-bmp.Width / 2, -50);
             gr.ResetTransform();

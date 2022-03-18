@@ -103,7 +103,7 @@ namespace BlueControls.Controls {
                 Develop.DebugPrint_Disposed(IsDisposed);
                 if (value < 0) { value = -1; }
                 if (value == _showingRowKey) { return; }
-                if (value > -1 && _database == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Database is nothing"); }
+                if (value > -1 && _database == null) { Develop.DebugPrint(FehlerArt.Fehler, "Database is nothing"); }
 
                 _showingRowKey = value;
                 _tmpShowingRow = _database?.Row.SearchByKey(_showingRowKey);

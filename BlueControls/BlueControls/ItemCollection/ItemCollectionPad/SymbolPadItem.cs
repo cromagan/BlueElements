@@ -118,7 +118,7 @@ namespace BlueControls.ItemCollection {
         protected override string ClassId() => "Symbol";
 
         protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
-            var trp = drawingCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
+            var trp = drawingCoordinates.PointOf(Alignment.Horizontal_Vertical_Center);
             gr.TranslateTransform(trp.X, trp.Y);
             gr.RotateTransform(-Drehwinkel);
             GraphicsPath? p = null;

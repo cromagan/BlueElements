@@ -26,10 +26,11 @@ using BlueDatabase;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using BlueBasics.Interfaces;
 
 namespace BlueControls.ItemCollection {
 
-    public class RowWithFilterPaditem : FixedRectangleBitmapPadItem {
+    public class RowWithFilterPaditem : FixedRectangleBitmapPadItem, IReadableText {
 
         #region Fields
 
@@ -78,7 +79,7 @@ namespace BlueControls.ItemCollection {
             if (Database == null) { return l; }
 
             l.Add(new FlexiControlForProperty(Database, "Caption"));
-            l.Add(new FlexiControlForProperty(this, "Datenbankkopf", enImageCode.Datenbank));
+            l.Add(new FlexiControlForProperty(this, "Datenbankkopf", ImageCode.Datenbank));
             l.Add(new FlexiControl());
             //l.Add(new FlexiControlForProperty(Column, "Caption"));
             //l.Add(new FlexiControl());
@@ -97,6 +98,16 @@ namespace BlueControls.ItemCollection {
             return l;
         }
 
+        public string ReadableText() {
+            if (Database != null) { return "Zeile aus " + Database.Caption; }
+
+            return "[FEHLER]";
+        }
+
+        public QuickImage? SymbolForReadableText() {
+            return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IDColor(ID));
+        }
+
         public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
@@ -110,15 +121,15 @@ namespace BlueControls.ItemCollection {
 
         protected override Bitmap GeneratePic() {
             if (Database == null) {
-                return QuickImage.Get(enImageCode.Warnung, 128)!;
+                return QuickImage.Get(ImageCode.Warnung, 128)!;
             }
 
             var bmp = new Bitmap(300, 300);
             var gr = Graphics.FromImage(bmp);
 
-            gr.Clear(Constants.IDColor[ID]);
-            Skin.Draw_FormatedText(gr, Database.Filename.FileNameWithoutSuffix(), QuickImage.Get(enImageCode.Datenbank, 32)!,
-                enAlignment.Horizontal_Vertical_Center, new Rectangle(5, 5, 290, 290), ColumnFont, false);
+            gr.Clear(Skin.IDColor(ID));
+            Skin.Draw_FormatedText(gr, Database.Filename.FileNameWithoutSuffix(), QuickImage.Get(ImageCode.Datenbank, 32)!,
+                Alignment.Horizontal_Vertical_Center, new Rectangle(5, 5, 290, 290), ColumnFont, false);
             ////Table.Draw_FormatedText(gr,)
 
             //for (var z = 0; z < 3; z++) {

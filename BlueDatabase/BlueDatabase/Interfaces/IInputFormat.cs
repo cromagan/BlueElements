@@ -124,9 +124,9 @@ namespace BlueDatabase.Interfaces {
         /// </summary>
         /// <param name="t"></param>
         /// <param name="type"></param>
-        public static void SetFormat(this IInputFormat t, enVarType type) {
+        public static void SetFormat(this IInputFormat t, VarType type) {
             switch (type) {
-                case enVarType.Text:
+                case VarType.Text:
                     t.AllowedChars = string.Empty;
                     t.Regex = string.Empty;
                     t.Suffix = string.Empty;
@@ -137,7 +137,7 @@ namespace BlueDatabase.Interfaces {
                     t.MultiLine = false;
                     return;
 
-                case enVarType.Bit:
+                case VarType.Bit:
                     t.AllowedChars = "+-";
                     t.Regex = @"^([+]|[-])$";
                     t.Suffix = string.Empty;
@@ -148,7 +148,7 @@ namespace BlueDatabase.Interfaces {
                     t.MultiLine = false;
                     return;
 
-                case enVarType.TextMitFormatierung:
+                case VarType.TextMitFormatierung:
                     t.AllowedChars = string.Empty;
                     t.Regex = string.Empty;
                     t.Suffix = string.Empty;
@@ -159,7 +159,7 @@ namespace BlueDatabase.Interfaces {
                     t.MultiLine = true;
                     return;
 
-                case enVarType.Date:
+                case VarType.Date:
                     t.Regex = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}$";
                     t.AllowedChars = Constants.Char_Numerals + ".";
                     t.Suffix = string.Empty;
@@ -170,7 +170,7 @@ namespace BlueDatabase.Interfaces {
                     t.MultiLine = false;
                     return;
 
-                case enVarType.Url:
+                case VarType.Url:
                     //    https://regex101.com/r/S2CbwM/1
                     t.Regex = @"^(https:|http:|www\.)\S*$";
                     t.AllowedChars = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + "._/";
@@ -182,7 +182,7 @@ namespace BlueDatabase.Interfaces {
                     t.MultiLine = false;
                     return;
 
-                case enVarType.Email:
+                case VarType.Email:
                     //http://emailregex.com/
                     t.Regex = @"^[a-z0-9A-Z._-]{1,40}[@][a-z0-9A-Z._-]{1,40}[.][a-zA-Z]{1,3}$";
                     t.AllowedChars = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + "@._";
@@ -194,7 +194,7 @@ namespace BlueDatabase.Interfaces {
                     t.MultiLine = false;
                     return;
 
-                case enVarType.Float:
+                case VarType.Float:
                     //https://regex101.com/r/onr0NZ/1
                     t.Regex = @"(^-?([1-9]\d*)|^0)([.]\d*[1-9])?$";
                     t.AllowedChars = Constants.Char_Numerals + ",";
@@ -206,7 +206,7 @@ namespace BlueDatabase.Interfaces {
                     t.MultiLine = false;
                     return;
 
-                case enVarType.Integer:
+                case VarType.Integer:
                     t.Regex = @"^((-?[1-9]\d*)|0)$";
                     t.AllowedChars = Constants.Char_Numerals;
                     t.Suffix = string.Empty;
@@ -217,7 +217,7 @@ namespace BlueDatabase.Interfaces {
                     t.MultiLine = false;
                     return;
 
-                case enVarType.PhoneNumber:
+                case VarType.PhoneNumber:
                     //https://regex101.com/r/OzJr8j/1
                     t.Regex = @"^[+][1-9][\s0-9]*[0-9]$";
                     t.AllowedChars = Constants.Char_Numerals + "+ ";
@@ -229,7 +229,7 @@ namespace BlueDatabase.Interfaces {
                     t.MultiLine = false;
                     return;
 
-                case enVarType.DateTime:
+                case VarType.DateTime:
                     t.Regex = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}[ ](0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$";
                     t.AllowedChars = Constants.Char_Numerals + ":. ";
                     t.Suffix = string.Empty;

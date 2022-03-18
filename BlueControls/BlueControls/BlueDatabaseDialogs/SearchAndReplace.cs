@@ -169,7 +169,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 if (rowChanged) { thisRow.DoAutomatic(true, false, 10, "value changed"); }
             }
             p?.Close();
-            MessageBox.Show(count + " Ersetzung(en) vorgenommen.", enImageCode.Information, "OK");
+            MessageBox.Show(count + " Ersetzung(en) vorgenommen.", ImageCode.Information, "OK");
             _isWorking = false;
         }
 

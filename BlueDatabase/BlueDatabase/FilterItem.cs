@@ -82,7 +82,7 @@ namespace BlueDatabase {
 
         public FilterItem(ColumnItem? column, FilterType filterType, IReadOnlyCollection<string>? searchValue, string herkunft) {
             if (column == null) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Spalte nicht vorhanden.");
+                Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht vorhanden.");
                 return;
             }
             Database = column.Database;
@@ -165,7 +165,7 @@ namespace BlueDatabase {
         public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
 
         public void OnChanged() {
-            if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
+            if (IsParsing) { Develop.DebugPrint(FehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
@@ -175,7 +175,7 @@ namespace BlueDatabase {
                 switch (pair.Key) {
                     case "identifier":
                         if (pair.Value != "Filter") {
-                            Develop.DebugPrint(enFehlerArt.Fehler, "Identifier fehlerhaft: " + pair.Value);
+                            Develop.DebugPrint(FehlerArt.Fehler, "Identifier fehlerhaft: " + pair.Value);
                         }
                         break;
 
@@ -206,7 +206,7 @@ namespace BlueDatabase {
                         break;
 
                     default:
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
+                        Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
                         break;
                 }
             }

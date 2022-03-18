@@ -75,7 +75,7 @@ namespace BlueBasics {
         public bool ThrowEvents {
             get => !Disposed && _throwEvents;
             set {
-                if (_throwEvents == value) { Develop.DebugPrint(enFehlerArt.Fehler, "Set ThrowEvents-Fehler! " + value.ToPlusMinus()); }
+                if (_throwEvents == value) { Develop.DebugPrint(FehlerArt.Fehler, "Set ThrowEvents-Fehler! " + value.ToPlusMinus()); }
                 _throwEvents = value;
             }
         }
@@ -87,7 +87,7 @@ namespace BlueBasics {
         public new T this[int index] {
             get {
                 Develop.DebugPrint_Disposed(Disposed);
-                if (index >= Count || index < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Index falsch: " + index); }
+                if (index >= Count || index < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Index falsch: " + index); }
                 return base[index];
             }
             set {
@@ -167,7 +167,7 @@ namespace BlueBasics {
         }
 
         public new void Insert(int index, T item) {
-            if (index > Count || index < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Index falsch: " + index); }
+            if (index > Count || index < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Index falsch: " + index); }
             base.Insert(index, item);
             OnItemAdded(item);
         }

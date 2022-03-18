@@ -20,7 +20,7 @@ using System;
 namespace BlueBasics.Enums {
 
     [Flags]
-    public enum enDirection : byte {
+    public enum Direction : byte {
         Nichts = 0,
         Oben = 1,
         Unten = 2,

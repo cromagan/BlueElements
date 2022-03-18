@@ -113,7 +113,7 @@ namespace BluePaint {
 
         public void Set(int left, int top, int right, int bottom) {
             if (left < 0 || top < 0 || right > 0 || bottom > 0) {
-                DebugPrint(enFehlerArt.Warnung, "Fehler in den Angaben");
+                DebugPrint(FehlerArt.Warnung, "Fehler in den Angaben");
             }
             CheckMinMax();
             Links.Value = left;
@@ -143,7 +143,7 @@ namespace BluePaint {
 
         private void WollenSieDenZuschnittÜbernehmen() {
             if (Links.Value <= 0 && Recht.Value >= 0 && Oben.Value <= 0 && Unten.Value >= 0) { return; }
-            if (MessageBox.Show("Soll der <b>aktuelle</b> Zuschnitt<br>übernommen werden?", enImageCode.Zuschneiden, "Ja", "Nein") == 1) { return; }
+            if (MessageBox.Show("Soll der <b>aktuelle</b> Zuschnitt<br>übernommen werden?", ImageCode.Zuschneiden, "Ja", "Nein") == 1) { return; }
             ZuschnittOK_Click(null, System.EventArgs.Empty);
         }
 
