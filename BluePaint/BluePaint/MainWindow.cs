@@ -99,10 +99,6 @@ namespace BluePaint {
                 _currentTool.NeedCurrentPic += CurrentTool_NeedCurrentPic;
 
                 newTool.ToolFirstShown();
-
-                if (_merker != null && _merker.Contains(newTool)) {
-                    _merker.Add(newTool);
-                }
             }
         }
 

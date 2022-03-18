@@ -226,6 +226,10 @@ namespace BlueControls.Forms {
 
         private void _originalDB_Disposing(object sender, System.EventArgs e) => ChangeDatabase(null);
 
+        private void btnAlleErweitern_Click(object sender, System.EventArgs e) => Table.ExpandAll();
+
+        private void btnAlleSchließen_Click(object sender, System.EventArgs e) => Table.CollapesAll();
+
         private void btnClipboardImport_Click(object sender, System.EventArgs e) => Table.ImportClipboard();
 
         private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => OpenDatabaseHeadEditor(Table.Database);
@@ -255,6 +259,8 @@ namespace BlueControls.Forms {
         }
 
         private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => Table.Database.Column.GenerateOverView();
+
+        private void btnUnterschiede_CheckedChanged(object sender, System.EventArgs e) => Table.Unterschiede = btnUnterschiede.Checked ? Table.CursorPosRow().Row : null;
 
         private void btnVorherigeVersion_Click(object sender, System.EventArgs e) {
             btnVorherigeVersion.Enabled = false;
@@ -293,6 +299,11 @@ namespace BlueControls.Forms {
             Table.Database.Row.Remove(Table.Filter, Table.PinnedRows);
         }
 
+        private void cbxColumnArr_ItemClicked(object sender, BasicListItemEventArgs e) {
+            if (string.IsNullOrEmpty(cbxColumnArr.Text)) { return; }
+            Table.Arrangement = int.Parse(e.Item.Internal);
+        }
+
         private void ChangeDatabase(Database? database) {
             if (_originalDb != null) {
                 _originalDb.Disposing -= _originalDB_Disposing;
@@ -328,19 +339,30 @@ namespace BlueControls.Forms {
                 return;
             }
 
+            btnUnterschiede_CheckedChanged(null, System.EventArgs.Empty);
+
             if (e.Column != null) { Formula.Database = e.Column.Database; }
             if (e.RowData?.Row != null) { Formula.Database = e.RowData.Row.Database; }
 
             Formula.ShowingRowKey = e.Column == null || e.RowData?.Row == null ? -1 : e.RowData.Row.Key;
         }
 
-        private void Table_VisibleRowsChanged(object sender, System.EventArgs e) {
-            capZeilen2.Text = "<IMAGECODE=Information|16> " + LanguageTool.DoTranslate("Einzigartige Zeilen:") + " " + Table.Database.Row.VisibleRowCount + " " + LanguageTool.DoTranslate("St.");
+        private void Table_ViewChanged(object sender, System.EventArgs e) => Table.WriteColumnArrangementsInto(cbxColumnArr, Table.Database, Table.Arrangement);
 
+        private void Table_VisibleRowsChanged(object sender, System.EventArgs e) {
+            if (InvokeRequired) {
+                Invoke(new Action(() => Table_VisibleRowsChanged(sender, e)));
+                return;
+            }
+
+            capZeilen1.Text = "<IMAGECODE=Information|16> " + LanguageTool.DoTranslate("Einzigartige Zeilen:") + " " + Table.Database.Row.VisibleRowCount + " " + LanguageTool.DoTranslate("St.");
+            capZeilen1.Refresh(); // Backgroundworker lassen wenig luft
+            capZeilen2.Text = capZeilen1.Text;
             capZeilen2.Refresh();
         }
 
         private void TableView_DatabaseChanged(object sender, System.EventArgs e) {
+            Table.WriteColumnArrangementsInto(cbxColumnArr, Table.Database, Table.Arrangement);
             ChangeDatabase(Table.Database);
             Check_OrderButtons();
         }

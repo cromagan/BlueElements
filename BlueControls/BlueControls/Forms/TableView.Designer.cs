@@ -25,6 +25,14 @@ namespace BlueControls.Forms {
         /// </summary>
         private void InitializeComponent() {
             this.ribMain = new BlueControls.Controls.RibbonBar();
+            this.tabAllgemein = new System.Windows.Forms.TabPage();
+            this.grpAnsicht = new BlueControls.Controls.GroupBox();
+            this.btnUnterschiede = new BlueControls.Controls.Button();
+            this.btnAlleSchließen = new BlueControls.Controls.Button();
+            this.btnAlleErweitern = new BlueControls.Controls.Button();
+            this.capSpaltenanordnung = new BlueControls.Controls.Caption();
+            this.capZeilen1 = new BlueControls.Controls.Caption();
+            this.cbxColumnArr = new BlueControls.Controls.ComboBox();
             this.tabAdmin = new System.Windows.Forms.TabPage();
             this.grpAdminZeilen = new BlueControls.Controls.GroupBox();
             this.btnZeileLöschen = new BlueControls.Controls.Button();
@@ -52,6 +60,8 @@ namespace BlueControls.Forms {
             this.capStatusbar = new BlueControls.Controls.Caption();
             this.capZeilen2 = new BlueControls.Controls.Caption();
             this.ribMain.SuspendLayout();
+            this.tabAllgemein.SuspendLayout();
+            this.grpAnsicht.SuspendLayout();
             this.tabAdmin.SuspendLayout();
             this.grpAdminZeilen.SuspendLayout();
             this.grpAdminImport.SuspendLayout();
@@ -70,6 +80,7 @@ namespace BlueControls.Forms {
             // 
             // ribMain
             // 
+            this.ribMain.Controls.Add(this.tabAllgemein);
             this.ribMain.Controls.Add(this.tabAdmin);
             this.ribMain.Dock = System.Windows.Forms.DockStyle.Top;
             this.ribMain.HotTrack = true;
@@ -80,6 +91,102 @@ namespace BlueControls.Forms {
             this.ribMain.TabDefault = null;
             this.ribMain.TabDefaultOrder = null;
             this.ribMain.TabIndex = 93;
+            // 
+            // tabAllgemein
+            // 
+            this.tabAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.tabAllgemein.Controls.Add(this.grpAnsicht);
+            this.tabAllgemein.Location = new System.Drawing.Point(4, 25);
+            this.tabAllgemein.Name = "tabAllgemein";
+            this.tabAllgemein.Padding = new System.Windows.Forms.Padding(3);
+            this.tabAllgemein.Size = new System.Drawing.Size(1000, 81);
+            this.tabAllgemein.TabIndex = 1;
+            this.tabAllgemein.Text = "Allgemein";
+            // 
+            // grpAnsicht
+            // 
+            this.grpAnsicht.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpAnsicht.CausesValidation = false;
+            this.grpAnsicht.Controls.Add(this.btnUnterschiede);
+            this.grpAnsicht.Controls.Add(this.btnAlleSchließen);
+            this.grpAnsicht.Controls.Add(this.btnAlleErweitern);
+            this.grpAnsicht.Controls.Add(this.capSpaltenanordnung);
+            this.grpAnsicht.Controls.Add(this.capZeilen1);
+            this.grpAnsicht.Controls.Add(this.cbxColumnArr);
+            this.grpAnsicht.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpAnsicht.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
+            this.grpAnsicht.Location = new System.Drawing.Point(3, 3);
+            this.grpAnsicht.Name = "grpAnsicht";
+            this.grpAnsicht.Size = new System.Drawing.Size(328, 75);
+            this.grpAnsicht.TabIndex = 3;
+            this.grpAnsicht.TabStop = false;
+            this.grpAnsicht.Text = "Ansicht";
+            // 
+            // btnUnterschiede
+            // 
+            this.btnUnterschiede.ButtonStyle = ((BlueControls.Enums.ButtonStyle)(((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Button_Big) 
+            | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnUnterschiede.Location = new System.Drawing.Point(216, 46);
+            this.btnUnterschiede.Name = "btnUnterschiede";
+            this.btnUnterschiede.QuickInfo = "Zeigt Unterschiede zur gewählten Zeile an";
+            this.btnUnterschiede.Size = new System.Drawing.Size(104, 22);
+            this.btnUnterschiede.TabIndex = 14;
+            this.btnUnterschiede.Text = "Unterschiede";
+            this.btnUnterschiede.CheckedChanged += new System.EventHandler(this.btnUnterschiede_CheckedChanged);
+            // 
+            // btnAlleSchließen
+            // 
+            this.btnAlleSchließen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnAlleSchließen.ImageCode = "Pfeil_Oben_Scrollbar|14|||||0";
+            this.btnAlleSchließen.Location = new System.Drawing.Point(216, 24);
+            this.btnAlleSchließen.Name = "btnAlleSchließen";
+            this.btnAlleSchließen.QuickInfo = "Neuen Eintrag ergänzen";
+            this.btnAlleSchließen.Size = new System.Drawing.Size(104, 22);
+            this.btnAlleSchließen.TabIndex = 4;
+            this.btnAlleSchließen.Text = "alle schließen";
+            this.btnAlleSchließen.Click += new System.EventHandler(this.btnAlleSchließen_Click);
+            // 
+            // btnAlleErweitern
+            // 
+            this.btnAlleErweitern.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnAlleErweitern.ImageCode = "Pfeil_Unten_Scrollbar|14|||ff0000||200|200";
+            this.btnAlleErweitern.Location = new System.Drawing.Point(216, 2);
+            this.btnAlleErweitern.Name = "btnAlleErweitern";
+            this.btnAlleErweitern.QuickInfo = "Neuen Eintrag ergänzen";
+            this.btnAlleErweitern.Size = new System.Drawing.Size(104, 22);
+            this.btnAlleErweitern.TabIndex = 3;
+            this.btnAlleErweitern.Text = "alle erweitern";
+            this.btnAlleErweitern.Click += new System.EventHandler(this.btnAlleErweitern_Click);
+            // 
+            // capSpaltenanordnung
+            // 
+            this.capSpaltenanordnung.CausesValidation = false;
+            this.capSpaltenanordnung.Location = new System.Drawing.Point(8, 2);
+            this.capSpaltenanordnung.Margin = new System.Windows.Forms.Padding(4);
+            this.capSpaltenanordnung.Name = "capSpaltenanordnung";
+            this.capSpaltenanordnung.Size = new System.Drawing.Size(200, 22);
+            this.capSpaltenanordnung.Text = "<u>Spaltenanordnung:";
+            // 
+            // capZeilen1
+            // 
+            this.capZeilen1.CausesValidation = false;
+            this.capZeilen1.Location = new System.Drawing.Point(8, 46);
+            this.capZeilen1.Margin = new System.Windows.Forms.Padding(4);
+            this.capZeilen1.Name = "capZeilen1";
+            this.capZeilen1.Size = new System.Drawing.Size(200, 22);
+            this.capZeilen1.Text = "<ImageCode=Information|16>";
+            this.capZeilen1.Translate = false;
+            // 
+            // cbxColumnArr
+            // 
+            this.cbxColumnArr.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxColumnArr.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxColumnArr.Location = new System.Drawing.Point(8, 24);
+            this.cbxColumnArr.Margin = new System.Windows.Forms.Padding(4);
+            this.cbxColumnArr.Name = "cbxColumnArr";
+            this.cbxColumnArr.Size = new System.Drawing.Size(200, 22);
+            this.cbxColumnArr.TabIndex = 2;
+            this.cbxColumnArr.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.cbxColumnArr_ItemClicked);
             // 
             // tabAdmin
             // 
@@ -314,6 +421,7 @@ namespace BlueControls.Forms {
             this.Table.TabIndex = 0;
             this.Table.CursorPosChanged += new System.EventHandler<BlueDatabase.EventArgs.CellExtEventArgs>(this.Table_CursorPosChanged);
             this.Table.DatabaseChanged += new System.EventHandler(this.TableView_DatabaseChanged);
+            this.Table.ViewChanged += new System.EventHandler(this.Table_ViewChanged);
             this.Table.VisibleRowsChanged += new System.EventHandler(this.Table_VisibleRowsChanged);
             this.Table.EnabledChanged += new System.EventHandler(this.TableView_EnabledChanged);
             // 
@@ -414,6 +522,8 @@ namespace BlueControls.Forms {
             this.Text = "TableViewx";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.ribMain.ResumeLayout(false);
+            this.tabAllgemein.ResumeLayout(false);
+            this.grpAnsicht.ResumeLayout(false);
             this.tabAdmin.ResumeLayout(false);
             this.grpAdminZeilen.ResumeLayout(false);
             this.grpAdminImport.ResumeLayout(false);
@@ -461,5 +571,13 @@ namespace BlueControls.Forms {
         public Controls.Caption capStatusbar;
         private Controls.Caption capZeilen2;
         protected Controls.Formula Formula;
+        protected System.Windows.Forms.TabPage tabAllgemein;
+        protected Controls.Button btnUnterschiede;
+        private Controls.Caption capSpaltenanordnung;
+        private Controls.Caption capZeilen1;
+        private Controls.ComboBox cbxColumnArr;
+        protected Controls.GroupBox grpAnsicht;
+        protected Controls.Button btnAlleSchließen;
+        protected Controls.Button btnAlleErweitern;
     }
 }

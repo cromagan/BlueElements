@@ -55,7 +55,6 @@ namespace BlueControls.Forms
         {
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
-            this.cbxColumnArr = new BlueControls.Controls.ComboBox();
             this.tabDatei = new System.Windows.Forms.TabPage();
             this.grpInformation = new BlueControls.Controls.GroupBox();
             this.Copyright = new BlueControls.Controls.Caption();
@@ -68,15 +67,11 @@ namespace BlueControls.Forms
             this.btnOeffnen = new BlueControls.Controls.Button();
             this.btnSaveAs = new BlueControls.Controls.Button();
             this.btnNeuDB = new BlueControls.Controls.Button();
-            this.tabStart = new System.Windows.Forms.TabPage();
-            this.grpAnsicht = new BlueControls.Controls.GroupBox();
-            this.SpaltAnsichtCap = new BlueControls.Controls.Caption();
+            this.grpAnsichtWahl = new BlueControls.Controls.GroupBox();
             this.Ansicht2 = new BlueControls.Controls.Button();
             this.Ansicht1 = new BlueControls.Controls.Button();
             this.Ansicht0 = new BlueControls.Controls.Button();
             this.grpBearbeitung = new BlueControls.Controls.GroupBox();
-            this.btnAlleSchließen = new BlueControls.Controls.Button();
-            this.btnAlleErweitern = new BlueControls.Controls.Button();
             this.Datenüberprüfung = new BlueControls.Controls.Button();
             this.AngezeigteZeilenLöschen = new BlueControls.Controls.Button();
             this.SuchenUndErsetzen = new BlueControls.Controls.Button();
@@ -97,12 +92,15 @@ namespace BlueControls.Forms
             this.SplitContainer1.Panel2.SuspendLayout();
             this.SplitContainer1.SuspendLayout();
             this.tabAdmin.SuspendLayout();
+            this.tbcSidebar.SuspendLayout();
+            this.tabFormula.SuspendLayout();
+            this.tabAllgemein.SuspendLayout();
+            this.grpAnsicht.SuspendLayout();
             this.tabDatei.SuspendLayout();
             this.grpInformation.SuspendLayout();
             this.grpOrdner.SuspendLayout();
             this.grpDatei.SuspendLayout();
-            this.tabStart.SuspendLayout();
-            this.grpAnsicht.SuspendLayout();
+            this.grpAnsichtWahl.SuspendLayout();
             this.grpBearbeitung.SuspendLayout();
             this.grpFormularSteuerung.SuspendLayout();
             this.grpAllgemein2.SuspendLayout();
@@ -111,36 +109,83 @@ namespace BlueControls.Forms
             // ribMain
             // 
             this.ribMain.Controls.Add(this.tabDatei);
-            this.ribMain.Controls.Add(this.tabStart);
             this.ribMain.SelectedIndex = 1;
+            this.ribMain.Size = new System.Drawing.Size(1311, 110);
             this.ribMain.TabDefault = this.tabDatei;
             this.ribMain.TabDefaultOrder = new string[] {
         "Datei",
-        "Start",
+        "Allgemein",
         "Extras",
         "Administration"};
             this.ribMain.TabIndex = 92;
-            this.ribMain.Controls.SetChildIndex(this.tabStart, 0);
             this.ribMain.Controls.SetChildIndex(this.tabDatei, 0);
             this.ribMain.Controls.SetChildIndex(this.tabAdmin, 0);
+            this.ribMain.Controls.SetChildIndex(this.tabAllgemein, 0);
+            // 
+            // pnlDatabaseSelect
+            // 
+            this.pnlDatabaseSelect.Size = new System.Drawing.Size(961, 24);
+            // 
+            // tbcDatabaseSelector
+            // 
+            this.tbcDatabaseSelector.Size = new System.Drawing.Size(961, 24);
+            // 
+            // pnlSerachBar
+            // 
+            this.pnlSerachBar.Size = new System.Drawing.Size(961, 40);
             // 
             // FilterLeiste
             // 
-            this.FilterLeiste.Size = new System.Drawing.Size(739, 42);
+            this.FilterLeiste.Size = new System.Drawing.Size(961, 42);
             this.FilterLeiste.TabIndex = 93;
             this.FilterLeiste.Text = "Filter";
             // 
             // Table
             // 
-            this.Table.ColumnArrangementChanged += new System.EventHandler(this.TableView_ColumnArrangementChanged);
+            this.Table.Size = new System.Drawing.Size(961, 531);
             this.Table.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.TableView_ContextMenu_Init);
-            this.Table.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.TableView_ContextMenuItemClicked);       
+            this.Table.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.TableView_ContextMenuItemClicked);
             this.Table.EditBeforeBeginEdit += new System.EventHandler<BlueDatabase.EventArgs.CellCancelEventArgs>(this.TableView_EditBeforeBeginEdit);
-            this.Table.ViewChanged += new System.EventHandler(this.TableView_ViewChanged);
             this.Table.VisibleRowsChanged += new System.EventHandler(this.TableView_RowsSorted);
             // 
             // SplitContainer1
             // 
+            this.SplitContainer1.Size = new System.Drawing.Size(1311, 595);
+            this.SplitContainer1.SplitterDistance = 961;
+            // 
+            // tabAdmin
+            // 
+            this.tabAdmin.Size = new System.Drawing.Size(1303, 81);
+            // 
+            // tbcSidebar
+            // 
+            this.tbcSidebar.Size = new System.Drawing.Size(339, 595);
+            // 
+            // tabFormula
+            // 
+            this.tabFormula.Size = new System.Drawing.Size(331, 566);
+            // 
+            // capStatusbar
+            // 
+            this.capStatusbar.Size = new System.Drawing.Size(1007, 24);
+            this.capStatusbar.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Text_Abschneiden;
+            // 
+            // Formula
+            // 
+            this.Formula.Size = new System.Drawing.Size(325, 560);
+            // 
+            // tabAllgemein
+            // 
+            this.tabAllgemein.Controls.Add(this.grpAnsichtWahl);
+            this.tabAllgemein.Controls.Add(this.grpFormularSteuerung);
+            this.tabAllgemein.Controls.Add(this.grpAllgemein2);
+            this.tabAllgemein.Controls.Add(this.grpBearbeitung);
+            this.tabAllgemein.Size = new System.Drawing.Size(1303, 81);
+            this.tabAllgemein.Controls.SetChildIndex(this.grpAnsicht, 0);
+            this.tabAllgemein.Controls.SetChildIndex(this.grpBearbeitung, 0);
+            this.tabAllgemein.Controls.SetChildIndex(this.grpAllgemein2, 0);
+            this.tabAllgemein.Controls.SetChildIndex(this.grpFormularSteuerung, 0);
+            this.tabAllgemein.Controls.SetChildIndex(this.grpAnsichtWahl, 0);
             // 
             // LoadTab
             // 
@@ -152,16 +197,6 @@ namespace BlueControls.Forms
             // 
             this.SaveTab.Filter = "*.MDB Datenbanken|*.MDB|*.* Alle Dateien|*";
             this.SaveTab.Title = "Bitte neuen Dateinamen der Datenbank wählen.";
-            // 
-            // cbxColumnArr
-            // 
-            this.cbxColumnArr.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxColumnArr.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxColumnArr.Location = new System.Drawing.Point(120, 46);
-            this.cbxColumnArr.Name = "cbxColumnArr";
-            this.cbxColumnArr.Size = new System.Drawing.Size(210, 22);
-            this.cbxColumnArr.TabIndex = 86;
-            this.cbxColumnArr.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.cbxColumnArr_ItemClicked);
             // 
             // tabDatei
             // 
@@ -314,50 +349,26 @@ namespace BlueControls.Forms
             this.btnNeuDB.Text = "Neu";
             this.btnNeuDB.Click += new System.EventHandler(this.btnNeuDB_SaveAs_Click);
             // 
-            // tabStart
+            // grpAnsichtWahl
             // 
-            this.tabStart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.tabStart.Controls.Add(this.grpAnsicht);
-            this.tabStart.Controls.Add(this.grpBearbeitung);
-            this.tabStart.Controls.Add(this.grpFormularSteuerung);
-            this.tabStart.Controls.Add(this.grpAllgemein2);
-            this.tabStart.Location = new System.Drawing.Point(4, 25);
-            this.tabStart.Name = "tabStart";
-            this.tabStart.Size = new System.Drawing.Size(1000, 81);
-            this.tabStart.TabIndex = 1;
-            this.tabStart.Text = "Start";
-            // 
-            // grpAnsicht
-            // 
-            this.grpAnsicht.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpAnsicht.CausesValidation = false;
-            this.grpAnsicht.Controls.Add(this.cbxColumnArr);
-            this.grpAnsicht.Controls.Add(this.SpaltAnsichtCap);
-            this.grpAnsicht.Controls.Add(this.Ansicht2);
-            this.grpAnsicht.Controls.Add(this.Ansicht1);
-            this.grpAnsicht.Controls.Add(this.Ansicht0);
-            this.grpAnsicht.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpAnsicht.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAnsicht.Location = new System.Drawing.Point(808, 0);
-            this.grpAnsicht.Name = "grpAnsicht";
-            this.grpAnsicht.Size = new System.Drawing.Size(464, 81);
-            this.grpAnsicht.TabIndex = 0;
-            this.grpAnsicht.TabStop = false;
-            this.grpAnsicht.Text = "Ansichten-Auswahl";
-            // 
-            // SpaltAnsichtCap
-            // 
-            this.SpaltAnsichtCap.CausesValidation = false;
-            this.SpaltAnsichtCap.Location = new System.Drawing.Point(8, 46);
-            this.SpaltAnsichtCap.Name = "SpaltAnsichtCap";
-            this.SpaltAnsichtCap.Size = new System.Drawing.Size(98, 22);
-            this.SpaltAnsichtCap.Text = "Spalten-Ansicht:";
-            this.SpaltAnsichtCap.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
+            this.grpAnsichtWahl.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpAnsichtWahl.CausesValidation = false;
+            this.grpAnsichtWahl.Controls.Add(this.Ansicht2);
+            this.grpAnsichtWahl.Controls.Add(this.Ansicht1);
+            this.grpAnsichtWahl.Controls.Add(this.Ansicht0);
+            this.grpAnsichtWahl.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpAnsichtWahl.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
+            this.grpAnsichtWahl.Location = new System.Drawing.Point(1019, 3);
+            this.grpAnsichtWahl.Name = "grpAnsichtWahl";
+            this.grpAnsichtWahl.Size = new System.Drawing.Size(260, 75);
+            this.grpAnsichtWahl.TabIndex = 0;
+            this.grpAnsichtWahl.TabStop = false;
+            this.grpAnsichtWahl.Text = "Ansichten-Auswahl";
             // 
             // Ansicht2
             // 
             this.Ansicht2.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
-            this.Ansicht2.Location = new System.Drawing.Point(216, 2);
+            this.Ansicht2.Location = new System.Drawing.Point(8, 46);
             this.Ansicht2.Name = "Ansicht2";
             this.Ansicht2.Size = new System.Drawing.Size(240, 22);
             this.Ansicht2.TabIndex = 14;
@@ -388,45 +399,17 @@ namespace BlueControls.Forms
             // 
             this.grpBearbeitung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpBearbeitung.CausesValidation = false;
-            this.grpBearbeitung.Controls.Add(this.btnAlleSchließen);
-            this.grpBearbeitung.Controls.Add(this.btnAlleErweitern);
             this.grpBearbeitung.Controls.Add(this.Datenüberprüfung);
             this.grpBearbeitung.Controls.Add(this.AngezeigteZeilenLöschen);
             this.grpBearbeitung.Controls.Add(this.SuchenUndErsetzen);
             this.grpBearbeitung.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpBearbeitung.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpBearbeitung.Location = new System.Drawing.Point(448, 0);
+            this.grpBearbeitung.Location = new System.Drawing.Point(331, 3);
             this.grpBearbeitung.Name = "grpBearbeitung";
-            this.grpBearbeitung.Size = new System.Drawing.Size(360, 81);
+            this.grpBearbeitung.Size = new System.Drawing.Size(240, 75);
             this.grpBearbeitung.TabIndex = 1;
             this.grpBearbeitung.TabStop = false;
             this.grpBearbeitung.Text = "Bearbeitung";
-            // 
-            // btnAlleSchließen
-            // 
-            this.btnAlleSchließen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnAlleSchließen.Enabled = false;
-            this.btnAlleSchließen.ImageCode = "Pfeil_Oben_Scrollbar|14|||||0";
-            this.btnAlleSchließen.Location = new System.Drawing.Point(248, 24);
-            this.btnAlleSchließen.Name = "btnAlleSchließen";
-            this.btnAlleSchließen.QuickInfo = "Neuen Eintrag ergänzen";
-            this.btnAlleSchließen.Size = new System.Drawing.Size(104, 22);
-            this.btnAlleSchließen.TabIndex = 14;
-            this.btnAlleSchließen.Text = "alle schließen";
-            this.btnAlleSchließen.Click += new System.EventHandler(this.btnAlleSchließen_Click);
-            // 
-            // btnAlleErweitern
-            // 
-            this.btnAlleErweitern.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnAlleErweitern.Enabled = false;
-            this.btnAlleErweitern.ImageCode = "Pfeil_Unten_Scrollbar|14|||ff0000||200|200";
-            this.btnAlleErweitern.Location = new System.Drawing.Point(248, 2);
-            this.btnAlleErweitern.Name = "btnAlleErweitern";
-            this.btnAlleErweitern.QuickInfo = "Neuen Eintrag ergänzen";
-            this.btnAlleErweitern.Size = new System.Drawing.Size(104, 22);
-            this.btnAlleErweitern.TabIndex = 13;
-            this.btnAlleErweitern.Text = "alle erweitern";
-            this.btnAlleErweitern.Click += new System.EventHandler(this.btnAlleErweitern_Click);
             // 
             // Datenüberprüfung
             // 
@@ -473,9 +456,9 @@ namespace BlueControls.Forms
             this.grpFormularSteuerung.Controls.Add(this.btnZurück);
             this.grpFormularSteuerung.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpFormularSteuerung.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpFormularSteuerung.Location = new System.Drawing.Point(208, 0);
+            this.grpFormularSteuerung.Location = new System.Drawing.Point(779, 3);
             this.grpFormularSteuerung.Name = "grpFormularSteuerung";
-            this.grpFormularSteuerung.Size = new System.Drawing.Size(240, 81);
+            this.grpFormularSteuerung.Size = new System.Drawing.Size(240, 75);
             this.grpFormularSteuerung.TabIndex = 2;
             this.grpFormularSteuerung.TabStop = false;
             this.grpFormularSteuerung.Text = "Formular-Ansicht-Steuerung";
@@ -536,9 +519,9 @@ namespace BlueControls.Forms
             this.grpAllgemein2.Controls.Add(this.btnLoeschen);
             this.grpAllgemein2.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAllgemein2.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAllgemein2.Location = new System.Drawing.Point(0, 0);
+            this.grpAllgemein2.Location = new System.Drawing.Point(571, 3);
             this.grpAllgemein2.Name = "grpAllgemein2";
-            this.grpAllgemein2.Size = new System.Drawing.Size(208, 81);
+            this.grpAllgemein2.Size = new System.Drawing.Size(208, 75);
             this.grpAllgemein2.TabIndex = 4;
             this.grpAllgemein2.TabStop = false;
             this.grpAllgemein2.Text = "Allgemein";
@@ -581,7 +564,7 @@ namespace BlueControls.Forms
             // TableView_OLD
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.ClientSize = new System.Drawing.Size(1008, 729);
+            this.ClientSize = new System.Drawing.Size(1311, 729);
             this.MinimumSize = new System.Drawing.Size(1024, 768);
             this.Name = "TableView_OLD";
             this.ribMain.ResumeLayout(false);
@@ -592,12 +575,15 @@ namespace BlueControls.Forms
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).EndInit();
             this.SplitContainer1.ResumeLayout(false);
             this.tabAdmin.ResumeLayout(false);
+            this.tbcSidebar.ResumeLayout(false);
+            this.tabFormula.ResumeLayout(false);
+            this.tabAllgemein.ResumeLayout(false);
+            this.grpAnsicht.ResumeLayout(false);
             this.tabDatei.ResumeLayout(false);
             this.grpInformation.ResumeLayout(false);
             this.grpOrdner.ResumeLayout(false);
             this.grpDatei.ResumeLayout(false);
-            this.tabStart.ResumeLayout(false);
-            this.grpAnsicht.ResumeLayout(false);
+            this.grpAnsichtWahl.ResumeLayout(false);
             this.grpBearbeitung.ResumeLayout(false);
             this.grpFormularSteuerung.ResumeLayout(false);
             this.grpAllgemein2.ResumeLayout(false);
@@ -618,8 +604,6 @@ namespace BlueControls.Forms
         private OpenFileDialog LoadTab;
         private Button btnNeuDB;
         private SaveFileDialog SaveTab;
-        private Caption SpaltAnsichtCap;
-        private ComboBox cbxColumnArr;
         private Button btnSaveAs;
         private Button SuchenUndErsetzen;
         private Button AngezeigteZeilenLöschen;
@@ -629,17 +613,14 @@ namespace BlueControls.Forms
         private Button Ansicht2;
         private Button btnTemporärenSpeicherortÖffnen;
         internal  System.Windows.Forms.TabPage tabDatei;
-        internal  System.Windows.Forms.TabPage tabStart;
         internal Button btnDatenbanken;
         internal Button Datenüberprüfung;
         internal LastFilesCombo btnLetzteDateien;
         private Caption Copyright;
         private GroupBox grpInformation;
-        private GroupBox grpAnsicht;
+        private GroupBox grpAnsichtWahl;
         private GroupBox grpBearbeitung;
         private GroupBox grpOrdner;
         private GroupBox grpDatei;
-        protected Button btnAlleSchließen;
-        protected Button btnAlleErweitern;
     }
 }

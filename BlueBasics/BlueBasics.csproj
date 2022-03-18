@@ -97,7 +97,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="BitmapExt.cs" />
-    <Compile Include="clsImageMatrix.cs" />
+    <Compile Include="ImageMatrix.cs" />
     <Compile Include="Enums\enBlurType.cs" />
     <Compile Include="Enums\enVarType.cs" />
     <Compile Include="Enums\enEditTypeFormula.cs" />
@@ -142,7 +142,7 @@
     <Compile Include="Interfaces\IntegerArrayExtension.cs" />
     <Compile Include="Interfaces\IParseable.cs" />
     <Compile Include="Interfaces\IReadableTextWithChanging.cs" />
-    <Compile Include="ListOfExtension.cs" />
+    <Compile Include="Extensions\ListOfExtension.cs" />
     <Compile Include="Geometry.cs" />
     <Compile Include="Extensions\PaddingExtension.cs" />
     <Compile Include="Extensions\PointExtension.cs" />
@@ -199,9 +199,6 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{94E38DFF-614B-4CBD-B67C-F211BB35CE8B}" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="DataFormat.cs" />
   </ItemGroup>
   <ItemGroup>
     <Import Include="System" />

@@ -214,10 +214,6 @@ namespace BlueControls.Forms {
             CheckButtons();
         }
 
-        private void btnAlleErweitern_Click(object sender, System.EventArgs e) => Table.ExpandAll();
-
-        private void btnAlleSchlieﬂen_Click(object sender, System.EventArgs e) => Table.CollapesAll();
-
         private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e) {
             BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
             var bu = (Button)sender;
@@ -261,9 +257,7 @@ namespace BlueControls.Forms {
                 : "[Neue Datenbank] - Be Creative! V" + Version;
         }
 
-        private void cbxColumnArr_ItemClicked(object sender, BasicListItemEventArgs e) {
-            if (string.IsNullOrEmpty(cbxColumnArr.Text)) { return; }
-            Table.Arrangement = IntParse(e.Item.Internal);
+        private void cbxColumnArr_TextChanged(object sender, System.EventArgs e) {
         }
 
         private void Check_SuchButton() => SuchB.Enabled = Table.Database != null && Table.Database.Row.Count >= 1 && !string.IsNullOrEmpty(such.Text) && !string.IsNullOrEmpty(such.Text.RemoveChars(" "));
@@ -279,8 +273,6 @@ namespace BlueControls.Forms {
             Ansicht1.Enabled = datenbankDa;
             Ansicht2.Enabled = datenbankDa;
             btnDatenbanken.Enabled = datenbankDa && !string.IsNullOrEmpty(Table.Database.Filename);
-            cbxColumnArr.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
-            SpaltAnsichtCap.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
             SuchenUndErsetzen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
             AngezeigteZeilenLˆschen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
             Daten¸berpr¸fung.Enabled = datenbankDa;
@@ -530,8 +522,6 @@ namespace BlueControls.Forms {
 
         private void SuchenUndErsetzen_Click(object sender, System.EventArgs e) => Table.OpenSearchAndReplace();
 
-        private void TableView_ColumnArrangementChanged(object sender, System.EventArgs e) => Table.WriteColumnArrangementsInto(cbxColumnArr, Table.Database, Table.Arrangement);
-
         private void TableView_ContextMenu_Init(object sender, ContextMenuInitEventArgs e) {
             var bt = (Table)sender;
             var cellKey = e.Tags.TagGet("Cellkey");
@@ -570,8 +560,6 @@ namespace BlueControls.Forms {
         private void TableView_RowsSorted(object sender, System.EventArgs e) {
             CheckButtons();
         }
-
-        private void TableView_ViewChanged(object sender, System.EventArgs e) => Table.WriteColumnArrangementsInto(cbxColumnArr, Table.Database, Table.Arrangement);
 
         private void Tempor‰renSpeicherort÷ffnen_Click(object sender, System.EventArgs e) {
             BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);

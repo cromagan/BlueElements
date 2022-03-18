@@ -70,4 +70,243 @@ namespace BlueBasics.Enums {
 
         // bis 999 wird geprüft
     }
+
+    public static class DataFormatExtensions {
+        //public static string AllowedChars(this enDataFormat format) {
+        //    switch (format) {
+        //        case enDataFormat.Text:
+        //        case enDataFormat.Columns_für_LinkedCellDropdown:
+        //        case enDataFormat.Values_für_LinkedCellDropdown:
+        //        case enDataFormat.RelationText:
+        //            return Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + Constants.Char_Satzzeichen + Constants.Char_Sonderzeichen;
+
+        //        case enDataFormat.Bit:
+        //            return "+-";
+
+        //        case enDataFormat.FarbeInteger:
+        //            return Constants.Char_Numerals + "-";
+
+        //        case enDataFormat.Link_To_Filesystem:
+        //            return Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + ",.\\:_ +-()'";
+
+        //        case enDataFormat.LinkedCell:
+        //            Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
+        //            return string.Empty;
+
+        //        case enDataFormat.Button:
+        //            return string.Empty;
+
+        //        default:
+        //            Develop.DebugPrint(format);
+        //            return string.Empty;
+        //    }
+        //}
+
+        #region Methods
+
+        public static bool Autofilter_möglich(this Enums.DataFormat format) => format switch {
+            Enums.DataFormat.Text or Enums.DataFormat.FarbeInteger or Enums.DataFormat.Schrift or Enums.DataFormat.Link_To_Filesystem or Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank or Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems or Enums.DataFormat.RelationText => true,
+            _ => false
+        };
+
+        public static bool CanBeChangedByRules(this Enums.DataFormat format) => format switch {
+            Enums.DataFormat.Text or Enums.DataFormat.FarbeInteger or Enums.DataFormat.RelationText or Enums.DataFormat.Schrift => true,
+            _ => false
+        };
+
+        public static bool CanBeCheckedByRules(this Enums.DataFormat format) => format switch {
+            Enums.DataFormat.Text or Enums.DataFormat.FarbeInteger or Enums.DataFormat.RelationText or Enums.DataFormat.Schrift or Enums.DataFormat.Link_To_Filesystem or Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank or Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems => true,
+            _ => false
+        };
+
+        public static bool DropdownItemsAllowed(this Enums.DataFormat format) => format switch {
+            Enums.DataFormat.Text or Enums.DataFormat.Link_To_Filesystem or Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems or Enums.DataFormat.RelationText => true,
+            _ => false
+        };
+
+        public static bool DropdownItemsOfOtherCellsAllowed(this Enums.DataFormat format) => format switch {
+            Enums.DataFormat.Text or Enums.DataFormat.FarbeInteger or Enums.DataFormat.Schrift or Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank or Enums.DataFormat.RelationText => true,
+            _ => false
+        };
+
+        public static bool DropdownUnselectAllAllowed(this Enums.DataFormat format) => format switch {
+            Enums.DataFormat.Text or Enums.DataFormat.FarbeInteger or Enums.DataFormat.RelationText or Enums.DataFormat.Schrift or Enums.DataFormat.Link_To_Filesystem or Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank => true,
+            _ => false
+        };
+
+        public static bool ExportableForLayout(this Enums.DataFormat format) => format switch {
+            Enums.DataFormat.Text or Enums.DataFormat.RelationText or Enums.DataFormat.Schrift or Enums.DataFormat.Link_To_Filesystem or Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank or Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems => true,
+            _ => false
+        };
+
+        ///// <summary>
+        ///// Prüft, ob ein String der geforderte Typ sein kann.
+        ///// Dabei wird die Textlänge, die Schablone und die erlaubten Zeichen geprüft.
+        ///// Ein Logigcheck (z.B. ob ein Datum gültig ist) wird ebenfalls ausgeführt.
+        ///// </summary>
+        ///// <param name="txt"></param>
+        ///// <param name="format"></param>
+        ///// <param name="multiLine"></param>
+        ///// <returns></returns>
+        ///// <remarks></remarks>
+        //public static bool IsFormat(this string txt, enDataFormat format, bool multiLine, string additionalRegex) {
+        //    if (multiLine) {
+        //        var ex = txt.SplitAndCutByCr();
+        //        return ex.All(thisString => string.IsNullOrEmpty(thisString) || thisString.IsFormat(format, additionalRegex));
+        //    }
+        //    return txt.IsFormat(format, additionalRegex);
+        //}
+
+        //public static bool IsFormat(this string txt, enDataFormat format) => Text_LängeCheck(txt, format) && Text_SchabloneCheck(txt, format) && txt.ContainsOnlyChars(AllowedChars(format)) && Text_ValueCheck(txt, format);
+
+        public static bool MultilinePossible(this Enums.DataFormat format) => format switch {
+            Enums.DataFormat.Text or Enums.DataFormat.RelationText or Enums.DataFormat.Link_To_Filesystem or Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank => true,
+            _ => false
+        };
+
+        public static bool NeedTargetDatabase(this Enums.DataFormat format) => format switch {
+            Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank or Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems => true,
+            _ => false
+        };
+
+        public static bool SaveSizeData(this Enums.DataFormat format) => format switch {
+            Enums.DataFormat.Text or Enums.DataFormat.FarbeInteger or Enums.DataFormat.RelationText or Enums.DataFormat.Schrift or Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems => true,
+            _ => false
+        };
+
+        public static bool SpellCheckingPossible(this Enums.DataFormat format) => format switch {
+            Enums.DataFormat.Text or Enums.DataFormat.RelationText => true,
+            _ => false
+        };
+
+        //public static bool Text_LängeCheck(string txt, enDataFormat format) {
+        //    var ml = Text_MaximaleLänge(format);
+        //    var il = 0;
+        //    if (txt != null) { il = txt.Length; }
+        //    if (ml > -1 && il > ml) { return false; }
+        //    switch (format) {
+        //        case enDataFormat.Text:
+        //        case enDataFormat.RelationText:
+        //        case enDataFormat.Columns_für_LinkedCellDropdown:
+        //        case enDataFormat.Values_für_LinkedCellDropdown:
+        //        case enDataFormat.Button:
+        //            return true;
+
+        //        case enDataFormat.Bit:
+        //            return il == 1;
+
+        //        case enDataFormat.FarbeInteger:
+        //        case enDataFormat.BildCode:
+        //            return il > 0;
+
+        //        case enDataFormat.LinkedCell:
+        //            Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
+        //            return true;
+
+        //        case enDataFormat.Link_To_Filesystem:
+        //            return il < 257;
+
+        //        default:
+        //            Develop.DebugPrint(format);
+        //            return true;
+        //    }
+        //}
+
+        //public static int Text_MaximaleLänge(this enDataFormat format) {
+        //    switch (format) {
+        //        case enDataFormat.Text:
+        //        case enDataFormat.BildCode:
+        //        case enDataFormat.RelationText:
+        //        case enDataFormat.FarbeInteger:
+        //        case enDataFormat.LinkedCell:
+        //        case enDataFormat.Columns_für_LinkedCellDropdown:
+        //        case enDataFormat.Values_für_LinkedCellDropdown:
+        //            return -1;
+
+        //        case enDataFormat.Bit:
+        //            return 1;
+
+        //        case enDataFormat.Link_To_Filesystem:
+        //            return 260;
+
+        //        case enDataFormat.Button:
+        //            return 0;
+
+        //        default:
+        //            Develop.DebugPrint(format);
+        //            return -1;
+        //    }
+        //}
+
+        ///// <summary>
+        ///// Gibt zurück, ob der Text in die vordefinierte Schablone paßt.
+        ///// </summary>
+        ///// <param name="txt"></param>
+        ///// <param name="format"></param>
+        ///// <returns></returns>
+        ///// <remarks></remarks>
+        //public static bool Text_SchabloneCheck(string txt, enDataFormat format) {
+        //    switch (format) {
+        //        case enDataFormat.Text:
+        //        case enDataFormat.BildCode:
+        //        case enDataFormat.Columns_für_LinkedCellDropdown:
+        //        case enDataFormat.Values_für_LinkedCellDropdown:
+        //        case enDataFormat.RelationText:
+        //        case enDataFormat.Link_To_Filesystem:
+        //        case enDataFormat.Button:
+        //            return true;
+
+        //        case enDataFormat.Bit:
+        //            return txt.Length == 1;
+
+        //        case enDataFormat.FarbeInteger:
+        //            if (txt == "0") { return true; }
+        //            if (txt == "-") { return false; }
+        //            if (!string.IsNullOrEmpty(txt) && txt.Substring(0, 1) == "0") { return false; }
+        //            if (txt.Length > 1 && txt.Substring(0, 2) == "-0") { return false; }
+        //            if (txt.Length > 2 && txt.IndexOf("-", 1) > -1) { return false; }
+        //            return true;
+
+        //        case enDataFormat.LinkedCell:
+        //            Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
+        //            return true;
+
+        //        default:
+        //            Develop.DebugPrint(format);
+        //            return true;
+        //    }
+        //}
+
+        //public static bool Text_ValueCheck(string tXT, enDataFormat format) {
+        //    switch (format) {
+        //        case enDataFormat.Text:
+        //        case enDataFormat.BildCode:
+        //        case enDataFormat.Columns_für_LinkedCellDropdown:
+        //        case enDataFormat.Values_für_LinkedCellDropdown:
+        //        case enDataFormat.Bit:
+        //        case enDataFormat.RelationText:
+        //        case enDataFormat.Link_To_Filesystem:
+        //        case enDataFormat.Button:
+        //            return true;
+
+        //        case enDataFormat.FarbeInteger:
+        //            return long.TryParse(tXT, out _);
+
+        //        case enDataFormat.LinkedCell:
+        //            Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
+        //            return true;
+
+        //        default:
+        //            Develop.DebugPrint(format);
+        //            return true;
+        //    }
+        //}
+
+        public static bool TextboxEditPossible(this Enums.DataFormat format) => format switch {
+            Enums.DataFormat.Text or Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank or Enums.DataFormat.RelationText => true,
+            _ => false
+        };
+
+        #endregion
+    }
 }
