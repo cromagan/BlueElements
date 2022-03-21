@@ -81,7 +81,7 @@ namespace BlueDatabase {
         private EditTypeFormula _editType;
         private FilterOptions _filterOptions;
         private Color _foreColor;
-        private BlueBasics.Enums.DataFormat _format;
+        private DataFormat _format;
         private bool _formatierungErlaubt;
         private string _identifier;
         private bool _ignoreAtRowFilter;
@@ -138,7 +138,7 @@ namespace BlueDatabase {
             _name = Database.Column.Freename(string.Empty);
             _caption = string.Empty;
             //_CaptionBitmap = null;
-            _format = BlueBasics.Enums.DataFormat.Text;
+            _format = DataFormat.Text;
             _lineLeft = ColumnLineStyle.Dünn;
             _lineRight = ColumnLineStyle.Ohne;
             _multiLine = false;
@@ -500,7 +500,7 @@ namespace BlueDatabase {
             }
         }
 
-        public BlueBasics.Enums.DataFormat Format {
+        public DataFormat Format {
             get => _format;
             set {
                 if (_format == value) { return; }
@@ -809,25 +809,25 @@ namespace BlueDatabase {
 
         #region Methods
 
-        public static EditTypeTable UserEditDialogTypeInTable(BlueBasics.Enums.DataFormat format, bool doDropDown, bool keybordInputAllowed, bool isMultiline) {
+        public static EditTypeTable UserEditDialogTypeInTable(DataFormat format, bool doDropDown, bool keybordInputAllowed, bool isMultiline) {
             if (!doDropDown && !keybordInputAllowed) { return EditTypeTable.None; }
 
             switch (format) {
-                case BlueBasics.Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
+                case DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
                     return EditTypeTable.Dropdown_Single;
 
-                case BlueBasics.Enums.DataFormat.Link_To_Filesystem:
+                case DataFormat.Link_To_Filesystem:
                     return EditTypeTable.FileHandling_InDateiSystem;
 
-                case BlueBasics.Enums.DataFormat.FarbeInteger:
+                case DataFormat.FarbeInteger:
                     if (doDropDown) { return EditTypeTable.Dropdown_Single; }
                     return EditTypeTable.Farb_Auswahl_Dialog;
 
-                case BlueBasics.Enums.DataFormat.Schrift:
+                case DataFormat.Schrift:
                     if (doDropDown) { return EditTypeTable.Dropdown_Single; }
                     return EditTypeTable.Font_AuswahlDialog;
 
-                case BlueBasics.Enums.DataFormat.Button:
+                case DataFormat.Button:
                     return EditTypeTable.None;
 
                 default:
@@ -846,7 +846,7 @@ namespace BlueDatabase {
         public static EditTypeTable UserEditDialogTypeInTable(ColumnItem? column, bool doDropDown) => UserEditDialogTypeInTable(column.Format, doDropDown, column.TextBearbeitungErlaubt, column.MultiLine);
 
         public string AutoCorrect(string value) {
-            if (Format == BlueBasics.Enums.DataFormat.Link_To_Filesystem) {
+            if (Format == DataFormat.Link_To_Filesystem) {
                 List<string> l = new(value.SplitAndCutByCr());
                 var l2 = l.Select(thisFile => SimplyFile(thisFile)).ToList();
                 value = l2.SortedDistinctList().JoinWithCr();
@@ -910,7 +910,7 @@ namespace BlueDatabase {
         /// <param name="mustBeFree">Wenn True wird ein Dateiname zurückgegeben, der noch nicht im Verzeichnis vorhanden ist.</param>
         /// <returns> Gibt den Dateinamen mit Pfad und Suffix zurück</returns>
         public string BestFile(string filename, bool mustBeFree) {
-            if (_format != BlueBasics.Enums.DataFormat.Link_To_Filesystem) { Develop.DebugPrint(FehlerArt.Fehler, "Nur bei Link_To_Filesystem erlaubt!"); }
+            if (_format != DataFormat.Link_To_Filesystem) { Develop.DebugPrint(FehlerArt.Fehler, "Nur bei Link_To_Filesystem erlaubt!"); }
 
             if (string.IsNullOrEmpty(filename)) {
                 if (!mustBeFree) { return string.Empty; }
@@ -941,7 +941,7 @@ namespace BlueDatabase {
                 if (nr > 0) { tmpname += nr.ToString(Constants.Format_Integer2); }
                 var ok = true;
                 foreach (var columnitem in Database.Column) {
-                    if (columnitem.Format == BlueBasics.Enums.DataFormat.Link_To_Filesystem) {
+                    if (columnitem.Format == DataFormat.Link_To_Filesystem) {
                         var r = Database.Row[new FilterItem(columnitem, FilterType.Istgleich_GroßKleinEgal, tmpname)];
                         if (r != null) {
                             ok = false;
@@ -1109,7 +1109,7 @@ namespace BlueDatabase {
                 }
             }
             switch (_format) {
-                case BlueBasics.Enums.DataFormat.RelationText:
+                case DataFormat.RelationText:
                     if (!_multiLine) { return "Bei diesem Format muss mehrzeilig ausgewählt werden."; }
                     if (_keyColumnKey > -1) { return "Diese Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
                     if (IsFirst()) { return "Diese Format ist bei der ersten (intern) erste Spalte nicht erlaubt."; }
@@ -1136,14 +1136,14 @@ namespace BlueDatabase {
                 //    }
                 //    break;
 
-                case BlueBasics.Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
+                case DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
                     //Develop.DebugPrint("Values_für_LinkedCellDropdown Verwendung bei:" + Database.Filename); //TODO: 29.07.2021 Values_für_LinkedCellDropdown Format entfernen
                     if (!string.IsNullOrEmpty(_cellInitValue)) { return "Dieses Format kann keinen Initial-Text haben."; }
                     if (KeyColumnKey > -1) { return "Dieses Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
                     if (_vorschlagsColumn > 0) { return "Dieses Format kann keine Vorschlags-Spalte haben."; }
                     break;
 
-                case BlueBasics.Enums.DataFormat.Link_To_Filesystem:
+                case DataFormat.Link_To_Filesystem:
                     if (!string.IsNullOrEmpty(_cellInitValue)) { return "Dieses Format kann keinen Initial-Text haben."; }
                     if (_multiLine && !_afterEditQuickSortRemoveDouble) { return "Format muss sortiert werden."; }
                     if (_vorschlagsColumn > 0) { return "Dieses Format kann keine Vorschlags-Spalte haben."; }
@@ -1188,7 +1188,7 @@ namespace BlueDatabase {
                 if (thisS.ToUpper() == "#ADMINISTRATOR") { return "'#Administrator' bei den Bearbeitern entfernen."; }
             }
             if (_dropdownBearbeitungErlaubt || tmpEditDialog == EditTypeTable.Dropdown_Single) {
-                if (_format != BlueBasics.Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) {
+                if (_format != DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) {
                     if (!_dropdownWerteAndererZellenAnzeigen && DropDownItems.Count == 0) { return "Keine Dropdown-Items vorhanden bzw. Alles hinzufügen nicht angewählt."; }
                 }
             } else {
@@ -1215,8 +1215,8 @@ namespace BlueDatabase {
             }
             //if (string.IsNullOrEmpty(_linkedKeyKennung) && _format.NeedLinkedKeyKennung()) { return "Spaltenkennung für verlinkte Datenbanken fehlt."; }
             if (OpticalReplace.Count > 0) {
-                if (_format is not BlueBasics.Enums.DataFormat.Text and
-                    not BlueBasics.Enums.DataFormat.RelationText) { return "Format unterstützt keine Ersetzungen."; }
+                if (_format is not DataFormat.Text and
+                    not DataFormat.RelationText) { return "Format unterstützt keine Ersetzungen."; }
                 if (_filterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled)) { return "Entweder 'Ersetzungen' oder 'erweiternden Autofilter'"; }
                 if (!string.IsNullOrEmpty(_autoFilterJoker)) { return "Entweder 'Ersetzungen' oder 'Autofilter Joker'"; }
             }
@@ -1228,7 +1228,7 @@ namespace BlueDatabase {
             if (IsFirst()) {
                 if (_keyColumnKey > -1) { return "Die (intern) erste Spalte darf keine Verknüpfung zu einer andern Schlüsselspalte haben."; }
             }
-            if (_format is not BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank and not BlueBasics.Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) {
+            if (_format is not DataFormat.Verknüpfung_zu_anderer_Datenbank and not DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) {
                 //if (_LinkedCell_RowKeyIsInColumn > -1) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
                 if (_linkedCellColumnKeyOfLinkedDatabase > -1) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
             }
@@ -1452,7 +1452,7 @@ namespace BlueDatabase {
 
             try {
                 switch ((int)_format) {
-                    case (int)BlueBasics.Enums.DataFormat.Button:
+                    case (int)DataFormat.Button:
                         ScriptType = ScriptType.Nicht_vorhanden;
                         break;
 
@@ -1488,7 +1488,7 @@ namespace BlueDatabase {
                     case 74: //(int)enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
 
                         //if (LinkedCell_RowKeyIsInColumn != -9999) {
-                        _format = BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank;
+                        _format = DataFormat.Verknüpfung_zu_anderer_Datenbank;
                         LinkedCellFilter.Clear();
                         //LinkedCellFilter.Add(LinkedCell_RowKeyIsInColumn.ToString());
                         //LinkedCell_RowKeyIsInColumn = -1;
@@ -1496,7 +1496,7 @@ namespace BlueDatabase {
                         break;
 
                     case 75:
-                        _format = BlueBasics.Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems;
+                        _format = DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems;
 
                         break;
                 }
@@ -1504,17 +1504,17 @@ namespace BlueDatabase {
                 if (ScriptType == ScriptType.undefiniert) {
                     if (MultiLine) {
                         ScriptType = ScriptType.List;
-                    } else if (Format is BlueBasics.Enums.DataFormat.Text or BlueBasics.Enums.DataFormat.Link_To_Filesystem) {
+                    } else if (Format is DataFormat.Text or DataFormat.Link_To_Filesystem) {
                         if (SortType is SortierTyp.ZahlenwertFloat or SortierTyp.ZahlenwertInt) {
                             ScriptType = ScriptType.Numeral;
                         }
                         ScriptType = ScriptType.String;
-                    } else if (Format == BlueBasics.Enums.DataFormat.Schrift) {
+                    } else if (Format == DataFormat.Schrift) {
                         ScriptType = ScriptType.Nicht_vorhanden;
                     }
                 }
 
-                if (_format is BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+                if (_format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                     var c = LinkedDatabase?.Column.SearchByKey(_linkedCellColumnKeyOfLinkedDatabase);
                     if (c != null) {
                         this.GetStyleFrom(c);
@@ -1547,7 +1547,7 @@ namespace BlueDatabase {
             switch (_identifier) {
                 case "System: Creator":
                     _name = "SYS_Creator";
-                    _format = BlueBasics.Enums.DataFormat.Text;
+                    _format = DataFormat.Text;
                     if (setAll) {
                         Caption = "Ersteller";
                         DropdownBearbeitungErlaubt = true;
@@ -1560,7 +1560,7 @@ namespace BlueDatabase {
 
                 case "System: Changer":
                     _name = "SYS_Changer";
-                    _format = BlueBasics.Enums.DataFormat.Text;
+                    _format = DataFormat.Text;
                     _spellCheckingEnabled = false;
                     _textBearbeitungErlaubt = false;
                     _dropdownBearbeitungErlaubt = false;
@@ -1576,7 +1576,7 @@ namespace BlueDatabase {
 
                 case "System: Chapter":
                     _name = "SYS_Chapter";
-                    _format = BlueBasics.Enums.DataFormat.Text;
+                    _format = DataFormat.Text;
                     _afterEditAutoCorrect = true; // Verhindert \r am Ende und somit anzeigefehler
                     if (setAll) {
                         Caption = "Kapitel";
@@ -1621,7 +1621,7 @@ namespace BlueDatabase {
                     _name = "SYS_Correct";
                     _caption = "Fehlerfrei";
                     _spellCheckingEnabled = false;
-                    _format = BlueBasics.Enums.DataFormat.Text;
+                    _format = DataFormat.Text;
                     //_AutoFilterErweitertErlaubt = false;
                     _autoFilterJoker = string.Empty;
                     //_AutofilterTextFilterErlaubt = false;
@@ -1645,7 +1645,7 @@ namespace BlueDatabase {
                 case "System: Locked":
                     _name = "SYS_Locked";
                     _spellCheckingEnabled = false;
-                    _format = BlueBasics.Enums.DataFormat.Text;
+                    _format = DataFormat.Text;
                     _scriptType = ScriptType.Bool;
                     _filterOptions = FilterOptions.Enabled;
                     _autoFilterJoker = string.Empty;
@@ -1716,7 +1716,7 @@ namespace BlueDatabase {
         public void SetFormatForBildCode() {
             ((IInputFormat)this).SetFormat(VarType.Text); // Standard Verhalten
 
-            Format = BlueBasics.Enums.DataFormat.Text;
+            Format = DataFormat.Text;
             Align = AlignmentHorizontal.Links;
             SortType = SortierTyp.Original_String;
             Translate = TranslationType.Original_Anzeigen;
@@ -1728,7 +1728,7 @@ namespace BlueDatabase {
         public void SetFormatForBit() {
             ((IInputFormat)this).SetFormat(VarType.Bit); // Standard Verhalten
 
-            Format = BlueBasics.Enums.DataFormat.Text;
+            Format = DataFormat.Text;
             Align = AlignmentHorizontal.Zentriert;
             SortType = SortierTyp.Original_String;
             Translate = TranslationType.Original_Anzeigen;
@@ -1746,7 +1746,7 @@ namespace BlueDatabase {
         public void SetFormatForDate() {
             ((IInputFormat)this).SetFormat(VarType.Date);
 
-            Format = BlueBasics.Enums.DataFormat.Text;
+            Format = DataFormat.Text;
             Align = AlignmentHorizontal.Links;
             SortType = SortierTyp.Datum_Uhrzeit;
             Translate = TranslationType.Datum;
@@ -1758,7 +1758,7 @@ namespace BlueDatabase {
         public void SetFormatForDateTime() {
             ((IInputFormat)this).SetFormat(VarType.DateTime);
 
-            Format = BlueBasics.Enums.DataFormat.Text;
+            Format = DataFormat.Text;
             Align = AlignmentHorizontal.Links;
             SortType = SortierTyp.Datum_Uhrzeit;
             Translate = TranslationType.Datum;
@@ -1770,7 +1770,7 @@ namespace BlueDatabase {
         public void SetFormatForEmail() {
             ((IInputFormat)this).SetFormat(VarType.Email);
 
-            Format = BlueBasics.Enums.DataFormat.Text;
+            Format = DataFormat.Text;
             Align = AlignmentHorizontal.Links;
             SortType = SortierTyp.Original_String;
             Translate = TranslationType.Original_Anzeigen;
@@ -1782,7 +1782,7 @@ namespace BlueDatabase {
         public void SetFormatForFloat() {
             ((IInputFormat)this).SetFormat(VarType.Float);
 
-            Format = BlueBasics.Enums.DataFormat.Text;
+            Format = DataFormat.Text;
             Align = AlignmentHorizontal.Rechts;
             Translate = TranslationType.Zahl;
             SortType = SortierTyp.ZahlenwertFloat;
@@ -1794,7 +1794,7 @@ namespace BlueDatabase {
         public void SetFormatForInteger() {
             ((IInputFormat)this).SetFormat(VarType.Integer);
 
-            Format = BlueBasics.Enums.DataFormat.Text;
+            Format = DataFormat.Text;
             Align = AlignmentHorizontal.Rechts;
             SortType = SortierTyp.ZahlenwertInt;
             Translate = TranslationType.Original_Anzeigen;
@@ -1806,7 +1806,7 @@ namespace BlueDatabase {
         public void SetFormatForPhoneNumber() {
             ((IInputFormat)this).SetFormat(VarType.PhoneNumber);
 
-            Format = BlueBasics.Enums.DataFormat.Text;
+            Format = DataFormat.Text;
             Align = AlignmentHorizontal.Links;
             SortType = SortierTyp.Original_String;
             Translate = TranslationType.Original_Anzeigen;
@@ -1818,7 +1818,7 @@ namespace BlueDatabase {
         public void SetFormatForText() {
             ((IInputFormat)this).SetFormat(VarType.Text);
 
-            Format = BlueBasics.Enums.DataFormat.Text;
+            Format = DataFormat.Text;
             Align = AlignmentHorizontal.Links;
             SortType = SortierTyp.Sprachneutral_String;
             Translate = TranslationType.Original_Anzeigen;
@@ -1830,7 +1830,7 @@ namespace BlueDatabase {
         public void SetFormatForTextMitFormatierung() {
             ((IInputFormat)this).SetFormat(VarType.TextMitFormatierung);
 
-            Format = BlueBasics.Enums.DataFormat.Text;
+            Format = DataFormat.Text;
             Align = AlignmentHorizontal.Links;
             SortType = SortierTyp.Sprachneutral_String;
             Translate = TranslationType.Original_Anzeigen;
@@ -1844,7 +1844,7 @@ namespace BlueDatabase {
 
             MultiLine = true; // Verhalten von Setformat überschreiben
 
-            Format = BlueBasics.Enums.DataFormat.Text;
+            Format = DataFormat.Text;
             Align = AlignmentHorizontal.Links;
             SortType = SortierTyp.Sprachneutral_String;
             Translate = TranslationType.Übersetzen;
@@ -1856,7 +1856,7 @@ namespace BlueDatabase {
         public void SetFormatForUrl() {
             ((IInputFormat)this).SetFormat(VarType.Url);
 
-            Format = BlueBasics.Enums.DataFormat.Text;
+            Format = DataFormat.Text;
             Align = AlignmentHorizontal.Links;
             SortType = SortierTyp.Original_String;
             Translate = TranslationType.Original_Anzeigen;
@@ -1866,7 +1866,7 @@ namespace BlueDatabase {
         }
 
         public string SimplyFile(string fullFileName) {
-            if (_format != BlueBasics.Enums.DataFormat.Link_To_Filesystem) {
+            if (_format != DataFormat.Link_To_Filesystem) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Nur bei Link_To_Filesystem erlaubt!");
             }
             var tmpfile = fullFileName.FileNameWithoutSuffix();
@@ -1952,11 +1952,11 @@ namespace BlueDatabase {
 : this == Database.Column.SysRowCreator
 ? QuickImage.Get(ImageCode.Person)
 : _format switch {
-    BlueBasics.Enums.DataFormat.Link_To_Filesystem => QuickImage.Get(ImageCode.Datei, 16),
-    BlueBasics.Enums.DataFormat.RelationText => QuickImage.Get(ImageCode.Herz, 16),
-    BlueBasics.Enums.DataFormat.FarbeInteger => QuickImage.Get(ImageCode.Pinsel, 16),
-    BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank => QuickImage.Get(ImageCode.Fernglas, 16),
-    BlueBasics.Enums.DataFormat.Button => QuickImage.Get(ImageCode.Kugel, 16),
+    DataFormat.Link_To_Filesystem => QuickImage.Get(ImageCode.Datei, 16),
+    DataFormat.RelationText => QuickImage.Get(ImageCode.Herz, 16),
+    DataFormat.FarbeInteger => QuickImage.Get(ImageCode.Pinsel, 16),
+    DataFormat.Verknüpfung_zu_anderer_Datenbank => QuickImage.Get(ImageCode.Fernglas, 16),
+    DataFormat.Button => QuickImage.Get(ImageCode.Kugel, 16),
     _ => _format.TextboxEditPossible()
     ? _multiLine ? QuickImage.Get(ImageCode.Textfeld, 16, Color.Red, Color.Transparent) : QuickImage.Get(ImageCode.Textfeld)
     : QuickImage.Get("Pfeil_Unten_Scrollbar|14|||||0")
@@ -1986,8 +1986,8 @@ namespace BlueDatabase {
 
         public bool UserEditDialogTypeInFormula(EditTypeFormula editTypeToCheck) {
             switch (_format) {
-                case BlueBasics.Enums.DataFormat.Text:
-                case BlueBasics.Enums.DataFormat.RelationText:
+                case DataFormat.Text:
+                case DataFormat.RelationText:
                     if (editTypeToCheck == EditTypeFormula.Textfeld) { return true; } // Textfeld immer erlauben auch wenn beide Bearbeitungen nicht erlaubt sind. Einfach der Übersichtlichktei
                     if (_multiLine && editTypeToCheck == EditTypeFormula.Textfeld_mit_Auswahlknopf) { return false; }
                     if (_dropdownBearbeitungErlaubt && editTypeToCheck == EditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
@@ -1998,7 +1998,7 @@ namespace BlueDatabase {
                     if (!_multiLine && editTypeToCheck == EditTypeFormula.Ja_Nein_Knopf) { return true; }
                     return false;
 
-                case BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank:
+                case DataFormat.Verknüpfung_zu_anderer_Datenbank:
                     if (editTypeToCheck == EditTypeFormula.None) { return true; }
                     //if (EditType_To_Check != enEditTypeFormula.Textfeld &&
                     //    EditType_To_Check != enEditTypeFormula.nur_als_Text_anzeigen) { return false; }
@@ -2015,7 +2015,7 @@ namespace BlueDatabase {
                     if (col == null) { return false; }
                     return col.UserEditDialogTypeInFormula(editTypeToCheck);
 
-                case BlueBasics.Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
+                case DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
                     if (editTypeToCheck == EditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
                     return false;
 
@@ -2027,7 +2027,7 @@ namespace BlueDatabase {
                 //    if (editType_To_Check == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
                 //    return false;
 
-                case BlueBasics.Enums.DataFormat.Link_To_Filesystem:
+                case DataFormat.Link_To_Filesystem:
                     if (_multiLine) {
                         //if (EditType_To_Check == enEditType.Listbox) { return true; }
                         if (editTypeToCheck == EditTypeFormula.Gallery) { return true; }
@@ -2045,13 +2045,13 @@ namespace BlueDatabase {
                 //        default:
                 //            return false;
                 //    }
-                case BlueBasics.Enums.DataFormat.FarbeInteger:
+                case DataFormat.FarbeInteger:
                     return editTypeToCheck == EditTypeFormula.Farb_Auswahl_Dialog;
 
-                case BlueBasics.Enums.DataFormat.Schrift:
+                case DataFormat.Schrift:
                     return editTypeToCheck == EditTypeFormula.Font_AuswahlDialog;
 
-                case BlueBasics.Enums.DataFormat.Button:
+                case DataFormat.Button:
                     //if (EditType_To_Check == enEditTypeFormula.Button) { return true; }
                     return false;
 
@@ -2090,7 +2090,7 @@ namespace BlueDatabase {
                                                                                                                                                           //if (thisColumn.LinkedCell_RowKeyIsInColumn == Key) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
                                                                                                                                                           //if (ThisColumn.LinkedCell_ColumnValueFoundIn == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
 
-                if (thisColumn.Format == BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+                if (thisColumn.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                     foreach (var thisV in thisColumn.LinkedCellFilter) {
                         if (IntTryParse(thisV, out var key)) {
                             if (key == Key) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; }
@@ -2132,7 +2132,7 @@ namespace BlueDatabase {
                     break;
 
                 case DatabaseDataType.co_Format:
-                    _format = (BlueBasics.Enums.DataFormat)IntParse(wert);
+                    _format = (DataFormat)IntParse(wert);
                     break;
 
                 case DatabaseDataType.co_ForeColor:

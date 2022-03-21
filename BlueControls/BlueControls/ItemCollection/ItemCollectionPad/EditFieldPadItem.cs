@@ -92,7 +92,7 @@ namespace BlueControls.ItemCollection {
 
                 x.Add("<Keine Quelle>");
 
-                var it = BlueControls.Forms.InputBoxListBoxStyle.Show("Quelle wählen:", x, AddType.None, true);
+                var it = Forms.InputBoxListBoxStyle.Show("Quelle wählen:", x, AddType.None, true);
 
                 if (it == null || it.Count != 1) { return; }
 
@@ -115,7 +115,7 @@ namespace BlueControls.ItemCollection {
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new();
 
-            l.Add(new FlexiControlForProperty<string>(() => this.Datenquelle_wählen, ImageCode.Pfeil_Rechts));
+            l.Add(new FlexiControlForProperty<string>(() => Datenquelle_wählen, ImageCode.Pfeil_Rechts));
             l.Add(new FlexiControl());
 
             //{
@@ -200,7 +200,7 @@ namespace BlueControls.ItemCollection {
         //    return false;
         //}
         protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
-            var id = -1; if (_getValueFrom != null) { id = _getValueFrom.ID; }
+            var id = -1; if (_getValueFrom != null) { id = _getValueFrom.Id; }
 
             DrawColorScheme(gr, drawingCoordinates, zoom, id);
 

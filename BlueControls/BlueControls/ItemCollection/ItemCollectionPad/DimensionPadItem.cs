@@ -172,14 +172,14 @@ namespace BlueControls.ItemCollection {
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new()
             {
-                new FlexiControlForProperty<float>(() => this.Länge_In_Mm),
-                new FlexiControlForProperty<string>(() => this.Text_Oben),
-                new FlexiControlForProperty<string>(() => this.Suffix),
-                new FlexiControlForProperty<string>(() => this.Text_Unten),
-                new FlexiControlForProperty<string>(() => this.Präfix)
+                new FlexiControlForProperty<float>(() => Länge_In_Mm),
+                new FlexiControlForProperty<string>(() => Text_Oben),
+                new FlexiControlForProperty<string>(() => Suffix),
+                new FlexiControlForProperty<string>(() => Text_Unten),
+                new FlexiControlForProperty<string>(() => Präfix)
             };
             AddStyleOption(l);
-            l.Add(new FlexiControlForProperty<float>(() => this.Skalierung));
+            l.Add(new FlexiControlForProperty<float>(() => Skalierung));
             l.AddRange(base.GetStyleOptions());
             return l;
         }

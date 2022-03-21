@@ -270,7 +270,7 @@ namespace BlueControls.Forms {
             Enabled = false;
             var n = cbxLayoutWahl.Text;
             cbxLayoutWahl.Text = string.Empty;
-            BlueControls.Forms.TableView.OpenLayoutEditor(Database, n);
+            TableView.OpenLayoutEditor(Database, n);
             BefülleLayoutDropdowns();
             if (cbxLayoutWahl.Item[n] != null) {
                 cbxLayoutWahl.Text = n;

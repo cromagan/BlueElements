@@ -17,7 +17,7 @@
 
 namespace BlueBasics.Enums {
 
-    public enum enSw {
+    public enum Sw {
         Hide = 0,
         Normal = 1,
         ShowMinimized = 2,

@@ -17,7 +17,7 @@
 
 namespace BlueControls.ItemCollection {
 
-    internal class ClsKraft {
+    internal class Kraft {
         //public PointM Wirkpunkt;
         //public double Richtung;
         //public double Stärke;

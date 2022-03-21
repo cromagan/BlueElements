@@ -113,8 +113,8 @@ namespace BlueControls.Forms {
                 //    break;
 
                 //case enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
-                case BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank:
-                case BlueBasics.Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
+                case DataFormat.Verknüpfung_zu_anderer_Datenbank:
+                case DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
                     (columnLinked, _, _) = CellCollection.LinkedCellData(column, row, true, false);
                     posError = true;
                     break;

@@ -172,7 +172,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
                 //    }
                 //    break;
 
-                case BlueBasics.Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
+                case DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
                     var db2 = column.LinkedDatabase;
                     if (db2 == null) { Notification.Show("Verknüpfte Datenbank nicht vorhanden", ImageCode.Information); return; }
 
@@ -438,7 +438,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         public BasicListItem? Add(string value, ColumnItem? columnStyle, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
             if (this[value] == null) {
-                if (columnStyle.Format == BlueBasics.Enums.DataFormat.Link_To_Filesystem && value.FileType() == FileFormat.Image) {
+                if (columnStyle.Format == DataFormat.Link_To_Filesystem && value.FileType() == FileFormat.Image) {
                     return Add(columnStyle.BestFile(value, false), value, value, columnStyle.Database.FileEncryptionKey);
                 }
 

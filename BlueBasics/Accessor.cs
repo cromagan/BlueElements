@@ -36,9 +36,11 @@ namespace BlueBasics {
         public readonly bool CanWrite = false;
         public readonly string Name = "[unbekannt]";
         public readonly string QuickInfo = string.Empty;
-        public readonly string TypeFullname = string.Empty;
-        private Func<T> Getter;
-        private Action<T> Setter;
+
+        //public readonly string TypeFullname = string.Empty;
+        private readonly Func<T> _getter;
+
+        private readonly Action<T> _setter;
 
         #endregion
 
@@ -52,20 +54,20 @@ namespace BlueBasics {
             IEnumerable<Attribute> ca = null;
 
             if (memberExpression.Member is PropertyInfo propertyInfo) {
-                Setter = Expression.Lambda<Action<T>>(Expression.Call(instanceExpression, propertyInfo.GetSetMethod(), parameter), parameter).Compile();
-                Getter = Expression.Lambda<Func<T>>(Expression.Call(instanceExpression, propertyInfo.GetGetMethod())).Compile();
+                _setter = Expression.Lambda<Action<T>>(Expression.Call(instanceExpression, propertyInfo.GetSetMethod(), parameter), parameter).Compile();
+                _getter = Expression.Lambda<Func<T>>(Expression.Call(instanceExpression, propertyInfo.GetGetMethod())).Compile();
                 CanWrite = propertyInfo.CanWrite;
                 CanRead = propertyInfo.CanRead;
                 Name = propertyInfo.Name;
-                TypeFullname = propertyInfo.PropertyType.FullName;
+                //TypeFullname = propertyInfo.PropertyType.FullName;
                 ca = propertyInfo.GetCustomAttributes();
             } else if (memberExpression.Member is FieldInfo fieldInfo) {
-                Setter = Expression.Lambda<Action<T>>(Expression.Assign(memberExpression, parameter), parameter).Compile();
-                Getter = Expression.Lambda<Func<T>>(Expression.Field(instanceExpression, fieldInfo)).Compile();
+                _setter = Expression.Lambda<Action<T>>(Expression.Assign(memberExpression, parameter), parameter).Compile();
+                _getter = Expression.Lambda<Func<T>>(Expression.Field(instanceExpression, fieldInfo)).Compile();
                 CanWrite = !fieldInfo.IsInitOnly;
                 CanRead = true;
                 Name = fieldInfo.Name;
-                TypeFullname = fieldInfo.FieldType.FullName;
+                //TypeFullname = fieldInfo.FieldType.FullName;
                 ca = fieldInfo.GetCustomAttributes();
             }
 
@@ -82,9 +84,9 @@ namespace BlueBasics {
 
         #region Methods
 
-        public T Get() => Getter();
+        public T Get() => _getter();
 
-        public void Set(T value) => Setter(value);
+        public void Set(T value) => _setter(value);
 
         #endregion
     }

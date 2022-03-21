@@ -110,7 +110,6 @@
     <Compile Include="HTML.cs" />
     <Compile Include="Interfaces\IStringable.cs" />
     <Compile Include="Interfaces\IReadableText.cs" />
-    <Compile Include="Interfaces\IVersionable.cs" />
     <Compile Include="MultiUserFile\MultiUserFile.cs" />
     <Compile Include="Enums\SW.cs" />
     <Compile Include="Enums\DataFormat.cs" />

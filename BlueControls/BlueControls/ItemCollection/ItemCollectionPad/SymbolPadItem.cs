@@ -69,10 +69,10 @@ namespace BlueControls.ItemCollection {
             };
             List<FlexiControl> l = new()
             {
-                new FlexiControlForProperty<enSymbol>(() => this.Symbol, comms),
-                new FlexiControlForProperty<float>(() => this.Randdicke),
-                new FlexiControlForProperty<Color>(() => this.Randfarbe),
-                new FlexiControlForProperty<Color>(() => this.Hintergrundfarbe)
+                new FlexiControlForProperty<enSymbol>(() => Symbol, comms),
+                new FlexiControlForProperty<float>(() => Randdicke),
+                new FlexiControlForProperty<Color>(() => Randfarbe),
+                new FlexiControlForProperty<Color>(() => Hintergrundfarbe)
             };
             l.AddRange(base.GetStyleOptions());
             return l;

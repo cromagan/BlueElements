@@ -47,7 +47,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         protected override Size ComputeSizeUntouchedForListBox() => Pos.X == 0 && Pos.Y == 0 && Pos.Width == 0 && Pos.Height == 0 ? new Size(4, 4) : Pos.Size;
 
-        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, Design itemdesign, States vState, bool DrawBorderAndBack, bool Translate) => GR.DrawLine(Skin.GetBlueFont(itemdesign, States.Standard).Pen(1f), PositionModified.Left, (int)(PositionModified.Top + (PositionModified.Height / 2.0)), PositionModified.Right, (int)(PositionModified.Top + (PositionModified.Height / 2.0)));
+        protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States vState, bool drawBorderAndBack, bool translate) => gr.DrawLine(Skin.GetBlueFont(itemdesign, States.Standard).Pen(1f), positionModified.Left, (int)(positionModified.Top + (positionModified.Height / 2.0)), positionModified.Right, (int)(positionModified.Top + (positionModified.Height / 2.0)));
 
         protected override string GetCompareKey() => Pos.ToString();
 

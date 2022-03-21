@@ -99,6 +99,7 @@ namespace BlueControls.ItemCollection {
 
         public List<QuickImage> Overlays => _overlays;
 
+        // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
         public int Padding { get; set; }
 
         public override string QuickInfo => string.Empty;

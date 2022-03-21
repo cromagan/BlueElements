@@ -18,13 +18,10 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
-using BlueDatabase;
 using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Reflection;
 using System.Windows.Forms;
 using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
@@ -38,24 +35,24 @@ namespace BlueControls.Controls {
     // https://stackoverflow.com/questions/724143/how-do-i-create-a-delegate-for-a-net-property
     // http://peisker.net/dotnet/propertydelegates.htm
     // http://geekswithblogs.net/akraus1/archive/2006/02/10/69047.aspx
-    public class FlexiControlForProperty<t> : FlexiControl {
+    public class FlexiControlForProperty<T> : FlexiControl {
 
         #region Fields
 
-        private readonly bool _isButton = false;
-        private BlueBasics.Accessor<t>? _accessor;
+        private readonly Accessor<T>? _accessor;
+        private readonly bool _isButton;
 
         #endregion
 
         #region Constructors
 
-        public FlexiControlForProperty(Expression<Func<t>> expr, ItemCollectionList? list) : this(expr, 1, list, ImageCode.None) { }
+        public FlexiControlForProperty(Expression<Func<T>> expr, ItemCollectionList? list) : this(expr, 1, list, ImageCode.None) { }
 
-        public FlexiControlForProperty(Expression<Func<t>> expr, int rowCount) : this(expr, rowCount, null, ImageCode.None) { }
+        public FlexiControlForProperty(Expression<Func<T>> expr, int rowCount) : this(expr, rowCount, null, ImageCode.None) { }
 
-        public FlexiControlForProperty(Expression<Func<t>> expr, ImageCode image) : this(expr, 1, null, image) { }
+        public FlexiControlForProperty(Expression<Func<T>> expr, ImageCode image) : this(expr, 1, null, image) { }
 
-        public FlexiControlForProperty(Expression<Func<t>> expr) : this(expr, 1, null, ImageCode.None) { }
+        public FlexiControlForProperty(Expression<Func<T>> expr) : this(expr, 1, null, ImageCode.None) { }
 
         //public FlexiControlForProperty(object expr) : this(expr, 1, null, ImageCode.None) { }
 
@@ -67,8 +64,8 @@ namespace BlueControls.Controls {
             Size = new Size(200, 24);
         }
 
-        private FlexiControlForProperty(Expression<Func<t>> expr, int rowCount, ItemCollectionList? list, ImageCode image) : this() {
-            _accessor = new Accessor<t>(expr);
+        private FlexiControlForProperty(Expression<Func<T>> expr, int rowCount, ItemCollectionList? list, ImageCode image) : this() {
+            _accessor = new Accessor<T?>(expr);
 
             _isButton = (image != ImageCode.None);
 
@@ -80,29 +77,6 @@ namespace BlueControls.Controls {
 
         #region Methods
 
-        internal bool CheckEnabledState() {
-            if (DesignMode) {
-                DisabledReason = string.Empty;
-                return true;
-            }
-
-            if (_accessor == null) {
-                DisabledReason = "Kein zugehöriges Objekt definiert.";
-                return false;
-            }
-
-            if (!_accessor.CanWrite) {
-                DisabledReason = "Feld kann generell nicht beschrieben werden.";
-                return false;
-            }
-            //if (_alwaysDiabled) {
-            //    DisabledReason = "Feld ist schreibgeschützt.";
-            //    return false;
-            //}
-            DisabledReason = string.Empty;
-            return true;
-        }
-
         protected override void Dispose(bool disposing) {
             _IdleTimer.Tick -= Checker_Tick;
             //if (_propertyObject is IReloadable LS) { LS.LoadedFromDisk -= OnLoadedFromDisk; }
@@ -112,7 +86,7 @@ namespace BlueControls.Controls {
         protected override void OnButtonClicked() {
             base.OnButtonClicked();
             if (_isButton) {
-                _accessor.Set(default);
+                _accessor?.Set(default);
             }
 
             //if (_methInfo != null) {
@@ -136,6 +110,29 @@ namespace BlueControls.Controls {
             base.OnValueChanged();
         }
 
+        private bool CheckEnabledState() {
+            if (DesignMode) {
+                DisabledReason = string.Empty;
+                return true;
+            }
+
+            if (_accessor == null) {
+                DisabledReason = "Kein zugehöriges Objekt definiert.";
+                return false;
+            }
+
+            if (!_accessor.CanWrite) {
+                DisabledReason = "Feld kann generell nicht beschrieben werden.";
+                return false;
+            }
+            //if (_alwaysDiabled) {
+            //    DisabledReason = "Feld ist schreibgeschützt.";
+            //    return false;
+            //}
+            DisabledReason = string.Empty;
+            return true;
+        }
+
         private void Checker_Tick(object sender, System.EventArgs e) {
             //if (_IsFilling) { return; }
             if (!Allinitialized) { return; }
@@ -143,52 +140,66 @@ namespace BlueControls.Controls {
             SetValueFromProperty();
         }
 
+        /// <summary>
+        /// Schreibt den Wert von Value in das Property Objekt zurück
+        /// </summary>
         private void FillPropertyNow() {
             if (!Allinitialized) { return; }
             if (!CheckEnabledState()) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
 
-            if (_accessor == null || !_accessor.CanRead) { return; }
+            if (_accessor == null || !_accessor.CanRead || !_accessor.CanWrite) { return; }
             if (_isButton) { return; }
 
-            var oldVal = string.Empty;
-            t x = _accessor.Get();
+            switch (_accessor) {
+                case Accessor<string> al:
+                    if (al.Get() != Value) { al.Set(Value); }
+                    break;
 
-            t toSet = x;
+                case Accessor<List<string>> ls:
+                    var listnew = Value.SplitAndCutByCrToList();
+                    if (listnew.IsDifferentTo(ls.Get())) { ls.Set(listnew); }
+                    break;
 
-            if (x is string s) {
-                oldVal = s;
-                toSet = (t)Convert.ChangeType(Value, typeof(t));
-            } else if (x is List<string> ls) {
-                oldVal = ls.JoinWithCr();
-                toSet = (t)Convert.ChangeType(Value.SplitAndCutByCrToList(), typeof(t));
-            } else if (x is bool bo) {
-                oldVal = bo.ToPlusMinus();
-                toSet = (t)Convert.ChangeType(Value.FromPlusMinus(), typeof(t));
-            } else if (x is Color co) {
-                oldVal = co.ToHtmlCode();
-                toSet = (t)Convert.ChangeType(Value.FromHtmlCode(), typeof(t));
-            } else if (x is int iv) {
-                oldVal = iv.ToString();
-                IntTryParse(Value, out var i);
-                toSet = (t)Convert.ChangeType(Value, typeof(t)); //i;
-            } else if (x is Enum enx) {
-                oldVal = enx. ((int)enx).ToString();
-                IntTryParse(Value, out var i);
-                toSet = (t)Convert.ChangeType(i, typeof(t)); // i;
-            } else if (x is double db) {
-                oldVal = db.ToString(Constants.Format_Float2);
-                DoubleTryParse(Value, out var i);
-                toSet = (t)Convert.ChangeType(i, typeof(t)); //i;
-            } else if (x is float fl) {
-                oldVal = fl.ToString(Constants.Format_Float2);
-                FloatTryParse(Value, out var i);
-                toSet = (t)Convert.ChangeType(i, typeof(t)); //i;
-            } else {
-                Develop.DebugPrint(FehlerArt.Fehler, "Art unbekannt!");
+                case Accessor<bool> ab:
+                    var nb = Value.FromPlusMinus();
+                    if (ab.Get() != nb) { ab.Set(nb); }
+                    break;
+
+                case Accessor<Color> ac:
+                    if (ac.Get().ToHtmlCode() != Value) { ac.Set(Value.FromHtmlCode()); }
+                    break;
+
+                case Accessor<int> ai:
+                    IntTryParse(Value, out var i);
+                    if (ai.Get() != i) { ai.Set(i); }
+                    break;
+
+                case Accessor<double> ad:
+                    DoubleTryParse(Value, out var d);
+                    if (ad.Get() != d) { ad.Set(d); }
+                    break;
+
+                case Accessor<float> af:
+                    FloatTryParse(Value, out var f);
+                    if (af.Get() != f) { af.Set(f); }
+                    break;
+
+                //case Accessor <enum> ae:
+                //    FloatTryParse(Value, out var f);
+                //    if (af.Get() != f) { af.Set(f); }
+                //    break;
+
+                default:
+
+                    if (_accessor.Get() is Enum) {
+                        IntTryParse(Value, out var ef);
+                        var nval = (T)Enum.ToObject(typeof(T), ef); // https://stackoverflow.com/questions/29482/how-can-i-cast-int-to-enum
+                        if (nval.ToString() != _accessor.Get().ToString()) { _accessor.Set(nval); }
+                    } else {
+                        Develop.DebugPrint(FehlerArt.Fehler, "Art unbekannt!");
+                    }
+                    break;
             }
-            if (oldVal == Value) { return; }
-
-            _accessor.Set(toSet);
         }
 
         private void GenFehlerText() {
@@ -211,43 +222,54 @@ namespace BlueControls.Controls {
             InfoText = string.Empty;
         }
 
-        //private void OnLoadedFromDisk(object sender, System.EventArgs e) {
-        //    FillPropertyNow();
-        //    _propertyObject = null;  //Das Objekt ist tot und irgendwo im Nirvana verschwunden
-        //    UpdateControlData(false, 1, null, enImageCode.None);
-        //    CheckEnabledState();
-        //    LoadedFromDisk?.Invoke(this, System.EventArgs.Empty);
-        //}
         private void SetValueFromProperty() {
             if (_accessor == null || !_accessor.CanRead) {
                 ValueSet(string.Empty, true, false);
                 InfoText = string.Empty;
                 return;
             }
-            object x = _accessor.Get();
+            object? x = _accessor.Get();
 
-            if (x is null) {
-                ValueSet(string.Empty, true, false);
-            } else if (x is string s) {
-                ValueSet(s, true, false);
-            } else if (x is List<string> ls) {
-                ValueSet(ls.JoinWithCr(), true, false);
-            } else if (x is bool bo) {
-                ValueSet(bo.ToPlusMinus(), true, false);
-            } else if (x is int iv) {
-                ValueSet(iv.ToString(), true, false);
-            } else if (x is Enum) {
-                ValueSet(((int)x).ToString(), true, false);
-            } else if (x is double dc) {
-                ValueSet(dc.ToString(Constants.Format_Float2), true, false);
-            } else if (x is double db) {
-                ValueSet(db.ToString(Constants.Format_Float2), true, false);
-            } else if (x is float fl) {
-                ValueSet(fl.ToString(Constants.Format_Float2), true, false);
-            } else if (x is Color co) {
-                ValueSet(co.ToHtmlCode(), true, false);
-            } else {
-                Develop.DebugPrint(FehlerArt.Fehler, "Art unbekannt!");
+            switch (x) {
+                case null:
+                    ValueSet(string.Empty, true, false);
+                    break;
+
+                case string s:
+                    ValueSet(s, true, false);
+                    break;
+
+                case List<string> ls:
+                    ValueSet(ls.JoinWithCr(), true, false);
+                    break;
+
+                case bool bo:
+                    ValueSet(bo.ToPlusMinus(), true, false);
+                    break;
+
+                case int iv:
+                    ValueSet(iv.ToString(), true, false);
+                    break;
+
+                case Enum:
+                    ValueSet(((int)x).ToString(), true, false);
+                    break;
+
+                case double db:
+                    ValueSet(db.ToString(Constants.Format_Float2), true, false);
+                    break;
+
+                case float fl:
+                    ValueSet(fl.ToString(Constants.Format_Float2), true, false);
+                    break;
+
+                case Color co:
+                    ValueSet(co.ToHtmlCode(), true, false);
+                    break;
+
+                default:
+                    Develop.DebugPrint(FehlerArt.Fehler, "Art unbekannt!");
+                    break;
             }
         }
 
@@ -274,8 +296,8 @@ namespace BlueControls.Controls {
                     c0.ImageCode = QuickImage.Get(image, 22).ToString();
                 }
             } else {
-                switch (_accessor.TypeFullname.ToLower()) {
-                    case "system.boolean": {
+                switch (_accessor) {
+                    case Accessor<bool>: {
                             EditType = EditTypeFormula.Ja_Nein_Knopf;
                             var s1 = BlueFont.MeasureStringOfCaption(Caption);
                             Size = new Size((int)s1.Width + 30, 22);
@@ -294,25 +316,23 @@ namespace BlueControls.Controls {
                                 StyleComboBox((ComboBox)CreateSubControls(), list, ComboBoxStyle.DropDownList);
                             } else {
                                 EditType = EditTypeFormula.Textfeld;
-                                var tmpName = _accessor.TypeFullname.ToLower();
                                 if (textLines >= 2) {
                                     CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
                                     Size = new Size(200, 16 + (24 * textLines));
                                     MultiLine = true;
-                                    tmpName = "system.string";
+                                    this.SetFormat(VarType.Text);
                                 } else {
                                     CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
                                     Size = new Size(200, 24);
                                     MultiLine = false;
-                                }
-
-                                switch (tmpName) {
-                                    case "system.string": this.SetFormat(VarType.Text); break;
-                                    case "system.int32": this.SetFormat(VarType.Integer); break;
-                                    case "system.float": this.SetFormat(VarType.Float); break;
-                                    case "system.double": this.SetFormat(VarType.Float); break;
-                                    case "system.drawing.color": this.SetFormat(VarType.Text); break;
-                                    default: this.SetFormat(VarType.Text); break;
+                                    switch (_accessor) {
+                                        case Accessor<string>: this.SetFormat(VarType.Text); break;
+                                        case Accessor<int>: this.SetFormat(VarType.Integer); break;
+                                        case Accessor<float>: this.SetFormat(VarType.Float); break;
+                                        case Accessor<double>: this.SetFormat(VarType.Float); break;
+                                        case Accessor<Color>: this.SetFormat(VarType.Text); break;
+                                        default: this.SetFormat(VarType.Text); break;
+                                    }
                                 }
 
                                 StyleTextBox((TextBox)CreateSubControls());

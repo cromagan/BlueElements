@@ -238,7 +238,7 @@ namespace BlueControls.ItemCollection {
                 /// /       Item.SheetStyle = Skin.StyleDB.Row[value];
                 //   if (Item.SheetStyle == null) { Item.SheetStyle = Skin.StyleDB.Row.First(); }// Einfach die Erste nehmen
                 _sheetStyle = value;
-                AplyDesignToItems();
+                ApplyDesignToItems();
                 //RepairAll(0, false);
                 OnChanged();
             }
@@ -251,7 +251,7 @@ namespace BlueControls.ItemCollection {
                 if (value < 0.1d) { value = 0.1f; }
                 if (_sheetStyleScale == value) { return; }
                 _sheetStyleScale = value;
-                AplyDesignToItems();
+                ApplyDesignToItems();
                 OnChanged();
             }
         }
@@ -328,7 +328,7 @@ namespace BlueControls.ItemCollection {
                 }
                 return true;
             } catch {
-                Generic.CollectGarbage();
+                CollectGarbage();
                 return false;
             }
         }
@@ -456,7 +456,7 @@ namespace BlueControls.ItemCollection {
             var r = MaxBounds(null);
             if (r.Width == 0) { return null; }
 
-            Generic.CollectGarbage();
+            CollectGarbage();
 
             do {
                 if ((int)(r.Width * scale) > 15000) {
@@ -634,9 +634,9 @@ namespace BlueControls.ItemCollection {
             IsSaved = false;
         }
 
-        private void AplyDesignToItems() {
+        private void ApplyDesignToItems() {
             foreach (var thisItem in this) {
-                thisItem?.DesignOrStyleChanged();
+                thisItem?.ProcessStyleChange();
             }
             OnChanged();
         }

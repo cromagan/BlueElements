@@ -57,7 +57,7 @@ namespace BlueScript.Methods {
 
             var newcommand = vs.ValueString + infos.AttributText.Substring(posgleich) + ";";
 
-            return Method_BerechneVariable.VariablenBerechnung(newcommand, s, infos, false);
+            return Method_BerechneVariable.VariablenBerechnung(newcommand, s, false);
 
             //return s.BerechneVariable.DoitKomplett(newcommand, s, infos, false);
         }

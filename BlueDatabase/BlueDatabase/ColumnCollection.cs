@@ -86,23 +86,23 @@ namespace BlueDatabase {
 
         #region Methods
 
-        public static string ChangeKeysInString(string OriginalString, int OldKey, int NewKey) {
-            var o = ParsableColumnKey(OldKey);
-            if (!OriginalString.Contains(o)) { return OriginalString; }
-            var n = ParsableColumnKey(NewKey);
-            if (OldKey == NewKey) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel gleich:  " + OldKey);
-                return OriginalString;
+        public static string ChangeKeysInString(string originalString, int oldKey, int newKey) {
+            var o = ParsableColumnKey(oldKey);
+            if (!originalString.Contains(o)) { return originalString; }
+            var n = ParsableColumnKey(newKey);
+            if (oldKey == newKey) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel gleich:  " + oldKey);
+                return originalString;
             }
-            OriginalString = OriginalString.Replace(o + "}", n + "}");
-            OriginalString = OriginalString.Replace(o + ",", n + ",");
-            OriginalString = OriginalString.Replace(o + " ", n + " ");
-            if (OriginalString.EndsWith(o)) { OriginalString = OriginalString.TrimEnd(o) + n; }
-            if (OriginalString.Contains(o)) {
-                Develop.DebugPrint(FehlerArt.Fehler, "String nicht ersetzt: " + OriginalString);
-                return OriginalString;
+            originalString = originalString.Replace(o + "}", n + "}");
+            originalString = originalString.Replace(o + ",", n + ",");
+            originalString = originalString.Replace(o + " ", n + " ");
+            if (originalString.EndsWith(o)) { originalString = originalString.TrimEnd(o) + n; }
+            if (originalString.Contains(o)) {
+                Develop.DebugPrint(FehlerArt.Fehler, "String nicht ersetzt: " + originalString);
+                return originalString;
             }
-            return OriginalString;
+            return originalString;
         }
 
         [Obsolete("Direkter Aufruf nicht erlaubt!", true)]
@@ -153,7 +153,7 @@ namespace BlueDatabase {
                 return null;
             }
             columnName = columnName.ToUpper();
-            return this.FirstOrDefault(ThisColumn => ThisColumn != null && ThisColumn.Name == columnName);
+            return this.FirstOrDefault(thisColumn => thisColumn != null && thisColumn.Name == columnName);
         }
 
         /// <summary>
@@ -167,12 +167,12 @@ namespace BlueDatabase {
             wunschname = wunschname.ReduceToChars(Constants.AllowedCharsVariableName);
             if (string.IsNullOrEmpty(wunschname)) { wunschname = "NewColumn"; }
             if (Exists(wunschname) == null) { return wunschname; }
-            string? TestName;
+            string? testName;
             do {
                 nr++;
-                TestName = wunschname + "_" + nr;
-            } while (Exists(TestName) != null);
-            return TestName;
+                testName = wunschname + "_" + nr;
+            } while (Exists(testName) != null);
+            return testName;
         }
 
         public void GenerateOverView() {
@@ -192,18 +192,18 @@ namespace BlueDatabase {
             da.CellAdd("Änderungs-Rechte");
             da.RowEnd();
             var lfdn = 0;
-            foreach (var ThisColumnItem in Database.Column.Where(ThisColumnItem => ThisColumnItem != null)) {
+            foreach (var thisColumnItem in Database.Column.Where(thisColumnItem => thisColumnItem != null)) {
                 lfdn++;
                 da.RowBeginn();
                 da.CellAdd(lfdn.ToString());
-                da.CellAdd(ThisColumnItem.Name);
-                da.CellAdd(ThisColumnItem.Caption.Replace("\r", "<br>"));
-                da.CellAdd((ThisColumnItem.Ueberschrift1 + "/" + ThisColumnItem.Ueberschrift2 + "/" + ThisColumnItem.Ueberschrift3 + "/").TrimEnd("/"));
-                da.CellAdd(ThisColumnItem.Format.ToString());
-                da.CellAdd(ThisColumnItem.Quickinfo.Replace("\r", "<br>"));
-                da.CellAdd(ThisColumnItem.AdminInfo.Replace("\r", "<br>"));
-                da.CellAdd(ThisColumnItem.Tags.JoinWith("<br>"));
-                da.CellAdd(ThisColumnItem.PermissionGroupsChangeCell.JoinWith("<br>"));
+                da.CellAdd(thisColumnItem.Name);
+                da.CellAdd(thisColumnItem.Caption.Replace("\r", "<br>"));
+                da.CellAdd((thisColumnItem.Ueberschrift1 + "/" + thisColumnItem.Ueberschrift2 + "/" + thisColumnItem.Ueberschrift3 + "/").TrimEnd("/"));
+                da.CellAdd(thisColumnItem.Format.ToString());
+                da.CellAdd(thisColumnItem.Quickinfo.Replace("\r", "<br>"));
+                da.CellAdd(thisColumnItem.AdminInfo.Replace("\r", "<br>"));
+                da.CellAdd(thisColumnItem.Tags.JoinWith("<br>"));
+                da.CellAdd(thisColumnItem.PermissionGroupsChangeCell.JoinWith("<br>"));
                 da.RowEnd();
             }
             da.TableEnd();
@@ -219,41 +219,41 @@ namespace BlueDatabase {
             SysRowChanger = null;
             SysRowChangeDate = null;
             SysChapter = null;
-            foreach (var ThisColumnItem in this.Where(ThisColumnItem => ThisColumnItem != null)) {
-                switch (ThisColumnItem.Identifier) {
+            foreach (var thisColumnItem in this.Where(thisColumnItem => thisColumnItem != null)) {
+                switch (thisColumnItem.Identifier) {
                     case "":
                         break;
 
                     case "System: Locked":
-                        SysLocked = ThisColumnItem;
+                        SysLocked = thisColumnItem;
                         break;
 
                     case "System: Creator":
-                        SysRowCreator = ThisColumnItem;
+                        SysRowCreator = thisColumnItem;
                         break;
 
                     case "System: Changer":
-                        SysRowChanger = ThisColumnItem;
+                        SysRowChanger = thisColumnItem;
                         break;
 
                     case "System: Date Created":
-                        SysRowCreateDate = ThisColumnItem;
+                        SysRowCreateDate = thisColumnItem;
                         break;
 
                     case "System: Correct":
-                        SysCorrect = ThisColumnItem;
+                        SysCorrect = thisColumnItem;
                         break;
 
                     case "System: Date Changed":
-                        SysRowChangeDate = ThisColumnItem;
+                        SysRowChangeDate = thisColumnItem;
                         break;
 
                     case "System: Chapter":
-                        SysChapter = ThisColumnItem;
+                        SysChapter = thisColumnItem;
                         break;
 
                     default:
-                        Develop.DebugPrint(FehlerArt.Fehler, "Unbekannte Kennung: " + ThisColumnItem.Identifier);
+                        Develop.DebugPrint(FehlerArt.Fehler, "Unbekannte Kennung: " + thisColumnItem.Identifier);
                         break;
                 }
             }
@@ -293,22 +293,22 @@ namespace BlueDatabase {
             }
 
             // Reihengolge reparieren
-            var ColN = -1;
+            var colN = -1;
             do {
-                ColN++;
-                if (ColN + 2 > Count) { break; }
-                if (this[ColN] == null) {
-                    Swap(ColN, ColN + 1);
-                    ColN = -1;
-                } else if (this[ColN + 1] == null) {
+                colN++;
+                if (colN + 2 > Count) { break; }
+                if (this[colN] == null) {
+                    Swap(colN, colN + 1);
+                    colN = -1;
+                } else if (this[colN + 1] == null) {
                     // Dummy, um nachfoldgnd nicht abfragen zu müssen
-                } else if (!string.IsNullOrEmpty(this[ColN].Identifier) && string.IsNullOrEmpty(this[ColN + 1].Identifier)) {
-                    Swap(ColN, ColN + 1);
-                    ColN = -1;
-                } else if (!string.IsNullOrEmpty(this[ColN].Identifier) && !string.IsNullOrEmpty(this[ColN + 1].Identifier)) {
-                    if (w.IndexOf(this[ColN].Identifier) > w.IndexOf(this[ColN + 1].Identifier)) {
-                        Swap(ColN, ColN + 1);
-                        ColN = -1;
+                } else if (!string.IsNullOrEmpty(this[colN].Identifier) && string.IsNullOrEmpty(this[colN + 1].Identifier)) {
+                    Swap(colN, colN + 1);
+                    colN = -1;
+                } else if (!string.IsNullOrEmpty(this[colN].Identifier) && !string.IsNullOrEmpty(this[colN + 1].Identifier)) {
+                    if (w.IndexOf(this[colN].Identifier) > w.IndexOf(this[colN + 1].Identifier)) {
+                        Swap(colN, colN + 1);
+                        colN = -1;
                     }
                 }
             } while (true);
@@ -323,7 +323,7 @@ namespace BlueDatabase {
                 if (Database == null) { return null; }
                 if (key < 0) { return null; } // Evtl. Gelöschte Spalte in irgendeiner Order
                 Database.BlockReload(false);
-                return this.FirstOrDefault(ThisColumn => ThisColumn != null && ThisColumn.Key == key);
+                return this.FirstOrDefault(thisColumn => thisColumn != null && thisColumn.Key == key);
             } catch {
                 return SearchByKey(key); // Sammlung wurde verändert
             }
@@ -337,9 +337,9 @@ namespace BlueDatabase {
             Database.ColumnArrangements[0].ShowAllColumns(); // Damit die Datenbank mitbekommt, das sich da was geändert hat
         }
 
-        internal static string ParsableColumnKey(ColumnItem Column) => Column == null ? "ColumnKey=?" : ParsableColumnKey(Column.Key);
+        internal static string ParsableColumnKey(ColumnItem column) => column == null ? "ColumnKey=?" : ParsableColumnKey(column.Key);
 
-        internal static string ParsableColumnKey(long Key) => "ColumnKey=" + Key;
+        internal static string ParsableColumnKey(long key) => "ColumnKey=" + key;
 
         internal long NextColumnKey() {
             var s = Generic.UserName() + "\r\n" + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName;
@@ -371,11 +371,11 @@ namespace BlueDatabase {
         //    return string.Empty;
         //}
 
-        internal void SaveToByteList(List<byte> List) {
+        internal void SaveToByteList(List<byte> list) {
             //Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString());
-            for (var ColumnCount = 0; ColumnCount < Count; ColumnCount++) {
-                if (this[ColumnCount] != null && !string.IsNullOrEmpty(this[ColumnCount].Name)) {
-                    this[ColumnCount].SaveToByteList(ref List);
+            for (var columnCount = 0; columnCount < Count; columnCount++) {
+                if (this[columnCount] != null && !string.IsNullOrEmpty(this[columnCount].Name)) {
+                    this[columnCount].SaveToByteList(ref list);
                 }
             }
         }
@@ -387,7 +387,7 @@ namespace BlueDatabase {
         }
 
         private void AddSystem(string identifier) {
-            if (this.Any(ThisColumn => ThisColumn != null && string.Equals(ThisColumn.Identifier, identifier, StringComparison.CurrentCultureIgnoreCase))) {
+            if (this.Any(thisColumn => thisColumn != null && string.Equals(thisColumn.Identifier, identifier, StringComparison.CurrentCultureIgnoreCase))) {
                 return;
             }
             var c = Add(identifier);

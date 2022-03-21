@@ -120,7 +120,7 @@ namespace BlueControls.Forms {
 
         public new void Show() {
             try {
-                WindowsRemoteControl.ShowWindow(Handle, (int)enSw.ShowNoActivate);
+                WindowsRemoteControl.ShowWindow(Handle, (int)Sw.ShowNoActivate);
             } catch (ObjectDisposedException) {
                 // kommt vor, wenn der Aufbau zu lange dauert. Ignorierbar.
             } catch (Exception ex) {

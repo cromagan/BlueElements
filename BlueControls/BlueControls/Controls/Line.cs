@@ -29,7 +29,7 @@ namespace BlueControls.Controls {
 
         #region Fields
 
-        private Orientation _Orientation = Orientation.Waagerecht;
+        private Orientation _orientation = Orientation.Waagerecht;
 
         #endregion
 
@@ -49,12 +49,12 @@ namespace BlueControls.Controls {
 
         [DefaultValue(Orientation.Waagerecht)]
         public Orientation Orientation {
-            get => _Orientation;
+            get => _orientation;
             set {
-                if (value == _Orientation) {
+                if (value == _orientation) {
                     return;
                 }
-                _Orientation = value;
+                _orientation = value;
                 CheckSize();
                 Invalidate();
             }
@@ -77,7 +77,7 @@ namespace BlueControls.Controls {
         #region Methods
 
         public void CheckSize() {
-            if (_Orientation == Orientation.Waagerecht) {
+            if (_orientation == Orientation.Waagerecht) {
                 if (Width < 10) { Width = 10; }
                 Height = 2;
             } else {
@@ -88,14 +88,14 @@ namespace BlueControls.Controls {
 
         protected override void DrawControl(Graphics gr, States state) {
             CheckSize();
-            Pen DP = new(SystemColors.ControlDark);
-            Pen LP = new(SystemColors.ControlLight);
-            if (_Orientation == Orientation.Waagerecht) {
-                gr.DrawLine(DP, 0, 0, Width - 1, 0);
-                gr.DrawLine(LP, 1, 1, Width, 1);
+            Pen dp = new(SystemColors.ControlDark);
+            Pen lp = new(SystemColors.ControlLight);
+            if (_orientation == Orientation.Waagerecht) {
+                gr.DrawLine(dp, 0, 0, Width - 1, 0);
+                gr.DrawLine(lp, 1, 1, Width, 1);
             } else {
-                gr.DrawLine(DP, 0, 0, 0, Height - 1);
-                gr.DrawLine(LP, 1, 1, 1, Height);
+                gr.DrawLine(dp, 0, 0, 0, Height - 1);
+                gr.DrawLine(lp, 1, 1, 1, Height);
             }
         }
 

@@ -441,7 +441,7 @@ namespace BlueDatabase {
             var lockMe = new object();
 
             foreach (var thisColumnItem in Column) {
-                if (thisColumnItem != null && thisColumnItem.Format == BlueBasics.Enums.DataFormat.Link_To_Filesystem) {
+                if (thisColumnItem != null && thisColumnItem.Format == DataFormat.Link_To_Filesystem) {
                     var tmp = thisColumnItem.Contents();
                     Parallel.ForEach(tmp, thisTmp => {
                         var x = thisColumnItem.BestFile(thisTmp, false).ToLower();
@@ -621,7 +621,7 @@ namespace BlueDatabase {
                         if (thisColumn != null) {
                             var lcColumn = thisColumn;
                             var lCrow = thisRow.Row;
-                            if (thisColumn.Format is BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+                            if (thisColumn.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                                 (lcColumn, lCrow, _) = CellCollection.LinkedCellData(thisColumn, thisRow.Row, false, false);
                             }
                             if (lCrow != null && lcColumn != null) {
@@ -708,7 +708,7 @@ namespace BlueDatabase {
                     if (col == null) {
                         col = Column.Add(zeil[0][spaltNo]);
                         col.Caption = zeil[0][spaltNo];
-                        col.Format = BlueBasics.Enums.DataFormat.Text;
+                        col.Format = DataFormat.Text;
                     }
                     columns.Add(col);
                 }
@@ -717,7 +717,7 @@ namespace BlueDatabase {
                 while (columns.Count < zeil[0].GetUpperBound(0) + 1) {
                     var newc = Column.Add();
                     newc.Caption = newc.Name;
-                    newc.Format = BlueBasics.Enums.DataFormat.Text;
+                    newc.Format = DataFormat.Text;
                     newc.MultiLine = true;
                     columns.Add(newc);
                 }

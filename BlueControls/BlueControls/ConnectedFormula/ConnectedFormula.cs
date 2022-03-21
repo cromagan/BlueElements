@@ -36,7 +36,7 @@ namespace BlueControls.ConnectedFormula {
 
         #region Fields
 
-        public static readonly string Version = "0.01";
+        public const string Version = "0.01";
 
         public readonly ListExt<string> DatabaseFiles = new();
         public readonly List<Database?> Databases = new();
@@ -142,7 +142,7 @@ namespace BlueControls.ConnectedFormula {
             foreach (var thisfile in DatabaseFiles) {
                 var mf = Database.GetByFilename(thisfile, false, false);
 
-                if (mf is BlueDatabase.Database db) {
+                if (mf is Database db) {
                     Databases.Add(db);
                 } else {
                     Databases.Add(null);

@@ -104,38 +104,38 @@ namespace BlueBasics.Enums {
 
         #region Methods
 
-        public static bool Autofilter_möglich(this Enums.DataFormat format) => format switch {
-            Enums.DataFormat.Text or Enums.DataFormat.FarbeInteger or Enums.DataFormat.Schrift or Enums.DataFormat.Link_To_Filesystem or Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank or Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems or Enums.DataFormat.RelationText => true,
+        public static bool Autofilter_möglich(this DataFormat format) => format switch {
+            DataFormat.Text or DataFormat.FarbeInteger or DataFormat.Schrift or DataFormat.Link_To_Filesystem or DataFormat.Verknüpfung_zu_anderer_Datenbank or DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems or DataFormat.RelationText => true,
             _ => false
         };
 
-        public static bool CanBeChangedByRules(this Enums.DataFormat format) => format switch {
-            Enums.DataFormat.Text or Enums.DataFormat.FarbeInteger or Enums.DataFormat.RelationText or Enums.DataFormat.Schrift => true,
+        public static bool CanBeChangedByRules(this DataFormat format) => format switch {
+            DataFormat.Text or DataFormat.FarbeInteger or DataFormat.RelationText or DataFormat.Schrift => true,
             _ => false
         };
 
-        public static bool CanBeCheckedByRules(this Enums.DataFormat format) => format switch {
-            Enums.DataFormat.Text or Enums.DataFormat.FarbeInteger or Enums.DataFormat.RelationText or Enums.DataFormat.Schrift or Enums.DataFormat.Link_To_Filesystem or Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank or Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems => true,
+        public static bool CanBeCheckedByRules(this DataFormat format) => format switch {
+            DataFormat.Text or DataFormat.FarbeInteger or DataFormat.RelationText or DataFormat.Schrift or DataFormat.Link_To_Filesystem or DataFormat.Verknüpfung_zu_anderer_Datenbank or DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems => true,
             _ => false
         };
 
-        public static bool DropdownItemsAllowed(this Enums.DataFormat format) => format switch {
-            Enums.DataFormat.Text or Enums.DataFormat.Link_To_Filesystem or Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems or Enums.DataFormat.RelationText => true,
+        public static bool DropdownItemsAllowed(this DataFormat format) => format switch {
+            DataFormat.Text or DataFormat.Link_To_Filesystem or DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems or DataFormat.RelationText => true,
             _ => false
         };
 
-        public static bool DropdownItemsOfOtherCellsAllowed(this Enums.DataFormat format) => format switch {
-            Enums.DataFormat.Text or Enums.DataFormat.FarbeInteger or Enums.DataFormat.Schrift or Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank or Enums.DataFormat.RelationText => true,
+        public static bool DropdownItemsOfOtherCellsAllowed(this DataFormat format) => format switch {
+            DataFormat.Text or DataFormat.FarbeInteger or DataFormat.Schrift or DataFormat.Verknüpfung_zu_anderer_Datenbank or DataFormat.RelationText => true,
             _ => false
         };
 
-        public static bool DropdownUnselectAllAllowed(this Enums.DataFormat format) => format switch {
-            Enums.DataFormat.Text or Enums.DataFormat.FarbeInteger or Enums.DataFormat.RelationText or Enums.DataFormat.Schrift or Enums.DataFormat.Link_To_Filesystem or Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank => true,
+        public static bool DropdownUnselectAllAllowed(this DataFormat format) => format switch {
+            DataFormat.Text or DataFormat.FarbeInteger or DataFormat.RelationText or DataFormat.Schrift or DataFormat.Link_To_Filesystem or DataFormat.Verknüpfung_zu_anderer_Datenbank => true,
             _ => false
         };
 
-        public static bool ExportableForLayout(this Enums.DataFormat format) => format switch {
-            Enums.DataFormat.Text or Enums.DataFormat.RelationText or Enums.DataFormat.Schrift or Enums.DataFormat.Link_To_Filesystem or Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank or Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems => true,
+        public static bool ExportableForLayout(this DataFormat format) => format switch {
+            DataFormat.Text or DataFormat.RelationText or DataFormat.Schrift or DataFormat.Link_To_Filesystem or DataFormat.Verknüpfung_zu_anderer_Datenbank or DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems => true,
             _ => false
         };
 
@@ -159,23 +159,23 @@ namespace BlueBasics.Enums {
 
         //public static bool IsFormat(this string txt, enDataFormat format) => Text_LängeCheck(txt, format) && Text_SchabloneCheck(txt, format) && txt.ContainsOnlyChars(AllowedChars(format)) && Text_ValueCheck(txt, format);
 
-        public static bool MultilinePossible(this Enums.DataFormat format) => format switch {
-            Enums.DataFormat.Text or Enums.DataFormat.RelationText or Enums.DataFormat.Link_To_Filesystem or Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank => true,
+        public static bool MultilinePossible(this DataFormat format) => format switch {
+            DataFormat.Text or DataFormat.RelationText or DataFormat.Link_To_Filesystem or DataFormat.Verknüpfung_zu_anderer_Datenbank => true,
             _ => false
         };
 
-        public static bool NeedTargetDatabase(this Enums.DataFormat format) => format switch {
-            Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank or Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems => true,
+        public static bool NeedTargetDatabase(this DataFormat format) => format switch {
+            DataFormat.Verknüpfung_zu_anderer_Datenbank or DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems => true,
             _ => false
         };
 
-        public static bool SaveSizeData(this Enums.DataFormat format) => format switch {
-            Enums.DataFormat.Text or Enums.DataFormat.FarbeInteger or Enums.DataFormat.RelationText or Enums.DataFormat.Schrift or Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems => true,
+        public static bool SaveSizeData(this DataFormat format) => format switch {
+            DataFormat.Text or DataFormat.FarbeInteger or DataFormat.RelationText or DataFormat.Schrift or DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems => true,
             _ => false
         };
 
-        public static bool SpellCheckingPossible(this Enums.DataFormat format) => format switch {
-            Enums.DataFormat.Text or Enums.DataFormat.RelationText => true,
+        public static bool SpellCheckingPossible(this DataFormat format) => format switch {
+            DataFormat.Text or DataFormat.RelationText => true,
             _ => false
         };
 
@@ -302,8 +302,8 @@ namespace BlueBasics.Enums {
         //    }
         //}
 
-        public static bool TextboxEditPossible(this Enums.DataFormat format) => format switch {
-            Enums.DataFormat.Text or Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank or Enums.DataFormat.RelationText => true,
+        public static bool TextboxEditPossible(this DataFormat format) => format switch {
+            DataFormat.Text or DataFormat.Verknüpfung_zu_anderer_Datenbank or DataFormat.RelationText => true,
             _ => false
         };
 

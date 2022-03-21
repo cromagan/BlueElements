@@ -33,15 +33,15 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
-        public readonly Size Size;
-        public readonly string Text;
+        //public readonly Size Size;
+        private readonly string _text;
 
         #endregion
 
         #region Constructors
 
         public GenericPadItem(string intern, string text, Size s) : base(intern) {
-            Text = text;
+            _text = text;
             Size = s;
         }
 
@@ -51,17 +51,17 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        public override void DesignOrStyleChanged() => RemovePic();
-
         public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
 
-            t = t + "Text=" + Text.ToNonCritical() + ", ";
+            t = t + "Text=" + _text.ToNonCritical() + ", ";
             t = t + "Size=" + Size + ", ";
 
             return t.Trim(", ") + "}";
         }
+
+        internal override void ProcessStyleChange() => RemovePic();
 
         protected override string ClassId() => "GenericConnectible";
 
@@ -77,7 +77,7 @@ namespace BlueControls.ItemCollection {
                 return bmp;
             }
 
-            Skin.Draw_FormatedText(gr, Text, null, Alignment.Horizontal_Vertical_Center, new Rectangle(0, 0, Size.Width, Size.Height), null, false, font, false);
+            Skin.Draw_FormatedText(gr, _text, null, Alignment.Horizontal_Vertical_Center, new Rectangle(0, 0, Size.Width, Size.Height), null, false, font, false);
             gr.DrawRectangle(font.Pen(1), new Rectangle(0, 0, Size.Width, Size.Height));
 
             return bmp;

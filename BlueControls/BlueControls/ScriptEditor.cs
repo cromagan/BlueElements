@@ -40,10 +40,10 @@ namespace BlueControls {
         #region Fields
 
         private Befehlsreferenz? _befehlsReferenz;
-        private string _LastVariableContent = string.Empty;
-        private string? _LastWord = string.Empty;
-        private bool _MenuDone;
-        private AutocompleteMenu _PopupMenu;
+        private string _lastVariableContent = string.Empty;
+        private string? _lastWord = string.Empty;
+        private bool _menuDone;
+        private AutocompleteMenu _popupMenu;
 
         #endregion
 
@@ -82,19 +82,19 @@ namespace BlueControls {
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
             switch (e.ClickedComand.ToLower()) {
                 case "variableninhalt kopieren":
-                    Generic.CopytoClipboard(_LastVariableContent);
+                    Generic.CopytoClipboard(_lastVariableContent);
                     return true;
             }
 
             return false;
         }
 
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? Items, out object? HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
-            if (!string.IsNullOrEmpty(_LastVariableContent)) {
-                Items.Add("Variableninhalt kopieren");
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
+            if (!string.IsNullOrEmpty(_lastVariableContent)) {
+                items.Add("Variableninhalt kopieren");
             }
 
-            HotItem = _LastWord;
+            hotItem = _lastWord;
         }
 
         public void Message(string txt) => txbSkriptInfo.Text = "[" + DateTime.Now.ToLongTimeString() + "] " + txt;
@@ -129,9 +129,9 @@ namespace BlueControls {
         protected virtual void OpenAdditionalFileFolder() { }
 
         protected void WriteComandsToList(Script s) {
-            if (!_MenuDone) {
-                _MenuDone = true;
-                _PopupMenu = new AutocompleteMenu(txtSkript) {
+            if (!_menuDone) {
+                _menuDone = true;
+                _popupMenu = new AutocompleteMenu(txtSkript) {
                     //popupMenu.Items.ImageList = imageList1;
                     SearchPattern = @"[\w\.:=!<>]",
                     AllowTabKey = true
@@ -148,7 +148,7 @@ namespace BlueControls {
                     }
                 }
                 //set as autocomplete source
-                _PopupMenu.Items.SetAutocompleteItems(items);
+                _popupMenu.Items.SetAutocompleteItems(items);
             }
         }
 
@@ -215,10 +215,10 @@ namespace BlueControls {
             x.Column.Add("Inhalt", "I", VarType.Text, "Inhalt (gekürzte Ansicht)");
             x.Column.Add("Kommentar", "K", VarType.Text, "Komentar");
 
-            foreach (var ThisColumn in x.Column.Where(ThisColumn => string.IsNullOrEmpty(ThisColumn.Identifier))) {
-                ThisColumn.MultiLine = true;
-                ThisColumn.TextBearbeitungErlaubt = false;
-                ThisColumn.DropdownBearbeitungErlaubt = false;
+            foreach (var thisColumn in x.Column.Where(thisColumn => string.IsNullOrEmpty(thisColumn.Identifier))) {
+                thisColumn.MultiLine = true;
+                thisColumn.TextBearbeitungErlaubt = false;
+                thisColumn.DropdownBearbeitungErlaubt = false;
             }
 
             x.RepairAfterParse();
@@ -258,20 +258,20 @@ namespace BlueControls {
             if (Script.Comands == null) { return; }
 
             try {
-                _LastWord = string.Empty;
-                _LastVariableContent = string.Empty;
+                _lastWord = string.Empty;
+                _lastVariableContent = string.Empty;
                 foreach (var thisc in Script.Comands.Where(thisc => thisc.Comand(null).Contains(e.HoveredWord, false))) {
                     e.ToolTipTitle = thisc.Syntax;
                     e.ToolTipText = thisc.HintText();
                     return;
                 }
                 var hoveredWordnew = new Range(txtSkript, e.Place, e.Place).GetFragment("[A-Za-z0-9_]").Text;
-                _LastWord = hoveredWordnew;
+                _lastWord = hoveredWordnew;
 
                 foreach (var r in tableVariablen.Database.Row) {
                     if (string.Equals(r.CellFirstString(), hoveredWordnew, StringComparison.CurrentCultureIgnoreCase)) {
                         var inh = r.CellGetString("Inhalt");
-                        _LastVariableContent = inh;
+                        _lastVariableContent = inh;
                         inh = inh.Replace("\r", ";");
                         inh = inh.Replace("\n", ";");
                         if (inh.Length > 25) { inh = inh.Substring(0, 20) + "..."; }

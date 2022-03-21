@@ -89,7 +89,7 @@ namespace BlueControls.ItemCollection {
             List<FlexiControl> l = new()
             {
                 new FlexiControl(),
-                new FlexiControlForProperty<int>(() => this.Drehwinkel)
+                new FlexiControlForProperty<int>(() => Drehwinkel)
             };
             l.AddRange(base.GetStyleOptions());
             return l;

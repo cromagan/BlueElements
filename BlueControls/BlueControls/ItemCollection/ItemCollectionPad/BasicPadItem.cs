@@ -55,6 +55,7 @@ namespace BlueControls.ItemCollection {
         /// <remarks></remarks>
         private bool _beiExportSichtbar = true;
 
+        private bool _disposedValue;
         private ItemCollectionPad _parent;
 
         private PadStyles _style = PadStyles.Style_Standard;
@@ -62,7 +63,6 @@ namespace BlueControls.ItemCollection {
         private RectangleF _usedArea;
 
         private int _zoomPadding;
-        private bool disposedValue;
 
         #endregion
 
@@ -129,7 +129,8 @@ namespace BlueControls.ItemCollection {
             set {
                 if (_style == value) { return; }
                 _style = value;
-                DesignOrStyleChanged();
+                ProcessStyleChange();
+                OnChanged();
             }
         }
 
@@ -165,7 +166,6 @@ namespace BlueControls.ItemCollection {
         #region Methods
 
         public static BasicPadItem? NewByParsing(string code) {
-            BasicPadItem? i = null;
             var x = code.GetAllTags();
             var ding = string.Empty;
             var name = string.Empty;
@@ -193,7 +193,7 @@ namespace BlueControls.ItemCollection {
 
             if (ItemCollectionPad.PadItemTypes != null) {
                 foreach (var thisType in ItemCollectionPad.PadItemTypes) {
-                    i = thisType.TryParse(ding, name, x);
+                    var i = thisType.TryParse(ding, name, x);
                     if (i != null) { return i; }
                 }
             }
@@ -226,11 +226,9 @@ namespace BlueControls.ItemCollection {
             return tmp.Contains(value);
         }
 
-        public virtual void DesignOrStyleChanged() { }
-
         public void Dispose() {
             // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-            Dispose(disposing: true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -239,10 +237,10 @@ namespace BlueControls.ItemCollection {
 
             if (forPrinting && !_beiExportSichtbar) { return; }
 
-            var PositionModified = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
+            var positionModified = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
 
-            if (IsInDrawingArea(PositionModified, sizeOfParentControl)) {
-                DrawExplicit(gr, PositionModified, zoom, shiftX, shiftY, forPrinting);
+            if (IsInDrawingArea(positionModified, sizeOfParentControl)) {
+                DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
             }
 
             #region Verknüpfte Pfeile Zeichnen
@@ -302,8 +300,8 @@ namespace BlueControls.ItemCollection {
             List<FlexiControl> l = new()
             {
                 new FlexiControl(),
-                new FlexiControlForProperty<string>(() => this.Gruppenzugehörigkeit),
-                new FlexiControlForProperty<bool>(() => this.Bei_Export_Sichtbar)
+                new FlexiControlForProperty<string>(() => Gruppenzugehörigkeit),
+                new FlexiControlForProperty<bool>(() => Bei_Export_Sichtbar)
             };
             if (AdditionalStyleOptions != null) {
                 l.Add(new FlexiControl());
@@ -446,9 +444,9 @@ namespace BlueControls.ItemCollection {
             return x;
         }
 
-        internal void AddLineStyleOption(List<FlexiControl> l) => l.Add(new FlexiControlForProperty<PadStyles>(() => this.Stil, Skin.GetRahmenArt(_parent.SheetStyle, true)));
+        internal void AddLineStyleOption(List<FlexiControl> l) => l.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(_parent.SheetStyle, true)));
 
-        internal void AddStyleOption(List<FlexiControl> l) => l.Add(new FlexiControlForProperty<PadStyles>(() => this.Stil, Skin.GetFonts(_parent.SheetStyle)));
+        internal void AddStyleOption(List<FlexiControl> l) => l.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetFonts(_parent.SheetStyle)));
 
         internal BasicPadItem? Next() {
             var itemCount = _parent.IndexOf(this);
@@ -470,12 +468,18 @@ namespace BlueControls.ItemCollection {
             } while (true);
         }
 
+        /// <summary>
+        /// Teilt dem Item mit, dass das Design geändert wurde.
+        /// Es löst kein Ereigniss aus.
+        /// </summary>
+        internal virtual void ProcessStyleChange() { }
+
         protected abstract RectangleF CalculateUsedArea();
 
         protected abstract string ClassId();
 
         protected virtual void Dispose(bool disposing) {
-            if (!disposedValue) {
+            if (!_disposedValue) {
                 if (disposing) {
                     // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
                 }
@@ -493,7 +497,7 @@ namespace BlueControls.ItemCollection {
 
                 // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
                 // TODO: Große Felder auf NULL setzen
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
 

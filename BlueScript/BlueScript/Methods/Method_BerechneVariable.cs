@@ -53,10 +53,9 @@ namespace BlueScript.Methods {
         /// </summary>
         /// <param name="newcommand">Erwartet wird: X=5;</param>
         /// <param name="s"></param>
-        /// <param name="originalinfos"></param>
         /// <param name="generateVariable"></param>
         /// <returns></returns>
-        public static DoItFeedback VariablenBerechnung(string newcommand, Script s, CanDoFeedback originalinfos, bool generateVariable) {
+        public static DoItFeedback VariablenBerechnung(string newcommand, Script s, bool generateVariable) {
             //if (s.BerechneVariable == null) { return new DoItFeedback("Interner Fehler"); }
 
             var (pos, _) = NextText(newcommand, 0, Gleich, false, false, null);
@@ -97,7 +96,7 @@ namespace BlueScript.Methods {
         /// <param name="infos"></param>
         /// <param name="s"></param>
         /// <returns></returns>
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) => VariablenBerechnung(infos.ComandText + infos.AttributText + ";", s, infos, false);
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) => VariablenBerechnung(infos.ComandText + infos.AttributText + ";", s, false);
 
         #endregion
     }

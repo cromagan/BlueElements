@@ -72,7 +72,7 @@ namespace BlueDatabase {
         public static string AutomaticInitalValue(ColumnItem? column, RowItem? row) {
             if (column == null || row == null) { return string.Empty; }
 
-            if (column.Format is BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 var (lcolumn, lrow, _) = LinkedCellData(column, row, true, true);
                 return AutomaticInitalValue(lcolumn, lrow);
             }
@@ -105,7 +105,7 @@ namespace BlueDatabase {
             if (!string.IsNullOrEmpty(tmpf)) { return LanguageTool.DoTranslate(tmpf); }
             if (!column.SaveContent) { return LanguageTool.DoTranslate("Der Spalteninhalt wird nicht gespeichert."); }
 
-            if (column.Format is BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 var (lcolumn, lrow, info) = LinkedCellData(column, row, true, false);
                 if (lcolumn != null && lrow != null) {
                     lcolumn.Database.PowerEdit = column.Database.PowerEdit;
@@ -161,7 +161,7 @@ namespace BlueDatabase {
                 }
             }
 
-            if (fi.Count == 0 && column.Format != BlueBasics.Enums.DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return (null, "Keine gültigen Suchkriterien definiert."); }
+            if (fi.Count == 0 && column.Format != DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return (null, "Keine gültigen Suchkriterien definiert."); }
 
             return (fi, string.Empty);
         }
@@ -195,7 +195,7 @@ namespace BlueDatabase {
         public static (ColumnItem? column, RowItem? row, string info) LinkedCellData(ColumnItem? column, RowItem? row, bool repairLinkedValue, bool addRowIfNotExists) {
             if (column == null) { return (null, null, "Interner Spaltenfehler."); }
 
-            if (column.Format is not BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank) { return ((ColumnItem?)null, (RowItem?)null, "Format ist nicht LinkedCell."); }
+            if (column.Format is not DataFormat.Verknüpfung_zu_anderer_Datenbank) { return ((ColumnItem?)null, (RowItem?)null, "Format ist nicht LinkedCell."); }
 
             var linkedDatabase = column.LinkedDatabase;
             if (linkedDatabase == null) { return (null, null, "Verlinkte Datenbank nicht gefunden."); }
@@ -285,12 +285,12 @@ namespace BlueDatabase {
             var currentValue = GetString(column, _database.Row.SearchByKey(rowKey));
             if (!doAlways && currentValue == previewsValue) { return; }
             switch (column.Format) {
-                case BlueBasics.Enums.DataFormat.RelationText:
+                case DataFormat.RelationText:
                     RepairRelationText(column, _database.Row.SearchByKey(rowKey), previewsValue);
                     SetSameValueOfKey(column, rowKey, currentValue);
                     break;
 
-                case BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank:
+                case DataFormat.Verknüpfung_zu_anderer_Datenbank:
                     if (doAlways) {
                         LinkedCellData(column, _database.Row.SearchByKey(rowKey), true, false); // Repariert auch Cellbezüge
                     }
@@ -305,7 +305,7 @@ namespace BlueDatabase {
                         //case enDataFormat.Relation:
                         //    RelationNameChanged(ThisColumnItem, PreviewsValue, CurrentValue);
                         //    break;
-                        case BlueBasics.Enums.DataFormat.RelationText:
+                        case DataFormat.RelationText:
                             RelationTextNameChanged(thisColumnItem, rowKey, previewsValue, currentValue);
                             break;
                     }
@@ -380,7 +380,7 @@ namespace BlueDatabase {
             try {
                 if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
                 if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + _database.Filename); }
-                if (column.Format is BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+                if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                     var (lcolumn, lrow, _) = LinkedCellData(column, row, false, false);
                     return lcolumn != null && lrow != null ? lrow.CellGetString(lcolumn) : string.Empty;
                 }
@@ -403,7 +403,7 @@ namespace BlueDatabase {
         public bool IsNullOrEmpty(ColumnItem? column, RowItem? row) {
             if (column == null) { return true; }
             if (row == null) { return true; }
-            if (column.Format is BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 var (lcolumn, lrow, _) = LinkedCellData(column, row, false, false);
                 return lcolumn == null || lrow == null || lrow.CellIsNullOrEmpty(lcolumn);
             }
@@ -445,7 +445,7 @@ namespace BlueDatabase {
                 // Tatsächlichen String ermitteln --------------------------------------------
                 var @string = string.Empty;
                 var fColumn = column;
-                if (column.Format is BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+                if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                     var (columnItem, rowItem, _) = LinkedCellData(column, row, false, false);
                     if (columnItem != null && rowItem != null) {
                         @string = rowItem.CellGetString(columnItem);
@@ -514,7 +514,7 @@ namespace BlueDatabase {
             _database.BlockReload(false);
             if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
             if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!!<br>" + _database.Filename); }
-            if (column.Format is BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 var (lcolumn, lrow, _) = LinkedCellData(column, row, true, !string.IsNullOrEmpty(value));
                 lrow?.CellSet(lcolumn, value);
                 return;
@@ -670,7 +670,7 @@ namespace BlueDatabase {
                 return;
             }
 
-            if (column?.Format is not BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank) { value = column?.AutoCorrect(value); }
+            if (column?.Format is not DataFormat.Verknüpfung_zu_anderer_Datenbank) { value = column?.AutoCorrect(value); }
 
             var cellKey = KeyOfCell(column.Key, row.Key);
             var oldValue = string.Empty;
@@ -882,7 +882,7 @@ namespace BlueDatabase {
             if (keyc is null) { return; }
 
             var ownRow = _database.Row.SearchByKey(rowKey);
-            var rows = keyc.Format == BlueBasics.Enums.DataFormat.RelationText
+            var rows = keyc.Format == DataFormat.RelationText
                 ? ConnectedRowsOfRelations(ownRow.CellGetString(keyc), ownRow)
                 : RowCollection.MatchesTo(new FilterItem(keyc, FilterType.Istgleich_GroßKleinEgal, ownRow.CellGetString(keyc)));
             rows.Remove(ownRow);
@@ -976,7 +976,7 @@ namespace BlueDatabase {
                 //    LinkedCellData(thisColumn, ownRow, true, false); // Repariert auch Zellbezüge
                 //}
 
-                if (thisColumn.Format == BlueBasics.Enums.DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+                if (thisColumn.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                     foreach (var thisV in thisColumn.LinkedCellFilter) {
                         if (IntTryParse(thisV, out var key)) {
                             if (key == column.Key) { LinkedCellData(thisColumn, ownRow, true, false); break; }
@@ -986,7 +986,7 @@ namespace BlueDatabase {
 
                 if (thisColumn.KeyColumnKey == column.Key) {
                     if (rows == null) {
-                        rows = column.Format == BlueBasics.Enums.DataFormat.RelationText
+                        rows = column.Format == DataFormat.RelationText
                             ? ConnectedRowsOfRelations(currentvalue, ownRow)
                             : RowCollection.MatchesTo(new FilterItem(column, FilterType.Istgleich_GroßKleinEgal, currentvalue));
                         rows.Remove(ownRow);

@@ -32,7 +32,7 @@ namespace BlueControls.Forms {
         #region Fields
 
         private readonly ColumnItem? _column;
-        private Database? Database;
+        private Database? _database;
 
         #endregion
 
@@ -44,10 +44,10 @@ namespace BlueControls.Forms {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            Database = database;
-            Database.Disposing += Database_Disposing;
-            foreach (var ThisColumnItem in Database.Column.Where(ThisColumnItem => ThisColumnItem != null && ThisColumnItem.Format == BlueBasics.Enums.DataFormat.RelationText)) {
-                _column = ThisColumnItem;
+            _database = database;
+            _database.Disposing += Database_Disposing;
+            foreach (var thisColumnItem in _database.Column.Where(thisColumnItem => thisColumnItem != null && thisColumnItem.Format == DataFormat.RelationText)) {
+                _column = thisColumnItem;
                 break;
             }
         }
@@ -56,38 +56,38 @@ namespace BlueControls.Forms {
 
         #region Methods
 
-        public RowFormulaPadItem? AddOne(string What, int xPos, int Ypos, string layoutID) {
-            if (string.IsNullOrEmpty(What)) { return null; }
-            if (Pad.Item[What] != null) { return null; }
-            var r = Database.Row[What];
+        public RowFormulaPadItem? AddOne(string what, int xPos, int ypos, string layoutId) {
+            if (string.IsNullOrEmpty(what)) { return null; }
+            if (Pad.Item[what] != null) { return null; }
+            var r = _database.Row[what];
             if (r == null) {
-                MessageBox.Show("<b>" + What + "</B> konnte nicht hinzugefügt werden.", ImageCode.Information, "OK");
+                MessageBox.Show("<b>" + what + "</B> konnte nicht hinzugefügt werden.", ImageCode.Information, "OK");
                 return null;
             }
             if (ItemOfRow(r) != null) { return null; }
-            RowFormulaPadItem i2 = new(Database, r.Key, layoutID);
+            RowFormulaPadItem i2 = new(_database, r.Key, layoutId);
             Pad.Item.Add(i2);
             //  Pad.Invalidate()
-            i2.SetLeftTopPoint(xPos, Ypos);
+            i2.SetLeftTopPoint(xPos, ypos);
             i2.InDenVordergrund();
             //RelationsValid = false;
             return i2;
         }
 
-        public RowFormulaPadItem? ItemOfRow(RowItem R) {
-            foreach (var ThisItem in Pad.Item) {
-                if (ThisItem is RowFormulaPadItem tempVar && tempVar.Row == R) { return tempVar; }
+        public RowFormulaPadItem? ItemOfRow(RowItem r) {
+            foreach (var thisItem in Pad.Item) {
+                if (thisItem is RowFormulaPadItem tempVar && tempVar.Row == r) { return tempVar; }
             }
             return null;
         }
 
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
             base.OnFormClosing(e);
-            if (Database != null) {
-                Database.Disposing -= Database_Disposing;
+            if (_database != null) {
+                _database.Disposing -= Database_Disposing;
             }
 
-            Database = null;
+            _database = null;
         }
 
         private void BezPlus(RowFormulaPadItem? initialItem) {
@@ -95,11 +95,11 @@ namespace BlueControls.Forms {
             var t = initialItem.Row.CellGetString(_column).ToUpper();
             if (string.IsNullOrEmpty(t)) { return; }
             // Alle möglichen Namen holen
-            List<string> Names = new();
-            Names.AddRange(Database.Column[0].GetUcaseNamesSortedByLenght());
+            List<string> names = new();
+            names.AddRange(_database.Column[0].GetUcaseNamesSortedByLenght());
             // Namen ermitteln, die relevant sind
             List<string> bez = new();
-            foreach (var thisN in Names.Where(thisN => t.Contains(thisN))) {
+            foreach (var thisN in names.Where(thisN => t.Contains(thisN))) {
                 bez.AddIfNotExists(thisN);
                 t = t.Replace(thisN, string.Empty);
             }
@@ -107,7 +107,7 @@ namespace BlueControls.Forms {
             // Namen in der Übersicht hinzufügen
             var lastit = initialItem;
             foreach (var thisn in bez) {
-                var ro = Database.Row[thisn];
+                var ro = _database.Row[thisn];
                 var it = ItemOfRow(ro);
                 if (it == null) {
                     //lastit = AddOne(thisn, (int)lastit.p_RO.X, (int)lastit.p_RO.Y, lastit.Layout_ID);
@@ -251,7 +251,7 @@ namespace BlueControls.Forms {
                     var newn = FileOperations.TempFile(fl.SelectedPath, no, "png");
                     r.GeneratedBitmap.Save(newn, System.Drawing.Imaging.ImageFormat.Png);
                     foreach (var thisc in r.Row.Database.Column) {
-                        if (thisc.Format == BlueBasics.Enums.DataFormat.Link_To_Filesystem) {
+                        if (thisc.Format == DataFormat.Link_To_Filesystem) {
                             var l = r.Row.CellGetList(thisc);
                             foreach (var thiss in l) {
                                 var f = thisc.BestFile(thiss, false);
@@ -304,7 +304,7 @@ namespace BlueControls.Forms {
 
         private void Hinzu_Click(object sender, System.EventArgs e) {
             ItemCollectionList il = new();
-            il.AddRange(Database.Column[0].Contents());
+            il.AddRange(_database.Column[0].Contents());
             il.Sort();
             il.CheckBehavior = CheckBehavior.SingleSelection;
             var i = InputBoxListBoxStyle.Show("Objekt hinzufügen:", il, AddType.None, true);

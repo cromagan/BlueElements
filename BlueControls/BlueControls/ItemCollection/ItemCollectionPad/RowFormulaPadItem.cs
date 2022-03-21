@@ -110,12 +110,10 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        public override void DesignOrStyleChanged() => RemovePic();
-
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new()
             {
-                new FlexiControlForProperty<string>(() => this.Datensatz_bearbeiten, ImageCode.Stift),
+                new FlexiControlForProperty<string>(() => Datensatz_bearbeiten, ImageCode.Stift),
                 new FlexiControl()
             };
             ItemCollectionList.ItemCollectionList layouts = new();
@@ -123,7 +121,7 @@ namespace BlueControls.ItemCollection {
                 ItemCollectionPad p = new(thisLayouts, string.Empty);
                 layouts.Add(p.Caption, p.Id, ImageCode.Stern);
             }
-            l.Add(new FlexiControlForProperty<string>(() => this.Layout_Id, layouts));
+            l.Add(new FlexiControlForProperty<string>(() => Layout_Id, layouts));
             l.AddRange(base.GetStyleOptions());
             return l;
         }
@@ -176,6 +174,8 @@ namespace BlueControls.ItemCollection {
             if (Row is RowItem r) { t = t + "FirstValue=" + r.CellFirstString().ToNonCritical() + ", "; }
             return t.Trim(", ") + "}";
         }
+
+        internal override void ProcessStyleChange() => RemovePic();
 
         protected override string ClassId() => "ROW";
 

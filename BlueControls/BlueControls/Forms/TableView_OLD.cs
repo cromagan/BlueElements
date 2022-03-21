@@ -285,7 +285,7 @@ namespace BlueControls.Forms {
             FilterLeiste.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
         }
 
-        private void DatabaseSet(string filename) {
+        private void DatabaseSet(string? filename) {
             DatabaseSet((Database)null);
             if (!FileExists(filename)) {
                 CheckButtons();

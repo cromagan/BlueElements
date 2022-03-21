@@ -35,7 +35,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection {
 
-    public class BitmapPadItem : RectanglePadItem, ICanHaveColumnVariables, IDisposable {
+    public sealed class BitmapPadItem : RectanglePadItem, ICanHaveColumnVariables, IDisposable {
 
         #region Fields
 
@@ -117,15 +117,16 @@ namespace BlueControls.ItemCollection {
             // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
             Dispose(true);
             GC.SuppressFinalize(this);
+            base.Dispose();
         }
 
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new()
             {
-                new FlexiControlForProperty<string>(() => this.Bildschirmbereich_wählen, ImageCode.Bild),
-                new FlexiControlForProperty<string>(() => this.Datei_laden, ImageCode.Ordner),
+                new FlexiControlForProperty<string>(() => Bildschirmbereich_wählen, ImageCode.Bild),
+                new FlexiControlForProperty<string>(() => Datei_laden, ImageCode.Ordner),
                 new FlexiControl(),
-                new FlexiControlForProperty<string>(() => this.Platzhalter_Für_Layout, 2),
+                new FlexiControlForProperty<string>(() => Platzhalter_Für_Layout, 2),
                 new FlexiControl()
             };
             ItemCollectionList.ItemCollectionList comms = new()
@@ -134,10 +135,10 @@ namespace BlueControls.ItemCollection {
                 { "Verzerren", ((int)SizeModes.Verzerren).ToString(), QuickImage.Get("BildmodusVerzerren|32") },
                 { "Einpassen", ((int)SizeModes.EmptySpace).ToString(), QuickImage.Get("BildmodusEinpassen|32") }
             };
-            l.Add(new FlexiControlForProperty<SizeModes>(() => this.Bild_Modus, comms));
+            l.Add(new FlexiControlForProperty<SizeModes>(() => Bild_Modus, comms));
             l.Add(new FlexiControl());
             AddLineStyleOption(l);
-            l.Add(new FlexiControlForProperty<bool>(() => this.Hintergrund_Weiß_Füllen));
+            l.Add(new FlexiControlForProperty<bool>(() => Hintergrund_Weiß_Füllen));
             l.AddRange(base.GetStyleOptions());
             return l;
         }
@@ -214,23 +215,6 @@ namespace BlueControls.ItemCollection {
         }
 
         protected override string ClassId() => "IMAGE";
-
-        protected virtual void Dispose(bool disposing) {
-            if (!_disposedValue) {
-                if (disposing) {
-                    // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
-                }
-
-                // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
-                // TODO: Große Felder auf NULL setzen
-                if (Bitmap != null) {
-                    Bitmap.Dispose();
-                    Bitmap = null;
-                }
-
-                _disposedValue = true;
-            }
-        }
 
         protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
             positionModified.Inflate(-Padding, -Padding);
@@ -310,6 +294,23 @@ namespace BlueControls.ItemCollection {
                 return x;
             }
             return null;
+        }
+
+        private void Dispose(bool disposing) {
+            if (!_disposedValue) {
+                if (disposing) {
+                    // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+                }
+
+                // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
+                // TODO: Große Felder auf NULL setzen
+                if (Bitmap != null) {
+                    Bitmap.Dispose();
+                    Bitmap = null;
+                }
+
+                _disposedValue = true;
+            }
         }
 
         #endregion

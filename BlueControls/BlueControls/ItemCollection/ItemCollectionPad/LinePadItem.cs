@@ -106,7 +106,7 @@ namespace BlueControls.ItemCollection {
                 { "Linie soll Objekten ausweichen", ((int)ConectorStyle.Ausweichenx).ToString(), QuickImage.Get(ImageCode.Linie) },
                 { "Linie soll Objekten ausweichen und rechtwinklig sein", ((int)ConectorStyle.AusweichenUndGerade).ToString(), QuickImage.Get(ImageCode.Linie) }
             };
-            l.Add(new FlexiControlForProperty<ConectorStyle>(() => this.Linien_Verhalten, verhalt));
+            l.Add(new FlexiControlForProperty<ConectorStyle>(() => Linien_Verhalten, verhalt));
             AddLineStyleOption(l);
             l.AddRange(base.GetStyleOptions());
             return l;

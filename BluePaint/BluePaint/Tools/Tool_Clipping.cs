@@ -129,7 +129,7 @@ namespace BluePaint {
 
         private void AutoZ_Click(object? sender, System.EventArgs? e) {
             WollenSieDenZuschnittÜbernehmen();
-            var pic = base.OnNeedCurrentPic();
+            var pic = OnNeedCurrentPic();
             OnZoomFit();
             var pa = GetAutoValuesForCrop(pic, 0.9);
             Links.Value = pa.Left;

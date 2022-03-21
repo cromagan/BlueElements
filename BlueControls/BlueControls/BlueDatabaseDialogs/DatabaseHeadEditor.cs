@@ -199,7 +199,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnAlleUndos_Click(object sender, System.EventArgs e) {
             btnAlleUndos.Enabled = false;
-            var l = BlueControls.Forms.TableView.Vorgängerversionen(_database);
+            var l = TableView.Vorgängerversionen(_database);
             if (l.Count < 1) {
                 MessageBox.Show("Keine Vorgänger gefunden.");
                 return;

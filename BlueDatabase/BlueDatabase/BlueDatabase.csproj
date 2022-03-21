@@ -108,7 +108,6 @@
     <Compile Include="ColumnViewCollection.cs" />
     <Compile Include="ColumnViewItem.cs" />
     <Compile Include="Database.cs" />
-    <Compile Include="DataHolder.cs" />
     <Compile Include="Enums\FilterOptions.cs" />
     <Compile Include="Enums\ItemState.cs" />
     <Compile Include="Enums\FilterType.cs" />

@@ -43,7 +43,7 @@ namespace BlueScript.Methods {
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback("Kein Text angekommen."); }
 
-            return Method_BerechneVariable.VariablenBerechnung(infos.AttributText + ";", s, infos, true);
+            return Method_BerechneVariable.VariablenBerechnung(infos.AttributText + ";", s, true);
 
             //return s.BerechneVariable.DoitKomplett(infos.AttributText + ";", s, infos, true);
         }

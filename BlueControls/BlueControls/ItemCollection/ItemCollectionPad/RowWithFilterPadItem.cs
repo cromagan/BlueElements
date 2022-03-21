@@ -43,10 +43,10 @@ namespace BlueControls.ItemCollection {
         /// <summary>
         /// Laufende Nummer, bestimmt die einfärbung
         /// </summary>
-        public readonly int ID;
+        public readonly int Id;
 
-        public Database? Database;
         public FilterCollection? Filter;
+        private readonly Database? _database;
 
         #endregion
 
@@ -55,9 +55,9 @@ namespace BlueControls.ItemCollection {
         public RowWithFilterPaditem(Database? db, int id) : this(UniqueInternal(), db, id) { }
 
         public RowWithFilterPaditem(string intern, Database? db, int id) : base(intern) {
-            Database = db;
+            _database = db;
             if (db != null) { Filter = new FilterCollection(db); }
-            ID = id;
+            Id = id;
             Size = new Size(300, 100);
         }
 
@@ -67,14 +67,11 @@ namespace BlueControls.ItemCollection {
 
         #region Properties
 
-        /// <summary>
-        /// Wird von Flexoptions aufgerufen
-        /// </summary>
         public string Datenbankkopf {
-            get { return string.Empty; }
+            get => string.Empty;
             set {
-                if (Database == null) { return; }
-                BlueControls.Forms.TableView.OpenDatabaseHeadEditor(Database);
+                if (_database == null) { return; }
+                Forms.TableView.OpenDatabaseHeadEditor(_database);
             }
         }
 
@@ -84,8 +81,8 @@ namespace BlueControls.ItemCollection {
 
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new() { };
-            if (Database == null) { return l; }
-            l.Add(new FlexiControlForProperty<string>(() => Database.Caption));
+            if (_database == null) { return l; }
+            l.Add(new FlexiControlForProperty<string>(() => _database.Caption));
             //l.Add(new FlexiControlForProperty(Database, "Caption"));
             l.Add(new FlexiControlForProperty<string>(() => Datenbankkopf, ImageCode.Datenbank));
             //l.Add(new FlexiControlForProperty(()=> this.Datenbankkopf"));
@@ -108,20 +105,18 @@ namespace BlueControls.ItemCollection {
         }
 
         public string ReadableText() {
-            if (Database != null) { return "Zeile aus: " + Database.Caption; }
+            if (_database != null) { return "Zeile aus: " + _database.Caption; }
 
             return "Zeile einer Datenbank";
         }
 
-        public QuickImage? SymbolForReadableText() {
-            return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IDColor(ID));
-        }
+        public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IDColor(Id));
 
         public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
-            if (Database != null) {
-                t = t + "Database=" + Database.Filename.ToNonCritical() + ", ";
+            if (_database != null) {
+                t = t + "Database=" + _database.Filename.ToNonCritical() + ", ";
             }
             return t.Trim(", ") + "}";
         }
@@ -129,10 +124,10 @@ namespace BlueControls.ItemCollection {
         protected override string ClassId() => "RowWithFilter";
 
         protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
-            DrawColorScheme(gr, drawingCoordinates, zoom, ID);
+            DrawColorScheme(gr, drawingCoordinates, zoom, Id);
 
-            if (Database != null) {
-                Skin.Draw_FormatedText(gr, Database.Caption, QuickImage.Get(ImageCode.Datenbank, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
+            if (_database != null) {
+                Skin.Draw_FormatedText(gr, _database.Caption, QuickImage.Get(ImageCode.Datenbank, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
             }
             //drawingCoordinates.Inflate(-Padding, -Padding);
             //RectangleF r1 = new(drawingCoordinates.Left + Padding, drawingCoordinates.Top + Padding,

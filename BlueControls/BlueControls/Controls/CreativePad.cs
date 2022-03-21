@@ -275,9 +275,9 @@ namespace BlueControls.Controls {
 
         public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
-        public void OnItemAdded(BlueBasics.EventArgs.ListEventArgs e) => ItemAdded?.Invoke(this, e);
+        public void OnItemAdded(ListEventArgs e) => ItemAdded?.Invoke(this, e);
 
-        public void OnItemInternalChanged(BlueBasics.EventArgs.ListEventArgs e) => ItemInternalChanged?.Invoke(this, e);
+        public void OnItemInternalChanged(ListEventArgs e) => ItemInternalChanged?.Invoke(this, e);
 
         public void OnItemRemoved() => ItemRemoved?.Invoke(this, System.EventArgs.Empty);
 
@@ -488,13 +488,13 @@ namespace BlueControls.Controls {
 
         protected override void OnMouseUp(MouseEventArgs e) => DoMouseUp(e);
 
-        private void _Item_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
+        private void _Item_ItemAdded(object sender, ListEventArgs e) {
             if (_item.Count == 1 || Fitting) { ZoomFit(); }
             Invalidate();
             OnItemAdded(e);
         }
 
-        private void _item_ItemInternalChanged(object sender, BlueBasics.EventArgs.ListEventArgs e) => OnItemInternalChanged(e);
+        private void _item_ItemInternalChanged(object sender, ListEventArgs e) => OnItemInternalChanged(e);
 
         private void _Item_ItemRemoved(object sender, System.EventArgs e) {
             if (Fitting) { ZoomFit(); }

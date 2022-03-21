@@ -39,7 +39,7 @@ namespace BlueControls.ItemCollection {
 
         public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
 
-        public ColumnItem? Column;
+        public readonly ColumnItem? Column;
 
         #endregion
 
@@ -74,7 +74,7 @@ namespace BlueControls.ItemCollection {
             get => string.Empty;
             set {
                 if (Column == null) { return; }
-                BlueControls.Forms.TableView.OpenColumnEditor(Column, null, null);
+                Forms.TableView.OpenColumnEditor(Column, null, null);
             }
         }
 
@@ -86,9 +86,9 @@ namespace BlueControls.ItemCollection {
             List<FlexiControl> l = new() { };
             if (Column == null) { return l; }
 
-            l.Add(new FlexiControlForProperty<string>(() => this.Datenbank));
-            l.Add(new FlexiControlForProperty<string>(() => this.Interner_Name));
-            l.Add(new FlexiControlForProperty<string>(() => this.Spalte_bearbeiten, ImageCode.Spalte));
+            l.Add(new FlexiControlForProperty<string>(() => Datenbank));
+            l.Add(new FlexiControlForProperty<string>(() => Interner_Name));
+            l.Add(new FlexiControlForProperty<string>(() => Spalte_bearbeiten, ImageCode.Spalte));
             l.Add(new FlexiControl());
             l.Add(new FlexiControlForProperty<string>(() => Column.Caption));
             l.Add(new FlexiControl());

@@ -104,18 +104,16 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        private BlueBasics.Enums.DataFormat Format { get; set; } = BlueBasics.Enums.DataFormat.Text;
+        private DataFormat Format { get; set; } = DataFormat.Text;
 
         #endregion
 
         #region Methods
 
-        public override void DesignOrStyleChanged() => InvalidateText();
-
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new()
             {
-                new FlexiControlForProperty<string>(() => this.Text, 5)
+                new FlexiControlForProperty<string>(() => Text, 5)
             };
             ItemCollectionList.ItemCollectionList aursicht = new()
             {
@@ -124,8 +122,8 @@ namespace BlueControls.ItemCollection {
                 { "Rechtsbündig ausrichten", ((int)Alignment.Top_Right).ToString(), ImageCode.Rechtsbündig }
             };
             aursicht.Sort();
-            l.Add(new FlexiControlForProperty<Alignment>(() => this.Ausrichtung, aursicht));
-            l.Add(new FlexiControlForProperty<float>(() => this.Skalierung));
+            l.Add(new FlexiControlForProperty<Alignment>(() => Ausrichtung, aursicht));
+            l.Add(new FlexiControlForProperty<float>(() => Skalierung));
             AddStyleOption(l);
             l.AddRange(base.GetStyleOptions());
             return l;
@@ -144,7 +142,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "format":
-                    Format = (BlueBasics.Enums.DataFormat)IntParse(value);
+                    Format = (DataFormat)IntParse(value);
                     return true;
 
                 case "additionalscale":
@@ -191,11 +189,13 @@ namespace BlueControls.ItemCollection {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
             if (!string.IsNullOrEmpty(_textOriginal)) { t = t + "ReadableText=" + _textOriginal.ToNonCritical() + ", "; }
-            if (Format != BlueBasics.Enums.DataFormat.Text) { t = t + "Format=" + (int)Format + ", "; }
+            if (Format != DataFormat.Text) { t = t + "Format=" + (int)Format + ", "; }
             if (_ausrichtung != Alignment.Top_Left) { t = t + "Alignment=" + (int)_ausrichtung + ", "; }
             t = t + "AdditionalScale=" + Skalierung.ToString(CultureInfo.InvariantCulture).ToNonCritical() + ", ";
             return t.Trim(", ") + "}";
         }
+
+        internal override void ProcessStyleChange() => InvalidateText();
 
         protected override string ClassId() => "TEXT";
 

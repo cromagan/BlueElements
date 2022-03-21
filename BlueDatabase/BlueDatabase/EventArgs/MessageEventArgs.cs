@@ -35,8 +35,13 @@ namespace BlueDatabase.EventArgs {
         #region Properties
 
         public string Message { get; }
+
+        // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
         public bool Shown { get; set; }
+
         public FehlerArt Type { get; }
+
+        // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
         public bool WrittenToLogifile { get; set; }
 
         #endregion

@@ -24,7 +24,7 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
-        public readonly List<ClsKraft> Kraft = new();
+        public readonly List<Kraft> Kraft = new();
 
         #endregion
 

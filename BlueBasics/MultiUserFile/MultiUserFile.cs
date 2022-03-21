@@ -113,11 +113,11 @@ namespace BlueBasics.MultiUserFile {
         // Disposing leider als Variable vorhanden
         public event EventHandler<LoadingEventArgs> Loading;
 
-        /// <summary>
-        /// Wird ausgegeben, sobald isParsed false ist, noch vor den automatischen Reperaturen.
-        /// Dieses Event kann verwendet werden, um die Datei automatisch zu reparieren, bevor sich automatische Dialoge öffnen.
-        /// </summary>
-        public event EventHandler Parsed;
+        ///// <summary>
+        ///// Wird ausgegeben, sobald isParsed false ist, noch vor den automatischen Reperaturen.
+        ///// Dieses Event kann verwendet werden, um die Datei automatisch zu reparieren, bevor sich automatische Dialoge öffnen.
+        ///// </summary>
+        //public event EventHandler Parsed;
 
         public event EventHandler SavedToDisk;
 
@@ -546,7 +546,7 @@ namespace BlueBasics.MultiUserFile {
             IsParsing = false;
             // Repair NACH ExecutePendung, vielleicht ist es schon repariert
             // Repair NACH _isParsing, da es auch abgespeichert werden soll
-            OnParsed();
+            //OnParsed();
             RepairAfterParse();
         }
 
@@ -883,10 +883,10 @@ namespace BlueBasics.MultiUserFile {
             Loading?.Invoke(this, e);
         }
 
-        private void OnParsed() {
-            if (Disposed) { return; }
-            Parsed?.Invoke(this, System.EventArgs.Empty);
-        }
+        //private void OnParsed() {
+        //    if (Disposed) { return; }
+        //    Parsed?.Invoke(this, System.EventArgs.Empty);
+        //}
 
         private void OnSavedToDisk() {
             if (Disposed) { return; }

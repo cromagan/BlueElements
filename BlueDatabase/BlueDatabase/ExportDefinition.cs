@@ -32,7 +32,7 @@ using static BlueBasics.FileOperations;
 
 namespace BlueDatabase {
 
-    public class ExportDefinition : IParseable, IReadableTextWithChanging, IDisposable {
+    public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, IDisposable {
 
         #region Fields
 
@@ -638,22 +638,6 @@ namespace BlueDatabase {
             return didAndOk;
         }
 
-        protected virtual void Dispose(bool disposing) {
-            if (!_disposedValue) {
-                if (disposing) {
-                    // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
-                }
-                Database.Disposing -= Database_Disposing;
-                Database = null;
-                Filter.Dispose();
-
-                BereitsExportiert.Changed -= _BereitsExportiert_ListOrItemChanged;
-                BereitsExportiert = new ListExt<string>();
-                BereitsExportiert.Dispose();
-                _disposedValue = true;
-            }
-        }
-
         private void _BereitsExportiert_ListOrItemChanged(object sender, System.EventArgs e) => OnChanged();
 
         private void _Filter_Changed(object sender, System.EventArgs e) => OnChanged();
@@ -679,6 +663,22 @@ namespace BlueDatabase {
                 BereitsExportiert.RemoveNullOrEmpty();
             }
             return did;
+        }
+
+        private void Dispose(bool disposing) {
+            if (!_disposedValue) {
+                if (disposing) {
+                    // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+                }
+                Database.Disposing -= Database_Disposing;
+                Database = null;
+                Filter.Dispose();
+
+                BereitsExportiert.Changed -= _BereitsExportiert_ListOrItemChanged;
+                BereitsExportiert = new ListExt<string>();
+                BereitsExportiert.Dispose();
+                _disposedValue = true;
+            }
         }
 
         private string GetShortener() {

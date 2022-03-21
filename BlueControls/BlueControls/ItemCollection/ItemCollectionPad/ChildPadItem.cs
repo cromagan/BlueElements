@@ -99,25 +99,19 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        public override void DesignOrStyleChanged() {
-            RemovePic();
-            PadInternal.Item.SheetStyle = Parent.SheetStyle;
-            PadInternal.Item.SheetStyleScale = Parent.SheetStyleScale;
-        }
-
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new()
             {
-                new FlexiControlForProperty<string>(() => this.Name),
-                new FlexiControlForProperty<Color>(() => this.Randfarbe)
+                new FlexiControlForProperty<string>(() => Name),
+                new FlexiControlForProperty<Color>(() => Randfarbe)
             };
             ItemCollectionList.ItemCollectionList lage = new()
             {
                 { "ohne", "-1" },
                 { "Links oben", ((int)Alignment.Top_Left).ToString() }
             };
-            l.Add(new FlexiControlForProperty<Alignment>(() => this.Textlage, lage));
-            l.Add(new FlexiControlForProperty<List<string>>(() => this.Eingebettete_Ansichten, 5));
+            l.Add(new FlexiControlForProperty<Alignment>(() => Textlage, lage));
+            l.Add(new FlexiControlForProperty<List<string>>(() => Eingebettete_Ansichten, 5));
             l.AddRange(base.GetStyleOptions());
             return l;
         }
@@ -269,6 +263,12 @@ namespace BlueControls.ItemCollection {
                 t = t + "Data=" + PadInternal.Item.ToString() + ", ";
             }
             return t.Trim(", ") + "}";
+        }
+
+        internal override void ProcessStyleChange() {
+            RemovePic();
+            PadInternal.Item.SheetStyle = Parent.SheetStyle;
+            PadInternal.Item.SheetStyleScale = Parent.SheetStyleScale;
         }
 
         protected override string ClassId() => "CHILDPAD";

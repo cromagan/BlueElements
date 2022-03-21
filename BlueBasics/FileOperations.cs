@@ -132,7 +132,7 @@ namespace BlueBasics {
 
             if (pfad.Substring(pfad.Length - 1) != "\\") { pfad += "\\"; }
             if (pfad.IndexOf("\\\\", 1) > 0) { Develop.DebugPrint("Achtung, Doppelslash: " + pfad); }
-            if (pfad.Length > 1 &&  pfad.Substring(0, 1) == "\\" && pfad.Substring(0, 2) != "\\\\") { Develop.DebugPrint("Achtung, Doppelslash: " + pfad); }
+            if (pfad.Length > 1 && pfad.Substring(0, 1) == "\\" && pfad.Substring(0, 2) != "\\\\") { Develop.DebugPrint("Achtung, Doppelslash: " + pfad); }
 
             if (pfad.Length > 1 && pfad.IndexOf(":", 2) > 0) { Develop.DebugPrint("Falscher Doppelpunktk: " + pfad); }
 
@@ -212,7 +212,7 @@ namespace BlueBasics {
             return true;
         }
 
-        public static bool FileExists(string file) {
+        public static bool FileExists(string? file) {
             try {
                 return file != null && !string.IsNullOrEmpty(file) && !file.ContainsChars(Constants.Char_PfadSonderZeichen) && File.Exists(file);
             } catch {

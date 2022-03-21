@@ -90,9 +90,9 @@ namespace BlueBasics {
             }
         }
 
-        public static void FensterMaximieren(IntPtr handle) => ShowWindow(handle, (int)enSw.ShowMaximized);
+        public static void FensterMaximieren(IntPtr handle) => ShowWindow(handle, (int)Sw.ShowMaximized);
 
-        public static void FensterMinimieren(IntPtr handle) => ShowWindow(handle, (int)enSw.ShowMinimized);
+        public static void FensterMinimieren(IntPtr handle) => ShowWindow(handle, (int)Sw.ShowMinimized);
 
         public static void FensterPosSetzen(IntPtr handle, int left, int top) {
             Rectangle r = new();
@@ -102,7 +102,7 @@ namespace BlueBasics {
             SetWindowPos(handle, 0, left, top, r.Width - r.Left, r.Height - r.Top, 0);
         }
 
-        public static void FensterRestore(IntPtr handle) => ShowWindow(handle, (int)enSw.Restore);
+        public static void FensterRestore(IntPtr handle) => ShowWindow(handle, (int)Sw.Restore);
 
         public static IntPtr GetAncestor(IntPtr hWnd) {
             var hw = hWnd;

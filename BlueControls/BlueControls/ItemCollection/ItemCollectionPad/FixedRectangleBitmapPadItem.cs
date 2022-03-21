@@ -64,11 +64,7 @@ namespace BlueControls.ItemCollection {
             // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
             Dispose(true);
             GC.SuppressFinalize(this);
-        }
-
-        public void RemovePic() {
-            _generatedBitmap?.Dispose();
-            _generatedBitmap = null;
+            base.Dispose();
         }
 
         protected void Dispose(bool disposing) {
@@ -138,6 +134,11 @@ namespace BlueControls.ItemCollection {
         protected abstract Bitmap GeneratePic();
 
         protected override void ParseFinished() => SizeChanged();
+
+        protected void RemovePic() {
+            _generatedBitmap?.Dispose();
+            _generatedBitmap = null;
+        }
 
         #endregion
 

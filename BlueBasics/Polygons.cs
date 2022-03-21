@@ -40,10 +40,10 @@ namespace BlueBasics {
             //         | /
             //         |/
             //
-            PointF plusOben = new((float) (rect.Left + (rect.Width * 0.5)),
-                (float) (rect.PointOf(Alignment.VerticalCenter_Right).Y - (rect.Height * 0.18)));
-            PointF plusUnten = new((float) (rect.Left + (rect.Width * 0.5)),
-                (float) (rect.PointOf(Alignment.VerticalCenter_Right).Y + (rect.Height * 0.18)));
+            PointF plusOben = new((float)(rect.Left + (rect.Width * 0.5)),
+                (float)(rect.PointOf(Alignment.VerticalCenter_Right).Y - (rect.Height * 0.18)));
+            PointF plusUnten = new((float)(rect.Left + (rect.Width * 0.5)),
+                (float)(rect.PointOf(Alignment.VerticalCenter_Right).Y + (rect.Height * 0.18)));
             p.AddLine(rect.PointOf(Alignment.VerticalCenter_Right), new PointF(plusUnten.X, rect.Bottom));
             p.AddLine(p.GetLastPoint(), plusUnten);
             p.AddLine(p.GetLastPoint(), new PointF(rect.Left, plusUnten.Y));
@@ -73,42 +73,42 @@ namespace BlueBasics {
         }
 
         public static GraphicsPath Poly_Rechteck(Rectangle rect) {
-            GraphicsPath tempPoly_Rechteck = new();
-            tempPoly_Rechteck.AddRectangle(rect);
-            tempPoly_Rechteck.CloseFigure();
-            return tempPoly_Rechteck;
+            GraphicsPath tempPolyRechteck = new();
+            tempPolyRechteck.AddRectangle(rect);
+            tempPolyRechteck.CloseFigure();
+            return tempPolyRechteck;
         }
 
         public static GraphicsPath? Poly_RoundRec(Rectangle rect, int radius) => Poly_RoundRec(rect.X, rect.Y, rect.Width, rect.Height, radius);
 
         public static GraphicsPath? Poly_RoundRec(int x, int y, int width, int height, int radius) {
             if (width < 1 || height < 1) { return null; }
-            GraphicsPath? tempPoly_RoundRec = new();
+            GraphicsPath? tempPolyRoundRec = new();
             if (radius > (height / 2.0) + 2) { radius = (int)(height / 2.0) + 2; }
             if (radius > (width / 2.0) + 2) { radius = (int)(width / 2.0) + 2; }
 
-            tempPoly_RoundRec.AddLine(x + radius, y, x + width - radius, y);
+            tempPolyRoundRec.AddLine(x + radius, y, x + width - radius, y);
             if (radius > 0) { AddRad90(x + width - radius, y, radius, 270); }
-            tempPoly_RoundRec.AddLine(x + width, y + radius, x + width, y + height - radius);
+            tempPolyRoundRec.AddLine(x + width, y + radius, x + width, y + height - radius);
             if (radius > 0) { AddRad90(x + width - radius, y + height - radius, radius, 0); }
-            tempPoly_RoundRec.AddLine(x + width - radius, y + height, x + radius, y + height);
+            tempPolyRoundRec.AddLine(x + width - radius, y + height, x + radius, y + height);
             if (radius > 0) { AddRad90(x, y + height - radius, radius, 90); }
-            tempPoly_RoundRec.AddLine(x, y + height - radius, x, y + radius);
+            tempPolyRoundRec.AddLine(x, y + height - radius, x, y + radius);
             if (radius > 0) { AddRad90(x, y, radius, 180); }
-            tempPoly_RoundRec.CloseFigure();
-            return tempPoly_RoundRec;
+            tempPolyRoundRec.CloseFigure();
+            return tempPolyRoundRec;
 
-            void AddRad90(int mxX, int mxY, int Radius, int gradStart) {
-                tempPoly_RoundRec.AddArc(mxX, mxY, Radius, Radius, gradStart, 90);
+            void AddRad90(int mxX, int mxY, int radius, int gradStart) {
+                tempPolyRoundRec.AddArc(mxX, mxY, radius, radius, gradStart, 90);
             }
         }
 
         public static GraphicsPath Poly_Triangle(PointF p1, PointF p2, PointF p3) {
-            GraphicsPath P = new();
-            P.AddLine(p1, p2);
-            P.AddLine(p2, p3);
-            P.CloseFigure();
-            return P;
+            GraphicsPath p = new();
+            p.AddLine(p1, p2);
+            p.AddLine(p2, p3);
+            p.CloseFigure();
+            return p;
         }
 
         #endregion

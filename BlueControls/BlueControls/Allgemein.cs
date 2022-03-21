@@ -49,18 +49,18 @@ namespace BlueControls {
         public static IContextMenu? ParentControlWithCommands(this object o) {
             var par = o.ParentControl<IContextMenu>();
             if (par == null) { return null; }
-            ItemCollectionList? ThisContextMenu = new(BlueListBoxAppearance.KontextMenu);
-            ItemCollectionList UserMenu = new(BlueListBoxAppearance.KontextMenu);
+            ItemCollectionList? thisContextMenu = new(BlueListBoxAppearance.KontextMenu);
+            ItemCollectionList userMenu = new(BlueListBoxAppearance.KontextMenu);
             List<string> tags = new();
-            var Cancel = false;
-            var Translate = true;
-            par.GetContextMenuItems(null, ThisContextMenu, out var HotItem, tags, ref Cancel, ref Translate);
-            if (Cancel) { return null; }
-            ContextMenuInitEventArgs ec = new(HotItem, tags, UserMenu);
+            var cancel = false;
+            var translate = true;
+            par.GetContextMenuItems(null, thisContextMenu, out var hotItem, tags, ref cancel, ref translate);
+            if (cancel) { return null; }
+            ContextMenuInitEventArgs ec = new(hotItem, tags, userMenu);
             par.OnContextMenuInit(ec);
             return ec.Cancel ? null
-                : ThisContextMenu != null && ThisContextMenu.Count > 0 ? par
-                : UserMenu.Count > 0 ? par
+                : thisContextMenu != null && thisContextMenu.Count > 0 ? par
+                : userMenu.Count > 0 ? par
                 : null;
         }
 

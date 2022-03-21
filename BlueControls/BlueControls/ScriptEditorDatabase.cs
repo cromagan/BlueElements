@@ -123,7 +123,7 @@ namespace BlueControls {
             switch (e.ClickedComand.ToLower()) {
                 case "spalteneigenschaftenbearbeiten":
                     if (c != null) {
-                        BlueControls.Forms.TableView.OpenColumnEditor(c, null, null);
+                        Forms.TableView.OpenColumnEditor(c, null, null);
                     }
 
                     break;

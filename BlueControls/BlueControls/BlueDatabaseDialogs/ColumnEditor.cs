@@ -219,7 +219,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void ButtonCheck() {
-            var tmpFormat = (BlueBasics.Enums.DataFormat)IntParse(cbxFormat.Text);
+            var tmpFormat = (DataFormat)IntParse(cbxFormat.Text);
             // Mehrzeilig
             btnMultiline.Enabled = tmpFormat.MultilinePossible();
             if (!tmpFormat.MultilinePossible()) { btnMultiline.Checked = false; }
@@ -233,7 +233,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             //    cbxBildTextVerhalten.Text = string.Empty;
             //}
             // Format: LinkToFileSystem
-            grpLinkToFileSystem.Enabled = tmpFormat == BlueBasics.Enums.DataFormat.Link_To_Filesystem;
+            grpLinkToFileSystem.Enabled = tmpFormat == DataFormat.Link_To_Filesystem;
             //if (tmpFormat != enDataFormat.BildCode) {
             //    txbBestFileStandardFolder.Text = string.Empty;
             //    txbBestFileStandardSuffix.Text = string.Empty;
@@ -290,7 +290,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void Column_DatenAuslesen(ColumnItem? fromColumn) {
             _column = fromColumn;
-            cbxFormat.Item.AddRange(typeof(BlueBasics.Enums.DataFormat));
+            cbxFormat.Item.AddRange(typeof(DataFormat));
             cbxRandLinks.Item.AddRange(typeof(ColumnLineStyle));
             cbxRandRechts.Item.AddRange(typeof(ColumnLineStyle));
             cbxBildTextVerhalten.Item.AddRange(typeof(BildTextVerhalten));
@@ -413,7 +413,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // Einige Dropdown-Menüs sind abhängig von der LinkedDatabase und werden in dessen TextChanged-Event befüllt
             // siehe Ende dieser Routine
             foreach (var thisColumn in _column.Database.Column) {
-                if ((thisColumn.Format == BlueBasics.Enums.DataFormat.RelationText || !thisColumn.MultiLine) && thisColumn.Format.CanBeCheckedByRules()) { cbxSchlüsselspalte.Item.Add(thisColumn); }
+                if ((thisColumn.Format == DataFormat.RelationText || !thisColumn.MultiLine) && thisColumn.Format.CanBeCheckedByRules()) { cbxSchlüsselspalte.Item.Add(thisColumn); }
                 if (thisColumn.Format.CanBeCheckedByRules() && !thisColumn.MultiLine && !thisColumn.Format.NeedTargetDatabase()) {
                     cbxDropDownKey.Item.Add(thisColumn);
                     cbxVorschlagSpalte.Item.Add(thisColumn);
@@ -433,7 +433,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (_column.Database.ReadOnly) { return; }
             _column.Name = tbxName.Text;
             _column.Caption = tbxCaption.Text.Replace("\r\n", "\r").Trim().Trim("\r").Trim();
-            _column.Format = (BlueBasics.Enums.DataFormat)IntParse(cbxFormat.Text);
+            _column.Format = (DataFormat)IntParse(cbxFormat.Text);
             _column.Quickinfo = tbxQuickinfo.Text.Replace("\r", "<BR>");
             _column.AdminInfo = tbxAdminInfo.Text.Replace("\r", "<BR>");
             _column.Suffix = cbxEinheit.Text;
