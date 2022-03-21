@@ -67,6 +67,17 @@ namespace BlueControls.ItemCollection {
             }
         }
 
+        /// <summary>
+        /// Wird von Flexoptions aufgerufen
+        /// </summary>
+        public string Spalte_bearbeiten {
+            get => string.Empty;
+            set {
+                if (Column == null) { return; }
+                BlueControls.Forms.TableView.OpenColumnEditor(Column, null, null);
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -75,18 +86,18 @@ namespace BlueControls.ItemCollection {
             List<FlexiControl> l = new() { };
             if (Column == null) { return l; }
 
-            l.Add(new FlexiControlForProperty(this, "Datenbank"));
-            l.Add(new FlexiControlForProperty(this, "Interner Name"));
-            l.Add(new FlexiControlForProperty(this, "Spalte bearbeiten", ImageCode.Spalte));
+            l.Add(new FlexiControlForProperty<string>(() => this.Datenbank));
+            l.Add(new FlexiControlForProperty<string>(() => this.Interner_Name));
+            l.Add(new FlexiControlForProperty<string>(() => this.Spalte_bearbeiten, ImageCode.Spalte));
             l.Add(new FlexiControl());
-            l.Add(new FlexiControlForProperty(Column, "Caption"));
+            l.Add(new FlexiControlForProperty<string>(() => Column.Caption));
             l.Add(new FlexiControl());
-            l.Add(new FlexiControlForProperty(Column, "Ueberschrift1"));
-            l.Add(new FlexiControlForProperty(Column, "Ueberschrift2"));
-            l.Add(new FlexiControlForProperty(Column, "Ueberschrift3"));
+            l.Add(new FlexiControlForProperty<string>(() => Column.Ueberschrift1));
+            l.Add(new FlexiControlForProperty<string>(() => Column.Ueberschrift2));
+            l.Add(new FlexiControlForProperty<string>(() => Column.Ueberschrift3));
             l.Add(new FlexiControl());
-            l.Add(new FlexiControlForProperty(Column, "Quickinfo"));
-            l.Add(new FlexiControlForProperty(Column, "AdminInfo"));
+            l.Add(new FlexiControlForProperty<string>(() => Column.Quickinfo));
+            l.Add(new FlexiControlForProperty<string>(() => Column.AdminInfo));
 
             if (AdditionalStyleOptions != null) {
                 l.Add(new FlexiControl());
@@ -98,17 +109,9 @@ namespace BlueControls.ItemCollection {
             //    ItemCollectionPad p = new(thisLayouts, string.Empty);
             //    layouts.Add(p.Caption, p.Id, enImageCode.Stern);
             //}
-            //l.Add(new FlexiControlForProperty(this, "Layout-ID", layouts));
+            //l.Add(new FlexiControlForProperty(()=> this.Layout-ID", layouts));
             //l.AddRange(base.GetStyleOptions());
             return l;
-        }
-
-        /// <summary>
-        /// Wird von Flexoptions aufgerufen
-        /// </summary>
-        public void Spalte_bearbeiten() {
-            if (Column == null) { return; }
-            BlueControls.Forms.TableView.OpenColumnEditor(Column, null, null);
         }
 
         public override string ToString() {

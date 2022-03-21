@@ -108,16 +108,16 @@ namespace BlueControls.ItemCollection {
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new()
             {
-                new FlexiControlForProperty(this, "Name"),
-                new FlexiControlForProperty(this, "Randfarbe")
+                new FlexiControlForProperty<string>(() => this.Name),
+                new FlexiControlForProperty<Color>(() => this.Randfarbe)
             };
             ItemCollectionList.ItemCollectionList lage = new()
             {
                 { "ohne", "-1" },
                 { "Links oben", ((int)Alignment.Top_Left).ToString() }
             };
-            l.Add(new FlexiControlForProperty(this, "Textlage", lage));
-            l.Add(new FlexiControlForProperty(this, "Eingebettete Ansichten", 5));
+            l.Add(new FlexiControlForProperty<Alignment>(() => this.Textlage, lage));
+            l.Add(new FlexiControlForProperty<List<string>>(() => this.Eingebettete_Ansichten, 5));
             l.AddRange(base.GetStyleOptions());
             return l;
         }
@@ -273,9 +273,9 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "CHILDPAD";
 
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
+        protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
             try {
-                var trp = drawingCoordinates.PointOf(Alignment.Horizontal_Vertical_Center);
+                var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
                 gr.TranslateTransform(trp.X, trp.Y);
                 gr.RotateTransform(-Drehwinkel);
                 Font font = new("Arial", 30 * zoom);
@@ -283,15 +283,15 @@ namespace BlueControls.ItemCollection {
                     PadInternal.Item.SheetStyle = Parent.SheetStyle;
                     PadInternal.Item.SheetStyleScale = Parent.SheetStyleScale;
                     if (_tmpBmp != null) {
-                        if (_tmpBmp.Width != drawingCoordinates.Width || drawingCoordinates.Height != _tmpBmp.Height) {
+                        if (_tmpBmp.Width != positionModified.Width || positionModified.Height != _tmpBmp.Height) {
                             _tmpBmp.Dispose();
                             RemovePic();
                             Generic.CollectGarbage();
                         }
                     }
-                    if (drawingCoordinates.Width < 1 || drawingCoordinates.Height < 1 || drawingCoordinates.Width > 20000 || drawingCoordinates.Height > 20000) { return; }
+                    if (positionModified.Width < 1 || positionModified.Height < 1 || positionModified.Width > 20000 || positionModified.Height > 20000) { return; }
                     if (_tmpBmp == null) {
-                        _tmpBmp = new Bitmap((int)Math.Abs(drawingCoordinates.Width), (int)Math.Abs(drawingCoordinates.Height));
+                        _tmpBmp = new Bitmap((int)Math.Abs(positionModified.Width), (int)Math.Abs(positionModified.Height));
                     }
                     var mb = PadInternal.Item.MaxBounds(ZoomItems);
                     var zoomv = ItemCollectionPad.ZoomFitValue(mb, _tmpBmp.Size);
@@ -328,25 +328,25 @@ namespace BlueControls.ItemCollection {
                                 }
                             }
                         }
-                        gr.DrawImage(_tmpBmp, new Rectangle((int)-drawingCoordinates.Width / 2, (int)-drawingCoordinates.Height / 2, (int)drawingCoordinates.Width, (int)drawingCoordinates.Height));
+                        gr.DrawImage(_tmpBmp, new Rectangle((int)-positionModified.Width / 2, (int)-positionModified.Height / 2, (int)positionModified.Width, (int)positionModified.Height));
                     }
                 }
                 gr.TranslateTransform(-trp.X, -trp.Y);
                 gr.ResetTransform();
                 if (!forPrinting) {
-                    BlueFont.DrawString(gr, Name, font, Brushes.Gray, drawingCoordinates.Left, drawingCoordinates.Top);
+                    BlueFont.DrawString(gr, Name, font, Brushes.Gray, positionModified.Left, positionModified.Top);
                 }
                 if (Textlage != (Alignment)(-1)) {
                     Pen p = new(Randfarbe, (float)(8.7d * zoom)) {
                         DashPattern = new float[] { 10, 2, 1, 2 }
                     };
-                    gr.DrawRectangle(p, drawingCoordinates);
+                    gr.DrawRectangle(p, positionModified);
                     var s = gr.MeasureString(Name, font);
-                    BlueFont.DrawString(gr, Name, font, new SolidBrush(Randfarbe), drawingCoordinates.Left, drawingCoordinates.Top - s.Height - (9f * zoom));
+                    BlueFont.DrawString(gr, Name, font, new SolidBrush(Randfarbe), positionModified.Left, positionModified.Top - s.Height - (9f * zoom));
                 }
             } catch {
             }
-            base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, forPrinting);
+            base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         }
 
         protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {

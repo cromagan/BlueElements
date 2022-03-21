@@ -30,7 +30,7 @@ using BlueBasics.Interfaces;
 
 namespace BlueControls.ItemCollection {
 
-    public class RowWithFilterPaditem : FixedRectangleBitmapPadItem, IReadableText {
+    public class RowWithFilterPaditem : FixedRectanglePadItem, IReadableText {
 
         #region Fields
 
@@ -58,37 +58,46 @@ namespace BlueControls.ItemCollection {
             Database = db;
             if (db != null) { Filter = new FilterCollection(db); }
             ID = id;
+            Size = new Size(300, 100);
         }
 
         public RowWithFilterPaditem(string intern) : this(intern, null, 0) { }
 
         #endregion
 
-        #region Methods
+        #region Properties
 
         /// <summary>
         /// Wird von Flexoptions aufgerufen
         /// </summary>
-        public void Datenbankkopf() {
-            if (Database == null) { return; }
-            BlueControls.Forms.TableView.OpenDatabaseHeadEditor(Database);
+        public string Datenbankkopf {
+            get { return string.Empty; }
+            set {
+                if (Database == null) { return; }
+                BlueControls.Forms.TableView.OpenDatabaseHeadEditor(Database);
+            }
         }
+
+        #endregion
+
+        #region Methods
 
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new() { };
             if (Database == null) { return l; }
-
-            l.Add(new FlexiControlForProperty(Database, "Caption"));
-            l.Add(new FlexiControlForProperty(this, "Datenbankkopf", ImageCode.Datenbank));
+            l.Add(new FlexiControlForProperty<string>(() => Database.Caption));
+            //l.Add(new FlexiControlForProperty(Database, "Caption"));
+            l.Add(new FlexiControlForProperty<string>(() => Datenbankkopf, ImageCode.Datenbank));
+            //l.Add(new FlexiControlForProperty(()=> this.Datenbankkopf"));
             l.Add(new FlexiControl());
-            //l.Add(new FlexiControlForProperty(Column, "Caption"));
+
             //l.Add(new FlexiControl());
-            //l.Add(new FlexiControlForProperty(Column, "Ueberschrift1"));
-            //l.Add(new FlexiControlForProperty(Column, "Ueberschrift2"));
-            //l.Add(new FlexiControlForProperty(Column, "Ueberschrift3"));
+            //l.Add(new FlexiControlForProperty<string>(() => Column.Ueberschrift1"));
+            //l.Add(new FlexiControlForProperty<string>(() => Column.Ueberschrift2"));
+            //l.Add(new FlexiControlForProperty<string>(() => Column.Ueberschrift3"));
             //l.Add(new FlexiControl());
             //l.Add(new FlexiControlForProperty(Database.t, "Quickinfo"));
-            //l.Add(new FlexiControlForProperty(Column, "AdminInfo"));
+            //l.Add(new FlexiControlForProperty<string>(() => Column.AdminInfo"));
 
             //if (AdditionalStyleOptions != null) {
             //    l.Add(new FlexiControl());
@@ -99,9 +108,9 @@ namespace BlueControls.ItemCollection {
         }
 
         public string ReadableText() {
-            if (Database != null) { return "Zeile aus " + Database.Caption; }
+            if (Database != null) { return "Zeile aus: " + Database.Caption; }
 
-            return "[FEHLER]";
+            return "Zeile einer Datenbank";
         }
 
         public QuickImage? SymbolForReadableText() {
@@ -119,41 +128,80 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "RowWithFilter";
 
-        protected override Bitmap GeneratePic() {
-            if (Database == null) {
-                return QuickImage.Get(ImageCode.Warnung, 128)!;
+        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
+            DrawColorScheme(gr, drawingCoordinates, zoom, ID);
+
+            if (Database != null) {
+                Skin.Draw_FormatedText(gr, Database.Caption, QuickImage.Get(ImageCode.Datenbank, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
             }
+            //drawingCoordinates.Inflate(-Padding, -Padding);
+            //RectangleF r1 = new(drawingCoordinates.Left + Padding, drawingCoordinates.Top + Padding,
+            //    drawingCoordinates.Width - (Padding * 2), drawingCoordinates.Height - (Padding * 2));
+            //RectangleF r2 = new();
+            //RectangleF r3 = new();
+            //if (Bitmap != null) {
+            //    r3 = new RectangleF(0, 0, Bitmap.Width, Bitmap.Height);
+            //    switch (Bild_Modus) {
+            //        case enSizeModes.Verzerren: {
+            //                r2 = r1;
+            //                break;
+            //            }
 
-            var bmp = new Bitmap(300, 300);
-            var gr = Graphics.FromImage(bmp);
-
-            gr.Clear(Skin.IDColor(ID));
-            Skin.Draw_FormatedText(gr, Database.Filename.FileNameWithoutSuffix(), QuickImage.Get(ImageCode.Datenbank, 32)!,
-                Alignment.Horizontal_Vertical_Center, new Rectangle(5, 5, 290, 290), ColumnFont, false);
-            ////Table.Draw_FormatedText(gr,)
-
-            //for (var z = 0; z < 3; z++) {
-            //    var n = Column.Ueberschrift(z);
-            //    if (!string.IsNullOrEmpty(n)) {
-            //        Skin.Draw_FormatedText(gr, n, null, enAlignment.Horizontal_Vertical_Center, new Rectangle(0, z * 16, bmp.Width, 61), null, false, ColumnFont, true);
+            //        case enSizeModes.BildAbschneiden: {
+            //                var scale = Math.Max((drawingCoordinates.Width - (Padding * 2)) / Bitmap.Width, (drawingCoordinates.Height - (Padding * 2)) / Bitmap.Height);
+            //                var tmpw = (drawingCoordinates.Width - (Padding * 2)) / scale;
+            //                var tmph = (drawingCoordinates.Height - (Padding * 2)) / scale;
+            //                r3 = new RectangleF((Bitmap.Width - tmpw) / 2, (Bitmap.Height - tmph) / 2, tmpw, tmph);
+            //                r2 = r1;
+            //                break;
+            //            }
+            //        default: // Is = enSizeModes.WeißerRand
+            //            {
+            //                var scale = Math.Min((drawingCoordinates.Width - (Padding * 2)) / Bitmap.Width, (drawingCoordinates.Height - (Padding * 2)) / Bitmap.Height);
+            //                r2 = new RectangleF(((drawingCoordinates.Width - (Bitmap.Width * scale)) / 2) + drawingCoordinates.Left, ((drawingCoordinates.Height - (Bitmap.Height * scale)) / 2) + drawingCoordinates.Top, Bitmap.Width * scale, Bitmap.Height * scale);
+            //                break;
+            //            }
             //    }
             //}
-
-            //gr.TranslateTransform(bmp.Width / 2, 50);
-            //gr.RotateTransform(-90);
-            //Skin.Draw_FormatedText(gr, Column.Caption, null, enAlignment.VerticalCenter_Left, new Rectangle(-150, -150, 300, 300), null, false, ColumnFont, true);
-
-            //gr.TranslateTransform(-bmp.Width / 2, -50);
-            //gr.ResetTransform();
-
-            //gr.DrawLine(Pens.Black, 0, 210, bmp.Width, 210);
-
-            //var r = Column.Database.Row.First();
-            //if (r != null) {
-            //    Table.Draw_FormatedText(gr, r.CellGetString(Column), Column, new Rectangle(0, 210, bmp.Width, 90), Design.Table_Cell, States.Standard, BlueDatabase.Enums.ShortenStyle.Replaced, Column.BildTextVerhalten);
+            //var trp = drawingCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
+            //gr.TranslateTransform(trp.X, trp.Y);
+            //gr.RotateTransform(-Drehwinkel);
+            //r1 = new RectangleF(r1.Left - trp.X, r1.Top - trp.Y, r1.Width, r1.Height);
+            //r2 = new RectangleF(r2.Left - trp.X, r2.Top - trp.Y, r2.Width, r2.Height);
+            //if (Hintergrund_Weiß_Füllen) {
+            //    gr.FillRectangle(Brushes.White, r1);
             //}
-
-            return bmp;
+            //try {
+            //    if (Bitmap != null) {
+            //        if (forPrinting) {
+            //            gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            //            gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
+            //        } else {
+            //            gr.InterpolationMode = InterpolationMode.Low;
+            //            gr.PixelOffsetMode = PixelOffsetMode.HighSpeed;
+            //        }
+            //        gr.DrawImage(Bitmap, r2, r3, GraphicsUnit.Pixel);
+            //    }
+            //} catch {
+            //    Generic.CollectGarbage();
+            //}
+            //if (Stil != PadStyles.Undefiniert) {
+            //    if (Parent.SheetStyleScale > 0 && Parent.SheetStyle != null) {
+            //        gr.DrawRectangle(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(zoom * Parent.SheetStyleScale), r1);
+            //    }
+            //}
+            //foreach (var thisQi in Overlays) {
+            //    gr.DrawImage(thisQi, r2.Left + 8, r2.Top + 8);
+            //}
+            //gr.TranslateTransform(-trp.X, -trp.Y);
+            //gr.ResetTransform();
+            //if (!forPrinting) {
+            //    if (!string.IsNullOrEmpty(Platzhalter_Für_Layout)) {
+            //        Font f = new("Arial", 8);
+            //        BlueFont.DrawString(gr, Platzhalter_Für_Layout, f, Brushes.Black, drawingCoordinates.Left, drawingCoordinates.Top);
+            //    }
+            //}
+            base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, forPrinting);
         }
 
         protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {

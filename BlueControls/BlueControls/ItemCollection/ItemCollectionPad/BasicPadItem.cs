@@ -33,16 +33,18 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection {
 
-    public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, IMoveable {
+    public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, IMoveable, IDisposable {
 
         #region Fields
 
         public readonly ListExt<ItemConnection> ConnectsTo = new();
+
         public readonly ListExt<PointM> MovablePoint = new();
 
         public readonly List<PointM> PointsForSuccesfullyMove = new();
 
         public List<FlexiControl>? AdditionalStyleOptions = null;
+
         private static int _uniqueInternalCount;
 
         private static string _uniqueInternalLastTime = "InitialDummy";
@@ -58,7 +60,9 @@ namespace BlueControls.ItemCollection {
         private PadStyles _style = PadStyles.Style_Standard;
 
         private RectangleF _usedArea;
+
         private int _zoomPadding;
+        private bool disposedValue;
 
         #endregion
 
@@ -67,8 +71,13 @@ namespace BlueControls.ItemCollection {
         protected BasicPadItem(string internalname) {
             Internal = string.IsNullOrEmpty(internalname) ? UniqueInternal() : internalname;
             if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben."); }
+
             MovablePoint.ItemAdded += Points_ItemAdded;
             MovablePoint.ItemRemoving += Points_ItemRemoving;
+
+            ConnectsTo.ItemAdded += ConnectsTo_ItemAdded;
+            ConnectsTo.ItemRemoving += ConnectsTo_ItemRemoving;
+            ConnectsTo.ItemRemoved += ConnectsTo_ItemRemoved;
         }
 
         #endregion
@@ -219,19 +228,21 @@ namespace BlueControls.ItemCollection {
 
         public virtual void DesignOrStyleChanged() { }
 
+        public void Dispose() {
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
         public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting) {
             if (_parent == null) { Develop.DebugPrint(FehlerArt.Fehler, "Parent nicht definiert"); }
 
             if (forPrinting && !_beiExportSichtbar) { return; }
 
-            var drawingCoordinates = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
+            var PositionModified = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
 
-            if (IsInDrawingArea(drawingCoordinates, sizeOfParentControl)) {
-                DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, forPrinting);
-
-                if (!_beiExportSichtbar) {
-                    gr.DrawImage(QuickImage.Get("Drucker|16||1"), drawingCoordinates.X, drawingCoordinates.Y);
-                }
+            if (IsInDrawingArea(PositionModified, sizeOfParentControl)) {
+                DrawExplicit(gr, PositionModified, zoom, shiftX, shiftY, forPrinting);
             }
 
             #region Verknüpfte Pfeile Zeichnen
@@ -291,8 +302,8 @@ namespace BlueControls.ItemCollection {
             List<FlexiControl> l = new()
             {
                 new FlexiControl(),
-                new FlexiControlForProperty(this, "Gruppenzugehörigkeit"),
-                new FlexiControlForProperty(this, "Bei_Export_sichtbar")
+                new FlexiControlForProperty<string>(() => this.Gruppenzugehörigkeit),
+                new FlexiControlForProperty<bool>(() => this.Bei_Export_Sichtbar)
             };
             if (AdditionalStyleOptions != null) {
                 l.Add(new FlexiControl());
@@ -435,9 +446,9 @@ namespace BlueControls.ItemCollection {
             return x;
         }
 
-        internal void AddLineStyleOption(List<FlexiControl> l) => l.Add(new FlexiControlForProperty(this, "Stil", Skin.GetRahmenArt(_parent.SheetStyle, true)));
+        internal void AddLineStyleOption(List<FlexiControl> l) => l.Add(new FlexiControlForProperty<PadStyles>(() => this.Stil, Skin.GetRahmenArt(_parent.SheetStyle, true)));
 
-        internal void AddStyleOption(List<FlexiControl> l) => l.Add(new FlexiControlForProperty(this, "Stil", Skin.GetFonts(_parent.SheetStyle)));
+        internal void AddStyleOption(List<FlexiControl> l) => l.Add(new FlexiControlForProperty<PadStyles>(() => this.Stil, Skin.GetFonts(_parent.SheetStyle)));
 
         internal BasicPadItem? Next() {
             var itemCount = _parent.IndexOf(this);
@@ -463,7 +474,61 @@ namespace BlueControls.ItemCollection {
 
         protected abstract string ClassId();
 
-        protected abstract void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting);
+        protected virtual void Dispose(bool disposing) {
+            if (!disposedValue) {
+                if (disposing) {
+                    // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+                }
+
+                MovablePoint.ItemAdded -= Points_ItemAdded;
+                MovablePoint.Clear();
+                MovablePoint.ItemRemoving -= Points_ItemRemoving;
+
+                ConnectsTo.ItemAdded -= ConnectsTo_ItemAdded;
+                ConnectsTo.Clear();
+                ConnectsTo.ItemRemoving -= ConnectsTo_ItemRemoving;
+                ConnectsTo.ItemRemoved -= ConnectsTo_ItemRemoved;
+
+                //ConnectsTo = null;
+
+                // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
+                // TODO: Große Felder auf NULL setzen
+                disposedValue = true;
+            }
+        }
+
+        protected void DrawColorScheme(Graphics gr, RectangleF drawingCoordinates, float zoom, int id) {
+            gr.FillRectangle(Brushes.White, drawingCoordinates);
+
+            var w = zoom * 6;
+
+            var tmp = drawingCoordinates;
+            tmp.Inflate(-w, -w);
+
+            gr.DrawRectangle(new Pen(Skin.IDColor(id), w * 2), tmp);
+
+            gr.DrawRectangle(Pens.Black, drawingCoordinates);
+        }
+
+        protected virtual void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+            try {
+                if (!forPrinting) {
+                    if (zoom > 1) {
+                        gr.DrawRectangle(new Pen(Color.Gray, zoom), positionModified);
+                    } else {
+                        gr.DrawRectangle(ZoomPad.PenGray, positionModified);
+                    }
+                    if (positionModified.Width < 1 || positionModified.Height < 1) {
+                        gr.DrawEllipse(new Pen(Color.Gray, 3), positionModified.Left - 5, positionModified.Top + 5, 10, 10);
+                        gr.DrawLine(ZoomPad.PenGray, positionModified.PointOf(Alignment.Top_Left), positionModified.PointOf(Alignment.Bottom_Right));
+                    }
+                }
+
+                if (!_beiExportSichtbar) {
+                    gr.DrawImage(QuickImage.Get("Drucker|16||1"), positionModified.X, positionModified.Y);
+                }
+            } catch { }
+        }
 
         protected bool IsInDrawingArea(RectangleF drawingKoordinates, Size sizeOfParentControl) => sizeOfParentControl.IsEmpty || sizeOfParentControl.Width == 0 || sizeOfParentControl.Height == 0
 || drawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, sizeOfParentControl));
@@ -471,6 +536,22 @@ namespace BlueControls.ItemCollection {
         protected abstract void ParseFinished();
 
         protected abstract BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse);
+
+        private void ConnectsTo_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
+            var x = (ItemConnection)e.Item;
+
+            x.OtherItem.Changed += Item_Changed;
+            OnChanged();
+        }
+
+        private void ConnectsTo_ItemRemoved(object sender, System.EventArgs e) => OnChanged();
+
+        private void ConnectsTo_ItemRemoving(object sender, BlueBasics.EventArgs.ListEventArgs e) {
+            var x = (ItemConnection)e.Item;
+            x.OtherItem.Changed -= Item_Changed;
+        }
+
+        private void Item_Changed(object sender, System.EventArgs e) => OnChanged();
 
         private void Points_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
             if (e.Item is PointM p) {
@@ -487,5 +568,12 @@ namespace BlueControls.ItemCollection {
         }
 
         #endregion
+
+        // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+        // ~BasicPadItem()
+        // {
+        //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        //     Dispose(disposing: false);
+        // }
     }
 }

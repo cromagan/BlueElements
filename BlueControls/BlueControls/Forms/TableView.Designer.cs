@@ -459,6 +459,7 @@ namespace BlueControls.Forms {
             this.tbcSidebar.TabDefault = null;
             this.tbcSidebar.TabDefaultOrder = null;
             this.tbcSidebar.TabIndex = 21;
+            this.tbcSidebar.SelectedIndexChanged += new System.EventHandler(this.tbcSidebar_SelectedIndexChanged);
             // 
             // tabFormula
             // 
@@ -480,6 +481,8 @@ namespace BlueControls.Forms {
             this.Formula.Size = new System.Drawing.Size(244, 560);
             this.Formula.TabIndex = 0;
             this.Formula.Text = "Formula";
+            this.Formula.SizeChanged += new System.EventHandler(this.Formula_SizeChanged);
+            this.Formula.VisibleChanged += new System.EventHandler(this.Formula_VisibleChanged);
             // 
             // pnlStatusBar
             // 

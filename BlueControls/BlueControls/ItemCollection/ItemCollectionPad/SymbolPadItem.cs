@@ -69,10 +69,10 @@ namespace BlueControls.ItemCollection {
             };
             List<FlexiControl> l = new()
             {
-                new FlexiControlForProperty(this, "Symbol", comms),
-                new FlexiControlForProperty(this, "Randdicke"),
-                new FlexiControlForProperty(this, "Randfarbe"),
-                new FlexiControlForProperty(this, "Hintergrundfarbe")
+                new FlexiControlForProperty<enSymbol>(() => this.Symbol, comms),
+                new FlexiControlForProperty<float>(() => this.Randdicke),
+                new FlexiControlForProperty<Color>(() => this.Randfarbe),
+                new FlexiControlForProperty<Color>(() => this.Hintergrundfarbe)
             };
             l.AddRange(base.GetStyleOptions());
             return l;
@@ -117,16 +117,16 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "Symbol";
 
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
-            var trp = drawingCoordinates.PointOf(Alignment.Horizontal_Vertical_Center);
+        protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+            var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
             gr.TranslateTransform(trp.X, trp.Y);
             gr.RotateTransform(-Drehwinkel);
             GraphicsPath? p = null;
 
             // Wegen der Nullpunktverschiebung wird ein temporäres Rechteck benötigt
-            var d2 = drawingCoordinates;
-            d2.X = -drawingCoordinates.Width / 2;
-            d2.Y = -drawingCoordinates.Height / 2;
+            var d2 = positionModified;
+            d2.X = -positionModified.Width / 2;
+            d2.Y = -positionModified.Height / 2;
 
             switch (Symbol) {
                 case enSymbol.Ohne:
@@ -160,7 +160,7 @@ namespace BlueControls.ItemCollection {
 
             gr.TranslateTransform(-trp.X, -trp.Y);
             gr.ResetTransform();
-            base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, forPrinting);
+            base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         }
 
         protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {

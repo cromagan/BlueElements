@@ -410,12 +410,14 @@ namespace BlueControls.ItemCollection {
         }
 
         protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-            if (MovablePoint.Count < 1) { return; }
-            var lastP = MovablePoint[MovablePoint.Count - 1];
-            foreach (var thisP in MovablePoint) {
-                gr.DrawLine(Pens.Black, lastP.ZoomAndMove(zoom, shiftX, shiftY), thisP.ZoomAndMove(zoom, shiftX, shiftY));
-                lastP = thisP;
+            if (MovablePoint.Count > 0) {
+                var lastP = MovablePoint[MovablePoint.Count - 1];
+                foreach (var thisP in MovablePoint) {
+                    gr.DrawLine(Pens.Black, lastP.ZoomAndMove(zoom, shiftX, shiftY), thisP.ZoomAndMove(zoom, shiftX, shiftY));
+                    lastP = thisP;
+                }
             }
+            base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         }
 
         protected override void ParseFinished() { }

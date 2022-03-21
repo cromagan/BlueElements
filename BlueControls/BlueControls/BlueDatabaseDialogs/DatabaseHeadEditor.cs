@@ -94,7 +94,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // Exports ----------------
             lbxExportSets.Item.Clear();
             foreach (var thisSet in _database.Export.Where(thisSet => thisSet != null)) {
-                lbxExportSets.Item.Add(thisSet);
+                lbxExportSets.Item.Add(thisSet, string.Empty, string.Empty);
             }
             lbxExportSets.Item.Sort();
             // -----------------------------
@@ -362,7 +362,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void ExportSets_AddClicked(object sender, System.EventArgs e) {
-            var newExportItem = lbxExportSets.Item.Add(new ExportDefinition(_database));
+            var newExportItem = lbxExportSets.Item.Add(new ExportDefinition(_database), string.Empty, string.Empty);
             newExportItem.Checked = true;
         }
 

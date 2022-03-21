@@ -227,16 +227,6 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
         /// Fügt das übergebende Object den Tags hinzu.
         /// </summary>
         /// <param name="readableObject"></param>
-        public TextListItem Add(IReadableText readableObject) {
-            var i = Add(readableObject, string.Empty, string.Empty);
-            i.Tag = readableObject;
-            return i;
-        }
-
-        /// <summary>
-        /// Fügt das übergebende Object den Tags hinzu.
-        /// </summary>
-        /// <param name="readableObject"></param>
         /// <param name="internalname"></param>
         public TextListItem Add(IReadableText readableObject, string internalname) {
             var i = Add(readableObject, internalname, string.Empty);

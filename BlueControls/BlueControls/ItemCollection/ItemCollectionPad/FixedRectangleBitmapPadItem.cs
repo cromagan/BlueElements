@@ -26,28 +26,9 @@ using System.Drawing;
 
 namespace BlueControls.ItemCollection {
 
-    public abstract class FixedRectangleBitmapPadItem : BasicPadItem, IDisposable {
+    public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem, IDisposable {
 
         #region Fields
-
-        private readonly PointM? _pl;
-
-        /// <summary>
-        /// Dieser Punkt bestimmt die ganzen Koordinaten. Die anderen werden nur mitgeschleift
-        /// </summary>
-        private readonly PointM? _pLo;
-
-        private readonly PointM? _pLu;
-
-        private readonly PointM? _po;
-
-        private readonly PointM? _pr;
-
-        private readonly PointM? _pRo;
-
-        private readonly PointM? _pRu;
-
-        private readonly PointM? _pu;
 
         private bool _disposedValue;
         private Bitmap? _generatedBitmap;
@@ -57,40 +38,20 @@ namespace BlueControls.ItemCollection {
         #region Constructors
 
         protected FixedRectangleBitmapPadItem(string internalname) : base(internalname) {
-            _pLo = new PointM(this, "LO", 0, 0);
-            _pRo = new PointM(this, "RO", 0, 0);
-            _pRu = new PointM(this, "RU", 0, 0);
-            _pLu = new PointM(this, "LU", 0, 0);
-            _pl = new PointM(this, "L", 0, 0);
-            _pr = new PointM(this, "R", 0, 0);
-            _po = new PointM(this, "O", 0, 0);
-            _pu = new PointM(this, "U", 0, 0);
-            MovablePoint.Add(_pLo);
-            MovablePoint.Add(_pRo);
-            MovablePoint.Add(_pLu);
-            MovablePoint.Add(_pRu);
-            MovablePoint.Add(_pl);
-            MovablePoint.Add(_pr);
-            MovablePoint.Add(_pu);
-            MovablePoint.Add(_po);
-            PointsForSuccesfullyMove.Add(_pLo);
-
-            ConnectsTo.ItemAdded += ConnectsTo_ItemAdded;
-            ConnectsTo.ItemRemoving += ConnectsTo_ItemRemoving;
-            ConnectsTo.ItemRemoved += ConnectsTo_ItemRemoved;
-
             RemovePic();
-            //GeneratePic(true);
         }
 
         #endregion
 
         #region Properties
 
-        public Bitmap GeneratedBitmap {
+        public Bitmap? GeneratedBitmap {
             get {
                 if (_generatedBitmap != null) { return _generatedBitmap; }
                 _generatedBitmap = GeneratePic();
+                if (_generatedBitmap == null) {
+                    Size = Size.Empty;
+                } else { Size = _generatedBitmap.Size; }
                 return _generatedBitmap;
             }
         }
@@ -105,125 +66,15 @@ namespace BlueControls.ItemCollection {
             GC.SuppressFinalize(this);
         }
 
-        public override void PointMoved(object sender, MoveEventArgs e) {
-            base.PointMoved(sender, e);
-            var x = 0f;
-            var y = 0f;
-
-            var point = (PointM)sender;
-
-            if (point != null) {
-                x = point.X;
-                y = point.Y;
-            }
-
-            if (point == _pLo) {
-                if (e.Y) {
-                    _pRu.Y = y + GeneratedBitmap.Height;
-                    _po.Y = y;
-                }
-                if (e.X) {
-                    _pRu.X = x + GeneratedBitmap.Width;
-                    _pl.X = x;
-                }
-            }
-
-            if (point == _pRu) {
-                if (e.X) {
-                    _pLo.X = x - GeneratedBitmap.Width;
-                    _pr.X = x;
-                }
-                if (e.Y) {
-                    _pLo.Y = y - GeneratedBitmap.Height;
-                    _pu.Y = y;
-                }
-            }
-
-            if (point == _pRo) {
-                if (e.Y) { _po.Y = y; }
-                if (e.X) { _pr.X = x; }
-            }
-
-            if (point == _pLu) {
-                if (e.X) { _pl.X = x; }
-                if (e.Y) { _pu.Y = y; }
-            }
-
-            if (point == _po && e.Y) {
-                _pLo.Y = y;
-                _pRo.Y = y;
-            }
-
-            if (point == _pu && e.Y) {
-                _pLu.Y = y;
-                _pRu.Y = y;
-            }
-
-            if (point == _pl && e.X) {
-                _pLo.X = x;
-                _pLu.X = x;
-            }
-
-            if (point == _pr && e.X) {
-                _pRo.X = x;
-                _pRu.X = x;
-            }
-
-            SizeChanged();
-        }
-
-        //        case "rotation":
-        //            _drehwinkel = IntParse(value);
-        //            return true;
-        //    }
-        //    return false;
-        //}
         public void RemovePic() {
             _generatedBitmap?.Dispose();
             _generatedBitmap = null;
-        }
-
-        //public override bool ParseThis(string tag, string value) {
-        //    if (base.ParseThis(tag, value)) { return true; }
-        //    switch (tag) {
-        //        case "fixsize": // TODO: Entfernt am 24.05.2021
-        //            //_größe_fixiert = value.FromPlusMinus();
-        //            return true;
-        public void SetLeftTopPoint(float x, float y) => _pLo.SetTo(x, y);
-
-        public void SizeChanged() {
-            // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
-            _pl.SetTo(_pLo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2));
-            _pr.SetTo(_pRo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2));
-            _pu.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRu.Y);
-            _po.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRo.Y);
-        }
-
-        protected override RectangleF CalculateUsedArea() {
-            var bmp = GeneratedBitmap;
-            if (bmp == null || _pLo == null) { return RectangleF.Empty; }
-            return new RectangleF(_pLo.X, _pLo.Y, bmp.Width, bmp.Height);
-
-            //if (ConnectsTo == null) { return _bitmapUsedArea; }
-
-            //var r = _bitmapUsedArea;
-
-            //foreach (var thisc in ConnectsTo) {
-            //    if (thisc.OtherItem != null && !thisc.OtherItem.UsedArea.IsEmpty) {
-            //        r = RectangleF.Union(r, thisc.OtherItem.UsedArea);
-            //    }
-            //}
-            //return r;
         }
 
         protected void Dispose(bool disposing) {
             if (!_disposedValue) {
                 if (disposing) {
                     // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
-                    ConnectsTo.ItemAdded -= ConnectsTo_ItemAdded;
-                    ConnectsTo.Clear();
-                    ConnectsTo.ItemRemoving -= ConnectsTo_ItemRemoving;
-                    ConnectsTo.ItemRemoved -= ConnectsTo_ItemRemoved;
                 }
                 RemovePic();
 
@@ -239,7 +90,7 @@ namespace BlueControls.ItemCollection {
         //    if (Drehwinkel != 0) { t = t + "Rotation=" + Drehwinkel + ", "; }
         //    return t.Trim(", ") + "}";
         //}
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
+        protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
 
             #region Bild zeichnen
 
@@ -252,37 +103,21 @@ namespace BlueControls.ItemCollection {
                         gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
                         gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
                     }
-                    gr.DrawImage(_generatedBitmap, drawingCoordinates);
+                    gr.DrawImage(_generatedBitmap, positionModified);
                 }
             } catch { }
 
             #endregion
 
-            var line = 1f;
-            if (zoom > 1) { line = zoom; }
-
-            #region Umrandung Zeichnen
-
-            try {
-                if (!forPrinting || _generatedBitmap == null) {
-                    gr.DrawRectangle(new Pen(Color.Gray, line), drawingCoordinates);
-
-                    if (drawingCoordinates.Width < 1 || drawingCoordinates.Height < 1) {
-                        gr.DrawEllipse(new Pen(Color.Gray, 3), drawingCoordinates.Left - 5, drawingCoordinates.Top + 5, 10, 10);
-                        gr.DrawLine(ZoomPad.PenGray, drawingCoordinates.PointOf(Alignment.Top_Left), drawingCoordinates.PointOf(Alignment.Bottom_Right));
-                    }
-                }
-            } catch { }
-
-            #endregion
+            base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         }
 
         //public override List<FlexiControl> GetStyleOptions() {
         //    List<FlexiControl> l = new()
         //    {
         //        new FlexiControl(),
-        //        //new FlexiControlForProperty(this, "Drehwinkel"),
-        //        //new FlexiControlForProperty(this, "Größe_fixiert")
+        //        //new FlexiControlForProperty(()=> this.Drehwinkel"),
+        //        //new FlexiControlForProperty(()=> this.Größe_fixiert")
         //    };
         //    l.AddRange(base.GetStyleOptions());
         //    return l;
@@ -303,22 +138,6 @@ namespace BlueControls.ItemCollection {
         protected abstract Bitmap GeneratePic();
 
         protected override void ParseFinished() => SizeChanged();
-
-        private void ConnectsTo_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
-            var x = (ItemConnection)e.Item;
-
-            x.OtherItem.Changed += Item_Changed;
-            OnChanged();
-        }
-
-        private void ConnectsTo_ItemRemoved(object sender, System.EventArgs e) => OnChanged();
-
-        private void ConnectsTo_ItemRemoving(object sender, BlueBasics.EventArgs.ListEventArgs e) {
-            var x = (ItemConnection)e.Item;
-            x.OtherItem.Changed -= Item_Changed;
-        }
-
-        private void Item_Changed(object sender, System.EventArgs e) => OnChanged();
 
         #endregion
 

@@ -260,7 +260,7 @@ namespace BlueControls.Forms {
 
         private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => Table.Database.Column.GenerateOverView();
 
-        private void btnUnterschiede_CheckedChanged(object sender, System.EventArgs e) => Table.Unterschiede = btnUnterschiede.Checked ? Table.CursorPosRow().Row : null;
+        private void btnUnterschiede_CheckedChanged(object sender, System.EventArgs e) => Table.Unterschiede = btnUnterschiede.Checked ? Table.CursorPosRow.Row : null;
 
         private void btnVorherigeVersion_Click(object sender, System.EventArgs e) {
             btnVorherigeVersion.Enabled = false;
@@ -333,6 +333,27 @@ namespace BlueControls.Forms {
             tabAdmin.Enabled = true;
         }
 
+        private void FillFormula() {
+            if (tbcSidebar.SelectedTab != tabFormula) { return; }
+            if (Formula is null || Formula.IsDisposed) { return; }
+            if (!Formula.Visible) { return; }
+
+            if (Formula.Width < 30 || Formula.Height < 10) {
+                Formula.Database = null;
+                return;
+            }
+
+            Formula.Database = Table.Database;
+            //if (e.Column != null) { Formula.Database = e.Column.Database; }
+            //if (e.RowData?.Row != null) { Formula.Database = e.RowData.Row.Database; }
+
+            Formula.ShowingRowKey = Table.CursorPosColumn == null || Table.CursorPosRow?.Row == null ? -1 : Table.CursorPosRow.Row.Key;
+        }
+
+        private void Formula_SizeChanged(object sender, System.EventArgs e) => FillFormula();
+
+        private void Formula_VisibleChanged(object sender, System.EventArgs e) => FillFormula();
+
         private void Table_CursorPosChanged(object sender, CellExtEventArgs e) {
             if (InvokeRequired) {
                 Invoke(new Action(() => Table_CursorPosChanged(sender, e)));
@@ -341,10 +362,7 @@ namespace BlueControls.Forms {
 
             btnUnterschiede_CheckedChanged(null, System.EventArgs.Empty);
 
-            if (e.Column != null) { Formula.Database = e.Column.Database; }
-            if (e.RowData?.Row != null) { Formula.Database = e.RowData.Row.Database; }
-
-            Formula.ShowingRowKey = e.Column == null || e.RowData?.Row == null ? -1 : e.RowData.Row.Key;
+            FillFormula();
         }
 
         private void Table_ViewChanged(object sender, System.EventArgs e) => Table.WriteColumnArrangementsInto(cbxColumnArr, Table.Database, Table.Arrangement);
@@ -368,6 +386,8 @@ namespace BlueControls.Forms {
         }
 
         private void TableView_EnabledChanged(object sender, System.EventArgs e) => Check_OrderButtons();
+
+        private void tbcSidebar_SelectedIndexChanged(object sender, System.EventArgs e) => FillFormula();
 
         #endregion
     }

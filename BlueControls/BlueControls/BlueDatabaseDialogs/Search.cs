@@ -43,7 +43,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             _blueTable = table;
             _blueTable.CursorPosChanged += CursorPosChanged;
-            CursorPosChanged(_blueTable, new CellExtEventArgs(_blueTable.CursorPosColumn(), _blueTable.CursorPosRow()));
+            CursorPosChanged(_blueTable, new CellExtEventArgs(_blueTable.CursorPosColumn, _blueTable.CursorPosRow));
         }
 
         #endregion
@@ -58,7 +58,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void btnSuchInCell_Click(object? sender, System.EventArgs e) {
             var suchtT = SuchText();
             if (string.IsNullOrEmpty(suchtT)) { return; }
-            Table.SearchNextText(suchtT, _blueTable, _col, _blueTable.CursorPosRow(), out var found, out var gefRow, btnAehnliches.Checked);
+            Table.SearchNextText(suchtT, _blueTable, _col, _blueTable.CursorPosRow, out var found, out var gefRow, btnAehnliches.Checked);
             if (found == null) {
                 MessageBox.Show("Text nicht gefunden", ImageCode.Information, "OK");
                 return;

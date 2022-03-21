@@ -324,7 +324,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                     if (oo != null) {
                         cpi.AdditionalStyleOptions = new();
-                        cpi.AdditionalStyleOptions.Add(new FlexiControlForProperty(oo, "Permanent"));
+                        cpi.AdditionalStyleOptions.Add(new FlexiControlForProperty<bool>(() => oo.Permanent));
                     }
                 }
             }

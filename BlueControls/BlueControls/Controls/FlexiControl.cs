@@ -323,7 +323,7 @@ namespace BlueControls.Controls {
         }
 
         /// <summary>
-        /// Zum setzen des Wertes muss ValueSet benutzt werden.
+        /// Info: Zum Setzen des Wertes muss ValueSet benutzt werden.
         /// </summary>
         [DefaultValue("")]
         [Browsable(false)]

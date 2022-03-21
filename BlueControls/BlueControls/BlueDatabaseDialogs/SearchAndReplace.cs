@@ -45,7 +45,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             _blueTable = table;
             _blueTable.CursorPosChanged += CursorPosChanged;
-            CursorPosChanged(_blueTable, new CellExtEventArgs(_blueTable.CursorPosColumn(), _blueTable.CursorPosRow()));
+            CursorPosChanged(_blueTable, new CellExtEventArgs(_blueTable.CursorPosColumn, _blueTable.CursorPosRow));
         }
 
         #endregion
@@ -91,10 +91,10 @@ namespace BlueControls.BlueDatabaseDialogs {
                 canDo = true;
             }
             if (NurinAktuellerSpalte.Checked) {
-                if (_blueTable.CursorPosColumn() == null) {
+                if (_blueTable.CursorPosColumn == null) {
                     canDo = false;
                 } else {
-                    if (!_blueTable.CursorPosColumn().Format.CanBeCheckedByRules()) { canDo = false; }
+                    if (!_blueTable.CursorPosColumn.Format.CanBeCheckedByRules()) { canDo = false; }
                 }
             }
             if (Alt.Text == Neu.Text) {
@@ -118,7 +118,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             List<ColumnItem?> sp = new();
             List<RowItem> ro = new();
             if (NurinAktuellerSpalte.Checked) {
-                sp.Add(_blueTable.CursorPosColumn());
+                sp.Add(_blueTable.CursorPosColumn);
             } else {
                 sp.AddRange(_blueTable.Database.Column.Where(thisColumn => thisColumn != null && thisColumn.Format.CanBeChangedByRules()));
             }

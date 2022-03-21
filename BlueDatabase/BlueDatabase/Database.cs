@@ -212,6 +212,7 @@ namespace BlueDatabase {
         }
 
         [Browsable(false)]
+        [Description("Der Name der Datenbank.")]
         public string Caption {
             get => _caption;
             set {

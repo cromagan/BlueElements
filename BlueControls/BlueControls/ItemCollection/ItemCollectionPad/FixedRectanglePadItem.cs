@@ -22,31 +22,39 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection {
 
-    public abstract class RectanglePadItem : BasicPadItem {
+    public abstract class FixedRectanglePadItem : BasicPadItem {
 
         #region Fields
 
+        protected Size Size = Size.Empty;
         private readonly PointM? _pl;
+
+        /// <summary>
+        /// Dieser Punkt bestimmt die ganzen Koordinaten. Die anderen werden nur mitgeschleift
+        /// </summary>
         private readonly PointM? _pLo;
+
         private readonly PointM? _pLu;
+
         private readonly PointM? _po;
+
         private readonly PointM? _pr;
+
         private readonly PointM? _pRo;
+
         private readonly PointM? _pRu;
+
         private readonly PointM? _pu;
-        private int _drehwinkel;
 
         #endregion
 
         #region Constructors
 
-        protected RectanglePadItem(string internalname) : base(internalname) {
+        protected FixedRectanglePadItem(string internalname) : base(internalname) {
             _pLo = new PointM(this, "LO", 0, 0);
             _pRo = new PointM(this, "RO", 0, 0);
             _pRu = new PointM(this, "RU", 0, 0);
@@ -64,50 +72,11 @@ namespace BlueControls.ItemCollection {
             MovablePoint.Add(_pu);
             MovablePoint.Add(_po);
             PointsForSuccesfullyMove.Add(_pLo);
-            PointsForSuccesfullyMove.Add(_pRu);
-            Drehwinkel = 0;
-        }
-
-        #endregion
-
-        #region Properties
-
-        public int Drehwinkel {
-            get => _drehwinkel;
-            set {
-                if (_drehwinkel == value) { return; }
-                _drehwinkel = value;
-                OnChanged();
-            }
         }
 
         #endregion
 
         #region Methods
-
-        public override List<FlexiControl> GetStyleOptions() {
-            List<FlexiControl> l = new()
-            {
-                new FlexiControl(),
-                new FlexiControlForProperty<int>(() => this.Drehwinkel)
-            };
-            l.AddRange(base.GetStyleOptions());
-            return l;
-        }
-
-        public override bool ParseThis(string tag, string value) {
-            if (base.ParseThis(tag, value)) { return true; }
-            switch (tag) {
-                case "fixsize": // TODO: Entfernt am 24.05.2021
-                    //_größe_fixiert = value.FromPlusMinus();
-                    return true;
-
-                case "rotation":
-                    _drehwinkel = IntParse(value);
-                    return true;
-            }
-            return false;
-        }
 
         public override void PointMoved(object sender, MoveEventArgs e) {
             base.PointMoved(sender, e);
@@ -122,8 +91,25 @@ namespace BlueControls.ItemCollection {
             }
 
             if (point == _pLo) {
-                if (e.Y) { _po.Y = y; }
-                if (e.X) { _pl.X = x; }
+                if (e.Y) {
+                    _pRu.Y = y + Size.Height;
+                    _po.Y = y;
+                }
+                if (e.X) {
+                    _pRu.X = x + Size.Width;
+                    _pl.X = x;
+                }
+            }
+
+            if (point == _pRu) {
+                if (e.X) {
+                    _pLo.X = x - Size.Width;
+                    _pr.X = x;
+                }
+                if (e.Y) {
+                    _pLo.Y = y - Size.Height;
+                    _pu.Y = y;
+                }
             }
 
             if (point == _pRo) {
@@ -133,11 +119,6 @@ namespace BlueControls.ItemCollection {
 
             if (point == _pLu) {
                 if (e.X) { _pl.X = x; }
-                if (e.Y) { _pu.Y = y; }
-            }
-
-            if (point == _pRu) {
-                if (e.X) { _pr.X = x; }
                 if (e.Y) { _pu.Y = y; }
             }
 
@@ -164,19 +145,21 @@ namespace BlueControls.ItemCollection {
             SizeChanged();
         }
 
-        public void SetCoordinates(RectangleF r, bool overrideFixedSize) {
-            if (!overrideFixedSize) {
-                var vr = r.PointOf(Alignment.Horizontal_Vertical_Center);
-                var ur = UsedArea;
-                _pLo.SetTo(vr.X - (ur.Width / 2), vr.Y - (ur.Height / 2));
-                _pRu.SetTo(_pLo.X + ur.Width, _pLo.Y + ur.Height);
-            } else {
-                _pLo.SetTo(r.PointOf(Alignment.Top_Left));
-                _pRu.SetTo(r.PointOf(Alignment.Bottom_Right));
-            }
-        }
+        //public override bool ParseThis(string tag, string value) {
+        //    if (base.ParseThis(tag, value)) { return true; }
+        //    switch (tag) {
+        //        case "fixsize": // TODO: Entfernt am 24.05.2021
+        //            //_größe_fixiert = value.FromPlusMinus();
+        //            return true;
+        public void SetLeftTopPoint(float x, float y) => _pLo.SetTo(x, y);
 
-        public virtual void SizeChanged() {
+        //        case "rotation":
+        //            _drehwinkel = IntParse(value);
+        //            return true;
+        //    }
+        //    return false;
+        //}
+        public void SizeChanged() {
             // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
             _pl.SetTo(_pLo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2));
             _pr.SetTo(_pRo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2));
@@ -184,18 +167,23 @@ namespace BlueControls.ItemCollection {
             _po.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRo.Y);
         }
 
-        public override string ToString() {
-            var t = base.ToString();
-            t = t.Substring(0, t.Length - 1) + ", ";
-            if (Drehwinkel != 0) { t = t + "Rotation=" + Drehwinkel + ", "; }
-            return t.Trim(", ") + "}";
+        protected override RectangleF CalculateUsedArea() {
+            if (_pLo == null) { return RectangleF.Empty; }
+            return new RectangleF(_pLo.X, _pLo.Y, Size.Width, Size.Height);
         }
-
-        protected override RectangleF CalculateUsedArea() => _pLo == null || _pRu == null ? RectangleF.Empty
-: new RectangleF(Math.Min(_pLo.X, _pRu.X), Math.Min(_pLo.Y, _pRu.Y), Math.Abs(_pRu.X - _pLo.X), Math.Abs(_pRu.Y - _pLo.Y));
 
         protected override void ParseFinished() => SizeChanged();
 
         #endregion
+
+        //public void SetLeftTopPoint(float x, float y) => _pLo.SetTo(x, y);
+
+        //public void SizeChanged() {
+        //    // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
+        //    _pl.SetTo(_pLo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2));
+        //    _pr.SetTo(_pRo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2));
+        //    _pu.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRu.Y);
+        //    _po.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRo.Y);
+        //}
     }
 }

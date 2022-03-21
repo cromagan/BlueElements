@@ -74,7 +74,35 @@ namespace BlueControls.ItemCollection {
 
         public SizeModes Bild_Modus { get; set; }
 
+        public string Bildschirmbereich_wählen {
+            get => string.Empty;
+            set {
+                if (Bitmap != null) {
+                    if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+                }
+                Bitmap = ScreenShot.GrabArea(null);
+            }
+        }
+
         public Bitmap? Bitmap { get; set; }
+
+        public string Datei_laden {
+            get => string.Empty;
+            set {
+                if (Bitmap != null) {
+                    if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+                }
+                System.Windows.Forms.OpenFileDialog e = new() {
+                    CheckFileExists = true,
+                    Multiselect = false,
+                    Title = "Bild wählen:",
+                    Filter = "PNG Portable Network Graphics|*.png|JPG Jpeg Interchange|*.jpg|Bmp Windows Bitmap|*.bmp"
+                };
+                e.ShowDialog();
+                if (!FileExists(e.FileName)) { return; }
+                Bitmap = (Bitmap)BitmapExt.Image_FromFile(e.FileName);
+            }
+        }
 
         public bool Hintergrund_Weiß_Füllen { get; set; }
 
@@ -85,28 +113,6 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        public void Bildschirmbereich_wählen() {
-            if (Bitmap != null) {
-                if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-            }
-            Bitmap = ScreenShot.GrabArea(null);
-        }
-
-        public void Datei_laden() {
-            if (Bitmap != null) {
-                if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-            }
-            System.Windows.Forms.OpenFileDialog e = new() {
-                CheckFileExists = true,
-                Multiselect = false,
-                Title = "Bild wählen:",
-                Filter = "PNG Portable Network Graphics|*.png|JPG Jpeg Interchange|*.jpg|Bmp Windows Bitmap|*.bmp"
-            };
-            e.ShowDialog();
-            if (!FileExists(e.FileName)) { return; }
-            Bitmap = (Bitmap)BitmapExt.Image_FromFile(e.FileName);
-        }
-
         public void Dispose() {
             // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
             Dispose(true);
@@ -116,10 +122,10 @@ namespace BlueControls.ItemCollection {
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new()
             {
-                new FlexiControlForProperty(this, "Bildschirmbereich_wählen", ImageCode.Bild),
-                new FlexiControlForProperty(this, "Datei_laden", ImageCode.Ordner),
+                new FlexiControlForProperty<string>(() => this.Bildschirmbereich_wählen, ImageCode.Bild),
+                new FlexiControlForProperty<string>(() => this.Datei_laden, ImageCode.Ordner),
                 new FlexiControl(),
-                new FlexiControlForProperty(this, "Platzhalter_für_Layout", 2),
+                new FlexiControlForProperty<string>(() => this.Platzhalter_Für_Layout, 2),
                 new FlexiControl()
             };
             ItemCollectionList.ItemCollectionList comms = new()
@@ -128,10 +134,10 @@ namespace BlueControls.ItemCollection {
                 { "Verzerren", ((int)SizeModes.Verzerren).ToString(), QuickImage.Get("BildmodusVerzerren|32") },
                 { "Einpassen", ((int)SizeModes.EmptySpace).ToString(), QuickImage.Get("BildmodusEinpassen|32") }
             };
-            l.Add(new FlexiControlForProperty(this, "Bild-Modus", comms));
+            l.Add(new FlexiControlForProperty<SizeModes>(() => this.Bild_Modus, comms));
             l.Add(new FlexiControl());
             AddLineStyleOption(l);
-            l.Add(new FlexiControlForProperty(this, "Hintergrund_weiß_füllen"));
+            l.Add(new FlexiControlForProperty<bool>(() => this.Hintergrund_Weiß_Füllen));
             l.AddRange(base.GetStyleOptions());
             return l;
         }
@@ -226,10 +232,10 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
-            drawingCoordinates.Inflate(-Padding, -Padding);
-            RectangleF r1 = new(drawingCoordinates.Left + Padding, drawingCoordinates.Top + Padding,
-                drawingCoordinates.Width - (Padding * 2), drawingCoordinates.Height - (Padding * 2));
+        protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+            positionModified.Inflate(-Padding, -Padding);
+            RectangleF r1 = new(positionModified.Left + Padding, positionModified.Top + Padding,
+                positionModified.Width - (Padding * 2), positionModified.Height - (Padding * 2));
             RectangleF r2 = new();
             RectangleF r3 = new();
             if (Bitmap != null) {
@@ -241,22 +247,22 @@ namespace BlueControls.ItemCollection {
                         }
 
                     case SizeModes.BildAbschneiden: {
-                            var scale = Math.Max((drawingCoordinates.Width - (Padding * 2)) / Bitmap.Width, (drawingCoordinates.Height - (Padding * 2)) / Bitmap.Height);
-                            var tmpw = (drawingCoordinates.Width - (Padding * 2)) / scale;
-                            var tmph = (drawingCoordinates.Height - (Padding * 2)) / scale;
+                            var scale = Math.Max((positionModified.Width - (Padding * 2)) / Bitmap.Width, (positionModified.Height - (Padding * 2)) / Bitmap.Height);
+                            var tmpw = (positionModified.Width - (Padding * 2)) / scale;
+                            var tmph = (positionModified.Height - (Padding * 2)) / scale;
                             r3 = new RectangleF((Bitmap.Width - tmpw) / 2, (Bitmap.Height - tmph) / 2, tmpw, tmph);
                             r2 = r1;
                             break;
                         }
                     default: // Is = enSizeModes.WeißerRand
                         {
-                            var scale = Math.Min((drawingCoordinates.Width - (Padding * 2)) / Bitmap.Width, (drawingCoordinates.Height - (Padding * 2)) / Bitmap.Height);
-                            r2 = new RectangleF(((drawingCoordinates.Width - (Bitmap.Width * scale)) / 2) + drawingCoordinates.Left, ((drawingCoordinates.Height - (Bitmap.Height * scale)) / 2) + drawingCoordinates.Top, Bitmap.Width * scale, Bitmap.Height * scale);
+                            var scale = Math.Min((positionModified.Width - (Padding * 2)) / Bitmap.Width, (positionModified.Height - (Padding * 2)) / Bitmap.Height);
+                            r2 = new RectangleF(((positionModified.Width - (Bitmap.Width * scale)) / 2) + positionModified.Left, ((positionModified.Height - (Bitmap.Height * scale)) / 2) + positionModified.Top, Bitmap.Width * scale, Bitmap.Height * scale);
                             break;
                         }
                 }
             }
-            var trp = drawingCoordinates.PointOf(Alignment.Horizontal_Vertical_Center);
+            var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
             gr.TranslateTransform(trp.X, trp.Y);
             gr.RotateTransform(-Drehwinkel);
             r1 = new RectangleF(r1.Left - trp.X, r1.Top - trp.Y, r1.Width, r1.Height);
@@ -291,10 +297,10 @@ namespace BlueControls.ItemCollection {
             if (!forPrinting) {
                 if (!string.IsNullOrEmpty(Platzhalter_Für_Layout)) {
                     Font f = new("Arial", 8);
-                    BlueFont.DrawString(gr, Platzhalter_Für_Layout, f, Brushes.Black, drawingCoordinates.Left, drawingCoordinates.Top);
+                    BlueFont.DrawString(gr, Platzhalter_Für_Layout, f, Brushes.Black, positionModified.Left, positionModified.Top);
                 }
             }
-            base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, forPrinting);
+            base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         }
 
         protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {

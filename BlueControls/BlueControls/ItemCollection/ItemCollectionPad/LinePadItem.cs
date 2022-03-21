@@ -106,7 +106,7 @@ namespace BlueControls.ItemCollection {
                 { "Linie soll Objekten ausweichen", ((int)ConectorStyle.Ausweichenx).ToString(), QuickImage.Get(ImageCode.Linie) },
                 { "Linie soll Objekten ausweichen und rechtwinklig sein", ((int)ConectorStyle.AusweichenUndGerade).ToString(), QuickImage.Get(ImageCode.Linie) }
             };
-            l.Add(new FlexiControlForProperty(this, "Linien-Verhalten", verhalt));
+            l.Add(new FlexiControlForProperty<ConectorStyle>(() => this.Linien_Verhalten, verhalt));
             AddLineStyleOption(l);
             l.AddRange(base.GetStyleOptions());
             return l;
@@ -171,13 +171,15 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "LINE";
 
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
-            if (Stil == PadStyles.Undefiniert) { return; }
-            CalcTempPoints();
-            if (_tempPoints.Count == 0) { return; }
-            for (var z = 0; z <= _tempPoints.Count - 2; z++) {
-                gr.DrawLine(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(zoom * Parent.SheetStyleScale), _tempPoints[z].ZoomAndMove(zoom, shiftX, shiftY), _tempPoints[z + 1].ZoomAndMove(zoom, shiftX, shiftY));
+        protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+            if (Stil != PadStyles.Undefiniert) {
+                CalcTempPoints();
+                if (_tempPoints.Count == 0) { return; }
+                for (var z = 0; z <= _tempPoints.Count - 2; z++) {
+                    gr.DrawLine(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(zoom * Parent.SheetStyleScale), _tempPoints[z].ZoomAndMove(zoom, shiftX, shiftY), _tempPoints[z + 1].ZoomAndMove(zoom, shiftX, shiftY));
+                }
             }
+            base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         }
 
         protected override void ParseFinished() { }

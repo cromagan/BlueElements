@@ -78,61 +78,51 @@ namespace BlueControls.ItemCollection {
         //[Description("Hier kann ein Variablenname als Platzhalter eingegeben werden. Beispiel: ~Bild~")]
         //public string Platzhalter_Für_Layout { get; set; }
 
-        #region Methods
+        #region Properties
 
-        public void Datenquelle_wählen() {
-            var x = new ItemCollectionList.ItemCollectionList();
-            foreach (var thisR in Parent) {
-                if (thisR is RowWithFilterPaditem rfp) {
-                    x.Add(rfp);
+        public string Datenquelle_wählen {
+            get => string.Empty;
+            set {
+                var x = new ItemCollectionList.ItemCollectionList();
+                foreach (var thisR in Parent) {
+                    if (thisR is RowWithFilterPaditem rfp) {
+                        x.Add(rfp, thisR.Internal);
+                    }
                 }
+
+                x.Add("<Keine Quelle>");
+
+                var it = BlueControls.Forms.InputBoxListBoxStyle.Show("Quelle wählen:", x, AddType.None, true);
+
+                if (it == null || it.Count != 1) { return; }
+
+                var t = Parent[it[0]];
+
+                if (t is RowWithFilterPaditem rfp2) {
+                    _getValueFrom = rfp2;
+                } else {
+                    _getValueFrom = null;
+                }
+
+                RepairConnections();
             }
-
-            x.Add("<Keine Quelle>");
-
-            var it = BlueControls.Forms.InputBoxListBoxStyle.Show("Quelle wählen:", x, AddType.None, true);
-
-            if (it == null || it.Count != 1) { return; }
-
-            var t = Parent[it[0]];
-
-
-            if (t is RowWithFilterPaditem rfp2) {
-                _getValueFrom = rfp2;
-
-            }
-            else {
-                _getValueFrom = null;
-            }
-
-            RepairConnections();
-
-
         }
 
-        private void RepairConnections() {
+        #endregion
 
-            ConnectsTo.Clear();
-
-            if(_getValueFrom != null) {
-
-                ConnectsTo.Add(new ItemConnection(_getValueFrom, ConnectionType.Top, ConnectionType.Bottom, true, false));
-            }
-
-
-        }
+        #region Methods
 
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new();
 
-            l.Add(new FlexiControlForProperty(this, "Datenquelle wählen", ImageCode.Pfeil_Rechts));
+            l.Add(new FlexiControlForProperty<string>(() => this.Datenquelle_wählen, ImageCode.Pfeil_Rechts));
             l.Add(new FlexiControl());
 
             //{
-            //    new FlexiControlForProperty(this, "Bildschirmbereich_wählen", enImageCode.Bild),
-            //    new FlexiControlForProperty(this, "Datei_laden", enImageCode.Ordner),
+            //    new FlexiControlForProperty(()=> this.Bildschirmbereich_wählen", enImageCode.Bild),
+            //    new FlexiControlForProperty(()=> this.Datei_laden", enImageCode.Ordner),
             //    new FlexiControl(),
-            //    new FlexiControlForProperty(this, "Platzhalter_für_Layout", 2),
+            //    new FlexiControlForProperty(()=> this.Platzhalter_für_Layout", 2),
             //    new FlexiControl()
             //};
             //ItemCollectionList.ItemCollectionList comms = new()
@@ -141,10 +131,10 @@ namespace BlueControls.ItemCollection {
             //    { "Verzerren", ((int)enSizeModes.Verzerren).ToString(), QuickImage.Get("BildmodusVerzerren|32") },
             //    { "Einpassen", ((int)enSizeModes.EmptySpace).ToString(), QuickImage.Get("BildmodusEinpassen|32") }
             //};
-            //l.Add(new FlexiControlForProperty(this, "Bild-Modus", comms));
+            //l.Add(new FlexiControlForProperty(()=> this.Bild-Modus", comms));
             //l.Add(new FlexiControl());
             //AddLineStyleOption(l);
-            //l.Add(new FlexiControlForProperty(this, "Hintergrund_weiß_füllen"));
+            //l.Add(new FlexiControlForProperty(()=> this.Hintergrund_weiß_füllen"));
             //l.AddRange(base.GetStyleOptions());
             return l;
         }
@@ -178,30 +168,6 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
-        //public bool ReplaceVariable(Variable variable) {
-        //    if (string.IsNullOrEmpty(Platzhalter_Für_Layout)) { return false; }
-        //    if ("~" + variable.Name.ToLower() + "~" != Platzhalter_Für_Layout.ToLower()) { return false; }
-        //    if (variable is not VariableBitmap vbmp) { return false; }
-        //    var ot = vbmp.ValueBitmap;
-        //    if (ot is Bitmap bmp) {
-        //        Bitmap = bmp;
-        //        OnChanged();
-        //        return true;
-        //    }
-
-        //    return false;
-        //}
-
-        //public bool ResetVariables() {
-        //    if (!string.IsNullOrEmpty(Platzhalter_Für_Layout) && Bitmap != null) {
-        //        Bitmap.Dispose();
-        //        Bitmap = null;
-        //        OnChanged();
-        //        return true;
-        //    }
-        //    return false;
-        //}
-
         public override string ToString() {
             var t = base.ToString();
             //t = t.Substring(0, t.Length - 1) + ", ";
@@ -220,16 +186,23 @@ namespace BlueControls.ItemCollection {
             return t.Trim(", ") + "}";
         }
 
+        //public bool ResetVariables() {
+        //    if (!string.IsNullOrEmpty(Platzhalter_Für_Layout) && Bitmap != null) {
+        //        Bitmap.Dispose();
+        //        Bitmap = null;
+        //        OnChanged();
+        //        return true;
+        //    }
+        //    return false;
+        //}
         protected override string ClassId() => "EditField";
 
+        //    return false;
+        //}
         protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
-            gr.FillRectangle(Brushes.White, drawingCoordinates);
-            gr.DrawRectangle(Pens.Black, drawingCoordinates);
+            var id = -1; if (_getValueFrom != null) { id = _getValueFrom.ID; }
 
-            drawingCoordinates.Inflate(-6, -6);
-            if (_getValueFrom != null) {
-                gr.DrawRectangle(new Pen(Skin.IDColor(_getValueFrom.ID), 3), drawingCoordinates);
-            }
+            DrawColorScheme(gr, drawingCoordinates, zoom, id);
 
             //drawingCoordinates.Inflate(-Padding, -Padding);
             //RectangleF r1 = new(drawingCoordinates.Left + Padding, drawingCoordinates.Top + Padding,
@@ -298,9 +271,19 @@ namespace BlueControls.ItemCollection {
             //        BlueFont.DrawString(gr, Platzhalter_Für_Layout, f, Brushes.Black, drawingCoordinates.Left, drawingCoordinates.Top);
             //    }
             //}
-            //base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, forPrinting);
+            base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, forPrinting);
         }
 
+        //public bool ReplaceVariable(Variable variable) {
+        //    if (string.IsNullOrEmpty(Platzhalter_Für_Layout)) { return false; }
+        //    if ("~" + variable.Name.ToLower() + "~" != Platzhalter_Für_Layout.ToLower()) { return false; }
+        //    if (variable is not VariableBitmap vbmp) { return false; }
+        //    var ot = vbmp.ValueBitmap;
+        //    if (ot is Bitmap bmp) {
+        //        Bitmap = bmp;
+        //        OnChanged();
+        //        return true;
+        //    }
         protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
             if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
                 var x = new BitmapPadItem(name);
@@ -308,6 +291,14 @@ namespace BlueControls.ItemCollection {
                 return x;
             }
             return null;
+        }
+
+        private void RepairConnections() {
+            ConnectsTo.Clear();
+
+            if (_getValueFrom != null) {
+                ConnectsTo.Add(new ItemConnection(_getValueFrom, ConnectionType.Bottom, ConnectionType.Top, true, false));
+            }
         }
 
         #endregion

@@ -172,14 +172,14 @@ namespace BlueControls.ItemCollection {
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new()
             {
-                new FlexiControlForProperty(this, "Länge_in_MM"),
-                new FlexiControlForProperty(this, "Text oben"),
-                new FlexiControlForProperty(this, "Suffix"),
-                new FlexiControlForProperty(this, "Text unten"),
-                new FlexiControlForProperty(this, "Präfix")
+                new FlexiControlForProperty<float>(() => this.Länge_In_Mm),
+                new FlexiControlForProperty<string>(() => this.Text_Oben),
+                new FlexiControlForProperty<string>(() => this.Suffix),
+                new FlexiControlForProperty<string>(() => this.Text_Unten),
+                new FlexiControlForProperty<string>(() => this.Präfix)
             };
             AddStyleOption(l);
-            l.Add(new FlexiControlForProperty(this, "Skalierung"));
+            l.Add(new FlexiControlForProperty<float>(() => this.Skalierung));
             l.AddRange(base.GetStyleOptions());
             return l;
         }
@@ -261,50 +261,52 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "DIMENSION";
 
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
-            if (Stil == PadStyles.Undefiniert) { return; }
-            var geszoom = Parent.SheetStyleScale * Skalierung * zoom;
-            var f = Skin.GetBlueFont(Stil, Parent.SheetStyle);
-            var pfeilG = f.Font(geszoom).Size * 0.8f;
-            var pen2 = f.Pen(zoom);
+        protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+            if (Stil != PadStyles.Undefiniert) {
+                var geszoom = Parent.SheetStyleScale * Skalierung * zoom;
+                var f = Skin.GetBlueFont(Stil, Parent.SheetStyle);
+                var pfeilG = f.Font(geszoom).Size * 0.8f;
+                var pen2 = f.Pen(zoom);
 
-            //DrawOutline(gr, zoom, shiftX, shiftY, Color.Red);
-            //gr.DrawLine(pen2, UsedArea().PointOf(enAlignment.Top_Left).ZoomAndMove(zoom, shiftX, shiftY), UsedArea().PointOf(enAlignment.Bottom_Right).ZoomAndMove(zoom, shiftX, shiftY)); // Bezugslinie 1
-            //gr.DrawLine(pen2, UsedArea().PointOf(enAlignment.Top_Left).ZoomAndMove(zoom, shiftX, shiftY), UsedArea().PointOf(enAlignment.Bottom_Left).ZoomAndMove(zoom, shiftX, shiftY)); // Bezugslinie 1
+                //DrawOutline(gr, zoom, shiftX, shiftY, Color.Red);
+                //gr.DrawLine(pen2, UsedArea().PointOf(enAlignment.Top_Left).ZoomAndMove(zoom, shiftX, shiftY), UsedArea().PointOf(enAlignment.Bottom_Right).ZoomAndMove(zoom, shiftX, shiftY)); // Bezugslinie 1
+                //gr.DrawLine(pen2, UsedArea().PointOf(enAlignment.Top_Left).ZoomAndMove(zoom, shiftX, shiftY), UsedArea().PointOf(enAlignment.Bottom_Left).ZoomAndMove(zoom, shiftX, shiftY)); // Bezugslinie 1
 
-            gr.DrawLine(pen2, _point1.ZoomAndMove(zoom, shiftX, shiftY), _bezugslinie1.ZoomAndMove(zoom, shiftX, shiftY)); // Bezugslinie 1
-            gr.DrawLine(pen2, _point2.ZoomAndMove(zoom, shiftX, shiftY), _bezugslinie2.ZoomAndMove(zoom, shiftX, shiftY)); // Bezugslinie 2
-            gr.DrawLine(pen2, _schnittPunkt1.ZoomAndMove(zoom, shiftX, shiftY), _schnittPunkt2.ZoomAndMove(zoom, shiftX, shiftY)); // Maßhilfslinie
-            gr.DrawLine(pen2, _schnittPunkt1.ZoomAndMove(zoom, shiftX, shiftY), _textPoint.ZoomAndMove(zoom, shiftX, shiftY)); // Maßhilfslinie
-            var sz1 = gr.MeasureString(Angezeigter_Text_Oben(), f.Font(geszoom));
-            var sz2 = gr.MeasureString(Text_Unten, f.Font(geszoom));
-            var p1 = _schnittPunkt1.ZoomAndMove(zoom, shiftX, shiftY);
-            var p2 = _schnittPunkt2.ZoomAndMove(zoom, shiftX, shiftY);
-            if (sz1.Width + (pfeilG * 2f) < GetLenght(p1, p2)) {
-                DrawArrow(gr, p1, _winkel, f.ColorMain, pfeilG);
-                DrawArrow(gr, p2, _winkel + 180, f.ColorMain, pfeilG);
-            } else {
-                DrawArrow(gr, p1, _winkel + 180, f.ColorMain, pfeilG);
-                DrawArrow(gr, p2, _winkel, f.ColorMain, pfeilG);
+                gr.DrawLine(pen2, _point1.ZoomAndMove(zoom, shiftX, shiftY), _bezugslinie1.ZoomAndMove(zoom, shiftX, shiftY)); // Bezugslinie 1
+                gr.DrawLine(pen2, _point2.ZoomAndMove(zoom, shiftX, shiftY), _bezugslinie2.ZoomAndMove(zoom, shiftX, shiftY)); // Bezugslinie 2
+                gr.DrawLine(pen2, _schnittPunkt1.ZoomAndMove(zoom, shiftX, shiftY), _schnittPunkt2.ZoomAndMove(zoom, shiftX, shiftY)); // Maßhilfslinie
+                gr.DrawLine(pen2, _schnittPunkt1.ZoomAndMove(zoom, shiftX, shiftY), _textPoint.ZoomAndMove(zoom, shiftX, shiftY)); // Maßhilfslinie
+                var sz1 = gr.MeasureString(Angezeigter_Text_Oben(), f.Font(geszoom));
+                var sz2 = gr.MeasureString(Text_Unten, f.Font(geszoom));
+                var p1 = _schnittPunkt1.ZoomAndMove(zoom, shiftX, shiftY);
+                var p2 = _schnittPunkt2.ZoomAndMove(zoom, shiftX, shiftY);
+                if (sz1.Width + (pfeilG * 2f) < GetLenght(p1, p2)) {
+                    DrawArrow(gr, p1, _winkel, f.ColorMain, pfeilG);
+                    DrawArrow(gr, p2, _winkel + 180, f.ColorMain, pfeilG);
+                } else {
+                    DrawArrow(gr, p1, _winkel + 180, f.ColorMain, pfeilG);
+                    DrawArrow(gr, p2, _winkel, f.ColorMain, pfeilG);
+                }
+                var mitte = _textPoint.ZoomAndMove(zoom, shiftX, shiftY);
+                var textWinkel = _winkel % 360;
+                if (textWinkel is > 90 and <= 270) { textWinkel = _winkel - 180; }
+                if (geszoom < 0.15d) { return; } // Schrift zu klein, würde abstürzen
+                PointM mitte1 = new(mitte, (float)(sz1.Height / 2.1), textWinkel + 90);
+                var x = gr.Save();
+                gr.TranslateTransform(mitte1.X, mitte1.Y);
+                gr.RotateTransform(-textWinkel);
+                gr.FillRectangle(new SolidBrush(Color.White), new RectangleF((int)(-sz1.Width * 0.9 / 2), (int)(-sz1.Height * 0.8 / 2), (int)(sz1.Width * 0.9), (int)(sz1.Height * 0.8)));
+                f.DrawString(gr, Angezeigter_Text_Oben(), (float)(-sz1.Width / 2.0), (float)(-sz1.Height / 2.0), geszoom, StringFormat.GenericDefault);
+                gr.Restore(x);
+                PointM mitte2 = new(mitte, (float)(sz2.Height / 2.1), textWinkel - 90);
+                x = gr.Save();
+                gr.TranslateTransform(mitte2.X, mitte2.Y);
+                gr.RotateTransform(-textWinkel);
+                gr.FillRectangle(new SolidBrush(Color.White), new RectangleF((int)(-sz2.Width * 0.9 / 2), (int)(-sz2.Height * 0.8 / 2), (int)(sz2.Width * 0.9), (int)(sz2.Height * 0.8)));
+                f.DrawString(gr, Text_Unten, (float)(-sz2.Width / 2.0), (float)(-sz2.Height / 2.0), geszoom, StringFormat.GenericDefault);
+                gr.Restore(x);
             }
-            var mitte = _textPoint.ZoomAndMove(zoom, shiftX, shiftY);
-            var textWinkel = _winkel % 360;
-            if (textWinkel is > 90 and <= 270) { textWinkel = _winkel - 180; }
-            if (geszoom < 0.15d) { return; } // Schrift zu klein, würde abstürzen
-            PointM mitte1 = new(mitte, (float)(sz1.Height / 2.1), textWinkel + 90);
-            var x = gr.Save();
-            gr.TranslateTransform(mitte1.X, mitte1.Y);
-            gr.RotateTransform(-textWinkel);
-            gr.FillRectangle(new SolidBrush(Color.White), new RectangleF((int)(-sz1.Width * 0.9 / 2), (int)(-sz1.Height * 0.8 / 2), (int)(sz1.Width * 0.9), (int)(sz1.Height * 0.8)));
-            f.DrawString(gr, Angezeigter_Text_Oben(), (float)(-sz1.Width / 2.0), (float)(-sz1.Height / 2.0), geszoom, StringFormat.GenericDefault);
-            gr.Restore(x);
-            PointM mitte2 = new(mitte, (float)(sz2.Height / 2.1), textWinkel - 90);
-            x = gr.Save();
-            gr.TranslateTransform(mitte2.X, mitte2.Y);
-            gr.RotateTransform(-textWinkel);
-            gr.FillRectangle(new SolidBrush(Color.White), new RectangleF((int)(-sz2.Width * 0.9 / 2), (int)(-sz2.Height * 0.8 / 2), (int)(sz2.Width * 0.9), (int)(sz2.Height * 0.8)));
-            f.DrawString(gr, Text_Unten, (float)(-sz2.Width / 2.0), (float)(-sz2.Height / 2.0), geszoom, StringFormat.GenericDefault);
-            gr.Restore(x);
+            base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         }
 
         protected override void ParseFinished() => CalculateOtherPoints();

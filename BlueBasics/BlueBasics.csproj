@@ -96,6 +96,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Accessor.cs" />
     <Compile Include="BitmapExt.cs" />
     <Compile Include="Enums\SortierTyp.cs" />
     <Compile Include="ImageMatrix.cs" />

@@ -66,6 +66,17 @@ namespace BlueControls.ItemCollection {
         #region Properties
 
         /// <summary>
+        /// Wird von Flexoptions aufgerufen
+        /// </summary>
+        public string Datensatz_bearbeiten {
+            get => string.Empty;
+            set {
+                _tmpQuickInfo = string.Empty; // eigentlich unnötig, da RowChanged anschlagen müsste
+                EditBoxRow.Show("Datensatz bearbeiten:", Row, true);
+            }
+        }
+
+        /// <summary>
         /// Namen so lassen, wegen Kontextmenu
         /// </summary>
         public string Layout_Id {
@@ -99,20 +110,12 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        /// <summary>
-        /// Wird von Flexoptions aufgerufen
-        /// </summary>
-        public void Datensatz_bearbeiten() {
-            _tmpQuickInfo = string.Empty; // eigentlich unnötig, da RowChanged anschlagen müsste
-            EditBoxRow.Show("Datensatz bearbeiten:", Row, true);
-        }
-
         public override void DesignOrStyleChanged() => RemovePic();
 
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new()
             {
-                new FlexiControlForProperty(this, "Datensatz bearbeiten", ImageCode.Stift),
+                new FlexiControlForProperty<string>(() => this.Datensatz_bearbeiten, ImageCode.Stift),
                 new FlexiControl()
             };
             ItemCollectionList.ItemCollectionList layouts = new();
@@ -120,7 +123,7 @@ namespace BlueControls.ItemCollection {
                 ItemCollectionPad p = new(thisLayouts, string.Empty);
                 layouts.Add(p.Caption, p.Id, ImageCode.Stern);
             }
-            l.Add(new FlexiControlForProperty(this, "Layout-ID", layouts));
+            l.Add(new FlexiControlForProperty<string>(() => this.Layout_Id, layouts));
             l.AddRange(base.GetStyleOptions());
             return l;
         }

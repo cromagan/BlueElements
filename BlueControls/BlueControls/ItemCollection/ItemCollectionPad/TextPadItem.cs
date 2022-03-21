@@ -115,7 +115,7 @@ namespace BlueControls.ItemCollection {
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new()
             {
-                new FlexiControlForProperty(this, "Text", 5)
+                new FlexiControlForProperty<string>(() => this.Text, 5)
             };
             ItemCollectionList.ItemCollectionList aursicht = new()
             {
@@ -124,8 +124,8 @@ namespace BlueControls.ItemCollection {
                 { "Rechtsbündig ausrichten", ((int)Alignment.Top_Right).ToString(), ImageCode.Rechtsbündig }
             };
             aursicht.Sort();
-            l.Add(new FlexiControlForProperty(this, "Ausrichtung", aursicht));
-            l.Add(new FlexiControlForProperty(this, "Skalierung"));
+            l.Add(new FlexiControlForProperty<Alignment>(() => this.Ausrichtung, aursicht));
+            l.Add(new FlexiControlForProperty<float>(() => this.Skalierung));
             AddStyleOption(l);
             l.AddRange(base.GetStyleOptions());
             return l;
@@ -199,26 +199,28 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "TEXT";
 
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
-            if (Stil == PadStyles.Undefiniert) { return; }
-            gr.SetClip(drawingCoordinates);
-            var trp = drawingCoordinates.PointOf(Alignment.Horizontal_Vertical_Center);
-            gr.TranslateTransform(trp.X, trp.Y);
-            gr.RotateTransform(-Drehwinkel);
+        protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+            if (Stil != PadStyles.Undefiniert) {
+                gr.SetClip(positionModified);
+                var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
+                gr.TranslateTransform(trp.X, trp.Y);
+                gr.RotateTransform(-Drehwinkel);
 
-            if (_txt == null) { MakeNewETxt(); }
+                if (_txt == null) { MakeNewETxt(); }
 
-            if (_txt != null) {
-                _txt.DrawingPos = new Point((int)(drawingCoordinates.Left - trp.X), (int)(drawingCoordinates.Top - trp.Y));
-                _txt.DrawingArea = Rectangle.Empty; // new Rectangle(drawingCoordinates.Left, drawingCoordinates.Top, drawingCoordinates.Width, drawingCoordinates.Height);
-                if (!string.IsNullOrEmpty(_textReplaced) || !forPrinting) {
-                    _txt.Draw(gr, zoom * Skalierung * Parent.SheetStyleScale);
+                if (_txt != null) {
+                    _txt.DrawingPos = new Point((int)(positionModified.Left - trp.X), (int)(positionModified.Top - trp.Y));
+                    _txt.DrawingArea = Rectangle.Empty; // new Rectangle(drawingCoordinates.Left, drawingCoordinates.Top, drawingCoordinates.Width, drawingCoordinates.Height);
+                    if (!string.IsNullOrEmpty(_textReplaced) || !forPrinting) {
+                        _txt.Draw(gr, zoom * Skalierung * Parent.SheetStyleScale);
+                    }
                 }
+                gr.TranslateTransform(-trp.X, -trp.Y);
+                gr.ResetTransform();
+                gr.ResetClip();
             }
-            gr.TranslateTransform(-trp.X, -trp.Y);
-            gr.ResetTransform();
-            gr.ResetClip();
-            base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, forPrinting);
+
+            base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         }
 
         protected override void ParseFinished() {

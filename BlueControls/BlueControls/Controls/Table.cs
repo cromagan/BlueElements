@@ -183,6 +183,10 @@ namespace BlueControls.Controls {
                     ? null
                     : _database.ColumnArrangements[_arrangementNr];
 
+        public ColumnItem? CursorPosColumn => _cursorPosColumn;
+
+        public RowData? CursorPosRow => _cursorPosRow;
+
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -670,10 +674,6 @@ namespace BlueControls.Controls {
             Invalidate();
             OnCursorPosChanged(new CellExtEventArgs(_cursorPosColumn, _cursorPosRow));
         }
-
-        public ColumnItem? CursorPosColumn() => _cursorPosColumn;
-
-        public RowData? CursorPosRow() => _cursorPosRow;
 
         public void Draw_Column_Head(Graphics gr, ColumnViewItem viewItem, Rectangle displayRectangleWoSlider, int lfdNo) {
             if (!IsOnScreen(viewItem, displayRectangleWoSlider)) { return; }

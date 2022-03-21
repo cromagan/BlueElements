@@ -84,7 +84,7 @@ namespace BlueControls.Classes_Editor {
             ExportSpaltenAnsicht.Text = Item.ExportSpaltenAnsicht.ToString();
             lbxFilter.Item.Clear();
             foreach (var thisFilter in Item.Filter.Where(thisFilter => thisFilter != null)) {
-                lbxFilter.Item.Add(thisFilter);
+                lbxFilter.Item.Add(thisFilter, string.Empty, string.Empty);
             }
             lsbExportDateien.Item.Clear();
             foreach (var t1 in Item.BereitsExportiert) {
@@ -166,7 +166,7 @@ namespace BlueControls.Classes_Editor {
         }
 
         private void lbxFilter_AddClicked(object sender, System.EventArgs e) {
-            var NewFilterItem = lbxFilter.Item.Add(new FilterItem(Item.Database, string.Empty));
+            var NewFilterItem = lbxFilter.Item.Add(new FilterItem(Item.Database, string.Empty), string.Empty, string.Empty);
             NewFilterItem.Checked = true;
         }
 

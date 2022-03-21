@@ -387,10 +387,10 @@ namespace BlueControls.Forms {
             //}
             //if (Table.Visible) {
             //    if (Table.Database != null) {
-            //        if (Table.CursorPosRow() == null && Table.View_RowFirst() != null) {
+            //        if (Table.CursorPosRow == null && Table.View_RowFirst() != null) {
             //            Table.CursorPos_Set(Table.Database.Column[0], Table.View_RowFirst(), false);
             //        }
-            //        if (Table.CursorPosRow() != null) { Formula.ShowingRowKey = Table.CursorPosRow().Row.Key; }
+            //        if (Table.CursorPosRow != null) { Formula.ShowingRowKey = Table.CursorPosRow.Row.Key; }
             //    }
             //} else {
             //    Formula.ShowingRowKey = -1;
@@ -446,7 +446,7 @@ namespace BlueControls.Forms {
                 MessageBox.Show("Bitte Text zum Suchen eingeben.", ImageCode.Information, "OK");
                 return;
             }
-            Table.SearchNextText(suchtT, Table, null, Table.CursorPosRow(), out _, out var gefRow, true);
+            Table.SearchNextText(suchtT, Table, null, Table.CursorPosRow, out _, out var gefRow, true);
             //var CheckRow = BlueFormulax.ShowingRow;
             //RowItem GefRow = null;
             //if (CheckRow == null) { CheckRow = TableView.View_RowFirst(); }
@@ -510,11 +510,11 @@ namespace BlueControls.Forms {
             if (Table.Database.Row.Count < 1) { return; }
             // Temporär berechnen, um geflacker zu vermeiden (Endabled - > Disabled bei Nothing)
             if (Convert.ToBoolean(richtung & Direction.Unten)) {
-                row = Table.View_NextRow(Table.CursorPosRow());
+                row = Table.View_NextRow(Table.CursorPosRow);
                 if (row == null) { row = Table.View_RowFirst(); }
             }
             if (Convert.ToBoolean(richtung & Direction.Oben)) {
-                row = Table.View_PreviousRow(Table.CursorPosRow());
+                row = Table.View_PreviousRow(Table.CursorPosRow);
                 if (row == null) { row = Table.View_RowLast(); }
             }
             if (row == null) { row = Table.View_RowFirst(); }
