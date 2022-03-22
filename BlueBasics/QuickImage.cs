@@ -338,7 +338,9 @@ namespace BlueBasics {
                         c = Color.FromArgb(0, 0, 0, 0);
                     } else {
                         if (colgreen != null && c.ToArgb() == -16711936) { c = (Color)colgreen; }
-                        if (colfärb != null) { c = ((Color)colfärb).GetHue().FromHsb(((Color)colfärb).GetSaturation(), c.GetBrightness(), c.A); }
+                        if (colfärb is Color cf && cf.A > 0) {
+                            c = cf.GetHue().FromHsb(cf.GetSaturation(), c.GetBrightness(), c.A);
+                        }
                         if (Sättigung != 100 || Helligkeit != 100) { c = c.GetHue().FromHsb(c.GetSaturation() * Sättigung / 100, c.GetBrightness() * Helligkeit / 100, c.A); }
                         if (Effekt.HasFlag(ImageCodeEffect.WindowsXPDisabled)) {
                             var w = (int)(c.GetBrightness() * 100);

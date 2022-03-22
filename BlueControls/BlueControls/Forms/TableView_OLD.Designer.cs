@@ -82,7 +82,6 @@ namespace BlueControls.Forms
             this.btnZurück = new BlueControls.Controls.Button();
             this.grpAllgemein2 = new BlueControls.Controls.GroupBox();
             this.btnNeu = new BlueControls.Controls.Button();
-            this.btnDrucken = new BlueControls.Controls.ComboBox();
             this.btnLoeschen = new BlueControls.Controls.Button();
             this.ribMain.SuspendLayout();
             this.pnlDatabaseSelect.SuspendLayout();
@@ -515,7 +514,6 @@ namespace BlueControls.Forms
             this.grpAllgemein2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpAllgemein2.CausesValidation = false;
             this.grpAllgemein2.Controls.Add(this.btnNeu);
-            this.grpAllgemein2.Controls.Add(this.btnDrucken);
             this.grpAllgemein2.Controls.Add(this.btnLoeschen);
             this.grpAllgemein2.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAllgemein2.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
@@ -536,19 +534,6 @@ namespace BlueControls.Forms
             this.btnNeu.TabIndex = 2;
             this.btnNeu.Text = "Neu";
             this.btnNeu.Click += new System.EventHandler(this.Neu_Click);
-            // 
-            // btnDrucken
-            // 
-            this.btnDrucken.Cursor = System.Windows.Forms.Cursors.Arrow;
-            this.btnDrucken.DrawStyle = BlueControls.Enums.ComboboxStyle.RibbonBar;
-            this.btnDrucken.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.btnDrucken.ImageCode = "Drucker";
-            this.btnDrucken.Location = new System.Drawing.Point(120, 2);
-            this.btnDrucken.Name = "btnDrucken";
-            this.btnDrucken.Size = new System.Drawing.Size(80, 66);
-            this.btnDrucken.TabIndex = 12;
-            this.btnDrucken.Text = "Drucken bzw. Export";
-            this.btnDrucken.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.Drucken_ItemClicked);
             // 
             // btnLoeschen
             // 
@@ -599,7 +584,6 @@ namespace BlueControls.Forms
         private Button btnZurück;
         private Button btnLoeschen;
         private Button btnNeu;
-        private ComboBox btnDrucken;
         private Button btnOeffnen;
         private OpenFileDialog LoadTab;
         private Button btnNeuDB;

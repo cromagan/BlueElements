@@ -155,7 +155,7 @@ namespace BlueControls.Forms {
             var top = Skin.Padding;
             foreach (var thisFlexi in flexis) {
                 tabElementEigenschaften.Controls.Add(thisFlexi);
-                thisFlexi.DisabledReason = string.Empty;
+                //thisFlexi.DisabledReason = string.Empty;
                 thisFlexi.Left = Skin.Padding;
                 thisFlexi.Top = top;
                 thisFlexi.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;

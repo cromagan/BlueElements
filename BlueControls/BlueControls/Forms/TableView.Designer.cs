@@ -37,8 +37,6 @@ namespace BlueControls.Forms {
             this.grpAdminZeilen = new BlueControls.Controls.GroupBox();
             this.btnZeileLöschen = new BlueControls.Controls.Button();
             this.btnDatenüberprüfung = new BlueControls.Controls.Button();
-            this.grpAdminImport = new BlueControls.Controls.GroupBox();
-            this.btnClipboardImport = new BlueControls.Controls.Button();
             this.grpAdminBearbeiten = new BlueControls.Controls.GroupBox();
             this.btnPowerBearbeitung = new BlueControls.Controls.Button();
             this.btnSpaltenanordnung = new BlueControls.Controls.Button();
@@ -47,6 +45,13 @@ namespace BlueControls.Forms {
             this.btnVorherigeVersion = new BlueControls.Controls.Button();
             this.btnDatenbankKopf = new BlueControls.Controls.Button();
             this.btnSpaltenUebersicht = new BlueControls.Controls.Button();
+            this.tabExport = new System.Windows.Forms.TabPage();
+            this.grpExport = new BlueControls.Controls.GroupBox();
+            this.btnDrucken = new BlueControls.Controls.ComboBox();
+            this.btnHTMLExport = new BlueControls.Controls.Button();
+            this.btnCSVClipboard = new BlueControls.Controls.Button();
+            this.grpImport = new BlueControls.Controls.GroupBox();
+            this.btnClipboardImport = new BlueControls.Controls.Button();
             this.pnlDatabaseSelect = new System.Windows.Forms.Panel();
             this.tbcDatabaseSelector = new BlueControls.Controls.TabControl();
             this.pnlSerachBar = new System.Windows.Forms.Panel();
@@ -64,9 +69,11 @@ namespace BlueControls.Forms {
             this.grpAnsicht.SuspendLayout();
             this.tabAdmin.SuspendLayout();
             this.grpAdminZeilen.SuspendLayout();
-            this.grpAdminImport.SuspendLayout();
             this.grpAdminBearbeiten.SuspendLayout();
             this.grpAdminAllgemein.SuspendLayout();
+            this.tabExport.SuspendLayout();
+            this.grpExport.SuspendLayout();
+            this.grpImport.SuspendLayout();
             this.pnlDatabaseSelect.SuspendLayout();
             this.pnlSerachBar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).BeginInit();
@@ -82,6 +89,7 @@ namespace BlueControls.Forms {
             // 
             this.ribMain.Controls.Add(this.tabAllgemein);
             this.ribMain.Controls.Add(this.tabAdmin);
+            this.ribMain.Controls.Add(this.tabExport);
             this.ribMain.Dock = System.Windows.Forms.DockStyle.Top;
             this.ribMain.HotTrack = true;
             this.ribMain.Location = new System.Drawing.Point(0, 0);
@@ -98,7 +106,6 @@ namespace BlueControls.Forms {
             this.tabAllgemein.Controls.Add(this.grpAnsicht);
             this.tabAllgemein.Location = new System.Drawing.Point(4, 25);
             this.tabAllgemein.Name = "tabAllgemein";
-            this.tabAllgemein.Padding = new System.Windows.Forms.Padding(3);
             this.tabAllgemein.Size = new System.Drawing.Size(1000, 81);
             this.tabAllgemein.TabIndex = 1;
             this.tabAllgemein.Text = "Allgemein";
@@ -115,9 +122,11 @@ namespace BlueControls.Forms {
             this.grpAnsicht.Controls.Add(this.cbxColumnArr);
             this.grpAnsicht.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAnsicht.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAnsicht.Location = new System.Drawing.Point(3, 3);
+            this.grpAnsicht.Location = new System.Drawing.Point(0, 0);
+            this.grpAnsicht.Margin = new System.Windows.Forms.Padding(0);
             this.grpAnsicht.Name = "grpAnsicht";
-            this.grpAnsicht.Size = new System.Drawing.Size(328, 75);
+            this.grpAnsicht.Padding = new System.Windows.Forms.Padding(0);
+            this.grpAnsicht.Size = new System.Drawing.Size(328, 81);
             this.grpAnsicht.TabIndex = 3;
             this.grpAnsicht.TabStop = false;
             this.grpAnsicht.Text = "Ansicht";
@@ -192,12 +201,10 @@ namespace BlueControls.Forms {
             // 
             this.tabAdmin.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabAdmin.Controls.Add(this.grpAdminZeilen);
-            this.tabAdmin.Controls.Add(this.grpAdminImport);
             this.tabAdmin.Controls.Add(this.grpAdminBearbeiten);
             this.tabAdmin.Controls.Add(this.grpAdminAllgemein);
             this.tabAdmin.Location = new System.Drawing.Point(4, 25);
             this.tabAdmin.Name = "tabAdmin";
-            this.tabAdmin.Padding = new System.Windows.Forms.Padding(3);
             this.tabAdmin.Size = new System.Drawing.Size(1000, 81);
             this.tabAdmin.TabIndex = 0;
             this.tabAdmin.Text = "Administration";
@@ -210,9 +217,9 @@ namespace BlueControls.Forms {
             this.grpAdminZeilen.Controls.Add(this.btnDatenüberprüfung);
             this.grpAdminZeilen.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAdminZeilen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAdminZeilen.Location = new System.Drawing.Point(504, 3);
+            this.grpAdminZeilen.Location = new System.Drawing.Point(429, 0);
             this.grpAdminZeilen.Name = "grpAdminZeilen";
-            this.grpAdminZeilen.Size = new System.Drawing.Size(152, 75);
+            this.grpAdminZeilen.Size = new System.Drawing.Size(152, 81);
             this.grpAdminZeilen.TabIndex = 8;
             this.grpAdminZeilen.TabStop = false;
             this.grpAdminZeilen.Text = "Zeilen";
@@ -241,31 +248,6 @@ namespace BlueControls.Forms {
             this.btnDatenüberprüfung.Text = "Datenüber-prüfung";
             this.btnDatenüberprüfung.Click += new System.EventHandler(this.btnDatenüberprüfung_Click);
             // 
-            // grpAdminImport
-            // 
-            this.grpAdminImport.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpAdminImport.CausesValidation = false;
-            this.grpAdminImport.Controls.Add(this.btnClipboardImport);
-            this.grpAdminImport.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpAdminImport.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAdminImport.Location = new System.Drawing.Point(432, 3);
-            this.grpAdminImport.Name = "grpAdminImport";
-            this.grpAdminImport.Size = new System.Drawing.Size(72, 75);
-            this.grpAdminImport.TabIndex = 10;
-            this.grpAdminImport.TabStop = false;
-            this.grpAdminImport.Text = "Import";
-            // 
-            // btnClipboardImport
-            // 
-            this.btnClipboardImport.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnClipboardImport.ImageCode = "Tabelle||||||||||Pfeil_Links";
-            this.btnClipboardImport.Location = new System.Drawing.Point(8, 2);
-            this.btnClipboardImport.Name = "btnClipboardImport";
-            this.btnClipboardImport.Size = new System.Drawing.Size(56, 66);
-            this.btnClipboardImport.TabIndex = 39;
-            this.btnClipboardImport.Text = "Clipboard-Import";
-            this.btnClipboardImport.Click += new System.EventHandler(this.btnClipboardImport_Click);
-            // 
             // grpAdminBearbeiten
             // 
             this.grpAdminBearbeiten.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
@@ -275,9 +257,9 @@ namespace BlueControls.Forms {
             this.grpAdminBearbeiten.Controls.Add(this.btnLayouts);
             this.grpAdminBearbeiten.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAdminBearbeiten.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAdminBearbeiten.Location = new System.Drawing.Point(211, 3);
+            this.grpAdminBearbeiten.Location = new System.Drawing.Point(208, 0);
             this.grpAdminBearbeiten.Name = "grpAdminBearbeiten";
-            this.grpAdminBearbeiten.Size = new System.Drawing.Size(221, 75);
+            this.grpAdminBearbeiten.Size = new System.Drawing.Size(221, 81);
             this.grpAdminBearbeiten.TabIndex = 9;
             this.grpAdminBearbeiten.TabStop = false;
             this.grpAdminBearbeiten.Text = "Bearbeiten";
@@ -325,9 +307,9 @@ namespace BlueControls.Forms {
             this.grpAdminAllgemein.Controls.Add(this.btnSpaltenUebersicht);
             this.grpAdminAllgemein.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAdminAllgemein.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAdminAllgemein.Location = new System.Drawing.Point(3, 3);
+            this.grpAdminAllgemein.Location = new System.Drawing.Point(0, 0);
             this.grpAdminAllgemein.Name = "grpAdminAllgemein";
-            this.grpAdminAllgemein.Size = new System.Drawing.Size(208, 75);
+            this.grpAdminAllgemein.Size = new System.Drawing.Size(208, 81);
             this.grpAdminAllgemein.TabIndex = 7;
             this.grpAdminAllgemein.TabStop = false;
             this.grpAdminAllgemein.Text = "Allgemein";
@@ -364,6 +346,95 @@ namespace BlueControls.Forms {
             this.btnSpaltenUebersicht.TabIndex = 36;
             this.btnSpaltenUebersicht.Text = "Spalten-Übersicht";
             this.btnSpaltenUebersicht.Click += new System.EventHandler(this.btnSpaltenUebersicht_Click);
+            // 
+            // tabExport
+            // 
+            this.tabExport.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.tabExport.Controls.Add(this.grpExport);
+            this.tabExport.Controls.Add(this.grpImport);
+            this.tabExport.Location = new System.Drawing.Point(4, 25);
+            this.tabExport.Name = "tabExport";
+            this.tabExport.Size = new System.Drawing.Size(1000, 81);
+            this.tabExport.TabIndex = 2;
+            this.tabExport.Text = "Import/Export";
+            // 
+            // grpExport
+            // 
+            this.grpExport.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpExport.CausesValidation = false;
+            this.grpExport.Controls.Add(this.btnDrucken);
+            this.grpExport.Controls.Add(this.btnHTMLExport);
+            this.grpExport.Controls.Add(this.btnCSVClipboard);
+            this.grpExport.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpExport.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
+            this.grpExport.Location = new System.Drawing.Point(80, 0);
+            this.grpExport.Name = "grpExport";
+            this.grpExport.Size = new System.Drawing.Size(224, 81);
+            this.grpExport.TabIndex = 3;
+            this.grpExport.TabStop = false;
+            this.grpExport.Text = "Export";
+            // 
+            // btnDrucken
+            // 
+            this.btnDrucken.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.btnDrucken.DrawStyle = BlueControls.Enums.ComboboxStyle.RibbonBar;
+            this.btnDrucken.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.btnDrucken.ImageCode = "Drucker";
+            this.btnDrucken.Location = new System.Drawing.Point(136, 2);
+            this.btnDrucken.Name = "btnDrucken";
+            this.btnDrucken.Size = new System.Drawing.Size(80, 66);
+            this.btnDrucken.TabIndex = 13;
+            this.btnDrucken.Text = "Drucken bzw. Export";
+            this.btnDrucken.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.btnDrucken_ItemClicked);
+            // 
+            // btnHTMLExport
+            // 
+            this.btnHTMLExport.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnHTMLExport.ImageCode = "Globus";
+            this.btnHTMLExport.Location = new System.Drawing.Point(72, 2);
+            this.btnHTMLExport.Name = "btnHTMLExport";
+            this.btnHTMLExport.QuickInfo = "HTML-Format (für einen Internet-Browser) als Datei";
+            this.btnHTMLExport.Size = new System.Drawing.Size(64, 66);
+            this.btnHTMLExport.TabIndex = 3;
+            this.btnHTMLExport.Text = "HTML";
+            this.btnHTMLExport.Click += new System.EventHandler(this.btnHTMLExport_Click);
+            // 
+            // btnCSVClipboard
+            // 
+            this.btnCSVClipboard.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnCSVClipboard.ImageCode = "Clipboard||||||||||Pfeil_Rechts";
+            this.btnCSVClipboard.Location = new System.Drawing.Point(8, 2);
+            this.btnCSVClipboard.Name = "btnCSVClipboard";
+            this.btnCSVClipboard.QuickInfo = "CSV-Format (z.B.: für Excel) in die Zwischenablage";
+            this.btnCSVClipboard.Size = new System.Drawing.Size(64, 66);
+            this.btnCSVClipboard.TabIndex = 0;
+            this.btnCSVClipboard.Text = "CSV";
+            this.btnCSVClipboard.Click += new System.EventHandler(this.btnCSVClipboard_Click);
+            // 
+            // grpImport
+            // 
+            this.grpImport.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpImport.CausesValidation = false;
+            this.grpImport.Controls.Add(this.btnClipboardImport);
+            this.grpImport.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpImport.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
+            this.grpImport.Location = new System.Drawing.Point(0, 0);
+            this.grpImport.Name = "grpImport";
+            this.grpImport.Size = new System.Drawing.Size(80, 81);
+            this.grpImport.TabIndex = 4;
+            this.grpImport.TabStop = false;
+            this.grpImport.Text = "Import";
+            // 
+            // btnClipboardImport
+            // 
+            this.btnClipboardImport.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnClipboardImport.ImageCode = "Tabelle||||||||||Pfeil_Links";
+            this.btnClipboardImport.Location = new System.Drawing.Point(8, 2);
+            this.btnClipboardImport.Name = "btnClipboardImport";
+            this.btnClipboardImport.Size = new System.Drawing.Size(64, 66);
+            this.btnClipboardImport.TabIndex = 39;
+            this.btnClipboardImport.Text = "Clipboard-Import";
+            this.btnClipboardImport.Click += new System.EventHandler(this.btnClipboardImport_Click);
             // 
             // pnlDatabaseSelect
             // 
@@ -522,16 +593,18 @@ namespace BlueControls.Forms {
             this.Controls.Add(this.pnlStatusBar);
             this.MinimumSize = new System.Drawing.Size(800, 600);
             this.Name = "TableView";
-            this.Text = "TableViewx";
+            this.Text = "TableView";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.ribMain.ResumeLayout(false);
             this.tabAllgemein.ResumeLayout(false);
             this.grpAnsicht.ResumeLayout(false);
             this.tabAdmin.ResumeLayout(false);
             this.grpAdminZeilen.ResumeLayout(false);
-            this.grpAdminImport.ResumeLayout(false);
             this.grpAdminBearbeiten.ResumeLayout(false);
             this.grpAdminAllgemein.ResumeLayout(false);
+            this.tabExport.ResumeLayout(false);
+            this.grpExport.ResumeLayout(false);
+            this.grpImport.ResumeLayout(false);
             this.pnlDatabaseSelect.ResumeLayout(false);
             this.pnlSerachBar.ResumeLayout(false);
             this.SplitContainer1.Panel1.ResumeLayout(false);
@@ -567,7 +640,6 @@ namespace BlueControls.Forms {
         protected Controls.GroupBox grpAdminZeilen;
         protected Controls.GroupBox grpAdminBearbeiten;
         protected Controls.GroupBox grpAdminAllgemein;
-        protected Controls.GroupBox grpAdminImport;
         protected Controls.TabControl tbcSidebar;
         protected System.Windows.Forms.TabPage tabFormula;
         private System.Windows.Forms.Panel pnlStatusBar;
@@ -582,5 +654,11 @@ namespace BlueControls.Forms {
         protected Controls.GroupBox grpAnsicht;
         protected Controls.Button btnAlleSchließen;
         protected Controls.Button btnAlleErweitern;
+        private Controls.GroupBox grpImport;
+        private Controls.GroupBox grpExport;
+        private Controls.Button btnHTMLExport;
+        private Controls.Button btnCSVClipboard;
+        protected System.Windows.Forms.TabPage tabExport;
+        private Controls.ComboBox btnDrucken;
     }
 }

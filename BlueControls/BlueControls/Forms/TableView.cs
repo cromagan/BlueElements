@@ -38,6 +38,7 @@ using BlueBasics.EventArgs;
 using BlueControls.ItemCollection.ItemCollectionList;
 using System.Threading.Tasks;
 using System.Drawing;
+using static BlueBasics.Generic;
 
 namespace BlueControls.Forms {
 
@@ -53,32 +54,20 @@ namespace BlueControls.Forms {
 
         public TableView() {
             InitializeComponent();
+
+            if (btnDrucken != null) {
+                btnDrucken.Item.Clear();
+                btnDrucken.Item.Add("Drucken bzw. Export", "erweitert", QuickImage.Get(ImageCode.Drucker, 28));
+                btnDrucken.Item.AddSeparator();
+                btnDrucken.Item.Add("CSV-Format für Excel in die Zwischenablage", "csv", QuickImage.Get(ImageCode.Excel, 28));
+                btnDrucken.Item.Add("HTML-Format für Internet-Seiten", "html", QuickImage.Get(ImageCode.Globus, 28));
+                btnDrucken.Item.AddSeparator();
+                btnDrucken.Item.Add("Layout-Editor öffnen", "editor", QuickImage.Get(ImageCode.Layout, 28));
+            }
             Check_OrderButtons();
         }
 
         #endregion
-
-        //[DefaultValue((Table?)null)]
-        //public Table? Table {
-        //    get => TableView;
-        //    set {
-        //        if (TableView == value) { return; }
-        //        if (TableView != null) {
-        //            TableView.DatabaseChanged -= TableView_DatabaseChanged;
-        //            TableView.EnabledChanged -= TableView_EnabledChanged;
-        //            ChangeDatabase(null);
-        //        }
-        //        TableView = value;
-        //        Check_OrderButtons();
-        //        if (TableView == null) {
-        //            return;
-        //        }
-
-        //        ChangeDatabase(TableView.Database);
-        //        TableView.DatabaseChanged += TableView_DatabaseChanged;
-        //        TableView.EnabledChanged += TableView_EnabledChanged;
-        //    }
-        //}
 
         #region Methods
 
@@ -96,6 +85,11 @@ namespace BlueControls.Forms {
             }
         }
 
+        //        ChangeDatabase(TableView.Database);
+        //        TableView.DatabaseChanged += TableView_DatabaseChanged;
+        //        TableView.EnabledChanged += TableView_EnabledChanged;
+        //    }
+        //}
         public static void OpenColumnEditor(ColumnItem? column, RowItem? row, Table? tableview) {
             if (column == null) { return; }
             if (row == null) {
@@ -134,6 +128,21 @@ namespace BlueControls.Forms {
             bearbColumn.Repair();
         }
 
+        //[DefaultValue((Table?)null)]
+        //public Table? Table {
+        //    get => TableView;
+        //    set {
+        //        if (TableView == value) { return; }
+        //        if (TableView != null) {
+        //            TableView.DatabaseChanged -= TableView_DatabaseChanged;
+        //            TableView.EnabledChanged -= TableView_EnabledChanged;
+        //            ChangeDatabase(null);
+        //        }
+        //        TableView = value;
+        //        Check_OrderButtons();
+        //        if (TableView == null) {
+        //            return;
+        //        }
         public static void OpenColumnEditor(ColumnItem? column, Table? tableview) {
             using ColumnEditor w = new(column, tableview);
             w.ShowDialog();
@@ -218,10 +227,79 @@ namespace BlueControls.Forms {
             }
         }
 
+        protected virtual void btnCSVClipboard_Click(object sender, System.EventArgs e) {
+            CopytoClipboard(Table.Export_CSV(FirstRow.ColumnCaption));
+            Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
+        }
+
+        protected virtual void btnDrucken_ItemClicked(object sender, BasicListItemEventArgs e) {
+            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+            switch (e.Item.Internal) {
+                case "erweitert":
+                    Visible = false;
+                    List<RowItem?> selectedRows = new();
+                    if (Table.Design == BlueTableAppearance.OnlyMainColumnWithoutHead && Formula.ShowingRow != null) {
+                        selectedRows.Add(Formula.ShowingRow);
+                    } else {
+                        selectedRows = Table.VisibleUniqueRows();
+                    }
+                    using (ExportDialog l = new(Table.Database, selectedRows)) {
+                        l.ShowDialog();
+                    }
+                    Visible = true;
+                    break;
+
+                case "csv":
+                    Generic.CopytoClipboard(Table.Export_CSV(FirstRow.ColumnCaption));
+                    MessageBox.Show("Die gewünschten Daten<br>sind nun im Zwischenspeicher.", ImageCode.Clipboard, "Ok");
+                    break;
+
+                case "html":
+                    Table.Export_HTML();
+                    break;
+
+                default:
+                    DebugPrint(e.Item);
+                    break;
+            }
+        }
+
+        protected virtual void btnHTMLExport_Click(object sender, System.EventArgs e) {
+            Table.Export_HTML();
+        }
+
+        protected virtual void CheckButtons() {
+            var datenbankDa = Convert.ToBoolean(Table.Database != null);
+            //btnNeuDB.Enabled = true;
+            //btnOeffnen.Enabled = true;
+            //btnNeu.Enabled = datenbankDa && _ansicht == Ansicht.Überschriften_und_Formular && Table.Database.PermissionCheck(Table.Database.PermissionGroupsNewRow, null);
+            //btnLoeschen.Enabled = datenbankDa;
+            btnDrucken.Enabled = datenbankDa;
+            //Ansicht0.Enabled = datenbankDa;
+            //Ansicht1.Enabled = datenbankDa;
+            //Ansicht2.Enabled = datenbankDa;
+            //btnDatenbanken.Enabled = datenbankDa && !string.IsNullOrEmpty(Table.Database.Filename);
+            //SuchenUndErsetzen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
+            //AngezeigteZeilenLöschen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
+            //Datenüberprüfung.Enabled = datenbankDa;
+            //btnSaveAs.Enabled = datenbankDa;
+            btnDrucken.Item["csv"].Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
+            btnDrucken.Item["html"].Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
+            //btnVorwärts.Enabled = datenbankDa;
+            //btnZurück.Enabled = datenbankDa;
+            //such.Enabled = datenbankDa;
+            FilterLeiste.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
+        }
+
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
             DatabaseSet(null);
             BlueBasics.MultiUserFile.MultiUserFile.SaveAll(true);
             base.OnFormClosing(e);
+        }
+
+        protected override void OnLoad(System.EventArgs e) {
+            base.OnLoad(e);
+            CheckButtons();
         }
 
         private void _originalDB_Disposing(object sender, System.EventArgs e) => ChangeDatabase(null);
@@ -230,7 +308,10 @@ namespace BlueControls.Forms {
 
         private void btnAlleSchließen_Click(object sender, System.EventArgs e) => Table.CollapesAll();
 
-        private void btnClipboardImport_Click(object sender, System.EventArgs e) => Table.ImportClipboard();
+        private void btnClipboardImport_Click(object sender, System.EventArgs e) {
+            if (Table.Database == null || !Table.Database.IsAdministrator()) { return; }
+            Table.ImportClipboard();
+        }
 
         private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => OpenDatabaseHeadEditor(Table.Database);
 
@@ -329,7 +410,7 @@ namespace BlueControls.Forms {
                 enTabellenAnsicht = false;
             }
             grpAdminAllgemein.Enabled = enTabAllgemein;
-            grpAdminImport.Enabled = enTabellenAnsicht;
+            grpImport.Enabled = enTabellenAnsicht;
             tabAdmin.Enabled = true;
         }
 
@@ -383,6 +464,7 @@ namespace BlueControls.Forms {
             Table.WriteColumnArrangementsInto(cbxColumnArr, Table.Database, Table.Arrangement);
             ChangeDatabase(Table.Database);
             Check_OrderButtons();
+            CheckButtons();
         }
 
         private void TableView_EnabledChanged(object sender, System.EventArgs e) => Check_OrderButtons();

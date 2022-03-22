@@ -409,6 +409,12 @@ namespace BlueControls.ItemCollection {
 
         public virtual void PointMoving(object sender, MoveEventArgs e) { }
 
+        /// <summary>
+        /// Teilt dem Item mit, dass das Design geändert wurde.
+        /// Es löst kein Ereigniss aus.
+        /// </summary>
+        public virtual void ProcessStyleChange() { }
+
         public override string ToString() {
             var t = "{";
             t = t + "ClassID=" + ClassId() + ", ";
@@ -468,12 +474,6 @@ namespace BlueControls.ItemCollection {
             } while (true);
         }
 
-        /// <summary>
-        /// Teilt dem Item mit, dass das Design geändert wurde.
-        /// Es löst kein Ereigniss aus.
-        /// </summary>
-        internal virtual void ProcessStyleChange() { }
-
         protected abstract RectangleF CalculateUsedArea();
 
         protected abstract string ClassId();
@@ -517,12 +517,15 @@ namespace BlueControls.ItemCollection {
         protected virtual void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
             try {
                 if (!forPrinting) {
-                    if (zoom > 1) {
-                        gr.DrawRectangle(new Pen(Color.Gray, zoom), positionModified);
-                    } else {
-                        gr.DrawRectangle(ZoomPad.PenGray, positionModified);
+
+                    if (positionModified.Width > 1 && positionModified.Height > 1) {
+                        if (zoom > 1) {
+                            gr.DrawRectangle(new Pen(Color.Gray, zoom), positionModified);
+                        } else {
+                            gr.DrawRectangle(ZoomPad.PenGray, positionModified);
+                        }
                     }
-                    if (positionModified.Width < 1 || positionModified.Height < 1) {
+                    if (positionModified.Width < 1 && positionModified.Height < 1) {
                         gr.DrawEllipse(new Pen(Color.Gray, 3), positionModified.Left - 5, positionModified.Top + 5, 10, 10);
                         gr.DrawLine(ZoomPad.PenGray, positionModified.PointOf(Alignment.Top_Left), positionModified.PointOf(Alignment.Bottom_Right));
                     }
@@ -535,7 +538,7 @@ namespace BlueControls.ItemCollection {
         }
 
         protected bool IsInDrawingArea(RectangleF drawingKoordinates, Size sizeOfParentControl) => sizeOfParentControl.IsEmpty || sizeOfParentControl.Width == 0 || sizeOfParentControl.Height == 0
-|| drawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, sizeOfParentControl));
+    || drawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, sizeOfParentControl));
 
         protected abstract void ParseFinished();
 

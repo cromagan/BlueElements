@@ -38,9 +38,9 @@ namespace BlueBasics {
         public readonly string QuickInfo = string.Empty;
 
         //public readonly string TypeFullname = string.Empty;
-        private readonly Func<T> _getter;
+        private readonly Func<T>? _getter;
 
-        private readonly Action<T> _setter;
+        private readonly Action<T>? _setter;
 
         #endregion
 
@@ -54,8 +54,15 @@ namespace BlueBasics {
             IEnumerable<Attribute> ca = null;
 
             if (memberExpression.Member is PropertyInfo propertyInfo) {
-                _setter = Expression.Lambda<Action<T>>(Expression.Call(instanceExpression, propertyInfo.GetSetMethod(), parameter), parameter).Compile();
-                _getter = Expression.Lambda<Func<T>>(Expression.Call(instanceExpression, propertyInfo.GetGetMethod())).Compile();
+                var setm = propertyInfo.GetSetMethod();
+                if (setm != null) {
+                    _setter = Expression.Lambda<Action<T>>(Expression.Call(instanceExpression, setm, parameter), parameter).Compile();
+                }
+
+                var getm = propertyInfo.GetGetMethod();
+                if (getm != null) {
+                    _getter = Expression.Lambda<Func<T>>(Expression.Call(instanceExpression, getm)).Compile();
+                }
                 CanWrite = propertyInfo.CanWrite;
                 CanRead = propertyInfo.CanRead;
                 Name = propertyInfo.Name;
@@ -84,9 +91,19 @@ namespace BlueBasics {
 
         #region Methods
 
-        public T Get() => _getter();
+        public T Get() {
+            if (_getter != null) { return _getter(); }
+            Develop.DebugPrint("Getter ist null!");
+            return default;
+        }
 
-        public void Set(T value) => _setter(value);
+        public void Set(T value) {
+            if (_setter != null) {
+                _setter(value);
+            } else {
+                Develop.DebugPrint("Setter ist null!");
+            }
+        }
 
         #endregion
     }

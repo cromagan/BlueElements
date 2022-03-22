@@ -153,7 +153,7 @@ namespace BlueControls.Controls {
 
         public event EventHandler PinnedChanged;
 
-        //public event EventHandler<RowEventArgs> RowAdded;
+        public event EventHandler<RowEventArgs> RowAdded;
 
         public event EventHandler ViewChanged;
 
@@ -1909,7 +1909,7 @@ namespace BlueControls.Controls {
         }
 
         private void _Database_Row_RowAdded(object sender, RowEventArgs e) {
-            //OnRowAdded(sender, e);
+            OnRowAdded(sender, e);
             Invalidate_FilteredRows();
         }
 
@@ -3098,7 +3098,7 @@ namespace BlueControls.Controls {
 
         private void OnPinnedChanged() => PinnedChanged?.Invoke(this, System.EventArgs.Empty);
 
-        //private void OnRowAdded(object sender, RowEventArgs e) => RowAdded?.Invoke(sender, e);
+        private void OnRowAdded(object sender, RowEventArgs e) => RowAdded?.Invoke(sender, e);
 
         private void OnViewChanged() {
             ViewChanged?.Invoke(this, System.EventArgs.Empty);

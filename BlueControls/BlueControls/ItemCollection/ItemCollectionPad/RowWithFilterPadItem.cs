@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using BlueBasics.Interfaces;
+using System.ComponentModel;
 
 namespace BlueControls.ItemCollection {
 
@@ -40,13 +41,16 @@ namespace BlueControls.ItemCollection {
 
         public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
 
+        public readonly Database? Database;
+
         /// <summary>
         /// Laufende Nummer, bestimmt die einfärbung
         /// </summary>
         public readonly int Id;
 
         public FilterCollection? Filter;
-        private readonly Database? _database;
+
+        private bool _genau_eine_Zeile = true;
 
         #endregion
 
@@ -55,10 +59,10 @@ namespace BlueControls.ItemCollection {
         public RowWithFilterPaditem(Database? db, int id) : this(UniqueInternal(), db, id) { }
 
         public RowWithFilterPaditem(string intern, Database? db, int id) : base(intern) {
-            _database = db;
+            Database = db;
             if (db != null) { Filter = new FilterCollection(db); }
             Id = id;
-            Size = new Size(300, 100);
+            Size = new Size(200, 50);
         }
 
         public RowWithFilterPaditem(string intern) : this(intern, null, 0) { }
@@ -70,8 +74,18 @@ namespace BlueControls.ItemCollection {
         public string Datenbankkopf {
             get => string.Empty;
             set {
-                if (_database == null) { return; }
-                Forms.TableView.OpenDatabaseHeadEditor(_database);
+                if (Database == null) { return; }
+                Forms.TableView.OpenDatabaseHeadEditor(Database);
+            }
+        }
+
+        [Description("Nur wenn das Filterergebis genau eine Zeile ergeben wird(und muss),\r\nkönnen die abhängige Zellen bearbeitet werden.\r\nAndernfalls werden abhängige Felder Auswahlfelder.")]
+        public bool Genau_eine_Zeile {
+            get => _genau_eine_Zeile;
+            set {
+                if (value == _genau_eine_Zeile) { return; }
+                _genau_eine_Zeile = value;
+                OnChanged();
             }
         }
 
@@ -81,12 +95,13 @@ namespace BlueControls.ItemCollection {
 
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new() { };
-            if (_database == null) { return l; }
-            l.Add(new FlexiControlForProperty<string>(() => _database.Caption));
+            if (Database == null) { return l; }
+            l.Add(new FlexiControlForProperty<string>(() => Database.Caption));
             //l.Add(new FlexiControlForProperty(Database, "Caption"));
             l.Add(new FlexiControlForProperty<string>(() => Datenbankkopf, ImageCode.Datenbank));
             //l.Add(new FlexiControlForProperty(()=> this.Datenbankkopf"));
             l.Add(new FlexiControl());
+            l.Add(new FlexiControlForProperty<bool>(() => Genau_eine_Zeile));
 
             //l.Add(new FlexiControl());
             //l.Add(new FlexiControlForProperty<string>(() => Column.Ueberschrift1"));
@@ -105,30 +120,48 @@ namespace BlueControls.ItemCollection {
         }
 
         public string ReadableText() {
-            if (_database != null) { return "Zeile aus: " + _database.Caption; }
+            if (Database != null) {
+                if (Genau_eine_Zeile) {
+                    return "(eine) Zeile aus: " + Database.Caption;
+                } else {
+                    return "Zeilen aus: " + Database.Caption;
+                }
+            }
 
             return "Zeile einer Datenbank";
         }
 
-        public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IDColor(Id));
+        public QuickImage? SymbolForReadableText() {
+            if (Genau_eine_Zeile) {
+                return QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(Id));
+            } else {
+                return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IDColor(Id));
+            }
+        }
 
         public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
-            if (_database != null) {
-                t = t + "Database=" + _database.Filename.ToNonCritical() + ", ";
+            if (Database != null) {
+                t = t + "Database=" + Database.Filename.ToNonCritical() + ", ";
             }
+            t = t + "OneRow=" + Genau_eine_Zeile.ToPlusMinus() + ", ";
             return t.Trim(", ") + "}";
         }
 
         protected override string ClassId() => "RowWithFilter";
 
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
-            DrawColorScheme(gr, drawingCoordinates, zoom, Id);
+        protected override void DrawExplicit(Graphics gr, RectangleF modifiedPosition, float zoom, float shiftX, float shiftY, bool forPrinting) {
+            DrawColorScheme(gr, modifiedPosition, zoom, Id);
 
-            if (_database != null) {
-                Skin.Draw_FormatedText(gr, _database.Caption, QuickImage.Get(ImageCode.Datenbank, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
+            if (Database != null) {
+                var txt = string.Empty;
+                if (!Genau_eine_Zeile) { txt = "Mehrere Zeilen\r\n"; }
+
+                Skin.Draw_FormatedText(gr, txt + Database.Caption, QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, modifiedPosition.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
             }
+
+            gr.FillRectangle(new SolidBrush(Color.FromArgb(128, 255, 255, 255)), modifiedPosition);
             //drawingCoordinates.Inflate(-Padding, -Padding);
             //RectangleF r1 = new(drawingCoordinates.Left + Padding, drawingCoordinates.Top + Padding,
             //    drawingCoordinates.Width - (Padding * 2), drawingCoordinates.Height - (Padding * 2));
@@ -196,7 +229,7 @@ namespace BlueControls.ItemCollection {
             //        BlueFont.DrawString(gr, Platzhalter_Für_Layout, f, Brushes.Black, drawingCoordinates.Left, drawingCoordinates.Top);
             //    }
             //}
-            base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, forPrinting);
+            base.DrawExplicit(gr, modifiedPosition, zoom, shiftX, shiftY, forPrinting);
         }
 
         protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {

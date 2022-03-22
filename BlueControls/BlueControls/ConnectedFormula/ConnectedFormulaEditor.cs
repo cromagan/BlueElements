@@ -63,18 +63,21 @@ namespace BlueControls.Forms {
         private void btnZeileHinzu_Click(object sender, System.EventArgs e) {
             var x = Directory.GetFiles(_cf.FilePath, "*.mdb").ToList();
 
-            //x.RemoveRange(_cf.DatabaseFiles);
-
             if (x == null || x.Count == 0) {
                 MessageBox.Show("Keine Datenbanken vorhanden.");
                 return;
             }
 
-            var rück = InputBoxListBoxStyle.Show("Datenbank wählen: ", x.ToList());
+            var fi = new ItemCollectionList();
+            foreach (var thisf in x) {
+                fi.Add(thisf.FileNameWithoutSuffix(), thisf);
+            }
 
-            if (rück == null) { return; }
+            var rück = InputBoxListBoxStyle.Show("Datenbank wählen: ", fi, Enums.AddType.None, true);
 
-            _cf.DatabaseFiles.Add(rück);
+            if (rück == null || rück.Count != 1) { return; }
+
+            _cf.DatabaseFiles.Add(rück[0]);
 
             var db = _cf.Databases[_cf.Databases.Count - 1];
 

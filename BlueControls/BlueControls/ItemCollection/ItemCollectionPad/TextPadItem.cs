@@ -152,6 +152,8 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
+        public override void ProcessStyleChange() => InvalidateText();
+
         /// <summary>
         /// Löst die angegebene Variable in _text_replaced auf, falls diese (noch) vorhanden ist.
         /// </summary>
@@ -194,8 +196,6 @@ namespace BlueControls.ItemCollection {
             t = t + "AdditionalScale=" + Skalierung.ToString(CultureInfo.InvariantCulture).ToNonCritical() + ", ";
             return t.Trim(", ") + "}";
         }
-
-        internal override void ProcessStyleChange() => InvalidateText();
 
         protected override string ClassId() => "TEXT";
 

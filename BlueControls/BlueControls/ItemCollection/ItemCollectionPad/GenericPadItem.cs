@@ -51,6 +51,8 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
+        public override void ProcessStyleChange() => RemovePic();
+
         public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
@@ -61,11 +63,9 @@ namespace BlueControls.ItemCollection {
             return t.Trim(", ") + "}";
         }
 
-        internal override void ProcessStyleChange() => RemovePic();
+        protected override string ClassId() => "GenericPadItem";
 
-        protected override string ClassId() => "GenericConnectible";
-
-        protected override Bitmap GeneratePic() {
+        protected override void GeneratePic() {
             var bmp = new Bitmap(Size.Width, Size.Height);
             var gr = Graphics.FromImage(bmp);
 
@@ -74,13 +74,14 @@ namespace BlueControls.ItemCollection {
             var font = Skin.GetBlueFont(Stil, Parent.SheetStyle);
 
             if (font == null) {
-                return bmp;
+                GeneratedBitmap = bmp;
+                return;
             }
 
             Skin.Draw_FormatedText(gr, _text, null, Alignment.Horizontal_Vertical_Center, new Rectangle(0, 0, Size.Width, Size.Height), null, false, font, false);
             gr.DrawRectangle(font.Pen(1), new Rectangle(0, 0, Size.Width, Size.Height));
 
-            return bmp;
+            GeneratedBitmap = bmp;
         }
 
         protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {

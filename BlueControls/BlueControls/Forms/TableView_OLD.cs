@@ -66,13 +66,7 @@ namespace BlueControls.Forms {
             //var eq = b.SequenceEqual(tmpb);
             //var newbmp = BlueBasics.modConverter.StringUnicodeToBitmap(newstUTF8);
             Copyright.Text = "(c) 2010-" + DateTime.Now.Year + " Christian Peter";
-            btnDrucken.Item.Clear();
-            btnDrucken.Item.Add("Drucken bzw. Export", "erweitert", QuickImage.Get(ImageCode.Drucker, 28));
-            btnDrucken.Item.AddSeparator();
-            btnDrucken.Item.Add("CSV-Format für Excel in die Zwischenablage", "csv", QuickImage.Get(ImageCode.Excel, 28));
-            btnDrucken.Item.Add("HTML-Format für Internet-Seiten", "html", QuickImage.Get(ImageCode.Globus, 28));
-            btnDrucken.Item.AddSeparator();
-            btnDrucken.Item.Add("Layout-Editor öffnen", "editor", QuickImage.Get(ImageCode.Layout, 28));
+
             if (!adminTabVisible) {
                 grpAdminAllgemein.Visible = false;
                 grpBearbeitung.Visible = false;
@@ -184,7 +178,6 @@ namespace BlueControls.Forms {
 
         protected override void OnLoad(System.EventArgs e) {
             base.OnLoad(e);
-            CheckButtons();
             CaptionAnzeige();
         }
 
@@ -268,7 +261,6 @@ namespace BlueControls.Forms {
             btnOeffnen.Enabled = true;
             btnNeu.Enabled = datenbankDa && _ansicht == Ansicht.Überschriften_und_Formular && Table.Database.PermissionCheck(Table.Database.PermissionGroupsNewRow, null);
             btnLoeschen.Enabled = datenbankDa;
-            btnDrucken.Enabled = datenbankDa;
             Ansicht0.Enabled = datenbankDa;
             Ansicht1.Enabled = datenbankDa;
             Ansicht2.Enabled = datenbankDa;
@@ -277,8 +269,6 @@ namespace BlueControls.Forms {
             AngezeigteZeilenLöschen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
             Datenüberprüfung.Enabled = datenbankDa;
             btnSaveAs.Enabled = datenbankDa;
-            btnDrucken.Item["csv"].Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
-            btnDrucken.Item["html"].Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
             btnVorwärts.Enabled = datenbankDa;
             btnZurück.Enabled = datenbankDa;
             such.Enabled = datenbankDa;
@@ -299,38 +289,6 @@ namespace BlueControls.Forms {
         }
 
         private void Datenüberprüfung_Click(object sender, System.EventArgs e) => Table.Database.Row.DoAutomatic(Table.Filter, true, Table.PinnedRows, "manual check");
-
-        private void Drucken_ItemClicked(object sender, BasicListItemEventArgs e) {
-            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-            switch (e.Item.Internal) {
-                case "erweitert":
-                    Visible = false;
-                    List<RowItem?> selectedRows = new();
-                    if (Ansicht1.Checked && Formula.ShowingRow != null) {
-                        selectedRows.Add(Formula.ShowingRow);
-                    } else {
-                        selectedRows = Table.VisibleUniqueRows();
-                    }
-                    using (ExportDialog l = new(Table.Database, selectedRows)) {
-                        l.ShowDialog();
-                    }
-                    Visible = true;
-                    break;
-
-                case "csv":
-                    Generic.CopytoClipboard(Table.Export_CSV(FirstRow.ColumnCaption));
-                    MessageBox.Show("Die gewünschten Daten<br>sind nun im Zwischenspeicher.", ImageCode.Clipboard, "Ok");
-                    break;
-
-                case "html":
-                    Table.Export_HTML();
-                    break;
-
-                default:
-                    DebugPrint(e.Item);
-                    break;
-            }
-        }
 
         private void InitView() {
             //Formula.HideViewEditor();

@@ -237,6 +237,12 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
+        public override void ProcessStyleChange() {
+            RemovePic();
+            PadInternal.Item.SheetStyle = Parent.SheetStyle;
+            PadInternal.Item.SheetStyleScale = Parent.SheetStyleScale;
+        }
+
         public bool ReplaceVariable(Variable variable) {
             if (PadInternal == null) { return false; }
             var b = PadInternal.Item.ParseVariable(variable);
@@ -263,12 +269,6 @@ namespace BlueControls.ItemCollection {
                 t = t + "Data=" + PadInternal.Item.ToString() + ", ";
             }
             return t.Trim(", ") + "}";
-        }
-
-        internal override void ProcessStyleChange() {
-            RemovePic();
-            PadInternal.Item.SheetStyle = Parent.SheetStyle;
-            PadInternal.Item.SheetStyleScale = Parent.SheetStyleScale;
         }
 
         protected override string ClassId() => "CHILDPAD";

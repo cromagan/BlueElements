@@ -47,7 +47,13 @@ namespace BlueControls.ItemCollection {
 
         public ColumnPadItem(string internalname) : base(internalname) { }
 
-        public ColumnPadItem(ColumnItem c) : base(c.Name) => Column = c;
+        public ColumnPadItem(ColumnItem c) : base(c.Name) {
+            Column = c;
+
+            if (Column != null) {
+                Column.Changed += Column_Changed;
+            }
+        }
 
         #endregion
 
@@ -96,8 +102,8 @@ namespace BlueControls.ItemCollection {
             l.Add(new FlexiControlForProperty<string>(() => Column.Ueberschrift2));
             l.Add(new FlexiControlForProperty<string>(() => Column.Ueberschrift3));
             l.Add(new FlexiControl());
-            l.Add(new FlexiControlForProperty<string>(() => Column.Quickinfo));
-            l.Add(new FlexiControlForProperty<string>(() => Column.AdminInfo));
+            l.Add(new FlexiControlForProperty<string>(() => Column.Quickinfo, 5));
+            l.Add(new FlexiControlForProperty<string>(() => Column.AdminInfo, 5));
 
             if (AdditionalStyleOptions != null) {
                 l.Add(new FlexiControl());
@@ -127,9 +133,20 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "Column";
 
-        protected override Bitmap GeneratePic() {
+        protected override void Dispose(bool disposing) {
+            base.Dispose(disposing);
+            if (disposing) {
+                if (Column != null) {
+                    Column.Changed -= Column_Changed;
+                }
+                //Column = null;
+            }
+        }
+
+        protected override void GeneratePic() {
             if (Column == null) {
-                return QuickImage.Get(ImageCode.Warnung, 128);
+                GeneratedBitmap = QuickImage.Get(ImageCode.Warnung, 128);
+                return;
             }
 
             var wi = Table.TmpColumnContentWidth(null, Column, CellFont, 16);
@@ -162,7 +179,7 @@ namespace BlueControls.ItemCollection {
                 Table.Draw_FormatedText(gr, r.CellGetString(Column), Column, new Rectangle(0, 210, bmp.Width, 90), Design.Table_Cell, States.Standard, BlueDatabase.Enums.ShortenStyle.Replaced, Column.BildTextVerhalten);
             }
 
-            return bmp;
+            GeneratedBitmap = bmp;
         }
 
         protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
@@ -172,6 +189,11 @@ namespace BlueControls.ItemCollection {
                 return x;
             }
             return null;
+        }
+
+        private void Column_Changed(object sender, System.EventArgs e) {
+            RemovePic();
+            OnChanged();
         }
 
         #endregion

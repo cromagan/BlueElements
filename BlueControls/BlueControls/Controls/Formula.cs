@@ -129,10 +129,12 @@ namespace BlueControls.Controls {
                 return _showingRowKey;
             }
             set {
-                Develop.DebugPrint_Disposed(IsDisposed);
+
                 if (value < 0) { value = -1; }
                 if (grpEditor.Visible) { value = -1; }
                 if (value == _showingRowKey) { return; }
+                Develop.DebugPrint_Disposed(IsDisposed);
+
                 if (value > -1 && _database == null) { Develop.DebugPrint(FehlerArt.Fehler, "Database is nothing"); }
                 if (!_inited) {
                     if (value < 0) { return; }

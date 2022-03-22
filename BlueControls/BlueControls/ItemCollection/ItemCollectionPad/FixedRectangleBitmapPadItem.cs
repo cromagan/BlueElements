@@ -39,6 +39,7 @@ namespace BlueControls.ItemCollection {
 
         protected FixedRectangleBitmapPadItem(string internalname) : base(internalname) {
             RemovePic();
+            //GeneratePic(); // Im Construcor nicht möglich, weil noch Werte fehlen.
         }
 
         #endregion
@@ -48,11 +49,16 @@ namespace BlueControls.ItemCollection {
         public Bitmap? GeneratedBitmap {
             get {
                 if (_generatedBitmap != null) { return _generatedBitmap; }
-                _generatedBitmap = GeneratePic();
+                GeneratePic();
+                return _generatedBitmap;
+            }
+            protected set {
+                _generatedBitmap = value;
                 if (_generatedBitmap == null) {
                     Size = Size.Empty;
-                } else { Size = _generatedBitmap.Size; }
-                return _generatedBitmap;
+                } else {
+                    Size = _generatedBitmap.Size;
+                }
             }
         }
 
@@ -67,7 +73,15 @@ namespace BlueControls.ItemCollection {
             base.Dispose();
         }
 
-        protected void Dispose(bool disposing) {
+        protected override RectangleF CalculateUsedArea() {
+            if (_generatedBitmap == null) { GeneratePic(); } // Um die Size zu erhalten
+
+            return base.CalculateUsedArea();
+        }
+
+        protected override void Dispose(bool disposing) {
+            base.Dispose(disposing);
+
             if (!_disposedValue) {
                 if (disposing) {
                     // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
@@ -76,7 +90,6 @@ namespace BlueControls.ItemCollection {
 
                 // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
                 // TODO: Große Felder auf NULL setzen
-                _disposedValue = true;
             }
         }
 
@@ -87,6 +100,7 @@ namespace BlueControls.ItemCollection {
         //    return t.Trim(", ") + "}";
         //}
         protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+            if (_generatedBitmap == null) { GeneratePic(); }
 
             #region Bild zeichnen
 
@@ -131,7 +145,7 @@ namespace BlueControls.ItemCollection {
         //    p_U.SetTo(p_LO.X + ((p_RO.X - p_LO.X) / 2), p_RU.Y);
         //    p_O.SetTo(p_LO.X + ((p_RO.X - p_LO.X) / 2), p_RO.Y);
         //}
-        protected abstract Bitmap GeneratePic();
+        protected abstract void GeneratePic();
 
         protected override void ParseFinished() => SizeChanged();
 

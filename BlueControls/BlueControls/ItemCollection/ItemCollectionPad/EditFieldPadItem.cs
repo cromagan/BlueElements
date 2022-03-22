@@ -32,6 +32,11 @@ using BlueScript.Variables;
 using static BlueBasics.FileOperations;
 using MessageBox = BlueControls.Forms.MessageBox;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
+using BlueDatabase;
+using BlueDatabase.Enums;
+
+using BlueControls.Enums;
 
 namespace BlueControls.ItemCollection {
 
@@ -39,9 +44,15 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
+        private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
+        private ColumnItem? _column = null;
         private RowWithFilterPaditem? _getValueFrom = null;
+        private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Links_neben_Dem_Feld;
 
         #endregion
+
+        //private string _quickinfo;
+        //private string _adminInfo;
 
         #region Constructors
 
@@ -80,6 +91,25 @@ namespace BlueControls.ItemCollection {
 
         #region Properties
 
+        public EditTypeFormula Bearbeitung {
+            get {
+                return _bearbeitung;
+            }
+            set {
+                if (_bearbeitung == value) { return; }
+                _bearbeitung = value;
+                OnChanged();
+            }
+        }
+
+        public string Datenbank {
+            get {
+                if (_column?.Database == null) { return "?"; }
+                return _column.Database.Filename.FileNameWithSuffix();
+            }
+        }
+
+        [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
         public string Datenquelle_wählen {
             get => string.Empty;
             set {
@@ -99,12 +129,97 @@ namespace BlueControls.ItemCollection {
                 var t = Parent[it[0]];
 
                 if (t is RowWithFilterPaditem rfp2) {
-                    _getValueFrom = rfp2;
+                    if (rfp2 != _getValueFrom) {
+                        _getValueFrom = rfp2;
+                        _column = null;
+                    }
                 } else {
                     _getValueFrom = null;
+                    _column = null;
                 }
 
                 RepairConnections();
+                OnChanged();
+            }
+        }
+
+        public string Interner_Name {
+            get {
+                if (_column == null) { return "?"; }
+                return _column.Name;
+            }
+        }
+
+        public string Spalte_bearbeiten {
+            get => string.Empty;
+            set {
+                if (_column == null) { return; }
+                Forms.TableView.OpenColumnEditor(_column, null, null);
+
+                OnChanged();
+            }
+        }
+
+        [Description("Wählt die Spalte, die angezeigt werden soll.\r\nDiese bestimmt maßgeblich die Eigenschaften")]
+        public string Spalte_wählen {
+            get => string.Empty;
+            set {
+                if (_getValueFrom == null) {
+                    MessageBox.Show("Zuerst Datenquelle wählen.");
+                    return;
+                }
+
+                if (_getValueFrom.Database == null) {
+                    MessageBox.Show("Quelle fehlerhaft!");
+                    return;
+                }
+
+                var lst = new ItemCollectionList.ItemCollectionList();
+                lst.AddRange(_getValueFrom.Database.Column, false);
+
+                var sho = Forms.InputBoxListBoxStyle.Show("Spalte wählen:", lst, AddType.None, true);
+
+                if (sho == null || sho.Count != 1) { return; }
+
+                var k = IntParse(sho[0]);
+
+                var col = _getValueFrom.Database.Column.SearchByKey(k);
+
+                if (col == _column) { return; }
+                _column = col;
+
+                OnChanged();
+            }
+        }
+
+        public string Spalten_AdminInfo {
+            get {
+                if (_column != null) { return _column.AdminInfo; }
+                return string.Empty;
+            }
+            set {
+                if (_column != null) { _column.AdminInfo = value; }
+            }
+        }
+
+        public string Spalten_QuickInfo {
+            get {
+                if (_column != null) { return _column.Quickinfo; }
+                return string.Empty;
+            }
+            set {
+                if (_column != null) { _column.Quickinfo = value; }
+            }
+        }
+
+        public ÜberschriftAnordnung ÜberschriftAnordnung {
+            get {
+                return _überschiftanordung;
+            }
+            set {
+                if (_überschiftanordung == value) { return; }
+                _überschiftanordung = value;
+                OnChanged();
             }
         }
 
@@ -116,7 +231,29 @@ namespace BlueControls.ItemCollection {
             List<FlexiControl> l = new();
 
             l.Add(new FlexiControlForProperty<string>(() => Datenquelle_wählen, ImageCode.Pfeil_Rechts));
+            l.Add(new FlexiControlForProperty<string>(() => Datenbank));
+            l.Add(new FlexiControlForProperty<string>(() => Spalte_wählen, ImageCode.Pfeil_Rechts));
+            l.Add(new FlexiControlForProperty<string>(() => Interner_Name));
+            l.Add(new FlexiControlForProperty<string>(() => Spalte_bearbeiten, ImageCode.Spalte));
             l.Add(new FlexiControl());
+
+            var u = new ItemCollection.ItemCollectionList.ItemCollectionList();
+            u.AddRange(typeof(ÜberschriftAnordnung));
+            l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => ÜberschriftAnordnung, u));
+            var b = new ItemCollection.ItemCollectionList.ItemCollectionList();
+            b.AddRange(typeof(EditTypeFormula));
+            l.Add(new FlexiControlForProperty<EditTypeFormula>(() => Bearbeitung, b));
+            l.Add(new FlexiControl());
+            l.Add(new FlexiControlForProperty<string>(() => Spalten_QuickInfo, 5));
+            l.Add(new FlexiControlForProperty<string>(() => Spalten_AdminInfo, 5));
+            l.Add(new FlexiControl());
+
+            //if(_getValueFrom != null && _getValueFrom.Database is Database db) {
+            //      foreach(var thisC in db) {
+            //          s
+            //      }
+
+            //  }
 
             //{
             //    new FlexiControlForProperty(()=> this.Bildschirmbereich_wählen", enImageCode.Bild),
@@ -170,6 +307,11 @@ namespace BlueControls.ItemCollection {
 
         public override string ToString() {
             var t = base.ToString();
+
+            if (_getValueFrom != null) {
+                t = "GetValueFrom=" + _getValueFrom.Internal.ToNonCritical() + ", ";
+            }
+
             //t = t.Substring(0, t.Length - 1) + ", ";
             //t = t + "Modus=" + (int)Bild_Modus + ", ";
             //if (!string.IsNullOrEmpty(Platzhalter_Für_Layout)) {
@@ -199,10 +341,42 @@ namespace BlueControls.ItemCollection {
 
         //    return false;
         //}
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
+        protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
             var id = -1; if (_getValueFrom != null) { id = _getValueFrom.Id; }
 
-            DrawColorScheme(gr, drawingCoordinates, zoom, id);
+            DrawColorScheme(gr, positionModified, zoom, id);
+
+            if (_getValueFrom == null) {
+                Skin.Draw_FormatedText(gr, "Datenquelle fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), RowWithFilterPaditem.CellFont.Scale(zoom), true);
+            } else if (_column == null) {
+                Skin.Draw_FormatedText(gr, "Spalte fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), RowWithFilterPaditem.CellFont.Scale(zoom), true);
+            } else {
+                Point cap;
+
+                switch (ÜberschriftAnordnung) {
+                    case ÜberschriftAnordnung.ohne:
+                        cap = new Point(-1, -1);
+                        break;
+
+                    case ÜberschriftAnordnung.Links_neben_Dem_Feld:
+                        cap = new Point(0, 0);
+                        break;
+
+                    case ÜberschriftAnordnung.Ohne_mit_Abstand:
+                        cap = new Point(-1, -1);
+                        break;
+
+                    case ÜberschriftAnordnung.Über_dem_Feld:
+                    default:
+                        cap = new Point(0, 0);
+                        break;
+                }
+
+                if (cap.X >= 0) {
+                    var e = new RectangleF(positionModified.Left + cap.X * zoom, positionModified.Top + cap.Y * zoom, positionModified.Width, 16 * zoom);
+                    Skin.Draw_FormatedText(gr, _column.ReadableText(), null, Alignment.Top_Left, e.ToRect(), RowWithFilterPaditem.CellFont.Scale(zoom), true);
+                }
+            }
 
             //drawingCoordinates.Inflate(-Padding, -Padding);
             //RectangleF r1 = new(drawingCoordinates.Left + Padding, drawingCoordinates.Top + Padding,
@@ -271,7 +445,7 @@ namespace BlueControls.ItemCollection {
             //        BlueFont.DrawString(gr, Platzhalter_Für_Layout, f, Brushes.Black, drawingCoordinates.Left, drawingCoordinates.Top);
             //    }
             //}
-            base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, forPrinting);
+            base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         }
 
         //public bool ReplaceVariable(Variable variable) {

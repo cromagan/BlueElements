@@ -165,6 +165,8 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
+        public override void ProcessStyleChange() => RemovePic();
+
         public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
@@ -175,13 +177,12 @@ namespace BlueControls.ItemCollection {
             return t.Trim(", ") + "}";
         }
 
-        internal override void ProcessStyleChange() => RemovePic();
-
         protected override string ClassId() => "ROW";
 
-        protected override Bitmap GeneratePic() {
+        protected override void GeneratePic() {
             if (string.IsNullOrEmpty(_layoutId) || !_layoutId.StartsWith("#")) {
-                return QuickImage.Get(ImageCode.Warnung, 128);
+                GeneratedBitmap = QuickImage.Get(ImageCode.Warnung, 128);
+                return;
             }
 
             CreativePad pad = new(new ItemCollectionPad(_layoutId, _database, _rowKey));
@@ -199,7 +200,7 @@ namespace BlueControls.ItemCollection {
             pad.Item.DrawCreativePadToBitmap(generatedBitmap, States.Standard, zoomv, slidervalues.X, slidervalues.Y, null);
             //if (sizeChangeAllowed) { p_RU.SetTo(p_LO.X + GeneratedBitmap.Width, p_LO.Y + GeneratedBitmap.Height); }
             //SizeChanged();
-            return generatedBitmap;
+            GeneratedBitmap = generatedBitmap;
         }
 
         protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
