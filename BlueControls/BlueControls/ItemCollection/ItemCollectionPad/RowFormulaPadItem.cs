@@ -105,13 +105,14 @@ namespace BlueControls.ItemCollection {
         }
 
         public RowItem? Row => _database?.Row.SearchByKey(_rowKey);
+        protected override int SaveOrder => 999;
 
         #endregion
 
         #region Methods
 
-        public override List<FlexiControl> GetStyleOptions() {
-            List<FlexiControl> l = new()
+        public override List<GenericControl> GetStyleOptions() {
+            List<GenericControl> l = new()
             {
                 new FlexiControlForProperty<string>(() => Datensatz_bearbeiten, ImageCode.Stift),
                 new FlexiControl()
@@ -203,11 +204,9 @@ namespace BlueControls.ItemCollection {
             GeneratedBitmap = generatedBitmap;
         }
 
-        protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
+        protected override BasicPadItem? TryCreate(string id, string name) {
             if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-                var x = new RowFormulaPadItem(name);
-                x.Parse(toParse);
-                return x;
+                return new RowFormulaPadItem(name);
             }
             return null;
         }

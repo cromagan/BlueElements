@@ -1008,7 +1008,7 @@ namespace BlueDatabase {
             OpticalReplace.Clear();
             OpticalReplace.AddRange(source.OpticalReplace);
             AfterEditAutoReplace.Clear();
-            AfterEditAutoReplace.AddRange(source.OpticalReplace);
+            AfterEditAutoReplace.AddRange(source.AfterEditAutoReplace);
             this.GetStyleFrom(source); // regex, Allowed Chars, etc.
             ScriptType = source.ScriptType;
             ShowUndo = source.ShowUndo;

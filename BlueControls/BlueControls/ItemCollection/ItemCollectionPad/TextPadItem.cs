@@ -104,14 +104,15 @@ namespace BlueControls.ItemCollection {
             }
         }
 
+        protected override int SaveOrder => 999;
         private DataFormat Format { get; set; } = DataFormat.Text;
 
         #endregion
 
         #region Methods
 
-        public override List<FlexiControl> GetStyleOptions() {
-            List<FlexiControl> l = new()
+        public override List<GenericControl> GetStyleOptions() {
+            List<GenericControl> l = new()
             {
                 new FlexiControlForProperty<string>(() => Text, 5)
             };
@@ -228,13 +229,11 @@ namespace BlueControls.ItemCollection {
             InvalidateText();
         }
 
-        protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
+        protected override BasicPadItem? TryCreate(string id, string name) {
             if (id.Equals("blueelements.clsitemtext", StringComparison.OrdinalIgnoreCase) ||
                      id.Equals("blueelements.textitem", StringComparison.OrdinalIgnoreCase) ||
                      id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-                var x = new TextPadItem(name);
-                x.Parse(toParse);
-                return x;
+                return new TextPadItem(name);
             }
             return null;
         }

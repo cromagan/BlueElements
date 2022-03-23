@@ -49,6 +49,12 @@ namespace BlueControls.ItemCollection {
 
         #endregion
 
+        #region Properties
+
+        protected override int SaveOrder => 999;
+
+        #endregion
+
         #region Methods
 
         public override void ProcessStyleChange() => RemovePic();
@@ -84,11 +90,9 @@ namespace BlueControls.ItemCollection {
             GeneratedBitmap = bmp;
         }
 
-        protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
+        protected override BasicPadItem? TryCreate(string id, string name) {
             if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-                var x = new GenericPadItem(name);
-                x.Parse(toParse);
-                return x;
+                return new GenericPadItem(name);
             }
             return null;
         }

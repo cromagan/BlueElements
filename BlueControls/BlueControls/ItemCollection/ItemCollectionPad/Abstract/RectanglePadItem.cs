@@ -85,8 +85,8 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        public override List<FlexiControl> GetStyleOptions() {
-            List<FlexiControl> l = new()
+        public override List<GenericControl> GetStyleOptions() {
+            List<GenericControl> l = new()
             {
                 new FlexiControl(),
                 new FlexiControlForProperty<int>(() => Drehwinkel)

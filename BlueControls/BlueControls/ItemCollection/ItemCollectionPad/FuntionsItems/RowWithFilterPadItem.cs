@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using BlueBasics.Interfaces;
 using System.ComponentModel;
+using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollection {
 
@@ -36,12 +37,8 @@ namespace BlueControls.ItemCollection {
         #region Fields
 
         public static BlueFont? CellFont = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
-
         public static BlueFont? ChapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard);
-
         public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
-
-        public readonly Database? Database;
 
         /// <summary>
         /// Laufende Nummer, bestimmt die einfärbung
@@ -49,7 +46,7 @@ namespace BlueControls.ItemCollection {
         public readonly int Id;
 
         public FilterCollection? Filter;
-
+        private readonly Database _filterdef;
         private bool _genau_eine_Zeile = true;
 
         #endregion
@@ -63,6 +60,10 @@ namespace BlueControls.ItemCollection {
             if (db != null) { Filter = new FilterCollection(db); }
             Id = id;
             Size = new Size(200, 50);
+
+            _filterdef = GenerateFilterDatabase();
+
+            _filterdef.Cell.CellValueChanged += Cell_CellValueChanged;
         }
 
         public RowWithFilterPaditem(string intern) : this(intern, null, 0) { }
@@ -71,11 +72,34 @@ namespace BlueControls.ItemCollection {
 
         #region Properties
 
+        public Database? Database { get; private set; }
+
         public string Datenbankkopf {
             get => string.Empty;
             set {
                 if (Database == null) { return; }
                 Forms.TableView.OpenDatabaseHeadEditor(Database);
+            }
+        }
+
+        public string Filter_hinzufügen {
+            get => string.Empty;
+            set {
+                if (Database == null) { return; }
+
+                var c = new ItemCollectionList.ItemCollectionList();
+                foreach (var thiscol in Database.Column) {
+                    if (thiscol.Format.Autofilter_möglich() && !thiscol.Format.NeedTargetDatabase() && string.IsNullOrEmpty(thiscol.Identifier)) {
+                        c.Add(thiscol);
+                    }
+                }
+
+                var t = BlueControls.Forms.InputBoxListBoxStyle.Show("Filter für welche Spalte?", c, AddType.None, true);
+
+                if (t == null || t.Count != 1) { return; }
+
+                var r = _filterdef.Row.Add(t[0]);
+                r.CellSet("FilterArt", "=");
             }
         }
 
@@ -89,12 +113,14 @@ namespace BlueControls.ItemCollection {
             }
         }
 
+        protected override int SaveOrder => 1;
+
         #endregion
 
         #region Methods
 
-        public override List<FlexiControl> GetStyleOptions() {
-            List<FlexiControl> l = new() { };
+        public override List<GenericControl> GetStyleOptions() {
+            List<GenericControl> l = new() { };
             if (Database == null) { return l; }
             l.Add(new FlexiControlForProperty<string>(() => Database.Caption));
             //l.Add(new FlexiControlForProperty(Database, "Caption"));
@@ -102,6 +128,11 @@ namespace BlueControls.ItemCollection {
             //l.Add(new FlexiControlForProperty(()=> this.Datenbankkopf"));
             l.Add(new FlexiControl());
             l.Add(new FlexiControlForProperty<bool>(() => Genau_eine_Zeile));
+            l.Add(new FlexiControl());
+
+            FilterDatabaseUpdate();
+            l.Add(new FlexiControlForProperty<string>(() => Filter_hinzufügen, ImageCode.PlusZeichen));
+            l.Add(GenerateFilterTable());
 
             //l.Add(new FlexiControl());
             //l.Add(new FlexiControlForProperty<string>(() => Column.Ueberschrift1"));
@@ -117,6 +148,26 @@ namespace BlueControls.ItemCollection {
             //}
 
             return l;
+        }
+
+        public override bool ParseThis(string tag, string value) {
+            if (base.ParseThis(tag, value)) { return true; }
+            switch (tag) {
+                case "database":
+                    Database = Database.GetByFilename(value.FromNonCritical(), false, false);
+                    return true;
+
+                case "onerow":
+                    Genau_eine_Zeile = value.FromPlusMinus();
+                    return true;
+
+                case "filterdb":
+                    _filterdef.Row.Clear();
+                    FilterDatabaseUpdate();
+                    _filterdef.Import(value.FromNonCritical(), true, false, ";", false, false, false);
+                    return true;
+            }
+            return false;
         }
 
         public string ReadableText() {
@@ -142,14 +193,28 @@ namespace BlueControls.ItemCollection {
         public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
+
             if (Database != null) {
                 t = t + "Database=" + Database.Filename.ToNonCritical() + ", ";
             }
             t = t + "OneRow=" + Genau_eine_Zeile.ToPlusMinus() + ", ";
+
+            if (_filterdef != null) {
+                t = t + "FilterDB=" + _filterdef.Export_CSV(FirstRow.ColumnInternalName, (List<ColumnItem>)null, null).ToNonCritical() + ", ";
+            }
+
             return t.Trim(", ") + "}";
         }
 
         protected override string ClassId() => "RowWithFilter";
+
+        protected override void Dispose(bool disposing) {
+            base.Dispose(disposing);
+
+            if (disposing) {
+                _filterdef.Cell.CellValueChanged -= Cell_CellValueChanged;
+            }
+        }
 
         protected override void DrawExplicit(Graphics gr, RectangleF modifiedPosition, float zoom, float shiftX, float shiftY, bool forPrinting) {
             DrawColorScheme(gr, modifiedPosition, zoom, Id);
@@ -232,13 +297,164 @@ namespace BlueControls.ItemCollection {
             base.DrawExplicit(gr, modifiedPosition, zoom, shiftX, shiftY, forPrinting);
         }
 
-        protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
+        protected override BasicPadItem? TryCreate(string id, string name) {
             if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-                var x = new RowWithFilterPaditem(name);
-                x.Parse(toParse);
-                return x;
+                return new RowWithFilterPaditem(name);
             }
             return null;
+        }
+
+        private void Cell_CellValueChanged(object sender, BlueDatabase.EventArgs.CellEventArgs e) {
+            RepairConnections();
+        }
+
+        private void FilterDatabaseUpdate() {
+            if (_filterdef == null) { return; }
+
+            var sc = string.Empty;
+
+            #region Hauptspalte
+
+            var hs = _filterdef.Column["spalte"];
+            hs.OpticalReplace.Clear();
+            foreach (var thisc in Database.Column) {
+                hs.OpticalReplace.Add(thisc.Key.ToString() + "|" + thisc.ReadableText());
+            }
+
+            #endregion
+
+            #region Spalte Suchtext & SuchSym-Script
+
+            var b = _filterdef.Column["suchtxt"];
+            b.DropDownItems.Clear();
+            b.OpticalReplace.Clear();
+
+            foreach (var thisPadItem in Parent) {
+                if (thisPadItem is EditFieldPadItem efpi) {
+                    if (efpi.GetValueFrom != null &&
+                       efpi.GetValueFrom.Database != null &&
+                       efpi.GetValueFrom.Id != Id) {
+                        b.DropDownItems.Add(efpi.Internal);
+                        b.OpticalReplace.Add(efpi.Internal + "|" + efpi.ReadableText());
+                        var s = string.Empty;
+                        var tmp = efpi.SymbolForReadableText();
+                        if (tmp != null) { s = tmp.ToString(); }
+
+                        sc = sc + "if (" + b.Name + "==\"" + efpi.Internal + "\") {suchsym=\"" + s + "\";}";
+                    }
+                }
+
+                if (thisPadItem is ConstantTextPaditem ctpi) {
+                    b.DropDownItems.Add(ctpi.Internal);
+                    b.OpticalReplace.Add(ctpi.Internal + "|" + ctpi.ReadableText());
+                    var s = string.Empty;
+                    var tmp = ctpi.SymbolForReadableText();
+                    if (tmp != null) { s = tmp.ToString(); }
+
+                    sc = sc + "if (" + b.Name + "==\"" + ctpi.Internal + "\") {suchsym=\"" + s + "\";}";
+                }
+            }
+
+            #endregion
+
+            _filterdef.RulesScript = sc;
+        }
+
+        private Database GenerateFilterDatabase() {
+            Database x = new(false);
+            //x.Column.Add("count", "count", VarType.Integer);
+            //var vis = x.Column.Add("visible", "visible", VarType.Bit);
+            var sp = x.Column.Add("Spalte", "Spalte", VarType.Text);
+            sp.Align = AlignmentHorizontal.Rechts;
+
+            var fa = x.Column.Add("FilterArt", "Art", VarType.Text);
+            fa.MultiLine = false;
+            fa.TextBearbeitungErlaubt = false;
+            fa.DropdownAllesAbwählenErlaubt = true;
+            fa.DropdownBearbeitungErlaubt = true;
+            fa.DropDownItems.Add("=");
+            fa.DropDownItems.Add("x");
+            fa.OpticalReplace.Add("=|ist (GK egal)");
+            fa.OpticalReplace.Add("x|LÖSCHEN");
+
+            var b1 = x.Column.Add("suchsym", " ", VarType.Text);
+            b1.BildTextVerhalten = BildTextVerhalten.Nur_Bild;
+            b1.ScriptType = ScriptType.String;
+
+            var b = x.Column.Add("suchtxt", "Suchtext", VarType.Text);
+            //            //b.Quickinfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum suchen<br>Mischen wird nicht unterstützt.";
+            b.MultiLine = false;
+            b.TextBearbeitungErlaubt = false;
+            b.DropdownAllesAbwählenErlaubt = true;
+            b.DropdownBearbeitungErlaubt = true;
+            b.ScriptType = ScriptType.String;
+
+            FilterDatabaseUpdate();
+
+            x.RepairAfterParse();
+            x.ColumnArrangements[1].ShowAllColumns();
+            //x.ColumnArrangements[1].Hide("visible");
+            x.ColumnArrangements[1].HideSystemColumns();
+            x.SortDefinition = new RowSortDefinition(x, "Spalte", false);
+
+            //            x.Tags.TagSet("Filename", linkdb.Filename);
+
+            //            tblFilterliste.Filter.Add(vis, FilterType.Istgleich, "+");
+            //        }
+
+            //        linkdb.RepairAfterParse(); // Dass ja die 0 Ansicht stimmt
+
+            //        var ok = IntTryParse(cbxTargetColumn.Text, out var key);
+            //        ColumnItem? spalteauDb = null;
+            //        if (ok) { spalteauDb = linkdb.Column.SearchByKey(key); }
+
+            //        for (var z = 0; z < linkdb.Column.Count; z++) {
+            //            var col = linkdb.Column[z];
+
+            //            var r = tblFilterliste.Database.Row[z.ToString()];
+            //            if (r == null) {
+            //                r = tblFilterliste.Database.Row.Add(z.ToString());
+            //            }
+
+            //            r.CellSet("Spalte", col.ReadableText() + " = ");
+
+            //            if (col.Format.Autofilter_möglich() && !col.MultiLine && col != spalteauDb  && !col.Format.NeedTargetDatabase() && string.IsNullOrEmpty(col.Identifier)) {
+            //                r.CellSet("visible", true);
+            //            } else {
+            //                r.CellSet("visible", false);
+            //            }
+
+            //            SetLinkedCellFilter();
+            //        }
+
+            //}
+
+            return x;
+        }
+
+        private Table GenerateFilterTable() {
+            var tblFilterliste = new Table();
+            tblFilterliste.ShowWaitScreen = true;
+            tblFilterliste.Size = new System.Drawing.Size(968, 400);
+
+            if (Database == null) { return tblFilterliste; }
+
+            tblFilterliste.Database = _filterdef;
+            tblFilterliste.Arrangement = 1;
+
+            return tblFilterliste;
+        }
+
+        private void RepairConnections() {
+            ConnectsTo.Clear();
+
+            foreach (var thisRow in _filterdef.Row) {
+                var GetValueFrom = Parent[thisRow.CellGetString("suchtxt")];
+
+                if (GetValueFrom != null) {
+                    ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, GetValueFrom, ConnectionType.Bottom, false));
+                }
+            }
         }
 
         #endregion

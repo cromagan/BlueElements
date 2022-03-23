@@ -588,7 +588,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                 r.CellSet("Spalte", col.ReadableText() + " = ");
 
-                if (col.Format.Autofilter_möglich() && !col.MultiLine && col != spalteauDb && col != spalteauDb && !col.Format.NeedTargetDatabase() && string.IsNullOrEmpty(col.Identifier)) {
+                if (col.Format.Autofilter_möglich() && !col.MultiLine && col != spalteauDb && !col.Format.NeedTargetDatabase() && string.IsNullOrEmpty(col.Identifier)) {
                     r.CellSet("visible", true);
                 } else {
                     r.CellSet("visible", false);

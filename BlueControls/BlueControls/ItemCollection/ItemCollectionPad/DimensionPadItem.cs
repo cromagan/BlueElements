@@ -37,7 +37,6 @@ namespace BlueControls.ItemCollection {
         #region Fields
 
         private readonly PointM _bezugslinie1 = new(null, "Bezugslinie 1, Ende der Hilfslinie", 0, 0);
-
         private readonly PointM _bezugslinie2 = new(null, "Bezugslinie 2, Ende der Hilfslinien", 0, 0);
 
         /// <summary>
@@ -51,7 +50,6 @@ namespace BlueControls.ItemCollection {
         private readonly PointM? _point2 = new(null, "Punkt 2", 0, 0);
 
         private readonly PointM? _schnittPunkt1 = new(null, "Schnittpunkt 1, Zeigt der Pfeil hin", 0, 0);
-
         private readonly PointM? _schnittPunkt2 = new(null, "Schnittpunkt 2, Zeigt der Pfeil hin", 0, 0);
 
         /// <summary>
@@ -60,9 +58,7 @@ namespace BlueControls.ItemCollection {
         private readonly PointM? _textPoint = new(null, "Mitte Text", 0, 0);
 
         private float _länge;
-
         private string _textOben = string.Empty;
-
         private float _winkel;
 
         #endregion
@@ -115,9 +111,7 @@ namespace BlueControls.ItemCollection {
         #region Properties
 
         public float Länge_In_Mm => (float)Math.Round(PixelToMm(_länge, ItemCollectionPad.Dpi), Nachkommastellen);
-
         public int Nachkommastellen { get; set; }
-
         public string Präfix { get; set; } = string.Empty;
 
         //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
@@ -136,6 +130,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public string Text_Unten { get; set; }
+        protected override int SaveOrder => 999;
 
         #endregion
 
@@ -169,8 +164,8 @@ namespace BlueControls.ItemCollection {
                     || Länge(new PointM(value), _textPoint) < ne * 10;
         }
 
-        public override List<FlexiControl> GetStyleOptions() {
-            List<FlexiControl> l = new()
+        public override List<GenericControl> GetStyleOptions() {
+            List<GenericControl> l = new()
             {
                 new FlexiControlForProperty<float>(() => Länge_In_Mm),
                 new FlexiControlForProperty<string>(() => Text_Oben),
@@ -311,13 +306,11 @@ namespace BlueControls.ItemCollection {
 
         protected override void ParseFinished() => CalculateOtherPoints();
 
-        protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
+        protected override BasicPadItem? TryCreate(string id, string name) {
             if (id.Equals("blueelements.clsitemimage", StringComparison.OrdinalIgnoreCase) ||
                      id.Equals("blueelements.imageitem", StringComparison.OrdinalIgnoreCase) ||
                      id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-                var x = new DimensionPadItem(name);
-                x.Parse(toParse);
-                return x;
+                return new DimensionPadItem(name);
             }
             return null;
         }

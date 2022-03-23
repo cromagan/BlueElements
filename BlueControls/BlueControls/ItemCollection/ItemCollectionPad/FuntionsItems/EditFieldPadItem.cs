@@ -21,14 +21,10 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueControls.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using BlueScript.Variables;
 using static BlueBasics.FileOperations;
 using MessageBox = BlueControls.Forms.MessageBox;
 using static BlueBasics.Converter;
@@ -36,23 +32,20 @@ using static BlueBasics.Extensions;
 using BlueDatabase;
 using BlueDatabase.Enums;
 
-using BlueControls.Enums;
+using BlueBasics.Interfaces;
 
 namespace BlueControls.ItemCollection {
 
-    public class EditFieldPadItem : RectanglePadItem {
+    public class EditFieldPadItem : RectanglePadItem, IReadableText {
 
         #region Fields
 
         private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
         private ColumnItem? _column = null;
-        private RowWithFilterPaditem? _getValueFrom = null;
+        private RowWithFilterPaditem? _GetValueFrom = null;
         private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Links_neben_Dem_Feld;
 
         #endregion
-
-        //private string _quickinfo;
-        //private string _adminInfo;
 
         #region Constructors
 
@@ -61,33 +54,6 @@ namespace BlueControls.ItemCollection {
         }
 
         #endregion
-
-        //public EditFieldPadItem(string internalname, string fileToLoad) : this(internalname, (Bitmap)BitmapExt.Image_FromFile(fileToLoad), Size.Empty) { }
-
-        //public EditFieldPadItem(string internalname, Bitmap? bmp) : this(internalname, bmp, Size.Empty) { }
-
-        //public EditFieldPadItem(Bitmap? bmp, Size size) : this(string.Empty, bmp, size) { }
-
-        //public EditFieldPadItem(Bitmap? bmp) : this(string.Empty, bmp, Size.Empty) { }
-
-        //public EditFieldPadItem(string internalname, Bitmap? bmp, Size size) : base(internalname) {
-        //    //Bitmap = bmp;
-        //    //SetCoordinates(new RectangleF(0, 0, size.Width, size.Height), true);
-        //    //Overlays = new List<QuickImage>();
-        //    //Hintergrund_Weiß_Füllen = true;
-        //    //Padding = 0;
-        //    //Bild_Modus = enSizeModes.EmptySpace;
-        //    //Stil = PadStyles.Undefiniert; // Kein Rahmen
-        //}
-
-        //public enSizeModes Bild_Modus { get; set; }
-
-        //public Bitmap? Bitmap { get; set; }
-
-        //public bool Hintergrund_Weiß_Füllen { get; set; }
-
-        //[Description("Hier kann ein Variablenname als Platzhalter eingegeben werden. Beispiel: ~Bild~")]
-        //public string Platzhalter_Für_Layout { get; set; }
 
         #region Properties
 
@@ -129,15 +95,25 @@ namespace BlueControls.ItemCollection {
                 var t = Parent[it[0]];
 
                 if (t is RowWithFilterPaditem rfp2) {
-                    if (rfp2 != _getValueFrom) {
-                        _getValueFrom = rfp2;
+                    if (rfp2 != GetValueFrom) {
+                        GetValueFrom = rfp2;
                         _column = null;
                     }
                 } else {
-                    _getValueFrom = null;
+                    GetValueFrom = null;
                     _column = null;
                 }
 
+                OnChanged();
+            }
+        }
+
+        public RowWithFilterPaditem? GetValueFrom {
+            get => _GetValueFrom;
+
+            set {
+                if (value == _GetValueFrom) { return; }
+                _GetValueFrom = value;
                 RepairConnections();
                 OnChanged();
             }
@@ -150,6 +126,8 @@ namespace BlueControls.ItemCollection {
             }
         }
 
+        //[Description("Hier kann ein Variablenname als Platzhalter eingegeben werden. Beispiel: ~Bild~")]
+        //public string Platzhalter_Für_Layout { get; set; }
         public string Spalte_bearbeiten {
             get => string.Empty;
             set {
@@ -160,22 +138,23 @@ namespace BlueControls.ItemCollection {
             }
         }
 
+        //public bool Hintergrund_Weiß_Füllen { get; set; }
         [Description("Wählt die Spalte, die angezeigt werden soll.\r\nDiese bestimmt maßgeblich die Eigenschaften")]
         public string Spalte_wählen {
             get => string.Empty;
             set {
-                if (_getValueFrom == null) {
+                if (GetValueFrom == null) {
                     MessageBox.Show("Zuerst Datenquelle wählen.");
                     return;
                 }
 
-                if (_getValueFrom.Database == null) {
+                if (GetValueFrom.Database == null) {
                     MessageBox.Show("Quelle fehlerhaft!");
                     return;
                 }
 
                 var lst = new ItemCollectionList.ItemCollectionList();
-                lst.AddRange(_getValueFrom.Database.Column, false);
+                lst.AddRange(GetValueFrom.Database.Column, false);
 
                 var sho = Forms.InputBoxListBoxStyle.Show("Spalte wählen:", lst, AddType.None, true);
 
@@ -183,7 +162,7 @@ namespace BlueControls.ItemCollection {
 
                 var k = IntParse(sho[0]);
 
-                var col = _getValueFrom.Database.Column.SearchByKey(k);
+                var col = GetValueFrom.Database.Column.SearchByKey(k);
 
                 if (col == _column) { return; }
                 _column = col;
@@ -192,6 +171,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
+        //public Bitmap? Bitmap { get; set; }
         public string Spalten_AdminInfo {
             get {
                 if (_column != null) { return _column.AdminInfo; }
@@ -202,6 +182,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
+        //public enSizeModes Bild_Modus { get; set; }
         public string Spalten_QuickInfo {
             get {
                 if (_column != null) { return _column.Quickinfo; }
@@ -212,6 +193,15 @@ namespace BlueControls.ItemCollection {
             }
         }
 
+        //public EditFieldPadItem(string internalname, Bitmap? bmp, Size size) : base(internalname) {
+        //    //Bitmap = bmp;
+        //    //SetCoordinates(new RectangleF(0, 0, size.Width, size.Height), true);
+        //    //Overlays = new List<QuickImage>();
+        //    //Hintergrund_Weiß_Füllen = true;
+        //    //Padding = 0;
+        //    //Bild_Modus = enSizeModes.EmptySpace;
+        //    //Stil = PadStyles.Undefiniert; // Kein Rahmen
+        //}
         public ÜberschriftAnordnung ÜberschriftAnordnung {
             get {
                 return _überschiftanordung;
@@ -223,12 +213,23 @@ namespace BlueControls.ItemCollection {
             }
         }
 
+        protected override int SaveOrder => 2;
+
         #endregion
+
+        //private string _quickinfo;
+        //private string _adminInfo;
+        //public EditFieldPadItem(string internalname, string fileToLoad) : this(internalname, (Bitmap)BitmapExt.Image_FromFile(fileToLoad), Size.Empty) { }
+
+        //public EditFieldPadItem(string internalname, Bitmap? bmp) : this(internalname, bmp, Size.Empty) { }
+
+        //public EditFieldPadItem(Bitmap? bmp, Size size) : this(string.Empty, bmp, size) { }
 
         #region Methods
 
-        public override List<FlexiControl> GetStyleOptions() {
-            List<FlexiControl> l = new();
+        //public EditFieldPadItem(Bitmap? bmp) : this(string.Empty, bmp, Size.Empty) { }
+        public override List<GenericControl> GetStyleOptions() {
+            List<GenericControl> l = new();
 
             l.Add(new FlexiControlForProperty<string>(() => Datenquelle_wählen, ImageCode.Pfeil_Rechts));
             l.Add(new FlexiControlForProperty<string>(() => Datenbank));
@@ -279,74 +280,73 @@ namespace BlueControls.ItemCollection {
         public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
             switch (tag) {
-                //case "stretchallowed": // ALT
-                //    return true;
+                case "getvaluefrom":
+                    GetValueFrom = (RowWithFilterPaditem)Parent[value.FromNonCritical()];
+                    return true;
 
-                //case "modus":
-                //    Bild_Modus = (enSizeModes)IntParse(value);
-                //    return true;
+                case "column":
+                    _column = GetValueFrom.Database.Column.SearchByKey(IntParse(value));
+                    return true;
 
-                //case "whiteback":
-                //    Hintergrund_Weiß_Füllen = value.FromPlusMinus();
-                //    return true;
+                case "edittype":
+                    _bearbeitung = (EditTypeFormula)IntParse(value);
+                    return true;
 
-                //case "padding":
-                //    Padding = IntParse(value);
-                //    return true;
-
-                //case "image":
-                //    Bitmap = Base64ToBitmap(value);
-                //    return true;
-
-                //case "placeholder":
-                //    Platzhalter_Für_Layout = value.FromNonCritical();
-                //    return true;
+                case "caption":
+                    _überschiftanordung = (ÜberschriftAnordnung)IntParse(value);
+                    return true;
             }
             return false;
         }
 
-        public override string ToString() {
-            var t = base.ToString();
+        public string ReadableText() {
+            if (_column != null) {
+                return "Wert aus: " + _column.ReadableText();
 
-            if (_getValueFrom != null) {
-                t = "GetValueFrom=" + _getValueFrom.Internal.ToNonCritical() + ", ";
+                //if (Genau_eine_Zeile) {
+                //    return "(eine) Zeile aus: " + Database.Caption;
+                //} else {
+                //    return "Zeilen aus: " + Database.Caption;
+                //}
             }
 
-            //t = t.Substring(0, t.Length - 1) + ", ";
-            //t = t + "Modus=" + (int)Bild_Modus + ", ";
-            //if (!string.IsNullOrEmpty(Platzhalter_Für_Layout)) {
-            //    t = t + "Placeholder=" + Platzhalter_Für_Layout.ToNonCritical() + ", ";
-            //}
-            //t = t + "WhiteBack=" + Hintergrund_Weiß_Füllen.ToPlusMinus() + ", ";
-            //foreach (var thisQi in Overlays) {
-            //    t = t + "Overlay=" + thisQi + ", ";
-            //}
-            //t = t + "Padding=" + Padding + ", ";
-            //if (Bitmap != null) {
-            //    t = t + "Image=" + BitmapToBase64(Bitmap, ImageFormat.Png) + ", ";
-            //}
+            return "Wert einer Spalte";
+        }
+
+        public QuickImage? SymbolForReadableText() {
+            if (GetValueFrom == null) { return null; }
+
+            return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IDColor(GetValueFrom.Id));
+        }
+
+        public override string ToString() {
+            var t = base.ToString();
+            t = t.Substring(0, t.Length - 1) + ", ";
+
+            if (GetValueFrom != null) {
+                t = t + "GetValueFrom=" + GetValueFrom.Internal.ToNonCritical() + ", ";
+            }
+
+            if (_column != null) {
+                t = t + "Column=" + _column.Key + ", ";
+            }
+
+            t = t + "EditType=" + ((int)_bearbeitung).ToString() + ", ";
+            t = t + "Caption=" + ((int)_überschiftanordung).ToString() + ", ";
+
             return t.Trim(", ") + "}";
         }
 
-        //public bool ResetVariables() {
-        //    if (!string.IsNullOrEmpty(Platzhalter_Für_Layout) && Bitmap != null) {
-        //        Bitmap.Dispose();
-        //        Bitmap = null;
-        //        OnChanged();
-        //        return true;
-        //    }
-        //    return false;
-        //}
         protected override string ClassId() => "EditField";
 
         //    return false;
         //}
         protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-            var id = -1; if (_getValueFrom != null) { id = _getValueFrom.Id; }
+            var id = -1; if (GetValueFrom != null) { id = GetValueFrom.Id; }
 
             DrawColorScheme(gr, positionModified, zoom, id);
 
-            if (_getValueFrom == null) {
+            if (GetValueFrom == null) {
                 Skin.Draw_FormatedText(gr, "Datenquelle fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), RowWithFilterPaditem.CellFont.Scale(zoom), true);
             } else if (_column == null) {
                 Skin.Draw_FormatedText(gr, "Spalte fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), RowWithFilterPaditem.CellFont.Scale(zoom), true);
@@ -458,11 +458,9 @@ namespace BlueControls.ItemCollection {
         //        OnChanged();
         //        return true;
         //    }
-        protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
+        protected override BasicPadItem? TryCreate(string id, string name) {
             if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-                var x = new BitmapPadItem(name);
-                x.Parse(toParse);
-                return x;
+                return new EditFieldPadItem(name);
             }
             return null;
         }
@@ -470,8 +468,8 @@ namespace BlueControls.ItemCollection {
         private void RepairConnections() {
             ConnectsTo.Clear();
 
-            if (_getValueFrom != null) {
-                ConnectsTo.Add(new ItemConnection(_getValueFrom, ConnectionType.Bottom, ConnectionType.Top, true, false));
+            if (GetValueFrom != null) {
+                ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, GetValueFrom, ConnectionType.Bottom, false));
             }
         }
 

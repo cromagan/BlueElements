@@ -17,6 +17,7 @@
 
 using BlueBasics.Enums;
 using BlueControls.Enums;
+using System;
 using System.Drawing;
 using static BlueBasics.Extensions;
 
@@ -36,7 +37,7 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public ItemConnection(BasicPadItem otheritem, ConnectionType otherItemType, ConnectionType myItemType, bool arrowOnMyItem, bool arrowOnOtherItem) {
+        public ItemConnection(ConnectionType myItemType, bool arrowOnMyItem, BasicPadItem otheritem, ConnectionType otherItemType, bool arrowOnOtherItem) {
             OtherItem = otheritem;
             OtherItemType = otherItemType;
             MyItemType = myItemType;
@@ -66,6 +67,19 @@ namespace BlueControls.ItemCollection {
                     var m1 = otherItem.UsedArea.PointOf(Alignment.Horizontal_Vertical_Center);
                     return item.UsedArea.NearestLineMiddle(m1);
             }
+        }
+
+        internal string ToString(BasicPadItem myItem) {
+            var t = "{";
+
+            t = t + "Item1=" + myItem.Internal.ToNonCritical() + ", ";
+            t = t + "Arrow1=" + ArrowOnMyItem.ToPlusMinus() + ", ";
+            t = t + "Type1=" + ((int)MyItemType).ToString() + ", ";
+            t = t + "Item2=" + OtherItem.Internal.ToNonCritical() + ", ";
+            t = t + "Arrow2=" + ArrowOnOtherItem.ToPlusMinus() + ", ";
+            t = t + "Type2=" + ((int)OtherItemType).ToString() + ", ";
+
+            return t.TrimEnd(", ") + "}";
         }
 
         #endregion

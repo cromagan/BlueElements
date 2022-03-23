@@ -39,8 +39,10 @@ namespace BlueControls.ConnectedFormula {
         public const string Version = "0.01";
 
         public readonly ListExt<string> DatabaseFiles = new();
-        public readonly List<Database?> Databases = new();
+        //public readonly List<Database?> Databases = new();
 
+        private string _createDate = string.Empty;
+        private string _creator = string.Empty;
         private int _id = 0;
         private string _padData = string.Empty;
 
@@ -51,6 +53,9 @@ namespace BlueControls.ConnectedFormula {
         #region Constructors
 
         public ConnectedFormula(string filename) : base(false, false) {
+            _createDate = DateTime.Now.ToString(Constants.Format_Date5);
+            _creator = Generic.UserName();
+
             Load(filename, true);
             DatabaseFiles.Changed += DatabaseFiles_Changed;
         }
@@ -108,12 +113,24 @@ namespace BlueControls.ConnectedFormula {
                         FilePath = pair.Value.FromNonCritical();
                         break;
 
-                    case "DatabaseFiles":
+                    case "databasefiles":
                         DatabaseFiles.Clear();
                         DatabaseFiles.AddRange(pair.Value.FromNonCritical().SplitByCrToList());
                         break;
 
-                    case "ID":
+                    case "createdate":
+                        _createDate = pair.Value.FromNonCritical();
+                        break;
+
+                    case "createname":
+                        _creator = pair.Value.FromNonCritical();
+                        break;
+
+                    case "paditemdata":
+                        _padData = pair.Value.FromNonCritical();
+                        break;
+
+                    case "lastusedid":
                         _id = IntParse(pair.Value);
                         break;
 
@@ -127,26 +144,29 @@ namespace BlueControls.ConnectedFormula {
         protected override byte[] ToListOfByte() {
             var t = new List<string>();
 
-            t.TagSet("Type", "ConnectedFormula");
-            t.TagSet("Version", Version);
-            t.TagSet("FilePath", FilePath.ToNonCritical());
-            t.TagSet("ID", _id.ToString());
-            t.TagSet("DatabaseFiles", DatabaseFiles.JoinWithCr().ToNonCritical());
+            t.Add("Type=ConnectedFormula");
+            t.Add("Version=" + Version);
+            t.Add("CreateDate=" + _createDate.ToNonCritical());
+            t.Add("CreateName=" + _creator.ToNonCritical());
+            t.Add("FilePath=" + FilePath.ToNonCritical());
+            t.Add("LastUsedID=" + _id.ToString());
+            t.Add("DatabaseFiles=" + DatabaseFiles.JoinWithCr().ToNonCritical());
+            t.Add("PadItemData=" + _padData.ToNonCritical());
 
-            return t.JoinWithCr().WIN1252_toByte();
+            return ("{" + t.JoinWith(", ").TrimEnd(", ") + "}").WIN1252_toByte();
         }
 
         private void DatabaseFiles_Changed(object sender, System.EventArgs e) {
-            Databases.Clear();
+            //Databases.Clear();
 
             foreach (var thisfile in DatabaseFiles) {
-                var mf = Database.GetByFilename(thisfile, false, false);
+                Database.GetByFilename(thisfile, false, false);
 
-                if (mf is Database db) {
-                    Databases.Add(db);
-                } else {
-                    Databases.Add(null);
-                }
+                //if (mf is Database db) {
+                //    Databases.Add(db);
+                //} else {
+                //    Databases.Add(null);
+                //}
             }
 
             _saved = false;

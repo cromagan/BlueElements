@@ -158,7 +158,13 @@ namespace BlueControls.ItemCollection {
                         break;
 
                     case "items":
-                        ParseItems(pair.Value);
+                        CreateItems(pair.Value); // im ersten Step nur die items erzeugen....
+                        ParseItems(pair.Value);// ...im zweiten können nun auch Beziehungen erstellt werden!
+
+                        break;
+
+                    case "connections":
+                        ParseConnections(pair.Value);
                         break;
 
                     case "dpi":
@@ -494,6 +500,9 @@ namespace BlueControls.ItemCollection {
                 t = t + "PrintArea=" + RandinMm + ", ";
             }
             //t = t + "Dpi=" + Dpi + ", "; // TODO: Nach Update wieder aktivieren
+
+            #region Items
+
             t += "Items={";
             foreach (var thisitem in this) {
                 if (thisitem != null) {
@@ -501,6 +510,23 @@ namespace BlueControls.ItemCollection {
                 }
             }
             t = t.TrimEnd(", ") + "}, ";
+
+            #endregion
+
+            #region Items
+
+            t += "Connections={";
+            foreach (var thisitem in this) {
+                if (thisitem != null) {
+                    foreach (var thisCon in thisitem.ConnectsTo) {
+                        t = t + "Connection=" + thisCon.ToString(thisitem) + ", ";
+                    }
+                }
+            }
+            t = t.TrimEnd(", ") + "}, ";
+
+            #endregion
+
             t = t + "SnapMode=" + ((int)_snapMode) + ", ";
             t = t + "GridShow=" + _gridShow + ", ";
             t = t + "GridSnap=" + _gridsnap + ", ";
@@ -641,6 +667,62 @@ namespace BlueControls.ItemCollection {
             OnChanged();
         }
 
+        private void CreateConnection(string toparse) {
+            var x = toparse.GetAllTags();
+
+            BasicPadItem item1 = null;
+            BasicPadItem item2 = null;
+            bool arrow1 = false;
+            bool arrow2 = false;
+            ConnectionType con1 = ConnectionType.Auto;
+            ConnectionType con2 = ConnectionType.Auto;
+
+            foreach (var thisIt in x) {
+                switch (thisIt.Key) {
+                    case "item1":
+                        item1 = this[thisIt.Value.FromNonCritical()];
+                        break;
+
+                    case "item2":
+                        item2 = this[thisIt.Value.FromNonCritical()];
+                        break;
+
+                    case "arrow1":
+                        arrow1 = thisIt.Value.FromPlusMinus();
+                        break;
+
+                    case "arrow2":
+                        arrow2 = thisIt.Value.FromPlusMinus();
+                        break;
+
+                    case "type1":
+                        con1 = (ConnectionType)IntParse(thisIt.Value);
+                        break;
+
+                    case "type2":
+                        con2 = (ConnectionType)IntParse(thisIt.Value);
+                        break;
+                }
+            }
+            if (item1 == null || item2 == null) { return; }
+            item1.ConnectsTo.Add(new ItemConnection(con1, arrow1, item2, con2, arrow2));
+        }
+
+        private void CreateItems(string toParse) {
+            foreach (var pair in toParse.GetAllTags()) {
+                switch (pair.Key.ToLower()) {
+                    case "item":
+                        var i = BasicPadItem.NewByParsing(pair.Value);
+                        if (i != null) { Add(i); }
+                        break;
+
+                    default:
+                        Develop.DebugPrint(FehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
+                        break;
+                }
+            }
+        }
+
         private void GenPoints() {
             if (Math.Abs(_sheetSizeInMm.Width) < 0.001 || Math.Abs(_sheetSizeInMm.Height) < 0.001) {
                 if (_prLo != null) {
@@ -694,76 +776,38 @@ namespace BlueControls.ItemCollection {
             return !done ? RectangleF.Empty : new RectangleF(x1, y1, x2 - x1, y2 - y1);
         }
 
-        private void ParseItems(string toParse) {
-            //ToParse = ToParse.Replace("}, Item={ClassID=TEXT", ", Item={ClassID=TEXT");
-            //ToParse = ToParse.Replace(", Item={ClassID=TEXT", "}, Item={ClassID=TEXT");
-            //ToParse = ToParse.Replace(", }", "}");
-            //var tmp = ToParse.IndexOf("Item=");
-
-            //ToParse = "{" + ToParse.Substring(tmp);
-
+        private void ParseConnections(string toParse) {
             foreach (var pair in toParse.GetAllTags()) {
                 switch (pair.Key.ToLower()) {
-                    //case "sheetsize":
-                    //    _SheetSizeInMM = Extensions.SizeFParse(pair.Value);
-                    //    GenPoints();
-                    //    break;
-                    //case "printarea":
-                    //    _RandinMM = Extensions.PaddingParse(pair.Value);
-                    //    GenPoints();
-                    //    break;
-                    ////case "items":
-                    ////    Parse(pvalue);
-                    ////    break;
-                    //case "relation":
-                    //    AllRelations.Add(new clsPointRelation(this, pair.Value));
-                    //    break;
-                    //case "caption":
-                    //    Caption = pair.Value.FromNonCritical();
-                    //    break;
-                    //case "id":
-                    //    if (string.IsNullOrEmpty(ID)) { ID = pair.Value.FromNonCritical(); }
-                    //    break;
-                    //case "style":
-                    //    _SheetStyle = Skin.StyleDB.Row[pair.Value];
-                    //    if (_SheetStyle == null) { _SheetStyle = Skin.StyleDB.Row.First(); }// Einfach die Erste nehmen
-                    //    break;
-                    //case "fontscale":
-                    //    _SheetStyleScale = FloatParse(pair.Value);
-                    //    break;
-                    //case "grid":
-                    //    //_Grid = pair.Value.FromPlusMinus();
-                    //    break;
-                    //case "gridshow":
-                    //    //_GridShow = FloatParse(pair.Value);
-                    //    break;
-                    //case "gridsnap":
-                    //    //_Gridsnap = FloatParse(pair.Value);
-                    //    break;
-                    //case "format": //_Format = DirectCast(Integer.Parse(pair.Value.Value), enDataFormat)
-                    //    break;
-                    case "item":
-                        var i = BasicPadItem.NewByParsing(pair.Value);
-                        if (i != null) { Add(i); }
-                        break;
+                    case "connection":
+                        CreateConnection(pair.Value);
 
-                    case "dpi": // TODO: LÖschen 26.02.2020
-                        if (IntParse(pair.Value) != Dpi) {
-                            Develop.DebugPrint("Dpi Unterschied: " + Dpi + " <> " + pair.Value);
-                        }
-                        break;
-
-                    case "sheetstyle": // TODO: LÖschen 26.02.2020
-                        //if (Skin.StyleDB == null) { Skin.InitStyles(); }
-                        //_SheetStyle = Skin.StyleDB.Row[pair.Value];
-                        break;
-
-                    case "sheetstylescale": // TODO: LÖschen 26.02.2020
-                        //_SheetStyleScale = FloatParse(pair.Value);
                         break;
 
                     default:
-                        Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
+                        Develop.DebugPrint(FehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
+                        break;
+                }
+            }
+        }
+
+        private void ParseItems(string toParse) {
+            foreach (var pair in toParse.GetAllTags()) {
+                switch (pair.Key.ToLower()) {
+                    case "item":
+                        var x = pair.Value.GetAllTags();
+                        foreach (var thisIt in x) {
+                            switch (thisIt.Key) {
+                                case "internalname":
+                                    var it = this[thisIt.Value];
+                                    it?.Parse(x);
+                                    break;
+                            }
+                        }
+                        break;
+
+                    default:
+                        Develop.DebugPrint(FehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
                         break;
                 }
             }

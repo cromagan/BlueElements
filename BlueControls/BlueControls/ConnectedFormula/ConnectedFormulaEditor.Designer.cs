@@ -26,6 +26,7 @@ namespace BlueControls.Forms {
         private void InitializeComponent() {
             this.tabEditor = new System.Windows.Forms.TabPage();
             this.grpFelder = new BlueControls.Controls.GroupBox();
+            this.btnKonstante = new BlueControls.Controls.Button();
             this.btnFeldHinzu = new BlueControls.Controls.Button();
             this.btnZeileHinzu = new BlueControls.Controls.Button();
             this.grpDesign.SuspendLayout();
@@ -64,13 +65,17 @@ namespace BlueControls.Forms {
             // 
             this.tabStart.Size = new System.Drawing.Size(966, 81);
             // 
+            // tabExport
+            // 
+            this.tabExport.Size = new System.Drawing.Size(966, 81);
+            // 
             // tabEditor
             // 
             this.tabEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabEditor.Controls.Add(this.grpFelder);
             this.tabEditor.Location = new System.Drawing.Point(4, 25);
+            this.tabEditor.Margin = new System.Windows.Forms.Padding(0);
             this.tabEditor.Name = "tabEditor";
-            this.tabEditor.Padding = new System.Windows.Forms.Padding(3);
             this.tabEditor.Size = new System.Drawing.Size(966, 81);
             this.tabEditor.TabIndex = 4;
             this.tabEditor.Text = "Editor";
@@ -78,22 +83,35 @@ namespace BlueControls.Forms {
             // grpFelder
             // 
             this.grpFelder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpFelder.Controls.Add(this.btnKonstante);
             this.grpFelder.Controls.Add(this.btnFeldHinzu);
             this.grpFelder.Controls.Add(this.btnZeileHinzu);
             this.grpFelder.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpFelder.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpFelder.Location = new System.Drawing.Point(3, 3);
+            this.grpFelder.Location = new System.Drawing.Point(0, 0);
             this.grpFelder.Name = "grpFelder";
-            this.grpFelder.Size = new System.Drawing.Size(293, 75);
+            this.grpFelder.Size = new System.Drawing.Size(293, 81);
             this.grpFelder.TabIndex = 0;
             this.grpFelder.TabStop = false;
             this.grpFelder.Text = "Felder";
+            // 
+            // btnKonstante
+            // 
+            this.btnKonstante.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnKonstante.ImageCode = "Textfeld|16";
+            this.btnKonstante.Location = new System.Drawing.Point(136, 2);
+            this.btnKonstante.Name = "btnKonstante";
+            this.btnKonstante.QuickInfo = "Fügt einen konstanten Wert hinzu,\r\nder für Filterungen benutzt werden\r\nkann.";
+            this.btnKonstante.Size = new System.Drawing.Size(64, 66);
+            this.btnKonstante.TabIndex = 2;
+            this.btnKonstante.Text = "Konstante hinzufügen";
+            this.btnKonstante.Click += new System.EventHandler(this.btnKonstante_Click);
             // 
             // btnFeldHinzu
             // 
             this.btnFeldHinzu.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnFeldHinzu.ImageCode = "Stift|16|||||||||PlusZeichen";
-            this.btnFeldHinzu.Location = new System.Drawing.Point(80, 2);
+            this.btnFeldHinzu.Location = new System.Drawing.Point(72, 2);
             this.btnFeldHinzu.Name = "btnFeldHinzu";
             this.btnFeldHinzu.QuickInfo = "Fügt ein Feld hinzu.\r\nDieses kann entweder von einer Zeile\r\nbefüllt werden, oder " +
     "frei eingegeben werden";
@@ -137,5 +155,6 @@ namespace BlueControls.Forms {
         private Controls.GroupBox grpFelder;
         private Controls.Button btnZeileHinzu;
         private Controls.Button btnFeldHinzu;
+        private Controls.Button btnKonstante;
     }
 }

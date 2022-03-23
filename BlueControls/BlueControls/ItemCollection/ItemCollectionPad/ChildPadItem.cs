@@ -36,13 +36,9 @@ namespace BlueControls.ItemCollection {
         #region Fields
 
         public List<BasicPadItem>? VisibleItems;
-
         public List<BasicPadItem>? ZoomItems;
-
         private string _name;
-
         private CreativePad? _padInternal;
-
         private Bitmap? _tmpBmp;
 
         #endregion
@@ -92,15 +88,15 @@ namespace BlueControls.ItemCollection {
         }
 
         public Color Randfarbe { get; set; }
-
         public Alignment Textlage { get; set; }
+        protected override int SaveOrder => 1000;
 
         #endregion
 
         #region Methods
 
-        public override List<FlexiControl> GetStyleOptions() {
-            List<FlexiControl> l = new()
+        public override List<GenericControl> GetStyleOptions() {
+            List<GenericControl> l = new()
             {
                 new FlexiControlForProperty<string>(() => Name),
                 new FlexiControlForProperty<Color>(() => Randfarbe)
@@ -349,13 +345,11 @@ namespace BlueControls.ItemCollection {
             base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         }
 
-        protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
+        protected override BasicPadItem? TryCreate(string id, string name) {
             if (id.Equals("blueelements.clsitempad", StringComparison.OrdinalIgnoreCase) ||
                      id.Equals("blueelements.itempad", StringComparison.OrdinalIgnoreCase) ||
                      id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-                var x = new ChildPadItem(name);
-                x.Parse(toParse);
-                return x;
+                return new ChildPadItem(name);
             }
             return null;
         }

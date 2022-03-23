@@ -122,7 +122,7 @@ namespace BlueControls.ItemCollection {
             base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         }
 
-        //public override List<FlexiControl> GetStyleOptions() {
+        //public override List<GenericControl> GetStyleOptions() {
         //    List<FlexiControl> l = new()
         //    {
         //        new FlexiControl(),

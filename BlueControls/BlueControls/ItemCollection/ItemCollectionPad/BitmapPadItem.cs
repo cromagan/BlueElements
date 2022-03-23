@@ -40,7 +40,6 @@ namespace BlueControls.ItemCollection {
         #region Fields
 
         public List<QuickImage> Overlays;
-
         public int Padding;
         private bool _disposedValue;
 
@@ -109,6 +108,8 @@ namespace BlueControls.ItemCollection {
         [Description("Hier kann ein Variablenname als Platzhalter eingegeben werden. Beispiel: ~Bild~")]
         public string Platzhalter_Für_Layout { get; set; }
 
+        protected override int SaveOrder => 999;
+
         #endregion
 
         #region Methods
@@ -120,8 +121,8 @@ namespace BlueControls.ItemCollection {
             base.Dispose();
         }
 
-        public override List<FlexiControl> GetStyleOptions() {
-            List<FlexiControl> l = new()
+        public override List<GenericControl> GetStyleOptions() {
+            List<GenericControl> l = new()
             {
                 new FlexiControlForProperty<string>(() => Bildschirmbereich_wählen, ImageCode.Bild),
                 new FlexiControlForProperty<string>(() => Datei_laden, ImageCode.Ordner),
@@ -287,11 +288,9 @@ namespace BlueControls.ItemCollection {
             base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         }
 
-        protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
+        protected override BasicPadItem? TryCreate(string id, string name) {
             if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-                var x = new BitmapPadItem(name);
-                x.Parse(toParse);
-                return x;
+                return new BitmapPadItem(name);
             }
             return null;
         }

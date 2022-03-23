@@ -47,18 +47,16 @@ namespace BlueControls.ItemCollection {
         #region Properties
 
         public Color Hintergrundfarbe { get; set; }
-
         public float Randdicke { get; set; }
-
         public Color Randfarbe { get; set; }
-
         public enSymbol Symbol { get; set; }
+        protected override int SaveOrder => 999;
 
         #endregion
 
         #region Methods
 
-        public override List<FlexiControl> GetStyleOptions() {
+        public override List<GenericControl> GetStyleOptions() {
             ItemCollectionList.ItemCollectionList comms = new()
             {
                 { "Ohne", ((int)enSymbol.Ohne).ToString(), QuickImage.Get("Datei|32") },
@@ -67,7 +65,7 @@ namespace BlueControls.ItemCollection {
                 { "Pfeil", ((int)enSymbol.Pfeil).ToString(), QuickImage.Get("Pfeil_Rechts|32") },
                 { "Bruchlinie", ((int)enSymbol.Bruchlinie).ToString() }
             };
-            List<FlexiControl> l = new()
+            List<GenericControl> l = new()
             {
                 new FlexiControlForProperty<enSymbol>(() => Symbol, comms),
                 new FlexiControlForProperty<float>(() => Randdicke),
@@ -163,11 +161,9 @@ namespace BlueControls.ItemCollection {
             base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         }
 
-        protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
+        protected override BasicPadItem? TryCreate(string id, string name) {
             if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-                var x = new SymbolPadItem(name);
-                x.Parse(toParse);
-                return x;
+                return new SymbolPadItem(name);
             }
             return null;
         }

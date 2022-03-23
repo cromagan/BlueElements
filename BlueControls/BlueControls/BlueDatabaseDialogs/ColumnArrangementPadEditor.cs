@@ -431,7 +431,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                                     var c = thisc.Column.Database.Column.SearchByKey(key);
                                     if (c != null) {
                                         var rkcolit = (ColumnPadItem)Pad.Item[c.Name];
-                                        rkcolit?.ConnectsTo.AddIfNotExists(new ItemConnection(databItem, ConnectionType.Top, ConnectionType.Bottom, false, true));
+                                        rkcolit?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false, databItem, ConnectionType.Top, true));
                                     }
                                 }// else if (!string.IsNullOrEmpty(column.LinkedCellFilter[z]) && column.LinkedCellFilter[z].StartsWith("@")) {
                                  //    fi.Add(new FilterItem(linkedDatabase.Column[z], enFilterType.Istgleich, column.LinkedCellFilter[z].Substring(1)));
@@ -447,13 +447,13 @@ namespace BlueControls.BlueDatabaseDialogs {
                                 var it2 = new ColumnPadItem(c2);
                                 Pad.Item.Add(it2);
                                 it2.SetLeftTopPoint(kx, 600);
-                                it2.ConnectsTo.Add(new ItemConnection(it, ConnectionType.Bottom, ConnectionType.Top,
-                                    false, true));
+                                it2.ConnectsTo.Add(new ItemConnection(ConnectionType.Top, false, it,
+                                    ConnectionType.Bottom, true));
                                 kx = it2.UsedArea.Right;
 
                                 // und noch die Datenbank auf die Spalte zeigen lassem
-                                databItem?.ConnectsTo.AddIfNotExists(new ItemConnection(it2, ConnectionType.Bottom,
-                                    ConnectionType.Bottom, false, false));
+                                databItem?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false,
+                                    it2, ConnectionType.Bottom, false));
                             }
 
                             #endregion

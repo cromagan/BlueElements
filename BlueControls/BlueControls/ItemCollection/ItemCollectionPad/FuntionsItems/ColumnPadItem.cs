@@ -34,11 +34,8 @@ namespace BlueControls.ItemCollection {
         #region Fields
 
         public static BlueFont? CellFont = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
-
         public static BlueFont? ChapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard);
-
         public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
-
         public readonly ColumnItem? Column;
 
         #endregion
@@ -84,12 +81,14 @@ namespace BlueControls.ItemCollection {
             }
         }
 
+        protected override int SaveOrder => 999;
+
         #endregion
 
         #region Methods
 
-        public override List<FlexiControl> GetStyleOptions() {
-            List<FlexiControl> l = new() { };
+        public override List<GenericControl> GetStyleOptions() {
+            List<GenericControl> l = new() { };
             if (Column == null) { return l; }
 
             l.Add(new FlexiControlForProperty<string>(() => Datenbank));
@@ -182,11 +181,9 @@ namespace BlueControls.ItemCollection {
             GeneratedBitmap = bmp;
         }
 
-        protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
+        protected override BasicPadItem? TryCreate(string id, string name) {
             if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-                var x = new ColumnPadItem(name);
-                x.Parse(toParse);
-                return x;
+                return new ColumnPadItem(name);
             }
             return null;
         }

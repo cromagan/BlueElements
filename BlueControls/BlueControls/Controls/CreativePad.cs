@@ -49,11 +49,8 @@ namespace BlueControls.Controls {
 
         private readonly List<IMoveable?> _itemsToMove = new();
         private IMouseAndKeyHandle? _givesMouseComandsTo;
-
         private ItemCollectionPad _item;
-
         private string _lastQuickInfo = string.Empty;
-
         private bool _repairPrinterDataPrepaired;
         private bool _showInPrintMode;
 
@@ -92,7 +89,7 @@ namespace BlueControls.Controls {
 
         public event EventHandler<ListEventArgs> ItemAdded;
 
-        public event EventHandler<ListEventArgs> ItemInternalChanged;
+        //public event EventHandler<ListEventArgs> ItemInternalChanged;
 
         public event EventHandler<System.EventArgs> ItemRemoved;
 
@@ -139,7 +136,6 @@ namespace BlueControls.Controls {
         }
 
         public BasicPadItem? LastClickedItem { get; private set; }
-
         public override string QuickInfoText => _lastQuickInfo;
 
         [DefaultValue(false)]
@@ -277,7 +273,7 @@ namespace BlueControls.Controls {
 
         public void OnItemAdded(ListEventArgs e) => ItemAdded?.Invoke(this, e);
 
-        public void OnItemInternalChanged(ListEventArgs e) => ItemInternalChanged?.Invoke(this, e);
+        //public void OnItemInternalChanged(ListEventArgs e) => ItemInternalChanged?.Invoke(this, e);
 
         public void OnItemRemoved() => ItemRemoved?.Invoke(this, System.EventArgs.Empty);
 
@@ -301,6 +297,7 @@ namespace BlueControls.Controls {
             if (!additional) { Unselect(); }
             if (item == null) { return; }
             _itemsToMove.Add(item);
+
             Invalidate();
         }
 
@@ -494,7 +491,7 @@ namespace BlueControls.Controls {
             OnItemAdded(e);
         }
 
-        private void _item_ItemInternalChanged(object sender, ListEventArgs e) => OnItemInternalChanged(e);
+        private void _item_ItemInternalChanged(object sender, ListEventArgs e) => OnChanged();
 
         private void _Item_ItemRemoved(object sender, System.EventArgs e) {
             if (Fitting) { ZoomFit(); }
@@ -543,6 +540,7 @@ namespace BlueControls.Controls {
 
         private void Item_Changed(object sender, System.EventArgs e) {
             Invalidate();
+            OnChanged();
         }
 
         private void MoveItems(float x, float y, bool doSnap, bool modifyMouseDown) {

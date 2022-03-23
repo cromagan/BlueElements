@@ -33,7 +33,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection {
 
-    public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, IMoveable, IDisposable {
+    public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, IMoveable, IDisposable, IComparable {
 
         #region Fields
 
@@ -161,6 +161,8 @@ namespace BlueControls.ItemCollection {
             }
         }
 
+        protected abstract int SaveOrder { get; }
+
         #endregion
 
         #region Methods
@@ -193,11 +195,10 @@ namespace BlueControls.ItemCollection {
 
             if (ItemCollectionPad.PadItemTypes != null) {
                 foreach (var thisType in ItemCollectionPad.PadItemTypes) {
-                    var i = thisType.TryParse(ding, name, x);
+                    var i = thisType.TryCreate(ding, name);
                     if (i != null) { return i; }
                 }
             }
-
             return null;
         }
 
@@ -212,7 +213,23 @@ namespace BlueControls.ItemCollection {
             return "Auto " + neueZeit + " IDX" + _uniqueInternalCount;
         }
 
-        public object? Clone() => NewByParsing(ToString());
+        public object? Clone() {
+            var x = ToString();
+
+            var i = NewByParsing(x);
+            i?.Parse(x);
+
+            return i;
+        }
+
+        public int CompareTo(object obj) {
+            if (obj is BasicPadItem v) {
+                return SaveOrder.CompareTo(v.SaveOrder);
+            }
+
+            Develop.DebugPrint(FehlerArt.Fehler, "Falscher Objecttyp!");
+            return 0;
+        }
 
         /// <summary>
         /// Prüft, ob die angegebenen Koordinaten das Element berühren.
@@ -249,14 +266,16 @@ namespace BlueControls.ItemCollection {
             if (zoom > 1) { line = zoom; }
             foreach (var thisV in ConnectsTo) {
                 if (Parent.Contains(thisV.OtherItem) && thisV != null && thisV.OtherItem != this) {
-                    var t1 = ItemConnection.GetConnectionPoint(this, thisV.MyItemType, thisV.OtherItem).ZoomAndMove(zoom, shiftX, shiftY);
-                    var t2 = ItemConnection.GetConnectionPoint(thisV.OtherItem, thisV.OtherItemType, this).ZoomAndMove(zoom, shiftX, shiftY);
+                    if (!forPrinting || thisV.OtherItem.Bei_Export_Sichtbar) {
+                        var t1 = ItemConnection.GetConnectionPoint(this, thisV.MyItemType, thisV.OtherItem).ZoomAndMove(zoom, shiftX, shiftY);
+                        var t2 = ItemConnection.GetConnectionPoint(thisV.OtherItem, thisV.OtherItemType, this).ZoomAndMove(zoom, shiftX, shiftY);
 
-                    if (Geometry.GetLenght(t1, t2) > 1) {
-                        gr.DrawLine(new Pen(Color.Gray, line), t1, t2);
-                        var wi = Geometry.Winkel(t1, t2);
-                        if (thisV.ArrowOnMyItem) { DimensionPadItem.DrawArrow(gr, t1, wi, Color.Gray, zoom * 20); }
-                        if (thisV.ArrowOnOtherItem) { DimensionPadItem.DrawArrow(gr, t2, wi + 180, Color.Gray, zoom * 20); }
+                        if (Geometry.GetLenght(t1, t2) > 1) {
+                            gr.DrawLine(new Pen(Color.Gray, line), t1, t2);
+                            var wi = Geometry.Winkel(t1, t2);
+                            if (thisV.ArrowOnMyItem) { DimensionPadItem.DrawArrow(gr, t1, wi, Color.Gray, zoom * 20); }
+                            if (thisV.ArrowOnOtherItem) { DimensionPadItem.DrawArrow(gr, t2, wi + 180, Color.Gray, zoom * 20); }
+                        }
                     }
                 }
             }
@@ -296,8 +315,8 @@ namespace BlueControls.ItemCollection {
         /// Gibt für das aktuelle Item das "Kontext-Menü" zurück.
         /// </summary>
         /// <returns></returns>
-        public virtual List<FlexiControl> GetStyleOptions() {
-            List<FlexiControl> l = new()
+        public virtual List<GenericControl> GetStyleOptions() {
+            List<GenericControl> l = new()
             {
                 new FlexiControl(),
                 new FlexiControlForProperty<string>(() => Gruppenzugehörigkeit),
@@ -450,9 +469,9 @@ namespace BlueControls.ItemCollection {
             return x;
         }
 
-        internal void AddLineStyleOption(List<FlexiControl> l) => l.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(_parent.SheetStyle, true)));
+        internal void AddLineStyleOption(List<GenericControl> l) => l.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(_parent.SheetStyle, true)));
 
-        internal void AddStyleOption(List<FlexiControl> l) => l.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetFonts(_parent.SheetStyle)));
+        internal void AddStyleOption(List<GenericControl> l) => l.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetFonts(_parent.SheetStyle)));
 
         internal BasicPadItem? Next() {
             var itemCount = _parent.IndexOf(this);
@@ -504,20 +523,19 @@ namespace BlueControls.ItemCollection {
         protected void DrawColorScheme(Graphics gr, RectangleF drawingCoordinates, float zoom, int id) {
             gr.FillRectangle(Brushes.White, drawingCoordinates);
 
-            var w = zoom * 6;
+            var w = zoom * 2;
 
             var tmp = drawingCoordinates;
             tmp.Inflate(-w, -w);
 
             gr.DrawRectangle(new Pen(Skin.IDColor(id), w * 2), tmp);
 
-            gr.DrawRectangle(Pens.Black, drawingCoordinates);
+            gr.DrawRectangle(new Pen(Color.Black, zoom), drawingCoordinates);
         }
 
         protected virtual void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
             try {
                 if (!forPrinting) {
-
                     if (positionModified.Width > 1 && positionModified.Height > 1) {
                         if (zoom > 1) {
                             gr.DrawRectangle(new Pen(Color.Gray, zoom), positionModified);
@@ -542,7 +560,7 @@ namespace BlueControls.ItemCollection {
 
         protected abstract void ParseFinished();
 
-        protected abstract BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse);
+        protected abstract BasicPadItem? TryCreate(string id, string name);
 
         private void ConnectsTo_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
             var x = (ItemConnection)e.Item;

@@ -36,12 +36,9 @@ namespace BlueControls.ItemCollection {
         #region Fields
 
         private readonly PointM? _point1;
-
         private readonly PointM? _point2;
-
         private string _calcTempPointsCode = string.Empty;
         private DateTime _lastRecalc = DateTime.Now.AddHours(-1);
-
         private List<PointF>? _tempPoints;
 
         #endregion
@@ -70,6 +67,7 @@ namespace BlueControls.ItemCollection {
         #region Properties
 
         public ConectorStyle Linien_Verhalten { get; set; }
+        protected override int SaveOrder => 999;
 
         #endregion
 
@@ -98,8 +96,8 @@ namespace BlueControls.ItemCollection {
         //        Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
         //    }
         //}
-        public override List<FlexiControl> GetStyleOptions() {
-            List<FlexiControl> l = new();
+        public override List<GenericControl> GetStyleOptions() {
+            List<GenericControl> l = new();
             ItemCollectionList.ItemCollectionList verhalt = new()
             {
                 { "Linie direkt zwischen zwei Punkten", ((int)ConectorStyle.Direct).ToString(), QuickImage.Get(ImageCode.Linie) },
@@ -184,13 +182,11 @@ namespace BlueControls.ItemCollection {
 
         protected override void ParseFinished() { }
 
-        protected override BasicPadItem? TryParse(string id, string name, List<KeyValuePair<string, string>> toParse) {
+        protected override BasicPadItem? TryCreate(string id, string name) {
             if (id.Equals("blueelements.clsitemline", StringComparison.OrdinalIgnoreCase) ||
                      id.Equals("blueelements.itemline", StringComparison.OrdinalIgnoreCase) ||
                      id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-                var x = new LinePadItem(name);
-                x.Parse(toParse);
-                return x;
+                return new LinePadItem(name);
             }
             return null;
         }
