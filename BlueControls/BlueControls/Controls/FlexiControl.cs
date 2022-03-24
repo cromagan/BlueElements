@@ -335,6 +335,13 @@ namespace BlueControls.Controls {
 
         #region Methods
 
+        public void StyleComboBox(ItemCollectionList? list, ComboBoxStyle style) {
+            if (!Allinitialized) { CreateSubControls(); }
+            foreach (var thiscb in Controls) {
+                if (thiscb is ComboBox cb) { StyleComboBox(cb, list, style); }
+            }
+        }
+
         /// <summary>
         ///
         /// </summary>

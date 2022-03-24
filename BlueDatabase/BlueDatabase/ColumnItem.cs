@@ -886,15 +886,6 @@ namespace BlueDatabase {
             return value;
         }
 
-        public List<string> Autofilter_ItemList(FilterCollection? filter, List<RowItem?> pinned) {
-            if (filter == null || filter.Count < 0) { return Contents((FilterCollection)null, pinned); }
-            FilterCollection tfilter = new(Database);
-            foreach (var thisFilter in filter.Where(thisFilter => thisFilter != null && this != thisFilter.Column)) {
-                tfilter.Add(thisFilter);
-            }
-            return Contents(tfilter, pinned);
-        }
-
         public bool AutoFilterSymbolPossible() => FilterOptions.HasFlag(FilterOptions.Enabled) && Format.Autofilter_möglich();
 
         /// <summary>
@@ -1034,19 +1025,56 @@ namespace BlueDatabase {
 
         public List<string> Contents() => Contents((FilterCollection)null, null);
 
-        public List<string> Contents(List<FilterItem>? fi, List<RowItem>? pinned) {
-            if (fi == null || fi.Count == 0) { return Contents((FilterCollection)null, null); }
-            var ficol = new FilterCollection(fi[0].Database);
-            ficol.AddRange(fi);
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="filter">Wird kein Filter übergeben, werden alle Inhalte zurückgegeben!</param>
+        /// <param name="pinned"></param>
+        /// <returns></returns>
+        public List<string> Contents(List<FilterItem> filter, List<RowItem>? pinned) {
+            //if (fi == null || fi.Count == 0) { return Contents((FilterCollection)null, null); }
+            var ficol = new FilterCollection(filter[0].Database);
+            ficol.AddRange(filter);
             return Contents(ficol, pinned);
         }
 
-        public List<string> Contents(FilterItem fi, List<RowItem?> pinned) {
-            var x = new FilterCollection(fi.Database) { fi };
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="filter">Wird kein Filter übergeben, werden alle Inhalte zurückgegeben!</param>
+        /// <param name="pinned"></param>
+        /// <returns></returns>
+        public List<string> Contents(FilterItem filter, List<RowItem>? pinned) {
+            var x = new FilterCollection(filter.Database) { filter };
             return Contents(x, pinned);
         }
 
-        public List<string> Contents(FilterCollection? filter, List<RowItem>? pinned) {
+        public List<string> Contents(List<RowItem?>? pinned) {
+            List<string> list = new();
+
+            if (pinned == null || pinned.Count == 0) { return list; }
+
+            foreach (var thisRowItem in pinned) {
+                if (thisRowItem != null) {
+                    if (_multiLine) {
+                        list.AddRange(thisRowItem.CellGetList(this));
+                    } else {
+                        if (thisRowItem.CellGetString(this).Length > 0) {
+                            list.Add(thisRowItem.CellGetString(this));
+                        }
+                    }
+                }
+            }
+            return list.SortedDistinctList();
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="filter">Wird kein Filter übergeben, werden alle Inhalte zurückgegeben!</param>
+        /// <param name="pinned"></param>
+        /// <returns></returns>
+        public List<string> Contents(FilterCollection filter, List<RowItem>? pinned) {
             List<string> list = new();
             foreach (var thisRowItem in Database.Row) {
                 if (thisRowItem != null) {
@@ -1066,7 +1094,13 @@ namespace BlueDatabase {
             return list.SortedDistinctList();
         }
 
-        public void DeleteContents(FilterCollection? filter, List<RowItem?> pinned) {
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="filter">Wird kein Filter übergeben, werden alle Inhalte gelöscht!</param>
+        /// <param name="pinned"></param>
+        /// <returns></returns>
+        public void DeleteContents(FilterCollection filter, List<RowItem>? pinned) {
             foreach (var thisRowItem in Database.Row) {
                 if (thisRowItem != null) {
                     if (thisRowItem.MatchesTo(filter) || pinned.Contains(thisRowItem)) { thisRowItem.CellSet(this, ""); }

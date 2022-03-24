@@ -98,6 +98,7 @@ namespace BlueControls.ItemCollection {
                     Filter = "PNG Portable Network Graphics|*.png|JPG Jpeg Interchange|*.jpg|Bmp Windows Bitmap|*.bmp"
                 };
                 e.ShowDialog();
+
                 if (!FileExists(e.FileName)) { return; }
                 Bitmap = (Bitmap)BitmapExt.Image_FromFile(e.FileName);
             }

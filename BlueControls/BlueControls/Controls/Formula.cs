@@ -182,6 +182,7 @@ namespace BlueControls.Controls {
                     if (ShowingRow == null) { return true; }
                     FormulaQuickSelect sh = new(ShowingRow);
                     sh.ShowDialog();
+                    sh.Dispose();
                     return true;
 
                 case "#ansicht":

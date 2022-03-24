@@ -774,7 +774,7 @@ namespace BlueControls.Controls {
         private void UpdateColumnData() {
             if (_tmpColumn == null) {
                 if (string.IsNullOrEmpty(_columnName)) {
-                    Caption = string.Empty;
+                    Caption = "[?]";
                     EditType = EditTypeFormula.None;
                     QuickInfo = string.Empty;
                     FileEncryptionKey = string.Empty;

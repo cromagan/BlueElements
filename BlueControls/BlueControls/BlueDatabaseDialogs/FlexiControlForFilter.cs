@@ -205,7 +205,7 @@ namespace BlueControls.Controls {
                 cbx.Item.Add("Anzeigefehler", "|~", ImageCode.Kreuz, false);
                 return;
             }
-            var listFilterString = Filter.Column.Autofilter_ItemList(TableView.Filter, TableView.PinnedRows);
+            var listFilterString = AutoFilter.Autofilter_ItemList(Filter.Column, TableView.Filter, TableView.PinnedRows);
             if (listFilterString.Count == 0) {
                 cbx.Item.Add("Keine weiteren Einträge vorhanden", "|~", ImageCode.Kreuz, false);
             } else if (listFilterString.Count < 400) {

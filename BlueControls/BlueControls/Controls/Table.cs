@@ -485,6 +485,7 @@ namespace BlueControls.Controls {
         public static void ImportCsv(Database database, string csvtxt) {
             using Import x = new(database, csvtxt);
             x.ShowDialog();
+            x.Dispose();
         }
 
         public static void SearchNextText(string searchTxt, Table tableView, ColumnItem? column, RowData? row, out ColumnItem? foundColumn, out RowData? foundRow, bool vereinfachteSuche) {
@@ -2266,6 +2267,7 @@ namespace BlueControls.Controls {
             colList.Sort();
             ColDia.CustomColors = colList.Distinct().ToArray();
             ColDia.ShowDialog();
+            ColDia.Dispose();
             UserEdited(this, Color.FromArgb(255, ColDia.Color).ToArgb().ToString(), cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, cellInThisDatabaseRow?.Chapter, false);
         }
 

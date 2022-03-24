@@ -110,6 +110,15 @@
     </Compile>
     <Compile Include="BlueFont.cs" />
     <Compile Include="ConnectedFormula\ConnectedFormula.cs" />
+    <Compile Include="ConnectedFormula\ConnectedFormulaView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ConnectedFormula\ConnectedFormulaView.Designer.cs">
+      <DependentUpon>ConnectedFormulaView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConnectedFormula\Connector.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\EasyPicMulti.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -201,6 +210,12 @@
     </Compile>
     <Compile Include="Forms\DialogWithOkAndCancel.Designer.cs">
       <DependentUpon>DialogWithOkAndCancel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\EditBoxRow_NEW.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\EditBoxRow_NEW.Designer.cs">
+      <DependentUpon>EditBoxRow_NEW.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\EditBoxRow.cs">
       <SubType>Form</SubType>
@@ -685,6 +700,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\DialogWithOkAndCancel.resx">
       <DependentUpon>DialogWithOkAndCancel.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\EditBoxRow_NEW.resx">
+      <DependentUpon>EditBoxRow_NEW.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\EditBoxRow.resx">

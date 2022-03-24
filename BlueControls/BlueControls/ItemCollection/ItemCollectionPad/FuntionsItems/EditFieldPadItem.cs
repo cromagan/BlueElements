@@ -40,8 +40,10 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
+        public static BlueFont? CaptionFNT = Skin.GetBlueFont(Design.Caption, States.Standard);
+
+        public ColumnItem? Column = null;
         private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
-        private ColumnItem? _column = null;
         private RowWithFilterPaditem? _GetValueFrom = null;
         private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Links_neben_Dem_Feld;
 
@@ -57,21 +59,30 @@ namespace BlueControls.ItemCollection {
 
         #region Properties
 
-        public EditTypeFormula Bearbeitung {
+        //public EditFieldPadItem(string internalname, Bitmap? bmp, Size size) : base(internalname) {
+        //    //Bitmap = bmp;
+        //    //SetCoordinates(new RectangleF(0, 0, size.Width, size.Height), true);
+        //    //Overlays = new List<QuickImage>();
+        //    //Hintergrund_Weiß_Füllen = true;
+        //    //Padding = 0;
+        //    //Bild_Modus = enSizeModes.EmptySpace;
+        //    //Stil = PadStyles.Undefiniert; // Kein Rahmen
+        //}
+        public ÜberschriftAnordnung CaptionPosition {
             get {
-                return _bearbeitung;
+                return _überschiftanordung;
             }
             set {
-                if (_bearbeitung == value) { return; }
-                _bearbeitung = value;
+                if (_überschiftanordung == value) { return; }
+                _überschiftanordung = value;
                 OnChanged();
             }
         }
 
         public string Datenbank {
             get {
-                if (_column?.Database == null) { return "?"; }
-                return _column.Database.Filename.FileNameWithSuffix();
+                if (Column?.Database == null) { return "?"; }
+                return Column.Database.Filename.FileNameWithSuffix();
             }
         }
 
@@ -95,20 +106,31 @@ namespace BlueControls.ItemCollection {
                 var t = Parent[it[0]];
 
                 if (t is RowWithFilterPaditem rfp2) {
-                    if (rfp2 != GetValueFrom) {
-                        GetValueFrom = rfp2;
-                        _column = null;
+                    if (rfp2 != GetRowFrom) {
+                        GetRowFrom = rfp2;
+                        Column = null;
                     }
                 } else {
-                    GetValueFrom = null;
-                    _column = null;
+                    GetRowFrom = null;
+                    Column = null;
                 }
 
                 OnChanged();
             }
         }
 
-        public RowWithFilterPaditem? GetValueFrom {
+        public EditTypeFormula EditType {
+            get {
+                return _bearbeitung;
+            }
+            set {
+                if (_bearbeitung == value) { return; }
+                _bearbeitung = value;
+                OnChanged();
+            }
+        }
+
+        public RowWithFilterPaditem? GetRowFrom {
             get => _GetValueFrom;
 
             set {
@@ -121,18 +143,16 @@ namespace BlueControls.ItemCollection {
 
         public string Interner_Name {
             get {
-                if (_column == null) { return "?"; }
-                return _column.Name;
+                if (Column == null) { return "?"; }
+                return Column.Name;
             }
         }
 
-        //[Description("Hier kann ein Variablenname als Platzhalter eingegeben werden. Beispiel: ~Bild~")]
-        //public string Platzhalter_Für_Layout { get; set; }
         public string Spalte_bearbeiten {
             get => string.Empty;
             set {
-                if (_column == null) { return; }
-                Forms.TableView.OpenColumnEditor(_column, null, null);
+                if (Column == null) { return; }
+                Forms.TableView.OpenColumnEditor(Column, null, null);
 
                 OnChanged();
             }
@@ -143,18 +163,18 @@ namespace BlueControls.ItemCollection {
         public string Spalte_wählen {
             get => string.Empty;
             set {
-                if (GetValueFrom == null) {
+                if (GetRowFrom == null) {
                     MessageBox.Show("Zuerst Datenquelle wählen.");
                     return;
                 }
 
-                if (GetValueFrom.Database == null) {
+                if (GetRowFrom.Database == null) {
                     MessageBox.Show("Quelle fehlerhaft!");
                     return;
                 }
 
                 var lst = new ItemCollectionList.ItemCollectionList();
-                lst.AddRange(GetValueFrom.Database.Column, false);
+                lst.AddRange(GetRowFrom.Database.Column, false);
 
                 var sho = Forms.InputBoxListBoxStyle.Show("Spalte wählen:", lst, AddType.None, true);
 
@@ -162,10 +182,10 @@ namespace BlueControls.ItemCollection {
 
                 var k = IntParse(sho[0]);
 
-                var col = GetValueFrom.Database.Column.SearchByKey(k);
+                var col = GetRowFrom.Database.Column.SearchByKey(k);
 
-                if (col == _column) { return; }
-                _column = col;
+                if (col == Column) { return; }
+                Column = col;
 
                 OnChanged();
             }
@@ -174,42 +194,33 @@ namespace BlueControls.ItemCollection {
         //public Bitmap? Bitmap { get; set; }
         public string Spalten_AdminInfo {
             get {
-                if (_column != null) { return _column.AdminInfo; }
+                if (Column != null) { return Column.AdminInfo; }
                 return string.Empty;
             }
             set {
-                if (_column != null) { _column.AdminInfo = value; }
+                if (Column != null) { Column.AdminInfo = value; }
             }
         }
 
         //public enSizeModes Bild_Modus { get; set; }
         public string Spalten_QuickInfo {
             get {
-                if (_column != null) { return _column.Quickinfo; }
+                if (Column != null) { return Column.Quickinfo; }
                 return string.Empty;
             }
             set {
-                if (_column != null) { _column.Quickinfo = value; }
+                if (Column != null) { Column.Quickinfo = value; }
             }
         }
 
-        //public EditFieldPadItem(string internalname, Bitmap? bmp, Size size) : base(internalname) {
-        //    //Bitmap = bmp;
-        //    //SetCoordinates(new RectangleF(0, 0, size.Width, size.Height), true);
-        //    //Overlays = new List<QuickImage>();
-        //    //Hintergrund_Weiß_Füllen = true;
-        //    //Padding = 0;
-        //    //Bild_Modus = enSizeModes.EmptySpace;
-        //    //Stil = PadStyles.Undefiniert; // Kein Rahmen
-        //}
-        public ÜberschriftAnordnung ÜberschriftAnordnung {
-            get {
-                return _überschiftanordung;
-            }
+        public string Standardhöhe {
+            get => string.Empty;
             set {
-                if (_überschiftanordung == value) { return; }
-                _überschiftanordung = value;
-                OnChanged();
+                var x = UsedArea;
+                x.Height = Converter.MmToPixel(ConnectedFormula.ConnectedFormula.StandardHöhe, 300);
+                SetCoordinates(x, true);
+
+                //OnChanged();
             }
         }
 
@@ -240,10 +251,11 @@ namespace BlueControls.ItemCollection {
 
             var u = new ItemCollection.ItemCollectionList.ItemCollectionList();
             u.AddRange(typeof(ÜberschriftAnordnung));
-            l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => ÜberschriftAnordnung, u));
+            l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
             var b = new ItemCollection.ItemCollectionList.ItemCollectionList();
             b.AddRange(typeof(EditTypeFormula));
-            l.Add(new FlexiControlForProperty<EditTypeFormula>(() => Bearbeitung, b));
+            l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
+            l.Add(new FlexiControlForProperty<string>(() => Standardhöhe, ImageCode.GrößeÄndern));
             l.Add(new FlexiControl());
             l.Add(new FlexiControlForProperty<string>(() => Spalten_QuickInfo, 5));
             l.Add(new FlexiControlForProperty<string>(() => Spalten_AdminInfo, 5));
@@ -281,11 +293,11 @@ namespace BlueControls.ItemCollection {
             if (base.ParseThis(tag, value)) { return true; }
             switch (tag) {
                 case "getvaluefrom":
-                    GetValueFrom = (RowWithFilterPaditem)Parent[value.FromNonCritical()];
+                    GetRowFrom = (RowWithFilterPaditem)Parent[value.FromNonCritical()];
                     return true;
 
                 case "column":
-                    _column = GetValueFrom.Database.Column.SearchByKey(IntParse(value));
+                    Column = GetRowFrom.Database.Column.SearchByKey(IntParse(value));
                     return true;
 
                 case "edittype":
@@ -300,8 +312,8 @@ namespace BlueControls.ItemCollection {
         }
 
         public string ReadableText() {
-            if (_column != null) {
-                return "Wert aus: " + _column.ReadableText();
+            if (Column != null) {
+                return "Wert aus: " + Column.ReadableText();
 
                 //if (Genau_eine_Zeile) {
                 //    return "(eine) Zeile aus: " + Database.Caption;
@@ -314,21 +326,21 @@ namespace BlueControls.ItemCollection {
         }
 
         public QuickImage? SymbolForReadableText() {
-            if (GetValueFrom == null) { return null; }
+            if (GetRowFrom == null) { return null; }
 
-            return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IDColor(GetValueFrom.Id));
+            return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IDColor(GetRowFrom.Id));
         }
 
         public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
 
-            if (GetValueFrom != null) {
-                t = t + "GetValueFrom=" + GetValueFrom.Internal.ToNonCritical() + ", ";
+            if (GetRowFrom != null) {
+                t = t + "GetValueFrom=" + GetRowFrom.Internal.ToNonCritical() + ", ";
             }
 
-            if (_column != null) {
-                t = t + "Column=" + _column.Key + ", ";
+            if (Column != null) {
+                t = t + "Column=" + Column.Key + ", ";
             }
 
             t = t + "EditType=" + ((int)_bearbeitung).ToString() + ", ";
@@ -342,39 +354,53 @@ namespace BlueControls.ItemCollection {
         //    return false;
         //}
         protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-            var id = -1; if (GetValueFrom != null) { id = GetValueFrom.Id; }
+            var id = -1; if (GetRowFrom != null) { id = GetRowFrom.Id; }
 
-            DrawColorScheme(gr, positionModified, zoom, id);
+            if (!forPrinting) {
+                DrawColorScheme(gr, positionModified, zoom, id);
+            }
 
-            if (GetValueFrom == null) {
-                Skin.Draw_FormatedText(gr, "Datenquelle fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), RowWithFilterPaditem.CellFont.Scale(zoom), true);
-            } else if (_column == null) {
-                Skin.Draw_FormatedText(gr, "Spalte fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), RowWithFilterPaditem.CellFont.Scale(zoom), true);
+            if (GetRowFrom == null) {
+                Skin.Draw_FormatedText(gr, "Datenquelle fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), CaptionFNT.Scale(zoom), true);
+            } else if (Column == null) {
+                Skin.Draw_FormatedText(gr, "Spalte fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), CaptionFNT.Scale(zoom), true);
             } else {
                 Point cap;
+                Rectangle uc = positionModified.ToRect();
 
-                switch (ÜberschriftAnordnung) {
+                switch (CaptionPosition) {
                     case ÜberschriftAnordnung.ohne:
                         cap = new Point(-1, -1);
+                        //uc = positionModified.ToRect();
                         break;
 
                     case ÜberschriftAnordnung.Links_neben_Dem_Feld:
                         cap = new Point(0, 0);
+                        uc.X += (int)(100 * zoom);
+                        uc.Width -= (int)(100 * zoom);
                         break;
 
                     case ÜberschriftAnordnung.Ohne_mit_Abstand:
                         cap = new Point(-1, -1);
+                        uc.Y += (int)(19 * zoom);
+                        uc.Height -= (int)(19 * zoom);
                         break;
 
                     case ÜberschriftAnordnung.Über_dem_Feld:
                     default:
                         cap = new Point(0, 0);
+                        uc.Y += (int)(19 * zoom);
+                        uc.Height -= (int)(19 * zoom);
                         break;
                 }
 
                 if (cap.X >= 0) {
                     var e = new RectangleF(positionModified.Left + cap.X * zoom, positionModified.Top + cap.Y * zoom, positionModified.Width, 16 * zoom);
-                    Skin.Draw_FormatedText(gr, _column.ReadableText(), null, Alignment.Top_Left, e.ToRect(), RowWithFilterPaditem.CellFont.Scale(zoom), true);
+                    Skin.Draw_FormatedText(gr, Column.ReadableText() + ":", null, Alignment.Top_Left, e.ToRect(), CaptionFNT.Scale(zoom), true);
+                }
+
+                if (uc.Width > 0 && uc.Height > 0) {
+                    gr.DrawRectangle(new Pen(Color.Black, zoom), uc);
                 }
             }
 
@@ -468,8 +494,8 @@ namespace BlueControls.ItemCollection {
         private void RepairConnections() {
             ConnectsTo.Clear();
 
-            if (GetValueFrom != null) {
-                ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, GetValueFrom, ConnectionType.Bottom, false));
+            if (GetRowFrom != null) {
+                ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, GetRowFrom, ConnectionType.Bottom, false));
             }
         }
 

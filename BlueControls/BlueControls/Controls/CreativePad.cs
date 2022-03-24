@@ -555,10 +555,10 @@ namespace BlueControls.Controls {
                     }
                 }
             }
-            if (pointToMove != null && x != 0d) { x = SnapToGrid(true, pointToMove, x); }
-            if (pointToMove != null && y != 0d) { y = SnapToGrid(false, pointToMove, y); }
+            if (pointToMove != null && x != 0f) { x = SnapToGrid(true, pointToMove, x); }
+            if (pointToMove != null && y != 0f) { y = SnapToGrid(false, pointToMove, y); }
 
-            if (x == 0d && y == 0d) { return; }
+            if (x == 0f && y == 0f) { return; }
 
             foreach (var thisIt in _itemsToMove) {
                 thisIt.Move(x, y);

@@ -339,7 +339,7 @@ namespace BlueControls.ItemCollection {
             foreach (var t in PointsForSuccesfullyMove) {
                 t.Move(x, y);
             }
-            OnChanged();
+            //OnChanged();
         }
 
         /// <summary>
@@ -424,7 +424,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public virtual void PointMoved(object sender, MoveEventArgs e) => OnChanged();
+        public virtual void PointMoved(object sender, MoveEventArgs e) { OnChanged(); }
 
         public virtual void PointMoving(object sender, MoveEventArgs e) { }
 

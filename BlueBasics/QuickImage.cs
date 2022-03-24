@@ -166,9 +166,10 @@ namespace BlueBasics {
             c.Append("|");
             if (effekt != ImageCodeEffect.Ohne) { c.Append((int)effekt); }
             c.Append("|");
-            c.Append(färbung);
+            if(färbung != "00ffffff") { c.Append(färbung); }
+     
             c.Append("|");
-            c.Append(changeGreenTo);
+            if (changeGreenTo != "00ffffff") {               c.Append(changeGreenTo);            }
             c.Append("|");
             if (helligkeit != 100) { c.Append(helligkeit); }
             c.Append("|");

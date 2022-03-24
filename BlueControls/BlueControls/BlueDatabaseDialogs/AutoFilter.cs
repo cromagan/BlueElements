@@ -79,9 +79,18 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Methods
 
+        public static List<string> Autofilter_ItemList(ColumnItem column, FilterCollection? filter, List<RowItem?> pinned) {
+            if (filter == null || filter.Count < 0) { return column.Contents(); }
+            FilterCollection tfilter = new(column.Database);
+            foreach (var thisFilter in filter.Where(thisFilter => thisFilter != null && column != thisFilter.Column)) {
+                tfilter.Add(thisFilter);
+            }
+            return column.Contents(tfilter, pinned);
+        }
+
         public void GenerateAll(FilterCollection? filter, List<RowItem?> pinned) {
             var nochOk = true;
-            var listFilterString = _column.Autofilter_ItemList(filter, pinned);
+            var listFilterString = Autofilter_ItemList(_column, filter, pinned);
             var f = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
 
             //ACHUNG:

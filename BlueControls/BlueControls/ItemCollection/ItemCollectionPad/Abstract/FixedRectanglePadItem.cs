@@ -31,6 +31,7 @@ namespace BlueControls.ItemCollection {
         #region Fields
 
         protected Size Size = Size.Empty;
+
         private readonly PointM? _pl;
 
         /// <summary>
@@ -145,20 +146,9 @@ namespace BlueControls.ItemCollection {
             SizeChanged();
         }
 
-        //public override bool ParseThis(string tag, string value) {
-        //    if (base.ParseThis(tag, value)) { return true; }
-        //    switch (tag) {
-        //        case "fixsize": // TODO: Entfernt am 24.05.2021
-        //            //_größe_fixiert = value.FromPlusMinus();
-        //            return true;
         public void SetLeftTopPoint(float x, float y) => _pLo.SetTo(x, y);
 
-        //        case "rotation":
-        //            _drehwinkel = IntParse(value);
-        //            return true;
-        //    }
-        //    return false;
-        //}
+
         public void SizeChanged() {
             // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
             _pl.SetTo(_pLo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2));
@@ -176,14 +166,5 @@ namespace BlueControls.ItemCollection {
 
         #endregion
 
-        //public void SetLeftTopPoint(float x, float y) => _pLo.SetTo(x, y);
-
-        //public void SizeChanged() {
-        //    // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
-        //    _pl.SetTo(_pLo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2));
-        //    _pr.SetTo(_pRo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2));
-        //    _pu.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRu.Y);
-        //    _po.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRo.Y);
-        //}
     }
 }

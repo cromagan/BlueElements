@@ -211,9 +211,9 @@ namespace BlueDatabase {
 
         public int CellGetInteger(ColumnItem? column) => Database.Cell.GetInteger(column, this);
 
-        public List<string?> CellGetList(string columnName) => Database.Cell.GetList(Database.Column[columnName], this);
+        public List<string> CellGetList(string columnName) => Database.Cell.GetList(Database.Column[columnName], this);
 
-        public List<string?> CellGetList(ColumnItem? column) => Database.Cell.GetList(column, this);
+        public List<string> CellGetList(ColumnItem? column) => Database.Cell.GetList(column, this);
 
         public Point CellGetPoint(string columnName) => Database.Cell.GetPoint(Database.Column[columnName], this);
 

@@ -29,6 +29,7 @@ using System.Drawing;
 using BlueBasics.Interfaces;
 using System.ComponentModel;
 using BlueDatabase.Enums;
+using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection {
 
@@ -40,30 +41,25 @@ namespace BlueControls.ItemCollection {
         public static BlueFont? ChapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard);
         public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
 
-        /// <summary>
-        /// Laufende Nummer, bestimmt die einfärbung
-        /// </summary>
-        public readonly int Id;
+        public readonly Database FilterDefiniton;
 
-        public FilterCollection? Filter;
-        private readonly Database _filterdef;
         private bool _genau_eine_Zeile = true;
 
         #endregion
 
         #region Constructors
 
-        public RowWithFilterPaditem(Database? db, int id) : this(UniqueInternal(), db, id) { }
+        public RowWithFilterPaditem(Database? db, int id) : this(string.Empty, db, id) { }
 
         public RowWithFilterPaditem(string intern, Database? db, int id) : base(intern) {
             Database = db;
-            if (db != null) { Filter = new FilterCollection(db); }
+            //if (db != null) { Filter = new FilterCollection(db); }
             Id = id;
             Size = new Size(200, 50);
 
-            _filterdef = GenerateFilterDatabase();
+            FilterDefiniton = GenerateFilterDatabase();
 
-            _filterdef.Cell.CellValueChanged += Cell_CellValueChanged;
+            FilterDefiniton.Cell.CellValueChanged += Cell_CellValueChanged;
         }
 
         public RowWithFilterPaditem(string intern) : this(intern, null, 0) { }
@@ -89,7 +85,7 @@ namespace BlueControls.ItemCollection {
 
                 var c = new ItemCollectionList.ItemCollectionList();
                 foreach (var thiscol in Database.Column) {
-                    if (thiscol.Format.Autofilter_möglich() && !thiscol.Format.NeedTargetDatabase() && string.IsNullOrEmpty(thiscol.Identifier)) {
+                    if (thiscol.Format.Autofilter_möglich() && !thiscol.Format.NeedTargetDatabase() ) {
                         c.Add(thiscol);
                     }
                 }
@@ -98,7 +94,7 @@ namespace BlueControls.ItemCollection {
 
                 if (t == null || t.Count != 1) { return; }
 
-                var r = _filterdef.Row.Add(t[0]);
+                var r = FilterDefiniton.Row.Add(t[0]);
                 r.CellSet("FilterArt", "=");
             }
         }
@@ -112,6 +108,11 @@ namespace BlueControls.ItemCollection {
                 OnChanged();
             }
         }
+
+        /// <summary>
+        /// Laufende Nummer, bestimmt die Einfärbung
+        /// </summary>
+        public int Id { get; private set; }
 
         protected override int SaveOrder => 1;
 
@@ -161,10 +162,14 @@ namespace BlueControls.ItemCollection {
                     Genau_eine_Zeile = value.FromPlusMinus();
                     return true;
 
+                case "id":
+                    Id = IntParse(value);
+                    return true;
+
                 case "filterdb":
-                    _filterdef.Row.Clear();
+                    FilterDefiniton.Row.Clear();
                     FilterDatabaseUpdate();
-                    _filterdef.Import(value.FromNonCritical(), true, false, ";", false, false, false);
+                    FilterDefiniton.Import(value.FromNonCritical(), true, false, ";", false, false, false);
                     return true;
             }
             return false;
@@ -194,13 +199,15 @@ namespace BlueControls.ItemCollection {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
 
+            t = t + "ID=" + Id.ToString() + ", ";
+
             if (Database != null) {
                 t = t + "Database=" + Database.Filename.ToNonCritical() + ", ";
             }
             t = t + "OneRow=" + Genau_eine_Zeile.ToPlusMinus() + ", ";
 
-            if (_filterdef != null) {
-                t = t + "FilterDB=" + _filterdef.Export_CSV(FirstRow.ColumnInternalName, (List<ColumnItem>)null, null).ToNonCritical() + ", ";
+            if (FilterDefiniton != null) {
+                t = t + "FilterDB=" + FilterDefiniton.Export_CSV(FirstRow.ColumnInternalName, (List<ColumnItem>)null, null).ToNonCritical() + ", ";
             }
 
             return t.Trim(", ") + "}";
@@ -212,7 +219,7 @@ namespace BlueControls.ItemCollection {
             base.Dispose(disposing);
 
             if (disposing) {
-                _filterdef.Cell.CellValueChanged -= Cell_CellValueChanged;
+                FilterDefiniton.Cell.CellValueChanged -= Cell_CellValueChanged;
             }
         }
 
@@ -309,13 +316,13 @@ namespace BlueControls.ItemCollection {
         }
 
         private void FilterDatabaseUpdate() {
-            if (_filterdef == null) { return; }
+            if (FilterDefiniton == null) { return; }
 
             var sc = string.Empty;
 
             #region Hauptspalte
 
-            var hs = _filterdef.Column["spalte"];
+            var hs = FilterDefiniton.Column["spalte"];
             hs.OpticalReplace.Clear();
             foreach (var thisc in Database.Column) {
                 hs.OpticalReplace.Add(thisc.Key.ToString() + "|" + thisc.ReadableText());
@@ -325,15 +332,15 @@ namespace BlueControls.ItemCollection {
 
             #region Spalte Suchtext & SuchSym-Script
 
-            var b = _filterdef.Column["suchtxt"];
+            var b = FilterDefiniton.Column["suchtxt"];
             b.DropDownItems.Clear();
             b.OpticalReplace.Clear();
 
             foreach (var thisPadItem in Parent) {
                 if (thisPadItem is EditFieldPadItem efpi) {
-                    if (efpi.GetValueFrom != null &&
-                       efpi.GetValueFrom.Database != null &&
-                       efpi.GetValueFrom.Id != Id) {
+                    if (efpi.GetRowFrom != null &&
+                       efpi.GetRowFrom.Database != null &&
+                       efpi.GetRowFrom.Id != Id) {
                         b.DropDownItems.Add(efpi.Internal);
                         b.OpticalReplace.Add(efpi.Internal + "|" + efpi.ReadableText());
                         var s = string.Empty;
@@ -357,7 +364,14 @@ namespace BlueControls.ItemCollection {
 
             #endregion
 
-            _filterdef.RulesScript = sc;
+            #region Zeilen Prüfen
+            foreach (var thisrow in FilterDefiniton.Row) {
+                thisrow.DoAutomatic("to be sure");
+            }
+
+            #endregion
+
+            FilterDefiniton.RulesScript = sc;
         }
 
         private Database GenerateFilterDatabase() {
@@ -439,7 +453,7 @@ namespace BlueControls.ItemCollection {
 
             if (Database == null) { return tblFilterliste; }
 
-            tblFilterliste.Database = _filterdef;
+            tblFilterliste.Database = FilterDefiniton;
             tblFilterliste.Arrangement = 1;
 
             return tblFilterliste;
@@ -448,7 +462,7 @@ namespace BlueControls.ItemCollection {
         private void RepairConnections() {
             ConnectsTo.Clear();
 
-            foreach (var thisRow in _filterdef.Row) {
+            foreach (var thisRow in FilterDefiniton.Row) {
                 var GetValueFrom = Parent[thisRow.CellGetString("suchtxt")];
 
                 if (GetValueFrom != null) {

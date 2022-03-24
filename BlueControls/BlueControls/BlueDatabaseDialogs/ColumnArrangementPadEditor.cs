@@ -181,6 +181,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             using (ColumnEditor w = new(newc, null)) {
                 w.ShowDialog();
                 newc.Invalidate_ColumAndContent();
+                w.Dispose();
             }
             Database.Column.Repair();
 

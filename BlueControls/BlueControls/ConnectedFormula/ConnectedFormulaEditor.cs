@@ -33,6 +33,7 @@ using static BlueBasics.Extensions;
 using BlueControls.ItemCollection;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
+using static BlueControls.ConnectedFormula.ConnectedFormula;
 
 namespace BlueControls.Forms {
 
@@ -51,7 +52,12 @@ namespace BlueControls.Forms {
             InitializeComponent();
             _creating = true;
             _cf = cf;
-            Pad.Item = new ItemCollectionPad(cf.PadData, string.Empty);
+            Pad.Item = _cf.PadData;
+
+            Pad.Item.SheetSizeInMm = new SizeF(500 * Umrechnungsfaktor, 850 * Umrechnungsfaktor);
+            Pad.Item.GridShow = 0.5f;
+            Pad.Item.GridSnap = 0.5f;
+
             _creating = false;
         }
 
@@ -65,15 +71,15 @@ namespace BlueControls.Forms {
             var x = new EditFieldPadItem(_cf.NextID().ToString());
 
             if (l is RowWithFilterPaditem ri) {
-                x.GetValueFrom = ri;
+                x.GetRowFrom = ri;
             }
-            if (l is EditFieldPadItem efi && efi.GetValueFrom != null) {
-                x.GetValueFrom = efi.GetValueFrom;
+            if (l is EditFieldPadItem efi && efi.GetRowFrom != null) {
+                x.GetRowFrom = efi.GetRowFrom;
             }
 
             Pad.Item.Add(x);
 
-            if (x.GetValueFrom != null && x.GetValueFrom.Database != null) {
+            if (x.GetRowFrom != null && x.GetRowFrom.Database != null) {
                 x.Spalte_wählen = string.Empty; // Dummy setzen
             }
         }
@@ -82,6 +88,15 @@ namespace BlueControls.Forms {
             var x = new ConstantTextPaditem();
             x.Bei_Export_Sichtbar = false;
             Pad.Item.Add(x);
+        }
+
+        private void btnPfeileAusblenden_CheckedChanged(object sender, System.EventArgs e) => btnVorschauModus.Checked = btnPfeileAusblenden.Checked;
+
+        private void btnVorschauModus_CheckedChanged(object sender, System.EventArgs e) => btnPfeileAusblenden.Checked = btnVorschauModus.Checked;
+
+        private void btnVorschauÖffnen_Click(object sender, System.EventArgs e) {
+            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+            BlueControls.Forms.EditBoxRow_NEW.Show("Achtung:\r\nVoll funktionsfähige Test-Ansicht", _cf, true);
         }
 
         private void btnZeileHinzu_Click(object sender, System.EventArgs e) {
@@ -110,15 +125,6 @@ namespace BlueControls.Forms {
                 dbitem.Bei_Export_Sichtbar = false;
                 Pad.Item.Add(dbitem);
             }
-        }
-
-        private void Pad_Changed(object sender, System.EventArgs e) {
-            if (_creating) { return; }
-
-            _creating = true;
-            Pad.Item.Sort();
-            _cf.PadData = Pad.Item.ToString();
-            _creating = false;
         }
 
         #endregion

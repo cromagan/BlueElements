@@ -29,24 +29,29 @@ using static BlueBasics.Develop;
 using BlueDatabase;
 using BlueBasics;
 using static BlueBasics.Converter;
+using BlueBasics.Interfaces;
+using BlueControls.ItemCollection;
 
 namespace BlueControls.ConnectedFormula {
 
-    public class ConnectedFormula : BlueBasics.MultiUserFile.MultiUserFile {
+    public class ConnectedFormula : BlueBasics.MultiUserFile.MultiUserFile, IChangedFeedback {
 
         #region Fields
 
         public const string Version = "0.01";
-
+        public static readonly float StandardHöhe = 3.5f;
+        public static readonly float Umrechnungsfaktor = Converter.PixelToMm(1, 300);
+        public static readonly float Umrechnungsfaktor2 = Converter.MmToPixel(StandardHöhe, 300) / 44;
         public readonly ListExt<string> DatabaseFiles = new();
         //public readonly List<Database?> Databases = new();
 
         private string _createDate = string.Empty;
         private string _creator = string.Empty;
-        private int _id = 0;
-        private string _padData = string.Empty;
+        private int _id = -1;
+        private ItemCollection.ItemCollectionPad _padData;
 
         private bool _saved = true;
+        private bool _saving = false;
 
         #endregion
 
@@ -55,10 +60,16 @@ namespace BlueControls.ConnectedFormula {
         public ConnectedFormula(string filename) : base(false, false) {
             _createDate = DateTime.Now.ToString(Constants.Format_Date5);
             _creator = Generic.UserName();
-
+            PadData = new ItemCollection.ItemCollectionPad();
             Load(filename, true);
             DatabaseFiles.Changed += DatabaseFiles_Changed;
         }
+
+        #endregion
+
+        #region Events
+
+        public event EventHandler Changed;
 
         #endregion
 
@@ -66,11 +77,18 @@ namespace BlueControls.ConnectedFormula {
 
         public string FilePath { get; set; } = string.Empty;
 
-        public string PadData {
+        public ItemCollection.ItemCollectionPad PadData {
             get => _padData;
-            set {
-                if (value == _padData) { return; }
+            private set {
+                if (_padData == value) { return; }
+
+                if (_padData != null) {
+                    PadData.Changed -= PadData_Changed;
+                }
                 _padData = value;
+                if (_padData != null) {
+                    PadData.Changed += PadData_Changed;
+                }
                 _saved = false;
             }
         }
@@ -79,6 +97,15 @@ namespace BlueControls.ConnectedFormula {
 
         #region Methods
 
+        //public string PadData {
+        //    get => _padData;
+        //    set {
+        //        if (value == _padData) { return; }
+        //        _padData = value;
+        //        _saved = false;
+        //        OnChanged();
+        //    }
+        //}
         public override void DiscardPendingChanges() => _saved = true;
 
         public override bool HasPendingChanges() => !_saved;
@@ -87,6 +114,10 @@ namespace BlueControls.ConnectedFormula {
             _id++;
             _saved = false;
             return _id;
+        }
+
+        public void OnChanged() {
+            Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
         public override void RepairAfterParse() { }
@@ -127,7 +158,7 @@ namespace BlueControls.ConnectedFormula {
                         break;
 
                     case "paditemdata":
-                        _padData = pair.Value.FromNonCritical();
+                        PadData = new ItemCollection.ItemCollectionPad(pair.Value.FromNonCritical(), string.Empty);
                         break;
 
                     case "lastusedid":
@@ -142,6 +173,26 @@ namespace BlueControls.ConnectedFormula {
         }
 
         protected override byte[] ToListOfByte() {
+
+            #region ein bischen aufräumen zuvor
+
+            _saving = true;
+            PadData.Sort();
+
+            _id = -1;
+
+            DatabaseFiles.Clear();
+
+            foreach (var thisit in PadData) {
+                if (thisit is RowWithFilterPaditem rwf) {
+                    DatabaseFiles.AddIfNotExists(rwf.Database.Filename);
+                    _id = Math.Max(_id, rwf.Id);
+                }
+            }
+            _saving = false;
+
+            #endregion
+
             var t = new List<string>();
 
             t.Add("Type=ConnectedFormula");
@@ -151,23 +202,23 @@ namespace BlueControls.ConnectedFormula {
             t.Add("FilePath=" + FilePath.ToNonCritical());
             t.Add("LastUsedID=" + _id.ToString());
             t.Add("DatabaseFiles=" + DatabaseFiles.JoinWithCr().ToNonCritical());
-            t.Add("PadItemData=" + _padData.ToNonCritical());
+            t.Add("PadItemData=" + PadData.ToString().ToNonCritical());
 
             return ("{" + t.JoinWith(", ").TrimEnd(", ") + "}").WIN1252_toByte();
         }
 
         private void DatabaseFiles_Changed(object sender, System.EventArgs e) {
-            //Databases.Clear();
+            if (_saving) { return; }
 
             foreach (var thisfile in DatabaseFiles) {
                 Database.GetByFilename(thisfile, false, false);
-
-                //if (mf is Database db) {
-                //    Databases.Add(db);
-                //} else {
-                //    Databases.Add(null);
-                //}
             }
+
+            _saved = false;
+        }
+
+        private void PadData_Changed(object sender, System.EventArgs e) {
+            if (_saving) { return; }
 
             _saved = false;
         }

@@ -88,7 +88,7 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
-        public string ReadableText() => _text;
+        public string ReadableText() => "Konstanter Wert: " +_text;
 
         public QuickImage? SymbolForReadableText() {
             return QuickImage.Get(ImageCode.Textfeld, 16);

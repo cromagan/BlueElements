@@ -78,8 +78,11 @@ namespace BlueControls.Forms {
             this.Pad.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Pad.Location = new System.Drawing.Point(0, 110);
             this.Pad.Name = "Pad";
+            this.Pad.ShiftX = -1F;
+            this.Pad.ShiftY = -1F;
             this.Pad.Size = new System.Drawing.Size(884, 251);
             this.Pad.TabIndex = 0;
+            this.Pad.Zoom = 1F;
             this.Pad.PreviewModeChanged += new System.EventHandler(this.Pad_PreviewModChanged);
             this.Pad.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Pad_MouseUp);
             // 
@@ -276,11 +279,11 @@ namespace BlueControls.Forms {
         private Button btnZoomIn;
         private Button btnDruckerDialog;
         private Button btnAlsBildSpeichern;
-        private Button btnVorschau;
-        private Button btnVorschauModus;
+        protected Button btnVorschau;
         private Button btnZoom11;
         private GroupBox grpZoom;
         private GroupBox grpDrucken;
         private Button btnPageSetup;
+        protected Button btnVorschauModus;
     }
 }

@@ -271,12 +271,16 @@ namespace BlueDatabase {
             var gr = Math.Truncate(column.Database.GlobalScale * 16).ToString(Constants.Format_Integer1);
             if (!string.IsNullOrEmpty(column.BildCode_ConstantHeight)) { gr = column.BildCode_ConstantHeight; }
 
-            if (replacedText.Contains("|")) {
-                var x = replacedText.SplitBy("|");
-                replacedText = x[0];
-            }
 
-            var defaultImage = QuickImage.Get(replacedText + "|" + gr);
+                var x = (replacedText + "||").SplitBy("|");
+                var gr2 = (gr+"||").SplitBy("|");
+                x[1] = gr2[0];
+                x[2] = gr2[1];
+                replacedText = x.JoinWith("|").TrimEnd("|");
+
+   
+
+            var defaultImage = QuickImage.Get(replacedText);
             return defaultImage != null && !defaultImage.IsError ? defaultImage : StandardErrorImage(gr, bildTextverhalten, replacedText, column);
         }
 
