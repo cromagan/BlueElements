@@ -48,6 +48,7 @@ namespace BlueControls.Controls {
         #region Fields
 
         private readonly List<IMoveable?> _itemsToMove = new();
+        private string _currentPage = string.Empty;
         private IMouseAndKeyHandle? _givesMouseComandsTo;
         private ItemCollectionPad _item;
         private string _lastQuickInfo = string.Empty;
@@ -102,6 +103,17 @@ namespace BlueControls.Controls {
         #endregion
 
         #region Properties
+
+        [DefaultValue("")]
+        public string CurrentPage {
+            get => _currentPage;
+            set {
+                if (_currentPage == value) { return; }
+                _currentPage = value;
+                OnPreviewModeChanged();
+                Invalidate();
+            }
+        }
 
         [DefaultValue(true)]
         public bool EditAllowed { get; set; } = true;
@@ -437,7 +449,7 @@ namespace BlueControls.Controls {
             LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray,
                 LinearGradientMode.Vertical);
             gr.FillRectangle(lgb, ClientRectangle);
-            _item.DrawCreativePadTo(gr, Size, state, Zoom, ShiftX, ShiftY, null, _showInPrintMode);
+            _item.DrawCreativePadTo(gr, Size, state, Zoom, ShiftX, ShiftY, null, _showInPrintMode, CurrentPage);
 
             #region Dann die selectiereren Punkte
 
@@ -533,7 +545,7 @@ namespace BlueControls.Controls {
         private void DruckerDokument_PrintPage(object sender, PrintPageEventArgs e) {
             e.HasMorePages = false;
             OnPrintPage(e);
-            var i = _item.ToBitmap(3);
+            var i = _item.ToBitmap(3, string.Empty);
             if (i == null) { return; }
             e.Graphics.DrawImageInRectAspectRatio(i, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
         }

@@ -30,10 +30,11 @@ using BlueBasics.Interfaces;
 using System.ComponentModel;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
+using BlueControls.Interfaces;
 
 namespace BlueControls.ItemCollection {
 
-    public class RowWithFilterPaditem : FixedRectanglePadItem, IReadableText {
+    public class RowWithFilterPaditem : FixedRectanglePadItem, IReadableText, IRecursiveCheck {
 
         #region Fields
 
@@ -85,7 +86,7 @@ namespace BlueControls.ItemCollection {
 
                 var c = new ItemCollectionList.ItemCollectionList();
                 foreach (var thiscol in Database.Column) {
-                    if (thiscol.Format.Autofilter_möglich() && !thiscol.Format.NeedTargetDatabase() ) {
+                    if (thiscol.Format.Autofilter_möglich() && !thiscol.Format.NeedTargetDatabase()) {
                         c.Add(thiscol);
                     }
                 }
@@ -149,6 +150,19 @@ namespace BlueControls.ItemCollection {
             //}
 
             return l;
+        }
+
+        public bool IsRecursiveWith(IRecursiveCheck obj) {
+            if (obj == this) { return true; }
+
+            foreach (var thisR in FilterDefiniton.Row) {
+                var it = Parent[thisR.CellGetString("suchtxt")];
+                if (it is IRecursiveCheck i) {
+                    if (i.IsRecursiveWith(obj)) { return true; }
+                }
+            }
+
+            return false;
         }
 
         public override bool ParseThis(string tag, string value) {
@@ -318,7 +332,7 @@ namespace BlueControls.ItemCollection {
         private void FilterDatabaseUpdate() {
             if (FilterDefiniton == null) { return; }
 
-            var sc = string.Empty;
+            var sc = "if (!IsDropDownItem(suchtxt, suchtxt)) {suchtxt=\"\";}";
 
             #region Hauptspalte
 
@@ -337,10 +351,8 @@ namespace BlueControls.ItemCollection {
             b.OpticalReplace.Clear();
 
             foreach (var thisPadItem in Parent) {
-                if (thisPadItem is EditFieldPadItem efpi) {
-                    if (efpi.GetRowFrom != null &&
-                       efpi.GetRowFrom.Database != null &&
-                       efpi.GetRowFrom.Id != Id) {
+                if (thisPadItem is IContentHolder efpi) {
+                    if (!efpi.IsRecursiveWith(this)) {
                         b.DropDownItems.Add(efpi.Internal);
                         b.OpticalReplace.Add(efpi.Internal + "|" + efpi.ReadableText());
                         var s = string.Empty;
@@ -350,21 +362,12 @@ namespace BlueControls.ItemCollection {
                         sc = sc + "if (" + b.Name + "==\"" + efpi.Internal + "\") {suchsym=\"" + s + "\";}";
                     }
                 }
-
-                if (thisPadItem is ConstantTextPaditem ctpi) {
-                    b.DropDownItems.Add(ctpi.Internal);
-                    b.OpticalReplace.Add(ctpi.Internal + "|" + ctpi.ReadableText());
-                    var s = string.Empty;
-                    var tmp = ctpi.SymbolForReadableText();
-                    if (tmp != null) { s = tmp.ToString(); }
-
-                    sc = sc + "if (" + b.Name + "==\"" + ctpi.Internal + "\") {suchsym=\"" + s + "\";}";
-                }
             }
 
             #endregion
 
             #region Zeilen Prüfen
+
             foreach (var thisrow in FilterDefiniton.Row) {
                 thisrow.DoAutomatic("to be sure");
             }
@@ -410,38 +413,6 @@ namespace BlueControls.ItemCollection {
             //x.ColumnArrangements[1].Hide("visible");
             x.ColumnArrangements[1].HideSystemColumns();
             x.SortDefinition = new RowSortDefinition(x, "Spalte", false);
-
-            //            x.Tags.TagSet("Filename", linkdb.Filename);
-
-            //            tblFilterliste.Filter.Add(vis, FilterType.Istgleich, "+");
-            //        }
-
-            //        linkdb.RepairAfterParse(); // Dass ja die 0 Ansicht stimmt
-
-            //        var ok = IntTryParse(cbxTargetColumn.Text, out var key);
-            //        ColumnItem? spalteauDb = null;
-            //        if (ok) { spalteauDb = linkdb.Column.SearchByKey(key); }
-
-            //        for (var z = 0; z < linkdb.Column.Count; z++) {
-            //            var col = linkdb.Column[z];
-
-            //            var r = tblFilterliste.Database.Row[z.ToString()];
-            //            if (r == null) {
-            //                r = tblFilterliste.Database.Row.Add(z.ToString());
-            //            }
-
-            //            r.CellSet("Spalte", col.ReadableText() + " = ");
-
-            //            if (col.Format.Autofilter_möglich() && !col.MultiLine && col != spalteauDb  && !col.Format.NeedTargetDatabase() && string.IsNullOrEmpty(col.Identifier)) {
-            //                r.CellSet("visible", true);
-            //            } else {
-            //                r.CellSet("visible", false);
-            //            }
-
-            //            SetLinkedCellFilter();
-            //        }
-
-            //}
 
             return x;
         }

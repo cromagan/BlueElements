@@ -34,6 +34,7 @@ using BlueControls.ItemCollection;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using static BlueControls.ConnectedFormula.ConnectedFormula;
+using static BlueBasics.Converter;
 
 namespace BlueControls.Forms {
 
@@ -54,7 +55,7 @@ namespace BlueControls.Forms {
             _cf = cf;
             Pad.Item = _cf.PadData;
 
-            Pad.Item.SheetSizeInMm = new SizeF(500 * Umrechnungsfaktor, 850 * Umrechnungsfaktor);
+            Pad.Item.SheetSizeInMm = new SizeF(PixelToMm(500, 300), PixelToMm(850, 300));
             Pad.Item.GridShow = 0.5f;
             Pad.Item.GridSnap = 0.5f;
 
@@ -68,7 +69,7 @@ namespace BlueControls.Forms {
         private void btnFeldHinzu_Click(object sender, System.EventArgs e) {
             var l = Pad.LastClickedItem;
 
-            var x = new EditFieldPadItem(_cf.NextID().ToString());
+            var x = new EditFieldPadItem(string.Empty);
 
             if (l is RowWithFilterPaditem ri) {
                 x.GetRowFrom = ri;

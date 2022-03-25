@@ -40,8 +40,10 @@ namespace BlueControls.ConnectedFormula {
 
         public const string Version = "0.01";
         public static readonly float StandardHöhe = 3.5f;
-        public static readonly float Umrechnungsfaktor = Converter.PixelToMm(1, 300);
+
+        //public static readonly float Umrechnungsfaktor = Converter.PixelToMm(1, 300);
         public static readonly float Umrechnungsfaktor2 = Converter.MmToPixel(StandardHöhe, 300) / 44;
+
         public readonly ListExt<string> DatabaseFiles = new();
         //public readonly List<Database?> Databases = new();
 

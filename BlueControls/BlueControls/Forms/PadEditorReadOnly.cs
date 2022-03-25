@@ -54,7 +54,10 @@ namespace BlueControls.Forms {
             if (btnZoomOut.Checked) { Pad.ZoomOut(e); }
         }
 
-        private void Pad_PreviewModChanged(object sender, System.EventArgs e) => btnVorschauModus.Checked = Pad.ShowInPrintMode;
+        private void Pad_PreviewModChanged(object sender, System.EventArgs e) {
+            btnVorschauModus.Checked = Pad.ShowInPrintMode;
+            txbPage.Text = Pad.CurrentPage;
+        }
 
         #endregion
     }

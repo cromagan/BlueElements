@@ -446,6 +446,9 @@ namespace BlueControls.Controls {
                 return;
             }
 
+            //gr.Clear(Skin.RandomColor);
+            //return;
+
             if (Develop.Exited || IsDisposed || !Visible) { return; }
             lock (this) {
                 if (!Skin.Inited) {

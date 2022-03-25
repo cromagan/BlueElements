@@ -42,7 +42,7 @@ namespace BlueControls.ItemCollection {
         public readonly ListExt<PointM> MovablePoint = new();
 
         public readonly List<PointM> PointsForSuccesfullyMove = new();
-
+        public readonly ListExt<string> VisibleOnPage = new();
         public List<FlexiControl>? AdditionalStyleOptions = null;
 
         private static int _uniqueInternalCount;
@@ -78,6 +78,8 @@ namespace BlueControls.ItemCollection {
             ConnectsTo.ItemAdded += ConnectsTo_ItemAdded;
             ConnectsTo.ItemRemoving += ConnectsTo_ItemRemoving;
             ConnectsTo.ItemRemoved += ConnectsTo_ItemRemoved;
+
+            VisibleOnPage.Changed += VisibleOnPage_Changed;
         }
 
         #endregion
@@ -249,14 +251,14 @@ namespace BlueControls.ItemCollection {
             GC.SuppressFinalize(this);
         }
 
-        public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting) {
+        public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting, string page) {
             if (_parent == null) { Develop.DebugPrint(FehlerArt.Fehler, "Parent nicht definiert"); }
 
             if (forPrinting && !_beiExportSichtbar) { return; }
 
             var positionModified = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
 
-            if (IsInDrawingArea(positionModified, sizeOfParentControl)) {
+            if (IsInDrawingArea(positionModified, sizeOfParentControl, page)) {
                 DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
             }
 
@@ -455,6 +457,11 @@ namespace BlueControls.ItemCollection {
             if (!string.IsNullOrEmpty(Gruppenzugehörigkeit)) {
                 t = t + "RemoveTooGroup=" + Gruppenzugehörigkeit.ToNonCritical() + ", ";
             }
+
+            if (VisibleOnPage != null && VisibleOnPage.Count > 0) {
+                t = t + "VisibleOnPage=" + VisibleOnPage.JoinWith(",").ToNonCritical() + ", ";
+            }
+
             return t.Trim(", ") + "}";
         }
 
@@ -512,6 +519,8 @@ namespace BlueControls.ItemCollection {
                 ConnectsTo.ItemRemoving -= ConnectsTo_ItemRemoving;
                 ConnectsTo.ItemRemoved -= ConnectsTo_ItemRemoved;
 
+                VisibleOnPage.Changed -= VisibleOnPage_Changed;
+
                 //ConnectsTo = null;
 
                 // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
@@ -555,8 +564,16 @@ namespace BlueControls.ItemCollection {
             } catch { }
         }
 
-        protected bool IsInDrawingArea(RectangleF drawingKoordinates, Size sizeOfParentControl) => sizeOfParentControl.IsEmpty || sizeOfParentControl.Width == 0 || sizeOfParentControl.Height == 0
-    || drawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, sizeOfParentControl));
+        protected bool IsInDrawingArea(RectangleF drawingKoordinates, Size sizeOfParentControl, string page) {
+            if (!string.IsNullOrEmpty(page) && VisibleOnPage.Count > 0) {
+                if (!VisibleOnPage.Contains(page)) { return false; }
+            }
+
+            return sizeOfParentControl.IsEmpty ||
+                sizeOfParentControl.Width == 0 ||
+                sizeOfParentControl.Height == 0 ||
+                drawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, sizeOfParentControl));
+        }
 
         protected abstract void ParseFinished();
 
@@ -591,6 +608,8 @@ namespace BlueControls.ItemCollection {
                 p.Moved -= PointMoved;
             }
         }
+
+        private void VisibleOnPage_Changed(object sender, System.EventArgs e) { OnChanged(); }
 
         #endregion
 

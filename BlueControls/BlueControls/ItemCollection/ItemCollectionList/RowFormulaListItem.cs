@@ -154,7 +154,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
             var slidervalues = ItemCollectionPad.SliderValues(mb, zoomv, centerpos);
             //pad.ShowInPrintMode = true;
             //pad.Unselect();
-            pad.DrawCreativePadToBitmap(_tmpBmp, States.Standard, zoomv, slidervalues.X, slidervalues.Y, null);
+            pad.DrawCreativePadToBitmap(_tmpBmp, States.Standard, zoomv, slidervalues.X, slidervalues.Y, null, string.Empty);
         }
 
         private void RemovePic() {

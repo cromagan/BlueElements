@@ -33,10 +33,11 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 
 using BlueBasics.Interfaces;
+using BlueControls.Interfaces;
 
 namespace BlueControls.ItemCollection {
 
-    public class EditFieldPadItem : RectanglePadItem, IReadableText {
+    public class EditFieldPadItem : RectanglePadItem, IReadableText, IRecursiveCheck, IContentHolder {
 
         #region Fields
 
@@ -45,7 +46,7 @@ namespace BlueControls.ItemCollection {
         public ColumnItem? Column = null;
         private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
         private RowWithFilterPaditem? _GetValueFrom = null;
-        private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Links_neben_Dem_Feld;
+        private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
         #endregion
 
@@ -93,7 +94,9 @@ namespace BlueControls.ItemCollection {
                 var x = new ItemCollectionList.ItemCollectionList();
                 foreach (var thisR in Parent) {
                     if (thisR is RowWithFilterPaditem rfp) {
-                        x.Add(rfp, thisR.Internal);
+                        if (!rfp.IsRecursiveWith(this)) {
+                            x.Add(rfp, thisR.Internal);
+                        }
                     }
                 }
 
@@ -224,6 +227,38 @@ namespace BlueControls.ItemCollection {
             }
         }
 
+        public string Breite_Berechnen {
+            get => string.Empty;
+            set {
+
+                var li = new ItemCollectionList.ItemCollectionList();
+                for(var br =1; br<= 20; br++) {
+                    li.Add("Breite: " + br , br.ToString(),true,string.Empty);
+
+                    for (var pos = 1; pos <= br; pos++) {
+                        li.Add("Breite: " + br + " - Position: " + pos, br +";"+pos);
+                    }
+                    }
+
+
+                var x2 = BlueControls.Forms.InputBoxListBoxStyle.Show("Bitte Breite und Position wählen:", li,  AddType.None, true);
+
+                if(x2 == null || x2.Count !=1) { return; }
+
+                var doit = x2[0].SplitBy(";");
+
+                var anzbr = IntParse(doit[0]);
+                var npos = IntParse(doit[1]);
+                var x = UsedArea;
+                x.Width = (Parent.SheetSizeInPix.Width - (MmToPixel(0.5f, 300) * (anzbr - 1))) / anzbr;
+                x.X = x.Width * (npos-1) + MmToPixel(0.5f, 300) * (npos - 1);
+                
+                SetCoordinates(x, true);
+
+                //OnChanged();
+            }
+        }
+
         protected override int SaveOrder => 2;
 
         #endregion
@@ -256,6 +291,7 @@ namespace BlueControls.ItemCollection {
             b.AddRange(typeof(EditTypeFormula));
             l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
             l.Add(new FlexiControlForProperty<string>(() => Standardhöhe, ImageCode.GrößeÄndern));
+            l.Add(new FlexiControlForProperty<string>(() => Breite_Berechnen, ImageCode.GrößeÄndern));
             l.Add(new FlexiControl());
             l.Add(new FlexiControlForProperty<string>(() => Spalten_QuickInfo, 5));
             l.Add(new FlexiControlForProperty<string>(() => Spalten_AdminInfo, 5));
@@ -287,6 +323,13 @@ namespace BlueControls.ItemCollection {
             //l.Add(new FlexiControlForProperty(()=> this.Hintergrund_weiß_füllen"));
             //l.AddRange(base.GetStyleOptions());
             return l;
+        }
+
+        public bool IsRecursiveWith(IRecursiveCheck obj) {
+            if (obj == this) { return true; }
+
+            if (GetRowFrom is IRecursiveCheck i) { return i.IsRecursiveWith(obj); }
+            return false;
         }
 
         public override bool ParseThis(string tag, string value) {

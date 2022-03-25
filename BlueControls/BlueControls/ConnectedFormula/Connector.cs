@@ -168,7 +168,8 @@ namespace BlueControls.ConnectedFormula {
 
                         default:
                             value = "@@@";
-                            DebugPrint("Parent " + thisR.CellGetString("suchtxt") + " nicht gefunden.");
+                            ft = FilterType.KeinFilter; // Wurde dsa Parent eben gelöscht...
+                            //DebugPrint("Parent " + thisR.CellGetString("suchtxt") + " nicht gefunden.");
                             break;
                     }
                 }
@@ -248,8 +249,11 @@ namespace BlueControls.ConnectedFormula {
 
             foreach (var thisR in _rwf.FilterDefiniton.Row) {
                 var item = _rwf.Parent[thisR.CellGetString("suchtxt")];
-                var c = ((ConnectedFormulaView)Parent).SearchOrGenerate(item);
-                _parents.Add(c);
+                if (item != null) {
+
+                    var c = ((ConnectedFormulaView)Parent).SearchOrGenerate(item);
+                    _parents.Add(c);
+                }
             }
         }
 

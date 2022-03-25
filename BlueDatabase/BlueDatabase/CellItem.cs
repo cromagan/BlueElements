@@ -276,11 +276,11 @@ namespace BlueDatabase {
                 var gr2 = (gr+"||").SplitBy("|");
                 x[1] = gr2[0];
                 x[2] = gr2[1];
-                replacedText = x.JoinWith("|").TrimEnd("|");
+                var ntxt = x.JoinWith("|").TrimEnd("|");
 
    
 
-            var defaultImage = QuickImage.Get(replacedText);
+            var defaultImage = QuickImage.Get(ntxt);
             return defaultImage != null && !defaultImage.IsError ? defaultImage : StandardErrorImage(gr, bildTextverhalten, replacedText, column);
         }
 

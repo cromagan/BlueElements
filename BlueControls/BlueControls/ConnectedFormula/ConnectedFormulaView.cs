@@ -84,6 +84,9 @@ namespace BlueControls.Controls {
         #region Methods
 
         public System.Windows.Forms.Control? SearchOrGenerate(ItemCollection.BasicPadItem thisit) {
+
+            if(thisit == null) { return null; }
+
             foreach (var thisC in Controls) {
                 if (thisC is System.Windows.Forms.Control c) {
                     if (c.Tag is string s) {

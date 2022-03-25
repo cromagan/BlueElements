@@ -308,6 +308,8 @@
     <Compile Include="frmBefehlsreferenz.Designer.cs">
       <DependentUpon>frmBefehlsreferenz.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interfaces\IContenHolder.cs" />
+    <Compile Include="Interfaces\IRecursiveCheck.cs" />
     <Compile Include="Interfaces\IBackgroundNone.cs" />
     <Compile Include="Interfaces\IMoveable.cs" />
     <Compile Include="Forms\Notification.cs">

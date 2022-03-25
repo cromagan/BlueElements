@@ -847,6 +847,18 @@ namespace BlueControls {
 
         #endregion
 
+        #region Properties
+
+        public static Color RandomColor {
+            get {
+                return Color.FromArgb((byte)Constants.GlobalRND.Next(0, 255),
+                                      (byte)Constants.GlobalRND.Next(0, 255),
+                                      (byte)Constants.GlobalRND.Next(0, 255));
+            }
+        }
+
+        #endregion
+
         #region Methods
 
         public static ImageCodeEffect AdditionalState(States vState) => vState.HasFlag(States.Standard_Disabled) ? St[0] : ImageCodeEffect.Ohne;

@@ -235,10 +235,8 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-
         public SizeF SheetSizeInPix {
-            get => new SizeF(_prRu.X- _prLo.X, _prRu.Y - _prLo.Y);
-
+            get => new SizeF(_prRu.X - _prLo.X, _prRu.Y - _prLo.Y);
         }
 
         public RowItem? SheetStyle {
@@ -322,20 +320,20 @@ namespace BlueControls.ItemCollection {
                             sizeOfPaintArea.Height / maxBounds.Height);
         }
 
-        public void DrawCreativePadToBitmap(Bitmap? bmp, States vState, float zoomf, float x, float y, List<BasicPadItem>? visibleItems) {
+        public void DrawCreativePadToBitmap(Bitmap? bmp, States vState, float zoomf, float x, float y, List<BasicPadItem>? visibleItems, string page) {
             if (bmp == null) { return; }
             var gr = Graphics.FromImage(bmp);
-            DrawCreativePadTo(gr, bmp.Size, vState, zoomf, x, y, visibleItems, true);
+            DrawCreativePadTo(gr, bmp.Size, vState, zoomf, x, y, visibleItems, true, page);
             gr.Dispose();
         }
 
-        public bool DrawItems(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting, List<BasicPadItem>? visibleItems) {
+        public bool DrawItems(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting, List<BasicPadItem>? visibleItems, string page) {
             try {
                 if (SheetStyle == null || SheetStyleScale < 0.1d) { return true; }
                 foreach (var thisItem in this.Where(thisItem => thisItem != null)) {
                     gr.PixelOffsetMode = PixelOffsetMode.None;
                     if (visibleItems == null || visibleItems.Contains(thisItem)) {
-                        thisItem.Draw(gr, zoom, shiftX, shiftY, sizeOfParentControl, forPrinting);
+                        thisItem.Draw(gr, zoom, shiftX, shiftY, sizeOfParentControl, forPrinting, page);
                     }
                 }
                 return true;
@@ -429,7 +427,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public void SaveAsBitmap(string filename) {
-            var i = ToBitmap(1);
+            var i = ToBitmap(1, string.Empty);
             if (i == null) { return; }
             switch (filename.FileSuffix().ToUpper()) {
                 case "JPG":
@@ -464,7 +462,7 @@ namespace BlueControls.ItemCollection {
             OnChanged();
         }
 
-        public Bitmap? ToBitmap(float scale) {
+        public Bitmap? ToBitmap(float scale, string page) {
             var r = MaxBounds(null);
             if (r.Width == 0) { return null; }
 
@@ -486,8 +484,8 @@ namespace BlueControls.ItemCollection {
 
             using var gr = Graphics.FromImage(I);
             gr.Clear(BackColor);
-            if (!DrawCreativePadTo(gr, I.Size, States.Standard, scale, r.Left * scale, r.Top * scale, null, true)) {
-                return ToBitmap(scale);
+            if (!DrawCreativePadTo(gr, I.Size, States.Standard, scale, r.Left * scale, r.Top * scale, null, true, page)) {
+                return ToBitmap(scale, page);
             }
 
             return I;
@@ -539,7 +537,7 @@ namespace BlueControls.ItemCollection {
             return t.TrimEnd(", ") + "}";
         }
 
-        internal bool DrawCreativePadTo(Graphics gr, Size sizeOfParentControl, States state, float zoom, float shiftX, float shiftY, List<BasicPadItem>? visibleItems, bool showinprintmode) {
+        internal bool DrawCreativePadTo(Graphics gr, Size sizeOfParentControl, States state, float zoom, float shiftX, float shiftY, List<BasicPadItem>? visibleItems, bool showinprintmode, string page) {
             try {
                 gr.PixelOffsetMode = PixelOffsetMode.None;
 
@@ -607,13 +605,13 @@ namespace BlueControls.ItemCollection {
 
                 #region Items selbst
 
-                if (!DrawItems(gr, zoom, shiftX, shiftY, sizeOfParentControl, showinprintmode, visibleItems)) {
-                    return DrawCreativePadTo(gr, sizeOfParentControl, state, zoom, shiftX, shiftY, visibleItems, showinprintmode);
+                if (!DrawItems(gr, zoom, shiftX, shiftY, sizeOfParentControl, showinprintmode, visibleItems, page)) {
+                    return DrawCreativePadTo(gr, sizeOfParentControl, state, zoom, shiftX, shiftY, visibleItems, showinprintmode, page);
                 }
 
                 #endregion
             } catch {
-                return DrawCreativePadTo(gr, sizeOfParentControl, state, zoom, shiftX, shiftY, visibleItems, showinprintmode);
+                return DrawCreativePadTo(gr, sizeOfParentControl, state, zoom, shiftX, shiftY, visibleItems, showinprintmode, page);
             }
             return true;
         }

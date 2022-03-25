@@ -28,10 +28,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using BlueBasics.Interfaces;
 using System.ComponentModel;
+using BlueControls.Interfaces;
 
 namespace BlueControls.ItemCollection {
 
-    public class ConstantTextPaditem : FixedRectanglePadItem, IReadableText {
+    public class ConstantTextPaditem : FixedRectanglePadItem, IReadableText, IContentHolder {
 
         #region Fields
 
@@ -78,6 +79,12 @@ namespace BlueControls.ItemCollection {
             return l;
         }
 
+        public bool IsRecursiveWith(IRecursiveCheck obj) {
+            if (obj == this) { return true; }
+
+            return false;
+        }
+
         public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
             switch (tag) {
@@ -88,7 +95,7 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
-        public string ReadableText() => "Konstanter Wert: " +_text;
+        public string ReadableText() => "Konstanter Wert: " + _text;
 
         public QuickImage? SymbolForReadableText() {
             return QuickImage.Get(ImageCode.Textfeld, 16);
