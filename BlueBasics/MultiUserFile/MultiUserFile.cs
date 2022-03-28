@@ -466,7 +466,7 @@ namespace BlueBasics.MultiUserFile {
             if (string.Equals(newFileName, Filename, StringComparison.OrdinalIgnoreCase)) { Develop.DebugPrint(FehlerArt.Fehler, "Dateiname unterscheiden sich nicht!"); }
             Save(true); // Original-Datei speichern, die ist ja dann weg.
             // Jetzt kann es aber immern noch sein, das PendingChanges da sind.
-            // Wenn kein Dateiname angegeben ist oder die Datei Readonkly wir nicht gespeichert und die Pendings bleiben erhalten!
+            // Wenn kein Dateiname angegeben ist oder bei Readonly wird die Datei nicht gespeichert und die Pendings bleiben erhalten!
             RemoveWatcher();
             Filename = newFileName;
             DiscardPendingChanges(); // Oben beschrieben. Sonst passiert bei Reload, dass diese wiederholt werden.

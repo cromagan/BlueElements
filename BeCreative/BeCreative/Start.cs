@@ -38,15 +38,13 @@ namespace BeCreative {
         private void btnBildEditor_Click(object sender, System.EventArgs e) {
             var x = new BluePaint.MainWindow(true);
 
-            Application.Run(x);
             x.ShowDialog();
             x.Dispose();
         }
 
         private void btnDatenbank_Click(object sender, System.EventArgs e) {
-            var x = new BlueControls.Forms.TableView_OLD(null, true, true);
+            var x = new BlueControls.Forms.TableView(null, true, true);
 
-            Application.Run(x);
             x.ShowDialog();
             x.Dispose();
         }
@@ -54,7 +52,6 @@ namespace BeCreative {
         private void btnFormular_Click(object sender, System.EventArgs e) {
             var x = new BlueControls.Forms.ConnectedFormulaEditor();
 
-            Application.Run(x);
             x.ShowDialog();
             x.Dispose();
         }
@@ -62,7 +59,6 @@ namespace BeCreative {
         private void btnHierachie_Click(object sender, System.EventArgs e) {
             var x = new BlueControls.Forms.RelationDiagram(null);
 
-            Application.Run(x);
             x.ShowDialog();
             x.Dispose();
         }
@@ -70,7 +66,6 @@ namespace BeCreative {
         private void btnLayout_Click(object sender, System.EventArgs e) {
             var x = new LayoutPadEditor((Database)null);
 
-            Application.Run(x);
             x.ShowDialog();
             x.Dispose();
         }

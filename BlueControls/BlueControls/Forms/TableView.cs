@@ -28,6 +28,7 @@ using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using static BlueBasics.Develop;
@@ -51,8 +52,29 @@ namespace BlueControls.Forms {
 
         #region Constructors
 
-        public TableView() {
+        public TableView() : this(null, true, true) { }
+
+        public TableView(Database? database, bool loadTabVisible, bool adminTabVisible) {
             InitializeComponent();
+            //var bmp = new System.Drawing.Bitmap(111,112);
+            //var gr = System.Drawing.Graphics.FromImage(bmp);
+            //gr.Clear(System.Drawing.Color.Gray);
+            //gr.Dispose();
+            //var stUTF8 = BlueBasics.modConverter.BitmapToStringUnicode(bmp, System.Drawing.Imaging.ImageFormat.Png);
+            //var b = stUTF8.UTF8_ToByte();
+            //var newstUTF8 = b.ToStringUTF8();
+            //var tmpb = newstUTF8.UTF8_ToByte();
+            //var eq = b.SequenceEqual(tmpb);
+            //var newbmp = BlueBasics.modConverter.StringUnicodeToBitmap(newstUTF8);
+            //Copyright.Text = "(c) 2010-" + DateTime.Now.Year + " Christian Peter";
+
+            if (!adminTabVisible) {
+                grpAdminAllgemein.Visible = false;
+                //grpBearbeitung.Visible = false;
+            }
+            if (!loadTabVisible) {
+                ribMain.Controls.Remove(tabFile);
+            }
 
             if (btnDrucken != null) {
                 btnDrucken.Item.Clear();
@@ -64,6 +86,8 @@ namespace BlueControls.Forms {
                 btnDrucken.Item.Add("Layout-Editor öffnen", "editor", QuickImage.Get(ImageCode.Layout, 28));
             }
             Check_OrderButtons();
+
+            DatabaseSet(database);
         }
 
         #endregion
@@ -205,27 +229,6 @@ namespace BlueControls.Forms {
             return l;
         }
 
-        public void DatabaseSet(Database? database) {
-            Table.Database = database;
-            Formula.Database = database;
-            FilterLeiste.Table = Table;
-
-            //if (Table.Database == null) {
-            //    SetDatabasetoNothing();
-            //} else {
-            //    //if (Table.Database.Ansicht != Ansicht.Unverändert) {
-            //    //    _ansicht = Table.Database.Ansicht;
-            //    //}
-            //}
-            //InitView();
-            //CheckButtons();
-            //CaptionAnzeige();
-            //CheckButtons();
-            if (Table.View_RowFirst() != null) {
-                Table.CursorPos_Set(Table.Database.Column[0], Table.View_RowFirst(), false);
-            }
-        }
-
         protected virtual void btnCSVClipboard_Click(object sender, System.EventArgs e) {
             CopytoClipboard(Table.Export_CSV(FirstRow.ColumnCaption));
             Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
@@ -249,7 +252,7 @@ namespace BlueControls.Forms {
                     break;
 
                 case "csv":
-                    Generic.CopytoClipboard(Table.Export_CSV(FirstRow.ColumnCaption));
+                    CopytoClipboard(Table.Export_CSV(FirstRow.ColumnCaption));
                     MessageBox.Show("Die gewünschten Daten<br>sind nun im Zwischenspeicher.", ImageCode.Clipboard, "Ok");
                     break;
 
@@ -269,19 +272,19 @@ namespace BlueControls.Forms {
 
         protected virtual void CheckButtons() {
             var datenbankDa = Convert.ToBoolean(Table.Database != null);
-            //btnNeuDB.Enabled = true;
-            //btnOeffnen.Enabled = true;
-            //btnNeu.Enabled = datenbankDa && _ansicht == Ansicht.Überschriften_und_Formular && Table.Database.PermissionCheck(Table.Database.PermissionGroupsNewRow, null);
+            btnNeuDB.Enabled = true;
+            btnOeffnen.Enabled = true;
+            //btnNeu.Enabled = datenbankDa && Table.Database.PermissionCheck(Table.Database.PermissionGroupsNewRow, null);
             //btnLoeschen.Enabled = datenbankDa;
             btnDrucken.Enabled = datenbankDa;
             //Ansicht0.Enabled = datenbankDa;
             //Ansicht1.Enabled = datenbankDa;
             //Ansicht2.Enabled = datenbankDa;
-            //btnDatenbanken.Enabled = datenbankDa && !string.IsNullOrEmpty(Table.Database.Filename);
+            btnDatenbanken.Enabled = datenbankDa && !string.IsNullOrEmpty(Table.Database.Filename);
             //SuchenUndErsetzen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
             //AngezeigteZeilenLöschen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
             //Datenüberprüfung.Enabled = datenbankDa;
-            //btnSaveAs.Enabled = datenbankDa;
+            btnSaveAs.Enabled = datenbankDa;
             btnDrucken.Item["csv"].Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
             btnDrucken.Item["html"].Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
             //btnVorwärts.Enabled = datenbankDa;
@@ -290,8 +293,29 @@ namespace BlueControls.Forms {
             FilterLeiste.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
         }
 
+        protected void DatabaseSet(Database? database) {
+            Table.Database = database;
+            Formula.Database = database;
+            FilterLeiste.Table = Table;
+
+            //if (Table.Database == null) {
+            //    SetDatabasetoNothing();
+            //} else {
+            //    //if (Table.Database.Ansicht != Ansicht.Unverändert) {
+            //    //    _ansicht = Table.Database.Ansicht;
+            //    //}
+            //}
+            //InitView();
+            //CheckButtons();
+            //CaptionAnzeige();
+            //CheckButtons();
+            if (Table.View_RowFirst() != null && database != null) {
+                Table.CursorPos_Set(database.Column[0], Table.View_RowFirst(), false);
+            }
+        }
+
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
-            DatabaseSet(null);
+            DatabaseSet((Database)null);
             BlueBasics.MultiUserFile.MultiUserFile.SaveAll(true);
             base.OnFormClosing(e);
         }
@@ -312,6 +336,11 @@ namespace BlueControls.Forms {
             Table.ImportClipboard();
         }
 
+        private void btnDatenbanken_Click(object sender, System.EventArgs e) {
+            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+            ExecuteFile(Table.Database.Filename.FilePath());
+        }
+
         private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => OpenDatabaseHeadEditor(Table.Database);
 
         private void btnDatenüberprüfung_Click(object sender, System.EventArgs e) {
@@ -323,6 +352,41 @@ namespace BlueControls.Forms {
             DebugPrint_InvokeRequired(InvokeRequired, true);
             if (Table.Database == null) { return; }
             OpenLayoutEditor(Table.Database, string.Empty);
+        }
+
+        private void btnLetzteDateien_ItemClicked(object sender, BasicListItemEventArgs e) {
+            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+            DatabaseSet(e.Item.Internal);
+        }
+
+        private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e) {
+            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+
+            if (sender == btnSaveAs) {
+                if (Table.Database == null) { return; }
+            }
+
+            if (sender == btnNeuDB) {
+                if (Table.Database != null) { DatabaseSet(null as Database); }
+            }
+
+            SaveTab.ShowDialog();
+            if (!PathExists(SaveTab.FileName.FilePath())) { return; }
+            if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
+
+            if (sender == btnNeuDB) {
+                DatabaseSet(new Database(false)); // Ab jetzt in der Variable _Database zu finden
+            }
+            if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
+
+            Table.Database.SaveAsAndChangeTo(SaveTab.FileName);
+
+            DatabaseSet(SaveTab.FileName);
+        }
+
+        private void btnOeffnen_Click(object sender, System.EventArgs e) {
+            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+            LoadTab.ShowDialog();
         }
 
         private void btnPowerBearbeitung_Click(object sender, System.EventArgs e) {
@@ -339,6 +403,11 @@ namespace BlueControls.Forms {
         }
 
         private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => Table.Database.Column.GenerateOverView();
+
+        private void btnTemporärenSpeicherortÖffnen_Click(object sender, System.EventArgs e) {
+            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+            ExecuteFile(Path.GetTempPath());
+        }
 
         private void btnUnterschiede_CheckedChanged(object sender, System.EventArgs e) => Table.Unterschiede = btnUnterschiede.Checked ? Table.CursorPosRow.Row : null;
 
@@ -413,6 +482,19 @@ namespace BlueControls.Forms {
             tabAdmin.Enabled = true;
         }
 
+        private void DatabaseSet(string? filename) {
+            DatabaseSet((Database)null);
+            if (!FileExists(filename)) {
+                CheckButtons();
+                return;
+            }
+            btnLetzteDateien.AddFileName(filename, string.Empty);
+            LoadTab.FileName = filename;
+            var tmpDatabase = Database.GetByFilename(filename, false, false);
+            if (tmpDatabase == null) { return; }
+            DatabaseSet(tmpDatabase);
+        }
+
         private void FillFormula() {
             if (tbcSidebar.SelectedTab != tabFormula) { return; }
             if (Formula is null || Formula.IsDisposed) { return; }
@@ -433,6 +515,8 @@ namespace BlueControls.Forms {
         private void Formula_SizeChanged(object sender, System.EventArgs e) => FillFormula();
 
         private void Formula_VisibleChanged(object sender, System.EventArgs e) => FillFormula();
+
+        private void LoadTab_FileOk(object sender, CancelEventArgs e) => DatabaseSet(LoadTab.FileName);
 
         private void Table_CursorPosChanged(object sender, CellExtEventArgs e) {
             if (InvokeRequired) {

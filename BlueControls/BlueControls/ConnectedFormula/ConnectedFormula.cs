@@ -21,6 +21,7 @@ using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Windows.Forms;
 using static BlueBasics.Develop;
 using BlueDatabase;
 using BlueBasics;
@@ -39,7 +40,7 @@ namespace BlueControls.ConnectedFormula {
         public static readonly float StandardHöhe = 3.5f;
 
         //public static readonly float Umrechnungsfaktor = Converter.PixelToMm(1, 300);
-        public static readonly float Umrechnungsfaktor2 = Converter.MmToPixel(StandardHöhe, 300) / 44;
+        public static readonly float Umrechnungsfaktor2 = MmToPixel(StandardHöhe, 300) / 44;
 
         public readonly ListExt<string> DatabaseFiles = new();
         //public readonly List<Database?> Databases = new();
@@ -48,7 +49,7 @@ namespace BlueControls.ConnectedFormula {
         private string _createDate = string.Empty;
         private string _creator = string.Empty;
         private int _id = -1;
-        private ItemCollection.ItemCollectionPad _padData;
+        private ItemCollectionPad _padData;
 
         private bool _saved = true;
         private bool _saving = false;
@@ -57,13 +58,17 @@ namespace BlueControls.ConnectedFormula {
 
         #region Constructors
 
+        public ConnectedFormula() : this(string.Empty) {
+        }
+
         private ConnectedFormula(string filename) : base(false, false) {
             _createDate = DateTime.Now.ToString(Constants.Format_Date5);
             _creator = Generic.UserName();
-            PadData = new ItemCollection.ItemCollectionPad();
+            PadData = new ItemCollectionPad();
 
-            Load(filename, true);
-
+            if (FileExists(filename)) {
+                Load(filename, true);
+            }
             //if (notallowedchilds != null) {
             //    NotAllowedChilds.AddIfNotExists(notallowedchilds);
             //}
@@ -82,9 +87,7 @@ namespace BlueControls.ConnectedFormula {
 
         #region Properties
 
-        public string FilePath { get; set; } = string.Empty;
-
-        public ItemCollection.ItemCollectionPad PadData {
+        public ItemCollectionPad PadData {
             get => _padData;
             private set {
                 if (_padData == value) { return; }
@@ -164,9 +167,9 @@ namespace BlueControls.ConnectedFormula {
                     case "version":
                         break;
 
-                    case "filepath":
-                        FilePath = pair.Value.FromNonCritical();
-                        break;
+                    //case "filepath":
+                    //    FilePath = pair.Value.FromNonCritical();
+                    //    break;
 
                     case "databasefiles":
                         DatabaseFiles.Clear();
@@ -187,7 +190,7 @@ namespace BlueControls.ConnectedFormula {
                         break;
 
                     case "paditemdata":
-                        PadData = new ItemCollection.ItemCollectionPad(pair.Value.FromNonCritical(), string.Empty);
+                        PadData = new ItemCollectionPad(pair.Value.FromNonCritical(), string.Empty);
                         break;
 
                     case "lastusedid":
@@ -228,7 +231,7 @@ namespace BlueControls.ConnectedFormula {
             t.Add("Version=" + Version);
             t.Add("CreateDate=" + _createDate.ToNonCritical());
             t.Add("CreateName=" + _creator.ToNonCritical());
-            t.Add("FilePath=" + FilePath.ToNonCritical());
+            //t.Add("FilePath=" + FilePath.ToNonCritical());
             t.Add("LastUsedID=" + _id.ToString());
             t.Add("DatabaseFiles=" + DatabaseFiles.JoinWithCr().ToNonCritical());
             t.Add("NotAllowedChilds=" + NotAllowedChilds.JoinWithCr().ToNonCritical());

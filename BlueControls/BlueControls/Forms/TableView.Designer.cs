@@ -25,6 +25,15 @@ namespace BlueControls.Forms {
         /// </summary>
         private void InitializeComponent() {
             this.ribMain = new BlueControls.Controls.RibbonBar();
+            this.tabFile = new System.Windows.Forms.TabPage();
+            this.grpOrdner = new BlueControls.Controls.GroupBox();
+            this.btnDatenbanken = new BlueControls.Controls.Button();
+            this.btnTemporärenSpeicherortÖffnen = new BlueControls.Controls.Button();
+            this.grpDatei = new BlueControls.Controls.GroupBox();
+            this.btnLetzteDateien = new BlueControls.Controls.LastFilesCombo();
+            this.btnOeffnen = new BlueControls.Controls.Button();
+            this.btnSaveAs = new BlueControls.Controls.Button();
+            this.btnNeuDB = new BlueControls.Controls.Button();
             this.tabAllgemein = new System.Windows.Forms.TabPage();
             this.grpAnsicht = new BlueControls.Controls.GroupBox();
             this.btnUnterschiede = new BlueControls.Controls.Button();
@@ -64,8 +73,12 @@ namespace BlueControls.Forms {
             this.pnlStatusBar = new System.Windows.Forms.Panel();
             this.capStatusbar = new BlueControls.Controls.Caption();
             this.capZeilen2 = new BlueControls.Controls.Caption();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.LoadTab = new System.Windows.Forms.OpenFileDialog();
+            this.SaveTab = new System.Windows.Forms.SaveFileDialog();
             this.ribMain.SuspendLayout();
+            this.tabFile.SuspendLayout();
+            this.grpOrdner.SuspendLayout();
+            this.grpDatei.SuspendLayout();
             this.tabAllgemein.SuspendLayout();
             this.grpAnsicht.SuspendLayout();
             this.tabAdmin.SuspendLayout();
@@ -88,7 +101,7 @@ namespace BlueControls.Forms {
             // 
             // ribMain
             // 
-            this.ribMain.Controls.Add(this.tabPage1);
+            this.ribMain.Controls.Add(this.tabFile);
             this.ribMain.Controls.Add(this.tabAllgemein);
             this.ribMain.Controls.Add(this.tabAdmin);
             this.ribMain.Controls.Add(this.tabExport);
@@ -101,6 +114,121 @@ namespace BlueControls.Forms {
             this.ribMain.TabDefault = null;
             this.ribMain.TabDefaultOrder = null;
             this.ribMain.TabIndex = 93;
+            // 
+            // tabFile
+            // 
+            this.tabFile.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.tabFile.Controls.Add(this.grpOrdner);
+            this.tabFile.Controls.Add(this.grpDatei);
+            this.tabFile.Location = new System.Drawing.Point(4, 25);
+            this.tabFile.Margin = new System.Windows.Forms.Padding(0);
+            this.tabFile.Name = "tabFile";
+            this.tabFile.Size = new System.Drawing.Size(1000, 81);
+            this.tabFile.TabIndex = 3;
+            this.tabFile.Text = "Datei";
+            // 
+            // grpOrdner
+            // 
+            this.grpOrdner.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpOrdner.CausesValidation = false;
+            this.grpOrdner.Controls.Add(this.btnDatenbanken);
+            this.grpOrdner.Controls.Add(this.btnTemporärenSpeicherortÖffnen);
+            this.grpOrdner.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpOrdner.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
+            this.grpOrdner.Location = new System.Drawing.Point(304, 0);
+            this.grpOrdner.Name = "grpOrdner";
+            this.grpOrdner.Size = new System.Drawing.Size(184, 81);
+            this.grpOrdner.TabIndex = 3;
+            this.grpOrdner.TabStop = false;
+            this.grpOrdner.Text = "Ordner";
+            // 
+            // btnDatenbanken
+            // 
+            this.btnDatenbanken.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnDatenbanken.ImageCode = "Ordner";
+            this.btnDatenbanken.Location = new System.Drawing.Point(8, 2);
+            this.btnDatenbanken.Name = "btnDatenbanken";
+            this.btnDatenbanken.QuickInfo = "Speicherort der Datenbanken öffnen";
+            this.btnDatenbanken.Size = new System.Drawing.Size(88, 66);
+            this.btnDatenbanken.TabIndex = 27;
+            this.btnDatenbanken.Text = "Datenbanken-Pfad";
+            this.btnDatenbanken.Click += new System.EventHandler(this.btnDatenbanken_Click);
+            // 
+            // btnTemporärenSpeicherortÖffnen
+            // 
+            this.btnTemporärenSpeicherortÖffnen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnTemporärenSpeicherortÖffnen.ImageCode = "Ordner||||0000ff||126";
+            this.btnTemporärenSpeicherortÖffnen.Location = new System.Drawing.Point(96, 2);
+            this.btnTemporärenSpeicherortÖffnen.Name = "btnTemporärenSpeicherortÖffnen";
+            this.btnTemporärenSpeicherortÖffnen.QuickInfo = "Temporären Speicherort öffnen";
+            this.btnTemporärenSpeicherortÖffnen.Size = new System.Drawing.Size(80, 66);
+            this.btnTemporärenSpeicherortÖffnen.TabIndex = 26;
+            this.btnTemporärenSpeicherortÖffnen.Text = "Temporärer Speicherort";
+            this.btnTemporärenSpeicherortÖffnen.Click += new System.EventHandler(this.btnTemporärenSpeicherortÖffnen_Click);
+            // 
+            // grpDatei
+            // 
+            this.grpDatei.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpDatei.CausesValidation = false;
+            this.grpDatei.Controls.Add(this.btnLetzteDateien);
+            this.grpDatei.Controls.Add(this.btnOeffnen);
+            this.grpDatei.Controls.Add(this.btnSaveAs);
+            this.grpDatei.Controls.Add(this.btnNeuDB);
+            this.grpDatei.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpDatei.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
+            this.grpDatei.Location = new System.Drawing.Point(0, 0);
+            this.grpDatei.Name = "grpDatei";
+            this.grpDatei.Size = new System.Drawing.Size(304, 81);
+            this.grpDatei.TabIndex = 4;
+            this.grpDatei.TabStop = false;
+            this.grpDatei.Text = "Datei";
+            // 
+            // btnLetzteDateien
+            // 
+            this.btnLetzteDateien.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.btnLetzteDateien.DrawStyle = BlueControls.Enums.ComboboxStyle.RibbonBar;
+            this.btnLetzteDateien.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.btnLetzteDateien.Enabled = false;
+            this.btnLetzteDateien.ImageCode = "Ordner";
+            this.btnLetzteDateien.Location = new System.Drawing.Point(128, 2);
+            this.btnLetzteDateien.Name = "btnLetzteDateien";
+            this.btnLetzteDateien.Size = new System.Drawing.Size(104, 66);
+            this.btnLetzteDateien.TabIndex = 1;
+            this.btnLetzteDateien.Text = "zuletzt geöffnete Dateien";
+            this.btnLetzteDateien.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.btnLetzteDateien_ItemClicked);
+            // 
+            // btnOeffnen
+            // 
+            this.btnOeffnen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnOeffnen.ImageCode = "Ordner";
+            this.btnOeffnen.Location = new System.Drawing.Point(72, 2);
+            this.btnOeffnen.Name = "btnOeffnen";
+            this.btnOeffnen.Size = new System.Drawing.Size(56, 66);
+            this.btnOeffnen.TabIndex = 1;
+            this.btnOeffnen.Text = "Öffnen";
+            this.btnOeffnen.Click += new System.EventHandler(this.btnOeffnen_Click);
+            // 
+            // btnSaveAs
+            // 
+            this.btnSaveAs.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnSaveAs.ImageCode = "Diskette";
+            this.btnSaveAs.Location = new System.Drawing.Point(232, 2);
+            this.btnSaveAs.Name = "btnSaveAs";
+            this.btnSaveAs.Size = new System.Drawing.Size(64, 66);
+            this.btnSaveAs.TabIndex = 4;
+            this.btnSaveAs.Text = "Speichern unter";
+            this.btnSaveAs.Click += new System.EventHandler(this.btnNeuDB_SaveAs_Click);
+            // 
+            // btnNeuDB
+            // 
+            this.btnNeuDB.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnNeuDB.ImageCode = "Datei";
+            this.btnNeuDB.Location = new System.Drawing.Point(8, 2);
+            this.btnNeuDB.Name = "btnNeuDB";
+            this.btnNeuDB.Size = new System.Drawing.Size(56, 66);
+            this.btnNeuDB.TabIndex = 0;
+            this.btnNeuDB.Text = "Neu";
+            this.btnNeuDB.Click += new System.EventHandler(this.btnNeuDB_SaveAs_Click);
             // 
             // tabAllgemein
             // 
@@ -585,15 +713,17 @@ namespace BlueControls.Forms {
             this.capZeilen2.Size = new System.Drawing.Size(304, 24);
             this.capZeilen2.Translate = false;
             // 
-            // tabPage1
+            // LoadTab
             // 
-            this.tabPage1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.tabPage1.Location = new System.Drawing.Point(4, 25);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1000, 81);
-            this.tabPage1.TabIndex = 3;
-            this.tabPage1.Text = "tabDatei";
+            this.LoadTab.Filter = "*.MDB Datenbanken|*.MDB|*.* Alle Dateien|*";
+            this.LoadTab.Title = "Bitte Datenbank laden!";
+            this.LoadTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
+            // 
+            // SaveTab
+            // 
+            this.SaveTab.Filter = "*.MDB Datenbanken|*.MDB|*.* Alle Dateien|*";
+            this.SaveTab.Title = "Bitte neuen Dateinamen der Datenbank wählen.";
+            this.SaveTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
             // 
             // TableView
             // 
@@ -608,6 +738,9 @@ namespace BlueControls.Forms {
             this.Text = "TableView";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.ribMain.ResumeLayout(false);
+            this.tabFile.ResumeLayout(false);
+            this.grpOrdner.ResumeLayout(false);
+            this.grpDatei.ResumeLayout(false);
             this.tabAllgemein.ResumeLayout(false);
             this.grpAnsicht.ResumeLayout(false);
             this.tabAdmin.ResumeLayout(false);
@@ -672,6 +805,16 @@ namespace BlueControls.Forms {
         private Controls.Button btnCSVClipboard;
         protected System.Windows.Forms.TabPage tabExport;
         private Controls.ComboBox btnDrucken;
-        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tabFile;
+        private Controls.GroupBox grpOrdner;
+        private Controls.Button btnDatenbanken;
+        private Controls.Button btnTemporärenSpeicherortÖffnen;
+        private Controls.GroupBox grpDatei;
+        private Controls.LastFilesCombo btnLetzteDateien;
+        private Controls.Button btnOeffnen;
+        private Controls.Button btnSaveAs;
+        private Controls.Button btnNeuDB;
+        private System.Windows.Forms.OpenFileDialog LoadTab;
+        private System.Windows.Forms.SaveFileDialog SaveTab;
     }
 }

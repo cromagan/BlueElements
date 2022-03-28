@@ -38,7 +38,7 @@ namespace BlueControls.ItemCollection {
         public static BlueFont? CellFont = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
         public static BlueFont? ChapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard);
         public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
-        public BlueControls.Controls.ListBox Childs = new();
+        public Controls.ListBox Childs = new();
         public ListExt<string> NotAllowedChilds = new();
         private string _path = string.Empty;
 
@@ -77,30 +77,24 @@ namespace BlueControls.ItemCollection {
         #region Methods
 
         public Control GenerateControl(ConnectedFormulaView parent) {
-            var c3 = new BlueControls.Controls.TabControl();
+            var c3 = new Controls.TabControl();
             c3.Tag = Internal;
 
-
-            foreach(var thisc in Childs.Item) {
+            foreach (var thisc in Childs.Item) {
                 var t = new TabPage();
                 t.Text = thisc.Internal.FileNameWithoutSuffix();
                 c3.TabPages.Add(t);
 
-       var cf = ConnectedFormula.ConnectedFormula.GetByFilename(thisc.Internal);
+                var cf = ConnectedFormula.ConnectedFormula.GetByFilename(thisc.Internal);
 
-                if(cf!= null) {
+                if (cf != null) {
                     var cc = new ConnectedFormulaView();
-                   
+
                     t.Controls.Add(cc);
                     cc.ConnectedFormula = cf;
                     cc.Dock = DockStyle.Fill;
                 }
-   
-         
-
-
             }
-
 
             return c3;
         }
@@ -182,7 +176,7 @@ namespace BlueControls.ItemCollection {
         }
 
         private void Childs_ContextMenuInit(object sender, EventArgs.ContextMenuInitEventArgs e) {
-            e.UserMenu.Add(BlueControls.Enums.ContextMenuComands.Bearbeiten);
+            e.UserMenu.Add(ContextMenuComands.Bearbeiten);
         }
 
         private void Childs_ContextMenuItemClicked(object sender, EventArgs.ContextMenuItemClickedEventArgs e) {

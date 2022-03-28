@@ -18,6 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -33,7 +34,7 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private ConnectedFormula.ConnectedFormula _cf;
+        private ConnectedFormula.ConnectedFormula? _cf;
 
         #endregion
 
@@ -42,29 +43,10 @@ namespace BlueControls.Forms {
         public ConnectedFormulaEditor(string filename, List<string>? notAllowedchilds) {
             InitializeComponent();
 
-            _cf = ConnectedFormula.ConnectedFormula.GetByFilename(filename);
-
-            if (notAllowedchilds != null) {
-                _cf.NotAllowedChilds.AddRange(notAllowedchilds);
-            }
-
-            //   _cf = new BlueControls.ConnectedFormula.ConnectedFormula(filename, notAllowedchilds);
-            Pad.Item = _cf.PadData;
-
-            Pad.Item.SheetSizeInMm = new SizeF(PixelToMm(500, 300), PixelToMm(850, 300));
-            Pad.Item.GridShow = 0.5f;
-            Pad.Item.GridSnap = 0.5f;
+            FormulaSet(filename, notAllowedchilds);
         }
 
-        public ConnectedFormulaEditor() {
-            InitializeComponent();
-            _cf = null;
-            Pad.Item = null;
-
-            Pad.Item.SheetSizeInMm = new SizeF(PixelToMm(500, 300), PixelToMm(850, 300));
-            Pad.Item.GridShow = 0.5f;
-            Pad.Item.GridSnap = 0.5f;
-        }
+        public ConnectedFormulaEditor() : this(string.Empty, null) { }
 
         #endregion
 
@@ -95,9 +77,48 @@ namespace BlueControls.Forms {
             Pad.AddCentered(x);
         }
 
+        private void btnLetzteDateien_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) {
+            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+
+            if (e?.Item == null) { return; }
+            FormulaSet(e.Item.Internal, null);
+        }
+
+        private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e) {
+            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+
+            if (sender == btnSaveAs) {
+                if (_cf == null) { return; }
+            }
+
+            if (sender == btnNeuDB) {
+                if (_cf != null) { FormulaSet(null as ConnectedFormula.ConnectedFormula, null); }
+            }
+
+            SaveTab.ShowDialog();
+            if (!PathExists(SaveTab.FileName.FilePath())) { return; }
+            if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
+
+            if (sender == btnNeuDB) {
+                FormulaSet(new ConnectedFormula.ConnectedFormula(), null); // Ab jetzt in der Variable _Database zu finden
+            }
+            if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
+
+            _cf.SaveAsAndChangeTo(SaveTab.FileName);
+
+            FormulaSet(SaveTab.FileName, null);
+        }
+
+        private void btnOeffnen_Click(object sender, System.EventArgs e) {
+            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+            LoadTab.ShowDialog();
+        }
+
         private void btnPfeileAusblenden_CheckedChanged(object sender, System.EventArgs e) => btnVorschauModus.Checked = btnPfeileAusblenden.Checked;
 
         private void btnTabControlAdd_Click(object sender, System.EventArgs e) {
+            if (_cf == null) { return; }
+
             var x = new ChildFormulaPaditem(string.Empty, _cf.Filename, _cf.NotAllowedChilds);
             x.Bei_Export_Sichtbar = true;
             Pad.AddCentered(x);
@@ -107,11 +128,13 @@ namespace BlueControls.Forms {
 
         private void btnVorschauÖffnen_Click(object sender, System.EventArgs e) {
             BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-            BlueControls.Forms.EditBoxRow_NEW.Show("Achtung:\r\nVoll funktionsfähige Test-Ansicht", _cf, true);
+            EditBoxRow_NEW.Show("Achtung:\r\nVoll funktionsfähige Test-Ansicht", _cf, true);
         }
 
         private void btnZeileHinzu_Click(object sender, System.EventArgs e) {
-            var x = Directory.GetFiles(_cf.FilePath, "*.mdb").ToList();
+            if (_cf == null) { return; }
+
+            var x = Directory.GetFiles(_cf.Filename.FilePath(), "*.mdb").ToList();
 
             if (x == null || x.Count == 0) {
                 MessageBox.Show("Keine Datenbanken vorhanden.");
@@ -137,6 +160,43 @@ namespace BlueControls.Forms {
                 Pad.AddCentered(dbitem);
             }
         }
+
+        private void CheckButtons() {
+        }
+
+        private void FormulaSet(string filename, List<string>? notAllowedchilds) {
+            FormulaSet(null as ConnectedFormula.ConnectedFormula, notAllowedchilds);
+
+            if (!FileExists(filename)) {
+                CheckButtons();
+                return;
+            }
+
+            btnLetzteFormulare.AddFileName(filename, string.Empty);
+            LoadTab.FileName = filename;
+            var tmpDatabase = ConnectedFormula.ConnectedFormula.GetByFilename(filename);
+            if (tmpDatabase == null) { return; }
+            FormulaSet(tmpDatabase, notAllowedchilds);
+        }
+
+        private void FormulaSet(ConnectedFormula.ConnectedFormula? formular, List<string>? notAllowedchilds) {
+            _cf = formular;
+
+            if (notAllowedchilds != null && _cf != null) {
+                _cf.NotAllowedChilds.AddRange(notAllowedchilds);
+            }
+
+            if (_cf == null) {
+                Pad.Item = null;
+            } else {
+                Pad.Item = _cf.PadData;
+                Pad.Item.SheetSizeInMm = new SizeF(PixelToMm(500, 300), PixelToMm(850, 300));
+                Pad.Item.GridShow = 0.5f;
+                Pad.Item.GridSnap = 0.5f;
+            }
+        }
+
+        private void LoadTab_FileOk(object sender, CancelEventArgs e) => FormulaSet(LoadTab.FileName, null);
 
         #endregion
     }

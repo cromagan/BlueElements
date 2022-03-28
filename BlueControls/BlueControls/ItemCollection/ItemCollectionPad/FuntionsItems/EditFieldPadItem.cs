@@ -71,7 +71,7 @@ namespace BlueControls.ItemCollection {
                     }
                 }
 
-                var x2 = BlueControls.Forms.InputBoxListBoxStyle.Show("Bitte Breite und Position wählen:", li, AddType.None, true);
+                var x2 = Forms.InputBoxListBoxStyle.Show("Bitte Breite und Position wählen:", li, AddType.None, true);
 
                 if (x2 == null || x2.Count != 1) { return; }
 
@@ -245,7 +245,7 @@ namespace BlueControls.ItemCollection {
             get => string.Empty;
             set {
                 var x = UsedArea;
-                x.Height = Converter.MmToPixel(ConnectedFormula.ConnectedFormula.StandardHöhe, 300);
+                x.Height = MmToPixel(ConnectedFormula.ConnectedFormula.StandardHöhe, 300);
                 SetCoordinates(x, true);
 
                 //OnChanged();

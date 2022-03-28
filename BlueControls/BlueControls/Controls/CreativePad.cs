@@ -47,9 +47,9 @@ namespace BlueControls.Controls {
 
         #region Fields
 
-        private readonly List<IMoveable?> _itemsToMove = new();
+        private readonly List<IMoveable> _itemsToMove = new();
         private IMouseAndKeyHandle? _givesMouseComandsTo;
-        private ItemCollectionPad _item;
+        private ItemCollectionPad? _item;
         private string _lastQuickInfo = string.Empty;
         private bool _repairPrinterDataPrepaired;
         private bool _showInPrintMode;
@@ -110,7 +110,7 @@ namespace BlueControls.Controls {
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public ItemCollectionPad Item {
+        public ItemCollectionPad? Item {
             get => _item;
             set {
                 if (_item == value) { return; }
@@ -154,7 +154,8 @@ namespace BlueControls.Controls {
         #region Methods
 
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
-            BasicPadItem thisItem = null;
+            BasicPadItem? thisItem = null;
+
             if (e.HotItem is BasicPadItem item) { thisItem = item; }
             var done = false;
             if (thisItem != null) {
@@ -260,7 +261,7 @@ namespace BlueControls.Controls {
         }
 
         public List<BasicPadItem> HotItems(MouseEventArgs? e) {
-            if (e == null) { return new List<BasicPadItem>(); }
+            if (e == null || _item == null) { return new List<BasicPadItem>(); }
             Point p = new((int)((e.X + ShiftX) / Zoom), (int)((e.Y + ShiftY) / Zoom));
             return _item.Where(thisItem => thisItem != null && thisItem.Contains(p, Zoom)).ToList();
         }
@@ -452,7 +453,7 @@ namespace BlueControls.Controls {
             LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray,
                 LinearGradientMode.Vertical);
             gr.FillRectangle(lgb, ClientRectangle);
-            _item.DrawCreativePadTo(gr, Size, state, Zoom, ShiftX, ShiftY, null, _showInPrintMode);
+            _item?.DrawCreativePadTo(gr, Size, state, Zoom, ShiftX, ShiftY, null, _showInPrintMode);
 
             #region Dann die selectiereren Punkte
 
@@ -548,7 +549,7 @@ namespace BlueControls.Controls {
         private void DruckerDokument_PrintPage(object sender, PrintPageEventArgs e) {
             e.HasMorePages = false;
             OnPrintPage(e);
-            var i = _item.ToBitmap(3);
+            var i = _item?.ToBitmap(3);
             if (i == null) { return; }
             e.Graphics.DrawImageInRectAspectRatio(i, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
         }

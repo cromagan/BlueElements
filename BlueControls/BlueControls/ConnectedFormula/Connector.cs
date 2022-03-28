@@ -148,7 +148,7 @@ namespace BlueControls.ConnectedFormula {
                                 } else if (se is FlexiControl fc) {
                                     value = fc.Value;
                                 } else {
-                                    Develop.DebugPrint("Unbekannt");
+                                    DebugPrint("Unbekannt");
                                 }
                             } else {
                                 value = "@@@";
@@ -265,7 +265,7 @@ namespace BlueControls.ConnectedFormula {
             } else if (e.Item is FlexiControl fc) {
                 fc.ValueChanged += Parent_ValueChanged;
             } else {
-                Develop.DebugPrint("unbekannt");
+                DebugPrint("unbekannt");
             }
             CalculateRows();
         }

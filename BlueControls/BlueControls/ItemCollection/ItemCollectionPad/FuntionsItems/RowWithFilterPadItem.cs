@@ -94,7 +94,7 @@ namespace BlueControls.ItemCollection {
                     }
                 }
 
-                var t = BlueControls.Forms.InputBoxListBoxStyle.Show("Filter für welche Spalte?", c, AddType.None, true);
+                var t = Forms.InputBoxListBoxStyle.Show("Filter für welche Spalte?", c, AddType.None, true);
 
                 if (t == null || t.Count != 1) { return; }
 
@@ -450,7 +450,7 @@ namespace BlueControls.ItemCollection {
         private Table GenerateFilterTable() {
             var tblFilterliste = new Table();
             tblFilterliste.ShowWaitScreen = true;
-            tblFilterliste.Size = new System.Drawing.Size(968, 400);
+            tblFilterliste.Size = new Size(968, 400);
 
             if (Database == null) { return tblFilterliste; }
 

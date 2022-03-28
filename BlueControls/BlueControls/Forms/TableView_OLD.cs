@@ -47,33 +47,9 @@ namespace BlueControls.Forms {
 
         #region Constructors
 
-        public TableView_OLD() : this(null, true, true) { }
+        public TableView_OLD() : base(null, true, true) { }
 
-        public TableView_OLD(Database? database) : this(database, false, false) { }
-
-        public TableView_OLD(Database? database, bool loadTabVisible, bool adminTabVisible) {
-            InitializeComponent();
-            //var bmp = new System.Drawing.Bitmap(111,112);
-            //var gr = System.Drawing.Graphics.FromImage(bmp);
-            //gr.Clear(System.Drawing.Color.Gray);
-            //gr.Dispose();
-            //var stUTF8 = BlueBasics.modConverter.BitmapToStringUnicode(bmp, System.Drawing.Imaging.ImageFormat.Png);
-            //var b = stUTF8.UTF8_ToByte();
-            //var newstUTF8 = b.ToStringUTF8();
-            //var tmpb = newstUTF8.UTF8_ToByte();
-            //var eq = b.SequenceEqual(tmpb);
-            //var newbmp = BlueBasics.modConverter.StringUnicodeToBitmap(newstUTF8);
-            Copyright.Text = "(c) 2010-" + DateTime.Now.Year + " Christian Peter";
-
-            if (!adminTabVisible) {
-                grpAdminAllgemein.Visible = false;
-                grpBearbeitung.Visible = false;
-            }
-            if (!loadTabVisible) {
-                ribMain.Controls.Remove(tabDatei);
-            }
-            DatabaseSet(database);
-        }
+        public TableView_OLD(Database? database) : base(database, false, false) { }
 
         #endregion
 
@@ -205,39 +181,6 @@ namespace BlueControls.Forms {
             CheckButtons();
         }
 
-        private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e) {
-            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-            var bu = (Button)sender;
-            switch (bu.Name) {
-                case "btnSaveAs":
-                    if (Table.Database == null) { return; }
-                    break;
-
-                case "btnNeuDB":
-                    if (Table.Database != null) { DatabaseSet(null); }
-                    break;
-
-                default:
-                    DebugPrint(FehlerArt.Fehler, "Ung¸ltiger Aufruf!");
-                    break;
-            }
-            SaveTab.ShowDialog();
-            if (!PathExists(SaveTab.FileName.FilePath())) { return; }
-            if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
-            SelectStandardTab();
-            if (bu.Name == "btnNeuDB") {
-                DatabaseSet(new Database(false)); // Ab jetzt in der Variable _Database zu finden
-            }
-            if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
-            Table.Database.SaveAsAndChangeTo(SaveTab.FileName);
-            DatabaseSet(SaveTab.FileName);
-        }
-
-        private void btnOeffnen_Click(object sender, System.EventArgs e) {
-            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-            LoadTab.ShowDialog();
-        }
-
         private void CaptionAnzeige() {
             if (Table.Database == null) {
                 Text = "Be Creative! V" + Version;
@@ -255,35 +198,19 @@ namespace BlueControls.Forms {
 
         private void CheckButtons() {
             var datenbankDa = Convert.ToBoolean(Table.Database != null);
-            btnNeuDB.Enabled = true;
-            btnOeffnen.Enabled = true;
             btnNeu.Enabled = datenbankDa && _ansicht == Ansicht.‹berschriften_und_Formular && Table.Database.PermissionCheck(Table.Database.PermissionGroupsNewRow, null);
             btnLoeschen.Enabled = datenbankDa;
             Ansicht0.Enabled = datenbankDa;
             Ansicht1.Enabled = datenbankDa;
             Ansicht2.Enabled = datenbankDa;
-            btnDatenbanken.Enabled = datenbankDa && !string.IsNullOrEmpty(Table.Database.Filename);
+
             SuchenUndErsetzen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
             AngezeigteZeilenLˆschen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
             Daten¸berpr¸fung.Enabled = datenbankDa;
-            btnSaveAs.Enabled = datenbankDa;
             btnVorw‰rts.Enabled = datenbankDa;
             btnZur¸ck.Enabled = datenbankDa;
             such.Enabled = datenbankDa;
             FilterLeiste.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
-        }
-
-        private void DatabaseSet(string? filename) {
-            DatabaseSet((Database)null);
-            if (!FileExists(filename)) {
-                CheckButtons();
-                return;
-            }
-            btnLetzteDateien.AddFileName(filename, string.Empty);
-            LoadTab.FileName = filename;
-            var tmpDatabase = Database.GetByFilename(filename, false, false);
-            if (tmpDatabase == null) { return; }
-            DatabaseSet(tmpDatabase);
         }
 
         private void Daten¸berpr¸fung_Click(object sender, System.EventArgs e) => Table.Database.Row.DoAutomatic(Table.Filter, true, Table.PinnedRows, "manual check");
@@ -353,13 +280,6 @@ namespace BlueControls.Forms {
             //}
         }
 
-        private void LastDatabases_ItemClicked(object sender, BasicListItemEventArgs e) {
-            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-            DatabaseSet(e.Item.Internal);
-        }
-
-        private void LoadTab_FileOk(object sender, CancelEventArgs e) => DatabaseSet(LoadTab.FileName);
-
         private string NameRepair(string istName, RowItem? vRow) {
             var newName = istName;
             var istZ = 0;
@@ -379,12 +299,6 @@ namespace BlueControls.Forms {
                 ? Table.Database.Row.Add(NameRepair(DateTime.Now.ToString(Constants.Format_Date5), null))
                 : Table.Database.Row.Add(NameRepair("Neuer Eintrag", null));
             Table.CursorPos_Set(Table.Database.Column.First(), Table.SortedRows().Get(r), true);
-        }
-
-        private void Ordn_Click(object sender, System.EventArgs e) {
-            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-            SelectStandardTab();
-            ExecuteFile(Table.Database.Filename.FilePath());
         }
 
         private void SelectStandardTab() => ribMain.SelectedIndex = 1;
@@ -515,17 +429,6 @@ namespace BlueControls.Forms {
 
         private void TableView_RowsSorted(object sender, System.EventArgs e) {
             CheckButtons();
-        }
-
-        private void Tempor‰renSpeicherort÷ffnen_Click(object sender, System.EventArgs e) {
-            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-            SelectStandardTab();
-            ExecuteFile(Path.GetTempPath());
-        }
-
-        private void ‹berDiesesProgramm_Click(object sender, System.EventArgs e) {
-            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-            MessageBox.Show("(c) Christian Peter<br>V " + Version, ImageCode.Information, "OK");
         }
 
         private void vor_Click(object sender, System.EventArgs e) {
