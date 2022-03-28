@@ -18,8 +18,6 @@
 #nullable enable
 
 using System;
-using System.Collections.Generic;
-using System.Drawing;
 
 // http://www.carlosag.net/tools/codetranslator/
 // http://converter.telerik.com/

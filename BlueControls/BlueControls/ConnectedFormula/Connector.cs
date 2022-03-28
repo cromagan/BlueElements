@@ -17,25 +17,13 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static BlueBasics.Extensions;
 using static BlueBasics.Develop;
 using BlueDatabase;
 using BlueBasics;
-using static BlueBasics.Converter;
-using BlueBasics.Interfaces;
 using BlueControls.ItemCollection;
 using BlueControls.Controls;
 using BlueDatabase.Enums;
-
-using BlueControls.ItemCollection;
-
 using BlueControls.Interfaces;
 
 namespace BlueControls.ConnectedFormula {

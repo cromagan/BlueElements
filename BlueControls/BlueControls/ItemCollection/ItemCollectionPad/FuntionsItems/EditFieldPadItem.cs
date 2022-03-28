@@ -25,10 +25,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using static BlueBasics.FileOperations;
 using MessageBox = BlueControls.Forms.MessageBox;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 using BlueDatabase;
 using BlueDatabase.Enums;
 
@@ -101,9 +99,7 @@ namespace BlueControls.ItemCollection {
         //    //Stil = PadStyles.Undefiniert; // Kein Rahmen
         //}
         public ÜberschriftAnordnung CaptionPosition {
-            get {
-                return _überschiftanordung;
-            }
+            get => _überschiftanordung;
             set {
                 if (_überschiftanordung == value) { return; }
                 _überschiftanordung = value;
@@ -154,9 +150,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public EditTypeFormula EditType {
-            get {
-                return _bearbeitung;
-            }
+            get => _bearbeitung;
             set {
                 if (_bearbeitung == value) { return; }
                 _bearbeitung = value;
@@ -440,7 +434,7 @@ namespace BlueControls.ItemCollection {
                 Skin.Draw_FormatedText(gr, "Spalte fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), CaptionFNT.Scale(zoom), true);
             } else {
                 Point cap;
-                Rectangle uc = positionModified.ToRect();
+                var uc = positionModified.ToRect();
 
                 switch (CaptionPosition) {
                     case ÜberschriftAnordnung.ohne:

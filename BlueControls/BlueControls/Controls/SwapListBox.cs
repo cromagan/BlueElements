@@ -60,14 +60,14 @@ namespace BlueControls.Controls {
         protected override void DrawControl(Graphics gr, States state) {
         }
 
-        protected void MoveItemBetweenList(ListBox Source, ListBox Target, string Internal, bool doRemove) {
-            var SourceItem = Source.Item[Internal];
-            var TargetItem = Target.Item[Internal];
-            if (SourceItem != null && TargetItem == null) {
-                Target.Item.Add((BasicListItem)SourceItem.Clone());
-            } else if (SourceItem == null && TargetItem == null) {
-                TargetItem = new TextListItem(Internal, Internal, null, false, true, string.Empty);
-                Target.Item.Add(TargetItem);
+        protected void MoveItemBetweenList(ListBox source, ListBox target, string @internal, bool doRemove) {
+            var sourceItem = source.Item[@internal];
+            var targetItem = target.Item[@internal];
+            if (sourceItem != null && targetItem == null) {
+                target.Item.Add((BasicListItem)sourceItem.Clone());
+            } else if (sourceItem == null && targetItem == null) {
+                targetItem = new TextListItem(@internal, @internal, null, false, true, string.Empty);
+                target.Item.Add(targetItem);
             }
             //var SourceItem = Source.Item[Internal];
             //var TargetItem = Target.Item[Internal];
@@ -76,8 +76,8 @@ namespace BlueControls.Controls {
             //    TargetItem = new TextListItem(Internal);
             //    Target.Item.Add(TargetItem);
             //}
-            Target.Item.Sort();
-            if (SourceItem != null && doRemove) { Source.Item.Remove(SourceItem); }
+            target.Item.Sort();
+            if (sourceItem != null && doRemove) { source.Item.Remove(sourceItem); }
         }
 
         //private void Main_ContextMenuItemClicked(object sender, EventArgs.ContextMenuItemClickedEventArgs e) {

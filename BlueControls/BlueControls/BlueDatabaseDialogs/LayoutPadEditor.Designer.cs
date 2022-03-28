@@ -3,7 +3,7 @@ using BlueControls.Controls;
 
 namespace BlueControls.BlueDatabaseDialogs 
     {
-    internal partial class LayoutPadEditor 
+        public partial class LayoutPadEditor 
         {
         //Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]

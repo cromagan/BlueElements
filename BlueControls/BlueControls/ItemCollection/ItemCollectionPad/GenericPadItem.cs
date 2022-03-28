@@ -20,7 +20,6 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection {

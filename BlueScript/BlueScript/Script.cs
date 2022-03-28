@@ -18,14 +18,12 @@
 #nullable enable
 
 using BlueBasics;
-using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using static BlueBasics.FileOperations;
 using static BlueBasics.Generic;
 
 namespace BlueScript {

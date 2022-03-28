@@ -19,15 +19,12 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueDatabase;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using BlueBasics.Interfaces;
-using System.ComponentModel;
 using BlueControls.Interfaces;
 using System.Windows.Forms;
 using BlueDatabase.Enums;
@@ -109,9 +106,7 @@ namespace BlueControls.ItemCollection {
 
         public string ReadableText() => "Konstanter Wert: " + _text;
 
-        public QuickImage? SymbolForReadableText() {
-            return QuickImage.Get(ImageCode.Textfeld, 16);
-        }
+        public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld, 16);
 
         public override string ToString() {
             var t = base.ToString();

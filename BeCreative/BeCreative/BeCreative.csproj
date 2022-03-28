@@ -8,16 +8,19 @@
     <LangVersion>latest</LangVersion>
     <ProjectGuid>{14EC995D-9366-4481-AF41-90395E4421D3}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <StartupObject></StartupObject>
+    <StartupObject>BeCreative.Program</StartupObject>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BeCreative</RootNamespace>
     <AssemblyName>BeCreative</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>WindowsFormsWithCustomSubMain</MyType>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <ApplicationIcon></ApplicationIcon>
-    <FileUpgradeFlags></FileUpgradeFlags>
-    <UpgradeBackupLocation></UpgradeBackupLocation>
+    <ApplicationIcon>
+    </ApplicationIcon>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <TargetFrameworkProfile />
@@ -57,7 +60,7 @@
     <OutputPath>bin\Release\</OutputPath>
     <DocumentationFile>BeCreative.xml</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
-	<LangVersion>latest</LangVersion>
+    <LangVersion>latest</LangVersion>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -72,7 +75,7 @@
     <Prefer32Bit>false</Prefer32Bit>
     <Optimize>false</Optimize>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-	<LangVersion>latest</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
@@ -84,7 +87,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-	<LangVersion>latest</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
@@ -107,6 +110,12 @@
     <Compile Include="Properties\Application.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="Start.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Start.Designer.cs">
+      <DependentUpon>Start.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -151,6 +160,15 @@
       <Project>{ce8be078-ddae-47f5-aaa9-685564b898c9}</Project>
       <Name>BlueDatabase</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\BluePaint\BluePaint\BluePaint.csproj">
+      <Project>{f357f648-987a-4442-93a9-bfc421561dd2}</Project>
+      <Name>BluePaint</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Start.resx">
+      <DependentUpon>Start.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

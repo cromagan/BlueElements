@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using BlueDatabase;
-
 namespace BlueControls.Forms {
 
     public partial class EditBoxRow_NEW : DialogWithOkAndCancel {
@@ -36,9 +34,6 @@ namespace BlueControls.Forms {
         }
 
         #endregion
-
-
-     
 
         #region Methods
 

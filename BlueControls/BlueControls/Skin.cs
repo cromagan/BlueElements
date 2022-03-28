@@ -849,13 +849,10 @@ namespace BlueControls {
 
         #region Properties
 
-        public static Color RandomColor {
-            get {
-                return Color.FromArgb((byte)Constants.GlobalRND.Next(0, 255),
-                                      (byte)Constants.GlobalRND.Next(0, 255),
-                                      (byte)Constants.GlobalRND.Next(0, 255));
-            }
-        }
+        public static Color RandomColor =>
+            Color.FromArgb((byte)Constants.GlobalRND.Next(0, 255),
+                (byte)Constants.GlobalRND.Next(0, 255),
+                (byte)Constants.GlobalRND.Next(0, 255));
 
         #endregion
 

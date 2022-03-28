@@ -64,6 +64,7 @@ namespace BlueControls.Forms {
             this.pnlStatusBar = new System.Windows.Forms.Panel();
             this.capStatusbar = new BlueControls.Controls.Caption();
             this.capZeilen2 = new BlueControls.Controls.Caption();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
             this.ribMain.SuspendLayout();
             this.tabAllgemein.SuspendLayout();
             this.grpAnsicht.SuspendLayout();
@@ -87,6 +88,7 @@ namespace BlueControls.Forms {
             // 
             // ribMain
             // 
+            this.ribMain.Controls.Add(this.tabPage1);
             this.ribMain.Controls.Add(this.tabAllgemein);
             this.ribMain.Controls.Add(this.tabAdmin);
             this.ribMain.Controls.Add(this.tabExport);
@@ -583,6 +585,16 @@ namespace BlueControls.Forms {
             this.capZeilen2.Size = new System.Drawing.Size(304, 24);
             this.capZeilen2.Translate = false;
             // 
+            // tabPage1
+            // 
+            this.tabPage1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.tabPage1.Location = new System.Drawing.Point(4, 25);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(1000, 81);
+            this.tabPage1.TabIndex = 3;
+            this.tabPage1.Text = "tabDatei";
+            // 
             // TableView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -660,5 +672,6 @@ namespace BlueControls.Forms {
         private Controls.Button btnCSVClipboard;
         protected System.Windows.Forms.TabPage tabExport;
         private Controls.ComboBox btnDrucken;
+        private System.Windows.Forms.TabPage tabPage1;
     }
 }

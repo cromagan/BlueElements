@@ -24,7 +24,6 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueScript.Enums;
 using BlueScript.Structures;
-using static BlueScript.Extensions;
 using BlueScript.Methods;
 using static BlueBasics.Extensions;
 

@@ -17,7 +17,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -25,7 +24,6 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;

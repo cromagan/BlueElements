@@ -18,7 +18,7 @@ namespace BeCreative {
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new BlueControls.Forms.TableView_OLD(null, true, true));
+            Application.Run(new Start());
             BlueBasics.Develop.TraceLogging_End();
         }
 

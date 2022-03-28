@@ -29,7 +29,7 @@ using static BlueBasics.FileOperations;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
-    internal partial class LayoutPadEditor : PadEditorWithFileAccess {
+    public partial class LayoutPadEditor : PadEditorWithFileAccess {
 
         #region Constructors
 

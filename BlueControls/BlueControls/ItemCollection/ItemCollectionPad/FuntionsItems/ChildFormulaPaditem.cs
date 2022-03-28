@@ -18,41 +18,15 @@
 #nullable enable
 
 using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueDatabase;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using BlueBasics.Interfaces;
-using System.ComponentModel;
 using BlueControls.Interfaces;
 using System.Windows.Forms;
-using BlueDatabase.Enums;
-using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
-
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Controls;
-
 using BlueControls.Forms;
-
-using BlueDatabase;
-using BlueDatabase.Enums;
-using System;
-using System.Collections.Generic;
-
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
 using BlueControls.ItemCollection.ItemCollectionList;
-
-using static BlueBasics.Converter;
-using System.Drawing;
-
 using BlueBasics.MultiUserFile;
 
 namespace BlueControls.ItemCollection {

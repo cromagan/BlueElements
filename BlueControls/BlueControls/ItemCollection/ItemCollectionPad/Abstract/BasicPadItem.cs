@@ -239,7 +239,6 @@ namespace BlueControls.ItemCollection {
         public virtual bool Contains(PointF value, float zoomfactor) {
             var tmp = UsedArea; // Umwandlung, um den Bezug zur Klasse zu zerstören
 
-
             var ne = 6 / zoomfactor + 1;
             tmp.Inflate(ne, ne);
             return tmp.Contains(value);
@@ -567,12 +566,11 @@ namespace BlueControls.ItemCollection {
             } catch { }
         }
 
-        protected bool IsInDrawingArea(RectangleF drawingKoordinates, Size sizeOfParentControl) {
-            return sizeOfParentControl.IsEmpty ||
-                sizeOfParentControl.Width == 0 ||
-                sizeOfParentControl.Height == 0 ||
-                drawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, sizeOfParentControl));
-        }
+        protected bool IsInDrawingArea(RectangleF drawingKoordinates, Size sizeOfParentControl) =>
+            sizeOfParentControl.IsEmpty ||
+            sizeOfParentControl.Width == 0 ||
+            sizeOfParentControl.Height == 0 ||
+            drawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, sizeOfParentControl));
 
         protected abstract void ParseFinished();
 

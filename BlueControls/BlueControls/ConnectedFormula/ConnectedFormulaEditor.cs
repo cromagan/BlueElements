@@ -17,23 +17,14 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using static BlueBasics.FileOperations;
-using BlueControls.ConnectedFormula;
-using static BlueBasics.Extensions;
 using BlueControls.ItemCollection;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
-using static BlueControls.ConnectedFormula.ConnectedFormula;
 using static BlueBasics.Converter;
 
 namespace BlueControls.Forms {
@@ -65,18 +56,17 @@ namespace BlueControls.Forms {
             Pad.Item.GridSnap = 0.5f;
         }
 
+        public ConnectedFormulaEditor() {
+            InitializeComponent();
+            _cf = null;
+            Pad.Item = null;
+
+            Pad.Item.SheetSizeInMm = new SizeF(PixelToMm(500, 300), PixelToMm(850, 300));
+            Pad.Item.GridShow = 0.5f;
+            Pad.Item.GridSnap = 0.5f;
+        }
+
         #endregion
-
-        //public ConnectedFormulaEditor(ConnectedFormula.ConnectedFormula cf) {
-        //    InitializeComponent();
-        //    _cf = cf;
-        //    Pad.Item = _cf.PadData;
-
-        //    Pad.Item.SheetSizeInMm = new SizeF(PixelToMm(500, 300), PixelToMm(850, 300));
-        //    Pad.Item.GridShow = 0.5f;
-        //    Pad.Item.GridSnap = 0.5f;
-
-        //}
 
         #region Methods
 

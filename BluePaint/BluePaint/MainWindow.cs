@@ -22,7 +22,6 @@ using BlueBasics.Enums;
 using BlueControls.Forms;
 using BluePaint.EventArgs;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.BitmapExt;
 using static BlueBasics.FileOperations;

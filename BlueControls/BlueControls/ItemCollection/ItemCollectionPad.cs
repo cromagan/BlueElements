@@ -235,9 +235,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public SizeF SheetSizeInPix {
-            get => new SizeF(_prRu.X - _prLo.X, _prRu.Y - _prLo.Y);
-        }
+        public SizeF SheetSizeInPix => new SizeF(_prRu.X - _prLo.X, _prRu.Y - _prLo.Y);
 
         public RowItem? SheetStyle {
             get => _sheetStyle;
@@ -676,10 +674,10 @@ namespace BlueControls.ItemCollection {
 
             BasicPadItem item1 = null;
             BasicPadItem item2 = null;
-            bool arrow1 = false;
-            bool arrow2 = false;
-            ConnectionType con1 = ConnectionType.Auto;
-            ConnectionType con2 = ConnectionType.Auto;
+            var arrow1 = false;
+            var arrow2 = false;
+            var con1 = ConnectionType.Auto;
+            var con2 = ConnectionType.Auto;
 
             foreach (var thisIt in x) {
                 switch (thisIt.Key) {

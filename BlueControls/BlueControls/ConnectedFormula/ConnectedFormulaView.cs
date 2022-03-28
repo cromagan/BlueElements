@@ -16,26 +16,13 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
-using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueDatabase;
-using BlueDatabase.EventArgs;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Linq;
-using BlueControls.ItemCollection;
-using static BlueBasics.Converter;
-using BlueDatabase.Enums;
 using static BlueControls.ConnectedFormula.ConnectedFormula;
-using BlueControls.ConnectedFormula;
 
 #nullable enable
 

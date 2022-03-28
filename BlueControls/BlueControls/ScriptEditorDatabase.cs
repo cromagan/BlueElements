@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueDatabase;

@@ -21,50 +21,13 @@ using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static BlueBasics.Extensions;
 using static BlueBasics.Develop;
 using BlueDatabase;
 using BlueBasics;
 using static BlueBasics.Converter;
 using BlueBasics.Interfaces;
 using BlueControls.ItemCollection;
-
-using BlueBasics;
-using BlueBasics.Enums;
-
-using BlueControls.BlueDatabaseDialogs;
-using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-
-using BlueDatabase;
-
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
-
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-
-using System.IO;
-
-using System.Linq;
-using static BlueBasics.Develop;
-
 using static BlueBasics.FileOperations;
-
-using static BlueBasics.Converter;
-
-using BlueBasics.EventArgs;
-using BlueControls.ItemCollection.ItemCollectionList;
-
-using System.Threading.Tasks;
-
-using System.Drawing;
-using static BlueBasics.Generic;
 
 namespace BlueControls.ConnectedFormula {
 
