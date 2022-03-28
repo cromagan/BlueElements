@@ -32,15 +32,12 @@ namespace BlueControls.Forms {
             this.btnPageSetup = new BlueControls.Controls.Button();
             this.btnAlsBildSpeichern = new BlueControls.Controls.Button();
             this.btnDruckerDialog = new BlueControls.Controls.Button();
-            this.groupBox1 = new BlueControls.Controls.GroupBox();
-            this.txbPage = new BlueControls.Controls.TextBox();
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.grpAssistent.SuspendLayout();
             this.grpZoom.SuspendLayout();
             this.tabExport.SuspendLayout();
             this.grpDrucken.SuspendLayout();
-            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnZoomOut
@@ -106,7 +103,6 @@ namespace BlueControls.Forms {
             // tabStart
             // 
             this.tabStart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.tabStart.Controls.Add(this.groupBox1);
             this.tabStart.Controls.Add(this.grpAssistent);
             this.tabStart.Controls.Add(this.grpZoom);
             this.tabStart.Location = new System.Drawing.Point(4, 25);
@@ -254,28 +250,6 @@ namespace BlueControls.Forms {
             this.btnDruckerDialog.Text = "Drucken";
             this.btnDruckerDialog.Click += new System.EventHandler(this.btnDruckerDialog_Click);
             // 
-            // groupBox1
-            // 
-            this.groupBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.groupBox1.CausesValidation = false;
-            this.groupBox1.Controls.Add(this.txbPage);
-            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.groupBox1.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.groupBox1.Location = new System.Drawing.Point(368, 0);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(296, 81);
-            this.groupBox1.TabIndex = 2;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Seiten";
-            // 
-            // txbPage
-            // 
-            this.txbPage.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbPage.Location = new System.Drawing.Point(48, 24);
-            this.txbPage.Name = "txbPage";
-            this.txbPage.Size = new System.Drawing.Size(144, 22);
-            this.txbPage.TabIndex = 0;
-            // 
             // PadEditorReadOnly
             // 
             this.ClientSize = new System.Drawing.Size(884, 361);
@@ -291,7 +265,6 @@ namespace BlueControls.Forms {
             this.grpZoom.ResumeLayout(false);
             this.tabExport.ResumeLayout(false);
             this.grpDrucken.ResumeLayout(false);
-            this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -312,7 +285,5 @@ namespace BlueControls.Forms {
         private GroupBox grpDrucken;
         private Button btnPageSetup;
         protected Button btnVorschauModus;
-        private GroupBox groupBox1;
-        private TextBox txbPage;
     }
 }

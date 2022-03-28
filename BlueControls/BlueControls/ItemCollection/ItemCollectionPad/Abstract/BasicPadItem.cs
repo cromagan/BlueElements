@@ -42,7 +42,7 @@ namespace BlueControls.ItemCollection {
         public readonly ListExt<PointM> MovablePoint = new();
 
         public readonly List<PointM> PointsForSuccesfullyMove = new();
-        public readonly ListExt<string> VisibleOnPage = new();
+
         public List<FlexiControl>? AdditionalStyleOptions = null;
 
         private static int _uniqueInternalCount;
@@ -78,8 +78,6 @@ namespace BlueControls.ItemCollection {
             ConnectsTo.ItemAdded += ConnectsTo_ItemAdded;
             ConnectsTo.ItemRemoving += ConnectsTo_ItemRemoving;
             ConnectsTo.ItemRemoved += ConnectsTo_ItemRemoved;
-
-            VisibleOnPage.Changed += VisibleOnPage_Changed;
         }
 
         #endregion
@@ -240,7 +238,9 @@ namespace BlueControls.ItemCollection {
         /// <remarks></remarks>
         public virtual bool Contains(PointF value, float zoomfactor) {
             var tmp = UsedArea; // Umwandlung, um den Bezug zur Klasse zu zerstören
-            var ne = -5 / zoomfactor + 1;
+
+
+            var ne = 6 / zoomfactor + 1;
             tmp.Inflate(ne, ne);
             return tmp.Contains(value);
         }
@@ -251,14 +251,14 @@ namespace BlueControls.ItemCollection {
             GC.SuppressFinalize(this);
         }
 
-        public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting, string page) {
+        public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting) {
             if (_parent == null) { Develop.DebugPrint(FehlerArt.Fehler, "Parent nicht definiert"); }
 
             if (forPrinting && !_beiExportSichtbar) { return; }
 
             var positionModified = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
 
-            if (IsInDrawingArea(positionModified, sizeOfParentControl, page)) {
+            if (IsInDrawingArea(positionModified, sizeOfParentControl)) {
                 DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
             }
 
@@ -335,6 +335,15 @@ namespace BlueControls.ItemCollection {
         public void InDenHintergrund() => _parent?.InDenHintergrund(this);
 
         public void InDenVordergrund() => _parent?.InDenVordergrund(this);
+
+        /// <summary>
+        /// Wird für den Editor benötigt, um bei hinzufügen es für den Benutzer mittig zu Plazieren
+        /// </summary>
+        /// <param name="v1"></param>
+        /// <param name="v2"></param>
+        /// <param name="wid"></param>
+        /// <param name="he"></param>
+        public abstract void InitialPosition(int x, int y, int width, int height);
 
         public void Move(float x, float y) {
             if (x == 0 && y == 0) { return; }
@@ -458,10 +467,6 @@ namespace BlueControls.ItemCollection {
                 t = t + "RemoveTooGroup=" + Gruppenzugehörigkeit.ToNonCritical() + ", ";
             }
 
-            if (VisibleOnPage != null && VisibleOnPage.Count > 0) {
-                t = t + "VisibleOnPage=" + VisibleOnPage.JoinWith(",").ToNonCritical() + ", ";
-            }
-
             return t.Trim(", ") + "}";
         }
 
@@ -519,8 +524,6 @@ namespace BlueControls.ItemCollection {
                 ConnectsTo.ItemRemoving -= ConnectsTo_ItemRemoving;
                 ConnectsTo.ItemRemoved -= ConnectsTo_ItemRemoved;
 
-                VisibleOnPage.Changed -= VisibleOnPage_Changed;
-
                 //ConnectsTo = null;
 
                 // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
@@ -564,11 +567,7 @@ namespace BlueControls.ItemCollection {
             } catch { }
         }
 
-        protected bool IsInDrawingArea(RectangleF drawingKoordinates, Size sizeOfParentControl, string page) {
-            if (!string.IsNullOrEmpty(page) && VisibleOnPage.Count > 0) {
-                if (!VisibleOnPage.Contains(page)) { return false; }
-            }
-
+        protected bool IsInDrawingArea(RectangleF drawingKoordinates, Size sizeOfParentControl) {
             return sizeOfParentControl.IsEmpty ||
                 sizeOfParentControl.Width == 0 ||
                 sizeOfParentControl.Height == 0 ||
@@ -608,8 +607,6 @@ namespace BlueControls.ItemCollection {
                 p.Moved -= PointMoved;
             }
         }
-
-        private void VisibleOnPage_Changed(object sender, System.EventArgs e) { OnChanged(); }
 
         #endregion
 

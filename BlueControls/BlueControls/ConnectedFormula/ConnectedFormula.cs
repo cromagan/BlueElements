@@ -32,6 +32,40 @@ using static BlueBasics.Converter;
 using BlueBasics.Interfaces;
 using BlueControls.ItemCollection;
 
+using BlueBasics;
+using BlueBasics.Enums;
+
+using BlueControls.BlueDatabaseDialogs;
+using BlueControls.Controls;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+
+using BlueDatabase;
+
+using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+
+using System.IO;
+
+using System.Linq;
+using static BlueBasics.Develop;
+
+using static BlueBasics.FileOperations;
+
+using static BlueBasics.Converter;
+
+using BlueBasics.EventArgs;
+using BlueControls.ItemCollection.ItemCollectionList;
+
+using System.Threading.Tasks;
+
+using System.Drawing;
+using static BlueBasics.Generic;
+
 namespace BlueControls.ConnectedFormula {
 
     public class ConnectedFormula : BlueBasics.MultiUserFile.MultiUserFile, IChangedFeedback {
@@ -47,6 +81,7 @@ namespace BlueControls.ConnectedFormula {
         public readonly ListExt<string> DatabaseFiles = new();
         //public readonly List<Database?> Databases = new();
 
+        public readonly ListExt<string> NotAllowedChilds = new();
         private string _createDate = string.Empty;
         private string _creator = string.Empty;
         private int _id = -1;
@@ -59,12 +94,19 @@ namespace BlueControls.ConnectedFormula {
 
         #region Constructors
 
-        public ConnectedFormula(string filename) : base(false, false) {
+        private ConnectedFormula(string filename) : base(false, false) {
             _createDate = DateTime.Now.ToString(Constants.Format_Date5);
             _creator = Generic.UserName();
             PadData = new ItemCollection.ItemCollectionPad();
+
             Load(filename, true);
+
+            //if (notallowedchilds != null) {
+            //    NotAllowedChilds.AddIfNotExists(notallowedchilds);
+            //}
+
             DatabaseFiles.Changed += DatabaseFiles_Changed;
+            NotAllowedChilds.Changed += NotAllowedChilds_Changed;
         }
 
         #endregion
@@ -98,6 +140,23 @@ namespace BlueControls.ConnectedFormula {
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Sucht die Datenbank im Speicher. Wird sie nicht gefunden, wird sie geladen.
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="checkOnlyFilenameToo"></param>
+        /// <param name="readOnly"></param>
+        /// <returns></returns>
+        public static ConnectedFormula? GetByFilename(string filename) {
+            var tmpCF = GetByFilename(filename, false);
+
+            if (tmpCF is ConnectedFormula cf) { return cf; }
+
+            if (tmpCF != null) { return null; }//  Daten im Speicher, aber keine Datenbank!
+
+            return !FileExists(filename) ? null : new ConnectedFormula(filename);
+        }
 
         //public string PadData {
         //    get => _padData;
@@ -149,6 +208,11 @@ namespace BlueControls.ConnectedFormula {
                     case "databasefiles":
                         DatabaseFiles.Clear();
                         DatabaseFiles.AddRange(pair.Value.FromNonCritical().SplitByCrToList());
+                        break;
+
+                    case "notallowedchilds":
+                        NotAllowedChilds.Clear();
+                        NotAllowedChilds.AddRange(pair.Value.FromNonCritical().SplitByCrToList());
                         break;
 
                     case "createdate":
@@ -204,6 +268,7 @@ namespace BlueControls.ConnectedFormula {
             t.Add("FilePath=" + FilePath.ToNonCritical());
             t.Add("LastUsedID=" + _id.ToString());
             t.Add("DatabaseFiles=" + DatabaseFiles.JoinWithCr().ToNonCritical());
+            t.Add("NotAllowedChilds=" + NotAllowedChilds.JoinWithCr().ToNonCritical());
             t.Add("PadItemData=" + PadData.ToString().ToNonCritical());
 
             return ("{" + t.JoinWith(", ").TrimEnd(", ") + "}").WIN1252_toByte();
@@ -216,6 +281,11 @@ namespace BlueControls.ConnectedFormula {
                 Database.GetByFilename(thisfile, false, false);
             }
 
+            _saved = false;
+        }
+
+        private void NotAllowedChilds_Changed(object sender, System.EventArgs e) {
+            if (_saving) { return; }
             _saved = false;
         }
 

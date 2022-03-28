@@ -15,18 +15,21 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueControls.Controls;
+
 namespace BlueControls.Interfaces {
 
-    public interface IRecursiveCheck {
+    public interface IItemToControl {
+
+        #region Properties
+
+        public string Internal { get; }
+
+        #endregion
 
         #region Methods
 
-        /// <summary>
-        /// Übrprüft ob eine Rekursivität besteht.
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public bool IsRecursiveWith(IRecursiveCheck obj);
+        public System.Windows.Forms.Control GenerateControl(ConnectedFormulaView parent);
 
         #endregion
     }

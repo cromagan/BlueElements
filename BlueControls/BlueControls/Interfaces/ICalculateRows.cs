@@ -15,18 +15,24 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Interfaces;
+using BlueControls.Controls;
+using BlueDatabase;
+
 namespace BlueControls.Interfaces {
 
-    public interface IRecursiveCheck {
+    public interface ICalculateRows : IRecursiveCheck, IReadableText {
 
-        #region Methods
+        #region Properties
+
+        public Database? Database { get; set; }
 
         /// <summary>
-        /// Übrprüft ob eine Rekursivität besteht.
+        /// Laufende Nummer, bestimmt die Einfärbung
         /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public bool IsRecursiveWith(IRecursiveCheck obj);
+        public int Id { get; set; }
+
+        public string Internal { get; }
 
         #endregion
     }

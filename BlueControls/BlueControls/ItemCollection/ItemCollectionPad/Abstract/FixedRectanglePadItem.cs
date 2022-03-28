@@ -79,6 +79,11 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
+        public override void InitialPosition(int x, int y, int width, int height) {
+            var ua = UsedArea;
+            SetLeftTopPoint(x - ua.Width / 2 + width / 2, y - ua.Height / 2 + height / 2);
+        }
+
         public override void PointMoved(object sender, MoveEventArgs e) {
             base.PointMoved(sender, e);
             var x = 0f;
@@ -148,7 +153,6 @@ namespace BlueControls.ItemCollection {
 
         public void SetLeftTopPoint(float x, float y) => _pLo.SetTo(x, y);
 
-
         public void SizeChanged() {
             // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
             _pl.SetTo(_pLo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2));
@@ -165,6 +169,5 @@ namespace BlueControls.ItemCollection {
         protected override void ParseFinished() => SizeChanged();
 
         #endregion
-
     }
 }

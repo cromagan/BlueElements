@@ -29,10 +29,12 @@ using System.Drawing;
 using BlueBasics.Interfaces;
 using System.ComponentModel;
 using BlueControls.Interfaces;
+using System.Windows.Forms;
+using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollection {
 
-    public class ConstantTextPaditem : FixedRectanglePadItem, IReadableText, IContentHolder {
+    public class ConstantTextPaditem : FixedRectanglePadItem, IReadableText, IContentHolder, IItemToControl {
 
         #region Fields
 
@@ -72,6 +74,16 @@ namespace BlueControls.ItemCollection {
         #endregion
 
         #region Methods
+
+        public Control GenerateControl(ConnectedFormulaView parent) {
+            var c3 = new FlexiControl();
+            c3.CaptionPosition = ÜberschriftAnordnung.ohne;
+            c3.EditType = EditTypeFormula.Textfeld;
+            c3.DisabledReason = "Konstanter Wert";
+            c3.ValueSet(Text, true, true);
+            c3.Tag = Internal;
+            return c3;
+        }
 
         public override List<GenericControl> GetStyleOptions() {
             List<GenericControl> l = new() { };

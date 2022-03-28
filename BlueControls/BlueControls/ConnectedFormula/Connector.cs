@@ -36,6 +36,8 @@ using BlueDatabase.Enums;
 
 using BlueControls.ItemCollection;
 
+using BlueControls.Interfaces;
+
 namespace BlueControls.ConnectedFormula {
 
     internal class Connector : System.Windows.Forms.Control {
@@ -48,21 +50,21 @@ namespace BlueControls.ConnectedFormula {
         private bool _disposing = false;
         private List<RowItem>? _rows;
 
+        private string _verbindungsID = string.Empty;
+
         #endregion
 
         #region Constructors
 
-        public Connector(RowWithFilterPaditem rwf) {
+        public Connector(RowWithFilterPaditem rwf, string verbindungsID) {
             _rwf = rwf;
+            _verbindungsID = verbindungsID;
 
             // den Rest initialisieren, bei OnParentChanged
-            // weil der Parent gebrauct wird um Filter zu erstellen
+            // weil der Parent gebraucht wird um Filter zu erstellen
         }
 
         #endregion
-
-        //private readonly System.Windows.Forms.Control.ControlCollection _controls;
-        //public string Tag { get; internal set; } = string.Empty;
 
         #region Methods
 
@@ -71,6 +73,7 @@ namespace BlueControls.ConnectedFormula {
 
             if (disposing) {
                 _disposing = true;
+
                 Tag = null;
                 _rwf.Changed -= _rwf_Changed;
 
@@ -97,7 +100,6 @@ namespace BlueControls.ConnectedFormula {
         }
 
         private void _rwf_Changed(object? sender, System.EventArgs e) {
-            //_database = _rwf.Database;
             GetParentsList();
             CalculateRows();
         }
@@ -189,19 +191,19 @@ namespace BlueControls.ConnectedFormula {
 
             #endregion
 
-            ChildsBefüllen();
+            ChildsUndVerbundeneBefüllen();
         }
 
         private void Childs_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
-            ChildsBefüllen();
+            ChildsUndVerbundeneBefüllen();
         }
 
-        private void ChildsBefüllen() {
+        private void ChildsUndVerbundeneBefüllen() {
             if (_disposing || IsDisposed) { return; }
 
             foreach (var thischild in Childs) {
                 switch (thischild) {
-                    case FlexiControlForCell fcfc:
+                    case IAcceptRowKey fcfc:
                         // Normales Zellenfeld
                         if (_rwf.Genau_eine_Zeile) {
                             fcfc.Database = _rwf.Database;
@@ -223,16 +225,25 @@ namespace BlueControls.ConnectedFormula {
                             fc.DisabledReason = "Vorgänger hat falschen Datentyp";
                             fc.ValueSet(string.Empty, true, true);
                         } else {
+                            // Wie lautet der eigene Ursprüngliche Name, von dem das FlexControl abstammt
                             var id = (string)fc.Tag;
-                            var efpi = (EditFieldPadItem)_rwf.Parent[id];
-                            var li = efpi.Column.Contents(_rows);
-                            var cbx = new ItemCollection.ItemCollectionList.ItemCollectionList();
-                            cbx.AddRange(li, efpi.Column, ShortenStyle.Replaced, efpi.Column.BildTextVerhalten);
-                            cbx.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
 
-                            if (fc.EditType == EditTypeFormula.Textfeld_mit_Auswahlknopf) {
-                                fc.StyleComboBox(cbx, System.Windows.Forms.ComboBoxStyle.DropDownList);
-                                if (!li.Contains(fc.Value)) { fc.ValueSet(string.Empty, true, true); }
+                            // Sich selbst suchen - also, das Original Item. Das Patent hier ist die PadCollection
+                            var efpi = (EditFieldPadItem)_rwf.Parent[id];
+
+                            if (efpi == null) {
+                                fc.DisabledReason = "Interner Fehler: Ursprungsitem nicht vorhanden";
+                                fc.ValueSet(string.Empty, true, true);
+                            } else {
+                                var li = efpi.Column.Contents(_rows);
+                                var cbx = new ItemCollection.ItemCollectionList.ItemCollectionList();
+                                cbx.AddRange(li, efpi.Column, ShortenStyle.Replaced, efpi.Column.BildTextVerhalten);
+                                cbx.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
+
+                                if (fc.EditType == EditTypeFormula.Textfeld_mit_Auswahlknopf) {
+                                    fc.StyleComboBox(cbx, System.Windows.Forms.ComboBoxStyle.DropDownList);
+                                    if (!li.Contains(fc.Value)) { fc.ValueSet(string.Empty, true, true); }
+                                }
                             }
                         }
                         break;
@@ -250,7 +261,6 @@ namespace BlueControls.ConnectedFormula {
             foreach (var thisR in _rwf.FilterDefiniton.Row) {
                 var item = _rwf.Parent[thisR.CellGetString("suchtxt")];
                 if (item != null) {
-
                     var c = ((ConnectedFormulaView)Parent).SearchOrGenerate(item);
                     _parents.Add(c);
                 }

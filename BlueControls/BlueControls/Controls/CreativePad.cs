@@ -48,7 +48,6 @@ namespace BlueControls.Controls {
         #region Fields
 
         private readonly List<IMoveable?> _itemsToMove = new();
-        private string _currentPage = string.Empty;
         private IMouseAndKeyHandle? _givesMouseComandsTo;
         private ItemCollectionPad _item;
         private string _lastQuickInfo = string.Empty;
@@ -90,10 +89,9 @@ namespace BlueControls.Controls {
 
         public event EventHandler<ListEventArgs> ItemAdded;
 
-        //public event EventHandler<ListEventArgs> ItemInternalChanged;
-
         public event EventHandler<System.EventArgs> ItemRemoved;
 
+        //public event EventHandler<ListEventArgs> ItemInternalChanged;
         public event EventHandler<ListEventArgs> ItemRemoving;
 
         public event EventHandler PreviewModeChanged;
@@ -103,17 +101,6 @@ namespace BlueControls.Controls {
         #endregion
 
         #region Properties
-
-        [DefaultValue("")]
-        public string CurrentPage {
-            get => _currentPage;
-            set {
-                if (_currentPage == value) { return; }
-                _currentPage = value;
-                OnPreviewModeChanged();
-                Invalidate();
-            }
-        }
 
         [DefaultValue(true)]
         public bool EditAllowed { get; set; } = true;
@@ -148,6 +135,7 @@ namespace BlueControls.Controls {
         }
 
         public BasicPadItem? LastClickedItem { get; private set; }
+
         public override string QuickInfoText => _lastQuickInfo;
 
         [DefaultValue(false)]
@@ -285,10 +273,9 @@ namespace BlueControls.Controls {
 
         public void OnItemAdded(ListEventArgs e) => ItemAdded?.Invoke(this, e);
 
-        //public void OnItemInternalChanged(ListEventArgs e) => ItemInternalChanged?.Invoke(this, e);
-
         public void OnItemRemoved() => ItemRemoved?.Invoke(this, System.EventArgs.Empty);
 
+        //public void OnItemInternalChanged(ListEventArgs e) => ItemInternalChanged?.Invoke(this, e);
         public void OnItemRemoving(ListEventArgs e) => ItemRemoving?.Invoke(this, e);
 
         public void OpenSaveDialog(string title) {
@@ -343,6 +330,22 @@ namespace BlueControls.Controls {
         public void Unselect() {
             _itemsToMove.Clear();
             Invalidate();
+        }
+
+        internal void AddCentered(BasicPadItem it) {
+            var pos = MiddleOfVisiblesScreen();
+            var wid = (int)((Width + Zoom) * 0.8);
+            var he = (int)((Height + Zoom) * 0.8);
+
+            wid = Math.Max(wid, 10);
+            he = Math.Max(he, 10);
+
+            wid = Math.Min(wid, 200);
+            he = Math.Min(he, 200);
+
+            it.InitialPosition(pos.X - wid / 2, pos.Y - he / 2, wid, he);
+
+            Item.Add(it);
         }
 
         internal void DoMouseDown(MouseEventArgs e) {
@@ -449,7 +452,7 @@ namespace BlueControls.Controls {
             LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray,
                 LinearGradientMode.Vertical);
             gr.FillRectangle(lgb, ClientRectangle);
-            _item.DrawCreativePadTo(gr, Size, state, Zoom, ShiftX, ShiftY, null, _showInPrintMode, CurrentPage);
+            _item.DrawCreativePadTo(gr, Size, state, Zoom, ShiftX, ShiftY, null, _showInPrintMode);
 
             #region Dann die selectiereren Punkte
 
@@ -545,7 +548,7 @@ namespace BlueControls.Controls {
         private void DruckerDokument_PrintPage(object sender, PrintPageEventArgs e) {
             e.HasMorePages = false;
             OnPrintPage(e);
-            var i = _item.ToBitmap(3, string.Empty);
+            var i = _item.ToBitmap(3);
             if (i == null) { return; }
             e.Graphics.DrawImageInRectAspectRatio(i, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
         }

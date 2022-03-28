@@ -67,6 +67,7 @@ namespace BlueControls.ItemCollection {
         #region Properties
 
         public ConectorStyle Linien_Verhalten { get; set; }
+
         protected override int SaveOrder => 999;
 
         #endregion
@@ -108,6 +109,11 @@ namespace BlueControls.ItemCollection {
             AddLineStyleOption(l);
             l.AddRange(base.GetStyleOptions());
             return l;
+        }
+
+        public override void InitialPosition(int x, int y, int width, int height) {
+            _point1.SetTo(x, y + height / 2);
+            _point2.SetTo(x + width, y + height / 2);
         }
 
         //public void Move(float x, float y) {

@@ -43,26 +43,40 @@ namespace BlueControls.Forms {
         #region Fields
 
         private ConnectedFormula.ConnectedFormula _cf;
-        private bool _creating = false;
 
         #endregion
 
         #region Constructors
 
-        public ConnectedFormulaEditor(ConnectedFormula.ConnectedFormula cf) {
+        public ConnectedFormulaEditor(string filename, List<string>? notAllowedchilds) {
             InitializeComponent();
-            _creating = true;
-            _cf = cf;
+
+            _cf = ConnectedFormula.ConnectedFormula.GetByFilename(filename);
+
+            if (notAllowedchilds != null) {
+                _cf.NotAllowedChilds.AddRange(notAllowedchilds);
+            }
+
+            //   _cf = new BlueControls.ConnectedFormula.ConnectedFormula(filename, notAllowedchilds);
             Pad.Item = _cf.PadData;
 
             Pad.Item.SheetSizeInMm = new SizeF(PixelToMm(500, 300), PixelToMm(850, 300));
             Pad.Item.GridShow = 0.5f;
             Pad.Item.GridSnap = 0.5f;
-
-            _creating = false;
         }
 
         #endregion
+
+        //public ConnectedFormulaEditor(ConnectedFormula.ConnectedFormula cf) {
+        //    InitializeComponent();
+        //    _cf = cf;
+        //    Pad.Item = _cf.PadData;
+
+        //    Pad.Item.SheetSizeInMm = new SizeF(PixelToMm(500, 300), PixelToMm(850, 300));
+        //    Pad.Item.GridShow = 0.5f;
+        //    Pad.Item.GridSnap = 0.5f;
+
+        //}
 
         #region Methods
 
@@ -78,7 +92,7 @@ namespace BlueControls.Forms {
                 x.GetRowFrom = efi.GetRowFrom;
             }
 
-            Pad.Item.Add(x);
+            Pad.AddCentered(x);
 
             if (x.GetRowFrom != null && x.GetRowFrom.Database != null) {
                 x.Spalte_wählen = string.Empty; // Dummy setzen
@@ -88,10 +102,16 @@ namespace BlueControls.Forms {
         private void btnKonstante_Click(object sender, System.EventArgs e) {
             var x = new ConstantTextPaditem();
             x.Bei_Export_Sichtbar = false;
-            Pad.Item.Add(x);
+            Pad.AddCentered(x);
         }
 
         private void btnPfeileAusblenden_CheckedChanged(object sender, System.EventArgs e) => btnVorschauModus.Checked = btnPfeileAusblenden.Checked;
+
+        private void btnTabControlAdd_Click(object sender, System.EventArgs e) {
+            var x = new ChildFormulaPaditem(string.Empty, _cf.Filename, _cf.NotAllowedChilds);
+            x.Bei_Export_Sichtbar = true;
+            Pad.AddCentered(x);
+        }
 
         private void btnVorschauModus_CheckedChanged(object sender, System.EventArgs e) => btnPfeileAusblenden.Checked = btnVorschauModus.Checked;
 
@@ -124,7 +144,7 @@ namespace BlueControls.Forms {
             if (db != null) {
                 var dbitem = new RowWithFilterPaditem(db, _cf.NextID());
                 dbitem.Bei_Export_Sichtbar = false;
-                Pad.Item.Add(dbitem);
+                Pad.AddCentered(dbitem);
             }
         }
 

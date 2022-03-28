@@ -29,6 +29,7 @@ namespace BlueControls.Forms {
             this.btnVorschauÖffnen = new BlueControls.Controls.Button();
             this.btnPfeileAusblenden = new BlueControls.Controls.Button();
             this.grpFelder = new BlueControls.Controls.GroupBox();
+            this.btnTabControlAdd = new BlueControls.Controls.Button();
             this.btnKonstante = new BlueControls.Controls.Button();
             this.btnFeldHinzu = new BlueControls.Controls.Button();
             this.btnZeileHinzu = new BlueControls.Controls.Button();
@@ -91,7 +92,7 @@ namespace BlueControls.Forms {
             this.grpVorschau.Controls.Add(this.btnPfeileAusblenden);
             this.grpVorschau.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpVorschau.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpVorschau.Location = new System.Drawing.Point(216, 0);
+            this.grpVorschau.Location = new System.Drawing.Point(288, 0);
             this.grpVorschau.Name = "grpVorschau";
             this.grpVorschau.Size = new System.Drawing.Size(208, 81);
             this.grpVorschau.TabIndex = 1;
@@ -124,6 +125,7 @@ namespace BlueControls.Forms {
             // grpFelder
             // 
             this.grpFelder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpFelder.Controls.Add(this.btnTabControlAdd);
             this.grpFelder.Controls.Add(this.btnKonstante);
             this.grpFelder.Controls.Add(this.btnFeldHinzu);
             this.grpFelder.Controls.Add(this.btnZeileHinzu);
@@ -131,10 +133,23 @@ namespace BlueControls.Forms {
             this.grpFelder.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpFelder.Location = new System.Drawing.Point(0, 0);
             this.grpFelder.Name = "grpFelder";
-            this.grpFelder.Size = new System.Drawing.Size(216, 81);
+            this.grpFelder.Size = new System.Drawing.Size(288, 81);
             this.grpFelder.TabIndex = 0;
             this.grpFelder.TabStop = false;
             this.grpFelder.Text = "Felder";
+            // 
+            // btnTabControlAdd
+            // 
+            this.btnTabControlAdd.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnTabControlAdd.ImageCode = "Bruchlinie|16|||||||||PlusZeichen";
+            this.btnTabControlAdd.Location = new System.Drawing.Point(208, 2);
+            this.btnTabControlAdd.Name = "btnTabControlAdd";
+            this.btnTabControlAdd.QuickInfo = "Fügt ein Steuerelement mit\r\nRegisterkarten hinzu.\r\nPro Registerkarte kann ein \r\nU" +
+    "nterformular gewählt werden.";
+            this.btnTabControlAdd.Size = new System.Drawing.Size(64, 66);
+            this.btnTabControlAdd.TabIndex = 3;
+            this.btnTabControlAdd.Text = "Register hinzufügen";
+            this.btnTabControlAdd.Click += new System.EventHandler(this.btnTabControlAdd_Click);
             // 
             // btnKonstante
             // 
@@ -180,6 +195,7 @@ namespace BlueControls.Forms {
             this.ClientSize = new System.Drawing.Size(974, 499);
             this.Name = "ConnectedFormulaEditor";
             this.Text = "ConnectedFormula";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.grpDesign.ResumeLayout(false);
             this.Ribbon.ResumeLayout(false);
             this.tabStart.ResumeLayout(false);
@@ -201,5 +217,6 @@ namespace BlueControls.Forms {
         private Controls.GroupBox grpVorschau;
         private Controls.Button btnPfeileAusblenden;
         private Controls.Button btnVorschauÖffnen;
+        private Controls.Button btnTabControlAdd;
     }
 }

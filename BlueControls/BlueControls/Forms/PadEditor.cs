@@ -87,31 +87,31 @@ namespace BlueControls.Forms {
 
         private void btnAddDimension_Click(object sender, System.EventArgs e) {
             DimensionPadItem b = new(new PointF(300, 300), new PointF(400, 300), 30);
-            Pad.Item.Add(b);
+            Pad.AddCentered(b);
         }
 
         private void btnAddImage_Click(object sender, System.EventArgs e) {
             BitmapPadItem b = new(QuickImage.Get(ImageCode.Fragezeichen), new Size(1000, 1000));
-            Pad.Item.Add(b);
+            Pad.AddCentered(b);
         }
 
         private void btnAddLine_Click(object sender, System.EventArgs e) {
             var p = Pad.MiddleOfVisiblesScreen();
             var w = (int)(300 / Pad.Zoom);
             LinePadItem b = new(PadStyles.Style_Standard, new Point(p.X - w, p.Y), new Point(p.X + w, p.Y));
-            Pad.Item.Add(b);
+            Pad.AddCentered(b);
         }
 
         private void btnAddPhsyik_Click(object sender, System.EventArgs e) {
             PhysicPadItem b = new();
             //b.SetCoordinates(new RectangleF(100, 100, 300, 300));
-            Pad.Item.Add(b);
+            Pad.AddCentered(b);
         }
 
         private void btnAddSymbol_Click(object sender, System.EventArgs e) {
             SymbolPadItem b = new();
             b.SetCoordinates(new RectangleF(100, 100, 300, 300), true);
-            Pad.Item.Add(b);
+            Pad.AddCentered(b);
         }
 
         private void btnAddText_Click(object sender, System.EventArgs e) {
@@ -119,14 +119,14 @@ namespace BlueControls.Forms {
                 Text = string.Empty,
                 Stil = PadStyles.Style_Standard
             };
-            Pad.Item.Add(b);
+            Pad.AddCentered(b);
             b.SetCoordinates(new RectangleF(10, 10, 200, 200), true);
         }
 
         private void btnAddUnterStufe_Click(object sender, System.EventArgs e) {
             ChildPadItem b = new();
             b.SetCoordinates(new RectangleF(100, 100, 300, 300), true);
-            Pad.Item.Add(b);
+            Pad.AddCentered(b);
         }
 
         private void btnArbeitsbreichSetup_Click(object sender, System.EventArgs e) => Pad.ShowWorkingAreaSetup();

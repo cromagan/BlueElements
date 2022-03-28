@@ -42,7 +42,7 @@ using MessageBox = System.Windows.Forms.MessageBox;
 namespace BlueControls.Controls {
 
     [Designer(typeof(BasicDesigner))]
-    public partial class FlexiControlForCell : FlexiControl, IContextMenu {
+    public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRowKey {
 
         #region Fields
 

@@ -198,7 +198,7 @@ namespace BlueControls.ItemCollection {
             pad.ShowInPrintMode = true;
             pad.Unselect();
             if (Parent.SheetStyle != null) { pad.Item.SheetStyle = Parent.SheetStyle; }
-            pad.Item.DrawCreativePadToBitmap(generatedBitmap, States.Standard, zoomv, slidervalues.X, slidervalues.Y, null, string.Empty);
+            pad.Item.DrawCreativePadToBitmap(generatedBitmap, States.Standard, zoomv, slidervalues.X, slidervalues.Y, null);
             //if (sizeChangeAllowed) { p_RU.SetTo(p_LO.X + GeneratedBitmap.Width, p_LO.Y + GeneratedBitmap.Height); }
             //SizeChanged();
             GeneratedBitmap = generatedBitmap;

@@ -56,7 +56,6 @@ namespace BlueControls.Forms {
 
         private void Pad_PreviewModChanged(object sender, System.EventArgs e) {
             btnVorschauModus.Checked = Pad.ShowInPrintMode;
-            txbPage.Text = Pad.CurrentPage;
         }
 
         #endregion

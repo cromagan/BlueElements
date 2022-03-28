@@ -44,6 +44,8 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
+        public override void InitialPosition(int x, int y, int width, int height) { }
+
         protected override string ClassId() => "Physics-Object";
 
         protected override BasicPadItem? TryCreate(string id, string name) {

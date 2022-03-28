@@ -34,10 +34,11 @@ using BlueDatabase.Enums;
 
 using BlueBasics.Interfaces;
 using BlueControls.Interfaces;
+using BlueControls.ConnectedFormula;
 
 namespace BlueControls.ItemCollection {
 
-    public class EditFieldPadItem : RectanglePadItem, IReadableText, IRecursiveCheck, IContentHolder {
+    public class EditFieldPadItem : RectanglePadItem, IReadableText, IRecursiveCheck, IContentHolder, IItemToControl {
 
         #region Fields
 
@@ -45,7 +46,7 @@ namespace BlueControls.ItemCollection {
 
         public ColumnItem? Column = null;
         private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
-        private RowWithFilterPaditem? _GetValueFrom = null;
+        private ICalculateRows? _GetValueFrom = null;
         private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
         #endregion
@@ -59,6 +60,36 @@ namespace BlueControls.ItemCollection {
         #endregion
 
         #region Properties
+
+        public string Breite_Berechnen {
+            get => string.Empty;
+            set {
+                var li = new ItemCollectionList.ItemCollectionList();
+                for (var br = 1; br <= 20; br++) {
+                    li.Add(br + " Spalte(n)", br.ToString(), true, string.Empty);
+
+                    for (var pos = 1; pos <= br; pos++) {
+                        li.Add(br + " Spalte(n) - Position: " + pos, br + ";" + pos);
+                    }
+                }
+
+                var x2 = BlueControls.Forms.InputBoxListBoxStyle.Show("Bitte Breite und Position wählen:", li, AddType.None, true);
+
+                if (x2 == null || x2.Count != 1) { return; }
+
+                var doit = x2[0].SplitBy(";");
+
+                var anzbr = IntParse(doit[0]);
+                var npos = IntParse(doit[1]);
+                var x = UsedArea;
+                x.Width = (Parent.SheetSizeInPix.Width - (MmToPixel(0.5f, 300) * (anzbr - 1))) / anzbr;
+                x.X = x.Width * (npos - 1) + MmToPixel(0.5f, 300) * (npos - 1);
+
+                SetCoordinates(x, true);
+
+                //OnChanged();
+            }
+        }
 
         //public EditFieldPadItem(string internalname, Bitmap? bmp, Size size) : base(internalname) {
         //    //Bitmap = bmp;
@@ -93,7 +124,7 @@ namespace BlueControls.ItemCollection {
             set {
                 var x = new ItemCollectionList.ItemCollectionList();
                 foreach (var thisR in Parent) {
-                    if (thisR is RowWithFilterPaditem rfp) {
+                    if (thisR is ICalculateRows rfp) {
                         if (!rfp.IsRecursiveWith(this)) {
                             x.Add(rfp, thisR.Internal);
                         }
@@ -108,7 +139,7 @@ namespace BlueControls.ItemCollection {
 
                 var t = Parent[it[0]];
 
-                if (t is RowWithFilterPaditem rfp2) {
+                if (t is ICalculateRows rfp2) {
                     if (rfp2 != GetRowFrom) {
                         GetRowFrom = rfp2;
                         Column = null;
@@ -133,7 +164,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public RowWithFilterPaditem? GetRowFrom {
+        public ICalculateRows? GetRowFrom {
             get => _GetValueFrom;
 
             set {
@@ -227,41 +258,43 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public string Breite_Berechnen {
-            get => string.Empty;
-            set {
-
-                var li = new ItemCollectionList.ItemCollectionList();
-                for(var br =1; br<= 20; br++) {
-                    li.Add("Breite: " + br , br.ToString(),true,string.Empty);
-
-                    for (var pos = 1; pos <= br; pos++) {
-                        li.Add("Breite: " + br + " - Position: " + pos, br +";"+pos);
-                    }
-                    }
-
-
-                var x2 = BlueControls.Forms.InputBoxListBoxStyle.Show("Bitte Breite und Position wählen:", li,  AddType.None, true);
-
-                if(x2 == null || x2.Count !=1) { return; }
-
-                var doit = x2[0].SplitBy(";");
-
-                var anzbr = IntParse(doit[0]);
-                var npos = IntParse(doit[1]);
-                var x = UsedArea;
-                x.Width = (Parent.SheetSizeInPix.Width - (MmToPixel(0.5f, 300) * (anzbr - 1))) / anzbr;
-                x.X = x.Width * (npos-1) + MmToPixel(0.5f, 300) * (npos - 1);
-                
-                SetCoordinates(x, true);
-
-                //OnChanged();
-            }
-        }
-
         protected override int SaveOrder => 2;
 
         #endregion
+
+        #region Methods
+
+        public System.Windows.Forms.Control GenerateControl(ConnectedFormulaView parent) {
+            if (GetRowFrom is RowWithFilterPaditem rfw2) {
+                var ff = parent.SearchOrGenerate(rfw2);
+
+                if (rfw2.Genau_eine_Zeile) {
+                    var cx = new FlexiControlForCell();
+                    cx.ColumnKey = Column.Key;
+                    cx.EditType = EditType;
+                    cx.CaptionPosition = CaptionPosition;
+                    cx.Tag = Internal;
+                    if (ff is Connector cc) { cc.Childs.Add(cx); }
+                    return cx;
+                } else {
+                    var c = new FlexiControl();
+                    c.Caption = Column.ReadableText() + ":";
+                    c.EditType = EditType;
+                    c.CaptionPosition = CaptionPosition;
+                    c.Tag = Internal;
+                    if (ff is Connector cc) { cc.Childs.Add(c); }
+                    return c;
+                }
+            }
+
+            var cy = new FlexiControl();
+            cy.Caption = Column.ReadableText() + ":";
+            cy.EditType = EditType;
+            cy.CaptionPosition = CaptionPosition;
+            cy.DisabledReason = "Keine Verknüpfung vorhanden.";
+            cy.Tag = Internal;
+            return cy;
+        }
 
         //private string _quickinfo;
         //private string _adminInfo;
@@ -270,8 +303,6 @@ namespace BlueControls.ItemCollection {
         //public EditFieldPadItem(string internalname, Bitmap? bmp) : this(internalname, bmp, Size.Empty) { }
 
         //public EditFieldPadItem(Bitmap? bmp, Size size) : this(string.Empty, bmp, size) { }
-
-        #region Methods
 
         //public EditFieldPadItem(Bitmap? bmp) : this(string.Empty, bmp, Size.Empty) { }
         public override List<GenericControl> GetStyleOptions() {
@@ -336,7 +367,7 @@ namespace BlueControls.ItemCollection {
             if (base.ParseThis(tag, value)) { return true; }
             switch (tag) {
                 case "getvaluefrom":
-                    GetRowFrom = (RowWithFilterPaditem)Parent[value.FromNonCritical()];
+                    GetRowFrom = (ICalculateRows)Parent[value.FromNonCritical()];
                     return true;
 
                 case "column":
@@ -538,7 +569,7 @@ namespace BlueControls.ItemCollection {
             ConnectsTo.Clear();
 
             if (GetRowFrom != null) {
-                ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, GetRowFrom, ConnectionType.Bottom, false));
+                ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, (BasicPadItem)GetRowFrom, ConnectionType.Bottom, false));
             }
         }
 

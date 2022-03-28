@@ -111,7 +111,9 @@ namespace BlueControls.ItemCollection {
         #region Properties
 
         public float Länge_In_Mm => (float)Math.Round(PixelToMm(_länge, ItemCollectionPad.Dpi), Nachkommastellen);
+
         public int Nachkommastellen { get; set; }
+
         public string Präfix { get; set; } = string.Empty;
 
         //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
@@ -130,6 +132,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public string Text_Unten { get; set; }
+
         protected override int SaveOrder => 999;
 
         #endregion
@@ -177,6 +180,12 @@ namespace BlueControls.ItemCollection {
             l.Add(new FlexiControlForProperty<float>(() => Skalierung));
             l.AddRange(base.GetStyleOptions());
             return l;
+        }
+
+        public override void InitialPosition(int x, int y, int width, int height) {
+            _point1.SetTo(x, y + height);
+            _point2.SetTo(x + width, y + height);
+            _textPoint.SetTo(x + width / 2, y);
         }
 
         public override bool ParseThis(string tag, string value) {

@@ -15,18 +15,18 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueControls.Controls;
+using BlueDatabase;
+
 namespace BlueControls.Interfaces {
 
-    public interface IRecursiveCheck {
+    public interface IAcceptRowKey {
 
-        #region Methods
+        #region Properties
 
-        /// <summary>
-        /// Übrprüft ob eine Rekursivität besteht.
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public bool IsRecursiveWith(IRecursiveCheck obj);
+        public Database? Database { get; set; }
+
+        public long RowKey { get; set; }
 
         #endregion
     }

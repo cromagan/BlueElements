@@ -295,7 +295,7 @@ namespace BlueControls.ItemCollection {
                     var slidervalues = ItemCollectionPad.SliderValues(mb, zoomv, centerpos);
                     PadInternal.ShowInPrintMode = forPrinting;
                     if (forPrinting) { PadInternal.Unselect(); }
-                    PadInternal.Item.DrawCreativePadToBitmap(_tmpBmp, States.Standard, zoomv, slidervalues.X, slidervalues.Y, VisibleItems, string.Empty);
+                    PadInternal.Item.DrawCreativePadToBitmap(_tmpBmp, States.Standard, zoomv, slidervalues.X, slidervalues.Y, VisibleItems);
                     if (_tmpBmp != null) {
                         foreach (var thisA in Eingebettete_Ansichten) {
                             ChildPadItem? pad = null;

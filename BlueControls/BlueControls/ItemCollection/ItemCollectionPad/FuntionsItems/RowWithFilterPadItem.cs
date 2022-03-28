@@ -31,10 +31,12 @@ using System.ComponentModel;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 using BlueControls.Interfaces;
+using System.Windows.Forms;
+using BlueControls.ConnectedFormula;
 
 namespace BlueControls.ItemCollection {
 
-    public class RowWithFilterPaditem : FixedRectanglePadItem, IReadableText, IRecursiveCheck {
+    public class RowWithFilterPaditem : FixedRectanglePadItem, IReadableText, IRecursiveCheck, ICalculateRows, IItemToControl {
 
         #region Fields
 
@@ -45,6 +47,8 @@ namespace BlueControls.ItemCollection {
         public readonly Database FilterDefiniton;
 
         private bool _genau_eine_Zeile = true;
+
+        private string _VerbindungsID = string.Empty;
 
         #endregion
 
@@ -69,7 +73,7 @@ namespace BlueControls.ItemCollection {
 
         #region Properties
 
-        public Database? Database { get; private set; }
+        public Database? Database { get; set; }
 
         public string Datenbankkopf {
             get => string.Empty;
@@ -113,13 +117,29 @@ namespace BlueControls.ItemCollection {
         /// <summary>
         /// Laufende Nummer, bestimmt die Einfärbung
         /// </summary>
-        public int Id { get; private set; }
+        public int Id { get; set; }
+
+        [Description("Mit dieser Verbindungs-ID können formularübergeifend Filter an\r\nan andere Filterelemnte übergeben werden bzw.\r\nempfangen werden.\r\nZiegt KEIN Pfeil auf dieses Element, übernimmt es den Wert.\r\nAndernfalls empfängt es den Wert.")]
+        public string VerbindungsID {
+            get => _VerbindungsID;
+            set {
+                if (_VerbindungsID == value) { return; }
+                _VerbindungsID = value;
+                OnChanged();
+            }
+        }
 
         protected override int SaveOrder => 1;
 
         #endregion
 
         #region Methods
+
+        public Control GenerateControl(ConnectedFormulaView parent) {
+            var c = new Connector(this, _VerbindungsID);
+            c.Tag = Internal;
+            return c;
+        }
 
         public override List<GenericControl> GetStyleOptions() {
             List<GenericControl> l = new() { };
@@ -130,6 +150,7 @@ namespace BlueControls.ItemCollection {
             //l.Add(new FlexiControlForProperty(()=> this.Datenbankkopf"));
             l.Add(new FlexiControl());
             l.Add(new FlexiControlForProperty<bool>(() => Genau_eine_Zeile));
+            l.Add(new FlexiControlForProperty<string>(() => VerbindungsID));
             l.Add(new FlexiControl());
 
             FilterDatabaseUpdate();
@@ -176,6 +197,10 @@ namespace BlueControls.ItemCollection {
                     Genau_eine_Zeile = value.FromPlusMinus();
                     return true;
 
+                case "connectionid":
+                    VerbindungsID = value.FromNonCritical();
+                    return true;
+
                 case "id":
                     Id = IntParse(value);
                     return true;
@@ -220,6 +245,8 @@ namespace BlueControls.ItemCollection {
             }
             t = t + "OneRow=" + Genau_eine_Zeile.ToPlusMinus() + ", ";
 
+            t = t + "ConnectionID=" + VerbindungsID.ToNonCritical() + ", ";
+
             if (FilterDefiniton != null) {
                 t = t + "FilterDB=" + FilterDefiniton.Export_CSV(FirstRow.ColumnInternalName, (List<ColumnItem>)null, null).ToNonCritical() + ", ";
             }
@@ -242,7 +269,11 @@ namespace BlueControls.ItemCollection {
 
             if (Database != null) {
                 var txt = string.Empty;
-                if (!Genau_eine_Zeile) { txt = "Mehrere Zeilen\r\n"; }
+                if (!Genau_eine_Zeile) {
+                    txt = "mehrere Zeilen aus\r\n";
+                } else {
+                    txt = "eine Zeile aus\r\n";
+                }
 
                 Skin.Draw_FormatedText(gr, txt + Database.Caption, QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, modifiedPosition.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
             }

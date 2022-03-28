@@ -66,7 +66,7 @@ namespace BlueControls.Forms {
             }
             if (ItemOfRow(r) != null) { return null; }
             RowFormulaPadItem i2 = new(_database, r.Key, layoutId);
-            Pad.Item.Add(i2);
+            Pad.AddCentered(i2);
             //  Pad.Invalidate()
             i2.SetLeftTopPoint(xPos, ypos);
             i2.InDenVordergrund();
