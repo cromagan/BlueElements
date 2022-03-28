@@ -35,7 +35,7 @@ using BlueControls.ConnectedFormula;
 
 namespace BlueControls.ItemCollection {
 
-    public class RowWithFilterPaditem : FixedRectanglePadItem, IReadableText, IRecursiveCheck, ICalculateRows, IItemToControl {
+    public class RowWithFilterPaditem : FixedRectanglePadItem, IReadableText, IRecursiveCheck, ICalculateRows, IItemToControl, IConnectionAttributes {
 
         #region Fields
 
@@ -274,7 +274,13 @@ namespace BlueControls.ItemCollection {
                     txt = "eine Zeile aus\r\n";
                 }
 
-                Skin.Draw_FormatedText(gr, txt + Database.Caption, QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, modifiedPosition.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
+                txt = txt + Database.Caption;
+
+                if (!string.IsNullOrEmpty(_VerbindungsID)) {
+                    txt = txt + "\r\nKlon-ID: " + _VerbindungsID;
+                }
+
+                Skin.Draw_FormatedText(gr, txt, QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, modifiedPosition.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
             }
 
             gr.FillRectangle(new SolidBrush(Color.FromArgb(128, 255, 255, 255)), modifiedPosition);

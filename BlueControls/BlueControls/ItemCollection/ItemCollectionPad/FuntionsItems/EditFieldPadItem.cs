@@ -252,7 +252,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        protected override int SaveOrder => 2;
+        protected override int SaveOrder => 3;
 
         #endregion
 

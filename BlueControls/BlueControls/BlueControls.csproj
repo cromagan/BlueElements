@@ -116,6 +116,9 @@
     <Compile Include="ConnectedFormula\ConnectedFormulaView.Designer.cs">
       <DependentUpon>ConnectedFormulaView.cs</DependentUpon>
     </Compile>
+    <Compile Include="ConnectedFormula\RowCloner.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ConnectedFormula\Connector.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -308,6 +311,8 @@
     <Compile Include="frmBefehlsreferenz.Designer.cs">
       <DependentUpon>frmBefehlsreferenz.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interfaces\IConnectionAttributes.cs" />
+    <Compile Include="Interfaces\IAcceptItemsForSelect.cs" />
     <Compile Include="Interfaces\ICalculateRows.cs" />
     <Compile Include="Interfaces\IContenHolder.cs" />
     <Compile Include="Interfaces\IAcceptRowKey.cs" />
@@ -325,6 +330,7 @@
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\EditFieldPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Abstract\FixedRectanglePadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\ConstantTextPaditem.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\RowClonePadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\RowWithFilterPadItem.cs" />
     <Compile Include="ItemCollection\ItemConnection.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Temporär\PhysicPadItem.cs" />

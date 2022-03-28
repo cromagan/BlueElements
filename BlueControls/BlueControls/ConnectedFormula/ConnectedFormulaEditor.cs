@@ -52,6 +52,42 @@ namespace BlueControls.Forms {
 
         #region Methods
 
+        private void AddRowItem(bool klon) {
+            if (_cf == null) { return; }
+
+            var x = Directory.GetFiles(_cf.Filename.FilePath(), "*.mdb").ToList();
+
+            if (x == null || x.Count == 0) {
+                MessageBox.Show("Keine Datenbanken vorhanden.");
+                return;
+            }
+
+            var fi = new ItemCollectionList();
+            foreach (var thisf in x) {
+                fi.Add(thisf.FileNameWithoutSuffix(), thisf);
+            }
+
+            var rück = InputBoxListBoxStyle.Show("Datenbank wählen: ", fi, Enums.AddType.None, true);
+
+            if (rück == null || rück.Count != 1) { return; }
+
+            _cf.DatabaseFiles.AddIfNotExists(rück[0]);
+
+            var db = Database.GetByFilename(rück[0], false, false);
+            if (db == null) { return; }
+
+            BasicPadItem dbitem;
+
+            if (!klon) {
+                dbitem = new RowWithFilterPaditem(db, _cf.NextID());
+            } else {
+                dbitem = new RowClonePadItem(db, _cf.NextID());
+            }
+
+            dbitem.Bei_Export_Sichtbar = false;
+            Pad.AddCentered(dbitem);
+        }
+
         private void btnFeldHinzu_Click(object sender, System.EventArgs e) {
             var l = Pad.LastClickedItem;
 
@@ -69,6 +105,10 @@ namespace BlueControls.Forms {
             if (x.GetRowFrom != null && x.GetRowFrom.Database != null) {
                 x.Spalte_wählen = string.Empty; // Dummy setzen
             }
+        }
+
+        private void btnKlonZeilen_Click(object sender, System.EventArgs e) {
+            AddRowItem(true);
         }
 
         private void btnKonstante_Click(object sender, System.EventArgs e) {
@@ -132,33 +172,7 @@ namespace BlueControls.Forms {
         }
 
         private void btnZeileHinzu_Click(object sender, System.EventArgs e) {
-            if (_cf == null) { return; }
-
-            var x = Directory.GetFiles(_cf.Filename.FilePath(), "*.mdb").ToList();
-
-            if (x == null || x.Count == 0) {
-                MessageBox.Show("Keine Datenbanken vorhanden.");
-                return;
-            }
-
-            var fi = new ItemCollectionList();
-            foreach (var thisf in x) {
-                fi.Add(thisf.FileNameWithoutSuffix(), thisf);
-            }
-
-            var rück = InputBoxListBoxStyle.Show("Datenbank wählen: ", fi, Enums.AddType.None, true);
-
-            if (rück == null || rück.Count != 1) { return; }
-
-            _cf.DatabaseFiles.AddIfNotExists(rück[0]);
-
-            var db = Database.GetByFilename(rück[0], false, false);
-
-            if (db != null) {
-                var dbitem = new RowWithFilterPaditem(db, _cf.NextID());
-                dbitem.Bei_Export_Sichtbar = false;
-                Pad.AddCentered(dbitem);
-            }
+            AddRowItem(false);
         }
 
         private void CheckButtons() {

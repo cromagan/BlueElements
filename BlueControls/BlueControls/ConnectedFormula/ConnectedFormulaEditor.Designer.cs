@@ -41,6 +41,7 @@ namespace BlueControls.Forms {
             this.btnNeuDB = new BlueControls.Controls.Button();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
+            this.btnKlonZeilen = new BlueControls.Controls.Button();
             this.grpDesign.SuspendLayout();
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
@@ -92,7 +93,7 @@ namespace BlueControls.Forms {
             this.tabEditor.Location = new System.Drawing.Point(4, 25);
             this.tabEditor.Margin = new System.Windows.Forms.Padding(0);
             this.tabEditor.Name = "tabEditor";
-            this.tabEditor.Size = new System.Drawing.Size(876, 81);
+            this.tabEditor.Size = new System.Drawing.Size(966, 81);
             this.tabEditor.TabIndex = 4;
             this.tabEditor.Text = "Editor";
             // 
@@ -103,7 +104,7 @@ namespace BlueControls.Forms {
             this.grpVorschau.Controls.Add(this.btnPfeileAusblenden);
             this.grpVorschau.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpVorschau.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpVorschau.Location = new System.Drawing.Point(288, 0);
+            this.grpVorschau.Location = new System.Drawing.Point(392, 0);
             this.grpVorschau.Name = "grpVorschau";
             this.grpVorschau.Size = new System.Drawing.Size(160, 81);
             this.grpVorschau.TabIndex = 1;
@@ -136,6 +137,7 @@ namespace BlueControls.Forms {
             // grpFelder
             // 
             this.grpFelder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpFelder.Controls.Add(this.btnKlonZeilen);
             this.grpFelder.Controls.Add(this.btnTabControlAdd);
             this.grpFelder.Controls.Add(this.btnKonstante);
             this.grpFelder.Controls.Add(this.btnFeldHinzu);
@@ -144,7 +146,7 @@ namespace BlueControls.Forms {
             this.grpFelder.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpFelder.Location = new System.Drawing.Point(0, 0);
             this.grpFelder.Name = "grpFelder";
-            this.grpFelder.Size = new System.Drawing.Size(288, 81);
+            this.grpFelder.Size = new System.Drawing.Size(392, 81);
             this.grpFelder.TabIndex = 0;
             this.grpFelder.TabStop = false;
             this.grpFelder.Text = "Felder";
@@ -153,7 +155,7 @@ namespace BlueControls.Forms {
             // 
             this.btnTabControlAdd.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnTabControlAdd.ImageCode = "Bruchlinie|16|||||||||PlusZeichen";
-            this.btnTabControlAdd.Location = new System.Drawing.Point(208, 2);
+            this.btnTabControlAdd.Location = new System.Drawing.Point(8, 2);
             this.btnTabControlAdd.Name = "btnTabControlAdd";
             this.btnTabControlAdd.QuickInfo = "Fügt ein Steuerelement mit\r\nRegisterkarten hinzu.\r\nPro Registerkarte kann ein \r\nU" +
     "nterformular gewählt werden.";
@@ -166,7 +168,7 @@ namespace BlueControls.Forms {
             // 
             this.btnKonstante.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnKonstante.ImageCode = "Textfeld|16";
-            this.btnKonstante.Location = new System.Drawing.Point(136, 2);
+            this.btnKonstante.Location = new System.Drawing.Point(320, 2);
             this.btnKonstante.Name = "btnKonstante";
             this.btnKonstante.QuickInfo = "Fügt einen konstanten Wert hinzu,\r\nder für Filterungen benutzt werden\r\nkann.";
             this.btnKonstante.Size = new System.Drawing.Size(64, 66);
@@ -178,7 +180,7 @@ namespace BlueControls.Forms {
             // 
             this.btnFeldHinzu.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnFeldHinzu.ImageCode = "Stift|16|||||||||PlusZeichen";
-            this.btnFeldHinzu.Location = new System.Drawing.Point(72, 2);
+            this.btnFeldHinzu.Location = new System.Drawing.Point(256, 2);
             this.btnFeldHinzu.Name = "btnFeldHinzu";
             this.btnFeldHinzu.QuickInfo = "Fügt ein Feld hinzu.\r\nDieses kann entweder von einer Zeile\r\nbefüllt werden, oder " +
     "frei eingegeben werden";
@@ -191,12 +193,12 @@ namespace BlueControls.Forms {
             // 
             this.btnZeileHinzu.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnZeileHinzu.ImageCode = "Zeile|16|||||||||PlusZeichen";
-            this.btnZeileHinzu.Location = new System.Drawing.Point(8, 2);
+            this.btnZeileHinzu.Location = new System.Drawing.Point(96, 2);
             this.btnZeileHinzu.Name = "btnZeileHinzu";
             this.btnZeileHinzu.QuickInfo = "Fügt eine Zeile einer  Datenbank.\r\nAus dieser könne Felder extrahiert werden.";
             this.btnZeileHinzu.Size = new System.Drawing.Size(64, 66);
             this.btnZeileHinzu.TabIndex = 0;
-            this.btnZeileHinzu.Text = "Zeile hinzufügen";
+            this.btnZeileHinzu.Text = "Zeile(n) hinzufügen";
             this.btnZeileHinzu.Click += new System.EventHandler(this.btnZeileHinzu_Click);
             // 
             // tabFile
@@ -285,6 +287,19 @@ namespace BlueControls.Forms {
             this.SaveTab.Filter = "*.CFO Formulare|*.CFO|*.* Alle Dateien|*";
             this.SaveTab.Title = "Bitte neuen Dateinamen der Datenbank wählen.";
             // 
+            // btnKlonZeilen
+            // 
+            this.btnKlonZeilen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnKlonZeilen.ImageCode = "Zeile|16|||ffff00||||||PlusZeichen";
+            this.btnKlonZeilen.Location = new System.Drawing.Point(160, 2);
+            this.btnKlonZeilen.Name = "btnKlonZeilen";
+            this.btnKlonZeilen.QuickInfo = "Fügt eine Zeile einer  Datenbank hinhzu.\r\nAus dieser könne Felder extrahiert werd" +
+    "en.";
+            this.btnKlonZeilen.Size = new System.Drawing.Size(72, 66);
+            this.btnKlonZeilen.TabIndex = 4;
+            this.btnKlonZeilen.Text = "Klon-Zeile(n) hinzufügen";
+            this.btnKlonZeilen.Click += new System.EventHandler(this.btnKlonZeilen_Click);
+            // 
             // ConnectedFormulaEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -325,5 +340,6 @@ namespace BlueControls.Forms {
         private Controls.Button btnNeuDB;
         private System.Windows.Forms.OpenFileDialog LoadTab;
         private System.Windows.Forms.SaveFileDialog SaveTab;
+        private Controls.Button btnKlonZeilen;
     }
 }

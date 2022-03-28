@@ -18,6 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using static BlueBasics.Develop;
 using BlueDatabase;
 using BlueBasics;
@@ -32,21 +33,27 @@ namespace BlueControls.ConnectedFormula {
 
         #region Fields
 
+        public static readonly List<Connector> AllConnectors = new();
         public readonly ListExt<System.Windows.Forms.Control> Childs = new();
+        public readonly string VerbindungsId = string.Empty;
         private readonly ListExt<System.Windows.Forms.Control> _parents = new();
         private readonly RowWithFilterPaditem _rwf;
         private bool _disposing = false;
         private List<RowItem>? _rows;
 
-        private string _verbindungsID = string.Empty;
-
         #endregion
 
         #region Constructors
 
-        public Connector(RowWithFilterPaditem rwf, string verbindungsID) {
+        public Connector(RowWithFilterPaditem rwf, string verbindungsId) {
             _rwf = rwf;
-            _verbindungsID = verbindungsID;
+            VerbindungsId = verbindungsId;
+
+            if (!string.IsNullOrEmpty(verbindungsId)) {
+                RemoveSameID(verbindungsId);
+            }
+
+            AllConnectors.Add(this);
 
             // den Rest initialisieren, bei OnParentChanged
             // weil der Parent gebraucht wird um Filter zu erstellen
@@ -56,11 +63,38 @@ namespace BlueControls.ConnectedFormula {
 
         #region Methods
 
+        public static void DoChilds(List<RowItem>? rows, ListExt<System.Windows.Forms.Control> childs, IConnectionAttributes rwf) {
+            //if (_disposing || IsDisposed) { return; }
+
+            foreach (var thischild in childs) {
+                var did = false;
+
+                if (thischild is FlexiControl fc) {
+                    did = DoChilds_ListItems(fc, rows, childs, rwf);
+                }
+
+                if (!did && thischild is RowCloner rc) {
+                    did = DoChilds_MultipleRows(rc, rows, childs, rwf);
+                }
+
+                if (!did && thischild is IAcceptRowKey fcfc) {
+                    did = DoChilds_OneRowKey(fcfc, rows, childs, rwf);
+                }
+
+                if (!did) {
+                    DebugPrint("Child nicht definiert.");
+                    break;
+                }
+            }
+        }
+
         protected override void Dispose(bool disposing) {
             base.Dispose(disposing);
 
             if (disposing) {
                 _disposing = true;
+
+                AllConnectors.Remove(this);
 
                 Tag = null;
                 _rwf.Changed -= _rwf_Changed;
@@ -85,6 +119,59 @@ namespace BlueControls.ConnectedFormula {
             _parents.ItemRemoving += Parents_ItemRemoving;
 
             _rwf_Changed(null, System.EventArgs.Empty);
+        }
+
+        private static bool DoChilds_ListItems(FlexiControl fc, List<RowItem>? rows, ListExt<System.Windows.Forms.Control> childs, IConnectionAttributes attributes) {
+            // Dropdownmenü mehrerer Einträge
+            if (attributes.Genau_eine_Zeile) {
+                fc.DisabledReason = "Vorgänger hat falschen Datentyp";
+                fc.ValueSet(string.Empty, true, true);
+                return false;
+            }
+
+            // Wie lautet der eigene Ursprüngliche Name, von dem das FlexControl abstammt
+            var id = (string)fc.Tag;
+
+            // Sich selbst suchen - also, das Original Item. Das Patent hier ist die PadCollection
+            var efpi = attributes.Parent[id];
+
+            if (efpi is not EditFieldPadItem epfi2) {
+                fc.DisabledReason = "Interner Fehler: Ursprungsitem nicht vorhanden";
+                fc.ValueSet(string.Empty, true, true);
+                return false;
+            }
+
+            var li = epfi2.Column.Contents(rows);
+            var cbx = new ItemCollection.ItemCollectionList.ItemCollectionList();
+            cbx.AddRange(li, epfi2.Column, ShortenStyle.Replaced, epfi2.Column.BildTextVerhalten);
+            cbx.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
+
+            if (fc.EditType == EditTypeFormula.Textfeld_mit_Auswahlknopf) {
+                fc.StyleComboBox(cbx, System.Windows.Forms.ComboBoxStyle.DropDownList);
+                if (!li.Contains(fc.Value)) { fc.ValueSet(string.Empty, true, true); }
+            }
+
+            return true;
+        }
+
+        private static bool DoChilds_OneRowKey(IAcceptRowKey fcfc, List<RowItem>? rows, ListExt<System.Windows.Forms.Control> childs, IConnectionAttributes attributes) {
+            // Normales Zellenfeld
+            if (attributes.Genau_eine_Zeile) {
+                fcfc.Database = attributes.Database;
+
+                if (rows != null && rows.Count == 1) {
+                    fcfc.RowKey = rows[0].Key;
+                } else {
+                    fcfc.RowKey = -1;
+                    return false;
+                }
+            } else {
+                // Falscher Datentyp
+                fcfc.RowKey = -1;
+                return false;
+            }
+
+            return true;
         }
 
         private void _rwf_Changed(object? sender, System.EventArgs e) {
@@ -179,68 +266,11 @@ namespace BlueControls.ConnectedFormula {
 
             #endregion
 
-            ChildsUndVerbundeneBefüllen();
+            DoChilds(_rows, Childs, _rwf);
         }
 
         private void Childs_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
-            ChildsUndVerbundeneBefüllen();
-        }
-
-        private void ChildsUndVerbundeneBefüllen() {
-            if (_disposing || IsDisposed) { return; }
-
-            foreach (var thischild in Childs) {
-                switch (thischild) {
-                    case IAcceptRowKey fcfc:
-                        // Normales Zellenfeld
-                        if (_rwf.Genau_eine_Zeile) {
-                            fcfc.Database = _rwf.Database;
-
-                            if (_rows != null && _rows.Count == 1) {
-                                fcfc.RowKey = _rows[0].Key;
-                            } else {
-                                fcfc.RowKey = -1;
-                            }
-                        } else {
-                            // Falscher Datentyp
-                            fcfc.RowKey = -1;
-                        }
-                        break;
-
-                    case FlexiControl fc:
-                        // Dropdownmenü mehrerer Einträge
-                        if (_rwf.Genau_eine_Zeile) {
-                            fc.DisabledReason = "Vorgänger hat falschen Datentyp";
-                            fc.ValueSet(string.Empty, true, true);
-                        } else {
-                            // Wie lautet der eigene Ursprüngliche Name, von dem das FlexControl abstammt
-                            var id = (string)fc.Tag;
-
-                            // Sich selbst suchen - also, das Original Item. Das Patent hier ist die PadCollection
-                            var efpi = (EditFieldPadItem)_rwf.Parent[id];
-
-                            if (efpi == null) {
-                                fc.DisabledReason = "Interner Fehler: Ursprungsitem nicht vorhanden";
-                                fc.ValueSet(string.Empty, true, true);
-                            } else {
-                                var li = efpi.Column.Contents(_rows);
-                                var cbx = new ItemCollection.ItemCollectionList.ItemCollectionList();
-                                cbx.AddRange(li, efpi.Column, ShortenStyle.Replaced, efpi.Column.BildTextVerhalten);
-                                cbx.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
-
-                                if (fc.EditType == EditTypeFormula.Textfeld_mit_Auswahlknopf) {
-                                    fc.StyleComboBox(cbx, System.Windows.Forms.ComboBoxStyle.DropDownList);
-                                    if (!li.Contains(fc.Value)) { fc.ValueSet(string.Empty, true, true); }
-                                }
-                            }
-                        }
-                        break;
-
-                    default:
-                        DebugPrint("Child nicht definiert.");
-                        break;
-                }
-            }
+            DoChilds(_rows, Childs, _rwf);
         }
 
         private void GetParentsList() {
@@ -276,6 +306,16 @@ namespace BlueControls.ConnectedFormula {
             }
 
             CalculateRows();
+        }
+
+        private void RemoveSameID(string verbindungsId) {
+            foreach (var thisConnector in AllConnectors) {
+                if (thisConnector.VerbindungsId == verbindungsId) {
+                    AllConnectors.Remove(thisConnector);
+                    RemoveSameID(verbindungsId);
+                    return;
+                }
+            }
         }
 
         #endregion
