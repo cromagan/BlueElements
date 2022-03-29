@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using System;
@@ -85,9 +87,9 @@ namespace BlueDatabase {
 
         #region Constructors
 
-        public RowData(RowItem? row) : this(row, string.Empty) { }
+        public RowData(RowItem row) : this(row, string.Empty) { }
 
-        public RowData(RowItem? row, string chapter) {
+        public RowData(RowItem row, string chapter) {
             Row = row;
             AdditinalSort = "2";
             Y = -1;

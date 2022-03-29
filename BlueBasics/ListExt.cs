@@ -136,7 +136,7 @@ namespace BlueBasics {
             return false;
         }
 
-        public new void AddRange(IEnumerable<T> collection) {
+        public new void AddRange(IEnumerable<T>? collection) {
             Develop.DebugPrint_Disposed(Disposed);
             if (collection is null) { return; }
             // base.AddRange(collection);

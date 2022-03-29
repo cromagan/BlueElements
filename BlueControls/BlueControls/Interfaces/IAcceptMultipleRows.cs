@@ -15,21 +15,22 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics;
 using BlueDatabase;
 
 namespace BlueControls.Interfaces {
 
     /// <summary>
-    /// Wird verwendet, wenn ein Steuerelement einen Zeilenschlüssele empfangen
+    /// Wird verwendet, wenn ein Steuerelement mehrere Zeilen empfangen
     /// und damit umgehen kann.
     /// </summary>
-    public interface IAcceptRowKey {
+    public interface IAcceptMultipleRows {
 
         #region Properties
 
         public Database? Database { get; set; }
 
-        public long RowKey { get; set; }
+        public ListExt<RowItem> Rows { get; }
 
         #endregion
     }

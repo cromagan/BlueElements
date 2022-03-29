@@ -372,7 +372,7 @@ namespace BlueControls.Controls {
                                 var y = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
                                 Size = new Size(x, y);
                                 var c = (ComboBox)CreateSubControls();
-                                StyleComboBox(c, list, ComboBoxStyle.DropDownList);
+                                StyleComboBox(c, list, ComboBoxStyle.DropDownList, true);
                             }
                             //else if (image != enImageCode.None)
                             //{

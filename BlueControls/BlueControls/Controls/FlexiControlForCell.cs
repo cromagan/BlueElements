@@ -248,9 +248,9 @@ namespace BlueControls.Controls {
                     ItemCollectionList item2 = new();
                     ItemCollectionList.GetItemCollection(item2, column1, null, ShortenStyle.Replaced, 10000);
                     if (column1.TextBearbeitungErlaubt) {
-                        StyleComboBox(comboBox, item2, ComboBoxStyle.DropDown);
+                        StyleComboBox(comboBox, item2, ComboBoxStyle.DropDown, false);
                     } else {
-                        StyleComboBox(comboBox, item2, ComboBoxStyle.DropDownList);
+                        StyleComboBox(comboBox, item2, ComboBoxStyle.DropDownList, true);
                     }
                     comboBox.GotFocus += GotFocus_ComboBox;
                     break;

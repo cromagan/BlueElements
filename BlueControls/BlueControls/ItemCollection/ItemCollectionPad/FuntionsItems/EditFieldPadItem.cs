@@ -44,7 +44,7 @@ namespace BlueControls.ItemCollection {
 
         public ColumnItem? Column = null;
         private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
-        private ICalculateRows? _GetValueFrom = null;
+        private ICalculateRowsItemLevel? _GetValueFrom = null;
         private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
         #endregion
@@ -120,7 +120,7 @@ namespace BlueControls.ItemCollection {
             set {
                 var x = new ItemCollectionList.ItemCollectionList();
                 foreach (var thisR in Parent) {
-                    if (thisR is ICalculateRows rfp) {
+                    if (thisR is ICalculateRowsItemLevel rfp) {
                         if (!rfp.IsRecursiveWith(this)) {
                             x.Add(rfp, thisR.Internal);
                         }
@@ -135,7 +135,7 @@ namespace BlueControls.ItemCollection {
 
                 var t = Parent[it[0]];
 
-                if (t is ICalculateRows rfp2) {
+                if (t is ICalculateRowsItemLevel rfp2) {
                     if (rfp2 != GetRowFrom) {
                         GetRowFrom = rfp2;
                         Column = null;
@@ -158,7 +158,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public ICalculateRows? GetRowFrom {
+        public ICalculateRowsItemLevel? GetRowFrom {
             get => _GetValueFrom;
 
             set {
@@ -259,8 +259,8 @@ namespace BlueControls.ItemCollection {
         #region Methods
 
         public System.Windows.Forms.Control GenerateControl(ConnectedFormulaView parent) {
-            if (GetRowFrom is RowWithFilterPaditem rfw2) {
-                var ff = parent.SearchOrGenerate(rfw2);
+            if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
+                var ff = parent.SearchOrGenerate((ItemCollection.BasicPadItem)rfw2);
 
                 if (rfw2.Genau_eine_Zeile) {
                     var cx = new FlexiControlForCell();
@@ -268,7 +268,7 @@ namespace BlueControls.ItemCollection {
                     cx.EditType = EditType;
                     cx.CaptionPosition = CaptionPosition;
                     cx.Tag = Internal;
-                    if (ff is Connector cc) { cc.Childs.Add(cx); }
+                    if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(cx); }
                     return cx;
                 } else {
                     var c = new FlexiControl();
@@ -276,7 +276,7 @@ namespace BlueControls.ItemCollection {
                     c.EditType = EditType;
                     c.CaptionPosition = CaptionPosition;
                     c.Tag = Internal;
-                    if (ff is Connector cc) { cc.Childs.Add(c); }
+                    if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(c); }
                     return c;
                 }
             }
@@ -361,7 +361,7 @@ namespace BlueControls.ItemCollection {
             if (base.ParseThis(tag, value)) { return true; }
             switch (tag) {
                 case "getvaluefrom":
-                    GetRowFrom = (ICalculateRows)Parent[value.FromNonCritical()];
+                    GetRowFrom = (ICalculateRowsItemLevel)Parent[value.FromNonCritical()];
                     return true;
 
                 case "column":

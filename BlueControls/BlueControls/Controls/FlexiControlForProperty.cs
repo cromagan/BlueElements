@@ -313,7 +313,7 @@ namespace BlueControls.Controls {
                                 var x2 = Math.Max((int)(biggestItemX + 20 + s2.Width), 200);
                                 var y2 = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
                                 Size = new Size(x2, y2);
-                                StyleComboBox((ComboBox)CreateSubControls(), list, ComboBoxStyle.DropDownList);
+                                StyleComboBox((ComboBox)CreateSubControls(), list, ComboBoxStyle.DropDownList, true);
                             } else {
                                 EditType = EditTypeFormula.Textfeld;
                                 if (textLines >= 2) {

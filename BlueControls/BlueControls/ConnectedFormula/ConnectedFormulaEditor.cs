@@ -27,6 +27,7 @@ using BlueControls.ItemCollection;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using static BlueBasics.Converter;
+using BlueControls.Interfaces;
 
 namespace BlueControls.Forms {
 
@@ -55,25 +56,34 @@ namespace BlueControls.Forms {
         private void AddRowItem(bool klon) {
             if (_cf == null) { return; }
 
-            var x = Directory.GetFiles(_cf.Filename.FilePath(), "*.mdb").ToList();
-
-            if (x == null || x.Count == 0) {
-                MessageBox.Show("Keine Datenbanken vorhanden.");
-                return;
+            if (string.IsNullOrEmpty(LoadTabDatabase.InitialDirectory)) {
+                LoadTabDatabase.InitialDirectory = _cf.Filename.FilePath();
             }
 
-            var fi = new ItemCollectionList();
-            foreach (var thisf in x) {
-                fi.Add(thisf.FileNameWithoutSuffix(), thisf);
-            }
+            LoadTabDatabase.ShowDialog();
 
-            var rück = InputBoxListBoxStyle.Show("Datenbank wählen: ", fi, Enums.AddType.None, true);
+            //var x = Directory.GetFiles(_cf.Filename.FilePath(), "*.mdb").ToList();
 
-            if (rück == null || rück.Count != 1) { return; }
+            //if (x == null || x.Count == 0) {
+            //    MessageBox.Show("Keine Datenbanken vorhanden.");
+            //    return;
+            //}
 
-            _cf.DatabaseFiles.AddIfNotExists(rück[0]);
+            //var fi = new ItemCollectionList();
+            //foreach (var thisf in x) {
+            //    fi.Add(thisf.FileNameWithoutSuffix(), thisf);
+            //}
 
-            var db = Database.GetByFilename(rück[0], false, false);
+            //var rück = InputBoxListBoxStyle.Show("Datenbank wählen: ", fi, Enums.AddType.None, true);
+
+            //if (rück == null || rück.Count != 1) { return; }
+
+            if (!FileExists(LoadTabDatabase.FileName)) { return; }
+            LoadTabDatabase.InitialDirectory = LoadTabDatabase.FileName.FilePath();
+
+            _cf.DatabaseFiles.AddIfNotExists(LoadTabDatabase.FileName);
+
+            var db = Database.GetByFilename(LoadTabDatabase.FileName, false, false);
             if (db == null) { return; }
 
             BasicPadItem dbitem;
@@ -93,7 +103,7 @@ namespace BlueControls.Forms {
 
             var x = new EditFieldPadItem(string.Empty);
 
-            if (l is RowWithFilterPaditem ri) {
+            if (l is ICalculateRowsItemLevel ri) {
                 x.GetRowFrom = ri;
             }
             if (l is EditFieldPadItem efi && efi.GetRowFrom != null) {

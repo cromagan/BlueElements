@@ -29,6 +29,7 @@ namespace BlueControls.Forms {
             this.btnVorschauÖffnen = new BlueControls.Controls.Button();
             this.btnPfeileAusblenden = new BlueControls.Controls.Button();
             this.grpFelder = new BlueControls.Controls.GroupBox();
+            this.btnKlonZeilen = new BlueControls.Controls.Button();
             this.btnTabControlAdd = new BlueControls.Controls.Button();
             this.btnKonstante = new BlueControls.Controls.Button();
             this.btnFeldHinzu = new BlueControls.Controls.Button();
@@ -41,7 +42,7 @@ namespace BlueControls.Forms {
             this.btnNeuDB = new BlueControls.Controls.Button();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
-            this.btnKlonZeilen = new BlueControls.Controls.Button();
+            this.LoadTabDatabase = new System.Windows.Forms.OpenFileDialog();
             this.grpDesign.SuspendLayout();
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
@@ -151,6 +152,19 @@ namespace BlueControls.Forms {
             this.grpFelder.TabStop = false;
             this.grpFelder.Text = "Felder";
             // 
+            // btnKlonZeilen
+            // 
+            this.btnKlonZeilen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnKlonZeilen.ImageCode = "Zeile|16|||ffff00||||||PlusZeichen";
+            this.btnKlonZeilen.Location = new System.Drawing.Point(160, 2);
+            this.btnKlonZeilen.Name = "btnKlonZeilen";
+            this.btnKlonZeilen.QuickInfo = "Fügt eine Zeile einer  Datenbank hinhzu.\r\nAus dieser könne Felder extrahiert werd" +
+    "en.";
+            this.btnKlonZeilen.Size = new System.Drawing.Size(72, 66);
+            this.btnKlonZeilen.TabIndex = 4;
+            this.btnKlonZeilen.Text = "Klon-Zeile(n) hinzufügen";
+            this.btnKlonZeilen.Click += new System.EventHandler(this.btnKlonZeilen_Click);
+            // 
             // btnTabControlAdd
             // 
             this.btnTabControlAdd.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
@@ -208,7 +222,7 @@ namespace BlueControls.Forms {
             this.tabFile.Location = new System.Drawing.Point(4, 25);
             this.tabFile.Margin = new System.Windows.Forms.Padding(0);
             this.tabFile.Name = "tabFile";
-            this.tabFile.Size = new System.Drawing.Size(966, 81);
+            this.tabFile.Size = new System.Drawing.Size(876, 81);
             this.tabFile.TabIndex = 5;
             this.tabFile.Text = "Datei";
             // 
@@ -279,26 +293,19 @@ namespace BlueControls.Forms {
             // LoadTab
             // 
             this.LoadTab.Filter = "*.CFO Formulare|*.CFO|*.* Alle Dateien|*";
-            this.LoadTab.Title = "Bitte Datenbank laden!";
+            this.LoadTab.Title = "Bitte Formular wählen:";
             this.LoadTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
             // 
             // SaveTab
             // 
+            this.SaveTab.DefaultExt = "CFO";
             this.SaveTab.Filter = "*.CFO Formulare|*.CFO|*.* Alle Dateien|*";
-            this.SaveTab.Title = "Bitte neuen Dateinamen der Datenbank wählen.";
+            this.SaveTab.Title = "Bitte neuen Dateinamen des Formulars wählen.";
             // 
-            // btnKlonZeilen
+            // LoadTabDatabase
             // 
-            this.btnKlonZeilen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnKlonZeilen.ImageCode = "Zeile|16|||ffff00||||||PlusZeichen";
-            this.btnKlonZeilen.Location = new System.Drawing.Point(160, 2);
-            this.btnKlonZeilen.Name = "btnKlonZeilen";
-            this.btnKlonZeilen.QuickInfo = "Fügt eine Zeile einer  Datenbank hinhzu.\r\nAus dieser könne Felder extrahiert werd" +
-    "en.";
-            this.btnKlonZeilen.Size = new System.Drawing.Size(72, 66);
-            this.btnKlonZeilen.TabIndex = 4;
-            this.btnKlonZeilen.Text = "Klon-Zeile(n) hinzufügen";
-            this.btnKlonZeilen.Click += new System.EventHandler(this.btnKlonZeilen_Click);
+            this.LoadTabDatabase.Filter = "*.MDB Datenbanken|*.MDB|*.* Alle Dateien|*";
+            this.LoadTabDatabase.Title = "Bitte Datenbank wählen:";
             // 
             // ConnectedFormulaEditor
             // 
@@ -341,5 +348,6 @@ namespace BlueControls.Forms {
         private System.Windows.Forms.OpenFileDialog LoadTab;
         private System.Windows.Forms.SaveFileDialog SaveTab;
         private Controls.Button btnKlonZeilen;
+        private System.Windows.Forms.OpenFileDialog LoadTabDatabase;
     }
 }

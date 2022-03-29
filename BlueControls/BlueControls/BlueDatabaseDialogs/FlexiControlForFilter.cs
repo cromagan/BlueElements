@@ -169,7 +169,7 @@ namespace BlueControls.Controls {
                 //{
                 //    Item2.Add("|" + thiss, thiss));
                 //}
-                StyleComboBox(cbx, item2, System.Windows.Forms.ComboBoxStyle.DropDown);
+                StyleComboBox(cbx, item2, System.Windows.Forms.ComboBoxStyle.DropDown, false);
                 cbx.DropDownShowing += Cbx_DropDownShowing;
             }
             if (e.Control is Button btn) {

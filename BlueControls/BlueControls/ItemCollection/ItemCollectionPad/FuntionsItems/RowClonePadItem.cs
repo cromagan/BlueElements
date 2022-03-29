@@ -36,7 +36,7 @@ using BlueControls.ConnectedFormula;
 
 namespace BlueControls.ItemCollection {
 
-    public class RowClonePadItem : FixedRectanglePadItem, IReadableText, IRecursiveCheck, ICalculateRows, IItemToControl, IConnectionAttributes {
+    public class RowClonePadItem : FixedRectanglePadItem, IReadableText, IRecursiveCheck, ICalculateRowsItemLevel, IItemToControl, IConnectionAttributes {
 
         #region Fields
 
@@ -198,9 +198,9 @@ namespace BlueControls.ItemCollection {
             if (Database != null) {
                 var txt = string.Empty;
                 if (!Genau_eine_Zeile) {
-                    txt = "Mehrere Zeilen aus\r\n";
+                    txt = "gleiche Zeilen wie\r\n";
                 } else {
-                    txt = "Eine Zeile aus\r\n";
+                    txt = "gleiche Zeile wie\r\n";
                 }
                 if (!string.IsNullOrEmpty(_VerbindungsID)) {
                     txt = txt + "Klon-ID: " + _VerbindungsID;

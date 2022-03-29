@@ -35,7 +35,7 @@ using BlueControls.ConnectedFormula;
 
 namespace BlueControls.ItemCollection {
 
-    public class RowWithFilterPaditem : FixedRectanglePadItem, IReadableText, IRecursiveCheck, ICalculateRows, IItemToControl, IConnectionAttributes {
+    public class RowWithFilterPaditem : FixedRectanglePadItem, IReadableText, IRecursiveCheck, ICalculateRowsItemLevel, IItemToControl, IConnectionAttributes {
 
         #region Fields
 

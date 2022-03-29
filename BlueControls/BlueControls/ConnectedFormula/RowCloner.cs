@@ -28,19 +28,15 @@ using BlueControls.Interfaces;
 
 namespace BlueControls.ConnectedFormula {
 
-    internal class RowCloner : System.Windows.Forms.Control, IAcceptItemsForSelect, IAcceptRowKey {
+    internal class RowCloner : System.Windows.Forms.Control, IAcceptMultipleRows, IAcceptRowKey, ICalculateRowsControlLevel {
 
         #region Fields
 
-        public readonly ListExt<System.Windows.Forms.Control> Childs = new();
-
+        private readonly ListExt<RowItem> _rows = new();
         private readonly RowClonePadItem _rwf;
         private bool _disposing = false;
-        private List<RowItem>? _rows;
 
         #endregion
-
-        //private string _verbindungsID = string.Empty;
 
         #region Constructors
 
@@ -66,8 +62,32 @@ namespace BlueControls.ConnectedFormula {
 
         #endregion
 
+        #region Properties
+
+        public ListExt<System.Windows.Forms.Control> Childs { get; } = new();
+        public Database? Database { get; set; }
+
+        public long RowKey {
+            get {
+                if (_rows.Count != 1) { return -1; }
+                return _rows[0].Key;
+            }
+            set {
+                if (_rows.Count == 1 && _rows[0].Key == value) { return; }
+                _rows.Clear();
+                var v = Database.Row.SearchByKey(value);
+                if (v == null) { return; }
+                _rows.Add(v);
+            }
+        }
+
+        public ListExt<RowItem> Rows => _rows;
+
+        #endregion
+
         #region Methods
 
+        //private string _verbindungsID = string.Empty;
         protected override void Dispose(bool disposing) {
             base.Dispose(disposing);
 
@@ -82,7 +102,10 @@ namespace BlueControls.ConnectedFormula {
                 _disposing = true;
                 Childs.Clear();
                 //_parents.Clear();
-                //_rows = null;
+                _rows.Clear();
+
+                _rows.ItemAdded -= _rows_ItemAdded;
+                _rows.ItemRemoved -= _rows_ItemRemoved;
 
                 Childs.ItemAdded -= Childs_ItemAdded;
                 //_parents.ItemAdded -= Parents_ItemAdded;
@@ -95,105 +118,115 @@ namespace BlueControls.ConnectedFormula {
 
             _rwf.Changed += _rwf_Changed;
             Childs.ItemAdded += Childs_ItemAdded;
+            _rows.ItemAdded += _rows_ItemAdded;
+            _rows.ItemRemoved += _rows_ItemRemoved;
             //_parents.ItemAdded += Parents_ItemAdded;
             //_parents.ItemRemoving += Parents_ItemRemoving;
 
             //_rwf_Changed(null, System.EventArgs.Empty);
-            CalculateRows();
+            Connector.DoChilds(_rows, Childs, _rwf);
+        }
+
+        private void _rows_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
+            Connector.DoChilds(_rows, Childs, _rwf);
+        }
+
+        private void _rows_ItemRemoved(object sender, System.EventArgs e) {
+            Connector.DoChilds(_rows, Childs, _rwf);
         }
 
         private void _rwf_Changed(object? sender, System.EventArgs e) {
-            CalculateRows();
-        }
-
-        private void CalculateRows() {
-            if (_disposing || IsDisposed) { return; }
-
-            //#region Filter erstellen
-
-            //var f = new FilterCollection(_rwf.Database);
-
-            //foreach (var thisR in _rwf.FilterDefiniton.Row) {
-            //    #region Column ermitteln
-
-            //    var column = _rwf.Database.Column.SearchByKey(thisR.CellGetInteger("Spalte"));
-
-            //    #endregion
-
-            //    #region Type ermitteln
-
-            //    FilterType ft;
-            //    switch (thisR.CellGetString("Filterart").ToLower()) {
-            //        case "=":
-            //            ft = FilterType.Istgleich_GroßKleinEgal;
-            //            break;
-
-            //        case "x":
-            //            // Filter löschen
-            //            ft = FilterType.KeinFilter;
-            //            break;
-
-            //        default:
-            //            ft = FilterType.Istgleich_GroßKleinEgal;
-            //            DebugPrint("Filter " + thisR.CellGetInteger("Filterart") + " nicht definiert.");
-            //            break;
-            //    }
-
-            //    #endregion
-
-            //    #region Value ermitteln
-
-            //    var value = string.Empty;
-            //    if (ft != FilterType.KeinFilter) {
-            //        var connected = _rwf.Parent[thisR.CellGetString("suchtxt")];
-
-            //        switch (connected) {
-            //            case ConstantTextPaditem ctpi:
-            //                value = ctpi.Text;
-            //                break;
-
-            //            case EditFieldPadItem efpi:
-            //                if (Parent is ConnectedFormulaView cfv) {
-            //                    var se = cfv.SearchOrGenerate(efpi);
-
-            //                    if (se is FlexiControlForCell fcfc) {
-            //                        value = fcfc.Value;
-            //                    } else if (se is FlexiControl fc) {
-            //                        value = fc.Value;
-            //                    } else {
-            //                        DebugPrint("Unbekannt");
-            //                    }
-            //                } else {
-            //                    value = "@@@";
-            //                    //DebugPrint("Parent unbekannt!");
-            //                }
-            //                break;
-
-            //            default:
-            //                value = "@@@";
-            //                ft = FilterType.KeinFilter; // Wurde dsa Parent eben gelöscht...
-            //                //DebugPrint("Parent " + thisR.CellGetString("suchtxt") + " nicht gefunden.");
-            //                break;
-            //        }
-            //    }
-
-            //    #endregion
-
-            //    if (column != null && ft != FilterType.KeinFilter) {
-            //        f.Add(new FilterItem(column, ft, value));
-            //    }
-            //}
-
-            //#endregion
-
-            //#region Zeile(n) ermitteln
-
-            //_rows = _rwf.Database.Row.CalculateFilteredRows(f);
-
-            //#endregion
-
             Connector.DoChilds(_rows, Childs, _rwf);
         }
+
+        //private void CalculateRows() {
+        //    if (_disposing || IsDisposed) { return; }
+
+        //    //#region Filter erstellen
+
+        //    //var f = new FilterCollection(_rwf.Database);
+
+        //    //foreach (var thisR in _rwf.FilterDefiniton.Row) {
+        //    //    #region Column ermitteln
+
+        //    //    var column = _rwf.Database.Column.SearchByKey(thisR.CellGetInteger("Spalte"));
+
+        //    //    #endregion
+
+        //    //    #region Type ermitteln
+
+        //    //    FilterType ft;
+        //    //    switch (thisR.CellGetString("Filterart").ToLower()) {
+        //    //        case "=":
+        //    //            ft = FilterType.Istgleich_GroßKleinEgal;
+        //    //            break;
+
+        //    //        case "x":
+        //    //            // Filter löschen
+        //    //            ft = FilterType.KeinFilter;
+        //    //            break;
+
+        //    //        default:
+        //    //            ft = FilterType.Istgleich_GroßKleinEgal;
+        //    //            DebugPrint("Filter " + thisR.CellGetInteger("Filterart") + " nicht definiert.");
+        //    //            break;
+        //    //    }
+
+        //    //    #endregion
+
+        //    //    #region Value ermitteln
+
+        //    //    var value = string.Empty;
+        //    //    if (ft != FilterType.KeinFilter) {
+        //    //        var connected = _rwf.Parent[thisR.CellGetString("suchtxt")];
+
+        //    //        switch (connected) {
+        //    //            case ConstantTextPaditem ctpi:
+        //    //                value = ctpi.Text;
+        //    //                break;
+
+        //    //            case EditFieldPadItem efpi:
+        //    //                if (Parent is ConnectedFormulaView cfv) {
+        //    //                    var se = cfv.SearchOrGenerate(efpi);
+
+        //    //                    if (se is FlexiControlForCell fcfc) {
+        //    //                        value = fcfc.Value;
+        //    //                    } else if (se is FlexiControl fc) {
+        //    //                        value = fc.Value;
+        //    //                    } else {
+        //    //                        DebugPrint("Unbekannt");
+        //    //                    }
+        //    //                } else {
+        //    //                    value = "@@@";
+        //    //                    //DebugPrint("Parent unbekannt!");
+        //    //                }
+        //    //                break;
+
+        //    //            default:
+        //    //                value = "@@@";
+        //    //                ft = FilterType.KeinFilter; // Wurde dsa Parent eben gelöscht...
+        //    //                //DebugPrint("Parent " + thisR.CellGetString("suchtxt") + " nicht gefunden.");
+        //    //                break;
+        //    //        }
+        //    //    }
+
+        //    //    #endregion
+
+        //    //    if (column != null && ft != FilterType.KeinFilter) {
+        //    //        f.Add(new FilterItem(column, ft, value));
+        //    //    }
+        //    //}
+
+        //    //#endregion
+
+        //    //#region Zeile(n) ermitteln
+
+        //    //_rows = _rwf.Database.Row.CalculateFilteredRows(f);
+
+        //    //#endregion
+
+        //    Connector.DoChilds(_rows, Childs, _rwf);
+        //}
 
         private void Childs_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
             Connector.DoChilds(_rows, Childs, _rwf);

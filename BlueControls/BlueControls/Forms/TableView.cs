@@ -43,12 +43,16 @@ using static BlueBasics.Generic;
 namespace BlueControls.Forms {
 
     public partial class TableView : Form {
+        //protected readonly List<string> DBView = new();
 
         #region Fields
 
+        //private readonly List<Database> DBStore = new();
         private Database? _originalDb;
 
         #endregion
+
+        //private int PrevIndexNo = -1;
 
         #region Constructors
 
@@ -87,7 +91,7 @@ namespace BlueControls.Forms {
             }
             Check_OrderButtons();
 
-            DatabaseSet(database);
+            SwitchTabToDatabase(database);
         }
 
         #endregion
@@ -229,6 +233,25 @@ namespace BlueControls.Forms {
             return l;
         }
 
+        public void ResetDatabaseSettings() {
+            foreach (var thisT in tbcDatabaseSelector.TabPages) {
+                if (thisT is System.Windows.Forms.TabPage tp && tp.Tag is List<string> s) {
+                    s[1] = string.Empty;
+                    tp.Tag = s;
+                }
+            }
+        }
+
+        protected void AddTabPage(string filename) {
+            var NTabPage = new System.Windows.Forms.TabPage {
+                Name = tbcDatabaseSelector.TabCount.ToString(),
+                Text = filename.FileNameWithoutSuffix(),
+                Tag = new List<string>() { filename, string.Empty }
+            };
+            tbcDatabaseSelector.Controls.Add(NTabPage);
+            //return NTabPage;
+        }
+
         protected virtual void btnCSVClipboard_Click(object sender, System.EventArgs e) {
             CopytoClipboard(Table.Export_CSV(FirstRow.ColumnCaption));
             Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
@@ -270,6 +293,21 @@ namespace BlueControls.Forms {
             Table.Export_HTML();
         }
 
+        protected void ChangeDatabaseInTab(string filename, System.Windows.Forms.TabPage xtab) {
+            if (xtab == null) { return; }
+
+            tbcDatabaseSelector.Enabled = false;
+            Table.Enabled = false;
+            Table.ShowWaitScreen = true;
+            Table.Refresh();
+
+            var s = (List<string>)(xtab.Tag);
+            s[0] = filename;
+            s[1] = string.Empty;
+            xtab.Tag = s;
+            tbcDatabaseSelector_Selected(null, new System.Windows.Forms.TabControlEventArgs(xtab, tbcDatabaseSelector.TabPages.IndexOf(xtab), System.Windows.Forms.TabControlAction.Selected));
+        }
+
         protected virtual void CheckButtons() {
             var datenbankDa = Convert.ToBoolean(Table.Database != null);
             btnNeuDB.Enabled = true;
@@ -293,10 +331,18 @@ namespace BlueControls.Forms {
             FilterLeiste.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
         }
 
-        protected void DatabaseSet(Database? database) {
+        protected void DatabaseSet(Database? database, string viewcode) {
             Table.Database = database;
             Formula.Database = database;
             FilterLeiste.Table = Table;
+
+            if (!string.IsNullOrEmpty(viewcode)) {
+                ParseView(viewcode);
+            }
+
+            Table.ShowWaitScreen = false;
+            tbcDatabaseSelector.Enabled = true;
+            Table.Enabled = true;
 
             //if (Table.Database == null) {
             //    SetDatabasetoNothing();
@@ -315,7 +361,7 @@ namespace BlueControls.Forms {
         }
 
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
-            DatabaseSet((Database)null);
+            DatabaseSet(null as Database, string.Empty);
             BlueBasics.MultiUserFile.MultiUserFile.SaveAll(true);
             base.OnFormClosing(e);
         }
@@ -325,8 +371,122 @@ namespace BlueControls.Forms {
             CheckButtons();
         }
 
+        protected virtual void ParseView(string ToParse) {
+            if (string.IsNullOrEmpty(ToParse)) { return; }
+            foreach (var pair in ToParse.GetAllTags()) {
+                switch (pair.Key) {
+                    case "tableview":
+                        Table.ParseView(pair.Value.FromNonCritical());
+                        break;
+                    //case "prio3":
+                    //    btnPrio3.Checked = pair.Value.FromPlusMinus();
+                    //    break;
+                    case "maintab":
+                        ribMain.SelectedIndex = int.Parse(pair.Value);
+                        break;
+                    //case "belegwahl":
+                    // cbxBelegWahl.Text = pair.Value.FromNonCritical();
+                    //return;
+                    default:
+                        DebugPrint(FehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
+                        break;
+                }
+            }
+            //        case "arrangementnr":
+            //            pair.Value
+            //            TableView.ParseView(i);
+            //d
+        }
+
+        //protected bool ShowDatabase(string dbName) {
+        //    var found = -1;
+        //    var db = EnsureLoaded(dbName, true);
+        //    if (db == null) {
+        //        DebugPrint(FehlerArt.Warnung, "Datenbank '" + dbName + "' nicht gefunden");
+        //        return false;
+        //    }
+        //    for (var count = 0; count < tbcDatabaseSelector.TabCount; count++) {
+        //        if (tbcDatabaseSelector.TabPages[count].Text.ToUpper() == dbName.ToUpper()) {
+        //            found = count;
+        //        }
+        //    }
+        //    if (found >= 0) {
+        //        tbcDatabaseSelector.SelectedIndex = found;
+        //        return true;
+        //    }
+        //    AddTabPagex(db.Filename);
+        //    tbcDatabaseSelector.SelectedIndex = tbcDatabaseSelector.TabCount - 1;
+        //    return true;
+        //}
+
+        /// <summary>
+        /// Sucht den Tab mit der angegebenen Datenbank.
+        /// Ist kein Reiter vorhanden, wird ein neuer erzeugt.
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        protected bool SwitchTabToDatabase(string filename) {
+            if (string.IsNullOrEmpty(filename)) { return false; }
+            if (!FileExists(filename)) { return false; }
+
+            foreach (var thisT in tbcDatabaseSelector.TabPages) {
+                if (thisT is System.Windows.Forms.TabPage tp && tp.Tag is List<string> s) {
+                    if (s[0].Equals(filename, StringComparison.InvariantCultureIgnoreCase)) {
+                        tbcDatabaseSelector.SelectedTab = tp;
+                        return true;
+                    }
+                }
+            }
+
+            AddTabPage(filename);
+            return SwitchTabToDatabase(filename);
+        }
+
+        protected bool SwitchTabToDatabase(Database? database) {
+            if (database == null) { return false; }
+            return SwitchTabToDatabase(database.Filename);
+        }
+
+        //    Table.Database = db;
+        //    if (Table.Database != null) {
+        //        tbcDatabaseSelector.TabPages[toIndex].Text = db.Filename.FileNameWithoutSuffix();
+        //        ParseView(DBView[toIndex]);
+        //    }
+        //    tbcDatabaseSelector.Enabled = true;
+        //    Table.Enabled = true;
+        //}
+        protected virtual string ViewToString() {
+            var s = "{" +
+                "MainTab=" + ribMain.SelectedIndex.ToString() + ", " +
+                "TableView=" + Table.ViewToString().ToNonCritical() +
+            "}";
+            return s;
+        }
+
+        //    if (PrevIndexNo > -1 && DBStore[PrevIndexNo] != Table.Database) { PrevIndexNo = -1; }
+        //    if (toIndex != PrevIndexNo && PrevIndexNo > -1 && DBStore[PrevIndexNo] != null) {
+        //        DBView[PrevIndexNo] = ViewToString();
+        //    }
+        //    PrevIndexNo = toIndex;
+        //    if (Table.Database == db) {
+        //        Table.Database = null; // um den Filtern klar zu machen, das ändert sich was
+        //    }
         private void _originalDB_Disposing(object sender, System.EventArgs e) => ChangeDatabase(null);
 
+        //protected void TabSetDatabaseAndEnable(int toIndex, Database db) {
+        //    tbcDatabaseSelector.Enabled = false;
+        //    Table.Enabled = false;
+        //    tbcDatabaseSelector.TabPages[toIndex].Enabled = true;
+        //    while (DBStore.Count <= toIndex) {
+        //        DBStore.Add(null);
+        //        DBView.Add(string.Empty);
+        //    }
+        //    if (DBStore[toIndex] != db) { DBView[toIndex] = string.Empty; }
+        //    DBStore[toIndex] = db;
+        //    if (tbcDatabaseSelector.SelectedIndex != toIndex) {
+        //        tbcDatabaseSelector.SelectedIndex = toIndex;
+        //        return; // Selected Index changed soll diese Routine hier aufrufen
+        //    }
         private void btnAlleErweitern_Click(object sender, System.EventArgs e) => Table.ExpandAll();
 
         private void btnAlleSchließen_Click(object sender, System.EventArgs e) => Table.CollapesAll();
@@ -356,32 +516,21 @@ namespace BlueControls.Forms {
 
         private void btnLetzteDateien_ItemClicked(object sender, BasicListItemEventArgs e) {
             BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-            DatabaseSet(e.Item.Internal);
+            SwitchTabToDatabase(e.Item.Internal);
         }
 
-        private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e) {
+        private void btnNeuDB_Click(object sender, System.EventArgs e) {
             BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-
-            if (sender == btnSaveAs) {
-                if (Table.Database == null) { return; }
-            }
-
-            if (sender == btnNeuDB) {
-                if (Table.Database != null) { DatabaseSet(null as Database); }
-            }
 
             SaveTab.ShowDialog();
             if (!PathExists(SaveTab.FileName.FilePath())) { return; }
             if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
-            if (sender == btnNeuDB) {
-                DatabaseSet(new Database(false)); // Ab jetzt in der Variable _Database zu finden
-            }
             if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
 
-            Table.Database.SaveAsAndChangeTo(SaveTab.FileName);
-
-            DatabaseSet(SaveTab.FileName);
+            var db = new Database(false);
+            db.SaveAsAndChangeTo(SaveTab.FileName);
+            SwitchTabToDatabase(SaveTab.FileName);
         }
 
         private void btnOeffnen_Click(object sender, System.EventArgs e) {
@@ -392,6 +541,25 @@ namespace BlueControls.Forms {
         private void btnPowerBearbeitung_Click(object sender, System.EventArgs e) {
             Notification.Show("20 Sekunden (fast) rechtefreies<br>Vearbeiten akiviert.", ImageCode.Stift);
             Table.PowerEdit = DateTime.Now.AddSeconds(20);
+        }
+
+        private void btnSaveAs_Click(object sender, System.EventArgs e) {
+            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+
+            if (Table.Database == null) { return; }
+
+            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+
+            SaveTab.ShowDialog();
+            if (!PathExists(SaveTab.FileName.FilePath())) { return; }
+            if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
+
+            if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
+
+            var db = Table.Database;
+
+            db.SaveAsAndChangeTo(SaveTab.FileName);
+            SwitchTabToDatabase(SaveTab.FileName);
         }
 
         private void btnSpaltenanordnung_Click(object sender, System.EventArgs e) {
@@ -482,18 +650,18 @@ namespace BlueControls.Forms {
             tabAdmin.Enabled = true;
         }
 
-        private void DatabaseSet(string? filename) {
-            DatabaseSet((Database)null);
-            if (!FileExists(filename)) {
-                CheckButtons();
-                return;
-            }
-            btnLetzteDateien.AddFileName(filename, string.Empty);
-            LoadTab.FileName = filename;
-            var tmpDatabase = Database.GetByFilename(filename, false, false);
-            if (tmpDatabase == null) { return; }
-            DatabaseSet(tmpDatabase);
-        }
+        //private void DatabaseSetx(string filename) {
+        //    DatabaseSet(null as Database);
+        //    if (!FileExists(filename)) {
+        //        CheckButtons();
+        //        return;
+        //    }
+        //    btnLetzteDateien.AddFileName(filename, string.Empty);
+        //    LoadTab.FileName = filename;
+        //    var tmpDatabase = Database.GetByFilename(filename, false, false);
+        //    if (tmpDatabase == null) { return; }
+        //    DatabaseSet(tmpDatabase);
+        //}
 
         private void FillFormula() {
             if (tbcSidebar.SelectedTab != tabFormula) { return; }
@@ -509,14 +677,14 @@ namespace BlueControls.Forms {
             //if (e.Column != null) { Formula.Database = e.Column.Database; }
             //if (e.RowData?.Row != null) { Formula.Database = e.RowData.Row.Database; }
 
-            Formula.ShowingRowKey = Table.CursorPosColumn == null || Table.CursorPosRow?.Row == null ? -1 : Table.CursorPosRow.Row.Key;
+            Formula.ShowingRowKey = Table.CursorPosRow is RowData r ? r.Row.Key : -1;
         }
 
         private void Formula_SizeChanged(object sender, System.EventArgs e) => FillFormula();
 
         private void Formula_VisibleChanged(object sender, System.EventArgs e) => FillFormula();
 
-        private void LoadTab_FileOk(object sender, CancelEventArgs e) => DatabaseSet(LoadTab.FileName);
+        private void LoadTab_FileOk(object sender, CancelEventArgs e) => SwitchTabToDatabase(LoadTab.FileName);
 
         private void Table_CursorPosChanged(object sender, CellExtEventArgs e) {
             if (InvokeRequired) {
@@ -551,6 +719,33 @@ namespace BlueControls.Forms {
         }
 
         private void TableView_EnabledChanged(object sender, System.EventArgs e) => Check_OrderButtons();
+
+        private void tbcDatabaseSelector_Deselecting(object sender, System.Windows.Forms.TabControlCancelEventArgs e) {
+            var s = (List<string>)(e.TabPage.Tag);
+            s[1] = ViewToString();
+            e.TabPage.Tag = s;
+        }
+
+        private void tbcDatabaseSelector_Selected(object sender, System.Windows.Forms.TabControlEventArgs e) {
+            Table.ShowWaitScreen = true;
+            tbcDatabaseSelector.Enabled = false;
+            Table.Enabled = false;
+            Table.Refresh();
+
+            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+
+            var s = (List<string>)(e.TabPage.Tag);
+
+            var DB = Database.GetByFilename(s[0], false, false);
+
+            if (DB != null) {
+                btnLetzteDateien.AddFileName(DB.Filename, string.Empty);
+                LoadTab.FileName = DB.Filename;
+                e.TabPage.Text = DB.Filename.FileNameWithoutSuffix();
+            }
+
+            DatabaseSet(DB, s[1]);
+        }
 
         private void tbcSidebar_SelectedIndexChanged(object sender, System.EventArgs e) => FillFormula();
 

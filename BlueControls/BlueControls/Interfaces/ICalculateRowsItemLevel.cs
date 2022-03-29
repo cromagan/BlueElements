@@ -20,11 +20,13 @@ using BlueDatabase;
 
 namespace BlueControls.Interfaces {
 
-    public interface ICalculateRows : IRecursiveCheck, IReadableText {
+    public interface ICalculateRowsItemLevel : IRecursiveCheck, IReadableText {
 
         #region Properties
 
         public Database? Database { get; set; }
+
+        public bool Genau_eine_Zeile { get; set; }
 
         /// <summary>
         /// Laufende Nummer, bestimmt die Einfärbung

@@ -217,7 +217,7 @@ namespace BlueControls.Forms {
             this.btnSaveAs.Size = new System.Drawing.Size(64, 66);
             this.btnSaveAs.TabIndex = 4;
             this.btnSaveAs.Text = "Speichern unter";
-            this.btnSaveAs.Click += new System.EventHandler(this.btnNeuDB_SaveAs_Click);
+            this.btnSaveAs.Click += new System.EventHandler(this.btnSaveAs_Click);
             // 
             // btnNeuDB
             // 
@@ -228,7 +228,7 @@ namespace BlueControls.Forms {
             this.btnNeuDB.Size = new System.Drawing.Size(56, 66);
             this.btnNeuDB.TabIndex = 0;
             this.btnNeuDB.Text = "Neu";
-            this.btnNeuDB.Click += new System.EventHandler(this.btnNeuDB_SaveAs_Click);
+            this.btnNeuDB.Click += new System.EventHandler(this.btnNeuDB_Click);
             // 
             // tabAllgemein
             // 
@@ -585,7 +585,9 @@ namespace BlueControls.Forms {
             this.tbcDatabaseSelector.Size = new System.Drawing.Size(739, 24);
             this.tbcDatabaseSelector.TabDefault = null;
             this.tbcDatabaseSelector.TabDefaultOrder = null;
-            this.tbcDatabaseSelector.TabIndex = 20;
+            this.tbcDatabaseSelector.TabIndex = 20;   
+            this.tbcDatabaseSelector.Selected += new System.Windows.Forms.TabControlEventHandler(this.tbcDatabaseSelector_Selected);
+            this.tbcDatabaseSelector.Deselecting += new System.Windows.Forms.TabControlCancelEventHandler(this.tbcDatabaseSelector_Deselecting);
             // 
             // pnlSerachBar
             // 

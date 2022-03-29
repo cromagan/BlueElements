@@ -311,9 +311,11 @@
     <Compile Include="frmBefehlsreferenz.Designer.cs">
       <DependentUpon>frmBefehlsreferenz.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interfaces\IAcceptMultipleRows.cs" />
+    <Compile Include="Interfaces\ICalculateRowsControlLevel.cs" />
     <Compile Include="Interfaces\IConnectionAttributes.cs" />
     <Compile Include="Interfaces\IAcceptItemsForSelect.cs" />
-    <Compile Include="Interfaces\ICalculateRows.cs" />
+    <Compile Include="Interfaces\ICalculateRowsItemLevel.cs" />
     <Compile Include="Interfaces\IContenHolder.cs" />
     <Compile Include="Interfaces\IAcceptRowKey.cs" />
     <Compile Include="Interfaces\IItemToControl.cs" />

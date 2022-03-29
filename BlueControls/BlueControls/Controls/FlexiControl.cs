@@ -335,10 +335,10 @@ namespace BlueControls.Controls {
 
         #region Methods
 
-        public void StyleComboBox(ItemCollectionList? list, ComboBoxStyle style) {
+        public void StyleComboBox(ItemCollectionList? list, ComboBoxStyle style, bool removevalueIfNotExists) {
             if (!Allinitialized) { CreateSubControls(); }
             foreach (var thiscb in Controls) {
-                if (thiscb is ComboBox cb) { StyleComboBox(cb, list, style); }
+                if (thiscb is ComboBox cb) { StyleComboBox(cb, list, style, removevalueIfNotExists); }
             }
         }
 
@@ -624,13 +624,28 @@ namespace BlueControls.Controls {
             Allinitialized = false;
         }
 
-        protected void StyleComboBox(ComboBox? control, ItemCollectionList? list, ComboBoxStyle style) {
+        protected void StyleComboBox(ComboBox? control, ItemCollectionList? list, ComboBoxStyle style, bool removevalueIfNotExists) {
+            if (control == null) {
+                if (removevalueIfNotExists) {
+                    ValueSet(string.Empty, true, true);
+                }
+                return;
+            }
+
             control.Enabled = Enabled;
             control.GetStyleFrom(this);
             control.DropDownStyle = style;
             control.Item.Clear();
-            control.Item.AddClonesFrom(list);
+            if (list != null) {
+                control.Item.AddClonesFrom(list);
+            }
             control.Item.Sort();
+
+            if (removevalueIfNotExists) {
+                if (control.Item[Value] == null) {
+                    ValueSet(string.Empty, true, true);
+                }
+            }
         }
 
         protected void StyleListBox(ListBox? control, ColumnItem? column) {
@@ -784,7 +799,7 @@ namespace BlueControls.Controls {
         /// </summary>
         private ComboBox Control_Create_ComboBox() {
             ComboBox control = new();
-            StyleComboBox(control, null, ComboBoxStyle.DropDownList);
+            StyleComboBox(control, null, ComboBoxStyle.DropDownList, false);
             UpdateValueToControl();
             StandardBehandlung(control);
             return control;

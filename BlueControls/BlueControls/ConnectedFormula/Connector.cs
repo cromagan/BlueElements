@@ -29,12 +29,11 @@ using BlueControls.Interfaces;
 
 namespace BlueControls.ConnectedFormula {
 
-    internal class Connector : System.Windows.Forms.Control {
+    internal class Connector : System.Windows.Forms.Control, ICalculateRowsControlLevel {
 
         #region Fields
 
         public static readonly List<Connector> AllConnectors = new();
-        public readonly ListExt<System.Windows.Forms.Control> Childs = new();
         public readonly string VerbindungsId = string.Empty;
         private readonly ListExt<System.Windows.Forms.Control> _parents = new();
         private readonly RowWithFilterPaditem _rwf;
@@ -61,6 +60,12 @@ namespace BlueControls.ConnectedFormula {
 
         #endregion
 
+        #region Properties
+
+        public ListExt<System.Windows.Forms.Control> Childs { get; } = new();
+
+        #endregion
+
         #region Methods
 
         public static void DoChilds(List<RowItem>? rows, ListExt<System.Windows.Forms.Control> childs, IConnectionAttributes rwf) {
@@ -69,11 +74,11 @@ namespace BlueControls.ConnectedFormula {
             foreach (var thischild in childs) {
                 var did = false;
 
-                if (thischild is FlexiControl fc) {
+                if (thischild is IAcceptItemsForSelect fc) {
                     did = DoChilds_ListItems(fc, rows, childs, rwf);
                 }
 
-                if (!did && thischild is RowCloner rc) {
+                if (!did && thischild is IAcceptMultipleRows rc) {
                     did = DoChilds_MultipleRows(rc, rows, childs, rwf);
                 }
 
@@ -121,11 +126,12 @@ namespace BlueControls.ConnectedFormula {
             _rwf_Changed(null, System.EventArgs.Empty);
         }
 
-        private static bool DoChilds_ListItems(FlexiControl fc, List<RowItem>? rows, ListExt<System.Windows.Forms.Control> childs, IConnectionAttributes attributes) {
+        private static bool DoChilds_ListItems(IAcceptItemsForSelect fc, List<RowItem>? rows, ListExt<System.Windows.Forms.Control> childs, IConnectionAttributes attributes) {
             // Dropdownmenü mehrerer Einträge
             if (attributes.Genau_eine_Zeile) {
                 fc.DisabledReason = "Vorgänger hat falschen Datentyp";
-                fc.ValueSet(string.Empty, true, true);
+                fc.StyleComboBox(null, System.Windows.Forms.ComboBoxStyle.DropDownList, true);
+                //fc.ValueSet(string.Empty, true, true);
                 return false;
             }
 
@@ -137,7 +143,8 @@ namespace BlueControls.ConnectedFormula {
 
             if (efpi is not EditFieldPadItem epfi2) {
                 fc.DisabledReason = "Interner Fehler: Ursprungsitem nicht vorhanden";
-                fc.ValueSet(string.Empty, true, true);
+                fc.StyleComboBox(null, System.Windows.Forms.ComboBoxStyle.DropDownList, true);
+                //fc.ValueSet(string.Empty, true, true);
                 return false;
             }
 
@@ -147,8 +154,29 @@ namespace BlueControls.ConnectedFormula {
             cbx.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
 
             if (fc.EditType == EditTypeFormula.Textfeld_mit_Auswahlknopf) {
-                fc.StyleComboBox(cbx, System.Windows.Forms.ComboBoxStyle.DropDownList);
-                if (!li.Contains(fc.Value)) { fc.ValueSet(string.Empty, true, true); }
+                fc.StyleComboBox(cbx, System.Windows.Forms.ComboBoxStyle.DropDownList, true);
+            }
+
+            return true;
+        }
+
+        private static bool DoChilds_MultipleRows(IAcceptMultipleRows fcfc, List<RowItem>? rows, ListExt<System.Windows.Forms.Control> childs, IConnectionAttributes attributes) {
+            // Normales Zellenfeld
+            if (attributes.Genau_eine_Zeile) {
+                fcfc.Database = attributes.Database;
+                fcfc.Rows.Clear();
+                fcfc.Rows.AddRange(rows);
+
+                //    if (rows != null && rows.Count == 1) {
+                //        fcfc.RowKey = rows[0].Key;
+                //    } else {
+                //        fcfc.RowKey = -1;
+                //        return false;
+                //    }
+                //} else {
+                //    // Falscher Datentyp
+                //    fcfc.RowKey = -1;
+                //    return false;
             }
 
             return true;
@@ -163,8 +191,8 @@ namespace BlueControls.ConnectedFormula {
                     fcfc.RowKey = rows[0].Key;
                 } else {
                     fcfc.RowKey = -1;
-                    return false;
                 }
+                return true;
             } else {
                 // Falscher Datentyp
                 fcfc.RowKey = -1;

@@ -15,13 +15,36 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
+using BlueDatabase.Enums;
+using System.Windows.Forms;
 
 namespace BlueControls.Interfaces {
 
+    /// <summary>
+    /// Wird verwendet, wenn das Steuerelement eine Liste von String
+    /// empfangen kann und diese dann als Auswahlmöglichkeit (z. b. Dropdown)
+    /// anbieten kann.
+    /// </summary>
     public interface IAcceptItemsForSelect {
         //public Database? Database { get; set; }
 
         //public long RowKey { get; set; }
+
+        #region Properties
+
+        public string DisabledReason { get; set; }
+
+        public EditTypeFormula EditType { get; set; }
+        public object Tag { get; set; }
+
+        #endregion
+
+        #region Methods
+
+        public void StyleComboBox(ItemCollectionList? list, ComboBoxStyle style, bool removevalueIfNotExists);
+
+        #endregion
     }
 }
