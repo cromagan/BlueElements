@@ -213,7 +213,7 @@ namespace BlueBasics {
                 if (i1 != i2) {
                     var v1 = list[i1];
                     var v2 = list[i2];
-                    // modAllgemein.Swap(ref tempVar, ref tempVar2);
+                    // Generic.Swap(ref tempVar, ref tempVar2);
                     list[i1] = v2;
                     list[i2] = v1;
                 }

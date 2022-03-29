@@ -617,10 +617,10 @@ namespace BlueControls.Controls {
                             Forms.PictureView x = new(bi.Bitmap);
                             x.Show();
                             //var b = modConverter.FileToByte(t.Internal);
-                            //b = modAllgemein.SimpleCrypt(b, FileEncryptionKey, -1);
+                            //b = Generic.SimpleCrypt(b, FileEncryptionKey, -1);
                             //var tmp = TempFile(string.Empty, string.Empty, t.Internal.FileSuffix());
                             //modConverter.ByteToFile(tmp, b);
-                            //modAllgemein.ExecuteFile(tmp, null, true, false);
+                            //Generic.ExecuteFile(tmp, null, true, false);
                             //MessageBox.Show("Warte...");
                             //DeleteFile(tmp, true);
                         }

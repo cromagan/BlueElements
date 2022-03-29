@@ -55,7 +55,6 @@ namespace BlueControls.Controls {
         /// </summary>
         protected DateTime? LastTextChange;
 
-        protected bool TranslateCaption = true;
         private AdditionalCheck _additionalCheck = AdditionalCheck.None;
         private string _allowedChars = string.Empty;
         private string _caption = string.Empty;
@@ -68,16 +67,14 @@ namespace BlueControls.Controls {
         private string _disabledReason = string.Empty;
         private EditTypeFormula _editType;
         private bool _formatierungErlaubt;
-
-        //private enVarType _Format = enVarType.Text;
         private Caption? _infoCaption;
-
         private string _infoText = string.Empty;
         private bool _multiLine;
         private string _regex = string.Empty;
         private bool _showInfoWhenDisabled;
         private bool _spellChecking;
         private string _suffix = string.Empty;
+        private bool _translateCaption = true;
 
         #endregion
 
@@ -110,7 +107,6 @@ namespace BlueControls.Controls {
 
         public event EventHandler ButtonClicked;
 
-        //public event EventHandler RemovingAll;
         public event EventHandler NeedRefresh;
 
         [Obsolete("Value Changed benutzen", true)]
@@ -315,10 +311,10 @@ namespace BlueControls.Controls {
 
         [DefaultValue(true)]
         bool ITranslateable.Translate {
-            get => TranslateCaption;
+            get => _translateCaption;
             set {
-                if (TranslateCaption == value) { return; }
-                if (_captionObject is Caption c) { c.Translate = TranslateCaption; }
+                if (_translateCaption == value) { return; }
+                if (_captionObject is Caption c) { c.Translate = _translateCaption; }
             }
         }
 
@@ -794,7 +790,7 @@ namespace BlueControls.Controls {
             _captionObject.Top = 0;
             _captionObject.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             _captionObject.Visible = _captionPosition != ÜberschriftAnordnung.Ohne_mit_Abstand;
-            _captionObject.Translate = TranslateCaption;
+            _captionObject.Translate = _translateCaption;
             _captionObject.BringToFront();
         }
 
@@ -1047,16 +1043,12 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
         /// </summary>
-        private void UpdateValueTo_Combobox(TextBox control) =>
-            //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
-            control.Text = Value;
+        private void UpdateValueTo_Combobox(TextBox control) => control.Text = Value;
 
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling  muss TRUE sein.
         /// </summary>
-        private void UpdateValueTo_EasyPic(EasyPic control) =>
-            //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
-            control.FromFile(Value);
+        private void UpdateValueTo_EasyPic(EasyPic control) => control.FromFile(Value);
 
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
@@ -1066,9 +1058,7 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
         /// </summary>
-        private void UpdateValueTo_TextBox(TextBox control) =>
-            //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
-            control.Text = Value;
+        private void UpdateValueTo_TextBox(TextBox control) => control.Text = Value;
 
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Die Filling-Variable wird währenddessen umgesetzt.

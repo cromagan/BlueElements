@@ -75,15 +75,15 @@ namespace BlueControls.ConnectedFormula {
                 var did = false;
 
                 if (!did && thischild is IAcceptMultipleRows rc) {
-                    did = DoChilds_MultipleRows(rc, rows, childs, rwf);
+                    did = DoChilds_MultipleRows(rc, rows, rwf);
                 }
 
                 if (!did && thischild is IAcceptRowKey fcfc) {
-                    did = DoChilds_OneRowKey(fcfc, rows, childs, rwf);
+                    did = DoChilds_OneRowKey(fcfc, rows, rwf);
                 }
 
                 if (!did && thischild is IAcceptItemsForSelect fc) {
-                    did = DoChilds_ListItems(fc, rows, childs, rwf);
+                    did = DoChilds_ListItems(fc, rows, rwf);
                 }
 
                 if (thischild is IDisabledReason id) {
@@ -130,27 +130,17 @@ namespace BlueControls.ConnectedFormula {
             _rwf_Changed(null, System.EventArgs.Empty);
         }
 
-        private static bool DoChilds_ListItems(IAcceptItemsForSelect fc, List<RowItem>? rows, ListExt<System.Windows.Forms.Control> childs, IConnectionAttributes attributes) {
+        private static bool DoChilds_ListItems(IAcceptItemsForSelect fc, List<RowItem>? rows, IConnectionAttributes attributes) {
             // Dropdownmenü mehrerer Einträge
-            if (attributes.Genau_eine_Zeile) {
-                //fc.DisabledReason = "Vorgänger hat falschen Datentyp";
-                //fc.StyleComboBox(null, System.Windows.Forms.ComboBoxStyle.DropDownList, true);
-                //fc.ValueSet(string.Empty, true, true);
-                return false;
-            }
+            if (attributes.Genau_eine_Zeile) { return false; }
 
             // Wie lautet der eigene Ursprüngliche Name, von dem das FlexControl abstammt
             var id = (string)fc.Tag;
 
-            // Sich selbst suchen - also, das Original Item. Das Patent hier ist die PadCollection
+            // Sich selbst suchen - also, das Original Item. Das Parent hier ist die PadCollection
             var efpi = attributes.Parent[id];
 
-            if (efpi is not EditFieldPadItem epfi2) {
-                //fc.DisabledReason = "Interner Fehler: Ursprungsitem nicht vorhanden";
-                //fc.StyleComboBox(null, System.Windows.Forms.ComboBoxStyle.DropDownList, true);
-                //fc.ValueSet(string.Empty, true, true);
-                return false;
-            }
+            if (efpi is not EditFieldPadItem epfi2) { return false; }
 
             var li = epfi2.Column.Contents(rows);
             var cbx = new ItemCollection.ItemCollectionList.ItemCollectionList();
@@ -164,7 +154,7 @@ namespace BlueControls.ConnectedFormula {
             return true;
         }
 
-        private static bool DoChilds_MultipleRows(IAcceptMultipleRows fcfc, List<RowItem>? rows, ListExt<System.Windows.Forms.Control> childs, IConnectionAttributes attributes) {
+        private static bool DoChilds_MultipleRows(IAcceptMultipleRows fcfc, List<RowItem>? rows, IConnectionAttributes attributes) {
             // Normales Zellenfeld
             if (attributes.Genau_eine_Zeile) {
                 fcfc.Database = attributes.Database;
@@ -176,7 +166,7 @@ namespace BlueControls.ConnectedFormula {
             return false;
         }
 
-        private static bool DoChilds_OneRowKey(IAcceptRowKey fcfc, List<RowItem>? rows, ListExt<System.Windows.Forms.Control> childs, IConnectionAttributes attributes) {
+        private static bool DoChilds_OneRowKey(IAcceptRowKey fcfc, List<RowItem>? rows, IConnectionAttributes attributes) {
             // Normales Zellenfeld
             if (attributes.Genau_eine_Zeile) {
                 fcfc.Database = attributes.Database;

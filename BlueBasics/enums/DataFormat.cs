@@ -72,28 +72,28 @@ namespace BlueBasics.Enums {
     }
 
     public static class DataFormatExtensions {
-        //public static string AllowedChars(this enDataFormat format) {
+        //public static string AllowedChars(this DataFormat format) {
         //    switch (format) {
-        //        case enDataFormat.Text:
-        //        case enDataFormat.Columns_für_LinkedCellDropdown:
-        //        case enDataFormat.Values_für_LinkedCellDropdown:
-        //        case enDataFormat.RelationText:
+        //        case DataFormat.Text:
+        //        case DataFormat.Columns_für_LinkedCellDropdown:
+        //        case DataFormat.Values_für_LinkedCellDropdown:
+        //        case DataFormat.RelationText:
         //            return Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + Constants.Char_Satzzeichen + Constants.Char_Sonderzeichen;
 
-        //        case enDataFormat.Bit:
+        //        case DataFormat.Bit:
         //            return "+-";
 
-        //        case enDataFormat.FarbeInteger:
+        //        case DataFormat.FarbeInteger:
         //            return Constants.Char_Numerals + "-";
 
-        //        case enDataFormat.Link_To_Filesystem:
+        //        case DataFormat.Link_To_Filesystem:
         //            return Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + ",.\\:_ +-()'";
 
-        //        case enDataFormat.LinkedCell:
+        //        case DataFormat.LinkedCell:
         //            Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
         //            return string.Empty;
 
-        //        case enDataFormat.Button:
+        //        case DataFormat.Button:
         //            return string.Empty;
 
         //        default:
@@ -149,7 +149,7 @@ namespace BlueBasics.Enums {
         ///// <param name="multiLine"></param>
         ///// <returns></returns>
         ///// <remarks></remarks>
-        //public static bool IsFormat(this string txt, enDataFormat format, bool multiLine, string additionalRegex) {
+        //public static bool IsFormat(this string txt, DataFormat format, bool multiLine, string additionalRegex) {
         //    if (multiLine) {
         //        var ex = txt.SplitAndCutByCr();
         //        return ex.All(thisString => string.IsNullOrEmpty(thisString) || thisString.IsFormat(format, additionalRegex));
@@ -157,7 +157,7 @@ namespace BlueBasics.Enums {
         //    return txt.IsFormat(format, additionalRegex);
         //}
 
-        //public static bool IsFormat(this string txt, enDataFormat format) => Text_LängeCheck(txt, format) && Text_SchabloneCheck(txt, format) && txt.ContainsOnlyChars(AllowedChars(format)) && Text_ValueCheck(txt, format);
+        //public static bool IsFormat(this string txt, DataFormat format) => Text_LängeCheck(txt, format) && Text_SchabloneCheck(txt, format) && txt.ContainsOnlyChars(AllowedChars(format)) && Text_ValueCheck(txt, format);
 
         public static bool MultilinePossible(this DataFormat format) => format switch {
             DataFormat.Text or DataFormat.RelationText or DataFormat.Link_To_Filesystem or DataFormat.Verknüpfung_zu_anderer_Datenbank => true,
@@ -179,31 +179,31 @@ namespace BlueBasics.Enums {
             _ => false
         };
 
-        //public static bool Text_LängeCheck(string txt, enDataFormat format) {
+        //public static bool Text_LängeCheck(string txt, DataFormat format) {
         //    var ml = Text_MaximaleLänge(format);
         //    var il = 0;
         //    if (txt != null) { il = txt.Length; }
         //    if (ml > -1 && il > ml) { return false; }
         //    switch (format) {
-        //        case enDataFormat.Text:
-        //        case enDataFormat.RelationText:
-        //        case enDataFormat.Columns_für_LinkedCellDropdown:
-        //        case enDataFormat.Values_für_LinkedCellDropdown:
-        //        case enDataFormat.Button:
+        //        case DataFormat.Text:
+        //        case DataFormat.RelationText:
+        //        case DataFormat.Columns_für_LinkedCellDropdown:
+        //        case DataFormat.Values_für_LinkedCellDropdown:
+        //        case DataFormat.Button:
         //            return true;
 
-        //        case enDataFormat.Bit:
+        //        case DataFormat.Bit:
         //            return il == 1;
 
-        //        case enDataFormat.FarbeInteger:
-        //        case enDataFormat.BildCode:
+        //        case DataFormat.FarbeInteger:
+        //        case DataFormat.BildCode:
         //            return il > 0;
 
-        //        case enDataFormat.LinkedCell:
+        //        case DataFormat.LinkedCell:
         //            Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
         //            return true;
 
-        //        case enDataFormat.Link_To_Filesystem:
+        //        case DataFormat.Link_To_Filesystem:
         //            return il < 257;
 
         //        default:
@@ -212,24 +212,24 @@ namespace BlueBasics.Enums {
         //    }
         //}
 
-        //public static int Text_MaximaleLänge(this enDataFormat format) {
+        //public static int Text_MaximaleLänge(this DataFormat format) {
         //    switch (format) {
-        //        case enDataFormat.Text:
-        //        case enDataFormat.BildCode:
-        //        case enDataFormat.RelationText:
-        //        case enDataFormat.FarbeInteger:
-        //        case enDataFormat.LinkedCell:
-        //        case enDataFormat.Columns_für_LinkedCellDropdown:
-        //        case enDataFormat.Values_für_LinkedCellDropdown:
+        //        case DataFormat.Text:
+        //        case DataFormat.BildCode:
+        //        case DataFormat.RelationText:
+        //        case DataFormat.FarbeInteger:
+        //        case DataFormat.LinkedCell:
+        //        case DataFormat.Columns_für_LinkedCellDropdown:
+        //        case DataFormat.Values_für_LinkedCellDropdown:
         //            return -1;
 
-        //        case enDataFormat.Bit:
+        //        case DataFormat.Bit:
         //            return 1;
 
-        //        case enDataFormat.Link_To_Filesystem:
+        //        case DataFormat.Link_To_Filesystem:
         //            return 260;
 
-        //        case enDataFormat.Button:
+        //        case DataFormat.Button:
         //            return 0;
 
         //        default:
@@ -245,21 +245,21 @@ namespace BlueBasics.Enums {
         ///// <param name="format"></param>
         ///// <returns></returns>
         ///// <remarks></remarks>
-        //public static bool Text_SchabloneCheck(string txt, enDataFormat format) {
+        //public static bool Text_SchabloneCheck(string txt, DataFormat format) {
         //    switch (format) {
-        //        case enDataFormat.Text:
-        //        case enDataFormat.BildCode:
-        //        case enDataFormat.Columns_für_LinkedCellDropdown:
-        //        case enDataFormat.Values_für_LinkedCellDropdown:
-        //        case enDataFormat.RelationText:
-        //        case enDataFormat.Link_To_Filesystem:
-        //        case enDataFormat.Button:
+        //        case DataFormat.Text:
+        //        case DataFormat.BildCode:
+        //        case DataFormat.Columns_für_LinkedCellDropdown:
+        //        case DataFormat.Values_für_LinkedCellDropdown:
+        //        case DataFormat.RelationText:
+        //        case DataFormat.Link_To_Filesystem:
+        //        case DataFormat.Button:
         //            return true;
 
-        //        case enDataFormat.Bit:
+        //        case DataFormat.Bit:
         //            return txt.Length == 1;
 
-        //        case enDataFormat.FarbeInteger:
+        //        case DataFormat.FarbeInteger:
         //            if (txt == "0") { return true; }
         //            if (txt == "-") { return false; }
         //            if (!string.IsNullOrEmpty(txt) && txt.Substring(0, 1) == "0") { return false; }
@@ -267,7 +267,7 @@ namespace BlueBasics.Enums {
         //            if (txt.Length > 2 && txt.IndexOf("-", 1) > -1) { return false; }
         //            return true;
 
-        //        case enDataFormat.LinkedCell:
+        //        case DataFormat.LinkedCell:
         //            Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
         //            return true;
 
@@ -277,22 +277,22 @@ namespace BlueBasics.Enums {
         //    }
         //}
 
-        //public static bool Text_ValueCheck(string tXT, enDataFormat format) {
+        //public static bool Text_ValueCheck(string tXT, DataFormat format) {
         //    switch (format) {
-        //        case enDataFormat.Text:
-        //        case enDataFormat.BildCode:
-        //        case enDataFormat.Columns_für_LinkedCellDropdown:
-        //        case enDataFormat.Values_für_LinkedCellDropdown:
-        //        case enDataFormat.Bit:
-        //        case enDataFormat.RelationText:
-        //        case enDataFormat.Link_To_Filesystem:
-        //        case enDataFormat.Button:
+        //        case DataFormat.Text:
+        //        case DataFormat.BildCode:
+        //        case DataFormat.Columns_für_LinkedCellDropdown:
+        //        case DataFormat.Values_für_LinkedCellDropdown:
+        //        case DataFormat.Bit:
+        //        case DataFormat.RelationText:
+        //        case DataFormat.Link_To_Filesystem:
+        //        case DataFormat.Button:
         //            return true;
 
-        //        case enDataFormat.FarbeInteger:
+        //        case DataFormat.FarbeInteger:
         //            return long.TryParse(tXT, out _);
 
-        //        case enDataFormat.LinkedCell:
+        //        case DataFormat.LinkedCell:
         //            Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
         //            return true;
 

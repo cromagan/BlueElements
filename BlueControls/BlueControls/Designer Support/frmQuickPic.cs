@@ -131,7 +131,7 @@ namespace BlueControls.Designer_Support {
             SAT.Value = l.Sättigung;
             Hell.Value = l.Helligkeit;
             Transp.Value = l.Transparenz;
-            //if (l.Effekt < 0) { l.Effekt =  enImageCodeEffect.Ohne; }
+            //if (l.Effekt < 0) { l.Effekt =  ImageCodeEffect.Ohne; }
             chkbDurchgestrichen.Checked = Convert.ToBoolean(l.Effekt & ImageCodeEffect.Durchgestrichen);
             chkbMEDisabled.Checked = Convert.ToBoolean(l.Effekt & ImageCodeEffect.WindowsMEDisabled);
             chkbXPDisabled.Checked = Convert.ToBoolean(l.Effekt & ImageCodeEffect.WindowsXPDisabled);

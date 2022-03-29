@@ -781,7 +781,7 @@ namespace BlueBasics.MultiUserFile {
             // BlockDatei erstellen, aber noch kein muss. Evtl arbeiten 2 PC synchron, was beim langsamen Netz druchaus vorkommen kann.
             try {
                 var bInhalt = tmpInhalt.UTF8_ToByte();
-                // Nicht modAllgemein, wegen den strengen Datei-Rechten
+                // Nicht Generic, wegen den strengen Datei-Rechten
                 using (FileStream x = new(Blockdateiname(), FileMode.Create, FileAccess.Write,
                            FileShare.None)) {
                     x.Write(bInhalt, 0, bInhalt.Length);

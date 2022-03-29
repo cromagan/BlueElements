@@ -382,7 +382,7 @@ namespace BlueControls.Forms {
         //End Sub
         //Private Function Abbrechen() As Boolean
         //    If Not Pad.Changed Then Return False
-        //   switch (MessageBox.Show("Sollen ihre Änderungen gespeichert werden?", enImageCode.Frage, "Speichern", "Nicht speichern", "Abbrechen")
+        //   switch (MessageBox.Show("Sollen ihre Änderungen gespeichert werden?", ImageCode.Frage, "Speichern", "Nicht speichern", "Abbrechen")
         //        Case Is = 0
         //            Save_Click(Nothing, Nothing)
         //            Return False

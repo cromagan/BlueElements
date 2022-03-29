@@ -61,7 +61,7 @@ namespace BlueControls.Designer_Support {
                 new DesignerActionHeaderItem("Allgemein"),
                 new DesignerActionPropertyItem("TextFormat", "TextFormat", "Allgemein", "Wert kann nicht geändert werden. Bei Anklicken werden die entsprechenden Felder gesetzt.")
             };
-            //if ((int)ReverenceControl.ButtonStyle % 1000 is ((int)enButtonStyle.Checkbox) or ((int)enButtonStyle.Yes_or_No) or ((int)enButtonStyle.Pic1_or_Pic2) or ((int)enButtonStyle.Optionbox)) {
+            //if ((int)ReverenceControl.ButtonStyle % 1000 is ((int)ButtonStyle.Checkbox) or ((int)ButtonStyle.Yes_or_No) or ((int)ButtonStyle.Pic1_or_Pic2) or ((int)ButtonStyle.Optionbox)) {
             //    items.Add(new DesignerActionPropertyItem("Checked", "Checked", "Allgemein", "Der Checked-Status."));
             //}
             return items;

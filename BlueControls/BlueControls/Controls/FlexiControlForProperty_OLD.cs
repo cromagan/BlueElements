@@ -270,7 +270,7 @@ namespace BlueControls.Controls {
         //private void OnLoadedFromDisk(object sender, System.EventArgs e) {
         //    FillPropertyNow();
         //    _propertyObject = null;  //Das Objekt ist tot und irgendwo im Nirvana verschwunden
-        //    UpdateControlData(false, 1, null, enImageCode.None);
+        //    UpdateControlData(false, 1, null, ImageCode.None);
         //    CheckEnabledState();
         //    LoadedFromDisk?.Invoke(this, System.EventArgs.Empty);
         //}
@@ -374,7 +374,7 @@ namespace BlueControls.Controls {
                                 var c = (ComboBox)CreateSubControls();
                                 StyleComboBox(c, list, ComboBoxStyle.DropDownList, true);
                             }
-                            //else if (image != enImageCode.None)
+                            //else if (image != ImageCode.None)
                             //{
                             //    EditType = enEditTypeFormula.Button;
                             //    CaptionPosition = enÜberschriftAnordnung.ohne;

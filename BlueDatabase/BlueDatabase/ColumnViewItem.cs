@@ -238,7 +238,7 @@ namespace BlueDatabase {
             if (_spalteWidth > 20) { _spalteWidth = 20; }
             if (_spalteHeight < 1) { _spalteHeight = 1; }
             if (_spalteHeight > 30 && modH > 0) {
-                //if (MessageBox.Show("Resthöhe benutzen?", enImageCode.Frage, "Ja", "Nein") == 1)
+                //if (MessageBox.Show("Resthöhe benutzen?", ImageCode.Frage, "Ja", "Nein") == 1)
                 //{
                 //    _Spalte_Height = 30;
                 //}

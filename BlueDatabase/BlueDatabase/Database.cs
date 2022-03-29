@@ -453,7 +453,7 @@ namespace BlueDatabase {
             }
             //foreach (var ThisColumnItem in Column) {
             //    if (ThisColumnItem != null) {
-            //        if (ThisColumnItem.Format == enDataFormat.Link_To_Filesystem) {
+            //        if (ThisColumnItem.Format == DataFormat.Link_To_Filesystem) {
             //            var tmp = ThisColumnItem.Contents();
             //            foreach (var thisTmp in tmp) {
             //                Column_All.AddIfNotExists(ThisColumnItem.BestFile(thisTmp, false).ToLower());
@@ -1256,7 +1256,7 @@ namespace BlueDatabase {
                         if (b[pointer + 1] != 3 || b[pointer + 2] != 0 || b[pointer + 3] != 0 || b[pointer + 4] != 2 || b[pointer + 5] != 79 || b[pointer + 6] != 75) {
                             RemoveFilename();
                             LoadedVersion = "9.99";
-                            //MessageBox.Show("Zugriff verweigrt, Passwort falsch!", enImageCode.Kritisch, "OK");
+                            //MessageBox.Show("Zugriff verweigrt, Passwort falsch!", ImageCode.Kritisch, "OK");
                             break;
                         }
                     }

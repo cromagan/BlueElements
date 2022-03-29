@@ -1511,7 +1511,7 @@ namespace BlueControls.Controls {
                         if (_mouseOverColumn.Format.NeedTargetDatabase()) {
                             if (_mouseOverColumn.LinkedDatabase != null) {
                                 switch (_mouseOverColumn.Format) {
-                                    //case enDataFormat.Columns_für_LinkedCellDropdown:
+                                    //case DataFormat.Columns_für_LinkedCellDropdown:
                                     //    var txt = _mouseOverRow.Row.CellGetString(_mouseOverColumn);
                                     //    if (IntTryParse(txt, out var colKey)) {
                                     //        var c = _mouseOverColumn.LinkedDatabase().Column.SearchByKey(colKey);
@@ -1519,7 +1519,7 @@ namespace BlueControls.Controls {
                                     //    }
                                     //    break;
 
-                                    //case enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
+                                    //case DataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
                                     case DataFormat.Verknüpfung_zu_anderer_Datenbank:
                                     case DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
                                         var (lcolumn, _, info) = CellCollection.LinkedCellData(_mouseOverColumn, _mouseOverRow.Row, true, false);
@@ -1673,7 +1673,7 @@ namespace BlueControls.Controls {
         //private static void Database_DropConstructorMessage(object sender, MessageEventArgs e) {
         //    if (!e.Shown) {
         //        e.Shown = true;
-        //        Notification.Show(e.Message, enImageCode.Datenbank);
+        //        Notification.Show(e.Message, ImageCode.Datenbank);
         //    }
 
         //    if (e.Type is enFehlerArt.DevelopInfo or enFehlerArt.Info) { return; }

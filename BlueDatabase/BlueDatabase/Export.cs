@@ -59,11 +59,11 @@ namespace BlueDatabase {
 
         //Shared Sub SaveAsBitmap(Row As RowItem)
         //    If Row Is Nothing Then
-        //        MessageBox.Show("Kein Eintrag gewählt.", enImageCode.Information, "OK")
+        //        MessageBox.Show("Kein Eintrag gewählt.", ImageCode.Information, "OK")
         //        Exit Sub
         //    End If
         //    If Row.Database.Layouts.Count = 0 Then
-        //        MessageBox.Show("Kein Layouts vorhanden.", enImageCode.Information, "OK")
+        //        MessageBox.Show("Kein Layouts vorhanden.", ImageCode.Information, "OK")
         //        Exit Sub
         //    End If
         //    'Dim x As String = Row.Cell(Row.Database.Column.SysLastUsedLayout).String
@@ -97,7 +97,7 @@ namespace BlueDatabase {
             //    If FileExists(sav) Then
             //        If OpenIt Then ExecuteFile(sav)
             //    Else
-            //        MessageBox.Show("Datei konnte nicht erzeugt werden.", enImageCode.Information, "OK")
+            //        MessageBox.Show("Datei konnte nicht erzeugt werden.", ImageCode.Information, "OK")
             //    End If
             //End If
             return l;
@@ -188,13 +188,13 @@ namespace BlueDatabase {
         //                } else {
         //                    TXT = row.CellGetString(column);
         //                    switch (column.Format) {
-        //                        case enDataFormat.Link_To_Filesystem:
+        //                        case DataFormat.Link_To_Filesystem:
         //                            Bmp = (Bitmap)BitmapExt.Image_FromFile(column.BestFile(row.CellGetString(column), false));
         //                            break;
         //                    }
         //                }
         //            }
-        //            if (Bmp == null) { Bmp = QuickImage.Get(enImageCode.Warnung, 32).Bmp; }
+        //            if (Bmp == null) { Bmp = QuickImage.Get(ImageCode.Warnung, 32).Bmp; }
         //            break;
         //        case "003": // Spaltenname für Bedingugnen
         //            if (row != null) {

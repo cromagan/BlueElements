@@ -1151,8 +1151,8 @@ namespace BlueDatabase {
                     if (_vorschlagsColumn > 0) { return "Diese Format kann keine Vorschlags-Spalte haben."; }
                     break;
 
-                //case enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
-                //    //case enDataFormat.Verknüpfung_zu_anderer_Datenbank:
+                //case DataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
+                //    //case DataFormat.Verknüpfung_zu_anderer_Datenbank:
                 //    if (!string.IsNullOrEmpty(_cellInitValue)) { return "Dieses Format kann keinen Initial-Text haben."; }
                 //    if (_keyColumnKey > -1) { return "Dieses Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
                 //    if (IsFirst()) { return "Dieses Format ist bei der ersten (intern) erste Spalte nicht erlaubt."; }
@@ -1234,7 +1234,7 @@ namespace BlueDatabase {
             if (_dropdownAllesAbwählenErlaubt && !_format.DropdownUnselectAllAllowed()) { return "'Dropdownmenu alles abwählen' bei diesem Format nicht erlaubt."; }
             if (DropDownItems.Count > 0 && !_format.DropdownItemsAllowed()) { return "Manuelle 'Dropdow-Items' bei diesem Format nicht erlaubt."; }
             if (_bildTextVerhalten != BildTextVerhalten.Nur_Text) {
-                //if (_Format is enDataFormat.Text) {
+                //if (_Format is DataFormat.Text) {
                 //    // Performance-Teschnische Gründe
                 //    _BildTextVerhalten = BildTextVerhalten.Nur_Text;
                 //    //return "Bei diesem Format muss das Bild/Text-Verhalten 'Nur Text' sein.";
@@ -1519,7 +1519,7 @@ namespace BlueDatabase {
                         SetFormatForTextMitFormatierung();
                         break;
 
-                    case 74: //(int)enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
+                    case 74: //(int)DataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
 
                         //if (LinkedCell_RowKeyIsInColumn != -9999) {
                         _format = DataFormat.Verknüpfung_zu_anderer_Datenbank;
@@ -2053,7 +2053,7 @@ namespace BlueDatabase {
                     if (editTypeToCheck == EditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
                     return false;
 
-                //case enDataFormat.Bit:
+                //case DataFormat.Bit:
                 //    if (_MultiLine) { return false; }
                 //    if (editType_To_Check == enEditTypeFormula.Ja_Nein_Knopf) {
                 //        return !_DropdownWerteAndererZellenAnzeigen && DropDownItems.Count <= 0;
@@ -2069,7 +2069,7 @@ namespace BlueDatabase {
                         if (editTypeToCheck == EditTypeFormula.EasyPic) { return true; }
                     }
                     return false;
-                //case enDataFormat.Relation:
+                //case DataFormat.Relation:
                 //    switch (EditType_To_Check)
                 //    {
                 //        case enEditTypeFormula.Listbox_1_Zeile:
@@ -2132,7 +2132,7 @@ namespace BlueDatabase {
                     }
                 }
             }
-            //if (_format == enDataFormat.Columns_für_LinkedCellDropdown) { Am_A_Key_For_Other_Column = "Die Spalte selbst durch das Format"; }
+            //if (_format == DataFormat.Columns_für_LinkedCellDropdown) { Am_A_Key_For_Other_Column = "Die Spalte selbst durch das Format"; }
         }
 
         /// <summary>
@@ -2547,7 +2547,7 @@ namespace BlueDatabase {
 
         //private void _TMP_LinkedDatabase_ColumnKeyChanged(object sender, KeyChangedEventArgs e) {
         //    Database.BlockReload(false);
-        //    if (_Format != enDataFormat.Columns_für_LinkedCellDropdown) {
+        //    if (_Format != DataFormat.Columns_für_LinkedCellDropdown) {
         //        var os = e.KeyOld.ToString();
         //        var ns = e.KeyNew.ToString();
         //        foreach (var ThisRow in Database.Row) {
@@ -2556,7 +2556,7 @@ namespace BlueDatabase {
         //            }
         //        }
         //    }
-        //    if (_Format != enDataFormat.LinkedCell) {
+        //    if (_Format != DataFormat.LinkedCell) {
         //        var os = e.KeyOld.ToString() + "|";
         //        var ns = e.KeyNew.ToString() + "|";
         //        foreach (var ThisRow in Database.Row) {
@@ -2582,7 +2582,7 @@ namespace BlueDatabase {
         }
 
         //private void _TMP_LinkedDatabase_RowKeyChanged(object sender, KeyChangedEventArgs e) {
-        //    if (_Format != enDataFormat.LinkedCell) {
+        //    if (_Format != DataFormat.LinkedCell) {
         //        var os = "|" + e.KeyOld.ToString();
         //        var ns = "|" + e.KeyNew.ToString();
         //        foreach (var ThisRow in Database.Row) {

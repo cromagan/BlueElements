@@ -329,7 +329,7 @@ namespace BlueControls.ItemCollection {
         //        CloseMenu = false;
         //        if (Bitmap != null)
         //        {
-        //            if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+        //            if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         //        }
         //        Bitmap = ScreenShot.GrabArea(null, 2000, 2000).Pic;
         //        return;
@@ -339,7 +339,7 @@ namespace BlueControls.ItemCollection {
         //        CloseMenu = false;
         //        if (Bitmap != null)
         //        {
-        //            if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+        //            if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         //        }
         //        var e = new System.Windows.Forms.OpenFileDialog();
         //        e.CheckFileExists = true;
@@ -351,13 +351,13 @@ namespace BlueControls.ItemCollection {
         //        {
         //            return;
         //        }
-        //        Bitmap = (Bitmap)modAllgemein.Image_FromFile(e.FileName);
+        //        Bitmap = (Bitmap)Generic.Image_FromFile(e.FileName);
         //        return;
         //    }
         //    if (Tags.TagGet("Skalieren").FromPlusMinus())
         //    {
         //        CloseMenu = false;
-        //        var t = InputBox.Show("Skalierfaktor oder Formel eingeben:", "1", enDataFormat.Text);
+        //        var t = InputBox.Show("Skalierfaktor oder Formel eingeben:", "1", DataFormat.Text);
         //        var sc = modErgebnis.Ergebnis(t);
         //        if (sc == null || sc == 1)
         //        {

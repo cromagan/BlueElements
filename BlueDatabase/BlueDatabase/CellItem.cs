@@ -89,11 +89,11 @@ namespace BlueDatabase {
         //            return enAlignment.HorizontalCenter;
         //    }
         //    switch (column.Format) {
-        //        case enDataFormat.Ganzzahl:
-        //        case enDataFormat.Gleitkommazahl:
+        //        case DataFormat.Ganzzahl:
+        //        case DataFormat.Gleitkommazahl:
         //            return enAlignment.Top_Right;
 
-        //        case enDataFormat.Bit:
+        //        case DataFormat.Bit:
         //            if (bildTextverhalten is BildTextVerhalten.Nur_Bild or BildTextVerhalten.Bild_oder_Text) { return enAlignment.Top_HorizontalCenter; }
         //            return enAlignment.Top_Left;
 
@@ -189,8 +189,8 @@ namespace BlueDatabase {
                     txt = LanguageTool.ColumnReplace(txt, column, style);
                     break;
 
-                //case enDataFormat.FarbeInteger:
-                //    if (!string.IsNullOrEmpty(txt) && txt.IsFormat(enDataFormat.FarbeInteger)) {
+                //case DataFormat.FarbeInteger:
+                //    if (!string.IsNullOrEmpty(txt) && txt.IsFormat(DataFormat.FarbeInteger)) {
                 //        var col = Color.FromArgb(IntParse(txt));
                 //        txt = col.ToHTMLCode().ToUpper();
                 //    }
@@ -204,7 +204,7 @@ namespace BlueDatabase {
                     //return BlueFont.Get(Txt).ReadableText();
                     return txt;
 
-                //case enDataFormat.Columns_für_LinkedCellDropdown:
+                //case DataFormat.Columns_für_LinkedCellDropdown:
                 //    // Hier kommt die Spalten-ID  an
                 //    if (string.IsNullOrEmpty(txt)) { return string.Empty; }
                 //    if (!IntTryParse(txt, out var ColKey)) { return "Columkey kann nicht geparsed werden"; }

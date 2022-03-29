@@ -111,7 +111,7 @@ namespace BlueControls.ItemCollection {
             //ItemCollectionList.ItemCollectionList layouts = new();
             //foreach (var thisLayouts in Row.Database.Layouts) {
             //    ItemCollectionPad p = new(thisLayouts, string.Empty);
-            //    layouts.Add(p.Caption, p.Id, enImageCode.Stern);
+            //    layouts.Add(p.Caption, p.Id, ImageCode.Stern);
             //}
             //l.Add(new FlexiControlForProperty(()=> this.Layout-ID", layouts));
             //l.AddRange(base.GetStyleOptions());

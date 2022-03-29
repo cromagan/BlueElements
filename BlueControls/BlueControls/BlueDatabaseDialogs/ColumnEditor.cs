@@ -227,14 +227,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             btnSpellChecking.Enabled = tmpFormat.SpellCheckingPossible();
             if (!tmpFormat.SpellCheckingPossible()) { btnSpellChecking.Checked = false; }
             //// Format: Bildcode
-            //grpBildCode.Enabled = tmpFormat == enDataFormat.BildCode;
-            //if (tmpFormat != enDataFormat.BildCode) {
+            //grpBildCode.Enabled = tmpFormat == DataFormat.BildCode;
+            //if (tmpFormat != DataFormat.BildCode) {
             //    txbBildCodeConstHeight.Text = string.Empty;
             //    cbxBildTextVerhalten.Text = string.Empty;
             //}
             // Format: LinkToFileSystem
             grpLinkToFileSystem.Enabled = tmpFormat == DataFormat.Link_To_Filesystem;
-            //if (tmpFormat != enDataFormat.BildCode) {
+            //if (tmpFormat != DataFormat.BildCode) {
             //    txbBestFileStandardFolder.Text = string.Empty;
             //    txbBestFileStandardSuffix.Text = string.Empty;
             //}
@@ -245,7 +245,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             //}
 
             //// Format: LinkedCell
-            //grpVerlinkteZellen.Enabled = tmpFormat is enDataFormat.Verknüpfung_zu_anderer_Datenbank;
+            //grpVerlinkteZellen.Enabled = tmpFormat is DataFormat.Verknüpfung_zu_anderer_Datenbank;
         }
 
         private void cbxFormat_TextChanged(object sender, System.EventArgs e) => ButtonCheck();
@@ -265,7 +265,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 //    if (ThisColumn.Format.CanBeCheckedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase()) {
                 //        cbxRowKeyInColumn.Item.Add(ThisColumn);
                 //    }
-                //    //if (ThisColumn.Format == enDataFormat.Values_für_LinkedCellDropdownx && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) {
+                //    //if (ThisColumn.Format == DataFormat.Values_für_LinkedCellDropdownx && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) {
                 //    //    cbxRowKeyInColumn.Item.Add(ThisColumn);
                 //    //}
                 //}

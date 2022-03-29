@@ -17,7 +17,7 @@ namespace BlueControls.Forms {
         //    if (!PathExists(Pfad)) { return; }
         //    if (Meldungen)
         //    {
-        //        ButtonNumber = MessageBox.Show("Soll der Ordner \"" + Pfad + "\"<br>und dessen Inhalt wirklich <b>gelöscht</b> werden?\"", enImageCode.Warnung, "Ja - löschen", "Nein - abbrechen");
+        //        ButtonNumber = MessageBox.Show("Soll der Ordner \"" + Pfad + "\"<br>und dessen Inhalt wirklich <b>gelöscht</b> werden?\"", ImageCode.Warnung, "Ja - löschen", "Nein - abbrechen");
         //    }
         //    else
         //    {
@@ -33,7 +33,7 @@ namespace BlueControls.Forms {
         //        {
         //            if (Meldungen)
         //            {
-        //                MessageBox.Show("Ordner konnte <b>nicht</b> gelöscht werden:<br>" + ex.Message, enImageCode.Kritisch, "OK");
+        //                MessageBox.Show("Ordner konnte <b>nicht</b> gelöscht werden:<br>" + ex.Message, ImageCode.Kritisch, "OK");
         //            }
         //            Develop.DebugPrint("Ordner " + Pfad + " konnte nicht gelöscht werden.<br>" + ex.Message);
         //        }
@@ -42,7 +42,7 @@ namespace BlueControls.Forms {
         //    {
         //        if (Meldungen)
         //        {
-        //            MessageBox.Show("Ordner <b>nicht</b> gelöscht!", enImageCode.Information, "OK");
+        //            MessageBox.Show("Ordner <b>nicht</b> gelöscht!", ImageCode.Information, "OK");
         //        }
         //    }
         //}

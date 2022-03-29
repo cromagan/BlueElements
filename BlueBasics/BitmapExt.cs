@@ -983,7 +983,7 @@ namespace BlueBasics {
                 }
             } catch (Exception ex) {
                 Develop.DebugPrint(ex);
-                // if (!collectGarbage) { modAllgemein.CollectGarbage(); }
+                // if (!collectGarbage) { Generic.CollectGarbage(); }
                 // if (sizeMode == enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern)
                 // {
                 //    return (Bitmap)bmp.GetThumbnailImage(nw, nh, null, IntPtr.Zero);

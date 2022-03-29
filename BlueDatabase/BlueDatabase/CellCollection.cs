@@ -200,7 +200,7 @@ namespace BlueDatabase {
             var linkedDatabase = column.LinkedDatabase;
             if (linkedDatabase == null) { return (null, null, "Verlinkte Datenbank nicht gefunden."); }
 
-            //var skriptgesteuert = column.LinkedCell_RowKeyIsInColumn == -9999 && column.Format == enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert;
+            //var skriptgesteuert = column.LinkedCell_RowKeyIsInColumn == -9999 && column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert;
 
             if (repairLinkedValue) { return RepairLinkedCellValue(linkedDatabase, column, row, addRowIfNotExists); }
 
@@ -302,7 +302,7 @@ namespace BlueDatabase {
             if (column.IsFirst()) {
                 foreach (var thisColumnItem in _database.Column.Where(thisColumnItem => thisColumnItem != null)) {
                     switch (thisColumnItem.Format) {
-                        //case enDataFormat.Relation:
+                        //case DataFormat.Relation:
                         //    RelationNameChanged(ThisColumnItem, PreviewsValue, CurrentValue);
                         //    break;
                         case DataFormat.RelationText:
@@ -705,7 +705,7 @@ namespace BlueDatabase {
         }
 
         private static bool CompareValues(string istValue, string filterValue, FilterType typ) {
-            // if (Column.Format == enDataFormat.LinkedCell) { Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Fremdzellenzugriff"); }
+            // if (Column.Format == DataFormat.LinkedCell) { Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Fremdzellenzugriff"); }
             if (typ.HasFlag(FilterType.GroßKleinEgal)) {
                 istValue = istValue.ToUpper();
                 filterValue = filterValue.ToUpper();
@@ -783,7 +783,7 @@ namespace BlueDatabase {
             /// Zeile aus der Ziel-Datenbank ermitteln
             if (row == null) { return Ergebnis("Keine Zeile zum finden des Zeilenschlüssels angegeben."); }
 
-            //if (column.Format != enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            //if (column.Format != DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             //    var linkedCellRowIsInColumn = column.Database?.Column.SearchByKey(column.LinkedCell_RowKeyIsInColumn);
             //    if (linkedCellRowIsInColumn == null) { return Ergebnis("Die Spalte, aus der der Zeilenschlüssel kommen soll, existiert nicht."); }
             //    if (row.CellIsNullOrEmpty(linkedCellRowIsInColumn)) { return Ergebnis("Kein Zeilenschlüssel angegeben."); }

@@ -132,8 +132,8 @@ namespace BlueControls.Controls {
 
             //if (Parent is Filterleiste f) {
             //    if (f.pic.Visible) {
-            //        Items.Add("Filter verschieben", "#FilterVerschieben", QuickImage.Get(enImageCode.Trichter));
-            //        Items.Add("Bild-Pfad öffnen", "#BildPfad", QuickImage.Get(enImageCode.Ordner));
+            //        Items.Add("Filter verschieben", "#FilterVerschieben", QuickImage.Get(ImageCode.Trichter));
+            //        Items.Add("Bild-Pfad öffnen", "#BildPfad", QuickImage.Get(ImageCode.Ordner));
             //    }
             //}
         }

@@ -153,6 +153,7 @@
     <Compile Include="Extensions\BooleanExtensions.cs" />
     <Compile Include="Interfaces\ICanBeEmpty.cs" />
     <Compile Include="Generic.cs" />
+    <Compile Include="Enums\ThumbnailOptions.cs" />
     <Compile Include="WindowsRemoteControl.cs" />
     <Compile Include="Enums\SizeModes.cs" />
     <Compile Include="Extensions\ColorExtension.cs" />
@@ -172,6 +173,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="WindowsThumbnailProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="MultiUserFile\MultiUserFile.resx">

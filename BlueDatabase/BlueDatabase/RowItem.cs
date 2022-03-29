@@ -128,7 +128,7 @@ namespace BlueDatabase {
             var vars = new List<Variable>();
 
             switch (column.Format) {
-                //case enDataFormat.Verknüpfung_zu_anderer_Datenbank:
+                //case DataFormat.Verknüpfung_zu_anderer_Datenbank:
                 //    //if (column.LinkedCell_RowKeyIsInColumn == -9999) {
                 //    wert = string.Empty; // Beim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss.
                 //    //vars.Add(new Variable(column.Name + "_link", string.Empty, VariableDataType.String, true, true, "Dieser Wert kann nur mit SetLink verändert werden.\r\nBeim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss."));
@@ -146,7 +146,7 @@ namespace BlueDatabase {
                     }
                     break;
 
-                    //case enDataFormat.Columns_für_LinkedCellDropdown:
+                    //case DataFormat.Columns_für_LinkedCellDropdown:
                     //    if (IntTryParse(wert, out var colKey)) {
                     //        var c = column.LinkedDatabase().Column.SearchByKey(colKey);
                     //        if (c != null) { wert = c.Name; }
@@ -569,7 +569,7 @@ namespace BlueDatabase {
             if (columnVar == null || columnVar.Readonly) { return; }
             if (!column.SaveContent || !column.Format.CanBeChangedByRules()) { return; }
 
-            //if (column.Format == enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            //if (column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             //    var columnLinkVar = vars.GetSystem(column.Name + "_Link");
             //    if (columnLinkVar != null) {
             //        column.Database.Cell.SetValueBehindLinkedValue(column, this, columnLinkVar.ValueString);

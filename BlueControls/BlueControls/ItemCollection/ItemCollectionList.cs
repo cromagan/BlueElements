@@ -157,7 +157,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
                 }
             }
             switch (column.Format) {
-                //case enDataFormat.Columns_für_LinkedCellDropdown:
+                //case DataFormat.Columns_für_LinkedCellDropdown:
                 //    var db = column.LinkedDatabase();
                 //    if (db != null && !string.IsNullOrEmpty(column.LinkedKeyKennung)) {
                 //        foreach (var thisColumn in db.Column) {
@@ -168,7 +168,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
                 //    }
                 //    //l = l.SortedDistinctList(); // Sind nur die Keys....
                 //    if (l.Count == 0) {
-                //        Notification.Show("Keine Spalten gefunden, die<br>mit '" + column.LinkedKeyKennung + "' beginnen.", enImageCode.Information);
+                //        Notification.Show("Keine Spalten gefunden, die<br>mit '" + column.LinkedKeyKennung + "' beginnen.", ImageCode.Information);
                 //    }
                 //    break;
 

@@ -283,7 +283,7 @@ namespace BlueControls.Controls {
                 borderCoords.Width, borderCoords.Height);
             if (borderCoords.Height > 0) {
                 //// Kann sein, wenn PaintModY größer als die Höhe ist
-                //if (_Appearance == enBlueListBoxAppearance.Listbox)
+                //if (_Appearance == BlueListBoxAppearance.Listbox)
                 //{
                 Skin.Draw_Back(gr, tmp, vStateBox, borderCoords, this, true);
                 //}

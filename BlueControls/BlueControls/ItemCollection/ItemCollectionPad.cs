@@ -154,7 +154,7 @@ namespace BlueControls.ItemCollection {
                         _gridsnap = FloatParse(pair.Value);
                         break;
 
-                    case "format": //_Format = DirectCast(Integer.Parse(pair.Value.Value), enDataFormat)
+                    case "format": //_Format = DirectCast(Integer.Parse(pair.Value.Value), DataFormat)
                         break;
 
                     case "items":
@@ -383,16 +383,16 @@ namespace BlueControls.ItemCollection {
 
         //private void ParseVariable(string VariableName, ColumnItem Column, RowItem Row) {
         //    switch (Column.Format) {
-        //        case enDataFormat.Text:
-        //        case enDataFormat.Text_mit_Formatierung:
-        //        case enDataFormat.Gleitkommazahl:
-        //        case enDataFormat.Datum_und_Uhrzeit:
-        //        case enDataFormat.Bit:
-        //        case enDataFormat.Ganzzahl:
-        //        case enDataFormat.RelationText:
+        //        case DataFormat.Text:
+        //        case DataFormat.Text_mit_Formatierung:
+        //        case DataFormat.Gleitkommazahl:
+        //        case DataFormat.Datum_und_Uhrzeit:
+        //        case DataFormat.Bit:
+        //        case DataFormat.Ganzzahl:
+        //        case DataFormat.RelationText:
         //            ParseVariable(VariableName, Row.CellGetString(Column));
         //            break;
-        //        case enDataFormat.Link_To_Filesystem:
+        //        case DataFormat.Link_To_Filesystem:
         //            if (!Column.MultiLine) {
         //                var f = Column.BestFile(Row.CellGetString(Column), false);
         //                if (FileExists(f)) {
@@ -405,7 +405,7 @@ namespace BlueControls.ItemCollection {
         //                }
         //            }
         //            break;
-        //        //case enDataFormat.Relation:
+        //        //case DataFormat.Relation:
         //        //    ParseVariable(VariableName, enValueType.Unknown, "Nicht implementiert");
         //        //    break;
         //        default:

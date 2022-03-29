@@ -37,7 +37,7 @@ namespace BlueControls.Forms {
 
             //if (FitWindowToBest) {
             //    if (System.Windows.Forms.Screen.AllScreens.Length == 1 || OpenOnScreen < 0) {
-            //        var OpScNr = modAllgemein.PointOnScreenNr(System.Windows.Forms.Cursor.Position);
+            //        var OpScNr = Generic.PointOnScreenNr(System.Windows.Forms.Cursor.Position);
             //        Width = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Width / 1.5);
             //        Height = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Height / 1.5);
             //        Left = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Left + ((System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Width - Width) / 2.0));

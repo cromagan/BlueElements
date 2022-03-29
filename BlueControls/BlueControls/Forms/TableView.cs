@@ -126,14 +126,14 @@ namespace BlueControls.Forms {
             ColumnItem? columnLinked = null;
             var posError = false;
             switch (column.Format) {
-                //case enDataFormat.Columns_für_LinkedCellDropdown:
+                //case DataFormat.Columns_für_LinkedCellDropdown:
                 //    var txt = row.CellGetString(column);
                 //    if (IntTryParse(txt, out var colKey)) {
                 //        columnLinked = column.LinkedDatabase().Column.SearchByKey(colKey);
                 //    }
                 //    break;
 
-                //case enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
+                //case DataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
                 case DataFormat.Verknüpfung_zu_anderer_Datenbank:
                 case DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
                     (columnLinked, _, _) = CellCollection.LinkedCellData(column, row, true, false);
@@ -219,7 +219,7 @@ namespace BlueControls.Forms {
                     //foreach (var ThisString in ThisExport.BereitsExportiert) {
                     //    var t = ThisString.SplitAndCutBy("|");
                     //    if (FileExists(t[0])) {
-                    //        var q1 = QuickImage.Get(enImageCode.Kugel, 16, Extensions.MixColor(Color.Red, Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / ThisExport.AutoDelete).ToHTMLCode(), "");
+                    //        var q1 = QuickImage.Get(ImageCode.Kugel, 16, Extensions.MixColor(Color.Red, Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / ThisExport.AutoDelete).ToHTMLCode(), "");
                     //        L.Add(t[1], t[0], q1, true, t[1].CompareKey(enSortierTyp.Datum_Uhrzeit));
                     //    }
                     //}

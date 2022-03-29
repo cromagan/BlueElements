@@ -337,7 +337,7 @@ namespace BlueControls.Forms {
             //                var IsT = CheckRow.CellGetString(ThisColumnItem);
             //                if (!string.IsNullOrEmpty(IsT))
             //                {
-            //                    if (ThisColumnItem.Format == enDataFormat.Text_mit_Formatierung)
+            //                    if (ThisColumnItem.Format == DataFormat.Text_mit_Formatierung)
             //                    {
             //                        var l = new ExtText(enDesign.TextBox, enStates.Standard);
             //                        l.HtmlText = IsT;
