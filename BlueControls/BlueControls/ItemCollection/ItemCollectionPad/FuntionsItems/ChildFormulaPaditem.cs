@@ -76,7 +76,7 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        public Control GenerateControl(ConnectedFormulaView parent) {
+        public Control CreateControl(ConnectedFormulaView parent) {
             var c3 = new Controls.TabControl();
             c3.Tag = Internal;
 

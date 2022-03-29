@@ -74,10 +74,6 @@ namespace BlueControls.ConnectedFormula {
             foreach (var thischild in childs) {
                 var did = false;
 
-                if (thischild is IAcceptItemsForSelect fc) {
-                    did = DoChilds_ListItems(fc, rows, childs, rwf);
-                }
-
                 if (!did && thischild is IAcceptMultipleRows rc) {
                     did = DoChilds_MultipleRows(rc, rows, childs, rwf);
                 }
@@ -86,9 +82,17 @@ namespace BlueControls.ConnectedFormula {
                     did = DoChilds_OneRowKey(fcfc, rows, childs, rwf);
                 }
 
-                if (!did) {
-                    DebugPrint("Child nicht definiert.");
-                    break;
+                if (!did && thischild is IAcceptItemsForSelect fc) {
+                    did = DoChilds_ListItems(fc, rows, childs, rwf);
+                }
+
+                if (thischild is IDisabledReason id) {
+                    if (!did) {
+                        id.DeleteValue();
+                        id.DisabledReason = "Keine Befüllmethode bekannt.";
+                    } else {
+                        id.DisabledReason = string.Empty;
+                    }
                 }
             }
         }
@@ -129,8 +133,8 @@ namespace BlueControls.ConnectedFormula {
         private static bool DoChilds_ListItems(IAcceptItemsForSelect fc, List<RowItem>? rows, ListExt<System.Windows.Forms.Control> childs, IConnectionAttributes attributes) {
             // Dropdownmenü mehrerer Einträge
             if (attributes.Genau_eine_Zeile) {
-                fc.DisabledReason = "Vorgänger hat falschen Datentyp";
-                fc.StyleComboBox(null, System.Windows.Forms.ComboBoxStyle.DropDownList, true);
+                //fc.DisabledReason = "Vorgänger hat falschen Datentyp";
+                //fc.StyleComboBox(null, System.Windows.Forms.ComboBoxStyle.DropDownList, true);
                 //fc.ValueSet(string.Empty, true, true);
                 return false;
             }
@@ -142,8 +146,8 @@ namespace BlueControls.ConnectedFormula {
             var efpi = attributes.Parent[id];
 
             if (efpi is not EditFieldPadItem epfi2) {
-                fc.DisabledReason = "Interner Fehler: Ursprungsitem nicht vorhanden";
-                fc.StyleComboBox(null, System.Windows.Forms.ComboBoxStyle.DropDownList, true);
+                //fc.DisabledReason = "Interner Fehler: Ursprungsitem nicht vorhanden";
+                //fc.StyleComboBox(null, System.Windows.Forms.ComboBoxStyle.DropDownList, true);
                 //fc.ValueSet(string.Empty, true, true);
                 return false;
             }
@@ -166,20 +170,10 @@ namespace BlueControls.ConnectedFormula {
                 fcfc.Database = attributes.Database;
                 fcfc.Rows.Clear();
                 fcfc.Rows.AddRange(rows);
-
-                //    if (rows != null && rows.Count == 1) {
-                //        fcfc.RowKey = rows[0].Key;
-                //    } else {
-                //        fcfc.RowKey = -1;
-                //        return false;
-                //    }
-                //} else {
-                //    // Falscher Datentyp
-                //    fcfc.RowKey = -1;
-                //    return false;
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         private static bool DoChilds_OneRowKey(IAcceptRowKey fcfc, List<RowItem>? rows, ListExt<System.Windows.Forms.Control> childs, IConnectionAttributes attributes) {
@@ -193,13 +187,8 @@ namespace BlueControls.ConnectedFormula {
                     fcfc.RowKey = -1;
                 }
                 return true;
-            } else {
-                // Falscher Datentyp
-                fcfc.RowKey = -1;
-                return false;
             }
-
-            return true;
+            return false;
         }
 
         private void _rwf_Changed(object? sender, System.EventArgs e) {
@@ -251,7 +240,19 @@ namespace BlueControls.ConnectedFormula {
 
                     switch (connected) {
                         case ConstantTextPaditem ctpi:
-                            value = ctpi.Text;
+
+                            if (Parent is ConnectedFormulaView cfvx) {
+                                var se2 = cfvx.SearchOrGenerate(ctpi);
+
+                                if (se2 is FlexiControl fcx) {
+                                    value = fcx.Value;
+                                } else {
+                                    DebugPrint("Unbekannt");
+                                }
+                            } else {
+                                value = "@@@";
+                                //DebugPrint("Parent unbekannt!");
+                            }
                             break;
 
                         case EditFieldPadItem efpi:

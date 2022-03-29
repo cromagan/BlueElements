@@ -28,6 +28,7 @@ using BlueBasics.Interfaces;
 using BlueControls.Interfaces;
 using System.Windows.Forms;
 using BlueDatabase.Enums;
+using System.ComponentModel;
 
 namespace BlueControls.ItemCollection {
 
@@ -38,6 +39,7 @@ namespace BlueControls.ItemCollection {
         public static BlueFont? CellFont = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
         public static BlueFont? ChapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard);
         public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
+        private string _ID = string.Empty;
         private string _text = string.Empty;
 
         #endregion
@@ -57,6 +59,16 @@ namespace BlueControls.ItemCollection {
 
         #region Properties
 
+        [Description("Wenn eine ID vergeben wird, ist es möglich, dieses Feld mit einer internen Programmierung anzusprechen.\r\bAls Nebeneffekt wird der Text im Editir mit angezeigt. ")]
+        public string ID {
+            get => _ID;
+            set {
+                if (_ID == value) { return; }
+                _ID = value;
+                OnChanged();
+            }
+        }
+
         public string Text {
             get => _text;
             set {
@@ -72,9 +84,10 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        public Control GenerateControl(ConnectedFormulaView parent) {
+        public Control CreateControl(ConnectedFormulaView parent) {
             var c3 = new FlexiControl();
-            c3.CaptionPosition = ÜberschriftAnordnung.ohne;
+            c3.CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
+            c3.Caption = _ID;
             c3.EditType = EditTypeFormula.Textfeld;
             c3.DisabledReason = "Konstanter Wert";
             c3.ValueSet(Text, true, true);
@@ -85,6 +98,7 @@ namespace BlueControls.ItemCollection {
         public override List<GenericControl> GetStyleOptions() {
             List<GenericControl> l = new() { };
             l.Add(new FlexiControlForProperty<string>(() => Text));
+            l.Add(new FlexiControlForProperty<string>(() => ID));
             return l;
         }
 
@@ -100,11 +114,19 @@ namespace BlueControls.ItemCollection {
                 case "text":
                     Text = value.FromNonCritical();
                     return true;
+
+                case "id":
+                    _ID = value.FromNonCritical();
+                    return true;
             }
             return false;
         }
 
-        public string ReadableText() => "Konstanter Wert: " + _text;
+        public string ReadableText() {
+            if (!string.IsNullOrEmpty(_ID)) { return "Konstanter Wert: " + _text + "(" +_ID +")"; }
+
+            return "Konstanter Wert: " + _text;
+        }
 
         public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld, 16);
 
@@ -113,6 +135,7 @@ namespace BlueControls.ItemCollection {
             t = t.Substring(0, t.Length - 1) + ", ";
 
             t = t + "Text=" + _text.ToNonCritical() + ", ";
+            t = t + "ID=" + _ID.ToNonCritical() + ", ";
             return t.Trim(", ") + "}";
         }
 
@@ -123,7 +146,11 @@ namespace BlueControls.ItemCollection {
             //s
             gr.DrawRectangle(new Pen(Color.Black, zoom), modifiedPosition);
 
-            Skin.Draw_FormatedText(gr, _text, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, modifiedPosition.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
+            var t = string.Empty;
+            if(!string.IsNullOrEmpty(_ID)) { t = _ID + ": "; }
+            t = t + _text;
+
+            Skin.Draw_FormatedText(gr, t, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, modifiedPosition.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
 
             gr.FillRectangle(new SolidBrush(Color.FromArgb(128, 255, 255, 255)), modifiedPosition);
 

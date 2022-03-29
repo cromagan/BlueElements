@@ -82,7 +82,7 @@ namespace BlueControls.Controls {
             }
 
             if (thisit is IItemToControl it) {
-                var c = it.GenerateControl(this);
+                var c = it.CreateControl(this);
                 if (c.Tag is string s && s == thisit.Internal) {
                     //alles ok
                 } else {
@@ -94,6 +94,34 @@ namespace BlueControls.Controls {
 
             Develop.DebugPrint("Typ nicht definiert.");
             return null;
+        }
+
+        public void Set(string id, string value) {
+            foreach (var thisCon in Controls) {
+                switch (thisCon) {
+                    case ConnectedFormulaView cf:
+                        cf.Set(id, value);
+                        break;
+
+                    case FlexiControl fc:
+                        if (fc.Caption.Equals(id, System.StringComparison.InvariantCultureIgnoreCase)) {
+                            fc.ValueSet(value, true, true);
+                        }
+                        break;
+
+                    case TabControl tb:
+                        foreach (var thstp in tb.TabPages) {
+                            if (thstp is System.Windows.Forms.TabPage tp) {
+                                foreach (var cfvm in tp.Controls) {
+                                    if (cfvm is ConnectedFormulaView cfv) {
+                                        cfv.Set(id, value);
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                }
+            }
         }
 
         protected override void DrawControl(Graphics gr, States state) => Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);

@@ -108,7 +108,7 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        public Control GenerateControl(ConnectedFormulaView parent) {
+        public Control CreateControl(ConnectedFormulaView parent) {
             var c = new RowCloner(this);
             c.Tag = Internal;
             return c;

@@ -24,7 +24,7 @@ namespace BlueControls.Interfaces {
     /// Wird verwendet, wenn ein Steuerelement mehrere Zeilen empfangen
     /// und damit umgehen kann.
     /// </summary>
-    public interface IAcceptMultipleRows {
+    public interface IAcceptMultipleRows : IDisabledReason {
 
         #region Properties
 

@@ -67,6 +67,8 @@ namespace BlueControls.ConnectedFormula {
         public ListExt<System.Windows.Forms.Control> Childs { get; } = new();
         public Database? Database { get; set; }
 
+        public string DisabledReason { get; set; }
+
         public long RowKey {
             get {
                 if (_rows.Count != 1) { return -1; }
@@ -85,7 +87,14 @@ namespace BlueControls.ConnectedFormula {
 
         #endregion
 
+        // Ignorieren, wird eh nie angezeigt
+
         #region Methods
+
+        public void DeleteValue() {
+            _rows.Clear();
+            //RowKey = -1;
+        }
 
         //private string _verbindungsID = string.Empty;
         protected override void Dispose(bool disposing) {

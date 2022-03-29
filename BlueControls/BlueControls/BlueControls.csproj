@@ -311,6 +311,7 @@
     <Compile Include="frmBefehlsreferenz.Designer.cs">
       <DependentUpon>frmBefehlsreferenz.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interfaces\IDisabledReason.cs" />
     <Compile Include="Interfaces\IAcceptMultipleRows.cs" />
     <Compile Include="Interfaces\ICalculateRowsControlLevel.cs" />
     <Compile Include="Interfaces\IConnectionAttributes.cs" />

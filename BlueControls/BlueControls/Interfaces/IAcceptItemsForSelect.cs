@@ -27,14 +27,12 @@ namespace BlueControls.Interfaces {
     /// empfangen kann und diese dann als Auswahlmöglichkeit (z. b. Dropdown)
     /// anbieten kann.
     /// </summary>
-    public interface IAcceptItemsForSelect {
+    public interface IAcceptItemsForSelect : IDisabledReason {
         //public Database? Database { get; set; }
 
         //public long RowKey { get; set; }
 
         #region Properties
-
-        public string DisabledReason { get; set; }
 
         public EditTypeFormula EditType { get; set; }
         public object Tag { get; set; }

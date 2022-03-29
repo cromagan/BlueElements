@@ -29,7 +29,7 @@ namespace BlueControls.Interfaces {
 
         #region Methods
 
-        public System.Windows.Forms.Control GenerateControl(ConnectedFormulaView parent);
+        public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent);
 
         #endregion
     }

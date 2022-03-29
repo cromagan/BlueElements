@@ -335,6 +335,10 @@ namespace BlueControls.Controls {
 
         #region Methods
 
+        public void DeleteValue() {
+            ValueSet(string.Empty, true, true);
+        }
+
         public void StyleComboBox(ItemCollectionList? list, ComboBoxStyle style, bool removevalueIfNotExists) {
             if (!Allinitialized) { CreateSubControls(); }
             foreach (var thiscb in Controls) {

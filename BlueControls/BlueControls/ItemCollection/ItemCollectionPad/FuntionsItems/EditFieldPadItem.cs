@@ -258,7 +258,7 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        public System.Windows.Forms.Control GenerateControl(ConnectedFormulaView parent) {
+        public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
             if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
                 var ff = parent.SearchOrGenerate((ItemCollection.BasicPadItem)rfw2);
 

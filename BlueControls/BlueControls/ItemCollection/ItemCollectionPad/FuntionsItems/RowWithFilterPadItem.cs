@@ -134,7 +134,7 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        public Control GenerateControl(ConnectedFormulaView parent) {
+        public Control CreateControl(ConnectedFormulaView parent) {
             var c = new Connector(this, _VerbindungsID);
             c.Tag = Internal;
             return c;
