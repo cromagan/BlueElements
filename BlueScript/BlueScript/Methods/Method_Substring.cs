@@ -50,10 +50,17 @@ namespace BlueScript.Methods {
                 en += st;
                 st = 0;
             }
-            if (st + en > ((VariableString)attvar.Attributes[0]).ValueString.Length) {
-                en = ((VariableString)attvar.Attributes[0]).ValueString.Length - st;
+
+            var t = ((VariableString)attvar.Attributes[0]).ValueString;
+
+            if (st > t.Length) {
+                return new DoItFeedback(string.Empty, string.Empty);
             }
-            return new DoItFeedback(((VariableString)attvar.Attributes[0]).ValueString.Substring(st, en), string.Empty);
+
+            if (st + en > t.Length) {
+                en = t.Length - st;
+            }
+            return new DoItFeedback(t.Substring(st, en), string.Empty);
         }
 
         #endregion

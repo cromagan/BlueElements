@@ -236,7 +236,7 @@ namespace BlueScript {
             //}
 
             (Error, ErrorCode) = Parse(ReducedScriptText);
-            return !string.IsNullOrEmpty(Error);
+            return string.IsNullOrEmpty(Error);
         }
 
         //internal int AddBitmapToCache(Bitmap? bmp) {

@@ -19,6 +19,9 @@ using BlueControls.Controls;
 
 namespace BlueControls.Interfaces {
 
+    /// <summary>
+    /// Wird verwendet, wenn das PadItem zu einem ConnectedFormula-Control übersetzt werden kann.
+    /// </summary>
     public interface IItemToControl {
 
         #region Properties
@@ -29,7 +32,7 @@ namespace BlueControls.Interfaces {
 
         #region Methods
 
-        public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent);
+        public System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent);
 
         #endregion
     }

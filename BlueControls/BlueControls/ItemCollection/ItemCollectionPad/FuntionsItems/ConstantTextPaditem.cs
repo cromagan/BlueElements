@@ -59,7 +59,7 @@ namespace BlueControls.ItemCollection {
 
         #region Properties
 
-        [Description("Wenn eine ID vergeben wird, ist es möglich, dieses Feld mit einer internen Programmierung anzusprechen.\r\bAls Nebeneffekt wird der Text im Editir mit angezeigt. ")]
+        [Description("Wenn eine ID vergeben wird, ist es möglich, dieses Feld mit einer internen Programmierung anzusprechen.\r\bAls Nebeneffekt wird der Text im Editor mit angezeigt. ")]
         public string ID {
             get => _ID;
             set {
@@ -84,7 +84,7 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        public Control CreateControl(ConnectedFormulaView parent) {
+        public Control? CreateControl(ConnectedFormulaView parent) {
             var c3 = new FlexiControl();
             c3.CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
             c3.Caption = _ID;
@@ -102,11 +102,11 @@ namespace BlueControls.ItemCollection {
             return l;
         }
 
-        public bool IsRecursiveWith(IRecursiveCheck obj) {
-            if (obj == this) { return true; }
+        //public bool IsRecursiveWith(IAcceptAndSends obj) {
+        //    if (obj == this) { return true; }
 
-            return false;
-        }
+        //    return false;
+        //}
 
         public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
@@ -123,7 +123,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public string ReadableText() {
-            if (!string.IsNullOrEmpty(_ID)) { return "Konstanter Wert: " + _text + "(" +_ID +")"; }
+            if (!string.IsNullOrEmpty(_ID)) { return "Konstanter Wert: " + _text + "(" + _ID + ")"; }
 
             return "Konstanter Wert: " + _text;
         }
@@ -139,7 +139,7 @@ namespace BlueControls.ItemCollection {
             return t.Trim(", ") + "}";
         }
 
-        protected override string ClassId() => "ConstantText";
+        protected override string ClassId() => "FI-ConstantText";
 
         protected override void DrawExplicit(Graphics gr, RectangleF modifiedPosition, float zoom, float shiftX, float shiftY, bool forPrinting) {
             //DrawColorScheme(gr, modifiedPosition, zoom, Id);
@@ -147,7 +147,7 @@ namespace BlueControls.ItemCollection {
             gr.DrawRectangle(new Pen(Color.Black, zoom), modifiedPosition);
 
             var t = string.Empty;
-            if(!string.IsNullOrEmpty(_ID)) { t = _ID + ": "; }
+            if (!string.IsNullOrEmpty(_ID)) { t = _ID + ": "; }
             t = t + _text;
 
             Skin.Draw_FormatedText(gr, t, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, modifiedPosition.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);

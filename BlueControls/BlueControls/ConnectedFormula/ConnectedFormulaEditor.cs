@@ -220,6 +220,21 @@ namespace BlueControls.Forms {
             }
         }
 
+        private void grpFileExplorer_Click(object sender, System.EventArgs e) {
+            var l = Pad.LastClickedItem;
+
+            var x = new FileExplorerPadItem(string.Empty);
+
+            if (l is ICalculateRowsItemLevel ri) {
+                x.GetRowFrom = ri;
+            }
+            if (l is EditFieldPadItem efi && efi.GetRowFrom != null) {
+                x.GetRowFrom = efi.GetRowFrom;
+            }
+
+            Pad.AddCentered(x);
+        }
+
         private void LoadTab_FileOk(object sender, CancelEventArgs e) => FormulaSet(LoadTab.FileName, null);
 
         #endregion

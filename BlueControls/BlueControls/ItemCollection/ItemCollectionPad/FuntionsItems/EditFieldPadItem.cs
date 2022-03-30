@@ -36,7 +36,7 @@ using BlueControls.ConnectedFormula;
 
 namespace BlueControls.ItemCollection {
 
-    public class EditFieldPadItem : RectanglePadItem, IReadableText, IRecursiveCheck, IContentHolder, IItemToControl {
+    public class EditFieldPadItem : RectanglePadItem, IReadableText, IAcceptAndSends, IContentHolder, IItemToControl {
 
         #region Fields
 
@@ -258,7 +258,7 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
+        public System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
             if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
                 var ff = parent.SearchOrGenerate((ItemCollection.BasicPadItem)rfw2);
 
@@ -350,10 +350,10 @@ namespace BlueControls.ItemCollection {
             return l;
         }
 
-        public bool IsRecursiveWith(IRecursiveCheck obj) {
+        public bool IsRecursiveWith(IAcceptAndSends obj) {
             if (obj == this) { return true; }
 
-            if (GetRowFrom is IRecursiveCheck i) { return i.IsRecursiveWith(obj); }
+            if (GetRowFrom is IAcceptAndSends i) { return i.IsRecursiveWith(obj); }
             return false;
         }
 
@@ -417,7 +417,7 @@ namespace BlueControls.ItemCollection {
             return t.Trim(", ") + "}";
         }
 
-        protected override string ClassId() => "EditField";
+        protected override string ClassId() => "FI-EditField";
 
         //    return false;
         //}

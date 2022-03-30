@@ -28,6 +28,7 @@ using System.Windows.Forms;
 using BlueControls.Forms;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueBasics.MultiUserFile;
+using BlueBasics.Enums;
 
 namespace BlueControls.ItemCollection {
 
@@ -76,7 +77,7 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        public Control CreateControl(ConnectedFormulaView parent) {
+        public Control? CreateControl(ConnectedFormulaView parent) {
             var c3 = new Controls.TabControl();
             c3.Tag = Internal;
 
@@ -145,7 +146,7 @@ namespace BlueControls.ItemCollection {
 
         //public bool IsRecursiveWith(IRecursiveCheck obj) {
         //    if (obj == this) { return true; }
-        protected override string ClassId() => "ChildFormula";
+        protected override string ClassId() => "FI-ChildFormula";
 
         protected override void Dispose(bool disposing) {
             if (disposing) {
@@ -159,12 +160,26 @@ namespace BlueControls.ItemCollection {
         protected override void DrawExplicit(Graphics gr, RectangleF modifiedPosition, float zoom, float shiftX, float shiftY, bool forPrinting) {
             //DrawColorScheme(gr, modifiedPosition, zoom, Id);
             //s
-            gr.DrawRectangle(new Pen(Color.Black, zoom), modifiedPosition);
+            var headh = 25 * zoom;
+            var headb = 70 * zoom;
+
+            var body = new RectangleF(modifiedPosition.X, modifiedPosition.Y + headh, modifiedPosition.Width, modifiedPosition.Height - headh);
+            var c = -1;
+            foreach (var thisC in Childs.Item) {
+                c++;
+                var it = new RectangleF(modifiedPosition.X + c * headb, modifiedPosition.Y, headb, headh);
+
+                gr.FillRectangle(new SolidBrush(Color.FromArgb(255, 200, 200, 200)), it);
+
+                Skin.Draw_FormatedText(gr, thisC.Internal.FileNameWithoutSuffix(), null, Alignment.Horizontal_Vertical_Center, it.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
+                gr.DrawRectangle(new Pen(Color.Black, zoom), it);
+            }
+
+            gr.FillRectangle(new SolidBrush(Color.FromArgb(255, 200, 200, 200)), body);
+            gr.DrawRectangle(new Pen(Color.Black, zoom), body);
 
             //Skin.Draw_FormatedText(gr, _text, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, modifiedPosition.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
-
-            gr.FillRectangle(new SolidBrush(Color.FromArgb(128, 255, 255, 255)), modifiedPosition);
-
+            Skin.Draw_FormatedText(gr, "Register-\r\nkarten", null, Alignment.Horizontal_Vertical_Center, body.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
             base.DrawExplicit(gr, modifiedPosition, zoom, shiftX, shiftY, forPrinting);
         }
 

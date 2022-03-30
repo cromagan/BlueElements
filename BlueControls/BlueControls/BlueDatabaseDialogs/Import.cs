@@ -88,7 +88,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 MessageBox.Show("Bitte Trennzeichen angeben.", ImageCode.Information, "OK");
                 return;
             }
-            var m = Database.Import(_originalImportText, SpalteZuordnen.Checked, ZeilenZuorden.Checked, TR, Aufa.Checked, AnfTre.Checked, false);
+            var m = Database.Import(_originalImportText, SpalteZuordnen.Checked, ZeilenZuorden.Checked, TR, Aufa.Checked, AnfTre.Checked, false, txbScript.Text);
 
             if (!string.IsNullOrEmpty(m)) {
                 MessageBox.Show(m, ImageCode.Information, "OK");

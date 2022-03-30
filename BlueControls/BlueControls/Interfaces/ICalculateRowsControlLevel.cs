@@ -21,6 +21,11 @@ using BlueDatabase;
 
 namespace BlueControls.Interfaces {
 
+    /// <summary>
+    /// Ähnlich zu ICalculateRowsItemLevel.
+    /// Hier sind die Wert zu finden, wenn das Control Zeilen berechnen kann und
+    /// diese an Childs weiter geben kann.
+    /// </summary>
     public interface ICalculateRowsControlLevel {
 
         #region Properties

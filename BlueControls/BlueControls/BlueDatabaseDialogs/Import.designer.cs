@@ -24,6 +24,7 @@ namespace BlueControls.BlueDatabaseDialogs
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Import));
             this.Fertig = new BlueControls.Controls.Button();
             this.Aufa = new BlueControls.Controls.Button();
             this.BlueFrame1 = new BlueControls.Controls.GroupBox();
@@ -42,16 +43,24 @@ namespace BlueControls.BlueDatabaseDialogs
             this.GroupBox1 = new BlueControls.Controls.GroupBox();
             this.ZeilenAlle = new BlueControls.Controls.Button();
             this.ZeilenZuorden = new BlueControls.Controls.Button();
+            this.tabControl1 = new BlueControls.Controls.TabControl();
+            this.tabAllgemein = new System.Windows.Forms.TabPage();
+            this.tabSkript = new System.Windows.Forms.TabPage();
+            this.txbScript = new BlueControls.Controls.TextBox();
+            this.caption1 = new BlueControls.Controls.Caption();
             this.BlueFrame1.SuspendLayout();
             this.BlueFrame3.SuspendLayout();
             this.GroupBox1.SuspendLayout();
+            this.tabControl1.SuspendLayout();
+            this.tabAllgemein.SuspendLayout();
+            this.tabSkript.SuspendLayout();
             this.SuspendLayout();
             // 
             // Fertig
             // 
             this.Fertig.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.Fertig.ImageCode = "Textfeld|16";
-            this.Fertig.Location = new System.Drawing.Point(704, 248);
+            this.Fertig.Location = new System.Drawing.Point(663, 319);
             this.Fertig.Name = "Fertig";
             this.Fertig.Size = new System.Drawing.Size(104, 32);
             this.Fertig.TabIndex = 9;
@@ -69,7 +78,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // BlueFrame1
             // 
-            this.BlueFrame1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
+            this.BlueFrame1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.BlueFrame1.CausesValidation = false;
             this.BlueFrame1.Controls.Add(this.aTXT);
             this.BlueFrame1.Controls.Add(this.TabStopp);
@@ -77,9 +86,9 @@ namespace BlueControls.BlueDatabaseDialogs
             this.BlueFrame1.Controls.Add(this.Semikolon);
             this.BlueFrame1.Controls.Add(this.Leerzeichen);
             this.BlueFrame1.Controls.Add(this.Komma);
-            this.BlueFrame1.Location = new System.Drawing.Point(8, 80);
+            this.BlueFrame1.Location = new System.Drawing.Point(20, 15);
             this.BlueFrame1.Name = "BlueFrame1";
-            this.BlueFrame1.Size = new System.Drawing.Size(168, 160);
+            this.BlueFrame1.Size = new System.Drawing.Size(168, 169);
             this.BlueFrame1.TabIndex = 13;
             this.BlueFrame1.TabStop = false;
             this.BlueFrame1.Text = "Trennzeichen";
@@ -145,7 +154,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Eintr.CausesValidation = false;
             this.Eintr.Location = new System.Drawing.Point(8, 8);
             this.Eintr.Name = "Eintr";
-            this.Eintr.Size = new System.Drawing.Size(807, 24);
+            this.Eintr.Size = new System.Drawing.Size(766, 24);
             this.Eintr.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // AnfTre
@@ -159,13 +168,13 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // BlueFrame3
             // 
-            this.BlueFrame3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
+            this.BlueFrame3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.BlueFrame3.CausesValidation = false;
             this.BlueFrame3.Controls.Add(this.SpalteNachderReihe);
             this.BlueFrame3.Controls.Add(this.SpalteZuordnen);
-            this.BlueFrame3.Location = new System.Drawing.Point(184, 80);
+            this.BlueFrame3.Location = new System.Drawing.Point(200, 16);
             this.BlueFrame3.Name = "BlueFrame3";
-            this.BlueFrame3.Size = new System.Drawing.Size(624, 72);
+            this.BlueFrame3.Size = new System.Drawing.Size(532, 72);
             this.BlueFrame3.TabIndex = 12;
             this.BlueFrame3.TabStop = false;
             this.BlueFrame3.Text = "Spalten-Optionen";
@@ -175,7 +184,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.SpalteNachderReihe.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
             this.SpalteNachderReihe.Location = new System.Drawing.Point(8, 40);
             this.SpalteNachderReihe.Name = "SpalteNachderReihe";
-            this.SpalteNachderReihe.Size = new System.Drawing.Size(600, 24);
+            this.SpalteNachderReihe.Size = new System.Drawing.Size(512, 24);
             this.SpalteNachderReihe.TabIndex = 1;
             this.SpalteNachderReihe.Text = "Alle Einträge importieren, <b>interne Spaltenreihenfolge</b> benutzen und nichts " +
     "zuordnen.";
@@ -186,7 +195,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.SpalteZuordnen.Checked = true;
             this.SpalteZuordnen.Location = new System.Drawing.Point(8, 16);
             this.SpalteZuordnen.Name = "SpalteZuordnen";
-            this.SpalteZuordnen.Size = new System.Drawing.Size(600, 24);
+            this.SpalteZuordnen.Size = new System.Drawing.Size(512, 24);
             this.SpalteZuordnen.TabIndex = 0;
             this.SpalteZuordnen.Text = "Die <b>erste Zeile</b> enthält den Spaltennamen und zu diesen zuordnen.";
             // 
@@ -194,7 +203,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.Cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.Cancel.ImageCode = "Kreuz|16";
-            this.Cancel.Location = new System.Drawing.Point(592, 248);
+            this.Cancel.Location = new System.Drawing.Point(551, 319);
             this.Cancel.Name = "Cancel";
             this.Cancel.Size = new System.Drawing.Size(104, 32);
             this.Cancel.TabIndex = 11;
@@ -203,13 +212,13 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // GroupBox1
             // 
-            this.GroupBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
+            this.GroupBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.GroupBox1.CausesValidation = false;
             this.GroupBox1.Controls.Add(this.ZeilenAlle);
             this.GroupBox1.Controls.Add(this.ZeilenZuorden);
-            this.GroupBox1.Location = new System.Drawing.Point(184, 152);
+            this.GroupBox1.Location = new System.Drawing.Point(200, 96);
             this.GroupBox1.Name = "GroupBox1";
-            this.GroupBox1.Size = new System.Drawing.Size(624, 88);
+            this.GroupBox1.Size = new System.Drawing.Size(532, 88);
             this.GroupBox1.TabIndex = 0;
             this.GroupBox1.TabStop = false;
             this.GroupBox1.Text = "Zeilen-Optionen";
@@ -219,7 +228,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.ZeilenAlle.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
             this.ZeilenAlle.Location = new System.Drawing.Point(8, 56);
             this.ZeilenAlle.Name = "ZeilenAlle";
-            this.ZeilenAlle.Size = new System.Drawing.Size(608, 24);
+            this.ZeilenAlle.Size = new System.Drawing.Size(512, 24);
             this.ZeilenAlle.TabIndex = 1;
             this.ZeilenAlle.Text = "<b>Jede Zeile</b> importieren, auch wenn dadurch <b>doppelte</b> Einträge entsteh" +
     "en.";
@@ -230,24 +239,78 @@ namespace BlueControls.BlueDatabaseDialogs
             this.ZeilenZuorden.Checked = true;
             this.ZeilenZuorden.Location = new System.Drawing.Point(8, 24);
             this.ZeilenZuorden.Name = "ZeilenZuorden";
-            this.ZeilenZuorden.Size = new System.Drawing.Size(608, 32);
+            this.ZeilenZuorden.Size = new System.Drawing.Size(512, 32);
             this.ZeilenZuorden.TabIndex = 0;
             this.ZeilenZuorden.Text = "Die <b>erste Spalte</b> des Imports soll der <b>ersten Spalte</b> der Datenbank z" +
     "ugeordnet werden. <br>Wenn der Eintrag nicht in der Datenbank vorhanden ist, wir" +
     "d eine neue Zeile erstellt.";
             // 
+            // tabControl1
+            // 
+            this.tabControl1.Controls.Add(this.tabAllgemein);
+            this.tabControl1.Controls.Add(this.tabSkript);
+            this.tabControl1.HotTrack = true;
+            this.tabControl1.Location = new System.Drawing.Point(8, 80);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(760, 232);
+            this.tabControl1.TabDefault = null;
+            this.tabControl1.TabDefaultOrder = null;
+            this.tabControl1.TabIndex = 14;
+            // 
+            // tabAllgemein
+            // 
+            this.tabAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabAllgemein.Controls.Add(this.BlueFrame1);
+            this.tabAllgemein.Controls.Add(this.GroupBox1);
+            this.tabAllgemein.Controls.Add(this.BlueFrame3);
+            this.tabAllgemein.Location = new System.Drawing.Point(4, 25);
+            this.tabAllgemein.Name = "tabAllgemein";
+            this.tabAllgemein.Padding = new System.Windows.Forms.Padding(3);
+            this.tabAllgemein.Size = new System.Drawing.Size(752, 203);
+            this.tabAllgemein.TabIndex = 0;
+            this.tabAllgemein.Text = "Allgemein";
+            // 
+            // tabSkript
+            // 
+            this.tabSkript.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabSkript.Controls.Add(this.caption1);
+            this.tabSkript.Controls.Add(this.txbScript);
+            this.tabSkript.Location = new System.Drawing.Point(4, 25);
+            this.tabSkript.Name = "tabSkript";
+            this.tabSkript.Padding = new System.Windows.Forms.Padding(3);
+            this.tabSkript.Size = new System.Drawing.Size(752, 203);
+            this.tabSkript.TabIndex = 1;
+            this.tabSkript.Text = "Skript";
+            // 
+            // txbScript
+            // 
+            this.txbScript.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbScript.Location = new System.Drawing.Point(8, 64);
+            this.txbScript.MultiLine = true;
+            this.txbScript.Name = "txbScript";
+            this.txbScript.Size = new System.Drawing.Size(736, 136);
+            this.txbScript.TabIndex = 0;
+            // 
+            // caption1
+            // 
+            this.caption1.CausesValidation = false;
+            this.caption1.Location = new System.Drawing.Point(8, 8);
+            this.caption1.Name = "caption1";
+            this.caption1.Size = new System.Drawing.Size(736, 56);
+            this.caption1.Text = resources.GetString("caption1.Text");
+            this.caption1.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
             // Import
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(817, 284);
-            this.Controls.Add(this.GroupBox1);
+            this.ClientSize = new System.Drawing.Size(776, 355);
+            this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.Cancel);
-            this.Controls.Add(this.BlueFrame3);
             this.Controls.Add(this.AnfTre);
             this.Controls.Add(this.Fertig);
             this.Controls.Add(this.Aufa);
-            this.Controls.Add(this.BlueFrame1);
             this.Controls.Add(this.Eintr);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "Import";
@@ -257,6 +320,9 @@ namespace BlueControls.BlueDatabaseDialogs
             this.BlueFrame1.ResumeLayout(false);
             this.BlueFrame3.ResumeLayout(false);
             this.GroupBox1.ResumeLayout(false);
+            this.tabControl1.ResumeLayout(false);
+            this.tabAllgemein.ResumeLayout(false);
+            this.tabSkript.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -278,5 +344,10 @@ namespace BlueControls.BlueDatabaseDialogs
         internal GroupBox GroupBox1;
         internal Button ZeilenAlle;
         internal Button ZeilenZuorden;
+        private TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabAllgemein;
+        private System.Windows.Forms.TabPage tabSkript;
+        private Caption caption1;
+        private TextBox txbScript;
     }
 }

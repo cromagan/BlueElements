@@ -35,7 +35,7 @@ using BlueControls.ConnectedFormula;
 
 namespace BlueControls.ItemCollection {
 
-    public class RowWithFilterPaditem : FixedRectanglePadItem, IReadableText, IRecursiveCheck, ICalculateRowsItemLevel, IItemToControl, IConnectionAttributes {
+    public class RowWithFilterPaditem : FixedRectanglePadItem, IReadableText, IAcceptAndSends, ICalculateRowsItemLevel, IItemToControl, IConnectionAttributes {
 
         #region Fields
 
@@ -134,7 +134,7 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        public Control CreateControl(ConnectedFormulaView parent) {
+        public Control? CreateControl(ConnectedFormulaView parent) {
             var c = new Connector(this, _VerbindungsID);
             c.Tag = Internal;
             return c;
@@ -172,12 +172,12 @@ namespace BlueControls.ItemCollection {
             return l;
         }
 
-        public bool IsRecursiveWith(IRecursiveCheck obj) {
+        public bool IsRecursiveWith(IAcceptAndSends obj) {
             if (obj == this) { return true; }
 
             foreach (var thisR in FilterDefiniton.Row) {
                 var it = Parent[thisR.CellGetString("suchtxt")];
-                if (it is IRecursiveCheck i) {
+                if (it is IAcceptAndSends i) {
                     if (i.IsRecursiveWith(obj)) { return true; }
                 }
             }
@@ -207,7 +207,7 @@ namespace BlueControls.ItemCollection {
                 case "filterdb":
                     FilterDefiniton.Row.Clear();
                     FilterDatabaseUpdate();
-                    FilterDefiniton.Import(value.FromNonCritical(), true, false, ";", false, false, false);
+                    FilterDefiniton.Import(value.FromNonCritical(), true, false, ";", false, false, false, string.Empty);
                     return true;
             }
             return false;
@@ -253,7 +253,7 @@ namespace BlueControls.ItemCollection {
             return t.Trim(", ") + "}";
         }
 
-        protected override string ClassId() => "RowWithFilter";
+        protected override string ClassId() => "FI-RowWithFilter";
 
         protected override void Dispose(bool disposing) {
             base.Dispose(disposing);
@@ -388,7 +388,10 @@ namespace BlueControls.ItemCollection {
 
             foreach (var thisPadItem in Parent) {
                 if (thisPadItem is IContentHolder efpi) {
-                    if (!efpi.IsRecursiveWith(this)) {
+                    var rek = false;
+                    if (efpi is IAcceptAndSends aas) { rek = aas.IsRecursiveWith(this); }
+
+                    if (!rek) {
                         b.DropDownItems.Add(efpi.Internal);
                         b.OpticalReplace.Add(efpi.Internal + "|" + efpi.ReadableText());
                         var s = string.Empty;

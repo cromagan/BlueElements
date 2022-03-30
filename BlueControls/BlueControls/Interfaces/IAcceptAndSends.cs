@@ -17,7 +17,10 @@
 
 namespace BlueControls.Interfaces {
 
-    public interface IRecursiveCheck {
+    /// <summary>
+    /// Wird verwendet, wenn das Control Werte abgeben und empfagen kann
+    /// </summary>
+    public interface IAcceptAndSends {
 
         #region Methods
 
@@ -26,7 +29,7 @@ namespace BlueControls.Interfaces {
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public bool IsRecursiveWith(IRecursiveCheck obj);
+        public bool IsRecursiveWith(IAcceptAndSends obj);
 
         #endregion
     }

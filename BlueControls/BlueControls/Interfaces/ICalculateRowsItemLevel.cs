@@ -20,7 +20,11 @@ using BlueDatabase;
 
 namespace BlueControls.Interfaces {
 
-    public interface ICalculateRowsItemLevel : IRecursiveCheck, IReadableText {
+    /// <summary>
+    /// Wird verwendet, wenn das PadItem Zeilen berechnen kann und dann das
+    /// erzeugte Control es an Childs weiter geben kann.
+    /// </summary>
+    public interface ICalculateRowsItemLevel : IAcceptAndSends, IReadableText, IItemToControl {
 
         #region Properties
 

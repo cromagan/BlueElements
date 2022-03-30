@@ -34,6 +34,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static BlueBasics.FileOperations;
 using static BlueBasics.Converter;
+using static BlueScript.Script;
+using BlueScript.Variables;
 
 namespace BlueDatabase {
 
@@ -671,13 +673,35 @@ namespace BlueDatabase {
             }
         }
 
-        public string Import(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart, bool dorowautmatic) {
+        public string Import(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart, bool dorowautmatic, string script) {
             // Vorbereitung des Textes -----------------------------
             importText = importText.Replace("\r\n", "\r").Trim("\r");
+
+            #region die Zeilen (zeil) vorbereiten
+
             var ein = importText.SplitAndCutByCr();
             List<string[]> zeil = new();
             var neuZ = 0;
             for (var z = 0; z <= ein.GetUpperBound(0); z++) {
+
+                #region Das Skript berechnen
+
+                if (!string.IsNullOrEmpty(script)) {
+                    var vars = new List<BlueScript.Variables.Variable>();
+                    vars.Add(new VariableString("Row", ein[z], false, false, "Der Original-Text. Dieser kann (und soll) manipuliert werden."));
+                    vars.Add(new VariableBool("IsCaption", spalteZuordnen && z == 0, true, false, "Wenn TRUE, ist das die erste Zeile, die Überschriften enthält."));
+                    vars.Add(new VariableString("Seperator", splitChar, true, false, "Das Trennzeichen"));
+                    var x = new BlueScript.Script(vars, string.Empty);
+                    x.ScriptText = script;
+                    if (!x.Parse()) {
+                        OnDropMessage(FehlerArt.Warnung, "Skript-Fehler, Import kann nicht ausgeführt werden.");
+                        return x.Error;
+                    }
+                    ein[z] = vars.GetString("Row");
+                }
+
+                #endregion
+
                 if (eliminateMultipleSplitter) {
                     ein[z] = ein[z].Replace(splitChar + splitChar, splitChar);
                 }
@@ -687,15 +711,19 @@ namespace BlueDatabase {
                 ein[z] = ein[z].TrimEnd(splitChar);
                 zeil.Add(ein[z].SplitAndCutBy(splitChar));
             }
+
             if (zeil.Count == 0) {
                 OnDropMessage(FehlerArt.Warnung, "Import kann nicht ausgeführt werden.");
                 return "Import kann nicht ausgeführt werden.";
             }
+
+            #endregion
+
+            #region Spaltenreihenfolge (columns) ermitteln
+
             List<ColumnItem?> columns = new();
             var startZ = 0;
-            // -------------------------------------
-            // --- Spalten-Reihenfolge ermitteln ---
-            // -------------------------------------
+
             if (spalteZuordnen) {
                 startZ = 1;
                 for (var spaltNo = 0; spaltNo < zeil[0].GetUpperBound(0) + 1; spaltNo++) {
@@ -722,12 +750,14 @@ namespace BlueDatabase {
                     columns.Add(newc);
                 }
             }
+
+            #endregion
+
             // -------------------------------------
             // --- Importieren ---
             // -------------------------------------
-            //OnDropMessage("Starte Importierevorgang...");
+
             for (var zeilNo = startZ; zeilNo < zeil.Count; zeilNo++) {
-                //P?.Update(ZeilNo);
                 var tempVar2 = Math.Min(zeil[zeilNo].GetUpperBound(0) + 1, columns.Count);
                 RowItem? row = null;
                 for (var spaltNo = 0; spaltNo < tempVar2; spaltNo++) {
@@ -744,8 +774,31 @@ namespace BlueDatabase {
                     if (row != null && dorowautmatic) { row.DoAutomatic(true, true, "import"); }
                 }
             }
+
             OnDropMessage(FehlerArt.Info, "<b>Import abgeschlossen.</b>\r\n" + neuZ + " neue Zeilen erstellt.");
             return string.Empty;
+        }
+
+        public string ImportCSV(string filename, string script) {
+            if (!FileOperations.FileExists(filename)) { return "Datei nicht gefunden"; }
+            var importText = File.ReadAllText(filename, Constants.Win1252);
+
+            if (string.IsNullOrEmpty(importText)) { return "Dateiinhalt leer"; }
+
+            var x = importText.SplitAndCutByCrToList();
+
+            if (x.Count() < 2) { return "Keine Zeilen zum importieren."; }
+
+            var sep = ",";
+
+            if (x[0].StartsWith("sep=", StringComparison.OrdinalIgnoreCase)) {
+                if (x.Count() < 3) { return "Keine Zeilen zum importieren."; }
+                sep = x[0].Substring(4);
+                x.RemoveAt(0);
+                importText = x.JoinWithCr();
+            }
+
+            return Import(importText, true, true, sep, false, false, true, script);
         }
 
         /// <summary>

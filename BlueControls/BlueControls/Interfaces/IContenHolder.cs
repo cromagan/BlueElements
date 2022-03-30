@@ -19,7 +19,10 @@ using BlueBasics.Interfaces;
 
 namespace BlueControls.Interfaces {
 
-    public interface IContentHolder : IReadableText, IRecursiveCheck {
+    /// <summary>
+    /// Wird verwendet, wenn das Item einen Wert abgeben kann.
+    /// </summary>
+    public interface IContentHolder : IReadableText {
 
         #region Properties
 

@@ -36,7 +36,7 @@ using BlueControls.ConnectedFormula;
 
 namespace BlueControls.ItemCollection {
 
-    public class RowClonePadItem : FixedRectanglePadItem, IReadableText, IRecursiveCheck, ICalculateRowsItemLevel, IItemToControl, IConnectionAttributes {
+    public class RowClonePadItem : FixedRectanglePadItem, IReadableText, IAcceptAndSends, ICalculateRowsItemLevel, IItemToControl, IConnectionAttributes {
 
         #region Fields
 
@@ -108,7 +108,7 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        public Control CreateControl(ConnectedFormulaView parent) {
+        public Control? CreateControl(ConnectedFormulaView parent) {
             var c = new RowCloner(this);
             c.Tag = Internal;
             return c;
@@ -128,7 +128,7 @@ namespace BlueControls.ItemCollection {
             return l;
         }
 
-        public bool IsRecursiveWith(IRecursiveCheck obj) {
+        public bool IsRecursiveWith(IAcceptAndSends obj) {
             return false;
         }
 
@@ -190,7 +190,7 @@ namespace BlueControls.ItemCollection {
             return t.Trim(", ") + "}";
         }
 
-        protected override string ClassId() => "CloneRowsFilter";
+        protected override string ClassId() => "FI-CloneRowsFilter";
 
         protected override void DrawExplicit(Graphics gr, RectangleF modifiedPosition, float zoom, float shiftX, float shiftY, bool forPrinting) {
             DrawColorScheme(gr, modifiedPosition, zoom, Id);

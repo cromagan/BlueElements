@@ -129,7 +129,7 @@ namespace BlueControls.ItemCollection {
             return t.Trim(", ") + "}";
         }
 
-        protected override string ClassId() => "Column";
+        protected override string ClassId() => "FI-Column";
 
         protected override void Dispose(bool disposing) {
             base.Dispose(disposing);

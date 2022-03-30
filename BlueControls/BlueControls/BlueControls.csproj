@@ -326,7 +326,7 @@
     <Compile Include="Interfaces\IContenHolder.cs" />
     <Compile Include="Interfaces\IAcceptRowKey.cs" />
     <Compile Include="Interfaces\IItemToControl.cs" />
-    <Compile Include="Interfaces\IRecursiveCheck.cs" />
+    <Compile Include="Interfaces\IAcceptAndSends.cs" />
     <Compile Include="Interfaces\IBackgroundNone.cs" />
     <Compile Include="Interfaces\IMoveable.cs" />
     <Compile Include="Forms\Notification.cs">
@@ -336,6 +336,7 @@
       <DependentUpon>Notification.cs</DependentUpon>
     </Compile>
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\ChildFormulaPaditem.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\FileExplorerPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\EditFieldPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Abstract\FixedRectanglePadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\ConstantTextPaditem.cs" />
