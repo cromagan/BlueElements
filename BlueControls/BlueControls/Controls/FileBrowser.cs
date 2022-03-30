@@ -88,7 +88,7 @@ namespace BlueControls.Controls {
             var exekey = shellKey.OpenSubKey(shellComand.ToString());
             exekey = exekey.OpenSubKey("command");
 
-            return exekey.GetValue("").ToString(); ;
+            return exekey.GetValue("").ToString();
         }
 
         private void AbortThumbs() {
@@ -252,8 +252,8 @@ namespace BlueControls.Controls {
                     case "BMP":
                     case "TIF":
                         var pc = Image_FromFile(e.Item.Internal);
-                        var d = new BlueControls.Forms.PictureView((Bitmap)pc);
-                        d.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+                        var d = new PictureView((Bitmap)pc);
+                        d.WindowState = FormWindowState.Maximized;
                         d.Show();
                         return;
 
@@ -278,9 +278,9 @@ namespace BlueControls.Controls {
                 }
 
                 x = x.Replace("%1", e.Item.Internal);
-                var process = new System.Diagnostics.Process();
-                var startInfo = new System.Diagnostics.ProcessStartInfo();
-                startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                var process = new Process();
+                var startInfo = new ProcessStartInfo();
+                startInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 startInfo.FileName = "cmd.exe";
                 startInfo.Arguments = "/C \"" + x + "\"";
                 process.StartInfo = startInfo;
@@ -312,25 +312,22 @@ namespace BlueControls.Controls {
             foreach (var thisString in allF) {
                 if (AddThis(thisString, true)) // Prüfung 1, ob .cyo
                 {
-                    BitmapListItem p = null;
-                    var fileName = thisString;
-                    string suffix;
-                    var uncryptetName = fileName;
+                    BitmapListItem p;
 
-                    suffix = fileName.FileSuffix().ToUpper();
-                    p = new BitmapListItem(QuickImage.Get(fileName.FileType(), 64), fileName, fileName.FileNameWithoutSuffix());
+                    var suffix = thisString.FileSuffix().ToUpper();
+                    p = new BitmapListItem(QuickImage.Get(thisString.FileType(), 64), thisString, thisString.FileNameWithoutSuffix());
 
-                    if (AddThis(uncryptetName, true)) // Prüfung 2, ob der ungecryptete NAme auch wirklich rein darf
+                    if (AddThis(thisString, true)) // Prüfung 2, ob der ungecryptete NAme auch wirklich rein darf
                     {
                         p.Padding = 6;
 
                         switch (Sorierung.ToLower()) {
                             case "größe":
-                                p.UserDefCompareKey = new System.IO.FileInfo(fileName).Length.ToString(Constants.Format_Integer10);
+                                p.UserDefCompareKey = new FileInfo(thisString).Length.ToString(Constants.Format_Integer10);
                                 break;
 
                             case "erstelldatum":
-                                p.UserDefCompareKey = new System.IO.FileInfo(fileName).CreationTime.ToString("yyyy/MM/dd HH:mm:ss.fff");
+                                p.UserDefCompareKey = new FileInfo(thisString).CreationTime.ToString("yyyy/MM/dd HH:mm:ss.fff");
                                 break;
 
                             default:
@@ -343,8 +340,8 @@ namespace BlueControls.Controls {
 
                         tags.TagSet("Suffix", suffix);
 
-                        tags.TagSet("UncryptetName", uncryptetName);
-                        if (suffix == "URL") { tags.TagSet("URL", GetUrlFileDestination(fileName)); }
+                        tags.TagSet("UncryptetName", thisString);
+                        if (suffix == "URL") { tags.TagSet("URL", GetUrlFileDestination(thisString)); }
 
                         p.Tag = tags;
 
@@ -391,7 +388,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void ThumbGenerator_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e) {
+        private void ThumbGenerator_DoWork(object sender, DoWorkEventArgs e) {
             //ThumbGenerator.SetApartmentState
 
             var newPath = txbPfad.Text.Trim("\\") + "\\";
@@ -416,7 +413,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void ThumbGenerator_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e) {
+        private void ThumbGenerator_ProgressChanged(object sender, ProgressChangedEventArgs e) {
             var gb = (List<object>)e.UserState;
             var file = (string)gb[0];
 

@@ -20,7 +20,7 @@ namespace BlueControls.Interfaces {
     /// <summary>
     /// Wird verwendet, wenn das Control Werte abgeben und empfagen kann
     /// </summary>
-    public interface IAcceptAndSends {
+    public interface IAcceptAndSends : IContentHolder, IItemToControl {
 
         #region Methods
 

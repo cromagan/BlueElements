@@ -36,15 +36,13 @@ using BlueControls.ConnectedFormula;
 
 namespace BlueControls.ItemCollection {
 
-    public class EditFieldPadItem : RectanglePadItem, IReadableText, IAcceptAndSends, IContentHolder, IItemToControl {
+    public class EditFieldPadItem : VariableShowPadItem, IReadableText, IAcceptAndSends, IContentHolder, IItemToControl {
 
         #region Fields
 
-        public static BlueFont? CaptionFNT = Skin.GetBlueFont(Design.Caption, States.Standard);
-
         public ColumnItem? Column = null;
         private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
-        private ICalculateRowsItemLevel? _GetValueFrom = null;
+
         private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
         #endregion
@@ -59,45 +57,6 @@ namespace BlueControls.ItemCollection {
 
         #region Properties
 
-        public string Breite_Berechnen {
-            get => string.Empty;
-            set {
-                var li = new ItemCollectionList.ItemCollectionList();
-                for (var br = 1; br <= 20; br++) {
-                    li.Add(br + " Spalte(n)", br.ToString(), true, string.Empty);
-
-                    for (var pos = 1; pos <= br; pos++) {
-                        li.Add(br + " Spalte(n) - Position: " + pos, br + ";" + pos);
-                    }
-                }
-
-                var x2 = Forms.InputBoxListBoxStyle.Show("Bitte Breite und Position wählen:", li, AddType.None, true);
-
-                if (x2 == null || x2.Count != 1) { return; }
-
-                var doit = x2[0].SplitBy(";");
-
-                var anzbr = IntParse(doit[0]);
-                var npos = IntParse(doit[1]);
-                var x = UsedArea;
-                x.Width = (Parent.SheetSizeInPix.Width - (MmToPixel(0.5f, 300) * (anzbr - 1))) / anzbr;
-                x.X = x.Width * (npos - 1) + MmToPixel(0.5f, 300) * (npos - 1);
-
-                SetCoordinates(x, true);
-
-                //OnChanged();
-            }
-        }
-
-        //public EditFieldPadItem(string internalname, Bitmap? bmp, Size size) : base(internalname) {
-        //    //Bitmap = bmp;
-        //    //SetCoordinates(new RectangleF(0, 0, size.Width, size.Height), true);
-        //    //Overlays = new List<QuickImage>();
-        //    //Hintergrund_Weiß_Füllen = true;
-        //    //Padding = 0;
-        //    //Bild_Modus = enSizeModes.EmptySpace;
-        //    //Stil = PadStyles.Undefiniert; // Kein Rahmen
-        //}
         public ÜberschriftAnordnung CaptionPosition {
             get => _überschiftanordung;
             set {
@@ -107,64 +66,11 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public string Datenbank {
-            get {
-                if (Column?.Database == null) { return "?"; }
-                return Column.Database.Filename.FileNameWithSuffix();
-            }
-        }
-
-        [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
-        public string Datenquelle_wählen {
-            get => string.Empty;
-            set {
-                var x = new ItemCollectionList.ItemCollectionList();
-                foreach (var thisR in Parent) {
-                    if (thisR is ICalculateRowsItemLevel rfp) {
-                        if (!rfp.IsRecursiveWith(this)) {
-                            x.Add(rfp, thisR.Internal);
-                        }
-                    }
-                }
-
-                x.Add("<Keine Quelle>");
-
-                var it = Forms.InputBoxListBoxStyle.Show("Quelle wählen:", x, AddType.None, true);
-
-                if (it == null || it.Count != 1) { return; }
-
-                var t = Parent[it[0]];
-
-                if (t is ICalculateRowsItemLevel rfp2) {
-                    if (rfp2 != GetRowFrom) {
-                        GetRowFrom = rfp2;
-                        Column = null;
-                    }
-                } else {
-                    GetRowFrom = null;
-                    Column = null;
-                }
-
-                OnChanged();
-            }
-        }
-
         public EditTypeFormula EditType {
             get => _bearbeitung;
             set {
                 if (_bearbeitung == value) { return; }
                 _bearbeitung = value;
-                OnChanged();
-            }
-        }
-
-        public ICalculateRowsItemLevel? GetRowFrom {
-            get => _GetValueFrom;
-
-            set {
-                if (value == _GetValueFrom) { return; }
-                _GetValueFrom = value;
-                RepairConnections();
                 OnChanged();
             }
         }
@@ -241,26 +147,15 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public string Standardhöhe {
-            get => string.Empty;
-            set {
-                var x = UsedArea;
-                x.Height = MmToPixel(ConnectedFormula.ConnectedFormula.StandardHöhe, 300);
-                SetCoordinates(x, true);
-
-                //OnChanged();
-            }
-        }
-
         protected override int SaveOrder => 3;
 
         #endregion
 
         #region Methods
 
-        public System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
+        public override System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
             if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
-                var ff = parent.SearchOrGenerate((ItemCollection.BasicPadItem)rfw2);
+                var ff = parent.SearchOrGenerate((BasicPadItem)rfw2);
 
                 if (rfw2.Genau_eine_Zeile) {
                     var cx = new FlexiControlForCell();
@@ -302,12 +197,10 @@ namespace BlueControls.ItemCollection {
         public override List<GenericControl> GetStyleOptions() {
             List<GenericControl> l = new();
 
-            l.Add(new FlexiControlForProperty<string>(() => Datenquelle_wählen, ImageCode.Pfeil_Rechts));
-            l.Add(new FlexiControlForProperty<string>(() => Datenbank));
+            l.AddRange(base.GetStyleOptions());
             l.Add(new FlexiControlForProperty<string>(() => Spalte_wählen, ImageCode.Pfeil_Rechts));
             l.Add(new FlexiControlForProperty<string>(() => Interner_Name));
             l.Add(new FlexiControlForProperty<string>(() => Spalte_bearbeiten, ImageCode.Spalte));
-            l.Add(new FlexiControl());
 
             var u = new ItemCollection.ItemCollectionList.ItemCollectionList();
             u.AddRange(typeof(ÜberschriftAnordnung));
@@ -359,11 +252,8 @@ namespace BlueControls.ItemCollection {
 
         public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
-            switch (tag) {
-                case "getvaluefrom":
-                    GetRowFrom = (ICalculateRowsItemLevel)Parent[value.FromNonCritical()];
-                    return true;
 
+            switch (tag) {
                 case "column":
                     Column = GetRowFrom.Database.Column.SearchByKey(IntParse(value));
                     return true;
@@ -403,10 +293,6 @@ namespace BlueControls.ItemCollection {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
 
-            if (GetRowFrom != null) {
-                t = t + "GetValueFrom=" + GetRowFrom.Internal.ToNonCritical() + ", ";
-            }
-
             if (Column != null) {
                 t = t + "Column=" + Column.Key + ", ";
             }
@@ -419,8 +305,6 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "FI-EditField";
 
-        //    return false;
-        //}
         protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
             var id = -1; if (GetRowFrom != null) { id = GetRowFrom.Id; }
 

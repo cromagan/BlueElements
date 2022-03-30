@@ -687,7 +687,7 @@ namespace BlueDatabase {
                 #region Das Skript berechnen
 
                 if (!string.IsNullOrEmpty(script)) {
-                    var vars = new List<BlueScript.Variables.Variable>();
+                    var vars = new List<Variable>();
                     vars.Add(new VariableString("Row", ein[z], false, false, "Der Original-Text. Dieser kann (und soll) manipuliert werden."));
                     vars.Add(new VariableBool("IsCaption", spalteZuordnen && z == 0, true, false, "Wenn TRUE, ist das die erste Zeile, die Überschriften enthält."));
                     vars.Add(new VariableString("Seperator", splitChar, true, false, "Das Trennzeichen"));
@@ -780,7 +780,7 @@ namespace BlueDatabase {
         }
 
         public string ImportCSV(string filename, string script) {
-            if (!FileOperations.FileExists(filename)) { return "Datei nicht gefunden"; }
+            if (!FileExists(filename)) { return "Datei nicht gefunden"; }
             var importText = File.ReadAllText(filename, Constants.Win1252);
 
             if (string.IsNullOrEmpty(importText)) { return "Dateiinhalt leer"; }

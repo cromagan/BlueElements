@@ -36,13 +36,9 @@ using BlueControls.ConnectedFormula;
 
 namespace BlueControls.ItemCollection {
 
-    public class FileExplorerPadItem : RectanglePadItem, IItemToControl {
+    public class FileExplorerPadItem : VariableShowPadItem, IItemToControl {
 
         #region Fields
-
-        public static BlueFont? CaptionFNT = Skin.GetBlueFont(Design.Caption, States.Standard);
-
-        private ICalculateRowsItemLevel? _GetValueFrom = null;
 
         private string _pfad = string.Empty;
 
@@ -57,50 +53,6 @@ namespace BlueControls.ItemCollection {
         #endregion
 
         #region Properties
-
-        [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
-        public string Datenquelle_wählen {
-            get => string.Empty;
-            set {
-                var x = new ItemCollectionList.ItemCollectionList();
-                foreach (var thisR in Parent) {
-                    if (thisR is ICalculateRowsItemLevel rfp) {
-                        x.Add(rfp, thisR.Internal);
-                    }
-                }
-
-                x.Add("<Keine Quelle>");
-
-                var it = Forms.InputBoxListBoxStyle.Show("Quelle wählen:", x, AddType.None, true);
-
-                if (it == null || it.Count != 1) { return; }
-
-                var t = Parent[it[0]];
-
-                if (t is ICalculateRowsItemLevel rfp2) {
-                    if (rfp2 != GetRowFrom) {
-                        GetRowFrom = rfp2;
-                        Pfad = string.Empty;
-                    }
-                } else {
-                    GetRowFrom = null;
-                    Pfad = string.Empty;
-                }
-
-                OnChanged();
-            }
-        }
-
-        public ICalculateRowsItemLevel? GetRowFrom {
-            get => _GetValueFrom;
-
-            set {
-                if (value == _GetValueFrom) { return; }
-                _GetValueFrom = value;
-                RepairConnections();
-                OnChanged();
-            }
-        }
 
         [Description("Der Dateipfad, dessen Dateien angezeigt werden sollen.\r\nEs können Variablen aus dem Skript benutzt werden.\r\nDiese müssen im Format ~variable~ angegeben werden.")]
         public string Pfad {
@@ -119,9 +71,9 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        public System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
+        public override System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
             if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
-                var ff = parent.SearchOrGenerate((ItemCollection.BasicPadItem)rfw2);
+                var ff = parent.SearchOrGenerate((BasicPadItem)rfw2);
 
                 if (rfw2.Genau_eine_Zeile) {
                     var cx = new FileBrowser();
@@ -148,52 +100,8 @@ namespace BlueControls.ItemCollection {
         //public EditFieldPadItem(Bitmap? bmp) : this(string.Empty, bmp, Size.Empty) { }
         public override List<GenericControl> GetStyleOptions() {
             List<GenericControl> l = new();
-
-            l.Add(new FlexiControlForProperty<string>(() => Datenquelle_wählen, ImageCode.Pfeil_Rechts));
-            //l.Add(new FlexiControlForProperty<string>(() => Datenbank));
+            l.AddRange(base.GetStyleOptions());
             l.Add(new FlexiControlForProperty<string>(() => Pfad));
-            //l.Add(new FlexiControlForProperty<string>(() => Interner_Name));
-            //l.Add(new FlexiControlForProperty<string>(() => Spalte_bearbeiten, ImageCode.Spalte));
-            //l.Add(new FlexiControl());
-
-            //var u = new ItemCollection.ItemCollectionList.ItemCollectionList();
-            //u.AddRange(typeof(ÜberschriftAnordnung));
-            //l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
-            //var b = new ItemCollection.ItemCollectionList.ItemCollectionList();
-            //b.AddRange(typeof(EditTypeFormula));
-            //l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
-            //l.Add(new FlexiControlForProperty<string>(() => Standardhöhe, ImageCode.GrößeÄndern));
-            //l.Add(new FlexiControlForProperty<string>(() => Breite_Berechnen, ImageCode.GrößeÄndern));
-            //l.Add(new FlexiControl());
-            //l.Add(new FlexiControlForProperty<string>(() => Spalten_QuickInfo, 5));
-            //l.Add(new FlexiControlForProperty<string>(() => Spalten_AdminInfo, 5));
-            //l.Add(new FlexiControl());
-
-            //if(_getValueFrom != null && _getValueFrom.Database is Database db) {
-            //      foreach(var thisC in db) {
-            //          s
-            //      }
-
-            //  }
-
-            //{
-            //    new FlexiControlForProperty(()=> this.Bildschirmbereich_wählen", ImageCode.Bild),
-            //    new FlexiControlForProperty(()=> this.Datei_laden", ImageCode.Ordner),
-            //    new FlexiControl(),
-            //    new FlexiControlForProperty(()=> this.Platzhalter_für_Layout", 2),
-            //    new FlexiControl()
-            //};
-            //ItemCollectionList.ItemCollectionList comms = new()
-            //{
-            //    { "Abschneiden", ((int)enSizeModes.BildAbschneiden).ToString(), QuickImage.Get("BildmodusAbschneiden|32") },
-            //    { "Verzerren", ((int)enSizeModes.Verzerren).ToString(), QuickImage.Get("BildmodusVerzerren|32") },
-            //    { "Einpassen", ((int)enSizeModes.EmptySpace).ToString(), QuickImage.Get("BildmodusEinpassen|32") }
-            //};
-            //l.Add(new FlexiControlForProperty(()=> this.Bild-Modus", comms));
-            //l.Add(new FlexiControl());
-            //AddLineStyleOption(l);
-            //l.Add(new FlexiControlForProperty(()=> this.Hintergrund_weiß_füllen"));
-            //l.AddRange(base.GetStyleOptions());
             return l;
         }
 
@@ -207,10 +115,6 @@ namespace BlueControls.ItemCollection {
         public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
             switch (tag) {
-                case "getvaluefrom":
-                    GetRowFrom = (ICalculateRowsItemLevel)Parent[value.FromNonCritical()];
-                    return true;
-
                 case "pfad":
                     _pfad = value.FromNonCritical();
                     return true;
@@ -241,10 +145,6 @@ namespace BlueControls.ItemCollection {
         public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
-
-            if (GetRowFrom != null) {
-                t = t + "GetValueFrom=" + GetRowFrom.Internal.ToNonCritical() + ", ";
-            }
 
             t = t + "Pfad=" + _pfad.ToNonCritical() + ", ";
 
@@ -391,14 +291,6 @@ namespace BlueControls.ItemCollection {
                 return new EditFieldPadItem(name);
             }
             return null;
-        }
-
-        private void RepairConnections() {
-            ConnectsTo.Clear();
-
-            if (GetRowFrom != null) {
-                ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, (BasicPadItem)GetRowFrom, ConnectionType.Bottom, false));
-            }
         }
 
         #endregion

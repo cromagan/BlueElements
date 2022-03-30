@@ -27,6 +27,7 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Windows.Media.Converters;
 using static BlueBasics.Develop;
 using static BlueBasics.FileOperations;
 using static BlueBasics.Converter;
@@ -150,6 +151,24 @@ namespace BlueControls.Forms {
             }
         }
 
+        protected override void CheckButtons() {
+            base.CheckButtons();
+            var datenbankDa = Convert.ToBoolean(Table.Database != null);
+            btnNeu.Enabled = datenbankDa && _ansicht == Ansicht.Überschriften_und_Formular && Table.Database.PermissionCheck(Table.Database.PermissionGroupsNewRow, null);
+            btnLoeschen.Enabled = datenbankDa;
+            Ansicht0.Enabled = datenbankDa;
+            Ansicht1.Enabled = datenbankDa;
+            Ansicht2.Enabled = datenbankDa;
+
+            SuchenUndErsetzen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
+            AngezeigteZeilenLöschen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
+            Datenüberprüfung.Enabled = datenbankDa;
+            btnVorwärts.Enabled = datenbankDa;
+            btnZurück.Enabled = datenbankDa;
+            such.Enabled = datenbankDa;
+            FilterLeiste.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
+        }
+
         protected override void OnLoad(System.EventArgs e) {
             base.OnLoad(e);
             CaptionAnzeige();
@@ -195,23 +214,6 @@ namespace BlueControls.Forms {
         }
 
         private void Check_SuchButton() => SuchB.Enabled = Table.Database != null && Table.Database.Row.Count >= 1 && !string.IsNullOrEmpty(such.Text) && !string.IsNullOrEmpty(such.Text.RemoveChars(" "));
-
-        private void CheckButtons() {
-            var datenbankDa = Convert.ToBoolean(Table.Database != null);
-            btnNeu.Enabled = datenbankDa && _ansicht == Ansicht.Überschriften_und_Formular && Table.Database.PermissionCheck(Table.Database.PermissionGroupsNewRow, null);
-            btnLoeschen.Enabled = datenbankDa;
-            Ansicht0.Enabled = datenbankDa;
-            Ansicht1.Enabled = datenbankDa;
-            Ansicht2.Enabled = datenbankDa;
-
-            SuchenUndErsetzen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
-            AngezeigteZeilenLöschen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
-            Datenüberprüfung.Enabled = datenbankDa;
-            btnVorwärts.Enabled = datenbankDa;
-            btnZurück.Enabled = datenbankDa;
-            such.Enabled = datenbankDa;
-            FilterLeiste.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
-        }
 
         private void Datenüberprüfung_Click(object sender, System.EventArgs e) => Table.Database.Row.DoAutomatic(Table.Filter, true, Table.PinnedRows, "manual check");
 

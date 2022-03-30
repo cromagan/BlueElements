@@ -88,17 +88,17 @@ namespace BlueBasics {
             if (radius > (width / 2.0) + 2) { radius = (int)(width / 2.0) + 2; }
 
             tempPolyRoundRec.AddLine(x + radius, y, x + width - radius, y);
-            if (radius > 0) { AddRad90(x + width - radius, y, radius, 270); }
+            if (radius > 0) { AddRad90(x + width - radius, y, 270); }
             tempPolyRoundRec.AddLine(x + width, y + radius, x + width, y + height - radius);
-            if (radius > 0) { AddRad90(x + width - radius, y + height - radius, radius, 0); }
+            if (radius > 0) { AddRad90(x + width - radius, y + height - radius, 0); }
             tempPolyRoundRec.AddLine(x + width - radius, y + height, x + radius, y + height);
-            if (radius > 0) { AddRad90(x, y + height - radius, radius, 90); }
+            if (radius > 0) { AddRad90(x, y + height - radius, 90); }
             tempPolyRoundRec.AddLine(x, y + height - radius, x, y + radius);
-            if (radius > 0) { AddRad90(x, y, radius, 180); }
+            if (radius > 0) { AddRad90(x, y, 180); }
             tempPolyRoundRec.CloseFigure();
             return tempPolyRoundRec;
 
-            void AddRad90(int mxX, int mxY, int radius, int gradStart) {
+            void AddRad90(int mxX, int mxY, int gradStart) {
                 tempPolyRoundRec.AddArc(mxX, mxY, radius, radius, gradStart, 90);
             }
         }

@@ -235,7 +235,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public SizeF SheetSizeInPix => new SizeF(_prRu.X - _prLo.X, _prRu.Y - _prLo.Y);
+        public SizeF SheetSizeInPix => new(_prRu.X - _prLo.X, _prRu.Y - _prLo.Y);
 
         public RowItem? SheetStyle {
             get => _sheetStyle;

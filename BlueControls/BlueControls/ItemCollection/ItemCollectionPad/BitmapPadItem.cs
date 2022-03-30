@@ -297,6 +297,7 @@ namespace BlueControls.ItemCollection {
         }
 
         private void Dispose(bool disposing) {
+            base.Dispose(disposing);
             if (!_disposedValue) {
                 if (disposing) {
                     // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
