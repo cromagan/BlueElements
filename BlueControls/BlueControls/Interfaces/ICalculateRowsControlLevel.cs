@@ -15,9 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueDatabase;
+using BlueScript;
 
 namespace BlueControls.Interfaces {
 
@@ -31,6 +34,9 @@ namespace BlueControls.Interfaces {
         #region Properties
 
         public ListExt<System.Windows.Forms.Control> Childs { get; }
+        public Database? Database { get; }
+        public bool Genau_eine_Zeile { get; set; }
+        public Script? Script { get; set; }
 
         #endregion
     }

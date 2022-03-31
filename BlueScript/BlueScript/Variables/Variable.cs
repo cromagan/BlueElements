@@ -167,7 +167,7 @@ namespace BlueScript.Variables {
         }
 
         public static Variable? GetSystem(this List<Variable> vars, string name) => vars.FirstOrDefault(thisv =>
-                                                                                    thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper());
+                                                                                      thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper());
 
         public static void RemoveWithComent(this List<Variable> vars, string coment) {
             var z = 0;
@@ -178,6 +178,13 @@ namespace BlueScript.Variables {
                     z++;
                 }
             } while (z < vars.Count);
+        }
+
+        public static string ReplaceInText(this List<Variable> vars, string originalText) {
+            foreach (var thisvar in vars) {
+                originalText = thisvar.ReplaceInText(originalText);
+            }
+            return originalText;
         }
 
         //public static void ScriptFinished(this List<Variable> vars) {

@@ -102,6 +102,7 @@ namespace BlueControls.ItemCollection {
             c.EditType = EditType;
             c.CaptionPosition = CaptionPosition;
             c.Tag = Internal;
+            c.OriginalText = _variable;
             if (GetRowFrom is ICalculateRowsItemLevel rfw2 && rfw2.Genau_eine_Zeile) {
                 var ff = parent.SearchOrGenerate((BasicPadItem)rfw2);
 
@@ -116,6 +117,10 @@ namespace BlueControls.ItemCollection {
 
         public override List<GenericControl> GetStyleOptions() {
             List<GenericControl> l = new();
+            l.AddRange(base.GetStyleOptions());
+
+            l.Add(new FlexiControlForProperty<String>(() => Überschrift));
+            l.Add(new FlexiControlForProperty<String>(() => Variable));
 
             var u = new ItemCollection.ItemCollectionList.ItemCollectionList();
             u.AddRange(typeof(ÜberschriftAnordnung));
@@ -211,7 +216,7 @@ namespace BlueControls.ItemCollection {
         //    }
         protected override BasicPadItem? TryCreate(string id, string name) {
             if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-                return new EditFieldPadItem(name);
+                return new VariableFieldPadItem(name);
             }
             return null;
         }

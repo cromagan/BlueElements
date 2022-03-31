@@ -29,11 +29,14 @@ namespace BlueControls.Forms {
             this.btnVorschauÖffnen = new BlueControls.Controls.Button();
             this.btnPfeileAusblenden = new BlueControls.Controls.Button();
             this.grpFelder = new BlueControls.Controls.GroupBox();
-            this.btnKlonZeilen = new BlueControls.Controls.Button();
-            this.btnTabControlAdd = new BlueControls.Controls.Button();
+            this.grpFileExplorer = new BlueControls.Controls.Button();
             this.btnKonstante = new BlueControls.Controls.Button();
             this.btnFeldHinzu = new BlueControls.Controls.Button();
+            this.groupBox1 = new BlueControls.Controls.GroupBox();
+            this.btnKlonZeilen = new BlueControls.Controls.Button();
             this.btnZeileHinzu = new BlueControls.Controls.Button();
+            this.grpOptik = new BlueControls.Controls.GroupBox();
+            this.btnTabControlAdd = new BlueControls.Controls.Button();
             this.tabFile = new System.Windows.Forms.TabPage();
             this.grpDatei = new BlueControls.Controls.GroupBox();
             this.btnLetzteFormulare = new BlueControls.Controls.LastFilesCombo();
@@ -43,9 +46,7 @@ namespace BlueControls.Forms {
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
             this.LoadTabDatabase = new System.Windows.Forms.OpenFileDialog();
-            this.grpOptik = new BlueControls.Controls.GroupBox();
-            this.groupBox1 = new BlueControls.Controls.GroupBox();
-            this.grpFileExplorer = new BlueControls.Controls.Button();
+            this.btnVariable = new BlueControls.Controls.Button();
             this.grpDesign.SuspendLayout();
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
@@ -53,10 +54,10 @@ namespace BlueControls.Forms {
             this.tabEditor.SuspendLayout();
             this.grpVorschau.SuspendLayout();
             this.grpFelder.SuspendLayout();
+            this.groupBox1.SuspendLayout();
+            this.grpOptik.SuspendLayout();
             this.tabFile.SuspendLayout();
             this.grpDatei.SuspendLayout();
-            this.grpOptik.SuspendLayout();
-            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabRightSide
@@ -112,7 +113,7 @@ namespace BlueControls.Forms {
             this.grpVorschau.Controls.Add(this.btnPfeileAusblenden);
             this.grpVorschau.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpVorschau.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpVorschau.Location = new System.Drawing.Point(488, 0);
+            this.grpVorschau.Location = new System.Drawing.Point(544, 0);
             this.grpVorschau.Name = "grpVorschau";
             this.grpVorschau.Size = new System.Drawing.Size(160, 81);
             this.grpVorschau.TabIndex = 1;
@@ -145,6 +146,7 @@ namespace BlueControls.Forms {
             // grpFelder
             // 
             this.grpFelder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpFelder.Controls.Add(this.btnVariable);
             this.grpFelder.Controls.Add(this.grpFileExplorer);
             this.grpFelder.Controls.Add(this.btnKonstante);
             this.grpFelder.Controls.Add(this.btnFeldHinzu);
@@ -152,36 +154,21 @@ namespace BlueControls.Forms {
             this.grpFelder.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpFelder.Location = new System.Drawing.Point(256, 0);
             this.grpFelder.Name = "grpFelder";
-            this.grpFelder.Size = new System.Drawing.Size(232, 81);
+            this.grpFelder.Size = new System.Drawing.Size(288, 81);
             this.grpFelder.TabIndex = 0;
             this.grpFelder.TabStop = false;
             this.grpFelder.Text = "Felder";
             // 
-            // btnKlonZeilen
+            // grpFileExplorer
             // 
-            this.btnKlonZeilen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnKlonZeilen.ImageCode = "Zeile|16|||ffff00||||||PlusZeichen";
-            this.btnKlonZeilen.Location = new System.Drawing.Point(80, 2);
-            this.btnKlonZeilen.Name = "btnKlonZeilen";
-            this.btnKlonZeilen.QuickInfo = "Fügt eine Zeile einer  Datenbank hinhzu.\r\nAus dieser könne Felder extrahiert werd" +
-    "en.";
-            this.btnKlonZeilen.Size = new System.Drawing.Size(72, 66);
-            this.btnKlonZeilen.TabIndex = 4;
-            this.btnKlonZeilen.Text = "Klon-Zeile(n) hinzufügen";
-            this.btnKlonZeilen.Click += new System.EventHandler(this.btnKlonZeilen_Click);
-            // 
-            // btnTabControlAdd
-            // 
-            this.btnTabControlAdd.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnTabControlAdd.ImageCode = "Bruchlinie|16|||||||||PlusZeichen";
-            this.btnTabControlAdd.Location = new System.Drawing.Point(8, 2);
-            this.btnTabControlAdd.Name = "btnTabControlAdd";
-            this.btnTabControlAdd.QuickInfo = "Fügt ein Steuerelement mit\r\nRegisterkarten hinzu.\r\nPro Registerkarte kann ein \r\nU" +
-    "nterformular gewählt werden.";
-            this.btnTabControlAdd.Size = new System.Drawing.Size(64, 66);
-            this.btnTabControlAdd.TabIndex = 3;
-            this.btnTabControlAdd.Text = "Register hinzufügen";
-            this.btnTabControlAdd.Click += new System.EventHandler(this.btnTabControlAdd_Click);
+            this.grpFileExplorer.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.grpFileExplorer.ImageCode = "Ordner|16|||||||||PlusZeichen";
+            this.grpFileExplorer.Location = new System.Drawing.Point(200, 2);
+            this.grpFileExplorer.Name = "grpFileExplorer";
+            this.grpFileExplorer.Size = new System.Drawing.Size(80, 66);
+            this.grpFileExplorer.TabIndex = 3;
+            this.grpFileExplorer.Text = "Verz.-Ansicht hinzufügen";
+            this.grpFileExplorer.Click += new System.EventHandler(this.grpFileExplorer_Click);
             // 
             // btnKonstante
             // 
@@ -208,6 +195,33 @@ namespace BlueControls.Forms {
             this.btnFeldHinzu.Text = "Feld hinzufügen";
             this.btnFeldHinzu.Click += new System.EventHandler(this.btnFeldHinzu_Click);
             // 
+            // groupBox1
+            // 
+            this.groupBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.groupBox1.Controls.Add(this.btnKlonZeilen);
+            this.groupBox1.Controls.Add(this.btnZeileHinzu);
+            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Left;
+            this.groupBox1.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
+            this.groupBox1.Location = new System.Drawing.Point(80, 0);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(176, 81);
+            this.groupBox1.TabIndex = 3;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Zeilen-Berechnung";
+            // 
+            // btnKlonZeilen
+            // 
+            this.btnKlonZeilen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnKlonZeilen.ImageCode = "Zeile|16|||ffff00||||||PlusZeichen";
+            this.btnKlonZeilen.Location = new System.Drawing.Point(80, 2);
+            this.btnKlonZeilen.Name = "btnKlonZeilen";
+            this.btnKlonZeilen.QuickInfo = "Fügt eine Zeile einer  Datenbank hinhzu.\r\nAus dieser könne Felder extrahiert werd" +
+    "en.";
+            this.btnKlonZeilen.Size = new System.Drawing.Size(72, 66);
+            this.btnKlonZeilen.TabIndex = 4;
+            this.btnKlonZeilen.Text = "Klon-Zeile(n) hinzufügen";
+            this.btnKlonZeilen.Click += new System.EventHandler(this.btnKlonZeilen_Click);
+            // 
             // btnZeileHinzu
             // 
             this.btnZeileHinzu.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
@@ -220,6 +234,32 @@ namespace BlueControls.Forms {
             this.btnZeileHinzu.Text = "Zeile(n) hinzufügen";
             this.btnZeileHinzu.Click += new System.EventHandler(this.btnZeileHinzu_Click);
             // 
+            // grpOptik
+            // 
+            this.grpOptik.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpOptik.Controls.Add(this.btnTabControlAdd);
+            this.grpOptik.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpOptik.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
+            this.grpOptik.Location = new System.Drawing.Point(0, 0);
+            this.grpOptik.Name = "grpOptik";
+            this.grpOptik.Size = new System.Drawing.Size(80, 81);
+            this.grpOptik.TabIndex = 2;
+            this.grpOptik.TabStop = false;
+            this.grpOptik.Text = "Optik";
+            // 
+            // btnTabControlAdd
+            // 
+            this.btnTabControlAdd.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnTabControlAdd.ImageCode = "Bruchlinie|16|||||||||PlusZeichen";
+            this.btnTabControlAdd.Location = new System.Drawing.Point(8, 2);
+            this.btnTabControlAdd.Name = "btnTabControlAdd";
+            this.btnTabControlAdd.QuickInfo = "Fügt ein Steuerelement mit\r\nRegisterkarten hinzu.\r\nPro Registerkarte kann ein \r\nU" +
+    "nterformular gewählt werden.";
+            this.btnTabControlAdd.Size = new System.Drawing.Size(64, 66);
+            this.btnTabControlAdd.TabIndex = 3;
+            this.btnTabControlAdd.Text = "Register hinzufügen";
+            this.btnTabControlAdd.Click += new System.EventHandler(this.btnTabControlAdd_Click);
+            // 
             // tabFile
             // 
             this.tabFile.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
@@ -227,7 +267,7 @@ namespace BlueControls.Forms {
             this.tabFile.Location = new System.Drawing.Point(4, 25);
             this.tabFile.Margin = new System.Windows.Forms.Padding(0);
             this.tabFile.Name = "tabFile";
-            this.tabFile.Size = new System.Drawing.Size(966, 81);
+            this.tabFile.Size = new System.Drawing.Size(876, 81);
             this.tabFile.TabIndex = 5;
             this.tabFile.Text = "Datei";
             // 
@@ -312,43 +352,16 @@ namespace BlueControls.Forms {
             this.LoadTabDatabase.Filter = "*.MDB Datenbanken|*.MDB|*.* Alle Dateien|*";
             this.LoadTabDatabase.Title = "Bitte Datenbank wählen:";
             // 
-            // grpOptik
+            // btnVariable
             // 
-            this.grpOptik.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpOptik.Controls.Add(this.btnTabControlAdd);
-            this.grpOptik.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpOptik.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpOptik.Location = new System.Drawing.Point(0, 0);
-            this.grpOptik.Name = "grpOptik";
-            this.grpOptik.Size = new System.Drawing.Size(80, 81);
-            this.grpOptik.TabIndex = 2;
-            this.grpOptik.TabStop = false;
-            this.grpOptik.Text = "Optik";
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.groupBox1.Controls.Add(this.btnKlonZeilen);
-            this.groupBox1.Controls.Add(this.btnZeileHinzu);
-            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.groupBox1.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.groupBox1.Location = new System.Drawing.Point(80, 0);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(176, 81);
-            this.groupBox1.TabIndex = 3;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Zeilen-Berechnung";
-            // 
-            // grpFileExplorer
-            // 
-            this.grpFileExplorer.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.grpFileExplorer.ImageCode = "Ordner|16|||||||||PlusZeichen";
-            this.grpFileExplorer.Location = new System.Drawing.Point(136, 2);
-            this.grpFileExplorer.Name = "grpFileExplorer";
-            this.grpFileExplorer.Size = new System.Drawing.Size(80, 66);
-            this.grpFileExplorer.TabIndex = 3;
-            this.grpFileExplorer.Text = "Verz.-Ansicht hinzufügen";
-            this.grpFileExplorer.Click += new System.EventHandler(this.grpFileExplorer_Click);
+            this.btnVariable.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnVariable.ImageCode = "Variable|16|||||||||PlusZeichen";
+            this.btnVariable.Location = new System.Drawing.Point(136, 2);
+            this.btnVariable.Name = "btnVariable";
+            this.btnVariable.Size = new System.Drawing.Size(64, 66);
+            this.btnVariable.TabIndex = 4;
+            this.btnVariable.Text = "Variablenf. hinzufügen";
+            this.btnVariable.Click += new System.EventHandler(this.btnVariable_Click);
             // 
             // ConnectedFormulaEditor
             // 
@@ -365,10 +378,10 @@ namespace BlueControls.Forms {
             this.tabEditor.ResumeLayout(false);
             this.grpVorschau.ResumeLayout(false);
             this.grpFelder.ResumeLayout(false);
+            this.groupBox1.ResumeLayout(false);
+            this.grpOptik.ResumeLayout(false);
             this.tabFile.ResumeLayout(false);
             this.grpDatei.ResumeLayout(false);
-            this.grpOptik.ResumeLayout(false);
-            this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -397,5 +410,6 @@ namespace BlueControls.Forms {
         private Controls.Button grpFileExplorer;
         private Controls.GroupBox groupBox1;
         private Controls.GroupBox grpOptik;
+        private Controls.Button btnVariable;
     }
 }

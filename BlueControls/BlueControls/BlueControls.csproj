@@ -129,7 +129,7 @@
       <DependentUpon>EasyPicMulti.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\FileBrowser.cs">
-      <SubType>UserControl</SubType>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\FileBrowser.Designer.cs">
       <DependentUpon>FileBrowser.cs</DependentUpon>
@@ -317,10 +317,10 @@
     <Compile Include="frmBefehlsreferenz.Designer.cs">
       <DependentUpon>frmBefehlsreferenz.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interfaces\IAcceptVariableList.cs" />
     <Compile Include="Interfaces\IDisabledReason.cs" />
     <Compile Include="Interfaces\IAcceptMultipleRows.cs" />
     <Compile Include="Interfaces\ICalculateRowsControlLevel.cs" />
-    <Compile Include="Interfaces\IConnectionAttributes.cs" />
     <Compile Include="Interfaces\IAcceptItemsForSelect.cs" />
     <Compile Include="Interfaces\ICalculateRowsItemLevel.cs" />
     <Compile Include="Interfaces\IContenHolder.cs" />
@@ -359,6 +359,11 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="clsDesign.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="ScriptEditor.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -843,6 +848,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmBefehlsreferenz.resx">
       <DependentUpon>frmBefehlsreferenz.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="ScriptEditor.resx">
       <DependentUpon>ScriptEditor.cs</DependentUpon>

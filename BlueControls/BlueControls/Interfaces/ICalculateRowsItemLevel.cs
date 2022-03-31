@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics.Interfaces;
 using BlueDatabase;
 
@@ -37,8 +39,8 @@ namespace BlueControls.Interfaces {
         /// </summary>
         public int Id { get; set; }
 
-        public string Internal { get; }
-
         #endregion
+
+        //public string Internal { get; }
     }
 }

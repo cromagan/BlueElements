@@ -43,16 +43,19 @@ using BlueControls.ItemCollection.ItemCollectionList;
 
 using CryptoExplorer;
 using static BlueBasics.BitmapExt;
+using BlueControls.Interfaces;
+using BlueScript.Variables;
+using System.Drawing.Imaging;
 
 namespace BlueControls.Controls {
 
-    public partial class FileBrowser : UserControl {
-
+    public partial class FileBrowser : GenericControl, IAcceptVariableList//UserControl //
+                                                  {
         #region Fields
 
         private string _ausschneiden = string.Empty;
-
         private bool _isLoading = false;
+        private string _originalText = string.Empty;
 
         #endregion
 
@@ -66,7 +69,32 @@ namespace BlueControls.Controls {
 
         #region Properties
 
-        public string Sorierung { get; set; }
+        public new bool Enabled {
+            get => base.Enabled; set {
+                base.Enabled = value;
+
+                CheckButtons();
+            }
+        }
+
+        public string OriginalText {
+            get => _originalText;
+            set {
+                _originalText = value;
+                CheckButtons();
+            }
+        }
+
+        public string Pfad {
+            get => txbPfad.Text;
+            set {
+                txbPfad.Text = value;
+                txbPfad_Enter(null, null);
+                CheckButtons();
+            }
+        }
+
+        public string Sorierung { get; set; } = "Name";
 
         #endregion
 
@@ -89,6 +117,18 @@ namespace BlueControls.Controls {
             exekey = exekey.OpenSubKey("command");
 
             return exekey.GetValue("").ToString();
+        }
+
+        public bool ParseVariables(List<Variable> list) {
+            var ct = list.ReplaceInText(OriginalText);
+
+           Pfad = ct;
+
+            return ct == OriginalText;
+        }
+
+        protected override void DrawControl(Graphics gr, States state) {
+            Skin.Draw_Back_Transparent(gr, ClientRectangle, this);
         }
 
         private void AbortThumbs() {
@@ -114,6 +154,67 @@ namespace BlueControls.Controls {
             //if (Path.EndsWith("\\Dokumente und Einstellungen\\")) { return false; }
 
             return true;
+        }
+
+        private void btnAddScreenShot_Click(object sender, System.EventArgs e) {
+            //if (!kommissionOK || !belegOK) { return; }
+            //var fil = Allgemein.KommissionsDaten.StandardPfad(enFilePath.OrderOrQuotationWithBeleg, beleg, position, k995_U11, index, belegOK, kommissionOK);
+            //if (!PathExists(fil)) { fil = GetUserPfad(); }
+            //if (!PathExists(fil)) {
+            //    Notification.Show("Pfad nicht gefunden!");
+            //    return;
+            //}
+            var i = ScreenShot.GrabArea(null);
+            //    var l = new List<string>
+            //    {
+            //        "01_Bürodokument",
+            //        "02_Kundenobjekte_allgemein",
+            //        "03_Kundenobjekte_Behälter",
+            //        "04_Kundenobjekte_Gebinde",
+            //        "05_Kundenobjekte_Palette",
+            //        "06_Packerdaten",
+            //        "07_Plannummer",
+            //        "08_Planausschnitt",
+            //        "09_Antriebsliste",
+            //        "20_Farbtafel_Suche",
+            //        beleg,
+            //        k995_U11,
+            //        "21_" + k995_U11.Replace("-","") + "G01",
+            //        "21_" + k995_U11.Replace("-","") + "F01",
+            //        "21_" + k995_U11.Replace("-","") + "T01",
+            //        "96_Konditionen",
+            //        "97_DQP",
+            //        "98_Angebotstext",
+            //        "99_Wandlungstext"
+            //};
+            //var Datei = InputBoxComboStyle.Show("Dateiname:", l, true);
+            //if (string.IsNullOrEmpty(Datei)) {
+            //    i.Dispose();
+            //    CollectGarbage();
+            //    MessageBox.Show("Bild nicht gespeichert.", ImageCode.Information, "OK");
+            //    return;
+            //}
+            //var gr = Graphics.FromImage(i);
+            //gr.InterpolationMode = InterpolationMode.Low;
+            //var s = k995_U11 + " - " + beleg + " - " + kundenname;
+            //for (var x = 0; x <= 2; x++) {
+            //    for (var y = 0; y <= 2; y++) {
+            //        BlueFont.DrawString(gr, s, new Font("Arial", 10), Brushes.White, x, y);
+            //    }
+            //}
+            //BlueFont.DrawString(gr, s, new Font("Arial", 10), Brushes.Red, 1, 1);
+            //gr.Dispose();
+            var dateiPNG = TempFile(txbPfad.Text.TrimEnd("\\"), "Screenshot " + DateTime.Now.ToString(Constants.Format_Date4), "PNG");
+            i.Save(dateiPNG, ImageFormat.Png);
+            i.Dispose();
+            CollectGarbage();
+            txbPfad_Enter(null, null);
+        }
+
+        private void CheckButtons() {
+            txbPfad.Enabled = Enabled && string.IsNullOrEmpty(OriginalText);
+            lsbFiles.Enabled = Enabled;
+            btnAddScreenShot.Enabled = PathExists(txbPfad.Text);
         }
 
         //private string ChangeFile(string filename, bool shoudbeCrypted) {
@@ -162,7 +263,7 @@ namespace BlueControls.Controls {
             e.UserMenu.Add(ContextMenuComands.Ausschneiden, !tags.TagGet("Folder").FromPlusMinus());
             e.UserMenu.Add(ContextMenuComands.Einfügen, tags.TagGet("CryptetFolder").FromPlusMinus() && !string.IsNullOrEmpty(_ausschneiden));
             e.UserMenu.AddSeparator();
-            e.UserMenu.Add(ContextMenuComands.Umbenennen, FileExists(it.Internal));
+            //e.UserMenu.Add(ContextMenuComands.Umbenennen, FileExists(it.Internal));
             e.UserMenu.Add(ContextMenuComands.Löschen, FileExists(it.Internal));
             e.UserMenu.AddSeparator();
 
@@ -192,7 +293,7 @@ namespace BlueControls.Controls {
                     ExecuteFile(it.Internal);
                     break;
 
-                case "Umbenennen":
+                    //case "Umbenennen":
 
                     //var n = tags.TagGet("UncryptetName");
 
@@ -389,18 +490,14 @@ namespace BlueControls.Controls {
         }
 
         private void ThumbGenerator_DoWork(object sender, DoWorkEventArgs e) {
-            //ThumbGenerator.SetApartmentState
-
             var newPath = txbPfad.Text.Trim("\\") + "\\";
             if (!PathExists(newPath)) { return; }
-
-            string rEadable;
 
             var allF = Directory.GetFiles(newPath, "*", SearchOption.TopDirectoryOnly);
 
             if (ThumbGenerator.CancellationPending) { return; }
 
-            foreach (var thisString in allF) {
+            Parallel.ForEach(allF, thisString => {
                 if (ThumbGenerator.CancellationPending) { return; }
                 if (AddThis(thisString, true)) // Prüfung 1, ob .cyo und auch unverschlüsselte
                 {
@@ -410,7 +507,7 @@ namespace BlueControls.Controls {
                     feedBack.Add(WindowsThumbnailProvider.GetThumbnail(thisString, 64, 64, ThumbnailOptions.BiggerSizeOk));
                     ThumbGenerator.ReportProgress(0, feedBack);
                 }
-            }
+            });
         }
 
         private void ThumbGenerator_ProgressChanged(object sender, ProgressChangedEventArgs e) {
@@ -423,6 +520,7 @@ namespace BlueControls.Controls {
 
             if (gb.Count == 2) {
                 bItem.Bitmap = (Bitmap)gb[1];
+                lsbFiles.Invalidate();
                 return;
             }
 

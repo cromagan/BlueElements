@@ -33,12 +33,13 @@ using System.Drawing;
 using System.Windows.Forms;
 using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
+using BlueScript.Variables;
 
 namespace BlueControls.Controls {
 
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ValueChanged")]
-    public partial class FlexiControl : GenericControl, IBackgroundNone, IInputFormat, ITranslateable, IAcceptItemsForSelect {
+    public partial class FlexiControl : GenericControl, IBackgroundNone, IInputFormat, ITranslateable, IAcceptItemsForSelect, IAcceptVariableList {
 
         #region Fields
 
@@ -252,6 +253,8 @@ namespace BlueControls.Controls {
             }
         }
 
+        public string OriginalText { get; set; } = string.Empty;
+
         [Browsable(false)]
         [DefaultValue("")]
         public string Prefix { get; set; } = string.Empty;
@@ -333,6 +336,12 @@ namespace BlueControls.Controls {
 
         public void DeleteValue() {
             ValueSet(string.Empty, true, true);
+        }
+
+        public bool ParseVariables(List<Variable> list) {
+            var ct = list.ReplaceInText(OriginalText);
+            ValueSet(ct, true, true);
+            return ct == OriginalText;
         }
 
         public void StyleComboBox(ItemCollectionList? list, ComboBoxStyle style, bool removevalueIfNotExists) {

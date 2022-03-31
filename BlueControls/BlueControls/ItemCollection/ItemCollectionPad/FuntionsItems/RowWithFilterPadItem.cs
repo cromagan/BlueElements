@@ -35,7 +35,7 @@ using BlueControls.ConnectedFormula;
 
 namespace BlueControls.ItemCollection {
 
-    public class RowWithFilterPaditem : FixedRectanglePadItem, IReadableText, IAcceptAndSends, ICalculateRowsItemLevel, IItemToControl, IConnectionAttributes {
+    public class RowWithFilterPaditem : FixedRectanglePadItem, IReadableText, IAcceptAndSends, ICalculateRowsItemLevel, IItemToControl {
 
         #region Fields
 
@@ -135,7 +135,7 @@ namespace BlueControls.ItemCollection {
         #region Methods
 
         public Control? CreateControl(ConnectedFormulaView parent) {
-            var c = new Connector(this, _VerbindungsID);
+            var c = new Connector(_VerbindungsID, Database, Genau_eine_Zeile, this.Parent, FilterDefiniton);
             c.Tag = Internal;
             return c;
         }

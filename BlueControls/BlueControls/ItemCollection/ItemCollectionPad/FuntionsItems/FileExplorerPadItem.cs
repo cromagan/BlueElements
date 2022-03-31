@@ -81,6 +81,7 @@ namespace BlueControls.ItemCollection {
                     //cx.ColumnKey = Column.Key;
                     //cx.EditType = EditType;
                     //cx.CaptionPosition = CaptionPosition;
+                    cx.OriginalText = Pfad;
                     cx.Tag = Internal;
                     if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(cx); }
                     return cx;
@@ -289,7 +290,7 @@ namespace BlueControls.ItemCollection {
         //    }
         protected override BasicPadItem? TryCreate(string id, string name) {
             if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-                return new EditFieldPadItem(name);
+                return new FileExplorerPadItem(name);
             }
             return null;
         }

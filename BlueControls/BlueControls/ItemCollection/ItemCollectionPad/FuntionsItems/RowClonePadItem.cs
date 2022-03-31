@@ -36,7 +36,7 @@ using BlueControls.ConnectedFormula;
 
 namespace BlueControls.ItemCollection {
 
-    public class RowClonePadItem : FixedRectanglePadItem, IReadableText, IAcceptAndSends, ICalculateRowsItemLevel, IItemToControl, IConnectionAttributes {
+    public class RowClonePadItem : FixedRectanglePadItem, IReadableText, IAcceptAndSends, ICalculateRowsItemLevel, IItemToControl {
 
         #region Fields
 
@@ -44,6 +44,7 @@ namespace BlueControls.ItemCollection {
         public static BlueFont? ChapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard);
         public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
 
+        public ItemCollectionPad? Parent;
         private bool _genau_eine_Zeile = true;
 
         private string _VerbindungsID = string.Empty;
@@ -109,7 +110,7 @@ namespace BlueControls.ItemCollection {
         #region Methods
 
         public Control? CreateControl(ConnectedFormulaView parent) {
-            var c = new RowCloner(this);
+            var c = new RowCloner(Database, Genau_eine_Zeile, VerbindungsID);
             c.Tag = Internal;
             return c;
         }

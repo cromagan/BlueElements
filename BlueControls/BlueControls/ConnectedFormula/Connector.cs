@@ -26,6 +26,7 @@ using BlueControls.ItemCollection;
 using BlueControls.Controls;
 using BlueDatabase.Enums;
 using BlueControls.Interfaces;
+using BlueScript;
 
 namespace BlueControls.ConnectedFormula {
 
@@ -35,17 +36,25 @@ namespace BlueControls.ConnectedFormula {
 
         public static readonly List<Connector> AllConnectors = new();
         public readonly string VerbindungsId = string.Empty;
+        public ItemCollectionPad? ParentCol;
         private readonly ListExt<System.Windows.Forms.Control> _parents = new();
-        private readonly RowWithFilterPaditem _rwf;
+
+        //private readonly RowWithFilterPaditem _rwf;
         private bool _disposing = false;
+
+        private Database _FilterDefiniton;
         private List<RowItem>? _rows;
 
         #endregion
 
         #region Constructors
 
-        public Connector(RowWithFilterPaditem rwf, string verbindungsId) {
-            _rwf = rwf;
+        public Connector(string verbindungsId, Database? database, bool genaueinezeile, ItemCollectionPad parent, Database filterdef) {
+            //_rwf = rwf;
+            ParentCol = parent;
+            Database = database;
+            _FilterDefiniton = filterdef;
+            Genau_eine_Zeile = genaueinezeile;
             VerbindungsId = verbindungsId;
 
             if (!string.IsNullOrEmpty(verbindungsId)) {
@@ -63,27 +72,38 @@ namespace BlueControls.ConnectedFormula {
         #region Properties
 
         public ListExt<System.Windows.Forms.Control> Childs { get; } = new();
+        public Database? Database { get; }
+        public bool Genau_eine_Zeile { get; set; }
+        public Script? Script { get; set; }
 
         #endregion
 
         #region Methods
 
-        public static void DoChilds(List<RowItem>? rows, ListExt<System.Windows.Forms.Control> childs, IConnectionAttributes rwf) {
+        public static void DoChilds(ICalculateRowsControlLevel con, List<RowItem>? rows, ItemCollectionPad? parent) {
             //if (_disposing || IsDisposed) { return; }
 
-            foreach (var thischild in childs) {
+            foreach (var thischild in con.Childs) {
                 var did = false;
 
+                if (!did && thischild is IAcceptVariableList rv) {
+                    if (con.Genau_eine_Zeile && rv.OriginalText.Contains("~") && con.Script == null && rows.Count == 1) {
+                        (_, _, con.Script) = rows[0].DoAutomatic("to be sure");
+                    }
+
+                    did = DoChilds_VariableList(rv, con.Script, rows, con.Database, con.Genau_eine_Zeile);
+                }
+
                 if (!did && thischild is IAcceptMultipleRows rc) {
-                    did = DoChilds_MultipleRows(rc, rows, rwf);
+                    did = DoChilds_MultipleRows(rc, rows, con.Database, con.Genau_eine_Zeile);
                 }
 
                 if (!did && thischild is IAcceptRowKey fcfc) {
-                    did = DoChilds_OneRowKey(fcfc, rows, rwf);
+                    did = DoChilds_OneRowKey(fcfc, rows, con.Database, con.Genau_eine_Zeile);
                 }
 
                 if (!did && thischild is IAcceptItemsForSelect fc) {
-                    did = DoChilds_ListItems(fc, rows, rwf);
+                    did = DoChilds_ListItems(fc, rows, con.Genau_eine_Zeile, parent);
                 }
 
                 if (thischild is IDisabledReason id) {
@@ -106,12 +126,12 @@ namespace BlueControls.ConnectedFormula {
                 AllConnectors.Remove(this);
 
                 Tag = null;
-                _rwf.Changed -= _rwf_Changed;
 
                 _disposing = true;
                 Childs.Clear();
                 _parents.Clear();
                 _rows = null;
+                ParentCol = null;
 
                 Childs.ItemAdded -= Childs_ItemAdded;
                 _parents.ItemAdded -= Parents_ItemAdded;
@@ -122,23 +142,23 @@ namespace BlueControls.ConnectedFormula {
         protected override void OnParentChanged(System.EventArgs e) {
             base.OnParentChanged(e);
 
-            _rwf.Changed += _rwf_Changed;
             Childs.ItemAdded += Childs_ItemAdded;
             _parents.ItemAdded += Parents_ItemAdded;
             _parents.ItemRemoving += Parents_ItemRemoving;
 
-            _rwf_Changed(null, System.EventArgs.Empty);
+            GetParentsList();
+            CalculateRows();
         }
 
-        private static bool DoChilds_ListItems(IAcceptItemsForSelect fc, List<RowItem>? rows, IConnectionAttributes attributes) {
+        private static bool DoChilds_ListItems(IAcceptItemsForSelect fc, List<RowItem>? rows, bool genaueinezeile, ItemCollectionPad? parent) {
             // Dropdownmenü mehrerer Einträge
-            if (attributes.Genau_eine_Zeile) { return false; }
+            if (genaueinezeile) { return false; }
 
             // Wie lautet der eigene Ursprüngliche Name, von dem das FlexControl abstammt
             var id = (string)fc.Tag;
 
             // Sich selbst suchen - also, das Original Item. Das Parent hier ist die PadCollection
-            var efpi = attributes.Parent[id];
+            var efpi = parent[id];
 
             if (efpi is not EditFieldPadItem epfi2) { return false; }
 
@@ -154,10 +174,10 @@ namespace BlueControls.ConnectedFormula {
             return true;
         }
 
-        private static bool DoChilds_MultipleRows(IAcceptMultipleRows fcfc, List<RowItem>? rows, IConnectionAttributes attributes) {
+        private static bool DoChilds_MultipleRows(IAcceptMultipleRows fcfc, List<RowItem>? rows, Database? database, bool genaueinezeile) {
             // Normales Zellenfeld
-            if (attributes.Genau_eine_Zeile) {
-                fcfc.Database = attributes.Database;
+            if (!genaueinezeile) {
+                fcfc.Database = database;
                 fcfc.Rows.Clear();
                 fcfc.Rows.AddRange(rows);
                 return true;
@@ -166,10 +186,10 @@ namespace BlueControls.ConnectedFormula {
             return false;
         }
 
-        private static bool DoChilds_OneRowKey(IAcceptRowKey fcfc, List<RowItem>? rows, IConnectionAttributes attributes) {
+        private static bool DoChilds_OneRowKey(IAcceptRowKey fcfc, List<RowItem>? rows, Database? database, bool genaueinezeile) {
             // Normales Zellenfeld
-            if (attributes.Genau_eine_Zeile) {
-                fcfc.Database = attributes.Database;
+            if (genaueinezeile) {
+                fcfc.Database = database;
 
                 if (rows != null && rows.Count == 1) {
                     fcfc.RowKey = rows[0].Key;
@@ -181,23 +201,36 @@ namespace BlueControls.ConnectedFormula {
             return false;
         }
 
-        private void _rwf_Changed(object? sender, System.EventArgs e) {
-            GetParentsList();
-            CalculateRows();
+        private static bool DoChilds_VariableList(IAcceptVariableList fcfc, Script? script, List<RowItem>? rows, Database? database, bool genaueinezeile) {
+            // Normales Zellenfeld
+            if (genaueinezeile && script != null && script.Variables != null && script.Variables.Count > 0) {
+                fcfc.ParseVariables(script.Variables);
+                //fcfc.Database = database;
+                //fcfc.Rows.Clear();
+                //fcfc.Rows.AddRange(rows);
+                return true;
+            }
+
+            return false;
         }
+
+        //private void _rwf_Changed(object? sender, System.EventArgs e) {
+        //    GetParentsList();
+        //    CalculateRows();
+        //}
 
         private void CalculateRows() {
             if (_disposing || IsDisposed) { return; }
 
             #region Filter erstellen
 
-            var f = new FilterCollection(_rwf.Database);
+            var f = new FilterCollection(Database);
 
-            foreach (var thisR in _rwf.FilterDefiniton.Row) {
+            foreach (var thisR in _FilterDefiniton.Row) {
 
                 #region Column ermitteln
 
-                var column = _rwf.Database.Column.SearchByKey(thisR.CellGetInteger("Spalte"));
+                var column = Database.Column.SearchByKey(thisR.CellGetInteger("Spalte"));
 
                 #endregion
 
@@ -226,7 +259,7 @@ namespace BlueControls.ConnectedFormula {
 
                 var value = string.Empty;
                 if (ft != FilterType.KeinFilter) {
-                    var connected = _rwf.Parent[thisR.CellGetString("suchtxt")];
+                    var connected = ParentCol[thisR.CellGetString("suchtxt")];
 
                     switch (connected) {
                         case ConstantTextPaditem ctpi:
@@ -279,24 +312,25 @@ namespace BlueControls.ConnectedFormula {
 
             #endregion
 
-            #region Zeile(n) ermitteln
+            #region Zeile(n) ermitteln und Script löschen
 
-            _rows = _rwf.Database.Row.CalculateFilteredRows(f);
+            _rows = Database.Row.CalculateFilteredRows(f);
+            Script = null;
 
             #endregion
 
-            DoChilds(_rows, Childs, _rwf);
+            DoChilds(this, _rows, ParentCol);
         }
 
         private void Childs_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
-            DoChilds(_rows, Childs, _rwf);
+            DoChilds(this, _rows, ParentCol);
         }
 
         private void GetParentsList() {
             if (_disposing || IsDisposed || Parent == null) { return; }
 
-            foreach (var thisR in _rwf.FilterDefiniton.Row) {
-                var item = _rwf.Parent[thisR.CellGetString("suchtxt")];
+            foreach (var thisR in _FilterDefiniton.Row) {
+                var item = ParentCol[thisR.CellGetString("suchtxt")];
                 if (item != null) {
                     var c = ((ConnectedFormulaView)Parent).SearchOrGenerate(item);
                     _parents.Add(c);

@@ -57,20 +57,7 @@ namespace BlueControls.ItemCollection {
 
         #region Properties
 
-        public ICalculateRowsItemLevel? GetRowFrom {
-            get => _GetValueFrom;
-
-            set {
-                if (value == _GetValueFrom) { return; }
-                _GetValueFrom = value;
-                RepairConnections();
-                OnChanged();
-            }
-        }
-
-        protected override int SaveOrder => 3;
-
-        private string Breite_Berechnen {
+        public string Breite_Berechnen {
             get => string.Empty;
             set {
                 var li = new ItemCollectionList.ItemCollectionList();
@@ -100,7 +87,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        private string Datenbank {
+        public string Datenbank {
             get {
                 if (GetRowFrom?.Database == null) { return "?"; }
 
@@ -109,7 +96,7 @@ namespace BlueControls.ItemCollection {
         }
 
         [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
-        private string Datenquelle_wählen {
+        public string Datenquelle_wählen {
             get => string.Empty;
             set {
                 var x = new ItemCollectionList.ItemCollectionList();
@@ -139,16 +126,31 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        private string Standardhöhe {
+        public ICalculateRowsItemLevel? GetRowFrom {
+            get => _GetValueFrom;
+
+            set {
+                if (value == _GetValueFrom) { return; }
+                _GetValueFrom = value;
+                RepairConnections();
+                OnChanged();
+            }
+        }
+
+        public string Standardhöhe {
             get => string.Empty;
             set {
                 var x = UsedArea;
-                x.Height = MmToPixel(ConnectedFormula.ConnectedFormula.StandardHöhe, 300);
+                var he = MmToPixel(ConnectedFormula.ConnectedFormula.StandardHöhe, 300);
+                x.Height = x.Height % he;
+                if (x.Height < he) { x.Height = he; }
                 SetCoordinates(x, true);
 
                 //OnChanged();
             }
         }
+
+        protected override int SaveOrder => 3;
 
         #endregion
 
@@ -227,13 +229,6 @@ namespace BlueControls.ItemCollection {
             }
 
             return t.Trim(", ") + "}";
-        }
-
-        protected override BasicPadItem? TryCreate(string id, string name) {
-            if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-                return new EditFieldPadItem(name);
-            }
-            return null;
         }
 
         private void RepairConnections() {

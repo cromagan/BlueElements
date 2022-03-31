@@ -49,7 +49,11 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         #region Methods
 
-        public override object Clone() => new TextListItem(Text, Internal, Symbol, IsCaption, Enabled, UserDefCompareKey);
+        public override object Clone() {
+            var l = new TextListItem(Text, Internal, Symbol, IsCaption, Enabled, UserDefCompareKey);
+            l.CloneBasicStatesFrom(this);
+            return l;
+        }
 
         public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Text.ToUpper().Contains(filterText.ToUpper());
 

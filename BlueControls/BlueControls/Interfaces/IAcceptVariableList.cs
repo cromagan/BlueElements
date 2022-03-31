@@ -15,18 +15,30 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueControls.ItemCollection;
+using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
+using BlueDatabase.Enums;
+using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace BlueControls.Interfaces {
 
-    public interface IConnectionAttributes {
+    /// <summary>
+    /// Wird verwendet, wenn das Steuerelement eine Liste von Variablen
+    /// empfangen kann und diese dann sinnvoll verarbeiten kann.
+    /// </summary>
+    public interface IAcceptVariableList {
 
         #region Properties
 
-        public Database? Database { get; set; }
-        public bool Genau_eine_Zeile { get; set; }
-        public ItemCollectionPad? Parent { get; }
+        public string OriginalText { get; set; }
+
+        #endregion
+
+        #region Methods
+
+        public bool ParseVariables(List<Variable> list);
 
         #endregion
     }

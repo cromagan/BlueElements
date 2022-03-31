@@ -106,7 +106,7 @@ namespace BlueControls.Forms {
             if (l is ICalculateRowsItemLevel ri) {
                 x.GetRowFrom = ri;
             }
-            if (l is EditFieldPadItem efi && efi.GetRowFrom != null) {
+            if (l is CustomizableShowPadItem efi && efi.GetRowFrom != null) {
                 x.GetRowFrom = efi.GetRowFrom;
             }
 
@@ -174,6 +174,22 @@ namespace BlueControls.Forms {
             Pad.AddCentered(x);
         }
 
+        private void btnVariable_Click(object sender, System.EventArgs e) {
+            var l = Pad.LastClickedItem;
+
+            var x = new VariableFieldPadItem(string.Empty);
+
+            if (l is ICalculateRowsItemLevel ri) {
+                x.GetRowFrom = ri;
+            }
+
+            if (l is CustomizableShowPadItem efi && efi.GetRowFrom != null) {
+                x.GetRowFrom = efi.GetRowFrom;
+            }
+
+            Pad.AddCentered(x);
+        }
+
         private void btnVorschauModus_CheckedChanged(object sender, System.EventArgs e) => btnPfeileAusblenden.Checked = btnVorschauModus.Checked;
 
         private void btnVorschauÖffnen_Click(object sender, System.EventArgs e) {
@@ -228,7 +244,7 @@ namespace BlueControls.Forms {
             if (l is ICalculateRowsItemLevel ri) {
                 x.GetRowFrom = ri;
             }
-            if (l is EditFieldPadItem efi && efi.GetRowFrom != null) {
+            if (l is CustomizableShowPadItem efi && efi.GetRowFrom != null) {
                 x.GetRowFrom = efi.GetRowFrom;
             }
 

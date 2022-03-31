@@ -39,7 +39,11 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         #region Methods
 
-        public override object Clone() => new LineListItem(Internal, UserDefCompareKey);
+        public override object Clone() {
+            var x = new LineListItem(Internal, UserDefCompareKey);
+            x.CloneBasicStatesFrom(this);
+            return x;
+        }
 
         public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth) => 4;
 

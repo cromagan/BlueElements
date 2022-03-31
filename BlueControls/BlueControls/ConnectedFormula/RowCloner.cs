@@ -25,6 +25,7 @@ using BlueControls.ItemCollection;
 using BlueControls.Controls;
 using BlueDatabase.Enums;
 using BlueControls.Interfaces;
+using BlueScript;
 
 namespace BlueControls.ConnectedFormula {
 
@@ -32,18 +33,22 @@ namespace BlueControls.ConnectedFormula {
 
         #region Fields
 
+        public ItemCollectionPad? ParentCol;
         private readonly ListExt<RowItem> _rows = new();
-        private readonly RowClonePadItem _rwf;
+
+        //private readonly RowClonePadItem _rwf;
         private bool _disposing = false;
 
         #endregion
 
         #region Constructors
 
-        public RowCloner(RowClonePadItem rwf) {
-            _rwf = rwf;
+        public RowCloner(Database? database, bool genaueinezeile, string verbindungsID) {
+            //_rwf = rwf;
+            Database = database;
+            Genau_eine_Zeile = genaueinezeile;
             foreach (var thisConnector in Connector.AllConnectors) {
-                if (thisConnector.VerbindungsId == rwf.VerbindungsID) {
+                if (thisConnector.VerbindungsId == verbindungsID) {
                     thisConnector.Childs.Add(this);
                 }
             }
@@ -66,8 +71,8 @@ namespace BlueControls.ConnectedFormula {
 
         public ListExt<System.Windows.Forms.Control> Childs { get; } = new();
         public Database? Database { get; set; }
-
         public string DisabledReason { get; set; }
+        public bool Genau_eine_Zeile { get; set; }
 
         public long RowKey {
             get {
@@ -84,6 +89,8 @@ namespace BlueControls.ConnectedFormula {
         }
 
         public ListExt<RowItem> Rows => _rows;
+
+        public Script? Script { get; set; }
 
         #endregion
 
@@ -106,7 +113,6 @@ namespace BlueControls.ConnectedFormula {
                 //AllConnectors.Remove(this);
 
                 Tag = null;
-                _rwf.Changed -= _rwf_Changed;
 
                 _disposing = true;
                 Childs.Clear();
@@ -125,7 +131,6 @@ namespace BlueControls.ConnectedFormula {
         protected override void OnParentChanged(System.EventArgs e) {
             base.OnParentChanged(e);
 
-            _rwf.Changed += _rwf_Changed;
             Childs.ItemAdded += Childs_ItemAdded;
             _rows.ItemAdded += _rows_ItemAdded;
             _rows.ItemRemoved += _rows_ItemRemoved;
@@ -133,19 +138,15 @@ namespace BlueControls.ConnectedFormula {
             //_parents.ItemRemoving += Parents_ItemRemoving;
 
             //_rwf_Changed(null, System.EventArgs.Empty);
-            Connector.DoChilds(_rows, Childs, _rwf);
+            Connector.DoChilds(this, _rows, ParentCol);
         }
 
         private void _rows_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
-            Connector.DoChilds(_rows, Childs, _rwf);
+            Connector.DoChilds(this, _rows, ParentCol);
         }
 
         private void _rows_ItemRemoved(object sender, System.EventArgs e) {
-            Connector.DoChilds(_rows, Childs, _rwf);
-        }
-
-        private void _rwf_Changed(object? sender, System.EventArgs e) {
-            Connector.DoChilds(_rows, Childs, _rwf);
+            Connector.DoChilds(this, _rows, ParentCol);
         }
 
         //private void CalculateRows() {
@@ -238,7 +239,7 @@ namespace BlueControls.ConnectedFormula {
         //}
 
         private void Childs_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
-            Connector.DoChilds(_rows, Childs, _rwf);
+            Connector.DoChilds(this, _rows, ParentCol);
         }
 
         #endregion
