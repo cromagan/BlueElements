@@ -33,7 +33,7 @@ using System;
 
 namespace BlueControls.ItemCollection {
 
-    public class TextPadItem : RectanglePadItem, ICanHaveColumnVariables {
+    public class TextPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
 
         #region Fields
 
@@ -158,7 +158,6 @@ namespace BlueControls.ItemCollection {
         /// <summary>
         /// Löst die angegebene Variable in _text_replaced auf, falls diese (noch) vorhanden ist.
         /// </summary>
-        /// <param name="s"></param>
         /// <param name="variable"></param>
         /// <returns></returns>
         public bool ReplaceVariable(Variable variable) {

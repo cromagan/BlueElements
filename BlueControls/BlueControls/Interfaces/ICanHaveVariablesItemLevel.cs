@@ -19,7 +19,10 @@ using BlueScript.Variables;
 
 namespace BlueControls.Interfaces {
 
-    public interface ICanHaveColumnVariables {
+    /// <summary>
+    /// Wird verwendet, wenn das PadItem mit Variablen umgehen kann und sich dadurch die Anzeige ändert.
+    /// </summary>
+    public interface ICanHaveVariablesItemLevel {
 
         #region Methods
 

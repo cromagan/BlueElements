@@ -37,7 +37,7 @@ using System.Windows.Forms;
 
 namespace BlueControls.ItemCollection {
 
-    public abstract class VariableShowPadItem : RectanglePadItem, IItemToControl {
+    public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl {
 
         #region Fields
 
@@ -49,7 +49,7 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public VariableShowPadItem(string internalname) : base(internalname) {
+        public CustomizableShowPadItem(string internalname) : base(internalname) {
             SetCoordinates(new RectangleF(0, 0, 50, 30), true);
         }
 
@@ -57,7 +57,20 @@ namespace BlueControls.ItemCollection {
 
         #region Properties
 
-        public string Breite_Berechnen {
+        public ICalculateRowsItemLevel? GetRowFrom {
+            get => _GetValueFrom;
+
+            set {
+                if (value == _GetValueFrom) { return; }
+                _GetValueFrom = value;
+                RepairConnections();
+                OnChanged();
+            }
+        }
+
+        protected override int SaveOrder => 3;
+
+        private string Breite_Berechnen {
             get => string.Empty;
             set {
                 var li = new ItemCollectionList.ItemCollectionList();
@@ -86,30 +99,6 @@ namespace BlueControls.ItemCollection {
                 //OnChanged();
             }
         }
-
-        public ICalculateRowsItemLevel? GetRowFrom {
-            get => _GetValueFrom;
-
-            set {
-                if (value == _GetValueFrom) { return; }
-                _GetValueFrom = value;
-                RepairConnections();
-                OnChanged();
-            }
-        }
-
-        public string Standardhöhe {
-            get => string.Empty;
-            set {
-                var x = UsedArea;
-                x.Height = MmToPixel(ConnectedFormula.ConnectedFormula.StandardHöhe, 300);
-                SetCoordinates(x, true);
-
-                //OnChanged();
-            }
-        }
-
-        protected override int SaveOrder => 3;
 
         private string Datenbank {
             get {
@@ -150,11 +139,61 @@ namespace BlueControls.ItemCollection {
             }
         }
 
+        private string Standardhöhe {
+            get => string.Empty;
+            set {
+                var x = UsedArea;
+                x.Height = MmToPixel(ConnectedFormula.ConnectedFormula.StandardHöhe, 300);
+                SetCoordinates(x, true);
+
+                //OnChanged();
+            }
+        }
+
         #endregion
 
         #region Methods
 
         public abstract Control? CreateControl(ConnectedFormulaView parent);
+
+        public void DrawFakeControl(RectangleF positionModified, float zoom, ÜberschriftAnordnung CaptionPosition, Graphics gr, string captiontxt) {
+            Point cap;
+            var uc = positionModified.ToRect();
+
+            switch (CaptionPosition) {
+                case ÜberschriftAnordnung.ohne:
+                    cap = new Point(-1, -1);
+                    break;
+
+                case ÜberschriftAnordnung.Links_neben_Dem_Feld:
+                    cap = new Point(0, 0);
+                    uc.X += (int)(100 * zoom);
+                    uc.Width -= (int)(100 * zoom);
+                    break;
+
+                case ÜberschriftAnordnung.Ohne_mit_Abstand:
+                    cap = new Point(-1, -1);
+                    uc.Y += (int)(19 * zoom);
+                    uc.Height -= (int)(19 * zoom);
+                    break;
+
+                case ÜberschriftAnordnung.Über_dem_Feld:
+                default:
+                    cap = new Point(0, 0);
+                    uc.Y += (int)(19 * zoom);
+                    uc.Height -= (int)(19 * zoom);
+                    break;
+            }
+
+            if (cap.X >= 0) {
+                var e = new RectangleF(positionModified.Left + cap.X * zoom, positionModified.Top + cap.Y * zoom, positionModified.Width, 16 * zoom);
+                Skin.Draw_FormatedText(gr, captiontxt + ":", null, Alignment.Top_Left, e.ToRect(), CaptionFNT.Scale(zoom), true);
+            }
+
+            if (uc.Width > 0 && uc.Height > 0) {
+                gr.DrawRectangle(new Pen(Color.Black, zoom), uc);
+            }
+        }
 
         public override List<GenericControl> GetStyleOptions() {
             List<GenericControl> l = new();

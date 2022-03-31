@@ -36,7 +36,7 @@ using BlueControls.ConnectedFormula;
 
 namespace BlueControls.ItemCollection {
 
-    public class EditFieldPadItem : VariableShowPadItem, IReadableText, IAcceptAndSends, IContentHolder, IItemToControl {
+    public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptAndSends, IContentHolder, IItemToControl {
 
         #region Fields
 
@@ -49,9 +49,7 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public EditFieldPadItem(string internalname) : base(internalname) {
-            SetCoordinates(new RectangleF(0, 0, 50, 30), true);
-        }
+        public EditFieldPadItem(string internalname) : base(internalname) { }
 
         #endregion
 
@@ -147,8 +145,6 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        protected override int SaveOrder => 3;
-
         #endregion
 
         #region Methods
@@ -208,8 +204,6 @@ namespace BlueControls.ItemCollection {
             var b = new ItemCollection.ItemCollectionList.ItemCollectionList();
             b.AddRange(typeof(EditTypeFormula));
             l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
-            l.Add(new FlexiControlForProperty<string>(() => Standardhöhe, ImageCode.GrößeÄndern));
-            l.Add(new FlexiControlForProperty<string>(() => Breite_Berechnen, ImageCode.GrößeÄndern));
             l.Add(new FlexiControl());
             l.Add(new FlexiControlForProperty<string>(() => Spalten_QuickInfo, 5));
             l.Add(new FlexiControlForProperty<string>(() => Spalten_AdminInfo, 5));
@@ -317,112 +311,9 @@ namespace BlueControls.ItemCollection {
             } else if (Column == null) {
                 Skin.Draw_FormatedText(gr, "Spalte fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), CaptionFNT.Scale(zoom), true);
             } else {
-                Point cap;
-                var uc = positionModified.ToRect();
-
-                switch (CaptionPosition) {
-                    case ÜberschriftAnordnung.ohne:
-                        cap = new Point(-1, -1);
-                        //uc = positionModified.ToRect();
-                        break;
-
-                    case ÜberschriftAnordnung.Links_neben_Dem_Feld:
-                        cap = new Point(0, 0);
-                        uc.X += (int)(100 * zoom);
-                        uc.Width -= (int)(100 * zoom);
-                        break;
-
-                    case ÜberschriftAnordnung.Ohne_mit_Abstand:
-                        cap = new Point(-1, -1);
-                        uc.Y += (int)(19 * zoom);
-                        uc.Height -= (int)(19 * zoom);
-                        break;
-
-                    case ÜberschriftAnordnung.Über_dem_Feld:
-                    default:
-                        cap = new Point(0, 0);
-                        uc.Y += (int)(19 * zoom);
-                        uc.Height -= (int)(19 * zoom);
-                        break;
-                }
-
-                if (cap.X >= 0) {
-                    var e = new RectangleF(positionModified.Left + cap.X * zoom, positionModified.Top + cap.Y * zoom, positionModified.Width, 16 * zoom);
-                    Skin.Draw_FormatedText(gr, Column.ReadableText() + ":", null, Alignment.Top_Left, e.ToRect(), CaptionFNT.Scale(zoom), true);
-                }
-
-                if (uc.Width > 0 && uc.Height > 0) {
-                    gr.DrawRectangle(new Pen(Color.Black, zoom), uc);
-                }
+                base.DrawFakeControl(positionModified, zoom, CaptionPosition, gr, Column.ReadableText());
             }
 
-            //drawingCoordinates.Inflate(-Padding, -Padding);
-            //RectangleF r1 = new(drawingCoordinates.Left + Padding, drawingCoordinates.Top + Padding,
-            //    drawingCoordinates.Width - (Padding * 2), drawingCoordinates.Height - (Padding * 2));
-            //RectangleF r2 = new();
-            //RectangleF r3 = new();
-            //if (Bitmap != null) {
-            //    r3 = new RectangleF(0, 0, Bitmap.Width, Bitmap.Height);
-            //    switch (Bild_Modus) {
-            //        case enSizeModes.Verzerren: {
-            //                r2 = r1;
-            //                break;
-            //            }
-
-            //        case enSizeModes.BildAbschneiden: {
-            //                var scale = Math.Max((drawingCoordinates.Width - (Padding * 2)) / Bitmap.Width, (drawingCoordinates.Height - (Padding * 2)) / Bitmap.Height);
-            //                var tmpw = (drawingCoordinates.Width - (Padding * 2)) / scale;
-            //                var tmph = (drawingCoordinates.Height - (Padding * 2)) / scale;
-            //                r3 = new RectangleF((Bitmap.Width - tmpw) / 2, (Bitmap.Height - tmph) / 2, tmpw, tmph);
-            //                r2 = r1;
-            //                break;
-            //            }
-            //        default: // Is = enSizeModes.WeißerRand
-            //            {
-            //                var scale = Math.Min((drawingCoordinates.Width - (Padding * 2)) / Bitmap.Width, (drawingCoordinates.Height - (Padding * 2)) / Bitmap.Height);
-            //                r2 = new RectangleF(((drawingCoordinates.Width - (Bitmap.Width * scale)) / 2) + drawingCoordinates.Left, ((drawingCoordinates.Height - (Bitmap.Height * scale)) / 2) + drawingCoordinates.Top, Bitmap.Width * scale, Bitmap.Height * scale);
-            //                break;
-            //            }
-            //    }
-            //}
-            //var trp = drawingCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
-            //gr.TranslateTransform(trp.X, trp.Y);
-            //gr.RotateTransform(-Drehwinkel);
-            //r1 = new RectangleF(r1.Left - trp.X, r1.Top - trp.Y, r1.Width, r1.Height);
-            //r2 = new RectangleF(r2.Left - trp.X, r2.Top - trp.Y, r2.Width, r2.Height);
-            //if (Hintergrund_Weiß_Füllen) {
-            //    gr.FillRectangle(Brushes.White, r1);
-            //}
-            //try {
-            //    if (Bitmap != null) {
-            //        if (forPrinting) {
-            //            gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            //            gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            //        } else {
-            //            gr.InterpolationMode = InterpolationMode.Low;
-            //            gr.PixelOffsetMode = PixelOffsetMode.HighSpeed;
-            //        }
-            //        gr.DrawImage(Bitmap, r2, r3, GraphicsUnit.Pixel);
-            //    }
-            //} catch {
-            //    Generic.CollectGarbage();
-            //}
-            //if (Stil != PadStyles.Undefiniert) {
-            //    if (Parent.SheetStyleScale > 0 && Parent.SheetStyle != null) {
-            //        gr.DrawRectangle(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(zoom * Parent.SheetStyleScale), r1);
-            //    }
-            //}
-            //foreach (var thisQi in Overlays) {
-            //    gr.DrawImage(thisQi, r2.Left + 8, r2.Top + 8);
-            //}
-            //gr.TranslateTransform(-trp.X, -trp.Y);
-            //gr.ResetTransform();
-            //if (!forPrinting) {
-            //    if (!string.IsNullOrEmpty(Platzhalter_Für_Layout)) {
-            //        Font f = new("Arial", 8);
-            //        BlueFont.DrawString(gr, Platzhalter_Für_Layout, f, Brushes.Black, drawingCoordinates.Left, drawingCoordinates.Top);
-            //    }
-            //}
             base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         }
 

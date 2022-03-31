@@ -336,7 +336,8 @@
       <DependentUpon>Notification.cs</DependentUpon>
     </Compile>
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\ChildFormulaPaditem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\VariableShowPadItem.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\CustomizableShowPadItem.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\VariableFieldPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\FileExplorerPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\EditFieldPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Abstract\FixedRectanglePadItem.cs" />
@@ -548,7 +549,7 @@
     <Compile Include="Controls\GroupBox.Designer.cs">
       <DependentUpon>GroupBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="Interfaces\ICanHaveColumnVariables.cs" />
+    <Compile Include="Interfaces\ICanHaveVariablesItemLevel.cs" />
     <Compile Include="Interfaces\IContextMenu.cs" />
     <Compile Include="Interfaces\IMouseAndKeyHandle.cs" />
     <Compile Include="ItemCollection\ItemCollectionList\Abstract\BasicListItem.cs" />

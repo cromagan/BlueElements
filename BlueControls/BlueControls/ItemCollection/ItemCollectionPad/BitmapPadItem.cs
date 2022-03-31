@@ -35,7 +35,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection {
 
-    public sealed class BitmapPadItem : RectanglePadItem, ICanHaveColumnVariables, IDisposable {
+    public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel, IDisposable {
 
         #region Fields
 

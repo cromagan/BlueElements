@@ -33,10 +33,11 @@ using BlueDatabase.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Interfaces;
 using BlueControls.ConnectedFormula;
+using BlueScript.Variables;
 
 namespace BlueControls.ItemCollection {
 
-    public class FileExplorerPadItem : VariableShowPadItem, IItemToControl {
+    public class FileExplorerPadItem : CustomizableShowPadItem, IItemToControl {
 
         #region Fields
 
@@ -294,5 +295,11 @@ namespace BlueControls.ItemCollection {
         }
 
         #endregion
+
+        /// <summary>
+        /// Löst die angegebene Variable in _text_replaced auf, falls diese (noch) vorhanden ist.
+        /// </summary>
+        /// <param name="variable"></param>
+        /// <returns></returns>
     }
 }

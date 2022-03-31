@@ -31,7 +31,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection {
 
-    public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveColumnVariables {
+    public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariablesItemLevel {
 
         #region Fields
 
