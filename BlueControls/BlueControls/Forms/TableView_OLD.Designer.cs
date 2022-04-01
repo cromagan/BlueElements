@@ -71,16 +71,13 @@ namespace BlueControls.Forms
             this.btnLoeschen = new BlueControls.Controls.Button();
             this.ribMain.SuspendLayout();
             this.pnlDatabaseSelect.SuspendLayout();
-            this.pnlSerachBar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).BeginInit();
             this.SplitContainer1.Panel1.SuspendLayout();
             this.SplitContainer1.Panel2.SuspendLayout();
             this.SplitContainer1.SuspendLayout();
-            this.tabAdmin.SuspendLayout();
             this.tbcSidebar.SuspendLayout();
             this.tabFormula.SuspendLayout();
             this.tabAllgemein.SuspendLayout();
-            this.grpAnsicht.SuspendLayout();
             this.grpAnsichtWahl.SuspendLayout();
             this.grpBearbeitung.SuspendLayout();
             this.grpFormularSteuerung.SuspendLayout();
@@ -106,10 +103,6 @@ namespace BlueControls.Forms
             // 
             this.tbcDatabaseSelector.Size = new System.Drawing.Size(961, 24);
             // 
-            // pnlSerachBar
-            // 
-            this.pnlSerachBar.Size = new System.Drawing.Size(961, 40);
-            // 
             // FilterLeiste
             // 
             this.FilterLeiste.Size = new System.Drawing.Size(961, 42);
@@ -128,10 +121,6 @@ namespace BlueControls.Forms
             // 
             this.SplitContainer1.Size = new System.Drawing.Size(1311, 595);
             this.SplitContainer1.SplitterDistance = 961;
-            // 
-            // tabAdmin
-            // 
-            this.tabAdmin.Size = new System.Drawing.Size(1303, 81);
             // 
             // tbcSidebar
             // 
@@ -157,15 +146,10 @@ namespace BlueControls.Forms
             this.tabAllgemein.Controls.Add(this.grpAllgemein2);
             this.tabAllgemein.Controls.Add(this.grpBearbeitung);
             this.tabAllgemein.Size = new System.Drawing.Size(1303, 81);
-            this.tabAllgemein.Controls.SetChildIndex(this.grpAnsicht, 0);
             this.tabAllgemein.Controls.SetChildIndex(this.grpBearbeitung, 0);
             this.tabAllgemein.Controls.SetChildIndex(this.grpAllgemein2, 0);
             this.tabAllgemein.Controls.SetChildIndex(this.grpFormularSteuerung, 0);
             this.tabAllgemein.Controls.SetChildIndex(this.grpAnsichtWahl, 0);
-            // 
-            // tabExport
-            // 
-            this.tabExport.Size = new System.Drawing.Size(1303, 81);
             // 
             // grpAnsichtWahl
             // 
@@ -373,16 +357,13 @@ namespace BlueControls.Forms
             this.Name = "TableView_OLD";
             this.ribMain.ResumeLayout(false);
             this.pnlDatabaseSelect.ResumeLayout(false);
-            this.pnlSerachBar.ResumeLayout(false);
             this.SplitContainer1.Panel1.ResumeLayout(false);
             this.SplitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).EndInit();
             this.SplitContainer1.ResumeLayout(false);
-            this.tabAdmin.ResumeLayout(false);
             this.tbcSidebar.ResumeLayout(false);
             this.tabFormula.ResumeLayout(false);
             this.tabAllgemein.ResumeLayout(false);
-            this.grpAnsicht.ResumeLayout(false);
             this.grpAnsichtWahl.ResumeLayout(false);
             this.grpBearbeitung.ResumeLayout(false);
             this.grpFormularSteuerung.ResumeLayout(false);

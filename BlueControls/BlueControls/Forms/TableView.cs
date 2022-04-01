@@ -318,7 +318,7 @@ namespace BlueControls.Forms {
             //Ansicht0.Enabled = datenbankDa;
             //Ansicht1.Enabled = datenbankDa;
             //Ansicht2.Enabled = datenbankDa;
-            btnDatenbanken.Enabled = datenbankDa && !string.IsNullOrEmpty(Table.Database.Filename);
+            btnDatenbankenSpeicherort.Enabled = datenbankDa && !string.IsNullOrEmpty(Table.Database.Filename);
             //SuchenUndErsetzen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
             //AngezeigteZeilenLöschen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
             //Datenüberprüfung.Enabled = datenbankDa;
@@ -496,7 +496,7 @@ namespace BlueControls.Forms {
             Table.ImportClipboard();
         }
 
-        private void btnDatenbanken_Click(object sender, System.EventArgs e) {
+        private void btnDatenbankenSpeicherort_Click(object sender, System.EventArgs e) {
             BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
             ExecuteFile(Table.Database.Filename.FilePath());
         }

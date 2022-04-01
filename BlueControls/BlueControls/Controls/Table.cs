@@ -1117,10 +1117,14 @@ namespace BlueControls.Controls {
             var x = "{";
             //   x = x & "<Filename>" & _Database.Filename
             x = x + "ArrangementNr=" + _arrangementNr;
-            var tmp = Filter.ToString();
-            if (tmp.Length > 2) {
-                x = x + ", Filters=" + Filter;
+
+            if (Filter != null) {
+                var tmp = Filter.ToString();
+                if (tmp.Length > 2) {
+                    x = x + ", Filters=" + Filter;
+                }
             }
+
             x = x + ", SliderX=" + SliderX.Value;
             x = x + ", SliderY=" + SliderY.Value;
             if (PinnedRows != null && PinnedRows.Count > 0) {
@@ -1133,9 +1137,12 @@ namespace BlueControls.Controls {
                     x = x + ", Collapsed=" + thiss.ToNonCritical();
                 }
             }
-            foreach (var thiscol in CurrentArrangement) {
-                if (thiscol.TmpReduced) { x = x + ", Reduced=" + thiscol.Column.Key; }
+            if (CurrentArrangement != null) {
+                foreach (var thiscol in CurrentArrangement) {
+                    if (thiscol.TmpReduced) { x = x + ", Reduced=" + thiscol.Column.Key; }
+                }
             }
+
             if (_sortDefinitionTemporary?.Columns != null) {
                 x = x + ", TempSort=" + _sortDefinitionTemporary;
             }

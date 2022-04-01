@@ -29,6 +29,7 @@ namespace BlueControls.Forms {
             this.btnVorschauÖffnen = new BlueControls.Controls.Button();
             this.btnPfeileAusblenden = new BlueControls.Controls.Button();
             this.grpFelder = new BlueControls.Controls.GroupBox();
+            this.btnVariable = new BlueControls.Controls.Button();
             this.grpFileExplorer = new BlueControls.Controls.Button();
             this.btnKonstante = new BlueControls.Controls.Button();
             this.btnFeldHinzu = new BlueControls.Controls.Button();
@@ -46,7 +47,6 @@ namespace BlueControls.Forms {
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
             this.LoadTabDatabase = new System.Windows.Forms.OpenFileDialog();
-            this.btnVariable = new BlueControls.Controls.Button();
             this.grpDesign.SuspendLayout();
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
@@ -59,6 +59,14 @@ namespace BlueControls.Forms {
             this.tabFile.SuspendLayout();
             this.grpDatei.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // grpKomponenteHinzufügen
+            // 
+            this.grpKomponenteHinzufügen.Visible = false;
+            // 
+            // grpDesign
+            // 
+            this.grpDesign.Visible = false;
             // 
             // tabRightSide
             // 
@@ -87,6 +95,10 @@ namespace BlueControls.Forms {
             // tabStart
             // 
             this.tabStart.Size = new System.Drawing.Size(966, 81);
+            // 
+            // tabExport
+            // 
+            this.tabExport.Size = new System.Drawing.Size(966, 81);
             // 
             // btnVorschauModus
             // 
@@ -158,6 +170,17 @@ namespace BlueControls.Forms {
             this.grpFelder.TabIndex = 0;
             this.grpFelder.TabStop = false;
             this.grpFelder.Text = "Felder";
+            // 
+            // btnVariable
+            // 
+            this.btnVariable.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnVariable.ImageCode = "Variable|16|||||||||PlusZeichen";
+            this.btnVariable.Location = new System.Drawing.Point(136, 2);
+            this.btnVariable.Name = "btnVariable";
+            this.btnVariable.Size = new System.Drawing.Size(64, 66);
+            this.btnVariable.TabIndex = 4;
+            this.btnVariable.Text = "Variablenf. hinzufügen";
+            this.btnVariable.Click += new System.EventHandler(this.btnVariable_Click);
             // 
             // grpFileExplorer
             // 
@@ -351,17 +374,6 @@ namespace BlueControls.Forms {
             // 
             this.LoadTabDatabase.Filter = "*.MDB Datenbanken|*.MDB|*.* Alle Dateien|*";
             this.LoadTabDatabase.Title = "Bitte Datenbank wählen:";
-            // 
-            // btnVariable
-            // 
-            this.btnVariable.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnVariable.ImageCode = "Variable|16|||||||||PlusZeichen";
-            this.btnVariable.Location = new System.Drawing.Point(136, 2);
-            this.btnVariable.Name = "btnVariable";
-            this.btnVariable.Size = new System.Drawing.Size(64, 66);
-            this.btnVariable.TabIndex = 4;
-            this.btnVariable.Text = "Variablenf. hinzufügen";
-            this.btnVariable.Click += new System.EventHandler(this.btnVariable_Click);
             // 
             // ConnectedFormulaEditor
             // 

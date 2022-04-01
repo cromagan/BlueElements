@@ -408,7 +408,7 @@ namespace BlueControls.Forms {
         private Button btnHintergrundFarbe;
         private System.Windows.Forms.ColorDialog ColorDia;
         private Button btnKeinHintergrund;
-        private System.Windows.Forms.TabPage tabHintergrund;
+        protected System.Windows.Forms.TabPage tabHintergrund;
         private System.Windows.Forms.TabPage tabElementEigenschaften;
         protected TabControl tabRightSide;
     }

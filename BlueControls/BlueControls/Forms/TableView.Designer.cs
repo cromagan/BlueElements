@@ -27,7 +27,7 @@ namespace BlueControls.Forms {
             this.ribMain = new BlueControls.Controls.RibbonBar();
             this.tabFile = new System.Windows.Forms.TabPage();
             this.grpOrdner = new BlueControls.Controls.GroupBox();
-            this.btnDatenbanken = new BlueControls.Controls.Button();
+            this.btnDatenbankenSpeicherort = new BlueControls.Controls.Button();
             this.btnTemporärenSpeicherortÖffnen = new BlueControls.Controls.Button();
             this.grpDatei = new BlueControls.Controls.GroupBox();
             this.btnLetzteDateien = new BlueControls.Controls.LastFilesCombo();
@@ -131,7 +131,7 @@ namespace BlueControls.Forms {
             // 
             this.grpOrdner.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpOrdner.CausesValidation = false;
-            this.grpOrdner.Controls.Add(this.btnDatenbanken);
+            this.grpOrdner.Controls.Add(this.btnDatenbankenSpeicherort);
             this.grpOrdner.Controls.Add(this.btnTemporärenSpeicherortÖffnen);
             this.grpOrdner.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpOrdner.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
@@ -144,15 +144,15 @@ namespace BlueControls.Forms {
             // 
             // btnDatenbanken
             // 
-            this.btnDatenbanken.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnDatenbanken.ImageCode = "Ordner";
-            this.btnDatenbanken.Location = new System.Drawing.Point(8, 2);
-            this.btnDatenbanken.Name = "btnDatenbanken";
-            this.btnDatenbanken.QuickInfo = "Speicherort der Datenbanken öffnen";
-            this.btnDatenbanken.Size = new System.Drawing.Size(88, 66);
-            this.btnDatenbanken.TabIndex = 27;
-            this.btnDatenbanken.Text = "Datenbanken-Pfad";
-            this.btnDatenbanken.Click += new System.EventHandler(this.btnDatenbanken_Click);
+            this.btnDatenbankenSpeicherort.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnDatenbankenSpeicherort.ImageCode = "Ordner";
+            this.btnDatenbankenSpeicherort.Location = new System.Drawing.Point(8, 2);
+            this.btnDatenbankenSpeicherort.Name = "btnDatenbankenSpeicherort";
+            this.btnDatenbankenSpeicherort.QuickInfo = "Speicherort der Datenbanken öffnen";
+            this.btnDatenbankenSpeicherort.Size = new System.Drawing.Size(88, 66);
+            this.btnDatenbankenSpeicherort.TabIndex = 27;
+            this.btnDatenbankenSpeicherort.Text = "Datenbanken-Pfad";
+            this.btnDatenbankenSpeicherort.Click += new System.EventHandler(this.btnDatenbankenSpeicherort_Click);
             // 
             // btnTemporärenSpeicherortÖffnen
             // 
@@ -778,15 +778,15 @@ namespace BlueControls.Forms {
         private Controls.Button btnZeileLöschen;
         private Controls.Button btnDatenüberprüfung;
         private Controls.Button btnPowerBearbeitung;
-        internal Controls.Button btnSpaltenanordnung;
+        private Controls.Button btnSpaltenanordnung;
         private Controls.Button btnLayouts;
         private Controls.Button btnVorherigeVersion;
         private Controls.Button btnDatenbankKopf;
-        internal Controls.Button btnSpaltenUebersicht;
+        private Controls.Button btnSpaltenUebersicht;
         private Controls.Button btnClipboardImport;
-        protected Controls.GroupBox grpAdminZeilen;
-        protected Controls.GroupBox grpAdminBearbeiten;
-        protected Controls.GroupBox grpAdminAllgemein;
+        private Controls.GroupBox grpAdminZeilen;
+        private Controls.GroupBox grpAdminBearbeiten;
+        private Controls.GroupBox grpAdminAllgemein;
         protected Controls.TabControl tbcSidebar;
         protected System.Windows.Forms.TabPage tabFormula;
         private System.Windows.Forms.Panel pnlStatusBar;
@@ -809,7 +809,7 @@ namespace BlueControls.Forms {
         private Controls.ComboBox btnDrucken;
         private System.Windows.Forms.TabPage tabFile;
         private Controls.GroupBox grpOrdner;
-        private Controls.Button btnDatenbanken;
+        private Controls.Button btnDatenbankenSpeicherort;
         private Controls.Button btnTemporärenSpeicherortÖffnen;
         private Controls.GroupBox grpDatei;
         private Controls.LastFilesCombo btnLetzteDateien;

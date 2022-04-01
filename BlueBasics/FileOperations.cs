@@ -227,7 +227,14 @@ namespace BlueBasics {
         /// <param name="name">Der ganze Pfad der Datei.</param>
         /// <returns>Dateiname ohne Suffix</returns>
         /// <remarks></remarks>
-        public static string FileNameWithoutSuffix(this string name) => string.IsNullOrEmpty(name) ? string.Empty : Path.GetFileNameWithoutExtension(name);
+        public static string FileNameWithoutSuffix(this string name) {
+            try {
+                return string.IsNullOrEmpty(name) ? string.Empty : Path.GetFileNameWithoutExtension(name);
+            } catch {
+                Develop.DebugPrint("Fehler bei: " + name);
+                return string.Empty;
+            }
+        }
 
         public static string FileNameWithSuffix(this string name) => string.IsNullOrEmpty(name) ? string.Empty : Path.GetFileName(name);
 
