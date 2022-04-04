@@ -26,11 +26,16 @@ namespace BlueControls.Interfaces {
     /// Wird verwendet, wenn das PadItem Zeilen berechnen kann und dann das
     /// erzeugte Control es an Childs weiter geben kann.
     /// </summary>
-    public interface ICalculateRowsItemLevel : ICalculateOneRowItemLevel {
+    public interface ICalculateOneRowItemLevel : IAcceptAndSends, IReadableText, IItemToControl {
 
         #region Properties
 
-        public bool Genau_eine_Zeile { get; set; }
+        public Database? Database { get; set; }
+
+        /// <summary>
+        /// Laufende Nummer, bestimmt die Einfärbung
+        /// </summary>
+        public int Id { get; set; }
 
         #endregion
     }

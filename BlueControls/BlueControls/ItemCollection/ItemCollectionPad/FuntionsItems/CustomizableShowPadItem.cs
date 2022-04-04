@@ -43,7 +43,7 @@ namespace BlueControls.ItemCollection {
 
         public static BlueFont? CaptionFNT = Skin.GetBlueFont(Design.Caption, States.Standard);
 
-        private ICalculateRowsItemLevel? _GetValueFrom = null;
+        private ICalculateOneRowItemLevel? _GetValueFrom = null;
 
         #endregion
 
@@ -126,7 +126,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public ICalculateRowsItemLevel? GetRowFrom {
+        public ICalculateOneRowItemLevel? GetRowFrom {
             get => _GetValueFrom;
 
             set {

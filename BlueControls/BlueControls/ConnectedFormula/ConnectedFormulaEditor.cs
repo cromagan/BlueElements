@@ -51,52 +51,9 @@ namespace BlueControls.Forms {
 
         #endregion
 
+        /// <summary>
+
         #region Methods
-
-        private void AddRowItem(bool klon) {
-            if (_cf == null) { return; }
-
-            if (string.IsNullOrEmpty(LoadTabDatabase.InitialDirectory)) {
-                LoadTabDatabase.InitialDirectory = _cf.Filename.FilePath();
-            }
-
-            LoadTabDatabase.ShowDialog();
-
-            //var x = Directory.GetFiles(_cf.Filename.FilePath(), "*.mdb").ToList();
-
-            //if (x == null || x.Count == 0) {
-            //    MessageBox.Show("Keine Datenbanken vorhanden.");
-            //    return;
-            //}
-
-            //var fi = new ItemCollectionList();
-            //foreach (var thisf in x) {
-            //    fi.Add(thisf.FileNameWithoutSuffix(), thisf);
-            //}
-
-            //var rück = InputBoxListBoxStyle.Show("Datenbank wählen: ", fi, Enums.AddType.None, true);
-
-            //if (rück == null || rück.Count != 1) { return; }
-
-            if (!FileExists(LoadTabDatabase.FileName)) { return; }
-            LoadTabDatabase.InitialDirectory = LoadTabDatabase.FileName.FilePath();
-
-            _cf.DatabaseFiles.AddIfNotExists(LoadTabDatabase.FileName);
-
-            var db = Database.GetByFilename(LoadTabDatabase.FileName, false, false);
-            if (db == null) { return; }
-
-            BasicPadItem dbitem;
-
-            if (!klon) {
-                dbitem = new RowWithFilterPaditem(db, _cf.NextID());
-            } else {
-                dbitem = new RowClonePadItem(db, _cf.NextID());
-            }
-
-            dbitem.Bei_Export_Sichtbar = false;
-            Pad.AddCentered(dbitem);
-        }
 
         private void btnFeldHinzu_Click(object sender, System.EventArgs e) {
             var l = Pad.LastClickedItem;
@@ -118,7 +75,12 @@ namespace BlueControls.Forms {
         }
 
         private void btnKlonZeilen_Click(object sender, System.EventArgs e) {
-            AddRowItem(true);
+            var it = new RowClonePadItem(string.Empty);
+
+            it.Bei_Export_Sichtbar = false;
+            Pad.AddCentered(it);
+
+            ChooseDatabaseAndID(it);
         }
 
         private void btnKonstante_Click(object sender, System.EventArgs e) {
@@ -198,10 +160,53 @@ namespace BlueControls.Forms {
         }
 
         private void btnZeileHinzu_Click(object sender, System.EventArgs e) {
-            AddRowItem(false);
+            var it = new RowWithFilterPaditem(string.Empty);
+
+            it.Bei_Export_Sichtbar = false;
+            Pad.AddCentered(it);
+
+            ChooseDatabaseAndID(it);
+        }
+
+        private void btnZeilenwahl_Click(object sender, System.EventArgs e) {
+            var l = Pad.LastClickedItem;
+
+            var x = new RowSelectFieldPadItem(string.Empty);
+
+            if (l is ICalculateRowsItemLevel ri) {
+                x.GetRowFrom = ri;
+            }
+            if (l is CustomizableShowPadItem efi && efi.GetRowFrom != null) {
+                x.GetRowFrom = efi.GetRowFrom;
+            }
+
+            ChooseDatabaseAndID(x);
+
+            Pad.AddCentered(x);
         }
 
         private void CheckButtons() {
+        }
+
+        private void ChooseDatabaseAndID(ICalculateOneRowItemLevel? it) {
+            if (_cf == null || it == null) { return; }
+
+            if (string.IsNullOrEmpty(LoadTabDatabase.InitialDirectory)) {
+                LoadTabDatabase.InitialDirectory = _cf.Filename.FilePath();
+            }
+
+            LoadTabDatabase.ShowDialog();
+
+            if (!FileExists(LoadTabDatabase.FileName)) { return; }
+            LoadTabDatabase.InitialDirectory = LoadTabDatabase.FileName.FilePath();
+
+            _cf.DatabaseFiles.AddIfNotExists(LoadTabDatabase.FileName);
+
+            var db = Database.GetByFilename(LoadTabDatabase.FileName, false, false);
+            if (db == null) { return; }
+
+            it.Database = db;
+            it.Id = _cf.NextID();
         }
 
         private void FormulaSet(string filename, List<string>? notAllowedchilds) {

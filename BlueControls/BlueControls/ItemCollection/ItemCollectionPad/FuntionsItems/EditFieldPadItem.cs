@@ -181,15 +181,6 @@ namespace BlueControls.ItemCollection {
             return cy;
         }
 
-        //private string _quickinfo;
-        //private string _adminInfo;
-        //public EditFieldPadItem(string internalname, string fileToLoad) : this(internalname, (Bitmap)BitmapExt.Image_FromFile(fileToLoad), Size.Empty) { }
-
-        //public EditFieldPadItem(string internalname, Bitmap? bmp) : this(internalname, bmp, Size.Empty) { }
-
-        //public EditFieldPadItem(Bitmap? bmp, Size size) : this(string.Empty, bmp, size) { }
-
-        //public EditFieldPadItem(Bitmap? bmp) : this(string.Empty, bmp, Size.Empty) { }
         public override List<GenericControl> GetStyleOptions() {
             List<GenericControl> l = new();
 
