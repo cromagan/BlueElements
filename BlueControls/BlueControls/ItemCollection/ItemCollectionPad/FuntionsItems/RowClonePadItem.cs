@@ -36,7 +36,7 @@ using BlueControls.ConnectedFormula;
 
 namespace BlueControls.ItemCollection {
 
-    public class RowClonePadItem : FixedRectanglePadItem, IReadableText, IAcceptAndSends, ICalculateRowsItemLevel, IItemToControl {
+    public class RowClonePadItem : FixedRectanglePadItem, IReadableText, IAcceptAndSends, ICalculateOneRowItemLevel, IItemToControl {
 
         #region Fields
 
@@ -110,7 +110,7 @@ namespace BlueControls.ItemCollection {
         #region Methods
 
         public Control? CreateControl(ConnectedFormulaView parent) {
-            var c = new RowCloner(Database, Genau_eine_Zeile, VerbindungsID);
+            var c = new RowCloner(Database, VerbindungsID);
             c.Tag = Internal;
             return c;
         }

@@ -119,7 +119,7 @@
     <Compile Include="ConnectedFormula\RowCloner.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ConnectedFormula\Connector.cs">
+    <Compile Include="ConnectedFormula\FlexiControlRowSelector.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\EasyPicMulti.cs">
@@ -320,10 +320,7 @@
     <Compile Include="Interfaces\IAcceptVariableList.cs" />
     <Compile Include="Interfaces\ICalculateOneRowItemLevel.cs" />
     <Compile Include="Interfaces\IDisabledReason.cs" />
-    <Compile Include="Interfaces\IAcceptMultipleRows.cs" />
     <Compile Include="Interfaces\ICalculateRowsControlLevel.cs" />
-    <Compile Include="Interfaces\IAcceptItemsForSelect.cs" />
-    <Compile Include="Interfaces\ICalculateRowsItemLevel.cs" />
     <Compile Include="Interfaces\IContenHolder.cs" />
     <Compile Include="Interfaces\IAcceptRowKey.cs" />
     <Compile Include="Interfaces\IItemToControl.cs" />
@@ -338,7 +335,6 @@
     </Compile>
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\ChildFormulaPaditem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\CustomizableShowPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\RowSelectFieldPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\VariableFieldPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\FileExplorerPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\EditFieldPadItem.cs" />

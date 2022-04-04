@@ -101,7 +101,7 @@ namespace BlueControls.ItemCollection {
             set {
                 var x = new ItemCollectionList.ItemCollectionList();
                 foreach (var thisR in Parent) {
-                    if (thisR is ICalculateRowsItemLevel rfp) {
+                    if (thisR is ICalculateOneRowItemLevel rfp) {
                         x.Add(rfp, thisR.Internal);
                     }
                 }
@@ -114,7 +114,7 @@ namespace BlueControls.ItemCollection {
 
                 var t = Parent[it[0]];
 
-                if (t is ICalculateRowsItemLevel rfp2) {
+                if (t is ICalculateOneRowItemLevel rfp2) {
                     if (rfp2 != GetRowFrom) {
                         GetRowFrom = rfp2;
                     }
@@ -214,7 +214,7 @@ namespace BlueControls.ItemCollection {
             if (base.ParseThis(tag, value)) { return true; }
             switch (tag) {
                 case "getvaluefrom":
-                    GetRowFrom = (ICalculateRowsItemLevel)Parent[value.FromNonCritical()];
+                    GetRowFrom = (ICalculateOneRowItemLevel)Parent[value.FromNonCritical()];
                     return true;
             }
             return false;

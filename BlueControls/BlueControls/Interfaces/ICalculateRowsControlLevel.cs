@@ -35,7 +35,6 @@ namespace BlueControls.Interfaces {
 
         public ListExt<System.Windows.Forms.Control> Childs { get; }
         public Database? Database { get; }
-        public bool Genau_eine_Zeile { get; set; }
         public Script? Script { get; set; }
 
         #endregion

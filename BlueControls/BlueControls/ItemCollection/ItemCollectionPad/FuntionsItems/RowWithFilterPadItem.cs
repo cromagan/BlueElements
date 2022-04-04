@@ -32,10 +32,11 @@ using static BlueBasics.Converter;
 using BlueControls.Interfaces;
 using System.Windows.Forms;
 using BlueControls.ConnectedFormula;
+using BlueScript.Variables;
 
 namespace BlueControls.ItemCollection {
 
-    public class RowWithFilterPaditem : FixedRectanglePadItem, IReadableText, IAcceptAndSends, ICalculateRowsItemLevel, IItemToControl {
+    public class RowWithFilterPaditem : FixedRectanglePadItem, IReadableText, IAcceptAndSends, ICalculateOneRowItemLevel, IItemToControl {
 
         #region Fields
 
@@ -45,8 +46,9 @@ namespace BlueControls.ItemCollection {
 
         public readonly Database FilterDefiniton;
 
-        private bool _genau_eine_Zeile = true;
-
+        private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
+        private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Über_dem_Feld;
+        private string _überschrift = string.Empty;
         private string _VerbindungsID = string.Empty;
 
         #endregion
@@ -72,6 +74,15 @@ namespace BlueControls.ItemCollection {
 
         #region Properties
 
+        public ÜberschriftAnordnung CaptionPosition {
+            get => _überschiftanordung;
+            set {
+                if (_überschiftanordung == value) { return; }
+                _überschiftanordung = value;
+                OnChanged();
+            }
+        }
+
         public Database? Database { get; set; }
 
         public string Datenbankkopf {
@@ -79,6 +90,15 @@ namespace BlueControls.ItemCollection {
             set {
                 if (Database == null) { return; }
                 Forms.TableView.OpenDatabaseHeadEditor(Database);
+            }
+        }
+
+        public EditTypeFormula EditType {
+            get => _bearbeitung;
+            set {
+                if (_bearbeitung == value) { return; }
+                _bearbeitung = value;
+                OnChanged();
             }
         }
 
@@ -103,20 +123,19 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        [Description("Nur wenn das Filterergebis genau eine Zeile ergeben wird(und muss),\r\nkönnen die abhängige Zellen bearbeitet werden.\r\nAndernfalls werden abhängige Felder Auswahlfelder.")]
-        public bool Genau_eine_Zeile {
-            get => _genau_eine_Zeile;
-            set {
-                if (value == _genau_eine_Zeile) { return; }
-                _genau_eine_Zeile = value;
-                OnChanged();
-            }
-        }
-
         /// <summary>
         /// Laufende Nummer, bestimmt die Einfärbung
         /// </summary>
         public int Id { get; set; }
+
+        public string Überschrift {
+            get => _überschrift;
+            set {
+                if (_überschrift == value) { return; }
+                _überschrift = value;
+                OnChanged();
+            }
+        }
 
         [Description("Mit dieser Verbindungs-ID können formularübergeifend Filter an\r\nan andere Filterelemnte übergeben werden bzw.\r\nempfangen werden.\r\nZiegt KEIN Pfeil auf dieses Element, übernimmt es den Wert.\r\nAndernfalls empfängt es den Wert.")]
         public string VerbindungsID {
@@ -135,7 +154,9 @@ namespace BlueControls.ItemCollection {
         #region Methods
 
         public Control? CreateControl(ConnectedFormulaView parent) {
-            var c = new Connector(_VerbindungsID, Database, Genau_eine_Zeile, this.Parent, FilterDefiniton);
+            var c = new FlexiControlRowSelector(_VerbindungsID, Database, this.Parent, FilterDefiniton, _überschrift);
+            c.EditType = EditType;
+            c.CaptionPosition = CaptionPosition;
             c.Tag = Internal;
             return c;
         }
@@ -143,12 +164,22 @@ namespace BlueControls.ItemCollection {
         public override List<GenericControl> GetStyleOptions() {
             List<GenericControl> l = new() { };
             if (Database == null) { return l; }
+            l.Add(new FlexiControlForProperty<String>(() => Überschrift));
+            //l.Add(new FlexiControlForProperty<String>(() => Variable));
+
+            var u = new ItemCollection.ItemCollectionList.ItemCollectionList();
+            u.AddRange(typeof(ÜberschriftAnordnung));
+            l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
+            var b = new ItemCollection.ItemCollectionList.ItemCollectionList();
+            b.AddRange(typeof(EditTypeFormula));
+            l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
+            l.Add(new FlexiControl());
+
             l.Add(new FlexiControlForProperty<string>(() => Database.Caption));
             //l.Add(new FlexiControlForProperty(Database, "Caption"));
             l.Add(new FlexiControlForProperty<string>(() => Datenbankkopf, ImageCode.Datenbank));
             //l.Add(new FlexiControlForProperty(()=> this.Datenbankkopf"));
             l.Add(new FlexiControl());
-            l.Add(new FlexiControlForProperty<bool>(() => Genau_eine_Zeile));
             l.Add(new FlexiControlForProperty<string>(() => VerbindungsID));
             l.Add(new FlexiControl());
 
@@ -192,10 +223,6 @@ namespace BlueControls.ItemCollection {
                     Database = Database.GetByFilename(value.FromNonCritical(), false, false);
                     return true;
 
-                case "onerow":
-                    Genau_eine_Zeile = value.FromPlusMinus();
-                    return true;
-
                 case "connectionid":
                     VerbindungsID = value.FromNonCritical();
                     return true;
@@ -209,40 +236,53 @@ namespace BlueControls.ItemCollection {
                     FilterDatabaseUpdate();
                     FilterDefiniton.Import(value.FromNonCritical(), true, false, ";", false, false, false, string.Empty);
                     return true;
+
+                case "edittype":
+                    _bearbeitung = (EditTypeFormula)IntParse(value);
+                    return true;
+
+                case "caption":
+                    _überschiftanordung = (ÜberschriftAnordnung)IntParse(value);
+                    return true;
+
+                case "captiontext":
+                    _überschrift = value.FromNonCritical();
+                    return true;
+
+                    //case "variable":
+                    //    _variable = value.FromNonCritical();
+                    //    return true;
             }
             return false;
         }
 
         public string ReadableText() {
             if (Database != null) {
-                if (Genau_eine_Zeile) {
-                    return "(eine) Zeile aus: " + Database.Caption;
-                } else {
-                    return "Zeilen aus: " + Database.Caption;
-                }
+                return "eine Zeile aus: " + Database.Caption;
             }
 
             return "Zeile einer Datenbank";
         }
 
         public QuickImage? SymbolForReadableText() {
-            if (Genau_eine_Zeile) {
-                return QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(Id));
-            } else {
-                return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IDColor(Id));
-            }
+            return QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(Id));
         }
 
         public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
 
+            t = t + "CaptionText=" + _überschrift.ToNonCritical() + ", ";
+            //t = t + "Variable=" + _variable.ToNonCritical() + ", ";
+
+            t = t + "EditType=" + ((int)_bearbeitung).ToString() + ", ";
+            t = t + "Caption=" + ((int)_überschiftanordung).ToString() + ", ";
+
             t = t + "ID=" + Id.ToString() + ", ";
 
             if (Database != null) {
                 t = t + "Database=" + Database.Filename.ToNonCritical() + ", ";
             }
-            t = t + "OneRow=" + Genau_eine_Zeile.ToPlusMinus() + ", ";
 
             t = t + "ConnectionID=" + VerbindungsID.ToNonCritical() + ", ";
 
@@ -267,12 +307,7 @@ namespace BlueControls.ItemCollection {
             DrawColorScheme(gr, modifiedPosition, zoom, Id);
 
             if (Database != null) {
-                var txt = string.Empty;
-                if (!Genau_eine_Zeile) {
-                    txt = "mehrere Zeilen aus\r\n";
-                } else {
-                    txt = "eine Zeile aus\r\n";
-                }
+                var txt = "eine Zeile aus\r\n";
 
                 txt = txt + Database.Caption;
 

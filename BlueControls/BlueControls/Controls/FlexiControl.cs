@@ -39,7 +39,7 @@ namespace BlueControls.Controls {
 
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ValueChanged")]
-    public partial class FlexiControl : GenericControl, IBackgroundNone, IInputFormat, ITranslateable, IAcceptItemsForSelect, IAcceptVariableList {
+    public partial class FlexiControl : GenericControl, IBackgroundNone, IInputFormat, ITranslateable, IAcceptVariableList {
 
         #region Fields
 

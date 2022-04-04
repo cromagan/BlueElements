@@ -86,10 +86,20 @@ namespace BlueControls.ItemCollection {
 
         public Control? CreateControl(ConnectedFormulaView parent) {
             var c3 = new FlexiControl();
-            c3.CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
-            c3.Caption = _ID;
+            c3.Width = 100;
+            c3.Height = 16;
+
+            if (string.IsNullOrEmpty(_ID)) {
+                c3.CaptionPosition = ÜberschriftAnordnung.ohne;
+            } else {
+                c3.CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
+                c3.Caption = _ID;
+            }
+
+
             c3.EditType = EditTypeFormula.Textfeld;
             c3.DisabledReason = "Konstanter Wert";
+
             c3.ValueSet(Text, true, true);
             c3.Tag = Internal;
             return c3;

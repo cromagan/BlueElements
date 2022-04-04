@@ -150,26 +150,16 @@ namespace BlueControls.ItemCollection {
         #region Methods
 
         public override System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
-            if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
+            if (GetRowFrom is ICalculateOneRowItemLevel rfw2) {
                 var ff = parent.SearchOrGenerate((BasicPadItem)rfw2);
 
-                if (rfw2.Genau_eine_Zeile) {
-                    var cx = new FlexiControlForCell();
-                    cx.ColumnKey = Column.Key;
-                    cx.EditType = EditType;
-                    cx.CaptionPosition = CaptionPosition;
-                    cx.Tag = Internal;
-                    if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(cx); }
-                    return cx;
-                } else {
-                    var c = new FlexiControl();
-                    c.Caption = Column.ReadableText() + ":";
-                    c.EditType = EditType;
-                    c.CaptionPosition = CaptionPosition;
-                    c.Tag = Internal;
-                    if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(c); }
-                    return c;
-                }
+                var cx = new FlexiControlForCell();
+                cx.ColumnKey = Column.Key;
+                cx.EditType = EditType;
+                cx.CaptionPosition = CaptionPosition;
+                cx.Tag = Internal;
+                if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(cx); }
+                return cx;
             }
 
             var cy = new FlexiControl();

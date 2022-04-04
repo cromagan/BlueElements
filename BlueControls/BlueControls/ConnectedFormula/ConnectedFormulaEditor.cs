@@ -60,7 +60,7 @@ namespace BlueControls.Forms {
 
             var x = new EditFieldPadItem(string.Empty);
 
-            if (l is ICalculateRowsItemLevel ri) {
+            if (l is ICalculateOneRowItemLevel ri) {
                 x.GetRowFrom = ri;
             }
             if (l is CustomizableShowPadItem efi && efi.GetRowFrom != null) {
@@ -141,7 +141,7 @@ namespace BlueControls.Forms {
 
             var x = new VariableFieldPadItem(string.Empty);
 
-            if (l is ICalculateRowsItemLevel ri) {
+            if (l is ICalculateOneRowItemLevel ri) {
                 x.GetRowFrom = ri;
             }
 
@@ -161,28 +161,8 @@ namespace BlueControls.Forms {
 
         private void btnZeileHinzu_Click(object sender, System.EventArgs e) {
             var it = new RowWithFilterPaditem(string.Empty);
-
-            it.Bei_Export_Sichtbar = false;
             Pad.AddCentered(it);
-
             ChooseDatabaseAndID(it);
-        }
-
-        private void btnZeilenwahl_Click(object sender, System.EventArgs e) {
-            var l = Pad.LastClickedItem;
-
-            var x = new RowSelectFieldPadItem(string.Empty);
-
-            if (l is ICalculateRowsItemLevel ri) {
-                x.GetRowFrom = ri;
-            }
-            if (l is CustomizableShowPadItem efi && efi.GetRowFrom != null) {
-                x.GetRowFrom = efi.GetRowFrom;
-            }
-
-            ChooseDatabaseAndID(x);
-
-            Pad.AddCentered(x);
         }
 
         private void CheckButtons() {
@@ -246,7 +226,7 @@ namespace BlueControls.Forms {
 
             var x = new FileExplorerPadItem(string.Empty);
 
-            if (l is ICalculateRowsItemLevel ri) {
+            if (l is ICalculateOneRowItemLevel ri) {
                 x.GetRowFrom = ri;
             }
             if (l is CustomizableShowPadItem efi && efi.GetRowFrom != null) {

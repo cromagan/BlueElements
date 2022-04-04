@@ -73,19 +73,17 @@ namespace BlueControls.ItemCollection {
         #region Methods
 
         public override System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
-            if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
+            if (GetRowFrom is ICalculateOneRowItemLevel rfw2) {
                 var ff = parent.SearchOrGenerate((BasicPadItem)rfw2);
 
-                if (rfw2.Genau_eine_Zeile) {
-                    var cx = new FileBrowser();
-                    //cx.ColumnKey = Column.Key;
-                    //cx.EditType = EditType;
-                    //cx.CaptionPosition = CaptionPosition;
-                    cx.OriginalText = Pfad;
-                    cx.Tag = Internal;
-                    if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(cx); }
-                    return cx;
-                }
+                var cx = new FileBrowser();
+                //cx.ColumnKey = Column.Key;
+                //cx.EditType = EditType;
+                //cx.CaptionPosition = CaptionPosition;
+                cx.OriginalText = Pfad;
+                cx.Tag = Internal;
+                if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(cx); }
+                return cx;
             }
 
             return null;

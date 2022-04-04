@@ -42,7 +42,7 @@ namespace BlueControls.ItemCollection {
 
         private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
         private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Über_dem_Feld;
-        private string _Überschrift = string.Empty;
+        private string _überschrift = string.Empty;
         private string _variable = string.Empty;
 
         #endregion
@@ -74,10 +74,10 @@ namespace BlueControls.ItemCollection {
         }
 
         public string Überschrift {
-            get => _Überschrift;
+            get => _überschrift;
             set {
-                if (_Überschrift == value) { return; }
-                _Überschrift = value;
+                if (_überschrift == value) { return; }
+                _überschrift = value;
                 OnChanged();
             }
         }
@@ -103,7 +103,7 @@ namespace BlueControls.ItemCollection {
             c.CaptionPosition = CaptionPosition;
             c.Tag = Internal;
             c.OriginalText = _variable;
-            if (GetRowFrom is ICalculateRowsItemLevel rfw2 && rfw2.Genau_eine_Zeile) {
+            if (GetRowFrom is ICalculateOneRowItemLevel rfw2) {
                 var ff = parent.SearchOrGenerate((BasicPadItem)rfw2);
 
                 if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(c); }
@@ -153,7 +153,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "captiontext":
-                    _Überschrift = value.FromNonCritical();
+                    _überschrift = value.FromNonCritical();
                     return true;
 
                 case "variable":
@@ -177,7 +177,7 @@ namespace BlueControls.ItemCollection {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
 
-            t = t + "CaptionText=" + _Überschrift.ToNonCritical() + ", ";
+            t = t + "CaptionText=" + _überschrift.ToNonCritical() + ", ";
             t = t + "Variable=" + _variable.ToNonCritical() + ", ";
 
             t = t + "EditType=" + ((int)_bearbeitung).ToString() + ", ";

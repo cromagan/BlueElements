@@ -32,7 +32,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         private string _layoutId;
 
-        private RowItem? _row;
+        private RowItem _row;
 
         private Bitmap? _tmpBmp;
 
@@ -40,13 +40,22 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
 
         #region Constructors
 
-        public RowFormulaListItem(RowItem? row, string internalname, string layoutId, string userDefCompareKey) : base(internalname, true) {
+        /// <summary>
+        /// Als Interner Name wird der RowKey als String abgelegt
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="layoutId"></param>
+        /// <param name="userDefCompareKey"></param>
+        public RowFormulaListItem(RowItem row, string layoutId, string userDefCompareKey) : base(row.Key.ToString(), true) {
             _row = row;
             _layoutId = layoutId;
             UserDefCompareKey = userDefCompareKey;
         }
 
-        public RowFormulaListItem(RowItem? row, string layoutId, string userDefCompareKey) : this(row, string.Empty, layoutId, userDefCompareKey) { }
+        /// <summary>
+        /// Als Interner Name wird der RowKey als String abgelegt
+        /// </summary>
+        public RowFormulaListItem(RowItem row, string layoutId) : this(row, layoutId, string.Empty) { }
 
         #endregion
 
@@ -85,7 +94,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
         #region Methods
 
         public override object Clone() {
-            var x = new RowFormulaListItem(_row, Internal, _layoutId, UserDefCompareKey);
+            var x = new RowFormulaListItem(_row, _layoutId, UserDefCompareKey);
             x.CloneBasicStatesFrom(this);
             return x;
         }
@@ -102,14 +111,12 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
         }
 
         protected override Size ComputeSizeUntouchedForListBox() {
-            if (_tmpBmp == null) { GeneratePic(); }
-            return _tmpBmp == null ? new Size(200, 200) : _tmpBmp.Size;
-
-            //var sc = ((float)_tmpBmp.Height / _tmpBmp.Width);
-
-            //if (sc > 1) { sc = 1; }
-
-            //return new Size(300, (int)(sc * 300));
+            try {
+                if (_tmpBmp == null) { GeneratePic(); }
+                return _tmpBmp == null ? new Size(200, 200) : _tmpBmp.Size;
+            } catch {
+                return ComputeSizeUntouchedForListBox();
+            }
         }
 
         protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States vState, bool drawBorderAndBack, bool translate) {
