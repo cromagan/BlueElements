@@ -36,7 +36,7 @@ using BlueScript.Variables;
 
 namespace BlueControls.ItemCollection {
 
-    public class RowWithFilterPaditem : FixedRectanglePadItem, IReadableText, IAcceptAndSends, ICalculateOneRowItemLevel, IItemToControl {
+    public class RowWithFilterPaditem : RectanglePadItem, IReadableText, IAcceptAndSends, ICalculateOneRowItemLevel, IItemToControl {
 
         #region Fields
 
@@ -46,6 +46,8 @@ namespace BlueControls.ItemCollection {
 
         public readonly Database FilterDefiniton;
 
+        public Table? FilterTable = null;
+        private string _anzeige = string.Empty;
         private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
         private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Über_dem_Feld;
         private string _überschrift = string.Empty;
@@ -59,13 +61,22 @@ namespace BlueControls.ItemCollection {
 
         public RowWithFilterPaditem(string intern, Database? db, int id) : base(intern) {
             Database = db;
-            //if (db != null) { Filter = new FilterCollection(db); }
+
             Id = id;
-            Size = new Size(200, 50);
+
+            FilterTable = new Table();
+            FilterTable.DropMessages = false;
+            FilterTable.ShowWaitScreen = true;
+            FilterTable.Size = new Size(968, 400);
 
             FilterDefiniton = GenerateFilterDatabase();
+            FilterTable.Database = FilterDefiniton;
+
+            FilterTable.Arrangement = 1;
 
             FilterDefiniton.Cell.CellValueChanged += Cell_CellValueChanged;
+            FilterTable.ContextMenuInit += FilterTable_ContextMenuInit;
+            FilterTable.ContextMenuItemClicked += Filtertable_ContextMenuItemClicked;
         }
 
         public RowWithFilterPaditem(string intern) : this(intern, null, 0) { }
@@ -73,6 +84,16 @@ namespace BlueControls.ItemCollection {
         #endregion
 
         #region Properties
+
+        [Description("Nach welchem Format die Zeilen angezeigt werden sollen. Es können Variablen im Format ~Variable~ benutzt werden. Achtung, KEINE Skript-Variaben, nur Spaltennamen.")]
+        public string Anzeige {
+            get => _anzeige;
+            set {
+                if (_anzeige == value) { return; }
+                _anzeige = value;
+                OnChanged();
+            }
+        }
 
         public ÜberschriftAnordnung CaptionPosition {
             get => _überschiftanordung;
@@ -96,6 +117,8 @@ namespace BlueControls.ItemCollection {
         public EditTypeFormula EditType {
             get => _bearbeitung;
             set {
+                if (value != EditTypeFormula.Textfeld_mit_Auswahlknopf) { value = EditTypeFormula.Textfeld_mit_Auswahlknopf; }
+
                 if (_bearbeitung == value) { return; }
                 _bearbeitung = value;
                 OnChanged();
@@ -154,7 +177,7 @@ namespace BlueControls.ItemCollection {
         #region Methods
 
         public Control? CreateControl(ConnectedFormulaView parent) {
-            var c = new FlexiControlRowSelector(_VerbindungsID, Database, this.Parent, FilterDefiniton, _überschrift);
+            var c = new FlexiControlRowSelector(_VerbindungsID, Database, this.Parent, FilterDefiniton, _überschrift, _anzeige);
             c.EditType = EditType;
             c.CaptionPosition = CaptionPosition;
             c.Tag = Internal;
@@ -164,7 +187,8 @@ namespace BlueControls.ItemCollection {
         public override List<GenericControl> GetStyleOptions() {
             List<GenericControl> l = new() { };
             if (Database == null) { return l; }
-            l.Add(new FlexiControlForProperty<String>(() => Überschrift));
+            l.Add(new FlexiControlForProperty<string>(() => Überschrift));
+            l.Add(new FlexiControlForProperty<string>(() => Anzeige));
             //l.Add(new FlexiControlForProperty<String>(() => Variable));
 
             var u = new ItemCollection.ItemCollectionList.ItemCollectionList();
@@ -185,7 +209,7 @@ namespace BlueControls.ItemCollection {
 
             FilterDatabaseUpdate();
             l.Add(new FlexiControlForProperty<string>(() => Filter_hinzufügen, ImageCode.PlusZeichen));
-            l.Add(GenerateFilterTable());
+            l.Add(FilterTable);
 
             //l.Add(new FlexiControl());
             //l.Add(new FlexiControlForProperty<string>(() => Column.Ueberschrift1"));
@@ -249,6 +273,9 @@ namespace BlueControls.ItemCollection {
                     _überschrift = value.FromNonCritical();
                     return true;
 
+                case "showformat":
+                    _anzeige = value.FromNonCritical();
+                    return true;
                     //case "variable":
                     //    _variable = value.FromNonCritical();
                     //    return true;
@@ -273,6 +300,7 @@ namespace BlueControls.ItemCollection {
             t = t.Substring(0, t.Length - 1) + ", ";
 
             t = t + "CaptionText=" + _überschrift.ToNonCritical() + ", ";
+            t = t + "ShowFormat=" + _anzeige.ToNonCritical() + ", ";
             //t = t + "Variable=" + _variable.ToNonCritical() + ", ";
 
             t = t + "EditType=" + ((int)_bearbeitung).ToString() + ", ";
@@ -300,6 +328,8 @@ namespace BlueControls.ItemCollection {
 
             if (disposing) {
                 FilterDefiniton.Cell.CellValueChanged -= Cell_CellValueChanged;
+                FilterTable.ContextMenuInit -= FilterTable_ContextMenuInit;
+                FilterTable.ContextMenuItemClicked -= Filtertable_ContextMenuItemClicked;
             }
         }
 
@@ -409,8 +439,10 @@ namespace BlueControls.ItemCollection {
 
             var hs = FilterDefiniton.Column["spalte"];
             hs.OpticalReplace.Clear();
-            foreach (var thisc in Database.Column) {
-                hs.OpticalReplace.Add(thisc.Key.ToString() + "|" + thisc.ReadableText());
+            if (Database != null) {
+                foreach (var thisc in Database.Column) {
+                    hs.OpticalReplace.Add(thisc.Key.ToString() + "|" + thisc.ReadableText());
+                }
             }
 
             #endregion
@@ -421,19 +453,21 @@ namespace BlueControls.ItemCollection {
             b.DropDownItems.Clear();
             b.OpticalReplace.Clear();
 
-            foreach (var thisPadItem in Parent) {
-                if (thisPadItem is IContentHolder efpi) {
-                    var rek = false;
-                    if (efpi is IAcceptAndSends aas) { rek = aas.IsRecursiveWith(this); }
+            if (Parent != null) {
+                foreach (var thisPadItem in Parent) {
+                    if (thisPadItem is IContentHolder efpi) {
+                        var rek = false;
+                        if (efpi is IAcceptAndSends aas) { rek = aas.IsRecursiveWith(this); }
 
-                    if (!rek) {
-                        b.DropDownItems.Add(efpi.Internal);
-                        b.OpticalReplace.Add(efpi.Internal + "|" + efpi.ReadableText());
-                        var s = string.Empty;
-                        var tmp = efpi.SymbolForReadableText();
-                        if (tmp != null) { s = tmp.ToString(); }
+                        if (!rek) {
+                            b.DropDownItems.Add(efpi.Internal);
+                            b.OpticalReplace.Add(efpi.Internal + "|" + efpi.ReadableText());
+                            var s = string.Empty;
+                            var tmp = efpi.SymbolForReadableText();
+                            if (tmp != null) { s = tmp.ToString(); }
 
-                        sc = sc + "if (" + b.Name + "==\"" + efpi.Internal + "\") {suchsym=\"" + s + "\";}";
+                            sc = sc + "if (" + b.Name + "==\"" + efpi.Internal + "\") {suchsym=\"" + s + "\";}";
+                        }
                     }
                 }
             }
@@ -451,6 +485,36 @@ namespace BlueControls.ItemCollection {
             FilterDefiniton.RulesScript = sc;
         }
 
+        private void FilterTable_ContextMenuInit(object sender, EventArgs.ContextMenuInitEventArgs e) {
+            var bt = (Table)sender;
+            var cellKey = e.Tags.TagGet("CellKey");
+            if (string.IsNullOrEmpty(cellKey)) { return; }
+            RowItem? row = null;
+            bt.Database?.Cell.DataOfCellKey(cellKey, out var column, out row);
+            if (row == null) { return; }
+
+            e.UserMenu.Add(BlueControls.Enums.ContextMenuComands.Löschen);
+        }
+
+        private void Filtertable_ContextMenuItemClicked(object sender, EventArgs.ContextMenuItemClickedEventArgs e) {
+            var bt = (Table)sender;
+            var cellKey = e.Tags.TagGet("CellKey");
+            if (string.IsNullOrEmpty(cellKey)) { return; }
+            RowItem? row = null;
+            bt.Database?.Cell.DataOfCellKey(cellKey, out var column, out row);
+            if (row == null) { return; }
+
+            switch (e.ClickedComand.ToLower()) {
+                case "löschen":
+                    row.Database?.Row.Remove(row);
+                    break;
+
+                default:
+                    BlueBasics.Develop.DebugPrint_MissingCommand(e.ClickedComand);
+                    break;
+            }
+        }
+
         private Database GenerateFilterDatabase() {
             Database x = new(false);
             //x.Column.Add("count", "count", VarType.Integer);
@@ -464,9 +528,9 @@ namespace BlueControls.ItemCollection {
             fa.DropdownAllesAbwählenErlaubt = true;
             fa.DropdownBearbeitungErlaubt = true;
             fa.DropDownItems.Add("=");
-            fa.DropDownItems.Add("x");
+            //fa.DropDownItems.Add("x");
             fa.OpticalReplace.Add("=|ist (GK egal)");
-            fa.OpticalReplace.Add("x|LÖSCHEN");
+            //fa.OpticalReplace.Add("x|LÖSCHEN");
 
             var b1 = x.Column.Add("suchsym", " ", VarType.Text);
             b1.BildTextVerhalten = BildTextVerhalten.Nur_Bild;
@@ -489,19 +553,6 @@ namespace BlueControls.ItemCollection {
             x.SortDefinition = new RowSortDefinition(x, "Spalte", false);
 
             return x;
-        }
-
-        private Table GenerateFilterTable() {
-            var tblFilterliste = new Table();
-            tblFilterliste.ShowWaitScreen = true;
-            tblFilterliste.Size = new Size(968, 400);
-
-            if (Database == null) { return tblFilterliste; }
-
-            tblFilterliste.Database = FilterDefiniton;
-            tblFilterliste.Arrangement = 1;
-
-            return tblFilterliste;
         }
 
         private void RepairConnections() {

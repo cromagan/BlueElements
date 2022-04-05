@@ -184,7 +184,6 @@ namespace BlueControls.Controls {
                     : _database.ColumnArrangements[_arrangementNr];
 
         public ColumnItem? CursorPosColumn => _cursorPosColumn;
-
         public RowData? CursorPosRow => _cursorPosRow;
 
         [Browsable(false)]
@@ -280,6 +279,7 @@ namespace BlueControls.Controls {
             }
         }
 
+        public bool DropMessages { get; set; }
         public FilterCollection? Filter { get; private set; }
 
         [DefaultValue(1.0f)]
@@ -1899,7 +1899,7 @@ namespace BlueControls.Controls {
         private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
 
         private void _Database_DropMessage(object sender, MessageEventArgs e) {
-            if (_database.IsAdministrator()) {
+            if (_database.IsAdministrator() && DropMessages) {
                 MessageBox.Show(e.Message);
             }
         }

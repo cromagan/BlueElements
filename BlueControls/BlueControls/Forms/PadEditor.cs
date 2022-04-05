@@ -154,14 +154,16 @@ namespace BlueControls.Forms {
             if (flexis.Count == 0) { return; }
             var top = Skin.Padding;
             foreach (var thisFlexi in flexis) {
-                tabElementEigenschaften.Controls.Add(thisFlexi);
-                //thisFlexi.DisabledReason = string.Empty;
-                thisFlexi.Left = Skin.Padding;
-                thisFlexi.Top = top;
-                thisFlexi.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-                top = top + Skin.Padding + thisFlexi.Height;
-                thisFlexi.Width = tabElementEigenschaften.Width - (Skin.Padding * 4);
-                //ThisFlexi.ButtonClicked += FlexiButtonClick;
+                if (thisFlexi != null) {
+                    tabElementEigenschaften.Controls.Add(thisFlexi);
+                    //thisFlexi.DisabledReason = string.Empty;
+                    thisFlexi.Left = Skin.Padding;
+                    thisFlexi.Top = top;
+                    thisFlexi.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+                    top = top + Skin.Padding + thisFlexi.Height;
+                    thisFlexi.Width = tabElementEigenschaften.Width - (Skin.Padding * 4);
+                    //ThisFlexi.ButtonClicked += FlexiButtonClick;
+                }
             }
         }
 

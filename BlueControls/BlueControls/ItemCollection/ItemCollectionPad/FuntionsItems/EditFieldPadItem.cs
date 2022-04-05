@@ -154,6 +154,7 @@ namespace BlueControls.ItemCollection {
                 var ff = parent.SearchOrGenerate((BasicPadItem)rfw2);
 
                 var cx = new FlexiControlForCell();
+                cx.Database = Column.Database;
                 cx.ColumnKey = Column.Key;
                 cx.EditType = EditType;
                 cx.CaptionPosition = CaptionPosition;

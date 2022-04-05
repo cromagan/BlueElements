@@ -338,8 +338,13 @@ namespace BlueControls.Controls {
             ValueSet(string.Empty, true, true);
         }
 
-        public bool ParseVariables(List<Variable> list) {
-            var ct = list.ReplaceInText(OriginalText);
+        public bool ParseVariables(List<Variable>? list) {
+            var ct = string.Empty;
+
+            if (list != null) {
+                ct = list.ReplaceInText(OriginalText);
+            }
+
             ValueSet(ct, true, true);
             return ct == OriginalText;
         }

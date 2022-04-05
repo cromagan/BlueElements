@@ -141,8 +141,11 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
         public static void GetItemCollection(ItemCollectionList? e, ColumnItem? column, RowItem? checkedItemsAtRow, ShortenStyle style, int maxItems) {
             List<string> marked = new();
             List<string> l = new();
+            if (e == null) { return; }
             e.Clear();
             e.CheckBehavior = CheckBehavior.MultiSelection; // Es kann ja mehr als nur eines angewählt sein, auch wenn nicht erlaubt!
+            if (column == null) { return; }
+
             l.AddRange(column.DropDownItems);
             if (column.DropdownWerteAndererZellenAnzeigen) {
                 if (column.DropdownKey >= 0 && checkedItemsAtRow != null) {
@@ -308,8 +311,14 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
             return i;
         }
 
+        /// <summary>
+        /// Als Interner Name wird der RowKey als String abgelegt
+        /// </summary>
         public RowFormulaListItem Add(RowItem? row, string layoutId) => Add(row, layoutId, string.Empty);
 
+        /// <summary>
+        /// Als Interner Name wird der RowKey als String abgelegt
+        /// </summary>
         public RowFormulaListItem Add(RowItem? row, string layoutId, string userDefCompareKey) {
             RowFormulaListItem i = new(row, layoutId, userDefCompareKey);
             Add(i);

@@ -247,7 +247,7 @@ namespace BlueControls.Controls {
                 case ComboBox comboBox:
                     ItemCollectionList item2 = new();
                     ItemCollectionList.GetItemCollection(item2, column1, null, ShortenStyle.Replaced, 10000);
-                    if (column1.TextBearbeitungErlaubt) {
+                    if (column1 != null && column1.TextBearbeitungErlaubt) {
                         StyleComboBox(comboBox, item2, ComboBoxStyle.DropDown, false);
                     } else {
                         StyleComboBox(comboBox, item2, ComboBoxStyle.DropDownList, true);

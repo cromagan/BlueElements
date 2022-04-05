@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BlueBasics;
@@ -13,39 +10,18 @@ using BlueBasics.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.ItemCollection.ItemCollectionList;
-
-using BlueBasics.Enums;
-
 using Microsoft.Win32;
-
-using System;
-using System.Collections.Generic;
-
 using System.Diagnostics;
-
-using System.Drawing;
-using System.IO;
-
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
-
-using BlueBasics;
-using BlueControls.EventArgs;
-
-using BlueControls;
 using static BlueBasics.Generic;
 using static BlueBasics.FileOperations;
 using BlueControls.Enums;
-using BlueControls.ItemCollection;
-
-using BlueControls.Forms;
-using BlueControls.ItemCollection.ItemCollectionList;
-
 using CryptoExplorer;
 using static BlueBasics.BitmapExt;
 using BlueControls.Interfaces;
 using BlueScript.Variables;
 using System.Drawing.Imaging;
+
+#nullable enable
 
 namespace BlueControls.Controls {
 
@@ -119,11 +95,14 @@ namespace BlueControls.Controls {
             return exekey.GetValue("").ToString();
         }
 
-        public bool ParseVariables(List<Variable> list) {
-            var ct = list.ReplaceInText(OriginalText);
+        public bool ParseVariables(List<Variable>? list) {
+            var ct = string.Empty;
 
-           Pfad = ct;
+            if (list != null) {
+                ct = list.ReplaceInText(OriginalText);
+            }
 
+            Pfad = ct;
             return ct == OriginalText;
         }
 

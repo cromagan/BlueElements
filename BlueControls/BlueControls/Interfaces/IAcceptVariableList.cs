@@ -38,7 +38,7 @@ namespace BlueControls.Interfaces {
 
         #region Methods
 
-        public bool ParseVariables(List<Variable> list);
+        public bool ParseVariables(List<Variable>? list);
 
         #endregion
     }

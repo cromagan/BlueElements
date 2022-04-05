@@ -83,7 +83,7 @@ namespace BlueControls.Forms {
             this.Ribbon.Controls.Add(this.tabEditor);
             this.Ribbon.Controls.Add(this.tabFile);
             this.Ribbon.Size = new System.Drawing.Size(974, 110);
-            this.Ribbon.TabDefault = this.tabEditor;
+            this.Ribbon.TabDefault = this.tabFile;
             this.Ribbon.TabDefaultOrder = new string[] {
         "Datei",
         "Editor",
@@ -112,7 +112,7 @@ namespace BlueControls.Forms {
             this.tabEditor.Location = new System.Drawing.Point(4, 25);
             this.tabEditor.Margin = new System.Windows.Forms.Padding(0);
             this.tabEditor.Name = "tabEditor";
-            this.tabEditor.Size = new System.Drawing.Size(966, 81);
+            this.tabEditor.Size = new System.Drawing.Size(876, 81);
             this.tabEditor.TabIndex = 4;
             this.tabEditor.Text = "Editor";
             // 

@@ -1043,8 +1043,8 @@ namespace BlueDatabase {
             // _Views-----------------------------------------
             // Nicht nötig, da die Spalten als Verweiß gespeichert sind
             // Zeilen-Quick-Info -----------------------------------------
-            ZeilenQuickInfo = ZeilenQuickInfo.Replace("~" + oldName + ";", "~" + newName.Name + ";", RegexOptions.IgnoreCase);
-            ZeilenQuickInfo = ZeilenQuickInfo.Replace("~" + oldName + "(", "~" + newName.Name + "(", RegexOptions.IgnoreCase);
+            //ZeilenQuickInfo = ZeilenQuickInfo.Replace("~" + oldName + ";", "~" + newName.Name + ";", RegexOptions.IgnoreCase);
+            //ZeilenQuickInfo = ZeilenQuickInfo.Replace("~" + oldName + "(", "~" + newName.Name + "(", RegexOptions.IgnoreCase);
         }
 
         internal string Column_UsedIn(ColumnItem? column) {

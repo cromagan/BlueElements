@@ -53,19 +53,25 @@ namespace BlueControls.ConnectedFormula {
         private RowItem _row;
         private List<RowItem>? _rows;
 
+        private string _showformat = string.Empty;
+
         #endregion
 
         #region Constructors
 
-        public FlexiControlRowSelector(string verbindungsId, Database? database, ItemCollectionPad parent, Database filterdef, string caption) : base() {
+        public FlexiControlRowSelector(string verbindungsId, Database? database, ItemCollectionPad parent, Database filterdef, string caption, string showFormat) : base() {
             CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
             EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
 
-            if(string.IsNullOrEmpty(caption))
-                {
-                caption = "Wählen:";
+            if (string.IsNullOrEmpty(caption)) {
+                Caption = "Wählen:";
             } else {
                 Caption = caption;
+            }
+            _showformat = showFormat;
+
+            if (string.IsNullOrEmpty(_showformat) && database != null && database.Column.Count > 0) {
+                _showformat = "~" + database.Column[0].Name + "~";
             }
 
             ParentCol = parent;
@@ -95,6 +101,7 @@ namespace BlueControls.ConnectedFormula {
             private set {
                 if (value == _row) { return; }
                 _row = value;
+                Script = null;
                 DoChilds(this, _row, ParentCol);
             }
         }
@@ -167,37 +174,13 @@ namespace BlueControls.ConnectedFormula {
             CalculateRows();
         }
 
-        //private static bool DoChilds_ListItems(IAcceptItemsForSelect fc, RowItem row, bool genaueinezeile, ItemCollectionPad? parent) {
-        //    // Dropdownmenü mehrerer Einträge
-        //    if (genaueinezeile) { return false; }
-
-        //    // Wie lautet der eigene Ursprüngliche Name, von dem das FlexControl abstammt
-        //    var id = (string)fc.Tag;
-
-        //    // Sich selbst suchen - also, das Original Item. Das Parent hier ist die PadCollection
-        //    var efpi = parent[id];
-
-        //    if (efpi is not EditFieldPadItem epfi2) { return false; }
-
-        //    var li = epfi2.Column.Contents(row);
-        //    var cbx = new ItemCollection.ItemCollectionList.ItemCollectionList();
-        //    cbx.AddRange(li, epfi2.Column, ShortenStyle.Replaced, epfi2.Column.BildTextVerhalten);
-        //    cbx.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
-
-        //    if (fc.EditType == EditTypeFormula.Textfeld_mit_Auswahlknopf) {
-        //        fc.StyleComboBox(cbx, System.Windows.Forms.ComboBoxStyle.DropDownList, true);
-        //    }
-
-        //    return true;
-        //}
-
         protected override void OnValueChanged() {
             base.OnValueChanged();
 
             if (string.IsNullOrEmpty(Value)) {
                 Row = null;
             } else {
-                Row = Database.Row.SearchByKey(IntParse(Value));
+                Row = Database.Row.SearchByKey(LongParse(Value));
             }
         }
 
@@ -216,15 +199,10 @@ namespace BlueControls.ConnectedFormula {
 
         private static bool DoChilds_VariableList(IAcceptVariableList fcfc, Script? script, RowItem row, Database? database) {
             // Normales Zellenfeld
-            if (script != null && script.Variables != null && script.Variables.Count > 0) {
-                fcfc.ParseVariables(script.Variables);
-                //fcfc.Database = database;
-                //fcfc.Rows.Clear();
-                //fcfc.Rows.AddRange(rows);
-                return true;
-            }
 
-            return false;
+            fcfc.ParseVariables(script?.Variables);
+
+            return true;
         }
 
         private void CalculateRows() {
@@ -403,7 +381,9 @@ namespace BlueControls.ConnectedFormula {
             if (_rows != null) {
                 foreach (var thisR in _rows) {
                     if (cb.Item[thisR.Key.ToString()] == null) {
-                        cb.Item.Add(thisR, string.Empty);
+                        var _tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, true);
+                        cb.Item.Add(_tmpQuickInfo, thisR.Key.ToString());
+                        //cb.Item.Add(thisR, string.Empty);
                     } else {
                         foreach (var thisIt in ex) {
                             if (thisIt.Internal == thisR.Key.ToString()) {

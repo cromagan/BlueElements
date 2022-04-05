@@ -26,7 +26,7 @@ namespace BlueControls.EventArgs {
 
         #region Constructors
 
-        public ContextMenuInitEventArgs(object? hotItem, List<string> tags, ItemCollectionList? userMenu) {
+        public ContextMenuInitEventArgs(object? hotItem, List<string> tags, ItemCollectionList userMenu) {
             UserMenu = userMenu;
             HotItem = hotItem;
             Tags = tags;
@@ -42,7 +42,7 @@ namespace BlueControls.EventArgs {
         public object? HotItem { get; }
         public List<string> Tags { get; }
         public bool Translate { get; }
-        public ItemCollectionList? UserMenu { get; }
+        public ItemCollectionList UserMenu { get; }
 
         #endregion
     }
