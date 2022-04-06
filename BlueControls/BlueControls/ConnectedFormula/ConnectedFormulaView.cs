@@ -16,9 +16,11 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueControls.ConnectedFormula;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using BlueDatabase;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -96,16 +98,35 @@ namespace BlueControls.Controls {
             return null;
         }
 
-        public void Set(string id, string value) {
+        /// <summary>
+        /// Setzt eine Variablen-ID auf diesen Wert.
+        /// String werden in Konstante Felder geschrieben.
+        /// Row wird in RowSelector geschrieben
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="value"></param>
+        public void Set(string id, object? value) {
             foreach (var thisCon in Controls) {
                 switch (thisCon) {
                     case ConnectedFormulaView cf:
                         cf.Set(id, value);
                         break;
 
+                    case FlexiControlRowSelector fcrs:
+                        if (value is RowItem rvalue) {
+                            if (fcrs.VerbindungsId.Equals(id, System.StringComparison.InvariantCultureIgnoreCase)) {
+                                if (fcrs.FilterDefiniton.Row.Count == 0) {
+                                    fcrs.ValueSet(rvalue.Key.ToString(), true, true);
+                                }
+                            }
+                        }
+                        break;
+
                     case FlexiControl fc:
-                        if (fc.Caption.Equals(id, System.StringComparison.InvariantCultureIgnoreCase)) {
-                            fc.ValueSet(value, true, true);
+                        if (value is string values) {
+                            if (fc.Caption.Equals(id, System.StringComparison.InvariantCultureIgnoreCase)) {
+                                fc.ValueSet(values, true, true);
+                            }
                         }
                         break;
 
@@ -135,16 +156,22 @@ namespace BlueControls.Controls {
         private void _cf_Changed(object sender, System.EventArgs e) { GenerateView(); }
 
         private void GenerateView() {
-            var used = new List<object>();
+            var unused = new List<System.Windows.Forms.Control>();
+            foreach (var thisco in Controls) {
+                if (thisco is System.Windows.Forms.Control c) {
+                    unused.Add(c);
+                }
+            }
+
 
             if (_cf != null) {
                 var addfactor = Size.Width / _cf.PadData.SheetSizeInPix.Width;
 
                 foreach (var thisit in _cf.PadData) {
                     var o = SearchOrGenerate(thisit);
-                    used.Add(o);
 
                     if (o is System.Windows.Forms.Control c) {
+                        unused.Remove(c);
                         c.Visible = true;
                         var ua = thisit.UsedArea;
                         c.Left = (int)(ua.Left * addfactor);
@@ -155,14 +182,13 @@ namespace BlueControls.Controls {
                 }
             }
 
-            foreach (var thisc in Controls) {
-                if (thisc is System.Windows.Forms.Control c) {
-                    if (!used.Contains(c)) {
-                        Controls.Remove(c);
-                        c.Dispose();
-                    }
-                }
+
+
+            foreach (var thisc in unused) {
+                Controls.Remove(thisc);
+                thisc.Dispose();
             }
+
         }
 
         #endregion

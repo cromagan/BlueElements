@@ -118,6 +118,8 @@ namespace BlueDatabase.Enums {
         ZeilenQuickInfo = 66,
         RulesScript = 67,
         AdditionaFilesPfad = 68,
+        StandardFormulaFile = 69,
+
         Info_ColumDataSart = 100,
         Info_ColumnDataEnd = 199,
         co_Name = 100,

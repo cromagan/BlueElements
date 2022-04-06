@@ -40,8 +40,6 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private const string Version = "1.0001";
-
         private Ansicht _ansicht = Ansicht.Nur_Tabelle;
 
         #endregion
@@ -160,38 +158,15 @@ namespace BlueControls.Forms {
             Ansicht1.Enabled = datenbankDa;
             Ansicht2.Enabled = datenbankDa;
 
-            SuchenUndErsetzen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
-            AngezeigteZeilenLöschen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
-            Datenüberprüfung.Enabled = datenbankDa;
             btnVorwärts.Enabled = datenbankDa;
             btnZurück.Enabled = datenbankDa;
             such.Enabled = datenbankDa;
             FilterLeiste.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
         }
 
-        protected override void OnLoad(System.EventArgs e) {
-            base.OnLoad(e);
-            CaptionAnzeige();
-        }
-
         protected override void OnShown(System.EventArgs e) {
             base.OnShown(e);
-            ribMain.SelectedIndex = 0;
             InitView();
-        }
-
-        //private void AllgemeinerEditor_Click(object sender, System.EventArgs e) {
-        //    Hide();
-        //    PadEditorWithFileAccess r = new() {
-        //        WindowState = System.Windows.Forms.FormWindowState.Maximized
-        //    };
-        //    r.ShowDialog();
-        //    Show();
-        //}
-
-        private void AngezeigteZeilenLöschen_Click(object sender, System.EventArgs e) {
-            Table.Database.Row.Remove(Table.Filter, Table.PinnedRows);
-            CheckButtons();
         }
 
         private void Ansicht_Click(object sender, System.EventArgs e) {
@@ -200,22 +175,7 @@ namespace BlueControls.Forms {
             CheckButtons();
         }
 
-        private void CaptionAnzeige() {
-            if (Table.Database == null) {
-                Text = "Be Creative! V" + Version;
-                return;
-            }
-            Text = Table.Database != null
-                ? Table.Database.Filename.FileNameWithSuffix() + " - Be Creative! V" + Version
-                : "[Neue Datenbank] - Be Creative! V" + Version;
-        }
-
-        private void cbxColumnArr_TextChanged(object sender, System.EventArgs e) {
-        }
-
         private void Check_SuchButton() => SuchB.Enabled = Table.Database != null && Table.Database.Row.Count >= 1 && !string.IsNullOrEmpty(such.Text) && !string.IsNullOrEmpty(such.Text.RemoveChars(" "));
-
-        private void Datenüberprüfung_Click(object sender, System.EventArgs e) => Table.Database.Row.DoAutomatic(Table.Filter, true, Table.PinnedRows, "manual check");
 
         private void InitView() {
             //Formula.HideViewEditor();
@@ -302,8 +262,6 @@ namespace BlueControls.Forms {
                 : Table.Database.Row.Add(NameRepair("Neuer Eintrag", null));
             Table.CursorPos_Set(Table.Database.Column.First(), Table.SortedRows().Get(r), true);
         }
-
-        private void SelectStandardTab() => ribMain.SelectedIndex = 1;
 
         private void such_Enter(object sender, System.EventArgs e) {
             if (SuchB.Enabled) { SuchB_Click(SuchB, System.EventArgs.Empty); }
@@ -392,8 +350,6 @@ namespace BlueControls.Forms {
             if (row == null) { row = Table.View_RowFirst(); }
         }
 
-        private void SuchenUndErsetzen_Click(object sender, System.EventArgs e) => Table.OpenSearchAndReplace();
-
         private void TableView_ContextMenu_Init(object sender, ContextMenuInitEventArgs e) {
             var bt = (Table)sender;
             var cellKey = e.Tags.TagGet("Cellkey");
@@ -427,10 +383,6 @@ namespace BlueControls.Forms {
             if (Table.Design == BlueTableAppearance.OnlyMainColumnWithoutHead) {
                 e.CancelReason = "In dieser Ansicht kann der Eintrag nicht bearbeitet werden.";
             }
-        }
-
-        private void TableView_RowsSorted(object sender, System.EventArgs e) {
-            CheckButtons();
         }
 
         private void vor_Click(object sender, System.EventArgs e) {

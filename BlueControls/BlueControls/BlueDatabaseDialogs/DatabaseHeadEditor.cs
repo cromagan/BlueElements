@@ -102,6 +102,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             tbxReloadVerzoegerung.Text = _database.ReloadDelaySecond.ToString();
             txbGlobalScale.Text = _database.GlobalScale.ToString(Constants.Format_Float1);
             txbAdditionalFiles.Text = _database.AdditionaFilesPfad;
+            txbStandardFormulaFile.Text = _database.StandardFormulaFile;
             txbZeilenQuickInfo.Text = _database.ZeilenQuickInfo.Replace("<br>", "\r");
             tbxUndoAnzahl.Text = _database.UndoCount.ToString();
             PermissionGroups_NewRow.Suggestions.Clear();
@@ -487,6 +488,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 _database.ReloadDelaySecond = 1;
             }
             _database.AdditionaFilesPfad = txbAdditionalFiles.Text;
+            _database.StandardFormulaFile = txbStandardFormulaFile.Text;
             _database.ZeilenQuickInfo = txbZeilenQuickInfo.Text.Replace("\r", "<br>");
             if (tbxTags.Text != _database.Tags.JoinWithCr()) {
                 _database.Tags.Clear();

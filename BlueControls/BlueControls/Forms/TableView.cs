@@ -322,18 +322,32 @@ namespace BlueControls.Forms {
             //SuchenUndErsetzen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
             //AngezeigteZeilenLöschen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
             //Datenüberprüfung.Enabled = datenbankDa;
+            btnZeileLöschen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
+            btnDatenüberprüfung.Enabled = datenbankDa;
             btnSaveAs.Enabled = datenbankDa;
             btnDrucken.Item["csv"].Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
             btnDrucken.Item["html"].Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
             //btnVorwärts.Enabled = datenbankDa;
             //btnZurück.Enabled = datenbankDa;
             //such.Enabled = datenbankDa;
+            btnSuchenUndErsetzen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
             FilterLeiste.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
         }
 
         protected void DatabaseSet(Database? database, string viewcode) {
             Table.Database = database;
             Formula.Database = database;
+
+            var f = database?.FormulaFileName();
+
+            if (f != null) {
+                var tmpFormula = ConnectedFormula.ConnectedFormula.GetByFilename(f);
+                if (tmpFormula == null) { return; }
+                FormulaBETA.ConnectedFormula = tmpFormula;
+            } else {
+                FormulaBETA.ConnectedFormula = null;
+            }
+
             FilterLeiste.Table = Table;
 
             if (!string.IsNullOrEmpty(viewcode)) {
@@ -572,6 +586,8 @@ namespace BlueControls.Forms {
 
         private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => Table.Database.Column.GenerateOverView();
 
+        private void btnSuchenUndErsetzen_Click(object sender, System.EventArgs e) => Table.OpenSearchAndReplace();
+
         private void btnTemporärenSpeicherortÖffnen_Click(object sender, System.EventArgs e) {
             BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
             ExecuteFile(Path.GetTempPath());
@@ -664,20 +680,28 @@ namespace BlueControls.Forms {
         //}
 
         private void FillFormula() {
-            if (tbcSidebar.SelectedTab != tabFormula) { return; }
-            if (Formula is null || Formula.IsDisposed) { return; }
-            if (!Formula.Visible) { return; }
+            if (tbcSidebar.SelectedTab == tabFormula) {
+                if (Formula is null || Formula.IsDisposed) { return; }
+                if (!Formula.Visible) { return; }
 
-            if (Formula.Width < 30 || Formula.Height < 10) {
-                Formula.Database = null;
-                return;
+                if (Formula.Width < 30 || Formula.Height < 10) {
+                    Formula.Database = null;
+                    return;
+                }
+
+                Formula.Database = Table.Database;
+                //if (e.Column != null) { Formula.Database = e.Column.Database; }
+                //if (e.RowData?.Row != null) { Formula.Database = e.RowData.Row.Database; }
+
+                Formula.ShowingRowKey = Table.CursorPosRow is RowData r ? r.Row.Key : -1;
             }
 
-            Formula.Database = Table.Database;
-            //if (e.Column != null) { Formula.Database = e.Column.Database; }
-            //if (e.RowData?.Row != null) { Formula.Database = e.RowData.Row.Database; }
+            if (tbcSidebar.SelectedTab == tabFormulaBeta) {
+                if (FormulaBETA is null || FormulaBETA.IsDisposed) { return; }
+                if (!FormulaBETA.Visible) { return; }
 
-            Formula.ShowingRowKey = Table.CursorPosRow is RowData r ? r.Row.Key : -1;
+                FormulaBETA.Set("row", Table?.CursorPosRow?.Row);
+            }
         }
 
         private void Formula_SizeChanged(object sender, System.EventArgs e) => FillFormula();

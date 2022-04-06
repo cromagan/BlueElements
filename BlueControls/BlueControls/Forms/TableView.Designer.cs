@@ -44,6 +44,7 @@ namespace BlueControls.Forms {
             this.cbxColumnArr = new BlueControls.Controls.ComboBox();
             this.tabAdmin = new System.Windows.Forms.TabPage();
             this.grpAdminZeilen = new BlueControls.Controls.GroupBox();
+            this.btnSuchenUndErsetzen = new BlueControls.Controls.Button();
             this.btnZeileLöschen = new BlueControls.Controls.Button();
             this.btnDatenüberprüfung = new BlueControls.Controls.Button();
             this.grpAdminBearbeiten = new BlueControls.Controls.GroupBox();
@@ -75,6 +76,8 @@ namespace BlueControls.Forms {
             this.capZeilen2 = new BlueControls.Controls.Caption();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
+            this.tabFormulaBeta = new System.Windows.Forms.TabPage();
+            this.FormulaBETA = new BlueControls.Controls.ConnectedFormulaView();
             this.ribMain.SuspendLayout();
             this.tabFile.SuspendLayout();
             this.grpOrdner.SuspendLayout();
@@ -97,6 +100,7 @@ namespace BlueControls.Forms {
             this.tbcSidebar.SuspendLayout();
             this.tabFormula.SuspendLayout();
             this.pnlStatusBar.SuspendLayout();
+            this.tabFormulaBeta.SuspendLayout();
             this.SuspendLayout();
             // 
             // ribMain
@@ -142,7 +146,7 @@ namespace BlueControls.Forms {
             this.grpOrdner.TabStop = false;
             this.grpOrdner.Text = "Ordner";
             // 
-            // btnDatenbanken
+            // btnDatenbankenSpeicherort
             // 
             this.btnDatenbankenSpeicherort.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnDatenbankenSpeicherort.ImageCode = "Ordner";
@@ -343,22 +347,34 @@ namespace BlueControls.Forms {
             // 
             this.grpAdminZeilen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpAdminZeilen.CausesValidation = false;
+            this.grpAdminZeilen.Controls.Add(this.btnSuchenUndErsetzen);
             this.grpAdminZeilen.Controls.Add(this.btnZeileLöschen);
             this.grpAdminZeilen.Controls.Add(this.btnDatenüberprüfung);
             this.grpAdminZeilen.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAdminZeilen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAdminZeilen.Location = new System.Drawing.Point(429, 0);
+            this.grpAdminZeilen.Location = new System.Drawing.Point(424, 0);
             this.grpAdminZeilen.Name = "grpAdminZeilen";
-            this.grpAdminZeilen.Size = new System.Drawing.Size(152, 81);
+            this.grpAdminZeilen.Size = new System.Drawing.Size(232, 81);
             this.grpAdminZeilen.TabIndex = 8;
             this.grpAdminZeilen.TabStop = false;
             this.grpAdminZeilen.Text = "Zeilen";
+            // 
+            // btnSuchenUndErsetzen
+            // 
+            this.btnSuchenUndErsetzen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnSuchenUndErsetzen.ImageCode = "Fernglas";
+            this.btnSuchenUndErsetzen.Location = new System.Drawing.Point(8, 2);
+            this.btnSuchenUndErsetzen.Name = "btnSuchenUndErsetzen";
+            this.btnSuchenUndErsetzen.Size = new System.Drawing.Size(80, 66);
+            this.btnSuchenUndErsetzen.TabIndex = 44;
+            this.btnSuchenUndErsetzen.Text = "Suchen und ersetzen";
+            this.btnSuchenUndErsetzen.Click += new System.EventHandler(this.btnSuchenUndErsetzen_Click);
             // 
             // btnZeileLöschen
             // 
             this.btnZeileLöschen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnZeileLöschen.ImageCode = "Zeile||||||||||Kreuz";
-            this.btnZeileLöschen.Location = new System.Drawing.Point(72, 2);
+            this.btnZeileLöschen.Location = new System.Drawing.Point(152, 2);
             this.btnZeileLöschen.Name = "btnZeileLöschen";
             this.btnZeileLöschen.QuickInfo = "Angezeigte Zeilen löschen";
             this.btnZeileLöschen.Size = new System.Drawing.Size(72, 66);
@@ -370,7 +386,7 @@ namespace BlueControls.Forms {
             // 
             this.btnDatenüberprüfung.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnDatenüberprüfung.ImageCode = "Zeile||||||||||Häkchen";
-            this.btnDatenüberprüfung.Location = new System.Drawing.Point(8, 2);
+            this.btnDatenüberprüfung.Location = new System.Drawing.Point(88, 2);
             this.btnDatenüberprüfung.Name = "btnDatenüberprüfung";
             this.btnDatenüberprüfung.QuickInfo = "Aktuell angezeigte Zeilen<br>automatisch überprüfen.";
             this.btnDatenüberprüfung.Size = new System.Drawing.Size(64, 66);
@@ -389,7 +405,7 @@ namespace BlueControls.Forms {
             this.grpAdminBearbeiten.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAdminBearbeiten.Location = new System.Drawing.Point(208, 0);
             this.grpAdminBearbeiten.Name = "grpAdminBearbeiten";
-            this.grpAdminBearbeiten.Size = new System.Drawing.Size(221, 81);
+            this.grpAdminBearbeiten.Size = new System.Drawing.Size(216, 81);
             this.grpAdminBearbeiten.TabIndex = 9;
             this.grpAdminBearbeiten.TabStop = false;
             this.grpAdminBearbeiten.Text = "Bearbeiten";
@@ -585,7 +601,7 @@ namespace BlueControls.Forms {
             this.tbcDatabaseSelector.Size = new System.Drawing.Size(739, 24);
             this.tbcDatabaseSelector.TabDefault = null;
             this.tbcDatabaseSelector.TabDefaultOrder = null;
-            this.tbcDatabaseSelector.TabIndex = 20;   
+            this.tbcDatabaseSelector.TabIndex = 20;
             this.tbcDatabaseSelector.Selected += new System.Windows.Forms.TabControlEventHandler(this.tbcDatabaseSelector_Selected);
             this.tbcDatabaseSelector.Deselecting += new System.Windows.Forms.TabControlCancelEventHandler(this.tbcDatabaseSelector_Deselecting);
             // 
@@ -617,6 +633,7 @@ namespace BlueControls.Forms {
             // Table
             // 
             this.Table.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Table.DropMessages = false;
             this.Table.Location = new System.Drawing.Point(0, 64);
             this.Table.Name = "Table";
             this.Table.ShowWaitScreen = true;
@@ -653,6 +670,7 @@ namespace BlueControls.Forms {
             // tbcSidebar
             // 
             this.tbcSidebar.Controls.Add(this.tabFormula);
+            this.tbcSidebar.Controls.Add(this.tabFormulaBeta);
             this.tbcSidebar.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tbcSidebar.HotTrack = true;
             this.tbcSidebar.Location = new System.Drawing.Point(0, 0);
@@ -727,6 +745,25 @@ namespace BlueControls.Forms {
             this.SaveTab.Title = "Bitte neuen Dateinamen der Datenbank wählen.";
             this.SaveTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
             // 
+            // tabFormulaBeta
+            // 
+            this.tabFormulaBeta.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabFormulaBeta.Controls.Add(this.FormulaBETA);
+            this.tabFormulaBeta.Location = new System.Drawing.Point(4, 25);
+            this.tabFormulaBeta.Name = "tabFormulaBeta";
+            this.tabFormulaBeta.Size = new System.Drawing.Size(250, 566);
+            this.tabFormulaBeta.TabIndex = 1;
+            this.tabFormulaBeta.Text = "Formular (BETA)";
+            // 
+            // FormulaBETA
+            // 
+            this.FormulaBETA.ConnectedFormula = null;
+            this.FormulaBETA.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.FormulaBETA.Location = new System.Drawing.Point(0, 0);
+            this.FormulaBETA.Name = "FormulaBETA";
+            this.FormulaBETA.Size = new System.Drawing.Size(250, 566);
+            this.FormulaBETA.TabIndex = 0;
+            // 
             // TableView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -761,6 +798,7 @@ namespace BlueControls.Forms {
             this.tbcSidebar.ResumeLayout(false);
             this.tabFormula.ResumeLayout(false);
             this.pnlStatusBar.ResumeLayout(false);
+            this.tabFormulaBeta.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -818,5 +856,8 @@ namespace BlueControls.Forms {
         private Controls.Button btnNeuDB;
         private System.Windows.Forms.OpenFileDialog LoadTab;
         private System.Windows.Forms.SaveFileDialog SaveTab;
+        private Controls.Button btnSuchenUndErsetzen;
+        private System.Windows.Forms.TabPage tabFormulaBeta;
+        private Controls.ConnectedFormulaView FormulaBETA;
     }
 }

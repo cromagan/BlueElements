@@ -44,6 +44,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capInfo = new BlueControls.Controls.Caption();
             this.GlobalTab = new BlueControls.Controls.TabControl();
             this.Tab_Allgemein = new System.Windows.Forms.TabPage();
+            this.txbStandardFormulaFile = new BlueControls.Controls.TextBox();
+            this.capStandardFormulaFile = new BlueControls.Controls.Caption();
             this.txbAdditionalFiles = new BlueControls.Controls.TextBox();
             this.capAdditional = new BlueControls.Controls.Caption();
             this.txbZeilenQuickInfo = new BlueControls.Controls.TextBox();
@@ -215,7 +217,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnSortRichtung
             // 
-            this.btnSortRichtung.ButtonStyle = BlueControls.Enums.ButtonStyle.Pic1_or_Pic2;
+            this.btnSortRichtung.ButtonStyle = BlueControls.Enums.ButtonStyle.Yes_or_No;
             this.btnSortRichtung.ImageCode = "AZ|16|8";
             this.btnSortRichtung.ImageCode_Checked = "ZA|16|8";
             this.btnSortRichtung.Location = new System.Drawing.Point(288, 32);
@@ -320,6 +322,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // Tab_Allgemein
             // 
             this.Tab_Allgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.Tab_Allgemein.Controls.Add(this.txbStandardFormulaFile);
+            this.Tab_Allgemein.Controls.Add(this.capStandardFormulaFile);
             this.Tab_Allgemein.Controls.Add(this.txbAdditionalFiles);
             this.Tab_Allgemein.Controls.Add(this.capAdditional);
             this.Tab_Allgemein.Controls.Add(this.txbZeilenQuickInfo);
@@ -346,10 +350,28 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Allgemein.TabIndex = 1;
             this.Tab_Allgemein.Text = "Allgemein";
             // 
+            // txbStandardFormulaFile
+            // 
+            this.txbStandardFormulaFile.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbStandardFormulaFile.Location = new System.Drawing.Point(8, 424);
+            this.txbStandardFormulaFile.Name = "txbStandardFormulaFile";
+            this.txbStandardFormulaFile.Size = new System.Drawing.Size(552, 24);
+            this.txbStandardFormulaFile.TabIndex = 47;
+            this.txbStandardFormulaFile.Verhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
+            // capStandardFormulaFile
+            // 
+            this.capStandardFormulaFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.capStandardFormulaFile.CausesValidation = false;
+            this.capStandardFormulaFile.Location = new System.Drawing.Point(8, 408);
+            this.capStandardFormulaFile.Name = "capStandardFormulaFile";
+            this.capStandardFormulaFile.Size = new System.Drawing.Size(152, 18);
+            this.capStandardFormulaFile.Text = "Standard-Formular-Datei:";
+            // 
             // txbAdditionalFiles
             // 
             this.txbAdditionalFiles.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbAdditionalFiles.Location = new System.Drawing.Point(8, 416);
+            this.txbAdditionalFiles.Location = new System.Drawing.Point(8, 376);
             this.txbAdditionalFiles.Name = "txbAdditionalFiles";
             this.txbAdditionalFiles.Size = new System.Drawing.Size(552, 24);
             this.txbAdditionalFiles.TabIndex = 45;
@@ -359,7 +381,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.capAdditional.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.capAdditional.CausesValidation = false;
-            this.capAdditional.Location = new System.Drawing.Point(8, 400);
+            this.capAdditional.Location = new System.Drawing.Point(8, 360);
             this.capAdditional.Name = "capAdditional";
             this.capAdditional.Size = new System.Drawing.Size(152, 18);
             this.capAdditional.Text = "Zugehörige-Dateien-Pfad:";
@@ -661,6 +683,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tblUndo.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.tblUndo.DropMessages = false;
             this.tblUndo.Location = new System.Drawing.Point(0, 56);
             this.tblUndo.Name = "tblUndo";
             this.tblUndo.ShowWaitScreen = true;
@@ -802,5 +825,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private ScriptEditorDatabase scriptEditor;
         private Button btnClipboard;
         private Button btnAlleUndos;
+        private TextBox txbStandardFormulaFile;
+        private Caption capStandardFormulaFile;
     }
 }

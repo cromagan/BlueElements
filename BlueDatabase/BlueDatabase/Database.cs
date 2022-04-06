@@ -82,34 +82,30 @@ namespace BlueDatabase {
         private string _additionaFilesPfad;
 
         private string _additionaFilesPfadtmp = string.Empty;
-
         private Ansicht _ansicht;
-
         private string _caption = string.Empty;
-
         private string _createDate = string.Empty;
-
         private string _creator = string.Empty;
-
         private string _fileEncryptionKey = string.Empty;
-
-        //private string _filterImagePfad;
-
         private double _globalScale;
 
+        //private string _filterImagePfad;
         private string _globalShowPass = string.Empty;
 
-        //private enJoinTyp _JoinTyp;
+        private string _rulesScript = string.Empty;
 
         ///// <summary>
         ///// Variable nur temporär für den BinReloader, um mögliche Datenverluste zu entdecken.
         ///// </summary>
         //private string _LastWorkItem = string.Empty;
-
-        private string _rulesScript = string.Empty;
-
         private RowSortDefinition? _sortDefinition;
 
+        /// <summary>
+        /// Die Eingabe des Benutzers. Ist der Pfad gewünscht, muss FormulaFileName benutzt werden.
+        /// </summary>
+        private string _standardFormulaFile;
+
+        //private enJoinTyp _JoinTyp;
         private int _undoCount;
 
         private VerwaisteDaten _verwaisteDaten;
@@ -303,6 +299,19 @@ namespace BlueDatabase {
             }
         }
 
+        /// <summary>
+        /// Die Eingabe des Benutzers. Ist der Pfad gewünscht, muss FormulaFileName benutzt werden.
+        /// </summary>
+        [Browsable(false)]
+        [Description("Das standardmäßige Formular - dessen Dateiname -, das angezeigt werden soll.")]
+        public string StandardFormulaFile {
+            get => _standardFormulaFile;
+            set {
+                if (_standardFormulaFile == value) { return; }
+                AddPending(DatabaseDataType.StandardFormulaFile, -1, -1, _standardFormulaFile, value, true);
+            }
+        }
+
         [Browsable(false)]
         public int UndoCount {
             get => _undoCount;
@@ -477,6 +486,15 @@ namespace BlueDatabase {
             return sortedRows;
         }
 
+        /// <summary>
+        /// Datenbankpfad mit Forms und abschließenden \
+        /// </summary>
+        /// <returns></returns>
+        public string DefaultFormulaPath() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "Forms\\";
+
+        /// <summary>
+        /// Datenbankpfad mit Layouts und abschließenden \
+        /// </summary>
         public string DefaultLayoutPath() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "Layouts\\";
 
         public override void DiscardPendingChanges() => ChangeWorkItems(ItemState.Pending, ItemState.Undo);
@@ -662,6 +680,17 @@ namespace BlueDatabase {
         /// </summary>
         /// <returns></returns>
         public void Export_HTML(string filename, ColumnViewCollection? arrangement, List<RowData?> sortedRows, bool execute) => Export_HTML(filename, arrangement.ListOfUsedColumn(), sortedRows, execute);
+
+        /// <summary>
+        /// Testet die Standard-Verzeichnisse und gibt das Formular zurück, falls es existiert
+        /// </summary>
+        /// <returns></returns>
+        public string? FormulaFileName() {
+            if (FileExists(_standardFormulaFile)) { return _standardFormulaFile; }
+            if (FileExists(AdditionaFilesPfadWhole() + _standardFormulaFile)) { return AdditionaFilesPfadWhole() + _standardFormulaFile; }
+            if (FileExists(DefaultFormulaPath() + _standardFormulaFile)) { return DefaultFormulaPath() + _standardFormulaFile; }
+            return null;
+        }
 
         public override bool HasPendingChanges() {
             try {
@@ -1371,6 +1400,7 @@ namespace BlueDatabase {
                 //SaveToByteList(l, enDatabaseDataType.FilterImagePfad, _filterImagePfad);
                 SaveToByteList(l, DatabaseDataType.AdditionaFilesPfad, _additionaFilesPfad);
                 SaveToByteList(l, DatabaseDataType.ZeilenQuickInfo, _zeilenQuickInfo);
+                SaveToByteList(l, DatabaseDataType.StandardFormulaFile, _standardFormulaFile);
                 Column.SaveToByteList(l);
                 //Row.SaveToByteList(l);
                 Cell.SaveToByteList(ref l);
@@ -1796,6 +1826,10 @@ namespace BlueDatabase {
                     _additionaFilesPfad = value;
                     break;
 
+                case DatabaseDataType.StandardFormulaFile:
+                    _standardFormulaFile = value;
+                    break;
+
                 case DatabaseDataType.ZeilenQuickInfo:
                     _zeilenQuickInfo = value;
                     break;
@@ -2014,18 +2048,6 @@ namespace BlueDatabase {
         }
 
         private void Row_RowRemoving(object sender, RowEventArgs e) => AddPending(DatabaseDataType.dummyComand_RemoveRow, -1, e.Row.Key, "", e.Row.Key.ToString(), false);
-
-        //private string SearchKeyValueInPendingsOf(long RowKey) {
-        //    var F = string.Empty;
-        //    foreach (var ThisPending in Works) {
-        //        if (ThisPending.State == enItemState.Pending) {
-        //            if (ThisPending.RowKey == RowKey && ThisPending.Comand == enDatabaseDataType.ce_Value_withoutSizeData && ThisPending.ColKey == Column[0].Key) {
-        //                F = ThisPending.ChangedTo;
-        //            }
-        //        }
-        //    }
-        //    return F;
-        //}
 
         private void Views_ListOrItemChanged(object sender, System.EventArgs e) {
             if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt werden. Kann zu Endlosschleifen führen.
