@@ -754,7 +754,7 @@ namespace BlueBasics.MultiUserFile {
             }
 
             if (mustSave && _checkerTickCount > countSave) {
-                if (!string.IsNullOrEmpty(ErrorReason(Enums.ErrorReason.Save))) { return; }
+               if (!string.IsNullOrEmpty(ErrorReason(Enums.ErrorReason.Save))) { return; }
                 if (!_pureBinSaver.IsBusy) { _pureBinSaver.RunWorkerAsync(); } // Eigentlich sollte diese Abfrage überflüssig sein. Ist sie aber nicht
                 _checkerTickCount = 0;
                 return;

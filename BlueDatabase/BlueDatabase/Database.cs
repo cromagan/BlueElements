@@ -103,7 +103,7 @@ namespace BlueDatabase {
         /// <summary>
         /// Die Eingabe des Benutzers. Ist der Pfad gewünscht, muss FormulaFileName benutzt werden.
         /// </summary>
-        private string _standardFormulaFile;
+        private string _standardFormulaFile = string.Empty;
 
         //private enJoinTyp _JoinTyp;
         private int _undoCount;
@@ -484,6 +484,33 @@ namespace BlueDatabase {
                 }
             }
             return sortedRows;
+        }
+
+        public void CloneDataFrom(Database sourceDatabase) {
+
+            #region Einstellungen der Ursprünglichen Datenbank auf die Kopie übertragen
+
+            RulesScript = sourceDatabase.RulesScript;
+            GlobalShowPass = sourceDatabase.GlobalShowPass;
+            DatenbankAdmin.CloneFrom(sourceDatabase.DatenbankAdmin);
+            PermissionGroupsNewRow.CloneFrom(sourceDatabase.PermissionGroupsNewRow);
+            ReloadDelaySecond = sourceDatabase.ReloadDelaySecond;
+            VerwaisteDaten = sourceDatabase.VerwaisteDaten;
+            ZeilenQuickInfo = sourceDatabase.ZeilenQuickInfo;
+            StandardFormulaFile = sourceDatabase.StandardFormulaFile;
+
+            if (SortDefinition.ToString() != sourceDatabase.SortDefinition.ToString()) {
+                SortDefinition = new RowSortDefinition(this, sourceDatabase.SortDefinition.ToString());
+            }
+
+            foreach (var ThisColumn in Column) {
+                var l = sourceDatabase.Column.Exists(ThisColumn.Name);
+                if (l != null) {
+                    ThisColumn.CloneFrom(l);
+                }
+            }
+
+            #endregion
         }
 
         /// <summary>

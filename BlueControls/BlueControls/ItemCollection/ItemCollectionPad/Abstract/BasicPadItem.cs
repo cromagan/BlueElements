@@ -349,7 +349,7 @@ namespace BlueControls.ItemCollection {
             foreach (var t in PointsForSuccesfullyMove) {
                 t.Move(x, y);
             }
-            //OnChanged();
+            OnChanged();
         }
 
         /// <summary>

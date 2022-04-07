@@ -72,6 +72,7 @@ namespace BlueControls.ConnectedFormula {
             //if (notallowedchilds != null) {
             //    NotAllowedChilds.AddIfNotExists(notallowedchilds);
             //}
+            _saved = true;
 
             DatabaseFiles.Changed += DatabaseFiles_Changed;
             NotAllowedChilds.Changed += NotAllowedChilds_Changed;
@@ -99,6 +100,9 @@ namespace BlueControls.ConnectedFormula {
                 if (_padData != null) {
                     PadData.Changed += PadData_Changed;
                 }
+
+                if (_saving || IsParsing || IsLoading) { return; }
+
                 _saved = false;
             }
         }
@@ -241,7 +245,7 @@ namespace BlueControls.ConnectedFormula {
         }
 
         private void DatabaseFiles_Changed(object sender, System.EventArgs e) {
-            if (_saving) { return; }
+            if (_saving || IsParsing || IsLoading) { return; }
 
             foreach (var thisfile in DatabaseFiles) {
                 Database.GetByFilename(thisfile, false, false);
@@ -251,12 +255,12 @@ namespace BlueControls.ConnectedFormula {
         }
 
         private void NotAllowedChilds_Changed(object sender, System.EventArgs e) {
-            if (_saving) { return; }
+            if (_saving || IsParsing || IsLoading) { return; }
             _saved = false;
         }
 
         private void PadData_Changed(object sender, System.EventArgs e) {
-            if (_saving) { return; }
+            if (_saving || IsParsing ||IsLoading) { return; }
 
             _saved = false;
         }

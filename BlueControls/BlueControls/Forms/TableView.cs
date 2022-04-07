@@ -701,6 +701,7 @@ namespace BlueControls.Forms {
                 if (!FormulaBETA.Visible) { return; }
 
                 FormulaBETA.Set("row", Table?.CursorPosRow?.Row);
+                FormulaBETA.Set("key", Table?.CursorPosRow?.Row?.CellFirstString());
             }
         }
 
