@@ -355,6 +355,12 @@ namespace BlueBasics {
 
         public static bool PathExists(string pfad) => pfad.Length >= 3 && Directory.Exists(pfad.CheckPath());
 
+        /// <summary>
+        /// Gibt einen höher gelegenden Ordner mit abschließenden \ zurück
+        /// </summary>
+        /// <param name="pfad"></param>
+        /// <param name="anzahlParents"></param>
+        /// <returns></returns>
         public static string PathParent(this string pfad, int anzahlParents) {
             for (var z = 1; z <= anzahlParents; z++) {
                 pfad = pfad.PathParent();
@@ -362,6 +368,10 @@ namespace BlueBasics {
             return pfad;
         }
 
+        /// <summary>
+        /// Gibt einen höher gelegenden Ordner mit abschließenden \ zurück
+        /// </summary>
+        /// <param name="pfad"></param>
         public static string PathParent(this string pfad) {
             var z = pfad.Length;
             pfad = pfad.CheckPath();

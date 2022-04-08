@@ -343,7 +343,7 @@ namespace BlueDatabase {
                         Database.Cell.Set(thisColum, this, x2);
                     } else {
                         if (!thisColum.IsFirst()) {
-                            Database.Cell.DoSpecialFormats(thisColum, Key, CellGetString(thisColum), false);
+                            Database.Cell.DoSpecialFormats(thisColum, this, CellGetString(thisColum), true);
                         }
                     }
                     CellCollection.Invalidate_CellContentSize(thisColum, this);

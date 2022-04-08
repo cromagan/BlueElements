@@ -374,6 +374,32 @@ namespace BlueControls.Forms {
             }
         }
 
+        protected virtual void FillFormula() {
+            if (tbcSidebar.SelectedTab == tabFormula) {
+                if (Formula is null || Formula.IsDisposed) { return; }
+                if (!Formula.Visible) { return; }
+
+                if (Formula.Width < 30 || Formula.Height < 10) {
+                    Formula.Database = null;
+                    return;
+                }
+
+                Formula.Database = Table.Database;
+                //if (e.Column != null) { Formula.Database = e.Column.Database; }
+                //if (e.RowData?.Row != null) { Formula.Database = e.RowData.Row.Database; }
+
+                Formula.ShowingRowKey = Table.CursorPosRow is RowData r ? r.Row.Key : -1;
+            }
+
+            if (tbcSidebar.SelectedTab == tabFormulaBeta) {
+                if (FormulaBETA is null || FormulaBETA.IsDisposed) { return; }
+                if (!FormulaBETA.Visible) { return; }
+
+                FormulaBETA.Set("row", Table?.CursorPosRow?.Row);
+                FormulaBETA.Set("key", Table?.CursorPosRow?.Row?.CellFirstString());
+            }
+        }
+
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
             DatabaseSet(null as Database, string.Empty);
             BlueBasics.MultiUserFile.MultiUserFile.SaveAll(true);
@@ -678,33 +704,6 @@ namespace BlueControls.Forms {
         //    if (tmpDatabase == null) { return; }
         //    DatabaseSet(tmpDatabase);
         //}
-
-        private void FillFormula() {
-            if (tbcSidebar.SelectedTab == tabFormula) {
-                if (Formula is null || Formula.IsDisposed) { return; }
-                if (!Formula.Visible) { return; }
-
-                if (Formula.Width < 30 || Formula.Height < 10) {
-                    Formula.Database = null;
-                    return;
-                }
-
-                Formula.Database = Table.Database;
-                //if (e.Column != null) { Formula.Database = e.Column.Database; }
-                //if (e.RowData?.Row != null) { Formula.Database = e.RowData.Row.Database; }
-
-                Formula.ShowingRowKey = Table.CursorPosRow is RowData r ? r.Row.Key : -1;
-            }
-
-            if (tbcSidebar.SelectedTab == tabFormulaBeta) {
-                if (FormulaBETA is null || FormulaBETA.IsDisposed) { return; }
-                if (!FormulaBETA.Visible) { return; }
-
-                FormulaBETA.Set("row", Table?.CursorPosRow?.Row);
-                FormulaBETA.Set("key", Table?.CursorPosRow?.Row?.CellFirstString());
-            }
-        }
-
         private void Formula_SizeChanged(object sender, System.EventArgs e) => FillFormula();
 
         private void Formula_VisibleChanged(object sender, System.EventArgs e) => FillFormula();

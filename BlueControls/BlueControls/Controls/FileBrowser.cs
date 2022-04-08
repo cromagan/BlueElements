@@ -26,7 +26,7 @@ using System.Drawing.Imaging;
 namespace BlueControls.Controls {
 
     public partial class FileBrowser : GenericControl, IAcceptVariableList//UserControl //
-                                                  {
+    {
         #region Fields
 
         private string _ausschneiden = string.Empty;
@@ -190,10 +190,20 @@ namespace BlueControls.Controls {
             txbPfad_Enter(null, null);
         }
 
+        private void btnExplorerÖffnen_Click(object sender, System.EventArgs e) {
+            ExecuteFile(txbPfad.Text);
+        }
+
+        private void btnZurück_Click(object sender, System.EventArgs e) {
+            ÖffnePfad(txbPfad.Text.PathParent(1));
+        }
+
         private void CheckButtons() {
             txbPfad.Enabled = Enabled && string.IsNullOrEmpty(OriginalText);
             lsbFiles.Enabled = Enabled;
             btnAddScreenShot.Enabled = PathExists(txbPfad.Text);
+            btnExplorerÖffnen.Enabled = PathExists(txbPfad.Text);
+            btnZurück.Enabled = PathExists(txbPfad.Text);
         }
 
         //private string ChangeFile(string filename, bool shoudbeCrypted) {
@@ -242,6 +252,9 @@ namespace BlueControls.Controls {
             e.UserMenu.Add(ContextMenuComands.Ausschneiden, !tags.TagGet("Folder").FromPlusMinus());
             e.UserMenu.Add(ContextMenuComands.Einfügen, tags.TagGet("CryptetFolder").FromPlusMinus() && !string.IsNullOrEmpty(_ausschneiden));
             e.UserMenu.AddSeparator();
+
+            //e.UserMenu.Add(ContextMenuComands.Bearbeiten,  it.Internal.FileSuffix().Equals("png", StringComparison.InvariantCultureIgnoreCase) );
+
             //e.UserMenu.Add(ContextMenuComands.Umbenennen, FileExists(it.Internal));
             e.UserMenu.Add(ContextMenuComands.Löschen, FileExists(it.Internal));
             e.UserMenu.AddSeparator();
@@ -254,10 +267,10 @@ namespace BlueControls.Controls {
             var it = ((BitmapListItem)e.HotItem);
             var tags = (List<string>)(it.Tag);
 
-            switch (e.ClickedComand) {
-                case "Löschen":
+            switch (e.ClickedComand.ToLower()) {
+                case "löschen":
                     var I = new FileInfo(it.Internal);
-                    var attribute = I.Attributes;
+                    //var attribute = I.Attributes;
 
                     var ask = false;
 
@@ -268,36 +281,36 @@ namespace BlueControls.Controls {
                     }
                     break;
 
-                case "Explorer":
+                case "explorer":
                     ExecuteFile(it.Internal);
                     break;
 
-                    //case "Umbenennen":
+                //case "Umbenennen":
 
-                    //var n = tags.TagGet("UncryptetName");
+                //var n = tags.TagGet("UncryptetName");
 
-                    //var nn = InputBox.Show("Neuer Name:", n.FileNameWithoutSuffix(), VarType.Text);
+                //var nn = InputBox.Show("Neuer Name:", n.FileNameWithoutSuffix(), VarType.Text);
 
-                    //if (n.FileNameWithoutSuffix() == n) { return; }
+                //if (n.FileNameWithoutSuffix() == n) { return; }
 
-                    //nn = n.FilePath() + nn + "." + n.FileSuffix();
+                //nn = n.FilePath() + nn + "." + n.FileSuffix();
 
-                    //if (n != it.Internal) { nn = CryptedFileName(nn, -10); }
+                //if (n != it.Internal) { nn = CryptedFileName(nn, -10); }
 
-                    //RenameFile(it.Internal, nn, true);
+                //RenameFile(it.Internal, nn, true);
 
-                    //if (FileExists(ThumbFile(it.Internal))) {
-                    //    RenameFile(ThumbFile(it.Internal), ThumbFile(nn), true);
-                    //}
+                //if (FileExists(ThumbFile(it.Internal))) {
+                //    RenameFile(ThumbFile(it.Internal), ThumbFile(nn), true);
+                //}
 
-                    //ÖffnePfad(txbPfad.Text);
-                    break;
+                //ÖffnePfad(txbPfad.Text);
+                //break;
 
-                case "Ausschneiden":
+                case "ausschneiden":
                     _ausschneiden = it.Internal;
                     break;
 
-                case "Einfügen":
+                case "einfügen":
                     var ziel = it.Internal + "\\" + _ausschneiden.FileNameWithSuffix();
 
                     if (FileExists(ziel)) {

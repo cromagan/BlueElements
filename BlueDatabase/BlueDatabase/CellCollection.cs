@@ -274,30 +274,39 @@ namespace BlueDatabase {
         }
 
         /// <summary>
-        ///
+        /// Rechnet Cellbezüge und besondere Spalten neu durch, falls sich der Wert geändert hat.
         /// </summary>
         /// <param name="column"></param>
         /// <param name="rowKey"></param>
         /// <param name="previewsValue"></param>
         /// <param name="doAlways">Auch wenn der PreviewsValue gleich dem CurrentValue ist, wird die Routine durchberechnet</param>
-        public void DoSpecialFormats(ColumnItem? column, long rowKey, string previewsValue, bool doAlways) {
+        public void DoSpecialFormats(ColumnItem? column, RowItem? row, string previewsValue, bool doAlways) {
+            if (_database == null || _database.Disposed) { return; }
+            if (row == null) { return; }
             if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
-            var currentValue = GetString(column, _database.Row.SearchByKey(rowKey));
-            if (!doAlways && currentValue == previewsValue) { return; }
-            switch (column.Format) {
+
+            var currentValue = GetString(column, row);
+
+            switch (column!.Format) {
                 case DataFormat.RelationText:
-                    RepairRelationText(column, _database.Row.SearchByKey(rowKey), previewsValue);
-                    SetSameValueOfKey(column, rowKey, currentValue);
+
+                    if (doAlways || currentValue != previewsValue) {
+                        RepairRelationText(column, row, previewsValue);
+                        SetSameValueOfKey(column, row, currentValue);
+                    }
                     break;
 
                 case DataFormat.Verknüpfung_zu_anderer_Datenbank:
                     if (doAlways) {
-                        LinkedCellData(column, _database.Row.SearchByKey(rowKey), true, false); // Repariert auch Cellbezüge
+                        LinkedCellData(column, row, true, false); // Repariert auch Cellbezüge
                     }
                     break;
             }
+
+            if (!doAlways && currentValue == previewsValue) { return; }
+
             if (!string.IsNullOrEmpty(column.Am_A_Key_For_Other_Column)) {
-                SetSameValueOfKey(column, rowKey, currentValue);
+                SetSameValueOfKey(column, row, currentValue);
             }
             if (column.IsFirst()) {
                 foreach (var thisColumnItem in _database.Column.Where(thisColumnItem => thisColumnItem != null)) {
@@ -306,13 +315,13 @@ namespace BlueDatabase {
                         //    RelationNameChanged(ThisColumnItem, PreviewsValue, CurrentValue);
                         //    break;
                         case DataFormat.RelationText:
-                            RelationTextNameChanged(thisColumnItem, rowKey, previewsValue, currentValue);
+                            RelationTextNameChanged(thisColumnItem, row.Key, previewsValue, currentValue);
                             break;
                     }
                 }
             }
             if (column.KeyColumnKey > -1) {
-                ChangeValueOfKey(currentValue, column, rowKey);
+                ChangeValueOfKey(currentValue, column, row.Key);
             }
         }
 
@@ -672,7 +681,7 @@ namespace BlueDatabase {
 
             if (column?.Format is not DataFormat.Verknüpfung_zu_anderer_Datenbank) { value = column?.AutoCorrect(value); }
 
-            var cellKey = KeyOfCell(column.Key, row.Key);
+            var cellKey = KeyOfCell(column, row);
             var oldValue = string.Empty;
             if (ContainsKey(cellKey)) { oldValue = this[cellKey].Value; }
             if (value == oldValue) { return; }
@@ -680,7 +689,7 @@ namespace BlueDatabase {
             _database?.WaitEditable();
             _database?.AddPending(DatabaseDataType.ce_Value_withoutSizeData, column.Key, row.Key, oldValue, value, true);
             column.UcaseNamesSortedByLenght = null;
-            DoSpecialFormats(column, row.Key, oldValue, false);
+            DoSpecialFormats(column, row, oldValue, false);
             SystemSet(_database?.Column.SysRowChanger, row, _database?.UserName);
             SystemSet(_database.Column.SysRowChangeDate, row, DateTime.Now.ToString(Constants.Format_Date5));
             Invalidate_CellContentSize(column, row);
@@ -968,9 +977,11 @@ namespace BlueDatabase {
         /// <param name="column"></param>
         /// <param name="rowKey"></param>
         /// <param name="currentvalue"></param>
-        private void SetSameValueOfKey(ColumnItem? column, long rowKey, string currentvalue) {
-            List<RowItem?> rows = null;
-            var ownRow = _database.Row.SearchByKey(rowKey);
+        private void SetSameValueOfKey(ColumnItem? column, RowItem ownRow, string currentvalue) {
+            if (_database == null || _database.Disposed) { return; }
+            if (column == null) { return; }
+            List<RowItem>? rows = null;
+
             foreach (var thisColumn in _database.Column) {
                 //if (thisColumn.LinkedCell_RowKeyIsInColumn == column.Key) {
                 //    LinkedCellData(thisColumn, ownRow, true, false); // Repariert auch Zellbezüge
