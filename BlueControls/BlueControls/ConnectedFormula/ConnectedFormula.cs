@@ -221,8 +221,10 @@ namespace BlueControls.ConnectedFormula {
 
             foreach (var thisit in PadData) {
                 if (thisit is RowWithFilterPaditem rwf) {
-                    DatabaseFiles.AddIfNotExists(rwf.Database.Filename);
-                    _id = Math.Max(_id, rwf.Id);
+                    if (rwf.Database != null) {
+                        DatabaseFiles.AddIfNotExists(rwf.Database.Filename);
+                        _id = Math.Max(_id, rwf.Id);
+                    }
                 }
             }
             _saving = false;

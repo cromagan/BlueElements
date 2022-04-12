@@ -83,6 +83,7 @@
     <Compile Include="AdditionalScriptComands\Method_ContentsFilter.cs" />
     <Compile Include="AdditionalScriptComands\Method_DisableCellChanges.cs" />
     <Compile Include="AdditionalScriptComands\Method_IsDropDownItem.cs" />
+    <Compile Include="AdditionalScriptComands\Method_RowCount.cs" />
     <Compile Include="AdditionalScriptComands\Method_UniqueRowID.cs" />
     <Compile Include="AdditionalScriptComands\Method_RowIsNull.cs" />
     <Compile Include="AdditionalScriptComands\Method_Row.cs" />
