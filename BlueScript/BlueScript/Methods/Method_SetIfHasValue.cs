@@ -51,12 +51,32 @@ namespace BlueScript.Methods {
                 if (attvar.Attributes[z] is VariableUnknown) { continue; }
                 if (attvar.Attributes[z].ShortName != attvar.Attributes[0].ShortName) { return new DoItFeedback("Variablentyp zur Ausgangsvariable unterschiedlich."); }
 
-                var hasvalue = attvar.Attributes[z].IsNullOrEmpty;
-                if (attvar.Attributes[z] is VariableFloat vf) { hasvalue = vf.ValueNum != 0; }
+                switch (attvar.Attributes[z]) {
+                    case VariableFloat vf:
+                        if (vf.ValueNum != 0) {
+                            ((VariableFloat)attvar.Attributes[0]).ValueNum = vf.ValueNum;
+                            return DoItFeedback.Null();
+                        }
+                        break;
 
-                if (hasvalue) {
-                    ((VariableString)attvar.Attributes[0]).ValueString = ((VariableString)attvar.Attributes[z]).ValueString;
-                    return DoItFeedback.Null();
+                    case VariableString vs:
+                        if (!string.IsNullOrEmpty(vs.ValueString)) {
+                            ((VariableString)attvar.Attributes[0]).ValueString = vs.ValueString;
+                            return DoItFeedback.Null();
+                        }
+                        break;
+
+                    case VariableBool vs:
+
+                        ((VariableBool)attvar.Attributes[0]).ValueBool = vs.ValueBool;
+                        return DoItFeedback.Null();
+
+                    case VariableListString vl:
+                        if (vl.ValueList != null) {
+                            ((VariableListString)attvar.Attributes[0]).ValueList = vl.ValueList;
+                            return DoItFeedback.Null();
+                        }
+                        break;
                 }
             }
 
