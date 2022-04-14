@@ -43,12 +43,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Bool };
+        public override List<List<string>> Args => new() { new() { VariableBool.ShortName_Plain } };
         public override string Description => "Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt. Es werden IMMER alle Vergleichsoperatoren aufgelöst. Deswegen sind Verschachtelungen mit Voricht zu verwenden - z.B. mir einem Exists-Befehl.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => true;
-        public override VariableDataType Returns => VariableDataType.Null;
+        public override string Returns => string.Empty;
         public override string StartSequence => "(";
         public override string Syntax => "if (true) { Code zum Ausführen }";
 
