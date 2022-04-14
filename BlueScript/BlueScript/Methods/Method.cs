@@ -33,7 +33,7 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public abstract List<VariableDataType> Args { get; }
+        public abstract List<List<string>> Args { get; }
 
         public abstract string Description { get; }
 
@@ -43,7 +43,7 @@ namespace BlueScript.Methods {
 
         public abstract bool GetCodeBlockAfter { get; }
 
-        public abstract VariableDataType Returns { get; }
+        public abstract string Returns { get; }
 
         public abstract string StartSequence { get; }
 
@@ -87,7 +87,7 @@ namespace BlueScript.Methods {
 
             List<string> c = new();
             foreach (var thisc in Script.Comands) {
-                if (thisc.Returns != VariableDataType.Null) {
+                if (!string.IsNullOrEmpty(thisc.Returns)) {
                     c.AddRange(thisc.Comand(s).Select(thiscs => thiscs + thisc.StartSequence));
                 }
             }
@@ -174,7 +174,7 @@ namespace BlueScript.Methods {
             return attributes;
         }
 
-        public static SplittedAttributesFeedback SplitAttributeToVars(string attributtext, Script s, List<VariableDataType> types, bool endlessArgs) {
+        public static SplittedAttributesFeedback SplitAttributeToVars(string attributtext, Script s, List<List<string>> types, bool endlessArgs) {
             if (types.Count == 0) {
                 return string.IsNullOrEmpty(attributtext)
                     ? new SplittedAttributesFeedback(new List<Variable>())
@@ -196,7 +196,10 @@ namespace BlueScript.Methods {
 
                 // Variable ermitteln oder eine Dummy-Variable als Rückgabe ermitteln
                 Variable? v = null;
-                if (exceptetType.HasFlag(VariableDataType.Variable)) {
+
+                var mustBeVar = exceptetType.Count > 0 && exceptetType[0].StartsWith("*");
+
+                if (mustBeVar) {
                     var varn = attributes[n];
                     if (varn.StartsWith("~") && varn.EndsWith("~")) {
                         var tmp2 = Variable.GetVariableByParsing(varn.Substring(1, varn.Length - 2), s);
@@ -215,17 +218,26 @@ namespace BlueScript.Methods {
                 }
 
                 // Den Typ der Variable checken
-                if (!exceptetType.HasFlag(v.Type)) {
-                    //if (v.Type == VariableDataType.Error) {
-                    //    return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Attribut " + (n + 1) + ": " + v.Coment);
+                var ok = false;
+
+                foreach (var thisAt in exceptetType) {
+                    if (thisAt.TrimStart("*") == v.ShortName) { ok = true; break; }
+
+                    if (thisAt.TrimStart("*") != Variable.Any_Plain) { ok = true; break; }
+
+                    //if (!exceptetType.HasFlag(v.Type)) {
+                    //    //if (v.Type == VariableDataType.Error) {
+                    //    //    return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Attribut " + (n + 1) + ": " + v.Coment);
+                    //    //}
+                    //    //if (exceptetType == VariableDataType.Integer) {
+                    //    //    if (v is not VariableFloat vn) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
+                    //    //    if (vn.ValueNum != vn.ValueInt) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
+                    //    //} else {
+                    //    //}
                     //}
-                    if (exceptetType == VariableDataType.Integer) {
-                        if (v is not VariableFloat vn) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
-                        if (vn.ValueNum != vn.ValueInt) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
-                    } else {
-                        return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht der erwartete Typ " + exceptetType.ToString() + ", sondern " + v.ShortName);
-                    }
                 }
+
+                if (!ok) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht der erwartete Typ " + exceptetType.ToString() + ", sondern " + v.ShortName); }
 
                 feedbackVariables.Add(v);
 
@@ -235,10 +247,10 @@ namespace BlueScript.Methods {
         }
 
         public CanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, Script s) {
-            if (!expectedvariablefeedback && Returns != VariableDataType.Null) {
+            if (!expectedvariablefeedback && !string.IsNullOrEmpty(Returns)) {
                 return new CanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
             }
-            if (expectedvariablefeedback && Returns == VariableDataType.Null) {
+            if (expectedvariablefeedback && string.IsNullOrEmpty(Returns)) {
                 return new CanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
             }
             var maxl = scriptText.Length;

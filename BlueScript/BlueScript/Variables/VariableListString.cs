@@ -59,6 +59,9 @@ namespace BlueScript.Variables {
 
         #region Properties
 
+        public static string ShortName_Plain => "lst";
+        public static string ShortName_Variable => "*lst";
+
         public override int CheckOrder => 3;
         public override bool GetFromStringPossible => true;
         public override bool IsNullOrEmpty => _list == null || _list.Count == 0;
@@ -83,8 +86,6 @@ namespace BlueScript.Variables {
 
         public override string ShortName => "lst";
         public override bool ToStringPossible => true;
-        public override VariableDataType Type => VariableDataType.List;
-
         public override string ValueForReplace => ReadableText;
 
         public List<string> ValueList {
@@ -124,7 +125,7 @@ namespace BlueScript.Variables {
                     return true;
                 }
 
-                var l = Method.SplitAttributeToVars(t, s, new List<VariableDataType> { VariableDataType.String }, true);
+                var l = Method.SplitAttributeToVars(t, s, new List<List<string>>() { new() { VariableString.ShortName_Plain } }, true);
                 if (!string.IsNullOrEmpty(l.ErrorMessage)) {
                     return false;
                 }

@@ -28,8 +28,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Variable_Object };
-
+        public override List<List<string>> Args => new() { new() { VariableRowItem.ShortName_Variable } };
         public override string Description => "Prüft die angegebene Zeile mit der Startroutine 'script'. Wenn die Zeile Null ist, wird kein Fehler ausgegeben.";
 
         public override bool EndlessArgs => false;
@@ -38,8 +37,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override VariableDataType Returns => VariableDataType.Null;
-
+        public override string Returns => string.Empty;
         public override string StartSequence => "(";
 
         public override string Syntax => "CheckRow(Row);";

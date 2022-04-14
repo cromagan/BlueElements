@@ -31,8 +31,7 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.String_or_List, VariableDataType.String_or_List };
-
+        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain, VariableListString.ShortName_Plain }, new() { VariableString.ShortName_Plain, VariableListString.ShortName_Plain } };
         public override string Description => "Prüft ob eine der Zeichenketten als ganzes Wort vorkommt. Gibt dann als Liste alle gefundenen Strings zurück.";
 
         public override bool EndlessArgs => true;
@@ -41,7 +40,7 @@ namespace BlueScript.Methods {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override VariableDataType Returns => VariableDataType.List;
+        public override string Returns => VariableListString.ShortName_Plain;
 
         public override string StartSequence => "(";
 

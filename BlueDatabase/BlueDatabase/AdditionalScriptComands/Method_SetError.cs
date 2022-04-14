@@ -27,8 +27,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.Variable_List_String_Numeral_or_Bool };
-
+        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Variable, VariableListString.ShortName_Variable, VariableFloat.ShortName_Variable, VariableBool.ShortName_Variable } };
         public override string Description => "Bei Zeilenprüfungen wird ein Fehler abgesetzt. Dessen Inhalt bestimmt die Nachricht. Die Spalten, die als fehlerhaft markiert werden sollen, müssen nachträglich als Variablennamen angegeben werden.";
 
         public override bool EndlessArgs => true;
@@ -37,8 +36,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override VariableDataType Returns => VariableDataType.Null;
-
+        public override string Returns => string.Empty;
         public override string StartSequence => "(";
 
         public override string Syntax => "SetError(Nachricht, Column1, Colum2, ...);";

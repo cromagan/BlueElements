@@ -26,12 +26,13 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Variable_List_String_Numeral_or_Bool, VariableDataType.Any };
+        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Variable, VariableListString.ShortName_Variable, VariableFloat.ShortName_Variable, VariableBool.ShortName_Variable }, new() { Variable.Any_Plain } };
+
         public override string Description => "Diese Routine setzt den ersten Wert, der keinen Fehler verursacht in die erste Variable.\r\nDabei müssen die Datentypen übereinstimmen.\r\nFalls einer der Werte eine Variable ist, die nicht existiert, wird diese einfach übergangen.";
         public override bool EndlessArgs => true;
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.Null;
+        public override string Returns => string.Empty;
         public override string StartSequence => "(";
         public override string Syntax => "SetIfExists(Variable, Werte, ...);";
 
@@ -51,7 +52,7 @@ namespace BlueScript.Methods {
                 if (attvar.Attributes[z] is VariableUnknown) { continue; }
 
                 if (attvar.Attributes[z].ShortName != attvar.Attributes[0].ShortName) { return new DoItFeedback("Variablentyp zur Ausgangsvariable unterschiedlich."); }
-               
+
                 switch (attvar.Attributes[z]) {
                     case VariableString vs:
                         ((VariableString)attvar.Attributes[0]).ValueString = vs.ValueString;
@@ -69,8 +70,6 @@ namespace BlueScript.Methods {
                         ((VariableListString)attvar.Attributes[0]).ValueList = vl.ValueList;
                         return DoItFeedback.Null();
                 }
-                
-
             }
 
             return DoItFeedback.Null();

@@ -27,12 +27,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Numeral };
+        public override List<List<string>> Args => new() { new() { VariableFloat.ShortName_Plain } };
         public override string Description => "Gibt den den angegeben Werten den, mit dem höchsten Wert zurück.";
         public override bool EndlessArgs => true;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.Numeral;
+        public override string Returns => VariableFloat.ShortName_Plain;
         public override string StartSequence => "(";
         public override string Syntax => "Max(Value1, Value2, ...)";
 

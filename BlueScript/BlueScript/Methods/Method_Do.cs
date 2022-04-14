@@ -26,12 +26,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new();
+        public override List<List<string>> Args => new();
         public override string Description => "Führt den Codeblock dauerhaft aus, bis der Befehl Break empfangen wurde. Variablen, die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.";
         public override bool EndlessArgs => false;
         public override string EndSequence => string.Empty;
         public override bool GetCodeBlockAfter => true;
-        public override VariableDataType Returns => VariableDataType.Null;
+        public override string Returns => string.Empty;
         public override string StartSequence => string.Empty;
         public override string Syntax => "Do { Break; }";
 

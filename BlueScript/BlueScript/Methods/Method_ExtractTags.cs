@@ -29,7 +29,7 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.String_or_List, VariableDataType.String };
+        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain, VariableListString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
 
         public override string Description => "Extrahiert aus dem gegebenen String oder Liste die Schlagwörter und erstellt neue String-Variablen.\r\n" +
             "Das zweite Attribut dient als Erkennungszeichen, welche das Ende eine Schlagwortes angibt. Zuvor extrahierte Variablen werden wieder entfernt.\r\n" +
@@ -38,7 +38,7 @@ namespace BlueScript.Methods {
         public override bool EndlessArgs => true;
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.Null;
+        public override string Returns => string.Empty;
         public override string StartSequence => "(";
         public override string Syntax => "ExtractTags(String, Delemiter);";
 

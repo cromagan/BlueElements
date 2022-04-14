@@ -27,12 +27,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.String };
+        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain } };
         public override string Description => "Erstellt ein Verzeichnis, falls dieses nicht existert. Gibt TRUE zurück, erstellt wurde oder bereits existierte.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.Bool;
+        public override string Returns => VariableBool.ShortName_Plain;
         public override string StartSequence => "(";
         public override string Syntax => "DirectoryCreate(Path)";
 

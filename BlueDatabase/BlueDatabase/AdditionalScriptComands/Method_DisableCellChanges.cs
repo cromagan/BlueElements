@@ -27,8 +27,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new();
-
+        public override List<List<string>> Args => new();
         public override string Description => "Verhindert in dieser Datenbank, dass Änderungen, die im SKript vorgenommen wurden, zurückgespielt werden.\r\nSo können z.B. Variabelen für den Export verändert werden und es hat keine Auswirkungen\r\nauf diese Datenbank.";
 
         public override bool EndlessArgs => false;
@@ -37,8 +36,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override VariableDataType Returns => VariableDataType.Null;
-
+        public override string Returns => string.Empty;
         public override string StartSequence => "(";
 
         public override string Syntax => "DisableCellChanges();";

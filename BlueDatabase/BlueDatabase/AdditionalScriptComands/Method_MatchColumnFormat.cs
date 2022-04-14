@@ -32,12 +32,12 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.String_or_List, VariableDataType.Variable_String_Numeral_List_or_Object };
+        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain, VariableListString.ShortName_Plain }, new() { Variable.Any_Variable } };
         public override string Description => "Prüft, ob der Inhalt der Variable mit dem Format der angegebenen Spalte übereinstimmt. Leere Inhalte sind dabei TRUE.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.Bool;
+        public override string Returns => VariableBool.ShortName_Plain;
         public override string StartSequence => "(";
         public override string Syntax => "MatchColumnFormat(Value, Column)";
 

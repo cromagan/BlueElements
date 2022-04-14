@@ -27,12 +27,13 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.String };
+        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
         public override string Description => "Wandelt einen Text in eine Liste um.\r\nEs trennt den Text dabei mitteles dem angegebenen Trennzeichen.\r\nEs wird dabei immer eine Liste mit mindestens einen Eintrag erzeugt,\r\ndieser kann aber leer sein.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.List;
+
+        public override string Returns => VariableString.ShortName_Plain;
         public override string StartSequence => "(";
         public override string Syntax => "Split(String, Trennzeichen)";
 

@@ -18,6 +18,7 @@
 using System.Collections.Generic;
 using BlueScript.Structures;
 using BlueScript.Enums;
+using BlueScript.Variables;
 
 namespace BlueScript.Methods {
 
@@ -25,12 +26,13 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Variable_String_Numeral_List_or_Object };
+        public override List<List<string>> Args => new() { new() { Variable.Any_Variable } };
         public override string Description => "Gibt TRUE zurück, wenn die Variable existiert.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.Bool;
+        public override string Returns => VariableBool.ShortName_Plain;
+
         public override string StartSequence => "(";
         public override string Syntax => "Exists(Variable)";
 

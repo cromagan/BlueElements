@@ -50,6 +50,7 @@ namespace BlueScript.Variables {
 
         #region Properties
 
+        public static string ShortName_Variable => "*sub";
         public override int CheckOrder => 4;
         public override bool GetFromStringPossible => true;
         public override bool IsNullOrEmpty => string.IsNullOrEmpty(SubName);
@@ -64,7 +65,6 @@ namespace BlueScript.Variables {
         public string SubName { get; private set; } = string.Empty;
         public int SubOnLine { get; } = 0;
         public override bool ToStringPossible => false;
-        public override VariableDataType Type => VariableDataType.Sub;
         public override string ValueForReplace => SubName.RemoveCriticalVariableChars();
 
         #endregion

@@ -28,12 +28,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Sub };
+        public override List<List<string>> Args => new() { new() { VariableSub.ShortName_Variable } };
         public override string Description => "Ruft eine Subroutine auf";
         public override bool EndlessArgs => false;
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.Null;
+        public override string Returns => string.Empty;
         public override string StartSequence => "(";
         public override string Syntax => "Call(SubName);";
 

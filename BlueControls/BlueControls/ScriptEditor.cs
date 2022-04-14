@@ -140,7 +140,7 @@ namespace BlueControls {
                 if (s != null && Script.Comands != null) {
                     foreach (var thisc in Script.Comands) {
                         items.Add(new SnippetAutocompleteItem(thisc.Syntax + " "));
-                        if (thisc.Returns != BlueScript.Enums.VariableDataType.Null) {
+                        if (!string.IsNullOrEmpty(thisc.Returns)) {
                             items.Add(new SnippetAutocompleteItem("var " + thisc.Returns + " = " + thisc.Syntax + "; "));
                         }
 

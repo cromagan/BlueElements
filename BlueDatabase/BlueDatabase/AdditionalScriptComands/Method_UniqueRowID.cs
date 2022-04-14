@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Enums;
+using BlueScript.Variables;
 
 namespace BlueDatabase.AdditionalScriptComands {
 
@@ -26,9 +27,8 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new();
-
-        public override string Description => "Gibt eine Systemweit einzigartige Zeilen-ID aller geladenen Datenbanken aus.";
+        public override List<List<string>> Args => new();
+        public override string Description => "Gibt eine systemweit einzigartige Zeilen-ID aller geladenen Datenbanken aus.";
 
         public override bool EndlessArgs => false;
 
@@ -36,7 +36,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override VariableDataType Returns => VariableDataType.String;
+        public override string Returns => VariableString.ShortName_Plain;
 
         public override string StartSequence => "(";
 

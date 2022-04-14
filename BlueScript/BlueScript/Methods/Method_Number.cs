@@ -27,12 +27,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.Numeral };
+        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableFloat.ShortName_Plain } };
         public override string Description => "Gibt den Text als Zahl zurück. Fall dies keine gültige Zahl ist, wird NaN-Value zurückgegeben.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.Numeral;
+        public override string Returns => VariableFloat.ShortName_Plain;
         public override string StartSequence => "(";
         public override string Syntax => "Number(string, NaNValue)";
 

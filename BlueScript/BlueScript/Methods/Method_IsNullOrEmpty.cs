@@ -26,8 +26,7 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Variable_String_Numeral_List_or_Object };
-
+        public override List<List<string>> Args => new() { new() { Variable.Any_Variable } };
         public override string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist oder keinen Inhalt hat.";
 
         public override bool EndlessArgs => false;
@@ -36,8 +35,7 @@ namespace BlueScript.Methods {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override VariableDataType Returns => VariableDataType.Bool;
-
+        public override string Returns => VariableBool.ShortName_Plain;
         public override string StartSequence => "(";
 
         public override string Syntax => "isNullOrEmpty(Variable)";

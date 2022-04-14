@@ -26,12 +26,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.String };
+        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain } };
         public override string Description => "Gibt den Text in Großbuchstaben zurück";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.String;
+        public override string Returns => VariableString.ShortName_Plain;
         public override string StartSequence => "(";
         public override string Syntax => "ToUpper(OriginalString)";
 

@@ -28,12 +28,13 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Variable_List, VariableDataType.String };
+        public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable }, new() { VariableString.ShortName_Plain } };
         public override string Description => "Fügt am Ende jedes Listenobjekts einen Text hinzu.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.Null;
+        public override string Returns => string.Empty;
+
         public override string StartSequence => "(";
         public override string Syntax => "AddSuffix(VariableListe, SuffixText)";
 

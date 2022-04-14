@@ -27,12 +27,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Nummeral_or_String };
+        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain, VariableFloat.ShortName_Plain } };
         public override string Description => "Prüft, ob der Inhalt der Variable eine gültige Zahl ist. ";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.Bool;
+        public override string Returns => VariableBool.ShortName_Plain;
         public override string StartSequence => "(";
         public override string Syntax => "isNumeral(Value)";
 

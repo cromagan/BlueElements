@@ -44,6 +44,7 @@ namespace BlueScript {
 
         #region Properties
 
+        public static string ShortName_Variable => "*fil";
         public override int CheckOrder => 99;
 
         public FilterItem FilterItem {
@@ -58,7 +59,6 @@ namespace BlueScript {
         public override bool IsNullOrEmpty => _filter == null;
         public override string ShortName => "fil";
         public override bool ToStringPossible => false;
-        public override VariableDataType Type => VariableDataType.Object;
 
         #endregion
 

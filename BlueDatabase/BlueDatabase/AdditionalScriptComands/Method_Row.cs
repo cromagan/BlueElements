@@ -29,8 +29,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Variable_Object };
-
+        public override List<List<string>> Args => new() { new() { VariableFilterItem.ShortName_Variable } };
         public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.";
 
         public override bool EndlessArgs => true;
@@ -39,7 +38,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override VariableDataType Returns => VariableDataType.Object;
+        public override string Returns => VariableRowItem.ShortName_Variable;
 
         public override string StartSequence => "(";
 

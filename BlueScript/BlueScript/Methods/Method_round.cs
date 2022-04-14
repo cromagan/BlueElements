@@ -27,12 +27,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Numeral, VariableDataType.Integer };
+        public override List<List<string>> Args => new() { new() { VariableFloat.ShortName_Plain }, new() { VariableFloat.ShortName_Plain } };
         public override string Description => "Rundet den Zahlenwert mathematisch korrekt.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.Numeral;
+        public override string Returns => VariableFloat.ShortName_Plain;
         public override string StartSequence => "(";
         public override string Syntax => "Round(Value, Nachkommastellen)";
 

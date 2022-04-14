@@ -25,7 +25,7 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new();
+        public override List<List<string>> Args => new();
 
         public override string Description => "Beendet das Skript ohne Fehler.";
 
@@ -35,7 +35,7 @@ namespace BlueScript.Methods {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override VariableDataType Returns => VariableDataType.Null;
+        public override string Returns => string.Empty;
 
         public override string StartSequence => "";
 

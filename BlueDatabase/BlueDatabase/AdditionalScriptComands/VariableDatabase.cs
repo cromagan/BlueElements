@@ -44,6 +44,7 @@ namespace BlueScript {
 
         #region Properties
 
+        public static string ShortName_Variable => "*dbs";
         public override int CheckOrder => 99;
 
         public Database? Database {
@@ -58,7 +59,6 @@ namespace BlueScript {
         public override bool IsNullOrEmpty => _db == null || _db.Disposed;
         public override string ShortName => "dbs";
         public override bool ToStringPossible => false;
-        public override VariableDataType Type => VariableDataType.Object;
 
         #endregion
 

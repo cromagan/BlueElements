@@ -28,12 +28,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.Bool, VariableDataType.String };
+        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableBool.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
         public override string Description => "Prüft, ob der String mit einem der angegeben Strings endet.";
         public override bool EndlessArgs => true;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.Bool;
+        public override string Returns => VariableBool.ShortName_Plain;
         public override string StartSequence => "(";
         public override string Syntax => "EndsWith(String, CaseSensitive, Value1, Value2, ...)";
 

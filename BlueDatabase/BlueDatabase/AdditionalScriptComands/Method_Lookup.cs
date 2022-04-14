@@ -27,8 +27,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.String, VariableDataType.String, VariableDataType.String, VariableDataType.String };
-
+        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
         public override string Description => "Lädt eine andere Datenbank (Database), sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als Liste zurück. Wird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben. Ist der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.";
 
         public override bool EndlessArgs => false;
@@ -37,7 +36,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override VariableDataType Returns => VariableDataType.List;
+        public override string Returns => VariableListString.ShortName_Plain;
 
         public override string StartSequence => "(";
 

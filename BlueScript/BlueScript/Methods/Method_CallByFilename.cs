@@ -30,12 +30,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.Bool };
+        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableBool.ShortName_Plain } };
         public override string Description => "Ruft eine Subroutine auf. Diese muss auf der Festplatte im UTF8-Format gespeichert sein. Mit KeepVariables kann bestimmt werden, ob die Variablen aus der Subroutine behalten werden sollen.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.Null;
+        public override string Returns => string.Empty;
         public override string StartSequence => "(";
         public override string Syntax => "CallByFilename(Filename, KeepVariables);";
 

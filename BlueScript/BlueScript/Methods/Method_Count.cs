@@ -26,12 +26,13 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Variable_List };
+        public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable } };
+
         public override string Description => "Gibt die Anzahl der Elemente der Liste zurück.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.Numeral;
+        public override string Returns => VariableFloat.ShortName_Plain;
         public override string StartSequence => "(";
         public override string Syntax => "Count(List-Variable)";
 

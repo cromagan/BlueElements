@@ -29,12 +29,13 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.String };
+        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain } };
         public override string Description => "Lädt das angegebene Bild aus dem Dateisystem.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.Object;
+
+        public override string Returns => VariableBitmap.ShortName_Variable;
         public override string StartSequence => "(";
         public override string Syntax => "LoadImage(Filename)";
 

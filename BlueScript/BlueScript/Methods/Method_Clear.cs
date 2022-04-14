@@ -28,12 +28,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Variable_List };
+        public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable } };
         public override string Description => "Entfernt alle Einträge einer Liste";
         public override bool EndlessArgs => false;
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.Null;
+        public override string Returns => string.Empty;
         public override string StartSequence => "(";
         public override string Syntax => "Clear(VariableListe);";
 

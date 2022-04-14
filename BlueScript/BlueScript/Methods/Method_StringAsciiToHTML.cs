@@ -27,12 +27,13 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.Bool };
+        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableBool.ShortName_Plain } };
+
         public override string Description => "Ersetzt einen ASCII-String zu einem HTML-String. Beispiel: aus ä wird &auml;  Dabei kann der Zeilenumbuch explicit ausgenommen werden.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.String;
+        public override string Returns => VariableString.ShortName_Plain;
         public override string StartSequence => "(";
         public override string Syntax => "StringAsciiToHTML(String, IgnoreBRbool)";
 

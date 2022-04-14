@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Enums;
+using BlueScript.Variables;
 
 namespace BlueDatabase.AdditionalScriptComands {
 
@@ -26,8 +27,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.Variable_Object };
-
+        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableFilterItem.ShortName_Variable } };
         public override string Description => "Lädt eine andere Datenbank (die mit den Filtern definiert wurde)\rund gibt aus der angegebenen Spalte alle Einträge (sortiert und einzigartig) als Liste zurück.\rDabei wird der Filter benutzt.\rEin Filter kann mit dem Befehl 'Filter' erstellt werden.";
 
         public override bool EndlessArgs => true;
@@ -36,7 +36,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override VariableDataType Returns => VariableDataType.List;
+        public override string Returns => VariableListString.ShortName_Plain;
 
         public override string StartSequence => "(";
 

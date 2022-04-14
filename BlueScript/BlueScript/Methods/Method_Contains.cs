@@ -28,8 +28,7 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Variable_List_Or_String, VariableDataType.Bool, VariableDataType.String_or_List };
-
+        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Variable, VariableListString.ShortName_Variable }, new() { VariableBool.ShortName_Plain }, new() { VariableString.ShortName_Plain, VariableListString.ShortName_Plain } };
         public override string Description => "Bei Listen: Prüft, ob einer der Werte in der Liste steht. Bei String: Prüft ob eine der Zeichenketten vorkommt.";
 
         public override bool EndlessArgs => true;
@@ -38,8 +37,7 @@ namespace BlueScript.Methods {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override VariableDataType Returns => VariableDataType.Bool;
-
+        public override string Returns => VariableBool.ShortName_Plain;
         public override string StartSequence => "(";
 
         public override string Syntax => "Contains(ListVariable/StringVariable, CaseSensitive, Value1, Value2, ...)";

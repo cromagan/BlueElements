@@ -30,12 +30,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Variable_Object, VariableDataType.String };
+        public override List<List<string>> Args => new() { new() { VariableBitmap.ShortName_Variable }, new() { VariableString.ShortName_Plain } };
         public override string Description => "Konvertiert das Bild in das Base64 Format und gibt dessen String zurück.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.String;
+        public override string Returns => VariableString.ShortName_Plain;
         public override string StartSequence => "(";
         public override string Syntax => "BitmapToBase64(Bitmap, JPG / PNG)";
 

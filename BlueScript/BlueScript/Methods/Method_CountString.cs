@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using BlueScript.Structures;
 using BlueScript.Enums;
 using static BlueBasics.Extensions;
+using BlueScript.Variables;
 
 namespace BlueScript.Methods {
 
@@ -28,12 +29,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.String };
-        public override string Description => "Zählt wie oft der Suchsting im Text vorkommt.";
+        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
+        public override string Description => "Zählt wie oft der Suchstring im Text vorkommt.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.Numeral;
+        public override string Returns => VariableFloat.ShortName_Plain;
         public override string StartSequence => "(";
         public override string Syntax => "CountString(Text, Suchstring)";
 

@@ -167,7 +167,7 @@ namespace BlueScript.Variables {
         }
 
         public static Variable? GetSystem(this List<Variable> vars, string name) => vars.FirstOrDefault(thisv =>
-                                                                                      thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper());
+                                                                                              thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper());
 
         public static void RemoveWithComent(this List<Variable> vars, string coment) {
             var z = 0;
@@ -312,6 +312,8 @@ namespace BlueScript.Variables {
 
         #region Properties
 
+        public static string Any_Plain => "any";
+        public static string Any_Variable => "*any";
         public abstract int CheckOrder { get; }
         public string Coment { get; set; }
 
@@ -326,13 +328,9 @@ namespace BlueScript.Variables {
         public virtual string ReadableText => "Objekt: " + ShortName;
 
         public bool Readonly { get; set; }
-
         public abstract string ShortName { get; }
 
         public abstract bool ToStringPossible { get; }
-
-        [Obsolete]
-        public abstract VariableDataType Type { get; }
 
         public virtual string ValueForReplace {
             get {

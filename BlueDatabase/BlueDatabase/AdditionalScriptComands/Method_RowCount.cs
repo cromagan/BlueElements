@@ -29,8 +29,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Variable_Object };
-
+        public override List<List<string>> Args => new() { new() { VariableFilterItem.ShortName_Variable } };
         public override string Description => "Zählt die Zeilen, die mit dem gegebenen Filter gefunden werden.";
 
         public override bool EndlessArgs => true;
@@ -39,8 +38,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override VariableDataType Returns => VariableDataType.Numeral;
-
+        public override string Returns => VariableFloat.ShortName_Plain;
         public override string StartSequence => "(";
 
         public override string Syntax => "RowCount(Filter, ...)";

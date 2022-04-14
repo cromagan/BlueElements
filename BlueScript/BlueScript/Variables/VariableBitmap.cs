@@ -47,12 +47,12 @@ namespace BlueScript.Variables {
 
         #region Properties
 
+        public static string ShortName_Variable => "*bmp";
         public override int CheckOrder => 99;
         public override bool GetFromStringPossible => false;
         public override bool IsNullOrEmpty => _bmp == null;
         public override string ShortName => "bmp";
         public override bool ToStringPossible => false;
-        public override VariableDataType Type => VariableDataType.Object;
 
         public Bitmap? ValueBitmap {
             get => _bmp;

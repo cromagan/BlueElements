@@ -22,6 +22,7 @@ using BlueScript.Structures;
 using BlueScript.Enums;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
+using BlueScript.Variables;
 
 namespace BlueScript.Methods {
 
@@ -29,12 +30,13 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.String };
+        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
+
         public override string Description => "Gibt einen neuen DateTime-String zurück, der mittels des zweiten String definiert ist.\rBeispiel eines solchen Strings:  " + Format_Date7 + "\rAchtung: Groß-Kleinschreibung ist wichtig!";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.String;
+        public override string Returns => VariableString.ShortName_Plain;
         public override string StartSequence => "(";
         public override string Syntax => "ChangeDateTimeFormat(DateTimeString, string)";
 

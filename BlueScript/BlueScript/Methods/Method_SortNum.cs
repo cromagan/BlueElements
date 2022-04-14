@@ -28,7 +28,7 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Variable_List, VariableDataType.Numeral };
+        public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable }, new() { VariableFloat.ShortName_Plain } };
 
         public override string Description => "Sortiert die Liste. Der Zahlenwert wird verwendet wenn der String nicht in eine Zahl umgewandelt werden kann.";
 
@@ -38,8 +38,7 @@ namespace BlueScript.Methods {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override VariableDataType Returns => VariableDataType.Null;
-
+        public override string Returns => string.Empty;
         public override string StartSequence => "(";
 
         public override string Syntax => "SortNum(ListVariable, Defaultwert);";

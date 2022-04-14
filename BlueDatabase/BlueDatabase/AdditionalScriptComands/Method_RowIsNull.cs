@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Enums;
+using BlueScript.Variables;
 
 namespace BlueDatabase.AdditionalScriptComands {
 
@@ -26,8 +27,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Variable_Object };
-
+        public override List<List<string>> Args => new() { new() { VariableRowItem.ShortName_Variable } };
         public override string Description => "Prüft, ob die übergebene Zeile NULL ist.";
 
         public override bool EndlessArgs => false;
@@ -35,8 +35,7 @@ namespace BlueDatabase.AdditionalScriptComands {
         public override string EndSequence => ")";
 
         public override bool GetCodeBlockAfter => false;
-
-        public override VariableDataType Returns => VariableDataType.Bool;
+        public override string Returns => VariableBool.ShortName_Plain;
 
         public override string StartSequence => "(";
 

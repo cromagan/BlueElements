@@ -27,7 +27,7 @@ namespace BlueScript.Methods {
 
         #region Fields
 
-        private static readonly List<VariableDataType> _args = new() { VariableDataType.Bool_Numeral_String_List_or_Object };
+        private static readonly List<List<string>> _args = new() { new() { Variable.Any_Plain } };
 
         #endregion
 
@@ -35,12 +35,13 @@ namespace BlueScript.Methods {
 
         public static bool SEndlessArgs => false;
 
-        public override List<VariableDataType> Args => _args;
+        public override List<List<string>> Args => _args;
+
         public override string Description => "Berechnet eine Variable. Der Typ der Variable und des Ergebnisses müssen übereinstimmen.";
         public override bool EndlessArgs => SEndlessArgs;
         public override string EndSequence => ";";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.Null;
+        public override string Returns => string.Empty;
         public override string StartSequence => "=";
         public override string Syntax => "VariablenName = Berechung;";
 

@@ -48,13 +48,14 @@ namespace BlueScript.Variables {
 
         #region Properties
 
+        public static string ShortName_Plain => "bol";
+        public static string ShortName_Variable => "*bol";
         public override int CheckOrder => 0;
         public override bool GetFromStringPossible => true;
         public override bool IsNullOrEmpty => false;
         public override string ReadableText => _valuebool.ToString();
         public override string ShortName => "bol";
         public override bool ToStringPossible => true;
-        public override VariableDataType Type => VariableDataType.Bool;
 
         public bool ValueBool {
             get => _valuebool;

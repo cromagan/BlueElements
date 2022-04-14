@@ -28,12 +28,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Variable_List, VariableDataType.String_or_List };
+        public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable }, new() { VariableString.ShortName_Plain, VariableListString.ShortName_Plain } };
         public override string Description => "Fügt einer Liste einen oder mehrere Werte hinzu.";
         public override bool EndlessArgs => true;
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.Null;
+        public override string Returns => string.Empty;
         public override string StartSequence => "(";
         public override string Syntax => "Add(List-Variable, Value1, Value2, ...);";
 

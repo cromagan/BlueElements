@@ -40,6 +40,7 @@ namespace BlueScript.Variables {
 
         #region Properties
 
+        public static string ShortName_Variable => "*ukn";
         public override int CheckOrder => 100;
 
         public override bool GetFromStringPossible => true;
@@ -52,7 +53,6 @@ namespace BlueScript.Variables {
 
         public override string ShortName => "ukn";
         public override bool ToStringPossible => false;
-        public override VariableDataType Type => VariableDataType.Unknown;
         public override string ValueForReplace => ReadableText;
 
         #endregion

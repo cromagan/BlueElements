@@ -29,7 +29,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.String, VariableDataType.String, VariableDataType.Variable_Object };
+        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain }, new() { VariableRowItem.ShortName_Variable } };
 
         public override string Description => "Setzt den Wert. Gibt TRUE zurück, wenn der Wert erfolgreich gesetzt wurde.";
 
@@ -39,8 +39,7 @@ namespace BlueDatabase.AdditionalScriptComands {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override VariableDataType Returns => VariableDataType.Bool;
-
+        public override string Returns => VariableBool.ShortName_Plain;
         public override string StartSequence => "(";
 
         public override string Syntax => "CellSetRow(Value, Column, Row)";

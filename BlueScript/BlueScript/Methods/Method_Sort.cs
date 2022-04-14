@@ -27,8 +27,7 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Variable_List, VariableDataType.Bool };
-
+        public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable }, new() { VariableBool.ShortName_Plain } };
         public override string Description => "Sortiert die Liste. Falls das zweite Attribut TRUE ist, werden Doubletten und leere Einträge entfernt.";
 
         public override bool EndlessArgs => false;
@@ -37,8 +36,7 @@ namespace BlueScript.Methods {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override VariableDataType Returns => VariableDataType.Null;
-
+        public override string Returns => string.Empty;
         public override string StartSequence => "(";
 
         public override string Syntax => "Sort(ListVariable, EliminateDupes);";

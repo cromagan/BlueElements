@@ -29,12 +29,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Bool_Numeral_String_List_or_Object };
+        public override List<List<string>> Args => new() { new() { Variable.Any_Plain } };
         public override string Description => "Berechnet eine Variable. Der Typ der Variable und des Ergebnisses müssen übereinstimmen.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ";";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.Null;
+        public override string Returns => string.Empty;
         public override string StartSequence => string.Empty;
         public override string Syntax => "~Variablennamenberechnung~ = Berechung;";
 

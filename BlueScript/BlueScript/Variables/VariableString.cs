@@ -46,6 +46,8 @@ namespace BlueScript.Variables {
 
         #region Properties
 
+        public static string ShortName_Plain => "str";
+        public static string ShortName_Variable => "*str";
         public override int CheckOrder => 2;
         public override bool GetFromStringPossible => true;
         public override bool IsNullOrEmpty => string.IsNullOrEmpty(_valueString);
@@ -57,7 +59,6 @@ namespace BlueScript.Variables {
 
         public override string ShortName => "str";
         public override bool ToStringPossible => true;
-        public override VariableDataType Type => VariableDataType.String;
 
         /// <summary>
         /// Der Wert mit " Aanfang/Ende un entfernten Kritischen Zeichen.

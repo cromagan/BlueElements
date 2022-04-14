@@ -18,6 +18,7 @@
 using System.Collections.Generic;
 using BlueScript.Structures;
 using BlueScript.Enums;
+using BlueScript.Variables;
 
 namespace BlueScript.Methods {
 
@@ -25,12 +26,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<VariableDataType> Args => new() { VariableDataType.Bool_Numeral_String_List_or_Object };
+        public override List<List<string>> Args => new() { new() { Variable.Any_Plain } };
         public override string Description => "Erstellt eine neue Variable, der Typ wird automtisch bestimmt.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ";";
         public override bool GetCodeBlockAfter => false;
-        public override VariableDataType Returns => VariableDataType.Null;
+        public override string Returns => string.Empty;
         public override string StartSequence => "";
         public override string Syntax => "var VariablenName = Wert;";
 
