@@ -31,11 +31,11 @@ namespace BlueScript.Methods {
         #region Properties
 
         public override List<List<string>> Args => new();
-        public override string Description => "Gibt die akutelle UTC-Uhrzeit im Format\r" + Format_Date7 + " zurück.";
+        public override string Description => "Gibt die akutelle UTC-Uhrzeit zurück.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override string Returns => VariableString.ShortName_Plain;
+        public override string Returns => VariableDateTime.ShortName_Variable;
         public override string StartSequence => "(";
         public override string Syntax => "DateTimeUTCNow()";
 
@@ -43,13 +43,13 @@ namespace BlueScript.Methods {
 
         #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "datetimeutcnow" };
+        public override List<string> Comand(Script? s) => new() { "datetimenowutc" };
 
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return !string.IsNullOrEmpty(attvar.ErrorMessage)
                 ? DoItFeedback.AttributFehler(this, attvar)
-                : new DoItFeedback(DateTime.UtcNow.ToString(Format_Date7), string.Empty);
+                : new DoItFeedback(DateTime.UtcNow);
         }
 
         #endregion

@@ -21,6 +21,7 @@ using BlueScript.Methods;
 using System.Collections.Generic;
 using System.Drawing;
 using BlueScript.Variables;
+using System;
 
 namespace BlueScript.Structures {
 
@@ -73,6 +74,11 @@ namespace BlueScript.Structures {
         public DoItFeedback(float value) {
             ErrorMessage = string.Empty;
             Variable = new VariableFloat(value);
+        }
+
+        public DoItFeedback(DateTime value) {
+            ErrorMessage = string.Empty;
+            Variable = new VariableDateTime(value);
         }
 
         public DoItFeedback(string[] list) {

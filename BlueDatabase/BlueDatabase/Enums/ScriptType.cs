@@ -24,6 +24,7 @@ namespace BlueDatabase.Enums {
         Numeral = 3,
         List = 4,
         String_Readonly = 5,
+        DateTime = 6,
 
         undefiniert = 999
     }

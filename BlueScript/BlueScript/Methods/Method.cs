@@ -223,7 +223,7 @@ namespace BlueScript.Methods {
                 foreach (var thisAt in exceptetType) {
                     if (thisAt.TrimStart("*") == v.ShortName) { ok = true; break; }
 
-                    if (thisAt.TrimStart("*") != Variable.Any_Plain) { ok = true; break; }
+                    if (thisAt.TrimStart("*") == Variable.Any_Plain) { ok = true; break; }
 
                     //if (!exceptetType.HasFlag(v.Type)) {
                     //    //if (v.Type == VariableDataType.Error) {

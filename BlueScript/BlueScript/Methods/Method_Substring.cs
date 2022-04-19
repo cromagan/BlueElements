@@ -26,7 +26,7 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Variable }, new() { VariableFloat.ShortName_Plain }, new() { VariableFloat.ShortName_Plain } };
+        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableFloat.ShortName_Plain }, new() { VariableFloat.ShortName_Plain } };
 
         public override string Description => "Gibt einen Teilstring zurück. Ist der Start oder das Ende keine gültige Position, wird das bestmögliche zurückgegeben und kein Fehler ausgelöst. Subrtring(\"Hallo\", 2,2) gibt ll zurück.";
         public override bool EndlessArgs => false;

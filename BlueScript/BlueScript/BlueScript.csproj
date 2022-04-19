@@ -71,7 +71,7 @@
     <Compile Include="Methods\Method_SetIfHasValue.cs" />
     <Compile Include="Methods\Method_SetIfExists.cs" />
     <Compile Include="Methods\Method_LoadImage.cs" />
-    <Compile Include="Methods\Method_ChangeDateTimeFormat.cs" />
+    <Compile Include="Methods\Method_DateTimeToString.cs" />
     <Compile Include="Methods\Method_AddDays.cs" />
     <Compile Include="Methods\Method_Count.cs" />
     <Compile Include="Methods\Method_IsNullOrZero.cs" />
@@ -128,6 +128,7 @@
     <Compile Include="Variables\VariableBool.cs" />
     <Compile Include="Variables\VariableListString.cs" />
     <Compile Include="Variables\VariableFloat.cs" />
+    <Compile Include="Variables\VariableDateTime.cs" />
     <Compile Include="Variables\VariableSub.cs" />
     <Compile Include="Variables\VariableUnknown.cs" />
     <Compile Include="Variables\VariableString.cs" />

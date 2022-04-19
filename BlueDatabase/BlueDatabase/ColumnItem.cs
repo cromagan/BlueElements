@@ -1731,16 +1731,46 @@ namespace BlueDatabase {
 
         public void SetFormat(VarType format) {
             switch (format) {
-                case VarType.Text: SetFormatForText(); break;
-                case VarType.Date: SetFormatForDate(); break;
-                case VarType.DateTime: SetFormatForDateTime(); break;
-                case VarType.Email: SetFormatForEmail(); break;
-                case VarType.Float: SetFormatForFloat(); break;
-                case VarType.Integer: SetFormatForInteger(); break;
-                case VarType.PhoneNumber: SetFormatForPhoneNumber(); break;
-                case VarType.TextMitFormatierung: SetFormatForTextMitFormatierung(); break;
-                case VarType.Url: SetFormatForUrl(); break;
-                case VarType.Bit: SetFormatForBit(); break;
+                case VarType.Text:
+                    SetFormatForText();
+                    break;
+
+                case VarType.Date:
+                    SetFormatForDate();
+                    break;
+
+                case VarType.DateTime:
+                    SetFormatForDateTime();
+                    break;
+
+                case VarType.Email:
+                    SetFormatForEmail();
+                    break;
+
+                case VarType.Float:
+                    SetFormatForFloat();
+                    break;
+
+                case VarType.Integer:
+                    SetFormatForInteger();
+                    break;
+
+                case VarType.PhoneNumber:
+                    SetFormatForPhoneNumber();
+                    break;
+
+                case VarType.TextMitFormatierung:
+                    SetFormatForTextMitFormatierung();
+                    break;
+
+                case VarType.Url:
+                    SetFormatForUrl();
+                    break;
+
+                case VarType.Bit:
+                    SetFormatForBit();
+                    break;
+
                 default:
                     Develop.DebugPrint(FehlerArt.Warnung);
                     break;
@@ -1786,7 +1816,7 @@ namespace BlueDatabase {
             Translate = TranslationType.Datum;
             AfterEdit_QuickSortRemoveDouble = false;
             BildTextVerhalten = BildTextVerhalten.Nur_Text;
-            ScriptType = ScriptType.String;
+            ScriptType = ScriptType.DateTime;
         }
 
         public void SetFormatForDateTime() {
@@ -1798,7 +1828,7 @@ namespace BlueDatabase {
             Translate = TranslationType.Datum;
             AfterEdit_QuickSortRemoveDouble = false;
             BildTextVerhalten = BildTextVerhalten.Nur_Text;
-            ScriptType = ScriptType.String;
+            ScriptType = ScriptType.DateTime;
         }
 
         public void SetFormatForEmail() {

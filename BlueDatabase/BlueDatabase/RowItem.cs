@@ -173,6 +173,12 @@ namespace BlueDatabase {
                     vars.Add(new VariableString(column.Name, wert, ro, false, qi));
                     break;
 
+                case ScriptType.DateTime:
+                    if (DateTimeTryParse(wert, out var d)) {
+                        vars.Add(new VariableDateTime(column.Name, d, ro, false, qi));
+                    }
+                    break;
+
                 case ScriptType.String_Readonly:
                     vars.Add(new VariableString(column.Name, wert, true, false, qi));
                     break;
@@ -594,6 +600,17 @@ namespace BlueDatabase {
                 CellSet(column, vs.ValueString);
                 return;
             }
+            if (columnVar is VariableDateTime vd) {
+                var x = vd.ValueDate.ToString(Constants.Format_Date7);
+                x = x.TrimEnd(".000");
+                x = x.TrimEnd(".0");
+                x = x.TrimEnd("00:00:00");
+                x = x.TrimEnd(" ");
+                CellSet(column, x);
+                return;
+            }
+
+            Develop.DebugPrint("Typ nicht erkannt: " + columnVar.ShortName);
         }
 
         #endregion

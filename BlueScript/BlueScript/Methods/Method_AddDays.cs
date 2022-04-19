@@ -30,12 +30,12 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableFloat.ShortName_Plain } };
+        public override List<List<string>> Args => new() { new() { VariableDateTime.ShortName_Variable }, new() { VariableFloat.ShortName_Plain } };
         public override string Description => "Fügt dem Datum die angegeben Anzahl Tage hinzu. Dabei können auch Gleitkommazahlen benutzt werden, so werden z.B. bei 0.25 nur 6 Stunden hinzugefügt. Der Rückgabwert erfolgt immer im Format " + Format_Date7;
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override string Returns => VariableString.ShortName_Plain;
+        public override string Returns => VariableDateTime.ShortName_Variable;
         public override string StartSequence => "(";
         public override string Syntax => "AddDays(DateTimeString, Days)";
 
@@ -48,12 +48,13 @@ namespace BlueScript.Methods {
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-            var ok = DateTimeTryParse(attvar.Attributes[0].ReadableText, out var d);
-            if (!ok) {
-                return new DoItFeedback("Der Wert '" + attvar.Attributes[0].ReadableText + "' wurde nicht als Zeitformat erkannt.");
-            }
+            // var ok = DateTimeTryParse(attvar.Attributes[0].ReadableText, out var d);
+            //if (!ok) {
+            //    return new DoItFeedback("Der Wert '" + attvar.Attributes[0].ReadableText + "' wurde nicht als Zeitformat erkannt.");
+            //}
+            var d = ((VariableDateTime)attvar.Attributes[0]).ValueDate;
             d = d.AddDays(((VariableFloat)attvar.Attributes[1]).ValueNum);
-            return new DoItFeedback(new VariableString(Variable.DummyName(), d.ToString(Format_Date7)));
+            return new DoItFeedback(d);
         }
 
         #endregion
