@@ -43,8 +43,10 @@ namespace BlueControls.ConnectedFormula {
 
         public static readonly List<FlexiControlRowSelector> AllConnectors = new();
         public readonly Database FilterDefiniton;
-        public readonly string VerbindungsId = string.Empty;
+
+        //public readonly string VerbindungsId = string.Empty;
         public ItemCollectionPad? ParentCol;
+
         private readonly ListExt<System.Windows.Forms.Control> _parents = new();
 
         //private readonly RowWithFilterPaditem _rwf;
@@ -59,7 +61,7 @@ namespace BlueControls.ConnectedFormula {
 
         #region Constructors
 
-        public FlexiControlRowSelector(string verbindungsId, Database? database, ItemCollectionPad parent, Database filterdef, string caption, string showFormat) : base() {
+        public FlexiControlRowSelector(Database? database, ItemCollectionPad parent, Database filterdef, string caption, string showFormat) : base() {
             CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
             EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
 
@@ -77,11 +79,11 @@ namespace BlueControls.ConnectedFormula {
             ParentCol = parent;
             Database = database;
             FilterDefiniton = filterdef;
-            VerbindungsId = verbindungsId;
+            //VerbindungsId = verbindungsId;
 
-            if (!string.IsNullOrEmpty(verbindungsId)) {
-                RemoveSameID(verbindungsId);
-            }
+            //if (!string.IsNullOrEmpty(verbindungsId)) {
+            //    RemoveSameID(verbindungsId);
+            //}
 
             AllConnectors.Add(this);
 
@@ -118,7 +120,6 @@ namespace BlueControls.ConnectedFormula {
             foreach (var thischild in con.Childs) {
                 var did = false;
 
-
                 if (!did && thischild is IAcceptRowKey fcfc) {
                     did = DoChilds_OneRowKey(fcfc, row, con.Database);
                 }
@@ -130,7 +131,6 @@ namespace BlueControls.ConnectedFormula {
 
                     did = DoChilds_VariableList(rv, con.Script, row, con.Database);
                 }
-
 
                 if (thischild is IDisabledReason id) {
                     if (!did) {
@@ -208,7 +208,7 @@ namespace BlueControls.ConnectedFormula {
         private void CalculateRows() {
             if (_disposing || IsDisposed) { return; }
 
-            if (string.IsNullOrEmpty(VerbindungsId) || FilterDefiniton.Row.Count > 0) {
+            if (FilterDefiniton.Row.Count > 0) {
 
                 #region Filter erstellen
 
@@ -309,7 +309,6 @@ namespace BlueControls.ConnectedFormula {
                 #endregion
             }
             UpdateMyCollection();
-
         }
 
         private void Childs_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
@@ -351,15 +350,15 @@ namespace BlueControls.ConnectedFormula {
             CalculateRows();
         }
 
-        private void RemoveSameID(string verbindungsId) {
-            foreach (var thisConnector in AllConnectors) {
-                if (thisConnector.VerbindungsId == verbindungsId) {
-                    AllConnectors.Remove(thisConnector);
-                    RemoveSameID(verbindungsId);
-                    return;
-                }
-            }
-        }
+        //private void RemoveSameID(string verbindungsId) {
+        //    foreach (var thisConnector in AllConnectors) {
+        //        if (thisConnector.VerbindungsId == verbindungsId) {
+        //            AllConnectors.Remove(thisConnector);
+        //            RemoveSameID(verbindungsId);
+        //            return;
+        //        }
+        //    }
+        //}
 
         private void UpdateMyCollection() {
             if (!Allinitialized) { CreateSubControls(); }
@@ -371,15 +370,13 @@ namespace BlueControls.ConnectedFormula {
                 if (thiscb is ComboBox cbx) { cb = cbx; break; }
             }
 
-
-
             #endregion
 
-            if (!string.IsNullOrEmpty(VerbindungsId) && FilterDefiniton.Row.Count == 0) {
-                DisabledReason = "Wert wird ferngesteuert.";
-                cb?.Item.Clear();
-                return;
-            }
+            //if (!string.IsNullOrEmpty(VerbindungsId) && FilterDefiniton.Row.Count == 0) {
+            //    DisabledReason = "Wert wird ferngesteuert.";
+            //    cb?.Item.Clear();
+            //    return;
+            //}
 
             if (cb == null) { return; }
 

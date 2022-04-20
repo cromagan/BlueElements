@@ -47,11 +47,13 @@ namespace BlueControls.ConnectedFormula {
         public RowCloner(Database? database, string verbindungsID) {
             Database = database;
 
-            foreach (var thisConnector in FlexiControlRowSelector.AllConnectors) {
-                if (thisConnector.VerbindungsId == verbindungsID) {
-                    thisConnector.Childs.Add(this);
-                }
-            }
+            Develop.DebugPrint_NichtImplementiert();
+
+            //foreach (var thisConnector in FlexiControlRowSelector.AllConnectors) {
+            //    if (thisConnector.VerbindungsId == verbindungsID) {
+            //        thisConnector.Childs.Add(this);
+            //    }
+            //}
         }
 
         #endregion

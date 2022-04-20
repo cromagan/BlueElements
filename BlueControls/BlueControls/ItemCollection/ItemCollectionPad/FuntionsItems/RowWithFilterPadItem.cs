@@ -51,7 +51,6 @@ namespace BlueControls.ItemCollection {
         private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
         private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Über_dem_Feld;
         private string _überschrift = string.Empty;
-        private string _VerbindungsID = string.Empty;
 
         #endregion
 
@@ -160,15 +159,15 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        [Description("Mit dieser Verbindungs-ID können formularübergeifend Filter an\r\nan andere Filterelemnte übergeben werden bzw.\r\nempfangen werden.\r\nZiegt KEIN Pfeil auf dieses Element, übernimmt es den Wert.\r\nAndernfalls empfängt es den Wert.")]
-        public string VerbindungsID {
-            get => _VerbindungsID;
-            set {
-                if (_VerbindungsID == value) { return; }
-                _VerbindungsID = value;
-                OnChanged();
-            }
-        }
+        //[Description("Mit dieser Verbindungs-ID können formularübergeifend Filter an\r\nan andere Filterelemnte übergeben werden bzw.\r\nempfangen werden.\r\nZiegt KEIN Pfeil auf dieses Element, übernimmt es den Wert.\r\nAndernfalls empfängt es den Wert.")]
+        //public string VerbindungsID {
+        //    get => _VerbindungsID;
+        //    set {
+        //        if (_VerbindungsID == value) { return; }
+        //        _VerbindungsID = value;
+        //        OnChanged();
+        //    }
+        //}
 
         protected override int SaveOrder => 1;
 
@@ -177,7 +176,7 @@ namespace BlueControls.ItemCollection {
         #region Methods
 
         public Control? CreateControl(ConnectedFormulaView parent) {
-            var c = new FlexiControlRowSelector(_VerbindungsID, Database, this.Parent, FilterDefiniton, _überschrift, _anzeige);
+            var c = new FlexiControlRowSelector(Database, this.Parent, FilterDefiniton, _überschrift, _anzeige);
             c.EditType = EditType;
             c.CaptionPosition = CaptionPosition;
             c.Tag = Internal;
@@ -199,13 +198,13 @@ namespace BlueControls.ItemCollection {
             l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
             l.Add(new FlexiControl());
 
-            l.Add(new FlexiControlForProperty<string>(() => Database.Caption));
+            //l.Add(new FlexiControlForProperty<string>(() => Database.Caption));
             //l.Add(new FlexiControlForProperty(Database, "Caption"));
             l.Add(new FlexiControlForProperty<string>(() => Datenbankkopf, ImageCode.Datenbank));
             //l.Add(new FlexiControlForProperty(()=> this.Datenbankkopf"));
-            l.Add(new FlexiControl());
-            l.Add(new FlexiControlForProperty<string>(() => VerbindungsID));
-            l.Add(new FlexiControl());
+            //l.Add(new FlexiControl());
+            //l.Add(new FlexiControlForProperty<string>(() => VerbindungsID));
+            //l.Add(new FlexiControl());
 
             FilterDatabaseUpdate();
             l.Add(new FlexiControlForProperty<string>(() => Filter_hinzufügen, ImageCode.PlusZeichen));
@@ -247,9 +246,9 @@ namespace BlueControls.ItemCollection {
                     Database = Database.GetByFilename(value.FromNonCritical(), false, false);
                     return true;
 
-                case "connectionid":
-                    VerbindungsID = value.FromNonCritical();
-                    return true;
+                //case "connectionid":
+                //    VerbindungsID = value.FromNonCritical();
+                //    return true;
 
                 case "id":
                     Id = IntParse(value);
@@ -312,7 +311,7 @@ namespace BlueControls.ItemCollection {
                 t = t + "Database=" + Database.Filename.ToNonCritical() + ", ";
             }
 
-            t = t + "ConnectionID=" + VerbindungsID.ToNonCritical() + ", ";
+            //t = t + "ConnectionID=" + VerbindungsID.ToNonCritical() + ", ";
 
             if (FilterDefiniton != null) {
                 t = t + "FilterDB=" + FilterDefiniton.Export_CSV(FirstRow.ColumnInternalName, (List<ColumnItem>)null, null).ToNonCritical() + ", ";
@@ -341,9 +340,9 @@ namespace BlueControls.ItemCollection {
 
                 txt = txt + Database.Caption;
 
-                if (!string.IsNullOrEmpty(_VerbindungsID)) {
-                    txt = txt + "\r\nKlon-ID: " + _VerbindungsID;
-                }
+                //if (!string.IsNullOrEmpty(_VerbindungsID)) {
+                //    txt = txt + "\r\nKlon-ID: " + _VerbindungsID;
+                //}
 
                 Skin.Draw_FormatedText(gr, txt, QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, modifiedPosition.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
             }

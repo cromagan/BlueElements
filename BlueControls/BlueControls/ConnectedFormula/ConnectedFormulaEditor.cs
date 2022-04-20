@@ -55,6 +55,15 @@ namespace BlueControls.Forms {
 
         #region Methods
 
+        private void btnAusgangsZeile_Click(object sender, System.EventArgs e) {
+        }
+
+        private void btnEingangsZeile_Click(object sender, System.EventArgs e) {
+            var it = new RowInputPadItem(string.Empty);
+            Pad.AddCentered(it);
+            ChooseDatabaseAndID(it);
+        }
+
         private void btnFeldHinzu_Click(object sender, System.EventArgs e) {
             var l = Pad.LastClickedItem;
 

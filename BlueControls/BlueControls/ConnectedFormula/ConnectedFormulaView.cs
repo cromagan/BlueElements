@@ -37,6 +37,8 @@ namespace BlueControls.Controls {
 
         private ConnectedFormula.ConnectedFormula? _cf;
 
+        private RowItem _inputrow = null;
+
         #endregion
 
         #region Constructors
@@ -65,6 +67,15 @@ namespace BlueControls.Controls {
                 }
 
                 _cf_Changed(null, null);
+            }
+        }
+
+        public RowItem InputRow {
+            get => _inputrow;
+            set {
+                if (value == _inputrow) { return; }
+                _inputrow = value;
+                Develop.DebugPrint_NichtImplementiert();
             }
         }
 
@@ -98,52 +109,52 @@ namespace BlueControls.Controls {
             return null;
         }
 
-        /// <summary>
-        /// Setzt eine Variablen-ID auf diesen Wert.
-        /// String werden in Konstante Felder geschrieben.
-        /// Row wird in RowSelector geschrieben
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="value"></param>
-        public void Set(string id, object? value) {
-            foreach (var thisCon in Controls) {
-                switch (thisCon) {
-                    case ConnectedFormulaView cf:
-                        cf.Set(id, value);
-                        break;
+        ///// <summary>
+        ///// Setzt eine Variablen-ID auf diesen Wert.
+        ///// String werden in Konstante Felder geschrieben.
+        ///// Row wird in RowSelector geschrieben
+        ///// </summary>
+        ///// <param name="id"></param>
+        ///// <param name="value"></param>
+        //public void Set(string id, object? value) {
+        //    foreach (var thisCon in Controls) {
+        //        switch (thisCon) {
+        //            case ConnectedFormulaView cf:
+        //                cf.Set(id, value);
+        //                break;
 
-                    case FlexiControlRowSelector fcrs:
-                        if (value is RowItem rvalue) {
-                            if (fcrs.VerbindungsId.Equals(id, System.StringComparison.InvariantCultureIgnoreCase)) {
-                                if (fcrs.FilterDefiniton.Row.Count == 0) {
-                                    fcrs.ValueSet(rvalue.Key.ToString(), true, true);
-                                }
-                            }
-                        }
-                        break;
+        //            case FlexiControlRowSelector fcrs:
+        //                if (value is RowItem rvalue) {
+        //                    if (fcrs.VerbindungsId.Equals(id, System.StringComparison.InvariantCultureIgnoreCase)) {
+        //                        if (fcrs.FilterDefiniton.Row.Count == 0) {
+        //                            fcrs.ValueSet(rvalue.Key.ToString(), true, true);
+        //                        }
+        //                    }
+        //                }
+        //                break;
 
-                    case FlexiControl fc:
-                        if (value is string values) {
-                            if (fc.Caption.Equals(id, System.StringComparison.InvariantCultureIgnoreCase)) {
-                                fc.ValueSet(values, true, true);
-                            }
-                        }
-                        break;
+        //            case FlexiControl fc:
+        //                if (value is string values) {
+        //                    if (fc.Caption.Equals(id, System.StringComparison.InvariantCultureIgnoreCase)) {
+        //                        fc.ValueSet(values, true, true);
+        //                    }
+        //                }
+        //                break;
 
-                    case TabControl tb:
-                        foreach (var thstp in tb.TabPages) {
-                            if (thstp is System.Windows.Forms.TabPage tp) {
-                                foreach (var cfvm in tp.Controls) {
-                                    if (cfvm is ConnectedFormulaView cfv) {
-                                        cfv.Set(id, value);
-                                    }
-                                }
-                            }
-                        }
-                        break;
-                }
-            }
-        }
+        //            case TabControl tb:
+        //                foreach (var thstp in tb.TabPages) {
+        //                    if (thstp is System.Windows.Forms.TabPage tp) {
+        //                        foreach (var cfvm in tp.Controls) {
+        //                            if (cfvm is ConnectedFormulaView cfv) {
+        //                                cfv.Set(id, value);
+        //                            }
+        //                        }
+        //                    }
+        //                }
+        //                break;
+        //        }
+        //    }
+        //}
 
         protected override void DrawControl(Graphics gr, States state) => Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
 
@@ -163,7 +174,6 @@ namespace BlueControls.Controls {
                 }
             }
 
-
             if (_cf != null) {
                 var addfactor = Size.Width / _cf.PadData.SheetSizeInPix.Width;
 
@@ -182,13 +192,10 @@ namespace BlueControls.Controls {
                 }
             }
 
-
-
             foreach (var thisc in unused) {
                 Controls.Remove(thisc);
                 thisc.Dispose();
             }
-
         }
 
         #endregion

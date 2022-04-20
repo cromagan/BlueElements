@@ -394,9 +394,10 @@ namespace BlueControls.Forms {
             if (tbcSidebar.SelectedTab == tabFormulaBeta) {
                 if (FormulaBETA is null || FormulaBETA.IsDisposed) { return; }
                 if (!FormulaBETA.Visible) { return; }
+                FormulaBETA.InputRow = Table?.CursorPosRow?.Row;
 
-                FormulaBETA.Set("row", Table?.CursorPosRow?.Row);
-                FormulaBETA.Set("key", Table?.CursorPosRow?.Row?.CellFirstString());
+                //FormulaBETA.Set("row", Table?.CursorPosRow?.Row);
+                //FormulaBETA.Set("key", Table?.CursorPosRow?.Row?.CellFirstString());
             }
         }
 

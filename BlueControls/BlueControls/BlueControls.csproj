@@ -335,6 +335,7 @@
     </Compile>
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\ChildFormulaPaditem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\CustomizableShowPadItem.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\RowInputPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\VariableFieldPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\FileExplorerPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\EditFieldPadItem.cs" />
