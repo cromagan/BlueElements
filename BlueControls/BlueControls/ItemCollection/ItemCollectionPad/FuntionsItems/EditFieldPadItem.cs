@@ -32,7 +32,6 @@ using BlueDatabase.Enums;
 
 using BlueBasics.Interfaces;
 using BlueControls.Interfaces;
-using BlueControls.ConnectedFormula;
 
 namespace BlueControls.ItemCollection {
 
@@ -184,7 +183,7 @@ namespace BlueControls.ItemCollection {
             u.AddRange(typeof(ÜberschriftAnordnung));
             l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
             var b = new ItemCollection.ItemCollectionList.ItemCollectionList();
-            b.AddRange(typeof(EditTypeFormula));
+            b.AddRange(Formula.GetAllowedEditTypes(Column));
             l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
             l.Add(new FlexiControl());
             l.Add(new FlexiControlForProperty<string>(() => Spalten_QuickInfo, 5));
@@ -282,7 +281,8 @@ namespace BlueControls.ItemCollection {
         protected override string ClassId() => "FI-EditField";
 
         protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-            var id = -1; if (GetRowFrom != null) { id = GetRowFrom.Id; }
+            var id = -1;
+            if (GetRowFrom != null) { id = GetRowFrom.Id; }
 
             if (!forPrinting) {
                 DrawColorScheme(gr, positionModified, zoom, id);

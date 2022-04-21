@@ -32,7 +32,6 @@ using static BlueBasics.Converter;
 using BlueControls.Interfaces;
 using System.Windows.Forms;
 using BlueControls.ConnectedFormula;
-using BlueScript.Variables;
 
 namespace BlueControls.ItemCollection {
 
@@ -48,7 +47,7 @@ namespace BlueControls.ItemCollection {
 
         public Table? FilterTable = null;
         private string _anzeige = string.Empty;
-        private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
+        private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
         private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Über_dem_Feld;
         private string _überschrift = string.Empty;
 
@@ -113,16 +112,16 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public EditTypeFormula EditType {
-            get => _bearbeitung;
-            set {
-                if (value != EditTypeFormula.Textfeld_mit_Auswahlknopf) { value = EditTypeFormula.Textfeld_mit_Auswahlknopf; }
+        //public EditTypeFormula EditType {
+        //    get => _bearbeitung;
+        //    set {
+        //        if (value != EditTypeFormula.Textfeld_mit_Auswahlknopf) { value = EditTypeFormula.Textfeld_mit_Auswahlknopf; }
 
-                if (_bearbeitung == value) { return; }
-                _bearbeitung = value;
-                OnChanged();
-            }
-        }
+        //        if (_bearbeitung == value) { return; }
+        //        _bearbeitung = value;
+        //        OnChanged();
+        //    }
+        //}
 
         public string Filter_hinzufügen {
             get => string.Empty;
@@ -177,7 +176,7 @@ namespace BlueControls.ItemCollection {
 
         public Control? CreateControl(ConnectedFormulaView parent) {
             var c = new FlexiControlRowSelector(Database, this.Parent, FilterDefiniton, _überschrift, _anzeige);
-            c.EditType = EditType;
+            c.EditType = _bearbeitung;
             c.CaptionPosition = CaptionPosition;
             c.Tag = Internal;
             return c;
@@ -193,9 +192,9 @@ namespace BlueControls.ItemCollection {
             var u = new ItemCollection.ItemCollectionList.ItemCollectionList();
             u.AddRange(typeof(ÜberschriftAnordnung));
             l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
-            var b = new ItemCollection.ItemCollectionList.ItemCollectionList();
-            b.AddRange(typeof(EditTypeFormula));
-            l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
+            //var b = new ItemCollection.ItemCollectionList.ItemCollectionList();
+            //b.AddRange(typeof(EditTypeFormula));
+            //l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
             l.Add(new FlexiControl());
 
             //l.Add(new FlexiControlForProperty<string>(() => Database.Caption));
@@ -347,7 +346,7 @@ namespace BlueControls.ItemCollection {
                 Skin.Draw_FormatedText(gr, txt, QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, modifiedPosition.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
             }
 
-            gr.FillRectangle(new SolidBrush(Color.FromArgb(128, 255, 255, 255)), modifiedPosition);
+            //gr.FillRectangle(new SolidBrush(Color.FromArgb(128, 255, 255, 255)), modifiedPosition);
             //drawingCoordinates.Inflate(-Padding, -Padding);
             //RectangleF r1 = new(drawingCoordinates.Left + Padding, drawingCoordinates.Top + Padding,
             //    drawingCoordinates.Width - (Padding * 2), drawingCoordinates.Height - (Padding * 2));
@@ -527,8 +526,10 @@ namespace BlueControls.ItemCollection {
             fa.DropdownAllesAbwählenErlaubt = true;
             fa.DropdownBearbeitungErlaubt = true;
             fa.DropDownItems.Add("=");
+            fa.DropDownItems.Add("=!empty");
             //fa.DropDownItems.Add("x");
             fa.OpticalReplace.Add("=|ist (GK egal)");
+            fa.OpticalReplace.Add("=!empty|wenn nicht leer, ist");
             //fa.OpticalReplace.Add("x|LÖSCHEN");
 
             var b1 = x.Column.Add("suchsym", " ", VarType.Text);

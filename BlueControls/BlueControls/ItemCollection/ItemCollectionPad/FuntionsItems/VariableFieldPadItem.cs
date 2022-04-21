@@ -25,14 +25,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using MessageBox = BlueControls.Forms.MessageBox;
 using static BlueBasics.Converter;
-using BlueDatabase;
 using BlueDatabase.Enums;
 
 using BlueBasics.Interfaces;
 using BlueControls.Interfaces;
-using BlueControls.ConnectedFormula;
 
 namespace BlueControls.ItemCollection {
 
@@ -64,14 +61,14 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public EditTypeFormula EditType {
-            get => _bearbeitung;
-            set {
-                if (_bearbeitung == value) { return; }
-                _bearbeitung = value;
-                OnChanged();
-            }
-        }
+        //public EditTypeFormula EditType {
+        //    get => _bearbeitung;
+        //    set {
+        //        if (_bearbeitung == value) { return; }
+        //        _bearbeitung = value;
+        //        OnChanged();
+        //    }
+        //}
 
         public string Überschrift {
             get => _überschrift;
@@ -99,7 +96,7 @@ namespace BlueControls.ItemCollection {
         public override System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
             var c = new FlexiControl();
             c.Caption = Überschrift + ":";
-            c.EditType = EditType;
+            c.EditType = _bearbeitung;
             c.CaptionPosition = CaptionPosition;
             c.Tag = Internal;
             c.OriginalText = _variable;
@@ -119,15 +116,15 @@ namespace BlueControls.ItemCollection {
             List<GenericControl> l = new();
             l.AddRange(base.GetStyleOptions());
 
-            l.Add(new FlexiControlForProperty<String>(() => Überschrift));
-            l.Add(new FlexiControlForProperty<String>(() => Variable));
+            l.Add(new FlexiControlForProperty<string>(() => Überschrift));
+            l.Add(new FlexiControlForProperty<string>(() => Variable));
 
             var u = new ItemCollection.ItemCollectionList.ItemCollectionList();
             u.AddRange(typeof(ÜberschriftAnordnung));
             l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
-            var b = new ItemCollection.ItemCollectionList.ItemCollectionList();
-            b.AddRange(typeof(EditTypeFormula));
-            l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
+            //var b = new ItemCollection.ItemCollectionList.ItemCollectionList();
+            //b.AddRange(typeof(EditTypeFormula));
+            //l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
             l.Add(new FlexiControl());
 
             return l;
@@ -189,7 +186,8 @@ namespace BlueControls.ItemCollection {
         protected override string ClassId() => "FI-VariableField";
 
         protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-            var id = -1; if (GetRowFrom != null) { id = GetRowFrom.Id; }
+            var id = -1;
+            if (GetRowFrom != null) { id = GetRowFrom.Id; }
 
             if (!forPrinting) {
                 DrawColorScheme(gr, positionModified, zoom, id);

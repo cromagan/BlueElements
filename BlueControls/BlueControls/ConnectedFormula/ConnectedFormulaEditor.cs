@@ -20,11 +20,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.IO;
-using System.Linq;
 using static BlueBasics.FileOperations;
 using BlueControls.ItemCollection;
-using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using static BlueBasics.Converter;
 using BlueControls.Interfaces;
@@ -61,7 +58,6 @@ namespace BlueControls.Forms {
         private void btnEingangsZeile_Click(object sender, System.EventArgs e) {
             var it = new RowInputPadItem(string.Empty);
             Pad.AddCentered(it);
-            ChooseDatabaseAndID(it);
         }
 
         private void btnFeldHinzu_Click(object sender, System.EventArgs e) {
@@ -94,7 +90,7 @@ namespace BlueControls.Forms {
 
         private void btnKonstante_Click(object sender, System.EventArgs e) {
             var x = new ConstantTextPaditem();
-            x.Bei_Export_Sichtbar = false;
+            //x.Bei_Export_Sichtbar = false;
             Pad.AddCentered(x);
         }
 

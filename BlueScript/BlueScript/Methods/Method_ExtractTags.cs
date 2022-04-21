@@ -18,7 +18,6 @@
 using System.Collections.Generic;
 using BlueBasics;
 using BlueScript.Structures;
-using BlueScript.Enums;
 using BlueScript.Variables;
 
 #nullable enable

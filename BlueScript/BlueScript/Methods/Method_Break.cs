@@ -19,7 +19,6 @@
 
 using System.Collections.Generic;
 using BlueScript.Structures;
-using BlueScript.Enums;
 
 namespace BlueScript.Methods {
 

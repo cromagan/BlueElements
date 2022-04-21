@@ -129,7 +129,6 @@ namespace BlueControls.Controls {
                 return _showingRowKey;
             }
             set {
-
                 if (value < 0) { value = -1; }
                 if (grpEditor.Visible) { value = -1; }
                 if (value == _showingRowKey) { return; }
@@ -162,6 +161,19 @@ namespace BlueControls.Controls {
         #endregion
 
         #region Methods
+
+        public static List<BasicListItem> GetAllowedEditTypes(ColumnItem? column) {
+            var l = new List<BasicListItem>();
+            if (column == null) { return l; }
+            var t = typeof(EditTypeFormula);
+
+            foreach (int z1 in Enum.GetValues(t)) {
+                if (column.UserEditDialogTypeInFormula((EditTypeFormula)z1)) {
+                    l.Add(new TextListItem(Enum.GetName(t, z1).Replace("_", " "), z1.ToString(), null, false, true, string.Empty));
+                }
+            }
+            return l;
+        }
 
         public static ColumnViewCollection? SearchColumnView(ColumnItem? column) {
             if (column == null) { return null; }
@@ -615,14 +627,7 @@ namespace BlueControls.Controls {
                 if (viewItem.Column != null) {
                     if (blinki) {
                         cbxControlType.Item.Clear();
-                        for (var z = 0; z <= 999; z++) {
-                            var w = (EditTypeFormula)z;
-                            if (w.ToString() != z.ToString()) {
-                                if (viewItem.Column.UserEditDialogTypeInFormula(w)) {
-                                    cbxControlType.Item.Add(w.ToString(), z.ToString());
-                                }
-                            }
-                        }
+                        cbxControlType.Item.AddRange(GetAllowedEditTypes(viewItem.Column));
                     }
                     cbxControlType.Text = ((int)viewItem.Column.EditType).ToString();
                 } else {

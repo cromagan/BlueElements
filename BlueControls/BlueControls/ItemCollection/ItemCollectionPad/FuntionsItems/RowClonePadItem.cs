@@ -27,11 +27,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using BlueBasics.Interfaces;
 using System.ComponentModel;
-using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 using BlueControls.Interfaces;
 using System.Windows.Forms;
-using System.Xml;
 using BlueControls.ConnectedFormula;
 
 namespace BlueControls.ItemCollection {

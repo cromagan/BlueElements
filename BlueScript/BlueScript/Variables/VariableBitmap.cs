@@ -18,7 +18,6 @@
 #nullable enable
 
 using System.Drawing;
-using BlueScript.Enums;
 using BlueScript.Structures;
 
 namespace BlueScript.Variables {

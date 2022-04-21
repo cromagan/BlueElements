@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.Drawing.Imaging;
 using BlueBasics;
 using BlueScript.Structures;
-using BlueScript.Enums;
 using BlueScript.Variables;
 
 namespace BlueScript.Methods {

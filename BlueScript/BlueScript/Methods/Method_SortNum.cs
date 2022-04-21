@@ -18,7 +18,6 @@
 using System.Collections.Generic;
 using BlueBasics;
 using BlueScript.Structures;
-using BlueScript.Enums;
 using BlueScript.Variables;
 using static BlueBasics.Converter;
 

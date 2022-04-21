@@ -15,12 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueControls.ItemCollection.ItemCollectionList;
-using BlueDatabase;
-using BlueDatabase.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using System.Windows.Forms;
 
 namespace BlueControls.Interfaces {
 

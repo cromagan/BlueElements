@@ -18,22 +18,12 @@
 #nullable enable
 
 using BlueBasics;
-using BlueBasics.Enums;
 using BlueControls.Controls;
-using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using MessageBox = BlueControls.Forms.MessageBox;
-using static BlueBasics.Converter;
-using BlueDatabase;
-using BlueDatabase.Enums;
-
-using BlueBasics.Interfaces;
 using BlueControls.Interfaces;
-using BlueControls.ConnectedFormula;
-using BlueScript.Variables;
 
 namespace BlueControls.ItemCollection {
 

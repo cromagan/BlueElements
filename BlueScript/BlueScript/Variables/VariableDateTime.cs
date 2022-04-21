@@ -18,7 +18,6 @@
 #nullable enable
 
 using BlueBasics;
-using BlueScript.Enums;
 using BlueScript.Structures;
 using System;
 

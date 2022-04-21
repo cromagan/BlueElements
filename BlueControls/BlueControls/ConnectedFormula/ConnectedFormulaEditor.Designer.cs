@@ -24,6 +24,7 @@ namespace BlueControls.Forms {
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConnectedFormulaEditor));
             this.tabEditor = new System.Windows.Forms.TabPage();
             this.grpVorschau = new BlueControls.Controls.GroupBox();
             this.btnVorschauÖffnen = new BlueControls.Controls.Button();
@@ -245,8 +246,8 @@ namespace BlueControls.Forms {
             this.btnAusgangsZeile.Location = new System.Drawing.Point(232, 2);
             this.btnAusgangsZeile.Name = "btnAusgangsZeile";
             this.btnAusgangsZeile.QuickInfo = "Fügt einen möglichen externen Übergabepunkt zu.\r\nMit dieser Option kann eine Zeil" +
-    "e von einem übergeordneten\r\nFormular empfangen werden.\r\nNur einmalig pro Formula" +
-    "r möglich!";
+    "e an ein übergeordnetes\r\nFormular gesendet werden.\r\nNur einmalig pro Formular mö" +
+    "glich!";
             this.btnAusgangsZeile.Size = new System.Drawing.Size(72, 66);
             this.btnAusgangsZeile.TabIndex = 6;
             this.btnAusgangsZeile.Text = "Zeilen-Ausgang";
@@ -258,9 +259,7 @@ namespace BlueControls.Forms {
             this.btnEingangsZeile.ImageCode = "Pfeil_Unten|16|||00FF00||||||Zeile";
             this.btnEingangsZeile.Location = new System.Drawing.Point(156, 2);
             this.btnEingangsZeile.Name = "btnEingangsZeile";
-            this.btnEingangsZeile.QuickInfo = "Fügt einen möglichen externen Übergabepunkt zu.\r\nMit dieser Option kann eine Zeil" +
-    "e an ein übergeordnetes\r\nElement abgegeben werden.\r\nNur einmalig pro Formular mö" +
-    "glich!";
+            this.btnEingangsZeile.QuickInfo = resources.GetString("btnEingangsZeile.QuickInfo");
             this.btnEingangsZeile.Size = new System.Drawing.Size(72, 66);
             this.btnEingangsZeile.TabIndex = 5;
             this.btnEingangsZeile.Text = "Zeilen-Eingang";

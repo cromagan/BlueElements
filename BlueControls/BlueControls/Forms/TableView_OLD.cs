@@ -24,12 +24,7 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using System;
-using System.ComponentModel;
-using System.IO;
 using System.Linq;
-using System.Windows.Media.Converters;
-using static BlueBasics.Develop;
-using static BlueBasics.FileOperations;
 using static BlueBasics.Converter;
 
 #nullable enable

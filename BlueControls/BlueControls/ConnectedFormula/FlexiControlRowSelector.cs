@@ -17,12 +17,7 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
-using System.Data.Common;
-using System.Diagnostics.Eventing.Reader;
-using System.Runtime.InteropServices;
-using System.Windows.Markup.Localizer;
 using static BlueBasics.Develop;
 using BlueDatabase;
 using BlueBasics;
@@ -32,7 +27,6 @@ using BlueDatabase.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueScript;
-using BlueScript.Variables;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ConnectedFormula {
@@ -223,6 +217,7 @@ namespace BlueControls.ConnectedFormula {
                     #endregion
 
                     #region Type ermitteln
+                    bool onlyifhasvalue = false;
 
                     FilterType ft;
                     switch (thisR.CellGetString("Filterart").ToLower()) {
@@ -230,10 +225,16 @@ namespace BlueControls.ConnectedFormula {
                             ft = FilterType.Istgleich_GroßKleinEgal;
                             break;
 
-                        case "x":
-                            // Filter löschen
-                            ft = FilterType.KeinFilter;
+                        case "=!empty":
+                            ft = FilterType.Istgleich_GroßKleinEgal;
+                            onlyifhasvalue = true;
                             break;
+
+
+                        //case "x":
+                        //    // Filter löschen
+                        //    ft = FilterType.KeinFilter;
+                        //    break;
 
                         default:
                             ft = FilterType.Istgleich_GroßKleinEgal;
@@ -283,6 +284,21 @@ namespace BlueControls.ConnectedFormula {
                                 }
                                 break;
 
+                            case RowInputPadItem ripi:
+                                if (Parent is ConnectedFormulaView cfvy) {
+                                    var se = cfvy.SearchOrGenerate(ripi);
+
+                                    if (se is FlexiControlForCell fcfc) {
+                                        value = fcfc.Value;
+                                    } else {
+                                        DebugPrint("Unbekannt");
+                                    }
+                                } else {
+                                    value = "@@@";
+                                    //DebugPrint("Parent unbekannt!");
+                                }
+                                break;
+
                             default:
                                 value = "@@@";
                                 ft = FilterType.KeinFilter; // Wurde dsa Parent eben gelöscht...
@@ -294,7 +310,10 @@ namespace BlueControls.ConnectedFormula {
                     #endregion
 
                     if (column != null && ft != FilterType.KeinFilter) {
-                        f.Add(new FilterItem(column, ft, value));
+
+                        if (!string.IsNullOrEmpty(value) || !onlyifhasvalue) {
+                            f.Add(new FilterItem(column, ft, value));
+                        }
                     }
                 }
 
