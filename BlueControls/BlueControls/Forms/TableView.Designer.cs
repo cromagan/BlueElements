@@ -639,6 +639,8 @@ namespace BlueControls.Forms {
             this.Table.ShowWaitScreen = true;
             this.Table.Size = new System.Drawing.Size(739, 531);
             this.Table.TabIndex = 0;
+            this.Table.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.TableView_ContextMenu_Init);
+            this.Table.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.TableView_ContextMenuItemClicked);
             this.Table.CursorPosChanged += new System.EventHandler<BlueDatabase.EventArgs.CellExtEventArgs>(this.Table_CursorPosChanged);
             this.Table.DatabaseChanged += new System.EventHandler(this.TableView_DatabaseChanged);
             this.Table.ViewChanged += new System.EventHandler(this.Table_ViewChanged);

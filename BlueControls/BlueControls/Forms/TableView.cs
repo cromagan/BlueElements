@@ -783,5 +783,114 @@ namespace BlueControls.Forms {
         private void tbcSidebar_SelectedIndexChanged(object sender, System.EventArgs e) => FillFormula();
 
         #endregion
+        public void TableView_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
+            var bt = (Table)sender;
+            var cellKey = e.Tags.TagGet("CellKey");
+            if (string.IsNullOrEmpty(cellKey)) { return; }
+            bt.Database.Cell.DataOfCellKey(cellKey, out var column, out var row);
+            switch (e.ClickedComand) {
+                case "SpaltenSortierungAZ":
+                    bt.SortDefinitionTemporary = new RowSortDefinition(bt.Database, column.Name, false);
+                    break;
+
+                case "SpaltenSortierungZA":
+                    bt.SortDefinitionTemporary = new RowSortDefinition(bt.Database, column.Name, true);
+                    break;
+
+                case "Fehlersuche":
+                    MessageBox.Show(row.DoAutomatic(true, true, 10, "manual check").error);
+                    break;
+
+                case "ZeileLöschen":
+                    if (row != null) {
+                        if (MessageBox.Show("Zeile löschen?", ImageCode.Frage, "Ja", "Nein") == 0) {
+                            bt.Database.Row.Remove(row);
+                        }
+                    }
+                    break;
+
+                case "ContentDelete":
+                    Table.Database.Cell.Delete(column, row.Key);
+                    break;
+
+                case "SpaltenEigenschaftenBearbeiten":
+                    OpenColumnEditor(column, row, Table);
+                    CheckButtons();
+                    break;
+
+                case "ContentCopy":
+                    Table.CopyToClipboard(column, row, true);
+                    break;
+
+                case "SuchenUndErsetzen":
+                    Table.OpenSearchAndReplace();
+                    break;
+
+                case "ÜberallDel":
+                    Table.OpenSearchAndReplace();
+                    break;
+
+                case "Summe":
+                    var summe = column.Summe(Table.Filter);
+                    if (!summe.HasValue) {
+                        MessageBox.Show("Die Summe konnte nicht berechnet werden.", ImageCode.Summe, "OK");
+                    } else {
+                        MessageBox.Show("Summe dieser Spalte, nur angezeigte Zeilen: <br><b>" + summe, ImageCode.Summe, "OK");
+                    }
+                    break;
+
+                case "Statistik":
+                    column.Statisik(Table.Filter, Table.PinnedRows);
+                    break;
+
+                case "VorherigenInhaltWiederherstellen":
+                    Table.DoUndo(column, row);
+                    break;
+
+                case "ContentPaste":
+                    row.CellSet(column, System.Windows.Forms.Clipboard.GetText());
+                    break;
+
+                case "ColumnContentDelete":
+                    if (column != null) {
+                        if (MessageBox.Show("Angezeite Inhalte dieser Spalte löschen?", ImageCode.Frage, "Ja", "Nein") == 0) {
+                            column.DeleteContents(Table.Filter, Table.PinnedRows);
+                        }
+                    }
+                    break;
+            }
+        }
+
+        protected Ansicht _ansicht = Ansicht.Nur_Tabelle;
+
+        private void TableView_ContextMenu_Init(object sender, ContextMenuInitEventArgs e) {
+            var bt = (Table)sender;
+            var cellKey = e.Tags.TagGet("Cellkey");
+            if (string.IsNullOrEmpty(cellKey)) { return; }
+            bt.Database.Cell.DataOfCellKey(cellKey, out var column, out var row);
+            if (_ansicht != Ansicht.Überschriften_und_Formular) {
+                e.UserMenu.Add("Sortierung", true);
+                e.UserMenu.Add(ContextMenuComands.SpaltenSortierungAZ, column != null && column.Format.CanBeCheckedByRules());
+                e.UserMenu.Add(ContextMenuComands.SpaltenSortierungZA, column != null && column.Format.CanBeCheckedByRules());
+                e.UserMenu.AddSeparator();
+                e.UserMenu.Add("Zelle", true);
+                e.UserMenu.Add("Inhalt Kopieren", "ContentCopy", ImageCode.Kopieren, column != null && column.Format.CanBeChangedByRules());
+                e.UserMenu.Add("Inhalt Einfügen", "ContentPaste", ImageCode.Clipboard, column != null && column.Format.CanBeChangedByRules());
+                e.UserMenu.Add("Inhalt löschen", "ContentDelete", ImageCode.Radiergummi, column != null && column.Format.CanBeChangedByRules());
+                e.UserMenu.Add(ContextMenuComands.VorherigenInhaltWiederherstellen, column != null && column.Format.CanBeChangedByRules() && column.ShowUndo);
+                e.UserMenu.Add(ContextMenuComands.SuchenUndErsetzen, column != null && column.Format.CanBeChangedByRules());
+                e.UserMenu.AddSeparator();
+                e.UserMenu.Add("Spalte", true);
+                e.UserMenu.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten, column != null);
+                e.UserMenu.Add("Statistik", "Statistik", QuickImage.Get(ImageCode.Balken, 16), column != null);
+                e.UserMenu.Add("Inhalte aller angezeigten Zellen dieser Spalte löschen", "ColumnContentDelete", ImageCode.Radiergummi, column != null && column.Format.CanBeChangedByRules());
+                e.UserMenu.Add("Summe", "Summe", ImageCode.Summe, column != null);
+                e.UserMenu.AddSeparator();
+            }
+            e.UserMenu.Add("Zeile", true);
+            e.UserMenu.Add(ContextMenuComands.ZeileLöschen, row != null);
+            e.UserMenu.Add("Zeile prüfen", "Fehlersuche", ImageCode.Zeile, row != null);
+        }
+
     }
 }

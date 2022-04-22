@@ -255,12 +255,12 @@ namespace BlueBasics {
             if (string.IsNullOrEmpty(name)) { return string.Empty; }
             if (!name.Contains(".")) { return string.Empty; }
             var l = Path.GetExtension(name);
-            return string.IsNullOrEmpty(l) ? string.Empty : l.Substring(1).ToUpper();
+            return string.IsNullOrEmpty(l) ? string.Empty : l.Substring(1);
         }
 
         public static FileFormat FileType(this string filename) => string.IsNullOrEmpty(filename)
 ? FileFormat.Unknown
-: filename.FileSuffix() switch {
+: filename.FileSuffix().ToUpper() switch {
     "DOC" or "DOCX" or "RTF" or "ODT" => FileFormat.WordKind,
     "TXT" or "INI" or "INFO" => FileFormat.Textdocument,
     "XLS" or "CSV" or "XLA" or "XLSX" or "XLSM" or "ODS" => FileFormat.ExcelKind,
