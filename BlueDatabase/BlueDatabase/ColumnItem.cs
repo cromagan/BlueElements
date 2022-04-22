@@ -913,17 +913,19 @@ namespace BlueDatabase {
             var suffix = filename.FileSuffix();
             var cleanfilename = filename;
             if (string.IsNullOrEmpty(suffix)) {
-                suffix = _bestFileStandardSuffix;
+                suffix = _bestFileStandardSuffix.ToLower();
             } else {
                 cleanfilename = filename.FileNameWithoutSuffix();
             }
+
             // Den Standardfolder benutzen. Falls dieser fehlt, 'Files' benutzen.
             var directory = _bestFileStandardFolder.Trim("\\");
             if (string.IsNullOrEmpty(directory)) { directory = "Files"; }
-            // Ist nur ein Unterferzeichniss angegeben, den Datenbankpfad benutzen und das Unterverzeichniss anhängen
+
+            // Ist nur ein Unterverzeichnis angegeben, den Datenbankpfad benutzen und das Unterverzeichniss anhängen
             if (directory.Substring(1, 1) != ":" && directory.Substring(0, 1) != "\\") { directory = Database.Filename.FilePath() + directory; }
             if (!mustBeFree) {
-                return (directory.TrimEnd("\\") + "\\" + cleanfilename + "." + suffix.ToLower()).TrimEnd(".");
+                return (directory.TrimEnd("\\") + "\\" + cleanfilename + "." + suffix).TrimEnd(".");
             }
             var nr = -1;
             do {

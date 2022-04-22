@@ -71,13 +71,13 @@ namespace BlueControls.Forms {
             this.tbcSidebar = new BlueControls.Controls.TabControl();
             this.tabFormula = new System.Windows.Forms.TabPage();
             this.Formula = new BlueControls.Controls.Formula();
+            this.tabFormulaBeta = new System.Windows.Forms.TabPage();
+            this.FormulaBETA = new BlueControls.Controls.ConnectedFormulaView();
             this.pnlStatusBar = new System.Windows.Forms.Panel();
             this.capStatusbar = new BlueControls.Controls.Caption();
             this.capZeilen2 = new BlueControls.Controls.Caption();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
-            this.tabFormulaBeta = new System.Windows.Forms.TabPage();
-            this.FormulaBETA = new BlueControls.Controls.ConnectedFormulaView();
             this.ribMain.SuspendLayout();
             this.tabFile.SuspendLayout();
             this.grpOrdner.SuspendLayout();
@@ -99,8 +99,8 @@ namespace BlueControls.Forms {
             this.SplitContainer1.SuspendLayout();
             this.tbcSidebar.SuspendLayout();
             this.tabFormula.SuspendLayout();
-            this.pnlStatusBar.SuspendLayout();
             this.tabFormulaBeta.SuspendLayout();
+            this.pnlStatusBar.SuspendLayout();
             this.SuspendLayout();
             // 
             // ribMain
@@ -115,7 +115,7 @@ namespace BlueControls.Forms {
             this.ribMain.Name = "ribMain";
             this.ribMain.SelectedIndex = 1;
             this.ribMain.Size = new System.Drawing.Size(1008, 110);
-            this.ribMain.TabDefault = null;
+            this.ribMain.TabDefault = this.tabFile;
             this.ribMain.TabDefaultOrder = null;
             this.ribMain.TabIndex = 93;
             // 
@@ -705,6 +705,26 @@ namespace BlueControls.Forms {
             this.Formula.SizeChanged += new System.EventHandler(this.Formula_SizeChanged);
             this.Formula.VisibleChanged += new System.EventHandler(this.Formula_VisibleChanged);
             // 
+            // tabFormulaBeta
+            // 
+            this.tabFormulaBeta.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabFormulaBeta.Controls.Add(this.FormulaBETA);
+            this.tabFormulaBeta.Location = new System.Drawing.Point(4, 25);
+            this.tabFormulaBeta.Name = "tabFormulaBeta";
+            this.tabFormulaBeta.Size = new System.Drawing.Size(250, 566);
+            this.tabFormulaBeta.TabIndex = 1;
+            this.tabFormulaBeta.Text = "Formular (BETA)";
+            // 
+            // FormulaBETA
+            // 
+            this.FormulaBETA.ConnectedFormula = null;
+            this.FormulaBETA.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.FormulaBETA.InputRow = null;
+            this.FormulaBETA.Location = new System.Drawing.Point(0, 0);
+            this.FormulaBETA.Name = "FormulaBETA";
+            this.FormulaBETA.Size = new System.Drawing.Size(250, 566);
+            this.FormulaBETA.TabIndex = 0;
+            // 
             // pnlStatusBar
             // 
             this.pnlStatusBar.Controls.Add(this.capStatusbar);
@@ -745,25 +765,6 @@ namespace BlueControls.Forms {
             this.SaveTab.Title = "Bitte neuen Dateinamen der Datenbank wählen.";
             this.SaveTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
             // 
-            // tabFormulaBeta
-            // 
-            this.tabFormulaBeta.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabFormulaBeta.Controls.Add(this.FormulaBETA);
-            this.tabFormulaBeta.Location = new System.Drawing.Point(4, 25);
-            this.tabFormulaBeta.Name = "tabFormulaBeta";
-            this.tabFormulaBeta.Size = new System.Drawing.Size(250, 566);
-            this.tabFormulaBeta.TabIndex = 1;
-            this.tabFormulaBeta.Text = "Formular (BETA)";
-            // 
-            // FormulaBETA
-            // 
-            this.FormulaBETA.ConnectedFormula = null;
-            this.FormulaBETA.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.FormulaBETA.Location = new System.Drawing.Point(0, 0);
-            this.FormulaBETA.Name = "FormulaBETA";
-            this.FormulaBETA.Size = new System.Drawing.Size(250, 566);
-            this.FormulaBETA.TabIndex = 0;
-            // 
             // TableView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -797,8 +798,8 @@ namespace BlueControls.Forms {
             this.SplitContainer1.ResumeLayout(false);
             this.tbcSidebar.ResumeLayout(false);
             this.tabFormula.ResumeLayout(false);
-            this.pnlStatusBar.ResumeLayout(false);
             this.tabFormulaBeta.ResumeLayout(false);
+            this.pnlStatusBar.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }

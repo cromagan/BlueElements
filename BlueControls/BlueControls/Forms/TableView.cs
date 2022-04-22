@@ -49,6 +49,7 @@ namespace BlueControls.Forms {
 
         //private readonly List<Database> DBStore = new();
         private Database? _originalDb;
+        private bool _firstOne = true;
 
         #endregion
 
@@ -474,6 +475,13 @@ namespace BlueControls.Forms {
                 if (thisT is System.Windows.Forms.TabPage tp && tp.Tag is List<string> s) {
                     if (s[0].Equals(filename, StringComparison.InvariantCultureIgnoreCase)) {
                         tbcDatabaseSelector.SelectedTab = tp;
+
+
+                        if (_firstOne) {
+                            _firstOne = false;
+                            tbcDatabaseSelector_Selected(null, new System.Windows.Forms.TabControlEventArgs(tp, tbcDatabaseSelector.TabPages.IndexOf(tp), System.Windows.Forms.TabControlAction.Selected));
+                        }
+
                         return true;
                     }
                 }

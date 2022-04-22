@@ -37,6 +37,7 @@ using System.Windows.Forms;
 using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.FileOperations;
 using MessageBox = System.Windows.Forms.MessageBox;
+using BlueDatabase.Interfaces;
 
 namespace BlueControls.Controls {
 
@@ -518,10 +519,11 @@ namespace BlueControls.Controls {
             }
 
             if (gbColumn != null) {
-                Suffix = gbColumn.Suffix;
-                AllowedChars = gbColumn.AllowedChars;
-                Regex = gbColumn.Regex;
-                MultiLine = gbColumn.MultiLine;
+                this.GetStyleFrom(gbColumn);
+                //Suffix = gbColumn.Suffix;
+                //AllowedChars = gbColumn.AllowedChars;
+                //Regex = gbColumn.Regex;
+                //MultiLine = gbColumn.MultiLine;
             } else {
                 if (column == null) { return null; }  // Bei Steuerelementen, die manuell hinzugefügt werden
                 if (row == null) { return null; }  // Beim initualisieren des Controls und Linked Cell kann das vorkommen

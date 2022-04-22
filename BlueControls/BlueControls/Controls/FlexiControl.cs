@@ -1014,7 +1014,7 @@ namespace BlueControls.Controls {
                     control.Enabled = true;
                 }
 
-                if (control is IInputFormat inf) { inf.GetStyleFrom(inf); }
+                if (control is IInputFormat inf) { inf.GetStyleFrom(this); }
             }
         }
 

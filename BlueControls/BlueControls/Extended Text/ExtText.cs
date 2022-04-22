@@ -430,7 +430,7 @@ namespace BlueControls.Extended_Text {
                     lastStufe = this[first].Stufe;
                 }
 
-                t.Append(this[first].HtmlText());
+                t.Append(this[z].HtmlText());
             }
 
             return t.ToString();
