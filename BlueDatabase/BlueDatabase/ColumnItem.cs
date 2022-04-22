@@ -1624,8 +1624,9 @@ namespace BlueDatabase {
                 case "System: Date Created":
                     _name = "SYS_CreateDate";
                     _spellCheckingEnabled = false;
-                    SetFormatForDateTime();
+
                     if (setAll) {
+                        SetFormatForDateTime();
                         Caption = "Erstell-Datum";
                         ForeColor = Color.FromArgb(0, 0, 128);
                         BackColor = Color.FromArgb(185, 185, 255);
@@ -1643,7 +1644,9 @@ namespace BlueDatabase {
                     _dropdownBearbeitungErlaubt = false;
                     _scriptType = ScriptType.String_Readonly;
                     PermissionGroupsChangeCell.Clear();
+
                     if (setAll) {
+                        SetFormatForDateTime();
                         Caption = "Änder-Datum";
                         ForeColor = Color.FromArgb(0, 128, 0);
                         BackColor = Color.FromArgb(185, 255, 185);

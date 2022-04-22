@@ -41,7 +41,7 @@ namespace BlueScript.Methods {
 
         #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "datetimenowutc" };
+        public override List<string> Comand(Script? s) => new() { "datetimeutcnow" };
 
         public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);

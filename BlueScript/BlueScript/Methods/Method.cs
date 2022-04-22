@@ -237,7 +237,7 @@ namespace BlueScript.Methods {
                     //}
                 }
 
-                if (!ok) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht der erwartete Typ " + exceptetType.ToString() + ", sondern " + v.ShortName); }
+                if (!ok) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht einer der erwarteten Typen '" + exceptetType.JoinWith ("' oder '") + "', sondern " + v.ShortName); }
 
                 feedbackVariables.Add(v);
 

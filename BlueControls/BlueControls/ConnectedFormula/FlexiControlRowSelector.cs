@@ -217,6 +217,7 @@ namespace BlueControls.ConnectedFormula {
                     #endregion
 
                     #region Type ermitteln
+
                     bool onlyifhasvalue = false;
 
                     FilterType ft;
@@ -229,7 +230,6 @@ namespace BlueControls.ConnectedFormula {
                             ft = FilterType.Istgleich_GroßKleinEgal;
                             onlyifhasvalue = true;
                             break;
-
 
                         //case "x":
                         //    // Filter löschen
@@ -310,7 +310,6 @@ namespace BlueControls.ConnectedFormula {
                     #endregion
 
                     if (column != null && ft != FilterType.KeinFilter) {
-
                         if (!string.IsNullOrEmpty(value) || !onlyifhasvalue) {
                             f.Add(new FilterItem(column, ft, value));
                         }

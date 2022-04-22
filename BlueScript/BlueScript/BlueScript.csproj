@@ -60,6 +60,7 @@
     <Compile Include="Methods\Method_BitmapToBase64.cs" />
     <Compile Include="Methods\Method_CallByFilename.cs" />
     <Compile Include="Methods\Method_ContainsWhich.cs" />
+    <Compile Include="Methods\Method_StringToDateTime.cs" />
     <Compile Include="Methods\Method_DirectoryCreate.cs" />
     <Compile Include="Methods\Method_RandomInt.cs" />
     <Compile Include="Methods\Method_DateTimeDifferenceInDays.cs" />

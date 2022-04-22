@@ -27,7 +27,7 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableSub.ShortName_Variable } };
+        public override List<List<string>> Args => new() { new() { VariableSub.ShortName_Plain } };
         public override string Description => "Ruft eine Subroutine auf";
         public override bool EndlessArgs => false;
         public override string EndSequence => ");";

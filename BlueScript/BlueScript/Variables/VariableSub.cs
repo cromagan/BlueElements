@@ -49,7 +49,7 @@ namespace BlueScript.Variables {
 
         #region Properties
 
-        public static string ShortName_Variable => "*sub";
+        public static string ShortName_Plain => "sub";
         public override int CheckOrder => 4;
         public override bool GetFromStringPossible => true;
         public override bool IsNullOrEmpty => string.IsNullOrEmpty(SubName);
