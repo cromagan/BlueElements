@@ -166,7 +166,7 @@ namespace BlueScript.Variables {
         }
 
         public static Variable? GetSystem(this List<Variable> vars, string name) => vars.FirstOrDefault(thisv =>
-                                                                                              thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper());
+                                                                                                thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper());
 
         public static void RemoveWithComent(this List<Variable> vars, string coment) {
             var z = 0;
@@ -350,6 +350,7 @@ namespace BlueScript.Variables {
         }
 
         public static DoItFeedback GetVariableByParsing(string txt, Script? s) {
+            if (string.IsNullOrEmpty(txt)) { return new DoItFeedback("Kein Wert zum Parsen angekommen."); }
 
             #region Prüfen, Ob noch mehre Klammern da sind, oder Anfangs/End-Klammern entfernen
 
@@ -430,18 +431,23 @@ namespace BlueScript.Variables {
                 var (pose, _) = NextText(txt, posa, KlammerZu, false, false, KlammernStd);
                 if (pose <= posa) { return DoItFeedback.Klammerfehler(); }
 
-                var tmp = GetVariableByParsing(txt.Substring(posa + 1, pose - posa - 1), s);
-                if (!string.IsNullOrEmpty(tmp.ErrorMessage)) { return new DoItFeedback("Befehls-Berechnungsfehler in ():" + tmp.ErrorMessage); }
-                if (tmp.Variable == null) { return new DoItFeedback("Allgemeiner Berechnungsfehler in ()"); }
-                if (!tmp.Variable.ToStringPossible) { return new DoItFeedback("Falscher Variablentyp: " + tmp.Variable.ShortName); }
-                return GetVariableByParsing(txt.Substring(0, posa) + tmp.Variable.ValueForReplace + txt.Substring(pose + 1), s);
+                var tmptxt = txt.Substring(posa + 1, pose - posa - 1);
+                if (!string.IsNullOrEmpty(tmptxt)) {
+                    var tmp = GetVariableByParsing(tmptxt, s);
+                    if (!string.IsNullOrEmpty(tmp.ErrorMessage)) { return new DoItFeedback("Befehls-Berechnungsfehler in ():" + tmp.ErrorMessage); }
+                    if (tmp.Variable == null) { return new DoItFeedback("Allgemeiner Berechnungsfehler in ()"); }
+                    if (!tmp.Variable.ToStringPossible) { return new DoItFeedback("Falscher Variablentyp: " + tmp.Variable.ShortName); }
+                    return GetVariableByParsing(txt.Substring(0, posa) + tmp.Variable.ValueForReplace + txt.Substring(pose + 1), s);
+                }
             }
 
             #endregion
 
             #region Jetzt die Variablen durchprüfen, ob eine ein OK gibt
 
-            if (Script.VarTypes == null) { return new DoItFeedback("Variablentypen nicht initialisiert"); }
+            if (Script.VarTypes == null) {
+                return new DoItFeedback("Variablentypen nicht initialisiert");
+            }
 
             foreach (var thisVT in Script.VarTypes) {
                 if (thisVT.GetFromStringPossible) {

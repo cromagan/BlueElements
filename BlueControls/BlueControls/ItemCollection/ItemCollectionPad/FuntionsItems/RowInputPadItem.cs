@@ -31,7 +31,7 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollection {
 
-    public class RowInputPadItem : FixedRectanglePadItem, IReadableText, IContentHolder, IItemToControl {
+    public class RowInputPadItem : RectanglePadItem, IReadableText, IContentHolder, IItemToControl {
 
         #region Fields
 
@@ -50,7 +50,7 @@ namespace BlueControls.ItemCollection {
 
         public RowInputPadItem(string intern, string spaltenname) : base(intern) {
             _spaltenname = spaltenname;
-            Size = new Size(200, 40);
+            //Size = new Size(200, 40);
         }
 
         public RowInputPadItem(string intern) : this(intern, string.Empty) { }
@@ -147,7 +147,7 @@ namespace BlueControls.ItemCollection {
 
             Skin.Draw_FormatedText(gr, t, SymbolForReadableText(), Alignment.Horizontal_Vertical_Center, modifiedPosition.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
 
-            gr.FillRectangle(new SolidBrush(Color.FromArgb(128, 255, 255, 255)), modifiedPosition);
+            //gr.FillRectangle(new SolidBrush(Color.FromArgb(128, 255, 255, 255)), modifiedPosition);
 
             base.DrawExplicit(gr, modifiedPosition, zoom, shiftX, shiftY, forPrinting);
         }
