@@ -341,16 +341,7 @@ namespace BlueControls.Forms {
         protected void DatabaseSet(Database? database, string viewcode) {
             Table.Database = database;
             Formula.Database = database;
-
-            var f = database?.FormulaFileName();
-
-            if (f != null) {
-                var tmpFormula = ConnectedFormula.ConnectedFormula.GetByFilename(f);
-                if (tmpFormula == null) { return; }
-                FormulaBETA.ConnectedFormula = tmpFormula;
-            } else {
-                FormulaBETA.ConnectedFormula = null;
-            }
+            SetFormulaBETA();
 
             FilterLeiste.Table = Table;
 
@@ -395,9 +386,30 @@ namespace BlueControls.Forms {
                 Formula.ShowingRowKey = Table.CursorPosRow is RowData r ? r.Row.Key : -1;
             }
 
+            //protected override void FillFormula() {
+            //    if (tbcSidebar.SelectedTab == tabFormulaBeta) {
+            //        if (FormulaBETA is null || FormulaBETA.IsDisposed) { return; }
+            //        if (!FormulaBETA.Visible) { return; }
+
+            //        FormulaBETA.ConnectedFormula =
+
+            //        FormulaBETA.InputRow = Table?.CursorPosRow?.Row;
+
+            //        //if (Table?.CursorPosRow?.Row is RowItem r) {
+            //        //    var k = Table.Database.Column.Exists("kommission");
+            //        //    if (k != null) { FormulaBETA.Set("kommission", r.CellGetString(k)); }
+            //        //}
+            //        return;
+            //    }
+
+            //    base.FillFormula();
+            //}
+
             if (tbcSidebar.SelectedTab == tabFormulaBeta) {
                 if (FormulaBETA is null || FormulaBETA.IsDisposed) { return; }
                 if (!FormulaBETA.Visible) { return; }
+
+                SetFormulaBETA();
                 FormulaBETA.InputRow = Table?.CursorPosRow?.Row;
 
                 //FormulaBETA.Set("row", Table?.CursorPosRow?.Row);
@@ -853,6 +865,22 @@ namespace BlueControls.Forms {
         private void Formula_VisibleChanged(object sender, System.EventArgs e) => FillFormula();
 
         private void LoadTab_FileOk(object sender, CancelEventArgs e) => SwitchTabToDatabase(LoadTab.FileName);
+
+        private void SetFormulaBETA() {
+            if (Table?.Database != null) {
+                var f = Table?.Database.FormulaFileName();
+
+                if (f != null) {
+                    var tmpFormula = ConnectedFormula.ConnectedFormula.GetByFilename(f);
+                    if (tmpFormula != null) {
+                        FormulaBETA.ConnectedFormula = tmpFormula;
+                        return;
+                    }
+                }
+            }
+
+            FormulaBETA.ConnectedFormula = null;
+        }
 
         private void Table_CursorPosChanged(object sender, CellExtEventArgs e) {
             if (InvokeRequired) {

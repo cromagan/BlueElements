@@ -861,6 +861,6 @@ namespace BlueControls.Forms {
         private System.Windows.Forms.SaveFileDialog SaveTab;
         private Controls.Button btnSuchenUndErsetzen;
         protected System.Windows.Forms.TabPage tabFormulaBeta;
-        protected Controls.ConnectedFormulaView FormulaBETA;
+        private Controls.ConnectedFormulaView FormulaBETA;
     }
 }

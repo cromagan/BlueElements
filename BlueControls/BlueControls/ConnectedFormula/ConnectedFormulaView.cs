@@ -39,7 +39,7 @@ namespace BlueControls.Controls {
 
         private ConnectedFormula.ConnectedFormula? _cf;
 
-        private RowItem _inputrow = null;
+        private RowItem? _inputrow = null;
 
         #endregion
 
@@ -72,7 +72,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        public RowItem InputRow {
+        public RowItem? InputRow {
             get => _inputrow;
             set {
                 if (value == _inputrow) { return; }
@@ -205,13 +205,19 @@ namespace BlueControls.Controls {
                     var c = SearchOrGenerate(ripi);
 
                     if (c is FlexiControlForCell fcfc) {
-                        ColumnItem co = null;
-                        if (_inputrow != null) { co = _inputrow.Database.Column[ripi.Spaltenname]; }
+                        ColumnItem? co = null;
+                        if (_inputrow != null) {
+                            if (ripi.Spaltenname.Equals("#first", System.StringComparison.InvariantCultureIgnoreCase)) {
+                                co = _inputrow?.Database?.Column.First();
+                            } else {
+                                co = _inputrow?.Database?.Column.Exists(ripi.Spaltenname);
+                            }
+                        }
 
                         if (co != null) {
-                            fcfc.Database = _inputrow.Database;
+                            fcfc.Database = _inputrow?.Database;
                             fcfc.ColumnKey = co.Key;
-                            fcfc.RowKey = _inputrow.Key;
+                            fcfc.RowKey = _inputrow!.Key;
                         } else {
                             fcfc.Database = null;
                             fcfc.RowKey = -1;

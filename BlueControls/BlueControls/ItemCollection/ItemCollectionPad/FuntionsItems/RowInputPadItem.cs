@@ -28,6 +28,7 @@ using BlueBasics.Interfaces;
 using BlueControls.Interfaces;
 using System.Windows.Forms;
 using BlueDatabase.Enums;
+using System.ComponentModel;
 
 namespace BlueControls.ItemCollection {
 
@@ -59,6 +60,7 @@ namespace BlueControls.ItemCollection {
 
         #region Properties
 
+        [Description("Aus welcher Spalte der Eingangs-Zeile kommen soll.\r\nEs muss der interne Spaltenname der ankommenden Zeile verwendet werden.\r\nAlternativ kann auch #first benutzt werden, wenn die erste Spalte benutzt werden soll.")]
         public string Spaltenname {
             get => _spaltenname;
             set {

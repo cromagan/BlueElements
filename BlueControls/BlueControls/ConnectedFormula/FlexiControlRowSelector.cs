@@ -437,6 +437,15 @@ namespace BlueControls.ConnectedFormula {
             }
 
             #endregion
+
+
+            #region Nur eine Zeile? auswählen!
+
+            if(cb.Item.Count == 1) {
+                ValueSet(cb.Item[0].Internal, true, true);
+            }
+            #endregion
+
         }
 
         #endregion

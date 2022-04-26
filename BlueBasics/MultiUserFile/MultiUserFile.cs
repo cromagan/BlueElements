@@ -754,7 +754,7 @@ namespace BlueBasics.MultiUserFile {
             }
 
             if (mustSave && _checkerTickCount > countSave) {
-               if (!string.IsNullOrEmpty(ErrorReason(Enums.ErrorReason.Save))) { return; }
+                if (!string.IsNullOrEmpty(ErrorReason(Enums.ErrorReason.Save))) { return; }
                 if (!_pureBinSaver.IsBusy) { _pureBinSaver.RunWorkerAsync(); } // Eigentlich sollte diese Abfrage überflüssig sein. Ist sie aber nicht
                 _checkerTickCount = 0;
                 return;
@@ -966,20 +966,28 @@ namespace BlueBasics.MultiUserFile {
                 return Feedback("Daten wurden inzwischen verändert.");
             }
             // OK, nun gehts rund: Zuerst das Backup löschen
-            if (FileExists(Backupdateiname())) { DeleteFile(Backupdateiname(), true); }
+            if (FileExists(Backupdateiname())) {
+                if (!DeleteFile(Backupdateiname(), false)) { return Feedback("Backup löschen fehlgeschlagen"); }
+            }
+
             // Haupt-Datei wird zum Backup umbenannt
-            RenameFile(Filename, Backupdateiname(), true);
+            if (!RenameFile(Filename, Backupdateiname(), false)) { return Feedback("Umbenennen der Hauptdatei fehlgeschlagen"); }
+
             // --- TmpFile wird zum Haupt ---
             RenameFile(tmpFileName, Filename, true);
+
             // ---- Steuerelemente Sagen, was gespeichert wurde
             DataOnDisk = savedDataUncompressed;
+
             // Und nun den Block entfernen
             CanWrite(Filename, 30); // sobald die Hauptdatei wieder frei ist
             DeleteBlockDatei(false, true);
+
             // Evtl. das BAK löschen
             if (AutoDeleteBak && FileExists(Backupdateiname())) {
                 DeleteFile(Backupdateiname(), false);
             }
+
             // --- nun Sollte alles auf der Festplatte sein, prüfen! ---
             var (data, fileinfo) = LoadBytesFromDisk(Enums.ErrorReason.LoadForCheckingOnly);
             if (data == null || !savedDataUncompressed.SequenceEqual(data)) {

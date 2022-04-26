@@ -462,6 +462,14 @@ namespace BlueBasics {
             return _canWriteLastResult;
         }
 
+        /// <summary>
+        /// Führt einen Datei-Befehl aus (z. B. löschen oder umbenennen)
+        /// </summary>
+        /// <param name="processMethod"></param>
+        /// <param name="file1"></param>
+        /// <param name="file2"></param>
+        /// <param name="toBeSure">Stellt sicher, dass der Befehl ausgeführt wird. Ansonsten wird das Programm abgebrochen</param>
+        /// <returns>True bei Erfolg</returns>
         private static bool ProcessFile(DoThis processMethod, string file1, string file2, bool toBeSure) {
             var tries = 0;
             var startTime = DateTime.Now;
