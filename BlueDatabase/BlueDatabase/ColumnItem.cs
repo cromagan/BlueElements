@@ -967,10 +967,18 @@ namespace BlueDatabase {
             EditTrotzSperreErlaubt = source.EditTrotzSperreErlaubt;
             EditType = source.EditType;
             Identifier = source.Identifier;
-            PermissionGroupsChangeCell.Clear();
-            PermissionGroupsChangeCell.AddRange(source.PermissionGroupsChangeCell);
-            Tags.Clear();
-            Tags.AddRange(source.Tags);
+
+            if (PermissionGroupsChangeCell.IsDifferentTo(source.PermissionGroupsChangeCell)) {
+                PermissionGroupsChangeCell.Clear();
+                PermissionGroupsChangeCell.AddRange(source.PermissionGroupsChangeCell);
+            }
+
+            if (Tags.IsDifferentTo(source.Tags)) {
+                Tags.Clear();
+                Tags.AddRange(source.Tags);
+            }
+
+
             AdminInfo = source.AdminInfo;
             FilterOptions = source.FilterOptions;
             IgnoreAtRowFilter = source.IgnoreAtRowFilter;
@@ -994,14 +1002,27 @@ namespace BlueDatabase {
             VorschlagsColumn = source.VorschlagsColumn;
             Align = source.Align;
             SortType = source.SortType;
-            DropDownItems.Clear();
-            DropDownItems.AddRange(source.DropDownItems);
-            LinkedCellFilter.Clear();
-            LinkedCellFilter.AddRange(source.LinkedCellFilter);
-            OpticalReplace.Clear();
-            OpticalReplace.AddRange(source.OpticalReplace);
-            AfterEditAutoReplace.Clear();
-            AfterEditAutoReplace.AddRange(source.AfterEditAutoReplace);
+
+            if (DropDownItems.IsDifferentTo(source.DropDownItems)) {
+                DropDownItems.Clear();
+                DropDownItems.AddRange(source.DropDownItems);
+            }
+
+            if (LinkedCellFilter.IsDifferentTo(source.LinkedCellFilter)) {
+                LinkedCellFilter.Clear();
+                LinkedCellFilter.AddRange(source.LinkedCellFilter);
+            }
+
+            if (OpticalReplace.IsDifferentTo(source.OpticalReplace)) {
+                OpticalReplace.Clear();
+                OpticalReplace.AddRange(source.OpticalReplace);
+            }
+
+            if (AfterEditAutoReplace.IsDifferentTo(source.AfterEditAutoReplace)) {
+                AfterEditAutoReplace.Clear();
+                AfterEditAutoReplace.AddRange(source.AfterEditAutoReplace);
+            }
+
             this.GetStyleFrom(source); // regex, Allowed Chars, etc.
             ScriptType = source.ScriptType;
             ShowUndo = source.ShowUndo;
