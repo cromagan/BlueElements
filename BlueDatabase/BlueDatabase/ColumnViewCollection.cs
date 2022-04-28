@@ -268,24 +268,23 @@ namespace BlueDatabase {
             tmp.RemoveString("#Administrator", false);
             tmp.RemoveNullOrEmpty();
 
-            if (isTableView) {
-                switch (number) {
-                    case 0:
-                        if (isTableView) {
-                            if (string.IsNullOrEmpty(Name)) { Name = "Alle Spalten"; }
-                            ShowAllColumns();
-                        } else {
-                            if (string.IsNullOrEmpty(Name)) { Name = "Kopf"; }
-                            if (PermissionGroups_Show.Count > 0) { PermissionGroups_Show.Clear(); }
-                        }
-                        break;
+            switch (number) {
+                case 0:
+                    if (isTableView) {
+                        if (string.IsNullOrEmpty(Name)) { Name = "Alle Spalten"; }
+                        ShowAllColumns();
+                    } else {
+                        if (string.IsNullOrEmpty(Name)) { Name = "Kopf"; }
+                        if (PermissionGroups_Show.Count > 0) { PermissionGroups_Show.Clear(); }
+                    }
+                    break;
 
-                    case 1:
-                        if (string.IsNullOrEmpty(Name)) { Name = "Standard"; }
-                        tmp.AddIfNotExists("#Everybody");
-                        break;
-                }
+                case 1:
+                    if (string.IsNullOrEmpty(Name)) { Name = "Standard"; }
+                    tmp.AddIfNotExists("#Everybody");
+                    break;
             }
+
 
             tmp = tmp.SortedDistinctList();
 
