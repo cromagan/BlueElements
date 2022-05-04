@@ -26,7 +26,7 @@ namespace BlueScript.Methods {
 
         #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
+        public override List<List<string>> Args => new() { new() { VariableDateTime.ShortName_Variable }, new() { VariableDateTime.ShortName_Variable } };
         public override string Description => "Gibt die Differnz in Tagen der beiden Datums als Gleitkommazahl zurück.\rErgebnis = DateTimeString1 - DateTimeString2";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
@@ -45,15 +45,9 @@ namespace BlueScript.Methods {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            var ok1 = DateTimeTryParse(((VariableString)attvar.Attributes[0]).ValueString, out var d1);
-            if (!ok1) {
-                return new DoItFeedback("Der Wert '" + ((VariableString)attvar.Attributes[0]).ValueString + "' wurde nicht als Zeitformat erkannt.");
-            }
-
-            var ok2 = DateTimeTryParse(((VariableString)attvar.Attributes[1]).ValueString, out var d2);
-            return !ok2
-                ? new DoItFeedback("Der Wert '" + ((VariableString)attvar.Attributes[1]).ValueString + "' wurde nicht als Zeitformat erkannt.")
-                : new DoItFeedback(d1.Subtract(d2).TotalDays);
+            var d1 = ((VariableDateTime)attvar.Attributes[0]).ValueDate;
+            var d2 = ((VariableDateTime)attvar.Attributes[1]).ValueDate;
+            return new DoItFeedback(d1.Subtract(d2).TotalDays);
         }
 
         #endregion

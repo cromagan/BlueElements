@@ -130,6 +130,7 @@ namespace BlueControls.Controls {
         protected override void OnSizeChanged(System.EventArgs e) {
             if (IsDisposed) { return; }
             base.OnSizeChanged(e);
+            _generated = false;
             GenerateView();
         }
 

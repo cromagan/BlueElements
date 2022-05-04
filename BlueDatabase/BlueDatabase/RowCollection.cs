@@ -313,6 +313,8 @@ namespace BlueDatabase {
         /// <returns></returns>
         public List<RowItem> CalculateVisibleRows(List<FilterItem>? filter, List<RowItem>? pinnedRows) {
             List<RowItem> tmpVisibleRows = new();
+            if (Database == null) { return tmpVisibleRows; }
+
             if (pinnedRows == null) { pinnedRows = new List<RowItem>(); }
 
             var lockMe = new object();
@@ -343,15 +345,15 @@ namespace BlueDatabase {
             GC.SuppressFinalize(this);
         }
 
-        public void DoAutomatic(FilterCollection? filter, bool fullCheck, List<RowItem?> pinned, string startroutine) {
-            if (Database.ReadOnly) { return; }
-            DoAutomatic(CalculateVisibleRows(filter, pinned), fullCheck, startroutine);
+        public string DoAutomatic(FilterCollection? filter, bool fullCheck, List<RowItem>? pinned, string startroutine) {
+            if (Database == null || Database.ReadOnly) { return "Datenbank schreibgeschützt."; }
+            return DoAutomatic(CalculateVisibleRows(filter, pinned), fullCheck, startroutine);
         }
 
-        public void DoAutomatic(List<RowItem>? rows, bool fullCheck, string startroutine) {
-            if (Database == null || Database.ReadOnly) { return; }
+        public string DoAutomatic(List<RowItem>? rows, bool fullCheck, string startroutine) {
+            if (Database == null || Database.ReadOnly) { return "Datenbank schreibgeschützt."; }
 
-            if (rows == null || rows.Count == 0) { return; }
+            if (rows == null || rows.Count == 0) { return "Keine Zeilen angekommen."; }
 
             Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", 0, rows.Count, true, false));
 
@@ -365,11 +367,12 @@ namespace BlueDatabase {
                     var w = rows[0].CellFirstString();
                     rows.Clear();
                     Database.OnDropMessage(FehlerArt.Warnung, "Skript fehlerhaft bei " + w + "\r\n" + s.Error);
-                    break;
+                    return "Skript fehlerhaft bei " + w + "\r\n" + s.Error;
                 }
                 if (checkPerformed) { rows.RemoveAt(0); }
             }
             Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", rows.Count, rows.Count, false, true));
+            return string.Empty;
         }
 
         public RowItem? First() => _internal.Values.FirstOrDefault(thisRowItem => thisRowItem != null);

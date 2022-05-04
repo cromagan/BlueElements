@@ -291,7 +291,7 @@ namespace BlueScript.Methods {
             co += "Argumente:\r\n";
             co += "~~~~~~~~~~\r\n";
             for (var z = 0; z < Args.Count; z++) {
-                co = co + "  - Argument " + (z + 1) + ": " + Args[z];
+                co = co + "  - Argument " + (z + 1) + ": " + Args[z].JoinWith(", ");
                 if (z == Args.Count - 1 && EndlessArgs) {
                     co += " -> Dieses Argument kann beliebig oft wiederholt werden";
                 }

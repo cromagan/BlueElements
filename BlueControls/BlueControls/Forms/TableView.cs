@@ -701,7 +701,11 @@ namespace BlueControls.Forms {
 
         private void btnDatenüberprüfung_Click(object sender, System.EventArgs e) {
             if (Table.Database == null || !Table.Database.IsAdministrator()) { return; }
-            Table.Database.Row.DoAutomatic(Table.Filter, true, Table.PinnedRows, "manual check");
+            var m = Table.Database.Row.DoAutomatic(Table.Filter, true, Table.PinnedRows, "manual check");
+
+            if (!string.IsNullOrEmpty(m)) {
+                MessageBox.Show(m);
+            }
         }
 
         private void btnLayouts_Click(object sender, System.EventArgs e) {
