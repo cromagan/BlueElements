@@ -37,6 +37,8 @@ namespace BlueDatabase {
         public bool TmpReduced;
         public Rectangle TmpReduceLocation;
 
+        private EditTypeFormula _editType;
+
         /// <summary>
         /// // Koordinaten Angabe in "Spalten"
         /// </summary>
@@ -59,35 +61,21 @@ namespace BlueDatabase {
 
         #region Constructors
 
-        /// <summary>
-        /// Info: Es wird keine Änderung ausgelöst
-        /// </summary>
-        public ColumnViewItem(ColumnItem? column, ViewType type, ColumnViewCollection parent) {
-            Initialize();
+        public ColumnViewItem(ColumnItem column, ViewType type, ColumnViewCollection parent) : this(parent) {
             Column = column;
             _viewType = type;
-            Parent = parent;
-            Column.CheckFormulaEditType();
+            _editType = Column.CheckFormulaEditType(Column.EditType);
         }
 
-        /// <summary>
-        /// Info: Es wird keine Änderung ausgelöst
-        /// </summary>
-        public ColumnViewItem(ColumnItem? column, ÜberschriftAnordnung überschrift, ColumnViewCollection parent) {
-            Initialize();
+        public ColumnViewItem(ColumnItem column, ÜberschriftAnordnung überschrift, ColumnViewCollection parent) : this(parent) {
             Column = column;
-            Parent = parent;
+
             _viewType = ViewType.Column;
             _überschriftAnordnung = überschrift;
-            Column.CheckFormulaEditType();
+            _editType = Column.CheckFormulaEditType(Column.EditType);
         }
 
-        /// <summary>
-        /// Info: Es wird keine Änderung ausgelöst
-        /// </summary>
-        public ColumnViewItem(Database database, string codeToParse, ColumnViewCollection parent) {
-            Initialize();
-            Parent = parent;
+        public ColumnViewItem(Database database, string codeToParse, ColumnViewCollection parent) : this(parent) {
             foreach (var pair in codeToParse.GetAllTags()) {
                 switch (pair.Key) {
                     case "column":
@@ -95,11 +83,13 @@ namespace BlueDatabase {
                     case "columnname":// Columname wichtg, wegen CopyLayout
                         Column = database.Column[pair.Value];
                         Column?.Repair(); // Alte Formate reparieren
+                        _editType = Column.CheckFormulaEditType(Column.EditType);
                         break;
 
                     case "columnkey":
                         Column = database.Column.SearchByKey(LongParse(pair.Value));
                         Column?.Repair(); // Alte Formate reparieren
+                        _editType = Column.CheckFormulaEditType(Column.EditType);
                         break;
 
                     case "x":
@@ -114,7 +104,7 @@ namespace BlueDatabase {
                         _spalteHeight = IntParse(pair.Value);
                         break;
 
-                    case "caption": // Todo: Alt 06.09.2019
+                    case "caption":
                         _überschriftAnordnung = (ÜberschriftAnordnung)IntParse(pair.Value);
                         break;
 
@@ -126,13 +116,36 @@ namespace BlueDatabase {
                         _viewType = (ViewType)IntParse(pair.Value);
                         break;
 
+                    case "edittype":
+                        _editType = (EditTypeFormula)IntParse(pair.Value);
+                        break;
+
+                    //if (_überschriftAnordnung != ÜberschriftAnordnung.Über_dem_Feld) { result = result + ", Caption=" + (int)_überschriftAnordnung; }
+                    //result = result + ", EditType=" + (int)_editType;
+
                     default:
                         Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
                         break;
                 }
             }
             if (Column != null && _viewType == ViewType.None) { _viewType = ViewType.Column; }
-            if (Column != null && _viewType != ViewType.None) { Column.CheckFormulaEditType(); }
+            //if (Column != null && _viewType != ViewType.None) { Column.CheckFormulaEditType(); }
+        }
+
+        private ColumnViewItem(ColumnViewCollection parent) : base() {
+            Parent = parent;
+            _viewType = ViewType.None;
+            Column = null;
+            _spalteX1 = 0;
+            _spalteWidth = 1;
+            _spalteHeight = 1;
+            _überschriftAnordnung = ÜberschriftAnordnung.Über_dem_Feld;
+            OrderTmpSpalteX1 = null;
+            TmpAutoFilterLocation = Rectangle.Empty;
+            TmpReduceLocation = Rectangle.Empty;
+            TmpDrawWidth = null;
+            TmpReduced = false;
+            _editType = EditTypeFormula.None;
         }
 
         #endregion
@@ -146,6 +159,15 @@ namespace BlueDatabase {
         #region Properties
 
         public ColumnItem? Column { get; private set; }
+
+        public EditTypeFormula EditType {
+            get => _editType;
+            set {
+                if (_editType == value) { return; }
+                _editType = value;
+                OnChanged();
+            }
+        }
 
         public int Height {
             get => _spalteHeight;
@@ -263,6 +285,8 @@ namespace BlueDatabase {
             if (_spalteWidth > 1) { result = result + ", Width=" + _spalteWidth; }
             if (_spalteHeight > 1) { result = result + ", Height=" + _spalteHeight; }
             if (_überschriftAnordnung != ÜberschriftAnordnung.Über_dem_Feld) { result = result + ", Caption=" + (int)_überschriftAnordnung; }
+            if (_editType != EditTypeFormula.None) { result = result + ", EditType=" + (int)_editType; }
+
             return result + "}";
         }
 
@@ -280,23 +304,6 @@ namespace BlueDatabase {
             //}
             var prev = PreviewsVisible();
             return prev == null || Convert.ToBoolean(prev.ViewType == ViewType.PermanentColumn);
-        }
-
-        /// <summary>
-        /// Info: Es wird keine Änderung ausgelöst
-        /// </summary>
-        private void Initialize() {
-            _viewType = ViewType.None;
-            Column = null;
-            _spalteX1 = 0;
-            _spalteWidth = 1;
-            _spalteHeight = 1;
-            _überschriftAnordnung = ÜberschriftAnordnung.Über_dem_Feld;
-            OrderTmpSpalteX1 = null;
-            TmpAutoFilterLocation = Rectangle.Empty;
-            TmpReduceLocation = Rectangle.Empty;
-            TmpDrawWidth = null;
-            TmpReduced = false;
         }
 
         #endregion

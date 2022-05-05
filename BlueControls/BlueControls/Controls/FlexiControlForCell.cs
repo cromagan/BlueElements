@@ -64,15 +64,16 @@ namespace BlueControls.Controls {
         #region Constructors
 
         // Für den Designer
-        public FlexiControlForCell() : this(null, -1, ÜberschriftAnordnung.Über_dem_Feld) { }
+        public FlexiControlForCell() : this(null, -1, ÜberschriftAnordnung.Über_dem_Feld, EditTypeFormula.None) { }
 
-        public FlexiControlForCell(Database? database, long columnKey, ÜberschriftAnordnung captionPosition) : base() {
+        public FlexiControlForCell(Database? database, long columnKey, ÜberschriftAnordnung captionPosition, EditTypeFormula editType) : base() {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             Size = new Size(300, 300);
             ShowInfoWhenDisabled = true;
             CaptionPosition = captionPosition;
+            EditType = editType;
             Database = database;
             ColumnKey = columnKey;
             CheckEnabledState();
@@ -287,6 +288,7 @@ namespace BlueControls.Controls {
                     break;
 
                 case Button:
+                case Line:
                     break;
                 //case Caption _:
                 //    break;
@@ -776,7 +778,7 @@ namespace BlueControls.Controls {
             if (_tmpColumn == null) {
                 if (string.IsNullOrEmpty(_columnName)) {
                     Caption = "[?]";
-                    EditType = EditTypeFormula.None;
+                    //EditType = EditTypeFormula.None;
                     QuickInfo = string.Empty;
                     FileEncryptionKey = string.Empty;
                 } else {
@@ -786,10 +788,8 @@ namespace BlueControls.Controls {
                 Caption = _tmpColumn.ReadableText() + ":";
                 FileEncryptionKey = _database.FileEncryptionKey;
                 if (string.IsNullOrEmpty(_columnName)) {
-                    EditType = _tmpColumn.EditType;
+                    //EditType = _tmpColumn.EditType;
                     QuickInfo = _tmpColumn.QuickInfoText(string.Empty);
-                } else {
-                    _tmpColumn.EditType = EditType;
                 }
             }
         }

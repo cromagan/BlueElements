@@ -86,20 +86,18 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (string.IsNullOrEmpty(t)) { return; }
             t = t.ToLower();
             foreach (var thisColumn in _row.Database.Column) {
-                if (thisColumn?.EditType is EditTypeFormula.SwapListBox or EditTypeFormula.Listbox or EditTypeFormula.Textfeld_mit_Auswahlknopf) {
-                    if (thisColumn.DropdownBearbeitungErlaubt) {
-                        if (CellCollection.UserEditPossible(thisColumn, _row, ErrorReason.OnlyRead)) {
-                            var thisView = Formula.SearchColumnView(thisColumn);
-                            if (thisView != null) {
-                                if (_row.Database.PermissionCheck(thisView.PermissionGroups_Show, null)) {
-                                    ItemCollectionList dummy = new();
-                                    ItemCollectionList.GetItemCollection(dummy, thisColumn, _row, ShortenStyle.Replaced, 1000);
-                                    if (dummy.Count > 0) {
-                                        foreach (var thisItem in dummy) {
-                                            if (thisItem.Internal.ToLower().Contains(t)) {
-                                                var ni = Auswahl.Item.Add(thisColumn.ReadableText() + ": " + thisItem.Internal, thisColumn.Name.ToUpper() + "|" + thisItem.Internal);
-                                                ni.Checked = thisItem.Checked;
-                                            }
+                if (thisColumn.DropdownBearbeitungErlaubt) {
+                    if (CellCollection.UserEditPossible(thisColumn, _row, ErrorReason.EditNormaly)) {
+                        var thisView = Formula.SearchColumnView(thisColumn);
+                        if (thisView != null) {
+                            if (_row.Database.PermissionCheck(thisView.PermissionGroups_Show, null)) {
+                                ItemCollectionList dummy = new();
+                                ItemCollectionList.GetItemCollection(dummy, thisColumn, _row, ShortenStyle.Replaced, 1000);
+                                if (dummy.Count > 0) {
+                                    foreach (var thisItem in dummy) {
+                                        if (thisItem.Internal.ToLower().Contains(t)) {
+                                            var ni = Auswahl.Item.Add(thisColumn.ReadableText() + ": " + thisItem.Internal, thisColumn.Name.ToUpper() + "|" + thisItem.Internal);
+                                            ni.Checked = thisItem.Checked;
                                         }
                                     }
                                 }

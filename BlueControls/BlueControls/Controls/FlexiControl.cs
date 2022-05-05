@@ -1112,9 +1112,9 @@ namespace BlueControls.Controls {
                         break;
 
                     case Line:
-                        if (!string.IsNullOrEmpty(Value)) {
-                            Develop.DebugPrint(FehlerArt.Fehler, "Line kann keine Value erhalten: '" + Value + "'");
-                        }
+                        //if (!string.IsNullOrEmpty(Value)) {
+                        //    Develop.DebugPrint(FehlerArt.Fehler, "Line kann keine Value erhalten: '" + Value + "'");
+                        //}
                         break;
 
                     default:

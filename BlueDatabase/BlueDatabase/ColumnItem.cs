@@ -978,7 +978,6 @@ namespace BlueDatabase {
                 Tags.AddRange(source.Tags);
             }
 
-
             AdminInfo = source.AdminInfo;
             FilterOptions = source.FilterOptions;
             IgnoreAtRowFilter = source.IgnoreAtRowFilter;
@@ -2159,18 +2158,17 @@ namespace BlueDatabase {
             return t + Database.Column_UsedIn(this);
         }
 
-        internal void CheckFormulaEditType() {
-            if (UserEditDialogTypeInFormula(_editType)) { return; }// Alles OK!
+        internal EditTypeFormula CheckFormulaEditType(EditTypeFormula toCheck) {
+            if (UserEditDialogTypeInFormula(toCheck)) { return toCheck; }// Alles OK!
             for (var z = 0; z <= 999; z++) {
                 var w = (EditTypeFormula)z;
                 if (w.ToString() != z.ToString()) {
                     if (UserEditDialogTypeInFormula(w)) {
-                        _editType = w;
-                        return;
+                        return w;
                     }
                 }
             }
-            _editType = EditTypeFormula.None;
+            return EditTypeFormula.None;
         }
 
         internal void CheckIfIAmAKeyColumn() {

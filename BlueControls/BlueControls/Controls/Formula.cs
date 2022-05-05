@@ -496,7 +496,7 @@ namespace BlueControls.Controls {
 
         private void cbxControlType_ItemClicked(object sender, BasicListItemEventArgs e) {
             var viewItem = SearchViewItem(EditorSelectedColumn());
-            if (viewItem != null) { viewItem.Column.EditType = (EditTypeFormula)IntParse(cbxControlType.Text); }
+            if (viewItem != null) { viewItem.EditType = (EditTypeFormula)IntParse(cbxControlType.Text); }
             RedoView();
             SortColumnList();
         }
@@ -505,7 +505,7 @@ namespace BlueControls.Controls {
             if (cd?.Column == null) { return; }
             Develop.Debugprint_BackgroundThread();
             FlexiControlForCell btb =
-                new(cd.Column.Database, cd.Column.Key, cd.ÜberschriftAnordnung) {
+                new(cd.Column.Database, cd.Column.Key, cd.ÜberschriftAnordnung, cd.EditType) {
                     TabIndex = TabIndex + 10000,
                     Tag = cd
                 };
@@ -629,7 +629,7 @@ namespace BlueControls.Controls {
                         cbxControlType.Item.Clear();
                         cbxControlType.Item.AddRange(GetAllowedEditTypes(viewItem.Column));
                     }
-                    cbxControlType.Text = ((int)viewItem.Column.EditType).ToString();
+                    cbxControlType.Text = ((int)viewItem.EditType).ToString();
                 } else {
                     cbxControlType.Enabled = false;
                 }

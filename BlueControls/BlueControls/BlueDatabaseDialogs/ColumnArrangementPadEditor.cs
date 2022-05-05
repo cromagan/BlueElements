@@ -188,6 +188,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (Arrangement > 0 && CurrentArrangement != null) { CurrentArrangement.Add(newc, false); }
 
             Database.RepairAfterParse();
+            ShowOrder();
         }
 
         private void btnSpalteEinblenden_Click(object sender, System.EventArgs e) {
