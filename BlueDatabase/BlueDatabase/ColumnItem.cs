@@ -1045,7 +1045,7 @@ namespace BlueDatabase {
             return tmp;
         }
 
-        public List<string> Contents() => Contents((FilterCollection)null, null);
+        public List<string> Contents() => Contents(null as FilterCollection, null);
 
         /// <summary>
         ///
@@ -1053,8 +1053,8 @@ namespace BlueDatabase {
         /// <param name="filter">Wird kein Filter übergeben, werden alle Inhalte zurückgegeben!</param>
         /// <param name="pinned"></param>
         /// <returns></returns>
-        public List<string> Contents(List<FilterItem> filter, List<RowItem>? pinned) {
-            //if (fi == null || fi.Count == 0) { return Contents((FilterCollection)null, null); }
+        public List<string> Contents(List<FilterItem>? filter, List<RowItem>? pinned) {
+            if (filter == null || filter.Count == 0) { return Contents(); }
             var ficol = new FilterCollection(filter[0].Database);
             ficol.AddRange(filter);
             return Contents(ficol, pinned);
@@ -1098,6 +1098,8 @@ namespace BlueDatabase {
         /// <returns></returns>
         public List<string> Contents(FilterCollection filter, List<RowItem>? pinned) {
             List<string> list = new();
+            if(Database == null) { return list; }
+
             foreach (var thisRowItem in Database.Row) {
                 if (thisRowItem != null) {
                     var add = thisRowItem.MatchesTo(filter);

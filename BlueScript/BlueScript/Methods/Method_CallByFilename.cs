@@ -89,6 +89,7 @@ namespace BlueScript.Methods {
             if (s.Sub < 0) { return new DoItFeedback("Subroutinen-Fehler"); }
 
             s.Line = weiterLine;
+            s.BreakFired = false;
 
             return new DoItFeedback(string.Empty);
         }
