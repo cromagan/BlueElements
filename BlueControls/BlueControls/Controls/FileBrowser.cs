@@ -493,11 +493,14 @@ namespace BlueControls.Controls {
                 if (ThumbGenerator.CancellationPending) { return; }
                 if (AddThis(thisString, true)) // Prüfung 1, ob .cyo und auch unverschlüsselte
                 {
-                    var feedBack = new List<object>(); // Zeile 1, Dateiname auf Festplatte, ZEile 2 das Bild selbst
-                    feedBack.Add(thisString);
+                    var x = WindowsThumbnailProvider.GetThumbnail(thisString, 64, 64, ThumbnailOptions.BiggerSizeOk);
 
-                    feedBack.Add(WindowsThumbnailProvider.GetThumbnail(thisString, 64, 64, ThumbnailOptions.BiggerSizeOk));
-                    ThumbGenerator.ReportProgress(0, feedBack);
+                    if (x != null) {
+                        var feedBack = new List<object>(); // Zeile 1, Dateiname auf Festplatte, ZEile 2 das Bild selbst
+                        feedBack.Add(thisString);
+                        feedBack.Add(x);
+                        ThumbGenerator.ReportProgress(0, feedBack);
+                    }
                 }
             });
         }

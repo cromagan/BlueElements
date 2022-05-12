@@ -123,13 +123,15 @@ namespace CryptoExplorer {
             return CreateAlphaBitmap(bmp, PixelFormat.Format32bppArgb);
         }
 
-        public static Bitmap GetThumbnail(string fileName, int width, int height, ThumbnailOptions options) {
+        public static Bitmap? GetThumbnail(string fileName, int width, int height, ThumbnailOptions options) {
             var hBitmap = GetHBitmap(Path.GetFullPath(fileName), width, height, options);
 
+            if (hBitmap == null) { return null; }
+
             try {
-                return GetBitmapFromHBitmap(hBitmap);
+                return GetBitmapFromHBitmap((IntPtr)hBitmap);
             } finally {
-                DeleteObject(hBitmap);
+                DeleteObject((IntPtr)hBitmap);
             }
         }
 
@@ -153,7 +155,7 @@ namespace CryptoExplorer {
         //    public byte rgbRed;
         //    public byte rgbReserved;
         //}
-        private static IntPtr GetHBitmap(string fileName, int width, int height, ThumbnailOptions options) {
+        private static IntPtr? GetHBitmap(string fileName, int width, int height, ThumbnailOptions options) {
             var shellItem2Guid = new Guid(IShellItem2Guid);
             var retCode = SHCreateItemFromParsingName(fileName, IntPtr.Zero, ref shellItem2Guid, out var nativeShellItem);
 
@@ -169,7 +171,8 @@ namespace CryptoExplorer {
 
             if (hr == HResult.Ok) { return hBitmap; }
 
-            throw Marshal.GetExceptionForHR((int)hr);
+            return null;
+            //throw Marshal.GetExceptionForHR((int)hr);
         }
 
         #endregion
