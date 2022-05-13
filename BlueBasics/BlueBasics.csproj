@@ -98,6 +98,7 @@
   <ItemGroup>
     <Compile Include="Accessor.cs" />
     <Compile Include="BitmapExt.cs" />
+    <Compile Include="DatabaseInterfaces\IDatabase.cs" />
     <Compile Include="Enums\SortierTyp.cs" />
     <Compile Include="ImageMatrix.cs" />
     <Compile Include="Enums\BlurType.cs" />

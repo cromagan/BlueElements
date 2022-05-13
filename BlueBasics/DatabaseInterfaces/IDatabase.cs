@@ -15,13 +15,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueBasics.Interfaces {
+#nullable enable
 
-    public interface ICanBeEmpty {
+namespace BlueBasics.DatabaseInterfaces {
 
-        #region Methods
+    public interface IDatabase {
 
-        bool IsNullOrEmpty();
+        #region Properties
+
+        public string Filename { get; }
+        public bool ReadOnly { get; }
 
         #endregion
     }
