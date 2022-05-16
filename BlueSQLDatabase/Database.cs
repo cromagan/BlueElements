@@ -28,6 +28,8 @@ using System.IO;
 using System.Globalization;
 
 namespace BlueSQLDatabase {
+    //https://www.c-sharpcorner.com/article/create-a-sql-server-database-dynamically-in-C-Sharp/
+    //https://www.ictdemy.com/csharp/databases/introduction-to-databases-in-csharp-net
 
     //https://docs.microsoft.com/en-us/troubleshoot/developer/visualstudio/csharp/language-compilers/create-sql-server-database-programmatically
     public class Database : IDatabase {
@@ -41,7 +43,7 @@ namespace BlueSQLDatabase {
 
         #region Constructors
 
-        private Database(string filename, bool readOnly, bool create) {
+        public Database(string filename, bool readOnly, bool create) {
             CultureInfo culture = new("de-DE");
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
@@ -50,13 +52,13 @@ namespace BlueSQLDatabase {
 
             if (create && !File.Exists(filename)) { CreateDatabase(filename); }
 
-            //string connetionString;
-            //SqlConnection cnn;
-            //connetionString = @"Data Source=WIN-50GP30FGO75;Initial Catalog=Demodb;User ID=sa;Password=demol23";
-            //_connection = new SqlConnection(connetionString);
-            //_connection.Open();
-            //MessageBox.Show("Connection Open  !");
-            //cnn.Close();
+            _connection = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" + filename + ";Integrated Security=True;Trusted_Connection=Yes;");
+
+            _connection.Open();
+
+            RepairAfterParse();
+
+            _connection.Close();
 
             //Cell = new CellCollection(this);
 
@@ -120,17 +122,27 @@ namespace BlueSQLDatabase {
         #region Methods
 
         public bool CreateDatabase(string filename) {
-            var myConn = new SqlConnection("Server=localhost;Integrated security=SSPI;database=master");
+            //var myConn = new SqlConnection("Server=localhost;Integrated security=SSPI;database=master");
+            // var myConn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database1.mdf;Integrated Security=True");
 
-            var str = "CREATE DATABASE MyDatabase ON PRIMARY " +
-             "(NAME = MyDatabase_Data, " +
-             "FILENAME = '" + filename + "', " +
-             "SIZE = 2MB, MAXSIZE = 512MB, FILEGROWTH = 1MB)";
-            //"LOG ON (NAME = MyDatabase_Log, " +
-            //"FILENAME = 'C:\\MyDatabaseLog.ldf', " +
-            //"SIZE = 1MB, " +
-            //"MAXSIZE = 5MB, " +
-            //"FILEGROWTH = 10%)";
+            //var myConn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;Integrated Security=True");
+
+            //var myConn = new SqlConnection("Integrated Security=SSPI;Initial Catalog=;Data Source=localhost;");
+
+            // var myConn = new SqlConnection("Server=(local)\\netsdk;uid=sa;pwd=;database=master");
+
+            var myConn = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;Integrated security=SSPI;database=master");
+            var dbn = filename.FileNameWithoutSuffix();
+
+            var str = "CREATE DATABASE " + dbn + " ON PRIMARY " +
+                 "(NAME = " + dbn + "_Data, " +
+                 "FILENAME = '" + filename + "', " +
+                 "SIZE = 2MB, MAXSIZE = 512MB, FILEGROWTH = 1MB)" +
+                "LOG ON (NAME = " + dbn + "_Log, " +
+                "FILENAME = '" + filename.TrimEnd(".mdf") + "Log.ldf', " +
+                "SIZE = 1MB, " +
+                "MAXSIZE = 50MB, " +
+                "FILEGROWTH = 1MB)";
 
             var myCommand = new SqlCommand(str, myConn);
             var ok = false;
@@ -147,6 +159,55 @@ namespace BlueSQLDatabase {
                 }
             }
             return ok;
+        }
+
+        public List<string> ListTables() {
+            List<string> tables = new();
+            //_connection.Open();
+            DataTable dt = _connection.GetSchema("Tables");
+            foreach (DataRow row in dt.Rows) {
+                string tablename = (string)row[2];
+                tables.Add(tablename);
+            }
+            //_connection.Close();
+            return tables;
+        }
+
+        public void RepairAfterParse() {
+            var x = ListTables();
+
+            if (!x.Contains("Main")) { CreateTable("Main"); }
+            if (!x.Contains("Main_Data")) { CreateTable("Main_Data"); }
+
+            //Column.Repair();
+            //CheckViewsAndArrangements();
+            //Layouts.Check();
+        }
+
+        private bool CreateTable(string name) {
+            try {
+                using var cmd = new SqlCommand();
+                cmd.Connection = _connection;
+
+                //   https://zetcode.com/csharp/sqlserver/
+
+                cmd.CommandText = "DROP TABLE IF EXISTS " + name;
+                cmd.ExecuteNonQuery();
+
+                //cmd.CommandText = @"CREATE TABLE cars(
+                //    id int identity(1,1) NOT NULL PRIMARY KEY,
+                //    name VARCHAR(255) NOT NULL,
+                //    price INT
+                //)";
+
+                cmd.CommandText = @"CREATE TABLE " + name + "(" +
+                    "id int identity(1,1) NOT NULL PRIMARY KEY," +
+                    ")";
+                cmd.ExecuteNonQuery();
+                return true;
+            } catch {
+                return false;
+            }
         }
 
         #endregion

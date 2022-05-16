@@ -1029,14 +1029,8 @@ namespace BlueDatabase {
         }
 
         public override void RepairAfterParse() {
-            // System-Spalten checken und alte Formate auf neuen Stand bringen
             Column.Repair();
-            // Evtl. Defekte Rows reparieren
-            //Row.Repair();
-            //Defekte Ansichten reparieren - Teil 1
-
             CheckViewsAndArrangements();
-
             Layouts.Check();
         }
 
