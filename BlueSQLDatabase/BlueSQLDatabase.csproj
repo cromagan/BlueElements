@@ -37,6 +37,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -45,14 +47,97 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdditionalScriptComands\MethodDatabase.cs" />
+    <Compile Include="AdditionalScriptComands\Method_AddRow.cs" />
+    <Compile Include="AdditionalScriptComands\Method_CellSetFilter.cs" />
+    <Compile Include="AdditionalScriptComands\Method_CellSetRow.cs" />
+    <Compile Include="AdditionalScriptComands\Method_CheckRow.cs" />
+    <Compile Include="AdditionalScriptComands\Method_ContentsFilter.cs" />
+    <Compile Include="AdditionalScriptComands\Method_DisableCellChanges.cs" />
+    <Compile Include="AdditionalScriptComands\Method_Filter.cs" />
+    <Compile Include="AdditionalScriptComands\Method_IsDropDownItem.cs" />
+    <Compile Include="AdditionalScriptComands\Method_Lookup.cs" />
+    <Compile Include="AdditionalScriptComands\Method_LookupFilter.cs" />
+    <Compile Include="AdditionalScriptComands\Method_MatchColumnFormat.cs" />
+    <Compile Include="AdditionalScriptComands\Method_Row.cs" />
+    <Compile Include="AdditionalScriptComands\Method_RowCount.cs" />
+    <Compile Include="AdditionalScriptComands\Method_RowIsNull.cs" />
+    <Compile Include="AdditionalScriptComands\Method_SetError.cs" />
+    <Compile Include="AdditionalScriptComands\Method_UniqueRowID.cs" />
+    <Compile Include="AdditionalScriptComands\VariableDatabase.cs" />
+    <Compile Include="AdditionalScriptComands\VariableFilterItem.cs" />
+    <Compile Include="AdditionalScriptComands\VariableRowItem.cs" />
+    <Compile Include="CellCollection.cs" />
+    <Compile Include="CellItem.cs" />
+    <Compile Include="ColumnCollection.cs" />
+    <Compile Include="ColumnItem.cs" />
+    <Compile Include="ColumnViewCollection.cs" />
+    <Compile Include="ColumnViewItem.cs" />
     <Compile Include="Database.cs" />
+    <Compile Include="Databasetmp.cs" />
+    <Compile Include="Enums\AdditionalCheck.cs" />
+    <Compile Include="Enums\AlignmentHorizontal.cs" />
+    <Compile Include="Enums\Ansicht.cs" />
+    <Compile Include="Enums\BildTextVerhalten.cs" />
+    <Compile Include="Enums\ColumnLineStyle.cs" />
+    <Compile Include="Enums\DatabaseDataType.cs" />
+    <Compile Include="Enums\EditTypeFormula.cs" />
+    <Compile Include="Enums\EditTypeTable.cs" />
+    <Compile Include="Enums\ExportTyp.cs" />
+    <Compile Include="Enums\FilterOptions.cs" />
+    <Compile Include="Enums\FilterType.cs" />
+    <Compile Include="Enums\FirstRow.cs" />
+    <Compile Include="Enums\ItemState.cs" />
+    <Compile Include="Enums\Routinen.cs" />
+    <Compile Include="Enums\ScriptType.cs" />
+    <Compile Include="Enums\ShortenStyle.cs" />
+    <Compile Include="Enums\TranslationType.cs" />
+    <Compile Include="Enums\VerwaisteDaten.cs" />
+    <Compile Include="Enums\ViewType.cs" />
+    <Compile Include="Enums\ÜberschriftAnordnung.cs" />
+    <Compile Include="EventArgs\CellCancelEventArgs.cs" />
+    <Compile Include="EventArgs\CellEventArgs.cs" />
+    <Compile Include="EventArgs\CellExtEventArgs.cs" />
+    <Compile Include="EventArgs\DoRowAutomaticEventArgs.cs" />
+    <Compile Include="EventArgs\FilterEventArgs.cs" />
+    <Compile Include="EventArgs\MessageEventArgs.cs" />
+    <Compile Include="EventArgs\OpenEditorEventArgs.cs" />
+    <Compile Include="EventArgs\PasswordEventArgs.cs" />
+    <Compile Include="EventArgs\ProgressbarEventArgs.cs" />
+    <Compile Include="EventArgs\RenameColumnInLayoutEventArgs.cs" />
+    <Compile Include="EventArgs\RowCancelEventArgs.cs" />
+    <Compile Include="EventArgs\RowCheckedEventArgs.cs" />
+    <Compile Include="EventArgs\RowEventArgs.cs" />
+    <Compile Include="Export.cs" />
+    <Compile Include="ExportDefinition.cs" />
+    <Compile Include="FilterCollection.cs" />
+    <Compile Include="FilterItem.cs" />
+    <Compile Include="Interfaces\IInputFormat.cs" />
+    <Compile Include="Interfaces\ITranslateAble.cs" />
+    <Compile Include="LanguageTool.cs" />
+    <Compile Include="LayoutCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RowCollection.cs" />
+    <Compile Include="RowData.cs" />
+    <Compile Include="RowItem.cs" />
+    <Compile Include="RowSortDefinition.cs" />
+    <Compile Include="WorkItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BlueBasics\BlueBasics.csproj">
       <Project>{e7e05bac-07cb-478d-861a-db24a27bbf75}</Project>
       <Name>BlueBasics</Name>
     </ProjectReference>
+    <ProjectReference Include="..\BlueScript\BlueScript\BlueScript.csproj">
+      <Project>{3acc6ee6-b919-4952-8502-f62baeeefc60}</Project>
+      <Name>BlueScript</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Database.resx">
+      <DependentUpon>Database.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

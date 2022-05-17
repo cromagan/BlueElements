@@ -17,15 +17,31 @@
 
 using System;
 
-namespace BlueDatabase.Enums {
+namespace BlueSQLDatabase.Enums {
 
-    [Flags]
-    public enum AlignmentHorizontal {
+    /// <summary>
+    /// In welchem Datenformat die Daten gelesen werden.
+    /// </summary>
+    public enum Routinen : byte {
 
-        //Keine_Präferenz = -1,
-        Links = System.Windows.Forms.TextFormatFlags.Left,
+        [Obsolete("Wird zukünftig entfernt werden", false)]
+        Column = 0,
 
-        Rechts = System.Windows.Forms.TextFormatFlags.Right,
-        Zentriert = System.Windows.Forms.TextFormatFlags.HorizontalCenter
+        [Obsolete("Wird zukünftig entfernt werden", false)]
+        DatenAllgemein = 1,
+
+        [Obsolete("Wird zukünftig entfernt werden", false)]
+        CellFormat = 2,
+
+        DatenAllgemeinUTF8 = 3,
+
+        [Obsolete("Wird zukünftig entfernt werden", false)]
+        CellFormatUTF8 = 4,
+
+        [Obsolete("Wird zukünftig entfernt werden", false)]
+        ColumnUTF8 = 5,
+
+        CellFormatUTF8_V400 = 6,
+        ColumnUTF8_V400 = 7
     }
 }

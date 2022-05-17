@@ -15,17 +15,20 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System;
+namespace BlueSQLDatabase.Enums {
 
-namespace BlueDatabase.Enums {
-
-    [Flags]
-    public enum AlignmentHorizontal {
-
-        //Keine_Präferenz = -1,
-        Links = System.Windows.Forms.TextFormatFlags.Left,
-
-        Rechts = System.Windows.Forms.TextFormatFlags.Right,
-        Zentriert = System.Windows.Forms.TextFormatFlags.HorizontalCenter
+    public enum BildTextVerhalten {
+        Nur_Text = 0,
+        Wenn_möglich_Bild_und_immer_Text = 1,
+        Nur_Bild = 110,
+        Bild_oder_Text = 120,
+        Interpretiere_Bool = 200,
+        Fehlendes_Bild_zeige_Fragezeichen = 2,
+        Fehlendes_Bild_zeige_Häkchen = 3,
+        Fehlendes_Bild_zeige_Kreis = 4,
+        Fehlendes_Bild_zeige_Kreuz = 5,
+        Fehlendes_Bild_zeige_Infozeichen = 6,
+        Fehlendes_Bild_zeige_Warnung = 7,
+        Fehlendes_Bild_zeige_Kritischzeichen = 8
     }
 }

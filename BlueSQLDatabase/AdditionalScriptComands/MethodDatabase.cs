@@ -1,0 +1,58 @@
+﻿// Authors:
+// Christian Peter
+//
+// Copyright (c) 2022 Christian Peter
+// https://github.com/cromagan/BlueElements
+//
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#nullable enable
+
+using BlueBasics;
+using BlueScript;
+using BlueScript.Methods;
+using BlueScript.Variables;
+
+namespace BlueSQLDatabase.AdditionalScriptComands {
+
+    public abstract class MethodSQLDatabase : Method {
+
+        #region Methods
+
+        protected ColumnItem? Column(Script s, string name) => MyDatabase(s)?.Column.Exists(name);
+
+        protected Database? DatabaseOf(Script s, string name) {
+            if (s.Variables != null) {
+                var db = MyDatabase(s);
+                if (db == null) { return null; }
+
+                if (string.IsNullOrEmpty(db.Filename)) { return null; }
+
+                var newf = db.Filename.FilePath() + name + ".mdb";
+
+                return Database.GetByFilename(newf, true, false);
+            }
+
+            return null;
+        }
+
+        protected Database? MyDatabase(Script s) {
+            if (s.Variables != null) {
+                var f = s.Variables.GetSystem("Database");
+                if (f is VariableSQLDatabase db) { return db.Database; }
+            }
+            return null;
+        }
+
+        #endregion
+    }
+}

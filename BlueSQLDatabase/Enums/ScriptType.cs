@@ -15,17 +15,17 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System;
+namespace BlueSQLDatabase.Enums {
 
-namespace BlueDatabase.Enums {
+    public enum ScriptType {
+        Nicht_vorhanden = 0,
+        Bool = 1,
+        String = 2,
+        Numeral = 3,
+        List = 4,
+        String_Readonly = 5,
+        DateTime = 6,
 
-    [Flags]
-    public enum AlignmentHorizontal {
-
-        //Keine_Präferenz = -1,
-        Links = System.Windows.Forms.TextFormatFlags.Left,
-
-        Rechts = System.Windows.Forms.TextFormatFlags.Right,
-        Zentriert = System.Windows.Forms.TextFormatFlags.HorizontalCenter
+        undefiniert = 999
     }
 }
