@@ -39,18 +39,14 @@ namespace BlueDatabase {
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public sealed class Database : BlueBasics.MultiUserFile.MultiUserFile {
+    public sealed class Database {
 
         #region Fields
 
         public const string DatabaseVersion = "4.00";
-
         public readonly CellCollection Cell;
-
         public readonly ColumnCollection Column;
-
         public readonly ListExt<ColumnViewCollection> ColumnArrangements = new();
-
         public readonly ListExt<string> DatenbankAdmin = new();
 
         /// <summary>
@@ -60,25 +56,16 @@ namespace BlueDatabase {
         public readonly ListExt<ExportDefinition?> Export = new();
 
         public readonly LayoutCollection Layouts = new();
-
         public readonly ListExt<string> PermissionGroupsNewRow = new();
-
         public readonly RowCollection Row;
-
         public readonly ListExt<string> Tags = new();
-
         public readonly string UserName = Generic.UserName().ToUpper();
-
         public readonly ListExt<ColumnViewCollection?> Views = new();
-
         public string UserGroup;
-
         public ListExt<WorkItem> Works;
-
         private readonly List<string> _filesAfterLoadingLCase;
-
+        private readonly BlueBasics.MultiUserFile.MultiUserFile _muf;
         private string _additionaFilesPfad;
-
         private string _additionaFilesPfadtmp = string.Empty;
         private Ansicht _ansicht;
         private string _caption = string.Empty;
@@ -107,22 +94,36 @@ namespace BlueDatabase {
         private int _undoCount;
 
         private VerwaisteDaten _verwaisteDaten;
-
-        //private string _WorkItemsBefore = string.Empty;
-
         private string _zeilenQuickInfo = string.Empty;
 
         #endregion
 
         #region Constructors
 
+        //private string _WorkItemsBefore = string.Empty;
         public Database(Stream stream) : this(stream, string.Empty, true, false) { }
 
         public Database(bool readOnly) : this(null, string.Empty, readOnly, true) { }
 
         public Database(string filename, bool readOnly, bool create) : this(null, filename, readOnly, create) { }
 
-        private Database(Stream? stream, string filename, bool readOnly, bool create) : base(readOnly, true) {
+        private Database(Stream? stream, string filename, bool readOnly, bool create) {
+            _muf = new BlueBasics.MultiUserFile.MultiUserFile(readOnly, true);
+
+            _muf.ConnectedControlsStopAllWorking += ConnectedControlsStopAllWorking;
+            _muf.Loaded += Loaded;
+            _muf.Loading += Loading;
+            _muf.SavedToDisk += SavedToDisk;
+            _muf.ShouldICancelSaveOperations += ShouldICancelSaveOperations;
+            _muf.DiscardPendingChanges += DiscardPendingChanges;
+            _muf.HasPendingChanges += HasPendingChanges;
+            _muf.RepairAfterParse += RepairAfterParse;
+            _muf.DoWorkAfterSaving += DoWorkAfterSaving;
+            _muf.IsThereBackgroundWorkToDo += IsThereBackgroundWorkToDo;
+            _muf.ParseExternal += ParseExternal;
+            _muf.ToListOfByte += ToListOfByte;
+            _muf.DoBackGroundWork += DoBackGroundWork;
+
             CultureInfo culture = new("de-DE");
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
@@ -153,9 +154,9 @@ namespace BlueDatabase {
             UserGroup = "#Administrator";
             if (!string.IsNullOrEmpty(filename)) {
                 //DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + filename.FileNameWithoutSuffix()));
-                Load(filename, create);
+                _muf.Load(filename, create);
             } else if (stream != null) {
-                LoadFromStream(stream);
+                _muf.LoadFromStream(stream);
             } else {
                 RepairAfterParse();
             }
@@ -243,6 +244,8 @@ namespace BlueDatabase {
             }
         }
 
+        public string Filename { get => _muf.Filename; }
+
         [Browsable(false)]
         public double GlobalScale {
             get => _globalScale;
@@ -266,11 +269,11 @@ namespace BlueDatabase {
         public DateTime PowerEdit { get; set; }
 
         [Browsable(false)]
-        public new int ReloadDelaySecond {
-            get => base.ReloadDelaySecond;
+        public int ReloadDelaySecond {
+            get => _muf.ReloadDelaySecond;
             set {
-                if (base.ReloadDelaySecond == value) { return; }
-                AddPending(DatabaseDataType.ReloadDelaySecond, -1, -1, base.ReloadDelaySecond.ToString(), value.ToString(), true);
+                if (_muf.ReloadDelaySecond == value) { return; }
+                AddPending(DatabaseDataType.ReloadDelaySecond, -1, -1, _muf.ReloadDelaySecond.ToString(), value.ToString(), true);
             }
         }
 
@@ -348,7 +351,7 @@ namespace BlueDatabase {
         /// <param name="readOnly"></param>
         /// <returns></returns>
         public static Database? GetByFilename(string filename, bool checkOnlyFilenameToo, bool readOnly) {
-            var tmpDb = GetByFilename(filename, checkOnlyFilenameToo);
+            var tmpDb = _muf.GetByFilename(filename, checkOnlyFilenameToo);
 
             if (tmpDb is Database db) { return db; }
 
@@ -515,17 +518,17 @@ namespace BlueDatabase {
         /// Datenbankpfad mit Forms und abschließenden \
         /// </summary>
         /// <returns></returns>
-        public string DefaultFormulaPath() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "Forms\\";
+        public string DefaultFormulaPath() => string.IsNullOrEmpty(_muf.Filename) ? string.Empty : Filename.FilePath() + "Forms\\";
 
         /// <summary>
         /// Datenbankpfad mit Layouts und abschließenden \
         /// </summary>
-        public string DefaultLayoutPath() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "Layouts\\";
+        public string DefaultLayoutPath() => string.IsNullOrEmpty(_muf.Filename) ? string.Empty : Filename.FilePath() + "Layouts\\";
 
-        public override void DiscardPendingChanges() => ChangeWorkItems(ItemState.Pending, ItemState.Undo);
+        public void DiscardPendingChanges() => ChangeWorkItems(ItemState.Pending, ItemState.Undo);
 
-        public override string ErrorReason(ErrorReason mode) {
-            var f = base.ErrorReason(mode);
+        public string ErrorReason(ErrorReason mode) {
+            var f = _muf.ErrorReason(mode);
 
             if (!string.IsNullOrEmpty(f)) { return f; }
             if (mode == BlueBasics.Enums.ErrorReason.OnlyRead) { return string.Empty; }
@@ -717,9 +720,9 @@ namespace BlueDatabase {
             return null;
         }
 
-        public override bool HasPendingChanges() {
+        public bool HasPendingChanges() {
             try {
-                if (ReadOnly) { return false; }
+                if (_muf.ReadOnly) { return false; }
 
                 return Works.Any(thisWork => thisWork.State == ItemState.Pending);
             } catch {
@@ -1028,7 +1031,7 @@ namespace BlueDatabase {
             return false;
         }
 
-        public override void RepairAfterParse() {
+        public void RepairAfterParse() {
             Column.Repair();
             CheckViewsAndArrangements();
             Layouts.Check();
@@ -1060,8 +1063,8 @@ namespace BlueDatabase {
             if (executeNow) {
                 ParseThis(comand, changedTo, Column.SearchByKey(columnKey), Row.SearchByKey(rowKey), -1, -1);
             }
-            if (IsParsing) { return; }
-            if (ReadOnly) {
+            if (_muf.IsParsing) { return; }
+            if (_muf.ReadOnly) {
                 if (!string.IsNullOrEmpty(Filename)) {
                     Develop.DebugPrint(FehlerArt.Warnung, "Datei ist Readonly, " + comand + ", " + Filename);
                 }
@@ -1069,7 +1072,7 @@ namespace BlueDatabase {
             }
             // Keine Doppelten Rausfiltern, ansonstn stimmen die Undo nicht mehr
 
-            if (comand != DatabaseDataType.AutoExport) { SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
+            if (comand != DatabaseDataType.AutoExport) { _muf.SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
 
             if (rowKey < -100) { Develop.DebugPrint(FehlerArt.Fehler, "RowKey darf hier nicht <-100 sein!"); }
             if (columnKey < -100) { Develop.DebugPrint(FehlerArt.Fehler, "ColKey darf hier nicht <-100 sein!"); }
@@ -1128,9 +1131,9 @@ namespace BlueDatabase {
 
         internal void DevelopWarnung(string t) {
             try {
-                t += "\r\nParsing: " + IsParsing;
-                t += "\r\nLoading: " + IsLoading;
-                t += "\r\nSaving: " + IsSaving;
+                t += "\r\nParsing: " + _muf.IsParsing;
+                t += "\r\nLoading: " + _muf.IsLoading;
+                t += "\r\nSaving: " + _muf.IsSaving;
                 t += "\r\nColumn-Count: " + Column.Count;
                 t += "\r\nRow-Count: " + Row.Count;
                 t += "\r\nFile: " + Filename;
@@ -1192,9 +1195,9 @@ namespace BlueDatabase {
             list.AddRange(b);
         }
 
-        protected override bool BlockSaveOperations() => RowItem.DoingScript || base.BlockSaveOperations();
+        protected bool BlockSaveOperations() => RowItem.DoingScript || base.BlockSaveOperations();
 
-        protected override void Dispose(bool disposing) {
+        protected void Dispose(bool disposing) {
             if (!Disposed) { return; }
             base.Dispose(disposing); // speichert und löscht die ganzen Worker. setzt auch disposedValue und ReadOnly auf true
             if (disposing) {
@@ -1255,7 +1258,7 @@ namespace BlueDatabase {
         //        //Develop.DebugPrint(ex);
         //    }
         //}
-        protected override void DoBackGroundWork(BackgroundWorker listenToMyCancel) {
+        protected void DoBackGroundWork(BackgroundWorker listenToMyCancel) {
             if (ReadOnly) { return; }
 
             foreach (var thisExport in Export) {
@@ -1276,7 +1279,7 @@ namespace BlueDatabase {
             }
         }
 
-        protected override void DoWorkAfterSaving() {
+        protected void DoWorkAfterSaving() {
             ChangeWorkItems(ItemState.Pending, ItemState.Undo);
             var filesNewLCase = AllConnectedFilesLCase();
             List<string> writerFilesToDeleteLCase = new();
@@ -1288,7 +1291,7 @@ namespace BlueDatabase {
             if (writerFilesToDeleteLCase.Count > 0) { DeleteFile(writerFilesToDeleteLCase); }
         }
 
-        protected override bool IsThereBackgroundWorkToDo() {
+        protected bool IsThereBackgroundWorkToDo() {
             if (HasPendingChanges()) { return true; }
             CancelEventArgs ec = new(false);
             OnExporting(ec);
@@ -1303,7 +1306,7 @@ namespace BlueDatabase {
             return false;
         }
 
-        protected override void ParseExternal(byte[] b) {
+        protected void ParseExternal(byte[] b) {
             Column.ThrowEvents = false;
             DatabaseDataType art = 0;
             var pointer = 0;
@@ -1355,7 +1358,7 @@ namespace BlueDatabase {
                         OnNeedPassword(e);
                         b = Cryptography.SimpleCrypt(b, e.Password, -1, pointer, b.Length - 1);
                         if (b[pointer + 1] != 3 || b[pointer + 2] != 0 || b[pointer + 3] != 0 || b[pointer + 4] != 2 || b[pointer + 5] != 79 || b[pointer + 6] != 75) {
-                            RemoveFilename();
+                            _muf.RemoveFilename();
                             LoadedVersion = "9.99";
                             //MessageBox.Show("Zugriff verweigrt, Passwort falsch!", ImageCode.Kritisch, "OK");
                             break;
@@ -1384,7 +1387,7 @@ namespace BlueDatabase {
             if (IntParse(LoadedVersion.Replace(".", "")) > IntParse(DatabaseVersion.Replace(".", ""))) { SetReadOnly(); }
         }
 
-        protected override byte[] ToListOfByte() {
+        protected byte[] ToListOfByte() {
             try {
                 var cryptPos = -1;
                 List<byte> l = new();
@@ -1412,7 +1415,7 @@ namespace BlueDatabase {
                 SaveToByteList(l, DatabaseDataType.DatenbankAdmin, DatenbankAdmin.JoinWithCr());
                 SaveToByteList(l, DatabaseDataType.GlobalScale, _globalScale.ToString(Constants.Format_Float1));
                 SaveToByteList(l, DatabaseDataType.Ansicht, ((int)_ansicht).ToString());
-                SaveToByteList(l, DatabaseDataType.ReloadDelaySecond, base.ReloadDelaySecond.ToString());
+                SaveToByteList(l, DatabaseDataType.ReloadDelaySecond, _muf.ReloadDelaySecond.ToString());
                 //SaveToByteList(l, enDatabaseDataType.ImportScript, _ImportScript);
                 SaveToByteList(l, DatabaseDataType.RulesScript, _rulesScript);
                 //SaveToByteList(l, enDatabaseDataType.BinaryDataInOne, Bins.ToString(true));
@@ -1519,7 +1522,7 @@ namespace BlueDatabase {
         private void CheckViewsAndArrangements() {
             //if (ReadOnly) { return; }  // Gibt fehler bei Datenbanken, die nur Temporär erzeugt werden!
 
-            if (IsParsing) { return; }
+            if (_muf.IsParsing) { return; }
 
             for (var z = 0; z < Math.Max(2, ColumnArrangements.Count); z++) {
                 if (ColumnArrangements.Count < z + 1) { ColumnArrangements.Add(new ColumnViewCollection(this, string.Empty)); }
@@ -1592,7 +1595,7 @@ namespace BlueDatabase {
         //    }
         //}
         private void Column_ItemRemoved(object sender, System.EventArgs e) {
-            if (IsParsing) { Develop.DebugPrint(FehlerArt.Warnung, "Parsing Falsch!"); }
+            if (_muf.IsParsing) { Develop.DebugPrint(FehlerArt.Warnung, "Parsing Falsch!"); }
             CheckViewsAndArrangements();
 
             Layouts.Check();
@@ -1604,22 +1607,22 @@ namespace BlueDatabase {
         }
 
         private void ColumnArrangements_ListOrItemChanged(object sender, System.EventArgs e) {
-            if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt werden. Kann zu Endlosschleifen führen.
+            if (_muf.IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt werden. Kann zu Endlosschleifen führen.
             AddPending(DatabaseDataType.ColumnArrangement, -1, ColumnArrangements.ToString(), false);
         }
 
         private void DatabaseAdmin_ListOrItemChanged(object sender, System.EventArgs e) {
-            if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+            if (_muf.IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
             AddPending(DatabaseDataType.DatenbankAdmin, -1, DatenbankAdmin.JoinWithCr(), false);
         }
 
         private void DatabaseTags_ListOrItemChanged(object sender, System.EventArgs e) {
-            if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+            if (_muf.IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
             AddPending(DatabaseDataType.Tags, -1, Tags.JoinWithCr(), false);
         }
 
         private void ExecutePending() {
-            if (!IsParsing) { Develop.DebugPrint(FehlerArt.Fehler, "Nur während des Parsens möglich"); }
+            if (!_muf.IsParsing) { Develop.DebugPrint(FehlerArt.Fehler, "Nur während des Parsens möglich"); }
             if (!HasPendingChanges()) { return; }
             // Erst die Neuen Zeilen / Spalten alle neutralisieren
             //var dummy = -1000;
@@ -1695,7 +1698,7 @@ namespace BlueDatabase {
         }
 
         private void Export_ListOrItemChanged(object sender, System.EventArgs e) {
-            if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+            if (_muf.IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
             AddPending(DatabaseDataType.AutoExport, -1, Export.ToString(true), false);
         }
 
@@ -1727,7 +1730,7 @@ namespace BlueDatabase {
         }
 
         private void InvalidateExports(string layoutId) {
-            if (ReadOnly) { return; }
+            if (_muf.ReadOnly) { return; }
 
             foreach (var thisExport in Export) {
                 if (thisExport != null) {
@@ -1751,7 +1754,7 @@ namespace BlueDatabase {
         }
 
         private void Layouts_ListOrItemChanged(object sender, System.EventArgs e) {
-            if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+            if (_muf.IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
             AddPending(DatabaseDataType.Layouts, -1, Layouts.JoinWithCr(), false);
         }
 
@@ -1818,7 +1821,7 @@ namespace BlueDatabase {
                     break;
 
                 case DatabaseDataType.ReloadDelaySecond:
-                    base.ReloadDelaySecond = IntParse(value);
+                    _muf.ReloadDelaySecond = IntParse(value);
                     break;
 
                 case DatabaseDataType.DatenbankAdmin:
@@ -2016,7 +2019,7 @@ namespace BlueDatabase {
                 default:
                     if (LoadedVersion == DatabaseVersion) {
                         LoadedVersion = "9.99";
-                        if (!ReadOnly) {
+                        if (!_muf.ReadOnly) {
                             Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Datei: " + Filename);
                         }
                     }
@@ -2046,7 +2049,7 @@ namespace BlueDatabase {
         }
 
         private void PermissionGroups_NewRow_ListOrItemChanged(object sender, System.EventArgs e) {
-            if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+            if (_muf.IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
             AddPending(DatabaseDataType.PermissionGroups_NewRow, -1, PermissionGroupsNewRow.JoinWithCr(), false);
         }
 
@@ -2061,7 +2064,7 @@ namespace BlueDatabase {
         }
 
         private void Row_RowAdded(object sender, RowEventArgs e) {
-            if (!IsParsing) {
+            if (!_muf.IsParsing) {
                 AddPending(DatabaseDataType.dummyComand_AddRow, -1, e.Row.Key, "", e.Row.Key.ToString(), false);
             }
         }
@@ -2069,7 +2072,7 @@ namespace BlueDatabase {
         private void Row_RowRemoving(object sender, RowEventArgs e) => AddPending(DatabaseDataType.dummyComand_RemoveRow, -1, e.Row.Key, "", e.Row.Key.ToString(), false);
 
         private void Views_ListOrItemChanged(object sender, System.EventArgs e) {
-            if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt werden. Kann zu Endlosschleifen führen.
+            if (_muf.IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt werden. Kann zu Endlosschleifen führen.
             AddPending(DatabaseDataType.Views, -1, Views.ToString(true), false);
         }
 

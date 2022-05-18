@@ -15,33 +15,22 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System;
+using System.Collections.Generic;
 
-namespace BlueSQLDatabase.Enums {
+namespace BlueBasics.EventArgs {
 
-    /// <summary>
-    /// In welchem Datenformat die Daten gelesen werden.
-    /// </summary>
-    public enum Routinen : byte {
+    public class MultiUserToListEventArgs : System.EventArgs {
 
-        [Obsolete("Wird zukünftig entfernt werden", false)]
-        Column = 0,
+        #region Constructors
 
-        [Obsolete("Wird zukünftig entfernt werden", false)]
-        DatenAllgemein = 1,
+        public MultiUserToListEventArgs() { }
 
-        [Obsolete("Wird zukünftig entfernt werden", false)]
-        CellFormat = 2,
+        #endregion
 
-        DatenAllgemeinUTF8 = 3,
+        #region Properties
 
-        [Obsolete("Wird zukünftig entfernt werden", false)]
-        CellFormatUTF8 = 4,
+        public byte[] Data { get; set; }
 
-        [Obsolete("Wird zukünftig entfernt werden", false)]
-        ColumnUTF8 = 5,
-
-        CellFormatUTF8_V400 = 6,
-        ColumnUTF8_V400 = 7
+        #endregion
     }
 }

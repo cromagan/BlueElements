@@ -15,12 +15,22 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueSQLDatabase.Enums {
+using System.Collections.Generic;
 
-    public enum AdditionalCheck {
-        None = 0,
-        Integer = 1,
-        Float = 2,
-        DateTime = 3
+namespace BlueBasics.EventArgs {
+
+    public class MultiUserIsThereBackgroundWorkToDoEventArgs : System.EventArgs {
+
+        #region Constructors
+
+        public MultiUserIsThereBackgroundWorkToDoEventArgs() => BackGroundWork = false;
+
+        #endregion
+
+        #region Properties
+
+        public bool BackGroundWork { get; }
+
+        #endregion
     }
 }

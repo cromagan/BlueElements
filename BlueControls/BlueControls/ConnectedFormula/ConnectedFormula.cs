@@ -31,7 +31,7 @@ using static BlueBasics.FileOperations;
 
 namespace BlueControls.ConnectedFormula {
 
-    public class ConnectedFormula : BlueBasics.MultiUserFile.MultiUserFile, IChangedFeedback {
+    public class ConnectedFormula : IChangedFeedback {
 
         #region Fields
 
@@ -42,12 +42,14 @@ namespace BlueControls.ConnectedFormula {
         public static readonly float Umrechnungsfaktor2 = MmToPixel(StandardHöhe, 300) / 44;
 
         public readonly ListExt<string> DatabaseFiles = new();
-        //public readonly List<Database?> Databases = new();
-
         public readonly ListExt<string> NotAllowedChilds = new();
+
+        //public readonly List<Database?> Databases = new();
         private string _createDate = string.Empty;
+
         private string _creator = string.Empty;
         private int _id = -1;
+        private BlueBasics.MultiUserFile.MultiUserFile _muf;
         private ItemCollectionPad _padData;
 
         private bool _saved = true;
@@ -60,13 +62,29 @@ namespace BlueControls.ConnectedFormula {
         public ConnectedFormula() : this(string.Empty) {
         }
 
-        private ConnectedFormula(string filename) : base(false, false) {
+        private ConnectedFormula(string filename) {
+            _muf = new BlueBasics.MultiUserFile.MultiUserFile(readOnly, true);
+
+            _muf.ConnectedControlsStopAllWorking += ConnectedControlsStopAllWorking;
+            _muf.Loaded += Loaded;
+            _muf.Loading += Loading;
+            _muf.SavedToDisk += SavedToDisk;
+            _muf.ShouldICancelSaveOperations += ShouldICancelSaveOperations;
+            _muf.DiscardPendingChanges += DiscardPendingChanges;
+            _muf.HasPendingChanges += HasPendingChanges;
+            _muf.RepairAfterParse += RepairAfterParse;
+            _muf.DoWorkAfterSaving += DoWorkAfterSaving;
+            _muf.IsThereBackgroundWorkToDo += IsThereBackgroundWorkToDo;
+            _muf.ParseExternal += ParseExternal;
+            _muf.ToListOfByte += ToListOfByte;
+            _muf.DoBackGroundWork += DoBackGroundWork;
+
             _createDate = DateTime.Now.ToString(Constants.Format_Date5);
             _creator = Generic.UserName();
             PadData = new ItemCollectionPad();
 
             if (FileExists(filename)) {
-                Load(filename, true);
+                _muf.Load(filename, true);
             }
             //if (notallowedchilds != null) {
             //    NotAllowedChilds.AddIfNotExists(notallowedchilds);
@@ -136,9 +154,9 @@ namespace BlueControls.ConnectedFormula {
         //        OnChanged();
         //    }
         //}
-        public override void DiscardPendingChanges() => _saved = true;
+        public void DiscardPendingChanges() => _saved = true;
 
-        public override bool HasPendingChanges() => !_saved;
+        public bool HasPendingChanges() => !_saved;
 
         public int NextID() {
             _id++;
@@ -150,15 +168,15 @@ namespace BlueControls.ConnectedFormula {
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
-        public override void RepairAfterParse() { }
+        public void RepairAfterParse() { }
 
-        protected override void DoBackGroundWork(BackgroundWorker listenToMyCancel) { }
+        protected void DoBackGroundWork(BackgroundWorker listenToMyCancel) { }
 
-        protected override void DoWorkAfterSaving() => _saved = true;
+        protected void DoWorkAfterSaving() => _saved = true;
 
-        protected override bool IsThereBackgroundWorkToDo() => false;
+        protected bool IsThereBackgroundWorkToDo() => false;
 
-        protected override void ParseExternal(byte[] bLoaded) {
+        protected void ParseExternal(byte[] bLoaded) {
             var ToParse = bLoaded.ToStringWin1252();
             if (string.IsNullOrEmpty(ToParse)) { return; }
 
@@ -207,7 +225,7 @@ namespace BlueControls.ConnectedFormula {
             }
         }
 
-        protected override byte[] ToListOfByte() {
+        protected byte[] ToListOfByte() {
 
             #region ein bischen aufräumen zuvor
 
@@ -246,7 +264,7 @@ namespace BlueControls.ConnectedFormula {
         }
 
         private void DatabaseFiles_Changed(object sender, System.EventArgs e) {
-            if (_saving || IsParsing || IsLoading) { return; }
+            if (_saving || _muf.IsParsing || _muf.IsLoading) { return; }
 
             foreach (var thisfile in DatabaseFiles) {
                 Database.GetByFilename(thisfile, false, false);
@@ -256,12 +274,12 @@ namespace BlueControls.ConnectedFormula {
         }
 
         private void NotAllowedChilds_Changed(object sender, System.EventArgs e) {
-            if (_saving || IsParsing || IsLoading) { return; }
+            if (_saving || _muf.IsParsing || _muf.IsLoading) { return; }
             _saved = false;
         }
 
         private void PadData_Changed(object sender, System.EventArgs e) {
-            if (_saving || IsParsing ||IsLoading) { return; }
+            if (_saving || _muf.IsParsing || _muf.IsLoading) { return; }
 
             _saved = false;
         }

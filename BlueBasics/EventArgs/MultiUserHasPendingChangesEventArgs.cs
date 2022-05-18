@@ -15,14 +15,22 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueSQLDatabase.Enums {
+using System.Collections.Generic;
 
-    public enum ExportTyp {
-        Undefiniert = 0,
-        DatenbankOriginalFormat = 1,
-        DatenbankHTMLFormat = 2,
-        DatenbankCSVFormat = 3,
-        EinzelnMitFormular = 101
-        //   EinzelnAlsHTML = 102
+namespace BlueBasics.EventArgs {
+
+    public class MultiUserFileHasPendingChangesEventArgs : System.EventArgs {
+
+        #region Constructors
+
+        public MultiUserFileHasPendingChangesEventArgs() => HasPendingChanges = false;
+
+        #endregion
+
+        #region Properties
+
+        public bool HasPendingChanges { get; }
+
+        #endregion
     }
 }

@@ -15,12 +15,22 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueSQLDatabase.Enums {
+using System.Collections.Generic;
 
-    public enum TranslationType {
-        Original_Anzeigen = 0,
-        Übersetzen = 1,
-        Datum = 20,
-        Zahl = 30
+namespace BlueBasics.EventArgs {
+
+    public class MultiUserParseEventArgs : System.EventArgs {
+
+        #region Constructors
+
+        public MultiUserParseEventArgs(byte[] data) => Data = data;
+
+        #endregion
+
+        #region Properties
+
+        public byte[] Data { get; }
+
+        #endregion
     }
 }

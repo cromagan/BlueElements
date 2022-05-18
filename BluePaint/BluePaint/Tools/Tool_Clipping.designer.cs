@@ -32,7 +32,7 @@ namespace BluePaint
             this.Recht = new Slider();
             this.PictureBox2 = new System.Windows.Forms.PictureBox();
             this.Links = new Slider();
-            this.AutoZ = new Button();
+            this.btnAutoZ = new Button();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox2)).BeginInit();
             this.SuspendLayout();
             // 
@@ -101,19 +101,19 @@ namespace BluePaint
             this.Links.Text = "Slider1";
             this.Links.ValueChanged += new System.EventHandler(this.ValueChangedByClicking);
             // 
-            // AutoZ
+            // btnAutoZ
             // 
-            this.AutoZ.ImageCode = "Schere|16";
-            this.AutoZ.Location = new System.Drawing.Point(16, 312);
-            this.AutoZ.Name = "AutoZ";
-            this.AutoZ.Size = new System.Drawing.Size(200, 32);
-            this.AutoZ.TabIndex = 10;
-            this.AutoZ.Text = "Automtisch Zuschneiden";
-            this.AutoZ.Click += new System.EventHandler(this.AutoZ_Click);
+            this.btnAutoZ.ImageCode = "Schere|16";
+            this.btnAutoZ.Location = new System.Drawing.Point(16, 312);
+            this.btnAutoZ.Name = "btnAutoZ";
+            this.btnAutoZ.Size = new System.Drawing.Size(200, 32);
+            this.btnAutoZ.TabIndex = 10;
+            this.btnAutoZ.Text = "Automatisch zuschneiden";
+            this.btnAutoZ.Click += new System.EventHandler(this.btnAutoZ_Click);
             // 
             // Tool_Clipping
             // 
-            this.Controls.Add(this.AutoZ);
+            this.Controls.Add(this.btnAutoZ);
             this.Controls.Add(this.PictureBox2);
             this.Controls.Add(this.ZuschnittOK);
             this.Controls.Add(this.Unten);
@@ -131,6 +131,6 @@ namespace BluePaint
         internal Slider Recht;
         internal System.Windows.Forms.PictureBox PictureBox2;
         internal Slider Links;
-        internal Button AutoZ;
+        internal Button btnAutoZ;
     }
 }

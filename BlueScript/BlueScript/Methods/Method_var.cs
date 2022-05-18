@@ -26,7 +26,7 @@ namespace BlueScript.Methods {
         #region Properties
 
         public override List<List<string>> Args => new() { new() { Variable.Any_Plain } };
-        public override string Description => "Erstellt eine neue Variable, der Typ wird automtisch bestimmt.";
+        public override string Description => "Erstellt eine neue Variable, der Typ wird automatisch bestimmt.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ";";
         public override bool GetCodeBlockAfter => false;

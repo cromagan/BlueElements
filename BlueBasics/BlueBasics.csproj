@@ -100,6 +100,11 @@
     <Compile Include="BitmapExt.cs" />
     <Compile Include="DatabaseInterfaces\IDatabase.cs" />
     <Compile Include="Enums\SortierTyp.cs" />
+    <Compile Include="EventArgs\MultiUserFileBackGroundWorker.cs" />
+    <Compile Include="EventArgs\MultiUserToListEventArgs.cs" />
+    <Compile Include="EventArgs\MultiUserParseEventArgs.cs" />
+    <Compile Include="EventArgs\MultiUserIsThereBackgroundWorkToDoEventArgs.cs" />
+    <Compile Include="EventArgs\MultiUserHasPendingChangesEventArgs.cs" />
     <Compile Include="ImageMatrix.cs" />
     <Compile Include="Enums\BlurType.cs" />
     <Compile Include="Enums\VarType.cs" />

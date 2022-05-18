@@ -37,7 +37,7 @@ namespace BluePaint {
             InitializeComponent();
 
             CheckMinMax();
-            AutoZ_Click(null, null);
+            btnAutoZ_Click(null, null);
             ZuschnittOK_Click(null, null);
             MessageBox.Show("Automatisch zugeschnitten.");
         }
@@ -89,7 +89,7 @@ namespace BluePaint {
             var c = command.SplitAndCutBy(";");
             if (c[0] == "AutoZuschnitt") {
                 CheckMinMax();
-                AutoZ_Click(null, null);
+                btnAutoZ_Click(null, null);
                 ZuschnittOK_Click(null, null);
             } else {
                 DebugPrint_NichtImplementiert();
@@ -124,10 +124,10 @@ namespace BluePaint {
 
         internal override void ToolFirstShown() {
             CheckMinMax();
-            AutoZ_Click(null, null);
+            btnAutoZ_Click(null, null);
         }
 
-        private void AutoZ_Click(object? sender, System.EventArgs? e) {
+        private void btnAutoZ_Click(object? sender, System.EventArgs? e) {
             WollenSieDenZuschnittÜbernehmen();
             var pic = OnNeedCurrentPic();
             OnZoomFit();
