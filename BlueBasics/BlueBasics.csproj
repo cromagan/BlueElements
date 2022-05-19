@@ -110,7 +110,6 @@
     <Compile Include="Enums\VarType.cs" />
     <Compile Include="Enums\ErrorReason.cs" />
     <Compile Include="EventArgs\NeedImageEventArgs.cs" />
-    <Compile Include="EventArgs\MultiUserFileGiveBackEventArgs.cs" />
     <Compile Include="Extensions\RectangleFExtension.cs" />
     <Compile Include="Cryptogaphy.cs" />
     <Compile Include="HTML.cs" />

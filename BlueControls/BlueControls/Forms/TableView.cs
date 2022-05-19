@@ -185,7 +185,7 @@ namespace BlueControls.Forms {
         /// </summary>
         /// <param name="db"></param>
         public static void OpenDatabaseHeadEditor(Database db) {
-            db.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+            db.OnConnectedControlsStopAllWorking(null, new MultiUserFileStopWorkingEventArgs());
             if (!db.IsLoading) { db.Load_Reload(); } // Die Routine wird evtl. in der Laderoutine aufgerufen. z.B. bei Fehlerhaften Regeln
             using DatabaseHeadEditor w = new(db);
             w.ShowDialog();

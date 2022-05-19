@@ -559,7 +559,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                     b.OpticalReplace.Add("~" + thisColumn.Name.ToLower() + "~|[Spalte: " + thisColumn.ReadableText() + "]");
                 }
 
-                x.RepairAfterParse();
+                x.RepairAfterParse(null, null);
                 x.ColumnArrangements[1].ShowAllColumns();
                 x.ColumnArrangements[1].Hide("visible");
                 x.ColumnArrangements[1].HideSystemColumns();
@@ -572,7 +572,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 tblFilterliste.Filter.Add(vis, FilterType.Istgleich, "+");
             }
 
-            linkdb.RepairAfterParse(); // Dass ja die 0 Ansicht stimmt
+            linkdb.RepairAfterParse(null, null); // Dass ja die 0 Ansicht stimmt
 
             var ok = IntTryParse(cbxTargetColumn.Text, out var key);
             ColumnItem? spalteauDb = null;

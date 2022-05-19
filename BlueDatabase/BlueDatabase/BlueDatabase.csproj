@@ -103,6 +103,7 @@
     <Compile Include="Enums\ScriptType.cs" />
     <Compile Include="Enums\TranslationType.cs" />
     <Compile Include="Enums\ÜberschriftAnordnung.cs" />
+    <Compile Include="EventArgs\MultiUserFileGiveBackEventArgs.cs" />
     <Compile Include="Interfaces\ITranslateAble.cs" />
     <Compile Include="Interfaces\IInputFormat.cs" />
     <Compile Include="RowData.cs" />

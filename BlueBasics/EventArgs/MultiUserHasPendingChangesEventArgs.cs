@@ -29,7 +29,7 @@ namespace BlueBasics.EventArgs {
 
         #region Properties
 
-        public bool HasPendingChanges { get; }
+        public bool HasPendingChanges { get; set; }
 
         #endregion
     }

@@ -124,11 +124,9 @@ namespace BlueDatabase {
                 var unique = ("X" + DateTime.Now.ToString("mm.fff") + x.ToString(Constants.Format_Integer5)).RemoveChars(Constants.Char_DateiSonderZeichen + ".");
                 var ok = true;
 
-                foreach (var thisfile in BlueBasics.MultiUserFile.MultiUserFile.AllFiles) {
-                    if (thisfile is Database db) {
-                        var row = db.Row[unique];
-                        if (row != null) { ok = false; break; }
-                    }
+                foreach (var thisfile in Database.AllFiles) {
+                    var row = thisfile.Row[unique];
+                    if (row != null) { ok = false; break; }
                 }
 
                 if (ok) { return unique; }

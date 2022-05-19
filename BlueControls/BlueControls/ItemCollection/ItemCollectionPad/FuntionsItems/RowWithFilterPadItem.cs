@@ -546,7 +546,7 @@ namespace BlueControls.ItemCollection {
 
             FilterDatabaseUpdate();
 
-            x.RepairAfterParse();
+            x.RepairAfterParse(null, null);
             x.ColumnArrangements[1].ShowAllColumns();
             //x.ColumnArrangements[1].Hide("visible");
             x.ColumnArrangements[1].HideSystemColumns();

@@ -766,7 +766,7 @@ namespace BlueControls.Controls {
             if (_database == null || grpEditor.Visible || !_database.IsAdministrator()) { return; }
 
             _database.Load_Reload();
-            _database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+            _database.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
 
             if (!_inited) { View_Init(); }
 

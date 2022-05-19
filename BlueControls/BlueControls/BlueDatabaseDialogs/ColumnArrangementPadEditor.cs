@@ -187,7 +187,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (Arrangement > 0 && CurrentArrangement != null) { CurrentArrangement.Add(newc, false); }
 
-            Database.RepairAfterParse();
+            Database.RepairAfterParse(null, null);
             ShowOrder();
         }
 
@@ -310,7 +310,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             Fixing--;
 
             if (Arrangement == 0 && did) {
-                Database.RepairAfterParse();
+                Database?.RepairAfterParse(null, null);
                 ShowOrder();
             }
         }

@@ -34,9 +34,8 @@ namespace BlueBasics.MultiUserFile {
 
         #region Fields
 
-        public static readonly ListExt<MultiUserFile> AllFiles = new();
-
         public int ReloadDelaySecond = 10;
+        private static readonly ListExt<MultiUserFile> _all_Files = new();
         private readonly BackgroundWorker _backgroundWorker;
         private readonly Timer _checker;
         private readonly BackgroundWorker _pureBinSaver;
@@ -47,6 +46,7 @@ namespace BlueBasics.MultiUserFile {
         private DateTime _canWriteNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
         private bool _checkedAndReloadNeed;
         private int _checkerTickCount = -5;
+        private byte[] _data_On_Disk;
         private bool _doingTempFile;
         private string _editNormalyError = string.Empty;
         private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
@@ -58,7 +58,6 @@ namespace BlueBasics.MultiUserFile {
         private DateTime _lastUserActionUtc = new(1900, 1, 1);
         private int _loadingThreadId = -1;
         private FileSystemWatcher? _watcher;
-        private byte[] DataOnDisk;
 
         #endregion
 
@@ -66,7 +65,7 @@ namespace BlueBasics.MultiUserFile {
 
         public MultiUserFile(bool readOnly, bool zipped) {
             _zipped = zipped;
-            AllFiles.Add(this);
+            _all_Files.Add(this);
             //OnMultiUserFileCreated(this); // Ruft ein statisches Event auf, deswegen geht das.
             _pureBinSaver = new BackgroundWorker {
                 WorkerReportsProgress = true
@@ -83,7 +82,7 @@ namespace BlueBasics.MultiUserFile {
             ReCreateWatcher();
             _checkedAndReloadNeed = true;
             _lastSaveCode = string.Empty;
-            DataOnDisk = Array.Empty<byte>();
+            _data_On_Disk = Array.Empty<byte>();
             ReadOnly = readOnly;
             AutoDeleteBak = false;
             BlockReload(false);
@@ -137,6 +136,19 @@ namespace BlueBasics.MultiUserFile {
 
         #region Properties
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <returns>-1 wenn keine vorhanden ist, ansonsten das Alter in Sekunden</returns>
+        public double AgeOfBlockDatei {
+            get {
+                if (!FileExists(Blockdateiname())) { return -1; }
+                FileInfo f = new(Blockdateiname());
+                var sec = DateTime.UtcNow.Subtract(f.CreationTimeUtc).TotalSeconds;
+                return Math.Max(0, sec); // ganz frische Dateien werden einen Bruchteil von Sekunden in der Zukunft erzeugt.
+            }
+        }
+
         public bool AutoDeleteBak { get; set; }
 
         public bool Disposed { get; private set; }
@@ -186,32 +198,6 @@ namespace BlueBasics.MultiUserFile {
         #region Methods
 
         /// <summary>
-        /// Suht die Datei im Speicher. Wird sie nicht gefunden, wird null zurück gegeben.
-        /// Evtl. besitzen abgeleitete Klassen eine eigene GetByFilename.
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <param name="checkOnlyFilenameToo">Prüft, ob die Datei ohne Dateipfad - also nur Dateiname und Suffix - existiert und gibt diese zurück.</param>
-        /// <returns></returns>
-        public static MultiUserFile? GetByFilename(string filePath, bool checkOnlyFilenameToo) {
-            foreach (var thisFile in AllFiles) {
-                if (thisFile != null && string.Equals(thisFile.Filename, filePath, StringComparison.OrdinalIgnoreCase)) {
-                    thisFile.BlockReload(false);
-                    return thisFile;
-                }
-            }
-
-            if (checkOnlyFilenameToo) {
-                foreach (var thisFile in AllFiles) {
-                    if (thisFile != null && thisFile.Filename.ToLower().FileNameWithSuffix() == filePath.ToLower().FileNameWithSuffix()) {
-                        thisFile.BlockReload(false);
-                        return thisFile;
-                    }
-                }
-            }
-            return null;
-        }
-
-        /// <summary>
         ///
         /// </summary>
         /// <param name="mustSave">Falls TRUE wird zuvor automatisch ein Speichervorgang mit FALSE eingeleitet, um so viel wie möglich zu speichern - falls eine Datei blockiert ist.</param>
@@ -220,10 +206,10 @@ namespace BlueBasics.MultiUserFile {
             // Parallel.ForEach(AllFiles, thisFile => {
             //    thisFile?.Save(mustSave);
             // });
-            var x = AllFiles.Count;
-            foreach (var thisFile in AllFiles) {
+            var x = _all_Files.Count;
+            foreach (var thisFile in _all_Files) {
                 thisFile?.Save(mustSave);
-                if (x != AllFiles.Count) {
+                if (x != _all_Files.Count) {
                     // Die Auflistung wurde verändert! Selten, aber kann passieren!
                     SaveAll(mustSave);
                     return;
@@ -243,17 +229,6 @@ namespace BlueBasics.MultiUserFile {
             }
 
             return null;
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <returns>-1 wenn keine vorhanden ist, ansonsten das Alter in Sekunden</returns>
-        public double AgeOfBlockDatei() {
-            if (!FileExists(Blockdateiname())) { return -1; }
-            FileInfo f = new(Blockdateiname());
-            var sec = DateTime.UtcNow.Subtract(f.CreationTimeUtc).TotalSeconds;
-            return Math.Max(0, sec); // ganz frische Dateien werden einen Bruchteil von Sekunden in der Zukunft erzeugt.
         }
 
         public void BlockReload(bool crashisiscurrentlyloading) {
@@ -290,7 +265,7 @@ namespace BlueBasics.MultiUserFile {
 
         public void Dispose(bool disposing) {
             if (!Disposed) {
-                AllFiles.Remove(this);
+                _all_Files.Remove(this);
                 if (disposing) {
                     // TODO: verwalteten Zustand (verwaltete Objekte) entsorgen.
                 }
@@ -313,7 +288,7 @@ namespace BlueBasics.MultiUserFile {
             //----------Load, vereinfachte Prüfung ------------------------------------------------------------------------
             if (mode is Enums.ErrorReason.Load or Enums.ErrorReason.LoadForCheckingOnly) {
                 if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
-                var sec = AgeOfBlockDatei();
+                var sec = AgeOfBlockDatei;
                 if (sec is >= 0 and < 10) { return "Ein anderer Computer speichert gerade Daten ab."; }
             }
 
@@ -339,7 +314,7 @@ namespace BlueBasics.MultiUserFile {
                     _editNormalyError = "Sie haben im Verzeichnis der Datei keine Schreibrechte.";
                     return _editNormalyError;
                 }
-                if (AgeOfBlockDatei() > 60) {
+                if (AgeOfBlockDatei > 60) {
                     _editNormalyError = "Eine Blockdatei ist anscheinend dauerhaft vorhanden. Administrator verständigen.";
                     return _editNormalyError;
                 }
@@ -369,7 +344,7 @@ namespace BlueBasics.MultiUserFile {
                 if (CheckForLastError(ref _canWriteNextCheckUtc, ref _canWriteError) && !string.IsNullOrEmpty(_canWriteError)) {
                     return _canWriteError;
                 }
-                if (AgeOfBlockDatei() >= 0) {
+                if (AgeOfBlockDatei >= 0) {
                     _canWriteError = "Beim letzten Versuch, die Datei zu speichern, ist der Speichervorgang nicht korrekt beendet worden. Speichern ist solange deaktiviert, bis ein Administrator die Freigabe zum Speichern erteilt.";
                     return _canWriteError;
                 }
@@ -405,7 +380,7 @@ namespace BlueBasics.MultiUserFile {
         //protected abstract void CheckDataAfterReload();
         // Dient zur Erkennung redundanter Aufrufe.
         public bool IsFileAllowedToLoad(string fileName) {
-            foreach (var thisFile in AllFiles) {
+            foreach (var thisFile in _all_Files) {
                 if (thisFile != null && string.Equals(thisFile.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
                     thisFile.Save(true);
                     Develop.DebugPrint(FehlerArt.Warnung, "Doppletes Laden von " + fileName);
@@ -466,7 +441,7 @@ namespace BlueBasics.MultiUserFile {
 
             var (bLoaded, tmpLastSaveCode) = LoadBytesFromDisk(Enums.ErrorReason.Load);
             if (bLoaded == null) { IsLoading = false; return; }
-            DataOnDisk = bLoaded;
+            _data_On_Disk = bLoaded;
             //PrepeareDataForCheckingBeforeLoad();
             ParseInternal(bLoaded);
             _lastSaveCode = tmpLastSaveCode; // initialize setzt zurück
@@ -515,7 +490,7 @@ namespace BlueBasics.MultiUserFile {
         public void RepairOldBlockFiles() {
             if (DateTime.UtcNow.Subtract(_lastMessageUtc).TotalMinutes < 1) { return; }
             _lastMessageUtc = DateTime.UtcNow;
-            var sec = AgeOfBlockDatei();
+            var sec = AgeOfBlockDatei;
             try {
                 // Nach 15 Minuten versuchen die Datei zu reparieren
                 if (sec >= 900) {
@@ -553,7 +528,7 @@ namespace BlueBasics.MultiUserFile {
             if (string.IsNullOrEmpty(Filename)) { return false; }
             OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs()); // Sonst meint der Benutzer evtl. noch, er könne Weiterarbeiten... Und Controlls haben die Möglichkeit, ihre Änderungen einzuchecken
             var d = DateTime.UtcNow; // Manchmal ist eine Block-Datei vorhanden, die just in dem Moment gelöscht wird. Also ein ganz kurze "Löschzeit" eingestehen.
-            if (!mustSave && AgeOfBlockDatei() >= 0) { RepairOldBlockFiles(); return false; }
+            if (!mustSave && AgeOfBlockDatei >= 0) { RepairOldBlockFiles(); return false; }
             while (OnHasPendingChanges()) {
                 IsInSaveingLoop = true;
                 CancelBackGroundWorker();
@@ -568,7 +543,7 @@ namespace BlueBasics.MultiUserFile {
                         IsInSaveingLoop = false;
                         return false;
                     }
-                    if (!mustSave && DateTime.UtcNow.Subtract(d).TotalSeconds > 5 && AgeOfBlockDatei() < 0) {
+                    if (!mustSave && DateTime.UtcNow.Subtract(d).TotalSeconds > 5 && AgeOfBlockDatei < 0) {
                         //Develop.DebugPrint(enFehlerArt.Info, "Optionales Speichern nach 5 Sekunden abgebrochen bei " + Filename + " " + f);
                         IsInSaveingLoop = false;
                         return false;
@@ -593,7 +568,7 @@ namespace BlueBasics.MultiUserFile {
                 x.Flush();
                 x.Close();
             }
-            DataOnDisk = l;
+            _data_On_Disk = l;
             _lastSaveCode = GetFileInfo(Filename, true);
             _checkedAndReloadNeed = false;
             CreateWatcher();
@@ -609,7 +584,7 @@ namespace BlueBasics.MultiUserFile {
         public void UnlockHard() {
             try {
                 Load_Reload();
-                if (AgeOfBlockDatei() >= 0) { DeleteBlockDatei(true, true); }
+                if (AgeOfBlockDatei >= 0) { DeleteBlockDatei(true, true); }
                 Save(true);
             } catch {
             }
@@ -639,7 +614,7 @@ namespace BlueBasics.MultiUserFile {
         }
 
         internal bool BlockDateiCheck() {
-            if (AgeOfBlockDatei() < 0) {
+            if (AgeOfBlockDatei < 0) {
                 //Develop.DebugPrint(enFehlerArt.Info, "Block-Datei Konflikt: Block-Datei zu jung\r\n" + Filename + "\r\nSoll: " + _inhaltBlockdatei);
                 return false;
             }
@@ -774,7 +749,7 @@ namespace BlueBasics.MultiUserFile {
                 return false;
             }
 
-            if (AgeOfBlockDatei() < 0) {
+            if (AgeOfBlockDatei < 0) {
                 //Develop.DebugPrint("Block-Datei Konflikt 1\r\n" + Filename);
                 return false;
             }
@@ -989,7 +964,7 @@ namespace BlueBasics.MultiUserFile {
             RenameFile(tmpFileName, Filename, true);
 
             // ---- Steuerelemente Sagen, was gespeichert wurde
-            DataOnDisk = savedDataUncompressed;
+            _data_On_Disk = savedDataUncompressed;
 
             // Und nun den Block entfernen
             CanWrite(Filename, 30); // sobald die Hauptdatei wieder frei ist

@@ -221,7 +221,7 @@ namespace BlueControls {
                 thisColumn.DropdownBearbeitungErlaubt = false;
             }
 
-            x.RepairAfterParse();
+            x.RepairAfterParse(null, null);
             x.ColumnArrangements[1].ShowAllColumns();
             x.ColumnArrangements[1].HideSystemColumns();
             x.SortDefinition = new RowSortDefinition(x, "Name", true);

@@ -114,7 +114,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (_isWorking) { return; }
             var suchText = Alt.Text.Replace(";cr;", "\r").Replace(";tab;", "\t");
             var ersetzText = Neu.Text.Replace(";cr;", "\r").Replace(";tab;", "\t");
-            _blueTable.Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+            _blueTable.Database.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
             List<ColumnItem?> sp = new();
             List<RowItem> ro = new();
             if (NurinAktuellerSpalte.Checked) {

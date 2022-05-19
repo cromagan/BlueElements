@@ -395,7 +395,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 thisColumn.DropdownBearbeitungErlaubt = false;
                 thisColumn.BildTextVerhalten = BildTextVerhalten.Bild_oder_Text;
             }
-            x.RepairAfterParse();
+            x.RepairAfterParse(null, null);
             x.ColumnArrangements[1].ShowAllColumns();
             x.ColumnArrangements[1].Hide("hidden");
             x.ColumnArrangements[1].HideSystemColumns();

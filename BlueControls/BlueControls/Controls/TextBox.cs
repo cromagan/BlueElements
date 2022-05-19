@@ -32,6 +32,7 @@ using System.ComponentModel;
 using System.Drawing;
 using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
+using BlueDatabase.EventArgs;
 
 namespace BlueControls.Controls {
 

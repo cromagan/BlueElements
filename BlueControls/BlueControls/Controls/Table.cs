@@ -1169,8 +1169,8 @@ namespace BlueControls.Controls {
         internal static void StartDatabaseService() {
             if (_serviceStarted) { return; }
             _serviceStarted = true;
-            BlueBasics.MultiUserFile.MultiUserFile.AllFiles.ItemAdded += AllFiles_ItemAdded;
-            BlueBasics.MultiUserFile.MultiUserFile.AllFiles.ItemRemoving += AllFiles_ItemRemoving;
+            Database.AllFiles.ItemAdded += AllFiles_ItemAdded;
+            Database.AllFiles.ItemRemoving += AllFiles_ItemRemoving;
             //Database.DropConstructorMessage += Database_DropConstructorMessage;
         }
 
@@ -1267,7 +1267,7 @@ namespace BlueControls.Controls {
             lock (_lockUserAction) {
                 if (_isinClick) { return; }
                 _isinClick = true;
-                Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+                Database.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
                 CellOnCoordinate(MousePos().X, MousePos().Y, out _mouseOverColumn, out _mouseOverRow);
                 _isinClick = false;
             }
@@ -1282,11 +1282,11 @@ namespace BlueControls.Controls {
                 CellOnCoordinate(MousePos().X, MousePos().Y, out _mouseOverColumn, out _mouseOverRow);
                 CellDoubleClickEventArgs ea = new(_mouseOverColumn, _mouseOverRow?.Row, true);
                 if (Mouse_IsInHead()) {
-                    Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+                    Database.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
                     DoubleClick?.Invoke(this, ea);
                 } else {
                     if (_mouseOverRow == null && MousePos().Y > HeadSize() + _pix18) {
-                        Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+                        Database.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
                         DoubleClick?.Invoke(this, ea);
                     } else {
                         DoubleClick?.Invoke(this, ea);
@@ -1307,7 +1307,7 @@ namespace BlueControls.Controls {
                 if (_isinKeyDown) { return; }
                 _isinKeyDown = true;
 
-                _database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+                _database.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
 
                 switch (e.KeyCode) {
                     case System.Windows.Forms.Keys.Oemcomma: // normales ,
@@ -1451,7 +1451,7 @@ namespace BlueControls.Controls {
             lock (_lockUserAction) {
                 if (_isinMouseDown) { return; }
                 _isinMouseDown = true;
-                _database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+                _database.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
                 CellOnCoordinate(e.X, e.Y, out _mouseOverColumn, out _mouseOverRow);
                 // Die beiden Befehle nur in Mouse Down!
                 // Wenn der Cursor bei Click/Up/Down geändert wird, wird ein Ereignis ausgelöst.
@@ -1510,7 +1510,7 @@ namespace BlueControls.Controls {
                 _mouseOverText = string.Empty;
                 CellOnCoordinate(e.X, e.Y, out _mouseOverColumn, out _mouseOverRow);
                 if (e.Button != System.Windows.Forms.MouseButtons.None) {
-                    _database?.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+                    _database?.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
                 } else {
                     if (_mouseOverColumn != null && e.Y < HeadSize()) {
                         _mouseOverText = _mouseOverColumn.QuickInfoText(string.Empty);
@@ -1616,7 +1616,7 @@ namespace BlueControls.Controls {
             lock (_lockUserAction) {
                 if (_isinMouseWheel) { return; }
                 _isinMouseWheel = true;
-                Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+                Database?.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
                 if (!SliderY.Visible) {
                     _isinMouseWheel = false;
                     return;
@@ -1632,7 +1632,7 @@ namespace BlueControls.Controls {
             lock (_lockUserAction) {
                 if (_isinSizeChanged) { return; }
                 _isinSizeChanged = true;
-                Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+                Database?.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
                 CurrentArrangement?.Invalidate_DrawWithOfAllItems();
                 _isinSizeChanged = false;
             }
@@ -1656,7 +1656,7 @@ namespace BlueControls.Controls {
             lock (_lockUserAction) {
                 if (_isinVisibleChanged) { return; }
                 _isinVisibleChanged = true;
-                Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+                Database.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
                 _isinVisibleChanged = false;
             }
         }
@@ -2060,7 +2060,7 @@ namespace BlueControls.Controls {
                 MessageBox.Show("Dieser Filter wurde<br>automatisch gesetzt.", ImageCode.Information, "OK");
                 return;
             }
-            Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+            Database.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
             //OnBeforeAutoFilterShow(new ColumnEventArgs(columnviewitem.Column));
             _autoFilter = new AutoFilter(columnviewitem.Column, Filter, PinnedRows);
             _autoFilter.Position_LocateToPosition(new Point(screenx + (int)columnviewitem.OrderTmpSpalteX1, screeny + HeadSize()));
@@ -2120,7 +2120,7 @@ namespace BlueControls.Controls {
         private void BTB_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e) => e.File = Database;
 
         private void Cell_Edit(ColumnItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, bool withDropDown) {
-            Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+            Database.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
             ColumnItem? contentHolderCellColumn;
             RowItem? contentHolderCellRow;
 
@@ -2865,7 +2865,11 @@ namespace BlueControls.Controls {
                 Skin.Draw_Border(gr, Enums.Design.Table_And_Pad, state, displayRectangleWoSlider);
 
                 if (Database.ReloadNeeded) { gr.DrawImage(QuickImage.Get(ImageCode.Uhr, 16), 8, 8); }
-                if (Database.HasPendingChanges()) { gr.DrawImage(QuickImage.Get(ImageCode.Stift, 16), 16, 8); }
+
+                var e2 = new MultiUserFileHasPendingChangesEventArgs();
+                Database.HasPendingChanges(null, e2);
+
+                if (e2.HasPendingChanges) { gr.DrawImage(QuickImage.Get(ImageCode.Stift, 16), 16, 8); }
                 if (Database.ReadOnly) { gr.DrawImage(QuickImage.Get(ImageCode.Schloss, 32), 16, 8); }
             } catch {
                 Invalidate();
@@ -3172,7 +3176,7 @@ namespace BlueControls.Controls {
         private void SliderX_ValueChanged(object sender, System.EventArgs e) {
             if (_database == null) { return; }
             lock (_lockUserAction) {
-                Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+                Database.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
                 Invalidate();
             }
         }
@@ -3180,7 +3184,7 @@ namespace BlueControls.Controls {
         private void SliderY_ValueChanged(object sender, System.EventArgs e) {
             if (_database == null) { return; }
             lock (_lockUserAction) {
-                Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+                Database.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
                 Invalidate();
             }
         }

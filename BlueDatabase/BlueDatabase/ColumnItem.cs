@@ -1098,7 +1098,7 @@ namespace BlueDatabase {
         /// <returns></returns>
         public List<string> Contents(FilterCollection filter, List<RowItem>? pinned) {
             List<string> list = new();
-            if(Database == null) { return list; }
+            if (Database == null) { return list; }
 
             foreach (var thisRowItem in Database.Row) {
                 if (thisRowItem != null) {
@@ -2624,7 +2624,7 @@ namespace BlueDatabase {
         //    }
         //}
 
-        private void _TMP_LinkedDatabase_ConnectedControlsStopAllWorking(object sender, MultiUserFileStopWorkingEventArgs e) => Database.OnConnectedControlsStopAllWorking(e);
+        private void _TMP_LinkedDatabase_ConnectedControlsStopAllWorking(object sender, MultiUserFileStopWorkingEventArgs e) => Database.OnConnectedControlsStopAllWorking(this, e);
 
         //public bool IsParsing {
         //    get {

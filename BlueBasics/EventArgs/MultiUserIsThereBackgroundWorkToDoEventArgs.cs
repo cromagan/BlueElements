@@ -29,7 +29,7 @@ namespace BlueBasics.EventArgs {
 
         #region Properties
 
-        public bool BackGroundWork { get; }
+        public bool BackGroundWork { get; set; }
 
         #endregion
     }
