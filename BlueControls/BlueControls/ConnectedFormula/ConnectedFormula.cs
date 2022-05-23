@@ -146,15 +146,14 @@ namespace BlueControls.ConnectedFormula {
 
         #region Methods
 
-        public static ConnectedFormula? GetByFilename(string filePath) {
+        public static ConnectedFormula? GetByFilename(string filename) {
             foreach (var thisFile in AllFiles) {
-                if (thisFile != null && string.Equals(thisFile.Filename, filePath, StringComparison.OrdinalIgnoreCase)) {
-                    //thisFile.BlockReload(false);
+                if (thisFile != null && string.Equals(thisFile.Filename, filename, StringComparison.OrdinalIgnoreCase)) {
                     return thisFile;
                 }
             }
 
-            return null;
+            return !FileExists(filename) ? null : new ConnectedFormula(filename);
         }
 
         ///// <summary>
