@@ -272,6 +272,7 @@ namespace BlueControls.Controls {
                         break;
 
                     case ButtonStyle.Checkbox_Big_Borderless:
+                    case ButtonStyle.Pic1_or_Pic2_Big_Borderless:
                         DrawButton(this, gr, Design.Ribbonbar_Button_CheckBox, state, pic, Alignment.VerticalCenter_Left, true, _etxt, _text, DisplayRectangle, Translate);
                         break;
 

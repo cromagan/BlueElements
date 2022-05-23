@@ -40,6 +40,8 @@ namespace BlueControls.Enums {
         ComboBoxButton = 32,
         ComboBoxButton_Borderless = ComboBoxButton | Borderless,
 
+        Pic1_or_Pic2_Big_Borderless = Pic1_or_Pic2 | Button_Big_Borderless,
+
         Text = 131072,
 
         Borderless = 65536

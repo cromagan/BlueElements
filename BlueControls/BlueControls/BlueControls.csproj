@@ -612,7 +612,7 @@
     <Compile Include="Controls\TextBox.Designer.cs">
       <DependentUpon>TextBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="clsScreenData.cs" />
+    <Compile Include="ScreenData.cs" />
     <Compile Include="Controls\ZoomPad.cs">
       <SubType>Component</SubType>
     </Compile>

@@ -28,9 +28,9 @@ namespace BlueControls.Controls {
             this.lsbFiles = new BlueControls.Controls.ListBox();
             this.txbPfad = new BlueControls.Controls.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.btnZurück = new BlueControls.Controls.Button();
             this.btnExplorerÖffnen = new BlueControls.Controls.Button();
             this.btnAddScreenShot = new BlueControls.Controls.Button();
-            this.btnZurück = new BlueControls.Controls.Button();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -58,23 +58,34 @@ namespace BlueControls.Controls {
             // 
             this.txbPfad.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbPfad.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txbPfad.Location = new System.Drawing.Point(0, 0);
+            this.txbPfad.Location = new System.Drawing.Point(32, 0);
             this.txbPfad.Name = "txbPfad";
-            this.txbPfad.Size = new System.Drawing.Size(382, 32);
+            this.txbPfad.Size = new System.Drawing.Size(318, 32);
             this.txbPfad.TabIndex = 3;
             this.txbPfad.Enter += new System.EventHandler(this.txbPfad_Enter);
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.txbPfad);
             this.panel1.Controls.Add(this.btnZurück);
             this.panel1.Controls.Add(this.btnExplorerÖffnen);
-            this.panel1.Controls.Add(this.txbPfad);
             this.panel1.Controls.Add(this.btnAddScreenShot);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(414, 32);
             this.panel1.TabIndex = 5;
+            // 
+            // btnZurück
+            // 
+            this.btnZurück.Dock = System.Windows.Forms.DockStyle.Left;
+            this.btnZurück.ImageCode = "Pfeil_Oben|24|||0000FF";
+            this.btnZurück.Location = new System.Drawing.Point(0, 0);
+            this.btnZurück.Name = "btnZurück";
+            this.btnZurück.QuickInfo = "Eine Ordnerstufe höher";
+            this.btnZurück.Size = new System.Drawing.Size(32, 32);
+            this.btnZurück.TabIndex = 6;
+            this.btnZurück.Click += new System.EventHandler(this.btnZurück_Click);
             // 
             // btnExplorerÖffnen
             // 
@@ -97,17 +108,6 @@ namespace BlueControls.Controls {
             this.btnAddScreenShot.Size = new System.Drawing.Size(32, 32);
             this.btnAddScreenShot.TabIndex = 4;
             this.btnAddScreenShot.Click += new System.EventHandler(this.btnAddScreenShot_Click);
-            // 
-            // btnZurück
-            // 
-            this.btnZurück.Dock = System.Windows.Forms.DockStyle.Left;
-            this.btnZurück.ImageCode = "Pfeil_Oben|24|||0000FF";
-            this.btnZurück.Location = new System.Drawing.Point(0, 0);
-            this.btnZurück.Name = "btnZurück";
-            this.btnZurück.QuickInfo = "Eine Ordnerstufe höher";
-            this.btnZurück.Size = new System.Drawing.Size(32, 32);
-            this.btnZurück.TabIndex = 6;
-            this.btnZurück.Click += new System.EventHandler(this.btnZurück_Click);
             // 
             // FileBrowser
             // 

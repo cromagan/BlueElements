@@ -25,13 +25,13 @@ namespace BlueControls.EventArgs {
 
         #region Constructors
 
-        public BasicListItemEventArgs(BasicListItem? item) => Item = item;
+        public BasicListItemEventArgs(BasicListItem item) => Item = item;
 
         #endregion
 
         #region Properties
 
-        public BasicListItem? Item { get; }
+        public BasicListItem Item { get; }
 
         #endregion
     }

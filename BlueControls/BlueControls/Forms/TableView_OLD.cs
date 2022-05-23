@@ -19,7 +19,6 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueControls.EventArgs;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
@@ -32,12 +31,6 @@ using static BlueBasics.Converter;
 namespace BlueControls.Forms {
 
     public partial class TableView_OLD : TableView {
-
-        #region Fields
-
-   
-
-        #endregion
 
         #region Constructors
 
@@ -65,7 +58,6 @@ namespace BlueControls.Forms {
                 Table.Database.Row.Remove(Table.Filter, Table.PinnedRows);
             }
         }
-
 
         protected override void CheckButtons() {
             base.CheckButtons();
@@ -267,7 +259,6 @@ namespace BlueControls.Forms {
             }
             if (row == null) { row = Table.View_RowFirst(); }
         }
-
 
         private void TableView_EditBeforeBeginEdit(object sender, CellCancelEventArgs e) {
             if (Table.Design == BlueTableAppearance.OnlyMainColumnWithoutHead) {
