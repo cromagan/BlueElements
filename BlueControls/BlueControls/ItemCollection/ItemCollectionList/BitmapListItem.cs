@@ -83,6 +83,7 @@ namespace BlueControls.ItemCollection.ItemCollectionList {
                 _imageFilename = string.Empty;
                 _bitmap = value;
                 //OnChanged();
+                Parent?.OnChanged();
             }
         }
 
