@@ -15,16 +15,15 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueDatabase.Enums {
+namespace BlueDatabase.Enums;
 
-    public enum FirstRow {
+public enum FirstRow {
 
-        /// <summary>
-        /// Gibt an, das der Spaltenkopf nicht exportiert wird und die Daten sofort beginnen
-        /// </summary>
-        Without = 0,
+    /// <summary>
+    /// Gibt an, das der Spaltenkopf nicht exportiert wird und die Daten sofort beginnen
+    /// </summary>
+    Without = 0,
 
-        ColumnInternalName = 1,
-        ColumnCaption = 2
-    }
+    ColumnInternalName = 1,
+    ColumnCaption = 2
 }

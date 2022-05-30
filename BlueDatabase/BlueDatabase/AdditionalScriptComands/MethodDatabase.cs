@@ -22,37 +22,36 @@ using BlueScript;
 using BlueScript.Methods;
 using BlueScript.Variables;
 
-namespace BlueDatabase.AdditionalScriptComands {
+namespace BlueDatabase.AdditionalScriptComands;
 
-    public abstract class MethodDatabase : Method {
+public abstract class MethodDatabase : Method {
 
-        #region Methods
+    #region Methods
 
-        protected ColumnItem? Column(Script s, string name) => MyDatabase(s)?.Column.Exists(name);
+    protected ColumnItem? Column(Script s, string name) => MyDatabase(s)?.Column.Exists(name);
 
-        protected Database? DatabaseOf(Script s, string name) {
-            if (s.Variables != null) {
-                var db = MyDatabase(s);
-                if (db == null) { return null; }
+    protected Database? DatabaseOf(Script s, string name) {
+        if (s.Variables != null) {
+            var db = MyDatabase(s);
+            if (db == null) { return null; }
 
-                if (string.IsNullOrEmpty(db.Filename)) { return null; }
+            if (string.IsNullOrEmpty(db.Filename)) { return null; }
 
-                var newf = db.Filename.FilePath() + name + ".mdb";
+            var newf = db.Filename.FilePath() + name + ".mdb";
 
-                return Database.GetByFilename(newf, true, false);
-            }
-
-            return null;
+            return Database.GetByFilename(newf, true, false);
         }
 
-        protected Database? MyDatabase(Script s) {
-            if (s.Variables != null) {
-                var f = s.Variables.GetSystem("Database");
-                if (f is VariableDatabase db) { return db.Database; }
-            }
-            return null;
-        }
-
-        #endregion
+        return null;
     }
+
+    protected Database? MyDatabase(Script s) {
+        if (s.Variables != null) {
+            var f = s.Variables.GetSystem("Database");
+            if (f is VariableDatabase db) { return db.Database; }
+        }
+        return null;
+    }
+
+    #endregion
 }

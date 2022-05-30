@@ -15,14 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueControls.Interfaces {
+namespace BlueControls.Interfaces;
 
-    public interface IMoveable {
+public interface IMoveable {
 
-        #region Methods
+    #region Methods
 
-        public void Move(float x, float y);
+    public void Move(float x, float y);
 
-        #endregion
-    }
+    #endregion
 }

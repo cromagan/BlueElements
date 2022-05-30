@@ -15,30 +15,29 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueDatabase.EventArgs {
+namespace BlueDatabase.EventArgs;
 
-    public class ProgressbarEventArgs : System.EventArgs {
+public class ProgressbarEventArgs : System.EventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public ProgressbarEventArgs(string name, int current, int count, bool beginns, bool ends) {
-            Name = name;
-            Current = current;
-            Count = count;
-            Beginns = beginns;
-            Ends = ends;
-        }
-
-        #endregion
-
-        #region Properties
-
-        public bool Beginns { get; }
-        public int Count { get; }
-        public int Current { get; }
-        public bool Ends { get; }
-        public string Name { get; }
-
-        #endregion
+    public ProgressbarEventArgs(string name, int current, int count, bool beginns, bool ends) {
+        Name = name;
+        Current = current;
+        Count = count;
+        Beginns = beginns;
+        Ends = ends;
     }
+
+    #endregion
+
+    #region Properties
+
+    public bool Beginns { get; }
+    public int Count { get; }
+    public int Current { get; }
+    public bool Ends { get; }
+    public string Name { get; }
+
+    #endregion
 }

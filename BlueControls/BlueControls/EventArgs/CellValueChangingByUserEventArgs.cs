@@ -19,21 +19,20 @@
 
 using BlueDatabase;
 
-namespace BlueControls.EventArgs {
+namespace BlueControls.EventArgs;
 
-    public class CellValueChangingByUserEventArgs : BlueDatabase.EventArgs.CellCancelEventArgs {
+public class CellValueChangingByUserEventArgs : BlueDatabase.EventArgs.CellCancelEventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        //   ColumnItem Column, RowItem Row, Point MousePos, string NewVal, ref string CancelReason
-        public CellValueChangingByUserEventArgs(ColumnItem? column, RowItem? row, string newVal, string cancelReason) : base(column, row, cancelReason) => NewVal = newVal;
+    //   ColumnItem Column, RowItem Row, Point MousePos, string NewVal, ref string CancelReason
+    public CellValueChangingByUserEventArgs(ColumnItem? column, RowItem? row, string newVal, string cancelReason) : base(column, row, cancelReason) => NewVal = newVal;
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public string NewVal { get; }
+    public string NewVal { get; }
 
-        #endregion
-    }
+    #endregion
 }

@@ -15,21 +15,20 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueScript.Enums {
+namespace BlueScript.Enums;
 
-    public enum ScriptIssueType {
-        ohne = 0,
-        FalscherDatentyp = 1,
-        AttributAnzahl = 2,
+public enum ScriptIssueType {
+    ohne = 0,
+    FalscherDatentyp = 1,
+    AttributAnzahl = 2,
 
-        /// <summary>
-        /// Es ist eine Rechenformel / BoolscheOperation vorhanden und diese ist Fehgeschlagen
-        /// </summary>
-        BerechnungFehlgeschlagen = 3,
+    /// <summary>
+    /// Es ist eine Rechenformel / BoolscheOperation vorhanden und diese ist Fehgeschlagen
+    /// </summary>
+    BerechnungFehlgeschlagen = 3,
 
-        VariableNichtGefunden = 4,
-        VariableErwartet = 5,
+    VariableNichtGefunden = 4,
+    VariableErwartet = 5,
 
-        VariablenNamenBerechnungFehler = 6
-    }
+    VariablenNamenBerechnungFehler = 6
 }

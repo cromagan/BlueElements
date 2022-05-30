@@ -20,74 +20,73 @@ using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueDatabase.AdditionalScriptComands {
+namespace BlueDatabase.AdditionalScriptComands;
 
-    public class Method_LookupFilter : MethodDatabase {
+public class Method_LookupFilter : MethodDatabase {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain }, new() { VariableFilterItem.ShortName_Variable } };
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain }, new() { VariableFilterItem.ShortName_Variable } };
 
-        public override string Description => "Lädt eine andere Datenbank sucht eine Zeile mit einem Filter und gibt den Inhalt einer Spalte (ReturnColumn) als Liste zurück. Wird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben. Ist der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben. Ein Filter kann mit dem Befehl 'Filter' erstellt werden.";
+    public override string Description => "Lädt eine andere Datenbank sucht eine Zeile mit einem Filter und gibt den Inhalt einer Spalte (ReturnColumn) als Liste zurück. Wird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben. Ist der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben. Ein Filter kann mit dem Befehl 'Filter' erstellt werden.";
 
-        public override bool EndlessArgs => true;
+    public override bool EndlessArgs => true;
 
-        public override string EndSequence => ")";
+    public override string EndSequence => ")";
 
-        public override bool GetCodeBlockAfter => false;
+    public override bool GetCodeBlockAfter => false;
 
-        public override string Returns => VariableListString.ShortName_Plain;
+    public override string Returns => VariableListString.ShortName_Plain;
 
-        public override string StartSequence => "(";
+    public override string StartSequence => "(";
 
-        //public Method_Lookup(Script parent) : base(parent) { }
-        public override string Syntax => "LookupFilter(ReturnColumn, NothingFoundValue, FoundToMuchValue, Filter, ...)";
+    //public Method_Lookup(Script parent) : base(parent) { }
+    public override string Syntax => "LookupFilter(ReturnColumn, NothingFoundValue, FoundToMuchValue, Filter, ...)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "lookupfilter" };
+    public override List<string> Comand(Script? s) => new() { "lookupfilter" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 3);
+        var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 3);
 
-            if (allFi is null) { return new DoItFeedback("Fehler im Filter"); }
+        if (allFi is null) { return new DoItFeedback("Fehler im Filter"); }
 
-            var returncolumn = allFi[0].Database.Column.Exists(((VariableString)attvar.Attributes[0]).ValueString);
-            if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString); }
+        var returncolumn = allFi[0].Database.Column.Exists(((VariableString)attvar.Attributes[0]).ValueString);
+        if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString); }
 
-            var l = new List<string>();
+        var l = new List<string>();
 
-            var r = RowCollection.MatchesTo(allFi);
-            if (r.Count == 0) {
-                l.Add(((VariableString)attvar.Attributes[1]).ValueString);
-                return new DoItFeedback(l);
-            }
-            if (r.Count > 1) {
-                l.Add(((VariableString)attvar.Attributes[2]).ValueString);
-                return new DoItFeedback(l);
-            }
-
-            var v = RowItem.CellToVariable(returncolumn, r[0]);
-            if (v == null || v.Count != 1) { return new DoItFeedback("Wert konnte nicht erzeugt werden: " + ((VariableString)attvar.Attributes[4]).ValueString); }
-
-            if (v[0] is VariableListString vl) {
-                l.AddRange(vl.ValueList);
-            } else if (v[0] is VariableString vs) {
-                l.Add(vs.ValueString);
-            } else {
-                return new DoItFeedback("Spaltentyp nicht unterstützt.");
-            }
-
-            //  l.Add(((VariableString)attvar.Attributes[2]).ValueString);
-
+        var r = RowCollection.MatchesTo(allFi);
+        if (r.Count == 0) {
+            l.Add(((VariableString)attvar.Attributes[1]).ValueString);
+            return new DoItFeedback(l);
+        }
+        if (r.Count > 1) {
+            l.Add(((VariableString)attvar.Attributes[2]).ValueString);
             return new DoItFeedback(l);
         }
 
-        #endregion
+        var v = RowItem.CellToVariable(returncolumn, r[0]);
+        if (v == null || v.Count != 1) { return new DoItFeedback("Wert konnte nicht erzeugt werden: " + ((VariableString)attvar.Attributes[4]).ValueString); }
+
+        if (v[0] is VariableListString vl) {
+            l.AddRange(vl.ValueList);
+        } else if (v[0] is VariableString vs) {
+            l.Add(vs.ValueString);
+        } else {
+            return new DoItFeedback("Spaltentyp nicht unterstützt.");
+        }
+
+        //  l.Add(((VariableString)attvar.Attributes[2]).ValueString);
+
+        return new DoItFeedback(l);
     }
+
+    #endregion
 }

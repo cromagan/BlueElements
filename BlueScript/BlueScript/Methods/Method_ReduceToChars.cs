@@ -20,33 +20,32 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Extensions;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_ReduceToChars : Method {
+internal class Method_ReduceToChars : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
-        public override string Description => "Entfernt aus dem Text alle Zeichen die nicht erlaubt sind";
-        public override bool EndlessArgs => false;
-        public override string EndSequence => ")";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => VariableString.ShortName_Plain;
-        public override string StartSequence => "(";
-        public override string Syntax => "ReduceToChars(OriginalString, ErlaubteZeichenString)";
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
+    public override string Description => "Entfernt aus dem Text alle Zeichen die nicht erlaubt sind";
+    public override bool EndlessArgs => false;
+    public override string EndSequence => ")";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => VariableString.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "ReduceToChars(OriginalString, ErlaubteZeichenString)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "reducetochars" };
+    public override List<string> Comand(Script? s) => new() { "reducetochars" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.AttributFehler(this, attvar)
-                                                             : new DoItFeedback(((VariableString)attvar.Attributes[0]).ValueString.ReduceToChars(((VariableString)attvar.Attributes[1]).ValueString), string.Empty);
-        }
-
-        #endregion
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.AttributFehler(this, attvar)
+            : new DoItFeedback(((VariableString)attvar.Attributes[0]).ValueString.ReduceToChars(((VariableString)attvar.Attributes[1]).ValueString), string.Empty);
     }
+
+    #endregion
 }

@@ -22,34 +22,33 @@ using System.Linq;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_Min : Method {
+internal class Method_Min : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableFloat.ShortName_Plain } };
-        public override string Description => "Gibt den den angegeben Werten den, mit dem niedrigsten Wert zurück.";
-        public override bool EndlessArgs => true;
-        public override string EndSequence => ")";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => VariableFloat.ShortName_Plain;
-        public override string StartSequence => "(";
-        public override string Syntax => "Min(Value1, Value2, ...)";
+    public override List<List<string>> Args => new() { new() { VariableFloat.ShortName_Plain } };
+    public override string Description => "Gibt den den angegeben Werten den, mit dem niedrigsten Wert zurück.";
+    public override bool EndlessArgs => true;
+    public override string EndSequence => ")";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => VariableFloat.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "Min(Value1, Value2, ...)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "min" };
+    public override List<string> Comand(Script? s) => new() { "min" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-            var val = attvar.Attributes.Select(thisval => ((VariableFloat)thisval).ValueNum).Prepend(float.MaxValue).Min();
-            return new DoItFeedback(val);
-        }
-
-        #endregion
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        var val = attvar.Attributes.Select(thisval => ((VariableFloat)thisval).ValueNum).Prepend(float.MaxValue).Min();
+        return new DoItFeedback(val);
     }
+
+    #endregion
 }

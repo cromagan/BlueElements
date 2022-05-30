@@ -20,48 +20,47 @@ using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_Sort : Method {
+internal class Method_Sort : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable }, new() { VariableBool.ShortName_Plain } };
-        public override string Description => "Sortiert die Liste. Falls das zweite Attribut TRUE ist, werden Doubletten und leere Einträge entfernt.";
+    public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable }, new() { VariableBool.ShortName_Plain } };
+    public override string Description => "Sortiert die Liste. Falls das zweite Attribut TRUE ist, werden Doubletten und leere Einträge entfernt.";
 
-        public override bool EndlessArgs => false;
+    public override bool EndlessArgs => false;
 
-        public override string EndSequence => ");";
+    public override string EndSequence => ");";
 
-        public override bool GetCodeBlockAfter => false;
+    public override bool GetCodeBlockAfter => false;
 
-        public override string Returns => string.Empty;
-        public override string StartSequence => "(";
+    public override string Returns => string.Empty;
+    public override string StartSequence => "(";
 
-        public override string Syntax => "Sort(ListVariable, EliminateDupes);";
+    public override string Syntax => "Sort(ListVariable, EliminateDupes);";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "sort" };
+    public override List<string> Comand(Script? s) => new() { "sort" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
+        if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
 
-            var x = ((VariableListString)attvar.Attributes[0]).ValueList;
-            if (((VariableBool)attvar.Attributes[1]).ValueBool) {
-                x = x.SortedDistinctList();
-            } else {
-                x.Sort();
-            }
-            ((VariableListString)attvar.Attributes[0]).ValueList = x;
-            return DoItFeedback.Null();
+        var x = ((VariableListString)attvar.Attributes[0]).ValueList;
+        if (((VariableBool)attvar.Attributes[1]).ValueBool) {
+            x = x.SortedDistinctList();
+        } else {
+            x.Sort();
         }
-
-        #endregion
+        ((VariableListString)attvar.Attributes[0]).ValueList = x;
+        return DoItFeedback.Null();
     }
+
+    #endregion
 }

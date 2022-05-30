@@ -18,20 +18,19 @@
 using System.Collections.Generic;
 using BlueControls.ItemCollection.ItemCollectionList;
 
-namespace BlueControls.EventArgs {
+namespace BlueControls.EventArgs;
 
-    public class ListOfBasicListItemEventArgs : System.EventArgs {
+public class ListOfBasicListItemEventArgs : System.EventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public ListOfBasicListItemEventArgs(List<BasicListItem> items) => Items = items;
+    public ListOfBasicListItemEventArgs(List<BasicListItem> items) => Items = items;
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public List<BasicListItem> Items { get; }
+    public List<BasicListItem> Items { get; }
 
-        #endregion
-    }
+    #endregion
 }

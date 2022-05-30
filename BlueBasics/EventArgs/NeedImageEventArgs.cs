@@ -17,24 +17,23 @@
 
 #nullable enable
 
-namespace BlueBasics.EventArgs {
+namespace BlueBasics.EventArgs;
 
-    public class NeedImageEventArgs : System.EventArgs {
+public class NeedImageEventArgs : System.EventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public NeedImageEventArgs(string name) {
-            Name = name;
-            Bmp = null;
-        }
-
-        #endregion
-
-        #region Properties
-
-        public BitmapExt? Bmp { get; set; }
-        public string Name { get; }
-
-        #endregion
+    public NeedImageEventArgs(string name) {
+        Name = name;
+        Bmp = null;
     }
+
+    #endregion
+
+    #region Properties
+
+    public BitmapExt? Bmp { get; set; }
+    public string Name { get; }
+
+    #endregion
 }

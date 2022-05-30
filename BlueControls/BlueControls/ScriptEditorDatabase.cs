@@ -21,114 +21,113 @@ using BlueDatabase;
 using BlueScript;
 using static BlueBasics.FileOperations;
 
-namespace BlueControls {
+namespace BlueControls;
 
-    public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.UserControl //
-       {
-        #region Fields
+public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.UserControl //
+{
+    #region Fields
 
-        private Database? _database;
+    private Database? _database;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public ScriptEditorDatabase() => InitializeComponent();
+    public ScriptEditorDatabase() => InitializeComponent();
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public Database? Database {
-            get => _database;
-            set {
-                if (_database != null) {
-                    _database.RulesScript = ScriptText;
-                    _database.Disposing -= _Database_Disposing;
-                }
-                _database = value;
-                if (_database == null) {
-                    return;
-                }
-
-                ScriptText = _database.RulesScript;
-                _database.Disposing += _Database_Disposing;
+    public Database? Database {
+        get => _database;
+        set {
+            if (_database != null) {
+                _database.RulesScript = ScriptText;
+                _database.Disposing -= _Database_Disposing;
             }
-        }
-
-        #endregion
-
-        #region Methods
-
-        internal void WriteScriptBack() {
-            if (_database == null) { return; }
-            _database.RulesScript = ScriptText;
-        }
-
-        protected override Script? GenerateAndDoScript() {
+            _database = value;
             if (_database == null) {
-                Message("Keine Datenbank geladen.");
-                return null;
-            }
-            _database.RulesScript = ScriptText;
-
-            if (_database.Row.Count == 0) {
-                Message("Zum Test wird zumindest eine Zeile benötigt.");
-                return null;
-            }
-            if (string.IsNullOrEmpty(txbTestZeile.Text)) {
-                txbTestZeile.Text = _database.Row.First().CellFirstString();
-            }
-
-            var r = _database.Row[txbTestZeile.Text];
-            if (r == null) {
-                Message("Zeile nicht gefunden.");
-                return null;
-            }
-
-            var (_, message, s) = r.DoAutomatic("script testing");
-
-            if (!string.IsNullOrEmpty(message)) {
-                Message("Allgemeiner Fehler: " + message);
-                return null;
-            }
-
-            return s;
-        }
-
-        protected override void OpenAdditionalFileFolder() {
-            if (_database == null) {
-                Message("Keine Datenbank geladen.");
                 return;
             }
-            if (PathExists(_database.AdditionaFilesPfadWhole())) { ExecuteFile(_database.AdditionaFilesPfadWhole()); }
+
+            ScriptText = _database.RulesScript;
+            _database.Disposing += _Database_Disposing;
         }
-
-        private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
-
-        private void scriptEditor_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-            if (e.HotItem is string txt) {
-                var c = _database.Column.Exists(txt);
-                if (c is null) { return; }
-                e.UserMenu.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten);
-            }
-        }
-
-        private void scriptEditor_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-            ColumnItem? c = null;
-
-            if (e.HotItem is string txt) { c = _database.Column.Exists(txt); }
-
-            switch (e.ClickedComand.ToLower()) {
-                case "spalteneigenschaftenbearbeiten":
-                    if (c != null) {
-                        Forms.TableView.OpenColumnEditor(c, null, null);
-                    }
-
-                    break;
-            }
-        }
-
-        #endregion
     }
+
+    #endregion
+
+    #region Methods
+
+    internal void WriteScriptBack() {
+        if (_database == null) { return; }
+        _database.RulesScript = ScriptText;
+    }
+
+    protected override Script? GenerateAndDoScript() {
+        if (_database == null) {
+            Message("Keine Datenbank geladen.");
+            return null;
+        }
+        _database.RulesScript = ScriptText;
+
+        if (_database.Row.Count == 0) {
+            Message("Zum Test wird zumindest eine Zeile benötigt.");
+            return null;
+        }
+        if (string.IsNullOrEmpty(txbTestZeile.Text)) {
+            txbTestZeile.Text = _database.Row.First().CellFirstString();
+        }
+
+        var r = _database.Row[txbTestZeile.Text];
+        if (r == null) {
+            Message("Zeile nicht gefunden.");
+            return null;
+        }
+
+        var (_, message, s) = r.DoAutomatic("script testing");
+
+        if (!string.IsNullOrEmpty(message)) {
+            Message("Allgemeiner Fehler: " + message);
+            return null;
+        }
+
+        return s;
+    }
+
+    protected override void OpenAdditionalFileFolder() {
+        if (_database == null) {
+            Message("Keine Datenbank geladen.");
+            return;
+        }
+        if (PathExists(_database.AdditionaFilesPfadWhole())) { ExecuteFile(_database.AdditionaFilesPfadWhole()); }
+    }
+
+    private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
+
+    private void scriptEditor_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
+        if (e.HotItem is string txt) {
+            var c = _database.Column.Exists(txt);
+            if (c is null) { return; }
+            e.UserMenu.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten);
+        }
+    }
+
+    private void scriptEditor_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
+        ColumnItem? c = null;
+
+        if (e.HotItem is string txt) { c = _database.Column.Exists(txt); }
+
+        switch (e.ClickedComand.ToLower()) {
+            case "spalteneigenschaftenbearbeiten":
+                if (c != null) {
+                    Forms.TableView.OpenColumnEditor(c, null, null);
+                }
+
+                break;
+        }
+    }
+
+    #endregion
 }

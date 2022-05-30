@@ -20,40 +20,39 @@
 using System.Collections.Generic;
 using BlueScript.Structures;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_Break : Method {
+internal class Method_Break : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new();
-        public override string Description => "Beendet eine Schleife oder Subroutine sofort.\r\nKann auch nur innerhalb von diesen verwendet werden.";
+    public override List<List<string>> Args => new();
+    public override string Description => "Beendet eine Schleife oder Subroutine sofort.\r\nKann auch nur innerhalb von diesen verwendet werden.";
 
-        public override bool EndlessArgs => false;
+    public override bool EndlessArgs => false;
 
-        public override string EndSequence => ";";
+    public override string EndSequence => ";";
 
-        public override bool GetCodeBlockAfter => false;
+    public override bool GetCodeBlockAfter => false;
 
-        public override string Returns => string.Empty;
-        public override string StartSequence => "";
+    public override string Returns => string.Empty;
+    public override string StartSequence => "";
 
-        public override string Syntax => "Break;";
+    public override string Syntax => "Break;";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "break" };
+    public override List<string> Comand(Script? s) => new() { "break" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            if (s.Schleife < 1 && s.Sub < 1) { return new DoItFeedback("Break nur innerhalb einer Schleife oder Subroutine erlaubt."); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        if (s.Schleife < 1 && s.Sub < 1) { return new DoItFeedback("Break nur innerhalb einer Schleife oder Subroutine erlaubt."); }
 
-            if (s.BreakFired) { return new DoItFeedback("Break doppelt ausgelöst."); }
-            s.BreakFired = true;
-            return DoItFeedback.Null();
-        }
-
-        #endregion
+        if (s.BreakFired) { return new DoItFeedback("Break doppelt ausgelöst."); }
+        s.BreakFired = true;
+        return DoItFeedback.Null();
     }
+
+    #endregion
 }

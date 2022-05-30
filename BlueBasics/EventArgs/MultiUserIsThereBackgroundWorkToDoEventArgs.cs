@@ -15,20 +15,19 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueBasics.EventArgs {
+namespace BlueBasics.EventArgs;
 
-    public class MultiUserIsThereBackgroundWorkToDoEventArgs : System.EventArgs {
+public class MultiUserIsThereBackgroundWorkToDoEventArgs : System.EventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public MultiUserIsThereBackgroundWorkToDoEventArgs() => BackGroundWork = false;
+    public MultiUserIsThereBackgroundWorkToDoEventArgs() => BackGroundWork = false;
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public bool BackGroundWork { get; set; }
+    public bool BackGroundWork { get; set; }
 
-        #endregion
-    }
+    #endregion
 }

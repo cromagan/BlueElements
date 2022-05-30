@@ -21,60 +21,59 @@ using BlueDatabase;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript {
+namespace BlueScript;
 
-    public class VariableRowItem : Variable {
+public class VariableRowItem : Variable {
 
-        #region Fields
+    #region Fields
 
-        private RowItem? _row;
+    private RowItem? _row;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public VariableRowItem(string name, RowItem? value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _row = value;
+    public VariableRowItem(string name, RowItem? value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _row = value;
 
-        public VariableRowItem(string name) : this(name, null, true, false, string.Empty) { }
+    public VariableRowItem(string name) : this(name, null, true, false, string.Empty) { }
 
-        public VariableRowItem(RowItem? value) : this(DummyName(), value, true, false, string.Empty) { }
+    public VariableRowItem(RowItem? value) : this(DummyName(), value, true, false, string.Empty) { }
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public static string ShortName_Variable => "*row";
-        public override int CheckOrder => 99;
-        public override bool GetFromStringPossible => false;
-        public override bool IsNullOrEmpty => _row == null;
+    public static string ShortName_Variable => "*row";
+    public override int CheckOrder => 99;
+    public override bool GetFromStringPossible => false;
+    public override bool IsNullOrEmpty => _row == null;
 
-        public RowItem? RowItem {
-            get => _row;
-            set {
-                if (Readonly) { return; }
-                _row = value;
-            }
+    public RowItem? RowItem {
+        get => _row;
+        set {
+            if (Readonly) { return; }
+            _row = value;
         }
-
-        public override string ShortName => "row";
-        public override bool ToStringPossible => false;
-
-        #endregion
-
-        #region Methods
-
-        public override DoItFeedback GetValueFrom(Variable variable) {
-            if (variable is not VariableRowItem v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
-            if (Readonly) { return DoItFeedback.Schreibgschützt(); }
-            RowItem = v.RowItem;
-            return DoItFeedback.Null();
-        }
-
-        protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
-            succesVar = null;
-            return false;
-        }
-
-        #endregion
     }
+
+    public override string ShortName => "row";
+    public override bool ToStringPossible => false;
+
+    #endregion
+
+    #region Methods
+
+    public override DoItFeedback GetValueFrom(Variable variable) {
+        if (variable is not VariableRowItem v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
+        if (Readonly) { return DoItFeedback.Schreibgschützt(); }
+        RowItem = v.RowItem;
+        return DoItFeedback.Null();
+    }
+
+    protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
+        succesVar = null;
+        return false;
+    }
+
+    #endregion
 }

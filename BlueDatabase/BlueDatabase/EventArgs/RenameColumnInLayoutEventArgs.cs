@@ -15,31 +15,30 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueDatabase.EventArgs {
+namespace BlueDatabase.EventArgs;
 
-    public class GenerateLayoutInternalEventargs : System.EventArgs {
+public class GenerateLayoutInternalEventargs : System.EventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public GenerateLayoutInternalEventargs(RowItem row, string layoutId, string saveTo) {
-            Row = row;
-            LayoutId = layoutId;
-            Filename = saveTo;
-            Handled = false;
-        }
-
-        #endregion
-
-        #region Properties
-
-        //public bool DirectPrint { get; set; }
-        //public bool DirectSave { get; set; }
-        public string Filename { get; }
-
-        public bool Handled { get; set; }
-        public string LayoutId { get; }
-        public RowItem Row { get; }
-
-        #endregion
+    public GenerateLayoutInternalEventargs(RowItem row, string layoutId, string saveTo) {
+        Row = row;
+        LayoutId = layoutId;
+        Filename = saveTo;
+        Handled = false;
     }
+
+    #endregion
+
+    #region Properties
+
+    //public bool DirectPrint { get; set; }
+    //public bool DirectSave { get; set; }
+    public string Filename { get; }
+
+    public bool Handled { get; set; }
+    public string LayoutId { get; }
+    public RowItem Row { get; }
+
+    #endregion
 }

@@ -15,21 +15,20 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueControls.Enums {
+namespace BlueControls.Enums;
 
-    public enum BlueListBoxAppearance {
+public enum BlueListBoxAppearance {
 
-        //   Undefiniert = enDesign.Undefiniert
-        Listbox = Design.ListBox,
+    //   Undefiniert = enDesign.Undefiniert
+    Listbox = Design.ListBox,
 
-        DropdownSelectbox = Design.Form_SelectBox_Dropdown,
-        Autofilter = Design.Form_AutoFilter,
-        KontextMenu = Design.Form_KontextMenu,
-        ComboBox_Textbox = Design.ComboBox_Textbox,
+    DropdownSelectbox = Design.Form_SelectBox_Dropdown,
+    Autofilter = Design.Form_AutoFilter,
+    KontextMenu = Design.Form_KontextMenu,
+    ComboBox_Textbox = Design.ComboBox_Textbox,
 
-        //Dropdown = enDesign.Form_SelectBox_Dropdown
-        Gallery = 11000,
+    //Dropdown = enDesign.Form_SelectBox_Dropdown
+    Gallery = 11000,
 
-        FileSystem = 11001
-    }
+    FileSystem = 11001
 }

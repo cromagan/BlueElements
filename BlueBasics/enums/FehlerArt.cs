@@ -15,12 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueBasics.Enums {
+namespace BlueBasics.Enums;
 
-    public enum FehlerArt {
-        Fehler = 1,
-        Warnung = 2,
-        Info = 3,
-        DevelopInfo = 4
-    }
+public enum FehlerArt {
+    Fehler = 1,
+    Warnung = 2,
+    Info = 3,
+    DevelopInfo = 4
 }

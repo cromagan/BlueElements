@@ -15,19 +15,18 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueBasics.Enums {
+namespace BlueBasics.Enums;
 
-    public enum VarType {
-        Unbekannt = -1,
-        Text = 0,
-        Integer = 1,
-        Float = 2,
-        Date = 3,
-        Url = 4,
-        Email = 5,
-        PhoneNumber = 8,
-        DateTime = 9,
-        TextMitFormatierung = 10,
-        Bit = 11
-    }
+public enum VarType {
+    Unbekannt = -1,
+    Text = 0,
+    Integer = 1,
+    Float = 2,
+    Date = 3,
+    Url = 4,
+    Email = 5,
+    PhoneNumber = 8,
+    DateTime = 9,
+    TextMitFormatierung = 10,
+    Bit = 11
 }

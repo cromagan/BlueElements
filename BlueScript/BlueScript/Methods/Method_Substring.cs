@@ -19,50 +19,49 @@ using System.Collections.Generic;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_Substring : Method {
+internal class Method_Substring : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableFloat.ShortName_Plain }, new() { VariableFloat.ShortName_Plain } };
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableFloat.ShortName_Plain }, new() { VariableFloat.ShortName_Plain } };
 
-        public override string Description => "Gibt einen Teilstring zurück. Ist der Start oder das Ende keine gültige Position, wird das bestmögliche zurückgegeben und kein Fehler ausgelöst. Subrtring(\"Hallo\", 2,2) gibt ll zurück.";
-        public override bool EndlessArgs => false;
-        public override string EndSequence => ")";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => VariableString.ShortName_Plain;
-        public override string StartSequence => "(";
-        public override string Syntax => "Substring(String, Start, Anzahl)";
+    public override string Description => "Gibt einen Teilstring zurück. Ist der Start oder das Ende keine gültige Position, wird das bestmögliche zurückgegeben und kein Fehler ausgelöst. Subrtring(\"Hallo\", 2,2) gibt ll zurück.";
+    public override bool EndlessArgs => false;
+    public override string EndSequence => ")";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => VariableString.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "Substring(String, Start, Anzahl)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "substring" };
+    public override List<string> Comand(Script? s) => new() { "substring" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-            var st = ((VariableFloat)attvar.Attributes[1]).ValueInt;
-            var en = ((VariableFloat)attvar.Attributes[2]).ValueInt;
-            if (st < 0) {
-                en += st;
-                st = 0;
-            }
-
-            var t = ((VariableString)attvar.Attributes[0]).ValueString;
-
-            if (st > t.Length) {
-                return new DoItFeedback(string.Empty, string.Empty);
-            }
-
-            if (st + en > t.Length) {
-                en = t.Length - st;
-            }
-            return new DoItFeedback(t.Substring(st, en), string.Empty);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        var st = ((VariableFloat)attvar.Attributes[1]).ValueInt;
+        var en = ((VariableFloat)attvar.Attributes[2]).ValueInt;
+        if (st < 0) {
+            en += st;
+            st = 0;
         }
 
-        #endregion
+        var t = ((VariableString)attvar.Attributes[0]).ValueString;
+
+        if (st > t.Length) {
+            return new DoItFeedback(string.Empty, string.Empty);
+        }
+
+        if (st + en > t.Length) {
+            en = t.Length - st;
+        }
+        return new DoItFeedback(t.Substring(st, en), string.Empty);
     }
+
+    #endregion
 }

@@ -20,67 +20,66 @@ using BlueControls.Enums;
 using System.Drawing;
 using static BlueBasics.Extensions;
 
-namespace BlueControls.ItemCollection {
+namespace BlueControls.ItemCollection;
 
-    public class ItemConnection {
+public class ItemConnection {
 
-        #region Fields
+    #region Fields
 
-        internal readonly bool ArrowOnMyItem = false;
-        internal readonly bool ArrowOnOtherItem = false;
-        internal readonly ConnectionType MyItemType;
-        internal readonly BasicPadItem OtherItem;
-        internal readonly ConnectionType OtherItemType;
+    internal readonly bool ArrowOnMyItem = false;
+    internal readonly bool ArrowOnOtherItem = false;
+    internal readonly ConnectionType MyItemType;
+    internal readonly BasicPadItem OtherItem;
+    internal readonly ConnectionType OtherItemType;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public ItemConnection(ConnectionType myItemType, bool arrowOnMyItem, BasicPadItem otheritem, ConnectionType otherItemType, bool arrowOnOtherItem) {
-            OtherItem = otheritem;
-            OtherItemType = otherItemType;
-            MyItemType = myItemType;
-            ArrowOnMyItem = arrowOnMyItem;
-            ArrowOnOtherItem = arrowOnOtherItem;
-        }
-
-        #endregion
-
-        #region Methods
-
-        public static PointF GetConnectionPoint(BasicPadItem item, ConnectionType itemc, BasicPadItem otherItem) {
-            switch (itemc) {
-                case ConnectionType.Top:
-                    return item.UsedArea.PointOf(Alignment.Top_HorizontalCenter);
-
-                case ConnectionType.Bottom:
-                    return item.UsedArea.PointOf(Alignment.Bottom_HorizontalCenter);
-
-                case ConnectionType.Left:
-                    return item.UsedArea.PointOf(Alignment.VerticalCenter_Left);
-
-                case ConnectionType.Right:
-                    return item.UsedArea.PointOf(Alignment.VerticalCenter_Right);
-
-                default:
-                    var m1 = otherItem.UsedArea.PointOf(Alignment.Horizontal_Vertical_Center);
-                    return item.UsedArea.NearestLineMiddle(m1);
-            }
-        }
-
-        internal string ToString(BasicPadItem myItem) {
-            var t = "{";
-
-            t = t + "Item1=" + myItem.Internal.ToNonCritical() + ", ";
-            t = t + "Arrow1=" + ArrowOnMyItem.ToPlusMinus() + ", ";
-            t = t + "Type1=" + ((int)MyItemType).ToString() + ", ";
-            t = t + "Item2=" + OtherItem.Internal.ToNonCritical() + ", ";
-            t = t + "Arrow2=" + ArrowOnOtherItem.ToPlusMinus() + ", ";
-            t = t + "Type2=" + ((int)OtherItemType).ToString() + ", ";
-
-            return t.TrimEnd(", ") + "}";
-        }
-
-        #endregion
+    public ItemConnection(ConnectionType myItemType, bool arrowOnMyItem, BasicPadItem otheritem, ConnectionType otherItemType, bool arrowOnOtherItem) {
+        OtherItem = otheritem;
+        OtherItemType = otherItemType;
+        MyItemType = myItemType;
+        ArrowOnMyItem = arrowOnMyItem;
+        ArrowOnOtherItem = arrowOnOtherItem;
     }
+
+    #endregion
+
+    #region Methods
+
+    public static PointF GetConnectionPoint(BasicPadItem item, ConnectionType itemc, BasicPadItem otherItem) {
+        switch (itemc) {
+            case ConnectionType.Top:
+                return item.UsedArea.PointOf(Alignment.Top_HorizontalCenter);
+
+            case ConnectionType.Bottom:
+                return item.UsedArea.PointOf(Alignment.Bottom_HorizontalCenter);
+
+            case ConnectionType.Left:
+                return item.UsedArea.PointOf(Alignment.VerticalCenter_Left);
+
+            case ConnectionType.Right:
+                return item.UsedArea.PointOf(Alignment.VerticalCenter_Right);
+
+            default:
+                var m1 = otherItem.UsedArea.PointOf(Alignment.Horizontal_Vertical_Center);
+                return item.UsedArea.NearestLineMiddle(m1);
+        }
+    }
+
+    internal string ToString(BasicPadItem myItem) {
+        var t = "{";
+
+        t = t + "Item1=" + myItem.Internal.ToNonCritical() + ", ";
+        t = t + "Arrow1=" + ArrowOnMyItem.ToPlusMinus() + ", ";
+        t = t + "Type1=" + ((int)MyItemType).ToString() + ", ";
+        t = t + "Item2=" + OtherItem.Internal.ToNonCritical() + ", ";
+        t = t + "Arrow2=" + ArrowOnOtherItem.ToPlusMinus() + ", ";
+        t = t + "Type2=" + ((int)OtherItemType).ToString() + ", ";
+
+        return t.TrimEnd(", ") + "}";
+    }
+
+    #endregion
 }

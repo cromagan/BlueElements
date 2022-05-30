@@ -19,42 +19,41 @@
 
 using BlueDatabase;
 
-namespace BlueControls.Forms {
+namespace BlueControls.Forms;
 
-    public partial class EditBoxRow : DialogWithOkAndCancel {
+public partial class EditBoxRow : DialogWithOkAndCancel {
 
-        #region Constructors
+    #region Constructors
 
-        private EditBoxRow() : this(string.Empty, null) { }
+    private EditBoxRow() : this(string.Empty, null) { }
 
-        private EditBoxRow(string txt, RowItem? row) : base(false, true) {
-            InitializeComponent();
+    private EditBoxRow(string txt, RowItem? row) : base(false, true) {
+        InitializeComponent();
 
-            if (row != null) {
-                formToEdit.Database = row.Database;
-                formToEdit.ShowingRowKey = row.Key;
-            }
-
-            Setup(txt, formToEdit, formToEdit.MinimumSize.Width + 50);
+        if (row != null) {
+            formToEdit.Database = row.Database;
+            formToEdit.ShowingRowKey = row.Key;
         }
 
-        #endregion
-
-        #region Methods
-
-        public static void Show(string txt, RowItem? row, bool isDialog) {
-            EditBoxRow MB = new(txt, row);
-            if (isDialog) {
-                MB.ShowDialog();
-            } else {
-                MB.Show();
-            }
-        }
-
-        protected override void SetValue(bool canceled) { }
-
-        #endregion
-
-        // Nix zu tun
+        Setup(txt, formToEdit, formToEdit.MinimumSize.Width + 50);
     }
+
+    #endregion
+
+    #region Methods
+
+    public static void Show(string txt, RowItem? row, bool isDialog) {
+        EditBoxRow MB = new(txt, row);
+        if (isDialog) {
+            MB.ShowDialog();
+        } else {
+            MB.Show();
+        }
+    }
+
+    protected override void SetValue(bool canceled) { }
+
+    #endregion
+
+    // Nix zu tun
 }

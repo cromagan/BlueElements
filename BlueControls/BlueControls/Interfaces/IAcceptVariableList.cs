@@ -18,24 +18,23 @@
 using BlueScript.Variables;
 using System.Collections.Generic;
 
-namespace BlueControls.Interfaces {
+namespace BlueControls.Interfaces;
 
-    /// <summary>
-    /// Wird verwendet, wenn das Steuerelement eine Liste von Variablen
-    /// empfangen kann und diese dann sinnvoll verarbeiten kann.
-    /// </summary>
-    public interface IAcceptVariableList {
+/// <summary>
+/// Wird verwendet, wenn das Steuerelement eine Liste von Variablen
+/// empfangen kann und diese dann sinnvoll verarbeiten kann.
+/// </summary>
+public interface IAcceptVariableList {
 
-        #region Properties
+    #region Properties
 
-        public string OriginalText { get; set; }
+    public string OriginalText { get; set; }
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public bool ParseVariables(List<Variable>? list);
+    public bool ParseVariables(List<Variable>? list);
 
-        #endregion
-    }
+    #endregion
 }

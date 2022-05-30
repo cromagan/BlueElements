@@ -25,47 +25,46 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Extensions;
 
-namespace BlueDatabase.AdditionalScriptComands {
+namespace BlueDatabase.AdditionalScriptComands;
 
-    internal class Method_MatchColumnFormat : MethodDatabase {
+internal class Method_MatchColumnFormat : MethodDatabase {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain, VariableListString.ShortName_Plain }, new() { Variable.Any_Variable } };
-        public override string Description => "Prüft, ob der Inhalt der Variable mit dem Format der angegebenen Spalte übereinstimmt. Leere Inhalte sind dabei TRUE.";
-        public override bool EndlessArgs => false;
-        public override string EndSequence => ")";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => VariableBool.ShortName_Plain;
-        public override string StartSequence => "(";
-        public override string Syntax => "MatchColumnFormat(Value, Column)";
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain, VariableListString.ShortName_Plain }, new() { Variable.Any_Variable } };
+    public override string Description => "Prüft, ob der Inhalt der Variable mit dem Format der angegebenen Spalte übereinstimmt. Leere Inhalte sind dabei TRUE.";
+    public override bool EndlessArgs => false;
+    public override string EndSequence => ")";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => VariableBool.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "MatchColumnFormat(Value, Column)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "matchcolumnformat" };
+    public override List<string> Comand(Script? s) => new() { "matchcolumnformat" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            var column = Column(s, attvar.Attributes[1].Name);
-            if (column == null) { return new DoItFeedback("Spalte in Datenbank nicht gefunden"); }
+        var column = Column(s, attvar.Attributes[1].Name);
+        if (column == null) { return new DoItFeedback("Spalte in Datenbank nicht gefunden"); }
 
-            var tocheck = new List<string>();
-            if (attvar.Attributes[0] is VariableListString vl) { tocheck.AddRange(vl.ValueList); }
-            if (attvar.Attributes[0] is VariableString vs) { tocheck.Add(vs.ValueString); }
+        var tocheck = new List<string>();
+        if (attvar.Attributes[0] is VariableListString vl) { tocheck.AddRange(vl.ValueList); }
+        if (attvar.Attributes[0] is VariableString vs) { tocheck.Add(vs.ValueString); }
 
-            tocheck = tocheck.SortedDistinctList();
+        tocheck = tocheck.SortedDistinctList();
 
-            if (tocheck.Any(thisstring => !thisstring.IsFormat(column))) {
-                return DoItFeedback.Falsch();
-            }
-
-            return DoItFeedback.Wahr();
+        if (tocheck.Any(thisstring => !thisstring.IsFormat(column))) {
+            return DoItFeedback.Falsch();
         }
 
-        #endregion
+        return DoItFeedback.Wahr();
     }
+
+    #endregion
 }

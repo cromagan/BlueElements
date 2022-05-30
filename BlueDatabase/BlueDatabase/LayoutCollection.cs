@@ -17,34 +17,33 @@
 
 using BlueBasics;
 
-namespace BlueDatabase {
+namespace BlueDatabase;
 
-    /// <summary>
-    /// Print Views werden nicht immer benötigt. Deswegen werden sie als String gespeichert. Der richtige Typ wäre ItemCollectionPad.
-    /// Noch dazu ist ItemCollectionPad in BlueConrolls verankert, das nur die Sichtbarmachung einen Sinn macht.
-    /// Und diese Sichtbarmachung braucht braucht Controls für die Bearbeitung.
-    /// </summary>
-    public class LayoutCollection : ListExt<string> {
+/// <summary>
+/// Print Views werden nicht immer benötigt. Deswegen werden sie als String gespeichert. Der richtige Typ wäre ItemCollectionPad.
+/// Noch dazu ist ItemCollectionPad in BlueConrolls verankert, das nur die Sichtbarmachung einen Sinn macht.
+/// Und diese Sichtbarmachung braucht braucht Controls für die Bearbeitung.
+/// </summary>
+public class LayoutCollection : ListExt<string> {
 
-        #region Methods
+    #region Methods
 
-        public void Check() {
-            for (var z = 0; z < Count; z++) {
-                if (!this[z].StartsWith("{ID=#")) {
-                    this[z] = "{ID=#Converted" + z + ", " + this[z].Substring(1);
-                }
+    public void Check() {
+        for (var z = 0; z < Count; z++) {
+            if (!this[z].StartsWith("{ID=#")) {
+                this[z] = "{ID=#Converted" + z + ", " + this[z].Substring(1);
             }
         }
-
-        // Info:
-        // ExportDialog.AddLayoutsOff wandelt Layouts In Items um
-        public int LayoutIdToIndex(string exportFormularId) {
-            for (var z = 0; z < Count; z++) {
-                if (this[z].Contains("ID=" + exportFormularId + ",")) { return z; }
-            }
-            return -1;
-        }
-
-        #endregion
     }
+
+    // Info:
+    // ExportDialog.AddLayoutsOff wandelt Layouts In Items um
+    public int LayoutIdToIndex(string exportFormularId) {
+        for (var z = 0; z < Count; z++) {
+            if (this[z].Contains("ID=" + exportFormularId + ",")) { return z; }
+        }
+        return -1;
+    }
+
+    #endregion
 }

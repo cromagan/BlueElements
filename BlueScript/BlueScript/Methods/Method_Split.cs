@@ -20,35 +20,34 @@ using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_Split : Method {
+internal class Method_Split : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
-        public override string Description => "Wandelt einen Text in eine Liste um.\r\nEs trennt den Text dabei mitteles dem angegebenen Trennzeichen.\r\nEs wird dabei immer eine Liste mit mindestens einen Eintrag erzeugt,\r\ndieser kann aber leer sein.";
-        public override bool EndlessArgs => false;
-        public override string EndSequence => ")";
-        public override bool GetCodeBlockAfter => false;
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
+    public override string Description => "Wandelt einen Text in eine Liste um.\r\nEs trennt den Text dabei mitteles dem angegebenen Trennzeichen.\r\nEs wird dabei immer eine Liste mit mindestens einen Eintrag erzeugt,\r\ndieser kann aber leer sein.";
+    public override bool EndlessArgs => false;
+    public override string EndSequence => ")";
+    public override bool GetCodeBlockAfter => false;
 
-        public override string Returns => VariableString.ShortName_Plain;
-        public override string StartSequence => "(";
-        public override string Syntax => "Split(String, Trennzeichen)";
+    public override string Returns => VariableString.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "Split(String, Trennzeichen)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "split" };
+    public override List<string> Comand(Script? s) => new() { "split" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            return !string.IsNullOrEmpty(attvar.ErrorMessage)
-                ? DoItFeedback.AttributFehler(this, attvar)
-                : new DoItFeedback(((VariableString)attvar.Attributes[0]).ValueString.SplitBy(((VariableString)attvar.Attributes[1]).ValueString));
-        }
-
-        #endregion
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        return !string.IsNullOrEmpty(attvar.ErrorMessage)
+            ? DoItFeedback.AttributFehler(this, attvar)
+            : new DoItFeedback(((VariableString)attvar.Attributes[0]).ValueString.SplitBy(((VariableString)attvar.Attributes[1]).ValueString));
     }
+
+    #endregion
 }

@@ -22,45 +22,44 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Extensions;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_BerechneVariable_Tilde : Method {
+internal class Method_BerechneVariable_Tilde : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { Variable.Any_Plain } };
-        public override string Description => "Berechnet eine Variable. Der Typ der Variable und des Ergebnisses müssen übereinstimmen.";
-        public override bool EndlessArgs => false;
-        public override string EndSequence => ";";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => string.Empty;
-        public override string StartSequence => string.Empty;
-        public override string Syntax => "~Variablennamenberechnung~ = Berechung;";
+    public override List<List<string>> Args => new() { new() { Variable.Any_Plain } };
+    public override string Description => "Berechnet eine Variable. Der Typ der Variable und des Ergebnisses müssen übereinstimmen.";
+    public override bool EndlessArgs => false;
+    public override string EndSequence => ";";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => string.Empty;
+    public override string Syntax => "~Variablennamenberechnung~ = Berechung;";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "~" };
+    public override List<string> Comand(Script? s) => new() { "~" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            if (infos.AttributText.Length < 5) { return new DoItFeedback("Variablen-Namen-Berechung kann nicht durchgeführt werden."); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        if (infos.AttributText.Length < 5) { return new DoItFeedback("Variablen-Namen-Berechung kann nicht durchgeführt werden."); }
 
-            var (postilde, _) = NextText(infos.AttributText, 0, Tilde, false, false, KlammernStd);
-            var (posgleich, _) = NextText(infos.AttributText, 0, Gleich, false, false, KlammernStd);
+        var (postilde, _) = NextText(infos.AttributText, 0, Tilde, false, false, KlammernStd);
+        var (posgleich, _) = NextText(infos.AttributText, 0, Gleich, false, false, KlammernStd);
 
-            if (postilde + 1 != posgleich) { return new DoItFeedback("Variablen-Namen-Berechung kein gültiges End-~-Zeichen gefunden."); }
+        if (postilde + 1 != posgleich) { return new DoItFeedback("Variablen-Namen-Berechung kein gültiges End-~-Zeichen gefunden."); }
 
-            var x = Variable.GetVariableByParsing(infos.AttributText.Substring(0, postilde), s);
-            if (x.Variable is not VariableString vs) { return new DoItFeedback("Fehler beim Berechnen des Variablen-Namens."); }
+        var x = Variable.GetVariableByParsing(infos.AttributText.Substring(0, postilde), s);
+        if (x.Variable is not VariableString vs) { return new DoItFeedback("Fehler beim Berechnen des Variablen-Namens."); }
 
-            var newcommand = vs.ValueString + infos.AttributText.Substring(posgleich) + ";";
+        var newcommand = vs.ValueString + infos.AttributText.Substring(posgleich) + ";";
 
-            return Method_BerechneVariable.VariablenBerechnung(newcommand, s, false);
+        return Method_BerechneVariable.VariablenBerechnung(newcommand, s, false);
 
-            //return s.BerechneVariable.DoitKomplett(newcommand, s, infos, false);
-        }
-
-        #endregion
+        //return s.BerechneVariable.DoitKomplett(newcommand, s, infos, false);
     }
+
+    #endregion
 }

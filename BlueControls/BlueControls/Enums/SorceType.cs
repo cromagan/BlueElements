@@ -15,17 +15,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueControls.Enums {
+namespace BlueControls.Enums;
 
-    public enum SorceType {
-        Nichts = 0,
+public enum SorceType {
+    Nichts = 0,
 
-        //Downloaded = 2,
-        SetedByProperty = 3,
+    //Downloaded = 2,
+    SetedByProperty = 3,
 
-        ScreenShot = 4,
-        LoadedFromDiskAndResized = 5,
-        LoadedFromDisk = 6,
-        EntryWithoutPic = 7
-    }
+    ScreenShot = 4,
+    LoadedFromDiskAndResized = 5,
+    LoadedFromDisk = 6,
+    EntryWithoutPic = 7
 }

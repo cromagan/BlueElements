@@ -22,62 +22,61 @@ using System;
 using System.Collections.Generic;
 using BlueControls.ItemCollection.ItemCollectionList;
 
-namespace BlueControls.Interfaces {
+namespace BlueControls.Interfaces;
+
+/// <summary>
+/// Interface, das zur Generierung von Kontextmenüs benötit wird.
+/// Die ganze Erstellung und Handling übernimmt dabei FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
+/// Dabei werden die hier angegebenen Routinen und Events abgefragt und ausgelöst.
+/// </summary>
+public interface IContextMenu {
+
+    #region Events
+
+    event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
+
+    event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
+
+    #endregion
+
+    #region Methods
 
     /// <summary>
-    /// Interface, das zur Generierung von Kontextmenüs benötit wird.
-    /// Die ganze Erstellung und Handling übernimmt dabei FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
-    /// Dabei werden die hier angegebenen Routinen und Events abgefragt und ausgelöst.
+    /// Hier wird dem Steuerelement die Möglichkeit, deen Kontextmenü-Befehl selbst abzuarbeiten.
+    /// Gibt dann zurück, ob der im Steuerelement selbst abgehandelt wurde.
+    /// Ansonten wird OnContextMenuItemClicked aufgerufen, um den übergeordneten Steuerelement die Möglichkeit zu geben, den Befehl abzuarbeiten.
+    /// Wenn das Kontextmenu ausschließlich von außerhalb des Steuerelemnts generiert wurde, muss immer false zurück gegeben werden.
     /// </summary>
-    public interface IContextMenu {
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    /// <returns></returns>
+    bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e);
 
-        #region Events
+    /// <summary>
+    /// Diese Routine wird als erstes aufgerufen und holt sich alle relevanten Daten.
+    /// Hier werden auch die Kontextmenü-Einträge erstellt, die intern abgehandelt werden müssen.
+    /// </summary>
+    /// <param name="e"></param>
+    /// <param name="items"></param>
+    /// <param name="hotItem"></param>
+    /// <param name="tags"></param>
+    /// <param name="cancel"></param>
+    /// <param name="translate"></param>
+    void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate);
 
-        event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
+    /// <summary>
+    /// Hier wird dem übergeordneten Steuerelement die Möglichkeit gegeben, Einträge in das Kontextmenu hinzuzufügen.
+    /// </summary>
+    /// <param name="e"></param>
+    void OnContextMenuInit(ContextMenuInitEventArgs e);
 
-        event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
+    /// <summary>
+    /// Wird der angeklickte Kontextmenü-Befehl nicht innerhalb des Steuerlements abgehandelt
+    /// (ContextMenuItemClickedInternalProcessig = FALSE), wird ein Event ausglöst, in dem das
+    /// übergeordnete Steuerelement den Kontextmenü-Befehl ausführen kann.
+    /// </summary>
+    /// <param name="e"></param>
+    void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e);
 
-        #endregion
-
-        #region Methods
-
-        /// <summary>
-        /// Hier wird dem Steuerelement die Möglichkeit, deen Kontextmenü-Befehl selbst abzuarbeiten.
-        /// Gibt dann zurück, ob der im Steuerelement selbst abgehandelt wurde.
-        /// Ansonten wird OnContextMenuItemClicked aufgerufen, um den übergeordneten Steuerelement die Möglichkeit zu geben, den Befehl abzuarbeiten.
-        /// Wenn das Kontextmenu ausschließlich von außerhalb des Steuerelemnts generiert wurde, muss immer false zurück gegeben werden.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// <returns></returns>
-        bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e);
-
-        /// <summary>
-        /// Diese Routine wird als erstes aufgerufen und holt sich alle relevanten Daten.
-        /// Hier werden auch die Kontextmenü-Einträge erstellt, die intern abgehandelt werden müssen.
-        /// </summary>
-        /// <param name="e"></param>
-        /// <param name="items"></param>
-        /// <param name="hotItem"></param>
-        /// <param name="tags"></param>
-        /// <param name="cancel"></param>
-        /// <param name="translate"></param>
-        void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate);
-
-        /// <summary>
-        /// Hier wird dem übergeordneten Steuerelement die Möglichkeit gegeben, Einträge in das Kontextmenu hinzuzufügen.
-        /// </summary>
-        /// <param name="e"></param>
-        void OnContextMenuInit(ContextMenuInitEventArgs e);
-
-        /// <summary>
-        /// Wird der angeklickte Kontextmenü-Befehl nicht innerhalb des Steuerlements abgehandelt
-        /// (ContextMenuItemClickedInternalProcessig = FALSE), wird ein Event ausglöst, in dem das
-        /// übergeordnete Steuerelement den Kontextmenü-Befehl ausführen kann.
-        /// </summary>
-        /// <param name="e"></param>
-        void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e);
-
-        #endregion
-    }
+    #endregion
 }

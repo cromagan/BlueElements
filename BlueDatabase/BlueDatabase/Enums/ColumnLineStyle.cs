@@ -15,15 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueDatabase.Enums {
+namespace BlueDatabase.Enums;
 
-    public enum ColumnLineStyle {
-        Ohne = 0,
-        Dünn = 1,
-        Kräftig = 2,
-        Dick = 3,
+public enum ColumnLineStyle {
+    Ohne = 0,
+    Dünn = 1,
+    Kräftig = 2,
+    Dick = 3,
 
-        //   ShadowLeft = 4
-        ShadowRight = 5
-    }
+    //   ShadowLeft = 4
+    ShadowRight = 5
 }

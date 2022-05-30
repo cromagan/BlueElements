@@ -17,33 +17,32 @@
 
 using BlueBasics.Enums;
 
-namespace BlueDatabase.EventArgs {
+namespace BlueDatabase.EventArgs;
 
-    public class MessageEventArgs : System.EventArgs {
+public class MessageEventArgs : System.EventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public MessageEventArgs(FehlerArt type, string message) {
-            Message = message;
-            Type = type;
-            WrittenToLogifile = false;
-            Shown = false;
-        }
-
-        #endregion
-
-        #region Properties
-
-        public string Message { get; }
-
-        // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
-        public bool Shown { get; set; }
-
-        public FehlerArt Type { get; }
-
-        // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
-        public bool WrittenToLogifile { get; set; }
-
-        #endregion
+    public MessageEventArgs(FehlerArt type, string message) {
+        Message = message;
+        Type = type;
+        WrittenToLogifile = false;
+        Shown = false;
     }
+
+    #endregion
+
+    #region Properties
+
+    public string Message { get; }
+
+    // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
+    public bool Shown { get; set; }
+
+    public FehlerArt Type { get; }
+
+    // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
+    public bool WrittenToLogifile { get; set; }
+
+    #endregion
 }

@@ -23,229 +23,228 @@ using BlueDatabase.Enums;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BlueDatabase.Interfaces {
+namespace BlueDatabase.Interfaces;
 
-    public interface IInputFormat {
+public interface IInputFormat {
 
-        #region Properties
+    #region Properties
 
-        public AdditionalCheck AdditionalCheck { get; set; }
+    public AdditionalCheck AdditionalCheck { get; set; }
 
-        //public enAlignmentHorizontal Align { get; set; }
-        public string AllowedChars { get; set; }
+    //public enAlignmentHorizontal Align { get; set; }
+    public string AllowedChars { get; set; }
 
-        //public int BildCode_ConstantHeight { get; set; }
-        //public BildTextVerhalten BildTextVerhalten { get; set; }
-        public bool FormatierungErlaubt { get; set; }
+    //public int BildCode_ConstantHeight { get; set; }
+    //public BildTextVerhalten BildTextVerhalten { get; set; }
+    public bool FormatierungErlaubt { get; set; }
 
-        public bool MultiLine { get; set; }
-        public string Prefix { get; set; }
-        public string Regex { get; set; }
+    public bool MultiLine { get; set; }
+    public string Prefix { get; set; }
+    public string Regex { get; set; }
 
-        //public enSortierTyp SortType { get; set; }
-        public bool SpellChecking { get; set; }
+    //public enSortierTyp SortType { get; set; }
+    public bool SpellChecking { get; set; }
 
-        public string Suffix { get; set; }
+    public string Suffix { get; set; }
 
-        #endregion
+    #endregion
 
-        //public enTranslationType Translate { get; set; }
+    //public enTranslationType Translate { get; set; }
+}
+
+public static class IInputFormatExtensions {
+
+    #region Methods
+
+    /// <summary>
+    /// Setzt: AllowedChars, Regex, Präfix, Suffix, FormatierungErlaubt, AdditionlCheck, SpellChecking und Multiline
+    /// </summary>
+    /// <param name="t"></param>
+    /// <param name="source"></param>
+    public static void GetStyleFrom(this IInputFormat? t, IInputFormat? source) {
+        t.AdditionalCheck = source.AdditionalCheck;
+        t.AllowedChars = source.AllowedChars;
+        t.Prefix = source.Prefix;
+        t.Regex = source.Regex;
+        t.Suffix = source.Suffix;
+        t.MultiLine = source.MultiLine;
+        t.SpellChecking = source.SpellChecking;
+        t.FormatierungErlaubt = source.FormatierungErlaubt;
     }
 
-    public static class IInputFormatExtensions {
+    public static bool IsFormat(this string txt, IInputFormat? formatToCheck) {
+        var l = new List<string>();
 
-        #region Methods
-
-        /// <summary>
-        /// Setzt: AllowedChars, Regex, Präfix, Suffix, FormatierungErlaubt, AdditionlCheck, SpellChecking und Multiline
-        /// </summary>
-        /// <param name="t"></param>
-        /// <param name="source"></param>
-        public static void GetStyleFrom(this IInputFormat? t, IInputFormat? source) {
-            t.AdditionalCheck = source.AdditionalCheck;
-            t.AllowedChars = source.AllowedChars;
-            t.Prefix = source.Prefix;
-            t.Regex = source.Regex;
-            t.Suffix = source.Suffix;
-            t.MultiLine = source.MultiLine;
-            t.SpellChecking = source.SpellChecking;
-            t.FormatierungErlaubt = source.FormatierungErlaubt;
+        if (formatToCheck.MultiLine) {
+            l.AddRange(txt.SplitAndCutByCr());
+        } else {
+            l.Add(txt);
         }
 
-        public static bool IsFormat(this string txt, IInputFormat? formatToCheck) {
-            var l = new List<string>();
+        foreach (var thisString in l.Where(thisString => !string.IsNullOrEmpty(thisString))) {
+            if (!string.IsNullOrEmpty(formatToCheck.AllowedChars) && !thisString.ContainsOnlyChars(formatToCheck.AllowedChars)) { return false; }
+            if (!string.IsNullOrEmpty(formatToCheck.Regex) && !thisString.RegexMatch(formatToCheck.Regex)) { return false; }
 
-            if (formatToCheck.MultiLine) {
-                l.AddRange(txt.SplitAndCutByCr());
-            } else {
-                l.Add(txt);
-            }
+            switch (formatToCheck.AdditionalCheck) {
+                case AdditionalCheck.None:
+                    break;
 
-            foreach (var thisString in l.Where(thisString => !string.IsNullOrEmpty(thisString))) {
-                if (!string.IsNullOrEmpty(formatToCheck.AllowedChars) && !thisString.ContainsOnlyChars(formatToCheck.AllowedChars)) { return false; }
-                if (!string.IsNullOrEmpty(formatToCheck.Regex) && !thisString.RegexMatch(formatToCheck.Regex)) { return false; }
+                case AdditionalCheck.Integer:
+                    if (!thisString.IsLong()) { return false; }
+                    break;
 
-                switch (formatToCheck.AdditionalCheck) {
-                    case AdditionalCheck.None:
-                        break;
+                case AdditionalCheck.Float:
+                    if (!thisString.IsDouble()) { return false; }
+                    break;
 
-                    case AdditionalCheck.Integer:
-                        if (!thisString.IsLong()) { return false; }
-                        break;
-
-                    case AdditionalCheck.Float:
-                        if (!thisString.IsDouble()) { return false; }
-                        break;
-
-                    case AdditionalCheck.DateTime:
-                        if (!thisString.IsDateTime()) { return false; }
-                        break;
-
-                    default:
-                        Develop.DebugPrint(formatToCheck.AdditionalCheck);
-                        break;
-                }
-            }
-            return true;
-            //return l.All(thisString => string.IsNullOrEmpty(thisString) || thisString.IsFormat(format, additionalRegex));
-        }
-
-        public static bool IsFormatIdentical(this IInputFormat t, IInputFormat source) => t.AdditionalCheck == source.AdditionalCheck &&
-            t.AllowedChars == source.AllowedChars &&
-            t.Prefix == source.Prefix &&
-            t.Regex == source.Regex &&
-            t.Suffix == source.Suffix &&
-            t.MultiLine == source.MultiLine &&
-            t.SpellChecking == source.SpellChecking &&
-            t.FormatierungErlaubt == source.FormatierungErlaubt;
-
-        /// <summary>
-        /// Setzt: AllowedChars, Regex, Präfix, Suffix, FormatierungErlaubt, AdditionlCheck, SpellChecking und Multiline
-        /// </summary>
-        /// <param name="t"></param>
-        /// <param name="type"></param>
-        public static void SetFormat(this IInputFormat t, VarType type) {
-            switch (type) {
-                case VarType.Text:
-                    t.AllowedChars = string.Empty;
-                    t.Regex = string.Empty;
-                    t.Suffix = string.Empty;
-                    t.Prefix = string.Empty;
-                    t.FormatierungErlaubt = false;
-                    t.AdditionalCheck = AdditionalCheck.None;
-                    t.SpellChecking = true;
-                    t.MultiLine = false;
-                    return;
-
-                case VarType.Bit:
-                    t.AllowedChars = "+-";
-                    t.Regex = @"^([+]|[-])$";
-                    t.Suffix = string.Empty;
-                    t.Prefix = string.Empty;
-                    t.FormatierungErlaubt = false;
-                    t.AdditionalCheck = AdditionalCheck.None;
-                    t.SpellChecking = false;
-                    t.MultiLine = false;
-                    return;
-
-                case VarType.TextMitFormatierung:
-                    t.AllowedChars = string.Empty;
-                    t.Regex = string.Empty;
-                    t.Suffix = string.Empty;
-                    t.Prefix = string.Empty;
-                    t.FormatierungErlaubt = true;
-                    t.AdditionalCheck = AdditionalCheck.None;
-                    t.SpellChecking = true;
-                    t.MultiLine = true;
-                    return;
-
-                case VarType.Date:
-                    t.Regex = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}$";
-                    t.AllowedChars = Constants.Char_Numerals + ".";
-                    t.Suffix = string.Empty;
-                    t.Prefix = string.Empty;
-                    t.FormatierungErlaubt = false;
-                    t.AdditionalCheck = AdditionalCheck.DateTime;
-                    t.SpellChecking = false;
-                    t.MultiLine = false;
-                    return;
-
-                case VarType.Url:
-                    //    https://regex101.com/r/S2CbwM/1
-                    t.Regex = @"^(https:|http:|www\.)\S*$";
-                    t.AllowedChars = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + "._/";
-                    t.Suffix = string.Empty;
-                    t.Prefix = string.Empty;
-                    t.FormatierungErlaubt = false;
-                    t.AdditionalCheck = AdditionalCheck.None;
-                    t.SpellChecking = false;
-                    t.MultiLine = false;
-                    return;
-
-                case VarType.Email:
-                    //http://emailregex.com/
-                    t.Regex = @"^[a-z0-9A-Z._-]{1,40}[@][a-z0-9A-Z._-]{1,40}[.][a-zA-Z]{1,3}$";
-                    t.AllowedChars = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + "@._";
-                    t.Suffix = string.Empty;
-                    t.Prefix = string.Empty;
-                    t.FormatierungErlaubt = false;
-                    t.AdditionalCheck = AdditionalCheck.None;
-                    t.SpellChecking = false;
-                    t.MultiLine = false;
-                    return;
-
-                case VarType.Float:
-                    //https://regex101.com/r/onr0NZ/1
-                    t.Regex = @"(^-?([1-9]\d*)|^0)([.]\d*[1-9])?$";
-                    t.AllowedChars = Constants.Char_Numerals + ",";
-                    t.Suffix = string.Empty;
-                    t.Prefix = string.Empty;
-                    t.FormatierungErlaubt = false;
-                    t.AdditionalCheck = AdditionalCheck.Float;
-                    t.SpellChecking = false;
-                    t.MultiLine = false;
-                    return;
-
-                case VarType.Integer:
-                    t.Regex = @"^((-?[1-9]\d*)|0)$";
-                    t.AllowedChars = Constants.Char_Numerals;
-                    t.Suffix = string.Empty;
-                    t.Prefix = string.Empty;
-                    t.FormatierungErlaubt = false;
-                    t.AdditionalCheck = AdditionalCheck.Integer;
-                    t.SpellChecking = false;
-                    t.MultiLine = false;
-                    return;
-
-                case VarType.PhoneNumber:
-                    //https://regex101.com/r/OzJr8j/1
-                    t.Regex = @"^[+][1-9][\s0-9]*[0-9]$";
-                    t.AllowedChars = Constants.Char_Numerals + "+ ";
-                    t.Suffix = string.Empty;
-                    t.Prefix = string.Empty;
-                    t.FormatierungErlaubt = false;
-                    t.AdditionalCheck = AdditionalCheck.None;
-                    t.SpellChecking = false;
-                    t.MultiLine = false;
-                    return;
-
-                case VarType.DateTime:
-                    t.Regex = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}[ ](0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$";
-                    t.AllowedChars = Constants.Char_Numerals + ":. ";
-                    t.Suffix = string.Empty;
-                    t.Prefix = string.Empty;
-                    t.FormatierungErlaubt = false;
-                    t.AdditionalCheck = AdditionalCheck.DateTime;
-                    t.SpellChecking = false;
-                    t.MultiLine = false;
-                    return;
+                case AdditionalCheck.DateTime:
+                    if (!thisString.IsDateTime()) { return false; }
+                    break;
 
                 default:
-                    Develop.DebugPrint(t);
+                    Develop.DebugPrint(formatToCheck.AdditionalCheck);
                     break;
             }
         }
-
-        #endregion
+        return true;
+        //return l.All(thisString => string.IsNullOrEmpty(thisString) || thisString.IsFormat(format, additionalRegex));
     }
+
+    public static bool IsFormatIdentical(this IInputFormat t, IInputFormat source) => t.AdditionalCheck == source.AdditionalCheck &&
+        t.AllowedChars == source.AllowedChars &&
+        t.Prefix == source.Prefix &&
+        t.Regex == source.Regex &&
+        t.Suffix == source.Suffix &&
+        t.MultiLine == source.MultiLine &&
+        t.SpellChecking == source.SpellChecking &&
+        t.FormatierungErlaubt == source.FormatierungErlaubt;
+
+    /// <summary>
+    /// Setzt: AllowedChars, Regex, Präfix, Suffix, FormatierungErlaubt, AdditionlCheck, SpellChecking und Multiline
+    /// </summary>
+    /// <param name="t"></param>
+    /// <param name="type"></param>
+    public static void SetFormat(this IInputFormat t, VarType type) {
+        switch (type) {
+            case VarType.Text:
+                t.AllowedChars = string.Empty;
+                t.Regex = string.Empty;
+                t.Suffix = string.Empty;
+                t.Prefix = string.Empty;
+                t.FormatierungErlaubt = false;
+                t.AdditionalCheck = AdditionalCheck.None;
+                t.SpellChecking = true;
+                t.MultiLine = false;
+                return;
+
+            case VarType.Bit:
+                t.AllowedChars = "+-";
+                t.Regex = @"^([+]|[-])$";
+                t.Suffix = string.Empty;
+                t.Prefix = string.Empty;
+                t.FormatierungErlaubt = false;
+                t.AdditionalCheck = AdditionalCheck.None;
+                t.SpellChecking = false;
+                t.MultiLine = false;
+                return;
+
+            case VarType.TextMitFormatierung:
+                t.AllowedChars = string.Empty;
+                t.Regex = string.Empty;
+                t.Suffix = string.Empty;
+                t.Prefix = string.Empty;
+                t.FormatierungErlaubt = true;
+                t.AdditionalCheck = AdditionalCheck.None;
+                t.SpellChecking = true;
+                t.MultiLine = true;
+                return;
+
+            case VarType.Date:
+                t.Regex = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}$";
+                t.AllowedChars = Constants.Char_Numerals + ".";
+                t.Suffix = string.Empty;
+                t.Prefix = string.Empty;
+                t.FormatierungErlaubt = false;
+                t.AdditionalCheck = AdditionalCheck.DateTime;
+                t.SpellChecking = false;
+                t.MultiLine = false;
+                return;
+
+            case VarType.Url:
+                //    https://regex101.com/r/S2CbwM/1
+                t.Regex = @"^(https:|http:|www\.)\S*$";
+                t.AllowedChars = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + "._/";
+                t.Suffix = string.Empty;
+                t.Prefix = string.Empty;
+                t.FormatierungErlaubt = false;
+                t.AdditionalCheck = AdditionalCheck.None;
+                t.SpellChecking = false;
+                t.MultiLine = false;
+                return;
+
+            case VarType.Email:
+                //http://emailregex.com/
+                t.Regex = @"^[a-z0-9A-Z._-]{1,40}[@][a-z0-9A-Z._-]{1,40}[.][a-zA-Z]{1,3}$";
+                t.AllowedChars = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + "@._";
+                t.Suffix = string.Empty;
+                t.Prefix = string.Empty;
+                t.FormatierungErlaubt = false;
+                t.AdditionalCheck = AdditionalCheck.None;
+                t.SpellChecking = false;
+                t.MultiLine = false;
+                return;
+
+            case VarType.Float:
+                //https://regex101.com/r/onr0NZ/1
+                t.Regex = @"(^-?([1-9]\d*)|^0)([.]\d*[1-9])?$";
+                t.AllowedChars = Constants.Char_Numerals + ",";
+                t.Suffix = string.Empty;
+                t.Prefix = string.Empty;
+                t.FormatierungErlaubt = false;
+                t.AdditionalCheck = AdditionalCheck.Float;
+                t.SpellChecking = false;
+                t.MultiLine = false;
+                return;
+
+            case VarType.Integer:
+                t.Regex = @"^((-?[1-9]\d*)|0)$";
+                t.AllowedChars = Constants.Char_Numerals;
+                t.Suffix = string.Empty;
+                t.Prefix = string.Empty;
+                t.FormatierungErlaubt = false;
+                t.AdditionalCheck = AdditionalCheck.Integer;
+                t.SpellChecking = false;
+                t.MultiLine = false;
+                return;
+
+            case VarType.PhoneNumber:
+                //https://regex101.com/r/OzJr8j/1
+                t.Regex = @"^[+][1-9][\s0-9]*[0-9]$";
+                t.AllowedChars = Constants.Char_Numerals + "+ ";
+                t.Suffix = string.Empty;
+                t.Prefix = string.Empty;
+                t.FormatierungErlaubt = false;
+                t.AdditionalCheck = AdditionalCheck.None;
+                t.SpellChecking = false;
+                t.MultiLine = false;
+                return;
+
+            case VarType.DateTime:
+                t.Regex = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}[ ](0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$";
+                t.AllowedChars = Constants.Char_Numerals + ":. ";
+                t.Suffix = string.Empty;
+                t.Prefix = string.Empty;
+                t.FormatierungErlaubt = false;
+                t.AdditionalCheck = AdditionalCheck.DateTime;
+                t.SpellChecking = false;
+                t.MultiLine = false;
+                return;
+
+            default:
+                Develop.DebugPrint(t);
+                break;
+        }
+    }
+
+    #endregion
 }

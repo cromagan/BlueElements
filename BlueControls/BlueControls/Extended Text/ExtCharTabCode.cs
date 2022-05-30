@@ -20,34 +20,33 @@
 using BlueControls.Enums;
 using System.Drawing;
 
-namespace BlueControls.Extended_Text {
+namespace BlueControls.Extended_Text;
 
-    internal class ExtCharTabCode : ExtChar {
+internal class ExtCharTabCode : ExtChar {
 
-        #region Constructors
+    #region Constructors
 
-        internal ExtCharTabCode(Design design, States state, BlueFont? font, int stufe) : base(design, state, font, stufe) { }
+    internal ExtCharTabCode(Design design, States state, BlueFont? font, int stufe) : base(design, state, font, stufe) { }
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override void Draw(Graphics gr, Point posModificator, float zoom) { }
+    public override void Draw(Graphics gr, Point posModificator, float zoom) { }
 
-        public override string HtmlText() => "<TAB>";
+    public override string HtmlText() => "<TAB>";
 
-        public override bool IsLineBreak() => false;
+    public override bool IsLineBreak() => false;
 
-        public override bool IsPossibleLineBreak() => true;
+    public override bool IsPossibleLineBreak() => true;
 
-        public override bool IsSpace() => true;
+    public override bool IsSpace() => true;
 
-        public override bool IsWordSeperator() => true;
+    public override bool IsWordSeperator() => true;
 
-        public override string PlainText() => "\t";
+    public override string PlainText() => "\t";
 
-        protected override SizeF CalculateSize() => SizeF.Empty;
+    protected override SizeF CalculateSize() => SizeF.Empty;
 
-        #endregion
-    }
+    #endregion
 }

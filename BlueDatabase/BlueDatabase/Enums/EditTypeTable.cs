@@ -15,23 +15,22 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueDatabase.Enums {
+namespace BlueDatabase.Enums;
 
-    public enum EditTypeTable {
-        None = -1,
-        Textfeld = 1,
-        FileHandling_InDateiSystem = 2,
+public enum EditTypeTable {
+    None = -1,
+    Textfeld = 1,
+    FileHandling_InDateiSystem = 2,
 
-        //Image_Auswahl_Dialog = 3,
-        Listbox = 4,
+    //Image_Auswahl_Dialog = 3,
+    Listbox = 4,
 
-        Farb_Auswahl_Dialog = 5,
+    Farb_Auswahl_Dialog = 5,
 
-        //RelationEditor_InTable = 6,
-        Dropdown_Single = 7,
+    //RelationEditor_InTable = 6,
+    Dropdown_Single = 7,
 
-        Font_AuswahlDialog = 8,
-        Textfeld_mit_Auswahlknopf = 9,
-        WarnungNurFormular = 10
-    }
+    Font_AuswahlDialog = 8,
+    Textfeld_mit_Auswahlknopf = 9,
+    WarnungNurFormular = 10
 }

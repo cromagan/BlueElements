@@ -17,14 +17,13 @@
 
 #nullable enable
 
-namespace BlueDatabase.EventArgs {
+namespace BlueDatabase.EventArgs;
 
-    public class MultiUserFileGiveBackEventArgs : System.EventArgs {
+public class MultiUserFileGiveBackEventArgs : System.EventArgs {
 
-        #region Properties
+    #region Properties
 
-        public BlueDatabase.Database? File { get; set; }
+    public BlueDatabase.Database? File { get; set; }
 
-        #endregion
-    }
+    #endregion
 }

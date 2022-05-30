@@ -15,20 +15,19 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueBasics.EventArgs {
+namespace BlueBasics.EventArgs;
 
-    public class MultiUserToListEventArgs : System.EventArgs {
+public class MultiUserToListEventArgs : System.EventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public MultiUserToListEventArgs() { }
+    public MultiUserToListEventArgs() { }
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public byte[] Data { get; set; }
+    public byte[] Data { get; set; }
 
-        #endregion
-    }
+    #endregion
 }

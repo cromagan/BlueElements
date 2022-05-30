@@ -20,34 +20,33 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Extensions;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_StringAsciiToHTML : Method {
+internal class Method_StringAsciiToHTML : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableBool.ShortName_Plain } };
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableBool.ShortName_Plain } };
 
-        public override string Description => "Ersetzt einen ASCII-String zu einem HTML-String. Beispiel: aus ä wird &auml;  Dabei kann der Zeilenumbuch explicit ausgenommen werden.";
-        public override bool EndlessArgs => false;
-        public override string EndSequence => ")";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => VariableString.ShortName_Plain;
-        public override string StartSequence => "(";
-        public override string Syntax => "StringAsciiToHTML(String, IgnoreBRbool)";
+    public override string Description => "Ersetzt einen ASCII-String zu einem HTML-String. Beispiel: aus ä wird &auml;  Dabei kann der Zeilenumbuch explicit ausgenommen werden.";
+    public override bool EndlessArgs => false;
+    public override string EndSequence => ")";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => VariableString.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "StringAsciiToHTML(String, IgnoreBRbool)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "stringasciitohtml" };
+    public override List<string> Comand(Script? s) => new() { "stringasciitohtml" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.AttributFehler(this, attvar)
-                                                              : new DoItFeedback(((VariableString)attvar.Attributes[0]).ValueString.CreateHtmlCodes(!((VariableBool)attvar.Attributes[1]).ValueBool), string.Empty);
-        }
-
-        #endregion
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.AttributFehler(this, attvar)
+            : new DoItFeedback(((VariableString)attvar.Attributes[0]).ValueString.CreateHtmlCodes(!((VariableBool)attvar.Attributes[1]).ValueBool), string.Empty);
     }
+
+    #endregion
 }

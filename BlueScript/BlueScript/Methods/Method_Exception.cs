@@ -19,34 +19,33 @@ using System.Collections.Generic;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_Exception : Method {
+internal class Method_Exception : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain } };
-        public override string Description => "Unterbricht das Skript mit einer Fehlermeldung.";
-        public override bool EndlessArgs => false;
-        public override string EndSequence => ");";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => string.Empty;
-        public override string StartSequence => "(";
-        public override string Syntax => "Exception(\"Unbehandelter Programmcode!\");";
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain } };
+    public override string Description => "Unterbricht das Skript mit einer Fehlermeldung.";
+    public override bool EndlessArgs => false;
+    public override string EndSequence => ");";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => "(";
+    public override string Syntax => "Exception(\"Unbehandelter Programmcode!\");";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "Exception" };
+    public override List<string> Comand(Script? s) => new() { "Exception" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            return attvar.Attributes == null || attvar.Attributes.Count != 1 ? new DoItFeedback("Die Ausführung wurde absichtlich abgebrochen.")
-                                                                             : new DoItFeedback("Exception: " + ((VariableString)attvar.Attributes[0]).ValueString);
-        }
-
-        #endregion
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        return attvar.Attributes == null || attvar.Attributes.Count != 1 ? new DoItFeedback("Die Ausführung wurde absichtlich abgebrochen.")
+            : new DoItFeedback("Exception: " + ((VariableString)attvar.Attributes[0]).ValueString);
     }
+
+    #endregion
 }

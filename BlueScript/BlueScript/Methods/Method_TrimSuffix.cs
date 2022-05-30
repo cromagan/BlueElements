@@ -22,51 +22,50 @@ using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_TrimSuffix : Method {
+internal class Method_TrimSuffix : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
-        public override string Description => "Entfernt die angegebenen Suffixe und evtl. übrige Leerzeichen. Die Suffixe werden nur entfernt, wenn vor dem Suffix ein Leerzeichen oder eine Zahl ist. Groß- und Kleinschreibung wird ignoriert.";
-        public override bool EndlessArgs => true;
-        public override string EndSequence => ")";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => VariableString.ShortName_Plain;
-        public override string StartSequence => "(";
-        public override string Syntax => "TrimSuffix(string, suffix, ...)";
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
+    public override string Description => "Entfernt die angegebenen Suffixe und evtl. übrige Leerzeichen. Die Suffixe werden nur entfernt, wenn vor dem Suffix ein Leerzeichen oder eine Zahl ist. Groß- und Kleinschreibung wird ignoriert.";
+    public override bool EndlessArgs => true;
+    public override string EndSequence => ")";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => VariableString.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "TrimSuffix(string, suffix, ...)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "trimsuffix" };
+    public override List<string> Comand(Script? s) => new() { "trimsuffix" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-            var val = ((VariableString)attvar.Attributes[0]).ValueString;
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        var val = ((VariableString)attvar.Attributes[0]).ValueString;
 
-            const string tmp = Constants.Char_Numerals + " ";
+        const string tmp = Constants.Char_Numerals + " ";
 
-            for (var z = 1; z < attvar.Attributes.Count; z++) {
-                var suf = ((VariableString)attvar.Attributes[z]).ValueString.ToLower();
-                if (val.Length <= suf.Length) {
-                    continue;
-                }
-
-                if (val.ToLower().EndsWith(suf)) {
-                    var c = val.Substring(val.Length - suf.Length - 1, 1);
-                    if (tmp.Contains(c)) {
-                        return new DoItFeedback(val.Substring(0, val.Length - suf.Length).TrimEnd(" "), string.Empty);
-                    }
-                }
+        for (var z = 1; z < attvar.Attributes.Count; z++) {
+            var suf = ((VariableString)attvar.Attributes[z]).ValueString.ToLower();
+            if (val.Length <= suf.Length) {
+                continue;
             }
 
-            return new DoItFeedback(val, string.Empty);
+            if (val.ToLower().EndsWith(suf)) {
+                var c = val.Substring(val.Length - suf.Length - 1, 1);
+                if (tmp.Contains(c)) {
+                    return new DoItFeedback(val.Substring(0, val.Length - suf.Length).TrimEnd(" "), string.Empty);
+                }
+            }
         }
 
-        #endregion
+        return new DoItFeedback(val, string.Empty);
     }
+
+    #endregion
 }

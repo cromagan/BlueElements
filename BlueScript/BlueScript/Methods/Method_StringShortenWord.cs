@@ -21,95 +21,94 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Extensions;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_StringShortenWord : Method {
+internal class Method_StringShortenWord : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain, VariableListString.ShortName_Plain } };
-        public override string Description => "Versucht den String zu kürzen, indem Abkürzungen verwendet werden.";
-        public override bool EndlessArgs => false;
-        public override string EndSequence => ")";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => VariableString.ShortName_Plain;
-        public override string StartSequence => "(";
-        public override string Syntax => "StringShortenWord(String)";
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain, VariableListString.ShortName_Plain } };
+    public override string Description => "Versucht den String zu kürzen, indem Abkürzungen verwendet werden.";
+    public override bool EndlessArgs => false;
+    public override string EndSequence => ")";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => VariableString.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "StringShortenWord(String)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "stringshortenword" };
+    public override List<string> Comand(Script? s) => new() { "stringshortenword" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-            var txt = ((VariableString)attvar.Attributes[0]).ValueString;
-            if (string.IsNullOrEmpty(txt)) {
-                return new DoItFeedback(txt, string.Empty);
-            }
-            //TXT = TXT.HTMLSpecialToNormalChar();
-            txt = txt.Replace("Sekunden", "Sek.");
-            txt = txt.Replace("Sekunde", "Sek.");
-            txt = txt.Replace("Minuten", "Min.");
-            txt = txt.Replace("Minute", "Min.");
-            txt = txt.Replace("Stunden", "Std.");
-            txt = txt.Replace("Stunde", "Std.");
-            txt = txt.Replace(" und ", " & ");
-            txt = txt.Replace(" oder ", " o. ");
-            txt = txt.Replace("Zum Beispiel", "Z. B.");
-            txt = txt.Replace("zum Beispiel", "z. B.");
-            txt = txt.Replace("Keine Angaben", "K. A.");
-            txt = txt.Replace("keine Angaben", "k. A.");
-            txt = txt.Replace("Keine Angabe", "K. A.");
-            txt = txt.Replace("keine Angabe", "k. A.");
-            //Tx = Tx.Replace("Etwa ", "Ca. ") ' und mit etwas Glück = und mit ca. Glück :-(((
-            //Tx = Tx.Replace("etwa ", "ca. ")
-            txt = txt.Replace("Circa", "Ca.");
-            txt = txt.Replace("circa", "ca.");
-            txt = txt.Replace("Stücke", "St.");
-            txt = txt.Replace("Stück", "St.");
-            txt = txt.Replace("St.n", "St."); // Stücken
-            txt = txt.Replace("St.chen", "St."); // Stückchen
-            txt = txt.Replace("Kilogramm", "kg");
-            //  tx = tx.Replace(" Kilo", " kg")
-            txt = txt.Replace("Gramm", "g");
-            txt = txt.Replace("Päckchen", "P.");
-            txt = txt.Replace("Packung", "P.");
-            txt = txt.Replace("Esslöffel", "EL");
-            txt = txt.Replace("Eßlöffel", "EL");
-            txt = txt.Replace("Teelöffel", "TL");
-            txt = txt.Replace("Messerspitze", "Msp.");
-            txt = txt.Replace("Portionen", "Port.");
-            txt = txt.Replace("Portion", "Port.");
-            txt = txt.Replace("ein halbes ", "1/2 ", RegexOptions.IgnoreCase);
-            txt = txt.Replace("eine halbe ", "1/2 ", RegexOptions.IgnoreCase);
-            txt = txt.Replace("ein halber ", "1/2 ", RegexOptions.IgnoreCase);
-            txt = txt.Replace("ein drittel ", "1/3 ", RegexOptions.IgnoreCase);
-            txt = txt.Replace("zwei drittel ", "2/3 ", RegexOptions.IgnoreCase);
-            txt = txt.Replace("eine drittel ", "1/3 ", RegexOptions.IgnoreCase);
-            txt = txt.Replace("ein achtel ", "1/8 ", RegexOptions.IgnoreCase);
-            txt = txt.Replace("eine achtel ", "1/8 ", RegexOptions.IgnoreCase);
-            txt = txt.Replace("Stufe ", "St. ");
-            txt = txt.Replace("Liter", "l ", RegexOptions.IgnoreCase);
-            txt = txt.Replace("ein EL", "1 EL", RegexOptions.IgnoreCase);
-            txt = txt.Replace("ein TL", "1 TL", RegexOptions.IgnoreCase);
-            txt = txt.Replace("zwei EL", "2 EL", RegexOptions.IgnoreCase);
-            txt = txt.Replace("zwei TL", "2 TL", RegexOptions.IgnoreCase);
-            string[] a = { "es", "er", "em", "en", "e", "" };
-            for (var t = 0; t <= a.GetUpperBound(0); t++) {
-                txt = txt.Replace("gerieben" + a[t], "ger.");
-                //tx = tx.Replace("groß" + A[t], "gr.");
-                //tx = tx.Replace("klein" + A[t], "kl.");
-                txt = txt.Replace("gekocht" + a[t], "gek.");
-                txt = txt.Replace("tiefgekühlt" + a[t], "TK");
-            }
-            txt = txt.Replace("Tiefkühl", "TK-");
-            //TXT = TXT.CreateHtmlCodes(true);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        var txt = ((VariableString)attvar.Attributes[0]).ValueString;
+        if (string.IsNullOrEmpty(txt)) {
             return new DoItFeedback(txt, string.Empty);
         }
-
-        #endregion
+        //TXT = TXT.HTMLSpecialToNormalChar();
+        txt = txt.Replace("Sekunden", "Sek.");
+        txt = txt.Replace("Sekunde", "Sek.");
+        txt = txt.Replace("Minuten", "Min.");
+        txt = txt.Replace("Minute", "Min.");
+        txt = txt.Replace("Stunden", "Std.");
+        txt = txt.Replace("Stunde", "Std.");
+        txt = txt.Replace(" und ", " & ");
+        txt = txt.Replace(" oder ", " o. ");
+        txt = txt.Replace("Zum Beispiel", "Z. B.");
+        txt = txt.Replace("zum Beispiel", "z. B.");
+        txt = txt.Replace("Keine Angaben", "K. A.");
+        txt = txt.Replace("keine Angaben", "k. A.");
+        txt = txt.Replace("Keine Angabe", "K. A.");
+        txt = txt.Replace("keine Angabe", "k. A.");
+        //Tx = Tx.Replace("Etwa ", "Ca. ") ' und mit etwas Glück = und mit ca. Glück :-(((
+        //Tx = Tx.Replace("etwa ", "ca. ")
+        txt = txt.Replace("Circa", "Ca.");
+        txt = txt.Replace("circa", "ca.");
+        txt = txt.Replace("Stücke", "St.");
+        txt = txt.Replace("Stück", "St.");
+        txt = txt.Replace("St.n", "St."); // Stücken
+        txt = txt.Replace("St.chen", "St."); // Stückchen
+        txt = txt.Replace("Kilogramm", "kg");
+        //  tx = tx.Replace(" Kilo", " kg")
+        txt = txt.Replace("Gramm", "g");
+        txt = txt.Replace("Päckchen", "P.");
+        txt = txt.Replace("Packung", "P.");
+        txt = txt.Replace("Esslöffel", "EL");
+        txt = txt.Replace("Eßlöffel", "EL");
+        txt = txt.Replace("Teelöffel", "TL");
+        txt = txt.Replace("Messerspitze", "Msp.");
+        txt = txt.Replace("Portionen", "Port.");
+        txt = txt.Replace("Portion", "Port.");
+        txt = txt.Replace("ein halbes ", "1/2 ", RegexOptions.IgnoreCase);
+        txt = txt.Replace("eine halbe ", "1/2 ", RegexOptions.IgnoreCase);
+        txt = txt.Replace("ein halber ", "1/2 ", RegexOptions.IgnoreCase);
+        txt = txt.Replace("ein drittel ", "1/3 ", RegexOptions.IgnoreCase);
+        txt = txt.Replace("zwei drittel ", "2/3 ", RegexOptions.IgnoreCase);
+        txt = txt.Replace("eine drittel ", "1/3 ", RegexOptions.IgnoreCase);
+        txt = txt.Replace("ein achtel ", "1/8 ", RegexOptions.IgnoreCase);
+        txt = txt.Replace("eine achtel ", "1/8 ", RegexOptions.IgnoreCase);
+        txt = txt.Replace("Stufe ", "St. ");
+        txt = txt.Replace("Liter", "l ", RegexOptions.IgnoreCase);
+        txt = txt.Replace("ein EL", "1 EL", RegexOptions.IgnoreCase);
+        txt = txt.Replace("ein TL", "1 TL", RegexOptions.IgnoreCase);
+        txt = txt.Replace("zwei EL", "2 EL", RegexOptions.IgnoreCase);
+        txt = txt.Replace("zwei TL", "2 TL", RegexOptions.IgnoreCase);
+        string[] a = { "es", "er", "em", "en", "e", "" };
+        for (var t = 0; t <= a.GetUpperBound(0); t++) {
+            txt = txt.Replace("gerieben" + a[t], "ger.");
+            //tx = tx.Replace("groß" + A[t], "gr.");
+            //tx = tx.Replace("klein" + A[t], "kl.");
+            txt = txt.Replace("gekocht" + a[t], "gek.");
+            txt = txt.Replace("tiefgekühlt" + a[t], "TK");
+        }
+        txt = txt.Replace("Tiefkühl", "TK-");
+        //TXT = TXT.CreateHtmlCodes(true);
+        return new DoItFeedback(txt, string.Empty);
     }
+
+    #endregion
 }

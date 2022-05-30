@@ -15,11 +15,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueControls.Enums {
+namespace BlueControls.Enums;
 
-    public enum ConectorStyle {
-        Direct = 0,
-        Ausweichenx = 1,
-        AusweichenUndGerade = 2
-    }
+public enum ConectorStyle {
+    Direct = 0,
+    Ausweichenx = 1,
+    AusweichenUndGerade = 2
 }

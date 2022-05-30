@@ -25,78 +25,77 @@ using System.Collections.Generic;
 using System.Linq;
 using BlueControls.ItemCollection.ItemCollectionList;
 
-namespace BlueControls.Forms {
+namespace BlueControls.Forms;
 
-    public sealed partial class ItemSelect : DialogWithOkAndCancel {
+public sealed partial class ItemSelect : DialogWithOkAndCancel {
 
-        #region Fields
+    #region Fields
 
-        private BasicListItem? _giveBack;
+    private BasicListItem? _giveBack;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        private ItemSelect(List<BasicListItem?> items) : base(true, true) {
-            InitializeComponent();
+    private ItemSelect(List<BasicListItem?> items) : base(true, true) {
+        InitializeComponent();
 
-            List.Item.Clear();
-            foreach (var thisItem in items) {
-                List.Item.Add(thisItem);
-            }
-
-            List.Item.Sort();
-
-            Setup(400, List.Bottom);
+        List.Item.Clear();
+        foreach (var thisItem in items) {
+            List.Item.Add(thisItem);
         }
 
-        #endregion
+        List.Item.Sort();
 
-        #region Methods
-
-        public static RowItem? Show(List<RowItem?> rows, string layoutId) {
-            try {
-                var items = rows.Select(thisRow => new RowFormulaListItem(thisRow, layoutId, string.Empty)).Cast<BasicListItem?>().ToList();
-
-                var x = Show(items);
-                return (x as RowFormulaListItem)?.Row;
-            } catch (Exception ex) {
-                Develop.DebugPrint(ex);
-                return null;
-            }
-        }
-
-        public static string Show(List<string> files, string fileEncryptionKey) {
-            var items = new List<BasicListItem?>();
-
-            foreach (var thisString in files) {
-                if (thisString.FileType() == FileFormat.Image) {
-                    items.Add(new BitmapListItem(thisString, thisString, thisString.FileNameWithoutSuffix(), fileEncryptionKey));
-                }
-            }
-            var x = Show(items);
-            return x != null ? x.Internal : string.Empty;
-        }
-
-        public static BasicListItem? Show(List<BasicListItem?> items) {
-            if (items == null || items.Count == 0) { return null; }
-
-            var x = new ItemSelect(items);
-            x.ShowDialog();
-
-            return x._giveBack;
-        }
-
-        protected override void SetValue(bool canceled) {
-            _giveBack = null;
-            if (canceled) { return; }
-
-            var l = List.Item.Checked();
-            if (l == null || l.Count != 1) { return; }
-
-            _giveBack = l[0];
-        }
-
-        #endregion
+        Setup(400, List.Bottom);
     }
+
+    #endregion
+
+    #region Methods
+
+    public static RowItem? Show(List<RowItem?> rows, string layoutId) {
+        try {
+            var items = rows.Select(thisRow => new RowFormulaListItem(thisRow, layoutId, string.Empty)).Cast<BasicListItem?>().ToList();
+
+            var x = Show(items);
+            return (x as RowFormulaListItem)?.Row;
+        } catch (Exception ex) {
+            Develop.DebugPrint(ex);
+            return null;
+        }
+    }
+
+    public static string Show(List<string> files, string fileEncryptionKey) {
+        var items = new List<BasicListItem?>();
+
+        foreach (var thisString in files) {
+            if (thisString.FileType() == FileFormat.Image) {
+                items.Add(new BitmapListItem(thisString, thisString, thisString.FileNameWithoutSuffix(), fileEncryptionKey));
+            }
+        }
+        var x = Show(items);
+        return x != null ? x.Internal : string.Empty;
+    }
+
+    public static BasicListItem? Show(List<BasicListItem?> items) {
+        if (items == null || items.Count == 0) { return null; }
+
+        var x = new ItemSelect(items);
+        x.ShowDialog();
+
+        return x._giveBack;
+    }
+
+    protected override void SetValue(bool canceled) {
+        _giveBack = null;
+        if (canceled) { return; }
+
+        var l = List.Item.Checked();
+        if (l == null || l.Count != 1) { return; }
+
+        _giveBack = l[0];
+    }
+
+    #endregion
 }

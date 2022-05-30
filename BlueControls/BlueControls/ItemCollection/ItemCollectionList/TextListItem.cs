@@ -22,71 +22,70 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
 
-namespace BlueControls.ItemCollection.ItemCollectionList {
+namespace BlueControls.ItemCollection.ItemCollectionList;
 
-    public class TextListItem : BasicListItem {
+public class TextListItem : BasicListItem {
 
-        #region Constructors
+    #region Constructors
 
-        public TextListItem(string readableText, string internalname, QuickImage? symbol, bool isCaption, bool enabled, string userDefCompareKey) : base(internalname, enabled) {
-            IsCaption = isCaption;
-            Text = readableText;
-            Symbol = symbol;
-            UserDefCompareKey = userDefCompareKey;
-        }
-
-        #endregion
-
-        #region Properties
-
-        public override string QuickInfo => Text.CreateHtmlCodes(true);
-
-        public QuickImage? Symbol { get; set; }
-
-        public string Text { get; set; }
-
-        #endregion
-
-        #region Methods
-
-        public override object Clone() {
-            var l = new TextListItem(Text, Internal, Symbol, IsCaption, Enabled, UserDefCompareKey);
-            l.CloneBasicStatesFrom(this);
-            return l;
-        }
-
-        public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Text.ToUpper().Contains(filterText.ToUpper());
-
-        public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth) => SizeUntouchedForListBox().Height;
-
-        protected override Size ComputeSizeUntouchedForListBox() => Skin.FormatedText_NeededSize(Text, Symbol, Skin.GetBlueFont(TempDesign(Parent.ItemDesign), States.Standard), 16);
-
-        protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design design, States vState, bool drawBorderAndBack, bool translate) {
-            var tmpd = TempDesign(design);
-            if (drawBorderAndBack) {
-                Skin.Draw_Back(gr, tmpd, vState, positionModified, null, false);
-            }
-            Skin.Draw_FormatedText(gr, Text, tmpd, vState, Symbol, Alignment.VerticalCenter_Left, positionModified, null, false, translate);
-            if (drawBorderAndBack) {
-                Skin.Draw_Border(gr, tmpd, vState, positionModified);
-            }
-        }
-
-        protected override string GetCompareKey() => Internal.CompareKey(SortierTyp.Sprachneutral_String);
-
-        private Design TempDesign(Design itemdesign) {
-            if (IsCaption) {
-                switch (itemdesign) {
-                    case Design.Item_KontextMenu:
-                        return Design.Item_KontextMenu_Caption;
-
-                    case Design.Item_Listbox:
-                        return Design.Item_Listbox_Caption;
-                }
-            }
-            return itemdesign;
-        }
-
-        #endregion
+    public TextListItem(string readableText, string internalname, QuickImage? symbol, bool isCaption, bool enabled, string userDefCompareKey) : base(internalname, enabled) {
+        IsCaption = isCaption;
+        Text = readableText;
+        Symbol = symbol;
+        UserDefCompareKey = userDefCompareKey;
     }
+
+    #endregion
+
+    #region Properties
+
+    public override string QuickInfo => Text.CreateHtmlCodes(true);
+
+    public QuickImage? Symbol { get; set; }
+
+    public string Text { get; set; }
+
+    #endregion
+
+    #region Methods
+
+    public override object Clone() {
+        var l = new TextListItem(Text, Internal, Symbol, IsCaption, Enabled, UserDefCompareKey);
+        l.CloneBasicStatesFrom(this);
+        return l;
+    }
+
+    public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Text.ToUpper().Contains(filterText.ToUpper());
+
+    public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth) => SizeUntouchedForListBox().Height;
+
+    protected override Size ComputeSizeUntouchedForListBox() => Skin.FormatedText_NeededSize(Text, Symbol, Skin.GetBlueFont(TempDesign(Parent.ItemDesign), States.Standard), 16);
+
+    protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design design, States vState, bool drawBorderAndBack, bool translate) {
+        var tmpd = TempDesign(design);
+        if (drawBorderAndBack) {
+            Skin.Draw_Back(gr, tmpd, vState, positionModified, null, false);
+        }
+        Skin.Draw_FormatedText(gr, Text, tmpd, vState, Symbol, Alignment.VerticalCenter_Left, positionModified, null, false, translate);
+        if (drawBorderAndBack) {
+            Skin.Draw_Border(gr, tmpd, vState, positionModified);
+        }
+    }
+
+    protected override string GetCompareKey() => Internal.CompareKey(SortierTyp.Sprachneutral_String);
+
+    private Design TempDesign(Design itemdesign) {
+        if (IsCaption) {
+            switch (itemdesign) {
+                case Design.Item_KontextMenu:
+                    return Design.Item_KontextMenu_Caption;
+
+                case Design.Item_Listbox:
+                    return Design.Item_Listbox_Caption;
+            }
+        }
+        return itemdesign;
+    }
+
+    #endregion
 }

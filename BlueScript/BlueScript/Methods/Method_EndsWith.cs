@@ -21,44 +21,43 @@ using System.Collections.Generic;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_EndsWith : Method {
+internal class Method_EndsWith : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableBool.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
-        public override string Description => "Prüft, ob der String mit einem der angegeben Strings endet.";
-        public override bool EndlessArgs => true;
-        public override string EndSequence => ")";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => VariableBool.ShortName_Plain;
-        public override string StartSequence => "(";
-        public override string Syntax => "EndsWith(String, CaseSensitive, Value1, Value2, ...)";
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableBool.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
+    public override string Description => "Prüft, ob der String mit einem der angegeben Strings endet.";
+    public override bool EndlessArgs => true;
+    public override string EndSequence => ")";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => VariableBool.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "EndsWith(String, CaseSensitive, Value1, Value2, ...)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "endswith" };
+    public override List<string> Comand(Script? s) => new() { "endswith" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-            for (var z = 2; z < attvar.Attributes.Count; z++) {
-                if (((VariableBool)attvar.Attributes[1]).ValueBool) {
-                    if (((VariableString)attvar.Attributes[0]).ValueString.EndsWith(((VariableString)attvar.Attributes[z]).ValueString)) {
-                        return DoItFeedback.Wahr();
-                    }
-                } else {
-                    if (((VariableString)attvar.Attributes[0]).ValueString.ToLower().EndsWith(((VariableString)attvar.Attributes[z]).ValueString.ToLower())) {
-                        return DoItFeedback.Wahr();
-                    }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        for (var z = 2; z < attvar.Attributes.Count; z++) {
+            if (((VariableBool)attvar.Attributes[1]).ValueBool) {
+                if (((VariableString)attvar.Attributes[0]).ValueString.EndsWith(((VariableString)attvar.Attributes[z]).ValueString)) {
+                    return DoItFeedback.Wahr();
+                }
+            } else {
+                if (((VariableString)attvar.Attributes[0]).ValueString.ToLower().EndsWith(((VariableString)attvar.Attributes[z]).ValueString.ToLower())) {
+                    return DoItFeedback.Wahr();
                 }
             }
-            return DoItFeedback.Falsch();
         }
-
-        #endregion
+        return DoItFeedback.Falsch();
     }
+
+    #endregion
 }

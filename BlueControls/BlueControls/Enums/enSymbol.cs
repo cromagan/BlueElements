@@ -15,13 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueControls.Enums {
+namespace BlueControls.Enums;
 
-    public enum enSymbol {
-        Ohne = 0,
-        Pfeil = 1,
-        Bruchlinie = 2,
-        Rechteck = 3,
-        Rechteck_gerundet = 4
-    }
+public enum enSymbol {
+    Ohne = 0,
+    Pfeil = 1,
+    Bruchlinie = 2,
+    Rechteck = 3,
+    Rechteck_gerundet = 4
 }

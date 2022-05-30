@@ -15,36 +15,35 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueControls.Enums {
+namespace BlueControls.Enums;
 
-    public enum ContextMenuComands {
-        Nothing = 0,
-        Ausführen = 1,
-        DateiÖffnen = 2,
-        Löschen = 3,
+public enum ContextMenuComands {
+    Nothing = 0,
+    Ausführen = 1,
+    DateiÖffnen = 2,
+    Löschen = 3,
 
-        DateiPfadÖffnen = 4,
-        Bearbeiten = 5,
+    DateiPfadÖffnen = 4,
+    Bearbeiten = 5,
 
-        InhaltLöschen = 6,
-        ZeileLöschen = 7,
-        Kopieren = 8,
-        Ausschneiden = 9,
-        SpaltenSortierungZA = 10,
-        SpaltenSortierungAZ = 11,
-        Information = 12,
-        ZellenInhaltKopieren = 13,
-        ZellenInhaltPaste = 14,
+    InhaltLöschen = 6,
+    ZeileLöschen = 7,
+    Kopieren = 8,
+    Ausschneiden = 9,
+    SpaltenSortierungZA = 10,
+    SpaltenSortierungAZ = 11,
+    Information = 12,
+    ZellenInhaltKopieren = 13,
+    ZellenInhaltPaste = 14,
 
-        // UserDef1 = 100
-        SpaltenEigenschaftenBearbeiten = 15,
+    // UserDef1 = 100
+    SpaltenEigenschaftenBearbeiten = 15,
 
-        Speichern = 16,
-        Umbenennen = 17,
-        SuchenUndErsetzen = 18,
-        Einfügen = 19,
-        VorherigenInhaltWiederherstellen = 23,
-        WeitereBefehle = 24,
-        Abbruch = 999
-    }
+    Speichern = 16,
+    Umbenennen = 17,
+    SuchenUndErsetzen = 18,
+    Einfügen = 19,
+    VorherigenInhaltWiederherstellen = 23,
+    WeitereBefehle = 24,
+    Abbruch = 999
 }

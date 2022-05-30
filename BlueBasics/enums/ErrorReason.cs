@@ -17,41 +17,40 @@
 
 using System;
 
-namespace BlueBasics.Enums {
+namespace BlueBasics.Enums;
 
-    [Flags]
-    public enum ErrorReason {
+[Flags]
+public enum ErrorReason {
 
-        /// <summary>
-        /// Ob der Wert gelesen werden kann. Ein Speichern/Bearbeiten ist nicht geplant.
-        /// </summary>
-        OnlyRead = 1,
+    /// <summary>
+    /// Ob der Wert gelesen werden kann. Ein Speichern/Bearbeiten ist nicht geplant.
+    /// </summary>
+    OnlyRead = 1,
 
-        ///// <summary>
-        ///// Ob das Feld im allgemeinen bearbeitet werden kann, wenn keine Prozesse dazwischenpfuschen
-        ///// </summary>
-        EditNormaly = 2,
+    ///// <summary>
+    ///// Ob das Feld im allgemeinen bearbeitet werden kann, wenn keine Prozesse dazwischenpfuschen
+    ///// </summary>
+    EditNormaly = 2,
 
-        /// <summary>
-        /// Wenn die Daten eigentlich geschrieben werden müssen
-        /// </summary>
-        EditAcut = 4,
+    /// <summary>
+    /// Wenn die Daten eigentlich geschrieben werden müssen
+    /// </summary>
+    EditAcut = 4,
 
-        /// <summary>
-        /// Es ist noch Zeit, der Benutzer kann ausgesperrt werden
-        /// </summary>
-        EditGeneral = 8,
+    /// <summary>
+    /// Es ist noch Zeit, der Benutzer kann ausgesperrt werden
+    /// </summary>
+    EditGeneral = 8,
 
-        Save = 16,
+    Save = 16,
 
-        /// <summary>
-        ///  Wenn die Daten von der Festplatte geladen und auch weiterverarbeitet werden sollen
-        /// </summary>
-        Load = 32,
+    /// <summary>
+    ///  Wenn die Daten von der Festplatte geladen und auch weiterverarbeitet werden sollen
+    /// </summary>
+    Load = 32,
 
-        /// <summary>
-        /// Wenn die Daten von der Festplatte geladen - aber wieder verworfen werden. Nur für Kontrollzwecke benutzen!
-        /// </summary>
-        LoadForCheckingOnly = 64
-    }
+    /// <summary>
+    /// Wenn die Daten von der Festplatte geladen - aber wieder verworfen werden. Nur für Kontrollzwecke benutzen!
+    /// </summary>
+    LoadForCheckingOnly = 64
 }

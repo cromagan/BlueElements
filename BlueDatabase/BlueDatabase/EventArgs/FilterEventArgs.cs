@@ -15,20 +15,19 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueDatabase.EventArgs {
+namespace BlueDatabase.EventArgs;
 
-    public class FilterEventArgs : System.EventArgs {
+public class FilterEventArgs : System.EventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public FilterEventArgs(FilterItem filter) => Filter = filter;
+    public FilterEventArgs(FilterItem filter) => Filter = filter;
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public FilterItem Filter { get; }
+    public FilterItem Filter { get; }
 
-        #endregion
-    }
+    #endregion
 }

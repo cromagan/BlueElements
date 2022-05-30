@@ -21,60 +21,59 @@ using BlueDatabase;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript {
+namespace BlueScript;
 
-    public class VariableFilterItem : Variable {
+public class VariableFilterItem : Variable {
 
-        #region Fields
+    #region Fields
 
-        private FilterItem _filter;
+    private FilterItem _filter;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public VariableFilterItem(string name, FilterItem value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _filter = value;
+    public VariableFilterItem(string name, FilterItem value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _filter = value;
 
-        public VariableFilterItem(string name) : this(name, null!, true, false, string.Empty) { }
+    public VariableFilterItem(string name) : this(name, null!, true, false, string.Empty) { }
 
-        public VariableFilterItem(FilterItem value) : this(DummyName(), value, true, false, string.Empty) { }
+    public VariableFilterItem(FilterItem value) : this(DummyName(), value, true, false, string.Empty) { }
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public static string ShortName_Variable => "*fil";
-        public override int CheckOrder => 99;
+    public static string ShortName_Variable => "*fil";
+    public override int CheckOrder => 99;
 
-        public FilterItem FilterItem {
-            get => _filter;
-            set {
-                if (Readonly) { return; }
-                _filter = value;
-            }
+    public FilterItem FilterItem {
+        get => _filter;
+        set {
+            if (Readonly) { return; }
+            _filter = value;
         }
-
-        public override bool GetFromStringPossible => false;
-        public override bool IsNullOrEmpty => _filter == null;
-        public override string ShortName => "fil";
-        public override bool ToStringPossible => false;
-
-        #endregion
-
-        #region Methods
-
-        public override DoItFeedback GetValueFrom(Variable variable) {
-            if (variable is not VariableFilterItem v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
-            if (Readonly) { return DoItFeedback.Schreibgschützt(); }
-            FilterItem = v.FilterItem;
-            return DoItFeedback.Null();
-        }
-
-        protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
-            succesVar = null;
-            return false;
-        }
-
-        #endregion
     }
+
+    public override bool GetFromStringPossible => false;
+    public override bool IsNullOrEmpty => _filter == null;
+    public override string ShortName => "fil";
+    public override bool ToStringPossible => false;
+
+    #endregion
+
+    #region Methods
+
+    public override DoItFeedback GetValueFrom(Variable variable) {
+        if (variable is not VariableFilterItem v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
+        if (Readonly) { return DoItFeedback.Schreibgschützt(); }
+        FilterItem = v.FilterItem;
+        return DoItFeedback.Null();
+    }
+
+    protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
+        succesVar = null;
+        return false;
+    }
+
+    #endregion
 }

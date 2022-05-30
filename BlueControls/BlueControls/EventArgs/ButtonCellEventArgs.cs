@@ -19,22 +19,21 @@ using BlueBasics;
 using BlueDatabase;
 using BlueDatabase.EventArgs;
 
-namespace BlueControls.EventArgs {
+namespace BlueControls.EventArgs;
 
-    public class ButtonCellEventArgs : CellEventArgs {
+public class ButtonCellEventArgs : CellEventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public ButtonCellEventArgs(ColumnItem? column, RowItem? row) : base(column, row) => Text = "Click";
+    public ButtonCellEventArgs(ColumnItem? column, RowItem? row) : base(column, row) => Text = "Click";
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public bool Cecked { get; set; }
-        public QuickImage? Image { get; set; }
-        public string Text { get; set; }
+    public bool Cecked { get; set; }
+    public QuickImage? Image { get; set; }
+    public string Text { get; set; }
 
-        #endregion
-    }
+    #endregion
 }

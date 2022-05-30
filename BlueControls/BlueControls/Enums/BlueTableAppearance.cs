@@ -15,12 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueControls.Enums {
+namespace BlueControls.Enums;
 
-    public enum BlueTableAppearance {
-        Standard = 0,
+public enum BlueTableAppearance {
+    Standard = 0,
 
-        // Quer_Einzeiler = 1
-        OnlyMainColumnWithoutHead = 2
-    }
+    // Quer_Einzeiler = 1
+    OnlyMainColumnWithoutHead = 2
 }

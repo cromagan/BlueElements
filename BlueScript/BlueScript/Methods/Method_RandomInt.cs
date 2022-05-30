@@ -20,35 +20,34 @@ using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_RandomInt : Method {
+internal class Method_RandomInt : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableFloat.ShortName_Plain } };
-        public override string Description => "Gibt eine nicht negative Zufalls-Ganzzahl zurück,\rdie kleiner als das angegebene Maximum ist.";
-        public override bool EndlessArgs => false;
-        public override string EndSequence => ")";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => VariableFloat.ShortName_Plain;
-        public override string StartSequence => "(";
-        public override string Syntax => "RandomInt(maxValue)";
+    public override List<List<string>> Args => new() { new() { VariableFloat.ShortName_Plain } };
+    public override string Description => "Gibt eine nicht negative Zufalls-Ganzzahl zurück,\rdie kleiner als das angegebene Maximum ist.";
+    public override bool EndlessArgs => false;
+    public override string EndSequence => ")";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => VariableFloat.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "RandomInt(maxValue)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "randomint" };
+    public override List<string> Comand(Script? s) => new() { "randomint" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
 
-            return !string.IsNullOrEmpty(attvar.ErrorMessage)
-                ? DoItFeedback.AttributFehler(this, attvar)
-                : new DoItFeedback(Constants.GlobalRND.Next(((VariableFloat)attvar.Attributes[0]).ValueInt));
-        }
-
-        #endregion
+        return !string.IsNullOrEmpty(attvar.ErrorMessage)
+            ? DoItFeedback.AttributFehler(this, attvar)
+            : new DoItFeedback(Constants.GlobalRND.Next(((VariableFloat)attvar.Attributes[0]).ValueInt));
     }
+
+    #endregion
 }

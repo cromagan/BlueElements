@@ -15,12 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueDatabase.Enums {
+namespace BlueDatabase.Enums;
 
-    public enum AdditionalCheck {
-        None = 0,
-        Integer = 1,
-        Float = 2,
-        DateTime = 3
-    }
+public enum AdditionalCheck {
+    None = 0,
+    Integer = 1,
+    Float = 2,
+    DateTime = 3
 }

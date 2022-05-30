@@ -23,92 +23,91 @@ using System.Drawing;
 using BlueScript.Variables;
 using System;
 
-namespace BlueScript.Structures {
+namespace BlueScript.Structures;
 
-    public struct DoItFeedback {
+public struct DoItFeedback {
 
-        #region Fields
+    #region Fields
 
-        public readonly Variable? Variable;
-        public string ErrorMessage;
+    public readonly Variable? Variable;
+    public string ErrorMessage;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public DoItFeedback(string errormessage) {
-            ErrorMessage = errormessage;
-            Variable = null;
-        }
-
-        public DoItFeedback(Variable variable) {
-            ErrorMessage = string.Empty;
-            Variable = variable;
-        }
-
-        public DoItFeedback(string valueString, string errormessage) {
-            ErrorMessage = errormessage;
-            Variable = new VariableString(Variable.DummyName(), valueString);
-        }
-
-        public DoItFeedback(List<string>? list) {
-            ErrorMessage = string.Empty;
-            Variable = new VariableListString(list);
-        }
-
-        public DoItFeedback(Bitmap bmp) {
-            ErrorMessage = string.Empty;
-            Variable = new VariableBitmap(bmp);
-        }
-
-        public DoItFeedback(bool value) {
-            ErrorMessage = string.Empty;
-            Variable = new VariableBool(value);
-        }
-
-        public DoItFeedback(double value) {
-            ErrorMessage = string.Empty;
-            Variable = new VariableFloat((float)value);
-        }
-
-        public DoItFeedback(float value) {
-            ErrorMessage = string.Empty;
-            Variable = new VariableFloat(value);
-        }
-
-        public DoItFeedback(DateTime value) {
-            ErrorMessage = string.Empty;
-            Variable = new VariableDateTime(value);
-        }
-
-        public DoItFeedback(string[] list) {
-            ErrorMessage = string.Empty;
-            Variable = new VariableListString(list);
-        }
-
-        #endregion
-
-        #region Methods
-
-        public static DoItFeedback AttributFehler(Method method, SplittedAttributesFeedback f) =>
-            new(f.ErrorMessage + " > " + method.Syntax);
-
-        public static DoItFeedback Falsch() => new(false);
-
-        public static DoItFeedback FalscherDatentyp() => new("Falscher Datentyp.");
-
-        public static DoItFeedback Klammerfehler() => new("Fehler bei der Klammersetzung.");
-
-        public static DoItFeedback Null() => new();
-
-        public static DoItFeedback Schreibgschützt() => new("Variable ist schreibgeschützt.");
-
-        public static DoItFeedback VerschiedeneTypen(Variable var1, Variable var2) =>
-            new("Variable '" + var1.Name + "' ist nicht der erwartete Typ {" + var2.ShortName +
-                "}, sondern {" + var1.ShortName + "}");
-
-        public static DoItFeedback Wahr() => new(true);
-
-        #endregion
+    public DoItFeedback(string errormessage) {
+        ErrorMessage = errormessage;
+        Variable = null;
     }
+
+    public DoItFeedback(Variable variable) {
+        ErrorMessage = string.Empty;
+        Variable = variable;
+    }
+
+    public DoItFeedback(string valueString, string errormessage) {
+        ErrorMessage = errormessage;
+        Variable = new VariableString(Variable.DummyName(), valueString);
+    }
+
+    public DoItFeedback(List<string>? list) {
+        ErrorMessage = string.Empty;
+        Variable = new VariableListString(list);
+    }
+
+    public DoItFeedback(Bitmap bmp) {
+        ErrorMessage = string.Empty;
+        Variable = new VariableBitmap(bmp);
+    }
+
+    public DoItFeedback(bool value) {
+        ErrorMessage = string.Empty;
+        Variable = new VariableBool(value);
+    }
+
+    public DoItFeedback(double value) {
+        ErrorMessage = string.Empty;
+        Variable = new VariableFloat((float)value);
+    }
+
+    public DoItFeedback(float value) {
+        ErrorMessage = string.Empty;
+        Variable = new VariableFloat(value);
+    }
+
+    public DoItFeedback(DateTime value) {
+        ErrorMessage = string.Empty;
+        Variable = new VariableDateTime(value);
+    }
+
+    public DoItFeedback(string[] list) {
+        ErrorMessage = string.Empty;
+        Variable = new VariableListString(list);
+    }
+
+    #endregion
+
+    #region Methods
+
+    public static DoItFeedback AttributFehler(Method method, SplittedAttributesFeedback f) =>
+        new(f.ErrorMessage + " > " + method.Syntax);
+
+    public static DoItFeedback Falsch() => new(false);
+
+    public static DoItFeedback FalscherDatentyp() => new("Falscher Datentyp.");
+
+    public static DoItFeedback Klammerfehler() => new("Fehler bei der Klammersetzung.");
+
+    public static DoItFeedback Null() => new();
+
+    public static DoItFeedback Schreibgschützt() => new("Variable ist schreibgeschützt.");
+
+    public static DoItFeedback VerschiedeneTypen(Variable var1, Variable var2) =>
+        new("Variable '" + var1.Name + "' ist nicht der erwartete Typ {" + var2.ShortName +
+            "}, sondern {" + var1.ShortName + "}");
+
+    public static DoItFeedback Wahr() => new(true);
+
+    #endregion
 }

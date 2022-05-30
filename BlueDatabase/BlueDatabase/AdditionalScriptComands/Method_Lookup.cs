@@ -20,87 +20,86 @@ using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueDatabase.AdditionalScriptComands {
+namespace BlueDatabase.AdditionalScriptComands;
 
-    public class Method_Lookup : MethodDatabase {
+public class Method_Lookup : MethodDatabase {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
-        public override string Description => "Lädt eine andere Datenbank (Database), sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als Liste zurück. Wird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben. Ist der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.";
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
+    public override string Description => "Lädt eine andere Datenbank (Database), sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als Liste zurück. Wird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben. Ist der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.";
 
-        public override bool EndlessArgs => false;
+    public override bool EndlessArgs => false;
 
-        public override string EndSequence => ")";
+    public override string EndSequence => ")";
 
-        public override bool GetCodeBlockAfter => false;
+    public override bool GetCodeBlockAfter => false;
 
-        public override string Returns => VariableListString.ShortName_Plain;
+    public override string Returns => VariableListString.ShortName_Plain;
 
-        public override string StartSequence => "(";
+    public override string StartSequence => "(";
 
-        //public Method_Lookup(Script parent) : base(parent) { }
-        public override string Syntax => "Lookup(Database, KeyValue, Column, NothingFoundValue, FoundToMuchValue)";
+    //public Method_Lookup(Script parent) : base(parent) { }
+    public override string Syntax => "Lookup(Database, KeyValue, Column, NothingFoundValue, FoundToMuchValue)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "lookup" };
+    public override List<string> Comand(Script? s) => new() { "lookup" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) {
-                return DoItFeedback.AttributFehler(this, attvar);
-            }
-
-            var db = DatabaseOf(s, ((VariableString)attvar.Attributes[0]).ValueString);
-            if (db == null) {
-                return new DoItFeedback("Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString +
-                                        "' nicht gefunden");
-            }
-
-            var c = db.Column.Exists(((VariableString)attvar.Attributes[2]).ValueString);
-            if (c == null) {
-                return new DoItFeedback("Spalte nicht gefunden: " +
-                                        ((VariableString)attvar.Attributes[2]).ValueString);
-            }
-
-            var r = RowCollection.MatchesTo(new FilterItem(db.Column[0], Enums.FilterType.Istgleich_GroßKleinEgal,
-                ((VariableString)attvar.Attributes[1]).ValueString));
-            if (r == null || r.Count == 0) {
-                if (attvar.Attributes.Count > 3) {
-                    return new DoItFeedback(new List<string> { ((VariableString)attvar.Attributes[3]).ValueString });
-                }
-
-                return new DoItFeedback(string.Empty);
-            }
-
-            if (r.Count > 1) {
-                if (attvar.Attributes.Count > 4) {
-                    return new DoItFeedback(new List<string> { ((VariableString)attvar.Attributes[4]).ValueString });
-                }
-
-                return new DoItFeedback(string.Empty);
-            }
-
-            var v = RowItem.CellToVariable(c, r[0]);
-            if (v == null || v.Count != 1) {
-                return new DoItFeedback("Wert konnte nicht erzeugt werden: " +
-                                        ((VariableString)attvar.Attributes[2]).ValueString);
-            }
-
-            if (v[0] is VariableListString vl) { return new DoItFeedback(vl.ValueList); }
-
-            return new DoItFeedback(new List<string> { v[0].ReadableText });
-            //return new DoItFeedback(new List<string>{kv[0].ReadableText
-
-            //return new DoItFeedback(v[0]);
-            //return v[0].Type != VariableDataType.List
-            //    ? new DoItFeedback(v[0].ValueString + "\r", VariableDataType.List)
-            //    : new DoItFeedback(v[0].ValueString, VariableDataType.List);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) {
+            return DoItFeedback.AttributFehler(this, attvar);
         }
 
-        #endregion
+        var db = DatabaseOf(s, ((VariableString)attvar.Attributes[0]).ValueString);
+        if (db == null) {
+            return new DoItFeedback("Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString +
+                                    "' nicht gefunden");
+        }
+
+        var c = db.Column.Exists(((VariableString)attvar.Attributes[2]).ValueString);
+        if (c == null) {
+            return new DoItFeedback("Spalte nicht gefunden: " +
+                                    ((VariableString)attvar.Attributes[2]).ValueString);
+        }
+
+        var r = RowCollection.MatchesTo(new FilterItem(db.Column[0], Enums.FilterType.Istgleich_GroßKleinEgal,
+            ((VariableString)attvar.Attributes[1]).ValueString));
+        if (r == null || r.Count == 0) {
+            if (attvar.Attributes.Count > 3) {
+                return new DoItFeedback(new List<string> { ((VariableString)attvar.Attributes[3]).ValueString });
+            }
+
+            return new DoItFeedback(string.Empty);
+        }
+
+        if (r.Count > 1) {
+            if (attvar.Attributes.Count > 4) {
+                return new DoItFeedback(new List<string> { ((VariableString)attvar.Attributes[4]).ValueString });
+            }
+
+            return new DoItFeedback(string.Empty);
+        }
+
+        var v = RowItem.CellToVariable(c, r[0]);
+        if (v == null || v.Count != 1) {
+            return new DoItFeedback("Wert konnte nicht erzeugt werden: " +
+                                    ((VariableString)attvar.Attributes[2]).ValueString);
+        }
+
+        if (v[0] is VariableListString vl) { return new DoItFeedback(vl.ValueList); }
+
+        return new DoItFeedback(new List<string> { v[0].ReadableText });
+        //return new DoItFeedback(new List<string>{kv[0].ReadableText
+
+        //return new DoItFeedback(v[0]);
+        //return v[0].Type != VariableDataType.List
+        //    ? new DoItFeedback(v[0].ValueString + "\r", VariableDataType.List)
+        //    : new DoItFeedback(v[0].ValueString, VariableDataType.List);
     }
+
+    #endregion
 }

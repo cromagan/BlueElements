@@ -17,65 +17,64 @@
 
 using System.Linq;
 
-namespace BlueScript.Structures {
+namespace BlueScript.Structures;
 
-    public struct CanDoFeedback {
+public struct CanDoFeedback {
 
-        #region Fields
+    #region Fields
 
-        /// <summary>
-        /// Der Text zwischen dem StartString und dem EndString
-        /// </summary>
-        public readonly string AttributText;
+    /// <summary>
+    /// Der Text zwischen dem StartString und dem EndString
+    /// </summary>
+    public readonly string AttributText;
 
-        /// <summary>
-        /// Falls ein Codeblock { } direkt nach dem Befehl beginnt, dessen Inhalt
-        /// </summary>
-        public readonly string CodeBlockAfterText;
+    /// <summary>
+    /// Falls ein Codeblock { } direkt nach dem Befehl beginnt, dessen Inhalt
+    /// </summary>
+    public readonly string CodeBlockAfterText;
 
-        /// <summary>
-        /// Der Text, mit dem eingestiegen wird. Also der Befehl mit dem StartString.
-        /// </summary>
-        public readonly string ComandText;
+    /// <summary>
+    /// Der Text, mit dem eingestiegen wird. Also der Befehl mit dem StartString.
+    /// </summary>
+    public readonly string ComandText;
 
-        /// <summary>
-        /// Die Position, wo der Fehler stattgefunfden hat ODER die Position wo weiter geparsesd werden muss
-        /// </summary>
-        public readonly int ContinueOrErrorPosition;
+    /// <summary>
+    /// Die Position, wo der Fehler stattgefunfden hat ODER die Position wo weiter geparsesd werden muss
+    /// </summary>
+    public readonly int ContinueOrErrorPosition;
 
-        public readonly string ErrorMessage;
+    public readonly string ErrorMessage;
 
-        public readonly int LineBreakInCodeBlock;
+    public readonly int LineBreakInCodeBlock;
 
-        /// <summary>
-        /// TRUE, wenn der Befehl erkannt wurde, aber nicht ausgeführt werden kann.
-        /// </summary>
-        public readonly bool MustAbort;
+    /// <summary>
+    /// TRUE, wenn der Befehl erkannt wurde, aber nicht ausgeführt werden kann.
+    /// </summary>
+    public readonly bool MustAbort;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public CanDoFeedback(int errorposition, string errormessage, bool mustabort) {
-            ContinueOrErrorPosition = errorposition;
-            ErrorMessage = errormessage;
-            MustAbort = mustabort;
-            ComandText = string.Empty;
-            AttributText = string.Empty;
-            CodeBlockAfterText = string.Empty;
-            LineBreakInCodeBlock = 0;
-        }
-
-        public CanDoFeedback(int continuePosition, string comandText, string attributtext, string codeblockaftertext) {
-            ContinueOrErrorPosition = continuePosition;
-            ErrorMessage = string.Empty;
-            MustAbort = false;
-            ComandText = comandText;
-            AttributText = attributtext;
-            CodeBlockAfterText = codeblockaftertext;
-            LineBreakInCodeBlock = codeblockaftertext.Count(c => c == '¶');
-        }
-
-        #endregion
+    public CanDoFeedback(int errorposition, string errormessage, bool mustabort) {
+        ContinueOrErrorPosition = errorposition;
+        ErrorMessage = errormessage;
+        MustAbort = mustabort;
+        ComandText = string.Empty;
+        AttributText = string.Empty;
+        CodeBlockAfterText = string.Empty;
+        LineBreakInCodeBlock = 0;
     }
+
+    public CanDoFeedback(int continuePosition, string comandText, string attributtext, string codeblockaftertext) {
+        ContinueOrErrorPosition = continuePosition;
+        ErrorMessage = string.Empty;
+        MustAbort = false;
+        ComandText = comandText;
+        AttributText = attributtext;
+        CodeBlockAfterText = codeblockaftertext;
+        LineBreakInCodeBlock = codeblockaftertext.Count(c => c == '¶');
+    }
+
+    #endregion
 }

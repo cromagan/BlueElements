@@ -23,49 +23,48 @@ using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_BitmapToBase64 : Method {
+internal class Method_BitmapToBase64 : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableBitmap.ShortName_Variable }, new() { VariableString.ShortName_Plain } };
-        public override string Description => "Konvertiert das Bild in das Base64 Format und gibt dessen String zurück.";
-        public override bool EndlessArgs => false;
-        public override string EndSequence => ")";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => VariableString.ShortName_Plain;
-        public override string StartSequence => "(";
-        public override string Syntax => "BitmapToBase64(Bitmap, JPG / PNG)";
+    public override List<List<string>> Args => new() { new() { VariableBitmap.ShortName_Variable }, new() { VariableString.ShortName_Plain } };
+    public override string Description => "Konvertiert das Bild in das Base64 Format und gibt dessen String zurück.";
+    public override bool EndlessArgs => false;
+    public override string EndSequence => ")";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => VariableString.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "BitmapToBase64(Bitmap, JPG / PNG)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "bitmaptobase64" };
+    public override List<string> Comand(Script? s) => new() { "bitmaptobase64" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            string x;
+        string x;
 
-            switch (((VariableString)attvar.Attributes[1]).ValueString.ToUpper()) {
-                case "JPG":
-                    x = Converter.BitmapToBase64(((VariableBitmap)attvar.Attributes[0]).ValueBitmap, ImageFormat.Jpeg);
-                    break;
+        switch (((VariableString)attvar.Attributes[1]).ValueString.ToUpper()) {
+            case "JPG":
+                x = Converter.BitmapToBase64(((VariableBitmap)attvar.Attributes[0]).ValueBitmap, ImageFormat.Jpeg);
+                break;
 
-                case "PNG":
-                    x = Converter.BitmapToBase64(((VariableBitmap)attvar.Attributes[0]).ValueBitmap, ImageFormat.Png);
-                    break;
+            case "PNG":
+                x = Converter.BitmapToBase64(((VariableBitmap)attvar.Attributes[0]).ValueBitmap, ImageFormat.Png);
+                break;
 
-                default:
-                    return new DoItFeedback("Es wir als zweites Attribut ein String mit dem Inhalt jpg oder png erwartet.");
-            }
-
-            return new DoItFeedback(x, string.Empty);
+            default:
+                return new DoItFeedback("Es wir als zweites Attribut ein String mit dem Inhalt jpg oder png erwartet.");
         }
 
-        #endregion
+        return new DoItFeedback(x, string.Empty);
     }
+
+    #endregion
 }

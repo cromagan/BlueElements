@@ -22,34 +22,33 @@ using System.Collections.Generic;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_DateTimeNowUTC : Method {
+internal class Method_DateTimeNowUTC : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new();
-        public override string Description => "Gibt die akutelle UTC-Uhrzeit zurück.";
-        public override bool EndlessArgs => false;
-        public override string EndSequence => ")";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => VariableDateTime.ShortName_Variable;
-        public override string StartSequence => "(";
-        public override string Syntax => "DateTimeUTCNow()";
+    public override List<List<string>> Args => new();
+    public override string Description => "Gibt die akutelle UTC-Uhrzeit zurück.";
+    public override bool EndlessArgs => false;
+    public override string EndSequence => ")";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => VariableDateTime.ShortName_Variable;
+    public override string StartSequence => "(";
+    public override string Syntax => "DateTimeUTCNow()";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "datetimeutcnow" };
+    public override List<string> Comand(Script? s) => new() { "datetimeutcnow" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            return !string.IsNullOrEmpty(attvar.ErrorMessage)
-                ? DoItFeedback.AttributFehler(this, attvar)
-                : new DoItFeedback(DateTime.UtcNow);
-        }
-
-        #endregion
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        return !string.IsNullOrEmpty(attvar.ErrorMessage)
+            ? DoItFeedback.AttributFehler(this, attvar)
+            : new DoItFeedback(DateTime.UtcNow);
     }
+
+    #endregion
 }

@@ -19,37 +19,36 @@ using BlueBasics;
 using System;
 using System.Drawing;
 
-namespace BlueControls.EventArgs {
+namespace BlueControls.EventArgs;
 
-    public class MouseEventArgs1_1DownAndCurrent : System.EventArgs {
+public class MouseEventArgs1_1DownAndCurrent : System.EventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public MouseEventArgs1_1DownAndCurrent(MouseEventArgs1_1 down, MouseEventArgs1_1 current) : base() {
-            MouseDown = down;
-            Current = current;
-        }
-
-        #endregion
-
-        #region Properties
-
-        public MouseEventArgs1_1 Current { get; }
-        public MouseEventArgs1_1 MouseDown { get; }
-
-        #endregion
-
-        #region Methods
-
-        public Rectangle TrimmedRectangle() {
-            if (MouseDown == null || Current == null) {
-                Develop.DebugPrint("Trimmen nicht möglich. " + (MouseDown == null) + " " + (Current == null));
-                return Rectangle.Empty;
-            }
-
-            return new Rectangle(Math.Min(MouseDown.TrimmedX, Current.TrimmedX), Math.Min(MouseDown.TrimmedY, Current.TrimmedY), Math.Abs(MouseDown.TrimmedX - Current.TrimmedX) + 1, Math.Abs(MouseDown.TrimmedY - Current.TrimmedY) + 1);
-        }
-
-        #endregion
+    public MouseEventArgs1_1DownAndCurrent(MouseEventArgs1_1 down, MouseEventArgs1_1 current) : base() {
+        MouseDown = down;
+        Current = current;
     }
+
+    #endregion
+
+    #region Properties
+
+    public MouseEventArgs1_1 Current { get; }
+    public MouseEventArgs1_1 MouseDown { get; }
+
+    #endregion
+
+    #region Methods
+
+    public Rectangle TrimmedRectangle() {
+        if (MouseDown == null || Current == null) {
+            Develop.DebugPrint("Trimmen nicht möglich. " + (MouseDown == null) + " " + (Current == null));
+            return Rectangle.Empty;
+        }
+
+        return new Rectangle(Math.Min(MouseDown.TrimmedX, Current.TrimmedX), Math.Min(MouseDown.TrimmedY, Current.TrimmedY), Math.Abs(MouseDown.TrimmedX - Current.TrimmedX) + 1, Math.Abs(MouseDown.TrimmedY - Current.TrimmedY) + 1);
+    }
+
+    #endregion
 }

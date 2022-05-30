@@ -15,15 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueBasics.Enums {
+namespace BlueBasics.Enums;
 
-    public enum SizeModes {
-        EmptySpace = 1,
-        BildAbschneiden = 2,
-        Breite_oder_Höhe_Anpassen_OhneVergrößern = 3,
-        Breite_oder_Höhe_Anpassen_MitVergrößern = 4,
+public enum SizeModes {
+    EmptySpace = 1,
+    BildAbschneiden = 2,
+    Breite_oder_Höhe_Anpassen_OhneVergrößern = 3,
+    Breite_oder_Höhe_Anpassen_MitVergrößern = 4,
 
-        // QuickPicGeneration = 5,
-        Verzerren = 6
-    }
+    // QuickPicGeneration = 5,
+    Verzerren = 6
 }

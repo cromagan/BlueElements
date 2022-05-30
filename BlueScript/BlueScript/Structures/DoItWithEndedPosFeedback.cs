@@ -19,34 +19,33 @@
 
 using BlueScript.Variables;
 
-namespace BlueScript.Structures {
+namespace BlueScript.Structures;
 
-    public struct DoItWithEndedPosFeedback {
+public struct DoItWithEndedPosFeedback {
 
-        #region Fields
+    #region Fields
 
-        internal readonly string ErrorMessage;
+    internal readonly string ErrorMessage;
 
-        internal readonly int Position;
+    internal readonly int Position;
 
-        internal readonly Variable? Variable;
+    internal readonly Variable? Variable;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public DoItWithEndedPosFeedback(string errormessage, Variable variable, int endpos) {
-            ErrorMessage = errormessage;
-            Variable = variable;
-            Position = endpos;
-        }
-
-        public DoItWithEndedPosFeedback(string errormessage) {
-            Position = -1;
-            ErrorMessage = errormessage;
-            Variable = null;
-        }
-
-        #endregion
+    public DoItWithEndedPosFeedback(string errormessage, Variable variable, int endpos) {
+        ErrorMessage = errormessage;
+        Variable = variable;
+        Position = endpos;
     }
+
+    public DoItWithEndedPosFeedback(string errormessage) {
+        Position = -1;
+        ErrorMessage = errormessage;
+        Variable = null;
+    }
+
+    #endregion
 }

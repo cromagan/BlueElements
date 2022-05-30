@@ -17,42 +17,41 @@
 
 using System.Collections.Generic;
 
-namespace BlueBasics {
+namespace BlueBasics;
 
-    public static class Cryptography {
+public static class Cryptography {
 
-        #region Methods
+    #region Methods
 
-        public static byte[] SimpleCrypt(byte[] b, string pass, int direction, int start, int end) {
-            if (string.IsNullOrEmpty(pass)) { return b; }
-            if (end <= start) { return b; }
-            for (var z = start; z <= end; z++) {
-                var tmp = b[z] + (pass[z % pass.Length] * direction);
-                if (tmp < 0) { tmp += 256; }
-                if (tmp > 255) { tmp -= 256; }
-                b[z] = (byte)tmp;
-            }
-            return b;
+    public static byte[] SimpleCrypt(byte[] b, string pass, int direction, int start, int end) {
+        if (string.IsNullOrEmpty(pass)) { return b; }
+        if (end <= start) { return b; }
+        for (var z = start; z <= end; z++) {
+            var tmp = b[z] + (pass[z % pass.Length] * direction);
+            if (tmp < 0) { tmp += 256; }
+            if (tmp > 255) { tmp -= 256; }
+            b[z] = (byte)tmp;
         }
-
-        public static string SimpleCrypt(string content, string pass, int direction) => SimpleCrypt(content.WIN1252_toByte(), pass, direction).ToStringWin1252();
-
-        public static byte[] SimpleCrypt(byte[] b, string pass, int direction) => SimpleCrypt(b, pass, direction, 0, b.GetUpperBound(0));
-
-        public static List<byte> SimpleCrypt(List<byte> b, string pass, int direction, int start, int end) {
-            if (string.IsNullOrEmpty(pass)) { return b; }
-            if (end <= start) { return b; }
-            for (var z = start; z <= end; z++) {
-                var TMP = b[z] + (pass[z % pass.Length] * direction);
-                if (TMP < 0) { TMP += 256; }
-                if (TMP > 255) { TMP -= 256; }
-                b[z] = (byte)TMP;
-            }
-            return b;
-        }
-
-        public static List<byte> SimpleCrypt(List<byte> b, string pass, int direction) => SimpleCrypt(b, pass, direction, 0, b.Count - 1);
-
-        #endregion
+        return b;
     }
+
+    public static string SimpleCrypt(string content, string pass, int direction) => SimpleCrypt(content.WIN1252_toByte(), pass, direction).ToStringWin1252();
+
+    public static byte[] SimpleCrypt(byte[] b, string pass, int direction) => SimpleCrypt(b, pass, direction, 0, b.GetUpperBound(0));
+
+    public static List<byte> SimpleCrypt(List<byte> b, string pass, int direction, int start, int end) {
+        if (string.IsNullOrEmpty(pass)) { return b; }
+        if (end <= start) { return b; }
+        for (var z = start; z <= end; z++) {
+            var TMP = b[z] + (pass[z % pass.Length] * direction);
+            if (TMP < 0) { TMP += 256; }
+            if (TMP > 255) { TMP -= 256; }
+            b[z] = (byte)TMP;
+        }
+        return b;
+    }
+
+    public static List<byte> SimpleCrypt(List<byte> b, string pass, int direction) => SimpleCrypt(b, pass, direction, 0, b.Count - 1);
+
+    #endregion
 }

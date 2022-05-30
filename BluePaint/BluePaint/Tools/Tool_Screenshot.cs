@@ -17,36 +17,35 @@
 
 using BlueControls;
 
-namespace BluePaint {
+namespace BluePaint;
 
-    public partial class Tool_Screenshot {
+public partial class Tool_Screenshot {
 
-        #region Constructors
+    #region Constructors
 
-        public Tool_Screenshot() : base() => InitializeComponent();
+    public Tool_Screenshot() : base() => InitializeComponent();
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        internal override void ToolFirstShown() {
-            DoScreenShot();
-            OnZoomFit();
-        }
-
-        private void DoScreenShot() {
-            OnHideMainWindow();
-            BlueBasics.Generic.Pause(1, true);
-            var pic = ScreenShot.GrabArea(null);
-            if (pic != null) { OnOverridePic(pic); }
-            OnShowMainWindow();
-        }
-
-        private void NeuerScreenshot_Click(object sender, System.EventArgs e) {
-            DoScreenShot();
-            OnZoomFit();
-        }
-
-        #endregion
+    internal override void ToolFirstShown() {
+        DoScreenShot();
+        OnZoomFit();
     }
+
+    private void DoScreenShot() {
+        OnHideMainWindow();
+        BlueBasics.Generic.Pause(1, true);
+        var pic = ScreenShot.GrabArea(null);
+        if (pic != null) { OnOverridePic(pic); }
+        OnShowMainWindow();
+    }
+
+    private void NeuerScreenshot_Click(object sender, System.EventArgs e) {
+        DoScreenShot();
+        OnZoomFit();
+    }
+
+    #endregion
 }

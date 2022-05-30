@@ -15,20 +15,19 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueBasics.EventArgs {
+namespace BlueBasics.EventArgs;
 
-    public class LoadedEventArgs : System.EventArgs {
+public class LoadedEventArgs : System.EventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public LoadedEventArgs(bool onlyReload) => OnlyReload = onlyReload;
+    public LoadedEventArgs(bool onlyReload) => OnlyReload = onlyReload;
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public bool OnlyReload { get; }
+    public bool OnlyReload { get; }
 
-        #endregion
-    }
+    #endregion
 }

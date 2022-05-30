@@ -17,15 +17,14 @@
 
 #nullable enable
 
-namespace BlueBasics.DatabaseInterfaces {
+namespace BlueBasics.DatabaseInterfaces;
 
-    public interface IDatabase {
+public interface IDatabase {
 
-        #region Properties
+    #region Properties
 
-        public string Filename { get; }
-        public bool ReadOnly { get; }
+    public string Filename { get; }
+    public bool ReadOnly { get; }
 
-        #endregion
-    }
+    #endregion
 }

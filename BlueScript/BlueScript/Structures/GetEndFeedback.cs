@@ -18,46 +18,45 @@
 using BlueBasics;
 using BlueScript.Variables;
 
-namespace BlueScript.Structures {
+namespace BlueScript.Structures;
 
-    public struct GetEndFeedback {
+public struct GetEndFeedback {
 
-        #region Fields
+    #region Fields
 
-        internal readonly string AttributeText;
+    internal readonly string AttributeText;
 
-        internal readonly int ContinuePosition;
+    internal readonly int ContinuePosition;
 
-        internal readonly string ErrorMessage;
+    internal readonly string ErrorMessage;
 
-        internal readonly Variable? Variable;
+    internal readonly Variable? Variable;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public GetEndFeedback(Variable variable) {
-            ContinuePosition = 0;
-            ErrorMessage = string.Empty;
-            AttributeText = string.Empty;
-            Variable = variable;
-        }
-
-        public GetEndFeedback(string errormessage) {
-            ContinuePosition = 0;
-            ErrorMessage = errormessage;
-            AttributeText = string.Empty;
-            Variable = null;
-        }
-
-        public GetEndFeedback(int continuePosition, string attributetext) {
-            ContinuePosition = continuePosition;
-            ErrorMessage = string.Empty;
-            AttributeText = attributetext;
-            Variable = null;
-            if (ContinuePosition == attributetext.Length) { Develop.DebugPrint("Müsste das nicht eine Variable sein?"); }
-        }
-
-        #endregion
+    public GetEndFeedback(Variable variable) {
+        ContinuePosition = 0;
+        ErrorMessage = string.Empty;
+        AttributeText = string.Empty;
+        Variable = variable;
     }
+
+    public GetEndFeedback(string errormessage) {
+        ContinuePosition = 0;
+        ErrorMessage = errormessage;
+        AttributeText = string.Empty;
+        Variable = null;
+    }
+
+    public GetEndFeedback(int continuePosition, string attributetext) {
+        ContinuePosition = continuePosition;
+        ErrorMessage = string.Empty;
+        AttributeText = attributetext;
+        Variable = null;
+        if (ContinuePosition == attributetext.Length) { Develop.DebugPrint("Müsste das nicht eine Variable sein?"); }
+    }
+
+    #endregion
 }

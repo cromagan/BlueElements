@@ -21,69 +21,68 @@ using BlueBasics;
 using BlueScript.Structures;
 using System;
 
-namespace BlueScript.Variables {
+namespace BlueScript.Variables;
 
-    public class VariableDateTime : Variable {
+public class VariableDateTime : Variable {
 
-        #region Fields
+    #region Fields
 
-        private DateTime _valueDateTime;
+    private DateTime _valueDateTime;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public VariableDateTime(string name, DateTime value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _valueDateTime = value;
+    public VariableDateTime(string name, DateTime value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _valueDateTime = value;
 
-        /// <summary>
-        /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
-        /// </summary>
-        /// <param name="name"></param>
-        public VariableDateTime(string name) : this(name, DateTime.Now, true, false, string.Empty) { }
+    /// <summary>
+    /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
+    /// </summary>
+    /// <param name="name"></param>
+    public VariableDateTime(string name) : this(name, DateTime.Now, true, false, string.Empty) { }
 
-        public VariableDateTime(DateTime value) : this(DummyName(), value, true, false, string.Empty) { }
+    public VariableDateTime(DateTime value) : this(DummyName(), value, true, false, string.Empty) { }
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public static string ShortName_Variable => "*dat";
-        public override int CheckOrder => 5;
-        public override bool GetFromStringPossible => false;
-        public override bool IsNullOrEmpty => false;
+    public static string ShortName_Variable => "*dat";
+    public override int CheckOrder => 5;
+    public override bool GetFromStringPossible => false;
+    public override bool IsNullOrEmpty => false;
 
-        public override string ReadableText => _valueDateTime.ToString(Constants.Format_Date4);
+    public override string ReadableText => _valueDateTime.ToString(Constants.Format_Date4);
 
-        public override string ShortName => "dat";
-        public override bool ToStringPossible => false;
+    public override string ShortName => "dat";
+    public override bool ToStringPossible => false;
 
-        /// <summary>
-        /// Der Wert ohne " am Anfang/Ende. Gleichgesetzt mit ReadableText
-        /// </summary>
-        public DateTime ValueDate {
-            get => _valueDateTime;
-            set {
-                if (Readonly) { return; }
-                _valueDateTime = value;
-            }
+    /// <summary>
+    /// Der Wert ohne " am Anfang/Ende. Gleichgesetzt mit ReadableText
+    /// </summary>
+    public DateTime ValueDate {
+        get => _valueDateTime;
+        set {
+            if (Readonly) { return; }
+            _valueDateTime = value;
         }
-
-        #endregion
-
-        #region Methods
-
-        public override DoItFeedback GetValueFrom(Variable variable) {
-            if (variable is not VariableDateTime v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
-            if (Readonly) { return DoItFeedback.Schreibgschützt(); }
-            ValueDate = v.ValueDate;
-            return DoItFeedback.Null();
-        }
-
-        protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
-            succesVar = null;
-            return false;
-        }
-
-        #endregion
     }
+
+    #endregion
+
+    #region Methods
+
+    public override DoItFeedback GetValueFrom(Variable variable) {
+        if (variable is not VariableDateTime v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
+        if (Readonly) { return DoItFeedback.Schreibgschützt(); }
+        ValueDate = v.ValueDate;
+        return DoItFeedback.Null();
+    }
+
+    protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
+        succesVar = null;
+        return false;
+    }
+
+    #endregion
 }

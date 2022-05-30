@@ -15,12 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueControls.ItemCollection {
+namespace BlueControls.ItemCollection;
 
-    internal class Kraft {
-        //public PointM Wirkpunkt;
-        //public double Richtung;
-        //public double Stärke;
-        //public double Aufliegefläche;
-    }
+internal class Kraft {
+    //public PointM Wirkpunkt;
+    //public double Richtung;
+    //public double Stärke;
+    //public double Aufliegefläche;
 }

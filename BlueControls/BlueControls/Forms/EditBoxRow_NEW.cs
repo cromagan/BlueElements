@@ -17,40 +17,39 @@
 
 #nullable enable
 
-namespace BlueControls.Forms {
+namespace BlueControls.Forms;
 
-    public partial class EditBoxRow_NEW : DialogWithOkAndCancel {
+public partial class EditBoxRow_NEW : DialogWithOkAndCancel {
 
-        #region Constructors
+    #region Constructors
 
-        private EditBoxRow_NEW() : this(string.Empty, null) { }
+    private EditBoxRow_NEW() : this(string.Empty, null) { }
 
-        private EditBoxRow_NEW(string txt, ConnectedFormula.ConnectedFormula? cf) : base(false, true) {
-            InitializeComponent();
+    private EditBoxRow_NEW(string txt, ConnectedFormula.ConnectedFormula? cf) : base(false, true) {
+        InitializeComponent();
 
-            formToEdit.ConnectedFormula = cf;
+        formToEdit.ConnectedFormula = cf;
 
-            Setup(txt, formToEdit, formToEdit.MinimumSize.Width + 50);
-        }
-
-        #endregion
-
-        #region Methods
-
-        public static void Show(string txt, ConnectedFormula.ConnectedFormula? cf, bool isDialog) {
-            EditBoxRow_NEW MB = new(txt, cf);
-            if (isDialog) {
-                MB.ShowDialog();
-                MB.Dispose();
-            } else {
-                MB.Show();
-            }
-        }
-
-        protected override void SetValue(bool canceled) { }
-
-        #endregion
-
-        // Nix zu tun
+        Setup(txt, formToEdit, formToEdit.MinimumSize.Width + 50);
     }
+
+    #endregion
+
+    #region Methods
+
+    public static void Show(string txt, ConnectedFormula.ConnectedFormula? cf, bool isDialog) {
+        EditBoxRow_NEW MB = new(txt, cf);
+        if (isDialog) {
+            MB.ShowDialog();
+            MB.Dispose();
+        } else {
+            MB.Show();
+        }
+    }
+
+    protected override void SetValue(bool canceled) { }
+
+    #endregion
+
+    // Nix zu tun
 }

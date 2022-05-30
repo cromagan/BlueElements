@@ -22,83 +22,82 @@ using BlueControls.Interfaces;
 using System.ComponentModel;
 using System.Drawing;
 
-namespace BlueControls.Controls {
+namespace BlueControls.Controls;
 
-    [Designer(typeof(BasicDesigner))]
-    public class Line : GenericControl, IBackgroundNone {
+[Designer(typeof(BasicDesigner))]
+public class Line : GenericControl, IBackgroundNone {
 
-        #region Fields
+    #region Fields
 
-        private Orientation _orientation = Orientation.Waagerecht;
+    private Orientation _orientation = Orientation.Waagerecht;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public Line() : base(false, false) {
-            // Dieser Aufruf ist für den Designer erforderlich.
-            //  InitializeComponent()
-            // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            SetNotFocusable();
-            MouseHighlight = false;
-        }
-
-        #endregion
-
-        #region Properties
-
-        [DefaultValue(Orientation.Waagerecht)]
-        public Orientation Orientation {
-            get => _orientation;
-            set {
-                if (value == _orientation) {
-                    return;
-                }
-                _orientation = value;
-                CheckSize();
-                Invalidate();
-            }
-        }
-
-        [DefaultValue(0)]
-        public new int TabIndex {
-            get => 0;
-            set => base.TabIndex = 0;
-        }
-
-        [DefaultValue(false)]
-        public new bool TabStop {
-            get => false;
-            set => base.TabStop = false;
-        }
-
-        #endregion
-
-        #region Methods
-
-        public void CheckSize() {
-            if (_orientation == Orientation.Waagerecht) {
-                if (Width < 10) { Width = 10; }
-                Height = 2;
-            } else {
-                Width = 2;
-                if (Height < 10) { Height = 10; }
-            }
-        }
-
-        protected override void DrawControl(Graphics gr, States state) {
-            CheckSize();
-            Pen dp = new(SystemColors.ControlDark);
-            Pen lp = new(SystemColors.ControlLight);
-            if (_orientation == Orientation.Waagerecht) {
-                gr.DrawLine(dp, 0, 0, Width - 1, 0);
-                gr.DrawLine(lp, 1, 1, Width, 1);
-            } else {
-                gr.DrawLine(dp, 0, 0, 0, Height - 1);
-                gr.DrawLine(lp, 1, 1, 1, Height);
-            }
-        }
-
-        #endregion
+    public Line() : base(false, false) {
+        // Dieser Aufruf ist für den Designer erforderlich.
+        //  InitializeComponent()
+        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        SetNotFocusable();
+        MouseHighlight = false;
     }
+
+    #endregion
+
+    #region Properties
+
+    [DefaultValue(Orientation.Waagerecht)]
+    public Orientation Orientation {
+        get => _orientation;
+        set {
+            if (value == _orientation) {
+                return;
+            }
+            _orientation = value;
+            CheckSize();
+            Invalidate();
+        }
+    }
+
+    [DefaultValue(0)]
+    public new int TabIndex {
+        get => 0;
+        set => base.TabIndex = 0;
+    }
+
+    [DefaultValue(false)]
+    public new bool TabStop {
+        get => false;
+        set => base.TabStop = false;
+    }
+
+    #endregion
+
+    #region Methods
+
+    public void CheckSize() {
+        if (_orientation == Orientation.Waagerecht) {
+            if (Width < 10) { Width = 10; }
+            Height = 2;
+        } else {
+            Width = 2;
+            if (Height < 10) { Height = 10; }
+        }
+    }
+
+    protected override void DrawControl(Graphics gr, States state) {
+        CheckSize();
+        Pen dp = new(SystemColors.ControlDark);
+        Pen lp = new(SystemColors.ControlLight);
+        if (_orientation == Orientation.Waagerecht) {
+            gr.DrawLine(dp, 0, 0, Width - 1, 0);
+            gr.DrawLine(lp, 1, 1, Width, 1);
+        } else {
+            gr.DrawLine(dp, 0, 0, 0, Height - 1);
+            gr.DrawLine(lp, 1, 1, 1, Height);
+        }
+    }
+
+    #endregion
 }

@@ -17,47 +17,46 @@
 
 using BlueBasics;
 
-namespace BlueControls.Forms {
+namespace BlueControls.Forms;
 
-    public partial class PadEditorReadOnly : Form {
+public partial class PadEditorReadOnly : Form {
 
-        #region Constructors
+    #region Constructors
 
-        public PadEditorReadOnly() : base() {
-            // Dieser Aufruf ist für den Designer erforderlich.
-            InitializeComponent();
-            // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+    public PadEditorReadOnly() : base() {
+        // Dieser Aufruf ist für den Designer erforderlich.
+        InitializeComponent();
+        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
-            if (Develop.IsHostRunning()) { TopMost = false; }
-        }
-
-        #endregion
-
-        #region Methods
-
-        private void btnAlsBildSpeichern_Click(object sender, System.EventArgs e) => Pad.OpenSaveDialog(string.Empty);
-
-        private void btnDruckerDialog_Click(object sender, System.EventArgs e) => Pad.Print();
-
-        private void btnPageSetup_Click(object sender, System.EventArgs e) => Pad.ShowPrinterPageSetup();
-
-        private void btnVorschau_Click(object sender, System.EventArgs e) => Pad.ShowPrintPreview();
-
-        private void btnVorschauModus_CheckedChanged(object sender, System.EventArgs e) => Pad.ShowInPrintMode = btnVorschauModus.Checked;
-
-        private void btnZoom11_Click(object sender, System.EventArgs e) => Pad.Zoom = 1f;
-
-        private void btnZoomFit_Click(object sender, System.EventArgs e) => Pad.ZoomFit();
-
-        private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
-            if (btnZoomIn.Checked) { Pad.ZoomIn(e); }
-            if (btnZoomOut.Checked) { Pad.ZoomOut(e); }
-        }
-
-        private void Pad_PreviewModChanged(object sender, System.EventArgs e) {
-            btnVorschauModus.Checked = Pad.ShowInPrintMode;
-        }
-
-        #endregion
+        if (Develop.IsHostRunning()) { TopMost = false; }
     }
+
+    #endregion
+
+    #region Methods
+
+    private void btnAlsBildSpeichern_Click(object sender, System.EventArgs e) => Pad.OpenSaveDialog(string.Empty);
+
+    private void btnDruckerDialog_Click(object sender, System.EventArgs e) => Pad.Print();
+
+    private void btnPageSetup_Click(object sender, System.EventArgs e) => Pad.ShowPrinterPageSetup();
+
+    private void btnVorschau_Click(object sender, System.EventArgs e) => Pad.ShowPrintPreview();
+
+    private void btnVorschauModus_CheckedChanged(object sender, System.EventArgs e) => Pad.ShowInPrintMode = btnVorschauModus.Checked;
+
+    private void btnZoom11_Click(object sender, System.EventArgs e) => Pad.Zoom = 1f;
+
+    private void btnZoomFit_Click(object sender, System.EventArgs e) => Pad.ZoomFit();
+
+    private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
+        if (btnZoomIn.Checked) { Pad.ZoomIn(e); }
+        if (btnZoomOut.Checked) { Pad.ZoomOut(e); }
+    }
+
+    private void Pad_PreviewModChanged(object sender, System.EventArgs e) {
+        btnVorschauModus.Checked = Pad.ShowInPrintMode;
+    }
+
+    #endregion
 }

@@ -15,12 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueControls.Enums {
+namespace BlueControls.Enums;
 
-    public enum GroupBoxStyle {
-        Normal = 1,
-        RibbonBar = 2,
-        Nothing = 3,
-        NormalBold = 4
-    }
+public enum GroupBoxStyle {
+    Normal = 1,
+    RibbonBar = 2,
+    Nothing = 3,
+    NormalBold = 4
 }

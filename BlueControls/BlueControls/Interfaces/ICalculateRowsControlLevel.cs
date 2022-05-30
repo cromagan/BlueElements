@@ -21,21 +21,20 @@ using BlueBasics;
 using BlueDatabase;
 using BlueScript;
 
-namespace BlueControls.Interfaces {
+namespace BlueControls.Interfaces;
 
-    /// <summary>
-    /// Ähnlich zu ICalculateRowsItemLevel.
-    /// Hier sind die Wert zu finden, wenn das Control Zeilen berechnen kann und
-    /// diese an Childs weiter geben kann.
-    /// </summary>
-    public interface ICalculateRowsControlLevel {
+/// <summary>
+/// Ähnlich zu ICalculateRowsItemLevel.
+/// Hier sind die Wert zu finden, wenn das Control Zeilen berechnen kann und
+/// diese an Childs weiter geben kann.
+/// </summary>
+public interface ICalculateRowsControlLevel {
 
-        #region Properties
+    #region Properties
 
-        public ListExt<System.Windows.Forms.Control> Childs { get; }
-        public Database? Database { get; }
-        public Script? Script { get; set; }
+    public ListExt<System.Windows.Forms.Control> Childs { get; }
+    public Database? Database { get; }
+    public Script? Script { get; set; }
 
-        #endregion
-    }
+    #endregion
 }

@@ -25,84 +25,83 @@ using static BlueBasics.Extensions;
 
 using BlueScript.Methods;
 
-namespace BlueScript.Variables {
+namespace BlueScript.Variables;
 
-    public class VariableSub : Variable {
+public class VariableSub : Variable {
 
-        #region Constructors
+    #region Constructors
 
-        public VariableSub(string name, string subName, int subOnLine, string subCode, bool system, string coment) : base(name, true, system, coment) {
-            SubName = subName.RestoreCriticalVariableChars();
-            SubOnLine = subOnLine;
-            SubCode = subCode;
-        }
-
-        /// <summary>
-        /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
-        /// </summary>
-        /// <param name="name"></param>
-        public VariableSub(string value) : this(DummyName(), value, 0, string.Empty, false, string.Empty) { }
-
-        public VariableSub(string name, string subName, int subOnLine, string subCode) : this(name, subName, subOnLine, subCode, false, string.Empty) { }
-
-        #endregion
-
-        #region Properties
-
-        public static string ShortName_Plain => "sub";
-        public override int CheckOrder => 4;
-        public override bool GetFromStringPossible => true;
-        public override bool IsNullOrEmpty => string.IsNullOrEmpty(SubName);
-
-        /// <summary>
-        /// Gleichgesetzt mit ValueString
-        /// </summary>
-        public override string ReadableText => SubName;
-
-        public override string ShortName => "sub";
-        public string SubCode { get; } = string.Empty;
-        public string SubName { get; private set; } = string.Empty;
-        public int SubOnLine { get; } = 0;
-        public override bool ToStringPossible => false;
-        public override string ValueForReplace => SubName.RemoveCriticalVariableChars();
-
-        #endregion
-
-        #region Methods
-
-        public override DoItFeedback GetValueFrom(Variable variable) {
-            if (variable is not VariableSub v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
-            if (Readonly) { return DoItFeedback.Schreibgschützt(); }
-            SubName = v.SubName;
-            return DoItFeedback.Null();
-        }
-
-        protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
-            succesVar = null;
-
-            if (string.IsNullOrEmpty(txt)) { return false; }
-
-            if (!IsValidName(txt)) { return false; }
-
-            var such = new List<string> { "sub" + txt.ToLower() + "()" };
-
-            var (pos, _) = NextText(s.ReducedScriptText.ToLower(), 0, such, true, false, KlammernStd);
-
-            if (pos < 0) { return false; }
-
-            var (pos2, _) = NextText(s.ReducedScriptText.ToLower(), pos + 1, such, true, false, KlammernStd);
-            if (pos2 > 0) { return false; }//return new DoItFeedback("Subroutine " + infos.AttributText + " mehrfach definert.");
-
-            var (item1, item2) = Method.GetCodeBlockText(s.ReducedScriptText, pos + such[0].Length);
-
-            if (!string.IsNullOrEmpty(item2)) { return false; }//new DoItFeedback("Subroutine " + infos.AttributText + ": " + item2); }
-
-            var subOnLine = s.ReducedScriptText.Substring(0, pos).Count(c => c == '¶') + 1;
-
-            succesVar = new VariableSub(DummyName(), txt, subOnLine, item1);
-            return true;
-        }
-
-        #endregion
+    public VariableSub(string name, string subName, int subOnLine, string subCode, bool system, string coment) : base(name, true, system, coment) {
+        SubName = subName.RestoreCriticalVariableChars();
+        SubOnLine = subOnLine;
+        SubCode = subCode;
     }
+
+    /// <summary>
+    /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
+    /// </summary>
+    /// <param name="name"></param>
+    public VariableSub(string value) : this(DummyName(), value, 0, string.Empty, false, string.Empty) { }
+
+    public VariableSub(string name, string subName, int subOnLine, string subCode) : this(name, subName, subOnLine, subCode, false, string.Empty) { }
+
+    #endregion
+
+    #region Properties
+
+    public static string ShortName_Plain => "sub";
+    public override int CheckOrder => 4;
+    public override bool GetFromStringPossible => true;
+    public override bool IsNullOrEmpty => string.IsNullOrEmpty(SubName);
+
+    /// <summary>
+    /// Gleichgesetzt mit ValueString
+    /// </summary>
+    public override string ReadableText => SubName;
+
+    public override string ShortName => "sub";
+    public string SubCode { get; } = string.Empty;
+    public string SubName { get; private set; } = string.Empty;
+    public int SubOnLine { get; } = 0;
+    public override bool ToStringPossible => false;
+    public override string ValueForReplace => SubName.RemoveCriticalVariableChars();
+
+    #endregion
+
+    #region Methods
+
+    public override DoItFeedback GetValueFrom(Variable variable) {
+        if (variable is not VariableSub v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
+        if (Readonly) { return DoItFeedback.Schreibgschützt(); }
+        SubName = v.SubName;
+        return DoItFeedback.Null();
+    }
+
+    protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
+        succesVar = null;
+
+        if (string.IsNullOrEmpty(txt)) { return false; }
+
+        if (!IsValidName(txt)) { return false; }
+
+        var such = new List<string> { "sub" + txt.ToLower() + "()" };
+
+        var (pos, _) = NextText(s.ReducedScriptText.ToLower(), 0, such, true, false, KlammernStd);
+
+        if (pos < 0) { return false; }
+
+        var (pos2, _) = NextText(s.ReducedScriptText.ToLower(), pos + 1, such, true, false, KlammernStd);
+        if (pos2 > 0) { return false; }//return new DoItFeedback("Subroutine " + infos.AttributText + " mehrfach definert.");
+
+        var (item1, item2) = Method.GetCodeBlockText(s.ReducedScriptText, pos + such[0].Length);
+
+        if (!string.IsNullOrEmpty(item2)) { return false; }//new DoItFeedback("Subroutine " + infos.AttributText + ": " + item2); }
+
+        var subOnLine = s.ReducedScriptText.Substring(0, pos).Count(c => c == '¶') + 1;
+
+        succesVar = new VariableSub(DummyName(), txt, subOnLine, item1);
+        return true;
+    }
+
+    #endregion
 }

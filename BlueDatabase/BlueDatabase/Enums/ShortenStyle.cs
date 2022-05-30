@@ -15,12 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueDatabase.Enums {
+namespace BlueDatabase.Enums;
 
-    public enum ShortenStyle {
-        Replaced = 0,
-        Unreplaced = 1,
-        Both = 2,
-        HTML = 3
-    }
+public enum ShortenStyle {
+    Replaced = 0,
+    Unreplaced = 1,
+    Both = 2,
+    HTML = 3
 }

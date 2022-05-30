@@ -18,35 +18,34 @@
 using BlueControls.Enums;
 using System.Windows.Forms;
 
-namespace BlueControls.Controls {
+namespace BlueControls.Controls;
 
-    public class RibbonBar : AbstractTabControl {
+public class RibbonBar : AbstractTabControl {
 
-        #region Constructors
+    #region Constructors
 
-        public RibbonBar() : base() {
-            Height = 110;
-            SendToBack();
-            Dock = DockStyle.Top;
-            BackColor = Skin.Color_Back(Design.RibbonBar_Body, States.Standard);
-        }
-
-        #endregion
-
-        #region Methods
-
-        protected override void OnControlAdded(ControlEventArgs e) {
-            base.OnControlAdded(e);
-            if (e.Control is not TabPage tp) {
-                return;
-            }
-
-            tp.BackColor = Skin.Color_Back(Design.RibbonBar_Body, States.Standard);
-            Invalidate();
-        }
-
-        protected override void OnPaint(PaintEventArgs e) => DrawControl(e, Design.RibbonBar_Back);
-
-        #endregion
+    public RibbonBar() : base() {
+        Height = 110;
+        SendToBack();
+        Dock = DockStyle.Top;
+        BackColor = Skin.Color_Back(Design.RibbonBar_Body, States.Standard);
     }
+
+    #endregion
+
+    #region Methods
+
+    protected override void OnControlAdded(ControlEventArgs e) {
+        base.OnControlAdded(e);
+        if (e.Control is not TabPage tp) {
+            return;
+        }
+
+        tp.BackColor = Skin.Color_Back(Design.RibbonBar_Body, States.Standard);
+        Invalidate();
+    }
+
+    protected override void OnPaint(PaintEventArgs e) => DrawControl(e, Design.RibbonBar_Back);
+
+    #endregion
 }

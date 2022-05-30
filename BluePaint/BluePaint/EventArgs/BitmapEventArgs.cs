@@ -19,20 +19,19 @@
 
 using System.Drawing;
 
-namespace BluePaint.EventArgs {
+namespace BluePaint.EventArgs;
 
-    public class BitmapEventArgs : System.EventArgs {
+public class BitmapEventArgs : System.EventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public BitmapEventArgs(Bitmap? bmp) => Bmp = bmp;
+    public BitmapEventArgs(Bitmap? bmp) => Bmp = bmp;
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public Bitmap? Bmp { get; set; }
+    public Bitmap? Bmp { get; set; }
 
-        #endregion
-    }
+    #endregion
 }

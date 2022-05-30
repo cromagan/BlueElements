@@ -19,38 +19,37 @@ using BlueControls.EventArgs;
 using System.Drawing;
 using static BlueBasics.BitmapExt;
 
-namespace BluePaint {
+namespace BluePaint;
 
-    public partial class Tool_Paint {
+public partial class Tool_Paint {
 
-        #region Constructors
+    #region Constructors
 
-        public Tool_Paint() : base() => InitializeComponent();
+    public Tool_Paint() : base() => InitializeComponent();
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap? originalPic) {
-            var c = Color.FromArgb(50, 255, 0, 0);
-            e.FillCircle(c, e.Current.TrimmedX, e.Current.TrimmedY, 2);
-        }
-
-        public override void MouseDown(MouseEventArgs1_1 e, Bitmap? originalPic) {
-            OnForceUndoSaving();
-            MouseMove(new MouseEventArgs1_1DownAndCurrent(e, e), originalPic);
-        }
-
-        public override void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap? originalPic) {
-            if (e.Current.Button == System.Windows.Forms.MouseButtons.Left) {
-                var pic = OnNeedCurrentPic();
-                FillCircle(pic, Color.Black, e.Current.TrimmedX, e.Current.TrimmedY, 2);
-                OnDoInvalidate();
-            } else {
-                OnDoInvalidate();
-            }
-        }
-
-        #endregion
+    public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap? originalPic) {
+        var c = Color.FromArgb(50, 255, 0, 0);
+        e.FillCircle(c, e.Current.TrimmedX, e.Current.TrimmedY, 2);
     }
+
+    public override void MouseDown(MouseEventArgs1_1 e, Bitmap? originalPic) {
+        OnForceUndoSaving();
+        MouseMove(new MouseEventArgs1_1DownAndCurrent(e, e), originalPic);
+    }
+
+    public override void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap? originalPic) {
+        if (e.Current.Button == System.Windows.Forms.MouseButtons.Left) {
+            var pic = OnNeedCurrentPic();
+            FillCircle(pic, Color.Black, e.Current.TrimmedX, e.Current.TrimmedY, 2);
+            OnDoInvalidate();
+        } else {
+            OnDoInvalidate();
+        }
+    }
+
+    #endregion
 }

@@ -20,40 +20,39 @@ using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueDatabase.AdditionalScriptComands {
+namespace BlueDatabase.AdditionalScriptComands;
 
-    public class Method_UniqueRowID : MethodDatabase {
+public class Method_UniqueRowID : MethodDatabase {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new();
-        public override string Description => "Gibt eine systemweit einzigartige Zeilen-ID aller geladenen Datenbanken aus.";
+    public override List<List<string>> Args => new();
+    public override string Description => "Gibt eine systemweit einzigartige Zeilen-ID aller geladenen Datenbanken aus.";
 
-        public override bool EndlessArgs => false;
+    public override bool EndlessArgs => false;
 
-        public override string EndSequence => ")";
+    public override string EndSequence => ")";
 
-        public override bool GetCodeBlockAfter => false;
+    public override bool GetCodeBlockAfter => false;
 
-        public override string Returns => VariableString.ShortName_Plain;
+    public override string Returns => VariableString.ShortName_Plain;
 
-        public override string StartSequence => "(";
+    public override string StartSequence => "(";
 
-        public override string Syntax => "UniqueRowID()";
+    public override string Syntax => "UniqueRowID()";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "uniquerowid" };
+    public override List<string> Comand(Script? s) => new() { "uniquerowid" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            return !string.IsNullOrEmpty(attvar.ErrorMessage)
-                ? DoItFeedback.AttributFehler(this, attvar)
-                : new DoItFeedback(RowCollection.UniqueKeyValue(), string.Empty);
-        }
-
-        #endregion
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        return !string.IsNullOrEmpty(attvar.ErrorMessage)
+            ? DoItFeedback.AttributFehler(this, attvar)
+            : new DoItFeedback(RowCollection.UniqueKeyValue(), string.Empty);
     }
+
+    #endregion
 }

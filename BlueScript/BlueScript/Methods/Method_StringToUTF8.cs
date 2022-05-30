@@ -20,33 +20,32 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Converter;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_StringToUTF8 : Method {
+internal class Method_StringToUTF8 : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain } };
-        public override string Description => "Ersetzt einen ASCII-String nach UTF8.";
-        public override bool EndlessArgs => false;
-        public override string EndSequence => ")";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => VariableString.ShortName_Plain;
-        public override string StartSequence => "(";
-        public override string Syntax => "StringToUTF8(String, IgnoreBRbool)";
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain } };
+    public override string Description => "Ersetzt einen ASCII-String nach UTF8.";
+    public override bool EndlessArgs => false;
+    public override string EndSequence => ")";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => VariableString.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "StringToUTF8(String, IgnoreBRbool)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "stringtoutf8" };
+    public override List<string> Comand(Script? s) => new() { "stringtoutf8" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.AttributFehler(this, attvar)
-                                                              : new DoItFeedback(((VariableString)attvar.Attributes[0]).ValueString.StringtoUtf8(), string.Empty);
-        }
-
-        #endregion
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.AttributFehler(this, attvar)
+            : new DoItFeedback(((VariableString)attvar.Attributes[0]).ValueString.StringtoUtf8(), string.Empty);
     }
+
+    #endregion
 }

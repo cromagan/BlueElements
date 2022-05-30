@@ -21,44 +21,43 @@ using System.Collections.Generic;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_AddPrefix : Method {
+internal class Method_AddPrefix : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable }, new() { VariableString.ShortName_Plain } };
-        public override string Description => "Fügt am Anfang jedes Listenobjekts einen Text hinzu.";
-        public override bool EndlessArgs => false;
-        public override string EndSequence => ");";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => string.Empty;
-        public override string StartSequence => "(";
-        public override string Syntax => "AddPrefix(VariableListe, PrefixText)";
+    public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable }, new() { VariableString.ShortName_Plain } };
+    public override string Description => "Fügt am Anfang jedes Listenobjekts einen Text hinzu.";
+    public override bool EndlessArgs => false;
+    public override string EndSequence => ");";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => "(";
+    public override string Syntax => "AddPrefix(VariableListe, PrefixText)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "addprefix" };
+    public override List<string> Comand(Script? s) => new() { "addprefix" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
+        if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
 
-            var tmp = ((VariableListString)attvar.Attributes[0]).ValueList;
+        var tmp = ((VariableListString)attvar.Attributes[0]).ValueList;
 
-            for (var z = 0; z < tmp.Count; z++) {
-                tmp[z] = attvar.Attributes[1].ReadableText + tmp[z];
-            }
-
-            ((VariableListString)attvar.Attributes[0]).ValueList = tmp;
-
-            return DoItFeedback.Null();
+        for (var z = 0; z < tmp.Count; z++) {
+            tmp[z] = attvar.Attributes[1].ReadableText + tmp[z];
         }
 
-        #endregion
+        ((VariableListString)attvar.Attributes[0]).ValueList = tmp;
+
+        return DoItFeedback.Null();
     }
+
+    #endregion
 }

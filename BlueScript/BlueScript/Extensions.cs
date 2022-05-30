@@ -15,55 +15,54 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueScript {
+namespace BlueScript;
 
-    public static class Extensions {
-        //public static readonly string ImageKennung = ((char)9001).ToString();
-        //public static readonly string ObjectKennung = ((char)9002).ToString();
+public static class Extensions {
+    //public static readonly string ImageKennung = ((char)9001).ToString();
+    //public static readonly string ObjectKennung = ((char)9002).ToString();
 
-        #region Fields
+    #region Fields
 
-        private static readonly string ReplacerForBackSlash = ((char)9003).ToString();
-        private static readonly string ReplacerForN = ((char)9005).ToString();
-        private static readonly string ReplacerForQuotes = ((char)9000).ToString();
-        private static readonly string ReplacerForR = ((char)9004).ToString();
+    private static readonly string ReplacerForBackSlash = ((char)9003).ToString();
+    private static readonly string ReplacerForN = ((char)9005).ToString();
+    private static readonly string ReplacerForQuotes = ((char)9000).ToString();
+    private static readonly string ReplacerForR = ((char)9004).ToString();
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public static string RemoveCriticalVariableChars(this string txt) {
-            txt = txt.Replace("\\", ReplacerForBackSlash);
-            txt = txt.Replace("\"", ReplacerForQuotes);
-            txt = txt.Replace("\r", ReplacerForR);
-            txt = txt.Replace("\n", ReplacerForN);
-            return txt;
-        }
-
-        public static string RemoveEscape(this string txt) {
-            txt = txt.Replace("\\\\", ReplacerForBackSlash);
-            txt = txt.Replace("\\\"", ReplacerForQuotes);
-            txt = txt.Replace("\\r", ReplacerForR);
-            txt = txt.Replace("\\n", ReplacerForN);
-            return txt;
-        }
-
-        public static string RestoreCriticalVariableChars(this string txt) {
-            txt = txt.Replace(ReplacerForBackSlash, "\\");
-            txt = txt.Replace(ReplacerForQuotes, "\"");
-            txt = txt.Replace(ReplacerForR, "\r");
-            txt = txt.Replace(ReplacerForN, "\n");
-            return txt;
-        }
-
-        public static string RestoreEscape(this string txt) {
-            txt = txt.Replace(ReplacerForBackSlash, "\\\\");
-            txt = txt.Replace(ReplacerForQuotes, "\\\"");
-            txt = txt.Replace(ReplacerForR, "\\r");
-            txt = txt.Replace(ReplacerForN, "\\n");
-            return txt;
-        }
-
-        #endregion
+    public static string RemoveCriticalVariableChars(this string txt) {
+        txt = txt.Replace("\\", ReplacerForBackSlash);
+        txt = txt.Replace("\"", ReplacerForQuotes);
+        txt = txt.Replace("\r", ReplacerForR);
+        txt = txt.Replace("\n", ReplacerForN);
+        return txt;
     }
+
+    public static string RemoveEscape(this string txt) {
+        txt = txt.Replace("\\\\", ReplacerForBackSlash);
+        txt = txt.Replace("\\\"", ReplacerForQuotes);
+        txt = txt.Replace("\\r", ReplacerForR);
+        txt = txt.Replace("\\n", ReplacerForN);
+        return txt;
+    }
+
+    public static string RestoreCriticalVariableChars(this string txt) {
+        txt = txt.Replace(ReplacerForBackSlash, "\\");
+        txt = txt.Replace(ReplacerForQuotes, "\"");
+        txt = txt.Replace(ReplacerForR, "\r");
+        txt = txt.Replace(ReplacerForN, "\n");
+        return txt;
+    }
+
+    public static string RestoreEscape(this string txt) {
+        txt = txt.Replace(ReplacerForBackSlash, "\\\\");
+        txt = txt.Replace(ReplacerForQuotes, "\\\"");
+        txt = txt.Replace(ReplacerForR, "\\r");
+        txt = txt.Replace(ReplacerForN, "\\n");
+        return txt;
+    }
+
+    #endregion
 }

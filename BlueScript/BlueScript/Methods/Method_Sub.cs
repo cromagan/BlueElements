@@ -19,36 +19,35 @@ using System.Collections.Generic;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_Sub : Method {
+internal class Method_Sub : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableSub.ShortName_Plain } };
-        public override string Description => "Bezeichnet den Start einer Subroutine.";
-        public override bool EndlessArgs => false;
-        public override string EndSequence => "()";
-        public override bool GetCodeBlockAfter => true;
-        public override string Returns => string.Empty;
-        public override string StartSequence => "";
-        public override string Syntax => "Sub SubName() {Code }";
+    public override List<List<string>> Args => new() { new() { VariableSub.ShortName_Plain } };
+    public override string Description => "Bezeichnet den Start einer Subroutine.";
+    public override bool EndlessArgs => false;
+    public override string EndSequence => "()";
+    public override bool GetCodeBlockAfter => true;
+    public override string Returns => string.Empty;
+    public override string StartSequence => "";
+    public override string Syntax => "Sub SubName() {Code }";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "sub" };
+    public override List<string> Comand(Script? s) => new() { "sub" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback("Kein Text angekommen."); }
-            if (!Variable.IsValidName(infos.AttributText)) { return new DoItFeedback(infos.AttributText + " ist kein gültiger Subroutinen-Name."); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback("Kein Text angekommen."); }
+        if (!Variable.IsValidName(infos.AttributText)) { return new DoItFeedback(infos.AttributText + " ist kein gültiger Subroutinen-Name."); }
 
-            //Subroutinen werden einfach übersprungen
-            s.Line += infos.LineBreakInCodeBlock;
-            return new DoItFeedback(string.Empty);
-        }
-
-        #endregion
+        //Subroutinen werden einfach übersprungen
+        s.Line += infos.LineBreakInCodeBlock;
+        return new DoItFeedback(string.Empty);
     }
+
+    #endregion
 }

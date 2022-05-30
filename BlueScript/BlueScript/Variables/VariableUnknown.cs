@@ -19,58 +19,57 @@
 
 using BlueScript.Structures;
 
-namespace BlueScript.Variables {
+namespace BlueScript.Variables;
 
-    public class VariableUnknown : Variable {
+public class VariableUnknown : Variable {
 
-        #region Constructors
+    #region Constructors
 
-        public VariableUnknown(string name, string value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) { }
+    public VariableUnknown(string name, string value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) { }
 
-        /// <summary>
-        /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
-        /// </summary>
-        /// <param name="name"></param>
-        public VariableUnknown(string name) : this(name, string.Empty, true, false, string.Empty) { }
+    /// <summary>
+    /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
+    /// </summary>
+    /// <param name="name"></param>
+    public VariableUnknown(string name) : this(name, string.Empty, true, false, string.Empty) { }
 
-        public VariableUnknown(string name, string value) : this(name, value, true, false, string.Empty) { }
+    public VariableUnknown(string name, string value) : this(name, value, true, false, string.Empty) { }
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public static string ShortName_Variable => "*ukn";
-        public override int CheckOrder => 100;
+    public static string ShortName_Variable => "*ukn";
+    public override int CheckOrder => 100;
 
-        public override bool GetFromStringPossible => true;
-        public override bool IsNullOrEmpty => false;
+    public override bool GetFromStringPossible => true;
+    public override bool IsNullOrEmpty => false;
 
-        /// <summary>
-        /// Gleichgesetzt mit ValueString
-        /// </summary>
-        public override string ReadableText => "[unknown]";
+    /// <summary>
+    /// Gleichgesetzt mit ValueString
+    /// </summary>
+    public override string ReadableText => "[unknown]";
 
-        public override string ShortName => "ukn";
-        public override bool ToStringPossible => false;
-        public override string ValueForReplace => ReadableText;
+    public override string ShortName => "ukn";
+    public override bool ToStringPossible => false;
+    public override string ValueForReplace => ReadableText;
 
-        #endregion
+    #endregion
 
-        //public override string ValueForReplace { get => "\"" + _valueString.RemoveCriticalVariableChars() + "\""; }
+    //public override string ValueForReplace { get => "\"" + _valueString.RemoveCriticalVariableChars() + "\""; }
 
-        #region Methods
+    #region Methods
 
-        public override DoItFeedback GetValueFrom(Variable variable) {
-            if (variable is not VariableUnknown) { return DoItFeedback.VerschiedeneTypen(this, variable); }
-            if (Readonly) { return DoItFeedback.Schreibgschützt(); }
-            return DoItFeedback.Null();
-        }
-
-        protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
-            succesVar = new VariableUnknown(txt);
-            return true;
-        }
-
-        #endregion
+    public override DoItFeedback GetValueFrom(Variable variable) {
+        if (variable is not VariableUnknown) { return DoItFeedback.VerschiedeneTypen(this, variable); }
+        if (Readonly) { return DoItFeedback.Schreibgschützt(); }
+        return DoItFeedback.Null();
     }
+
+    protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
+        succesVar = new VariableUnknown(txt);
+        return true;
+    }
+
+    #endregion
 }

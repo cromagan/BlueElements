@@ -20,47 +20,46 @@ using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueDatabase.AdditionalScriptComands {
+namespace BlueDatabase.AdditionalScriptComands;
 
-    public class Method_ContentsFilter : MethodDatabase {
+public class Method_ContentsFilter : MethodDatabase {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableFilterItem.ShortName_Variable } };
-        public override string Description => "Lädt eine andere Datenbank (die mit den Filtern definiert wurde)\rund gibt aus der angegebenen Spalte alle Einträge (sortiert und einzigartig) als Liste zurück.\rDabei wird der Filter benutzt.\rEin Filter kann mit dem Befehl 'Filter' erstellt werden.";
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableFilterItem.ShortName_Variable } };
+    public override string Description => "Lädt eine andere Datenbank (die mit den Filtern definiert wurde)\rund gibt aus der angegebenen Spalte alle Einträge (sortiert und einzigartig) als Liste zurück.\rDabei wird der Filter benutzt.\rEin Filter kann mit dem Befehl 'Filter' erstellt werden.";
 
-        public override bool EndlessArgs => true;
+    public override bool EndlessArgs => true;
 
-        public override string EndSequence => ")";
+    public override string EndSequence => ")";
 
-        public override bool GetCodeBlockAfter => false;
+    public override bool GetCodeBlockAfter => false;
 
-        public override string Returns => VariableListString.ShortName_Plain;
+    public override string Returns => VariableListString.ShortName_Plain;
 
-        public override string StartSequence => "(";
+    public override string StartSequence => "(";
 
-        public override string Syntax => "ContentsFilter(Colum, Filter, ...)";
+    public override string Syntax => "ContentsFilter(Colum, Filter, ...)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "contentsfilter" };
+    public override List<string> Comand(Script? s) => new() { "contentsfilter" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1);
+        var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1);
 
-            if (allFi is null) { return new DoItFeedback("Fehler im Filter"); }
+        if (allFi is null) { return new DoItFeedback("Fehler im Filter"); }
 
-            var returncolumn = allFi[0].Database.Column.Exists(attvar.Attributes[0].ReadableText);
-            if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[0].ReadableText); }
-            var x = returncolumn.Contents(allFi, null);
-            return new DoItFeedback(x);
-        }
-
-        #endregion
+        var returncolumn = allFi[0].Database.Column.Exists(attvar.Attributes[0].ReadableText);
+        if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[0].ReadableText); }
+        var x = returncolumn.Contents(allFi, null);
+        return new DoItFeedback(x);
     }
+
+    #endregion
 }

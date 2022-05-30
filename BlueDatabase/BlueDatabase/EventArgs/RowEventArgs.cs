@@ -15,20 +15,19 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueDatabase.EventArgs {
+namespace BlueDatabase.EventArgs;
 
-    public class RowEventArgs : System.EventArgs {
+public class RowEventArgs : System.EventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public RowEventArgs(RowItem? row) => Row = row;
+    public RowEventArgs(RowItem? row) => Row = row;
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public RowItem? Row { get; }
+    public RowItem? Row { get; }
 
-        #endregion
-    }
+    #endregion
 }

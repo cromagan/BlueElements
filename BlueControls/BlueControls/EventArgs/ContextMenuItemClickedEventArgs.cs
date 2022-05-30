@@ -19,26 +19,25 @@
 
 using System.Collections.Generic;
 
-namespace BlueControls.EventArgs {
+namespace BlueControls.EventArgs;
 
-    public class ContextMenuItemClickedEventArgs : System.EventArgs {
+public class ContextMenuItemClickedEventArgs : System.EventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public ContextMenuItemClickedEventArgs(string clickedComand, object hotItem, List<string>? tags) {
-            HotItem = hotItem;
-            Tags = tags ?? new List<string>();
-            ClickedComand = clickedComand;
-        }
-
-        #endregion
-
-        #region Properties
-
-        public string ClickedComand { get; }
-        public object HotItem { get; }
-        public List<string> Tags { get; }
-
-        #endregion
+    public ContextMenuItemClickedEventArgs(string clickedComand, object hotItem, List<string>? tags) {
+        HotItem = hotItem;
+        Tags = tags ?? new List<string>();
+        ClickedComand = clickedComand;
     }
+
+    #endregion
+
+    #region Properties
+
+    public string ClickedComand { get; }
+    public object HotItem { get; }
+    public List<string> Tags { get; }
+
+    #endregion
 }

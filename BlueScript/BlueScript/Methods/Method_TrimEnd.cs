@@ -20,44 +20,43 @@ using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_TrimEnd : Method {
+internal class Method_TrimEnd : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
-        public override string Description => "Entfernt die angegebenen Texte am Ende des Strings. Groß und Kleinschreibung wird ignoriert.";
-        public override bool EndlessArgs => true;
-        public override string EndSequence => ")";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => VariableString.ShortName_Plain;
-        public override string StartSequence => "(";
-        public override string Syntax => "TrimEnd(String, TexttoTrim, ...)";
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
+    public override string Description => "Entfernt die angegebenen Texte am Ende des Strings. Groß und Kleinschreibung wird ignoriert.";
+    public override bool EndlessArgs => true;
+    public override string EndSequence => ")";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => VariableString.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "TrimEnd(String, TexttoTrim, ...)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "trimend" };
+    public override List<string> Comand(Script? s) => new() { "trimend" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-            var val = ((VariableString)attvar.Attributes[0]).ValueString;
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        var val = ((VariableString)attvar.Attributes[0]).ValueString;
 
-            string txt;
+        string txt;
 
-            do {
-                txt = val;
-                for (var z = 1; z < attvar.Attributes.Count; z++) {
-                    val = val.TrimEnd(((VariableString)attvar.Attributes[z]).ValueString);
-                }
-            } while (txt != val);
+        do {
+            txt = val;
+            for (var z = 1; z < attvar.Attributes.Count; z++) {
+                val = val.TrimEnd(((VariableString)attvar.Attributes[z]).ValueString);
+            }
+        } while (txt != val);
 
-            return new DoItFeedback(val, string.Empty);
-        }
-
-        #endregion
+        return new DoItFeedback(val, string.Empty);
     }
+
+    #endregion
 }

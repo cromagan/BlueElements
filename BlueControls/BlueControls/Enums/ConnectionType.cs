@@ -17,15 +17,14 @@
 
 using System;
 
-namespace BlueControls.Enums {
+namespace BlueControls.Enums;
 
-    [Flags]
-    public enum ConnectionType {
-        Auto = 0,
+[Flags]
+public enum ConnectionType {
+    Auto = 0,
 
-        Top = 1,
-        Bottom = 2,
-        Left = 4,
-        Right = 8
-    }
+    Top = 1,
+    Bottom = 2,
+    Left = 4,
+    Right = 8
 }

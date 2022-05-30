@@ -17,20 +17,19 @@
 
 using BlueDatabase;
 
-namespace BlueControls.Interfaces {
+namespace BlueControls.Interfaces;
 
-    /// <summary>
-    /// Wird verwendet, wenn ein Steuerelement einen Zeilenschlüssele empfangen
-    /// und damit umgehen kann.
-    /// </summary>
-    public interface IAcceptRowKey : IDisabledReason {
+/// <summary>
+/// Wird verwendet, wenn ein Steuerelement einen Zeilenschlüssele empfangen
+/// und damit umgehen kann.
+/// </summary>
+public interface IAcceptRowKey : IDisabledReason {
 
-        #region Properties
+    #region Properties
 
-        public Database? Database { get; set; }
+    public Database? Database { get; set; }
 
-        public long RowKey { get; set; }
+    public long RowKey { get; set; }
 
-        #endregion
-    }
+    #endregion
 }

@@ -23,82 +23,81 @@ using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 
-namespace BlueControls.BlueDatabaseDialogs {
+namespace BlueControls.BlueDatabaseDialogs;
 
-    public partial class FormulaQuickSelect {
+public partial class FormulaQuickSelect {
 
-        #region Fields
+    #region Fields
 
-        private readonly RowItem? _row;
+    private readonly RowItem? _row;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public FormulaQuickSelect(RowItem? rowItem) {
-            // Dieser Aufruf ist für den Designer erforderlich.
-            InitializeComponent();
-            // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            _row = rowItem;
-        }
+    public FormulaQuickSelect(RowItem? rowItem) {
+        // Dieser Aufruf ist für den Designer erforderlich.
+        InitializeComponent();
+        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        _row = rowItem;
+    }
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        //Private Sub Auswahl_Item_CheckedChanged(sender As Object) Handles Auswahl.Item_CheckedChanged
-        //End Sub
-        protected override void OnLoad(System.EventArgs e) {
-            base.OnLoad(e);
-            Init();
-        }
+    //Private Sub Auswahl_Item_CheckedChanged(sender As Object) Handles Auswahl.Item_CheckedChanged
+    //End Sub
+    protected override void OnLoad(System.EventArgs e) {
+        base.OnLoad(e);
+        Init();
+    }
 
-        private void Auswahl_ItemClicked(object sender, BasicListItemEventArgs e) {
-            var x = e.Item.Internal.SplitAndCutBy("|");
-            if (_row.Database.Column[x[0]].MultiLine) {
-                var val = _row.CellGetList(_row.Database.Column[x[0]]);
-                if (e.Item.Checked) {
-                    val.AddIfNotExists(x[1]);
-                } else {
-                    val.Remove(x[1]);
-                }
-                _row.CellSet(_row.Database.Column[x[0]], val);
+    private void Auswahl_ItemClicked(object sender, BasicListItemEventArgs e) {
+        var x = e.Item.Internal.SplitAndCutBy("|");
+        if (_row.Database.Column[x[0]].MultiLine) {
+            var val = _row.CellGetList(_row.Database.Column[x[0]]);
+            if (e.Item.Checked) {
+                val.AddIfNotExists(x[1]);
             } else {
-                if (e.Item.Checked) {
-                    _row.CellSet(_row.Database.Column[x[0]], x[1]);
-                }
+                val.Remove(x[1]);
             }
-            //       End If
-            Such_TextChanged(null, System.EventArgs.Empty);
-        }
-
-        private void Init() {
-            if (_row == null) {
-                Close();
-                return;
+            _row.CellSet(_row.Database.Column[x[0]], val);
+        } else {
+            if (e.Item.Checked) {
+                _row.CellSet(_row.Database.Column[x[0]], x[1]);
             }
-            Für.Text = "<b>" + _row.CellFirstString();
         }
+        //       End If
+        Such_TextChanged(null, System.EventArgs.Empty);
+    }
 
-        private void Such_TextChanged(object? sender, System.EventArgs e) {
-            Auswahl.Item.Clear();
-            var t = Such.Text;
-            if (string.IsNullOrEmpty(t)) { return; }
-            t = t.ToLower();
-            foreach (var thisColumn in _row.Database.Column) {
-                if (thisColumn.DropdownBearbeitungErlaubt) {
-                    if (CellCollection.UserEditPossible(thisColumn, _row, ErrorReason.EditNormaly)) {
-                        var thisView = Formula.SearchColumnView(thisColumn);
-                        if (thisView != null) {
-                            if (_row.Database.PermissionCheck(thisView.PermissionGroups_Show, null)) {
-                                ItemCollectionList dummy = new();
-                                ItemCollectionList.GetItemCollection(dummy, thisColumn, _row, ShortenStyle.Replaced, 1000);
-                                if (dummy.Count > 0) {
-                                    foreach (var thisItem in dummy) {
-                                        if (thisItem.Internal.ToLower().Contains(t)) {
-                                            var ni = Auswahl.Item.Add(thisColumn.ReadableText() + ": " + thisItem.Internal, thisColumn.Name.ToUpper() + "|" + thisItem.Internal);
-                                            ni.Checked = thisItem.Checked;
-                                        }
+    private void Init() {
+        if (_row == null) {
+            Close();
+            return;
+        }
+        Für.Text = "<b>" + _row.CellFirstString();
+    }
+
+    private void Such_TextChanged(object? sender, System.EventArgs e) {
+        Auswahl.Item.Clear();
+        var t = Such.Text;
+        if (string.IsNullOrEmpty(t)) { return; }
+        t = t.ToLower();
+        foreach (var thisColumn in _row.Database.Column) {
+            if (thisColumn.DropdownBearbeitungErlaubt) {
+                if (CellCollection.UserEditPossible(thisColumn, _row, ErrorReason.EditNormaly)) {
+                    var thisView = Formula.SearchColumnView(thisColumn);
+                    if (thisView != null) {
+                        if (_row.Database.PermissionCheck(thisView.PermissionGroups_Show, null)) {
+                            ItemCollectionList dummy = new();
+                            ItemCollectionList.GetItemCollection(dummy, thisColumn, _row, ShortenStyle.Replaced, 1000);
+                            if (dummy.Count > 0) {
+                                foreach (var thisItem in dummy) {
+                                    if (thisItem.Internal.ToLower().Contains(t)) {
+                                        var ni = Auswahl.Item.Add(thisColumn.ReadableText() + ": " + thisItem.Internal, thisColumn.Name.ToUpper() + "|" + thisItem.Internal);
+                                        ni.Checked = thisItem.Checked;
                                     }
                                 }
                             }
@@ -107,7 +106,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
             }
         }
-
-        #endregion
     }
+
+    #endregion
 }

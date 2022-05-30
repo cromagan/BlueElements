@@ -15,29 +15,28 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueBasics.Enums {
+namespace BlueBasics.Enums;
 
-    public enum FileFormat {
-        Unknown,
-        WordKind,
-        Textdocument,
-        ExcelKind,
-        PowerPointKind,
-        EMail,
-        Pdf,
-        HTML,
-        Image,
-        CompressedArchive,
-        Movie,
-        Executable,
-        HelpFile,
-        Database,
-        XMLFile,
-        Visitenkarte,
-        Sound,
-        Icon,
-        ProgrammingCode,
-        Link,
-        BlueCreativeFile
-    }
+public enum FileFormat {
+    Unknown,
+    WordKind,
+    Textdocument,
+    ExcelKind,
+    PowerPointKind,
+    EMail,
+    Pdf,
+    HTML,
+    Image,
+    CompressedArchive,
+    Movie,
+    Executable,
+    HelpFile,
+    Database,
+    XMLFile,
+    Visitenkarte,
+    Sound,
+    Icon,
+    ProgrammingCode,
+    Link,
+    BlueCreativeFile
 }

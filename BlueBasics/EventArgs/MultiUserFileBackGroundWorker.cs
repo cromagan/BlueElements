@@ -17,22 +17,21 @@
 
 using System.ComponentModel;
 
-namespace BlueBasics.EventArgs {
+namespace BlueBasics.EventArgs;
 
-    public class MultiUserFileBackgroundWorkerEventArgs : System.EventArgs {
+public class MultiUserFileBackgroundWorkerEventArgs : System.EventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public MultiUserFileBackgroundWorkerEventArgs(BackgroundWorker bgw) {
-            BackgroundWorker = bgw;
-        }
-
-        #endregion
-
-        #region Properties
-
-        public BackgroundWorker BackgroundWorker { get; }
-
-        #endregion
+    public MultiUserFileBackgroundWorkerEventArgs(BackgroundWorker bgw) {
+        BackgroundWorker = bgw;
     }
+
+    #endregion
+
+    #region Properties
+
+    public BackgroundWorker BackgroundWorker { get; }
+
+    #endregion
 }

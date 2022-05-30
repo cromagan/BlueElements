@@ -22,80 +22,79 @@ using BlueBasics.Enums;
 using System;
 using System.Drawing;
 
-namespace BlueControls.ItemCollection {
-    /// <summary>
-    /// Ein einfaches Item, das immer als Rechteck dargestellt wird
-    /// und einen Text enthalten kann.
-    /// </summary>
+namespace BlueControls.ItemCollection;
 
-    public class GenericPadItem : FixedRectangleBitmapPadItem {
+/// <summary>
+/// Ein einfaches Item, das immer als Rechteck dargestellt wird
+/// und einen Text enthalten kann.
+/// </summary>
+public class GenericPadItem : FixedRectangleBitmapPadItem {
 
-        #region Fields
+    #region Fields
 
-        //public readonly Size Size;
-        private readonly string _text;
+    //public readonly Size Size;
+    private readonly string _text;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public GenericPadItem(string intern, string text, Size s) : base(intern) {
-            _text = text;
-            Size = s;
-        }
-
-        public GenericPadItem(string intern) : this(intern, string.Empty, new Size(10, 10)) { }
-
-        #endregion
-
-        #region Properties
-
-        protected override int SaveOrder => 999;
-
-        #endregion
-
-        #region Methods
-
-        public override void ProcessStyleChange() => RemovePic();
-
-        public override string ToString() {
-            var t = base.ToString();
-            t = t.Substring(0, t.Length - 1) + ", ";
-
-            t = t + "Text=" + _text.ToNonCritical() + ", ";
-            t = t + "Size=" + Size + ", ";
-
-            return t.Trim(", ") + "}";
-        }
-
-        protected override string ClassId() => "GenericPadItem";
-
-        protected override void GeneratePic() {
-            var bmp = new Bitmap(Size.Width, Size.Height);
-            var gr = Graphics.FromImage(bmp);
-
-            gr.Clear(Color.White);
-
-            var font = Skin.GetBlueFont(Stil, Parent.SheetStyle);
-
-            if (font == null) {
-                GeneratedBitmap = bmp;
-                return;
-            }
-
-            Skin.Draw_FormatedText(gr, _text, null, Alignment.Horizontal_Vertical_Center, new Rectangle(0, 0, Size.Width, Size.Height), null, false, font, false);
-            gr.DrawRectangle(font.Pen(1), new Rectangle(0, 0, Size.Width, Size.Height));
-
-            GeneratedBitmap = bmp;
-        }
-
-        protected override BasicPadItem? TryCreate(string id, string name) {
-            if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-                return new GenericPadItem(name);
-            }
-            return null;
-        }
-
-        #endregion
+    public GenericPadItem(string intern, string text, Size s) : base(intern) {
+        _text = text;
+        Size = s;
     }
+
+    public GenericPadItem(string intern) : this(intern, string.Empty, new Size(10, 10)) { }
+
+    #endregion
+
+    #region Properties
+
+    protected override int SaveOrder => 999;
+
+    #endregion
+
+    #region Methods
+
+    public override void ProcessStyleChange() => RemovePic();
+
+    public override string ToString() {
+        var t = base.ToString();
+        t = t.Substring(0, t.Length - 1) + ", ";
+
+        t = t + "Text=" + _text.ToNonCritical() + ", ";
+        t = t + "Size=" + Size + ", ";
+
+        return t.Trim(", ") + "}";
+    }
+
+    protected override string ClassId() => "GenericPadItem";
+
+    protected override void GeneratePic() {
+        var bmp = new Bitmap(Size.Width, Size.Height);
+        var gr = Graphics.FromImage(bmp);
+
+        gr.Clear(Color.White);
+
+        var font = Skin.GetBlueFont(Stil, Parent.SheetStyle);
+
+        if (font == null) {
+            GeneratedBitmap = bmp;
+            return;
+        }
+
+        Skin.Draw_FormatedText(gr, _text, null, Alignment.Horizontal_Vertical_Center, new Rectangle(0, 0, Size.Width, Size.Height), null, false, font, false);
+        gr.DrawRectangle(font.Pen(1), new Rectangle(0, 0, Size.Width, Size.Height));
+
+        GeneratedBitmap = bmp;
+    }
+
+    protected override BasicPadItem? TryCreate(string id, string name) {
+        if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
+            return new GenericPadItem(name);
+        }
+        return null;
+    }
+
+    #endregion
 }

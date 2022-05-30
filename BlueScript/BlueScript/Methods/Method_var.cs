@@ -19,35 +19,34 @@ using System.Collections.Generic;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_Var : Method {
+internal class Method_Var : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { Variable.Any_Plain } };
-        public override string Description => "Erstellt eine neue Variable, der Typ wird automatisch bestimmt.";
-        public override bool EndlessArgs => false;
-        public override string EndSequence => ";";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => string.Empty;
-        public override string StartSequence => "";
-        public override string Syntax => "var VariablenName = Wert;";
+    public override List<List<string>> Args => new() { new() { Variable.Any_Plain } };
+    public override string Description => "Erstellt eine neue Variable, der Typ wird automatisch bestimmt.";
+    public override bool EndlessArgs => false;
+    public override string EndSequence => ";";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => "";
+    public override string Syntax => "var VariablenName = Wert;";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "var" };
+    public override List<string> Comand(Script? s) => new() { "var" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback("Kein Text angekommen."); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback("Kein Text angekommen."); }
 
-            return Method_BerechneVariable.VariablenBerechnung(infos.AttributText + ";", s, true);
+        return Method_BerechneVariable.VariablenBerechnung(infos.AttributText + ";", s, true);
 
-            //return s.BerechneVariable.DoitKomplett(infos.AttributText + ";", s, infos, true);
-        }
-
-        #endregion
+        //return s.BerechneVariable.DoitKomplett(infos.AttributText + ";", s, infos, true);
     }
+
+    #endregion
 }

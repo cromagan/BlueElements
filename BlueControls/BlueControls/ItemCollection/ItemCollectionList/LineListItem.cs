@@ -18,43 +18,42 @@
 using System.Drawing;
 using BlueControls.Enums;
 
-namespace BlueControls.ItemCollection.ItemCollectionList {
+namespace BlueControls.ItemCollection.ItemCollectionList;
 
-    // LinenKollision
-    //http://www.vb-fun.de/cgi-bin/loadframe.pl?ID=vb/tipps/tip0294.shtml
-    //'Imports Microsoft.VisualBasic
-    public class LineListItem : BasicListItem {
+// LinenKollision
+//http://www.vb-fun.de/cgi-bin/loadframe.pl?ID=vb/tipps/tip0294.shtml
+//'Imports Microsoft.VisualBasic
+public class LineListItem : BasicListItem {
 
-        #region Constructors
+    #region Constructors
 
-        public LineListItem(string internalname, string userDefCompareKey) : base(internalname, true) => UserDefCompareKey = userDefCompareKey;
+    public LineListItem(string internalname, string userDefCompareKey) : base(internalname, true) => UserDefCompareKey = userDefCompareKey;
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public override string QuickInfo => string.Empty;
+    public override string QuickInfo => string.Empty;
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override object Clone() {
-            var x = new LineListItem(Internal, UserDefCompareKey);
-            x.CloneBasicStatesFrom(this);
-            return x;
-        }
-
-        public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth) => 4;
-
-        public override bool IsClickable() => false;
-
-        protected override Size ComputeSizeUntouchedForListBox() => Pos.X == 0 && Pos.Y == 0 && Pos.Width == 0 && Pos.Height == 0 ? new Size(4, 4) : Pos.Size;
-
-        protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States vState, bool drawBorderAndBack, bool translate) => gr.DrawLine(Skin.GetBlueFont(itemdesign, States.Standard).Pen(1f), positionModified.Left, (int)(positionModified.Top + (positionModified.Height / 2.0)), positionModified.Right, (int)(positionModified.Top + (positionModified.Height / 2.0)));
-
-        protected override string GetCompareKey() => Pos.ToString();
-
-        #endregion
+    public override object Clone() {
+        var x = new LineListItem(Internal, UserDefCompareKey);
+        x.CloneBasicStatesFrom(this);
+        return x;
     }
+
+    public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth) => 4;
+
+    public override bool IsClickable() => false;
+
+    protected override Size ComputeSizeUntouchedForListBox() => Pos.X == 0 && Pos.Y == 0 && Pos.Width == 0 && Pos.Height == 0 ? new Size(4, 4) : Pos.Size;
+
+    protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States vState, bool drawBorderAndBack, bool translate) => gr.DrawLine(Skin.GetBlueFont(itemdesign, States.Standard).Pen(1f), positionModified.Left, (int)(positionModified.Top + (positionModified.Height / 2.0)), positionModified.Right, (int)(positionModified.Top + (positionModified.Height / 2.0)));
+
+    protected override string GetCompareKey() => Pos.ToString();
+
+    #endregion
 }

@@ -15,12 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueDatabase.Enums {
+namespace BlueDatabase.Enums;
 
-    public enum ViewType {
-        None = 0,
-        Column = 1,
-        PermanentColumn = 2
-        //Separator = 100
-    }
+public enum ViewType {
+    None = 0,
+    Column = 1,
+    PermanentColumn = 2
+    //Separator = 100
 }

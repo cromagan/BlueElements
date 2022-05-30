@@ -21,36 +21,35 @@ using System.Collections.Generic;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_Element : Method {
+internal class Method_Element : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable }, new() { VariableFloat.ShortName_Plain } };
-        public override string Description => "Gibt ein das Element der Liste mit der Indexnummer als Text zurück. Die Liste beginnt mit dem Element 0.";
-        public override bool EndlessArgs => false;
-        public override string EndSequence => ")";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => VariableString.ShortName_Plain;
-        public override string StartSequence => "(";
-        public override string Syntax => "Element(VariableListe, Indexnummer)";
+    public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable }, new() { VariableFloat.ShortName_Plain } };
+    public override string Description => "Gibt ein das Element der Liste mit der Indexnummer als Text zurück. Die Liste beginnt mit dem Element 0.";
+    public override bool EndlessArgs => false;
+    public override string EndSequence => ")";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => VariableString.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "Element(VariableListe, Indexnummer)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "element" };
+    public override List<string> Comand(Script? s) => new() { "element" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-            var i = ((VariableFloat)attvar.Attributes[1]).ValueInt;
-            var list = ((VariableListString)attvar.Attributes[0]).ValueList;
-            return i < 0 || i >= list.Count ? new DoItFeedback("Element nicht in Liste")
-                                            : new DoItFeedback(list[i], string.Empty);
-        }
-
-        #endregion
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        var i = ((VariableFloat)attvar.Attributes[1]).ValueInt;
+        var list = ((VariableListString)attvar.Attributes[0]).ValueList;
+        return i < 0 || i >= list.Count ? new DoItFeedback("Element nicht in Liste")
+            : new DoItFeedback(list[i], string.Empty);
     }
+
+    #endregion
 }

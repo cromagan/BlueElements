@@ -21,46 +21,45 @@ using System.Collections.Generic;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_Add : Method {
+internal class Method_Add : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable }, new() { VariableString.ShortName_Plain, VariableListString.ShortName_Plain } };
-        public override string Description => "Fügt einer Liste einen oder mehrere Werte hinzu.";
-        public override bool EndlessArgs => true;
-        public override string EndSequence => ");";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => string.Empty;
-        public override string StartSequence => "(";
-        public override string Syntax => "Add(List-Variable, Value1, Value2, ...);";
+    public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable }, new() { VariableString.ShortName_Plain, VariableListString.ShortName_Plain } };
+    public override string Description => "Fügt einer Liste einen oder mehrere Werte hinzu.";
+    public override bool EndlessArgs => true;
+    public override string EndSequence => ");";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => "(";
+    public override string Syntax => "Add(List-Variable, Value1, Value2, ...);";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "add" };
+    public override List<string> Comand(Script? s) => new() { "add" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
+        if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
 
-            var tmpList = ((VariableListString)attvar.Attributes[0]).ValueList;
-            for (var z = 1; z < attvar.Attributes.Count; z++) {
-                if (attvar.Attributes[z] is VariableString vs) {
-                    tmpList.Add(vs.ValueString);
-                }
-                if (attvar.Attributes[z] is VariableListString vl) {
-                    tmpList.AddRange(vl.ValueList);
-                }
+        var tmpList = ((VariableListString)attvar.Attributes[0]).ValueList;
+        for (var z = 1; z < attvar.Attributes.Count; z++) {
+            if (attvar.Attributes[z] is VariableString vs) {
+                tmpList.Add(vs.ValueString);
             }
-            ((VariableListString)attvar.Attributes[0]).ValueList = tmpList;
-            return DoItFeedback.Null();
+            if (attvar.Attributes[z] is VariableListString vl) {
+                tmpList.AddRange(vl.ValueList);
+            }
         }
-
-        #endregion
+        ((VariableListString)attvar.Attributes[0]).ValueList = tmpList;
+        return DoItFeedback.Null();
     }
+
+    #endregion
 }

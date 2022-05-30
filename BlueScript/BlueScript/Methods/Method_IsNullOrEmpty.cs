@@ -20,52 +20,51 @@ using BlueScript.Structures;
 using BlueScript.Enums;
 using BlueScript.Variables;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_IsNullOrEmpty : Method {
+internal class Method_IsNullOrEmpty : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { Variable.Any_Variable } };
-        public override string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist oder keinen Inhalt hat.";
+    public override List<List<string>> Args => new() { new() { Variable.Any_Variable } };
+    public override string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist oder keinen Inhalt hat.";
 
-        public override bool EndlessArgs => false;
+    public override bool EndlessArgs => false;
 
-        public override string EndSequence => ")";
+    public override string EndSequence => ")";
 
-        public override bool GetCodeBlockAfter => false;
+    public override bool GetCodeBlockAfter => false;
 
-        public override string Returns => VariableBool.ShortName_Plain;
-        public override string StartSequence => "(";
+    public override string Returns => VariableBool.ShortName_Plain;
+    public override string StartSequence => "(";
 
-        public override string Syntax => "isNullOrEmpty(Variable)";
+    public override string Syntax => "isNullOrEmpty(Variable)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "isnullorempty" };
+    public override List<string> Comand(Script? s) => new() { "isnullorempty" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
 
-            if (attvar.Attributes.Count == 0) {
-                if (attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden) {
-                    return DoItFeedback.AttributFehler(this, attvar);
-                }
-
-                return DoItFeedback.Wahr();
+        if (attvar.Attributes.Count == 0) {
+            if (attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden) {
+                return DoItFeedback.AttributFehler(this, attvar);
             }
 
-            if (attvar.Attributes[0].IsNullOrEmpty) { return DoItFeedback.Wahr(); }
-
-            if (attvar.Attributes[0] is VariableUnknown) {
-                return DoItFeedback.Wahr();
-            }
-
-            return DoItFeedback.Falsch();
+            return DoItFeedback.Wahr();
         }
 
-        #endregion
+        if (attvar.Attributes[0].IsNullOrEmpty) { return DoItFeedback.Wahr(); }
+
+        if (attvar.Attributes[0] is VariableUnknown) {
+            return DoItFeedback.Wahr();
+        }
+
+        return DoItFeedback.Falsch();
     }
+
+    #endregion
 }

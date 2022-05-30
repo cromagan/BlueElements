@@ -17,16 +17,15 @@
 
 #nullable enable
 
-namespace BlueBasics.Interfaces {
+namespace BlueBasics.Interfaces;
 
-    public interface IReadableText {
+public interface IReadableText {
 
-        #region Methods
+    #region Methods
 
-        string ReadableText();
+    string ReadableText();
 
-        QuickImage? SymbolForReadableText();
+    QuickImage? SymbolForReadableText();
 
-        #endregion
-    }
+    #endregion
 }

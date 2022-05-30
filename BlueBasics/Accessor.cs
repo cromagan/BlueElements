@@ -21,87 +21,86 @@ using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace BlueBasics {
-    // https://stackoverflow.com/questions/32901771/multiple-enum-descriptions
-    // https://stackoverflow.com/questions/1402803/passing-properties-by-reference-in-c-sharp
+namespace BlueBasics;
+// https://stackoverflow.com/questions/32901771/multiple-enum-descriptions
+// https://stackoverflow.com/questions/1402803/passing-properties-by-reference-in-c-sharp
 
-    public class Accessor<T> {
+public class Accessor<T> {
 
-        #region Fields
+    #region Fields
 
-        public readonly bool CanRead = false;
-        public readonly bool CanWrite = false;
-        public readonly string Name = "[unbekannt]";
-        public readonly string QuickInfo = string.Empty;
+    public readonly bool CanRead = false;
+    public readonly bool CanWrite = false;
+    public readonly string Name = "[unbekannt]";
+    public readonly string QuickInfo = string.Empty;
 
-        //public readonly string TypeFullname = string.Empty;
-        private readonly Func<T>? _getter;
+    //public readonly string TypeFullname = string.Empty;
+    private readonly Func<T>? _getter;
 
-        private readonly Action<T>? _setter;
+    private readonly Action<T>? _setter;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public Accessor(Expression<Func<T>> expr) {
-            var memberExpression = (MemberExpression)expr.Body;
-            var instanceExpression = memberExpression.Expression;
-            var parameter = Expression.Parameter(typeof(T));
+    public Accessor(Expression<Func<T>> expr) {
+        var memberExpression = (MemberExpression)expr.Body;
+        var instanceExpression = memberExpression.Expression;
+        var parameter = Expression.Parameter(typeof(T));
 
-            IEnumerable<Attribute> ca = null;
+        IEnumerable<Attribute> ca = null;
 
-            if (memberExpression.Member is PropertyInfo propertyInfo) {
-                var setm = propertyInfo.GetSetMethod();
-                if (setm != null) {
-                    _setter = Expression.Lambda<Action<T>>(Expression.Call(instanceExpression, setm, parameter), parameter).Compile();
-                }
-
-                var getm = propertyInfo.GetGetMethod();
-                if (getm != null) {
-                    _getter = Expression.Lambda<Func<T>>(Expression.Call(instanceExpression, getm)).Compile();
-                }
-                CanWrite = propertyInfo.CanWrite;
-                CanRead = propertyInfo.CanRead;
-                Name = propertyInfo.Name;
-                //TypeFullname = propertyInfo.PropertyType.FullName;
-                ca = propertyInfo.GetCustomAttributes();
-            } else if (memberExpression.Member is FieldInfo fieldInfo) {
-                _setter = Expression.Lambda<Action<T>>(Expression.Assign(memberExpression, parameter), parameter).Compile();
-                _getter = Expression.Lambda<Func<T>>(Expression.Field(instanceExpression, fieldInfo)).Compile();
-                CanWrite = !fieldInfo.IsInitOnly;
-                CanRead = true;
-                Name = fieldInfo.Name;
-                //TypeFullname = fieldInfo.FieldType.FullName;
-                ca = fieldInfo.GetCustomAttributes();
+        if (memberExpression.Member is PropertyInfo propertyInfo) {
+            var setm = propertyInfo.GetSetMethod();
+            if (setm != null) {
+                _setter = Expression.Lambda<Action<T>>(Expression.Call(instanceExpression, setm, parameter), parameter).Compile();
             }
 
-            if (ca != null) {
-                foreach (var thisas in ca) {
-                    if (thisas is DescriptionAttribute da) {
-                        QuickInfo = da.Description;
-                    }
+            var getm = propertyInfo.GetGetMethod();
+            if (getm != null) {
+                _getter = Expression.Lambda<Func<T>>(Expression.Call(instanceExpression, getm)).Compile();
+            }
+            CanWrite = propertyInfo.CanWrite;
+            CanRead = propertyInfo.CanRead;
+            Name = propertyInfo.Name;
+            //TypeFullname = propertyInfo.PropertyType.FullName;
+            ca = propertyInfo.GetCustomAttributes();
+        } else if (memberExpression.Member is FieldInfo fieldInfo) {
+            _setter = Expression.Lambda<Action<T>>(Expression.Assign(memberExpression, parameter), parameter).Compile();
+            _getter = Expression.Lambda<Func<T>>(Expression.Field(instanceExpression, fieldInfo)).Compile();
+            CanWrite = !fieldInfo.IsInitOnly;
+            CanRead = true;
+            Name = fieldInfo.Name;
+            //TypeFullname = fieldInfo.FieldType.FullName;
+            ca = fieldInfo.GetCustomAttributes();
+        }
+
+        if (ca != null) {
+            foreach (var thisas in ca) {
+                if (thisas is DescriptionAttribute da) {
+                    QuickInfo = da.Description;
                 }
             }
         }
-
-        #endregion
-
-        #region Methods
-
-        public T Get() {
-            if (_getter != null) { return _getter(); }
-            Develop.DebugPrint("Getter ist null!");
-            return default;
-        }
-
-        public void Set(T value) {
-            if (_setter != null) {
-                _setter(value);
-            } else {
-                Develop.DebugPrint("Setter ist null!");
-            }
-        }
-
-        #endregion
     }
+
+    #endregion
+
+    #region Methods
+
+    public T Get() {
+        if (_getter != null) { return _getter(); }
+        Develop.DebugPrint("Getter ist null!");
+        return default;
+    }
+
+    public void Set(T value) {
+        if (_setter != null) {
+            _setter(value);
+        } else {
+            Develop.DebugPrint("Setter ist null!");
+        }
+    }
+
+    #endregion
 }

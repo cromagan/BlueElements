@@ -32,467 +32,466 @@ using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
 using BlueBasics.EventArgs;
 
-namespace BlueControls.BlueDatabaseDialogs {
+namespace BlueControls.BlueDatabaseDialogs;
 
-    public partial class ColumnArrangementPadEditor : PadEditor {
+public partial class ColumnArrangementPadEditor : PadEditor {
 
-        #region Fields
+    #region Fields
 
-        public readonly Database? Database;
+    public readonly Database? Database;
 
-        public int Fixing = 0;
-        public bool Generating;
+    public int Fixing = 0;
+    public bool Generating;
 
-        public bool Sorting;
+    public bool Sorting;
 
-        private int Arrangement = -1;
+    private int Arrangement = -1;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public ColumnArrangementPadEditor(Database database) : this() {
-            if (database == null || database.ReadOnly) {
-                MessageBox.Show("Datenbank schreibgeschützt.", ImageCode.Information, "OK");
-                Close();
-                return;
-            }
-
-            Database = database;
-            Database.ShouldICancelSaveOperations += TmpDatabase_ShouldICancelDiscOperations;
-            Arrangement = 1;
-            UpdateCombobox();
-            ShowOrder();
+    public ColumnArrangementPadEditor(Database database) : this() {
+        if (database == null || database.ReadOnly) {
+            MessageBox.Show("Datenbank schreibgeschützt.", ImageCode.Information, "OK");
+            Close();
+            return;
         }
 
-        private ColumnArrangementPadEditor() => InitializeComponent();
+        Database = database;
+        Database.ShouldICancelSaveOperations += TmpDatabase_ShouldICancelDiscOperations;
+        Arrangement = 1;
+        UpdateCombobox();
+        ShowOrder();
+    }
 
-        #endregion
+    private ColumnArrangementPadEditor() => InitializeComponent();
 
-        #region Properties
+    #endregion
 
-        public ColumnViewCollection? CurrentArrangement => Database?.ColumnArrangements == null || Database.ColumnArrangements.Count <= Arrangement
-                    ? null
-                    : Database.ColumnArrangements[Arrangement];
+    #region Properties
 
-        #endregion
+    public ColumnViewCollection? CurrentArrangement => Database?.ColumnArrangements == null || Database.ColumnArrangements.Count <= Arrangement
+        ? null
+        : Database.ColumnArrangements[Arrangement];
 
-        #region Methods
+    #endregion
 
-        protected override void OnFormClosed(System.Windows.Forms.FormClosedEventArgs e) {
-            Database.ShouldICancelSaveOperations -= TmpDatabase_ShouldICancelDiscOperations;
-            base.OnFormClosed(e);
+    #region Methods
+
+    protected override void OnFormClosed(System.Windows.Forms.FormClosedEventArgs e) {
+        Database.ShouldICancelSaveOperations -= TmpDatabase_ShouldICancelDiscOperations;
+        base.OnFormClosed(e);
+    }
+
+    private static void TmpDatabase_ShouldICancelDiscOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
+
+    private void btnAktuelleAnsichtLoeschen_Click(object sender, System.EventArgs e) {
+        if (Database == null || Arrangement < 2 || Arrangement >= Database.ColumnArrangements.Count) { return; }
+        if (MessageBox.Show("Anordung <b>'" + CurrentArrangement.Name + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+        Database.ColumnArrangements.RemoveAt(Arrangement);
+        Arrangement = 1;
+        UpdateCombobox();
+        ShowOrder();
+    }
+
+    private void btnAlleSpaltenEinblenden_Click(object sender, System.EventArgs e) {
+        if (MessageBox.Show("Alle Spalten anzeigen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+        CurrentArrangement.ShowAllColumns();
+        ShowOrder();
+    }
+
+    private void btnAnsichtUmbenennen_Click(object sender, System.EventArgs e) {
+        var n = InputBox.Show("Umbenennen:", CurrentArrangement.Name, VarType.Text);
+        if (!string.IsNullOrEmpty(n)) { CurrentArrangement.Name = n; }
+        UpdateCombobox();
+    }
+
+    private void btnBerechtigungsgruppen_Click(object sender, System.EventArgs e) {
+        ItemCollectionList aa = new();
+        aa.AddRange(Database.Permission_AllUsed(false));
+        aa.Sort();
+        aa.CheckBehavior = CheckBehavior.MultiSelection;
+        aa.Check(CurrentArrangement.PermissionGroups_Show, true);
+        var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, AddType.Text, true);
+        if (b == null) { return; }
+        CurrentArrangement.PermissionGroups_Show.Clear();
+        CurrentArrangement.PermissionGroups_Show.AddRange(b.ToArray());
+        if (Arrangement == 1) { CurrentArrangement.PermissionGroups_Show.Add("#Everybody"); }
+    }
+
+    private void btnNeueAnsichtErstellen_Click(object sender, System.EventArgs e) {
+        var MitVorlage = false;
+        if (Arrangement > 0 && CurrentArrangement != null) {
+            MitVorlage = Convert.ToBoolean(MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", ImageCode.Frage, "Ja", "Nein") == 0);
+        }
+        if (Database.ColumnArrangements.Count < 1) {
+            Database.ColumnArrangements.Add(new ColumnViewCollection(Database, "", ""));
+        }
+        string newname;
+        if (MitVorlage) {
+            newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", "", VarType.Text);
+            if (string.IsNullOrEmpty(newname)) { return; }
+            Database.ColumnArrangements.Add(new ColumnViewCollection(Database, CurrentArrangement.ToString(), newname));
+        } else {
+            newname = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", "", VarType.Text);
+            if (string.IsNullOrEmpty(newname)) { return; }
+            Database.ColumnArrangements.Add(new ColumnViewCollection(Database, "", newname));
+        }
+        UpdateCombobox();
+        ShowOrder();
+    }
+
+    private void btnNeueSpalte_Click(object sender, System.EventArgs e) {
+        if (Database == null || Database.ReadOnly) { return; }
+
+        ColumnItem? vorlage = null;
+        if (Pad.LastClickedItem is ColumnPadItem cpi && cpi.Column.Database == Database) {
+            vorlage = cpi.Column;
         }
 
-        private static void TmpDatabase_ShouldICancelDiscOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
-
-        private void btnAktuelleAnsichtLoeschen_Click(object sender, System.EventArgs e) {
-            if (Database == null || Arrangement < 2 || Arrangement >= Database.ColumnArrangements.Count) { return; }
-            if (MessageBox.Show("Anordung <b>'" + CurrentArrangement.Name + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-            Database.ColumnArrangements.RemoveAt(Arrangement);
-            Arrangement = 1;
-            UpdateCombobox();
-            ShowOrder();
-        }
-
-        private void btnAlleSpaltenEinblenden_Click(object sender, System.EventArgs e) {
-            if (MessageBox.Show("Alle Spalten anzeigen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-            CurrentArrangement.ShowAllColumns();
-            ShowOrder();
-        }
-
-        private void btnAnsichtUmbenennen_Click(object sender, System.EventArgs e) {
-            var n = InputBox.Show("Umbenennen:", CurrentArrangement.Name, VarType.Text);
-            if (!string.IsNullOrEmpty(n)) { CurrentArrangement.Name = n; }
-            UpdateCombobox();
-        }
-
-        private void btnBerechtigungsgruppen_Click(object sender, System.EventArgs e) {
-            ItemCollectionList aa = new();
-            aa.AddRange(Database.Permission_AllUsed(false));
-            aa.Sort();
-            aa.CheckBehavior = CheckBehavior.MultiSelection;
-            aa.Check(CurrentArrangement.PermissionGroups_Show, true);
-            var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, AddType.Text, true);
-            if (b == null) { return; }
-            CurrentArrangement.PermissionGroups_Show.Clear();
-            CurrentArrangement.PermissionGroups_Show.AddRange(b.ToArray());
-            if (Arrangement == 1) { CurrentArrangement.PermissionGroups_Show.Add("#Everybody"); }
-        }
-
-        private void btnNeueAnsichtErstellen_Click(object sender, System.EventArgs e) {
-            var MitVorlage = false;
-            if (Arrangement > 0 && CurrentArrangement != null) {
-                MitVorlage = Convert.ToBoolean(MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", ImageCode.Frage, "Ja", "Nein") == 0);
-            }
-            if (Database.ColumnArrangements.Count < 1) {
-                Database.ColumnArrangements.Add(new ColumnViewCollection(Database, "", ""));
-            }
-            string newname;
-            if (MitVorlage) {
-                newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", "", VarType.Text);
-                if (string.IsNullOrEmpty(newname)) { return; }
-                Database.ColumnArrangements.Add(new ColumnViewCollection(Database, CurrentArrangement.ToString(), newname));
-            } else {
-                newname = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", "", VarType.Text);
-                if (string.IsNullOrEmpty(newname)) { return; }
-                Database.ColumnArrangements.Add(new ColumnViewCollection(Database, "", newname));
-            }
-            UpdateCombobox();
-            ShowOrder();
-        }
-
-        private void btnNeueSpalte_Click(object sender, System.EventArgs e) {
-            if (Database == null || Database.ReadOnly) { return; }
-
-            ColumnItem? vorlage = null;
-            if (Pad.LastClickedItem is ColumnPadItem cpi && cpi.Column.Database == Database) {
-                vorlage = cpi.Column;
-            }
-
-            var mitDaten = false;
-            if (vorlage != null && !string.IsNullOrEmpty(vorlage.Identifier)) { vorlage = null; }
-            if (vorlage != null) {
-                switch (MessageBox.Show("Spalte '" + vorlage.ReadableText() + "' als<br>Vorlage verwenden?", ImageCode.Frage, "Ja", "Ja, mit allen Daten", "Nein", "Abbrechen")) {
-                    case 0:
-                        break;
-
-                    case 1:
-                        mitDaten = true;
-                        break;
-
-                    case 2:
-                        vorlage = null;
-                        break;
-
-                    default:
-                        return;
-                }
-            }
-            var newc = Database.Column.Add();
-            if (vorlage != null) {
-                newc.CloneFrom(vorlage);
-                if (mitDaten) {
-                    foreach (var thisR in Database.Row) {
-                        thisR.CellSet(newc, thisR.CellGetString(vorlage));
-                    }
-                }
-            }
-            using (ColumnEditor w = new(newc, null)) {
-                w.ShowDialog();
-                newc.Invalidate_ColumAndContent();
-                w.Dispose();
-            }
-            Database.Column.Repair();
-
-            if (Arrangement > 0 && CurrentArrangement != null) { CurrentArrangement.Add(newc, false); }
-
-            Database.RepairAfterParse(null, null);
-            ShowOrder();
-        }
-
-        private void btnSpalteEinblenden_Click(object sender, System.EventArgs e) {
-            ItemCollectionList ic = new();
-            foreach (var ThisColumnItem in Database.Column) {
-                if (ThisColumnItem != null && CurrentArrangement[ThisColumnItem] == null) { ic.Add(ThisColumnItem); }
-            }
-            if (ic.Count == 0) {
-                MessageBox.Show("Es werden bereits alle<br>Spalten angezeigt.", ImageCode.Information, "Ok");
-                return;
-            }
-            ic.Sort();
-            var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, AddType.None, true);
-            if (r == null || r.Count == 0) { return; }
-            CurrentArrangement.Add(Database.Column.SearchByKey(LongParse(r[0])), false);
-            ShowOrder();
-        }
-
-        private void btnSystemspaltenAusblenden_Click(object sender, System.EventArgs e) {
-            CurrentArrangement.HideSystemColumns();
-            ShowOrder();
-        }
-
-        private void cbxInternalColumnArrangementSelector_ItemClicked(object sender, BasicListItemEventArgs e) {
-            if (string.IsNullOrEmpty(cbxInternalColumnArrangementSelector.Text)) { return; }
-
-            var tmporder = IntParse(e.Item.Internal);
-
-            if (Arrangement == tmporder) { return; }
-
-            Arrangement = tmporder;
-            ShowOrder();
-        }
-
-        /// <summary>
-        /// Überträgt die aktuelle Ansicht fest in den Datenbankcode hinein
-        /// </summary>
-        private void FixColumnArrangement() {
-            if (Generating || Sorting) { return; }
-
-            var c = CurrentArrangement;
-            if (c == null) { return; }
-            var did = false;
-
-            Fixing++;
-
-            var done = new List<BasicPadItem>();
-            do {
-                var x = LeftestItem(done);
-                if (x == null) { break; }
-
-                if (Arrangement > 0) {
-
-                    #region Code für Ansichten > 0
-
-                    var currentVI = c.IndexOf(c[x.Column]);
-
-                    if (currentVI < 0) {
-                        c.Add(x.Column, false);
-                        currentVI = c.IndexOf(c[x.Column]);
-                        did = true;
-                    }
-
-                    if (currentVI != done.Count) {
-                        var onPosVI = c.IndexOf(c[done.Count]);
-                        c.Swap(c[onPosVI], c[currentVI]);
-                        did = true;
-                    }
-
-                    #endregion
-                } else {
-
-                    #region Code für Ansicht 0
-
-                    var currentC = Database.Column.IndexOf(x.Column);
-                    if (currentC < 0) {
-                        MessageBox.Show("Interner Fehler", ImageCode.Warnung, "OK");
-                        ShowOrder();
-                        Fixing--;
-                        return;
-                    }
-
-                    if (currentC != done.Count) {
-                        var onPosC = Database.Column.IndexOf(c[done.Count].Column);
-                        Database.Column.Swap(Database.Column[onPosC], Database.Column[currentC]);
-                        did = true;
-                    }
-
-                    #endregion
-                }
-
-                done.Add(x);
-            } while (true);
-
-            while (c.Count > done.Count) {
-                if (Arrangement > 0) {
-
-                    #region Code für Ansichten > 0
-
-                    c.RemoveAt(c.Count - 1);
-                    did = true;
-
-                    #endregion
-                } else {
-
-                    #region Code für Ansicht 0
-
-                    var col = Database.Column[c.Count - 1];
-                    if (string.IsNullOrEmpty(col.Identifier) && MessageBox.Show("Spalte <b>" + col.ReadableText() + "</b> endgültig löschen?", ImageCode.Warnung, "Ja", "Nein") == 0) {
-                        Database.Column.Remove(col);
-                    }
-                    did = true;
+        var mitDaten = false;
+        if (vorlage != null && !string.IsNullOrEmpty(vorlage.Identifier)) { vorlage = null; }
+        if (vorlage != null) {
+            switch (MessageBox.Show("Spalte '" + vorlage.ReadableText() + "' als<br>Vorlage verwenden?", ImageCode.Frage, "Ja", "Ja, mit allen Daten", "Nein", "Abbrechen")) {
+                case 0:
                     break;
 
-                    #endregion
+                case 1:
+                    mitDaten = true;
+                    break;
+
+                case 2:
+                    vorlage = null;
+                    break;
+
+                default:
+                    return;
+            }
+        }
+        var newc = Database.Column.Add();
+        if (vorlage != null) {
+            newc.CloneFrom(vorlage);
+            if (mitDaten) {
+                foreach (var thisR in Database.Row) {
+                    thisR.CellSet(newc, thisR.CellGetString(vorlage));
                 }
             }
+        }
+        using (ColumnEditor w = new(newc, null)) {
+            w.ShowDialog();
+            newc.Invalidate_ColumAndContent();
+            w.Dispose();
+        }
+        Database.Column.Repair();
 
-            Fixing--;
+        if (Arrangement > 0 && CurrentArrangement != null) { CurrentArrangement.Add(newc, false); }
 
-            if (Arrangement == 0 && did) {
-                Database?.RepairAfterParse(null, null);
-                ShowOrder();
+        Database.RepairAfterParse(null, null);
+        ShowOrder();
+    }
+
+    private void btnSpalteEinblenden_Click(object sender, System.EventArgs e) {
+        ItemCollectionList ic = new();
+        foreach (var ThisColumnItem in Database.Column) {
+            if (ThisColumnItem != null && CurrentArrangement[ThisColumnItem] == null) { ic.Add(ThisColumnItem); }
+        }
+        if (ic.Count == 0) {
+            MessageBox.Show("Es werden bereits alle<br>Spalten angezeigt.", ImageCode.Information, "Ok");
+            return;
+        }
+        ic.Sort();
+        var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, AddType.None, true);
+        if (r == null || r.Count == 0) { return; }
+        CurrentArrangement.Add(Database.Column.SearchByKey(LongParse(r[0])), false);
+        ShowOrder();
+    }
+
+    private void btnSystemspaltenAusblenden_Click(object sender, System.EventArgs e) {
+        CurrentArrangement.HideSystemColumns();
+        ShowOrder();
+    }
+
+    private void cbxInternalColumnArrangementSelector_ItemClicked(object sender, BasicListItemEventArgs e) {
+        if (string.IsNullOrEmpty(cbxInternalColumnArrangementSelector.Text)) { return; }
+
+        var tmporder = IntParse(e.Item.Internal);
+
+        if (Arrangement == tmporder) { return; }
+
+        Arrangement = tmporder;
+        ShowOrder();
+    }
+
+    /// <summary>
+    /// Überträgt die aktuelle Ansicht fest in den Datenbankcode hinein
+    /// </summary>
+    private void FixColumnArrangement() {
+        if (Generating || Sorting) { return; }
+
+        var c = CurrentArrangement;
+        if (c == null) { return; }
+        var did = false;
+
+        Fixing++;
+
+        var done = new List<BasicPadItem>();
+        do {
+            var x = LeftestItem(done);
+            if (x == null) { break; }
+
+            if (Arrangement > 0) {
+
+                #region Code für Ansichten > 0
+
+                var currentVI = c.IndexOf(c[x.Column]);
+
+                if (currentVI < 0) {
+                    c.Add(x.Column, false);
+                    currentVI = c.IndexOf(c[x.Column]);
+                    did = true;
+                }
+
+                if (currentVI != done.Count) {
+                    var onPosVI = c.IndexOf(c[done.Count]);
+                    c.Swap(c[onPosVI], c[currentVI]);
+                    did = true;
+                }
+
+                #endregion
+            } else {
+
+                #region Code für Ansicht 0
+
+                var currentC = Database.Column.IndexOf(x.Column);
+                if (currentC < 0) {
+                    MessageBox.Show("Interner Fehler", ImageCode.Warnung, "OK");
+                    ShowOrder();
+                    Fixing--;
+                    return;
+                }
+
+                if (currentC != done.Count) {
+                    var onPosC = Database.Column.IndexOf(c[done.Count].Column);
+                    Database.Column.Swap(Database.Column[onPosC], Database.Column[currentC]);
+                    did = true;
+                }
+
+                #endregion
+            }
+
+            done.Add(x);
+        } while (true);
+
+        while (c.Count > done.Count) {
+            if (Arrangement > 0) {
+
+                #region Code für Ansichten > 0
+
+                c.RemoveAt(c.Count - 1);
+                did = true;
+
+                #endregion
+            } else {
+
+                #region Code für Ansicht 0
+
+                var col = Database.Column[c.Count - 1];
+                if (string.IsNullOrEmpty(col.Identifier) && MessageBox.Show("Spalte <b>" + col.ReadableText() + "</b> endgültig löschen?", ImageCode.Warnung, "Ja", "Nein") == 0) {
+                    Database.Column.Remove(col);
+                }
+                did = true;
+                break;
+
+                #endregion
             }
         }
 
-        private void Item_ItemAdded(object sender, ListEventArgs e) {
-            if (e.Item is ColumnPadItem cpi) {
-                cpi.AdditionalStyleOptions = null;
+        Fixing--;
 
-                var c = CurrentArrangement;
+        if (Arrangement == 0 && did) {
+            Database?.RepairAfterParse(null, null);
+            ShowOrder();
+        }
+    }
 
-                if (c != null && cpi.Column.Database == Database && Arrangement > 0) {
-                    var oo = c[cpi.Column];
+    private void Item_ItemAdded(object sender, ListEventArgs e) {
+        if (e.Item is ColumnPadItem cpi) {
+            cpi.AdditionalStyleOptions = null;
 
-                    if (oo != null) {
-                        cpi.AdditionalStyleOptions = new();
-                        cpi.AdditionalStyleOptions.Add(new FlexiControlForProperty<bool>(() => oo.Permanent));
+            var c = CurrentArrangement;
+
+            if (c != null && cpi.Column.Database == Database && Arrangement > 0) {
+                var oo = c[cpi.Column];
+
+                if (oo != null) {
+                    cpi.AdditionalStyleOptions = new();
+                    cpi.AdditionalStyleOptions.Add(new FlexiControlForProperty<bool>(() => oo.Permanent));
+                }
+            }
+        }
+    }
+
+    private void Item_ItemRemoved(object sender, System.EventArgs e) {
+        Pad_MouseUp(null, null);
+    }
+
+    private ColumnPadItem? LeftestItem(List<BasicPadItem> ignore) {
+        ColumnPadItem? found = null;
+
+        foreach (var thisIt in Pad.Item) {
+            if (!ignore.Contains(thisIt) && thisIt is ColumnPadItem fi) {
+                if (fi.Column?.Database == Database) {
+                    if (found == null || fi.UsedArea.X < found.UsedArea.X) {
+                        found = fi;
                     }
                 }
             }
         }
 
-        private void Item_ItemRemoved(object sender, System.EventArgs e) {
-            Pad_MouseUp(null, null);
-        }
+        return found;
+    }
 
-        private ColumnPadItem? LeftestItem(List<BasicPadItem> ignore) {
-            ColumnPadItem? found = null;
+    private void Pad_MouseUp(object? sender, System.Windows.Forms.MouseEventArgs? e) {
+        if (Generating || Sorting || Fixing > 0) { return; }
+        SortColumns();
+        FixColumnArrangement();
+    }
 
-            foreach (var thisIt in Pad.Item) {
-                if (!ignore.Contains(thisIt) && thisIt is ColumnPadItem fi) {
-                    if (fi.Column?.Database == Database) {
-                        if (found == null || fi.UsedArea.X < found.UsedArea.X) {
-                            found = fi;
-                        }
-                    }
-                }
+    private void ShowOrder() {
+        if (Generating || Fixing > 0) { Develop.DebugPrint("Generating falsch!"); }
+
+        Generating = true;
+        Pad.Item.Clear();
+
+        ColumnPadItem? anyitem = null;
+
+        var ca = CurrentArrangement;
+        if (ca == null) { return; }
+
+        #region Erst alle Spalten der eigenen Datenbank erzeugen, um später verweisen zu können
+
+        var X = 0f;
+        foreach (var thisc in ca) {
+            if (thisc?.Column != null) {
+                var it = new ColumnPadItem(thisc?.Column);
+                Pad.Item.Add(it);
+                it.SetLeftTopPoint(X, 0);
+                X = it.UsedArea.Right;
+                anyitem = it;
             }
-
-            return found;
         }
-
-        private void Pad_MouseUp(object? sender, System.Windows.Forms.MouseEventArgs? e) {
-            if (Generating || Sorting || Fixing > 0) { return; }
-            SortColumns();
-            FixColumnArrangement();
-        }
-
-        private void ShowOrder() {
-            if (Generating || Fixing > 0) { Develop.DebugPrint("Generating falsch!"); }
-
-            Generating = true;
-            Pad.Item.Clear();
-
-            ColumnPadItem? anyitem = null;
-
-            var ca = CurrentArrangement;
-            if (ca == null) { return; }
-
-            #region Erst alle Spalten der eigenen Datenbank erzeugen, um später verweisen zu können
-
-            var X = 0f;
-            foreach (var thisc in ca) {
-                if (thisc?.Column != null) {
-                    var it = new ColumnPadItem(thisc?.Column);
-                    Pad.Item.Add(it);
-                    it.SetLeftTopPoint(X, 0);
-                    X = it.UsedArea.Right;
-                    anyitem = it;
-                }
-            }
-
-            #endregion
-
-            if (anyitem == null) { return; }
-
-            #region Im zweiten Durchlauf ermitteln, welche Verknüpfungen es gibt
-
-            var dbColumnCombi = new List<string>();
-            foreach (var thisc in Database?.Column) {
-                if (thisc.LinkedDatabase != null) {
-                    var dbN = thisc.LinkedDatabase.Filename + "|" + thisc.LinkedCellFilter.JoinWithCr();
-                    dbColumnCombi.AddIfNotExists(dbN);
-                }
-            }
-
-            #endregion
-
-            #region Im dritten Durchlauf nun die Verknüpfungen erstellen
-
-            var kx = 0f;
-            foreach (var thisCombi in dbColumnCombi) {
-                foreach (var thisc in CurrentArrangement) {
-                    var it = (ColumnPadItem)Pad.Item[thisc.Column.Name];
-
-                    if (thisc.Column.LinkedDatabase != null) {
-                        // String als Namen als eindeutige Kennung
-                        var toCheckCombi = thisc.Column.LinkedDatabase.Filename + "|" + thisc.Column.LinkedCellFilter.JoinWithCr();
-
-                        if (toCheckCombi == thisCombi) {
-
-                            #region Database-Item 'databItem' erzeugen
-
-                            var databItem = (GenericPadItem)Pad.Item[toCheckCombi];
-                            if (databItem == null) {
-                                var nam = thisc.Column.LinkedDatabase.Filename.FileNameWithSuffix();
-                                databItem = new GenericPadItem(toCheckCombi, nam, new Size((int)(anyitem.UsedArea.Height / 2), (int)anyitem.UsedArea.Height));
-                                Pad.Item.Add(databItem);
-                                databItem.SetLeftTopPoint(Math.Max(kx, it.UsedArea.Left - databItem.UsedArea.Width), 600);
-                                kx = databItem.UsedArea.Right;
-                            }
-
-                            #endregion
-
-                            #region LinkedDatabase-ColumnItems erzeugen
-
-                            #region ANDERE Spalten (die Filterung der Einträge) aus eigener Datenbank zur Verknüpften Datenbank zeigen lassen
-
-                            for (var z = 0; z < Math.Min(thisc.Column.LinkedCellFilter.Count, thisc.Column.LinkedDatabase.Column.Count); z++) {
-                                if (IntTryParse(thisc.Column.LinkedCellFilter[z], out var key)) {
-                                    var c = thisc.Column.Database.Column.SearchByKey(key);
-                                    if (c != null) {
-                                        var rkcolit = (ColumnPadItem)Pad.Item[c.Name];
-                                        rkcolit?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false, databItem, ConnectionType.Top, true));
-                                    }
-                                }// else if (!string.IsNullOrEmpty(column.LinkedCellFilter[z]) && column.LinkedCellFilter[z].StartsWith("@")) {
-                                 //    fi.Add(new FilterItem(linkedDatabase.Column[z], enFilterType.Istgleich, column.LinkedCellFilter[z].Substring(1)));
-                                 //}
-                            }
-
-                            #endregion
-
-                            #region Dann die Spalte erzeugen, aus der der der Wert kommt
-
-                            var c2 = thisc.Column.LinkedDatabase.Column.SearchByKey(thisc.Column.LinkedCell_ColumnKeyOfLinkedDatabase);
-                            if (c2 != null) {
-                                var it2 = new ColumnPadItem(c2);
-                                Pad.Item.Add(it2);
-                                it2.SetLeftTopPoint(kx, 600);
-                                it2.ConnectsTo.Add(new ItemConnection(ConnectionType.Top, false, it,
-                                    ConnectionType.Bottom, true));
-                                kx = it2.UsedArea.Right;
-
-                                // und noch die Datenbank auf die Spalte zeigen lassem
-                                databItem?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false,
-                                    it2, ConnectionType.Bottom, false));
-                            }
-
-                            #endregion
-
-                            #endregion
-                        }
-                    }
-                }
-
-                kx += 30;
-            }
-
-            #endregion
-
-            SortColumns();
-            Pad.ZoomFit();
-            Generating = false;
-        }
-
-        private void SortColumns() {
-            if (Sorting || Fixing > 0) { Develop.DebugPrint("Sorting falsch!"); }
-            Sorting = true;
-            var done = new List<BasicPadItem>();
-            var left = 0f;
-            do {
-                var x = LeftestItem(done);
-                if (x == null) { break; }
-                done.Add(x);
-                x.SetLeftTopPoint(left, 0);
-                left = x.UsedArea.Right;
-            } while (true);
-
-            Sorting = false;
-        }
-
-        private void UpdateCombobox() => Table.WriteColumnArrangementsInto(cbxInternalColumnArrangementSelector, Database, Arrangement);
 
         #endregion
+
+        if (anyitem == null) { return; }
+
+        #region Im zweiten Durchlauf ermitteln, welche Verknüpfungen es gibt
+
+        var dbColumnCombi = new List<string>();
+        foreach (var thisc in Database?.Column) {
+            if (thisc.LinkedDatabase != null) {
+                var dbN = thisc.LinkedDatabase.Filename + "|" + thisc.LinkedCellFilter.JoinWithCr();
+                dbColumnCombi.AddIfNotExists(dbN);
+            }
+        }
+
+        #endregion
+
+        #region Im dritten Durchlauf nun die Verknüpfungen erstellen
+
+        var kx = 0f;
+        foreach (var thisCombi in dbColumnCombi) {
+            foreach (var thisc in CurrentArrangement) {
+                var it = (ColumnPadItem)Pad.Item[thisc.Column.Name];
+
+                if (thisc.Column.LinkedDatabase != null) {
+                    // String als Namen als eindeutige Kennung
+                    var toCheckCombi = thisc.Column.LinkedDatabase.Filename + "|" + thisc.Column.LinkedCellFilter.JoinWithCr();
+
+                    if (toCheckCombi == thisCombi) {
+
+                        #region Database-Item 'databItem' erzeugen
+
+                        var databItem = (GenericPadItem)Pad.Item[toCheckCombi];
+                        if (databItem == null) {
+                            var nam = thisc.Column.LinkedDatabase.Filename.FileNameWithSuffix();
+                            databItem = new GenericPadItem(toCheckCombi, nam, new Size((int)(anyitem.UsedArea.Height / 2), (int)anyitem.UsedArea.Height));
+                            Pad.Item.Add(databItem);
+                            databItem.SetLeftTopPoint(Math.Max(kx, it.UsedArea.Left - databItem.UsedArea.Width), 600);
+                            kx = databItem.UsedArea.Right;
+                        }
+
+                        #endregion
+
+                        #region LinkedDatabase-ColumnItems erzeugen
+
+                        #region ANDERE Spalten (die Filterung der Einträge) aus eigener Datenbank zur Verknüpften Datenbank zeigen lassen
+
+                        for (var z = 0; z < Math.Min(thisc.Column.LinkedCellFilter.Count, thisc.Column.LinkedDatabase.Column.Count); z++) {
+                            if (IntTryParse(thisc.Column.LinkedCellFilter[z], out var key)) {
+                                var c = thisc.Column.Database.Column.SearchByKey(key);
+                                if (c != null) {
+                                    var rkcolit = (ColumnPadItem)Pad.Item[c.Name];
+                                    rkcolit?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false, databItem, ConnectionType.Top, true));
+                                }
+                            }// else if (!string.IsNullOrEmpty(column.LinkedCellFilter[z]) && column.LinkedCellFilter[z].StartsWith("@")) {
+                            //    fi.Add(new FilterItem(linkedDatabase.Column[z], enFilterType.Istgleich, column.LinkedCellFilter[z].Substring(1)));
+                            //}
+                        }
+
+                        #endregion
+
+                        #region Dann die Spalte erzeugen, aus der der der Wert kommt
+
+                        var c2 = thisc.Column.LinkedDatabase.Column.SearchByKey(thisc.Column.LinkedCell_ColumnKeyOfLinkedDatabase);
+                        if (c2 != null) {
+                            var it2 = new ColumnPadItem(c2);
+                            Pad.Item.Add(it2);
+                            it2.SetLeftTopPoint(kx, 600);
+                            it2.ConnectsTo.Add(new ItemConnection(ConnectionType.Top, false, it,
+                                ConnectionType.Bottom, true));
+                            kx = it2.UsedArea.Right;
+
+                            // und noch die Datenbank auf die Spalte zeigen lassem
+                            databItem?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false,
+                                it2, ConnectionType.Bottom, false));
+                        }
+
+                        #endregion
+
+                        #endregion
+                    }
+                }
+            }
+
+            kx += 30;
+        }
+
+        #endregion
+
+        SortColumns();
+        Pad.ZoomFit();
+        Generating = false;
     }
+
+    private void SortColumns() {
+        if (Sorting || Fixing > 0) { Develop.DebugPrint("Sorting falsch!"); }
+        Sorting = true;
+        var done = new List<BasicPadItem>();
+        var left = 0f;
+        do {
+            var x = LeftestItem(done);
+            if (x == null) { break; }
+            done.Add(x);
+            x.SetLeftTopPoint(left, 0);
+            left = x.UsedArea.Right;
+        } while (true);
+
+        Sorting = false;
+    }
+
+    private void UpdateCombobox() => Table.WriteColumnArrangementsInto(cbxInternalColumnArrangementSelector, Database, Arrangement);
+
+    #endregion
 }

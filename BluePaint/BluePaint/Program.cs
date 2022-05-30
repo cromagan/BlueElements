@@ -18,25 +18,24 @@
 using System;
 using System.Globalization;
 
-namespace BluePaint {
+namespace BluePaint;
 
-    internal static class Program {
+internal static class Program {
 
-        #region Methods
+    #region Methods
 
-        /// <summary>
-        /// Der Haupteinstiegspunkt für die Anwendung.
-        /// </summary>
-        [STAThread]
-        private static void Main() {
-            CultureInfo culture = new("de-DE");
-            CultureInfo.DefaultThreadCurrentCulture = culture;
-            CultureInfo.DefaultThreadCurrentUICulture = culture;
-            System.Windows.Forms.Application.EnableVisualStyles();
-            System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
-            System.Windows.Forms.Application.Run(new MainWindow(true));
-        }
-
-        #endregion
+    /// <summary>
+    /// Der Haupteinstiegspunkt für die Anwendung.
+    /// </summary>
+    [STAThread]
+    private static void Main() {
+        CultureInfo culture = new("de-DE");
+        CultureInfo.DefaultThreadCurrentCulture = culture;
+        CultureInfo.DefaultThreadCurrentUICulture = culture;
+        System.Windows.Forms.Application.EnableVisualStyles();
+        System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
+        System.Windows.Forms.Application.Run(new MainWindow(true));
     }
+
+    #endregion
 }

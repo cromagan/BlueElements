@@ -15,11 +15,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueControls.Enums {
+namespace BlueControls.Enums;
 
-    public enum Cs {
-        DROPSHADOW = 0x20000,
-        NOCLOSE = 0x200,
-        WS_EX_COMPOSITED = 0x02000000
-    }
+public enum Cs {
+    DROPSHADOW = 0x20000,
+    NOCLOSE = 0x200,
+    WS_EX_COMPOSITED = 0x02000000
 }

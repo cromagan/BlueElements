@@ -18,18 +18,17 @@
 using System.Drawing;
 using static BlueBasics.Converter;
 
-namespace BlueBasics {
+namespace BlueBasics;
 
-    public static partial class Extensions {
+public static partial class Extensions {
 
-        #region Methods
+    #region Methods
 
-        public static SizeF SizeFParse(this string code) {
-            code = code.RemoveChars("{}WidthHeg= ");
-            var w = code.Split(',');
-            return new SizeF(FloatParse(w[0]), FloatParse(w[1]));
-        }
-
-        #endregion
+    public static SizeF SizeFParse(this string code) {
+        code = code.RemoveChars("{}WidthHeg= ");
+        var w = code.Split(',');
+        return new SizeF(FloatParse(w[0]), FloatParse(w[1]));
     }
+
+    #endregion
 }

@@ -32,468 +32,467 @@ using System.Drawing.Imaging;
 //Inherits Panel '-> Alles ist ein Container!
 //Inherits ScrollableControl - > keine Tastatur/Mouseabfragen
 
-namespace BlueControls.Controls {
+namespace BlueControls.Controls;
 
-    public class GenericControl : System.Windows.Forms.Control {
+public class GenericControl : System.Windows.Forms.Control {
 
-        #region Fields
+    #region Fields
 
-        protected bool MouseHighlight = true;
+    protected bool MouseHighlight = true;
 
-        private readonly bool _useBackBitmap;
+    private readonly bool _useBackBitmap;
 
-        private Bitmap? _bitmapOfControl;
+    private Bitmap? _bitmapOfControl;
 
-        private bool _generatingBitmapOfControl;
+    private bool _generatingBitmapOfControl;
 
-        private bool _mousePressing;
+    private bool _mousePressing;
 
-        private PartentType _myParentType = PartentType.Unbekannt;
+    private PartentType _myParentType = PartentType.Unbekannt;
 
-        // Dieser Codeblock ist im Interface IQuickInfo herauskopiert und muss überall Identisch sein.
-        private string _quickInfo = "";
+    // Dieser Codeblock ist im Interface IQuickInfo herauskopiert und muss überall Identisch sein.
+    private string _quickInfo = "";
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        protected GenericControl() : this(false, false) {
+    protected GenericControl() : this(false, false) {
+    }
+
+    protected GenericControl(bool doubleBuffer, bool useBackgroundBitmap) : base() {
+        // Dieser Aufruf ist für den Designer erforderlich.
+        // InitializeComponent()
+        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        SetStyle(System.Windows.Forms.ControlStyles.ContainerControl, false);
+        SetStyle(System.Windows.Forms.ControlStyles.ResizeRedraw, false);
+        SetStyle(System.Windows.Forms.ControlStyles.SupportsTransparentBackColor, false);
+        SetStyle(System.Windows.Forms.ControlStyles.Opaque, true);
+        //The next 3 styles are allefor double buffering
+        SetStyle(System.Windows.Forms.ControlStyles.UserPaint, true);
+        SetStyle(System.Windows.Forms.ControlStyles.AllPaintingInWmPaint, true);
+        if (doubleBuffer) {
+            SetDoubleBuffering();
         }
+        _useBackBitmap = useBackgroundBitmap;
+    }
 
-        protected GenericControl(bool doubleBuffer, bool useBackgroundBitmap) : base() {
-            // Dieser Aufruf ist für den Designer erforderlich.
-            // InitializeComponent()
-            // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            SetStyle(System.Windows.Forms.ControlStyles.ContainerControl, false);
-            SetStyle(System.Windows.Forms.ControlStyles.ResizeRedraw, false);
-            SetStyle(System.Windows.Forms.ControlStyles.SupportsTransparentBackColor, false);
-            SetStyle(System.Windows.Forms.ControlStyles.Opaque, true);
-            //The next 3 styles are allefor double buffering
-            SetStyle(System.Windows.Forms.ControlStyles.UserPaint, true);
-            SetStyle(System.Windows.Forms.ControlStyles.AllPaintingInWmPaint, true);
-            if (doubleBuffer) {
-                SetDoubleBuffering();
+    #endregion
+
+    #region Properties
+
+    [DefaultValue(false)]
+    public override bool AutoSize {
+        get => false; //MyBase.AutoSize
+        set => base.AutoSize = false;
+    }
+
+    [Category("Darstellung")]
+    [DefaultValue("")]
+    [Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
+    [Description("QuickInfo des Steuerelementes - im extTXT-Format")]
+    public string QuickInfo {
+        get => _quickInfo;
+        set {
+            if (_quickInfo != value) {
+                Forms.QuickInfo.Close();
+                _quickInfo = value;
+                OnQuickInfoChanged();
             }
-            _useBackBitmap = useBackgroundBitmap;
         }
+    }
 
-        #endregion
+    public virtual string QuickInfoText => _quickInfo;
 
-        #region Properties
+    protected override bool ScaleChildren => false;
 
-        [DefaultValue(false)]
-        public override bool AutoSize {
-            get => false; //MyBase.AutoSize
-            set => base.AutoSize = false;
-        }
+    #endregion
 
-        [Category("Darstellung")]
-        [DefaultValue("")]
-        [Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
-        [Description("QuickInfo des Steuerelementes - im extTXT-Format")]
-        public string QuickInfo {
-            get => _quickInfo;
-            set {
-                if (_quickInfo != value) {
-                    Forms.QuickInfo.Close();
-                    _quickInfo = value;
-                    OnQuickInfoChanged();
-                }
-            }
-        }
+    #region Methods
 
-        public virtual string QuickInfoText => _quickInfo;
+    public static System.Windows.Forms.Form? ParentForm(System.Windows.Forms.Control o) {
+        if (o == null || o.IsDisposed) { return null; }
 
-        protected override bool ScaleChildren => false;
+        do {
+            switch (o) {
+                case Form frm:
+                    return frm;
 
-        #endregion
-
-        #region Methods
-
-        public static System.Windows.Forms.Form? ParentForm(System.Windows.Forms.Control o) {
-            if (o == null || o.IsDisposed) { return null; }
-
-            do {
-                switch (o) {
-                    case Form frm:
-                        return frm;
-
-                    case null:
-                        return null;
-
-                    default:
-                        o = o?.Parent; //Manchmal ist o null. MultiThreading?
-                        break;
-                }
-            } while (true);
-        }
-
-        public static PartentType Typ(System.Windows.Forms.Control control) {
-            switch (control) {
                 case null:
-                    return PartentType.Nothing;
-
-                case GroupBox: {
-                        if (control.Parent is System.Windows.Forms.TabPage tp) {
-                            if (tp.Parent == null) { return PartentType.Unbekannt; }
-                            if (tp.Parent is RibbonBar) { return PartentType.RibbonGroupBox; }
-                        }
-                        return PartentType.GroupBox;
-                    }
-
-                case LastFilesCombo:
-                    return PartentType.LastFilesCombo;
-                //Is = "BlueBasics.ComboBox"
-
-                case ComboBox box when box.ParentType() == PartentType.RibbonPage:
-                    return PartentType.RibbonBarCombobox;
-
-                case ComboBox:
-                    return PartentType.ComboBox;
-                // Is = "BlueBasics.TabControl"
-
-                case RibbonBar:
-                    return PartentType.RibbonControl;
-
-                case TabControl:
-                    return PartentType.TabControl;
-                // Is = "BlueBasics.TabPage"
-
-                case System.Windows.Forms.TabPage when control.Parent is RibbonBar:
-                    return PartentType.RibbonPage;
-
-                case System.Windows.Forms.TabPage:
-                    return PartentType.TabPage;
-                //Is = "BlueBasics.Slider"
-
-                case Slider:
-                    return PartentType.Slider;
-                //Is = "FRMMSGBOX"
-
-                case FloatingForm:
-                    return PartentType.MsgBox;
-
-                case DialogWithOkAndCancel:
-                    return PartentType.MsgBox;
-
-                case TextBox:
-                    return PartentType.TextBox;
-
-                case ListBox:
-                    return PartentType.ListBox;
-
-                case EasyPic:
-                    return PartentType.EasyPic;
-
-                case Button:
-                    return PartentType.Button;
-
-                case Line:
-                    return PartentType.Line;
-
-                case Caption:
-                    return PartentType.Caption;
-
-                case Formula:
-                    return PartentType.Formula;
-
-                case Form:
-                    return PartentType.Form;
-
-                case Table:
-                    return PartentType.Table;
-
-                case System.Windows.Forms.Panel:
-                    return PartentType.Panel;
-
-                case FlexiControlForCell:
-                    return PartentType.FlexiControlForCell;
-
-                case FlexiControl:
-                    return PartentType.FlexiControl;
+                    return null;
 
                 default:
-                    return PartentType.Nothing;
+                    o = o?.Parent; //Manchmal ist o null. MultiThreading?
+                    break;
             }
-        }
+        } while (true);
+    }
 
-        public Bitmap? BitmapOfControl() {
-            if (!_useBackBitmap || _generatingBitmapOfControl) { return null; }
-            _generatingBitmapOfControl = true;
-            if (_bitmapOfControl == null) { Refresh(); }
-            _generatingBitmapOfControl = false;
-            return _bitmapOfControl;
-        }
+    public static PartentType Typ(System.Windows.Forms.Control control) {
+        switch (control) {
+            case null:
+                return PartentType.Nothing;
 
-        public bool ContainsMouse() => ClientRectangle.Contains(PointToClient(System.Windows.Forms.Cursor.Position));
-
-        public void DoQuickInfo() {
-            if (string.IsNullOrEmpty(_quickInfo) && string.IsNullOrEmpty(QuickInfoText)) {
-                Forms.QuickInfo.Close();
-            } else {
-                if (ContainsMouse()) {
-                    Forms.QuickInfo.Show(QuickInfoText);
-                } else {
-                    Forms.QuickInfo.Close();
+            case GroupBox: {
+                if (control.Parent is System.Windows.Forms.TabPage tp) {
+                    if (tp.Parent == null) { return PartentType.Unbekannt; }
+                    if (tp.Parent is RibbonBar) { return PartentType.RibbonGroupBox; }
                 }
+                return PartentType.GroupBox;
+            }
+
+            case LastFilesCombo:
+                return PartentType.LastFilesCombo;
+            //Is = "BlueBasics.ComboBox"
+
+            case ComboBox box when box.ParentType() == PartentType.RibbonPage:
+                return PartentType.RibbonBarCombobox;
+
+            case ComboBox:
+                return PartentType.ComboBox;
+            // Is = "BlueBasics.TabControl"
+
+            case RibbonBar:
+                return PartentType.RibbonControl;
+
+            case TabControl:
+                return PartentType.TabControl;
+            // Is = "BlueBasics.TabPage"
+
+            case System.Windows.Forms.TabPage when control.Parent is RibbonBar:
+                return PartentType.RibbonPage;
+
+            case System.Windows.Forms.TabPage:
+                return PartentType.TabPage;
+            //Is = "BlueBasics.Slider"
+
+            case Slider:
+                return PartentType.Slider;
+            //Is = "FRMMSGBOX"
+
+            case FloatingForm:
+                return PartentType.MsgBox;
+
+            case DialogWithOkAndCancel:
+                return PartentType.MsgBox;
+
+            case TextBox:
+                return PartentType.TextBox;
+
+            case ListBox:
+                return PartentType.ListBox;
+
+            case EasyPic:
+                return PartentType.EasyPic;
+
+            case Button:
+                return PartentType.Button;
+
+            case Line:
+                return PartentType.Line;
+
+            case Caption:
+                return PartentType.Caption;
+
+            case Formula:
+                return PartentType.Formula;
+
+            case Form:
+                return PartentType.Form;
+
+            case Table:
+                return PartentType.Table;
+
+            case System.Windows.Forms.Panel:
+                return PartentType.Panel;
+
+            case FlexiControlForCell:
+                return PartentType.FlexiControlForCell;
+
+            case FlexiControl:
+                return PartentType.FlexiControl;
+
+            default:
+                return PartentType.Nothing;
+        }
+    }
+
+    public Bitmap? BitmapOfControl() {
+        if (!_useBackBitmap || _generatingBitmapOfControl) { return null; }
+        _generatingBitmapOfControl = true;
+        if (_bitmapOfControl == null) { Refresh(); }
+        _generatingBitmapOfControl = false;
+        return _bitmapOfControl;
+    }
+
+    public bool ContainsMouse() => ClientRectangle.Contains(PointToClient(System.Windows.Forms.Cursor.Position));
+
+    public void DoQuickInfo() {
+        if (string.IsNullOrEmpty(_quickInfo) && string.IsNullOrEmpty(QuickInfoText)) {
+            Forms.QuickInfo.Close();
+        } else {
+            if (ContainsMouse()) {
+                Forms.QuickInfo.Show(QuickInfoText);
+            } else {
+                Forms.QuickInfo.Close();
             }
         }
+    }
 
-        public Point MousePos() {
-            if (InvokeRequired) {
-                return (Point)Invoke(new Func<Point>(MousePos));
-            }
-            Develop.DebugPrint_Disposed(IsDisposed);
-            return PointToClient(System.Windows.Forms.Cursor.Position);
+    public Point MousePos() {
+        if (InvokeRequired) {
+            return (Point)Invoke(new Func<Point>(MousePos));
         }
+        Develop.DebugPrint_Disposed(IsDisposed);
+        return PointToClient(System.Windows.Forms.Cursor.Position);
+    }
 
-        // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
-        public void PerformAutoScale() {
-            // NIX TUN!!!!
+    // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
+    public void PerformAutoScale() {
+        // NIX TUN!!!!
+    }
+
+    /// <summary>
+    /// Veranlaßt, das das Control neu gezeichnet wird.
+    /// </summary>
+    /// <remarks></remarks>
+    public override void Refresh() {
+        if (IsDisposed) { return; }
+        DoDraw(CreateGraphics());
+    }
+
+    public void Scale() {
+        // NIX TUN!!!!
+    }
+
+    internal static bool AllEnabled(System.Windows.Forms.Control control) {
+        Develop.DebugPrint_Disposed(control.IsDisposed);
+        do {
+            if (control == null) { return true; }
+            if (control.IsDisposed) { return false; }
+            if (!control.Enabled) { return false; }
+            control = control.Parent;
+        } while (true);
+    }
+
+    protected override void Dispose(bool disposing) {
+        base.Dispose(disposing);
+        if (disposing) {
+            _bitmapOfControl?.Dispose();
+            _bitmapOfControl = null;
         }
+    }
 
-        /// <summary>
-        /// Veranlaßt, das das Control neu gezeichnet wird.
-        /// </summary>
-        /// <remarks></remarks>
-        public override void Refresh() {
+    protected virtual void DrawControl(Graphics gr, States state) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
+
+    //MyBase.ScaleChildren
+    protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) => bounds;
+
+    protected bool MousePressing() => _mousePressing;
+
+    protected override void OnEnabledChanged(System.EventArgs e) {
+        if (InvokeRequired) {
+            Invoke(new Action(() => OnEnabledChanged(e)));
+            return;
+        }
+        if (IsDisposed) { return; }
+        base.OnEnabledChanged(e);
+        Invalidate();
+    }
+
+    protected override void OnGotFocus(System.EventArgs e) {
+        if (IsDisposed) { return; }
+        if (!GetStyle(System.Windows.Forms.ControlStyles.Selectable)) {
+            Parent.SelectNextControl(this, true, true, true, true);
+        } else {
+            base.OnGotFocus(e);
+            Invalidate();
+        }
+    }
+
+    protected override void OnKeyDown(System.Windows.Forms.KeyEventArgs e) {
+        if (IsDisposed) { return; }
+        base.OnKeyDown(e);
+    }
+
+    protected override void OnKeyPress(System.Windows.Forms.KeyPressEventArgs e) {
+        if (IsDisposed) { return; }
+        base.OnKeyPress(e);
+    }
+
+    protected override void OnKeyUp(System.Windows.Forms.KeyEventArgs e) {
+        if (IsDisposed) { return; }
+        base.OnKeyUp(e);
+    }
+
+    protected override void OnLostFocus(System.EventArgs e) {
+        if (IsDisposed) { return; }
+        if (GetStyle(System.Windows.Forms.ControlStyles.Selectable)) {
+            //if (_MousePressing) { OnMouseUp(new System.Windows.Forms.MouseEventArgs(System.Windows.Forms.MouseButtons.None, 0, 0, 0, 0)); }
+            MouseHighlight = false;
+            base.OnLostFocus(e);
+            Invalidate();
+        }
+    }
+
+    protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
+        lock (this) {
             if (IsDisposed) { return; }
-            DoDraw(CreateGraphics());
+            if (_mousePressing) { return; }
+            _mousePressing = true;
+            Forms.QuickInfo.Close();
+            if (Enabled) {
+                if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && Focus()) { Focus(); }
+            }
+            base.OnMouseDown(e);
         }
+    }
 
-        public void Scale() {
-            // NIX TUN!!!!
+    protected override void OnMouseEnter(System.EventArgs e) {
+        if (IsDisposed) { return; }
+        base.OnMouseEnter(e);
+        if (!string.IsNullOrEmpty(_quickInfo) || !string.IsNullOrEmpty(QuickInfoText)) { Forms.QuickInfo.Show(QuickInfoText); }
+    }
+
+    protected override void OnMouseLeave(System.EventArgs e) {
+        if (IsDisposed) { return; }
+        base.OnMouseLeave(e);
+        DoQuickInfo();
+    }
+
+    protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
+        lock (this) {
+            if (IsDisposed) { return; }
+            base.OnMouseMove(e);
+            DoQuickInfo();
         }
+    }
 
-        internal static bool AllEnabled(System.Windows.Forms.Control control) {
-            Develop.DebugPrint_Disposed(control.IsDisposed);
-            do {
-                if (control == null) { return true; }
-                if (control.IsDisposed) { return false; }
-                if (!control.Enabled) { return false; }
-                control = control.Parent;
-            } while (true);
-        }
+    protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+        if (IsDisposed) { return; }
+        if (!_mousePressing) { return; }
+        _mousePressing = false;
+        base.OnMouseUp(e);
+    }
 
-        protected override void Dispose(bool disposing) {
-            base.Dispose(disposing);
-            if (disposing) {
-                _bitmapOfControl?.Dispose();
+    protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
+        if (IsDisposed) { return; }
+        _mousePressing = false;
+        base.OnMouseWheel(e);
+    }
+
+    protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) =>
+        // MyBase.OnPaint(e) - comment out - do not call  http://stackoverflow.com/questions/592538/how-to-create-a-transparent-control-which-works-when-on-top-of-other-controls
+        DoDraw(e.Graphics);
+
+    protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs pevent) {
+        // do not allow the background to be painted
+        // Um flimmern zu vermeiden!
+    }
+
+    protected virtual void OnQuickInfoChanged() {
+        // Dummy, dass die angeleeiteten Controls reagieren können.
+    }
+
+    protected override void OnSizeChanged(System.EventArgs e) {
+        if (IsDisposed) { return; }
+        Invalidate();
+        if (_bitmapOfControl != null) {
+            if (_bitmapOfControl.Width < Width || _bitmapOfControl.Height < Height) {
+                _bitmapOfControl.Dispose();
                 _bitmapOfControl = null;
             }
         }
+        base.OnSizeChanged(e);
+    }
 
-        protected virtual void DrawControl(Graphics gr, States state) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
+    protected System.Windows.Forms.Form? ParentForm() => ParentForm(Parent);
 
-        //MyBase.ScaleChildren
-        protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) => bounds;
+    protected PartentType ParentType() {
+        if (Parent == null) { return PartentType.Unbekannt; }
+        if (_myParentType != PartentType.Unbekannt) { return _myParentType; }
+        _myParentType = Typ(Parent);
+        return _myParentType;
+    }
 
-        protected bool MousePressing() => _mousePressing;
+    protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified) => base.ScaleControl(new SizeF(1, 1), specified);
 
-        protected override void OnEnabledChanged(System.EventArgs e) {
-            if (InvokeRequired) {
-                Invoke(new Action(() => OnEnabledChanged(e)));
-                return;
-            }
-            if (IsDisposed) { return; }
-            base.OnEnabledChanged(e);
-            Invalidate();
+    protected void SetDoubleBuffering() => SetStyle(System.Windows.Forms.ControlStyles.DoubleBuffer, true);
+
+    //MyBase.GetScaledBounds(bounds, factor, specified)
+
+    protected void SetNotFocusable() {
+        Develop.DebugPrint_Disposed(IsDisposed);
+        TabStop = false;
+        TabIndex = 0;
+        CausesValidation = false;
+        SetStyle(System.Windows.Forms.ControlStyles.Selectable, false);
+        //SetStyle(System.Windows.Forms.ControlStyles.StandardClick, false);
+        //SetStyle(System.Windows.Forms.ControlStyles.StandardDoubleClick, false);
+    }
+
+    protected override void WndProc(ref System.Windows.Forms.Message m) {
+        try {
+            //https://www.vb-paradise.de/allgemeines/tipps-tricks-und-tutorials/windows-forms/50038-wndproc-kleine-liste-aller-messages/
+            if (m.Msg == (int)enWndProc.WM_ERASEBKGND) { return; }
+            base.WndProc(ref m);
+        } catch { }
+    }
+
+    private void DoDraw(Graphics gr) {
+        if (IsDisposed) {
+            gr.Clear(Color.Red);
+            return;
         }
 
-        protected override void OnGotFocus(System.EventArgs e) {
-            if (IsDisposed) { return; }
-            if (!GetStyle(System.Windows.Forms.ControlStyles.Selectable)) {
-                Parent.SelectNextControl(this, true, true, true, true);
-            } else {
-                base.OnGotFocus(e);
-                Invalidate();
-            }
-        }
+        //gr.Clear(Skin.RandomColor);
+        //return;
 
-        protected override void OnKeyDown(System.Windows.Forms.KeyEventArgs e) {
-            if (IsDisposed) { return; }
-            base.OnKeyDown(e);
-        }
-
-        protected override void OnKeyPress(System.Windows.Forms.KeyPressEventArgs e) {
-            if (IsDisposed) { return; }
-            base.OnKeyPress(e);
-        }
-
-        protected override void OnKeyUp(System.Windows.Forms.KeyEventArgs e) {
-            if (IsDisposed) { return; }
-            base.OnKeyUp(e);
-        }
-
-        protected override void OnLostFocus(System.EventArgs e) {
-            if (IsDisposed) { return; }
-            if (GetStyle(System.Windows.Forms.ControlStyles.Selectable)) {
-                //if (_MousePressing) { OnMouseUp(new System.Windows.Forms.MouseEventArgs(System.Windows.Forms.MouseButtons.None, 0, 0, 0, 0)); }
-                MouseHighlight = false;
-                base.OnLostFocus(e);
-                Invalidate();
-            }
-        }
-
-        protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
-            lock (this) {
-                if (IsDisposed) { return; }
-                if (_mousePressing) { return; }
-                _mousePressing = true;
-                Forms.QuickInfo.Close();
-                if (Enabled) {
-                    if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && Focus()) { Focus(); }
-                }
-                base.OnMouseDown(e);
-            }
-        }
-
-        protected override void OnMouseEnter(System.EventArgs e) {
-            if (IsDisposed) { return; }
-            base.OnMouseEnter(e);
-            if (!string.IsNullOrEmpty(_quickInfo) || !string.IsNullOrEmpty(QuickInfoText)) { Forms.QuickInfo.Show(QuickInfoText); }
-        }
-
-        protected override void OnMouseLeave(System.EventArgs e) {
-            if (IsDisposed) { return; }
-            base.OnMouseLeave(e);
-            DoQuickInfo();
-        }
-
-        protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
-            lock (this) {
-                if (IsDisposed) { return; }
-                base.OnMouseMove(e);
-                DoQuickInfo();
-            }
-        }
-
-        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
-            if (IsDisposed) { return; }
-            if (!_mousePressing) { return; }
-            _mousePressing = false;
-            base.OnMouseUp(e);
-        }
-
-        protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
-            if (IsDisposed) { return; }
-            _mousePressing = false;
-            base.OnMouseWheel(e);
-        }
-
-        protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) =>
-            // MyBase.OnPaint(e) - comment out - do not call  http://stackoverflow.com/questions/592538/how-to-create-a-transparent-control-which-works-when-on-top-of-other-controls
-            DoDraw(e.Graphics);
-
-        protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs pevent) {
-            // do not allow the background to be painted
-            // Um flimmern zu vermeiden!
-        }
-
-        protected virtual void OnQuickInfoChanged() {
-            // Dummy, dass die angeleeiteten Controls reagieren können.
-        }
-
-        protected override void OnSizeChanged(System.EventArgs e) {
-            if (IsDisposed) { return; }
-            Invalidate();
-            if (_bitmapOfControl != null) {
-                if (_bitmapOfControl.Width < Width || _bitmapOfControl.Height < Height) {
-                    _bitmapOfControl.Dispose();
-                    _bitmapOfControl = null;
-                }
-            }
-            base.OnSizeChanged(e);
-        }
-
-        protected System.Windows.Forms.Form? ParentForm() => ParentForm(Parent);
-
-        protected PartentType ParentType() {
-            if (Parent == null) { return PartentType.Unbekannt; }
-            if (_myParentType != PartentType.Unbekannt) { return _myParentType; }
-            _myParentType = Typ(Parent);
-            return _myParentType;
-        }
-
-        protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified) => base.ScaleControl(new SizeF(1, 1), specified);
-
-        protected void SetDoubleBuffering() => SetStyle(System.Windows.Forms.ControlStyles.DoubleBuffer, true);
-
-        //MyBase.GetScaledBounds(bounds, factor, specified)
-
-        protected void SetNotFocusable() {
-            Develop.DebugPrint_Disposed(IsDisposed);
-            TabStop = false;
-            TabIndex = 0;
-            CausesValidation = false;
-            SetStyle(System.Windows.Forms.ControlStyles.Selectable, false);
-            //SetStyle(System.Windows.Forms.ControlStyles.StandardClick, false);
-            //SetStyle(System.Windows.Forms.ControlStyles.StandardDoubleClick, false);
-        }
-
-        protected override void WndProc(ref System.Windows.Forms.Message m) {
-            try {
-                //https://www.vb-paradise.de/allgemeines/tipps-tricks-und-tutorials/windows-forms/50038-wndproc-kleine-liste-aller-messages/
-                if (m.Msg == (int)enWndProc.WM_ERASEBKGND) { return; }
-                base.WndProc(ref m);
-            } catch { }
-        }
-
-        private void DoDraw(Graphics gr) {
-            if (IsDisposed) {
-                gr.Clear(Color.Red);
-                return;
-            }
-
-            //gr.Clear(Skin.RandomColor);
-            //return;
-
-            if (Develop.Exited || IsDisposed || !Visible) { return; }
-            lock (this) {
-                if (!Skin.Inited) {
-                    if (DesignMode) {
-                        Skin.LoadSkin();
-                    } else {
-                        return;
-                    }
-                }
-                if (Width < 1 || Height < 1) { return; }
-                try {
-                    if (_useBackBitmap) {
-                        if (_bitmapOfControl == null) { _bitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb); }
-                        var tmpgr = Graphics.FromImage(_bitmapOfControl);
-                        DrawControl(tmpgr, IsStatus());
-                        if (_bitmapOfControl != null) {
-                            gr.DrawImage(_bitmapOfControl, 0, 0);
-                        }
-                        tmpgr.Dispose();
-                    } else {
-                        DrawControl(gr, IsStatus());
-                    }
-                } catch {
+        if (Develop.Exited || IsDisposed || !Visible) { return; }
+        lock (this) {
+            if (!Skin.Inited) {
+                if (DesignMode) {
+                    Skin.LoadSkin();
+                } else {
                     return;
                 }
-                // UmRandung für DesignMode ------------
-                if (DesignMode) {
-                    using Pen p = new(Color.FromArgb(128, 255, 0, 0));
-                    gr.DrawRectangle(p, 0, 0, Width - 1, Height - 1);
+            }
+            if (Width < 1 || Height < 1) { return; }
+            try {
+                if (_useBackBitmap) {
+                    if (_bitmapOfControl == null) { _bitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb); }
+                    var tmpgr = Graphics.FromImage(_bitmapOfControl);
+                    DrawControl(tmpgr, IsStatus());
+                    if (_bitmapOfControl != null) {
+                        gr.DrawImage(_bitmapOfControl, 0, 0);
+                    }
+                    tmpgr.Dispose();
+                } else {
+                    DrawControl(gr, IsStatus());
                 }
+            } catch {
+                return;
+            }
+            // UmRandung für DesignMode ------------
+            if (DesignMode) {
+                using Pen p = new(Color.FromArgb(128, 255, 0, 0));
+                gr.DrawRectangle(p, 0, 0, Width - 1, Height - 1);
             }
         }
-
-        private States IsStatus() {
-            if (!Enabled) { return States.Standard_Disabled; }
-            var s = States.Standard;
-            if (MouseHighlight && ContainsMouse()) { s |= States.Standard_MouseOver; }
-            if (_mousePressing) {
-                if (MouseHighlight) { s |= States.Standard_MousePressed; }
-                if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && CanFocus) { s |= States.Standard_HasFocus; }
-            } else {
-                if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && CanFocus && Focused) { s |= States.Standard_HasFocus; }
-            }
-            return s;
-        }
-
-        #endregion
     }
+
+    private States IsStatus() {
+        if (!Enabled) { return States.Standard_Disabled; }
+        var s = States.Standard;
+        if (MouseHighlight && ContainsMouse()) { s |= States.Standard_MouseOver; }
+        if (_mousePressing) {
+            if (MouseHighlight) { s |= States.Standard_MousePressed; }
+            if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && CanFocus) { s |= States.Standard_HasFocus; }
+        } else {
+            if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && CanFocus && Focused) { s |= States.Standard_HasFocus; }
+        }
+        return s;
+    }
+
+    #endregion
 }

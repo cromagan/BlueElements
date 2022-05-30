@@ -26,155 +26,154 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BlueControls.BlueDatabaseDialogs {
+namespace BlueControls.BlueDatabaseDialogs;
 
-    internal sealed partial class SearchAndReplace : Form {
+internal sealed partial class SearchAndReplace : Form {
 
-        #region Fields
+    #region Fields
 
-        private readonly Table _blueTable;
-        private bool _isWorking;
+    private readonly Table _blueTable;
+    private bool _isWorking;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public SearchAndReplace(Table table) {
-            // Dieser Aufruf ist für den Designer erforderlich.
-            InitializeComponent();
-            // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            _blueTable = table;
-            _blueTable.CursorPosChanged += CursorPosChanged;
-            CursorPosChanged(_blueTable, new CellExtEventArgs(_blueTable.CursorPosColumn, _blueTable.CursorPosRow));
-        }
-
-        #endregion
-
-        #region Methods
-
-        protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
-            base.OnFormClosing(e);
-            _blueTable.CursorPosChanged -= CursorPosChanged;
-        }
-
-        private void Alt_TextChange(object sender, System.EventArgs e) => Checkbuttons();
-
-        private void Checkbuttons() {
-            var canDo = true;
-            if (_blueTable == null) { return; }
-            if (!_blueTable.Database.IsAdministrator()) { canDo = false; }
-            if (SucheNach.Checked) {
-                if (string.IsNullOrEmpty(Alt.Text)) { canDo = false; }
-                Alt.Enabled = true;
-                ErsetzeMit.Enabled = true;
-                NurinAktuellerSpalte.Enabled = true;
-            } else if (SucheExact.Checked) {
-                Alt.Enabled = true;
-                ErsetzeMit.Enabled = false;
-                if (ErsetzeMit.Checked) { canDo = false; }
-                NurinAktuellerSpalte.Enabled = true;
-            } else if (InhaltEgal.Checked) {
-                Alt.Enabled = false;
-                ErsetzeMit.Enabled = false;
-                NurinAktuellerSpalte.Enabled = false; // Zu Riskant
-                if (!NurinAktuellerSpalte.Checked) { canDo = false; }// Zu Riskant
-                if (ErsetzeMit.Checked) { canDo = false; }
-            } else {
-                canDo = false;
-            }
-            if (ErsetzeMit.Checked) { } else if (ErsetzeKomplett.Checked) {
-                NurinAktuellerSpalte.Enabled = false; // Zu Riskant
-                if (!NurinAktuellerSpalte.Checked) { canDo = false; }// Zu Riskant
-            } else if (FügeHinzu.Checked) {
-                if (string.IsNullOrEmpty(Neu.Text)) { canDo = false; }
-            } else {
-                canDo = true;
-            }
-            if (NurinAktuellerSpalte.Checked) {
-                if (_blueTable.CursorPosColumn == null) {
-                    canDo = false;
-                } else {
-                    if (!_blueTable.CursorPosColumn.Format.CanBeCheckedByRules()) { canDo = false; }
-                }
-            }
-            if (Alt.Text == Neu.Text) {
-                if (!InhaltEgal.Checked) { canDo = false; }
-                if (!ErsetzeKomplett.Checked) { canDo = false; }
-            }
-            ers.Enabled = canDo;
-        }
-
-        private void CursorPosChanged(object sender, CellExtEventArgs e) {
-            NurinAktuellerSpalte.Text = e.Column == null ? "Nur in der <b>aktuell gewählten Spalte</b> ersetzen."
-                                                         : "Nur in Spalte <b>'" + e.Column.ReadableText() + "'</b> ersetzen.";
-            Checkbuttons();
-        }
-
-        private void ers_Click(object sender, System.EventArgs e) {
-            if (_isWorking) { return; }
-            var suchText = Alt.Text.Replace(";cr;", "\r").Replace(";tab;", "\t");
-            var ersetzText = Neu.Text.Replace(";cr;", "\r").Replace(";tab;", "\t");
-            _blueTable.Database.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
-            List<ColumnItem?> sp = new();
-            List<RowItem> ro = new();
-            if (NurinAktuellerSpalte.Checked) {
-                sp.Add(_blueTable.CursorPosColumn);
-            } else {
-                sp.AddRange(_blueTable.Database.Column.Where(thisColumn => thisColumn != null && thisColumn.Format.CanBeChangedByRules()));
-            }
-            foreach (var thisRow in _blueTable.Database.Row) {
-                if (thisRow != null) {
-                    if (!AktuelleFilterung.Checked || thisRow.MatchesTo(_blueTable.Filter)) {
-                        if (!AbgeschlosseZellen.Checked || !thisRow.CellGetBoolean(_blueTable.Database.Column.SysLocked)) { ro.Add(thisRow); }
-                    }
-                }
-            }
-            var count = 0;
-            var geändeterText = "";
-            var co = 0;
-            var p = Progressbar.Show("Ersetze...", ro.Count);
-            foreach (var thisRow in ro) {
-                var rowChanged = false;
-                co++;
-                p.Update(co);
-                foreach (var thiscolumn in sp) {
-                    var trifft = false;
-                    var originalText = thisRow.CellGetString(thiscolumn);
-                    if (SucheNach.Checked) {
-                        trifft = originalText.Contains(suchText);
-                    } else if (SucheExact.Checked) {
-                        trifft = Convert.ToBoolean(originalText == suchText);
-                    } else if (InhaltEgal.Checked) {
-                        trifft = true;
-                    }
-                    if (trifft) {
-                        if (ErsetzeMit.Checked) {
-                            geändeterText = originalText.Replace(suchText, ersetzText);
-                        } else if (ErsetzeKomplett.Checked) {
-                            geändeterText = ersetzText;
-                        } else if (FügeHinzu.Checked) {
-                            List<string?> tmp = new(originalText.SplitAndCutByCr())
-                            {
-                                ersetzText
-                            };
-                            geändeterText = tmp.SortedDistinctList().JoinWithCr();
-                        }
-                        if (geändeterText != originalText) {
-                            rowChanged = true;
-                            count++;
-                            thisRow.CellSet(thiscolumn, geändeterText);
-                        }
-                    }
-                }
-                if (rowChanged) { thisRow.DoAutomatic(true, false, 10, "value changed"); }
-            }
-            p?.Close();
-            MessageBox.Show(count + " Ersetzung(en) vorgenommen.", ImageCode.Information, "OK");
-            _isWorking = false;
-        }
-
-        private void Something_CheckedChanged(object sender, System.EventArgs e) => Checkbuttons();
-
-        #endregion
+    public SearchAndReplace(Table table) {
+        // Dieser Aufruf ist für den Designer erforderlich.
+        InitializeComponent();
+        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        _blueTable = table;
+        _blueTable.CursorPosChanged += CursorPosChanged;
+        CursorPosChanged(_blueTable, new CellExtEventArgs(_blueTable.CursorPosColumn, _blueTable.CursorPosRow));
     }
+
+    #endregion
+
+    #region Methods
+
+    protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
+        base.OnFormClosing(e);
+        _blueTable.CursorPosChanged -= CursorPosChanged;
+    }
+
+    private void Alt_TextChange(object sender, System.EventArgs e) => Checkbuttons();
+
+    private void Checkbuttons() {
+        var canDo = true;
+        if (_blueTable == null) { return; }
+        if (!_blueTable.Database.IsAdministrator()) { canDo = false; }
+        if (SucheNach.Checked) {
+            if (string.IsNullOrEmpty(Alt.Text)) { canDo = false; }
+            Alt.Enabled = true;
+            ErsetzeMit.Enabled = true;
+            NurinAktuellerSpalte.Enabled = true;
+        } else if (SucheExact.Checked) {
+            Alt.Enabled = true;
+            ErsetzeMit.Enabled = false;
+            if (ErsetzeMit.Checked) { canDo = false; }
+            NurinAktuellerSpalte.Enabled = true;
+        } else if (InhaltEgal.Checked) {
+            Alt.Enabled = false;
+            ErsetzeMit.Enabled = false;
+            NurinAktuellerSpalte.Enabled = false; // Zu Riskant
+            if (!NurinAktuellerSpalte.Checked) { canDo = false; }// Zu Riskant
+            if (ErsetzeMit.Checked) { canDo = false; }
+        } else {
+            canDo = false;
+        }
+        if (ErsetzeMit.Checked) { } else if (ErsetzeKomplett.Checked) {
+            NurinAktuellerSpalte.Enabled = false; // Zu Riskant
+            if (!NurinAktuellerSpalte.Checked) { canDo = false; }// Zu Riskant
+        } else if (FügeHinzu.Checked) {
+            if (string.IsNullOrEmpty(Neu.Text)) { canDo = false; }
+        } else {
+            canDo = true;
+        }
+        if (NurinAktuellerSpalte.Checked) {
+            if (_blueTable.CursorPosColumn == null) {
+                canDo = false;
+            } else {
+                if (!_blueTable.CursorPosColumn.Format.CanBeCheckedByRules()) { canDo = false; }
+            }
+        }
+        if (Alt.Text == Neu.Text) {
+            if (!InhaltEgal.Checked) { canDo = false; }
+            if (!ErsetzeKomplett.Checked) { canDo = false; }
+        }
+        ers.Enabled = canDo;
+    }
+
+    private void CursorPosChanged(object sender, CellExtEventArgs e) {
+        NurinAktuellerSpalte.Text = e.Column == null ? "Nur in der <b>aktuell gewählten Spalte</b> ersetzen."
+            : "Nur in Spalte <b>'" + e.Column.ReadableText() + "'</b> ersetzen.";
+        Checkbuttons();
+    }
+
+    private void ers_Click(object sender, System.EventArgs e) {
+        if (_isWorking) { return; }
+        var suchText = Alt.Text.Replace(";cr;", "\r").Replace(";tab;", "\t");
+        var ersetzText = Neu.Text.Replace(";cr;", "\r").Replace(";tab;", "\t");
+        _blueTable.Database.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
+        List<ColumnItem?> sp = new();
+        List<RowItem> ro = new();
+        if (NurinAktuellerSpalte.Checked) {
+            sp.Add(_blueTable.CursorPosColumn);
+        } else {
+            sp.AddRange(_blueTable.Database.Column.Where(thisColumn => thisColumn != null && thisColumn.Format.CanBeChangedByRules()));
+        }
+        foreach (var thisRow in _blueTable.Database.Row) {
+            if (thisRow != null) {
+                if (!AktuelleFilterung.Checked || thisRow.MatchesTo(_blueTable.Filter)) {
+                    if (!AbgeschlosseZellen.Checked || !thisRow.CellGetBoolean(_blueTable.Database.Column.SysLocked)) { ro.Add(thisRow); }
+                }
+            }
+        }
+        var count = 0;
+        var geändeterText = "";
+        var co = 0;
+        var p = Progressbar.Show("Ersetze...", ro.Count);
+        foreach (var thisRow in ro) {
+            var rowChanged = false;
+            co++;
+            p.Update(co);
+            foreach (var thiscolumn in sp) {
+                var trifft = false;
+                var originalText = thisRow.CellGetString(thiscolumn);
+                if (SucheNach.Checked) {
+                    trifft = originalText.Contains(suchText);
+                } else if (SucheExact.Checked) {
+                    trifft = Convert.ToBoolean(originalText == suchText);
+                } else if (InhaltEgal.Checked) {
+                    trifft = true;
+                }
+                if (trifft) {
+                    if (ErsetzeMit.Checked) {
+                        geändeterText = originalText.Replace(suchText, ersetzText);
+                    } else if (ErsetzeKomplett.Checked) {
+                        geändeterText = ersetzText;
+                    } else if (FügeHinzu.Checked) {
+                        List<string?> tmp = new(originalText.SplitAndCutByCr())
+                        {
+                            ersetzText
+                        };
+                        geändeterText = tmp.SortedDistinctList().JoinWithCr();
+                    }
+                    if (geändeterText != originalText) {
+                        rowChanged = true;
+                        count++;
+                        thisRow.CellSet(thiscolumn, geändeterText);
+                    }
+                }
+            }
+            if (rowChanged) { thisRow.DoAutomatic(true, false, 10, "value changed"); }
+        }
+        p?.Close();
+        MessageBox.Show(count + " Ersetzung(en) vorgenommen.", ImageCode.Information, "OK");
+        _isWorking = false;
+    }
+
+    private void Something_CheckedChanged(object sender, System.EventArgs e) => Checkbuttons();
+
+    #endregion
 }

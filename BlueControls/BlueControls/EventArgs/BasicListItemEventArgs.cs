@@ -19,20 +19,19 @@
 
 using BlueControls.ItemCollection.ItemCollectionList;
 
-namespace BlueControls.EventArgs {
+namespace BlueControls.EventArgs;
 
-    public class BasicListItemEventArgs : System.EventArgs {
+public class BasicListItemEventArgs : System.EventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public BasicListItemEventArgs(BasicListItem item) => Item = item;
+    public BasicListItemEventArgs(BasicListItem item) => Item = item;
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public BasicListItem Item { get; }
+    public BasicListItem Item { get; }
 
-        #endregion
-    }
+    #endregion
 }

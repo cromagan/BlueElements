@@ -21,81 +21,80 @@ using BlueDatabase;
 using System.ComponentModel;
 using static BlueBasics.Extensions;
 
-namespace BlueControls.BlueDatabaseDialogs {
+namespace BlueControls.BlueDatabaseDialogs;
 
-    public sealed partial class Import {
+public sealed partial class Import {
 
-        #region Fields
+    #region Fields
 
-        private readonly string _originalImportText;
+    private readonly string _originalImportText;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public Import(Database? database, string importtext) : base() {
-            // Dieser Aufruf ist für den Designer erforderlich.
-            InitializeComponent();
-            // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            _originalImportText = importtext.Replace("\r\n", "\r").Trim("\r");
-            var ein = _originalImportText.SplitAndCutByCrToList();
-            Eintr.Text = ein.Count + " zum Importieren bereit.";
-            Database = database;
-            if (Database == null) {
-                return;
-            }
-
-            Database.Disposing += Database_Disposing;
-            Database.ShouldICancelSaveOperations += Database_ShouldICancelDiscOperations;
+    public Import(Database? database, string importtext) : base() {
+        // Dieser Aufruf ist für den Designer erforderlich.
+        InitializeComponent();
+        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        _originalImportText = importtext.Replace("\r\n", "\r").Trim("\r");
+        var ein = _originalImportText.SplitAndCutByCrToList();
+        Eintr.Text = ein.Count + " zum Importieren bereit.";
+        Database = database;
+        if (Database == null) {
+            return;
         }
 
-        #endregion
-
-        #region Properties
-
-        public Database? Database { get; }
-
-        #endregion
-
-        #region Methods
-
-        protected override void OnClosing(CancelEventArgs e) {
-            Database.Disposing -= Database_Disposing;
-            Database.ShouldICancelSaveOperations -= Database_ShouldICancelDiscOperations;
-            base.OnClosing(e);
-        }
-
-        private static void Database_ShouldICancelDiscOperations(object sender, CancelEventArgs e) => e.Cancel = true;
-
-        private void Cancel_Click(object sender, System.EventArgs e) => Close();
-
-        private void Database_Disposing(object sender, System.EventArgs e) => Close();
-
-        private void Fertig_Click(object sender, System.EventArgs e) {
-            var TR = string.Empty;
-            if (TabStopp.Checked) {
-                TR = "\t";
-            } else if (Semikolon.Checked) {
-                TR = ";";
-            } else if (Komma.Checked) {
-                TR = ",";
-            } else if (Leerzeichen.Checked) {
-                TR = " ";
-            } else if (Andere.Checked) {
-                TR = aTXT.Text;
-            }
-            if (string.IsNullOrEmpty(TR)) {
-                MessageBox.Show("Bitte Trennzeichen angeben.", ImageCode.Information, "OK");
-                return;
-            }
-            var m = Database.Import(_originalImportText, SpalteZuordnen.Checked, ZeilenZuorden.Checked, TR, Aufa.Checked, AnfTre.Checked, false, txbScript.Text);
-
-            if (!string.IsNullOrEmpty(m)) {
-                MessageBox.Show(m, ImageCode.Information, "OK");
-            }
-            Close();
-        }
-
-        #endregion
+        Database.Disposing += Database_Disposing;
+        Database.ShouldICancelSaveOperations += Database_ShouldICancelDiscOperations;
     }
+
+    #endregion
+
+    #region Properties
+
+    public Database? Database { get; }
+
+    #endregion
+
+    #region Methods
+
+    protected override void OnClosing(CancelEventArgs e) {
+        Database.Disposing -= Database_Disposing;
+        Database.ShouldICancelSaveOperations -= Database_ShouldICancelDiscOperations;
+        base.OnClosing(e);
+    }
+
+    private static void Database_ShouldICancelDiscOperations(object sender, CancelEventArgs e) => e.Cancel = true;
+
+    private void Cancel_Click(object sender, System.EventArgs e) => Close();
+
+    private void Database_Disposing(object sender, System.EventArgs e) => Close();
+
+    private void Fertig_Click(object sender, System.EventArgs e) {
+        var TR = string.Empty;
+        if (TabStopp.Checked) {
+            TR = "\t";
+        } else if (Semikolon.Checked) {
+            TR = ";";
+        } else if (Komma.Checked) {
+            TR = ",";
+        } else if (Leerzeichen.Checked) {
+            TR = " ";
+        } else if (Andere.Checked) {
+            TR = aTXT.Text;
+        }
+        if (string.IsNullOrEmpty(TR)) {
+            MessageBox.Show("Bitte Trennzeichen angeben.", ImageCode.Information, "OK");
+            return;
+        }
+        var m = Database.Import(_originalImportText, SpalteZuordnen.Checked, ZeilenZuorden.Checked, TR, Aufa.Checked, AnfTre.Checked, false, txbScript.Text);
+
+        if (!string.IsNullOrEmpty(m)) {
+            MessageBox.Show(m, ImageCode.Information, "OK");
+        }
+        Close();
+    }
+
+    #endregion
 }

@@ -17,19 +17,18 @@
 
 using BlueScript.Variables;
 
-namespace BlueControls.Interfaces {
+namespace BlueControls.Interfaces;
 
-    /// <summary>
-    /// Wird verwendet, wenn das PadItem mit Variablen umgehen kann und sich dadurch die Anzeige ändert.
-    /// </summary>
-    public interface ICanHaveVariablesItemLevel {
+/// <summary>
+/// Wird verwendet, wenn das PadItem mit Variablen umgehen kann und sich dadurch die Anzeige ändert.
+/// </summary>
+public interface ICanHaveVariablesItemLevel {
 
-        #region Methods
+    #region Methods
 
-        bool ReplaceVariable(Variable variable);
+    bool ReplaceVariable(Variable variable);
 
-        bool ResetVariables();
+    bool ResetVariables();
 
-        #endregion
-    }
+    #endregion
 }

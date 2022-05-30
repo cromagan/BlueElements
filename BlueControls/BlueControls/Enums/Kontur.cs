@@ -15,12 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueControls.Enums {
+namespace BlueControls.Enums;
 
-    public enum Kontur {
-        Unbekannt = -1,
-        Ohne = 0,
-        Rechteck = 1,
-        Rechteck_R4 = 50
-    }
+public enum Kontur {
+    Unbekannt = -1,
+    Ohne = 0,
+    Rechteck = 1,
+    Rechteck_R4 = 50
 }

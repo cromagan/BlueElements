@@ -17,30 +17,29 @@
 
 using System;
 
-namespace BlueControls.Enums {
+namespace BlueControls.Enums;
 
-    [Flags]
-    public enum MarkState {
-        None = 0,
+[Flags]
+public enum MarkState {
+    None = 0,
 
-        /// <summary>
-        /// Bei Rechtschreibfehlern
-        /// </summary>
-        Ringelchen = 1,
+    /// <summary>
+    /// Bei Rechtschreibfehlern
+    /// </summary>
+    Ringelchen = 1,
 
-        /// <summary>
-        /// Felder im Creativepad
-        /// </summary>
-        Field = 2,
+    /// <summary>
+    /// Felder im Creativepad
+    /// </summary>
+    Field = 2,
 
-        /// <summary>
-        /// Verknüpfungen, der eigene Name
-        /// </summary>
-        MyOwn = 4,
+    /// <summary>
+    /// Verknüpfungen, der eigene Name
+    /// </summary>
+    MyOwn = 4,
 
-        /// <summary>
-        /// Verknüpfungen, ein erkannter Link
-        /// </summary>
-        Other = 8
-    }
+    /// <summary>
+    /// Verknüpfungen, ein erkannter Link
+    /// </summary>
+    Other = 8
 }

@@ -21,54 +21,53 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Converter;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_SortNum : Method {
+internal class Method_SortNum : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable }, new() { VariableFloat.ShortName_Plain } };
+    public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable }, new() { VariableFloat.ShortName_Plain } };
 
-        public override string Description => "Sortiert die Liste. Der Zahlenwert wird verwendet wenn der String nicht in eine Zahl umgewandelt werden kann.";
+    public override string Description => "Sortiert die Liste. Der Zahlenwert wird verwendet wenn der String nicht in eine Zahl umgewandelt werden kann.";
 
-        public override bool EndlessArgs => false;
+    public override bool EndlessArgs => false;
 
-        public override string EndSequence => ");";
+    public override string EndSequence => ");";
 
-        public override bool GetCodeBlockAfter => false;
+    public override bool GetCodeBlockAfter => false;
 
-        public override string Returns => string.Empty;
-        public override string StartSequence => "(";
+    public override string Returns => string.Empty;
+    public override string StartSequence => "(";
 
-        public override string Syntax => "SortNum(ListVariable, Defaultwert);";
+    public override string Syntax => "SortNum(ListVariable, Defaultwert);";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "sortnum" };
+    public override List<string> Comand(Script? s) => new() { "sortnum" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
+        if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
 
-            var nums = new List<double>();
-            foreach (var txt in ((VariableListString)attvar.Attributes[0]).ValueList) {
-                if (txt.IsNumeral()) {
-                    nums.Add(DoubleParse(txt));
-                } else {
-                    nums.Add(((VariableFloat)attvar.Attributes[1]).ValueNum);
-                }
+        var nums = new List<double>();
+        foreach (var txt in ((VariableListString)attvar.Attributes[0]).ValueList) {
+            if (txt.IsNumeral()) {
+                nums.Add(DoubleParse(txt));
+            } else {
+                nums.Add(((VariableFloat)attvar.Attributes[1]).ValueNum);
             }
-
-            nums.Sort();
-
-            ((VariableListString)attvar.Attributes[0]).ValueList = nums.ConvertAll<string>(i => i.ToString(Constants.Format_Float1));
-            return DoItFeedback.Null();
         }
 
-        #endregion
+        nums.Sort();
+
+        ((VariableListString)attvar.Attributes[0]).ValueList = nums.ConvertAll<string>(i => i.ToString(Constants.Format_Float1));
+        return DoItFeedback.Null();
     }
+
+    #endregion
 }

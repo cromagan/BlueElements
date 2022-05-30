@@ -19,87 +19,86 @@
 
 using BlueScript.Structures;
 
-namespace BlueScript.Variables {
+namespace BlueScript.Variables;
 
-    public class VariableString : Variable {
+public class VariableString : Variable {
 
-        #region Fields
+    #region Fields
 
-        private string _valueString;
+    private string _valueString;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public VariableString(string name, string value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _valueString = value.RestoreCriticalVariableChars();
+    public VariableString(string name, string value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _valueString = value.RestoreCriticalVariableChars();
 
-        /// <summary>
-        /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
-        /// </summary>
-        /// <param name="name"></param>
-        public VariableString(string name) : this(name, string.Empty, true, false, string.Empty) { }
+    /// <summary>
+    /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
+    /// </summary>
+    /// <param name="name"></param>
+    public VariableString(string name) : this(name, string.Empty, true, false, string.Empty) { }
 
-        public VariableString(string name, string value) : this(name, value, true, false, string.Empty) { }
+    public VariableString(string name, string value) : this(name, value, true, false, string.Empty) { }
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public static string ShortName_Plain => "str";
-        public static string ShortName_Variable => "*str";
-        public override int CheckOrder => 2;
-        public override bool GetFromStringPossible => true;
-        public override bool IsNullOrEmpty => string.IsNullOrEmpty(_valueString);
+    public static string ShortName_Plain => "str";
+    public static string ShortName_Variable => "*str";
+    public override int CheckOrder => 2;
+    public override bool GetFromStringPossible => true;
+    public override bool IsNullOrEmpty => string.IsNullOrEmpty(_valueString);
 
-        /// <summary>
-        /// Der Wert ohne " am Anfang/Ende. Gleichgesetzt mit ValueString
-        /// </summary>
-        public override string ReadableText => _valueString;
+    /// <summary>
+    /// Der Wert ohne " am Anfang/Ende. Gleichgesetzt mit ValueString
+    /// </summary>
+    public override string ReadableText => _valueString;
 
-        public override string ShortName => "str";
-        public override bool ToStringPossible => true;
+    public override string ShortName => "str";
+    public override bool ToStringPossible => true;
 
-        /// <summary>
-        /// Der Wert mit " Aanfang/Ende un entfernten Kritischen Zeichen.
-        /// </summary>
-        public override string ValueForReplace => "\"" + _valueString.RemoveCriticalVariableChars() + "\"";
+    /// <summary>
+    /// Der Wert mit " Aanfang/Ende un entfernten Kritischen Zeichen.
+    /// </summary>
+    public override string ValueForReplace => "\"" + _valueString.RemoveCriticalVariableChars() + "\"";
 
-        /// <summary>
-        /// Der Wert ohne " am Anfang/Ende. Gleichgesetzt mit ReadableText
-        /// </summary>
-        public string ValueString {
-            get => _valueString;
-            set {
-                if (Readonly) { return; }
-                _valueString = value.RestoreCriticalVariableChars(); // Variablen enthalten immer den richtigen Wert und es werden nur beim Ersetzen im Script die kritischen Zeichen entfernt
-            }
+    /// <summary>
+    /// Der Wert ohne " am Anfang/Ende. Gleichgesetzt mit ReadableText
+    /// </summary>
+    public string ValueString {
+        get => _valueString;
+        set {
+            if (Readonly) { return; }
+            _valueString = value.RestoreCriticalVariableChars(); // Variablen enthalten immer den richtigen Wert und es werden nur beim Ersetzen im Script die kritischen Zeichen entfernt
         }
-
-        #endregion
-
-        #region Methods
-
-        public override DoItFeedback GetValueFrom(Variable variable) {
-            if (variable is not VariableString v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
-            if (Readonly) { return DoItFeedback.Schreibgschützt(); }
-            ValueString = v.ValueString;
-            return DoItFeedback.Null();
-        }
-
-        protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
-            succesVar = null;
-            if (txt.Length > 1 && txt.StartsWith("\"") && txt.EndsWith("\"")) {
-                var tmp = txt.Substring(1, txt.Length - 2); // Nicht Trimmen! Ansonsten wird sowas falsch: "X=" + "";
-                tmp = tmp.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
-                if (tmp.Contains("\"")) { return false; } //SetError("Verkettungsfehler"); return; } // Beispiel: s ist nicht definiert und "jj" + s + "kk
-
-                succesVar = new VariableString(DummyName(), tmp);
-                return true;
-            }
-
-            return false;
-        }
-
-        #endregion
     }
+
+    #endregion
+
+    #region Methods
+
+    public override DoItFeedback GetValueFrom(Variable variable) {
+        if (variable is not VariableString v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
+        if (Readonly) { return DoItFeedback.Schreibgschützt(); }
+        ValueString = v.ValueString;
+        return DoItFeedback.Null();
+    }
+
+    protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
+        succesVar = null;
+        if (txt.Length > 1 && txt.StartsWith("\"") && txt.EndsWith("\"")) {
+            var tmp = txt.Substring(1, txt.Length - 2); // Nicht Trimmen! Ansonsten wird sowas falsch: "X=" + "";
+            tmp = tmp.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
+            if (tmp.Contains("\"")) { return false; } //SetError("Verkettungsfehler"); return; } // Beispiel: s ist nicht definiert und "jj" + s + "kk
+
+            succesVar = new VariableString(DummyName(), tmp);
+            return true;
+        }
+
+        return false;
+    }
+
+    #endregion
 }

@@ -15,14 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueDatabase.Interfaces {
+namespace BlueDatabase.Interfaces;
 
-    public interface ITranslateable {
+public interface ITranslateable {
 
-        #region Properties
+    #region Properties
 
-        public bool Translate { get; set; }
+    public bool Translate { get; set; }
 
-        #endregion
-    }
+    #endregion
 }

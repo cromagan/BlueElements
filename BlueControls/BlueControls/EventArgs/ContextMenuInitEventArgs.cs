@@ -20,30 +20,29 @@
 using System.Collections.Generic;
 using BlueControls.ItemCollection.ItemCollectionList;
 
-namespace BlueControls.EventArgs {
+namespace BlueControls.EventArgs;
 
-    public class ContextMenuInitEventArgs : System.EventArgs {
+public class ContextMenuInitEventArgs : System.EventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public ContextMenuInitEventArgs(object? hotItem, List<string> tags, ItemCollectionList userMenu) {
-            UserMenu = userMenu;
-            HotItem = hotItem;
-            Tags = tags;
-            Translate = true;
-            Cancel = false;
-        }
-
-        #endregion
-
-        #region Properties
-
-        public bool Cancel { get; }
-        public object? HotItem { get; }
-        public List<string> Tags { get; }
-        public bool Translate { get; }
-        public ItemCollectionList UserMenu { get; }
-
-        #endregion
+    public ContextMenuInitEventArgs(object? hotItem, List<string> tags, ItemCollectionList userMenu) {
+        UserMenu = userMenu;
+        HotItem = hotItem;
+        Tags = tags;
+        Translate = true;
+        Cancel = false;
     }
+
+    #endregion
+
+    #region Properties
+
+    public bool Cancel { get; }
+    public object? HotItem { get; }
+    public List<string> Tags { get; }
+    public bool Translate { get; }
+    public ItemCollectionList UserMenu { get; }
+
+    #endregion
 }

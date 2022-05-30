@@ -1,29 +1,28 @@
 ﻿using System.ComponentModel.Design;
 
-namespace BlueControls.Designer_Support {
+namespace BlueControls.Designer_Support;
 
-    internal sealed class TextBoxDesigner : BasicDesigner {
+internal sealed class TextBoxDesigner : BasicDesigner {
 
-        #region Fields
+    #region Fields
 
-        private DesignerActionListCollection aList;
+    private DesignerActionListCollection aList;
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public override DesignerActionListCollection ActionLists {
-            get {
-                if (aList == null) {
-                    aList = new DesignerActionListCollection
-                    {
-                        new TextBoxActionList(Component)
-                    };
-                }
-                return aList;
+    public override DesignerActionListCollection ActionLists {
+        get {
+            if (aList == null) {
+                aList = new DesignerActionListCollection
+                {
+                    new TextBoxActionList(Component)
+                };
             }
+            return aList;
         }
-
-        #endregion
     }
+
+    #endregion
 }

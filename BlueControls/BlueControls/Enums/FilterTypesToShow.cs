@@ -17,14 +17,13 @@
 
 using System;
 
-namespace BlueControls.Enums {
+namespace BlueControls.Enums;
 
-    [Flags]
-    public enum FilterTypesToShow {
-        None = 0,
-        NachDefinierterAnsicht = 1,
-        AktuelleAnsicht_AktiveFilter = 2,
-        NachDefinierterAnsichtStepByStep = 4,
-        DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter = NachDefinierterAnsicht | AktuelleAnsicht_AktiveFilter
-    }
+[Flags]
+public enum FilterTypesToShow {
+    None = 0,
+    NachDefinierterAnsicht = 1,
+    AktuelleAnsicht_AktiveFilter = 2,
+    NachDefinierterAnsichtStepByStep = 4,
+    DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter = NachDefinierterAnsicht | AktuelleAnsicht_AktiveFilter
 }

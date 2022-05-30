@@ -20,34 +20,33 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Converter;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_IsDateTime : Method {
+internal class Method_IsDateTime : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain } };
-        public override string Description => "Prüft, ob der Inhalt der Variable ein gültiges Datum/Zeit-Format ist. ";
-        public override bool EndlessArgs => false;
-        public override string EndSequence => ")";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => VariableBool.ShortName_Plain;
-        public override string StartSequence => "(";
-        public override string Syntax => "IsDateTime(Value)";
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain } };
+    public override string Description => "Prüft, ob der Inhalt der Variable ein gültiges Datum/Zeit-Format ist. ";
+    public override bool EndlessArgs => false;
+    public override string EndSequence => ")";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => VariableBool.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "IsDateTime(Value)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "isdatetime" };
+    public override List<string> Comand(Script? s) => new() { "isdatetime" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.Falsch(); }
-            var ok = DateTimeTryParse(((VariableString)attvar.Attributes[0]).ValueString, out _);
-            return ok ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
-        }
-
-        #endregion
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.Falsch(); }
+        var ok = DateTimeTryParse(((VariableString)attvar.Attributes[0]).ValueString, out _);
+        return ok ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }
+
+    #endregion
 }

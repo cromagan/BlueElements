@@ -15,10 +15,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueDatabase.Enums {
+namespace BlueDatabase.Enums;
 
-    public enum VerwaisteDaten {
-        Ignorieren = 0,
-        Löschen = 1
-    }
+public enum VerwaisteDaten {
+    Ignorieren = 0,
+    Löschen = 1
 }

@@ -18,26 +18,25 @@
 using System.Drawing;
 using static BlueBasics.Converter;
 
-namespace BlueBasics {
+namespace BlueBasics;
 
-    public static partial class Extensions {
+public static partial class Extensions {
 
-        #region Methods
+    #region Methods
 
-        public static Point PointParse(this string code) {
-            code = code.RemoveChars("{}XYxy= ");
-            Point p = new();
-            if (string.IsNullOrEmpty(code)) {
-                p.X = 0;
-                p.Y = 0;
-                return p;
-            }
-            var w = code.Split(',');
-            p.X = IntParse(w[0]);
-            p.Y = IntParse(w[1]);
+    public static Point PointParse(this string code) {
+        code = code.RemoveChars("{}XYxy= ");
+        Point p = new();
+        if (string.IsNullOrEmpty(code)) {
+            p.X = 0;
+            p.Y = 0;
             return p;
         }
-
-        #endregion
+        var w = code.Split(',');
+        p.X = IntParse(w[0]);
+        p.Y = IntParse(w[1]);
+        return p;
     }
+
+    #endregion
 }

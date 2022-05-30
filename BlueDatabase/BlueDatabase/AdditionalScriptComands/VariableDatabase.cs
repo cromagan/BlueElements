@@ -21,60 +21,59 @@ using BlueDatabase;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript {
+namespace BlueScript;
 
-    public class VariableDatabase : Variable {
+public class VariableDatabase : Variable {
 
-        #region Fields
+    #region Fields
 
-        private Database? _db;
+    private Database? _db;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public VariableDatabase(string name, Database? value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _db = value;
+    public VariableDatabase(string name, Database? value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _db = value;
 
-        public VariableDatabase(string name) : this(name, null, true, false, string.Empty) { }
+    public VariableDatabase(string name) : this(name, null, true, false, string.Empty) { }
 
-        public VariableDatabase(Database? value) : this(DummyName(), value, true, false, string.Empty) { }
+    public VariableDatabase(Database? value) : this(DummyName(), value, true, false, string.Empty) { }
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public static string ShortName_Variable => "*dbs";
-        public override int CheckOrder => 99;
+    public static string ShortName_Variable => "*dbs";
+    public override int CheckOrder => 99;
 
-        public Database? Database {
-            get => _db;
-            set {
-                if (Readonly) { return; }
-                _db = value;
-            }
+    public Database? Database {
+        get => _db;
+        set {
+            if (Readonly) { return; }
+            _db = value;
         }
-
-        public override bool GetFromStringPossible => false;
-        public override bool IsNullOrEmpty => _db == null || _db.Disposed;
-        public override string ShortName => "dbs";
-        public override bool ToStringPossible => false;
-
-        #endregion
-
-        #region Methods
-
-        public override DoItFeedback GetValueFrom(Variable variable) {
-            if (variable is not VariableDatabase v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
-            if (Readonly) { return DoItFeedback.Schreibgschützt(); }
-            Database = v.Database;
-            return DoItFeedback.Null();
-        }
-
-        protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
-            succesVar = null;
-            return false;
-        }
-
-        #endregion
     }
+
+    public override bool GetFromStringPossible => false;
+    public override bool IsNullOrEmpty => _db == null || _db.Disposed;
+    public override string ShortName => "dbs";
+    public override bool ToStringPossible => false;
+
+    #endregion
+
+    #region Methods
+
+    public override DoItFeedback GetValueFrom(Variable variable) {
+        if (variable is not VariableDatabase v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
+        if (Readonly) { return DoItFeedback.Schreibgschützt(); }
+        Database = v.Database;
+        return DoItFeedback.Null();
+    }
+
+    protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
+        succesVar = null;
+        return false;
+    }
+
+    #endregion
 }

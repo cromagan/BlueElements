@@ -17,24 +17,23 @@
 
 using System;
 
-namespace BlueBasics.Interfaces {
+namespace BlueBasics.Interfaces;
 
-    public interface IChangedFeedback {
+public interface IChangedFeedback {
 
-        #region Events
+    #region Events
 
-        /// <summary>
-        /// Wird ausgelöst, wenn sich ein Objekt verändert.
-        /// Wird nicht bei der Neuerstellung des Objektes oder beim Parsen ausgelöst.
-        /// </summary>
-        event EventHandler Changed;
+    /// <summary>
+    /// Wird ausgelöst, wenn sich ein Objekt verändert.
+    /// Wird nicht bei der Neuerstellung des Objektes oder beim Parsen ausgelöst.
+    /// </summary>
+    event EventHandler Changed;
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        void OnChanged();
+    void OnChanged();
 
-        #endregion
-    }
+    #endregion
 }

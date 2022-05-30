@@ -22,80 +22,79 @@ using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_ReplaceList : Method {
+internal class Method_ReplaceList : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable }, new() { VariableBool.ShortName_Plain }, new() { VariableBool.ShortName_Plain }, new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
-        public override string Description => "Ersetzt alle Werte in der Liste. Bei Partial=True werden alle Teiltrings in den einzelnen Elementen ausgetauscht.";
-        public override bool EndlessArgs => false;
-        public override string EndSequence => ");";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => string.Empty;
-        public override string StartSequence => "(";
-        public override string Syntax => "ReplaceList(ListVariable, CaseSensitive, Partial, SearchValue, ReplaceValue);";
+    public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable }, new() { VariableBool.ShortName_Plain }, new() { VariableBool.ShortName_Plain }, new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
+    public override string Description => "Ersetzt alle Werte in der Liste. Bei Partial=True werden alle Teiltrings in den einzelnen Elementen ausgetauscht.";
+    public override bool EndlessArgs => false;
+    public override string EndSequence => ");";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => "(";
+    public override string Syntax => "ReplaceList(ListVariable, CaseSensitive, Partial, SearchValue, ReplaceValue);";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "replacelist" };
+    public override List<string> Comand(Script? s) => new() { "replacelist" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
+        if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
 
-            var tmpList = ((VariableListString)attvar.Attributes[0]).ValueList;
+        var tmpList = ((VariableListString)attvar.Attributes[0]).ValueList;
 
-            if (((VariableString)attvar.Attributes[3]).ValueString == ((VariableString)attvar.Attributes[4]).ValueString) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch."); }
-            if (!((VariableBool)attvar.Attributes[1]).ValueBool && string.Equals(((VariableString)attvar.Attributes[3]).ValueString, ((VariableString)attvar.Attributes[4]).ValueString, StringComparison.CurrentCultureIgnoreCase)) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch."); }
+        if (((VariableString)attvar.Attributes[3]).ValueString == ((VariableString)attvar.Attributes[4]).ValueString) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch."); }
+        if (!((VariableBool)attvar.Attributes[1]).ValueBool && string.Equals(((VariableString)attvar.Attributes[3]).ValueString, ((VariableString)attvar.Attributes[4]).ValueString, StringComparison.CurrentCultureIgnoreCase)) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch."); }
 
-            var ct = 0;
-            bool again;
-            do {
-                ct++;
-                if (ct > 10000) { return new DoItFeedback("Überlauf bei ReplaceList."); }
-                again = false;
-                for (var z = 0; z < tmpList.Count; z++) {
-                    if (((VariableBool)attvar.Attributes[2]).ValueBool) {
-                        // Teilersetzungen
-                        var orignal = tmpList[z];
+        var ct = 0;
+        bool again;
+        do {
+            ct++;
+            if (ct > 10000) { return new DoItFeedback("Überlauf bei ReplaceList."); }
+            again = false;
+            for (var z = 0; z < tmpList.Count; z++) {
+                if (((VariableBool)attvar.Attributes[2]).ValueBool) {
+                    // Teilersetzungen
+                    var orignal = tmpList[z];
 
-                        if (((VariableBool)attvar.Attributes[1]).ValueBool) {
-                            // Case Sensitive
-                            tmpList[z] = tmpList[z].Replace(((VariableString)attvar.Attributes[3]).ValueString, ((VariableString)attvar.Attributes[4]).ValueString);
-                        } else {
-                            // Not Case Sesitive
-                            tmpList[z] = tmpList[z].Replace(((VariableString)attvar.Attributes[3]).ValueString, ((VariableString)attvar.Attributes[4]).ValueString, RegexOptions.IgnoreCase);
-                        }
-                        again = tmpList[z] != orignal;
+                    if (((VariableBool)attvar.Attributes[1]).ValueBool) {
+                        // Case Sensitive
+                        tmpList[z] = tmpList[z].Replace(((VariableString)attvar.Attributes[3]).ValueString, ((VariableString)attvar.Attributes[4]).ValueString);
                     } else {
-                        // nur Komplett-Ersetzungen
-                        if (((VariableBool)attvar.Attributes[1]).ValueBool) {
-                            // Case Sensitive
-                            if (tmpList[z] == ((VariableString)attvar.Attributes[3]).ValueString) {
-                                tmpList[z] = ((VariableString)attvar.Attributes[4]).ValueString;
-                                again = true;
-                            }
-                        } else {
-                            // Not Case Sesitive
-                            if (string.Equals(tmpList[z], ((VariableString)attvar.Attributes[3]).ValueString, StringComparison.CurrentCultureIgnoreCase)) {
-                                tmpList[z] = ((VariableString)attvar.Attributes[4]).ValueString;
-                                again = true;
-                            }
+                        // Not Case Sesitive
+                        tmpList[z] = tmpList[z].Replace(((VariableString)attvar.Attributes[3]).ValueString, ((VariableString)attvar.Attributes[4]).ValueString, RegexOptions.IgnoreCase);
+                    }
+                    again = tmpList[z] != orignal;
+                } else {
+                    // nur Komplett-Ersetzungen
+                    if (((VariableBool)attvar.Attributes[1]).ValueBool) {
+                        // Case Sensitive
+                        if (tmpList[z] == ((VariableString)attvar.Attributes[3]).ValueString) {
+                            tmpList[z] = ((VariableString)attvar.Attributes[4]).ValueString;
+                            again = true;
+                        }
+                    } else {
+                        // Not Case Sesitive
+                        if (string.Equals(tmpList[z], ((VariableString)attvar.Attributes[3]).ValueString, StringComparison.CurrentCultureIgnoreCase)) {
+                            tmpList[z] = ((VariableString)attvar.Attributes[4]).ValueString;
+                            again = true;
                         }
                     }
                 }
-            } while (again);
+            }
+        } while (again);
 
-            ((VariableListString)attvar.Attributes[0]).ValueList = tmpList;
-            return DoItFeedback.Null();
-        }
-
-        #endregion
+        ((VariableListString)attvar.Attributes[0]).ValueList = tmpList;
+        return DoItFeedback.Null();
     }
+
+    #endregion
 }

@@ -19,85 +19,84 @@ using BlueBasics;
 using System;
 using System.Drawing;
 
-namespace BlueControls.Forms {
+namespace BlueControls.Forms;
 
-    public partial class QuickInfo : FloatingForm {
+public partial class QuickInfo : FloatingForm {
 
-        #region Fields
+    #region Fields
 
-        private static string _autoClosedTxt = string.Empty;
-        private static string _shownTxt = string.Empty;
-        private int _counter;
-        private bool _shown;
+    private static string _autoClosedTxt = string.Empty;
+    private static string _shownTxt = string.Empty;
+    private int _counter;
+    private bool _shown;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        private QuickInfo() : base(Enums.Design.Form_QuickInfo) => InitializeComponent();
+    private QuickInfo() : base(Enums.Design.Form_QuickInfo) => InitializeComponent();
 
-        private QuickInfo(string text) : this() {
-            //InitializeComponent();
-            capTXT.Text = text;
-            var he = Math.Min(capTXT.TextRequiredSize().Height, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
-            var wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
-            Size = new Size(wi + (capTXT.Left * 2), he + (capTXT.Top * 2));
-            Visible = false;
-            timQI.Enabled = true;
-        }
-
-        #endregion
-
-        #region Methods
-
-        public new static void Close() => Close(false);
-
-        public static void Show(string text) {
-            if (text == _shownTxt) { return; }
-            Close(false);
-            if (text == _autoClosedTxt) { return; }
-            _shownTxt = text;
-            if (string.IsNullOrEmpty(text)) { return; }
-            new QuickInfo(text);
-        }
-
-        private static void Close(bool autoClose) {
-            if (autoClose) {
-                _autoClosedTxt = _shownTxt;
-            } else {
-                _shownTxt = string.Empty;
-                _autoClosedTxt = string.Empty;
-            }
-            foreach (var thisForm in AllBoxes) {
-                if (thisForm.IsDisposed || thisForm is not QuickInfo qi) {
-                    continue;
-                }
-
-                try {
-                    qi.timQI.Enabled = false;
-                    thisForm.Close();
-                    Close(autoClose);
-                    return;
-                } catch (Exception ex) {
-                    Develop.DebugPrint(ex);
-                }
-            }
-        }
-
-        private void timQI_Tick(object sender, System.EventArgs e) {
-            Position_LocateToMouse();
-            if (!_shown) {
-                _shown = true;
-                Show();
-                timQI.Interval = 15;
-            }
-            _counter++;
-            if (_counter * timQI.Interval > 10000) {
-                timQI.Enabled = false;
-                Close(true);
-            }
-        }
-
-        #endregion
+    private QuickInfo(string text) : this() {
+        //InitializeComponent();
+        capTXT.Text = text;
+        var he = Math.Min(capTXT.TextRequiredSize().Height, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
+        var wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
+        Size = new Size(wi + (capTXT.Left * 2), he + (capTXT.Top * 2));
+        Visible = false;
+        timQI.Enabled = true;
     }
+
+    #endregion
+
+    #region Methods
+
+    public new static void Close() => Close(false);
+
+    public static void Show(string text) {
+        if (text == _shownTxt) { return; }
+        Close(false);
+        if (text == _autoClosedTxt) { return; }
+        _shownTxt = text;
+        if (string.IsNullOrEmpty(text)) { return; }
+        new QuickInfo(text);
+    }
+
+    private static void Close(bool autoClose) {
+        if (autoClose) {
+            _autoClosedTxt = _shownTxt;
+        } else {
+            _shownTxt = string.Empty;
+            _autoClosedTxt = string.Empty;
+        }
+        foreach (var thisForm in AllBoxes) {
+            if (thisForm.IsDisposed || thisForm is not QuickInfo qi) {
+                continue;
+            }
+
+            try {
+                qi.timQI.Enabled = false;
+                thisForm.Close();
+                Close(autoClose);
+                return;
+            } catch (Exception ex) {
+                Develop.DebugPrint(ex);
+            }
+        }
+    }
+
+    private void timQI_Tick(object sender, System.EventArgs e) {
+        Position_LocateToMouse();
+        if (!_shown) {
+            _shown = true;
+            Show();
+            timQI.Interval = 15;
+        }
+        _counter++;
+        if (_counter * timQI.Interval > 10000) {
+            timQI.Enabled = false;
+            Close(true);
+        }
+    }
+
+    #endregion
 }

@@ -23,61 +23,60 @@ using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueDatabase.AdditionalScriptComands {
+namespace BlueDatabase.AdditionalScriptComands;
 
-    public class Method_AddRow : MethodDatabase {
+public class Method_AddRow : MethodDatabase {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain }, new() { VariableBool.ShortName_Plain } };
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain }, new() { VariableBool.ShortName_Plain } };
 
-        public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeile. KeyValue muss einen Wert enthalten- zur Not kann UniqueRowId() benutzt werden.";
+    public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeile. KeyValue muss einen Wert enthalten- zur Not kann UniqueRowId() benutzt werden.";
 
-        public override bool EndlessArgs => false;
+    public override bool EndlessArgs => false;
 
-        public override string EndSequence => ")";
+    public override string EndSequence => ")";
 
-        public override bool GetCodeBlockAfter => false;
+    public override bool GetCodeBlockAfter => false;
 
-        public override string Returns => VariableRowItem.ShortName_Variable;
+    public override string Returns => VariableRowItem.ShortName_Variable;
 
-        public override string StartSequence => "(";
+    public override string StartSequence => "(";
 
-        public override string Syntax => "AddRow(database, keyvalue, startScriptOfNewRow);";
+    public override string Syntax => "AddRow(database, keyvalue, startScriptOfNewRow);";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "addrow" };
+    public override List<string> Comand(Script? s) => new() { "addrow" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            var db = DatabaseOf(s, ((VariableString)attvar.Attributes[0]).ValueString);
-            if (db == null) { return new DoItFeedback("Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden"); }
+        var db = DatabaseOf(s, ((VariableString)attvar.Attributes[0]).ValueString);
+        if (db == null) { return new DoItFeedback("Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden"); }
 
-            if (db.ReadOnly) { return DoItFeedback.Falsch(); }
+        if (db.ReadOnly) { return DoItFeedback.Falsch(); }
 
-            if (string.IsNullOrEmpty(((VariableString)attvar.Attributes[1]).ValueString)) { return new DoItFeedback("KeyValue muss einen Wert enthalten."); }
-            //var r = db.Row[((VariableString)attvar.Attributes[1]).ValueString];
+        if (string.IsNullOrEmpty(((VariableString)attvar.Attributes[1]).ValueString)) { return new DoItFeedback("KeyValue muss einen Wert enthalten."); }
+        //var r = db.Row[((VariableString)attvar.Attributes[1]).ValueString];
 
-            //if (r != null && !((VariableBool)attvar.Attributes[2]).ValueBool) { return Method_Row.RowToObject(r); }
+        //if (r != null && !((VariableBool)attvar.Attributes[2]).ValueBool) { return Method_Row.RowToObject(r); }
 
-            if (((VariableBool)attvar.Attributes[2]).ValueBool) {
-                StackTrace stackTrace = new();
+        if (((VariableBool)attvar.Attributes[2]).ValueBool) {
+            StackTrace stackTrace = new();
 
-                if (stackTrace.FrameCount > 400) {
-                    return new DoItFeedback("Stapelspeicherüberlauf");
-                }
+            if (stackTrace.FrameCount > 400) {
+                return new DoItFeedback("Stapelspeicherüberlauf");
             }
-
-            var r = db.Row.Add(((VariableString)attvar.Attributes[1]).ValueString, ((VariableBool)attvar.Attributes[2]).ValueBool);
-
-            return Method_Row.RowToObjectFeedback(r);
         }
 
-        #endregion
+        var r = db.Row.Add(((VariableString)attvar.Attributes[1]).ValueString, ((VariableBool)attvar.Attributes[2]).ValueBool);
+
+        return Method_Row.RowToObjectFeedback(r);
     }
+
+    #endregion
 }

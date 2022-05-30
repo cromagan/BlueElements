@@ -15,20 +15,19 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueDatabase.EventArgs {
+namespace BlueDatabase.EventArgs;
 
-    public class CellCancelEventArgs : CellEventArgs {
+public class CellCancelEventArgs : CellEventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public CellCancelEventArgs(ColumnItem? column, RowItem? row, string cancelReason) : base(column, row) => CancelReason = cancelReason;
+    public CellCancelEventArgs(ColumnItem? column, RowItem? row, string cancelReason) : base(column, row) => CancelReason = cancelReason;
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public string CancelReason { get; set; }
+    public string CancelReason { get; set; }
 
-        #endregion
-    }
+    #endregion
 }

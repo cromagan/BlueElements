@@ -15,12 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueDatabase.Enums {
+namespace BlueDatabase.Enums;
 
-    public enum TranslationType {
-        Original_Anzeigen = 0,
-        Übersetzen = 1,
-        Datum = 20,
-        Zahl = 30
-    }
+public enum TranslationType {
+    Original_Anzeigen = 0,
+    Übersetzen = 1,
+    Datum = 20,
+    Zahl = 30
 }

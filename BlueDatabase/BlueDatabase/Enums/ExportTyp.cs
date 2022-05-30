@@ -15,14 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueDatabase.Enums {
+namespace BlueDatabase.Enums;
 
-    public enum ExportTyp {
-        Undefiniert = 0,
-        DatenbankOriginalFormat = 1,
-        DatenbankHTMLFormat = 2,
-        DatenbankCSVFormat = 3,
-        EinzelnMitFormular = 101
-        //   EinzelnAlsHTML = 102
-    }
+public enum ExportTyp {
+    Undefiniert = 0,
+    DatenbankOriginalFormat = 1,
+    DatenbankHTMLFormat = 2,
+    DatenbankCSVFormat = 3,
+    EinzelnMitFormular = 101
+    //   EinzelnAlsHTML = 102
 }

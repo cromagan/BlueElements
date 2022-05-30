@@ -22,57 +22,56 @@ using BlueScript.Variables;
 
 #nullable enable
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_ExtractTags : Method {
+internal class Method_ExtractTags : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain, VariableListString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain, VariableListString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
 
-        public override string Description => "Extrahiert aus dem gegebenen String oder Liste die Schlagwörter und erstellt neue String-Variablen.\r\n" +
-            "Das zweite Attribut dient als Erkennungszeichen, welche das Ende eine Schlagwortes angibt. Zuvor extrahierte Variablen werden wieder entfernt.\r\n" +
-            "Beispiel: ExtractTags(\"Farbe: Blau\", \":\"); erstellt eine neue Variable 'extracted_farbe' mit dem Inhalt 'Blau'";
+    public override string Description => "Extrahiert aus dem gegebenen String oder Liste die Schlagwörter und erstellt neue String-Variablen.\r\n" +
+                                          "Das zweite Attribut dient als Erkennungszeichen, welche das Ende eine Schlagwortes angibt. Zuvor extrahierte Variablen werden wieder entfernt.\r\n" +
+                                          "Beispiel: ExtractTags(\"Farbe: Blau\", \":\"); erstellt eine neue Variable 'extracted_farbe' mit dem Inhalt 'Blau'";
 
-        public override bool EndlessArgs => true;
-        public override string EndSequence => ");";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => string.Empty;
-        public override string StartSequence => "(";
-        public override string Syntax => "ExtractTags(String, Delemiter);";
+    public override bool EndlessArgs => true;
+    public override string EndSequence => ");";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => "(";
+    public override string Syntax => "ExtractTags(String, Delemiter);";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "extracttags" };
+    public override List<string> Comand(Script? s) => new() { "extracttags" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            const string coment = "Mit dem Befehl 'ExtractTags' erstellt";
-            s.Variables.RemoveWithComent(coment);
+        const string coment = "Mit dem Befehl 'ExtractTags' erstellt";
+        s.Variables.RemoveWithComent(coment);
 
-            var tags = new List<string>();
-            if (attvar.Attributes[0] is VariableString vs) { tags.Add(vs.ValueString); }
-            if (attvar.Attributes[0] is VariableListString vl) { tags.AddRange(vl.ValueList); }
+        var tags = new List<string>();
+        if (attvar.Attributes[0] is VariableString vs) { tags.Add(vs.ValueString); }
+        if (attvar.Attributes[0] is VariableListString vl) { tags.AddRange(vl.ValueList); }
 
-            foreach (var thisw in tags) {
-                var x = thisw.SplitBy(((VariableString)attvar.Attributes[1]).ValueString);
+        foreach (var thisw in tags) {
+            var x = thisw.SplitBy(((VariableString)attvar.Attributes[1]).ValueString);
 
-                if (x.Length == 2) {
-                    var vn = x[0].ToLower().ReduceToChars(Constants.AllowedCharsVariableName);
-                    var thisv = x[1].Trim();
-                    if (!string.IsNullOrEmpty(vn) && !string.IsNullOrEmpty(thisv)) {
-                        s.Variables.Add(new VariableString("extracted_" + vn, thisv, true, false, coment));
-                    }
+            if (x.Length == 2) {
+                var vn = x[0].ToLower().ReduceToChars(Constants.AllowedCharsVariableName);
+                var thisv = x[1].Trim();
+                if (!string.IsNullOrEmpty(vn) && !string.IsNullOrEmpty(thisv)) {
+                    s.Variables.Add(new VariableString("extracted_" + vn, thisv, true, false, coment));
                 }
             }
-
-            return DoItFeedback.Null();
         }
 
-        #endregion
+        return DoItFeedback.Null();
     }
+
+    #endregion
 }

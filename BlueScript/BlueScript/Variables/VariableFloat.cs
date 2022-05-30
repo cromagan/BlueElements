@@ -22,82 +22,81 @@ using BlueScript.Structures;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 
-namespace BlueScript.Variables {
+namespace BlueScript.Variables;
 
-    public class VariableFloat : Variable {
+public class VariableFloat : Variable {
 
-        #region Fields
+    #region Fields
 
-        private double _double = 0f;
+    private double _double = 0f;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public VariableFloat(string name, double value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _double = value;
+    public VariableFloat(string name, double value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _double = value;
 
-        public VariableFloat(double value) : this(DummyName(), value, true, false, string.Empty) { }
+    public VariableFloat(double value) : this(DummyName(), value, true, false, string.Empty) { }
 
-        /// <summary>
-        /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
-        /// </summary>
-        /// <param name="name"></param>
-        public VariableFloat(string name) : this(name, 0f, true, false, string.Empty) { }
+    /// <summary>
+    /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
+    /// </summary>
+    /// <param name="name"></param>
+    public VariableFloat(string name) : this(name, 0f, true, false, string.Empty) { }
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public static string ShortName_Plain => "num";
-        public static string ShortName_Variable => "*num";
-        public override int CheckOrder => 1;
-        public override bool GetFromStringPossible => true;
-        public override bool IsNullOrEmpty => false;
-        public override string ReadableText => _double.ToString(Constants.Format_Float1);
-        public override string ShortName => "num";
-        public override bool ToStringPossible => true;
+    public static string ShortName_Plain => "num";
+    public static string ShortName_Variable => "*num";
+    public override int CheckOrder => 1;
+    public override bool GetFromStringPossible => true;
+    public override bool IsNullOrEmpty => false;
+    public override string ReadableText => _double.ToString(Constants.Format_Float1);
+    public override string ShortName => "num";
+    public override bool ToStringPossible => true;
 
-        public override string ValueForReplace => ReadableText;
+    public override string ValueForReplace => ReadableText;
 
-        public int ValueInt => (int)_double;
+    public int ValueInt => (int)_double;
 
-        public double ValueNum {
-            get => _double;
-            set {
-                if (Readonly) { return; }
-                _double = value;
-            }
+    public double ValueNum {
+        get => _double;
+        set {
+            if (Readonly) { return; }
+            _double = value;
         }
-
-        #endregion
-
-        #region Methods
-
-        public override DoItFeedback GetValueFrom(Variable variable) {
-            if (variable is not VariableFloat v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
-            if (Readonly) { return DoItFeedback.Schreibgschützt(); }
-            ValueNum = v.ValueNum;
-            return DoItFeedback.Null();
-        }
-
-        protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
-            succesVar = null;
-
-            var (pos2, _) = NextText(txt, 0, Berechnung.RechenOperatoren, false, false, KlammernStd);
-            if (pos2 >= 0) {
-                var erg = Berechnung.Ergebnis(txt);
-                if (erg == null) { return false; }
-                txt = erg.ToString();
-            }
-
-            if (DoubleTryParse(txt, out var zahl)) {
-                succesVar = new VariableFloat(zahl);
-                return true;
-            }
-
-            return false;
-        }
-
-        #endregion
     }
+
+    #endregion
+
+    #region Methods
+
+    public override DoItFeedback GetValueFrom(Variable variable) {
+        if (variable is not VariableFloat v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
+        if (Readonly) { return DoItFeedback.Schreibgschützt(); }
+        ValueNum = v.ValueNum;
+        return DoItFeedback.Null();
+    }
+
+    protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
+        succesVar = null;
+
+        var (pos2, _) = NextText(txt, 0, Berechnung.RechenOperatoren, false, false, KlammernStd);
+        if (pos2 >= 0) {
+            var erg = Berechnung.Ergebnis(txt);
+            if (erg == null) { return false; }
+            txt = erg.ToString();
+        }
+
+        if (DoubleTryParse(txt, out var zahl)) {
+            succesVar = new VariableFloat(zahl);
+            return true;
+        }
+
+        return false;
+    }
+
+    #endregion
 }

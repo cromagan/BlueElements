@@ -15,12 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueDatabase.Enums {
+namespace BlueDatabase.Enums;
 
-    public enum ÜberschriftAnordnung {
-        ohne = 0,
-        Links_neben_Dem_Feld = 1,
-        Über_dem_Feld = 2,
-        Ohne_mit_Abstand = 3
-    }
+public enum ÜberschriftAnordnung {
+    ohne = 0,
+    Links_neben_Dem_Feld = 1,
+    Über_dem_Feld = 2,
+    Ohne_mit_Abstand = 3
 }

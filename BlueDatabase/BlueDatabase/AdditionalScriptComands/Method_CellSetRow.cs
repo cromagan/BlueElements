@@ -22,48 +22,47 @@ using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueDatabase.AdditionalScriptComands {
+namespace BlueDatabase.AdditionalScriptComands;
 
-    public class Method_CellSetRow : MethodDatabase {
+public class Method_CellSetRow : MethodDatabase {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain }, new() { VariableRowItem.ShortName_Variable } };
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain }, new() { VariableRowItem.ShortName_Variable } };
 
-        public override string Description => "Setzt den Wert. Gibt TRUE zurück, wenn der Wert erfolgreich gesetzt wurde.";
+    public override string Description => "Setzt den Wert. Gibt TRUE zurück, wenn der Wert erfolgreich gesetzt wurde.";
 
-        public override bool EndlessArgs => false;
+    public override bool EndlessArgs => false;
 
-        public override string EndSequence => ")";
+    public override string EndSequence => ")";
 
-        public override bool GetCodeBlockAfter => false;
+    public override bool GetCodeBlockAfter => false;
 
-        public override string Returns => VariableBool.ShortName_Plain;
-        public override string StartSequence => "(";
+    public override string Returns => VariableBool.ShortName_Plain;
+    public override string StartSequence => "(";
 
-        public override string Syntax => "CellSetRow(Value, Column, Row)";
+    public override string Syntax => "CellSetRow(Value, Column, Row)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "cellsetrow" };
+    public override List<string> Comand(Script? s) => new() { "cellsetrow" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            var row = Method_Row.ObjectToRow(attvar.Attributes[2]);
-            if (row is null) { return new DoItFeedback("Fehler in der Zeile"); }
+        var row = Method_Row.ObjectToRow(attvar.Attributes[2]);
+        if (row is null) { return new DoItFeedback("Fehler in der Zeile"); }
 
-            var columnToSet = row.Database.Column.Exists(((VariableString)attvar.Attributes[1]).ValueString);
-            if (columnToSet == null) { return new DoItFeedback("Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[1]).ValueString); }
+        var columnToSet = row.Database.Column.Exists(((VariableString)attvar.Attributes[1]).ValueString);
+        if (columnToSet == null) { return new DoItFeedback("Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[1]).ValueString); }
 
-            row.CellSet(columnToSet, ((VariableString)attvar.Attributes[0]).ValueString);
+        row.CellSet(columnToSet, ((VariableString)attvar.Attributes[0]).ValueString);
 
-            return row.CellGetString(columnToSet) == ((VariableString)attvar.Attributes[0]).ValueString ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
-        }
-
-        #endregion
+        return row.CellGetString(columnToSet) == ((VariableString)attvar.Attributes[0]).ValueString ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }
+
+    #endregion
 }

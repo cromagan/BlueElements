@@ -17,20 +17,19 @@
 
 using System.Collections.Generic;
 
-namespace BlueBasics.EventArgs {
+namespace BlueBasics.EventArgs;
 
-    public class MultiUserFileStopWorkingEventArgs : System.EventArgs {
+public class MultiUserFileStopWorkingEventArgs : System.EventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public MultiUserFileStopWorkingEventArgs() => AllreadyStopped = new List<string>();
+    public MultiUserFileStopWorkingEventArgs() => AllreadyStopped = new List<string>();
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public List<string> AllreadyStopped { get; }
+    public List<string> AllreadyStopped { get; }
 
-        #endregion
-    }
+    #endregion
 }

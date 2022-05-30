@@ -21,35 +21,34 @@ using System.Collections.Generic;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_Clear : Method {
+internal class Method_Clear : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable } };
-        public override string Description => "Entfernt alle Einträge einer Liste";
-        public override bool EndlessArgs => false;
-        public override string EndSequence => ");";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => string.Empty;
-        public override string StartSequence => "(";
-        public override string Syntax => "Clear(VariableListe);";
+    public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable } };
+    public override string Description => "Entfernt alle Einträge einer Liste";
+    public override bool EndlessArgs => false;
+    public override string EndSequence => ");";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => "(";
+    public override string Syntax => "Clear(VariableListe);";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "clear" };
+    public override List<string> Comand(Script? s) => new() { "clear" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-            if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
-            ((VariableListString)attvar.Attributes[0]).ValueList = new List<string>();
-            return DoItFeedback.Null();
-        }
-
-        #endregion
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
+        ((VariableListString)attvar.Attributes[0]).ValueList = new List<string>();
+        return DoItFeedback.Null();
     }
+
+    #endregion
 }

@@ -18,30 +18,29 @@
 using BlueControls.Enums;
 using System.Windows.Forms;
 
-namespace BlueControls.Controls {
+namespace BlueControls.Controls;
 
-    public class TabControl : AbstractTabControl {
+public class TabControl : AbstractTabControl {
 
-        #region Constructors
+    #region Constructors
 
-        public TabControl() : base() => BackColor = Skin.Color_Back(Design.TabStrip_Body, States.Standard);
+    public TabControl() : base() => BackColor = Skin.Color_Back(Design.TabStrip_Body, States.Standard);
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        protected override void OnControlAdded(ControlEventArgs e) {
-            base.OnControlAdded(e);
-            if (e.Control is not TabPage tp) {
-                return;
-            }
-
-            tp.BackColor = Skin.Color_Back(Design.TabStrip_Body, States.Standard);
-            Invalidate();
+    protected override void OnControlAdded(ControlEventArgs e) {
+        base.OnControlAdded(e);
+        if (e.Control is not TabPage tp) {
+            return;
         }
 
-        protected override void OnPaint(PaintEventArgs e) => DrawControl(e, Design.TabStrip_Back);
-
-        #endregion
+        tp.BackColor = Skin.Color_Back(Design.TabStrip_Body, States.Standard);
+        Invalidate();
     }
+
+    protected override void OnPaint(PaintEventArgs e) => DrawControl(e, Design.TabStrip_Back);
+
+    #endregion
 }

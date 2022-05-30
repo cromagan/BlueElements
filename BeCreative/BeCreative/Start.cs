@@ -20,58 +20,57 @@
 using BlueControls.BlueDatabaseDialogs;
 using BlueDatabase;
 
-namespace BeCreative {
+namespace BeCreative;
 
-    public partial class Start : BlueControls.Forms.Form {
+public partial class Start : BlueControls.Forms.Form {
 
-        #region Constructors
+    #region Constructors
 
-        public Start() {
-            InitializeComponent();
-        }
-
-        #endregion
-
-        #region Methods
-
-        private void btnBildEditor_Click(object sender, System.EventArgs e) {
-            var x = new BluePaint.MainWindow(true);
-
-            x.ShowDialog();
-            x.Dispose();
-        }
-
-        private void btnDatenbank_Click(object sender, System.EventArgs e) {
-            var x = new BlueControls.Forms.TableView(null, true, true);
-
-            x.ShowDialog();
-            x.Dispose();
-        }
-
-        private void btnFormular_Click(object sender, System.EventArgs e) {
-            var x = new BlueControls.Forms.ConnectedFormulaEditor();
-
-            x.ShowDialog();
-            x.Dispose();
-        }
-
-        private void btnHierachie_Click(object sender, System.EventArgs e) {
-            var x = new BlueControls.Forms.RelationDiagram(null);
-
-            x.ShowDialog();
-            x.Dispose();
-        }
-
-        private void btnLayout_Click(object sender, System.EventArgs e) {
-            var x = new LayoutPadEditor((Database)null);
-
-            x.ShowDialog();
-            x.Dispose();
-        }
-
-        private void btnTextEditor_Click(object sender, System.EventArgs e) {
-        }
-
-        #endregion
+    public Start() {
+        InitializeComponent();
     }
+
+    #endregion
+
+    #region Methods
+
+    private void btnBildEditor_Click(object sender, System.EventArgs e) {
+        var x = new BluePaint.MainWindow(true);
+
+        x.ShowDialog();
+        x.Dispose();
+    }
+
+    private void btnDatenbank_Click(object sender, System.EventArgs e) {
+        var x = new BlueControls.Forms.TableView(null, true, true);
+
+        x.ShowDialog();
+        x.Dispose();
+    }
+
+    private void btnFormular_Click(object sender, System.EventArgs e) {
+        var x = new BlueControls.Forms.ConnectedFormulaEditor();
+
+        x.ShowDialog();
+        x.Dispose();
+    }
+
+    private void btnHierachie_Click(object sender, System.EventArgs e) {
+        var x = new BlueControls.Forms.RelationDiagram(null);
+
+        x.ShowDialog();
+        x.Dispose();
+    }
+
+    private void btnLayout_Click(object sender, System.EventArgs e) {
+        var x = new LayoutPadEditor((Database)null);
+
+        x.ShowDialog();
+        x.Dispose();
+    }
+
+    private void btnTextEditor_Click(object sender, System.EventArgs e) {
+    }
+
+    #endregion
 }

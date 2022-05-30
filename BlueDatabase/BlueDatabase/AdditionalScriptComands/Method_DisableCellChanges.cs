@@ -20,44 +20,43 @@ using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueDatabase.AdditionalScriptComands {
+namespace BlueDatabase.AdditionalScriptComands;
 
-    public class Method_DisableCellChanges : MethodDatabase {
+public class Method_DisableCellChanges : MethodDatabase {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new();
-        public override string Description => "Verhindert in dieser Datenbank, dass Änderungen, die im SKript vorgenommen wurden, zurückgespielt werden.\r\nSo können z.B. Variabelen für den Export verändert werden und es hat keine Auswirkungen\r\nauf diese Datenbank.";
+    public override List<List<string>> Args => new();
+    public override string Description => "Verhindert in dieser Datenbank, dass Änderungen, die im SKript vorgenommen wurden, zurückgespielt werden.\r\nSo können z.B. Variabelen für den Export verändert werden und es hat keine Auswirkungen\r\nauf diese Datenbank.";
 
-        public override bool EndlessArgs => false;
+    public override bool EndlessArgs => false;
 
-        public override string EndSequence => ");";
+    public override string EndSequence => ");";
 
-        public override bool GetCodeBlockAfter => false;
+    public override bool GetCodeBlockAfter => false;
 
-        public override string Returns => string.Empty;
-        public override string StartSequence => "(";
+    public override string Returns => string.Empty;
+    public override string StartSequence => "(";
 
-        public override string Syntax => "DisableCellChanges();";
+    public override string Syntax => "DisableCellChanges();";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "disablecellchanges" };
+    public override List<string> Comand(Script? s) => new() { "disablecellchanges" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            var ve = (VariableBool)s.Variables.GetSystem("CellChangesEnabled");
-            ve.Readonly = false;
-            ve.ValueBool = false;
-            ve.Readonly = true;
+        var ve = (VariableBool)s.Variables.GetSystem("CellChangesEnabled");
+        ve.Readonly = false;
+        ve.ValueBool = false;
+        ve.Readonly = true;
 
-            return DoItFeedback.Null();
-        }
-
-        #endregion
+        return DoItFeedback.Null();
     }
+
+    #endregion
 }

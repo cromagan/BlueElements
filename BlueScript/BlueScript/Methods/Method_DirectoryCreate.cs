@@ -20,42 +20,41 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Extensions;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_DirectoryCreate : Method {
+internal class Method_DirectoryCreate : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain } };
-        public override string Description => "Erstellt ein Verzeichnis, falls dieses nicht existert. Gibt TRUE zurück, erstellt wurde oder bereits existierte.";
-        public override bool EndlessArgs => false;
-        public override string EndSequence => ")";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => VariableBool.ShortName_Plain;
-        public override string StartSequence => "(";
-        public override string Syntax => "DirectoryCreate(Path)";
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain } };
+    public override string Description => "Erstellt ein Verzeichnis, falls dieses nicht existert. Gibt TRUE zurück, erstellt wurde oder bereits existierte.";
+    public override bool EndlessArgs => false;
+    public override string EndSequence => ")";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => VariableBool.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "DirectoryCreate(Path)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "directorycreate" };
+    public override List<string> Comand(Script? s) => new() { "directorycreate" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            var p = ((VariableString)attvar.Attributes[0]).ValueString.TrimEnd("\\");
+        var p = ((VariableString)attvar.Attributes[0]).ValueString.TrimEnd("\\");
 
-            if (System.IO.Directory.Exists(p)) { return DoItFeedback.Wahr(); }
+        if (System.IO.Directory.Exists(p)) { return DoItFeedback.Wahr(); }
 
-            try {
-                System.IO.Directory.CreateDirectory(p);
-            } catch { }
+        try {
+            System.IO.Directory.CreateDirectory(p);
+        } catch { }
 
-            return !System.IO.Directory.Exists(p) ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
-        }
-
-        #endregion
+        return !System.IO.Directory.Exists(p) ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
     }
+
+    #endregion
 }

@@ -20,58 +20,57 @@ using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueDatabase.AdditionalScriptComands {
+namespace BlueDatabase.AdditionalScriptComands;
 
-    public class Method_SetError : MethodDatabase {
+public class Method_SetError : MethodDatabase {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Variable, VariableListString.ShortName_Variable, VariableFloat.ShortName_Variable, VariableBool.ShortName_Variable } };
-        public override string Description => "Bei Zeilenprüfungen wird ein Fehler abgesetzt. Dessen Inhalt bestimmt die Nachricht. Die Spalten, die als fehlerhaft markiert werden sollen, müssen nachträglich als Variablennamen angegeben werden.";
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Variable, VariableListString.ShortName_Variable, VariableFloat.ShortName_Variable, VariableBool.ShortName_Variable } };
+    public override string Description => "Bei Zeilenprüfungen wird ein Fehler abgesetzt. Dessen Inhalt bestimmt die Nachricht. Die Spalten, die als fehlerhaft markiert werden sollen, müssen nachträglich als Variablennamen angegeben werden.";
 
-        public override bool EndlessArgs => true;
+    public override bool EndlessArgs => true;
 
-        public override string EndSequence => ");";
+    public override string EndSequence => ");";
 
-        public override bool GetCodeBlockAfter => false;
+    public override bool GetCodeBlockAfter => false;
 
-        public override string Returns => string.Empty;
-        public override string StartSequence => "(";
+    public override string Returns => string.Empty;
+    public override string StartSequence => "(";
 
-        public override string Syntax => "SetError(Nachricht, Column1, Colum2, ...);";
+    public override string Syntax => "SetError(Nachricht, Column1, Colum2, ...);";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "seterror" };
+    public override List<string> Comand(Script? s) => new() { "seterror" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            for (var z = 1; z < attvar.Attributes.Count; z++) {
-                var column = Column(s, attvar.Attributes[z].Name);
-                if (column == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[z].Name); }
+        for (var z = 1; z < attvar.Attributes.Count; z++) {
+            var column = Column(s, attvar.Attributes[z].Name);
+            if (column == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[z].Name); }
 
-                s.Feedback = s.Feedback + attvar.Attributes[z].Name.ToUpper() + "|" + ((VariableString)attvar.Attributes[0]).ValueString + "\r";
+            s.Feedback = s.Feedback + attvar.Attributes[z].Name.ToUpper() + "|" + ((VariableString)attvar.Attributes[0]).ValueString + "\r";
 
-                //var n = attvar.Attributes[z].Name.ToLower() + "_error";
-                //var ve = s.Variablen.GetSystem(n);
-                //if (ve == null) {
-                //    ve = new Variable(n, string.Empty, enVariableDataType.List, false, true, string.Empty);
-                //    s.Variablen.Add(ve);
-                //}
-                //ve.Readonly = false;
-                //var l = ve.ValueListString;
-                //l.AddIfNotExists(((VariableString)attvar.Attributes[0]).ValueString);
-                //ve.ValueListString = l;
-                //ve.Readonly = true;
-            }
-
-            return DoItFeedback.Null();
+            //var n = attvar.Attributes[z].Name.ToLower() + "_error";
+            //var ve = s.Variablen.GetSystem(n);
+            //if (ve == null) {
+            //    ve = new Variable(n, string.Empty, enVariableDataType.List, false, true, string.Empty);
+            //    s.Variablen.Add(ve);
+            //}
+            //ve.Readonly = false;
+            //var l = ve.ValueListString;
+            //l.AddIfNotExists(((VariableString)attvar.Attributes[0]).ValueString);
+            //ve.ValueListString = l;
+            //ve.Readonly = true;
         }
 
-        #endregion
+        return DoItFeedback.Null();
     }
+
+    #endregion
 }

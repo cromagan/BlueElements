@@ -27,217 +27,216 @@ using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
 using static BlueBasics.FileOperations;
 
-namespace BlueControls.Classes_Editor {
+namespace BlueControls.Classes_Editor;
 
-    internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<ExportDefinition> //  System.Windows.Forms.UserControl//
-    {
-        #region Constructors
+internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<ExportDefinition> //  System.Windows.Forms.UserControl//
+{
+    #region Constructors
 
-        public ExportDefinition_Editor() : base() => InitializeComponent();
+    public ExportDefinition_Editor() : base() => InitializeComponent();
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        protected override void DisableAndClearFormula() {
-            Enabled = false;
-            ExportCSVFormat.Checked = false;
-            ExportHTMLFormat.Checked = false;
-            ExportOriginalFormat.Checked = false;
-            ExportalsBild.Checked = false;
-            ExportVerzeichnis.Text = string.Empty;
-            ExportAutomatischLöschen.Text = string.Empty;
-            cbxExportFormularID.Text = string.Empty;
-            ExportSpaltenAnsicht.Text = string.Empty;
-            lbxFilter.Item.Clear();
-            lsbExportDateien.Item.Clear();
-        }
-
-        protected override void EnabledAndFillFormula() {
-            Enabled = true;
-            switch (Item.Typ) {
-                case ExportTyp.DatenbankCSVFormat:
-                    ExportCSVFormat.Checked = true;
-                    break;
-
-                case ExportTyp.DatenbankHTMLFormat:
-                    ExportHTMLFormat.Checked = true;
-                    break;
-
-                case ExportTyp.DatenbankOriginalFormat:
-                    ExportOriginalFormat.Checked = true;
-                    break;
-
-                case ExportTyp.EinzelnMitFormular:
-                    ExportalsBild.Checked = true;
-                    Item.BackupInterval = 0;
-                    break;
-
-                default:
-                    Develop.DebugPrint(Item.Typ);
-                    return;
-            }
-            ExportVerzeichnis.Text = Item.Verzeichnis;
-            ExportIntervall.Text = Item.BackupInterval.ToString(Constants.Format_Float1);
-            ExportAutomatischLöschen.Text = Item.AutoDelete.ToString(Constants.Format_Float1);
-            cbxExportFormularID.Text = Item.ExportFormularId;
-            ExportSpaltenAnsicht.Text = Item.ExportSpaltenAnsicht.ToString();
-            lbxFilter.Item.Clear();
-            foreach (var thisFilter in Item.Filter.Where(thisFilter => thisFilter != null)) {
-                lbxFilter.Item.Add(thisFilter, string.Empty, string.Empty);
-            }
-            lsbExportDateien.Item.Clear();
-            foreach (var t1 in Item.BereitsExportiert) {
-                if (!string.IsNullOrEmpty(t1)) {
-                    var t = t1.Split('|');
-                    if (!FileExists(t[0])) {
-                        lsbExportDateien.Item.Add(t[0], t1, QuickImage.Get(ImageCode.Kritisch), true, "0000");
-                    } else {
-                        var q1 = QuickImage.Get(ImageCode.Kugel, 16, Color.Red.MixColor(Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / Item.AutoDelete), Color.Transparent);
-                        lsbExportDateien.Item.Add(t[0], t1, q1, true, t[1].CompareKey(SortierTyp.Datum_Uhrzeit));
-                    }
-                }
-            }
-        }
-
-        protected override void PrepaireFormula() {
-            cbxExportFormularID.Item.Clear();
-            Forms.ExportDialog.AddLayoutsOff(cbxExportFormularID.Item, Item.Database, true);
-            ExportSpaltenAnsicht.Item.Clear();
-            for (var spa = 0; spa < Item.Database.ColumnArrangements.Count; spa++) {
-                ExportSpaltenAnsicht.Item.Add(Item.Database.ColumnArrangements[spa].Name, spa.ToString());
-            }
-            if (!string.IsNullOrEmpty(Item.Database.GlobalShowPass)) {
-                ExportCSVFormat.Enabled = false;
-                ExportHTMLFormat.Enabled = false;
-                ExportalsBild.Enabled = false;
-            } else {
-                ExportCSVFormat.Enabled = true;
-                ExportHTMLFormat.Enabled = true;
-                ExportalsBild.Enabled = true;
-            }
-        }
-
-        private void cbxExportFormularID_ItemClicked(object sender, BasicListItemEventArgs e) => UpdateExport(true);
-
-        //private void ExportFilter_AddClicked(object sender, System.EventArgs e)
-        //{
-        //    Develop.DebugPrint_NichtImplementiert();
-        //    var DummyFilter = new FilterItem(tmp.Database.Column[0], enFilterType.KeinFilter, "");
-        //    var NewFilter = FilterItem_Editor();// DialogBox.eEditClass(DummyFilter, false);
-        //    if (NewFilter == DummyFilter) { return; }
-        //    var NewFilter2 = (FilterItem)NewFilter;
-        //    if (NewFilter2.FilterType == enFilterType.KeinFilter) { return; }
-        //    ExportFilter.Item.Add(new ObjectListItem(NewFilter2));
-        //    UpdateExport(false);
-        //}
-        private void ExportDateien_ListOrItemChanged(object sender, System.EventArgs e) => UpdateExport(false);
-
-        private void ExportDateien_RemoveClicked(object sender, ListOfBasicListItemEventArgs e) {
-            foreach (var thisItem in e.Items) {
-                if (thisItem is BasicListItem ThisItemBasic) {
-                    string fil;
-                    if (ThisItemBasic.Internal.Contains("|")) {
-                        var f = ThisItemBasic.Internal.SplitAndCutBy("|");
-                        fil = f[0];
-                    } else {
-                        fil = ThisItemBasic.Internal;
-                    }
-                    if (FileExists(fil)) { DeleteFile(fil, false); }
-                }
-            }
-        }
-
-        private void ExportOriginalFormat_CheckedChanged(object sender, System.EventArgs e) => UpdateExport(true);
-
-        private void ExportVerzeichnis_TextChanged(object sender, System.EventArgs e) => UpdateExport(true);
-
-        private void filterItemEditor_Changed(object sender, System.EventArgs e) {
-            if (IsFilling) { return; }
-            foreach (var thisitem in lbxFilter.Item) {
-                if (thisitem is TextListItem tli) {
-                    if (tli.Tag == filterItemEditor.Item) {
-                        tli.Text = filterItemEditor.Item.ReadableText();
-                        tli.Symbol = filterItemEditor.Item.SymbolForReadableText();
-                    }
-                }
-            }
-            OnChanged(Item);
-        }
-
-        private void lbxFilter_AddClicked(object sender, System.EventArgs e) {
-            var NewFilterItem = lbxFilter.Item.Add(new FilterItem(Item.Database, string.Empty), string.Empty, string.Empty);
-            NewFilterItem.Checked = true;
-        }
-
-        private void lbxFilter_ItemCheckedChanged(object sender, System.EventArgs e) {
-            if (lbxFilter.Item.Checked().Count != 1) {
-                filterItemEditor.Item = null;
-                return;
-            }
-            if (Item.Database.ReadOnly) {
-                filterItemEditor.Item = null;
-                return;
-            }
-            filterItemEditor.Item = (FilterItem)((TextListItem)lbxFilter.Item.Checked()[0]).Tag;
-        }
-
-        private void lbxFilter_ListOrItemChanged(object sender, System.EventArgs e) => UpdateExport(false);
-
-        private void UpdateExport(bool MustDeleteAllExportFiles) {
-            if (ExportOriginalFormat.Checked) {
-                ExportIntervall.Enabled = true;
-                ExportSpaltenAnsicht.Enabled = false;
-                cbxExportFormularID.Enabled = false;
-                ExportAutomatischLöschen.Enabled = true;
-                lbxFilter.Enabled = false;
-            } else if (ExportCSVFormat.Checked || ExportHTMLFormat.Checked) {
-                ExportIntervall.Enabled = true;
-                ExportSpaltenAnsicht.Enabled = true;
-                cbxExportFormularID.Enabled = false;
-                ExportAutomatischLöschen.Enabled = true;
-                lbxFilter.Enabled = true;
-            } else if (ExportalsBild.Checked) {
-                ExportIntervall.Enabled = false;
-                ExportSpaltenAnsicht.Enabled = false;
-                cbxExportFormularID.Enabled = true;
-                ExportAutomatischLöschen.Enabled = false;
-                lbxFilter.Enabled = true;
-            }
-            if (IsFilling) { return; }
-            if (Item == null) { return; }
-            if (MustDeleteAllExportFiles) {
-                Item.DeleteAllBackups();
-            }
-            Item.Typ = ExportTyp.DatenbankOriginalFormat;
-            if (ExportCSVFormat.Checked) {
-                Item.Typ = ExportTyp.DatenbankCSVFormat;
-            }
-            if (ExportHTMLFormat.Checked) {
-                Item.Typ = ExportTyp.DatenbankHTMLFormat;
-            }
-            if (ExportalsBild.Checked) {
-                Item.Typ = ExportTyp.EinzelnMitFormular;
-            }
-            Item.Verzeichnis = ExportVerzeichnis.Text;
-            if (!string.IsNullOrEmpty(ExportIntervall.Text)) {
-                Item.BackupInterval = FloatParse(ExportIntervall.Text);
-            }
-            if (!string.IsNullOrEmpty(ExportAutomatischLöschen.Text)) {
-                Item.AutoDelete = FloatParse(ExportAutomatischLöschen.Text);
-            }
-            Item.ExportFormularId = cbxExportFormularID.Text;
-            Item.ExportSpaltenAnsicht = IntParse(ExportSpaltenAnsicht.Text);
-            Item.Filter.Clear();
-            foreach (var basicListItem in lbxFilter.Item) {
-                var thisFilter = (TextListItem)basicListItem;
-                Item.Filter.Add((FilterItem)thisFilter.Tag);
-            }
-            Item.BereitsExportiert.Clear();
-            Item.BereitsExportiert.AddRange(lsbExportDateien.Item.ToListOfString());
-            OnChanged(Item);
-        }
-
-        #endregion
+    protected override void DisableAndClearFormula() {
+        Enabled = false;
+        ExportCSVFormat.Checked = false;
+        ExportHTMLFormat.Checked = false;
+        ExportOriginalFormat.Checked = false;
+        ExportalsBild.Checked = false;
+        ExportVerzeichnis.Text = string.Empty;
+        ExportAutomatischLöschen.Text = string.Empty;
+        cbxExportFormularID.Text = string.Empty;
+        ExportSpaltenAnsicht.Text = string.Empty;
+        lbxFilter.Item.Clear();
+        lsbExportDateien.Item.Clear();
     }
+
+    protected override void EnabledAndFillFormula() {
+        Enabled = true;
+        switch (Item.Typ) {
+            case ExportTyp.DatenbankCSVFormat:
+                ExportCSVFormat.Checked = true;
+                break;
+
+            case ExportTyp.DatenbankHTMLFormat:
+                ExportHTMLFormat.Checked = true;
+                break;
+
+            case ExportTyp.DatenbankOriginalFormat:
+                ExportOriginalFormat.Checked = true;
+                break;
+
+            case ExportTyp.EinzelnMitFormular:
+                ExportalsBild.Checked = true;
+                Item.BackupInterval = 0;
+                break;
+
+            default:
+                Develop.DebugPrint(Item.Typ);
+                return;
+        }
+        ExportVerzeichnis.Text = Item.Verzeichnis;
+        ExportIntervall.Text = Item.BackupInterval.ToString(Constants.Format_Float1);
+        ExportAutomatischLöschen.Text = Item.AutoDelete.ToString(Constants.Format_Float1);
+        cbxExportFormularID.Text = Item.ExportFormularId;
+        ExportSpaltenAnsicht.Text = Item.ExportSpaltenAnsicht.ToString();
+        lbxFilter.Item.Clear();
+        foreach (var thisFilter in Item.Filter.Where(thisFilter => thisFilter != null)) {
+            lbxFilter.Item.Add(thisFilter, string.Empty, string.Empty);
+        }
+        lsbExportDateien.Item.Clear();
+        foreach (var t1 in Item.BereitsExportiert) {
+            if (!string.IsNullOrEmpty(t1)) {
+                var t = t1.Split('|');
+                if (!FileExists(t[0])) {
+                    lsbExportDateien.Item.Add(t[0], t1, QuickImage.Get(ImageCode.Kritisch), true, "0000");
+                } else {
+                    var q1 = QuickImage.Get(ImageCode.Kugel, 16, Color.Red.MixColor(Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / Item.AutoDelete), Color.Transparent);
+                    lsbExportDateien.Item.Add(t[0], t1, q1, true, t[1].CompareKey(SortierTyp.Datum_Uhrzeit));
+                }
+            }
+        }
+    }
+
+    protected override void PrepaireFormula() {
+        cbxExportFormularID.Item.Clear();
+        Forms.ExportDialog.AddLayoutsOff(cbxExportFormularID.Item, Item.Database, true);
+        ExportSpaltenAnsicht.Item.Clear();
+        for (var spa = 0; spa < Item.Database.ColumnArrangements.Count; spa++) {
+            ExportSpaltenAnsicht.Item.Add(Item.Database.ColumnArrangements[spa].Name, spa.ToString());
+        }
+        if (!string.IsNullOrEmpty(Item.Database.GlobalShowPass)) {
+            ExportCSVFormat.Enabled = false;
+            ExportHTMLFormat.Enabled = false;
+            ExportalsBild.Enabled = false;
+        } else {
+            ExportCSVFormat.Enabled = true;
+            ExportHTMLFormat.Enabled = true;
+            ExportalsBild.Enabled = true;
+        }
+    }
+
+    private void cbxExportFormularID_ItemClicked(object sender, BasicListItemEventArgs e) => UpdateExport(true);
+
+    //private void ExportFilter_AddClicked(object sender, System.EventArgs e)
+    //{
+    //    Develop.DebugPrint_NichtImplementiert();
+    //    var DummyFilter = new FilterItem(tmp.Database.Column[0], enFilterType.KeinFilter, "");
+    //    var NewFilter = FilterItem_Editor();// DialogBox.eEditClass(DummyFilter, false);
+    //    if (NewFilter == DummyFilter) { return; }
+    //    var NewFilter2 = (FilterItem)NewFilter;
+    //    if (NewFilter2.FilterType == enFilterType.KeinFilter) { return; }
+    //    ExportFilter.Item.Add(new ObjectListItem(NewFilter2));
+    //    UpdateExport(false);
+    //}
+    private void ExportDateien_ListOrItemChanged(object sender, System.EventArgs e) => UpdateExport(false);
+
+    private void ExportDateien_RemoveClicked(object sender, ListOfBasicListItemEventArgs e) {
+        foreach (var thisItem in e.Items) {
+            if (thisItem is BasicListItem ThisItemBasic) {
+                string fil;
+                if (ThisItemBasic.Internal.Contains("|")) {
+                    var f = ThisItemBasic.Internal.SplitAndCutBy("|");
+                    fil = f[0];
+                } else {
+                    fil = ThisItemBasic.Internal;
+                }
+                if (FileExists(fil)) { DeleteFile(fil, false); }
+            }
+        }
+    }
+
+    private void ExportOriginalFormat_CheckedChanged(object sender, System.EventArgs e) => UpdateExport(true);
+
+    private void ExportVerzeichnis_TextChanged(object sender, System.EventArgs e) => UpdateExport(true);
+
+    private void filterItemEditor_Changed(object sender, System.EventArgs e) {
+        if (IsFilling) { return; }
+        foreach (var thisitem in lbxFilter.Item) {
+            if (thisitem is TextListItem tli) {
+                if (tli.Tag == filterItemEditor.Item) {
+                    tli.Text = filterItemEditor.Item.ReadableText();
+                    tli.Symbol = filterItemEditor.Item.SymbolForReadableText();
+                }
+            }
+        }
+        OnChanged(Item);
+    }
+
+    private void lbxFilter_AddClicked(object sender, System.EventArgs e) {
+        var NewFilterItem = lbxFilter.Item.Add(new FilterItem(Item.Database, string.Empty), string.Empty, string.Empty);
+        NewFilterItem.Checked = true;
+    }
+
+    private void lbxFilter_ItemCheckedChanged(object sender, System.EventArgs e) {
+        if (lbxFilter.Item.Checked().Count != 1) {
+            filterItemEditor.Item = null;
+            return;
+        }
+        if (Item.Database.ReadOnly) {
+            filterItemEditor.Item = null;
+            return;
+        }
+        filterItemEditor.Item = (FilterItem)((TextListItem)lbxFilter.Item.Checked()[0]).Tag;
+    }
+
+    private void lbxFilter_ListOrItemChanged(object sender, System.EventArgs e) => UpdateExport(false);
+
+    private void UpdateExport(bool MustDeleteAllExportFiles) {
+        if (ExportOriginalFormat.Checked) {
+            ExportIntervall.Enabled = true;
+            ExportSpaltenAnsicht.Enabled = false;
+            cbxExportFormularID.Enabled = false;
+            ExportAutomatischLöschen.Enabled = true;
+            lbxFilter.Enabled = false;
+        } else if (ExportCSVFormat.Checked || ExportHTMLFormat.Checked) {
+            ExportIntervall.Enabled = true;
+            ExportSpaltenAnsicht.Enabled = true;
+            cbxExportFormularID.Enabled = false;
+            ExportAutomatischLöschen.Enabled = true;
+            lbxFilter.Enabled = true;
+        } else if (ExportalsBild.Checked) {
+            ExportIntervall.Enabled = false;
+            ExportSpaltenAnsicht.Enabled = false;
+            cbxExportFormularID.Enabled = true;
+            ExportAutomatischLöschen.Enabled = false;
+            lbxFilter.Enabled = true;
+        }
+        if (IsFilling) { return; }
+        if (Item == null) { return; }
+        if (MustDeleteAllExportFiles) {
+            Item.DeleteAllBackups();
+        }
+        Item.Typ = ExportTyp.DatenbankOriginalFormat;
+        if (ExportCSVFormat.Checked) {
+            Item.Typ = ExportTyp.DatenbankCSVFormat;
+        }
+        if (ExportHTMLFormat.Checked) {
+            Item.Typ = ExportTyp.DatenbankHTMLFormat;
+        }
+        if (ExportalsBild.Checked) {
+            Item.Typ = ExportTyp.EinzelnMitFormular;
+        }
+        Item.Verzeichnis = ExportVerzeichnis.Text;
+        if (!string.IsNullOrEmpty(ExportIntervall.Text)) {
+            Item.BackupInterval = FloatParse(ExportIntervall.Text);
+        }
+        if (!string.IsNullOrEmpty(ExportAutomatischLöschen.Text)) {
+            Item.AutoDelete = FloatParse(ExportAutomatischLöschen.Text);
+        }
+        Item.ExportFormularId = cbxExportFormularID.Text;
+        Item.ExportSpaltenAnsicht = IntParse(ExportSpaltenAnsicht.Text);
+        Item.Filter.Clear();
+        foreach (var basicListItem in lbxFilter.Item) {
+            var thisFilter = (TextListItem)basicListItem;
+            Item.Filter.Add((FilterItem)thisFilter.Tag);
+        }
+        Item.BereitsExportiert.Clear();
+        Item.BereitsExportiert.AddRange(lsbExportDateien.Item.ToListOfString());
+        OnChanged(Item);
+    }
+
+    #endregion
 }

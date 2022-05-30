@@ -18,43 +18,42 @@
 using System;
 using System.Collections.Generic;
 
-namespace BlueControls.ItemCollection {
+namespace BlueControls.ItemCollection;
 
-    internal class PhysicPadItem : AbstractPhysicPadItem {
+internal class PhysicPadItem : AbstractPhysicPadItem {
 
-        #region Fields
+    #region Fields
 
-        public readonly List<Kraft> Kraft = new();
+    public readonly List<Kraft> Kraft = new();
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public PhysicPadItem(string internalname) : base(internalname) { }
+    public PhysicPadItem(string internalname) : base(internalname) { }
 
-        public PhysicPadItem() : base(string.Empty) { }
+    public PhysicPadItem() : base(string.Empty) { }
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        protected override int SaveOrder => 999;
+    protected override int SaveOrder => 999;
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override void InitialPosition(int x, int y, int width, int height) { }
+    public override void InitialPosition(int x, int y, int width, int height) { }
 
-        protected override string ClassId() => "Physics-Object";
+    protected override string ClassId() => "Physics-Object";
 
-        protected override BasicPadItem? TryCreate(string id, string name) {
-            if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-                return new PhysicPadItem(name);
-            }
-            return null;
+    protected override BasicPadItem? TryCreate(string id, string name) {
+        if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
+            return new PhysicPadItem(name);
         }
-
-        #endregion
+        return null;
     }
+
+    #endregion
 }

@@ -18,34 +18,33 @@
 using BlueControls.Enums;
 using System.Drawing;
 
-namespace BlueControls.Extended_Text {
+namespace BlueControls.Extended_Text;
 
-    internal class ExtCharStoreXCode : ExtChar {
+internal class ExtCharStoreXCode : ExtChar {
 
-        #region Constructors
+    #region Constructors
 
-        internal ExtCharStoreXCode(Design design, States state, BlueFont? font, int stufe) : base(design, state, font, stufe) { }
+    internal ExtCharStoreXCode(Design design, States state, BlueFont? font, int stufe) : base(design, state, font, stufe) { }
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override void Draw(Graphics gr, Point posModificator, float zoom) { }
+    public override void Draw(Graphics gr, Point posModificator, float zoom) { }
 
-        public override string HtmlText() => "<ZBX_STORE>";
+    public override string HtmlText() => "<ZBX_STORE>";
 
-        public override bool IsLineBreak() => false;
+    public override bool IsLineBreak() => false;
 
-        public override bool IsPossibleLineBreak() => false;
+    public override bool IsPossibleLineBreak() => false;
 
-        public override bool IsSpace() => false;
+    public override bool IsSpace() => false;
 
-        public override bool IsWordSeperator() => false;
+    public override bool IsWordSeperator() => false;
 
-        public override string PlainText() => string.Empty;
+    public override string PlainText() => string.Empty;
 
-        protected override SizeF CalculateSize() => SizeF.Empty;
+    protected override SizeF CalculateSize() => SizeF.Empty;
 
-        #endregion
-    }
+    #endregion
 }

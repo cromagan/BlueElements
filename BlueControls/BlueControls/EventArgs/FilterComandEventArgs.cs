@@ -20,25 +20,24 @@ using BlueDatabase.EventArgs;
 
 #nullable enable
 
-namespace BlueControls.EventArgs {
+namespace BlueControls.EventArgs;
 
-    public class FilterComandEventArgs : FilterEventArgs {
+public class FilterComandEventArgs : FilterEventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        // string Comand, ColumnItem ThisColumn, FilterItem NewFilter
-        public FilterComandEventArgs(string comand, ColumnItem? column, FilterItem newFilter) : base(newFilter) {
-            Comand = comand;
-            Column = column;
-        }
-
-        #endregion
-
-        #region Properties
-
-        public ColumnItem? Column { get; }
-        public string Comand { get; }
-
-        #endregion
+    // string Comand, ColumnItem ThisColumn, FilterItem NewFilter
+    public FilterComandEventArgs(string comand, ColumnItem? column, FilterItem newFilter) : base(newFilter) {
+        Comand = comand;
+        Column = column;
     }
+
+    #endregion
+
+    #region Properties
+
+    public ColumnItem? Column { get; }
+    public string Comand { get; }
+
+    #endregion
 }

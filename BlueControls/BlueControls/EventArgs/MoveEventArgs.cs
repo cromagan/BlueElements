@@ -15,24 +15,23 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueControls.EventArgs {
+namespace BlueControls.EventArgs;
 
-    public class MoveEventArgs : System.EventArgs {
+public class MoveEventArgs : System.EventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public MoveEventArgs(bool x, bool y) {
-            X = x;
-            Y = y;
-        }
-
-        #endregion
-
-        #region Properties
-
-        public bool X { get; }
-        public bool Y { get; }
-
-        #endregion
+    public MoveEventArgs(bool x, bool y) {
+        X = x;
+        Y = y;
     }
+
+    #endregion
+
+    #region Properties
+
+    public bool X { get; }
+    public bool Y { get; }
+
+    #endregion
 }

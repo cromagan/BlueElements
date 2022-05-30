@@ -15,14 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueBasics.Interfaces {
+namespace BlueBasics.Interfaces;
 
-    public interface IParseable : IChangedFeedback, IStringable {
+public interface IParseable : IChangedFeedback, IStringable {
 
-        #region Methods
+    #region Methods
 
-        void Parse(string toParse);
+    void Parse(string toParse);
 
-        #endregion
-    }
+    #endregion
 }

@@ -20,43 +20,42 @@ using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueDatabase.AdditionalScriptComands {
+namespace BlueDatabase.AdditionalScriptComands;
 
-    public class Method_RowIsNull : MethodDatabase {
+public class Method_RowIsNull : MethodDatabase {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableRowItem.ShortName_Variable } };
-        public override string Description => "Prüft, ob die übergebene Zeile NULL ist.";
+    public override List<List<string>> Args => new() { new() { VariableRowItem.ShortName_Variable } };
+    public override string Description => "Prüft, ob die übergebene Zeile NULL ist.";
 
-        public override bool EndlessArgs => false;
+    public override bool EndlessArgs => false;
 
-        public override string EndSequence => ")";
+    public override string EndSequence => ")";
 
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => VariableBool.ShortName_Plain;
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => VariableBool.ShortName_Plain;
 
-        public override string StartSequence => "(";
+    public override string StartSequence => "(";
 
-        public override string Syntax => "RowIsNull(Row)";
+    public override string Syntax => "RowIsNull(Row)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "rowisnull" };
+    public override List<string> Comand(Script? s) => new() { "rowisnull" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            if (attvar.Attributes[0] is not VariableRowItem vr) { return new DoItFeedback("Kein Zeilenobjekt übergeben."); }
+        if (attvar.Attributes[0] is not VariableRowItem vr) { return new DoItFeedback("Kein Zeilenobjekt übergeben."); }
 
-            //var r = Method_Row.ObjectToRow(attvar.Attributes[0]);
+        //var r = Method_Row.ObjectToRow(attvar.Attributes[0]);
 
-            return vr.RowItem == null ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
-        }
-
-        #endregion
+        return vr.RowItem == null ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }
+
+    #endregion
 }

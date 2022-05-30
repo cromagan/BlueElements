@@ -20,150 +20,149 @@
 using BlueControls.EventArgs;
 using System.Drawing;
 
-namespace BlueControls.ItemCollection {
+namespace BlueControls.ItemCollection;
 
-    public abstract class FixedRectanglePadItem : BasicPadItem {
+public abstract class FixedRectanglePadItem : BasicPadItem {
 
-        #region Fields
+    #region Fields
 
-        protected Size Size = Size.Empty;
+    protected Size Size = Size.Empty;
 
-        private readonly PointM? _pl;
+    private readonly PointM? _pl;
 
-        /// <summary>
-        /// Dieser Punkt bestimmt die ganzen Koordinaten. Die anderen werden nur mitgeschleift
-        /// </summary>
-        private readonly PointM? _pLo;
+    /// <summary>
+    /// Dieser Punkt bestimmt die ganzen Koordinaten. Die anderen werden nur mitgeschleift
+    /// </summary>
+    private readonly PointM? _pLo;
 
-        private readonly PointM? _pLu;
+    private readonly PointM? _pLu;
 
-        private readonly PointM? _po;
+    private readonly PointM? _po;
 
-        private readonly PointM? _pr;
+    private readonly PointM? _pr;
 
-        private readonly PointM? _pRo;
+    private readonly PointM? _pRo;
 
-        private readonly PointM? _pRu;
+    private readonly PointM? _pRu;
 
-        private readonly PointM? _pu;
+    private readonly PointM? _pu;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        protected FixedRectanglePadItem(string internalname) : base(internalname) {
-            _pLo = new PointM(this, "LO", 0, 0);
-            _pRo = new PointM(this, "RO", 0, 0);
-            _pRu = new PointM(this, "RU", 0, 0);
-            _pLu = new PointM(this, "LU", 0, 0);
-            _pl = new PointM(this, "L", 0, 0);
-            _pr = new PointM(this, "R", 0, 0);
-            _po = new PointM(this, "O", 0, 0);
-            _pu = new PointM(this, "U", 0, 0);
-            MovablePoint.Add(_pLo);
-            MovablePoint.Add(_pRo);
-            MovablePoint.Add(_pLu);
-            MovablePoint.Add(_pRu);
-            MovablePoint.Add(_pl);
-            MovablePoint.Add(_pr);
-            MovablePoint.Add(_pu);
-            MovablePoint.Add(_po);
-            PointsForSuccesfullyMove.Add(_pLo);
-        }
-
-        #endregion
-
-        #region Methods
-
-        public override void InitialPosition(int x, int y, int width, int height) {
-            var ua = UsedArea;
-            SetLeftTopPoint(x - ua.Width / 2 + width / 2, y - ua.Height / 2 + height / 2);
-        }
-
-        public override void PointMoved(object sender, MoveEventArgs e) {
-            base.PointMoved(sender, e);
-            var x = 0f;
-            var y = 0f;
-
-            var point = (PointM)sender;
-
-            if (point != null) {
-                x = point.X;
-                y = point.Y;
-            }
-
-            if (point == _pLo) {
-                if (e.Y) {
-                    _pRu.Y = y + Size.Height;
-                    _po.Y = y;
-                }
-                if (e.X) {
-                    _pRu.X = x + Size.Width;
-                    _pl.X = x;
-                }
-            }
-
-            if (point == _pRu) {
-                if (e.X) {
-                    _pLo.X = x - Size.Width;
-                    _pr.X = x;
-                }
-                if (e.Y) {
-                    _pLo.Y = y - Size.Height;
-                    _pu.Y = y;
-                }
-            }
-
-            if (point == _pRo) {
-                if (e.Y) { _po.Y = y; }
-                if (e.X) { _pr.X = x; }
-            }
-
-            if (point == _pLu) {
-                if (e.X) { _pl.X = x; }
-                if (e.Y) { _pu.Y = y; }
-            }
-
-            if (point == _po && e.Y) {
-                _pLo.Y = y;
-                _pRo.Y = y;
-            }
-
-            if (point == _pu && e.Y) {
-                _pLu.Y = y;
-                _pRu.Y = y;
-            }
-
-            if (point == _pl && e.X) {
-                _pLo.X = x;
-                _pLu.X = x;
-            }
-
-            if (point == _pr && e.X) {
-                _pRo.X = x;
-                _pRu.X = x;
-            }
-
-            SizeChanged();
-        }
-
-        public void SetLeftTopPoint(float x, float y) => _pLo.SetTo(x, y);
-
-        public void SizeChanged() {
-            // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
-            _pl.SetTo(_pLo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2));
-            _pr.SetTo(_pRo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2));
-            _pu.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRu.Y);
-            _po.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRo.Y);
-        }
-
-        protected override RectangleF CalculateUsedArea() {
-            if (_pLo == null) { return RectangleF.Empty; }
-            return new RectangleF(_pLo.X, _pLo.Y, Size.Width, Size.Height);
-        }
-
-        protected override void ParseFinished() => SizeChanged();
-
-        #endregion
+    protected FixedRectanglePadItem(string internalname) : base(internalname) {
+        _pLo = new PointM(this, "LO", 0, 0);
+        _pRo = new PointM(this, "RO", 0, 0);
+        _pRu = new PointM(this, "RU", 0, 0);
+        _pLu = new PointM(this, "LU", 0, 0);
+        _pl = new PointM(this, "L", 0, 0);
+        _pr = new PointM(this, "R", 0, 0);
+        _po = new PointM(this, "O", 0, 0);
+        _pu = new PointM(this, "U", 0, 0);
+        MovablePoint.Add(_pLo);
+        MovablePoint.Add(_pRo);
+        MovablePoint.Add(_pLu);
+        MovablePoint.Add(_pRu);
+        MovablePoint.Add(_pl);
+        MovablePoint.Add(_pr);
+        MovablePoint.Add(_pu);
+        MovablePoint.Add(_po);
+        PointsForSuccesfullyMove.Add(_pLo);
     }
+
+    #endregion
+
+    #region Methods
+
+    public override void InitialPosition(int x, int y, int width, int height) {
+        var ua = UsedArea;
+        SetLeftTopPoint(x - ua.Width / 2 + width / 2, y - ua.Height / 2 + height / 2);
+    }
+
+    public override void PointMoved(object sender, MoveEventArgs e) {
+        base.PointMoved(sender, e);
+        var x = 0f;
+        var y = 0f;
+
+        var point = (PointM)sender;
+
+        if (point != null) {
+            x = point.X;
+            y = point.Y;
+        }
+
+        if (point == _pLo) {
+            if (e.Y) {
+                _pRu.Y = y + Size.Height;
+                _po.Y = y;
+            }
+            if (e.X) {
+                _pRu.X = x + Size.Width;
+                _pl.X = x;
+            }
+        }
+
+        if (point == _pRu) {
+            if (e.X) {
+                _pLo.X = x - Size.Width;
+                _pr.X = x;
+            }
+            if (e.Y) {
+                _pLo.Y = y - Size.Height;
+                _pu.Y = y;
+            }
+        }
+
+        if (point == _pRo) {
+            if (e.Y) { _po.Y = y; }
+            if (e.X) { _pr.X = x; }
+        }
+
+        if (point == _pLu) {
+            if (e.X) { _pl.X = x; }
+            if (e.Y) { _pu.Y = y; }
+        }
+
+        if (point == _po && e.Y) {
+            _pLo.Y = y;
+            _pRo.Y = y;
+        }
+
+        if (point == _pu && e.Y) {
+            _pLu.Y = y;
+            _pRu.Y = y;
+        }
+
+        if (point == _pl && e.X) {
+            _pLo.X = x;
+            _pLu.X = x;
+        }
+
+        if (point == _pr && e.X) {
+            _pRo.X = x;
+            _pRu.X = x;
+        }
+
+        SizeChanged();
+    }
+
+    public void SetLeftTopPoint(float x, float y) => _pLo.SetTo(x, y);
+
+    public void SizeChanged() {
+        // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
+        _pl.SetTo(_pLo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2));
+        _pr.SetTo(_pRo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2));
+        _pu.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRu.Y);
+        _po.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRo.Y);
+    }
+
+    protected override RectangleF CalculateUsedArea() {
+        if (_pLo == null) { return RectangleF.Empty; }
+        return new RectangleF(_pLo.X, _pLo.Y, Size.Width, Size.Height);
+    }
+
+    protected override void ParseFinished() => SizeChanged();
+
+    #endregion
 }

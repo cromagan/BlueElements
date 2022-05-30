@@ -19,33 +19,32 @@ using System.Collections.Generic;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_Exists : Method {
+internal class Method_Exists : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { Variable.Any_Variable } };
-        public override string Description => "Gibt TRUE zurück, wenn die Variable existiert.";
-        public override bool EndlessArgs => false;
-        public override string EndSequence => ")";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => VariableBool.ShortName_Plain;
+    public override List<List<string>> Args => new() { new() { Variable.Any_Variable } };
+    public override string Description => "Gibt TRUE zurück, wenn die Variable existiert.";
+    public override bool EndlessArgs => false;
+    public override string EndSequence => ")";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => VariableBool.ShortName_Plain;
 
-        public override string StartSequence => "(";
-        public override string Syntax => "Exists(Variable)";
+    public override string StartSequence => "(";
+    public override string Syntax => "Exists(Variable)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "exists" };
+    public override List<string> Comand(Script? s) => new() { "exists" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
-        }
-
-        #endregion
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
     }
+
+    #endregion
 }

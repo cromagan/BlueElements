@@ -18,52 +18,51 @@
 using BlueBasics.Enums;
 using BlueDatabase.Interfaces;
 
-namespace BlueControls.Forms {
+namespace BlueControls.Forms;
 
-    public partial class InputBox : DialogWithOkAndCancel {
+public partial class InputBox : DialogWithOkAndCancel {
 
-        #region Fields
+    #region Fields
 
-        private string _giveBack;
+    private string _giveBack;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        private InputBox() : this(string.Empty, string.Empty, VarType.Text, false) { }
+    private InputBox() : this(string.Empty, string.Empty, VarType.Text, false) { }
 
-        private InputBox(string txt, string vorschlagsText, VarType textformat, bool bigMultiLineBox) : base() {
-            InitializeComponent();
-            txbText.Text = vorschlagsText;
-            txbText.SetFormat(textformat);
-            txbText.MultiLine = bigMultiLineBox;
-            if (bigMultiLineBox) { txbText.Height += 200; }
-            Setup(txt, txbText, 250);
-            _giveBack = vorschlagsText;
-        }
-
-        #endregion
-
-        #region Methods
-
-        public static string Show(string txt) => Show(txt, "", VarType.Text, false);
-
-        public static string Show(string txt, string vorschlagsText, VarType textformat) => Show(txt, vorschlagsText, textformat, false);
-
-        public static string Show(string txt, string vorschlagsText, VarType textformat, bool bigMultiLineBox) {
-            InputBox mb = new(txt, vorschlagsText, textformat, bigMultiLineBox);
-            mb.ShowDialog();
-            return mb._giveBack;
-        }
-
-        protected override void SetValue(bool canceled) => _giveBack = canceled ? string.Empty : txbText.Text;
-
-        private void InputBox_Shown(object sender, System.EventArgs e) => txbText.Focus();
-
-        private void txbText_Enter(object sender, System.EventArgs e) => Ok();
-
-        private void txbText_ESC(object sender, System.EventArgs e) => Cancel();
-
-        #endregion
+    private InputBox(string txt, string vorschlagsText, VarType textformat, bool bigMultiLineBox) : base() {
+        InitializeComponent();
+        txbText.Text = vorschlagsText;
+        txbText.SetFormat(textformat);
+        txbText.MultiLine = bigMultiLineBox;
+        if (bigMultiLineBox) { txbText.Height += 200; }
+        Setup(txt, txbText, 250);
+        _giveBack = vorschlagsText;
     }
+
+    #endregion
+
+    #region Methods
+
+    public static string Show(string txt) => Show(txt, "", VarType.Text, false);
+
+    public static string Show(string txt, string vorschlagsText, VarType textformat) => Show(txt, vorschlagsText, textformat, false);
+
+    public static string Show(string txt, string vorschlagsText, VarType textformat, bool bigMultiLineBox) {
+        InputBox mb = new(txt, vorschlagsText, textformat, bigMultiLineBox);
+        mb.ShowDialog();
+        return mb._giveBack;
+    }
+
+    protected override void SetValue(bool canceled) => _giveBack = canceled ? string.Empty : txbText.Text;
+
+    private void InputBox_Shown(object sender, System.EventArgs e) => txbText.Focus();
+
+    private void txbText_Enter(object sender, System.EventArgs e) => Ok();
+
+    private void txbText_ESC(object sender, System.EventArgs e) => Cancel();
+
+    #endregion
 }

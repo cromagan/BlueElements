@@ -24,128 +24,127 @@ using System.Drawing;
 using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
 
-namespace BlueControls.Forms {
+namespace BlueControls.Forms;
 
-    public partial class FontSelectDialog {
+public partial class FontSelectDialog {
 
-        #region Fields
+    #region Fields
 
-        private static ItemCollectionList? _fnList;
-        private static ItemCollectionList? _fsList;
-        private bool _adding;
+    private static ItemCollectionList? _fnList;
+    private static ItemCollectionList? _fsList;
+    private bool _adding;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public FontSelectDialog() {
-            // Dieser Aufruf ist für den Designer erforderlich.
-            InitializeComponent();
-            // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            if (_fnList == null) {
-                _fnList = new ItemCollectionList();
-                foreach (var f in FontFamily.Families) {
-                    if (string.IsNullOrEmpty(f.Name)) {
-                        continue;
-                    }
-
-                    if (f.IsStyleAvailable(FontStyle.Regular)) {
-                        Font fo = new(f.Name, 100);
-                        try {
-                            BlueFont.MeasureString("T", fo);
-                            _fnList.Add(string.Empty, f.Name, BlueFont.Get(f, 12).NameInStyle(), true);
-                        } catch (Exception) { }
-                    }
+    public FontSelectDialog() {
+        // Dieser Aufruf ist für den Designer erforderlich.
+        InitializeComponent();
+        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        if (_fnList == null) {
+            _fnList = new ItemCollectionList();
+            foreach (var f in FontFamily.Families) {
+                if (string.IsNullOrEmpty(f.Name)) {
+                    continue;
                 }
-                _fnList.Sort();
-                _fsList = new ItemCollectionList
-                {
-                    { "8",SortierTyp.ZahlenwertFloat },
-                    { "9", SortierTyp.ZahlenwertFloat },
-                    { "10", SortierTyp.ZahlenwertFloat },
-                    { "11", SortierTyp.ZahlenwertFloat },
-                    { "12", SortierTyp.ZahlenwertFloat },
-                    { "14", SortierTyp.ZahlenwertFloat },
-                    { "16", SortierTyp.ZahlenwertFloat },
-                    { "18", SortierTyp.ZahlenwertFloat },
-                    { "20", SortierTyp.ZahlenwertFloat },
-                    { "22", SortierTyp.ZahlenwertFloat },
-                    { "24", SortierTyp.ZahlenwertFloat },
-                    { "26", SortierTyp.ZahlenwertFloat },
-                    { "28", SortierTyp.ZahlenwertFloat },
-                    { "36", SortierTyp.ZahlenwertFloat },
-                    { "48", SortierTyp.ZahlenwertFloat },
-                    { "72", SortierTyp.ZahlenwertFloat }
-                };
-                _fsList.Sort();
+
+                if (f.IsStyleAvailable(FontStyle.Regular)) {
+                    Font fo = new(f.Name, 100);
+                    try {
+                        BlueFont.MeasureString("T", fo);
+                        _fnList.Add(string.Empty, f.Name, BlueFont.Get(f, 12).NameInStyle(), true);
+                    } catch (Exception) { }
+                }
             }
-            FName.Item.AddRange(_fnList);
-            FName.Item.Sort();
-            FSize.Item.AddRange(_fsList);
-            FSize.Item.Sort();
-            Font = BlueFont.Get(Skin.DummyStandardFont); //, False, False, False, False, False, "000000", "", False)
-            UpdateSampleText();
+            _fnList.Sort();
+            _fsList = new ItemCollectionList
+            {
+                { "8",SortierTyp.ZahlenwertFloat },
+                { "9", SortierTyp.ZahlenwertFloat },
+                { "10", SortierTyp.ZahlenwertFloat },
+                { "11", SortierTyp.ZahlenwertFloat },
+                { "12", SortierTyp.ZahlenwertFloat },
+                { "14", SortierTyp.ZahlenwertFloat },
+                { "16", SortierTyp.ZahlenwertFloat },
+                { "18", SortierTyp.ZahlenwertFloat },
+                { "20", SortierTyp.ZahlenwertFloat },
+                { "22", SortierTyp.ZahlenwertFloat },
+                { "24", SortierTyp.ZahlenwertFloat },
+                { "26", SortierTyp.ZahlenwertFloat },
+                { "28", SortierTyp.ZahlenwertFloat },
+                { "36", SortierTyp.ZahlenwertFloat },
+                { "48", SortierTyp.ZahlenwertFloat },
+                { "72", SortierTyp.ZahlenwertFloat }
+            };
+            _fsList.Sort();
         }
-
-        #endregion
-
-        #region Properties
-
-        public new BlueFont? Font {
-            get => BlueFont.Get(FName.Item.Checked()[0].Internal, FloatParse(FSize.Item.Checked()[0].Internal), fFett.Checked, fKursiv.Checked, fUnterstrichen.Checked, fDurchge.Checked, fOutline.Checked, QuickImage.Get(cFarbe.ImageCode).ChangeGreenTo, QuickImage.Get(cRandF.ImageCode).ChangeGreenTo, fKap.Checked, OnlyUpper.Checked, OnlyLow.Checked);
-            set {
-                _adding = true;
-                if (value == null) { value = BlueFont.Get(Skin.DummyStandardFont); }
-                if (FName.Item[value.FontName] == null) { FName.Item.Add(value.FontName, value.FontName, QuickImage.Get(ImageCode.Warnung, 20)); }
-                FName.Item.UncheckAll();
-                FName.Item[value.FontName].Checked = true;
-                if (FSize.Item[value.FontSize.ToString(Constants.Format_Float1)] == null) { FSize.Item.Add(value.FontSize.ToString(Constants.Format_Float1)); }
-                FSize.Item.UncheckAll();
-                FSize.Item[value.FontSize.ToString(Constants.Format_Float1)].Checked = true;
-                fFett.Checked = value.Bold;
-                fKursiv.Checked = value.Italic;
-                fUnterstrichen.Checked = value.Underline;
-                fDurchge.Checked = value.StrikeOut;
-                fOutline.Checked = value.Outline;
-                cFarbe.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, value.ColorMain).ToString();
-                cRandF.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, value.ColorOutline).ToString();
-                fKap.Checked = value.Kapitälchen;
-                OnlyLow.Checked = value.OnlyLower;
-                OnlyUpper.Checked = value.OnlyUpper;
-                _adding = false;
-                UpdateSampleText();
-            }
-        }
-
-        #endregion
-
-        #region Methods
-
-        private void cFarbe_Click(object sender, System.EventArgs e) {
-            ColorDia.Color = QuickImage.Get(cFarbe.ImageCode).ChangeGreenTo.FromHtmlCode();
-            ColorDia.ShowDialog();
-            cFarbe.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToString();
-            UpdateSampleText();
-        }
-
-        private void cRandF_Click(object sender, System.EventArgs e) {
-            ColorDia.Color = QuickImage.Get(cRandF.ImageCode).ChangeGreenTo.FromHtmlCode();
-            ColorDia.ShowDialog();
-            cRandF.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToString();
-            UpdateSampleText();
-        }
-
-        private void fFett_CheckedChanged(object sender, System.EventArgs e) => UpdateSampleText();
-
-        private void FName_Item_CheckedChanged(object sender, System.EventArgs e) => UpdateSampleText();
-
-        private void Ok_Click(object sender, System.EventArgs e) => Close();
-
-        private void UpdateSampleText() {
-            if (_adding) { return; }
-            Sample.Image = Font.SampleText();
-        }
-
-        #endregion
+        FName.Item.AddRange(_fnList);
+        FName.Item.Sort();
+        FSize.Item.AddRange(_fsList);
+        FSize.Item.Sort();
+        Font = BlueFont.Get(Skin.DummyStandardFont); //, False, False, False, False, False, "000000", "", False)
+        UpdateSampleText();
     }
+
+    #endregion
+
+    #region Properties
+
+    public new BlueFont? Font {
+        get => BlueFont.Get(FName.Item.Checked()[0].Internal, FloatParse(FSize.Item.Checked()[0].Internal), fFett.Checked, fKursiv.Checked, fUnterstrichen.Checked, fDurchge.Checked, fOutline.Checked, QuickImage.Get(cFarbe.ImageCode).ChangeGreenTo, QuickImage.Get(cRandF.ImageCode).ChangeGreenTo, fKap.Checked, OnlyUpper.Checked, OnlyLow.Checked);
+        set {
+            _adding = true;
+            if (value == null) { value = BlueFont.Get(Skin.DummyStandardFont); }
+            if (FName.Item[value.FontName] == null) { FName.Item.Add(value.FontName, value.FontName, QuickImage.Get(ImageCode.Warnung, 20)); }
+            FName.Item.UncheckAll();
+            FName.Item[value.FontName].Checked = true;
+            if (FSize.Item[value.FontSize.ToString(Constants.Format_Float1)] == null) { FSize.Item.Add(value.FontSize.ToString(Constants.Format_Float1)); }
+            FSize.Item.UncheckAll();
+            FSize.Item[value.FontSize.ToString(Constants.Format_Float1)].Checked = true;
+            fFett.Checked = value.Bold;
+            fKursiv.Checked = value.Italic;
+            fUnterstrichen.Checked = value.Underline;
+            fDurchge.Checked = value.StrikeOut;
+            fOutline.Checked = value.Outline;
+            cFarbe.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, value.ColorMain).ToString();
+            cRandF.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, value.ColorOutline).ToString();
+            fKap.Checked = value.Kapitälchen;
+            OnlyLow.Checked = value.OnlyLower;
+            OnlyUpper.Checked = value.OnlyUpper;
+            _adding = false;
+            UpdateSampleText();
+        }
+    }
+
+    #endregion
+
+    #region Methods
+
+    private void cFarbe_Click(object sender, System.EventArgs e) {
+        ColorDia.Color = QuickImage.Get(cFarbe.ImageCode).ChangeGreenTo.FromHtmlCode();
+        ColorDia.ShowDialog();
+        cFarbe.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToString();
+        UpdateSampleText();
+    }
+
+    private void cRandF_Click(object sender, System.EventArgs e) {
+        ColorDia.Color = QuickImage.Get(cRandF.ImageCode).ChangeGreenTo.FromHtmlCode();
+        ColorDia.ShowDialog();
+        cRandF.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToString();
+        UpdateSampleText();
+    }
+
+    private void fFett_CheckedChanged(object sender, System.EventArgs e) => UpdateSampleText();
+
+    private void FName_Item_CheckedChanged(object sender, System.EventArgs e) => UpdateSampleText();
+
+    private void Ok_Click(object sender, System.EventArgs e) => Close();
+
+    private void UpdateSampleText() {
+        if (_adding) { return; }
+        Sample.Image = Font.SampleText();
+    }
+
+    #endregion
 }

@@ -21,48 +21,47 @@ using BlueControls;
 using BlueControls.Forms;
 using System.Drawing;
 
-namespace BluePaint {
+namespace BluePaint;
 
-    public partial class Tool_DummyGenerator {
+public partial class Tool_DummyGenerator {
 
-        #region Constructors
+    #region Constructors
 
-        public Tool_DummyGenerator() : base() => InitializeComponent();
+    public Tool_DummyGenerator() : base() => InitializeComponent();
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        private void CreateDummy() {
-            var w = Berechnung.Ergebnis(X.Text);
-            var h = Berechnung.Ergebnis(Y.Text);
-            if (w == null || (int)w < 2) {
-                Notification.Show("Bitte Breite eingeben.", ImageCode.Information);
-                return;
-            }
-            if (h == null || (int)h < 2) {
-                Notification.Show("Bitte Höhe eingeben.", ImageCode.Information);
-                return;
-            }
-            Bitmap newPic = new((int)w, (int)h);
-            var gr = Graphics.FromImage(newPic);
-            gr.Clear(Color.White);
-            gr.DrawRectangle(new Pen(Color.Black, 2), 1, 1, newPic.Width - 2, newPic.Height - 2);
-            if (!string.IsNullOrEmpty(TXT.Text)) {
-                Font f = new("Arial", 50, FontStyle.Bold);
-                var fs = gr.MeasureString(TXT.Text, f);
-                gr.TranslateTransform((float)(newPic.Width / 2.0), (float)(newPic.Height / 2.0));
-                gr.RotateTransform(-90);
-                BlueFont.DrawString(gr, TXT.Text, f, new SolidBrush(Color.Black), (float)(-fs.Width / 2.0), (float)(-fs.Height / 2.0));
-            }
-            OnOverridePic(newPic);
+    private void CreateDummy() {
+        var w = Berechnung.Ergebnis(X.Text);
+        var h = Berechnung.Ergebnis(Y.Text);
+        if (w == null || (int)w < 2) {
+            Notification.Show("Bitte Breite eingeben.", ImageCode.Information);
+            return;
         }
-
-        private void Erstellen_Click(object sender, System.EventArgs e) {
-            CreateDummy();
-            OnZoomFit();
+        if (h == null || (int)h < 2) {
+            Notification.Show("Bitte Höhe eingeben.", ImageCode.Information);
+            return;
         }
-
-        #endregion
+        Bitmap newPic = new((int)w, (int)h);
+        var gr = Graphics.FromImage(newPic);
+        gr.Clear(Color.White);
+        gr.DrawRectangle(new Pen(Color.Black, 2), 1, 1, newPic.Width - 2, newPic.Height - 2);
+        if (!string.IsNullOrEmpty(TXT.Text)) {
+            Font f = new("Arial", 50, FontStyle.Bold);
+            var fs = gr.MeasureString(TXT.Text, f);
+            gr.TranslateTransform((float)(newPic.Width / 2.0), (float)(newPic.Height / 2.0));
+            gr.RotateTransform(-90);
+            BlueFont.DrawString(gr, TXT.Text, f, new SolidBrush(Color.Black), (float)(-fs.Width / 2.0), (float)(-fs.Height / 2.0));
+        }
+        OnOverridePic(newPic);
     }
+
+    private void Erstellen_Click(object sender, System.EventArgs e) {
+        CreateDummy();
+        OnZoomFit();
+    }
+
+    #endregion
 }

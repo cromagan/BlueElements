@@ -2,42 +2,41 @@
 using System.Windows.Forms;
 using BlueScript.Methods;
 
-namespace BlueControls {
+namespace BlueControls;
 
-    public partial class Befehlsreferenz : Form {
+public partial class Befehlsreferenz : Form {
 
-        #region Constructors
+    #region Constructors
 
-        public Befehlsreferenz() {
-            InitializeComponent();
+    public Befehlsreferenz() {
+        InitializeComponent();
 
-            WriteComandsToList();
-        }
-
-        #endregion
-
-        #region Methods
-
-        private void lstComands_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) {
-            var co = string.Empty;
-            if (e.Item?.Tag is Method thisc) {
-                co += thisc.HintText();
-            }
-            txbComms.Text = co;
-        }
-
-        private void WriteComandsToList() {
-            lstComands.Item.Clear();
-
-            if (Script.Comands == null) { return; }
-
-            foreach (var thisc in Script.Comands) {
-                lstComands.Item.Add(thisc, thisc.Syntax.ToLower());
-            }
-
-            lstComands.Item.Sort();
-        }
-
-        #endregion
+        WriteComandsToList();
     }
+
+    #endregion
+
+    #region Methods
+
+    private void lstComands_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) {
+        var co = string.Empty;
+        if (e.Item?.Tag is Method thisc) {
+            co += thisc.HintText();
+        }
+        txbComms.Text = co;
+    }
+
+    private void WriteComandsToList() {
+        lstComands.Item.Clear();
+
+        if (Script.Comands == null) { return; }
+
+        foreach (var thisc in Script.Comands) {
+            lstComands.Item.Add(thisc, thisc.Syntax.ToLower());
+        }
+
+        lstComands.Item.Sort();
+    }
+
+    #endregion
 }

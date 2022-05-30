@@ -18,36 +18,35 @@
 using BlueControls.Enums;
 using System.Drawing;
 
-namespace BlueControls.Extended_Text {
+namespace BlueControls.Extended_Text;
 
-    internal class ExtCharCrlfCode : ExtChar {
+internal class ExtCharCrlfCode : ExtChar {
 
-        #region Constructors
+    #region Constructors
 
-        internal ExtCharCrlfCode() : this(Design.TextBox, States.Standard, null, 4) { }
+    internal ExtCharCrlfCode() : this(Design.TextBox, States.Standard, null, 4) { }
 
-        internal ExtCharCrlfCode(Design design, States state, BlueFont? font, int stufe) : base(design, state, font, stufe) { }
+    internal ExtCharCrlfCode(Design design, States state, BlueFont? font, int stufe) : base(design, state, font, stufe) { }
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override void Draw(Graphics gr, Point posModificator, float zoom) { }
+    public override void Draw(Graphics gr, Point posModificator, float zoom) { }
 
-        public override string HtmlText() => "<BR>";
+    public override string HtmlText() => "<BR>";
 
-        public override bool IsLineBreak() => true;
+    public override bool IsLineBreak() => true;
 
-        public override bool IsPossibleLineBreak() => true;
+    public override bool IsPossibleLineBreak() => true;
 
-        public override bool IsSpace() => false;
+    public override bool IsSpace() => false;
 
-        public override bool IsWordSeperator() => true;
+    public override bool IsWordSeperator() => true;
 
-        public override string PlainText() => "\r\n";
+    public override string PlainText() => "\r\n";
 
-        protected override SizeF CalculateSize() => Font == null ? new SizeF(0, 16) : new SizeF(0, Font.CharSize(65).Height);
+    protected override SizeF CalculateSize() => Font == null ? new SizeF(0, 16) : new SizeF(0, Font.CharSize(65).Height);
 
-        #endregion
-    }
+    #endregion
 }

@@ -15,11 +15,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueControls.Enums {
+namespace BlueControls.Enums;
 
-    public enum SnapMode {
-        Ohne = 0,
-        SnapToGrid = 1
-        //SnapToObjetcs =2
-    }
+public enum SnapMode {
+    Ohne = 0,
+    SnapToGrid = 1
+    //SnapToObjetcs =2
 }

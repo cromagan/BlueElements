@@ -26,223 +26,222 @@ using BlueDatabase;
 using static BlueBasics.Converter;
 using BlueControls.Interfaces;
 
-namespace BlueControls.Forms {
+namespace BlueControls.Forms;
 
-    public partial class ConnectedFormulaEditor : PadEditor {
+public partial class ConnectedFormulaEditor : PadEditor {
 
-        #region Fields
+    #region Fields
 
-        private ConnectedFormula.ConnectedFormula? _cf;
+    private ConnectedFormula.ConnectedFormula? _cf;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public ConnectedFormulaEditor(string filename, List<string>? notAllowedchilds) {
-            InitializeComponent();
+    public ConnectedFormulaEditor(string filename, List<string>? notAllowedchilds) {
+        InitializeComponent();
 
-            FormulaSet(filename, notAllowedchilds);
-        }
-
-        public ConnectedFormulaEditor() : this(string.Empty, null) { }
-
-        #endregion
-
-        /// <summary>
-
-        #region Methods
-
-        private void btnAusgangsZeile_Click(object sender, System.EventArgs e) {
-        }
-
-        private void btnEingangsZeile_Click(object sender, System.EventArgs e) {
-            var it = new RowInputPadItem(string.Empty);
-            Pad.AddCentered(it);
-        }
-
-        private void btnFeldHinzu_Click(object sender, System.EventArgs e) {
-            var l = Pad.LastClickedItem;
-
-            var x = new EditFieldPadItem(string.Empty);
-
-            if (l is ICalculateOneRowItemLevel ri) {
-                x.GetRowFrom = ri;
-            }
-            if (l is CustomizableShowPadItem efi && efi.GetRowFrom != null) {
-                x.GetRowFrom = efi.GetRowFrom;
-            }
-
-            Pad.AddCentered(x);
-
-            if (x.GetRowFrom != null && x.GetRowFrom.Database != null) {
-                x.Spalte_wählen = string.Empty; // Dummy setzen
-            }
-        }
-
-        private void btnKlonZeilen_Click(object sender, System.EventArgs e) {
-            var it = new RowClonePadItem(string.Empty);
-
-            it.Bei_Export_Sichtbar = false;
-            Pad.AddCentered(it);
-
-            ChooseDatabaseAndID(it);
-        }
-
-        private void btnKonstante_Click(object sender, System.EventArgs e) {
-            var x = new ConstantTextPaditem();
-            //x.Bei_Export_Sichtbar = false;
-            Pad.AddCentered(x);
-        }
-
-        private void btnLetzteDateien_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) {
-            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-
-            if (e?.Item == null) { return; }
-            FormulaSet(e.Item.Internal, null);
-        }
-
-        private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e) {
-            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-
-            if (sender == btnSaveAs) {
-                if (_cf == null) { return; }
-            }
-
-            if (sender == btnNeuDB) {
-                if (_cf != null) { FormulaSet(null as ConnectedFormula.ConnectedFormula, null); }
-            }
-
-            SaveTab.ShowDialog();
-            if (!PathExists(SaveTab.FileName.FilePath())) { return; }
-            if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
-
-            if (sender == btnNeuDB) {
-                FormulaSet(new ConnectedFormula.ConnectedFormula(), null); // Ab jetzt in der Variable _Database zu finden
-            }
-            if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
-
-            _cf.SaveAsAndChangeTo(SaveTab.FileName);
-
-            FormulaSet(SaveTab.FileName, null);
-        }
-
-        private void btnOeffnen_Click(object sender, System.EventArgs e) {
-            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-            LoadTab.ShowDialog();
-        }
-
-        private void btnPfeileAusblenden_CheckedChanged(object sender, System.EventArgs e) => btnVorschauModus.Checked = btnPfeileAusblenden.Checked;
-
-        private void btnTabControlAdd_Click(object sender, System.EventArgs e) {
-            if (_cf == null) { return; }
-
-            var x = new ChildFormulaPaditem(string.Empty, _cf.Filename, _cf.NotAllowedChilds);
-            x.Bei_Export_Sichtbar = true;
-            Pad.AddCentered(x);
-        }
-
-        private void btnVariable_Click(object sender, System.EventArgs e) {
-            var l = Pad.LastClickedItem;
-
-            var x = new VariableFieldPadItem(string.Empty);
-
-            if (l is ICalculateOneRowItemLevel ri) {
-                x.GetRowFrom = ri;
-            }
-
-            if (l is CustomizableShowPadItem efi && efi.GetRowFrom != null) {
-                x.GetRowFrom = efi.GetRowFrom;
-            }
-
-            Pad.AddCentered(x);
-        }
-
-        private void btnVorschauModus_CheckedChanged(object sender, System.EventArgs e) => btnPfeileAusblenden.Checked = btnVorschauModus.Checked;
-
-        private void btnVorschauÖffnen_Click(object sender, System.EventArgs e) {
-            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-            EditBoxRow_NEW.Show("Achtung:\r\nVoll funktionsfähige Test-Ansicht", _cf, true);
-        }
-
-        private void btnZeileHinzu_Click(object sender, System.EventArgs e) {
-            var it = new RowWithFilterPaditem(string.Empty);
-            Pad.AddCentered(it);
-            ChooseDatabaseAndID(it);
-        }
-
-        private void CheckButtons() {
-        }
-
-        private void ChooseDatabaseAndID(ICalculateOneRowItemLevel? it) {
-            if (_cf == null || it == null) { return; }
-
-            if (string.IsNullOrEmpty(LoadTabDatabase.InitialDirectory)) {
-                LoadTabDatabase.InitialDirectory = _cf.Filename.FilePath();
-            }
-
-            LoadTabDatabase.ShowDialog();
-
-            if (!FileExists(LoadTabDatabase.FileName)) { return; }
-            LoadTabDatabase.InitialDirectory = LoadTabDatabase.FileName.FilePath();
-
-            _cf.DatabaseFiles.AddIfNotExists(LoadTabDatabase.FileName);
-
-            var db = Database.GetByFilename(LoadTabDatabase.FileName, false, false);
-            if (db == null) { return; }
-
-            it.Database = db;
-            it.Id = _cf.NextID();
-        }
-
-        private void FormulaSet(string filename, List<string>? notAllowedchilds) {
-            FormulaSet(null as ConnectedFormula.ConnectedFormula, notAllowedchilds);
-
-            if (!FileExists(filename)) {
-                CheckButtons();
-                return;
-            }
-
-            btnLetzteFormulare.AddFileName(filename, string.Empty);
-            LoadTab.FileName = filename;
-            var tmpDatabase = ConnectedFormula.ConnectedFormula.GetByFilename(filename);
-            if (tmpDatabase == null) { return; }
-            FormulaSet(tmpDatabase, notAllowedchilds);
-        }
-
-        private void FormulaSet(ConnectedFormula.ConnectedFormula? formular, List<string>? notAllowedchilds) {
-            _cf = formular;
-
-            if (notAllowedchilds != null && _cf != null) {
-                _cf.NotAllowedChilds.AddRange(notAllowedchilds);
-            }
-
-            if (_cf == null) {
-                Pad.Item = null;
-            } else {
-                Pad.Item = _cf.PadData;
-                Pad.Item.SheetSizeInMm = new SizeF(PixelToMm(500, 300), PixelToMm(850, 300));
-                Pad.Item.GridShow = 0.5f;
-                Pad.Item.GridSnap = 0.5f;
-            }
-        }
-
-        private void grpFileExplorer_Click(object sender, System.EventArgs e) {
-            var l = Pad.LastClickedItem;
-
-            var x = new FileExplorerPadItem(string.Empty);
-
-            if (l is ICalculateOneRowItemLevel ri) {
-                x.GetRowFrom = ri;
-            }
-            if (l is CustomizableShowPadItem efi && efi.GetRowFrom != null) {
-                x.GetRowFrom = efi.GetRowFrom;
-            }
-
-            Pad.AddCentered(x);
-        }
-
-        private void LoadTab_FileOk(object sender, CancelEventArgs e) => FormulaSet(LoadTab.FileName, null);
-
-        #endregion
+        FormulaSet(filename, notAllowedchilds);
     }
+
+    public ConnectedFormulaEditor() : this(string.Empty, null) { }
+
+    #endregion
+
+    #region Methods
+
+    private void btnAusgangsZeile_Click(object sender, System.EventArgs e) {
+        var it = new RowOutputPadItem(string.Empty);
+        Pad.AddCentered(it);
+    }
+
+    private void btnEingangsZeile_Click(object sender, System.EventArgs e) {
+        var it = new RowInputPadItem(string.Empty);
+        Pad.AddCentered(it);
+    }
+
+    private void btnFeldHinzu_Click(object sender, System.EventArgs e) {
+        var l = Pad.LastClickedItem;
+
+        var x = new EditFieldPadItem(string.Empty);
+
+        if (l is ICalculateOneRowItemLevel ri) {
+            x.GetRowFrom = ri;
+        }
+        if (l is CustomizableShowPadItem efi && efi.GetRowFrom != null) {
+            x.GetRowFrom = efi.GetRowFrom;
+        }
+
+        Pad.AddCentered(x);
+
+        if (x.GetRowFrom != null && x.GetRowFrom.Database != null) {
+            x.Spalte_wählen = string.Empty; // Dummy setzen
+        }
+    }
+
+    private void btnKlonZeilen_Click(object sender, System.EventArgs e) {
+        var it = new RowClonePadItem(string.Empty);
+
+        it.Bei_Export_Sichtbar = false;
+        Pad.AddCentered(it);
+
+        ChooseDatabaseAndID(it);
+    }
+
+    private void btnKonstante_Click(object sender, System.EventArgs e) {
+        var x = new ConstantTextPaditem();
+        //x.Bei_Export_Sichtbar = false;
+        Pad.AddCentered(x);
+    }
+
+    private void btnLetzteDateien_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) {
+        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+
+        if (e?.Item == null) { return; }
+        FormulaSet(e.Item.Internal, null);
+    }
+
+    private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e) {
+        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+
+        if (sender == btnSaveAs) {
+            if (_cf == null) { return; }
+        }
+
+        if (sender == btnNeuDB) {
+            if (_cf != null) { FormulaSet(null as ConnectedFormula.ConnectedFormula, null); }
+        }
+
+        SaveTab.ShowDialog();
+        if (!PathExists(SaveTab.FileName.FilePath())) { return; }
+        if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
+
+        if (sender == btnNeuDB) {
+            FormulaSet(new ConnectedFormula.ConnectedFormula(), null); // Ab jetzt in der Variable _Database zu finden
+        }
+        if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
+
+        _cf.SaveAsAndChangeTo(SaveTab.FileName);
+
+        FormulaSet(SaveTab.FileName, null);
+    }
+
+    private void btnOeffnen_Click(object sender, System.EventArgs e) {
+        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+        LoadTab.ShowDialog();
+    }
+
+    private void btnPfeileAusblenden_CheckedChanged(object sender, System.EventArgs e) => btnVorschauModus.Checked = btnPfeileAusblenden.Checked;
+
+    private void btnTabControlAdd_Click(object sender, System.EventArgs e) {
+        if (_cf == null) { return; }
+
+        var x = new ChildFormulaPaditem(string.Empty, _cf.Filename, _cf.NotAllowedChilds);
+        x.Bei_Export_Sichtbar = true;
+        Pad.AddCentered(x);
+    }
+
+    private void btnVariable_Click(object sender, System.EventArgs e) {
+        var l = Pad.LastClickedItem;
+
+        var x = new VariableFieldPadItem(string.Empty);
+
+        if (l is ICalculateOneRowItemLevel ri) {
+            x.GetRowFrom = ri;
+        }
+
+        if (l is CustomizableShowPadItem efi && efi.GetRowFrom != null) {
+            x.GetRowFrom = efi.GetRowFrom;
+        }
+
+        Pad.AddCentered(x);
+    }
+
+    private void btnVorschauModus_CheckedChanged(object sender, System.EventArgs e) => btnPfeileAusblenden.Checked = btnVorschauModus.Checked;
+
+    private void btnVorschauÖffnen_Click(object sender, System.EventArgs e) {
+        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+        EditBoxRow_NEW.Show("Achtung:\r\nVoll funktionsfähige Test-Ansicht", _cf, true);
+    }
+
+    private void btnZeileHinzu_Click(object sender, System.EventArgs e) {
+        var it = new RowWithFilterPaditem(string.Empty);
+        Pad.AddCentered(it);
+        ChooseDatabaseAndID(it);
+    }
+
+    private void CheckButtons() {
+    }
+
+    private void ChooseDatabaseAndID(ICalculateOneRowItemLevel? it) {
+        if (_cf == null || it == null) { return; }
+
+        if (string.IsNullOrEmpty(LoadTabDatabase.InitialDirectory)) {
+            LoadTabDatabase.InitialDirectory = _cf.Filename.FilePath();
+        }
+
+        LoadTabDatabase.ShowDialog();
+
+        if (!FileExists(LoadTabDatabase.FileName)) { return; }
+        LoadTabDatabase.InitialDirectory = LoadTabDatabase.FileName.FilePath();
+
+        _cf.DatabaseFiles.AddIfNotExists(LoadTabDatabase.FileName);
+
+        var db = Database.GetByFilename(LoadTabDatabase.FileName, false, false);
+        if (db == null) { return; }
+
+        it.Database = db;
+        it.Id = _cf.NextID();
+    }
+
+    private void FormulaSet(string filename, List<string>? notAllowedchilds) {
+        FormulaSet(null as ConnectedFormula.ConnectedFormula, notAllowedchilds);
+
+        if (!FileExists(filename)) {
+            CheckButtons();
+            return;
+        }
+
+        btnLetzteFormulare.AddFileName(filename, string.Empty);
+        LoadTab.FileName = filename;
+        var tmpDatabase = ConnectedFormula.ConnectedFormula.GetByFilename(filename);
+        if (tmpDatabase == null) { return; }
+        FormulaSet(tmpDatabase, notAllowedchilds);
+    }
+
+    private void FormulaSet(ConnectedFormula.ConnectedFormula? formular, List<string>? notAllowedchilds) {
+        _cf = formular;
+
+        if (notAllowedchilds != null && _cf != null) {
+            _cf.NotAllowedChilds.AddRange(notAllowedchilds);
+        }
+
+        if (_cf == null) {
+            Pad.Item = null;
+        } else {
+            Pad.Item = _cf.PadData;
+            Pad.Item.SheetSizeInMm = new SizeF(PixelToMm(500, 300), PixelToMm(850, 300));
+            Pad.Item.GridShow = 0.5f;
+            Pad.Item.GridSnap = 0.5f;
+        }
+    }
+
+    private void grpFileExplorer_Click(object sender, System.EventArgs e) {
+        var l = Pad.LastClickedItem;
+
+        var x = new FileExplorerPadItem(string.Empty);
+
+        if (l is ICalculateOneRowItemLevel ri) {
+            x.GetRowFrom = ri;
+        }
+        if (l is CustomizableShowPadItem efi && efi.GetRowFrom != null) {
+            x.GetRowFrom = efi.GetRowFrom;
+        }
+
+        Pad.AddCentered(x);
+    }
+
+    private void LoadTab_FileOk(object sender, CancelEventArgs e) => FormulaSet(LoadTab.FileName, null);
+
+    #endregion
 }

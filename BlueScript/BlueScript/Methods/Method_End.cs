@@ -18,40 +18,39 @@
 using System.Collections.Generic;
 using BlueScript.Structures;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_End : Method {
+internal class Method_End : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new();
+    public override List<List<string>> Args => new();
 
-        public override string Description => "Beendet das Skript ohne Fehler.";
+    public override string Description => "Beendet das Skript ohne Fehler.";
 
-        public override bool EndlessArgs => false;
+    public override bool EndlessArgs => false;
 
-        public override string EndSequence => ";";
+    public override string EndSequence => ";";
 
-        public override bool GetCodeBlockAfter => false;
+    public override bool GetCodeBlockAfter => false;
 
-        public override string Returns => string.Empty;
+    public override string Returns => string.Empty;
 
-        public override string StartSequence => "";
+    public override string StartSequence => "";
 
-        //public Method_var(Script parent) : base(parent) { }
-        public override string Syntax => "End;";
+    //public Method_var(Script parent) : base(parent) { }
+    public override string Syntax => "End;";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "end" };
+    public override List<string> Comand(Script? s) => new() { "end" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            s.EndScript = true;
-            return DoItFeedback.Null();
-        }
-
-        #endregion
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        s.EndScript = true;
+        return DoItFeedback.Null();
     }
+
+    #endregion
 }

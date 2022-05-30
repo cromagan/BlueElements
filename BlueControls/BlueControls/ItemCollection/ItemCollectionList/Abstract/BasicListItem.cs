@@ -23,187 +23,186 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
 
-namespace BlueControls.ItemCollection.ItemCollectionList {
+namespace BlueControls.ItemCollection.ItemCollectionList;
 
-    public static class BasicListItemExtensions {
+public static class BasicListItemExtensions {
 
-        #region Methods
+    #region Methods
 
-        public static List<string> ToListOfString(this List<BasicListItem> items) {
-            List<string> w = new();
-            if (items == null) { return w; }
+    public static List<string> ToListOfString(this List<BasicListItem> items) {
+        List<string> w = new();
+        if (items == null) { return w; }
 
-            w.AddRange(from thisItem in items where thisItem != null where !string.IsNullOrEmpty(thisItem.Internal) select thisItem.Internal);
-            return w;
-        }
-
-        #endregion
+        w.AddRange(from thisItem in items where thisItem != null where !string.IsNullOrEmpty(thisItem.Internal) select thisItem.Internal);
+        return w;
     }
 
-    public abstract class BasicListItem : IComparable, ICloneable {
+    #endregion
+}
 
-        #region Fields
+public abstract class BasicListItem : IComparable, ICloneable {
 
-        public Rectangle Pos;
+    #region Fields
 
-        /// <summary>
-        /// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
-        /// </summary>
-        /// <remarks></remarks>
-        public object Tag;
+    public Rectangle Pos;
 
-        /// <summary>
-        /// Ist das Item markiert/selektiert?
-        /// </summary>
-        /// <remarks></remarks>
-        private bool _checked;
+    /// <summary>
+    /// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
+    /// </summary>
+    /// <remarks></remarks>
+    public object Tag;
 
-        /// <summary>
-        /// Ist das Item enabled?
-        /// </summary>
-        /// <remarks></remarks>
-        private bool _enabled;
+    /// <summary>
+    /// Ist das Item markiert/selektiert?
+    /// </summary>
+    /// <remarks></remarks>
+    private bool _checked;
 
-        private ItemCollectionList? _parent;
-        private Size _sizeUntouchedForListBox = Size.Empty;
+    /// <summary>
+    /// Ist das Item enabled?
+    /// </summary>
+    /// <remarks></remarks>
+    private bool _enabled;
 
-        #endregion
+    private ItemCollectionList? _parent;
+    private Size _sizeUntouchedForListBox = Size.Empty;
 
-        #region Constructors
+    #endregion
 
-        protected BasicListItem(string internalname, bool enabled) {
-            Internal = string.IsNullOrEmpty(internalname) ? BasicPadItem.UniqueInternal() : internalname;
-            if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben."); }
-            _checked = false;
-            _enabled = enabled;
-            Pos = Rectangle.Empty;
-            UserDefCompareKey = string.Empty;
-        }
+    #region Constructors
 
-        #endregion
+    protected BasicListItem(string internalname, bool enabled) {
+        Internal = string.IsNullOrEmpty(internalname) ? BasicPadItem.UniqueInternal() : internalname;
+        if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben."); }
+        _checked = false;
+        _enabled = enabled;
+        Pos = Rectangle.Empty;
+        UserDefCompareKey = string.Empty;
+    }
 
-        #region Properties
+    #endregion
 
-        public bool Checked {
-            get => _checked;
-            set {
-                if (Parent == null) {
-                    _checked = value;
-                } else {
-                    Parent?.SetNewCheckState(this, value, ref _checked);
-                }
+    #region Properties
+
+    public bool Checked {
+        get => _checked;
+        set {
+            if (Parent == null) {
+                _checked = value;
+            } else {
+                Parent?.SetNewCheckState(this, value, ref _checked);
             }
         }
+    }
 
-        public bool Enabled {
-            get => _enabled;
-            set {
-                if (_enabled == value) { return; }
-                _enabled = value;
-                Parent?.OnChanged();
-            }
-        }
-
-        public string Internal { get; set; }
-
-        public bool IsCaption { get; protected set; }
-
-        public ItemCollectionList? Parent {
-            get => _parent;
-            set {
-                if (_parent == null || _parent == value) {
-                    _parent = value;
-                    return;
-                }
-
-                Develop.DebugPrint(FehlerArt.Fehler, "Parent Fehler!");
-            }
-        }
-
-        public abstract string QuickInfo { get; }
-
-        public string UserDefCompareKey { get; set; }
-
-        #endregion
-
-        #region Methods
-
-        public abstract object Clone();
-
-        ///// <summary>
-        ///// Klont das aktuelle Objekt (es wird ein neues Objekt des gleichen Typs erstellt) und fügt es in die angegebene ItemCollection hinzu
-        ///// </summary>
-        ///// <param name="newParent"></param>
-        //public virtual void CloneToNewCollection(ItemCollectionList newParent) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
-
-        public void CloneBasicStatesFrom(BasicListItem sourceItem) {
-            Checked = sourceItem.Checked;
-            Enabled = sourceItem.Enabled;
-            Tag = sourceItem.Tag;
-            UserDefCompareKey = sourceItem.UserDefCompareKey;
-            Internal = sourceItem.Internal;
-            IsCaption = sourceItem.IsCaption;
-        }
-
-        public string CompareKey() {
-            if (!string.IsNullOrEmpty(UserDefCompareKey)) {
-                if (Convert.ToChar(UserDefCompareKey.Substring(0, 1)) < 32) { Develop.DebugPrint("Sortierung inkorrekt: " + UserDefCompareKey); }
-                return UserDefCompareKey + Constants.FirstSortChar + Parent?.IndexOf(this).ToString(Constants.Format_Integer6);
-            }
-            return GetCompareKey();
-        }
-
-        public int CompareTo(object obj) {
-            if (obj is BasicListItem tobj) {
-                return CompareKey().CompareTo(tobj.CompareKey());
-            }
-
-            Develop.DebugPrint(FehlerArt.Fehler, "Falscher Objecttyp!");
-            return 0;
-        }
-
-        public bool Contains(int x, int y) => Pos.Contains(x, y);
-
-        public void Draw(Graphics gr, int xModifier, int yModifier, Design controldesign, Design itemdesign, States vState, bool drawBorderAndBack, string filterText, bool translate) {
-            if (Parent == null) { Develop.DebugPrint(FehlerArt.Fehler, "Parent nicht definiert"); }
-            if (itemdesign == Design.Undefiniert) { return; }
-            Rectangle positionModified = new(Pos.X - xModifier, Pos.Y - yModifier, Pos.Width, Pos.Height);
-            DrawExplicit(gr, positionModified, itemdesign, vState, drawBorderAndBack, translate);
-            if (drawBorderAndBack) {
-                if (!string.IsNullOrEmpty(filterText) && !FilterMatch(filterText)) {
-                    var c1 = Skin.Color_Back(controldesign, States.Standard); // Standard als Notlösung, um nicht doppelt checken zu müssen
-                    c1 = c1.SetAlpha(160);
-                    gr.FillRectangle(new SolidBrush(c1), positionModified);
-                }
-            }
-        }
-
-        public virtual bool FilterMatch(string filterText) => Internal.ToUpper().Contains(filterText.ToUpper());
-
-        public abstract int HeightForListBox(BlueListBoxAppearance style, int columnWidth);
-
-        public virtual bool IsClickable() => !IsCaption;
-
-        public void SetCoordinates(Rectangle r) {
-            Pos = r;
+    public bool Enabled {
+        get => _enabled;
+        set {
+            if (_enabled == value) { return; }
+            _enabled = value;
             Parent?.OnChanged();
         }
+    }
 
-        public Size SizeUntouchedForListBox() {
-            if (_sizeUntouchedForListBox.IsEmpty) {
-                _sizeUntouchedForListBox = ComputeSizeUntouchedForListBox();
+    public string Internal { get; set; }
+
+    public bool IsCaption { get; protected set; }
+
+    public ItemCollectionList? Parent {
+        get => _parent;
+        set {
+            if (_parent == null || _parent == value) {
+                _parent = value;
+                return;
             }
-            return _sizeUntouchedForListBox;
+
+            Develop.DebugPrint(FehlerArt.Fehler, "Parent Fehler!");
+        }
+    }
+
+    public abstract string QuickInfo { get; }
+
+    public string UserDefCompareKey { get; set; }
+
+    #endregion
+
+    #region Methods
+
+    public abstract object Clone();
+
+    ///// <summary>
+    ///// Klont das aktuelle Objekt (es wird ein neues Objekt des gleichen Typs erstellt) und fügt es in die angegebene ItemCollection hinzu
+    ///// </summary>
+    ///// <param name="newParent"></param>
+    //public virtual void CloneToNewCollection(ItemCollectionList newParent) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
+
+    public void CloneBasicStatesFrom(BasicListItem sourceItem) {
+        Checked = sourceItem.Checked;
+        Enabled = sourceItem.Enabled;
+        Tag = sourceItem.Tag;
+        UserDefCompareKey = sourceItem.UserDefCompareKey;
+        Internal = sourceItem.Internal;
+        IsCaption = sourceItem.IsCaption;
+    }
+
+    public string CompareKey() {
+        if (!string.IsNullOrEmpty(UserDefCompareKey)) {
+            if (Convert.ToChar(UserDefCompareKey.Substring(0, 1)) < 32) { Develop.DebugPrint("Sortierung inkorrekt: " + UserDefCompareKey); }
+            return UserDefCompareKey + Constants.FirstSortChar + Parent?.IndexOf(this).ToString(Constants.Format_Integer6);
+        }
+        return GetCompareKey();
+    }
+
+    public int CompareTo(object obj) {
+        if (obj is BasicListItem tobj) {
+            return CompareKey().CompareTo(tobj.CompareKey());
         }
 
-        protected abstract Size ComputeSizeUntouchedForListBox();
-
-        protected abstract void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate);
-
-        protected abstract string GetCompareKey();
-
-        #endregion
-
-        //return null;
+        Develop.DebugPrint(FehlerArt.Fehler, "Falscher Objecttyp!");
+        return 0;
     }
+
+    public bool Contains(int x, int y) => Pos.Contains(x, y);
+
+    public void Draw(Graphics gr, int xModifier, int yModifier, Design controldesign, Design itemdesign, States vState, bool drawBorderAndBack, string filterText, bool translate) {
+        if (Parent == null) { Develop.DebugPrint(FehlerArt.Fehler, "Parent nicht definiert"); }
+        if (itemdesign == Design.Undefiniert) { return; }
+        Rectangle positionModified = new(Pos.X - xModifier, Pos.Y - yModifier, Pos.Width, Pos.Height);
+        DrawExplicit(gr, positionModified, itemdesign, vState, drawBorderAndBack, translate);
+        if (drawBorderAndBack) {
+            if (!string.IsNullOrEmpty(filterText) && !FilterMatch(filterText)) {
+                var c1 = Skin.Color_Back(controldesign, States.Standard); // Standard als Notlösung, um nicht doppelt checken zu müssen
+                c1 = c1.SetAlpha(160);
+                gr.FillRectangle(new SolidBrush(c1), positionModified);
+            }
+        }
+    }
+
+    public virtual bool FilterMatch(string filterText) => Internal.ToUpper().Contains(filterText.ToUpper());
+
+    public abstract int HeightForListBox(BlueListBoxAppearance style, int columnWidth);
+
+    public virtual bool IsClickable() => !IsCaption;
+
+    public void SetCoordinates(Rectangle r) {
+        Pos = r;
+        Parent?.OnChanged();
+    }
+
+    public Size SizeUntouchedForListBox() {
+        if (_sizeUntouchedForListBox.IsEmpty) {
+            _sizeUntouchedForListBox = ComputeSizeUntouchedForListBox();
+        }
+        return _sizeUntouchedForListBox;
+    }
+
+    protected abstract Size ComputeSizeUntouchedForListBox();
+
+    protected abstract void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate);
+
+    protected abstract string GetCompareKey();
+
+    #endregion
+
+    //return null;
 }

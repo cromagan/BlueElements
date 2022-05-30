@@ -15,12 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueControls.Enums {
+namespace BlueControls.Enums;
 
-    public enum CheckBehavior {
-        NoSelection = 0,
-        SingleSelection = 1,
-        MultiSelection = 2,
-        AlwaysSingleSelection = 3
-    }
+public enum CheckBehavior {
+    NoSelection = 0,
+    SingleSelection = 1,
+    MultiSelection = 2,
+    AlwaysSingleSelection = 3
 }

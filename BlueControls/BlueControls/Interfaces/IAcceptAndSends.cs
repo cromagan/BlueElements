@@ -15,22 +15,21 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueControls.Interfaces {
+namespace BlueControls.Interfaces;
+
+/// <summary>
+/// Wird verwendet, wenn das Control Werte abgeben und empfagen kann
+/// </summary>
+public interface IAcceptAndSends : IContentHolder, IItemToControl {
+
+    #region Methods
 
     /// <summary>
-    /// Wird verwendet, wenn das Control Werte abgeben und empfagen kann
+    /// Übrprüft ob eine Rekursivität besteht.
     /// </summary>
-    public interface IAcceptAndSends : IContentHolder, IItemToControl {
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public bool IsRecursiveWith(IAcceptAndSends obj);
 
-        #region Methods
-
-        /// <summary>
-        /// Übrprüft ob eine Rekursivität besteht.
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public bool IsRecursiveWith(IAcceptAndSends obj);
-
-        #endregion
-    }
+    #endregion
 }

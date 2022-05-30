@@ -33,308 +33,307 @@ using System.Drawing.Design;
 using System.Linq;
 using BlueControls.ItemCollection.ItemCollectionList;
 
-namespace BlueControls.Controls {
+namespace BlueControls.Controls;
 
-    [Designer(typeof(BasicDesigner))]
-    [DefaultEvent("TextChanged")]
-    public partial class ComboBox : TextBox, ITranslateable {
+[Designer(typeof(BasicDesigner))]
+[DefaultEvent("TextChanged")]
+public partial class ComboBox : TextBox, ITranslateable {
 
-        #region Fields
+    #region Fields
 
-        private bool _btnDropDownIsIn;
-        private ComboboxStyle _drawStyle = ComboboxStyle.TextBox;
-        private System.Windows.Forms.ComboBoxStyle _dropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
-        private ExtText _eTxt2;
-        private string _imageCode = string.Empty;
+    private bool _btnDropDownIsIn;
+    private ComboboxStyle _drawStyle = ComboboxStyle.TextBox;
+    private System.Windows.Forms.ComboBoxStyle _dropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
+    private ExtText _eTxt2;
+    private string _imageCode = string.Empty;
 
-        /// <summary>
-        /// Kümmert sich darum, wenn die ComboBox wie ein Button aussieht, dass immer
-        /// der Button-Text stehen bleibt und nicht der Ausgewählte
-        /// </summary>
-        private string _initialtext;
+    /// <summary>
+    /// Kümmert sich darum, wenn die ComboBox wie ein Button aussieht, dass immer
+    /// der Button-Text stehen bleibt und nicht der Ausgewählte
+    /// </summary>
+    private string _initialtext;
 
-        private string _lastClickedText;
+    private string _lastClickedText;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public ComboBox() : base() {
-            // Dieser Aufruf ist für den Designer erforderlich.
-            InitializeComponent();
-            // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            MouseHighlight = true;
-            SetStyle(System.Windows.Forms.ControlStyles.ContainerControl, true);
-            Item = new ItemCollectionList(BlueListBoxAppearance.DropdownSelectbox);
-            Item.ItemAdded += _Item_ItemAdded;
-            Item.ItemCheckedChanged += _Item_ItemCheckedChanged;
-            Item.ItemRemoved += _Item_ItemRemoved;
-            btnDropDown.Left = Width - btnDropDown.Width;
-            btnDropDown.Top = 0;
-            btnDropDown.Height = Height;
+    public ComboBox() : base() {
+        // Dieser Aufruf ist für den Designer erforderlich.
+        InitializeComponent();
+        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        MouseHighlight = true;
+        SetStyle(System.Windows.Forms.ControlStyles.ContainerControl, true);
+        Item = new ItemCollectionList(BlueListBoxAppearance.DropdownSelectbox);
+        Item.ItemAdded += _Item_ItemAdded;
+        Item.ItemCheckedChanged += _Item_ItemCheckedChanged;
+        Item.ItemRemoved += _Item_ItemRemoved;
+        btnDropDown.Left = Width - btnDropDown.Width;
+        btnDropDown.Top = 0;
+        btnDropDown.Height = Height;
+    }
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler DropDownShowing;
+
+    public event EventHandler<BasicListItemEventArgs> ItemClicked;
+
+    #endregion
+
+    #region Properties
+
+    [DefaultValue(ComboboxStyle.TextBox)]
+    public ComboboxStyle DrawStyle {
+        get => _drawStyle;
+        set {
+            if (_drawStyle != value) {
+                _drawStyle = value;
+                Invalidate();
+            }
+            SetStyle();
         }
+    }
 
-        #endregion
-
-        #region Events
-
-        public event EventHandler DropDownShowing;
-
-        public event EventHandler<BasicListItemEventArgs> ItemClicked;
-
-        #endregion
-
-        #region Properties
-
-        [DefaultValue(ComboboxStyle.TextBox)]
-        public ComboboxStyle DrawStyle {
-            get => _drawStyle;
-            set {
-                if (_drawStyle != value) {
-                    _drawStyle = value;
-                    Invalidate();
-                }
-                SetStyle();
+    [DefaultValue(System.Windows.Forms.ComboBoxStyle.DropDown)]
+    public System.Windows.Forms.ComboBoxStyle DropDownStyle {
+        get => _dropDownStyle;
+        set {
+            if (value != _dropDownStyle) {
+                _dropDownStyle = value;
+                Invalidate();
             }
+            SetStyle();
         }
+    }
 
-        [DefaultValue(System.Windows.Forms.ComboBoxStyle.DropDown)]
-        public System.Windows.Forms.ComboBoxStyle DropDownStyle {
-            get => _dropDownStyle;
-            set {
-                if (value != _dropDownStyle) {
-                    _dropDownStyle = value;
-                    Invalidate();
-                }
-                SetStyle();
+    [DefaultValue("")]
+    [Category("Darstellung")]
+    [Editor(typeof(QuickPicSelector), typeof(UITypeEditor))]
+    public string ImageCode {
+        get => _imageCode;
+        set {
+            if (_imageCode != value) {
+                _imageCode = value;
+                Invalidate();
             }
+            SetStyle();
         }
+    }
 
-        [DefaultValue("")]
-        [Category("Darstellung")]
-        [Editor(typeof(QuickPicSelector), typeof(UITypeEditor))]
-        public string ImageCode {
-            get => _imageCode;
-            set {
-                if (_imageCode != value) {
-                    _imageCode = value;
-                    Invalidate();
-                }
-                SetStyle();
-            }
+    public ItemCollectionList? Item { get; }
+
+    [DefaultValue(true)]
+    public bool Translate { get; set; } = true;
+
+    #endregion
+
+    #region Methods
+
+    public void SetTextIfItemExists(string text) {
+        if (Item.Any(thisItem => thisItem.Internal == text)) {
+            Text = text;
         }
+    }
 
-        public ItemCollectionList? Item { get; }
-
-        [DefaultValue(true)]
-        public bool Translate { get; set; } = true;
-
-        #endregion
-
-        #region Methods
-
-        public void SetTextIfItemExists(string text) {
-            if (Item.Any(thisItem => thisItem.Internal == text)) {
-                Text = text;
-            }
+    public void ShowMenu(object? sender, System.Windows.Forms.MouseEventArgs? ex) {
+        if (_btnDropDownIsIn || IsDisposed || !Enabled) { return; }
+        _btnDropDownIsIn = true;
+        OnDropDownShowing();
+        if (Item.Count == 0) { _btnDropDownIsIn = false; return; }
+        int x, y;
+        if (sender is Button but) {
+            x = System.Windows.Forms.Cursor.Position.X - but.MousePos().X - but.Location.X;
+            y = System.Windows.Forms.Cursor.Position.Y - but.MousePos().Y + Height; //Identisch
+        } else {
+            x = System.Windows.Forms.Cursor.Position.X - MousePos().X;
+            y = System.Windows.Forms.Cursor.Position.Y - MousePos().Y + Height; //Identisch
         }
+        Item.UncheckAll();
+        if (_drawStyle != ComboboxStyle.RibbonBar && Item[Text] != null) { Item[Text].Checked = true; }
+        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(Item, x, y, Width, null, this, Translate);
+        dropDownMenu.Cancel += DropDownMenu_Cancel;
+        dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
+        _btnDropDownIsIn = false;
+    }
 
-        public void ShowMenu(object? sender, System.Windows.Forms.MouseEventArgs? ex) {
-            if (_btnDropDownIsIn || IsDisposed || !Enabled) { return; }
-            _btnDropDownIsIn = true;
-            OnDropDownShowing();
-            if (Item.Count == 0) { _btnDropDownIsIn = false; return; }
-            int x, y;
-            if (sender is Button but) {
-                x = System.Windows.Forms.Cursor.Position.X - but.MousePos().X - but.Location.X;
-                y = System.Windows.Forms.Cursor.Position.Y - but.MousePos().Y + Height; //Identisch
-            } else {
-                x = System.Windows.Forms.Cursor.Position.X - MousePos().X;
-                y = System.Windows.Forms.Cursor.Position.Y - MousePos().Y + Height; //Identisch
-            }
-            Item.UncheckAll();
-            if (_drawStyle != ComboboxStyle.RibbonBar && Item[Text] != null) { Item[Text].Checked = true; }
-            var dropDownMenu = FloatingInputBoxListBoxStyle.Show(Item, x, y, Width, null, this, Translate);
-            dropDownMenu.Cancel += DropDownMenu_Cancel;
-            dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
-            _btnDropDownIsIn = false;
-        }
+    internal bool WasThisValueClicked() => _lastClickedText != null && Text == _lastClickedText;
 
-        internal bool WasThisValueClicked() => _lastClickedText != null && Text == _lastClickedText;
+    protected override void DrawControl(Graphics gr, States state) {
+        if (_drawStyle != ComboboxStyle.TextBox) {
+            if (string.IsNullOrEmpty(_initialtext) && !string.IsNullOrEmpty(Text)) { _initialtext = Text; }
 
-        protected override void DrawControl(Graphics gr, States state) {
-            if (_drawStyle != ComboboxStyle.TextBox) {
-                if (string.IsNullOrEmpty(_initialtext) && !string.IsNullOrEmpty(Text)) { _initialtext = Text; }
-
-                if (_eTxt2 == null) {
-                    _eTxt2 = new ExtText((Design)_drawStyle, state);
-                }
-
-                Button.DrawButton(this, gr, (Design)_drawStyle, state, QuickImage.Get(_imageCode), Alignment.Horizontal_Vertical_Center, true, _eTxt2, _initialtext, DisplayRectangle, Translate);
-                btnDropDown.Invalidate();
-                return;
+            if (_eTxt2 == null) {
+                _eTxt2 = new ExtText((Design)_drawStyle, state);
             }
 
-            btnDropDown.Enabled = Item.Count > 0;
-            var vType = Design.ComboBox_Textbox;
-            if (ParentType() is PartentType.RibbonGroupBox or PartentType.RibbonPage) {
-                vType = Design.Ribbon_ComboBox_Textbox;
-            }
-
-            var i = Item[Text];
-            if (i == null) {
-                base.DrawControl(gr, state);
-                btnDropDown.Invalidate();
-                return;
-            }
-
-            i.Parent = Item; // Um den Stil zu wissen
-            if (Focused && _dropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
-                // Focused = Bearbeitung erwünscht, Cursor anzeigen und KEINE Items zeichnen
-                base.DrawControl(gr, state);
-                btnDropDown.Invalidate();
-                return;
-            }
-
-            if (_dropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
-                if (i is TextListItem tempVar2) {
-                    if (tempVar2.Symbol == null && tempVar2.IsClickable()) {
-                        base.DrawControl(gr, state);
-                        btnDropDown.Invalidate();
-                        return;
-                    }
-                }
-            }
-
-            Skin.Draw_Back(gr, vType, state, DisplayRectangle, this, true);
-
-            if (!FloatingForm.IsShowing(this)) {
-                // Nur wenn die Selectbox gerade Nicht angezeigt wird, um hin und her Konvertierungen zu vermeiden
-                var r = i.Pos;
-                var ymod = -(int)((DisplayRectangle.Height - i.SizeUntouchedForListBox().Height) / 2.0);
-                i.SetCoordinates(new Rectangle(Skin.PaddingSmal, -ymod, Width - 30, i.SizeUntouchedForListBox().Height));
-                i.Draw(gr, 0, 0, Design.ComboBox_Textbox, Design.ComboBox_Textbox, state, false, string.Empty, Translate);
-                i.SetCoordinates(r);
-            }
-            Skin.Draw_Border(gr, vType, state, DisplayRectangle);
+            Button.DrawButton(this, gr, (Design)_drawStyle, state, QuickImage.Get(_imageCode), Alignment.Horizontal_Vertical_Center, true, _eTxt2, _initialtext, DisplayRectangle, Translate);
             btnDropDown.Invalidate();
+            return;
         }
 
-        protected override Design GetDesign() => ParentType() is PartentType.RibbonGroupBox or PartentType.RibbonPage
-   ? Design.Ribbon_ComboBox_Textbox
-   : Design.ComboBox_Textbox;
+        btnDropDown.Enabled = Item.Count > 0;
+        var vType = Design.ComboBox_Textbox;
+        if (ParentType() is PartentType.RibbonGroupBox or PartentType.RibbonPage) {
+            vType = Design.Ribbon_ComboBox_Textbox;
+        }
 
-        protected override void OnEnabledChanged(System.EventArgs e) {
-            base.OnEnabledChanged(e);
-            FloatingForm.Close(this);
-            btnDropDown.Enabled = Enabled;
+        var i = Item[Text];
+        if (i == null) {
+            base.DrawControl(gr, state);
             btnDropDown.Invalidate();
+            return;
         }
 
-        protected override void OnGotFocus(System.EventArgs e) {
+        i.Parent = Item; // Um den Stil zu wissen
+        if (Focused && _dropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
+            // Focused = Bearbeitung erwünscht, Cursor anzeigen und KEINE Items zeichnen
+            base.DrawControl(gr, state);
+            btnDropDown.Invalidate();
+            return;
+        }
+
+        if (_dropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
+            if (i is TextListItem tempVar2) {
+                if (tempVar2.Symbol == null && tempVar2.IsClickable()) {
+                    base.DrawControl(gr, state);
+                    btnDropDown.Invalidate();
+                    return;
+                }
+            }
+        }
+
+        Skin.Draw_Back(gr, vType, state, DisplayRectangle, this, true);
+
+        if (!FloatingForm.IsShowing(this)) {
+            // Nur wenn die Selectbox gerade Nicht angezeigt wird, um hin und her Konvertierungen zu vermeiden
+            var r = i.Pos;
+            var ymod = -(int)((DisplayRectangle.Height - i.SizeUntouchedForListBox().Height) / 2.0);
+            i.SetCoordinates(new Rectangle(Skin.PaddingSmal, -ymod, Width - 30, i.SizeUntouchedForListBox().Height));
+            i.Draw(gr, 0, 0, Design.ComboBox_Textbox, Design.ComboBox_Textbox, state, false, string.Empty, Translate);
+            i.SetCoordinates(r);
+        }
+        Skin.Draw_Border(gr, vType, state, DisplayRectangle);
+        btnDropDown.Invalidate();
+    }
+
+    protected override Design GetDesign() => ParentType() is PartentType.RibbonGroupBox or PartentType.RibbonPage
+        ? Design.Ribbon_ComboBox_Textbox
+        : Design.ComboBox_Textbox;
+
+    protected override void OnEnabledChanged(System.EventArgs e) {
+        base.OnEnabledChanged(e);
+        FloatingForm.Close(this);
+        btnDropDown.Enabled = Enabled;
+        btnDropDown.Invalidate();
+    }
+
+    protected override void OnGotFocus(System.EventArgs e) {
+        if (_dropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDownList) {
+            btnDropDown.Focus();
+        } else {
+            base.OnGotFocus(e);
+        }
+        FloatingForm.Close(this);
+    }
+
+    protected virtual void OnItemClicked(BasicListItemEventArgs e) => ItemClicked?.Invoke(this, e);
+
+    protected override void OnLostFocus(System.EventArgs e) {
+        Invalidate();
+        CheckLostFocus(e);
+    }
+
+    protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+        if (e.Button != System.Windows.Forms.MouseButtons.Right) {
+            // nicht bei rechts, ansonsten gibt's evtl. Kontextmenü (von der Textbox aus gesteuert) UND den Auswahldialog
             if (_dropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDownList) {
-                btnDropDown.Focus();
-            } else {
-                base.OnGotFocus(e);
-            }
-            FloatingForm.Close(this);
-        }
-
-        protected virtual void OnItemClicked(BasicListItemEventArgs e) => ItemClicked?.Invoke(this, e);
-
-        protected override void OnLostFocus(System.EventArgs e) {
-            Invalidate();
-            CheckLostFocus(e);
-        }
-
-        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
-            if (e.Button != System.Windows.Forms.MouseButtons.Right) {
-                // nicht bei rechts, ansonsten gibt's evtl. Kontextmenü (von der Textbox aus gesteuert) UND den Auswahldialog
-                if (_dropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDownList) {
-                    ShowMenu(this, e);
-                } else {
-                    base.OnMouseUp(e);
-                }
+                ShowMenu(this, e);
             } else {
                 base.OnMouseUp(e);
             }
+        } else {
+            base.OnMouseUp(e);
         }
-
-        //protected override void OnMouseEnter(System.EventArgs e)
-        //{
-        //    base.OnMouseEnter(e);
-        //    if (_DrawStyle == enComboboxStyle.TextBox || !Enabled) { return; }
-        //    Invalidate();
-        //}
-        //protected override void OnMouseLeave(System.EventArgs e)
-        //{
-        //    base.OnMouseLeave(e);
-        //    if (_DrawStyle == enComboboxStyle.TextBox || !Enabled) { return; }
-        //    Invalidate();
-        //}
-        protected override void OnTextChanged(System.EventArgs e) {
-            base.OnTextChanged(e);
-            FloatingForm.Close(this);
-        }
-
-        private void _Item_ItemAdded(object sender, ListEventArgs e) {
-            if (IsDisposed) { return; }
-            if (_btnDropDownIsIn) { return; }
-            FloatingForm.Close(this);
-            Invalidate();
-        }
-
-        private void _Item_ItemCheckedChanged(object sender, System.EventArgs e) {
-            if (IsDisposed) { return; }
-            if (_btnDropDownIsIn) { return; }
-            FloatingForm.Close(this);
-            Invalidate();
-        }
-
-        private void _Item_ItemRemoved(object sender, System.EventArgs e) {
-            if (IsDisposed) { return; }
-            if (_btnDropDownIsIn) { return; }
-            FloatingForm.Close(this);
-            Invalidate();
-        }
-
-        private void btnDropDown_LostFocus(object sender, System.EventArgs e) => CheckLostFocus(e);
-
-        private void CheckLostFocus(System.EventArgs e) {
-            try {
-                if (btnDropDown == null) { return; }
-                if (!btnDropDown.Focused && !Focused && !FloatingForm.IsShowing(this)) { base.OnLostFocus(e); }
-            } catch (Exception) { }
-        }
-
-        private void DropDownMenu_Cancel(object sender, object mouseOver) {
-            Item.UncheckAll();
-            FloatingForm.Close(this);
-            Focus();
-        }
-
-        private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-            Item.UncheckAll();
-            FloatingForm.Close(this);
-            if (!string.IsNullOrEmpty(e.ClickedComand)) {
-                _lastClickedText = e.ClickedComand;
-                Text = e.ClickedComand;
-                OnItemClicked(new BasicListItemEventArgs(Item[e.ClickedComand]));
-            }
-            Focus();
-        }
-
-        private void OnDropDownShowing() => DropDownShowing?.Invoke(this, System.EventArgs.Empty);
-
-        private void SetStyle() {
-            if (DrawStyle != ComboboxStyle.TextBox) {
-                Cursor = System.Windows.Forms.Cursors.Arrow;
-                _dropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-                btnDropDown.Visible = false;
-                // ImageCode = string.Empty; - Egal, wird eh ignoriert wenn es nicht gebraucht wird
-            }
-        }
-
-        #endregion
     }
+
+    //protected override void OnMouseEnter(System.EventArgs e)
+    //{
+    //    base.OnMouseEnter(e);
+    //    if (_DrawStyle == enComboboxStyle.TextBox || !Enabled) { return; }
+    //    Invalidate();
+    //}
+    //protected override void OnMouseLeave(System.EventArgs e)
+    //{
+    //    base.OnMouseLeave(e);
+    //    if (_DrawStyle == enComboboxStyle.TextBox || !Enabled) { return; }
+    //    Invalidate();
+    //}
+    protected override void OnTextChanged(System.EventArgs e) {
+        base.OnTextChanged(e);
+        FloatingForm.Close(this);
+    }
+
+    private void _Item_ItemAdded(object sender, ListEventArgs e) {
+        if (IsDisposed) { return; }
+        if (_btnDropDownIsIn) { return; }
+        FloatingForm.Close(this);
+        Invalidate();
+    }
+
+    private void _Item_ItemCheckedChanged(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
+        if (_btnDropDownIsIn) { return; }
+        FloatingForm.Close(this);
+        Invalidate();
+    }
+
+    private void _Item_ItemRemoved(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
+        if (_btnDropDownIsIn) { return; }
+        FloatingForm.Close(this);
+        Invalidate();
+    }
+
+    private void btnDropDown_LostFocus(object sender, System.EventArgs e) => CheckLostFocus(e);
+
+    private void CheckLostFocus(System.EventArgs e) {
+        try {
+            if (btnDropDown == null) { return; }
+            if (!btnDropDown.Focused && !Focused && !FloatingForm.IsShowing(this)) { base.OnLostFocus(e); }
+        } catch (Exception) { }
+    }
+
+    private void DropDownMenu_Cancel(object sender, object mouseOver) {
+        Item.UncheckAll();
+        FloatingForm.Close(this);
+        Focus();
+    }
+
+    private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
+        Item.UncheckAll();
+        FloatingForm.Close(this);
+        if (!string.IsNullOrEmpty(e.ClickedComand)) {
+            _lastClickedText = e.ClickedComand;
+            Text = e.ClickedComand;
+            OnItemClicked(new BasicListItemEventArgs(Item[e.ClickedComand]));
+        }
+        Focus();
+    }
+
+    private void OnDropDownShowing() => DropDownShowing?.Invoke(this, System.EventArgs.Empty);
+
+    private void SetStyle() {
+        if (DrawStyle != ComboboxStyle.TextBox) {
+            Cursor = System.Windows.Forms.Cursors.Arrow;
+            _dropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            btnDropDown.Visible = false;
+            // ImageCode = string.Empty; - Egal, wird eh ignoriert wenn es nicht gebraucht wird
+        }
+    }
+
+    #endregion
 }

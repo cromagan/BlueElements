@@ -20,37 +20,36 @@ using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_IsNumeral : Method {
+internal class Method_IsNumeral : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain, VariableFloat.ShortName_Plain } };
-        public override string Description => "Prüft, ob der Inhalt der Variable eine gültige Zahl ist. ";
-        public override bool EndlessArgs => false;
-        public override string EndSequence => ")";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => VariableBool.ShortName_Plain;
-        public override string StartSequence => "(";
-        public override string Syntax => "isNumeral(Value)";
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain, VariableFloat.ShortName_Plain } };
+    public override string Description => "Prüft, ob der Inhalt der Variable eine gültige Zahl ist. ";
+    public override bool EndlessArgs => false;
+    public override string EndSequence => ")";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => VariableBool.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "isNumeral(Value)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "isnumeral" };
+    public override List<string> Comand(Script? s) => new() { "isnumeral" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.Falsch(); }
-            if (attvar.Attributes[0] is VariableFloat) { return DoItFeedback.Wahr(); }
-            if (attvar.Attributes[0] is VariableString vs) {
-                if (vs.ValueString.IsNumeral()) { return DoItFeedback.Wahr(); }
-            }
-            return DoItFeedback.Falsch();
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.Falsch(); }
+        if (attvar.Attributes[0] is VariableFloat) { return DoItFeedback.Wahr(); }
+        if (attvar.Attributes[0] is VariableString vs) {
+            if (vs.ValueString.IsNumeral()) { return DoItFeedback.Wahr(); }
         }
-
-        #endregion
+        return DoItFeedback.Falsch();
     }
+
+    #endregion
 }

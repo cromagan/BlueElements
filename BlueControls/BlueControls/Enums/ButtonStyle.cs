@@ -17,33 +17,32 @@
 
 using System;
 
-namespace BlueControls.Enums {
+namespace BlueControls.Enums;
 
-    [Flags]
-    public enum ButtonStyle {
-        Button = 0,
-        Button_Big = 32768,
-        Button_Big_Borderless = Button_Big | Borderless,
+[Flags]
+public enum ButtonStyle {
+    Button = 0,
+    Button_Big = 32768,
+    Button_Big_Borderless = Button_Big | Borderless,
 
-        SliderButton = 1,
+    SliderButton = 1,
 
-        Checkbox = 2,
-        Checkbox_Big_Borderless = Checkbox | Button_Big_Borderless,
-        Checkbox_Text = Checkbox | Text,
-        Yes_or_No = Checkbox | 4,
-        Pic1_or_Pic2 = Checkbox | 8,
+    Checkbox = 2,
+    Checkbox_Big_Borderless = Checkbox | Button_Big_Borderless,
+    Checkbox_Text = Checkbox | Text,
+    Yes_or_No = Checkbox | 4,
+    Pic1_or_Pic2 = Checkbox | 8,
 
-        Optionbox = 16,
-        Optionbox_Big_Borderless = Optionbox | Button_Big_Borderless,
-        Optionbox_Text = Optionbox | Text,
+    Optionbox = 16,
+    Optionbox_Big_Borderless = Optionbox | Button_Big_Borderless,
+    Optionbox_Text = Optionbox | Text,
 
-        ComboBoxButton = 32,
-        ComboBoxButton_Borderless = ComboBoxButton | Borderless,
+    ComboBoxButton = 32,
+    ComboBoxButton_Borderless = ComboBoxButton | Borderless,
 
-        Pic1_or_Pic2_Big_Borderless = Pic1_or_Pic2 | Button_Big_Borderless,
+    Pic1_or_Pic2_Big_Borderless = Pic1_or_Pic2 | Button_Big_Borderless,
 
-        Text = 131072,
+    Text = 131072,
 
-        Borderless = 65536
-    }
+    Borderless = 65536
 }

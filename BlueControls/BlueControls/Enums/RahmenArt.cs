@@ -17,25 +17,24 @@
 
 using System;
 
-namespace BlueControls.Enums {
+namespace BlueControls.Enums;
 
-    public enum RahmenArt {
-        Unbekannt = -1,
-        Ohne = 0,
-        Solide_1px = 100,
-        Solide_1px_FocusDotLine = 105,
-        Solide_3px = 110,
-        Solide_21px = 112,
+public enum RahmenArt {
+    Unbekannt = -1,
+    Ohne = 0,
+    Solide_1px = 100,
+    Solide_1px_FocusDotLine = 105,
+    Solide_3px = 110,
+    Solide_21px = 112,
 
-        [Obsolete("Wird zukünftig entfernt werden", false)]
-        Solide_1px_DuoColor = 120,
+    [Obsolete("Wird zukünftig entfernt werden", false)]
+    Solide_1px_DuoColor = 120,
 
-        [Obsolete("Wird zukünftig entfernt werden", false)]
-        Solide_1px_DuoColor_NurOben = 121,
+    [Obsolete("Wird zukünftig entfernt werden", false)]
+    Solide_1px_DuoColor_NurOben = 121,
 
-        FocusDotLine = 150,
+    FocusDotLine = 150,
 
-        [Obsolete("Wird zukünftig entfernt werden", false)]
-        ShadowBox = 160
-    }
+    [Obsolete("Wird zukünftig entfernt werden", false)]
+    ShadowBox = 160
 }

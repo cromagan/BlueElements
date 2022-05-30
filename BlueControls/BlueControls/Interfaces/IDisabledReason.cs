@@ -15,24 +15,23 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueControls.Interfaces {
+namespace BlueControls.Interfaces;
 
-    /// <summary>
-    /// Wird verwendet, wenn ein Steuerelement mehrere Zeilen empfangen
-    /// und damit umgehen kann.
-    /// </summary>
-    public interface IDisabledReason {
+/// <summary>
+/// Wird verwendet, wenn ein Steuerelement mehrere Zeilen empfangen
+/// und damit umgehen kann.
+/// </summary>
+public interface IDisabledReason {
 
-        #region Properties
+    #region Properties
 
-        public string DisabledReason { get; set; }
+    public string DisabledReason { get; set; }
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public void DeleteValue();
+    public void DeleteValue();
 
-        #endregion
-    }
+    #endregion
 }

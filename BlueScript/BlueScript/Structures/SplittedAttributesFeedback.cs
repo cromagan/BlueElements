@@ -19,34 +19,33 @@ using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Variables;
 
-namespace BlueScript.Structures {
+namespace BlueScript.Structures;
 
-    public struct SplittedAttributesFeedback {
+public struct SplittedAttributesFeedback {
 
-        #region Fields
+    #region Fields
 
-        public readonly List<Variable> Attributes;
+    public readonly List<Variable> Attributes;
 
-        public readonly string ErrorMessage;
+    public readonly string ErrorMessage;
 
-        public readonly ScriptIssueType FehlerTyp;
+    public readonly ScriptIssueType FehlerTyp;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public SplittedAttributesFeedback(List<Variable> atts) {
-            Attributes = atts;
-            ErrorMessage = string.Empty;
-            FehlerTyp = ScriptIssueType.ohne;
-        }
-
-        public SplittedAttributesFeedback(ScriptIssueType type, string error) {
-            Attributes = new List<Variable>();
-            ErrorMessage = error;
-            FehlerTyp = type;
-        }
-
-        #endregion
+    public SplittedAttributesFeedback(List<Variable> atts) {
+        Attributes = atts;
+        ErrorMessage = string.Empty;
+        FehlerTyp = ScriptIssueType.ohne;
     }
+
+    public SplittedAttributesFeedback(ScriptIssueType type, string error) {
+        Attributes = new List<Variable>();
+        ErrorMessage = error;
+        FehlerTyp = type;
+    }
+
+    #endregion
 }

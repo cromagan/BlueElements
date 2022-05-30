@@ -17,20 +17,19 @@
 
 using System;
 
-namespace BlueControls.Enums {
+namespace BlueControls.Enums;
 
-    [Flags]
-    public enum Helpers {
-        Ohne = 0,
-        SmallCircle = 1,
-        SymetricalHorizontal = 2,
-        SymetricalVertical = 4,
-        MouseDownPoint = 8,
-        HorizontalLine = 16,
-        VerticalLine = 32,
-        DrawToPoint = 64,
-        FilledRectancle = 128,
-        PointNames = 256,
-        HorizontalVerticalLine = HorizontalLine | VerticalLine
-    }
+[Flags]
+public enum Helpers {
+    Ohne = 0,
+    SmallCircle = 1,
+    SymetricalHorizontal = 2,
+    SymetricalVertical = 4,
+    MouseDownPoint = 8,
+    HorizontalLine = 16,
+    VerticalLine = 32,
+    DrawToPoint = 64,
+    FilledRectancle = 128,
+    PointNames = 256,
+    HorizontalVerticalLine = HorizontalLine | VerticalLine
 }

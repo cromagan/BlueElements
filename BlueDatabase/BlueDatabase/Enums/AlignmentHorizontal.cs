@@ -17,15 +17,14 @@
 
 using System;
 
-namespace BlueDatabase.Enums {
+namespace BlueDatabase.Enums;
 
-    [Flags]
-    public enum AlignmentHorizontal {
+[Flags]
+public enum AlignmentHorizontal {
 
-        //Keine_Präferenz = -1,
-        Links = System.Windows.Forms.TextFormatFlags.Left,
+    //Keine_Präferenz = -1,
+    Links = System.Windows.Forms.TextFormatFlags.Left,
 
-        Rechts = System.Windows.Forms.TextFormatFlags.Right,
-        Zentriert = System.Windows.Forms.TextFormatFlags.HorizontalCenter
-    }
+    Rechts = System.Windows.Forms.TextFormatFlags.Right,
+    Zentriert = System.Windows.Forms.TextFormatFlags.HorizontalCenter
 }

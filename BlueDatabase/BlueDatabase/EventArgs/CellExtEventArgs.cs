@@ -17,24 +17,23 @@
 
 #nullable enable
 
-namespace BlueDatabase.EventArgs {
+namespace BlueDatabase.EventArgs;
 
-    public class CellExtEventArgs : System.EventArgs {
+public class CellExtEventArgs : System.EventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public CellExtEventArgs(ColumnItem? column, RowData? row) {
-            Column = column;
-            RowData = row;
-        }
-
-        #endregion
-
-        #region Properties
-
-        public ColumnItem? Column { get; }
-        public RowData? RowData { get; }
-
-        #endregion
+    public CellExtEventArgs(ColumnItem? column, RowData? row) {
+        Column = column;
+        RowData = row;
     }
+
+    #endregion
+
+    #region Properties
+
+    public ColumnItem? Column { get; }
+    public RowData? RowData { get; }
+
+    #endregion
 }

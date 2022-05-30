@@ -15,21 +15,20 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueDatabase.EventArgs {
+namespace BlueDatabase.EventArgs;
 
-    public class PasswordEventArgs : System.EventArgs {
+public class PasswordEventArgs : System.EventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public PasswordEventArgs() => Handled = false;
+    public PasswordEventArgs() => Handled = false;
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public bool Handled { get; set; }
-        public string Password { get; set; } = string.Empty;
+    public bool Handled { get; set; }
+    public string Password { get; set; } = string.Empty;
 
-        #endregion
-    }
+    #endregion
 }

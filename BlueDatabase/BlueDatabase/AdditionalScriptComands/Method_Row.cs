@@ -22,64 +22,63 @@ using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueDatabase.AdditionalScriptComands {
+namespace BlueDatabase.AdditionalScriptComands;
 
-    public class Method_Row : MethodDatabase {
+public class Method_Row : MethodDatabase {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableFilterItem.ShortName_Variable } };
-        public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.";
+    public override List<List<string>> Args => new() { new() { VariableFilterItem.ShortName_Variable } };
+    public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.";
 
-        public override bool EndlessArgs => true;
+    public override bool EndlessArgs => true;
 
-        public override string EndSequence => ")";
+    public override string EndSequence => ")";
 
-        public override bool GetCodeBlockAfter => false;
+    public override bool GetCodeBlockAfter => false;
 
-        public override string Returns => VariableRowItem.ShortName_Variable;
+    public override string Returns => VariableRowItem.ShortName_Variable;
 
-        public override string StartSequence => "(";
+    public override string StartSequence => "(";
 
-        public override string Syntax => "Row(Filter, ...)";
+    public override string Syntax => "Row(Filter, ...)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public static RowItem? ObjectToRow(Variable? attribute) {
-            if (attribute is not VariableRowItem vro) { return null; }
+    public static RowItem? ObjectToRow(Variable? attribute) {
+        if (attribute is not VariableRowItem vro) { return null; }
 
-            //var d = attribute.ObjectData();
-            //if (d.ToUpper() == "NULL") { return null; }
+        //var d = attribute.ObjectData();
+        //if (d.ToUpper() == "NULL") { return null; }
 
-            //var d2 = d.SplitAndCutBy("|");
+        //var d2 = d.SplitAndCutBy("|");
 
-            //var db = Database.GetByFilename(d2[0], true, false);
+        //var db = Database.GetByFilename(d2[0], true, false);
 
-            //return db?.Row.SearchByKey(LongParse(d2[1]));
+        //return db?.Row.SearchByKey(LongParse(d2[1]));
 
-            return vro.RowItem;
-        }
-
-        public static DoItFeedback RowToObjectFeedback(RowItem? row) => new(new VariableRowItem(row));
-
-        public override List<string> Comand(Script? s) => new() { "row" };
-
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-
-            var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
-            if (allFi is null) { return new DoItFeedback("Fehler im Filter"); }
-
-            var r = RowCollection.MatchesTo(allFi);
-
-            if (r.Count > 1) { return new DoItFeedback("Datenbankfehler, zu viele Einträge gefunden. Zuvor Prüfen mit RowCount."); }
-
-            return r == null || r.Count is 0 or > 1 ? RowToObjectFeedback(null) : RowToObjectFeedback(r[0]);
-        }
-
-        #endregion
+        return vro.RowItem;
     }
+
+    public static DoItFeedback RowToObjectFeedback(RowItem? row) => new(new VariableRowItem(row));
+
+    public override List<string> Comand(Script? s) => new() { "row" };
+
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+
+        var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
+        if (allFi is null) { return new DoItFeedback("Fehler im Filter"); }
+
+        var r = RowCollection.MatchesTo(allFi);
+
+        if (r.Count > 1) { return new DoItFeedback("Datenbankfehler, zu viele Einträge gefunden. Zuvor Prüfen mit RowCount."); }
+
+        return r == null || r.Count is 0 or > 1 ? RowToObjectFeedback(null) : RowToObjectFeedback(r[0]);
+    }
+
+    #endregion
 }

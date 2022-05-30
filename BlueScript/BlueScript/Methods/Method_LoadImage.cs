@@ -22,49 +22,48 @@ using BlueBasics.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_LoadImage : Method {
+internal class Method_LoadImage : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain } };
-        public override string Description => "Lädt das angegebene Bild aus dem Dateisystem.";
-        public override bool EndlessArgs => false;
-        public override string EndSequence => ")";
-        public override bool GetCodeBlockAfter => false;
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain } };
+    public override string Description => "Lädt das angegebene Bild aus dem Dateisystem.";
+    public override bool EndlessArgs => false;
+    public override string EndSequence => ")";
+    public override bool GetCodeBlockAfter => false;
 
-        public override string Returns => VariableBitmap.ShortName_Variable;
-        public override string StartSequence => "(";
-        public override string Syntax => "LoadImage(Filename)";
+    public override string Returns => VariableBitmap.ShortName_Variable;
+    public override string StartSequence => "(";
+    public override string Syntax => "LoadImage(Filename)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "loadimage" };
+    public override List<string> Comand(Script? s) => new() { "loadimage" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            if (((VariableString)attvar.Attributes[0]).ValueString.FileType() != FileFormat.Image) {
-                return new DoItFeedback("Datei ist kein Bildformat: " + ((VariableString)attvar.Attributes[0]).ValueString);
-            }
-
-            if (!FileOperations.FileExists(((VariableString)attvar.Attributes[0]).ValueString)) {
-                return new DoItFeedback("Datei nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString);
-            }
-
-            try {
-                Generic.CollectGarbage();
-                var bmp = (Bitmap)BitmapExt.Image_FromFile(((VariableString)attvar.Attributes[0]).ValueString)!;
-                return new DoItFeedback(bmp);
-            } catch {
-                return new DoItFeedback("Datei konnte nicht geladen werden: " + ((VariableString)attvar.Attributes[0]).ValueString);
-            }
+        if (((VariableString)attvar.Attributes[0]).ValueString.FileType() != FileFormat.Image) {
+            return new DoItFeedback("Datei ist kein Bildformat: " + ((VariableString)attvar.Attributes[0]).ValueString);
         }
 
-        #endregion
+        if (!FileOperations.FileExists(((VariableString)attvar.Attributes[0]).ValueString)) {
+            return new DoItFeedback("Datei nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString);
+        }
+
+        try {
+            Generic.CollectGarbage();
+            var bmp = (Bitmap)BitmapExt.Image_FromFile(((VariableString)attvar.Attributes[0]).ValueString)!;
+            return new DoItFeedback(bmp);
+        } catch {
+            return new DoItFeedback("Datei konnte nicht geladen werden: " + ((VariableString)attvar.Attributes[0]).ValueString);
+        }
     }
+
+    #endregion
 }

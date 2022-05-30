@@ -15,20 +15,19 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueBasics.EventArgs {
+namespace BlueBasics.EventArgs;
 
-    public class MultiUserFileHasPendingChangesEventArgs : System.EventArgs {
+public class MultiUserFileHasPendingChangesEventArgs : System.EventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public MultiUserFileHasPendingChangesEventArgs() => HasPendingChanges = false;
+    public MultiUserFileHasPendingChangesEventArgs() => HasPendingChanges = false;
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public bool HasPendingChanges { get; set; }
+    public bool HasPendingChanges { get; set; }
 
-        #endregion
-    }
+    #endregion
 }

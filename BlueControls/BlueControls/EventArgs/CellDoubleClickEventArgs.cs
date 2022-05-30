@@ -17,20 +17,19 @@
 
 using BlueDatabase;
 
-namespace BlueControls.EventArgs {
+namespace BlueControls.EventArgs;
 
-    public class CellDoubleClickEventArgs : BlueDatabase.EventArgs.CellEventArgs {
+public class CellDoubleClickEventArgs : BlueDatabase.EventArgs.CellEventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public CellDoubleClickEventArgs(ColumnItem? column, RowItem? row, bool startEdit) : base(column, row) => StartEdit = startEdit;
+    public CellDoubleClickEventArgs(ColumnItem? column, RowItem? row, bool startEdit) : base(column, row) => StartEdit = startEdit;
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public bool StartEdit { get; set; }
+    public bool StartEdit { get; set; }
 
-        #endregion
-    }
+    #endregion
 }

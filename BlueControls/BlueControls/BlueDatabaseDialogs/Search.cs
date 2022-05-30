@@ -23,109 +23,108 @@ using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.EventArgs;
 
-namespace BlueControls.BlueDatabaseDialogs {
+namespace BlueControls.BlueDatabaseDialogs;
 
-    public sealed partial class Search : Form {
+public sealed partial class Search : Form {
 
-        #region Fields
+    #region Fields
 
-        private readonly Table _blueTable;
-        private ColumnItem? _col;
-        private RowData? _row;
+    private readonly Table _blueTable;
+    private ColumnItem? _col;
+    private RowData? _row;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public Search(Table table) {
-            // Dieser Aufruf ist für den Designer erforderlich.
-            InitializeComponent();
-            // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            _blueTable = table;
-            _blueTable.CursorPosChanged += CursorPosChanged;
-            CursorPosChanged(_blueTable, new CellExtEventArgs(_blueTable.CursorPosColumn, _blueTable.CursorPosRow));
+    public Search(Table table) {
+        // Dieser Aufruf ist für den Designer erforderlich.
+        InitializeComponent();
+        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        _blueTable = table;
+        _blueTable.CursorPosChanged += CursorPosChanged;
+        CursorPosChanged(_blueTable, new CellExtEventArgs(_blueTable.CursorPosColumn, _blueTable.CursorPosRow));
+    }
+
+    #endregion
+
+    #region Methods
+
+    protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
+        base.OnFormClosing(e);
+        _blueTable.CursorPosChanged -= CursorPosChanged;
+    }
+
+    private void btnSuchInCell_Click(object? sender, System.EventArgs e) {
+        var suchtT = SuchText();
+        if (string.IsNullOrEmpty(suchtT)) { return; }
+        Table.SearchNextText(suchtT, _blueTable, _col, _blueTable.CursorPosRow, out var found, out var gefRow, btnAehnliches.Checked);
+        if (found == null) {
+            MessageBox.Show("Text nicht gefunden", ImageCode.Information, "OK");
+            return;
         }
+        _blueTable.CursorPos_Set(found, gefRow, true);
+        txbSuchText.Focus();
+    }
 
-        #endregion
-
-        #region Methods
-
-        protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
-            base.OnFormClosing(e);
-            _blueTable.CursorPosChanged -= CursorPosChanged;
+    private void btnSuchSpalte_Click(object sender, System.EventArgs e) {
+        if (_blueTable.Design == BlueTableAppearance.OnlyMainColumnWithoutHead) {
+            MessageBox.Show("In dieser Ansicht nicht möglich", ImageCode.Information, "OK");
+            return;
         }
-
-        private void btnSuchInCell_Click(object? sender, System.EventArgs e) {
-            var suchtT = SuchText();
-            if (string.IsNullOrEmpty(suchtT)) { return; }
-            Table.SearchNextText(suchtT, _blueTable, _col, _blueTable.CursorPosRow, out var found, out var gefRow, btnAehnliches.Checked);
-            if (found == null) {
-                MessageBox.Show("Text nicht gefunden", ImageCode.Information, "OK");
-                return;
-            }
-            _blueTable.CursorPos_Set(found, gefRow, true);
-            txbSuchText.Focus();
-        }
-
-        private void btnSuchSpalte_Click(object sender, System.EventArgs e) {
-            if (_blueTable.Design == BlueTableAppearance.OnlyMainColumnWithoutHead) {
-                MessageBox.Show("In dieser Ansicht nicht möglich", ImageCode.Information, "OK");
-                return;
-            }
-            var searchT = SuchText();
-            if (string.IsNullOrEmpty(searchT)) { return; }
-            var found = _col;
-            var ca = _blueTable?.CurrentArrangement;
-            if (found == null) { found = _blueTable.Database.Column.SysLocked; }
-            var columnStarted = _col;
-            do {
-                found = ca.NextVisible(found);
-                if (found == null) { found = ca[0].Column; }
-                var ist1 = found.ReadableText().ToLower();
-                if (!string.IsNullOrEmpty(ist1)) {
-                    // Allgemeine Prüfung
-                    if (ist1.Contains(searchT.ToLower())) { break; }
-                    if (btnAehnliches.Checked) {
-                        var ist3 = ist1.StarkeVereinfachung(" ,");
-                        var searchTxt3 = searchT.StarkeVereinfachung(" ,");
-                        if (!string.IsNullOrEmpty(ist3) && ist3.ToLower().Contains(searchTxt3.ToLower())) {
-                            break;
-                        }
+        var searchT = SuchText();
+        if (string.IsNullOrEmpty(searchT)) { return; }
+        var found = _col;
+        var ca = _blueTable?.CurrentArrangement;
+        if (found == null) { found = _blueTable.Database.Column.SysLocked; }
+        var columnStarted = _col;
+        do {
+            found = ca.NextVisible(found);
+            if (found == null) { found = ca[0].Column; }
+            var ist1 = found.ReadableText().ToLower();
+            if (!string.IsNullOrEmpty(ist1)) {
+                // Allgemeine Prüfung
+                if (ist1.Contains(searchT.ToLower())) { break; }
+                if (btnAehnliches.Checked) {
+                    var ist3 = ist1.StarkeVereinfachung(" ,");
+                    var searchTxt3 = searchT.StarkeVereinfachung(" ,");
+                    if (!string.IsNullOrEmpty(ist3) && ist3.ToLower().Contains(searchTxt3.ToLower())) {
+                        break;
                     }
                 }
-                if (columnStarted == found) {
-                    found = null;
-                    break;
-                }
-            } while (true);
-            if (found == null) {
-                MessageBox.Show("Text in den Spalten nicht gefunden.", ImageCode.Information, "OK");
-                return;
             }
-            _blueTable.CursorPos_Set(found, _row, true);
-            txbSuchText.Focus();
-        }
-
-        private void CursorPosChanged(object sender, CellExtEventArgs e) {
-            _row = e.RowData;
-            _col = e.Column;
-        }
-
-        private void Search_Load(object sender, System.EventArgs e) => txbSuchText.Focus();
-
-        private string SuchText() {
-            var suchtT = txbSuchText.Text.Trim();
-            if (string.IsNullOrEmpty(suchtT)) {
-                MessageBox.Show("Bitte Text zum Suchen eingeben.", ImageCode.Information, "OK");
-                return string.Empty;
+            if (columnStarted == found) {
+                found = null;
+                break;
             }
-            return suchtT.Replace(";cr;", "\r").Replace(";tab;", "\t").ToLower();
+        } while (true);
+        if (found == null) {
+            MessageBox.Show("Text in den Spalten nicht gefunden.", ImageCode.Information, "OK");
+            return;
         }
-
-        private void txbSuchText_Enter(object sender, System.EventArgs e) => btnSuchInCell_Click(null, System.EventArgs.Empty);
-
-        private void txbSuchText_TextChanged(object sender, System.EventArgs e) { }
-
-        #endregion
+        _blueTable.CursorPos_Set(found, _row, true);
+        txbSuchText.Focus();
     }
+
+    private void CursorPosChanged(object sender, CellExtEventArgs e) {
+        _row = e.RowData;
+        _col = e.Column;
+    }
+
+    private void Search_Load(object sender, System.EventArgs e) => txbSuchText.Focus();
+
+    private string SuchText() {
+        var suchtT = txbSuchText.Text.Trim();
+        if (string.IsNullOrEmpty(suchtT)) {
+            MessageBox.Show("Bitte Text zum Suchen eingeben.", ImageCode.Information, "OK");
+            return string.Empty;
+        }
+        return suchtT.Replace(";cr;", "\r").Replace(";tab;", "\t").ToLower();
+    }
+
+    private void txbSuchText_Enter(object sender, System.EventArgs e) => btnSuchInCell_Click(null, System.EventArgs.Empty);
+
+    private void txbSuchText_TextChanged(object sender, System.EventArgs e) { }
+
+    #endregion
 }

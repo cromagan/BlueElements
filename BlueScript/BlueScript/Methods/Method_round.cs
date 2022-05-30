@@ -20,37 +20,36 @@ using System.Collections.Generic;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_Round : Method {
+internal class Method_Round : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableFloat.ShortName_Plain }, new() { VariableFloat.ShortName_Plain } };
-        public override string Description => "Rundet den Zahlenwert mathematisch korrekt.";
-        public override bool EndlessArgs => false;
-        public override string EndSequence => ")";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => VariableFloat.ShortName_Plain;
-        public override string StartSequence => "(";
-        public override string Syntax => "Round(Value, Nachkommastellen)";
+    public override List<List<string>> Args => new() { new() { VariableFloat.ShortName_Plain }, new() { VariableFloat.ShortName_Plain } };
+    public override string Description => "Rundet den Zahlenwert mathematisch korrekt.";
+    public override bool EndlessArgs => false;
+    public override string EndSequence => ")";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => VariableFloat.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "Round(Value, Nachkommastellen)";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "round" };
+    public override List<string> Comand(Script? s) => new() { "round" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-            var n = (int)((VariableFloat)attvar.Attributes[1]).ValueNum;
-            if (n < 0) { n = 0; }
-            if (n > 10) { n = 10; }
-            var val = Math.Round(((VariableFloat)attvar.Attributes[0]).ValueNum, n);
-            return new DoItFeedback(val);
-        }
-
-        #endregion
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        var n = (int)((VariableFloat)attvar.Attributes[1]).ValueNum;
+        if (n < 0) { n = 0; }
+        if (n > 10) { n = 10; }
+        var val = Math.Round(((VariableFloat)attvar.Attributes[0]).ValueNum, n);
+        return new DoItFeedback(val);
     }
+
+    #endregion
 }

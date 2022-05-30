@@ -15,27 +15,26 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueControls.EventArgs {
+namespace BlueControls.EventArgs;
 
-    public class PositionEventArgs : System.EventArgs {
+public class PositionEventArgs : System.EventArgs {
 
-        #region Constructors
+    #region Constructors
 
-        public PositionEventArgs(int x, int y) {
-            X = x;
-            Y = y;
-        }
-
-        #endregion
-
-        #region Properties
-
-        // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
-        public int X { get; set; }
-
-        // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
-        public int Y { get; set; }
-
-        #endregion
+    public PositionEventArgs(int x, int y) {
+        X = x;
+        Y = y;
     }
+
+    #endregion
+
+    #region Properties
+
+    // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
+    public int X { get; set; }
+
+    // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
+    public int Y { get; set; }
+
+    #endregion
 }

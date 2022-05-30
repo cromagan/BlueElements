@@ -15,17 +15,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueDatabase.Enums {
+namespace BlueDatabase.Enums;
 
-    public enum ScriptType {
-        Nicht_vorhanden = 0,
-        Bool = 1,
-        String = 2,
-        Numeral = 3,
-        List = 4,
-        String_Readonly = 5,
-        DateTime = 6,
+public enum ScriptType {
+    Nicht_vorhanden = 0,
+    Bool = 1,
+    String = 2,
+    Numeral = 3,
+    List = 4,
+    String_Readonly = 5,
+    DateTime = 6,
 
-        undefiniert = 999
-    }
+    undefiniert = 999
 }

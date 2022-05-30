@@ -20,46 +20,45 @@ using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueScript.Methods {
+namespace BlueScript.Methods;
 
-    internal class Method_Remove : Method {
+internal class Method_Remove : Method {
 
-        #region Properties
+    #region Properties
 
-        public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable }, new() { VariableBool.ShortName_Plain }, new() { VariableString.ShortName_Plain, VariableListString.ShortName_Plain } };
-        public override string Description => "Entfernt aus der Liste die angegebenen Werte.";
-        public override bool EndlessArgs => true;
-        public override string EndSequence => ");";
-        public override bool GetCodeBlockAfter => false;
-        public override string Returns => string.Empty;
-        public override string StartSequence => "(";
-        public override string Syntax => "Remove(ListVariable, CaseSensitive, Value1, Value2, ...);";
+    public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable }, new() { VariableBool.ShortName_Plain }, new() { VariableString.ShortName_Plain, VariableListString.ShortName_Plain } };
+    public override string Description => "Entfernt aus der Liste die angegebenen Werte.";
+    public override bool EndlessArgs => true;
+    public override string EndSequence => ");";
+    public override bool GetCodeBlockAfter => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => "(";
+    public override string Syntax => "Remove(ListVariable, CaseSensitive, Value1, Value2, ...);";
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public override List<string> Comand(Script? s) => new() { "remove" };
+    public override List<string> Comand(Script? s) => new() { "remove" };
 
-        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
+        if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
 
-            var tmpList = ((VariableListString)attvar.Attributes[0]).ValueList;
-            for (var z = 2; z < attvar.Attributes.Count; z++) {
-                if (attvar.Attributes[z] is VariableString vs) {
-                    tmpList!.RemoveString(vs.ValueString, ((VariableBool)attvar.Attributes[1]).ValueBool);
-                }
-                if (attvar.Attributes[z] is VariableListString vl) {
-                    tmpList!.RemoveString(vl.ValueList, ((VariableBool)attvar.Attributes[1]).ValueBool);
-                }
+        var tmpList = ((VariableListString)attvar.Attributes[0]).ValueList;
+        for (var z = 2; z < attvar.Attributes.Count; z++) {
+            if (attvar.Attributes[z] is VariableString vs) {
+                tmpList!.RemoveString(vs.ValueString, ((VariableBool)attvar.Attributes[1]).ValueBool);
             }
-            ((VariableListString)attvar.Attributes[0]).ValueList = tmpList;
-            return DoItFeedback.Null();
+            if (attvar.Attributes[z] is VariableListString vl) {
+                tmpList!.RemoveString(vl.ValueList, ((VariableBool)attvar.Attributes[1]).ValueBool);
+            }
         }
-
-        #endregion
+        ((VariableListString)attvar.Attributes[0]).ValueList = tmpList;
+        return DoItFeedback.Null();
     }
+
+    #endregion
 }

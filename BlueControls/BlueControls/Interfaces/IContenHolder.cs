@@ -17,17 +17,16 @@
 
 using BlueBasics.Interfaces;
 
-namespace BlueControls.Interfaces {
+namespace BlueControls.Interfaces;
 
-    /// <summary>
-    /// Wird verwendet, wenn das Item einen Wert abgeben kann.
-    /// </summary>
-    public interface IContentHolder : IReadableText, IItemToControl {
+/// <summary>
+/// Wird verwendet, wenn das Item einen Wert abgeben kann.
+/// </summary>
+public interface IContentHolder : IReadableText, IItemToControl {
 
-        #region Properties
+    #region Properties
 
-        public string Internal { get; }
+    public string Internal { get; }
 
-        #endregion
-    }
+    #endregion
 }
