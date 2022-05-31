@@ -36,8 +36,6 @@ public partial class TableView_OLD : TableView {
 
     public TableView_OLD() : base(null, true, true) { }
 
-    public TableView_OLD(Database? database) : base(database, false, false) { }
-
     #endregion
 
     #region Methods

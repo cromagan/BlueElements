@@ -628,18 +628,18 @@ public partial class TableView : Form {
                 Table.DoUndo(column, row);
                 break;
 
-            //case "ContentPaste":
-            //    d
-            //    row.CellSet(column, System.Windows.Forms.Clipboard.GetText());
-            //    break;
+                //case "ContentPaste":
+                //    d
+                //    row.CellSet(column, System.Windows.Forms.Clipboard.GetText());
+                //    break;
 
-            //case "ColumnContentDelete":
-            //    if (column != null) {
-            //        if (MessageBox.Show("Angezeite Inhalte dieser Spalte löschen?", ImageCode.Frage, "Ja", "Nein") == 0) {
-            //            column.DeleteContents(Table.Filter, Table.PinnedRows);
-            //        }
-            //    }
-            //    break;
+                //case "ColumnContentDelete":
+                //    if (column != null) {
+                //        if (MessageBox.Show("Angezeite Inhalte dieser Spalte löschen?", ImageCode.Frage, "Ja", "Nein") == 0) {
+                //            column.DeleteContents(Table.Filter, Table.PinnedRows);
+                //        }
+                //    }
+                //    break;
         }
     }
 
@@ -706,6 +706,15 @@ public partial class TableView : Form {
         if (!string.IsNullOrEmpty(m)) {
             MessageBox.Show(m);
         }
+    }
+
+    private void btnFormular_Click(object sender, System.EventArgs e) {
+        DebugPrint_InvokeRequired(InvokeRequired, true);
+        if (Table.Database == null) { return; }
+
+        var x = new BlueControls.Forms.ConnectedFormulaEditor(Table?.Database.FormulaFileName(), null);
+        x.ShowDialog();
+        x.Dispose();
     }
 
     private void btnLayouts_Click(object sender, System.EventArgs e) {

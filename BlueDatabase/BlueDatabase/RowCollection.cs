@@ -245,7 +245,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposable {
         if (pinnedRows != null) {
             Parallel.ForEach(pinnedRows, thisRow => {
                 var rd = reUseMe.Get(thisRow, "Angepinnt") is RowData r ? r : new RowData(thisRow, "Angepinnt");
-                rd.AdditinalSort = "1";
+                rd.PinStateSortAddition = "1";
                 rd.MarkYellow = true;
                 rd.AdditionalSort = rowSortDefinition == null ? thisRow.CompareKey(null) : thisRow.CompareKey(rowSortDefinition.Columns);
 
@@ -282,7 +282,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposable {
             foreach (var thisCap in caps) {
                 var rd = reUseMe.Get(thisRow, thisCap) is RowData r ? r : new RowData(thisRow, thisCap);
 
-                rd.AdditinalSort = "2";
+                rd.PinStateSortAddition = "2";
                 rd.MarkYellow = markYellow;
                 rd.AdditionalSort = adk;
                 lock (lockMe) {

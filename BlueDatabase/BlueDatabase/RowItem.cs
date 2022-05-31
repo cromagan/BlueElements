@@ -146,12 +146,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposable {
                 }
                 break;
 
-            //case DataFormat.Columns_für_LinkedCellDropdown:
-            //    if (IntTryParse(wert, out var colKey)) {
-            //        var c = column.LinkedDatabase().Column.SearchByKey(colKey);
-            //        if (c != null) { wert = c.Name; }
-            //    }
-            //    break;
+                //case DataFormat.Columns_für_LinkedCellDropdown:
+                //    if (IntTryParse(wert, out var colKey)) {
+                //        var c = column.LinkedDatabase().Column.SearchByKey(colKey);
+                //        if (c != null) { wert = c.Name; }
+                //    }
+                //    break;
         }
 
         switch (column.ScriptType) {
@@ -174,8 +174,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposable {
                 break;
 
             case ScriptType.DateTime:
+                qi = qi + "\r\nFalls die Zelle keinen gültiges Datum enthält, wird 01.01.0001 als Datum verwendet.";
                 if (DateTimeTryParse(wert, out var d)) {
                     vars.Add(new VariableDateTime(column.Name, d, ro, false, qi));
+                } else {
+                    vars.Add(new VariableDateTime(column.Name, new DateTime(1, 1, 1), ro, false, qi));
                 }
                 break;
 

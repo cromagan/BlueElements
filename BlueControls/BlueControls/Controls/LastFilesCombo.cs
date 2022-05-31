@@ -90,18 +90,20 @@ public sealed class LastFilesCombo : ComboBox {
 
     #region Methods
 
-    public void AddFileName(string fileName, string additionalText) {
-        var s = fileName + "|" + additionalText;
-        s = s.Replace("\r\n", ";");
-        s = s.Replace("\r", ";");
-        s = s.Replace("\n", ";");
-        if (!_mustExists || FileExists(fileName)) {
-            if (_lastD.Count > 0) { _lastD.RemoveString(fileName, false); }
-            if (_lastD.Count > 0) { _lastD.RemoveString(s, false); }
-            _lastD.Add(s);
+    public void AddFileName(string? fileName, string additionalText) {
+        if (fileName != null) {
+            var s = fileName + "|" + additionalText;
+            s = s.Replace("\r\n", ";");
+            s = s.Replace("\r", ";");
+            s = s.Replace("\n", ";");
+            if (!_mustExists || FileExists(fileName)) {
+                if (_lastD.Count > 0) { _lastD.RemoveString(fileName, false); }
+                if (_lastD.Count > 0) { _lastD.RemoveString(s, false); }
+                _lastD.Add(s);
 
-            if (CanWriteInDirectory(SaveFileName().FilePath())) {
-                _lastD.Save(SaveFileName(), System.Text.Encoding.UTF8, false);
+                if (CanWriteInDirectory(SaveFileName().FilePath())) {
+                    _lastD.Save(SaveFileName(), System.Text.Encoding.UTF8, false);
+                }
             }
         }
         GenerateMenu();

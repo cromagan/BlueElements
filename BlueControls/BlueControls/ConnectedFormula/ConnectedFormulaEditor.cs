@@ -38,7 +38,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     #region Constructors
 
-    public ConnectedFormulaEditor(string filename, List<string>? notAllowedchilds) {
+    public ConnectedFormulaEditor(string? filename, List<string>? notAllowedchilds) {
         InitializeComponent();
 
         FormulaSet(filename, notAllowedchilds);
@@ -194,10 +194,10 @@ public partial class ConnectedFormulaEditor : PadEditor {
         it.Id = _cf.NextID();
     }
 
-    private void FormulaSet(string filename, List<string>? notAllowedchilds) {
+    private void FormulaSet(string? filename, List<string>? notAllowedchilds) {
         FormulaSet(null as ConnectedFormula.ConnectedFormula, notAllowedchilds);
 
-        if (!FileExists(filename)) {
+        if (filename == null || !FileExists(filename)) {
             CheckButtons();
             return;
         }

@@ -74,12 +74,12 @@ public class RowData : IComparable {
 
     public readonly string Chapter;
     public readonly RowItem? Row;
-    public string AdditinalSort;
     public string AdditionalSort;
     public Rectangle CaptionPos;
     public int DrawHeight;
     public bool Expanded;
     public bool MarkYellow;
+    public string PinStateSortAddition;
     public bool ShowCap;
     public int Y;
 
@@ -91,7 +91,7 @@ public class RowData : IComparable {
 
     public RowData(RowItem row, string chapter) {
         Row = row;
-        AdditinalSort = "2";
+        PinStateSortAddition = "2";
         Y = -1;
         Chapter = chapter;
         Expanded = true;
@@ -106,7 +106,7 @@ public class RowData : IComparable {
 
     #region Methods
 
-    public string CompareKey() => AdditinalSort + ";" + Chapter.StarkeVereinfachung(" ") + ";" + AdditionalSort;
+    public string CompareKey() => PinStateSortAddition + ";" + Chapter.StarkeVereinfachung(" ") + ";" + AdditionalSort;
 
     public int CompareTo(object obj) {
         if (obj is RowData robj) {
@@ -122,7 +122,7 @@ public class RowData : IComparable {
             Develop.DebugPrint(FehlerArt.Warnung, "RowData Kopie fehlgeschlagen!");
         }
 
-        AdditinalSort = thisRowData.AdditinalSort;
+        PinStateSortAddition = thisRowData.PinStateSortAddition;
         Y = thisRowData.Y;
 
         Expanded = thisRowData.Expanded;
