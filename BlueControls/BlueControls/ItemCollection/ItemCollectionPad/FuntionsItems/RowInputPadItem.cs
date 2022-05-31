@@ -76,7 +76,7 @@ public class RowInputPadItem : RectanglePadItem, IReadableText, IContentHolder, 
 
     #region Methods
 
-    public Control? CreateControl(ConnectedFormulaView parent) {
+    public Control CreateControl(ConnectedFormulaView parent) {
         var c3 = new FlexiControlForCell();
         c3.Width = 200;
         c3.Height = 32;
@@ -97,7 +97,7 @@ public class RowInputPadItem : RectanglePadItem, IReadableText, IContentHolder, 
     }
 
     public override List<GenericControl> GetStyleOptions() {
-        List<GenericControl> l = new() { };
+        List<GenericControl> l = new();
         l.Add(new FlexiControlForProperty<string>(() => Spaltenname));
         //l.Add(new FlexiControlForProperty<string>(() => ID));
         return l;

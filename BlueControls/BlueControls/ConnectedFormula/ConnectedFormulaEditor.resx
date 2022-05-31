@@ -128,6 +128,13 @@ muss der interne Spaltenname als Text eingegeben werden.
 Mit einer "Zeile mit Filterung" kann dann dieser Wert verwendet werden,
 auch Zwitter Lösungen mit dem Filter "wenn nicht leer" sind möglich.</value>
   </data>
+  <data name="btnTabControlAdd.QuickInfo" xml:space="preserve">
+    <value>Fügt ein Steuerelement mit Registerkarten hinzu.
+Pro Registerkarte kann ein Unterformular gewählt werden.
+Diese Unterformulare müssen eine "Zeileneingang" beinhalten.
+Gleichzeitig muss dieses Element an ein "Zeile mit Filterung"
+angeschlossen sein, um zu funktionieren.</value>
+  </data>
   <metadata name="LoadTab.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>644, 56</value>
   </metadata>

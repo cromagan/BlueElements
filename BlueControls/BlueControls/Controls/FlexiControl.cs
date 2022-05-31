@@ -715,8 +715,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         control.Enabled = Enabled;
         control.GetStyleFrom(this);
         control.Verhalten = _multiLine || Height > 20
-            ? enSteuerelementVerhalten.Scrollen_mit_Textumbruch
-            : enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
+            ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
+            : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
     }
 
     private void _IdleTimer_Tick(object sender, System.EventArgs e) {
@@ -797,7 +797,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             Controls.Add(_captionObject);
         }
         _captionObject.Enabled = Enabled;
-        _captionObject.TextAnzeigeVerhalten = enSteuerelementVerhalten.Text_Abschneiden; // nicht enSteuerelementVerhalten.Steuerelement_Anpassen! weil sonst beim einem Resize die Koordinaten geändert werden und das kann zum Ping Pong führen
+        _captionObject.TextAnzeigeVerhalten = SteuerelementVerhalten.Text_Abschneiden; // nicht enSteuerelementVerhalten.Steuerelement_Anpassen! weil sonst beim einem Resize die Koordinaten geändert werden und das kann zum Ping Pong führen
         _captionObject.Text = _caption.ReplaceLowerSign();
         _captionObject.Size = _captionObject.TextRequiredSize();
         _captionObject.Left = 0;

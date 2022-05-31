@@ -84,7 +84,7 @@ public class ConstantTextPaditem : FixedRectanglePadItem, IReadableText, IConten
 
     #region Methods
 
-    public Control? CreateControl(ConnectedFormulaView parent) {
+    public Control CreateControl(ConnectedFormulaView parent) {
         var c3 = new FlexiControl();
         c3.Width = 100;
         c3.Height = 16;
@@ -105,7 +105,7 @@ public class ConstantTextPaditem : FixedRectanglePadItem, IReadableText, IConten
     }
 
     public override List<GenericControl> GetStyleOptions() {
-        List<GenericControl> l = new() { };
+        List<GenericControl> l = new();
         l.Add(new FlexiControlForProperty<string>(() => Text));
         //l.Add(new FlexiControlForProperty<string>(() => ID));
         return l;
@@ -124,9 +124,9 @@ public class ConstantTextPaditem : FixedRectanglePadItem, IReadableText, IConten
                 Text = value.FromNonCritical();
                 return true;
 
-            //case "id":
-            //    _ID = value.FromNonCritical();
-            //    return true;
+                //case "id":
+                //    _ID = value.FromNonCritical();
+                //    return true;
         }
         return false;
     }

@@ -40,7 +40,7 @@ namespace BlueControls.Forms
             this.capTXT.Location = new System.Drawing.Point(8, 8);
             this.capTXT.Name = "capTXT";
             this.capTXT.Size = new System.Drawing.Size(16, 16);
-            this.capTXT.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Steuerelement_Anpassen;
+            this.capTXT.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Steuerelement_Anpassen;
             this.capTXT.Translate = false;
             // 
             // timQI

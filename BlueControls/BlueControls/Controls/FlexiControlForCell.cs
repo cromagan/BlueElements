@@ -42,7 +42,7 @@ using BlueDatabase.Interfaces;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRowKey {
+public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRowKey, IDisabledReason {
 
     #region Fields
 

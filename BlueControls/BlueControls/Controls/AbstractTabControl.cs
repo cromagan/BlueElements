@@ -182,7 +182,7 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
     protected override void ScaleControl(SizeF factor, BoundsSpecified specified) => base.ScaleControl(new SizeF(1, 1), specified);
 
     protected override void WndProc(ref Message m) {
-        if (m.Msg == (int)enWndProc.WM_ERASEBKGND) { return; }
+        if (m.Msg == (int)Enums.WndProc.WM_ERASEBKGND) { return; }
         base.WndProc(ref m);
     }
 

@@ -19,12 +19,6 @@ namespace BlueBasics.EventArgs;
 
 public class MultiUserToListEventArgs : System.EventArgs {
 
-    #region Constructors
-
-    public MultiUserToListEventArgs() { }
-
-    #endregion
-
     #region Properties
 
     public byte[] Data { get; set; }

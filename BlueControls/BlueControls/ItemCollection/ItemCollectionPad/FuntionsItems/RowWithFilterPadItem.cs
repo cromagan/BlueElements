@@ -174,7 +174,7 @@ public class RowWithFilterPaditem : RectanglePadItem, IReadableText, IAcceptAndS
 
     #region Methods
 
-    public Control? CreateControl(ConnectedFormulaView parent) {
+    public Control CreateControl(ConnectedFormulaView parent) {
         var c = new FlexiControlRowSelector(Database, this.Parent, FilterDefiniton, _überschrift, _anzeige);
         c.EditType = _bearbeitung;
         c.CaptionPosition = CaptionPosition;
@@ -183,7 +183,7 @@ public class RowWithFilterPaditem : RectanglePadItem, IReadableText, IAcceptAndS
     }
 
     public override List<GenericControl> GetStyleOptions() {
-        List<GenericControl> l = new() { };
+        List<GenericControl> l = new();
         if (Database == null) { return l; }
         l.Add(new FlexiControlForProperty<string>(() => Überschrift));
         l.Add(new FlexiControlForProperty<string>(() => Anzeige));
@@ -274,9 +274,9 @@ public class RowWithFilterPaditem : RectanglePadItem, IReadableText, IAcceptAndS
             case "showformat":
                 _anzeige = value.FromNonCritical();
                 return true;
-            //case "variable":
-            //    _variable = value.FromNonCritical();
-            //    return true;
+                //case "variable":
+                //    _variable = value.FromNonCritical();
+                //    return true;
         }
         return false;
     }

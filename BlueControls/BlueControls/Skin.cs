@@ -1213,7 +1213,7 @@ public static class Skin {
         return BlueFont.Get(@string);
     }
 
-    public static BlueFont? GetBlueFont(Design design, States state) => DesignOf(design, state).bFont;
+    public static BlueFont GetBlueFont(Design design, States state) => DesignOf(design, state).bFont;
 
     /// <summary>
     /// Gibt eine Liste aller Fonts zurück, die mit dem gewählten Sheetstyle möglich sind.
@@ -1664,7 +1664,7 @@ public static class Skin {
 
                     case PadStyles.Style_StandardFett:
                         return GetBlueFont(PadStyles.Style_Überschrift_Kapitel, rowOfStyle);
-                    //    Case Else : Return BlueFont(vDesign, vState)
+                        //    Case Else : Return BlueFont(vDesign, vState)
                 }
                 break;
 
@@ -1675,7 +1675,7 @@ public static class Skin {
 
                     case PadStyles.Style_StandardFett:
                         return GetBlueFont(PadStyles.Style_Überschrift_Untertitel, rowOfStyle);
-                    //    Case Else : Return BlueFont(vDesign, vState)
+                        //    Case Else : Return BlueFont(vDesign, vState)
                 }
                 break;
 
@@ -1686,7 +1686,7 @@ public static class Skin {
 
                     case PadStyles.Style_StandardFett:
                         return GetBlueFont(PadStyles.Style_Überschrift_Haupt, rowOfStyle);
-                    //  Case Else : Return BlueFont(vDesign, vState)
+                        //  Case Else : Return BlueFont(vDesign, vState)
                 }
                 break;
 
@@ -1697,7 +1697,7 @@ public static class Skin {
 
                     case PadStyles.Style_StandardFett:
                         return GetBlueFont(PadStyles.Style_Standard, rowOfStyle);
-                    //default: : Return BlueFont(vDesign, vState)
+                        //default: : Return BlueFont(vDesign, vState)
                 }
                 break;
         }
@@ -1705,7 +1705,7 @@ public static class Skin {
         return null;
     }
 
-    internal static BlueFont? GetBlueFont(Design design, States state, int stufe) {
+    internal static BlueFont GetBlueFont(Design design, States state, int stufe) {
         if (stufe != 4 && design != Enums.Design.TextBox) {
             if (design == Enums.Design.Form_QuickInfo) { return GetBlueFont(design, state); } // QuickInfo kann jeden Text enthatlten
             Develop.DebugPrint(FehlerArt.Warnung, "Design unbekannt: " + (int)design);

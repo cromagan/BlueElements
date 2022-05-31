@@ -67,7 +67,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     private string _suffix = string.Empty;
 
-    private enSteuerelementVerhalten _verhalten = enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
+    private SteuerelementVerhalten _verhalten = SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
 
     #endregion
 
@@ -210,8 +210,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
     }
 
-    [DefaultValue(enSteuerelementVerhalten.Scrollen_ohne_Textumbruch)]
-    public enSteuerelementVerhalten Verhalten {
+    [DefaultValue(SteuerelementVerhalten.Scrollen_ohne_Textumbruch)]
+    public SteuerelementVerhalten Verhalten {
         get => _verhalten;
         set {
             if (_verhalten == value) { return; }
@@ -517,12 +517,12 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         if (sliderVisible) { effectWidth = Width - 18; }
 
         switch (_verhalten) {
-            case enSteuerelementVerhalten.Scrollen_mit_Textumbruch:
+            case SteuerelementVerhalten.Scrollen_mit_Textumbruch:
                 _eTxt.TextDimensions = new Size(effectWidth - (Skin.PaddingSmal * 2), -1);
                 _eTxt.DrawingArea = new Rectangle(0, 0, effectWidth, Height);
                 break;
 
-            case enSteuerelementVerhalten.Scrollen_ohne_Textumbruch:
+            case SteuerelementVerhalten.Scrollen_ohne_Textumbruch:
                 var hp = HotPosition();
                 _eTxt.TextDimensions = Size.Empty;
                 _eTxt.DrawingArea = new Rectangle(0, 0, effectWidth, Height);
@@ -543,7 +543,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 if (_eTxt.DrawingPos.X > Skin.PaddingSmal) { _eTxt.DrawingPos.X = Skin.PaddingSmal; }
                 break;
 
-            case enSteuerelementVerhalten.Steuerelement_Anpassen:
+            case SteuerelementVerhalten.Steuerelement_Anpassen:
                 sliderVisible = false;
                 _eTxt.TextDimensions = Size.Empty;
                 Width = this is ComboBox
@@ -553,7 +553,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 _eTxt.DrawingArea = new Rectangle(0, 0, Width, Height);
                 break;
 
-            case enSteuerelementVerhalten.Text_Abschneiden:
+            case SteuerelementVerhalten.Text_Abschneiden:
                 sliderVisible = false;
                 _eTxt.TextDimensions = Size.Empty;
                 _eTxt.DrawingArea = new Rectangle(0, 0, Width, Height);

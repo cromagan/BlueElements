@@ -43,7 +43,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     private ExtText? _eText;
     private string _text = string.Empty;
 
-    private enSteuerelementVerhalten _textAnzeigeverhalten = enSteuerelementVerhalten.Text_Abschneiden;
+    private SteuerelementVerhalten _textAnzeigeverhalten = SteuerelementVerhalten.Text_Abschneiden;
 
     #endregion
 
@@ -70,18 +70,18 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     #region Properties
 
     public new int Height {
-        get => Convert.ToBoolean(_textAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)
+        get => Convert.ToBoolean(_textAnzeigeverhalten & SteuerelementVerhalten.Steuerelement_Anpassen)
             ? TextRequiredSize().Height
             : base.Height;
         set {
             GetDesign();
-            if (Convert.ToBoolean(_textAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)) { return; }
+            if (Convert.ToBoolean(_textAnzeigeverhalten & SteuerelementVerhalten.Steuerelement_Anpassen)) { return; }
             base.Height = value;
         }
     }
 
     public new Size Size {
-        get => Convert.ToBoolean(_textAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen) ? TextRequiredSize() : base.Size;
+        get => Convert.ToBoolean(_textAnzeigeverhalten & SteuerelementVerhalten.Steuerelement_Anpassen) ? TextRequiredSize() : base.Size;
         set {
             GetDesign();
             if (value.Width == base.Size.Width && value.Height == base.Size.Height) { return; }
@@ -118,8 +118,8 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
-    [DefaultValue(enSteuerelementVerhalten.Text_Abschneiden)]
-    public enSteuerelementVerhalten TextAnzeigeVerhalten {
+    [DefaultValue(SteuerelementVerhalten.Text_Abschneiden)]
+    public SteuerelementVerhalten TextAnzeigeVerhalten {
         get => _textAnzeigeverhalten;
         set {
             if (_textAnzeigeverhalten == value) { return; }
@@ -132,12 +132,12 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     public bool Translate { get; set; } = true;
 
     public new int Width {
-        get => Convert.ToBoolean(_textAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)
+        get => Convert.ToBoolean(_textAnzeigeverhalten & SteuerelementVerhalten.Steuerelement_Anpassen)
             ? TextRequiredSize().Width
             : base.Width;
         set {
             GetDesign();
-            if (Convert.ToBoolean(_textAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)) { return; }
+            if (Convert.ToBoolean(_textAnzeigeverhalten & SteuerelementVerhalten.Steuerelement_Anpassen)) { return; }
             base.Width = value;
         }
     }
@@ -199,20 +199,20 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
                 _eText.State = state;
                 _eText.Multiline = true;
                 switch (_textAnzeigeverhalten) {
-                    case enSteuerelementVerhalten.Steuerelement_Anpassen:
+                    case SteuerelementVerhalten.Steuerelement_Anpassen:
                         _eText.TextDimensions = Size.Empty;
                         Size = _eText.LastSize();
                         break;
 
-                    case enSteuerelementVerhalten.Text_Abschneiden:
+                    case SteuerelementVerhalten.Text_Abschneiden:
                         _eText.TextDimensions = Size.Empty;
                         break;
 
-                    case enSteuerelementVerhalten.Scrollen_mit_Textumbruch:
+                    case SteuerelementVerhalten.Scrollen_mit_Textumbruch:
                         _eText.TextDimensions = new Size(base.Size.Width, -1);
                         break;
 
-                    case enSteuerelementVerhalten.Scrollen_ohne_Textumbruch:
+                    case SteuerelementVerhalten.Scrollen_ohne_Textumbruch:
                         _eText.TextDimensions = Size.Empty;
                         break;
                 }
@@ -277,7 +277,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     }
 
     private bool QuickModePossible() {
-        if (_textAnzeigeverhalten != enSteuerelementVerhalten.Text_Abschneiden) { return false; }
+        if (_textAnzeigeverhalten != SteuerelementVerhalten.Text_Abschneiden) { return false; }
         //if (Math.Abs(_Zeilenabstand - 1) > 0.01) { return false; }
         return !_text.Contains("<");
     }

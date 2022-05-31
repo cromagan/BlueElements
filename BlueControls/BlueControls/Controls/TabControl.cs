@@ -17,14 +17,47 @@
 
 using BlueControls.Enums;
 using System.Windows.Forms;
+using BlueControls.Interfaces;
+using BlueDatabase;
 
 namespace BlueControls.Controls;
 
-public class TabControl : AbstractTabControl {
+public class TabControl : AbstractTabControl, IAcceptRowKey {
+
+    #region Fields
+
+    private Database? _database = null;
+
+    private long _rowkey = -1;
+
+    #endregion
 
     #region Constructors
 
     public TabControl() : base() => BackColor = Skin.Color_Back(Design.TabStrip_Body, States.Standard);
+
+    #endregion
+
+    #region Properties
+
+    public Database? Database {
+        get => _database;
+        set {
+            if (_database != value) {
+                _database = value;
+                DoDatabaseAction();
+            }
+        }
+    }
+
+    public long RowKey {
+        get => _rowkey; set {
+            if (_rowkey != value) {
+                _rowkey = value;
+                DoDatabaseAction();
+            }
+        }
+    }
 
     #endregion
 
@@ -41,6 +74,20 @@ public class TabControl : AbstractTabControl {
     }
 
     protected override void OnPaint(PaintEventArgs e) => DrawControl(e, Design.TabStrip_Back);
+
+    private void DoDatabaseAction() {
+        foreach (var thisTab in TabPages) {
+            if (thisTab is TabPage tp) {
+                foreach (var thisControl in tp.Controls) {
+                    if (thisControl is IAcceptRowKey iar && thisControl is not TabControl) {
+                        iar.RowKey = -1;
+                        iar.Database = Database;
+                        iar.RowKey = RowKey;
+                    }
+                }
+            }
+        }
+    }
 
     #endregion
 }

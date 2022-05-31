@@ -116,9 +116,6 @@
     <Compile Include="ConnectedFormula\ConnectedFormulaView.Designer.cs">
       <DependentUpon>ConnectedFormulaView.cs</DependentUpon>
     </Compile>
-    <Compile Include="ConnectedFormula\RowCloner.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="ConnectedFormula\FlexiControlRowSelector.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -173,9 +170,9 @@
     <Compile Include="Enums\GroupBoxStyle.cs" />
     <Compile Include="Enums\PartentType.cs" />
     <Compile Include="Enums\Helpers.cs" />
-    <Compile Include="Enums\enSymbol.cs" />
-    <Compile Include="Enums\enTableDrawColumn.cs" />
-    <Compile Include="Enums\enTableDrawType.cs" />
+    <Compile Include="Enums\Symbol.cs" />
+    <Compile Include="Enums\TableDrawColumn.cs" />
+    <Compile Include="Enums\TableDrawType.cs" />
     <Compile Include="Enums\SorceType.cs" />
     <Compile Include="Enums\ConectorStyle.cs" />
     <Compile Include="Enums\ASCIIKey.cs" />
@@ -189,7 +186,7 @@
     <Compile Include="Enums\MarkState.cs" />
     <Compile Include="Enums\RahmenArt.cs" />
     <Compile Include="Enums\States.cs" />
-    <Compile Include="Enums\enWndProc.cs" />
+    <Compile Include="Enums\WndProc.cs" />
     <Compile Include="Enums\PadStyles.cs" />
     <Compile Include="EventArgs\AdditionalDrawing.cs" />
     <Compile Include="EventArgs\ButtonCellEventArgs.cs" />
@@ -335,14 +332,12 @@
     </Compile>
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\ChildFormulaPaditem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\CustomizableShowPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\RowOutputPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\RowInputPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\VariableFieldPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\FileExplorerPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\EditFieldPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Abstract\FixedRectanglePadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\ConstantTextPaditem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\RowClonePadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\RowWithFilterPadItem.cs" />
     <Compile Include="ItemCollection\ItemConnection.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Temporär\PhysicPadItem.cs" />
@@ -409,7 +404,7 @@
     <Compile Include="Enums\ButtonStyle.cs" />
     <Compile Include="Enums\CheckBehavior.cs" />
     <Compile Include="Enums\HintergrundArt.cs" />
-    <Compile Include="Enums\enSteuerelementVerhalten.cs" />
+    <Compile Include="Enums\SteuerelementVerhalten.cs" />
     <Compile Include="Extended Text\ExtCharASCII.cs" />
     <Compile Include="Extended Text\ExtText.cs" />
     <Compile Include="Skin.cs" />

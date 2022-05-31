@@ -15,15 +15,17 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueDatabase;
 
 namespace BlueControls.Interfaces;
 
 /// <summary>
-/// Wird verwendet, wenn ein Steuerelement einen Zeilenschlüssele empfangen
+/// Wird verwendet, wenn ein Steuerelement einen Zeilenschlüssel empfangen
 /// und damit umgehen kann.
 /// </summary>
-public interface IAcceptRowKey : IDisabledReason {
+public interface IAcceptRowKey {
 
     #region Properties
 

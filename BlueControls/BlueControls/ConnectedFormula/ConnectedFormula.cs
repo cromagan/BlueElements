@@ -121,7 +121,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposable {
 
     #region Properties
 
-    public string Filename { get => _muf.Filename; }
+    public string Filename => _muf.Filename;
 
     public ItemCollectionPad PadData {
         get => _padData;

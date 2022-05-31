@@ -20,7 +20,7 @@ using System;
 namespace BlueControls.Enums;
 
 [Flags]
-public enum enSteuerelementVerhalten {
+public enum SteuerelementVerhalten {
     Text_Abschneiden = 0,
     Steuerelement_Anpassen = 1,
     Scrollen_ohne_Textumbruch = 2,

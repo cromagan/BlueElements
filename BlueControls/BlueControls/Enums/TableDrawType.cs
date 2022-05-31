@@ -17,8 +17,8 @@
 
 namespace BlueControls.Enums;
 
-public enum enTableDrawColumn {
-    NonPermament = 0,
-    Permament = 1,
-    All = 2
+public enum TableDrawType {
+    ColumnBackBody = 0,
+    Cells = 1,
+    ColumnHead = 2
 }

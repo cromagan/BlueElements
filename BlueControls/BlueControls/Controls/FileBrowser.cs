@@ -349,7 +349,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         Bitmap? thumbnail = null;
 
         if (realFileName.FileSuffix() == "URL") {
-            var addres = GetUrlFileDestination(cryptoFileOnDisk);
+            //var addres = GetUrlFileDestination(cryptoFileOnDisk);
 
             //// Let's use
             //string url = ((string.IsNullOrEmpty(Request.Params["site"])) ? "blog.yemrekeskin.com" : Request.Params["site"]);
@@ -682,64 +682,49 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         if (!PathExists(newPath)) { return; }
 
         var cryptet = IsCyrpted(newPath);
-        string rEadable;
 
         var allF = Directory.GetFiles(newPath, "*", SearchOption.TopDirectoryOnly);
 
         if (ThumbGenerator.CancellationPending) { return; }
 
         foreach (var thisString in allF) {
-            rEadable = thisString;
             if (ThumbGenerator.CancellationPending) { return; }
             if (AddThis(thisString, true)) // Prüfung 1, ob .cyo und auch unverschlüsselte
             {
                 var feedBack = new List<object?> { thisString }; // Zeile 1, Dateiname auf Festplatte, ZEile 2 das Bild selbst
 
                 if (cryptet) {
-                    rEadable = CryptedFileName(thisString, 10);
+                    var rEadable = CryptedFileName(thisString, 10);
 
-                    if (AddThis(rEadable, true))
-                    {
+                    if (AddThis(rEadable, true)) {
                         var th = ThumbFile(thisString);
 
-                        if (!FileExists(th))
-                        {
+                        if (!FileExists(th)) {
                             var thumbnail = GetThumbnail(thisString, rEadable);
-                            if (!PathExists(th.FilePath()))
-                            {
+                            if (!PathExists(th.FilePath())) {
                                 Directory.CreateDirectory(th.FilePath());
                             }
 
-                            if (thumbnail != null)
-                            {
+                            if (thumbnail != null) {
                                 thumbnail.Save(th, ImageFormat.Png);
                                 feedBack.Add(thumbnail);
                             }
-
-                        }
-                        else
-                        {
+                        } else {
                             feedBack.Add(Image_FromFile(th));
                         }
-
                     }
 
                     if (feedBack.Count == 1) {
                         // Verschlüsselte Dateinamen....schwierig ein echtes Bild zu kriegen...
                         feedBack.Add(QuickImage.Get(rEadable.FileType(), 64));
                     }
-
                 }
-
-
 
                 if (feedBack.Count == 1) {
                     feedBack.Add(WindowsThumbnailProvider.GetThumbnail(thisString, 64, 64, ThumbnailOptions.BiggerSizeOk));
                 }
 
-
                 ThumbGenerator.ReportProgress(0, feedBack);
-
             }
         }
     }

@@ -39,7 +39,7 @@ public class Script {
     /// Bei diesem Pfad können zusätzliche Dateien - wie z.B. Skript-Subroutinen enthalten sein.
     /// Der Pfad mit abschließenden \
     /// </summary>
-    public readonly string AdditionalFilesPath = string.Empty;
+    public readonly string AdditionalFilesPath;
 
     public readonly List<Variable>? Variables;
     public bool EndScript;

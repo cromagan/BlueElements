@@ -200,7 +200,7 @@ internal sealed class QuickPic : Panel {
         LB.Name = "LB";
         LB.Size = new Size(192, 303);
         LB.TabIndex = 0;
-        LB.DoubleClick += new EventHandler(LB_DoubleClick);
+        LB.DoubleClick += LB_DoubleClick;
         //
         // ButOK
         //
@@ -221,7 +221,7 @@ internal sealed class QuickPic : Panel {
         PicName.Size = new Size(192, 20);
         PicName.TabIndex = 2;
         PicName.Text = "PicNam";
-        PicName.TextChanged += new EventHandler(SomethingChanged);
+        PicName.TextChanged += SomethingChanged;
         //
         // GroupBox1
         //
@@ -256,7 +256,7 @@ internal sealed class QuickPic : Panel {
         GrY.Size = new Size(24, 20);
         GrY.TabIndex = 2;
         GrY.Text = "16";
-        GrY.TextChanged += new EventHandler(SomethingChanged);
+        GrY.TextChanged += SomethingChanged;
         //
         // GrX
         //
@@ -266,7 +266,7 @@ internal sealed class QuickPic : Panel {
         GrX.Size = new Size(24, 20);
         GrX.TabIndex = 0;
         GrX.Text = "16";
-        GrX.TextChanged += new EventHandler(SomethingChanged);
+        GrX.TextChanged += SomethingChanged;
         //
         // Label1
         //
@@ -284,7 +284,7 @@ internal sealed class QuickPic : Panel {
         chkbDurchgestrichen.Size = new Size(120, 16);
         chkbDurchgestrichen.TabIndex = 0;
         chkbDurchgestrichen.Text = "Durchgestrichen";
-        chkbDurchgestrichen.CheckedChanged += new EventHandler(SomethingCheckedChanged);
+        chkbDurchgestrichen.CheckedChanged += SomethingCheckedChanged;
         //
         // chkbGrauStufen
         //
@@ -294,7 +294,7 @@ internal sealed class QuickPic : Panel {
         chkbGrauStufen.Size = new Size(152, 16);
         chkbGrauStufen.TabIndex = 15;
         chkbGrauStufen.Text = "Bild in Graustufen anzeigen";
-        chkbGrauStufen.CheckedChanged += new EventHandler(SomethingCheckedChanged);
+        chkbGrauStufen.CheckedChanged += SomethingCheckedChanged;
         //
         // chkbMEDisabled
         //
@@ -304,7 +304,7 @@ internal sealed class QuickPic : Panel {
         chkbMEDisabled.Size = new Size(136, 16);
         chkbMEDisabled.TabIndex = 1;
         chkbMEDisabled.Text = "Windows ME disabled";
-        chkbMEDisabled.CheckedChanged += new EventHandler(SomethingCheckedChanged);
+        chkbMEDisabled.CheckedChanged += SomethingCheckedChanged;
         //
         // chkbXPDisabled
         //
@@ -314,7 +314,7 @@ internal sealed class QuickPic : Panel {
         chkbXPDisabled.Size = new Size(136, 16);
         chkbXPDisabled.TabIndex = 2;
         chkbXPDisabled.Text = "Windows XP disabled";
-        chkbXPDisabled.CheckedChanged += new EventHandler(SomethingCheckedChanged);
+        chkbXPDisabled.CheckedChanged += SomethingCheckedChanged;
         //
         // GroupBox4
         //
@@ -348,7 +348,7 @@ internal sealed class QuickPic : Panel {
         SAT.TabIndex = 5;
         SAT.TickFrequency = 10;
         SAT.Value = 100;
-        SAT.ValueChanged += new EventHandler(SomethingChanged);
+        SAT.ValueChanged += SomethingChanged;
         //
         // Label2
         //
@@ -378,7 +378,7 @@ internal sealed class QuickPic : Panel {
         Hell.TabIndex = 8;
         Hell.TickFrequency = 10;
         Hell.Value = 100;
-        Hell.ValueChanged += new EventHandler(SomethingChanged);
+        Hell.ValueChanged += SomethingChanged;
         //
         // Label4
         //
@@ -398,7 +398,7 @@ internal sealed class QuickPic : Panel {
         Transp.Size = new Size(240, 32);
         Transp.TabIndex = 8;
         Transp.TickFrequency = 10;
-        Transp.ValueChanged += new EventHandler(SomethingChanged);
+        Transp.ValueChanged += SomethingChanged;
         //
         // Helll
         //
@@ -449,7 +449,7 @@ internal sealed class QuickPic : Panel {
         Färb.Name = "Färb";
         Färb.Size = new Size(48, 20);
         Färb.TabIndex = 16;
-        Färb.TextChanged += new EventHandler(SomethingChanged);
+        Färb.TextChanged += SomethingChanged;
         //
         // grün
         //
@@ -458,7 +458,7 @@ internal sealed class QuickPic : Panel {
         grün.Name = "grün";
         grün.Size = new Size(48, 20);
         grün.TabIndex = 17;
-        grün.TextChanged += new EventHandler(SomethingChanged);
+        grün.TextChanged += SomethingChanged;
         //
         // GroupBox3
         //
@@ -503,7 +503,7 @@ internal sealed class QuickPic : Panel {
         txbZweitsymbol.Name = "txbZweitsymbol";
         txbZweitsymbol.Size = new Size(184, 20);
         txbZweitsymbol.TabIndex = 17;
-        txbZweitsymbol.TextChanged += new EventHandler(SomethingChanged);
+        txbZweitsymbol.TextChanged += SomethingChanged;
         //
         // frmQuickPic
         //

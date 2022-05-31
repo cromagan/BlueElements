@@ -434,7 +434,7 @@ public class GenericControl : System.Windows.Forms.Control {
     protected override void WndProc(ref System.Windows.Forms.Message m) {
         try {
             //https://www.vb-paradise.de/allgemeines/tipps-tricks-und-tutorials/windows-forms/50038-wndproc-kleine-liste-aller-messages/
-            if (m.Msg == (int)enWndProc.WM_ERASEBKGND) { return; }
+            if (m.Msg == (int)Enums.WndProc.WM_ERASEBKGND) { return; }
             base.WndProc(ref m);
         } catch { }
     }

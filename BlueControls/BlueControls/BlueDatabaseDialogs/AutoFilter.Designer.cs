@@ -126,7 +126,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capInfo.Location = new System.Drawing.Point(8, 8);
             this.capInfo.Name = "capInfo";
             this.capInfo.Size = new System.Drawing.Size(152, 72);
-            this.capInfo.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.capInfo.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             this.capInfo.Visible = false;
             // 
             // AutoFilter

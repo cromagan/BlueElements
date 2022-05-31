@@ -43,7 +43,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
 
     #region Constructors
 
-    public CustomizableShowPadItem(string internalname) : base(internalname) {
+    protected CustomizableShowPadItem(string internalname) : base(internalname) {
         SetCoordinates(new RectangleF(0, 0, 50, 30), true);
     }
 

@@ -118,7 +118,6 @@ public class VariableBool : Variable {
             #region Zweiten Wert als s2 ermitteln
 
             var s2 = txt.Substring(i + check.Length);
-            Variable v2 = null;
             if (string.IsNullOrEmpty(s2)) { return false; }//new DoItFeedback("Wert nach Operator (" + check + ") nicht gefunden: " + txt);
 
             var tmp2 = GetVariableByParsing(s2, s);
@@ -126,7 +125,7 @@ public class VariableBool : Variable {
                 return false;//new DoItFeedback("Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage);
             }
 
-            v2 = tmp2.Variable;
+            var v2 = tmp2.Variable;
 
             #endregion
 
@@ -144,64 +143,64 @@ public class VariableBool : Variable {
             var replacer = "false";
             switch (check) {
                 case "==": {
-                    if (v1.ValueForReplace == v2.ValueForReplace) { replacer = "true"; }
-                    break;
-                }
+                        if (v1.ValueForReplace == v2.ValueForReplace) { replacer = "true"; }
+                        break;
+                    }
 
                 case "!=": {
-                    if (v1.ValueForReplace != v2.ValueForReplace) { replacer = "true"; }
-                    break;
-                }
+                        if (v1.ValueForReplace != v2.ValueForReplace) { replacer = "true"; }
+                        break;
+                    }
 
                 case ">=": {
-                    if (v1 is not VariableFloat v1Fl) { return false; } //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                    if (v2 is not VariableFloat v2Fl) { return false; }  //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                    if (v1Fl.ValueNum >= v2Fl.ValueNum) { replacer = "true"; }
-                    break;
-                }
+                        if (v1 is not VariableFloat v1Fl) { return false; } //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v2 is not VariableFloat v2Fl) { return false; }  //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v1Fl.ValueNum >= v2Fl.ValueNum) { replacer = "true"; }
+                        break;
+                    }
 
                 case "<=": {
-                    if (v1 is not VariableFloat v1Fl) { return false; } //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                    if (v2 is not VariableFloat v2Fl) { return false; }  //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                    if (v1Fl.ValueNum <= v2Fl.ValueNum) { replacer = "true"; }
-                    break;
-                }
+                        if (v1 is not VariableFloat v1Fl) { return false; } //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v2 is not VariableFloat v2Fl) { return false; }  //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v1Fl.ValueNum <= v2Fl.ValueNum) { replacer = "true"; }
+                        break;
+                    }
 
                 case "<": {
-                    if (v1 is not VariableFloat v1Fl) { return false; } //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                    if (v2 is not VariableFloat v2Fl) { return false; }  //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                    if (v1Fl.ValueNum < v2Fl.ValueNum) { replacer = "true"; }
-                    break;
-                }
+                        if (v1 is not VariableFloat v1Fl) { return false; } //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v2 is not VariableFloat v2Fl) { return false; }  //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v1Fl.ValueNum < v2Fl.ValueNum) { replacer = "true"; }
+                        break;
+                    }
 
                 case ">": {
-                    if (v1 is not VariableFloat v1Fl) { return false; } //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                    if (v2 is not VariableFloat v2Fl) { return false; }  //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                    if (v1Fl.ValueNum > v2Fl.ValueNum) { replacer = "true"; }
-                    break;
-                }
+                        if (v1 is not VariableFloat v1Fl) { return false; } //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v2 is not VariableFloat v2Fl) { return false; }  //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v1Fl.ValueNum > v2Fl.ValueNum) { replacer = "true"; }
+                        break;
+                    }
 
                 case "||": {
-                    if (v1 is not VariableBool v1Bo) { return false; }                            // return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                    if (v2 is not VariableBool v2Bo) { return false; }// return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                    if (v1Bo.ValueBool || v2Bo.ValueBool) { replacer = "true"; }
-                    break;
-                }
+                        if (v1 is not VariableBool v1Bo) { return false; }                            // return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v2 is not VariableBool v2Bo) { return false; }// return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v1Bo.ValueBool || v2Bo.ValueBool) { replacer = "true"; }
+                        break;
+                    }
 
                 case "&&": {
-                    if (v1 is not VariableBool v1Bo) { return false; }  // return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                    if (v2 is not VariableBool v2Bo) { return false; }                                // return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                    if (v1Bo.ValueBool && v2Bo.ValueBool) { replacer = "true"; }
-                    break;
-                }
+                        if (v1 is not VariableBool v1Bo) { return false; }  // return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v2 is not VariableBool v2Bo) { return false; }                                // return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v1Bo.ValueBool && v2Bo.ValueBool) { replacer = "true"; }
+                        break;
+                    }
 
                 case "!": {
-                    // S1 dürfte eigentlich nie was sein: !False||!false
-                    // entweder ist es ganz am anfang, oder direkt nach einem Trenneichen
-                    if (v2 is not VariableBool v2Bo) { return false; }   // return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                    if (!v2Bo.ValueBool) { replacer = "true"; }
-                    break;
-                }
+                        // S1 dürfte eigentlich nie was sein: !False||!false
+                        // entweder ist es ganz am anfang, oder direkt nach einem Trenneichen
+                        if (v2 is not VariableBool v2Bo) { return false; }   // return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (!v2Bo.ValueBool) { replacer = "true"; }
+                        break;
+                    }
 
                 default:
                     return false; //  return new DoItFeedback("Operator (" + check + ") unbekannt: " + txt);

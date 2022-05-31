@@ -26,7 +26,6 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem, IDisp
 
     #region Fields
 
-    private bool _disposedValue;
     private Bitmap? _generatedBitmap;
 
     #endregion

@@ -88,8 +88,6 @@ public sealed class Database : IDisposable {
 
     private string _creator = string.Empty;
 
-    private bool _disposed_Value;
-
     private string _fileEncryptionKey = string.Empty;
 
     private double _globalScale;
@@ -237,7 +235,7 @@ public sealed class Database : IDisposable {
         }
     }
 
-    public double AgeOfBlockDatei { get => _muf.AgeOfBlockDatei; }
+    public double AgeOfBlockDatei => _muf.AgeOfBlockDatei;
 
     [Browsable(false)]
     public Ansicht Ansicht {
@@ -286,7 +284,7 @@ public sealed class Database : IDisposable {
         }
     }
 
-    public string Filename { get => _muf.Filename; }
+    public string Filename => _muf.Filename;
 
     [Browsable(false)]
     public double GlobalScale {
@@ -306,15 +304,15 @@ public sealed class Database : IDisposable {
         }
     }
 
-    public bool IsLoading { get => _muf.IsLoading; }
+    public bool IsLoading => _muf.IsLoading;
 
-    public bool IsParsing { get => _muf.IsParsing; }
+    public bool IsParsing => _muf.IsParsing;
 
     public string LoadedVersion { get; private set; }
 
     public DateTime PowerEdit { get; set; }
 
-    public bool ReadOnly { get => _muf.ReadOnly; }
+    public bool ReadOnly => _muf.ReadOnly;
 
     [Browsable(false)]
     public int ReloadDelaySecond {
@@ -325,7 +323,7 @@ public sealed class Database : IDisposable {
         }
     }
 
-    public bool ReloadNeeded { get => _muf.ReloadNeeded; }
+    public bool ReloadNeeded => _muf.ReloadNeeded;
 
     public string RulesScript {
         get => _rulesScript;
@@ -400,7 +398,7 @@ public sealed class Database : IDisposable {
     /// <param name="checkOnlyFilenameToo"></param>
     /// <param name="readOnly"></param>
     /// <returns></returns>
-    public static Database? GetByFilename(string filename, bool checkOnlyFilenameToo, bool readOnly) {
+    public static Database GetByFilename(string filename, bool checkOnlyFilenameToo, bool readOnly) {
         foreach (var thisFile in AllFiles) {
             if (thisFile != null && string.Equals(thisFile.Filename, filename, StringComparison.OrdinalIgnoreCase)) {
                 thisFile.BlockReload(false);
@@ -922,12 +920,12 @@ public sealed class Database : IDisposable {
 
         var x = importText.SplitAndCutByCrToList();
 
-        if (x.Count() < 2) { return "Keine Zeilen zum importieren."; }
+        if (x.Count < 2) { return "Keine Zeilen zum importieren."; }
 
         var sep = ",";
 
         if (x[0].StartsWith("sep=", StringComparison.OrdinalIgnoreCase)) {
-            if (x.Count() < 3) { return "Keine Zeilen zum importieren."; }
+            if (x.Count < 3) { return "Keine Zeilen zum importieren."; }
             sep = x[0].Substring(4);
             x.RemoveAt(0);
             importText = x.JoinWithCr();

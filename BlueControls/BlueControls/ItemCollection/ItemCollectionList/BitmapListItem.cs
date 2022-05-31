@@ -118,7 +118,7 @@ public class BitmapListItem : BasicListItem {
 
     #region Methods
 
-    public override object Clone() {
+    public override object? Clone() {
         Develop.DebugPrint_NichtImplementiert();
         return null;
     }

@@ -17,7 +17,7 @@
 
 namespace BlueControls.Enums;
 
-public enum enSymbol {
+public enum Symbol {
     Ohne = 0,
     Pfeil = 1,
     Bruchlinie = 2,

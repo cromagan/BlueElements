@@ -77,7 +77,7 @@ namespace BlueControls.Forms
             this.capAnzahlInfo.Location = new System.Drawing.Point(8, 16);
             this.capAnzahlInfo.Name = "capAnzahlInfo";
             this.capAnzahlInfo.Size = new System.Drawing.Size(847, 40);
-            this.capAnzahlInfo.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.capAnzahlInfo.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // cbxLayoutWahl
             // 
@@ -98,7 +98,7 @@ namespace BlueControls.Forms
             this.c_Layoutx.Name = "c_Layoutx";
             this.c_Layoutx.Size = new System.Drawing.Size(80, 16);
             this.c_Layoutx.Text = "c_Layoutx";
-            this.c_Layoutx.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.c_Layoutx.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // Caption3
             // 
@@ -147,7 +147,7 @@ namespace BlueControls.Forms
             this.capLayout.Name = "capLayout";
             this.capLayout.Size = new System.Drawing.Size(82, 22);
             this.capLayout.Text = "Layout:";
-            this.capLayout.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
+            this.capLayout.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
             // 
             // padVorschau
             // 

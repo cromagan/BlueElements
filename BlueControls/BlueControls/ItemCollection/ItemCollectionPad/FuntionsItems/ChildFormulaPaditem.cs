@@ -32,7 +32,7 @@ using BlueBasics.Enums;
 
 namespace BlueControls.ItemCollection;
 
-public class ChildFormulaPaditem : RectanglePadItem, IItemToControl {
+public class ChildFormulaPaditem : CustomizableShowPadItem, IItemToControl {
 
     #region Fields
 
@@ -77,9 +77,11 @@ public class ChildFormulaPaditem : RectanglePadItem, IItemToControl {
 
     #region Methods
 
-    public Control? CreateControl(ConnectedFormulaView parent) {
+    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var c3 = new Controls.TabControl();
         c3.Tag = Internal;
+
+        #region  Tabs erstellen
 
         foreach (var thisc in Childs.Item) {
             var t = new TabPage();
@@ -97,16 +99,23 @@ public class ChildFormulaPaditem : RectanglePadItem, IItemToControl {
             }
         }
 
+        #endregion
+
+        if (GetRowFrom is ICalculateOneRowItemLevel rfw2) {
+            var ff = parent.SearchOrGenerate((BasicPadItem)rfw2);
+            if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(c3); }
+        }
+
         return c3;
     }
 
     public override List<GenericControl> GetStyleOptions() {
-        List<GenericControl> l = new() { };
+        List<GenericControl> l = new();
 
         UpdateList();
+        l.AddRange(base.GetStyleOptions());
         l.Add(Childs);
 
-        //l.Add(new FlexiControlForProperty<string>(() => Text));
         return l;
     }
 

@@ -32,9 +32,9 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     #region Fields
 
-    public static BlueFont? CellFont = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
-    public static BlueFont? ChapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard);
-    public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
+    public static BlueFont CellFont = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
+    public static BlueFont ChapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard);
+    public static BlueFont ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
     public readonly ColumnItem? Column;
 
     #endregion
@@ -62,12 +62,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         }
     }
 
-    public string Interner_Name {
-        get {
-            if (Column == null) { return "?"; }
-            return Column.Name;
-        }
-    }
+    public string Interner_Name => Column == null ? "?" : Column.Name;
 
     /// <summary>
     /// Wird von Flexoptions aufgerufen
@@ -87,7 +82,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     #region Methods
 
     public override List<GenericControl> GetStyleOptions() {
-        List<GenericControl> l = new() { };
+        List<GenericControl> l = new();
         if (Column == null) { return l; }
 
         l.Add(new FlexiControlForProperty<string>(() => Datenbank));

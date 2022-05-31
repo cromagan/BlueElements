@@ -115,7 +115,8 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
             var did = false;
 
             if (!did && thischild is IAcceptRowKey fcfc) {
-                did = DoChilds_OneRowKey(fcfc, row, con.Database);
+                DoChilds_OneRowKey(fcfc, row, con.Database);
+                did = true;
             }
 
             if (!did && thischild is IAcceptVariableList rv) {
@@ -123,7 +124,8 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
                     (_, _, con.Script) = row.DoAutomatic("to be sure");
                 }
 
-                did = DoChilds_VariableList(rv, con.Script, row, con.Database);
+                DoChilds_VariableList(rv, con.Script, row, con.Database);
+                did = true;
             }
 
             if (thischild is IDisabledReason id) {
@@ -178,7 +180,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         }
     }
 
-    private static bool DoChilds_OneRowKey(IAcceptRowKey fcfc, RowItem row, Database? database) {
+    private static void DoChilds_OneRowKey(IAcceptRowKey fcfc, RowItem row, Database? database) {
         // Normales Zellenfeld
 
         fcfc.Database = database;
@@ -188,15 +190,12 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         } else {
             fcfc.RowKey = -1;
         }
-        return true;
     }
 
-    private static bool DoChilds_VariableList(IAcceptVariableList fcfc, Script? script, RowItem row, Database? database) {
+    private static void DoChilds_VariableList(IAcceptVariableList fcfc, Script? script, RowItem row, Database? database) {
         // Normales Zellenfeld
 
         fcfc.ParseVariables(script?.Variables);
-
-        return true;
     }
 
     private void CalculateRows() {
@@ -438,14 +437,13 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
         #endregion
 
-
         #region Nur eine Zeile? auswählen!
 
-        if(cb.Item.Count == 1) {
+        if (cb.Item.Count == 1) {
             ValueSet(cb.Item[0].Internal, true, true);
         }
-        #endregion
 
+        #endregion
     }
 
     #endregion

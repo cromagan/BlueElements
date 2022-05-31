@@ -155,7 +155,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Eintr.Location = new System.Drawing.Point(8, 8);
             this.Eintr.Name = "Eintr";
             this.Eintr.Size = new System.Drawing.Size(766, 24);
-            this.Eintr.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.Eintr.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // AnfTre
             // 
@@ -299,7 +299,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.caption1.Name = "caption1";
             this.caption1.Size = new System.Drawing.Size(736, 56);
             this.caption1.Text = resources.GetString("caption1.Text");
-            this.caption1.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.caption1.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // Import
             // 

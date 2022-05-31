@@ -1994,57 +1994,57 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 break;
 
             case "dospaltenvergleich": {
-                List<RowItem> ro = new();
-                ro.AddRange(VisibleUniqueRows());
+                    List<RowItem> ro = new();
+                    ro.AddRange(VisibleUniqueRows());
 
-                ItemCollectionList ic = new();
-                foreach (var thisColumnItem in e.Column.Database.Column) {
-                    if (thisColumnItem != null && thisColumnItem != e.Column) { ic.Add(thisColumnItem); }
+                    ItemCollectionList ic = new();
+                    foreach (var thisColumnItem in e.Column.Database.Column) {
+                        if (thisColumnItem != null && thisColumnItem != e.Column) { ic.Add(thisColumnItem); }
+                    }
+                    ic.Sort();
+
+                    var r = InputBoxListBoxStyle.Show("Mit welcher Spalte vergleichen?", ic, AddType.None, true);
+                    if (r == null || r.Count == 0) { return; }
+
+                    var c = e.Column.Database.Column.SearchByKey(LongParse(r[0]));
+
+                    List<string> d = new();
+                    foreach (var thisR in ro) {
+                        if (thisR.CellGetString(e.Column) != thisR.CellGetString(c)) { d.Add(thisR.CellFirstString()); }
+                    }
+                    if (d.Count > 0) {
+                        Filter.Add(new FilterItem(e.Column.Database.Column[0], FilterType.Istgleich_ODER_GroßKleinEgal, d));
+                        Notification.Show("Die aktuell <b>unterschiedlichen</b> Einträge wurden berechnet<br>und als <b>ODER-Filter</b> in der <b>ersten Spalte</b> gespeichert.", ImageCode.Trichter);
+                    } else {
+                        Notification.Show("Keine Filter verändert,<br>da <b>alle Einträge</b> identisch sind.", ImageCode.Trichter);
+                    }
+                    break;
                 }
-                ic.Sort();
-
-                var r = InputBoxListBoxStyle.Show("Mit welcher Spalte vergleichen?", ic, AddType.None, true);
-                if (r == null || r.Count == 0) { return; }
-
-                var c = e.Column.Database.Column.SearchByKey(LongParse(r[0]));
-
-                List<string> d = new();
-                foreach (var thisR in ro) {
-                    if (thisR.CellGetString(e.Column) != thisR.CellGetString(c)) { d.Add(thisR.CellFirstString()); }
-                }
-                if (d.Count > 0) {
-                    Filter.Add(new FilterItem(e.Column.Database.Column[0], FilterType.Istgleich_ODER_GroßKleinEgal, d));
-                    Notification.Show("Die aktuell <b>unterschiedlichen</b> Einträge wurden berechnet<br>und als <b>ODER-Filter</b> in der <b>ersten Spalte</b> gespeichert.", ImageCode.Trichter);
-                } else {
-                    Notification.Show("Keine Filter verändert,<br>da <b>alle Einträge</b> identisch sind.", ImageCode.Trichter);
-                }
-                break;
-            }
 
             case "doclipboard": {
-                var clipTmp = System.Windows.Forms.Clipboard.GetText();
-                clipTmp = clipTmp.RemoveChars(Constants.Char_NotFromClip);
-                clipTmp = clipTmp.TrimEnd("\r\n");
-                var searchValue = new List<string>(clipTmp.SplitAndCutByCr()).SortedDistinctList();
-                Filter.Remove(e.Column);
-                if (searchValue.Count > 0) {
-                    Filter.Add(new FilterItem(e.Column, FilterType.IstGleich_ODER | FilterType.GroßKleinEgal, searchValue));
+                    var clipTmp = System.Windows.Forms.Clipboard.GetText();
+                    clipTmp = clipTmp.RemoveChars(Constants.Char_NotFromClip);
+                    clipTmp = clipTmp.TrimEnd("\r\n");
+                    var searchValue = new List<string>(clipTmp.SplitAndCutByCr()).SortedDistinctList();
+                    Filter.Remove(e.Column);
+                    if (searchValue.Count > 0) {
+                        Filter.Add(new FilterItem(e.Column, FilterType.IstGleich_ODER | FilterType.GroßKleinEgal, searchValue));
+                    }
+                    break;
                 }
-                break;
-            }
 
             case "donotclipboard": {
-                var clipTmp = System.Windows.Forms.Clipboard.GetText();
-                clipTmp = clipTmp.RemoveChars(Constants.Char_NotFromClip);
-                clipTmp = clipTmp.TrimEnd("\r\n");
-                var columInhalt = Database.Export_CSV(FirstRow.Without, e.Column, null).SplitAndCutByCrToList().SortedDistinctList();
-                columInhalt.RemoveString(clipTmp.SplitAndCutByCrToList().SortedDistinctList(), false);
-                Filter.Remove(e.Column);
-                if (columInhalt.Count > 0) {
-                    Filter.Add(new FilterItem(e.Column, FilterType.IstGleich_ODER | FilterType.GroßKleinEgal, columInhalt));
+                    var clipTmp = System.Windows.Forms.Clipboard.GetText();
+                    clipTmp = clipTmp.RemoveChars(Constants.Char_NotFromClip);
+                    clipTmp = clipTmp.TrimEnd("\r\n");
+                    var columInhalt = Database.Export_CSV(FirstRow.Without, e.Column, null).SplitAndCutByCrToList().SortedDistinctList();
+                    columInhalt.RemoveString(clipTmp.SplitAndCutByCrToList().SortedDistinctList(), false);
+                    Filter.Remove(e.Column);
+                    if (columInhalt.Count > 0) {
+                        Filter.Add(new FilterItem(e.Column, FilterType.IstGleich_ODER | FilterType.GroßKleinEgal, columInhalt));
+                    }
+                    break;
                 }
-                break;
-            }
             default:
                 Develop.DebugPrint("Unbekannter Comand:   " + e.Comand);
                 break;
@@ -2137,8 +2137,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
 
         if (cellInThisDatabaseColumn.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-            string info;
-            (contentHolderCellColumn, contentHolderCellRow, info) = CellCollection.LinkedCellData(cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, true, true);
+            (contentHolderCellColumn, contentHolderCellRow, var info) = CellCollection.LinkedCellData(cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, true, true);
             if (contentHolderCellColumn == null || contentHolderCellRow == null) {
                 NotEditableInfo("In verknüpfter Datenbank nicht vorhanden:\r\n" + info);
                 return;
@@ -2851,14 +2850,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     permaX = Math.Max(permaX, (int)viewItem.OrderTmpSpalteX1 + (int)viewItem.TmpDrawWidth);
                 }
             }
-            Draw_Table_What(gr, sr, enTableDrawColumn.NonPermament, enTableDrawType.ColumnBackBody, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state);
-            Draw_Table_What(gr, sr, enTableDrawColumn.NonPermament, enTableDrawType.Cells, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state);
-            Draw_Table_What(gr, sr, enTableDrawColumn.Permament, enTableDrawType.ColumnBackBody, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state);
-            Draw_Table_What(gr, sr, enTableDrawColumn.Permament, enTableDrawType.Cells, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state);
+            Draw_Table_What(gr, sr, TableDrawColumn.NonPermament, TableDrawType.ColumnBackBody, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state);
+            Draw_Table_What(gr, sr, TableDrawColumn.NonPermament, TableDrawType.Cells, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state);
+            Draw_Table_What(gr, sr, TableDrawColumn.Permament, TableDrawType.ColumnBackBody, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state);
+            Draw_Table_What(gr, sr, TableDrawColumn.Permament, TableDrawType.Cells, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state);
             // Den CursorLines zeichnen
             Draw_Cursor(gr, displayRectangleWoSlider, true);
-            Draw_Table_What(gr, sr, enTableDrawColumn.NonPermament, enTableDrawType.ColumnHead, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state);
-            Draw_Table_What(gr, sr, enTableDrawColumn.Permament, enTableDrawType.ColumnHead, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state);
+            Draw_Table_What(gr, sr, TableDrawColumn.NonPermament, TableDrawType.ColumnHead, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state);
+            Draw_Table_What(gr, sr, TableDrawColumn.Permament, TableDrawType.ColumnHead, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state);
 
             /// Überschriften 1-3 Zeichnen
             Draw_Column_Head_Captions(gr);
@@ -2877,7 +2876,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    private void Draw_Table_What(Graphics gr, List<RowData?> sr, enTableDrawColumn col, enTableDrawType type, int permaX, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, States state) {
+    private void Draw_Table_What(Graphics gr, List<RowData?> sr, TableDrawColumn col, TableDrawType type, int permaX, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, States state) {
         var lfdno = 0;
 
         var firstOnScreen = true;
@@ -2885,18 +2884,18 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         foreach (var viewItem in CurrentArrangement.Where(viewItem => viewItem?.Column != null)) {
             lfdno++;
             if (IsOnScreen(viewItem, displayRectangleWoSlider)) {
-                if ((col == enTableDrawColumn.NonPermament && viewItem.ViewType != ViewType.PermanentColumn && (int)viewItem.OrderTmpSpalteX1 + (int)viewItem.TmpDrawWidth > permaX) ||
-                    (col == enTableDrawColumn.Permament && viewItem.ViewType == ViewType.PermanentColumn)) {
+                if ((col == TableDrawColumn.NonPermament && viewItem.ViewType != ViewType.PermanentColumn && (int)viewItem.OrderTmpSpalteX1 + (int)viewItem.TmpDrawWidth > permaX) ||
+                    (col == TableDrawColumn.Permament && viewItem.ViewType == ViewType.PermanentColumn)) {
                     switch (type) {
-                        case enTableDrawType.ColumnBackBody:
+                        case TableDrawType.ColumnBackBody:
                             Draw_Column_Body(gr, viewItem, displayRectangleWoSlider);
                             break;
 
-                        case enTableDrawType.Cells:
+                        case TableDrawType.Cells:
                             Draw_Column_Cells(gr, sr, viewItem, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state, firstOnScreen);
                             break;
 
-                        case enTableDrawType.ColumnHead:
+                        case TableDrawType.ColumnHead:
                             Draw_Column_Head(gr, viewItem, displayRectangleWoSlider, lfdno);
                             break;
                     }

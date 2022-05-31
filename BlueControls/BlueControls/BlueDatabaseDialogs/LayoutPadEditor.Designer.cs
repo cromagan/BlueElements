@@ -150,7 +150,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capLayout.Name = "capLayout";
             this.capLayout.Size = new System.Drawing.Size(82, 22);
             this.capLayout.Text = "Layout";
-            this.capLayout.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
+            this.capLayout.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
             // 
             // cbxLayout
             // 

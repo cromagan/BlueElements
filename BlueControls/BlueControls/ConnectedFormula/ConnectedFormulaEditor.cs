@@ -50,13 +50,9 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     #region Methods
 
-    private void btnAusgangsZeile_Click(object sender, System.EventArgs e) {
-        var it = new RowOutputPadItem(string.Empty);
-        Pad.AddCentered(it);
-    }
-
     private void btnEingangsZeile_Click(object sender, System.EventArgs e) {
         var it = new RowInputPadItem(string.Empty);
+        it.Bei_Export_Sichtbar = false;
         Pad.AddCentered(it);
     }
 
@@ -77,15 +73,6 @@ public partial class ConnectedFormulaEditor : PadEditor {
         if (x.GetRowFrom != null && x.GetRowFrom.Database != null) {
             x.Spalte_wählen = string.Empty; // Dummy setzen
         }
-    }
-
-    private void btnKlonZeilen_Click(object sender, System.EventArgs e) {
-        var it = new RowClonePadItem(string.Empty);
-
-        it.Bei_Export_Sichtbar = false;
-        Pad.AddCentered(it);
-
-        ChooseDatabaseAndID(it);
     }
 
     private void btnKonstante_Click(object sender, System.EventArgs e) {

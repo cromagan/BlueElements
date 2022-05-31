@@ -36,7 +36,7 @@ public class SymbolPadItem : RectanglePadItem {
     public SymbolPadItem() : this(string.Empty) { }
 
     public SymbolPadItem(string internalname) : base(internalname) {
-        Symbol = enSymbol.Pfeil;
+        Symbol = Symbol.Pfeil;
         Hintergrundfarbe = Color.White;
         Randfarbe = Color.Black;
         Randdicke = 1;
@@ -49,7 +49,7 @@ public class SymbolPadItem : RectanglePadItem {
     public Color Hintergrundfarbe { get; set; }
     public float Randdicke { get; set; }
     public Color Randfarbe { get; set; }
-    public enSymbol Symbol { get; set; }
+    public Symbol Symbol { get; set; }
     protected override int SaveOrder => 999;
 
     #endregion
@@ -59,15 +59,15 @@ public class SymbolPadItem : RectanglePadItem {
     public override List<GenericControl> GetStyleOptions() {
         ItemCollectionList.ItemCollectionList comms = new()
         {
-            { "Ohne", ((int)enSymbol.Ohne).ToString(), QuickImage.Get("Datei|32") },
-            { "Rechteck", ((int)enSymbol.Rechteck).ToString(), QuickImage.Get("Stop|32") },
-            { "Rechteck gerundet", ((int)enSymbol.Rechteck_gerundet).ToString() },
-            { "Pfeil", ((int)enSymbol.Pfeil).ToString(), QuickImage.Get("Pfeil_Rechts|32") },
-            { "Bruchlinie", ((int)enSymbol.Bruchlinie).ToString() }
+            { "Ohne", ((int)Symbol.Ohne).ToString(), QuickImage.Get("Datei|32") },
+            { "Rechteck", ((int)Symbol.Rechteck).ToString(), QuickImage.Get("Stop|32") },
+            { "Rechteck gerundet", ((int)Symbol.Rechteck_gerundet).ToString() },
+            { "Pfeil", ((int)Symbol.Pfeil).ToString(), QuickImage.Get("Pfeil_Rechts|32") },
+            { "Bruchlinie", ((int)Symbol.Bruchlinie).ToString() }
         };
         List<GenericControl> l = new()
         {
-            new FlexiControlForProperty<enSymbol>(() => Symbol, comms),
+            new FlexiControlForProperty<Symbol>(() => Symbol, comms),
             new FlexiControlForProperty<float>(() => Randdicke),
             new FlexiControlForProperty<Color>(() => Randfarbe),
             new FlexiControlForProperty<Color>(() => Hintergrundfarbe)
@@ -80,7 +80,7 @@ public class SymbolPadItem : RectanglePadItem {
         if (base.ParseThis(tag, value)) { return true; }
         switch (tag) {
             case "symbol":
-                Symbol = (enSymbol)IntParse(value);
+                Symbol = (Symbol)IntParse(value);
                 return true;
 
             case "backcolor":
@@ -127,22 +127,22 @@ public class SymbolPadItem : RectanglePadItem {
         d2.Y = -positionModified.Height / 2;
 
         switch (Symbol) {
-            case enSymbol.Ohne:
+            case Symbol.Ohne:
                 break;
 
-            case enSymbol.Pfeil:
+            case Symbol.Pfeil:
                 p = Poly_Arrow(d2.ToRect());
                 break;
 
-            case enSymbol.Bruchlinie:
+            case Symbol.Bruchlinie:
                 p = Poly_Bruchlinie(d2.ToRect());
                 break;
 
-            case enSymbol.Rechteck:
+            case Symbol.Rechteck:
                 p = Poly_Rechteck(d2.ToRect());
                 break;
 
-            case enSymbol.Rechteck_gerundet:
+            case Symbol.Rechteck_gerundet:
                 p = Poly_RoundRec(d2.ToRect(), (int)(20 * zoom));
                 break;
 

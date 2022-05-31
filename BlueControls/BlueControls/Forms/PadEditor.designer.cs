@@ -344,7 +344,7 @@ namespace BlueControls.Forms {
             this.capDesign.Name = "capDesign";
             this.capDesign.Size = new System.Drawing.Size(77, 22);
             this.capDesign.Text = "Design:";
-            this.capDesign.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
+            this.capDesign.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
             // 
             // tabRightSide
             // 

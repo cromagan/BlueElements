@@ -37,7 +37,7 @@ namespace BlueControls.Forms
             this.capText.Location = new System.Drawing.Point(8, 8);
             this.capText.Name = "capText";
             this.capText.Size = new System.Drawing.Size(16, 16);
-            this.capText.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Steuerelement_Anpassen;
+            this.capText.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Steuerelement_Anpassen;
             this.capText.Translate = false;
             // 
             // MessageBox
