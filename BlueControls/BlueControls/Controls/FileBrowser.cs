@@ -284,22 +284,23 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
 
         var crt = File.GetCreationTime(filename);
         var cht = File.GetLastWriteTime(filename);
+        var attribute = I.Attributes;
 
         File.Move(filename, T);
 
-        FileAttributes attribute;
         if (T.FileNameWithSuffix().StartsWith("#")) {
-            attribute = I.Attributes | FileAttributes.Hidden;
+            attribute = FileAttributes.Hidden;
         } else {
-            attribute = I.Attributes & ~FileAttributes.Hidden;
+            if (attribute.HasFlag(FileAttributes.Hidden)) {
+                attribute = I.Attributes & ~FileAttributes.Hidden;
+            }
         }
 
         try {
             File.SetAttributes(T, attribute);
             File.SetCreationTime(T, crt);
             File.SetLastWriteTime(T, cht);
-        } catch {
-        }
+        } catch { }
 
         return T;
     }
