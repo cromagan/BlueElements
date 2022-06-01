@@ -45,6 +45,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
 
     public List<FlexiControl>? AdditionalStyleOptions = null;
 
+    protected bool _disposedValue;
     private static int _uniqueInternalCount;
 
     private static string _uniqueInternalLastTime = "InitialDummy";
@@ -55,7 +56,6 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     /// <remarks></remarks>
     private bool _beiExportSichtbar = true;
 
-    private bool _disposedValue;
     private ItemCollectionPad _parent;
 
     private PadStyles _style = PadStyles.Style_Standard;

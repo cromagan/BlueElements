@@ -797,7 +797,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             Controls.Add(_captionObject);
         }
         _captionObject.Enabled = Enabled;
-        _captionObject.TextAnzeigeVerhalten = SteuerelementVerhalten.Text_Abschneiden; // nicht enSteuerelementVerhalten.Steuerelement_Anpassen! weil sonst beim einem Resize die Koordinaten geändert werden und das kann zum Ping Pong führen
+        _captionObject.TextAnzeigeVerhalten = SteuerelementVerhalten.Text_Abschneiden; // nicht SteuerelementVerhalten.Steuerelement_Anpassen! weil sonst beim einem Resize die Koordinaten geändert werden und das kann zum Ping Pong führen
         _captionObject.Text = _caption.ReplaceLowerSign();
         _captionObject.Size = _captionObject.TextRequiredSize();
         _captionObject.Left = 0;
