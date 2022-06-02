@@ -32,6 +32,7 @@ namespace BlueControls.Forms {
             this.btnPageSetup = new BlueControls.Controls.Button();
             this.btnAlsBildSpeichern = new BlueControls.Controls.Button();
             this.btnDruckerDialog = new BlueControls.Controls.Button();
+            this.tabSeiten = new BlueControls.Controls.TabControl();
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.grpAssistent.SuspendLayout();
@@ -76,14 +77,16 @@ namespace BlueControls.Forms {
             // Pad
             // 
             this.Pad.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Pad.Location = new System.Drawing.Point(0, 110);
+            this.Pad.Location = new System.Drawing.Point(0, 136);
             this.Pad.Name = "Pad";
             this.Pad.ShiftX = -1F;
             this.Pad.ShiftY = -1F;
-            this.Pad.Size = new System.Drawing.Size(884, 251);
+            this.Pad.Size = new System.Drawing.Size(884, 225);
             this.Pad.TabIndex = 0;
             this.Pad.Zoom = 1F;
-            this.Pad.PreviewModeChanged += new System.EventHandler(this.Pad_PreviewModChanged);
+            this.Pad.Changed += new System.EventHandler(this.Pad_Changed);
+            this.Pad.DrawModeChanged += new System.EventHandler(this.Pad_DrawModChanged);
+            this.Pad.GotNewItemCollection += new System.EventHandler(this.Pad_GotNewItemCollection);
             this.Pad.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Pad_MouseUp);
             // 
             // Ribbon
@@ -250,10 +253,26 @@ namespace BlueControls.Forms {
             this.btnDruckerDialog.Text = "Drucken";
             this.btnDruckerDialog.Click += new System.EventHandler(this.btnDruckerDialog_Click);
             // 
+            // tabSeiten
+            // 
+            this.tabSeiten.Database = null;
+            this.tabSeiten.Dock = System.Windows.Forms.DockStyle.Top;
+            this.tabSeiten.HotTrack = true;
+            this.tabSeiten.Location = new System.Drawing.Point(0, 110);
+            this.tabSeiten.Name = "tabSeiten";
+            this.tabSeiten.RowKey = ((long)(-1));
+            this.tabSeiten.SelectedIndex = 0;
+            this.tabSeiten.Size = new System.Drawing.Size(884, 26);
+            this.tabSeiten.TabDefault = null;
+            this.tabSeiten.TabDefaultOrder = null;
+            this.tabSeiten.TabIndex = 3;
+            this.tabSeiten.Selected += new System.Windows.Forms.TabControlEventHandler(this.tabSeiten_Selected);
+            // 
             // PadEditorReadOnly
             // 
             this.ClientSize = new System.Drawing.Size(884, 361);
             this.Controls.Add(this.Pad);
+            this.Controls.Add(this.tabSeiten);
             this.Controls.Add(this.Ribbon);
             this.Name = "PadEditorReadOnly";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
@@ -285,5 +304,6 @@ namespace BlueControls.Forms {
         private GroupBox grpDrucken;
         private Button btnPageSetup;
         protected Button btnVorschauModus;
+        protected TabControl tabSeiten;
     }
 }

@@ -51,7 +51,7 @@ namespace BlueControls.Forms {
             // 
             // Pad
             // 
-            this.Pad.Size = new System.Drawing.Size(512, 251);
+            this.Pad.Size = new System.Drawing.Size(512, 225);
             this.Pad.ClickedItemChanged += new System.EventHandler(this.Pad_ClickedItemChanged);
             this.Pad.GotNewItemCollection += new System.EventHandler(this.Pad_GotNewItemCollection);
             // 
@@ -80,6 +80,7 @@ namespace BlueControls.Forms {
             this.grpAssistent.Controls.Add(this.txbRasterAnzeige);
             this.grpAssistent.Controls.Add(this.ckbRaster);
             this.grpAssistent.Size = new System.Drawing.Size(200, 81);
+            this.grpAssistent.Controls.SetChildIndex(this.btnVorschauModus, 0);
             this.grpAssistent.Controls.SetChildIndex(this.ckbRaster, 0);
             this.grpAssistent.Controls.SetChildIndex(this.txbRasterAnzeige, 0);
             this.grpAssistent.Controls.SetChildIndex(this.txbRasterFangen, 0);
@@ -349,12 +350,14 @@ namespace BlueControls.Forms {
             // tabRightSide
             // 
             this.tabRightSide.Controls.Add(this.tabElementEigenschaften);
+            this.tabRightSide.Database = null;
             this.tabRightSide.Dock = System.Windows.Forms.DockStyle.Right;
             this.tabRightSide.HotTrack = true;
-            this.tabRightSide.Location = new System.Drawing.Point(512, 110);
+            this.tabRightSide.Location = new System.Drawing.Point(512, 136);
             this.tabRightSide.Name = "tabRightSide";
+            this.tabRightSide.RowKey = ((long)(-1));
             this.tabRightSide.SelectedIndex = 0;
-            this.tabRightSide.Size = new System.Drawing.Size(372, 251);
+            this.tabRightSide.Size = new System.Drawing.Size(372, 225);
             this.tabRightSide.TabDefault = null;
             this.tabRightSide.TabDefaultOrder = null;
             this.tabRightSide.TabIndex = 4;
@@ -364,7 +367,7 @@ namespace BlueControls.Forms {
             this.tabElementEigenschaften.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabElementEigenschaften.Location = new System.Drawing.Point(4, 25);
             this.tabElementEigenschaften.Name = "tabElementEigenschaften";
-            this.tabElementEigenschaften.Size = new System.Drawing.Size(364, 222);
+            this.tabElementEigenschaften.Size = new System.Drawing.Size(364, 196);
             this.tabElementEigenschaften.TabIndex = 0;
             this.tabElementEigenschaften.Text = "Element-Eigenschaften";
             // 
@@ -374,6 +377,7 @@ namespace BlueControls.Forms {
             this.Controls.Add(this.tabRightSide);
             this.Name = "PadEditor";
             this.Controls.SetChildIndex(this.Ribbon, 0);
+            this.Controls.SetChildIndex(this.tabSeiten, 0);
             this.Controls.SetChildIndex(this.tabRightSide, 0);
             this.Controls.SetChildIndex(this.Pad, 0);
             this.Ribbon.ResumeLayout(false);

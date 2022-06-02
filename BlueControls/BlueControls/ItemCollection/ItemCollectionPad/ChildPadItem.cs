@@ -35,7 +35,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
 
     #region Fields
 
-    public List<BasicPadItem>? VisibleItems;
+    public string Seite;
     public List<BasicPadItem>? ZoomItems;
     private string _name;
     private CreativePad? _padInternal;
@@ -49,7 +49,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
 
     public ChildPadItem(string internalname) : base(internalname) {
         PadInternal = null; // new CreativePad();
-        VisibleItems = null;
+        Seite = string.Empty;
         ZoomItems = null;
         _name = string.Empty;
         Textlage = (Alignment)(-1);
@@ -295,7 +295,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
                 var slidervalues = ItemCollectionPad.SliderValues(mb, zoomv, centerpos);
                 PadInternal.ShowInPrintMode = forPrinting;
                 if (forPrinting) { PadInternal.Unselect(); }
-                PadInternal.Item.DrawCreativePadToBitmap(_tmpBmp, States.Standard, zoomv, slidervalues.X, slidervalues.Y, VisibleItems);
+                PadInternal.Item.DrawCreativePadToBitmap(_tmpBmp, States.Standard, zoomv, slidervalues.X, slidervalues.Y, Seite);
                 if (_tmpBmp != null) {
                     foreach (var thisA in Eingebettete_Ansichten) {
                         ChildPadItem? pad = null;

@@ -52,7 +52,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     private void btnEingangsZeile_Click(object sender, System.EventArgs e) {
         var it = new RowInputPadItem(string.Empty);
-        it.Bei_Export_Sichtbar = false;
+        it.Bei_Export_sichtbar = false;
         Pad.AddCentered(it);
     }
 
@@ -120,11 +120,21 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     private void btnPfeileAusblenden_CheckedChanged(object sender, System.EventArgs e) => btnVorschauModus.Checked = btnPfeileAusblenden.Checked;
 
+    private void btnRegisterKarte_Click(object sender, System.EventArgs e) {
+        var n = InputBox.Show("Formular-Name:");
+        if (string.IsNullOrEmpty((n))) { return; }
+
+        var it = new RowInputPadItem(string.Empty);
+        it.Bei_Export_sichtbar = false;
+        it.Seite = n;
+        Pad.AddCentered(it);
+    }
+
     private void btnTabControlAdd_Click(object sender, System.EventArgs e) {
         if (_cf == null) { return; }
 
         var x = new ChildFormulaPaditem(string.Empty, _cf.Filename, _cf.NotAllowedChilds);
-        x.Bei_Export_Sichtbar = true;
+        x.Bei_Export_sichtbar = true;
         Pad.AddCentered(x);
     }
 
@@ -154,13 +164,13 @@ public partial class ConnectedFormulaEditor : PadEditor {
     private void btnZeileHinzu_Click(object sender, System.EventArgs e) {
         var it = new RowWithFilterPaditem(string.Empty);
         Pad.AddCentered(it);
-        ChooseDatabaseAndID(it);
+        ChooseDatabaseAndId(it);
     }
 
     private void CheckButtons() {
     }
 
-    private void ChooseDatabaseAndID(ICalculateOneRowItemLevel? it) {
+    private void ChooseDatabaseAndId(ICalculateOneRowItemLevel? it) {
         if (_cf == null || it == null) { return; }
 
         if (string.IsNullOrEmpty(LoadTabDatabase.InitialDirectory)) {
@@ -178,7 +188,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
         if (db == null) { return; }
 
         it.Database = db;
-        it.Id = _cf.NextID();
+        it.Id = _cf.NextId();
     }
 
     private void FormulaSet(string? filename, List<string>? notAllowedchilds) {
@@ -229,6 +239,10 @@ public partial class ConnectedFormulaEditor : PadEditor {
     }
 
     private void LoadTab_FileOk(object sender, CancelEventArgs e) => FormulaSet(LoadTab.FileName, null);
+
+    private void Pad_GotNewItemCollection(object sender, System.EventArgs e) {
+        Pad.CurrentPage = "Head";
+    }
 
     #endregion
 }

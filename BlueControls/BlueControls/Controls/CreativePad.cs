@@ -48,6 +48,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     #region Fields
 
     private readonly List<IMoveable> _itemsToMove = new();
+    private string _currentPage = string.Empty;
     private IMouseAndKeyHandle? _givesMouseComandsTo;
     private ItemCollectionPad? _item;
     private string _lastQuickInfo = string.Empty;
@@ -83,6 +84,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
 
     public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
 
+    public event EventHandler DrawModeChanged;
+
     public event PrintEventHandler EndPrint;
 
     public event EventHandler GotNewItemCollection;
@@ -94,13 +97,22 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     //public event EventHandler<ListEventArgs> ItemInternalChanged;
     public event EventHandler<ListEventArgs> ItemRemoving;
 
-    public event EventHandler PreviewModeChanged;
-
     public event PrintPageEventHandler PrintPage;
 
     #endregion
 
     #region Properties
+
+    [DefaultValue("")]
+    public string CurrentPage {
+        get => _currentPage;
+        set {
+            if (_currentPage == value) { return; }
+            _currentPage = value;
+            OnDrawModeChanged();
+            Invalidate();
+        }
+    }
 
     [DefaultValue(true)]
     public bool EditAllowed { get; set; } = true;
@@ -144,7 +156,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         set {
             if (_showInPrintMode == value) { return; }
             _showInPrintMode = value;
-            OnPreviewModeChanged();
+            OnDrawModeChanged();
             Invalidate();
         }
     }
@@ -453,9 +465,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray,
             LinearGradientMode.Vertical);
         gr.FillRectangle(lgb, ClientRectangle);
-        _item?.DrawCreativePadTo(gr, Size, state, Zoom, ShiftX, ShiftY, null, _showInPrintMode);
+        _item?.DrawCreativePadTo(gr, Size, state, Zoom, ShiftX, ShiftY, _currentPage, _showInPrintMode);
 
-        #region Dann die selectiereren Punkte
+        #region Dann die selektierten Punkte
 
         foreach (var thisItem in _itemsToMove) {
             if (thisItem is BasicPadItem bpi) {
@@ -482,14 +494,12 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         Skin.Draw_Border(gr, Design.Table_And_Pad, state, DisplayRectangle);
     }
 
-    protected override bool IsInputKey(Keys keyData) =>
-        // Ganz wichtig diese Routine!
-        // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
+    protected override bool IsInputKey(Keys keyData) {
         // http://technet.microsoft.com/de-de/subscriptions/control.isinputkey%28v=vs.100%29
-        keyData switch {
-            Keys.Up or Keys.Down or Keys.Left or Keys.Right => true,
-            _ => false
-        };
+        // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
+        // Ganz wichtig diese Routine!
+        return (keyData is Keys.Up or Keys.Down or Keys.Left or Keys.Right);
+    }
 
     protected override RectangleF MaxBounds() => _item == null ? new RectangleF(0, 0, 0, 0) : _item.MaxBounds(null);
 
@@ -591,11 +601,11 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
 
     private void OnClickedItemChanged() => ClickedItemChanged?.Invoke(this, System.EventArgs.Empty);
 
+    private void OnDrawModeChanged() => DrawModeChanged?.Invoke(this, System.EventArgs.Empty);
+
     private void OnEndPrint(PrintEventArgs e) => EndPrint?.Invoke(this, e);
 
     private void OnGotNewItemCollection() => GotNewItemCollection?.Invoke(this, System.EventArgs.Empty);
-
-    private void OnPreviewModeChanged() => PreviewModeChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void OnPrintPage(PrintPageEventArgs e) => PrintPage?.Invoke(this, e);
 

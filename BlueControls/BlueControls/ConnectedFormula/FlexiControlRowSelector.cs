@@ -43,13 +43,13 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
     private readonly ListExt<System.Windows.Forms.Control> _parents = new();
 
+    private readonly string _showformat = string.Empty;
+
     //private readonly RowWithFilterPaditem _rwf;
     private bool _disposing = false;
 
     private RowItem _row;
     private List<RowItem>? _rows;
-
-    private string _showformat = string.Empty;
 
     #endregion
 
@@ -405,8 +405,8 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         if (_rows != null) {
             foreach (var thisR in _rows) {
                 if (cb.Item[thisR.Key.ToString()] == null) {
-                    var _tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, true);
-                    cb.Item.Add(_tmpQuickInfo, thisR.Key.ToString());
+                    var tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, true);
+                    cb.Item.Add(tmpQuickInfo, thisR.Key.ToString());
                     //cb.Item.Add(thisR, string.Empty);
                 } else {
                     foreach (var thisIt in ex) {

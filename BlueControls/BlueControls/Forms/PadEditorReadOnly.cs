@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System.Collections.Generic;
+using System.Windows.Forms;
 using BlueBasics;
 
 namespace BlueControls.Forms;
@@ -28,7 +30,9 @@ public partial class PadEditorReadOnly : Form {
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
-        if (Develop.IsHostRunning()) { TopMost = false; }
+        if (Develop.IsHostRunning()) {
+            TopMost = false;
+        }
     }
 
     #endregion
@@ -49,13 +53,77 @@ public partial class PadEditorReadOnly : Form {
 
     private void btnZoomFit_Click(object sender, System.EventArgs e) => Pad.ZoomFit();
 
+    private void DoPages() {
+        var x = new List<string>();
+
+        if (Pad?.Item != null) { x.AddRange(Pad.Item.AllPages()); }
+
+        if (Pad != null) { x.AddIfNotExists(Pad.CurrentPage); }
+
+        TabPage? later = null;
+
+        if (x.Count > 0) {
+            tabSeiten.Visible = true;
+
+            var ist = new List<string>();
+
+            foreach (var thisTab in tabSeiten.TabPages) {
+                var tb = (TabPage)thisTab;
+
+                if (!x.Contains(tb.Text)) {
+                    tabSeiten.TabPages.Remove(tb);
+                    DoPages();
+                    return;
+                }
+
+                x.Remove(tb.Text);
+                if (tb.Text == Pad.CurrentPage) { later = tb; }
+            }
+
+            foreach (var thisn in x) {
+                var t = new TabPage(thisn);
+                t.Name = "Seite_" + thisn;
+                tabSeiten.TabPages.Add(t);
+
+                if (t.Text == Pad.CurrentPage) { later = t; }
+            }
+        } else {
+            tabSeiten.Visible = false;
+            tabSeiten.TabPages.Clear();
+        }
+
+        tabSeiten.SelectedTab = later;
+    }
+
+    private void Pad_Changed(object sender, System.EventArgs e) {
+        DoPages();
+    }
+
+    private void Pad_DrawModChanged(object sender, System.EventArgs e) {
+        btnVorschauModus.Checked = Pad.ShowInPrintMode;
+
+        DoPages();
+    }
+
+    private void Pad_GotNewItemCollection(object sender, System.EventArgs e) {
+        btnVorschauModus.Checked = Pad.ShowInPrintMode;
+
+        DoPages();
+    }
+
     private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
         if (btnZoomIn.Checked) { Pad.ZoomIn(e); }
         if (btnZoomOut.Checked) { Pad.ZoomOut(e); }
     }
 
-    private void Pad_PreviewModChanged(object sender, System.EventArgs e) {
-        btnVorschauModus.Checked = Pad.ShowInPrintMode;
+    private void tabSeiten_Selected(object sender, System.Windows.Forms.TabControlEventArgs e) {
+        var s = string.Empty;
+
+        if (tabSeiten.SelectedTab != null) {
+            s = tabSeiten.SelectedTab.Text;
+        }
+
+        Pad.CurrentPage = s;
     }
 
     #endregion

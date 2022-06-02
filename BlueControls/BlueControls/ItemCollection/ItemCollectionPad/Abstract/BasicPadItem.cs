@@ -57,7 +57,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     private bool _beiExportSichtbar = true;
 
     private ItemCollectionPad _parent;
-
+    private string _seite = string.Empty;
     private PadStyles _style = PadStyles.Style_Standard;
 
     private RectangleF _usedArea;
@@ -91,7 +91,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     #region Properties
 
     [Description("Wird bei einem Export (wie z. B. Drucken) nur angezeigt, wenn das Häkchen gesetzt ist.")]
-    public bool Bei_Export_Sichtbar {
+    public bool Bei_Export_sichtbar {
         get => _beiExportSichtbar;
         set {
             if (_beiExportSichtbar == value) { return; }
@@ -123,6 +123,16 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     }
 
     public virtual string QuickInfo { get; set; } = string.Empty;
+
+    [Description("Ist Seite befüllt, wird das Item nur angezeigt, wenn die anzuzeigende Seite mit dem String übereinstimmt.")]
+    public string Seite {
+        get => _seite;
+        set {
+            if (_seite == value) { return; }
+            _seite = value;
+            OnChanged();
+        }
+    }
 
     public PadStyles Stil {
         get => _style;
@@ -267,7 +277,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
         if (zoom > 1) { line = zoom; }
         foreach (var thisV in ConnectsTo) {
             if (Parent.Contains(thisV.OtherItem) && thisV != null && thisV.OtherItem != this) {
-                if (!forPrinting || thisV.OtherItem.Bei_Export_Sichtbar) {
+                if (!forPrinting || thisV.OtherItem.Bei_Export_sichtbar) {
                     var t1 = ItemConnection.GetConnectionPoint(this, thisV.MyItemType, thisV.OtherItem).ZoomAndMove(zoom, shiftX, shiftY);
                     var t2 = ItemConnection.GetConnectionPoint(thisV.OtherItem, thisV.OtherItemType, this).ZoomAndMove(zoom, shiftX, shiftY);
 
@@ -321,7 +331,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
         {
             new FlexiControl(),
             new FlexiControlForProperty<string>(() => Gruppenzugehörigkeit),
-            new FlexiControlForProperty<bool>(() => Bei_Export_Sichtbar)
+            new FlexiControlForProperty<bool>(() => Bei_Export_sichtbar)
         };
         if (AdditionalStyleOptions != null) {
             l.Add(new FlexiControl());
@@ -429,6 +439,10 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
                 QuickInfo = value.FromNonCritical();
                 return true;
 
+            case "page":
+                Seite = value.FromNonCritical();
+                return true;
+
             default:
                 return false;
         }
@@ -448,6 +462,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
         var t = "{";
         t = t + "ClassID=" + ClassId() + ", ";
         t = t + "InternalName=" + Internal.ToNonCritical() + ", ";
+        t = t + "Page=" + Seite.ToNonCritical() + ", ";
         if (Tags.Count > 0) {
             foreach (var thisTag in Tags) {
                 t = t + "Tag=" + thisTag.ToNonCritical() + ", ";
@@ -456,6 +471,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
         t = t + "Style=" + (int)_style + ", ";
         t = t + "Print=" + _beiExportSichtbar.ToPlusMinus() + ", ";
         t = t + "QuickInfo=" + QuickInfo.ToNonCritical() + ", ";
+
         if (_zoomPadding != 0) {
             t = t + "ZoomPadding=" + _zoomPadding + ", ";
         }

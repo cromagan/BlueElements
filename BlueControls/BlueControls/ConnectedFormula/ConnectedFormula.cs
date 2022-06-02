@@ -46,17 +46,16 @@ public class ConnectedFormula : IChangedFeedback, IDisposable {
     public readonly ListExt<string> DatabaseFiles = new();
     public readonly ListExt<string> NotAllowedChilds = new();
 
-    //public readonly List<Database?> Databases = new();
-    private string _createDate = string.Empty;
+    private readonly BlueBasics.MultiUserFile.MultiUserFile _muf;
+    private string _createDate;
 
-    private string _creator = string.Empty;
-    private bool _disposed_Value;
+    private string _creator;
+    private bool _disposedValue;
     private int _id = -1;
-    private BlueBasics.MultiUserFile.MultiUserFile _muf;
     private ItemCollectionPad _padData;
 
-    private bool _saved = true;
-    private bool _saving = false;
+    private bool _saved;
+    private bool _saving;
 
     #endregion
 
@@ -190,28 +189,28 @@ public class ConnectedFormula : IChangedFeedback, IDisposable {
         GC.SuppressFinalize(this);
     }
 
-    public void HasPendingChanges(object sender, MultiUserFileHasPendingChangesEventArgs e) {
-        e.HasPendingChanges = !_saved;
-    }
+    public void HasPendingChanges(object sender, MultiUserFileHasPendingChangesEventArgs e) => e.HasPendingChanges = !_saved;
 
-    public int NextID() {
+    public int NextId() {
         _id++;
         _saved = false;
         return _id;
     }
 
-    public void OnChanged() {
-        Changed?.Invoke(this, System.EventArgs.Empty);
+    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+
+    public void RepairAfterParse(object sender, System.EventArgs e) {
+        foreach (var thisIt in PadData) {
+            if (string.IsNullOrEmpty(thisIt.Seite)) {
+                thisIt.Seite = "Head";
+            }
+        }
     }
 
-    public void RepairAfterParse(object sender, System.EventArgs e) { }
-
-    internal void SaveAsAndChangeTo(string fileName) {
-        _muf.SaveAsAndChangeTo(fileName);
-    }
+    internal void SaveAsAndChangeTo(string fileName) => _muf.SaveAsAndChangeTo(fileName);
 
     protected virtual void Dispose(bool disposing) {
-        if (!_disposed_Value) {
+        if (!_disposedValue) {
             AllFiles.Remove(this);
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
@@ -219,7 +218,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposable {
 
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen
-            _disposed_Value = true;
+            _disposedValue = true;
         }
     }
 
@@ -228,10 +227,10 @@ public class ConnectedFormula : IChangedFeedback, IDisposable {
     protected void IsThereBackgroundWorkToDo(object sender, MultiUserIsThereBackgroundWorkToDoEventArgs e) { e.BackGroundWork = false; }
 
     protected void ParseExternal(object sender, MultiUserParseEventArgs e) {
-        var ToParse = e.Data.ToStringWin1252();
-        if (string.IsNullOrEmpty(ToParse)) { return; }
+        var toParse = e.Data.ToStringWin1252();
+        if (string.IsNullOrEmpty(toParse)) { return; }
 
-        foreach (var pair in ToParse.GetAllTags()) {
+        foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key.ToLower()) {
                 case "type":
                     break;
@@ -291,25 +290,15 @@ public class ConnectedFormula : IChangedFeedback, IDisposable {
         _saved = false;
     }
 
-    private void OnConnectedControlsStopAllWorking(object sender, MultiUserFileStopWorkingEventArgs e) {
-        ConnectedControlsStopAllWorking?.Invoke(this, e);
-    }
+    private void OnConnectedControlsStopAllWorking(object sender, MultiUserFileStopWorkingEventArgs e) => ConnectedControlsStopAllWorking?.Invoke(this, e);
 
-    private void OnLoaded(object sender, LoadedEventArgs e) {
-        Loaded?.Invoke(this, e);
-    }
+    private void OnLoaded(object sender, LoadedEventArgs e) => Loaded?.Invoke(this, e);
 
-    private void OnLoading(object sender, LoadingEventArgs e) {
-        Loading?.Invoke(this, e);
-    }
+    private void OnLoading(object sender, LoadingEventArgs e) => Loading?.Invoke(this, e);
 
-    private void OnSavedToDisk(object sender, System.EventArgs e) {
-        SavedToDisk?.Invoke(this, e);
-    }
+    private void OnSavedToDisk(object sender, System.EventArgs e) => SavedToDisk?.Invoke(this, e);
 
-    private void OnShouldICancelSaveOperations(object sender, CancelEventArgs e) {
-        ShouldICancelSaveOperations?.Invoke(this, e);
-    }
+    private void OnShouldICancelSaveOperations(object sender, CancelEventArgs e) => ShouldICancelSaveOperations?.Invoke(this, e);
 
     private void PadData_Changed(object sender, System.EventArgs e) {
         if (_saving || _muf.IsParsing || _muf.IsLoading) { return; }

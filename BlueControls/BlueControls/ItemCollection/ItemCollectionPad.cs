@@ -318,27 +318,102 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
             sizeOfPaintArea.Height / maxBounds.Height);
     }
 
-    public void DrawCreativePadToBitmap(Bitmap? bmp, States vState, float zoomf, float x, float y, List<BasicPadItem>? visibleItems) {
-        if (bmp == null) { return; }
-        var gr = Graphics.FromImage(bmp);
-        DrawCreativePadTo(gr, bmp.Size, vState, zoomf, x, y, visibleItems, true);
-        gr.Dispose();
+    public List<string> AllPages() {
+        var p = new List<string>();
+
+        foreach (var thisp in this) {
+            if (!string.IsNullOrEmpty(thisp.Seite)) {
+                p.AddIfNotExists(thisp.Seite);
+            }
+        }
+
+        return p;
     }
 
-    public bool DrawItems(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting, List<BasicPadItem>? visibleItems) {
+    public bool DrawCreativePadTo(Graphics gr, Size sizeOfParentControl, States state, float zoom, float shiftX, float shiftY, string seite, bool showinprintmode) {
         try {
-            if (SheetStyle == null || SheetStyleScale < 0.1d) { return true; }
-            foreach (var thisItem in this.Where(thisItem => thisItem != null)) {
-                gr.PixelOffsetMode = PixelOffsetMode.None;
-                if (visibleItems == null || visibleItems.Contains(thisItem)) {
-                    thisItem.Draw(gr, zoom, shiftX, shiftY, sizeOfParentControl, forPrinting);
+            gr.PixelOffsetMode = PixelOffsetMode.None;
+
+            #region Hintergrund und evtl. Zeichenbereich
+
+            if (SheetSizeInMm.Width > 0 && SheetSizeInMm.Height > 0) {
+                //Skin.Draw_Back(gr, enDesign.Table_And_Pad, state, DisplayRectangle, this, true);
+                var ssw = (float)Math.Round(MmToPixel(SheetSizeInMm.Width, Dpi), 1);
+                var ssh = (float)Math.Round(MmToPixel(SheetSizeInMm.Height, Dpi), 1);
+                var lo = new PointM(0f, 0f).ZoomAndMove(zoom, shiftX, shiftY);
+                var ru = new PointM(ssw, ssh).ZoomAndMove(zoom, shiftX, shiftY);
+
+                if (BackColor.A > 0) {
+                    Rectangle r = new((int)lo.X, (int)lo.Y, (int)(ru.X - lo.X), (int)(ru.Y - lo.Y));
+                    gr.FillRectangle(new SolidBrush(BackColor), r);
+                }
+
+                if (!showinprintmode) {
+                    var rLo = new PointM(_prLo.X, _prLo.Y).ZoomAndMove(zoom, shiftX, shiftY);
+                    var rRu = new PointM(_prRu.X, _prRu.Y).ZoomAndMove(zoom, shiftX, shiftY);
+                    Rectangle rr = new((int)rLo.X, (int)rLo.Y, (int)(rRu.X - rLo.X),
+                        (int)(rRu.Y - rLo.Y));
+                    gr.DrawRectangle(ZoomPad.PenGray, rr);
+                }
+            } else {
+                if (BackColor.A > 0) {
+                    gr.Clear(BackColor);
                 }
             }
-            return true;
+
+            #endregion
+
+            #region Grid
+
+            if (_gridShow > 0.1) {
+                var po = new PointM(0, 0).ZoomAndMove(zoom, shiftX, shiftY);
+                var mo = MmToPixel(_gridShow, Dpi) * zoom;
+
+                var p = new Pen(Color.FromArgb(10, 0, 0, 0));
+                float ex = 0;
+
+                for (var z = 0; z < 20; z++) {
+                    if (mo < 5) { mo *= 2; }
+                }
+
+                if (mo >= 5) {
+                    do {
+                        gr.DrawLine(p, po.X + (int)ex, 0, po.X + (int)ex, sizeOfParentControl.Height);
+                        gr.DrawLine(p, 0, po.Y + (int)ex, sizeOfParentControl.Width, po.Y + (int)ex);
+
+                        if (ex > 0) {
+                            // erste Linie nicht doppelt zeichnen
+                            gr.DrawLine(p, po.X - (int)ex, 0, po.X - (int)ex, sizeOfParentControl.Height);
+                            gr.DrawLine(p, 0, po.Y - (int)ex, sizeOfParentControl.Width, po.Y - (int)ex);
+                        }
+                        ex += mo;
+                        if (po.X - ex < 0 && po.Y - ex < 0 && po.X + ex > sizeOfParentControl.Width && po.Y + ex > sizeOfParentControl.Height) {
+                            break;
+                        }
+                    } while (true);
+                }
+            }
+
+            #endregion
+
+            #region Items selbst
+
+            if (!DrawItems(gr, zoom, shiftX, shiftY, sizeOfParentControl, showinprintmode, seite)) {
+                return DrawCreativePadTo(gr, sizeOfParentControl, state, zoom, shiftX, shiftY, seite, showinprintmode);
+            }
+
+            #endregion
         } catch {
-            CollectGarbage();
-            return false;
+            return DrawCreativePadTo(gr, sizeOfParentControl, state, zoom, shiftX, shiftY, seite, showinprintmode);
         }
+        return true;
+    }
+
+    public void DrawCreativePadToBitmap(Bitmap? bmp, States vState, float zoomf, float x, float y, string seite) {
+        if (bmp == null) { return; }
+        var gr = Graphics.FromImage(bmp);
+        DrawCreativePadTo(gr, bmp.Size, vState, zoomf, x, y, seite, true);
+        gr.Dispose();
     }
 
     public override void OnChanged() {
@@ -482,7 +557,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
 
         using var gr = Graphics.FromImage(I);
         gr.Clear(BackColor);
-        if (!DrawCreativePadTo(gr, I.Size, States.Standard, scale, r.Left * scale, r.Top * scale, null, true)) {
+        if (!DrawCreativePadTo(gr, I.Size, States.Standard, scale, r.Left * scale, r.Top * scale, string.Empty, true)) {
             return ToBitmap(scale);
         }
 
@@ -533,85 +608,6 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         t = t + "GridShow=" + _gridShow + ", ";
         t = t + "GridSnap=" + _gridsnap + ", ";
         return t.TrimEnd(", ") + "}";
-    }
-
-    internal bool DrawCreativePadTo(Graphics gr, Size sizeOfParentControl, States state, float zoom, float shiftX, float shiftY, List<BasicPadItem>? visibleItems, bool showinprintmode) {
-        try {
-            gr.PixelOffsetMode = PixelOffsetMode.None;
-
-            #region Hintergrund und evtl. Zeichenbereich
-
-            if (SheetSizeInMm.Width > 0 && SheetSizeInMm.Height > 0) {
-                //Skin.Draw_Back(gr, enDesign.Table_And_Pad, state, DisplayRectangle, this, true);
-                var ssw = (float)Math.Round(MmToPixel(SheetSizeInMm.Width, Dpi), 1);
-                var ssh = (float)Math.Round(MmToPixel(SheetSizeInMm.Height, Dpi), 1);
-                var lo = new PointM(0f, 0f).ZoomAndMove(zoom, shiftX, shiftY);
-                var ru = new PointM(ssw, ssh).ZoomAndMove(zoom, shiftX, shiftY);
-
-                if (BackColor.A > 0) {
-                    Rectangle r = new((int)lo.X, (int)lo.Y, (int)(ru.X - lo.X), (int)(ru.Y - lo.Y));
-                    gr.FillRectangle(new SolidBrush(BackColor), r);
-                }
-
-                if (!showinprintmode) {
-                    var rLo = new PointM(_prLo.X, _prLo.Y).ZoomAndMove(zoom, shiftX, shiftY);
-                    var rRu = new PointM(_prRu.X, _prRu.Y).ZoomAndMove(zoom, shiftX, shiftY);
-                    Rectangle rr = new((int)rLo.X, (int)rLo.Y, (int)(rRu.X - rLo.X),
-                        (int)(rRu.Y - rLo.Y));
-                    gr.DrawRectangle(ZoomPad.PenGray, rr);
-                }
-            } else {
-                if (BackColor.A > 0) {
-                    gr.Clear(BackColor);
-                }
-            }
-
-            #endregion
-
-            #region Grid
-
-            if (_gridShow > 0.1) {
-                var po = new PointM(0, 0).ZoomAndMove(zoom, shiftX, shiftY);
-                var mo = MmToPixel(_gridShow, Dpi) * zoom;
-
-                var p = new Pen(Color.FromArgb(10, 0, 0, 0));
-                float ex = 0;
-
-                for (var z = 0; z < 20; z++) {
-                    if (mo < 5) { mo *= 2; }
-                }
-
-                if (mo >= 5) {
-                    do {
-                        gr.DrawLine(p, po.X + (int)ex, 0, po.X + (int)ex, sizeOfParentControl.Height);
-                        gr.DrawLine(p, 0, po.Y + (int)ex, sizeOfParentControl.Width, po.Y + (int)ex);
-
-                        if (ex > 0) {
-                            // erste Linie nicht doppelt zeichnen
-                            gr.DrawLine(p, po.X - (int)ex, 0, po.X - (int)ex, sizeOfParentControl.Height);
-                            gr.DrawLine(p, 0, po.Y - (int)ex, sizeOfParentControl.Width, po.Y - (int)ex);
-                        }
-                        ex += mo;
-                        if (po.X - ex < 0 && po.Y - ex < 0 && po.X + ex > sizeOfParentControl.Width && po.Y + ex > sizeOfParentControl.Height) {
-                            break;
-                        }
-                    } while (true);
-                }
-            }
-
-            #endregion
-
-            #region Items selbst
-
-            if (!DrawItems(gr, zoom, shiftX, shiftY, sizeOfParentControl, showinprintmode, visibleItems)) {
-                return DrawCreativePadTo(gr, sizeOfParentControl, state, zoom, shiftX, shiftY, visibleItems, showinprintmode);
-            }
-
-            #endregion
-        } catch {
-            return DrawCreativePadTo(gr, sizeOfParentControl, state, zoom, shiftX, shiftY, visibleItems, showinprintmode);
-        }
-        return true;
     }
 
     internal Rectangle DruckbereichRect() => _prLo == null ? new Rectangle(0, 0, 0, 0) : new Rectangle((int)_prLo.X, (int)_prLo.Y, (int)(_prRu.X - _prLo.X), (int)(_prRu.Y - _prLo.Y));
@@ -722,6 +718,22 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
                     Develop.DebugPrint(FehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
                     break;
             }
+        }
+    }
+
+    private bool DrawItems(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting, string seite) {
+        try {
+            if (SheetStyle == null || SheetStyleScale < 0.1d) { return true; }
+            foreach (var thisItem in this.Where(thisItem => thisItem != null)) {
+                gr.PixelOffsetMode = PixelOffsetMode.None;
+                if (string.IsNullOrEmpty(seite) || thisItem.Seite.ToLower() == seite.ToLower()) {
+                    thisItem.Draw(gr, zoom, shiftX, shiftY, sizeOfParentControl, forPrinting);
+                }
+            }
+            return true;
+        } catch {
+            CollectGarbage();
+            return false;
         }
     }
 

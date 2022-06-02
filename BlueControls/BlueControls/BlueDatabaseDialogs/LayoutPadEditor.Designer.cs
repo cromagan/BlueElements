@@ -40,48 +40,70 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnLayoutOeffnen = new BlueControls.Controls.Button();
             this.tabSkript = new System.Windows.Forms.TabPage();
             this.scriptEditor = new BlueControls.ScriptEditorDatabase();
+            this.tabDatei.SuspendLayout();
+            this.grpDateiSystem.SuspendLayout();
+            this.grpDesign.SuspendLayout();
+            this.tabHintergrund.SuspendLayout();
+            this.tabRightSide.SuspendLayout();
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
-            this.tabDatei.SuspendLayout();
-            this.grpDesign.SuspendLayout();
             this.grpAssistent.SuspendLayout();
-            this.grpDateiSystem.SuspendLayout();
             this.grpLayoutSelection.SuspendLayout();
             this.grpExterneLayouts.SuspendLayout();
-            this.tabRightSide.SuspendLayout();
             this.tabSkript.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // Ribbon
-            // 
-            this.Ribbon.TabDefaultOrder = new string[] {
-        "Datei",
-        "Start",
-        "Hintergrund",
-        "Export"};
             // 
             // tabDatei
             // 
             this.tabDatei.Controls.Add(this.grpExterneLayouts);
             this.tabDatei.Controls.Add(this.grpLayoutSelection);
-            this.tabDatei.Size = new System.Drawing.Size(1332, 81);
             this.tabDatei.Controls.SetChildIndex(this.grpDateiSystem, 0);
             this.tabDatei.Controls.SetChildIndex(this.grpLayoutSelection, 0);
             this.tabDatei.Controls.SetChildIndex(this.grpExterneLayouts, 0);
             // 
             // grpDateiSystem
             // 
-            this.grpDateiSystem.Size = new System.Drawing.Size(208, 81);
+            this.grpDateiSystem.Size = new System.Drawing.Size(208, 75);
             // 
             // btnLastFiles
             // 
+            this.btnLastFiles.AdditionalCheck = BlueDatabase.Enums.AdditionalCheck.None;
             this.btnLastFiles.Location = new System.Drawing.Point(200, 2);
+            this.btnLastFiles.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
             this.btnLastFiles.Visible = false;
             // 
             // btnOeffnen
             // 
             this.btnOeffnen.ImageCode = "Textdatei||||||||||Pfeil_Links";
             this.btnOeffnen.Text = "Import";
+            // 
+            // tabRightSide
+            // 
+            this.tabRightSide.Controls.Add(this.tabSkript);
+            this.tabRightSide.Location = new System.Drawing.Point(968, 136);
+            this.tabRightSide.Size = new System.Drawing.Size(372, 476);
+            this.tabRightSide.Controls.SetChildIndex(this.tabSkript, 0);
+            // 
+            // Pad
+            // 
+            this.Pad.Size = new System.Drawing.Size(968, 476);
+            // 
+            // Ribbon
+            // 
+            this.Ribbon.Size = new System.Drawing.Size(1340, 110);
+            this.Ribbon.TabDefaultOrder = new string[] {
+        "Datei",
+        "Start",
+        "Hintergrund",
+        "Export"};
+            // 
+            // tabStart
+            // 
+            this.tabStart.Size = new System.Drawing.Size(1332, 81);
+            // 
+            // tabSeiten
+            // 
+            this.tabSeiten.Size = new System.Drawing.Size(1340, 26);
             // 
             // grpLayoutSelection
             // 
@@ -95,9 +117,9 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpLayoutSelection.Controls.Add(this.cbxLayout);
             this.grpLayoutSelection.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpLayoutSelection.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpLayoutSelection.Location = new System.Drawing.Point(496, 0);
+            this.grpLayoutSelection.Location = new System.Drawing.Point(211, 3);
             this.grpLayoutSelection.Name = "grpLayoutSelection";
-            this.grpLayoutSelection.Size = new System.Drawing.Size(232, 81);
+            this.grpLayoutSelection.Size = new System.Drawing.Size(232, 75);
             this.grpLayoutSelection.TabIndex = 2;
             this.grpLayoutSelection.TabStop = false;
             this.grpLayoutSelection.Text = "Datenbank";
@@ -164,11 +186,15 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tabRight
             // 
+            this.tabRight.Database = null;
             this.tabRight.HotTrack = true;
             this.tabRight.Location = new System.Drawing.Point(8, 67);
             this.tabRight.Name = "tabRight";
+            this.tabRight.RowKey = ((long)(-1));
             this.tabRight.SelectedIndex = 0;
             this.tabRight.Size = new System.Drawing.Size(472, 285);
+            this.tabRight.TabDefault = null;
+            this.tabRight.TabDefaultOrder = null;
             this.tabRight.TabIndex = 111;
             // 
             // grpExterneLayouts
@@ -180,9 +206,9 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpExterneLayouts.Controls.Add(this.btnLayoutOeffnen);
             this.grpExterneLayouts.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpExterneLayouts.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpExterneLayouts.Location = new System.Drawing.Point(728, 0);
+            this.grpExterneLayouts.Location = new System.Drawing.Point(443, 3);
             this.grpExterneLayouts.Name = "grpExterneLayouts";
-            this.grpExterneLayouts.Size = new System.Drawing.Size(336, 81);
+            this.grpExterneLayouts.Size = new System.Drawing.Size(336, 75);
             this.grpExterneLayouts.TabIndex = 1;
             this.grpExterneLayouts.TabStop = false;
             this.grpExterneLayouts.Text = "Externe Layouts aus dem Dateisytem";
@@ -221,17 +247,13 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnLayoutOeffnen.Text = "Layout mit Std.-Anwendung öffnen";
             this.btnLayoutOeffnen.Click += new System.EventHandler(this.btnLayoutOeffnen_Click);
             // 
-            // tabRightSide
-            // 
-            this.tabRightSide.Controls.Add(this.tabSkript);
-            // 
             // tabSkript
             // 
             this.tabSkript.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabSkript.Controls.Add(this.scriptEditor);
             this.tabSkript.Location = new System.Drawing.Point(4, 25);
             this.tabSkript.Name = "tabSkript";
-            this.tabSkript.Size = new System.Drawing.Size(516, 473);
+            this.tabSkript.Size = new System.Drawing.Size(364, 196);
             this.tabSkript.TabIndex = 1;
             this.tabSkript.Text = "Skript";
             // 
@@ -242,31 +264,28 @@ namespace BlueControls.BlueDatabaseDialogs
             this.scriptEditor.Dock = System.Windows.Forms.DockStyle.Fill;
             this.scriptEditor.Location = new System.Drawing.Point(0, 0);
             this.scriptEditor.Name = "scriptEditor";
-            this.scriptEditor.Size = new System.Drawing.Size(516, 473);
+            this.scriptEditor.Size = new System.Drawing.Size(364, 196);
             this.scriptEditor.TabIndex = 1;
             this.scriptEditor.TabStop = false;
             // 
-            // LayoutDesigner
+            // LayoutPadEditor
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(1340, 612);
-            this.Controls.Add(this.tabRightSide);
-            this.Name = "LayoutDesigner";
+            this.Name = "LayoutPadEditor";
             this.Text = "Druck-Layout";
             this.TopMost = false;
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            this.Controls.SetChildIndex(this.Ribbon, 0);
-            this.Controls.SetChildIndex(this.tabRightSide, 0);
-            this.Controls.SetChildIndex(this.Pad, 0);
+            this.tabDatei.ResumeLayout(false);
+            this.grpDateiSystem.ResumeLayout(false);
+            this.grpDesign.ResumeLayout(false);
+            this.tabHintergrund.ResumeLayout(false);
+            this.tabRightSide.ResumeLayout(false);
             this.Ribbon.ResumeLayout(false);
             this.tabStart.ResumeLayout(false);
-            this.tabDatei.ResumeLayout(false);
-            this.grpDesign.ResumeLayout(false);
             this.grpAssistent.ResumeLayout(false);
-            this.grpDateiSystem.ResumeLayout(false);
             this.grpLayoutSelection.ResumeLayout(false);
             this.grpExterneLayouts.ResumeLayout(false);
-            this.tabRightSide.ResumeLayout(false);
             this.tabSkript.ResumeLayout(false);
             this.ResumeLayout(false);
 

@@ -48,11 +48,14 @@ namespace BlueControls.Forms {
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
             this.LoadTabDatabase = new System.Windows.Forms.OpenFileDialog();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.btnRegisterKarte = new BlueControls.Controls.Button();
             this.grpDesign.SuspendLayout();
             this.tabHintergrund.SuspendLayout();
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.grpAssistent.SuspendLayout();
+            this.tabSeiten.SuspendLayout();
             this.tabEditor.SuspendLayout();
             this.grpVorschau.SuspendLayout();
             this.grpFelder.SuspendLayout();
@@ -76,12 +79,13 @@ namespace BlueControls.Forms {
             // 
             // tabRightSide
             // 
-            this.tabRightSide.Location = new System.Drawing.Point(602, 110);
-            this.tabRightSide.Size = new System.Drawing.Size(372, 389);
+            this.tabRightSide.Location = new System.Drawing.Point(602, 136);
+            this.tabRightSide.Size = new System.Drawing.Size(372, 363);
             // 
             // Pad
             // 
-            this.Pad.Size = new System.Drawing.Size(602, 389);
+            this.Pad.Size = new System.Drawing.Size(602, 363);
+            this.Pad.GotNewItemCollection += new System.EventHandler(this.Pad_GotNewItemCollection);
             // 
             // Ribbon
             // 
@@ -103,9 +107,18 @@ namespace BlueControls.Forms {
             // 
             this.tabStart.Size = new System.Drawing.Size(966, 81);
             // 
+            // tabExport
+            // 
+            this.tabExport.Size = new System.Drawing.Size(966, 81);
+            // 
             // btnVorschauModus
             // 
             this.btnVorschauModus.CheckedChanged += new System.EventHandler(this.btnVorschauModus_CheckedChanged);
+            // 
+            // tabSeiten
+            // 
+            this.tabSeiten.Controls.Add(this.tabPage1);
+            this.tabSeiten.Size = new System.Drawing.Size(974, 26);
             // 
             // tabEditor
             // 
@@ -128,7 +141,7 @@ namespace BlueControls.Forms {
             this.grpVorschau.Controls.Add(this.btnPfeileAusblenden);
             this.grpVorschau.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpVorschau.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpVorschau.Location = new System.Drawing.Point(520, 0);
+            this.grpVorschau.Location = new System.Drawing.Point(600, 0);
             this.grpVorschau.Name = "grpVorschau";
             this.grpVorschau.Size = new System.Drawing.Size(160, 81);
             this.grpVorschau.TabIndex = 1;
@@ -167,7 +180,7 @@ namespace BlueControls.Forms {
             this.grpFelder.Controls.Add(this.btnFeldHinzu);
             this.grpFelder.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpFelder.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpFelder.Location = new System.Drawing.Point(232, 0);
+            this.grpFelder.Location = new System.Drawing.Point(312, 0);
             this.grpFelder.Name = "grpFelder";
             this.grpFelder.Size = new System.Drawing.Size(288, 81);
             this.grpFelder.TabIndex = 0;
@@ -232,7 +245,7 @@ namespace BlueControls.Forms {
             this.groupBox1.Controls.Add(this.btnZeileHinzu);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Left;
             this.groupBox1.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.groupBox1.Location = new System.Drawing.Point(80, 0);
+            this.groupBox1.Location = new System.Drawing.Point(160, 0);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(152, 81);
             this.groupBox1.TabIndex = 3;
@@ -268,12 +281,13 @@ namespace BlueControls.Forms {
             // grpOptik
             // 
             this.grpOptik.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpOptik.Controls.Add(this.btnRegisterKarte);
             this.grpOptik.Controls.Add(this.btnTabControlAdd);
             this.grpOptik.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpOptik.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpOptik.Location = new System.Drawing.Point(0, 0);
             this.grpOptik.Name = "grpOptik";
-            this.grpOptik.Size = new System.Drawing.Size(80, 81);
+            this.grpOptik.Size = new System.Drawing.Size(160, 81);
             this.grpOptik.TabIndex = 2;
             this.grpOptik.TabStop = false;
             this.grpOptik.Text = "Optik";
@@ -382,6 +396,27 @@ namespace BlueControls.Forms {
             this.LoadTabDatabase.Filter = "*.MDB Datenbanken|*.MDB|*.* Alle Dateien|*";
             this.LoadTabDatabase.Title = "Bitte Datenbank wählen:";
             // 
+            // tabPage1
+            // 
+            this.tabPage1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabPage1.Location = new System.Drawing.Point(4, 25);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Size = new System.Drawing.Size(876, 0);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Visible = false;
+            // 
+            // btnRegisterKarte
+            // 
+            this.btnRegisterKarte.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnRegisterKarte.ImageCode = "PlusZeichen|16|||00FF00||||||Zeile";
+            this.btnRegisterKarte.Location = new System.Drawing.Point(72, 2);
+            this.btnRegisterKarte.Name = "btnRegisterKarte";
+            this.btnRegisterKarte.QuickInfo = resources.GetString("btnRegisterKarte.QuickInfo");
+            this.btnRegisterKarte.Size = new System.Drawing.Size(80, 66);
+            this.btnRegisterKarte.TabIndex = 6;
+            this.btnRegisterKarte.Text = "Registerkarte hinzufügen";
+            this.btnRegisterKarte.Click += new System.EventHandler(this.btnRegisterKarte_Click);
+            // 
             // ConnectedFormulaEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -395,6 +430,7 @@ namespace BlueControls.Forms {
             this.Ribbon.ResumeLayout(false);
             this.tabStart.ResumeLayout(false);
             this.grpAssistent.ResumeLayout(false);
+            this.tabSeiten.ResumeLayout(false);
             this.tabEditor.ResumeLayout(false);
             this.grpVorschau.ResumeLayout(false);
             this.grpFelder.ResumeLayout(false);
@@ -431,5 +467,7 @@ namespace BlueControls.Forms {
         private Controls.GroupBox grpOptik;
         private Controls.Button btnVariable;
         private Controls.Button btnEingangsZeile;
+        private System.Windows.Forms.TabPage tabPage1;
+        private Controls.Button btnRegisterKarte;
     }
 }

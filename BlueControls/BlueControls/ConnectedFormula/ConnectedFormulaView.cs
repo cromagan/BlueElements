@@ -35,7 +35,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone {
 
     #region Fields
 
-    public bool _generated = false;
+    public bool Generated = false;
 
     private ConnectedFormula.ConnectedFormula? _cf;
 
@@ -130,7 +130,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone {
     protected override void OnSizeChanged(System.EventArgs e) {
         if (IsDisposed) { return; }
         base.OnSizeChanged(e);
-        _generated = false;
+        Generated = false;
         GenerateView();
     }
 
@@ -148,7 +148,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone {
     //                }
     //                break;
     private void _cf_Changed(object sender, System.EventArgs e) {
-        _generated = false;
+        Generated = false;
         GenerateView();
     }
 
@@ -162,8 +162,8 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone {
     //                }
     //                break;
     private void GenerateView() {
-        if (_generated) { return; }
-        _generated = false;
+        if (Generated) { return; }
+        Generated = false;
 
         var unused = new List<System.Windows.Forms.Control>();
         foreach (var thisco in Controls) {
@@ -188,7 +188,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone {
                     c.Height = (int)(ua.Height / Umrechnungsfaktor2);
                 }
             }
-            _generated = true;
+            Generated = true;
         }
 
         foreach (var thisc in unused) {
@@ -199,7 +199,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone {
 
     private void SetInputRow() {
         GenerateView();
-        if (!_generated) { return; }
+        if (!Generated) { return; }
 
         foreach (var thisIt in _cf.PadData) {
             if (thisIt is RowInputPadItem ripi) {

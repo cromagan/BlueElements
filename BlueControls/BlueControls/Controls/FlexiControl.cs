@@ -56,6 +56,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// </summary>
     protected DateTime? LastTextChange;
 
+    private readonly bool _translateCaption = true;
     private AdditionalCheck _additionalCheck = AdditionalCheck.None;
     private string _allowedChars = string.Empty;
     private string _caption = string.Empty;
@@ -75,7 +76,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private bool _showInfoWhenDisabled;
     private bool _spellChecking;
     private string _suffix = string.Empty;
-    private bool _translateCaption = true;
 
     #endregion
 

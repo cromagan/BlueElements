@@ -36,10 +36,10 @@ namespace BlueControls.Forms {
             this.btnDruckerDialog = new BlueControls.Controls.Button();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
+            this.grpDesign.SuspendLayout();
+            this.tabHintergrund.SuspendLayout();
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
-            this.tabExport.SuspendLayout();
-            this.grpDesign.SuspendLayout();
             this.grpAssistent.SuspendLayout();
             this.tabDatei.SuspendLayout();
             this.grpDateiSystem.SuspendLayout();
@@ -48,6 +48,7 @@ namespace BlueControls.Forms {
             // Ribbon
             // 
             this.Ribbon.Controls.Add(this.tabDatei);
+            this.Ribbon.Location = new System.Drawing.Point(0, 0);
             this.Ribbon.TabDefault = this.tabDatei;
             this.Ribbon.TabDefaultOrder = new string[] {
         "Start",
@@ -55,13 +56,14 @@ namespace BlueControls.Forms {
         "Hintergrund",
         "Export"};
             this.Ribbon.TabIndex = 3;
+            this.Ribbon.Controls.SetChildIndex(this.tabHintergrund, 0);
             this.Ribbon.Controls.SetChildIndex(this.tabExport, 0);
             this.Ribbon.Controls.SetChildIndex(this.tabStart, 0);
             this.Ribbon.Controls.SetChildIndex(this.tabDatei, 0);
             // 
-            // grpAssistent
+            // tabSeiten
             // 
-            this.grpAssistent.Location = new System.Drawing.Point(0, 0);
+            this.tabSeiten.Location = new System.Drawing.Point(0, 110);
             // 
             // tabDatei
             // 
@@ -182,10 +184,10 @@ namespace BlueControls.Forms {
             this.ClientSize = new System.Drawing.Size(884, 361);
             this.Name = "PadEditorWithFileAccess";
             this.Text = "PadEditorWithFileAccess";
+            this.grpDesign.ResumeLayout(false);
+            this.tabHintergrund.ResumeLayout(false);
             this.Ribbon.ResumeLayout(false);
             this.tabStart.ResumeLayout(false);
-            this.tabExport.ResumeLayout(false);
-            this.grpDesign.ResumeLayout(false);
             this.grpAssistent.ResumeLayout(false);
             this.tabDatei.ResumeLayout(false);
             this.grpDateiSystem.ResumeLayout(false);
