@@ -62,6 +62,8 @@ public partial class PadEditorReadOnly : Form {
 
         TabPage? later = null;
 
+        if (x.Count == 1 && string.IsNullOrEmpty(x[0])) { x.Clear(); }
+
         if (x.Count > 0) {
             tabSeiten.Visible = true;
 
