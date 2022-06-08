@@ -398,7 +398,7 @@ public sealed class Database : IDisposable {
     /// <param name="checkOnlyFilenameToo"></param>
     /// <param name="readOnly"></param>
     /// <returns></returns>
-    public static Database GetByFilename(string filename, bool checkOnlyFilenameToo, bool readOnly) {
+    public static Database? GetByFilename(string filename, bool checkOnlyFilenameToo, bool readOnly) {
         foreach (var thisFile in AllFiles) {
             if (thisFile != null && string.Equals(thisFile.Filename, filename, StringComparison.OrdinalIgnoreCase)) {
                 thisFile.BlockReload(false);
@@ -414,6 +414,8 @@ public sealed class Database : IDisposable {
                 }
             }
         }
+
+        if(!FileExists(filename)) { return null; }
 
         return new Database(filename, readOnly, false);
     }
