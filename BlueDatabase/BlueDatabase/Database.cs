@@ -72,7 +72,7 @@ public sealed class Database : IDisposable {
 
     public ListExt<WorkItem> Works;
 
-    private readonly List<string> _filesAfterLoadingLCase;
+    //private readonly List<string> _filesAfterLoadingLCase;
 
     private readonly BlueBasics.MultiUserFile.MultiUserFile _muf;
 
@@ -87,8 +87,6 @@ public sealed class Database : IDisposable {
     private string _createDate = string.Empty;
 
     private string _creator = string.Empty;
-
-    private string _fileEncryptionKey = string.Empty;
 
     private double _globalScale;
 
@@ -111,7 +109,7 @@ public sealed class Database : IDisposable {
     //private enJoinTyp _JoinTyp;
     private int _undoCount;
 
-    private VerwaisteDaten _verwaisteDaten;
+    //private VerwaisteDaten _verwaisteDaten;
 
     private string _zeilenQuickInfo = string.Empty;
 
@@ -160,7 +158,7 @@ public sealed class Database : IDisposable {
         Column.ItemAdded += Column_ItemAdded;
 
         Works = new ListExt<WorkItem>();
-        _filesAfterLoadingLCase = new List<string>();
+        //_filesAfterLoadingLCase = new List<string>();
         ColumnArrangements.Changed += ColumnArrangements_ListOrItemChanged;
         Layouts.Changed += Layouts_ListOrItemChanged;
         Layouts.ItemSeted += Layouts_ItemSeted;
@@ -276,14 +274,6 @@ public sealed class Database : IDisposable {
 
     public bool Disposed { get; private set; }
 
-    public string FileEncryptionKey {
-        get => _fileEncryptionKey;
-        set {
-            if (_fileEncryptionKey == value) { return; }
-            AddPending(DatabaseDataType.FileEncryptionKey, -1, -1, _fileEncryptionKey, value, true);
-        }
-    }
-
     public string Filename => _muf.Filename;
 
     [Browsable(false)]
@@ -370,13 +360,13 @@ public sealed class Database : IDisposable {
         }
     }
 
-    public VerwaisteDaten VerwaisteDaten {
-        get => _verwaisteDaten;
-        set {
-            if (_verwaisteDaten == value) { return; }
-            AddPending(DatabaseDataType.VerwaisteDaten, -1, -1, ((int)_verwaisteDaten).ToString(), ((int)value).ToString(), true);
-        }
-    }
+    //public VerwaisteDaten VerwaisteDaten {
+    //    get => _verwaisteDaten;
+    //    set {
+    //        if (_verwaisteDaten == value) { return; }
+    //        AddPending(DatabaseDataType.VerwaisteDaten, -1, -1, ((int)_verwaisteDaten).ToString(), ((int)value).ToString(), true);
+    //    }
+    //}
 
     [Browsable(false)]
     public string ZeilenQuickInfo {
@@ -415,7 +405,7 @@ public sealed class Database : IDisposable {
             }
         }
 
-        if(!FileExists(filename)) { return null; }
+        if (!FileExists(filename)) { return null; }
 
         return new Database(filename, readOnly, false);
     }
@@ -508,34 +498,34 @@ public sealed class Database : IDisposable {
         return string.Empty;
     }
 
-    public List<string> AllConnectedFilesLCase() {
-        List<string> columnAll = new();
-        var lockMe = new object();
+    //public List<string> AllConnectedFilesLCase() {
+    //    List<string> columnAll = new();
+    //    var lockMe = new object();
 
-        foreach (var thisColumnItem in Column) {
-            if (thisColumnItem != null && thisColumnItem.Format == DataFormat.Link_To_Filesystem) {
-                var tmp = thisColumnItem.Contents();
-                Parallel.ForEach(tmp, thisTmp => {
-                    var x = thisColumnItem.BestFile(thisTmp, false).ToLower();
-                    lock (lockMe) {
-                        columnAll.Add(x);
-                    }
-                });
-            }
-        }
-        //foreach (var ThisColumnItem in Column) {
-        //    if (ThisColumnItem != null) {
-        //        if (ThisColumnItem.Format == DataFormat.Link_To_Filesystem) {
-        //            var tmp = ThisColumnItem.Contents();
-        //            foreach (var thisTmp in tmp) {
-        //                Column_All.AddIfNotExists(ThisColumnItem.BestFile(thisTmp, false).ToLower());
-        //            }
-        //        }
-        //    }
-        //}
+    //    foreach (var thisColumnItem in Column) {
+    //        if (thisColumnItem != null && thisColumnItem.Format == DataFormat.Link_To_Filesystem) {
+    //            var tmp = thisColumnItem.Contents();
+    //            Parallel.ForEach(tmp, thisTmp => {
+    //                var x = thisColumnItem.BestFile(thisTmp, false).ToLower();
+    //                lock (lockMe) {
+    //                    columnAll.Add(x);
+    //                }
+    //            });
+    //        }
+    //    }
+    //    //foreach (var ThisColumnItem in Column) {
+    //    //    if (ThisColumnItem != null) {
+    //    //        if (ThisColumnItem.Format == DataFormat.Link_To_Filesystem) {
+    //    //            var tmp = ThisColumnItem.Contents();
+    //    //            foreach (var thisTmp in tmp) {
+    //    //                Column_All.AddIfNotExists(ThisColumnItem.BestFile(thisTmp, false).ToLower());
+    //    //            }
+    //    //        }
+    //    //    }
+    //    //}
 
-        return columnAll.SortedDistinctList();
-    }
+    //    return columnAll.SortedDistinctList();
+    //}
 
     public List<RowData?> AllRows() {
         var sortedRows = new List<RowData?>();
@@ -562,7 +552,7 @@ public sealed class Database : IDisposable {
         DatenbankAdmin.CloneFrom(sourceDatabase.DatenbankAdmin);
         PermissionGroupsNewRow.CloneFrom(sourceDatabase.PermissionGroupsNewRow);
         ReloadDelaySecond = sourceDatabase.ReloadDelaySecond;
-        VerwaisteDaten = sourceDatabase.VerwaisteDaten;
+        //VerwaisteDaten = sourceDatabase.VerwaisteDaten;
         ZeilenQuickInfo = sourceDatabase.ZeilenQuickInfo;
         StandardFormulaFile = sourceDatabase.StandardFormulaFile;
 
@@ -1151,8 +1141,8 @@ public sealed class Database : IDisposable {
         //Row.RemoveNullOrDisposed();
         Cell.RemoveOrphans();
         //LoadPicsIntoImageChache();
-        _filesAfterLoadingLCase.Clear();
-        _filesAfterLoadingLCase.AddRange(AllConnectedFilesLCase());
+        //_filesAfterLoadingLCase.Clear();
+        //_filesAfterLoadingLCase.AddRange(AllConnectedFilesLCase());
         Works.AddRange(oldPendings);
         oldPendings.Clear();
         ExecutePending();
@@ -1638,14 +1628,14 @@ public sealed class Database : IDisposable {
 
     private void DoWorkAfterSaving(object sender, System.EventArgs e) {
         ChangeWorkItems(ItemState.Pending, ItemState.Undo);
-        var filesNewLCase = AllConnectedFilesLCase();
-        List<string> writerFilesToDeleteLCase = new();
-        if (_verwaisteDaten == VerwaisteDaten.Löschen) {
-            writerFilesToDeleteLCase = _filesAfterLoadingLCase.Except(filesNewLCase).ToList();
-        }
-        _filesAfterLoadingLCase.Clear();
-        _filesAfterLoadingLCase.AddRange(filesNewLCase);
-        if (writerFilesToDeleteLCase.Count > 0) { DeleteFile(writerFilesToDeleteLCase); }
+        //var filesNewLCase = AllConnectedFilesLCase();
+        //List<string> writerFilesToDeleteLCase = new();
+        //if (_verwaisteDaten == VerwaisteDaten.Löschen) {
+        //    writerFilesToDeleteLCase = _filesAfterLoadingLCase.Except(filesNewLCase).ToList();
+        //}
+        //_filesAfterLoadingLCase.Clear();
+        //_filesAfterLoadingLCase.AddRange(filesNewLCase);
+        //if (writerFilesToDeleteLCase.Count > 0) { DeleteFile(writerFilesToDeleteLCase); }
     }
 
     private void ExecutePending() {
@@ -1744,13 +1734,12 @@ public sealed class Database : IDisposable {
         Export.Clear();
         DatenbankAdmin.Clear();
         _globalShowPass = string.Empty;
-        _fileEncryptionKey = string.Empty;
         _creator = UserName;
         _createDate = DateTime.Now.ToString(Constants.Format_Date5);
         _muf.ReloadDelaySecond = 600;
         _undoCount = 300;
         _caption = string.Empty;
-        _verwaisteDaten = VerwaisteDaten.Ignorieren;
+        //_verwaisteDaten = VerwaisteDaten.Ignorieren;
         LoadedVersion = DatabaseVersion;
         _rulesScript = string.Empty;
         _globalScale = 1f;
@@ -2012,7 +2001,7 @@ public sealed class Database : IDisposable {
             //    break;
 
             case DatabaseDataType.VerwaisteDaten:
-                _verwaisteDaten = (VerwaisteDaten)IntParse(value);
+                //_verwaisteDaten = (VerwaisteDaten)IntParse(value);
                 break;
 
             case (DatabaseDataType)63://                    enDatabaseDataType.ImportScript:
@@ -2023,7 +2012,7 @@ public sealed class Database : IDisposable {
                 break;
 
             case DatabaseDataType.FileEncryptionKey:
-                _fileEncryptionKey = value;
+                //_fileEncryptionKey = value;
                 break;
 
             case DatabaseDataType.ce_Value_withSizeData:
@@ -2151,12 +2140,12 @@ public sealed class Database : IDisposable {
                 SaveToByteList(l, DatabaseDataType.CryptionTest, "OK");
             }
             SaveToByteList(l, DatabaseDataType.GlobalShowPass, _globalShowPass);
-            SaveToByteList(l, DatabaseDataType.FileEncryptionKey, _fileEncryptionKey);
+            //SaveToByteList(l, DatabaseDataType.FileEncryptionKey, _fileEncryptionKey);
             SaveToByteList(l, DatabaseDataType.Creator, _creator);
             SaveToByteList(l, DatabaseDataType.CreateDate, _createDate);
             SaveToByteList(l, DatabaseDataType.Caption, _caption);
             //SaveToByteList(l, enDatabaseDataType.JoinTyp, ((int)_JoinTyp).ToString());
-            SaveToByteList(l, DatabaseDataType.VerwaisteDaten, ((int)_verwaisteDaten).ToString());
+            //SaveToByteList(l, DatabaseDataType.VerwaisteDaten, ((int)_verwaisteDaten).ToString());
             SaveToByteList(l, DatabaseDataType.Tags, Tags.JoinWithCr());
             SaveToByteList(l, DatabaseDataType.PermissionGroups_NewRow, PermissionGroupsNewRow.JoinWithCr());
             SaveToByteList(l, DatabaseDataType.DatenbankAdmin, DatenbankAdmin.JoinWithCr());

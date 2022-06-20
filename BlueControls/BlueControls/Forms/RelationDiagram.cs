@@ -239,36 +239,36 @@ public partial class RelationDiagram : PadEditor {
     //    //Pad.Relation_Add(enRelationType.PositionZueinander, P1, i.Point1);
     //    //Pad.Relation_Add(enRelationType.PositionZueinander, P2, i.Point2);
     //}
-    private void btnBilderExport_Click(object sender, System.EventArgs e) {
-        System.Windows.Forms.FolderBrowserDialog fl = new();
-        fl.ShowDialog();
-        foreach (var thisR in Pad.Item) {
-            if (thisR is RowFormulaPadItem r) {
-                var no = r.Row.CellFirstString();
-                no = no.Replace(" ", "_");
-                no = no.Replace(",", "_");
-                no = no.Replace("__", "_");
-                var newn = FileOperations.TempFile(fl.SelectedPath, no, "png");
-                r.GeneratedBitmap.Save(newn, System.Drawing.Imaging.ImageFormat.Png);
-                foreach (var thisc in r.Row.Database.Column) {
-                    if (thisc.Format == DataFormat.Link_To_Filesystem) {
-                        var l = r.Row.CellGetList(thisc);
-                        foreach (var thiss in l) {
-                            var f = thisc.BestFile(thiss, false);
-                            if (FileOperations.FileExists(f)) {
-                                var n2 = r.Row.CellFirstString() + "-" + thisc.Caption;
-                                n2 = n2.Replace(" ", "_");
-                                n2 = n2.Replace(",", "_");
-                                n2 = n2.Replace("__", "_");
-                                var newn2 = FileOperations.TempFile(fl.SelectedPath, n2, f.FileSuffix());
-                                FileOperations.CopyFile(f, newn2, true);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+    //private void btnBilderExport_Click(object sender, System.EventArgs e) {
+    //    System.Windows.Forms.FolderBrowserDialog fl = new();
+    //    fl.ShowDialog();
+    //    foreach (var thisR in Pad.Item) {
+    //        if (thisR is RowFormulaPadItem r) {
+    //            var no = r.Row.CellFirstString();
+    //            no = no.Replace(" ", "_");
+    //            no = no.Replace(",", "_");
+    //            no = no.Replace("__", "_");
+    //            var newn = FileOperations.TempFile(fl.SelectedPath, no, "png");
+    //            r.GeneratedBitmap.Save(newn, System.Drawing.Imaging.ImageFormat.Png);
+    //            foreach (var thisc in r.Row.Database.Column) {
+    //                if (thisc.Format == DataFormat.Link_To_Filesystem) {
+    //                    var l = r.Row.CellGetList(thisc);
+    //                    foreach (var thiss in l) {
+    //                        var f = thisc.BestFile(thiss, false);
+    //                        if (FileOperations.FileExists(f)) {
+    //                            var n2 = r.Row.CellFirstString() + "-" + thisc.Caption;
+    //                            n2 = n2.Replace(" ", "_");
+    //                            n2 = n2.Replace(",", "_");
+    //                            n2 = n2.Replace("__", "_");
+    //                            var newn2 = FileOperations.TempFile(fl.SelectedPath, n2, f.FileSuffix());
+    //                            FileOperations.CopyFile(f, newn2, true);
+    //                        }
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
 
     private void btnTextExport_Click(object sender, System.EventArgs e) {
         System.Windows.Forms.FolderBrowserDialog fl = new();

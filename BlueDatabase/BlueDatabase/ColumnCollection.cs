@@ -342,14 +342,12 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     internal static string ParsableColumnKey(long key) => "ColumnKey=" + key;
 
     internal long NextColumnKey() {
-        var s = Generic.UserName() + "\r\n" + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName;
         var tmp = 0;
         long key;
 
         do {
+            key = Generic.GetUniqueKey(tmp, "column");
             tmp++;
-            key = (s.GetHashCode() * 100000000) + tmp;
-            if (key < 0) { key *= -1; }
         } while (SearchByKey(key) != null);
         return key;
     }

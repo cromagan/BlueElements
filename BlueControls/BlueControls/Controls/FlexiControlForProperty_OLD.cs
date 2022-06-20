@@ -333,7 +333,6 @@ public class FlexiControlForProperty_OLD : FlexiControl {
         if (!string.IsNullOrEmpty(_propertyName)) {
             var x = _propertyName.SplitAndCutBy("__");
             Caption = x[0].Replace("_", " ") + ":";
-            FileEncryptionKey = string.Empty;
         } else {
             Caption = "[unbekannt]";
         }
@@ -356,60 +355,77 @@ public class FlexiControlForProperty_OLD : FlexiControl {
         if (withCreate && _propInfo != null) {
             switch (_propInfo.PropertyType.FullName.ToLower()) {
                 case "system.boolean": {
-                    EditType = EditTypeFormula.Ja_Nein_Knopf;
-                    var s = BlueFont.MeasureStringOfCaption(Caption);
-                    Size = new Size((int)s.Width + 30, 22);
-                    break;
-                }
+                        EditType = EditTypeFormula.Ja_Nein_Knopf;
+                        var s = BlueFont.MeasureStringOfCaption(Caption);
+                        Size = new Size((int)s.Width + 30, 22);
+                        break;
+                    }
                 default: // Alle enums sind ein eigener Typ.... deswegen alles in die Textbox
                 {
-                    if (list != null) {
-                        EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-                        list.Appearance = BlueListBoxAppearance.ComboBox_Textbox;
-                        var s = BlueFont.MeasureStringOfCaption(Caption);
-                        var (biggestItemX, biggestItemY, _, _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
-                        var x = Math.Max((int)(biggestItemX + 20 + s.Width), 200);
-                        var y = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
-                        Size = new Size(x, y);
-                        var c = (ComboBox)CreateSubControls();
-                        StyleComboBox(c, list, ComboBoxStyle.DropDownList, true);
-                    }
-                    //else if (image != ImageCode.None)
-                    //{
-                    //    EditType = enEditTypeFormula.Button;
-                    //    CaptionPosition = enÜberschriftAnordnung.ohne;
-                    //    Size = new Size((int)BlueFont.MeasureStringOfCaption(_Caption).Width + 50, 30);
-                    //    var c = (Button)CreateSubControls();
-                    //    c.ImageCode = QuickImage.Get(image).ToString();
-                    //}
-                    else {
-                        EditType = EditTypeFormula.Textfeld;
-                        var tmpName = _propInfo.PropertyType.FullName.ToLower();
-                        if (textLines >= 2) {
-                            CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
-                            Size = new Size(200, 16 + (24 * textLines));
-                            MultiLine = true;
-                            tmpName = "system.string";
-                        } else {
-                            CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
-                            Size = new Size(200, 24);
-                            MultiLine = false;
+                        if (list != null) {
+                            EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
+                            list.Appearance = BlueListBoxAppearance.ComboBox_Textbox;
+                            var s = BlueFont.MeasureStringOfCaption(Caption);
+                            var (biggestItemX, biggestItemY, _, _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
+                            var x = Math.Max((int)(biggestItemX + 20 + s.Width), 200);
+                            var y = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
+                            Size = new Size(x, y);
+                            var c = (ComboBox)CreateSubControls();
+                            StyleComboBox(c, list, ComboBoxStyle.DropDownList, true);
                         }
+                        //else if (image != ImageCode.None)
+                        //{
+                        //    EditType = enEditTypeFormula.Button;
+                        //    CaptionPosition = enÜberschriftAnordnung.ohne;
+                        //    Size = new Size((int)BlueFont.MeasureStringOfCaption(_Caption).Width + 50, 30);
+                        //    var c = (Button)CreateSubControls();
+                        //    c.ImageCode = QuickImage.Get(image).ToString();
+                        //}
+                        else {
+                            EditType = EditTypeFormula.Textfeld;
+                            var tmpName = _propInfo.PropertyType.FullName.ToLower();
+                            if (textLines >= 2) {
+                                CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
+                                Size = new Size(200, 16 + (24 * textLines));
+                                MultiLine = true;
+                                tmpName = "system.string";
+                            } else {
+                                CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
+                                Size = new Size(200, 24);
+                                MultiLine = false;
+                            }
 
-                        switch (tmpName) {
-                            case "system.string": this.SetFormat(VarType.Text); break;
-                            case "system.int32": this.SetFormat(VarType.Integer); break;
-                            case "system.float": this.SetFormat(VarType.Float); break;
-                            case "system.double": this.SetFormat(VarType.Float); break;
-                            case "system.drawing.color": this.SetFormat(VarType.Text); break;
-                            default: this.SetFormat(VarType.Text); break;
+                            switch (tmpName) {
+                                case "system.string":
+                                    this.SetFormat(VarType.Text);
+                                    break;
+
+                                case "system.int32":
+                                    this.SetFormat(VarType.Integer);
+                                    break;
+
+                                case "system.float":
+                                    this.SetFormat(VarType.Float);
+                                    break;
+
+                                case "system.double":
+                                    this.SetFormat(VarType.Float);
+                                    break;
+
+                                case "system.drawing.color":
+                                    this.SetFormat(VarType.Text);
+                                    break;
+
+                                default:
+                                    this.SetFormat(VarType.Text);
+                                    break;
+                            }
+
+                            var c = CreateSubControls();
+                            StyleTextBox((TextBox)c);
                         }
-
-                        var c = CreateSubControls();
-                        StyleTextBox((TextBox)c);
+                        break;
                     }
-                    break;
-                }
             }
         }
         //else

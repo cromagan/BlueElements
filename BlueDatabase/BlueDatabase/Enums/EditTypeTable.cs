@@ -20,7 +20,7 @@ namespace BlueDatabase.Enums;
 public enum EditTypeTable {
     None = -1,
     Textfeld = 1,
-    FileHandling_InDateiSystem = 2,
+    //FileHandling_InDateiSystem = 2,
 
     //Image_Auswahl_Dialog = 3,
     Listbox = 4,

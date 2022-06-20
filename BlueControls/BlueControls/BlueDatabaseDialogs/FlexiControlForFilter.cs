@@ -230,7 +230,6 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
             Caption = string.Empty;
             EditType = EditTypeFormula.None;
             QuickInfo = string.Empty;
-            FileEncryptionKey = string.Empty;
             ValueSet(string.Empty, true, true);
         } else {
             DisabledReason = !string.IsNullOrEmpty(Filter.Herkunft) ? "Dieser Filter ist automatisch<br>gesetzt worden." : string.Empty;

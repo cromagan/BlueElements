@@ -70,9 +70,6 @@ internal sealed partial class DatabaseHeadEditor {
 
     protected override void OnLoad(System.EventArgs e) {
         base.OnLoad(e);
-        cbxVerwaisteDaten.Item.Clear();
-        cbxVerwaisteDaten.Item.AddRange(typeof(VerwaisteDaten));
-        cbxVerwaisteDaten.Text = ((int)_database.VerwaisteDaten).ToString();
         cbxAnsicht.Item.Clear();
         cbxAnsicht.Item.AddRange(typeof(Ansicht));
         cbxAnsicht.Text = ((int)_database.Ansicht).ToString();
@@ -113,7 +110,6 @@ internal sealed partial class DatabaseHeadEditor {
         lbxSortierSpalten.Suggestions.Clear();
         lbxSortierSpalten.Suggestions.AddRange(_database.Column, false);
 
-        CryptStatus();
         GenerateInfoText();
     }
 
@@ -309,46 +305,9 @@ internal sealed partial class DatabaseHeadEditor {
         MessageBox.Show("Erledigt.", ImageCode.Information, "OK");
     }
 
-    private void CryptStatus() {
-        if (string.IsNullOrEmpty(_database.FileEncryptionKey)) {
-            btnDateiSchluessel.Text = "Dateien verschlüsseln";
-            btnDateiSchluessel.QuickInfo = "Dazugehörige Dateien der Datenbank sind aktuell im Originalformat auf dem Laufwerk für jedem zugänglich.";
-        } else {
-            btnDateiSchluessel.Text = "Dateien freigeben";
-            btnDateiSchluessel.QuickInfo = "Dazugehörige Dateien der Datenbank sind aktuell verschlüsselt.";
-        }
-    }
-
     private void Database_Disposing(object sender, System.EventArgs e) {
         RemoveDatabase();
         Close();
-    }
-
-    private void DateienSchlüssel_Click(object sender, System.EventArgs e) {
-        btnDateiSchluessel.Enabled = false;
-        btnDateiSchluessel.Text = "Dateien in Arbeit";
-        var lLCase = _database.AllConnectedFilesLCase();
-        string? newKey;
-        if (string.IsNullOrEmpty(_database.FileEncryptionKey)) {
-            newKey = new string(Enumerable.Repeat("abcdefghijklmnopqrstuvwxyz äöü#_-<>ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 10).Select(s => s[Constants.GlobalRND.Next(s.Length)]).ToArray());
-            foreach (var thisFile in lLCase) {
-                var b = FileToByte(thisFile);
-                b = Cryptography.SimpleCrypt(b, newKey, 1);
-                FileOperations.DeleteFile(thisFile, true);
-                ByteToFile(thisFile, b);
-            }
-        } else {
-            newKey = string.Empty;
-            foreach (var thisFile in lLCase) {
-                var b = FileToByte(thisFile);
-                b = Cryptography.SimpleCrypt(b, _database.FileEncryptionKey, -1);
-                FileOperations.DeleteFile(thisFile, true);
-                ByteToFile(thisFile, b);
-            }
-        }
-        _database.FileEncryptionKey = newKey;
-        btnDateiSchluessel.Enabled = true;
-        CryptStatus();
     }
 
     private void ExportEditor_Changed(object sender, System.EventArgs e) {
@@ -503,7 +462,7 @@ internal sealed partial class DatabaseHeadEditor {
             _database.PermissionGroupsNewRow.AddRange(PermissionGroups_NewRow.Item.ToListOfString());
             _database.PermissionGroupsNewRow.Remove("#Administrator");
         }
-        _database.VerwaisteDaten = (VerwaisteDaten)IntParse(cbxVerwaisteDaten.Text);
+        //_database.VerwaisteDaten = (VerwaisteDaten)IntParse(cbxVerwaisteDaten.Text);
         _database.Ansicht = (Ansicht)IntParse(cbxAnsicht.Text);
 
         #region Sortierung

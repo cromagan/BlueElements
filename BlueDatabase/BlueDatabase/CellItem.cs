@@ -161,7 +161,6 @@ public class CellItem {
 
         switch (column.Format) {
             case DataFormat.Text:
-            case DataFormat.Link_To_Filesystem:
             case DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
             case DataFormat.RelationText:
             case DataFormat.Verknüpfung_zu_anderer_Datenbank: // Bei LinkedCell kommt direkt der Text der verlinkten Zelle an
@@ -271,14 +270,11 @@ public class CellItem {
         var gr = Math.Truncate(column.Database.GlobalScale * 16).ToString(Constants.Format_Integer1);
         if (!string.IsNullOrEmpty(column.BildCode_ConstantHeight)) { gr = column.BildCode_ConstantHeight; }
 
-
         var x = (replacedText + "||").SplitBy("|");
-        var gr2 = (gr+"||").SplitBy("|");
+        var gr2 = (gr + "||").SplitBy("|");
         x[1] = gr2[0];
         x[2] = gr2[1];
         var ntxt = x.JoinWith("|").TrimEnd("|");
-
-   
 
         var defaultImage = QuickImage.Get(ntxt);
         return defaultImage != null && !defaultImage.IsError ? defaultImage : StandardErrorImage(gr, bildTextverhalten, replacedText, column);

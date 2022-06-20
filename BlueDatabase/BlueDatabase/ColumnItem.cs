@@ -62,9 +62,11 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
     private string _autoFilterJoker;
     private string _autoRemove;
     private Color _backColor;
-    private string _bestFileStandardFolder;
-    private string _bestFileStandardSuffix;
+
+    //private string _bestFileStandardFolder;
+    //private string _bestFileStandardSuffix;
     private string _bildCodeConstantHeight;
+
     private BildTextVerhalten _bildTextVerhalten;
     private string _caption;
     private string _captionBitmapTxt;
@@ -194,8 +196,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         _bildTextVerhalten = BildTextVerhalten.Nur_Text;
         _bildCodeConstantHeight = string.Empty;
         _prefix = string.Empty;
-        _bestFileStandardSuffix = string.Empty;
-        _bestFileStandardFolder = string.Empty;
         UcaseNamesSortedByLenght = null;
 
         #endregion Standard-Werte
@@ -330,23 +330,23 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         }
     }
 
-    public string BestFile_StandardFolder {
-        get => _bestFileStandardFolder;
-        set {
-            if (_bestFileStandardFolder == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_BestFile_StandardFolder, this, _bestFileStandardFolder, value, true);
-            OnChanged();
-        }
-    }
+    //public string BestFile_StandardFolder {
+    //    get => _bestFileStandardFolder;
+    //    set {
+    //        if (_bestFileStandardFolder == value) { return; }
+    //        Database?.AddPending(DatabaseDataType.co_BestFile_StandardFolder, this, _bestFileStandardFolder, value, true);
+    //        OnChanged();
+    //    }
+    //}
 
-    public string BestFile_StandardSuffix {
-        get => _bestFileStandardSuffix;
-        set {
-            if (_bestFileStandardSuffix == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_BestFile_StandardSuffix, this, _bestFileStandardSuffix, value, true);
-            OnChanged();
-        }
-    }
+    //public string BestFile_StandardSuffix {
+    //    get => _bestFileStandardSuffix;
+    //    set {
+    //        if (_bestFileStandardSuffix == value) { return; }
+    //        Database?.AddPending(DatabaseDataType.co_BestFile_StandardSuffix, this, _bestFileStandardSuffix, value, true);
+    //        OnChanged();
+    //    }
+    //}
 
     public string BildCode_ConstantHeight {
         get => _bildCodeConstantHeight;
@@ -816,8 +816,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
             case DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
                 return EditTypeTable.Dropdown_Single;
 
-            case DataFormat.Link_To_Filesystem:
-                return EditTypeTable.FileHandling_InDateiSystem;
+            //case DataFormat.Link_To_Filesystem:
+            //    return EditTypeTable.FileHandling_InDateiSystem;
 
             case DataFormat.FarbeInteger:
                 if (doDropDown) { return EditTypeTable.Dropdown_Single; }
@@ -846,11 +846,11 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
     public static EditTypeTable UserEditDialogTypeInTable(ColumnItem? column, bool doDropDown) => UserEditDialogTypeInTable(column.Format, doDropDown, column.TextBearbeitungErlaubt, column.MultiLine);
 
     public string AutoCorrect(string value) {
-        if (Format == DataFormat.Link_To_Filesystem) {
-            List<string> l = new(value.SplitAndCutByCr());
-            var l2 = l.Select(thisFile => SimplyFile(thisFile)).ToList();
-            value = l2.SortedDistinctList().JoinWithCr();
-        }
+        //if (Format == DataFormat.Link_To_Filesystem) {
+        //    List<string> l = new(value.SplitAndCutByCr());
+        //    var l2 = l.Select(thisFile => SimplyFile(thisFile)).ToList();
+        //    value = l2.SortedDistinctList().JoinWithCr();
+        //}
         if (_afterEditDoUCase) { value = value.ToUpper(); }
         if (!string.IsNullOrEmpty(_autoRemove)) { value = value.RemoveChars(_autoRemove); }
         if (AfterEditAutoReplace.Count > 0) {
@@ -888,66 +888,66 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
 
     public bool AutoFilterSymbolPossible() => FilterOptions.HasFlag(FilterOptions.Enabled) && Format.Autofilter_möglich();
 
-    /// <summary>
-    /// Gibt einen Dateinamen mit Pfad und Suffix zurück, der sich aus dem Standard-Angaben der Spalte zusammensetzt.
-    /// Existiert in keiner Spalte und auch nicht auf der Festplatte.
-    /// </summary>
-    public string BestFile() => BestFile(string.Empty, true);
+    ///// <summary>
+    ///// Gibt einen Dateinamen mit Pfad und Suffix zurück, der sich aus dem Standard-Angaben der Spalte zusammensetzt.
+    ///// Existiert in keiner Spalte und auch nicht auf der Festplatte.
+    ///// </summary>
+    //public string BestFile() => BestFile(string.Empty, true);
 
-    /// <summary>
-    /// Gibt den Dateinamen mit Pfad und Suffix zurück, der sich aus dem Standard-Angaben der Zelle und dem hier übergebebenen Dateinamen zusammensetzt.
-    /// </summary>
-    /// <param name="filename">Der Dateiname. Ein evtl. fehlender Pfad und ein evtl. fehlendes Suffix werden ergänzt. </param>
-    /// <param name="mustBeFree">Wenn True wird ein Dateiname zurückgegeben, der noch nicht im Verzeichnis vorhanden ist.</param>
-    /// <returns> Gibt den Dateinamen mit Pfad und Suffix zurück</returns>
-    public string BestFile(string filename, bool mustBeFree) {
-        if (_format != DataFormat.Link_To_Filesystem) { Develop.DebugPrint(FehlerArt.Fehler, "Nur bei Link_To_Filesystem erlaubt!"); }
+    ///// <summary>
+    ///// Gibt den Dateinamen mit Pfad und Suffix zurück, der sich aus dem Standard-Angaben der Zelle und dem hier übergebebenen Dateinamen zusammensetzt.
+    ///// </summary>
+    ///// <param name="filename">Der Dateiname. Ein evtl. fehlender Pfad und ein evtl. fehlendes Suffix werden ergänzt. </param>
+    ///// <param name="mustBeFree">Wenn True wird ein Dateiname zurückgegeben, der noch nicht im Verzeichnis vorhanden ist.</param>
+    ///// <returns> Gibt den Dateinamen mit Pfad und Suffix zurück</returns>
+    //public string BestFile(string filename, bool mustBeFree) {
+    //    if (_format != DataFormat.Link_To_Filesystem) { Develop.DebugPrint(FehlerArt.Fehler, "Nur bei Link_To_Filesystem erlaubt!"); }
 
-        if (string.IsNullOrEmpty(filename)) {
-            if (!mustBeFree) { return string.Empty; }
-            filename = (_name.Substring(0, 1) + DateTime.Now.ToString("mm.fff")).RemoveChars(Constants.Char_DateiSonderZeichen + ".");
-        }
-        if (filename.Contains("\r")) { Develop.DebugPrint_NichtImplementiert(); }
+    //    if (string.IsNullOrEmpty(filename)) {
+    //        if (!mustBeFree) { return string.Empty; }
+    //        filename = (_name.Substring(0, 1) + DateTime.Now.ToString("mm.fff")).RemoveChars(Constants.Char_DateiSonderZeichen + ".");
+    //    }
+    //    if (filename.Contains("\r")) { Develop.DebugPrint_NichtImplementiert(); }
 
-        // Wenn FileNameWithoutPath kein Suffix hat, das Standard Suffix hinzufügen
-        var suffix = filename.FileSuffix();
-        var cleanfilename = filename;
-        if (string.IsNullOrEmpty(suffix)) {
-            suffix = _bestFileStandardSuffix.ToLower();
-        } else {
-            cleanfilename = filename.FileNameWithoutSuffix();
-        }
+    //    // Wenn FileNameWithoutPath kein Suffix hat, das Standard Suffix hinzufügen
+    //    var suffix = filename.FileSuffix();
+    //    var cleanfilename = filename;
+    //    if (string.IsNullOrEmpty(suffix)) {
+    //        suffix = _bestFileStandardSuffix.ToLower();
+    //    } else {
+    //        cleanfilename = filename.FileNameWithoutSuffix();
+    //    }
 
-        // Den Standardfolder benutzen. Falls dieser fehlt, 'Files' benutzen.
-        var directory = _bestFileStandardFolder.Trim("\\");
-        if (string.IsNullOrEmpty(directory)) { directory = "Files"; }
+    //    // Den Standardfolder benutzen. Falls dieser fehlt, 'Files' benutzen.
+    //    var directory = _bestFileStandardFolder.Trim("\\");
+    //    if (string.IsNullOrEmpty(directory)) { directory = "Files"; }
 
-        // Ist nur ein Unterverzeichnis angegeben, den Datenbankpfad benutzen und das Unterverzeichniss anhängen
-        if (directory.Substring(1, 1) != ":" && directory.Substring(0, 1) != "\\") { directory = Database.Filename.FilePath() + directory; }
-        if (!mustBeFree) {
-            return (directory.TrimEnd("\\") + "\\" + cleanfilename + "." + suffix).TrimEnd(".");
-        }
-        var nr = -1;
-        do {
-            nr++;
-            var tmpname = cleanfilename;
-            if (nr > 0) { tmpname += nr.ToString(Constants.Format_Integer2); }
-            var ok = true;
-            foreach (var columnitem in Database.Column) {
-                if (columnitem.Format == DataFormat.Link_To_Filesystem) {
-                    var r = Database.Row[new FilterItem(columnitem, FilterType.Istgleich_GroßKleinEgal, tmpname)];
-                    if (r != null) {
-                        ok = false;
-                        break;
-                    }
-                }
-            }
-            if (ok) {
-                var tmp = (directory.TrimEnd("\\") + "\\" + tmpname + "." + suffix.ToLower()).TrimEnd(".");
-                if (!FileExists(tmp)) { return tmp; }
-            }
-        } while (true);
-    }
+    //    // Ist nur ein Unterverzeichnis angegeben, den Datenbankpfad benutzen und das Unterverzeichniss anhängen
+    //    if (directory.Substring(1, 1) != ":" && directory.Substring(0, 1) != "\\") { directory = Database.Filename.FilePath() + directory; }
+    //    if (!mustBeFree) {
+    //        return (directory.TrimEnd("\\") + "\\" + cleanfilename + "." + suffix).TrimEnd(".");
+    //    }
+    //    var nr = -1;
+    //    do {
+    //        nr++;
+    //        var tmpname = cleanfilename;
+    //        if (nr > 0) { tmpname += nr.ToString(Constants.Format_Integer2); }
+    //        var ok = true;
+    //        foreach (var columnitem in Database.Column) {
+    //            if (columnitem.Format == DataFormat.Link_To_Filesystem) {
+    //                var r = Database.Row[new FilterItem(columnitem, FilterType.Istgleich_GroßKleinEgal, tmpname)];
+    //                if (r != null) {
+    //                    ok = false;
+    //                    break;
+    //                }
+    //            }
+    //        }
+    //        if (ok) {
+    //            var tmp = (directory.TrimEnd("\\") + "\\" + tmpname + "." + suffix.ToLower()).TrimEnd(".");
+    //            if (!FileExists(tmp)) { return tmp; }
+    //        }
+    //    } while (true);
+    //}
 
     /// <summary>
     /// Überschreibt alle Spalteeigenschaften mit dem der Vorlage.
@@ -1033,8 +1033,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         LinkedDatabaseFile = source.LinkedDatabaseFile;
         BildTextVerhalten = source.BildTextVerhalten;
         BildCode_ConstantHeight = source.BildCode_ConstantHeight;
-        BestFile_StandardSuffix = source.BestFile_StandardSuffix;
-        BestFile_StandardFolder = source.BestFile_StandardFolder;
+        //BestFile_StandardSuffix = source.BestFile_StandardSuffix;
+        //BestFile_StandardFolder = source.BestFile_StandardFolder;
     }
 
     public string CompareKey() {
@@ -1201,16 +1201,16 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
                 if (_vorschlagsColumn > 0) { return "Dieses Format kann keine Vorschlags-Spalte haben."; }
                 break;
 
-            case DataFormat.Link_To_Filesystem:
-                if (!string.IsNullOrEmpty(_cellInitValue)) { return "Dieses Format kann keinen Initial-Text haben."; }
-                if (_multiLine && !_afterEditQuickSortRemoveDouble) { return "Format muss sortiert werden."; }
-                if (_vorschlagsColumn > 0) { return "Dieses Format kann keine Vorschlags-Spalte haben."; }
-                if (!string.IsNullOrEmpty(_autoRemove)) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
-                if (_afterEditAutoCorrect) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
-                if (_afterEditDoUCase) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
-                if (_afterEditRunden != -1) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
-                if (AfterEditAutoReplace.Count > 0) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
-                break;
+                //case DataFormat.Link_To_Filesystem:
+                //    if (!string.IsNullOrEmpty(_cellInitValue)) { return "Dieses Format kann keinen Initial-Text haben."; }
+                //    if (_multiLine && !_afterEditQuickSortRemoveDouble) { return "Format muss sortiert werden."; }
+                //    if (_vorschlagsColumn > 0) { return "Dieses Format kann keine Vorschlags-Spalte haben."; }
+                //    if (!string.IsNullOrEmpty(_autoRemove)) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
+                //    if (_afterEditAutoCorrect) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
+                //    if (_afterEditDoUCase) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
+                //    if (_afterEditRunden != -1) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
+                //    if (AfterEditAutoReplace.Count > 0) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
+                //    break;
         }
 
         if (_multiLine) {
@@ -1543,6 +1543,10 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
                     SetFormatForTextMitFormatierung();
                     break;
 
+                case 73: // Link To Filesystem
+                    SetFormatForText();
+                    break;
+
                 case 74: //(int)DataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
 
                     //if (LinkedCell_RowKeyIsInColumn != -9999) {
@@ -1562,7 +1566,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
             if (ScriptType == ScriptType.undefiniert) {
                 if (MultiLine) {
                     ScriptType = ScriptType.List;
-                } else if (Format is DataFormat.Text or DataFormat.Link_To_Filesystem) {
+                } else if (Format is DataFormat.Text) {
                     if (SortType is SortierTyp.ZahlenwertFloat or SortierTyp.ZahlenwertInt) {
                         ScriptType = ScriptType.Numeral;
                     }
@@ -1956,20 +1960,21 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         ScriptType = ScriptType.String;
     }
 
-    public string SimplyFile(string fullFileName) {
-        if (_format != DataFormat.Link_To_Filesystem) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Nur bei Link_To_Filesystem erlaubt!");
-        }
-        var tmpfile = fullFileName.FileNameWithoutSuffix();
-        if (string.Equals(tmpfile, fullFileName, StringComparison.CurrentCultureIgnoreCase)) { return tmpfile; }
-        if (string.Equals(BestFile(tmpfile, false), fullFileName, StringComparison.CurrentCultureIgnoreCase)) { return tmpfile; }
-        tmpfile = fullFileName.FileNameWithSuffix();
-        return string.Equals(tmpfile, fullFileName, StringComparison.CurrentCultureIgnoreCase)
-            ? tmpfile
-            : string.Equals(BestFile(tmpfile, false), fullFileName, StringComparison.CurrentCultureIgnoreCase) ? tmpfile : fullFileName;
-    }
+    //public string SimplyFile(string fullFileName) {
+    //    if (_format != DataFormat.Link_To_Filesystem) {
+    //        Develop.DebugPrint(FehlerArt.Fehler, "Nur bei Link_To_Filesystem erlaubt!");
+    //    }
+    //    var tmpfile = fullFileName.FileNameWithoutSuffix();
+    //    if (string.Equals(tmpfile, fullFileName, StringComparison.CurrentCultureIgnoreCase)) { return tmpfile; }
+    //    if (string.Equals(BestFile(tmpfile, false), fullFileName, StringComparison.CurrentCultureIgnoreCase)) { return tmpfile; }
+    //    tmpfile = fullFileName.FileNameWithSuffix();
+    //    return string.Equals(tmpfile, fullFileName, StringComparison.CurrentCultureIgnoreCase)
+    //        ? tmpfile
+    //        : string.Equals(BestFile(tmpfile, false), fullFileName, StringComparison.CurrentCultureIgnoreCase) ? tmpfile : fullFileName;
+    //}
 
     public void Statisik(List<FilterItem>? filter, List<RowItem>? pinnedRows) {
+        if (Database == null) { return; }
         var r = Database.Row.CalculateVisibleRows(filter, pinnedRows);
 
         if (r == null || r.Count < 1) { return; }
@@ -2043,7 +2048,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         : this == Database.Column.SysRowCreator
             ? QuickImage.Get(ImageCode.Person)
             : _format switch {
-                DataFormat.Link_To_Filesystem => QuickImage.Get(ImageCode.Datei, 16),
                 DataFormat.RelationText => QuickImage.Get(ImageCode.Herz, 16),
                 DataFormat.FarbeInteger => QuickImage.Get(ImageCode.Pinsel, 16),
                 DataFormat.Verknüpfung_zu_anderer_Datenbank => QuickImage.Get(ImageCode.Fernglas, 16),
@@ -2118,14 +2122,14 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
             //    if (editType_To_Check == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
             //    return false;
 
-            case DataFormat.Link_To_Filesystem:
-                if (_multiLine) {
-                    //if (EditType_To_Check == enEditType.Listbox) { return true; }
-                    if (editTypeToCheck == EditTypeFormula.Gallery) { return true; }
-                } else {
-                    if (editTypeToCheck == EditTypeFormula.EasyPic) { return true; }
-                }
-                return false;
+            //case DataFormat.Link_To_Filesystem:
+            //    if (_multiLine) {
+            //        //if (EditType_To_Check == enEditType.Listbox) { return true; }
+            //        if (editTypeToCheck == EditTypeFormula.Gallery) { return true; }
+            //    } else {
+            //        if (editTypeToCheck == EditTypeFormula.EasyPic) { return true; }
+            //    }
+            //    return false;
             //case DataFormat.Relation:
             //    switch (EditType_To_Check)
             //    {
@@ -2414,11 +2418,11 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
                 break;
 
             case DatabaseDataType.co_BestFile_StandardSuffix:
-                _bestFileStandardSuffix = wert;
+                //_bestFileStandardSuffix = wert;
                 break;
 
             case DatabaseDataType.co_BestFile_StandardFolder:
-                _bestFileStandardFolder = wert;
+                //_bestFileStandardFolder = wert;
                 break;
 
             case DatabaseDataType.co_BildCode_ConstantHeight:
@@ -2565,8 +2569,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         Database.SaveToByteList(l, DatabaseDataType.co_Suffix, _suffix, Key);
         Database.SaveToByteList(l, DatabaseDataType.co_LinkedDatabase, _linkedDatabaseFile, Key);
         //Database.SaveToByteList(l, enDatabaseDataType.co_LinkKeyKennung, _linkedKeyKennung, Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_BestFile_StandardFolder, _bestFileStandardFolder, Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_BestFile_StandardSuffix, _bestFileStandardSuffix, Key);
+        //Database.SaveToByteList(l, DatabaseDataType.co_BestFile_StandardFolder, _bestFileStandardFolder, Key);
+        //Database.SaveToByteList(l, DatabaseDataType.co_BestFile_StandardSuffix, _bestFileStandardSuffix, Key);
         Database.SaveToByteList(l, DatabaseDataType.co_BildCode_ConstantHeight, _bildCodeConstantHeight, Key);
         Database.SaveToByteList(l, DatabaseDataType.co_BildTextVerhalten, ((int)_bildTextVerhalten).ToString(), Key);
         Database.SaveToByteList(l, DatabaseDataType.co_Translate, ((int)_translate).ToString(), Key);

@@ -64,9 +64,9 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
 
     #endregion
 
-    #region Events
+    //public event EventHandler<MultiUserFileGiveBackEventArgs> ConnectedDatabase;
 
-    public event EventHandler<MultiUserFileGiveBackEventArgs> ConnectedDatabase;
+    #region Events
 
     public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
 
@@ -100,9 +100,6 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     [DefaultValue("")]
     public string SorceName { get; private set; }
 
-    [DefaultValue(SorceType.Nichts)]
-    public SorceType SorceType { get; private set; }
-
     [DefaultValue(0)]
     public new int TabIndex {
         get => 0;
@@ -120,9 +117,8 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     #region Methods
 
     public void Clear() {
-        if (_bitmap != null || SorceType != SorceType.Nichts || !string.IsNullOrEmpty(SorceName)) {
+        if (_bitmap != null || !string.IsNullOrEmpty(SorceName)) {
             _bitmap = null;
-            SorceType = SorceType.Nichts;
             SorceName = string.Empty;
             ZoomFitInvalidateAndCheckButtons();
             OnImageChanged();
@@ -161,11 +157,9 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         var i = Image_Clone(ix);
         if (_maxSize > 0) {
             _bitmap = BitmapExt.Resize(i, _maxSize, _maxSize, SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
-            SorceType = SorceType.LoadedFromDiskAndResized;
             SorceName = filename;
         } else {
             _bitmap = i;
-            SorceType = SorceType.LoadedFromDisk;
             SorceName = filename;
         }
         ZoomFitInvalidateAndCheckButtons();
@@ -183,26 +177,6 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
-
-    public void SetBitmap(Bitmap? bmp) {
-        _bitmap = bmp;
-        SorceType = SorceType.SetedByProperty;
-        SorceName = string.Empty;
-        ZoomFitInvalidateAndCheckButtons();
-        OnImageChanged();
-    }
-
-    /// <summary>
-    /// Ändert die Herkunft ab.
-    /// </summary>
-    /// <param name="sorceName"></param>
-    /// <param name="sorceType"></param>
-    /// <param name="throwEvent"></param>
-    internal void ChangeSource(string sorceName, SorceType sorceType, bool throwEvent) {
-        SorceName = sorceName;
-        SorceType = sorceType;
-        if (throwEvent) { OnImageChanged(); }
-    }
 
     protected override void DrawControl(Graphics gr, States vState) {
         if (Convert.ToBoolean(vState & States.Standard_MouseOver)) { vState ^= States.Standard_MouseOver; }
@@ -228,8 +202,6 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         MultiUserFileGiveBackEventArgs ed = new() {
             File = null
         };
-        OnConnectedDatabase(ed);
-        AusDatenbank.Enabled = ed.File != null;
         _richt = 1;
         _PanelMover.Enabled = true;
     }
@@ -249,24 +221,6 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     protected override void OnResize(System.EventArgs e) {
         base.OnResize(e);
         ZoomFitInvalidateAndCheckButtons();
-    }
-
-    private void AusDatenbank_Click(object sender, System.EventArgs e) {
-        MultiUserFileGiveBackEventArgs ed = new() {
-            File = null
-        };
-        OnConnectedDatabase(ed);
-        if (ed.File is Database db) {
-            if (_bitmap != null) {
-                if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-            }
-
-            var n = ItemSelect.Show(db.AllConnectedFilesLCase(), db.FileEncryptionKey);
-
-            if (string.IsNullOrEmpty(n)) { return; }
-            FromFile(n);
-            OnImageChanged();
-        }
     }
 
     private void DelP_Click(object sender, System.EventArgs e) {
@@ -320,13 +274,10 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
             if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         }
         _bitmap = ScreenShot.GrabArea(ParentForm());
-        SorceType = SorceType.ScreenShot;
         SorceName = string.Empty;
         ZoomFitInvalidateAndCheckButtons();
         OnImageChanged();
     }
-
-    private void OnConnectedDatabase(MultiUserFileGiveBackEventArgs e) => ConnectedDatabase?.Invoke(this, e);
 
     private void OnImageChanged() => ImageChanged?.Invoke(this, System.EventArgs.Empty);
 

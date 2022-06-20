@@ -52,8 +52,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capZeilenQuickInfo = new BlueControls.Controls.Caption();
             this.txbGlobalScale = new BlueControls.Controls.TextBox();
             this.caption1 = new BlueControls.Controls.Caption();
-            this.cbxVerwaisteDaten = new BlueControls.Controls.ComboBox();
-            this.capVerwaisteDaten = new BlueControls.Controls.Caption();
             this.btnSpaltenuebersicht = new BlueControls.Controls.Button();
             this.tbxReloadVerzoegerung = new BlueControls.Controls.TextBox();
             this.capReloadVerzoegerung = new BlueControls.Controls.Caption();
@@ -62,9 +60,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Regeln = new System.Windows.Forms.TabPage();
             this.scriptEditor = new BlueControls.ScriptEditorDatabase();
             this.Tab_Rechte = new System.Windows.Forms.TabPage();
-            this.grpDateiVerschluesselung = new BlueControls.Controls.GroupBox();
-            this.capDateiverschluesselungInfo = new BlueControls.Controls.Caption();
-            this.btnDateiSchluessel = new BlueControls.Controls.Button();
             this.Tab_Sortierung = new System.Windows.Forms.TabPage();
             this.Tab_Backup = new System.Windows.Forms.TabPage();
             this.ExportEditor = new BlueControls.Classes_Editor.ExportDefinition_Editor();
@@ -87,7 +82,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Allgemein.SuspendLayout();
             this.Tab_Regeln.SuspendLayout();
             this.Tab_Rechte.SuspendLayout();
-            this.grpDateiVerschluesselung.SuspendLayout();
             this.Tab_Sortierung.SuspendLayout();
             this.Tab_Backup.SuspendLayout();
             this.grpExport.SuspendLayout();
@@ -330,8 +324,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Allgemein.Controls.Add(this.capZeilenQuickInfo);
             this.Tab_Allgemein.Controls.Add(this.txbGlobalScale);
             this.Tab_Allgemein.Controls.Add(this.caption1);
-            this.Tab_Allgemein.Controls.Add(this.cbxVerwaisteDaten);
-            this.Tab_Allgemein.Controls.Add(this.capVerwaisteDaten);
             this.Tab_Allgemein.Controls.Add(this.tbxTags);
             this.Tab_Allgemein.Controls.Add(this.btnSpaltenuebersicht);
             this.Tab_Allgemein.Controls.Add(this.tbxReloadVerzoegerung);
@@ -422,25 +414,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.caption1.Size = new System.Drawing.Size(144, 18);
             this.caption1.Text = "Bevorzugtes Skalierung:";
             // 
-            // cbxVerwaisteDaten
-            // 
-            this.cbxVerwaisteDaten.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.cbxVerwaisteDaten.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxVerwaisteDaten.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxVerwaisteDaten.Location = new System.Drawing.Point(168, 582);
-            this.cbxVerwaisteDaten.Name = "cbxVerwaisteDaten";
-            this.cbxVerwaisteDaten.Size = new System.Drawing.Size(160, 24);
-            this.cbxVerwaisteDaten.TabIndex = 37;
-            // 
-            // capVerwaisteDaten
-            // 
-            this.capVerwaisteDaten.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.capVerwaisteDaten.CausesValidation = false;
-            this.capVerwaisteDaten.Location = new System.Drawing.Point(8, 584);
-            this.capVerwaisteDaten.Name = "capVerwaisteDaten";
-            this.capVerwaisteDaten.Size = new System.Drawing.Size(120, 18);
-            this.capVerwaisteDaten.Text = "Verwaiste Daten:";
-            // 
             // btnSpaltenuebersicht
             // 
             this.btnSpaltenuebersicht.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -514,7 +487,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // Tab_Rechte
             // 
             this.Tab_Rechte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.Tab_Rechte.Controls.Add(this.grpDateiVerschluesselung);
             this.Tab_Rechte.Controls.Add(this.grpKennwort);
             this.Tab_Rechte.Controls.Add(this.grpBenutzergruppen);
             this.Tab_Rechte.Location = new System.Drawing.Point(4, 25);
@@ -523,38 +495,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Rechte.Size = new System.Drawing.Size(1039, 616);
             this.Tab_Rechte.TabIndex = 4;
             this.Tab_Rechte.Text = "Rechte";
-            // 
-            // grpDateiVerschluesselung
-            // 
-            this.grpDateiVerschluesselung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpDateiVerschluesselung.CausesValidation = false;
-            this.grpDateiVerschluesselung.Controls.Add(this.capDateiverschluesselungInfo);
-            this.grpDateiVerschluesselung.Controls.Add(this.btnDateiSchluessel);
-            this.grpDateiVerschluesselung.Location = new System.Drawing.Point(400, 120);
-            this.grpDateiVerschluesselung.Name = "grpDateiVerschluesselung";
-            this.grpDateiVerschluesselung.Size = new System.Drawing.Size(232, 176);
-            this.grpDateiVerschluesselung.TabIndex = 0;
-            this.grpDateiVerschluesselung.TabStop = false;
-            this.grpDateiVerschluesselung.Text = "Datei-Verschlüsselung:";
-            // 
-            // capDateiverschluesselungInfo
-            // 
-            this.capDateiverschluesselungInfo.CausesValidation = false;
-            this.capDateiverschluesselungInfo.Location = new System.Drawing.Point(8, 24);
-            this.capDateiverschluesselungInfo.Name = "capDateiverschluesselungInfo";
-            this.capDateiverschluesselungInfo.Size = new System.Drawing.Size(216, 72);
-            this.capDateiverschluesselungInfo.Text = "Dazugehörige Dateien im Dateisystem können mit diesen Kopf verschlüsselt oder wie" +
-    "der entschlüsselt werden.";
-            this.capDateiverschluesselungInfo.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            // 
-            // btnDateiSchluessel
-            // 
-            this.btnDateiSchluessel.Location = new System.Drawing.Point(8, 112);
-            this.btnDateiSchluessel.Name = "btnDateiSchluessel";
-            this.btnDateiSchluessel.Size = new System.Drawing.Size(216, 48);
-            this.btnDateiSchluessel.TabIndex = 1;
-            this.btnDateiSchluessel.Text = "Dateien ";
-            this.btnDateiSchluessel.Click += new System.EventHandler(this.DateienSchlüssel_Click);
             // 
             // Tab_Sortierung
             // 
@@ -759,7 +699,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Allgemein.ResumeLayout(false);
             this.Tab_Regeln.ResumeLayout(false);
             this.Tab_Rechte.ResumeLayout(false);
-            this.grpDateiVerschluesselung.ResumeLayout(false);
             this.Tab_Sortierung.ResumeLayout(false);
             this.Tab_Backup.ResumeLayout(false);
             this.grpExport.ResumeLayout(false);
@@ -800,16 +739,11 @@ namespace BlueControls.BlueDatabaseDialogs
         private GroupBox grpExport;
         private ExportDefinition_Editor ExportEditor;
         private Button btnSpaltenuebersicht;
-        private Button btnDateiSchluessel;
         private  System.Windows.Forms.TabPage Tab_Expermimentell;
         private Caption capExperimentellWarnung;
         private Button btnFremdImport;
         private Table tblUndo;
-        private GroupBox grpDateiVerschluesselung;
-        private Caption capDateiverschluesselungInfo;
         private Caption capNeueZeilenInfo;
-        private ComboBox cbxVerwaisteDaten;
-        private Caption capVerwaisteDaten;
         private Caption capUndoAnzahl;
         private TextBox tbxUndoAnzahl;
         private TextBox txbGlobalScale;

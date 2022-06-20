@@ -25,7 +25,6 @@ namespace BlueControls.Forms {
             this.Hinzu = new BlueControls.Controls.Button();
             this.grpExtras = new BlueControls.Controls.GroupBox();
             this.btnTextExport = new BlueControls.Controls.Button();
-            this.btnBilderExport = new BlueControls.Controls.Button();
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.grpKomponenteHinzufügen.SuspendLayout();
@@ -76,7 +75,6 @@ namespace BlueControls.Forms {
             // 
             this.grpExtras.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpExtras.Controls.Add(this.btnTextExport);
-            this.grpExtras.Controls.Add(this.btnBilderExport);
             this.grpExtras.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpExtras.Location = new System.Drawing.Point(576, 0);
             this.grpExtras.Name = "grpExtras";
@@ -96,17 +94,6 @@ namespace BlueControls.Forms {
             this.btnTextExport.Text = "Text-Export";
             this.btnTextExport.Click += new System.EventHandler(this.btnTextExport_Click);
             // 
-            // btnBilderExport
-            // 
-            this.btnBilderExport.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnBilderExport.ImageCode = "Bild||||||||||Pfeil_Unten";
-            this.btnBilderExport.Location = new System.Drawing.Point(8, 2);
-            this.btnBilderExport.Name = "btnBilderExport";
-            this.btnBilderExport.Size = new System.Drawing.Size(64, 66);
-            this.btnBilderExport.TabIndex = 0;
-            this.btnBilderExport.Text = "Bilder-Export";
-            this.btnBilderExport.Click += new System.EventHandler(this.btnBilderExport_Click);
-            // 
             // RelationDiagram
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -125,6 +112,5 @@ namespace BlueControls.Forms {
         private Button Hinzu;
         private GroupBox grpExtras;
         private Button btnTextExport;
-        private Button btnBilderExport;
     }
 }

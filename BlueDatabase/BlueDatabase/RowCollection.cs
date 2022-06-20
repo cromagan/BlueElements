@@ -472,17 +472,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposable {
     //}
 
     internal long NextRowKey() {
-        var x = DateTime.UtcNow.AddYears(-2020).Ticks;
-
-        var s = Generic.UserName() + "\r\n" + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName;
-
         var tmp = 0;
         long key;
 
         do {
+            key = Generic.GetUniqueKey(tmp, "row");
             tmp++;
-            key = x + (s.GetHashCode() * 100000000) + tmp;
-            if (key < 0) { key *= -1; }
         } while (SearchByKey(key) != null);
         return key;
     }

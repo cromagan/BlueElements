@@ -66,12 +66,12 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
         }
     }
 
-    public static string Show(List<string> files, string fileEncryptionKey) {
+    public static string Show(List<string> files) {
         var items = new List<BasicListItem?>();
 
         foreach (var thisString in files) {
             if (thisString.FileType() == FileFormat.Image) {
-                items.Add(new BitmapListItem(thisString, thisString, thisString.FileNameWithoutSuffix(), fileEncryptionKey));
+                items.Add(new BitmapListItem(thisString, thisString, thisString.FileNameWithoutSuffix()));
             }
         }
         var x = Show(items);

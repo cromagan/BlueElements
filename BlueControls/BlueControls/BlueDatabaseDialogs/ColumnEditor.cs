@@ -233,7 +233,7 @@ internal sealed partial class ColumnEditor {
         //    cbxBildTextVerhalten.Text = string.Empty;
         //}
         // Format: LinkToFileSystem
-        grpLinkToFileSystem.Enabled = tmpFormat == DataFormat.Link_To_Filesystem;
+        //grpLinkToFileSystem.Enabled = tmpFormat == DataFormat.Link_To_Filesystem;
         //if (tmpFormat != DataFormat.BildCode) {
         //    txbBestFileStandardFolder.Text = string.Empty;
         //    txbBestFileStandardSuffix.Text = string.Empty;
@@ -396,8 +396,8 @@ internal sealed partial class ColumnEditor {
         cbxEinheit.Text = _column.Suffix;
         txbBildCodeConstHeight.Text = _column.BildCode_ConstantHeight;
         cbxBildTextVerhalten.Text = ((int)_column.BildTextVerhalten).ToString();
-        txbBestFileStandardFolder.Text = _column.BestFile_StandardFolder;
-        txbBestFileStandardSuffix.Text = _column.BestFile_StandardSuffix;
+        //txbBestFileStandardFolder.Text = _column.BestFile_StandardFolder;
+        //txbBestFileStandardSuffix.Text = _column.BestFile_StandardSuffix;
         cbxLinkedDatabase.Text = _column.LinkedDatabaseFile;
         //txbLinkedKeyKennung.Text = _column.LinkedKeyKennung;
 
@@ -508,8 +508,8 @@ internal sealed partial class ColumnEditor {
         _column.BildCode_ConstantHeight = txbBildCodeConstHeight.Text;
         IntTryParse(cbxBildTextVerhalten.Text, out var imNf);
         _column.BildTextVerhalten = (BildTextVerhalten)imNf;
-        _column.BestFile_StandardFolder = txbBestFileStandardFolder.Text;
-        _column.BestFile_StandardSuffix = txbBestFileStandardSuffix.Text;
+        //_column.BestFile_StandardFolder = txbBestFileStandardFolder.Text;
+        //_column.BestFile_StandardSuffix = txbBestFileStandardSuffix.Text;
         _column.LinkedDatabaseFile = cbxLinkedDatabase.Text; // Muss vor LinkedCell_RowKey zurückgeschrieben werden
         _column.KeyColumnKey = ColumKeyFrom(_column.Database, cbxSchlüsselspalte.Text);
         _column.LinkedCell_ColumnKeyOfLinkedDatabase = ColumKeyFrom(_column.LinkedDatabase, cbxTargetColumn.Text); // LINKED DATABASE

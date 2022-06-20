@@ -22,8 +22,10 @@ public enum EditTypeFormula {
     Textfeld = 0,
     Textfeld_mit_Auswahlknopf = 1,
     SwapListBox = 2,
-    EasyPic = 3,
+
+    //EasyPic = 3,
     Ja_Nein_Knopf = 4,
+
     Farb_Auswahl_Dialog = 5,
 
     ////QuickPicDialog = 6
@@ -36,7 +38,7 @@ public enum EditTypeFormula {
     //Image_Auswahl_Dialog = 12,
     ////	ListBox_MarkedUp = 13,
     ////Einschätzung = 14,
-    Gallery = 15, // = Ist auch nur ne Listbox
+    //Gallery = 15, // = Ist auch nur ne Listbox
 
     ////	EventEditor = 16,
     ////	RelationOrEventEditor = 17,

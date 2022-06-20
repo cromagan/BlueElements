@@ -119,7 +119,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposable {
 
         #endregion
 
-        if (column.MultiLine && column.Format == DataFormat.Link_To_Filesystem) { return null; }
+        //if (column.MultiLine && column.Format == DataFormat.Link_To_Filesystem) { return null; }
         if (column.ScriptType == ScriptType.Nicht_vorhanden) { return null; }
 
         var wert = row.CellGetString(column);
@@ -138,20 +138,20 @@ public sealed class RowItem : ICanBeEmpty, IDisposable {
             //    //}
             //    break;
 
-            case DataFormat.Link_To_Filesystem:
-                qi = "Spalte: " + column.ReadableText() + "\r\nFalls die Datei auf der Festplatte existiert, wird eine weitere\r\nVariable erzeugt: " + column.Name + "_FileName";
-                var f = column.Database.Cell.BestFile(column, row);
-                if (f.FileType() == FileFormat.Image && FileOperations.FileExists(f)) {
-                    vars.Add(new VariableString(column.Name + "_FileName", f, true, false, "Spalte: " + column.ReadableText() + "\r\nEnthält den vollen Dateinamen der Datei der zugehörigen Zelle.\r\nDie Existenz der Datei wurde geprüft und die Datei existert.\r\nAuf die Datei kann evtl. mit LoadImage zugegriffen werden."));
-                }
-                break;
+            //case DataFormat.Link_To_Filesystem:
+            //    qi = "Spalte: " + column.ReadableText() + "\r\nFalls die Datei auf der Festplatte existiert, wird eine weitere\r\nVariable erzeugt: " + column.Name + "_FileName";
+            //    var f = column.Database.Cell.BestFile(column, row);
+            //    if (f.FileType() == FileFormat.Image && FileOperations.FileExists(f)) {
+            //        vars.Add(new VariableString(column.Name + "_FileName", f, true, false, "Spalte: " + column.ReadableText() + "\r\nEnthält den vollen Dateinamen der Datei der zugehörigen Zelle.\r\nDie Existenz der Datei wurde geprüft und die Datei existert.\r\nAuf die Datei kann evtl. mit LoadImage zugegriffen werden."));
+            //    }
+            //    break;
 
-                //case DataFormat.Columns_für_LinkedCellDropdown:
-                //    if (IntTryParse(wert, out var colKey)) {
-                //        var c = column.LinkedDatabase().Column.SearchByKey(colKey);
-                //        if (c != null) { wert = c.Name; }
-                //    }
-                //    break;
+            //case DataFormat.Columns_für_LinkedCellDropdown:
+            //    if (IntTryParse(wert, out var colKey)) {
+            //        var c = column.LinkedDatabase().Column.SearchByKey(colKey);
+            //        if (c != null) { wert = c.Name; }
+            //    }
+            //    break;
         }
 
         switch (column.ScriptType) {

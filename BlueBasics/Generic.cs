@@ -142,6 +142,15 @@ public static class Generic {
         return l;
     }
 
+    public static long GetUniqueKey(int tmp, string type) {
+        var x = DateTime.UtcNow.AddYears(-2020).Ticks;
+        var s = type + "\r\n" + Generic.UserName() + "\r\n" + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName;
+        long key = x + (s.GetHashCode() * 100000000) + tmp;
+        if (key < 0) { return key * -1; }
+
+        return key;
+    }
+
     public static string GetUrlFileDestination(string filename) {
         var d = File.ReadAllText(filename, Encoding.UTF8).SplitAndCutByCrToList();
         return d.TagGet("URL");

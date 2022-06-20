@@ -229,23 +229,23 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
     /// <returns></returns>
     public static bool UserEditPossible(ColumnItem? column, RowItem? row, ErrorReason mode) => string.IsNullOrEmpty(ErrorReason(column, row, mode));
 
-    /// <summary>
-    /// Gibt einen Datainamen/Pfad zurück, der sich aus dem Standard Angaben der Spalte und den Zelleninhalt zusammensetzt.
-    /// Keine Garantie, dass die Datei auch existiert.
-    /// </summary>
-    /// <param name="column"></param>
-    /// <param name="row"></param>
-    /// <returns></returns>
-    public string BestFile(string columnName, RowItem? row) => BestFile(_database.Column[columnName], row);
+    ///// <summary>
+    ///// Gibt einen Datainamen/Pfad zurück, der sich aus dem Standard Angaben der Spalte und den Zelleninhalt zusammensetzt.
+    ///// Keine Garantie, dass die Datei auch existiert.
+    ///// </summary>
+    ///// <param name="column"></param>
+    ///// <param name="row"></param>
+    ///// <returns></returns>
+    //public string BestFile(string columnName, RowItem? row) => BestFile(_database.Column[columnName], row);
 
-    /// <summary>
-    /// Gibt einen Datainamen/Pfad zurück, der sich aus dem Standard Angaben der Spalte und den Zelleninhalt zusammensetzt.
-    /// Keine Garantie, dass die Datei auch existiert.
-    /// </summary>
-    /// <param name="column"></param>
-    /// <param name="row"></param>
-    /// <returns></returns>
-    public string BestFile(ColumnItem? column, RowItem? row) => column.BestFile(GetString(column, row), false);
+    ///// <summary>
+    ///// Gibt einen Datainamen/Pfad zurück, der sich aus dem Standard Angaben der Spalte und den Zelleninhalt zusammensetzt.
+    ///// Keine Garantie, dass die Datei auch existiert.
+    ///// </summary>
+    ///// <param name="column"></param>
+    ///// <param name="row"></param>
+    ///// <returns></returns>
+    //public string BestFile(ColumnItem? column, RowItem? row) => column.BestFile(GetString(column, row), false);
 
     public void DataOfCellKey(string cellKey, out ColumnItem? column, out RowItem? row) {
         if (string.IsNullOrEmpty(cellKey)) {

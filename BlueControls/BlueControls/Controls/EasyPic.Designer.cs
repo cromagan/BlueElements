@@ -36,7 +36,6 @@ namespace BlueControls.Controls
         {
             this.components = new Container();
             this.EditPanelFrame = new GroupBox();
-            this.AusDatenbank = new Button();
             this.BlueLine1 = new Line();
             this.Lade = new Button();
             this.MakePic = new Button();
@@ -51,7 +50,6 @@ namespace BlueControls.Controls
             this.EditPanelFrame.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                                                           | System.Windows.Forms.AnchorStyles.Right)));
             this.EditPanelFrame.CausesValidation = false;
-            this.EditPanelFrame.Controls.Add(this.AusDatenbank);
             this.EditPanelFrame.Controls.Add(this.BlueLine1);
             this.EditPanelFrame.Controls.Add(this.Lade);
             this.EditPanelFrame.Controls.Add(this.MakePic);
@@ -60,17 +58,6 @@ namespace BlueControls.Controls
             this.EditPanelFrame.Name = "EditPanelFrame";
             this.EditPanelFrame.Size = new Size(472, 32);
             this.EditPanelFrame.Visible = false;
-            // 
-            // AusDatenbank
-            // 
-            this.AusDatenbank.ImageCode = "Tabelle|16";
-            this.AusDatenbank.Location = new Point(77, 3);
-            this.AusDatenbank.Name = "AusDatenbank";
-            this.AusDatenbank.QuickInfo = "Ein vorhandenes Bild das<br>bereits in der Datenbank<br>verwendet wird, verwenden" +
-                                          ".";
-            this.AusDatenbank.Size = new Size(32, 26);
-            this.AusDatenbank.TabIndex = 9;
-            this.AusDatenbank.Click += new EventHandler(this.AusDatenbank_Click);
             // 
             // BlueLine1
             // 
@@ -137,6 +124,5 @@ namespace BlueControls.Controls
         private Button Lade;
         private System.Windows.Forms.OpenFileDialog OpenDia;
         private System.Windows.Forms.Timer _PanelMover;
-        private Button AusDatenbank;
     }
 }

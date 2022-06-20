@@ -53,7 +53,7 @@ public enum DataFormat {
 
     // TextmitFormatierungUndLinkToAnotherDatabase = 71
     // Relation_And_Event_Mixed = 72,
-    Link_To_Filesystem = 73,
+    //Link_To_Filesystem = 73,
 
     /// <summary>
     /// Gibt die Werte einer anderen Spalte einer
@@ -105,7 +105,7 @@ public static class DataFormatExtensions {
     #region Methods
 
     public static bool Autofilter_möglich(this DataFormat format) => format switch {
-        DataFormat.Text or DataFormat.FarbeInteger or DataFormat.Schrift or DataFormat.Link_To_Filesystem or DataFormat.Verknüpfung_zu_anderer_Datenbank or DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems or DataFormat.RelationText => true,
+        DataFormat.Text or DataFormat.FarbeInteger or DataFormat.Schrift or DataFormat.Verknüpfung_zu_anderer_Datenbank or DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems or DataFormat.RelationText => true,
         _ => false
     };
 
@@ -115,12 +115,12 @@ public static class DataFormatExtensions {
     };
 
     public static bool CanBeCheckedByRules(this DataFormat format) => format switch {
-        DataFormat.Text or DataFormat.FarbeInteger or DataFormat.RelationText or DataFormat.Schrift or DataFormat.Link_To_Filesystem or DataFormat.Verknüpfung_zu_anderer_Datenbank or DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems => true,
+        DataFormat.Text or DataFormat.FarbeInteger or DataFormat.RelationText or DataFormat.Schrift or DataFormat.Verknüpfung_zu_anderer_Datenbank or DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems => true,
         _ => false
     };
 
     public static bool DropdownItemsAllowed(this DataFormat format) => format switch {
-        DataFormat.Text or DataFormat.Link_To_Filesystem or DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems or DataFormat.RelationText => true,
+        DataFormat.Text or DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems or DataFormat.RelationText => true,
         _ => false
     };
 
@@ -130,12 +130,12 @@ public static class DataFormatExtensions {
     };
 
     public static bool DropdownUnselectAllAllowed(this DataFormat format) => format switch {
-        DataFormat.Text or DataFormat.FarbeInteger or DataFormat.RelationText or DataFormat.Schrift or DataFormat.Link_To_Filesystem or DataFormat.Verknüpfung_zu_anderer_Datenbank => true,
+        DataFormat.Text or DataFormat.FarbeInteger or DataFormat.RelationText or DataFormat.Schrift or DataFormat.Verknüpfung_zu_anderer_Datenbank => true,
         _ => false
     };
 
     public static bool ExportableForLayout(this DataFormat format) => format switch {
-        DataFormat.Text or DataFormat.RelationText or DataFormat.Schrift or DataFormat.Link_To_Filesystem or DataFormat.Verknüpfung_zu_anderer_Datenbank or DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems => true,
+        DataFormat.Text or DataFormat.RelationText or DataFormat.Schrift or DataFormat.Verknüpfung_zu_anderer_Datenbank or DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems => true,
         _ => false
     };
 
@@ -160,7 +160,7 @@ public static class DataFormatExtensions {
     //public static bool IsFormat(this string txt, DataFormat format) => Text_LängeCheck(txt, format) && Text_SchabloneCheck(txt, format) && txt.ContainsOnlyChars(AllowedChars(format)) && Text_ValueCheck(txt, format);
 
     public static bool MultilinePossible(this DataFormat format) => format switch {
-        DataFormat.Text or DataFormat.RelationText or DataFormat.Link_To_Filesystem or DataFormat.Verknüpfung_zu_anderer_Datenbank => true,
+        DataFormat.Text or DataFormat.RelationText or DataFormat.Verknüpfung_zu_anderer_Datenbank => true,
         _ => false
     };
 

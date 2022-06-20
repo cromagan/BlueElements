@@ -52,6 +52,7 @@ public enum DatabaseDataType : byte {
     // RowUBoundx = 20
     GlobalShowPass = 21,
 
+    [Obsolete]
     FileEncryptionKey = 22,
 
     // DateiEndung = 23
@@ -107,6 +108,7 @@ public enum DatabaseDataType : byte {
     //[Obsolete]
     //JoinTyp = 61,
 
+    [Obsolete]
     VerwaisteDaten = 62,
 
     //ImportScript = 63,
@@ -210,8 +212,12 @@ public enum DatabaseDataType : byte {
     [Obsolete]
     co_LinkKeyKennung = 167,
 
+    [Obsolete]
     co_BestFile_StandardSuffix = 168,
+
+    [Obsolete]
     co_BestFile_StandardFolder = 169,
+
     co_BildCode_ConstantHeight = 170,
     co_BildTextVerhalten = 171,
 

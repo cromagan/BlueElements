@@ -116,7 +116,6 @@
     <Compile Include="Enums\ItemState.cs" />
     <Compile Include="Enums\FilterType.cs" />
     <Compile Include="Enums\ShortenStyle.cs" />
-    <Compile Include="Enums\VerwaisteDaten.cs" />
     <Compile Include="Enums\ColumnLineStyle.cs" />
     <Compile Include="Enums\EditTypeTable.cs" />
     <Compile Include="Enums\ExportTyp.cs" />

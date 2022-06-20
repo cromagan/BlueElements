@@ -450,32 +450,32 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Draw_CellTransparentDirect(gr, text, fitInRect, d.bFont, column, 16, style, bildTextverhalten, state);
     }
 
-    public static List<string?>? FileSystem(ColumnItem? tmpColumn) {
-        if (tmpColumn == null) { return null; }
+    //public static List<string?>? FileSystem(ColumnItem? tmpColumn) {
+    //    if (tmpColumn == null) { return null; }
 
-        var f = GetFilesWithFileSelector(tmpColumn.Database.Filename.FilePath(), tmpColumn.MultiLine);
+    //    var f = GetFilesWithFileSelector(tmpColumn.Database.Filename.FilePath(), tmpColumn.MultiLine);
 
-        if (f == null) { return null; }
+    //    if (f == null) { return null; }
 
-        List<string> delList = new();
-        List<string> newFiles = new();
+    //    List<string> delList = new();
+    //    List<string> newFiles = new();
 
-        foreach (var thisf in f) {
-            var b = FileToByte(thisf);
+    //    foreach (var thisf in f) {
+    //        var b = FileToByte(thisf);
 
-            if (!string.IsNullOrEmpty(tmpColumn.Database.FileEncryptionKey)) { b = Cryptography.SimpleCrypt(b, tmpColumn.Database.FileEncryptionKey, 1); }
+    //        if (!string.IsNullOrEmpty(tmpColumn.Database.FileEncryptionKey)) { b = Cryptography.SimpleCrypt(b, tmpColumn.Database.FileEncryptionKey, 1); }
 
-            var neu = thisf.FileNameWithSuffix();
-            neu = tmpColumn.BestFile(neu.FileNameWithSuffix(), true);
-            ByteToFile(neu, b);
+    //        var neu = thisf.FileNameWithSuffix();
+    //        neu = tmpColumn.BestFile(neu.FileNameWithSuffix(), true);
+    //        ByteToFile(neu, b);
 
-            newFiles.Add(neu);
-            delList.Add(thisf);
-        }
+    //        newFiles.Add(neu);
+    //        delList.Add(thisf);
+    //    }
 
-        FileDialogs.DeleteFile(delList, true);
-        return newFiles;
-    }
+    //    FileDialogs.DeleteFile(delList, true);
+    //    return newFiles;
+    //}
 
     public static Size FormatedText_NeededSize(ColumnItem? column, string originalText, BlueFont? font, ShortenStyle style, int minSize, BildTextVerhalten bildTextverhalten) {
         var (s, quickImage) = CellItem.GetDrawingData(column, originalText, style, bildTextverhalten);
@@ -2244,13 +2244,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 NotEditableInfo("Dieser Zelltyp kann nur in einem Formular-Fenster bearbeitet werden");
                 break;
 
-            case EditTypeTable.FileHandling_InDateiSystem:
-                if (cellInThisDatabaseColumn != contentHolderCellColumn || cellInThisDatabaseRow?.Row != contentHolderCellRow) {
-                    NotEditableInfo("Verlinkte Zellen hier verboten.");
-                    return;
-                }
-                Cell_Edit_FileSystem(cellInThisDatabaseColumn, cellInThisDatabaseRow);
-                break;
+            //case EditTypeTable.FileHandling_InDateiSystem:
+            //    if (cellInThisDatabaseColumn != contentHolderCellColumn || cellInThisDatabaseRow?.Row != contentHolderCellRow) {
+            //        NotEditableInfo("Verlinkte Zellen hier verboten.");
+            //        return;
+            //    }
+            //    Cell_Edit_FileSystem(cellInThisDatabaseColumn, cellInThisDatabaseRow);
+            //    break;
 
             default:
                 Develop.DebugPrint(dia);
@@ -2318,11 +2318,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Develop.Debugprint_BackgroundThread();
     }
 
-    private void Cell_Edit_FileSystem(ColumnItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow) {
-        var l = FileSystem(cellInThisDatabaseColumn);
-        if (l == null) { return; }
-        UserEdited(this, l.JoinWithCr(), cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, cellInThisDatabaseRow?.Chapter, false);
-    }
+    //private void Cell_Edit_FileSystem(ColumnItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow) {
+    //    var l = FileSystem(cellInThisDatabaseColumn);
+    //    if (l == null) { return; }
+    //    UserEdited(this, l.JoinWithCr(), cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, cellInThisDatabaseRow?.Chapter, false);
+    //}
 
     private bool Cell_Edit_TextBox(ColumnItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, ColumnItem? contentHolderCellColumn, RowItem? contentHolderCellRow, TextBox Box, int addWith, int isHeight) {
         if (contentHolderCellColumn != cellInThisDatabaseColumn) {
@@ -2494,7 +2494,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         maxX += Column_DrawWidth(thisViewItem, displayR);
                         _wiederHolungsSpaltenWidth = Math.Max(_wiederHolungsSpaltenWidth, maxX);
                     } else {
-                        thisViewItem.OrderTmpSpalteX1 = SliderX.Visible ? (int)(maxX - SliderX.Value) : 0;
+                        thisViewItem.OrderTmpSpalteX1 = SliderX.Enabled ? (int)(maxX - SliderX.Value) : maxX;
                         maxX += Column_DrawWidth(thisViewItem, displayR);
                     }
                 }

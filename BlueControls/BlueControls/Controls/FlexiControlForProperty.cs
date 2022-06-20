@@ -279,7 +279,6 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
         var x = _accessor.Name.SplitAndCutBy("__");
         Caption = x[0].Replace("_", " ") + ":";
-        FileEncryptionKey = string.Empty;
 
         #endregion Caption setzen
 
@@ -298,47 +297,64 @@ public class FlexiControlForProperty<T> : FlexiControl {
         } else {
             switch (_accessor) {
                 case Accessor<bool>: {
-                    EditType = EditTypeFormula.Ja_Nein_Knopf;
-                    var s1 = BlueFont.MeasureStringOfCaption(Caption);
-                    Size = new Size((int)s1.Width + 30, 22);
-                    break;
-                }
+                        EditType = EditTypeFormula.Ja_Nein_Knopf;
+                        var s1 = BlueFont.MeasureStringOfCaption(Caption);
+                        Size = new Size((int)s1.Width + 30, 22);
+                        break;
+                    }
                 default: // Alle enums sind ein eigener Typ.... deswegen alles in die Textbox
                 {
-                    if (list != null) {
-                        EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-                        list.Appearance = BlueListBoxAppearance.ComboBox_Textbox;
-                        var s2 = BlueFont.MeasureStringOfCaption(Caption);
-                        var (biggestItemX, biggestItemY, _, _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
-                        var x2 = Math.Max((int)(biggestItemX + 20 + s2.Width), 200);
-                        var y2 = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
-                        Size = new Size(x2, y2);
-                        StyleComboBox((ComboBox)CreateSubControls(), list, ComboBoxStyle.DropDownList, true);
-                    } else {
-                        EditType = EditTypeFormula.Textfeld;
-                        if (textLines >= 2) {
-                            CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
-                            Size = new Size(200, 16 + (24 * textLines));
-                            MultiLine = true;
-                            this.SetFormat(VarType.Text);
+                        if (list != null) {
+                            EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
+                            list.Appearance = BlueListBoxAppearance.ComboBox_Textbox;
+                            var s2 = BlueFont.MeasureStringOfCaption(Caption);
+                            var (biggestItemX, biggestItemY, _, _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
+                            var x2 = Math.Max((int)(biggestItemX + 20 + s2.Width), 200);
+                            var y2 = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
+                            Size = new Size(x2, y2);
+                            StyleComboBox((ComboBox)CreateSubControls(), list, ComboBoxStyle.DropDownList, true);
                         } else {
-                            CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
-                            Size = new Size(200, 24);
-                            MultiLine = false;
-                            switch (_accessor) {
-                                case Accessor<string>: this.SetFormat(VarType.Text); break;
-                                case Accessor<int>: this.SetFormat(VarType.Integer); break;
-                                case Accessor<float>: this.SetFormat(VarType.Float); break;
-                                case Accessor<double>: this.SetFormat(VarType.Float); break;
-                                case Accessor<Color>: this.SetFormat(VarType.Text); break;
-                                default: this.SetFormat(VarType.Text); break;
-                            }
-                        }
+                            EditType = EditTypeFormula.Textfeld;
+                            if (textLines >= 2) {
+                                CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
+                                Size = new Size(200, 16 + (24 * textLines));
+                                MultiLine = true;
+                                this.SetFormat(VarType.Text);
+                            } else {
+                                CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
+                                Size = new Size(200, 24);
+                                MultiLine = false;
+                                switch (_accessor) {
+                                    case Accessor<string>:
+                                        this.SetFormat(VarType.Text);
+                                        break;
 
-                        StyleTextBox((TextBox)CreateSubControls());
+                                    case Accessor<int>:
+                                        this.SetFormat(VarType.Integer);
+                                        break;
+
+                                    case Accessor<float>:
+                                        this.SetFormat(VarType.Float);
+                                        break;
+
+                                    case Accessor<double>:
+                                        this.SetFormat(VarType.Float);
+                                        break;
+
+                                    case Accessor<Color>:
+                                        this.SetFormat(VarType.Text);
+                                        break;
+
+                                    default:
+                                        this.SetFormat(VarType.Text);
+                                        break;
+                                }
+                            }
+
+                            StyleTextBox((TextBox)CreateSubControls());
+                        }
+                        break;
                     }
-                    break;
-                }
             }
         }
 

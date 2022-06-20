@@ -45,7 +45,6 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
 {
     #region Fields
 
-    public static readonly string CryptoErkennung = ".cyo";
     private string _ausschneiden = string.Empty;
 
     private bool _isLoading;
@@ -70,37 +69,6 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
     #endregion
 
     #region Properties
-
-    [Browsable(false)]
-    public bool Crypted {
-        get => IsCyrpted(txbPfad.Text);
-        set {
-            if (IsCyrpted(txbPfad.Text) == value) { return; }
-
-            var thumbPfad = txbPfad.Text.TrimEnd("\\") + "\\" + "Thumbs" + CryptoErkennung;
-
-            var allF = Directory.GetFiles(txbPfad.Text.TrimEnd("\\") + "\\", "*", SearchOption.TopDirectoryOnly);
-            foreach (var thisString in allF) {
-                if (thisString.EndsWith(CryptoErkennung)) { File.Delete(thisString); }
-            }
-
-            if (value) {
-                var l = new List<string>();
-                l.Add("1.2");
-                l.Add("Folder");
-                //l.Add(_cryptMatrix);
-                l.Save(CryoptErkennungsFile(txbPfad.Text.TrimEnd("\\") + "\\"), Constants.Win1252, false);
-
-                Directory.CreateDirectory(thumbPfad);
-            } else {
-                DeleteDir(thumbPfad, true);
-            }
-
-            Reload();
-        }
-    }
-
-    public string CryptMatrix { get; set; }
 
     public new bool Enabled {
         get => base.Enabled; set {
@@ -197,16 +165,6 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         ÖffnePfad(txbPfad.Text);
     }
 
-    public bool UrlExists(string nt) {
-        foreach (var thisItem in lsbFiles.Item) {
-            var tags = (List<string>)(thisItem.Tag);
-
-            if (tags.TagGet("URL").ToUpper() == nt.ToUpper()) { return true; }
-        }
-
-        return false;
-    }
-
     protected override void DrawControl(Graphics gr, States state) {
         Skin.Draw_Back_Transparent(gr, ClientRectangle, this);
     }
@@ -226,7 +184,6 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
     private bool AddThis(string path, bool isFile) {
         if (isFile) {
             if (path.FilePath() == "C:\\") { return false; }
-            if (path.EndsWith(CryptoErkennung)) { return false; }
             return true;
         }
 
@@ -236,7 +193,6 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         if (path.EndsWith("\\$recycle.bin\\")) { return false; }
         if (path.EndsWith("\\$recycle\\")) { return false; }
         if (path.EndsWith("\\system volume information\\")) { return false; }
-        if (path.EndsWith("\\thumbs" + CryptoErkennung.ToLower() + "\\")) { return false; }
 
         //if (Path.EndsWith("\\Dokumente und Einstellungen\\")) { return false; }
 
@@ -261,50 +217,6 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         ÖffnePfad(txbPfad.Text.PathParent(1));
     }
 
-    private string ChangeFile(string filename, bool shoudbeCrypted) {
-        if (string.IsNullOrEmpty(CryptMatrix)) { return filename; }
-
-        var richtung = 10;
-        if (shoudbeCrypted) { richtung = -10; }
-
-        if (!AddThis(filename, true)) { return filename; }
-
-        var T = CryptedFileName(filename, richtung);
-
-        if (T == filename) { return filename; }
-
-        var tmpOriFile = filename;
-        while (FileExists(T)) {
-            tmpOriFile = tmpOriFile.FilePath() + "\\" + tmpOriFile.FileNameWithoutSuffix() + "_." + tmpOriFile.FileSuffix();
-
-            T = CryptedFileName(tmpOriFile, richtung);
-        }
-
-        var I = new FileInfo(filename);
-
-        var crt = File.GetCreationTime(filename);
-        var cht = File.GetLastWriteTime(filename);
-        var attribute = I.Attributes;
-
-        File.Move(filename, T);
-
-        if (T.FileNameWithSuffix().StartsWith("#")) {
-            attribute = FileAttributes.Hidden;
-        } else {
-            if (attribute.HasFlag(FileAttributes.Hidden)) {
-                attribute = I.Attributes & ~FileAttributes.Hidden;
-            }
-        }
-
-        try {
-            File.SetAttributes(T, attribute);
-            File.SetCreationTime(T, crt);
-            File.SetLastWriteTime(T, cht);
-        } catch { }
-
-        return T;
-    }
-
     private void CheckButtons() {
         txbPfad.Enabled = Enabled && string.IsNullOrEmpty(OriginalText);
         lsbFiles.Enabled = Enabled;
@@ -313,95 +225,20 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         btnZurück.Enabled = PathExists(txbPfad.Text);
     }
 
-    private string CryoptErkennungsFile(string ofPath) {
-        var p = ofPath.Trim("\\") + "\\";
-        p = p + ofPath.Trim("\\").FileNameWithSuffix() + CryptoErkennung;
-        return p;
-    }
-
-    private string CryptedFileName(string fullFile, int richtung) {
-        var ret = string.Empty;
-
-        var fileName = fullFile.FileNameWithSuffix();
-
-        if (richtung < 0 && fileName.StartsWith("#")) { return fullFile; }
-        if (richtung > 0 && !fileName.StartsWith("#")) { return fullFile; }
-
-        for (var z = 0; z < fileName.Length; z++) {
-            int pos;
-            if (richtung > 0) {
-                pos = CryptMatrix.IndexOf(fileName[z]);
-            } else {
-                pos = CryptMatrix.LastIndexOf(fileName[z]);
-            }
-
-            if (pos >= 0) {
-                ret = ret + CryptMatrix[pos + richtung];
-            } else {
-                ret = ret + fileName[z];
-            }
-        }
-
-        if (richtung < 0) { return fullFile.FilePath() + "#" + ret; }
-        return fullFile.FilePath() + ret.Substring(1);
-    }
-
-    private Bitmap? GetThumbnail(string cryptoFileOnDisk, string realFileName) {
-        Bitmap? thumbnail = null;
-
-        if (realFileName.FileSuffix() == "URL") {
-            //var addres = GetUrlFileDestination(cryptoFileOnDisk);
-
-            //// Let's use
-            //string url = ((string.IsNullOrEmpty(Request.Params["site"])) ? "blog.yemrekeskin.com" : Request.Params["site"]);
-            //int width = ((string.IsNullOrEmpty(Request.Params["width"])) ? 1000 : int.Parse(Request.Params["width"]));
-            //int height = ((string.IsNullOrEmpty(Request.Params["height"])) ? 940 : int.Parse(Request.Params["height"]));
-            //int capWidth = ((string.IsNullOrEmpty(Request.Params["capWidth"])) ? 900 : int.Parse(Request.Params["capWidth"]));
-            //int capHeight = ((string.IsNullOrEmpty(Request.Params["capHeight"])) ? 800 : int.Parse(Request.Params["capHeight"]));
-
-            //string address = "http://" + url;
-
-            //WebsiteThumbImage test = new WebsiteThumbImage();
-            //test.BrowserWidth = 1000;
-            //test.BrowserHeight = 940;
-            //test.ThumbWidth = 900;
-            //test.ThumbHeight = 800;
-            //test.Url = addres;
-            //test.Generate();
-            //thumbnail = WebsiteThumbImage.GenerateScreenshot(addres, 800, 600);
-
-            //thumbnail = WebsiteThumbImage.WebsiteThumbnailImageGenerator.GetWebSiteThumbnail(address, 1000, 940, 900, 800);
-
-            //Response.ContentType = "image/jpeg";
-            //thumbnail.Save(Response.OutputStream, ImageFormat.Jpeg);
-        } else {
-            var f = ChangeFile(cryptoFileOnDisk, false);
-            thumbnail = WindowsThumbnailProvider.GetThumbnail(f, 64, 64, ThumbnailOptions.BiggerSizeOk);
-            ChangeFile(f, true);
-        }
-
-        return thumbnail;
-    }
-
-    private bool IsCyrpted(string path) {
-        return FileExists(CryoptErkennungsFile(path));
-    }
-
     private void lsbFiles_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         if (e.HotItem == null) { return; }
 
         var it = ((BitmapListItem)e.HotItem);
         var tags = (List<string>)(it.Tag);
-        var tmpCrypted = Crypted;
 
-        e.UserMenu.Add(ContextMenuComands.Ausschneiden, !tags.TagGet("Folder").FromPlusMinus() && tmpCrypted);
+        e.UserMenu.Add(ContextMenuComands.Ausschneiden, !tags.TagGet("Folder").FromPlusMinus());
         e.UserMenu.Add(ContextMenuComands.Einfügen, tags.TagGet("CryptetFolder").FromPlusMinus() && !string.IsNullOrEmpty(_ausschneiden));
         e.UserMenu.AddSeparator();
         e.UserMenu.Add(ContextMenuComands.Umbenennen, FileExists(it.Internal));
-        e.UserMenu.Add(ContextMenuComands.Löschen, FileExists(it.Internal) && tmpCrypted);
+        e.UserMenu.Add(ContextMenuComands.Löschen, FileExists(it.Internal));
         e.UserMenu.AddSeparator();
-        e.UserMenu.Add("Screenshot als Vorschau", "Screenshot", QuickImage.Get(ImageCode.Bild), FileExists(it.Internal) && tmpCrypted);
-        e.UserMenu.AddSeparator();
+        //e.UserMenu.Add("Screenshot als Vorschau", "Screenshot", QuickImage.Get(ImageCode.Bild), FileExists(it.Internal));
+        //e.UserMenu.AddSeparator();
 
         e.UserMenu.Add("Im Explorer öffnen", "Explorer", QuickImage.Get(ImageCode.Ordner));
         //TextListItem I1 = new TextListItem("#Relation", "Neue Beziehung hinzufügen", QuickImage.Get(ImageCode.Herz), true);
@@ -419,7 +256,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
                 bool ask = Convert.ToBoolean(I.Attributes & FileAttributes.ReadOnly);
 
                 if (FileDialogs.DeleteFile(I.FullName, ask)) {
-                    FileDialogs.DeleteFile(ThumbFile(I.FullName), false);
+                    //FileDialogs.DeleteFile(ThumbFile(I.FullName), false);
                     Reload();
                 }
                 break;
@@ -429,8 +266,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
                 break;
 
             case "Umbenennen":
-
-                var n = tags.TagGet("UncryptetName");
+                var n = it.Internal;
 
                 var nn = InputBox.Show("Neuer Name:", n.FileNameWithoutSuffix(), VarType.Text);
 
@@ -438,27 +274,21 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
 
                 nn = n.FilePath() + nn + "." + n.FileSuffix();
 
-                if (n != it.Internal) { nn = CryptedFileName(nn, -10); }
-
                 RenameFile(it.Internal, nn, true);
 
-                if (FileExists(ThumbFile(it.Internal))) {
-                    RenameFile(ThumbFile(it.Internal), ThumbFile(nn), true);
-                }
-
                 Reload();
                 break;
 
-            case "Screenshot":
-                var bmp = ScreenShot.GrabArea(ParentForm());
+            //case "Screenshot":
+            //    var bmp = ScreenShot.GrabArea(ParentForm());
 
-                if (bmp.GrabedArea().Width < 1) { return; }
-                var th = ThumbFile(it.Internal);
-                FileDialogs.DeleteFile(th, false);
-                bmp.Save(th, ImageFormat.Png);
-                Reload();
+            //    if (bmp.GrabedArea().Width < 1) { return; }
+            //    var th = ThumbFile(it.Internal);
+            //    FileDialogs.DeleteFile(th, false);
+            //    bmp.Save(th, ImageFormat.Png);
+            //    Reload();
 
-                break;
+            //    break;
 
             case "Ausschneiden":
                 _ausschneiden = it.Internal;
@@ -474,9 +304,9 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
 
                 RenameFile(_ausschneiden, ziel, true);
 
-                if (FileExists(ThumbFile(_ausschneiden))) {
-                    RenameFile(ThumbFile(_ausschneiden), ThumbFile(ziel), true);
-                }
+                //if (FileExists(ThumbFile(_ausschneiden))) {
+                //    RenameFile(ThumbFile(_ausschneiden), ThumbFile(ziel), true);
+                //}
                 _ausschneiden = string.Empty;
                 Reload();
 
@@ -517,11 +347,11 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
 
             string tmp;
 
-            if (FileExists(CryoptErkennungsFile(txbPfad.Text.TrimEnd("\\") + "\\"))) {
-                tmp = CryptedFileName(e.Item.Internal, 10);
-            } else {
-                tmp = e.Item.Internal;
-            }
+            //if (FileExists(CryoptErkennungsFile(txbPfad.Text.TrimEnd("\\") + "\\"))) {
+            //    tmp = CryptedFileName(e.Item.Internal, 10);
+            //} else {
+            tmp = e.Item.Internal;
+            //}
 
             var x = GestStandardCommand("." + tmp.FileSuffix());
 
@@ -568,56 +398,34 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
             return;
         }
 
-        var tmpCyrptedCrypted = Crypted;
-
         var allF = Directory.GetFiles(newPath, "*", SearchOption.TopDirectoryOnly);
 
-        foreach (var thisString in allF) {
-            if (AddThis(thisString, true)) // Prüfung 1, ob .cyo
-            {
-                var fileName = ChangeFile(thisString, tmpCyrptedCrypted);
-                string suffix;
-                var uncryptetName = fileName;
-                BitmapListItem p;
-                if (tmpCyrptedCrypted) {
-                    uncryptetName = CryptedFileName(fileName, 10);
-                    suffix = uncryptetName.FileSuffix().ToUpper();
-                    p = new BitmapListItem(QuickImage.Get(uncryptetName.FileType(), 64), fileName, uncryptetName.FileNameWithoutSuffix());
-                } else {
-                    suffix = fileName.FileSuffix().ToUpper();
-                    p = new BitmapListItem(QuickImage.Get(fileName.FileType(), 64), fileName, fileName.FileNameWithoutSuffix());
+        foreach (var fileName in allF) {
+            if (AddThis(fileName, true)) {
+                var suffix = fileName.FileSuffix().ToUpper();
+                var p = new BitmapListItem(QuickImage.Get(fileName.FileType(), 64), fileName, fileName.FileNameWithoutSuffix());
+
+                p.Padding = 6;
+
+                switch (_sort) {
+                    case "Größe":
+                        p.UserDefCompareKey = new FileInfo(fileName).Length.ToString(Constants.Format_Integer10);
+                        break;
+
+                    case "Erstelldatum":
+                        p.UserDefCompareKey = new FileInfo(fileName).CreationTime.ToString("yyyy/MM/dd HH:mm:ss.fff");
+                        break;
+
+                    default:
+                        p.UserDefCompareKey = Constants.SecondSortChar + p.Caption.ToUpper();
+                        break;
                 }
 
-                if (AddThis(uncryptetName, true)) // Prüfung 2, ob der ungecryptete NAme auch wirklich rein darf
-                {
-                    p.Padding = 6;
-
-                    switch (_sort) {
-                        case "Größe":
-                            p.UserDefCompareKey = new FileInfo(fileName).Length.ToString(Constants.Format_Integer10);
-                            break;
-
-                        case "Erstelldatum":
-                            p.UserDefCompareKey = new FileInfo(fileName).CreationTime.ToString("yyyy/MM/dd HH:mm:ss.fff");
-                            break;
-
-                        default:
-                            p.UserDefCompareKey = Constants.SecondSortChar + p.Caption.ToUpper();
-                            break;
-                    }
-
-                    var tags = new List<string>();
-                    tags.TagSet("Folder", bool.FalseString);
-
-                    tags.TagSet("Suffix", suffix);
-
-                    tags.TagSet("UncryptetName", uncryptetName);
-                    if (suffix == "URL") { tags.TagSet("URL", GetUrlFileDestination(fileName)); }
-
-                    p.Tag = tags;
-
-                    lsbFiles.Item.Add(p);
-                }
+                var tags = new List<string>();
+                tags.TagSet("Folder", bool.FalseString);
+                tags.TagSet("Suffix", suffix);
+                p.Tag = tags;
+                lsbFiles.Item.Add(p);
             }
 
             if (dropChanged) { OnFolderChanged(); }
@@ -629,13 +437,13 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
                 BitmapListItem p;
                 var tags = new List<string>();
 
-                if (IsCyrpted(thisString)) {
-                    p = new BitmapListItem(QuickImage.Get("Ordner|64|||FF0000"), thisString, thisString.FileNameWithoutSuffix());
-                    tags.TagSet("CryptetFolder", bool.TrueString);
-                } else {
-                    p = new BitmapListItem(QuickImage.Get("Ordner|64"), thisString, thisString.FileNameWithoutSuffix());
-                    tags.TagSet("CryptetFolder", bool.FalseString);
-                }
+                //if (IsCyrpted(thisString)) {
+                //    p = new BitmapListItem(QuickImage.Get("Ordner|64|||FF0000"), thisString, thisString.FileNameWithoutSuffix());
+                //    tags.TagSet("CryptetFolder", bool.TrueString);
+                //} else {
+                p = new BitmapListItem(QuickImage.Get("Ordner|64"), thisString, thisString.FileNameWithoutSuffix());
+                tags.TagSet("CryptetFolder", bool.FalseString);
+                //}
 
                 tags.TagSet("Folder", bool.TrueString);
                 p.Padding = 10;
@@ -670,19 +478,11 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         }
     }
 
-    private string ThumbFile(string thisString) {
-        var p = thisString.FilePath();
-        var d = thisString.FileNameWithSuffix();
-        return p + "Thumbs" + CryptoErkennung + "\\" + d;
-    }
-
     private void ThumbGenerator_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e) {
         //ThumbGenerator.SetApartmentState
 
         var newPath = txbPfad.Text.Trim("\\") + "\\";
         if (!PathExists(newPath)) { return; }
-
-        var cryptet = IsCyrpted(newPath);
 
         var allF = Directory.GetFiles(newPath, "*", SearchOption.TopDirectoryOnly);
 
@@ -694,36 +494,34 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
             {
                 var feedBack = new List<object?> { thisString }; // Zeile 1, Dateiname auf Festplatte, ZEile 2 das Bild selbst
 
-                if (cryptet) {
-                    var rEadable = CryptedFileName(thisString, 10);
+                //if (cryptet) {
+                //    var rEadable = CryptedFileName(thisString, 10);
 
-                    if (AddThis(rEadable, true)) {
-                        var th = ThumbFile(thisString);
+                //    if (AddThis(rEadable, true)) {
+                //        var th = ThumbFile(thisString);
 
-                        if (!FileExists(th)) {
-                            var thumbnail = GetThumbnail(thisString, rEadable);
-                            if (!PathExists(th.FilePath())) {
-                                Directory.CreateDirectory(th.FilePath());
-                            }
+                //        if (!FileExists(th)) {
+                //            var thumbnail = GetThumbnail(thisString, rEadable);
+                //            if (!PathExists(th.FilePath())) {
+                //                Directory.CreateDirectory(th.FilePath());
+                //            }
 
-                            if (thumbnail != null) {
-                                thumbnail.Save(th, ImageFormat.Png);
-                                feedBack.Add(thumbnail);
-                            }
-                        } else {
-                            feedBack.Add(Image_FromFile(th));
-                        }
-                    }
+                //            if (thumbnail != null) {
+                //                thumbnail.Save(th, ImageFormat.Png);
+                //                feedBack.Add(thumbnail);
+                //            }
+                //        } else {
+                //            feedBack.Add(Image_FromFile(th));
+                //        }
+                //    }
 
-                    if (feedBack.Count == 1) {
-                        // Verschlüsselte Dateinamen....schwierig ein echtes Bild zu kriegen...
-                        feedBack.Add(QuickImage.Get(rEadable.FileType(), 64));
-                    }
-                }
+                //    if (feedBack.Count == 1) {
+                //        // Verschlüsselte Dateinamen....schwierig ein echtes Bild zu kriegen...
+                //        feedBack.Add(QuickImage.Get(rEadable.FileType(), 64));
+                //    }
+                //}
 
-                if (feedBack.Count == 1) {
-                    feedBack.Add(WindowsThumbnailProvider.GetThumbnail(thisString, 64, 64, ThumbnailOptions.BiggerSizeOk));
-                }
+                feedBack.Add(WindowsThumbnailProvider.GetThumbnail(thisString, 64, 64, ThumbnailOptions.BiggerSizeOk));
 
                 ThumbGenerator.ReportProgress(0, feedBack);
             }
@@ -752,7 +550,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
             }
         }
 
-        bItem.Bitmap = (Bitmap)Image_FromFile(ThumbFile(file));
+        bItem.Bitmap = null;//  (Bitmap)Image_FromFile(ThumbFile(file));
     }
 
     private void txbPfad_Enter(object? sender, System.EventArgs? e) {

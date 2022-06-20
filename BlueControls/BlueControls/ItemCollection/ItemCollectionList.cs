@@ -298,8 +298,8 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         base.Add(item);
     }
 
-    public BitmapListItem Add(string filename, string internalname, string caption, string encryptionKey) {
-        BitmapListItem i = new(filename, internalname, caption, encryptionKey);
+    public BitmapListItem Add(string filename, string internalname, string caption) {
+        BitmapListItem i = new(filename, internalname, caption);
         Add(i);
         return i;
     }
@@ -447,9 +447,9 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
 
     public BasicListItem? Add(string value, ColumnItem? columnStyle, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
         if (this[value] == null) {
-            if (columnStyle.Format == DataFormat.Link_To_Filesystem && value.FileType() == FileFormat.Image) {
-                return Add(columnStyle.BestFile(value, false), value, value, columnStyle.Database.FileEncryptionKey);
-            }
+            //if (columnStyle.Format == DataFormat.Link_To_Filesystem && value.FileType() == FileFormat.Image) {
+            //    return Add(columnStyle.BestFile(value, false), value, value, columnStyle.Database.FileEncryptionKey);
+            //}
 
             CellLikeListItem i = new(value, columnStyle, style, true, bildTextverhalten);
             Add(i);
@@ -800,7 +800,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         OnItemCheckedChanged();
     }
 
-    internal void SetValuesTo(List<string> values, string fileEncryptionKey) {
+    internal void SetValuesTo(List<string> values) {
         var ist = this.ToListOfString();
         var zuviel = ist.Except(values).ToList();
         var zuwenig = values.Except(ist).ToList();
@@ -812,7 +812,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         foreach (var thisString in zuwenig) {
             if (FileOperations.FileExists(thisString)) {
                 if (thisString.FileType() == FileFormat.Image) {
-                    Add(thisString, thisString, thisString.FileNameWithoutSuffix(), fileEncryptionKey);
+                    Add(thisString, thisString, thisString.FileNameWithoutSuffix());
                 } else {
                     Add(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(thisString.FileType(), 48));
                 }

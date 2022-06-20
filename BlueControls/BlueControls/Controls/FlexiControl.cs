@@ -207,9 +207,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool Enabled => !DesignMode && string.IsNullOrEmpty(_disabledReason);
 
-    [DefaultValue("")]
-    public string FileEncryptionKey { get; set; } = "";
-
     public override bool Focused {
         get {
             foreach (Control thisControl in Controls) {
@@ -399,11 +396,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 c = Control_Create_TextBox();
                 break;
 
-            case EditTypeFormula.EasyPic:
-                c = Control_Create_EasyPic();
-                break;
-
-            case EditTypeFormula.Gallery:
             case EditTypeFormula.Listbox:
                 c = Control_Create_ListBox();
                 break;
@@ -436,9 +428,9 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 c = Control_Create_SwapListBox();
                 break;
 
-            default:
-                Develop.DebugPrint(_editType);
-                return null;
+            //default:
+                //Develop.DebugPrint(_editType);
+                //return null;
         }
         UpdateControls();
         return c;
@@ -688,10 +680,10 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         control.FilterAllowed = false;
         control.MoveAllowed = false;
         switch (_editType) {
-            case EditTypeFormula.Gallery:
-                control.Appearance = BlueListBoxAppearance.Gallery;
-                control.RemoveAllowed = true;
-                break;
+            //case EditTypeFormula.Gallery:
+            //    control.Appearance = BlueListBoxAppearance.Gallery;
+            //    control.RemoveAllowed = true;
+            //    break;
 
             case EditTypeFormula.Listbox:
                 control.RemoveAllowed = true;
@@ -816,18 +808,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         StyleComboBox(control, null, ComboBoxStyle.DropDownList, false);
         UpdateValueToControl();
         StandardBehandlung(control);
-        return control;
-    }
-
-    /// <summary>
-    /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
-    /// </summary>
-    private EasyPic Control_Create_EasyPic() {
-        EasyPic control = new() {
-            Enabled = Enabled
-        };
-        StandardBehandlung(control);
-        UpdateValueToControl();
         return control;
     }
 
@@ -1067,7 +1047,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// <summary>
     /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
     /// </summary>
-    private void UpdateValueTo_ListBox(ItemCollectionList main) => main.SetValuesTo(Value.SplitAndCutByCrToList(), FileEncryptionKey);
+    private void UpdateValueTo_ListBox(ItemCollectionList main) => main.SetValuesTo(Value.SplitAndCutByCrToList());
 
     /// <summary>
     /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.

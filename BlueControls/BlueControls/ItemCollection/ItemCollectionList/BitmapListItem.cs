@@ -33,8 +33,6 @@ public class BitmapListItem : BasicListItem {
 
     private const int ConstMy = 15;
 
-    private readonly string _encryptionKey = string.Empty;
-
     private readonly ListExt<QuickImage> _overlays = new();
 
     private Bitmap? _bitmap;
@@ -59,12 +57,11 @@ public class BitmapListItem : BasicListItem {
         _overlays.Clear();
     }
 
-    public BitmapListItem(string filename, string internalname, string caption, string encryptionKey) : base(internalname, true) {
+    public BitmapListItem(string filename, string internalname, string caption) : base(internalname, true) {
         _caption = caption;
         _captiontmp.Clear();
         //_Bitmap = bmp;
         _imageFilename = filename;
-        _encryptionKey = encryptionKey;
         Padding = 0;
         _overlays.Clear();
         //_overlays.ListOrItemChanged += _overlays_ListOrItemChanged;
@@ -211,13 +208,7 @@ public class BitmapListItem : BasicListItem {
         if (_bitmap != null) { return; }
         try {
             if (FileExists(_imageFilename)) {
-                if (!string.IsNullOrEmpty(_encryptionKey)) {
-                    var b = Converter.FileToByte(_imageFilename);
-                    b = Cryptography.SimpleCrypt(b, _encryptionKey, -1);
-                    _bitmap = Converter.ByteToBitmap(b);
-                } else {
-                    _bitmap = (Bitmap)BitmapExt.Image_FromFile(_imageFilename);
-                }
+                _bitmap = (Bitmap)BitmapExt.Image_FromFile(_imageFilename);
             }
         } catch (Exception ex) {
             Develop.DebugPrint(ex);

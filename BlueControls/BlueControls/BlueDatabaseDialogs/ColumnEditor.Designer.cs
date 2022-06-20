@@ -117,10 +117,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.Caption13 = new BlueControls.Controls.Caption();
             this.cbxLinkedDatabase = new BlueControls.Controls.ComboBox();
             this.capLinkedDatabase = new BlueControls.Controls.Caption();
-            this.capBestFileStandardSuffix = new BlueControls.Controls.Caption();
-            this.txbBestFileStandardSuffix = new BlueControls.Controls.TextBox();
-            this.capBestFileStandardFolder = new BlueControls.Controls.Caption();
-            this.txbBestFileStandardFolder = new BlueControls.Controls.TextBox();
             this.BlueFrame1 = new BlueControls.Controls.GroupBox();
             this.btnVerwendung = new BlueControls.Controls.Button();
             this.capInfo = new BlueControls.Controls.Caption();
@@ -145,8 +141,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnSchnellTelefonNummer = new BlueControls.Controls.Button();
             this.btnSchnellGleitkommazahl = new BlueControls.Controls.Button();
             this.btnSchnellGanzzahl = new BlueControls.Controls.Button();
-            this.tabSpezial = new System.Windows.Forms.TabPage();
-            this.grpLinkToFileSystem = new BlueControls.Controls.GroupBox();
             this.tabSpaltenVerlinkung = new System.Windows.Forms.TabPage();
             this.tblFilterliste = new BlueControls.Controls.Table();
             this.cbxTargetColumn = new BlueControls.Controls.ComboBox();
@@ -166,8 +160,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabControl.SuspendLayout();
             this.tabDatenFormat.SuspendLayout();
             this.grpSchnellformat.SuspendLayout();
-            this.tabSpezial.SuspendLayout();
-            this.grpLinkToFileSystem.SuspendLayout();
             this.tabSpaltenVerlinkung.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -1200,40 +1192,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capLinkedDatabase.Size = new System.Drawing.Size(152, 16);
             this.capLinkedDatabase.Text = "Vernküpfte Datenbank:";
             // 
-            // capBestFileStandardSuffix
-            // 
-            this.capBestFileStandardSuffix.CausesValidation = false;
-            this.capBestFileStandardSuffix.Location = new System.Drawing.Point(8, 72);
-            this.capBestFileStandardSuffix.Name = "capBestFileStandardSuffix";
-            this.capBestFileStandardSuffix.Size = new System.Drawing.Size(264, 16);
-            this.capBestFileStandardSuffix.Text = "Standard Dateiendung bei neuen Dateien:";
-            // 
-            // txbBestFileStandardSuffix
-            // 
-            this.txbBestFileStandardSuffix.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbBestFileStandardSuffix.Location = new System.Drawing.Point(280, 72);
-            this.txbBestFileStandardSuffix.Name = "txbBestFileStandardSuffix";
-            this.txbBestFileStandardSuffix.Regex = null;
-            this.txbBestFileStandardSuffix.Size = new System.Drawing.Size(152, 24);
-            this.txbBestFileStandardSuffix.TabIndex = 36;
-            // 
-            // capBestFileStandardFolder
-            // 
-            this.capBestFileStandardFolder.CausesValidation = false;
-            this.capBestFileStandardFolder.Location = new System.Drawing.Point(8, 24);
-            this.capBestFileStandardFolder.Name = "capBestFileStandardFolder";
-            this.capBestFileStandardFolder.Size = new System.Drawing.Size(320, 16);
-            this.capBestFileStandardFolder.Text = "Standard Speicher Ordner bei Dateien:";
-            // 
-            // txbBestFileStandardFolder
-            // 
-            this.txbBestFileStandardFolder.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbBestFileStandardFolder.Location = new System.Drawing.Point(8, 40);
-            this.txbBestFileStandardFolder.Name = "txbBestFileStandardFolder";
-            this.txbBestFileStandardFolder.Regex = null;
-            this.txbBestFileStandardFolder.Size = new System.Drawing.Size(424, 24);
-            this.txbBestFileStandardFolder.TabIndex = 34;
-            // 
             // BlueFrame1
             // 
             this.BlueFrame1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -1354,7 +1312,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabControl.Controls.Add(this.tabFilter);
             this.tabControl.Controls.Add(this.tabQuickInfo);
             this.tabControl.Controls.Add(this.tabSonstiges);
-            this.tabControl.Controls.Add(this.tabSpezial);
             this.tabControl.Controls.Add(this.tabSpaltenVerlinkung);
             this.tabControl.HotTrack = true;
             this.tabControl.Location = new System.Drawing.Point(0, 120);
@@ -1509,31 +1466,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnSchnellGanzzahl.Text = "Ganzzahl";
             this.btnSchnellGanzzahl.Click += new System.EventHandler(this.btnSchnellGanzzahl_Click);
             // 
-            // tabSpezial
-            // 
-            this.tabSpezial.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabSpezial.Controls.Add(this.grpLinkToFileSystem);
-            this.tabSpezial.Location = new System.Drawing.Point(4, 25);
-            this.tabSpezial.Name = "tabSpezial";
-            this.tabSpezial.Size = new System.Drawing.Size(993, 487);
-            this.tabSpezial.TabIndex = 9;
-            this.tabSpezial.Text = "Dateisystem-Verlinkung";
-            // 
-            // grpLinkToFileSystem
-            // 
-            this.grpLinkToFileSystem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpLinkToFileSystem.CausesValidation = false;
-            this.grpLinkToFileSystem.Controls.Add(this.capBestFileStandardFolder);
-            this.grpLinkToFileSystem.Controls.Add(this.txbBestFileStandardFolder);
-            this.grpLinkToFileSystem.Controls.Add(this.txbBestFileStandardSuffix);
-            this.grpLinkToFileSystem.Controls.Add(this.capBestFileStandardSuffix);
-            this.grpLinkToFileSystem.Location = new System.Drawing.Point(8, 8);
-            this.grpLinkToFileSystem.Name = "grpLinkToFileSystem";
-            this.grpLinkToFileSystem.Size = new System.Drawing.Size(440, 104);
-            this.grpLinkToFileSystem.TabIndex = 0;
-            this.grpLinkToFileSystem.TabStop = false;
-            this.grpLinkToFileSystem.Text = "Format: Link To Filesystem";
-            // 
             // tabSpaltenVerlinkung
             // 
             this.tabSpaltenVerlinkung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
@@ -1646,8 +1578,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabControl.ResumeLayout(false);
             this.tabDatenFormat.ResumeLayout(false);
             this.grpSchnellformat.ResumeLayout(false);
-            this.tabSpezial.ResumeLayout(false);
-            this.grpLinkToFileSystem.ResumeLayout(false);
             this.tabSpaltenVerlinkung.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -1721,10 +1651,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private TextBox txbBildCodeConstHeight;
         private ComboBox cbxLinkedDatabase;
         private Caption capLinkedDatabase;
-        private Caption capBestFileStandardSuffix;
-        private TextBox txbBestFileStandardSuffix;
-        private Caption capBestFileStandardFolder;
-        private TextBox txbBestFileStandardFolder;
         private ComboBox cbxTargetColumn;
         private Caption capTargetColumn;
         private TextBox txbReplacer;
@@ -1738,8 +1664,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private TextBox txbPrefix;
         private Caption capPraefix;
         private Button btnStandard;
-        private System.Windows.Forms.TabPage tabSpezial;
-        private GroupBox grpLinkToFileSystem;
         private ComboBox cbxSchlüsselspalte;
         private Caption capSchlüsselspalte;
         private Caption capSortiermaske;

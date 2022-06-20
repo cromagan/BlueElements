@@ -257,10 +257,10 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
                 comboBox.GotFocus += GotFocus_ComboBox;
                 break;
 
-            case EasyPic easyPic:
-                easyPic.ConnectedDatabase += EasyPicConnectedDatabase;
-                easyPic.ImageChanged += EasyPicImageChanged;
-                break;
+            //case EasyPic easyPic:
+            //    easyPic.ConnectedDatabase += EasyPicConnectedDatabase;
+            //    easyPic.ImageChanged += EasyPicImageChanged;
+            //    break;
 
             case TextBox textBox:
                 if (column1 == null) {
@@ -305,10 +305,10 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
                 comboBox.GotFocus -= GotFocus_ComboBox;
                 break;
 
-            case EasyPic easyPic:
-                easyPic.ConnectedDatabase -= EasyPicConnectedDatabase;
-                easyPic.ImageChanged -= EasyPicImageChanged;
-                break;
+            //case EasyPic easyPic:
+            //    easyPic.ConnectedDatabase -= EasyPicConnectedDatabase;
+            //    easyPic.ImageChanged -= EasyPicImageChanged;
+            //    break;
 
             case TextBox textBox:
                 textBox.NeedDatabaseOfAdditinalSpecialChars -= textBox_NeedDatabaseOfAdditinalSpecialChars;
@@ -424,51 +424,51 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         InfoText = newT;
     }
 
-    private void EasyPicConnectedDatabase(object sender, MultiUserFileGiveBackEventArgs e) => e.File = _database;
+    //private void EasyPicConnectedDatabase(object sender, MultiUserFileGiveBackEventArgs e) => e.File = _database;
 
-    private void EasyPicImageChanged(object sender, System.EventArgs e) {
-        foreach (Control thisControl in Controls) {
-            if (thisControl is EasyPic ep) {
-                if (_tmpColumn == null && _tmpRow == null) { Develop.DebugPrint_NichtImplementiert(); }
-                if (_tmpColumn.Format != DataFormat.Link_To_Filesystem) { Develop.DebugPrint_NichtImplementiert(); }
-                switch (ep.SorceType) {
-                    case SorceType.ScreenShot:
-                        var fil = _tmpColumn.BestFile(_tmpColumn.Name + ".png", true);
-                        ep.Bitmap.Save(fil, ImageFormat.Png);
-                        ep.ChangeSource(fil, SorceType.LoadedFromDisk, false);
-                        ValueSet(fil, false, true);
-                        return;
+    //private void EasyPicImageChanged(object sender, System.EventArgs e) {
+    //    foreach (Control thisControl in Controls) {
+    //        if (thisControl is EasyPic ep) {
+    //            if (_tmpColumn == null && _tmpRow == null) { Develop.DebugPrint_NichtImplementiert(); }
+    //            if (_tmpColumn.Format != DataFormat.Link_To_Filesystem) { Develop.DebugPrint_NichtImplementiert(); }
+    //            switch (ep.SorceType) {
+    //                case SorceType.ScreenShot:
+    //                    var fil = _tmpColumn.BestFile(_tmpColumn.Name + ".png", true);
+    //                    ep.Bitmap.Save(fil, ImageFormat.Png);
+    //                    ep.ChangeSource(fil, SorceType.LoadedFromDisk, false);
+    //                    ValueSet(fil, false, true);
+    //                    return;
 
-                    case SorceType.Nichts:
-                        ValueSet(string.Empty, false, true);
-                        return;
+    //                case SorceType.Nichts:
+    //                    ValueSet(string.Empty, false, true);
+    //                    return;
 
-                    case SorceType.LoadedFromDisk:
-                        if (ep.SorceName != _tmpColumn.SimplyFile(ep.SorceName)) {
-                            // DEr name kann nur vereifacht werden, wenn es bereits im richtigen Verzeichniss ist. Name wird vereinfacht (ungleich) - bereits im richtigen verzeichniss!
-                            ValueSet(ep.SorceName, false, true);
-                            return;
-                        }
-                        var fil2 = _tmpColumn.BestFile(_tmpColumn.Name + ".png", true);
-                        if (!string.Equals(fil2.FilePath(), ep.SorceName.FilePath(), StringComparison.CurrentCultureIgnoreCase)) {
-                            ep.Bitmap.Save(fil2, ImageFormat.Png);
-                        } else {
-                            fil2 = ep.SorceName;
-                        }
-                        ep.ChangeSource(fil2, SorceType.LoadedFromDisk, false);
-                        ValueSet(fil2, false, true);
-                        return;
+    //                case SorceType.LoadedFromDisk:
+    //                    if (ep.SorceName != _tmpColumn.SimplyFile(ep.SorceName)) {
+    //                        // DEr name kann nur vereifacht werden, wenn es bereits im richtigen Verzeichniss ist. Name wird vereinfacht (ungleich) - bereits im richtigen verzeichniss!
+    //                        ValueSet(ep.SorceName, false, true);
+    //                        return;
+    //                    }
+    //                    var fil2 = _tmpColumn.BestFile(_tmpColumn.Name + ".png", true);
+    //                    if (!string.Equals(fil2.FilePath(), ep.SorceName.FilePath(), StringComparison.CurrentCultureIgnoreCase)) {
+    //                        ep.Bitmap.Save(fil2, ImageFormat.Png);
+    //                    } else {
+    //                        fil2 = ep.SorceName;
+    //                    }
+    //                    ep.ChangeSource(fil2, SorceType.LoadedFromDisk, false);
+    //                    ValueSet(fil2, false, true);
+    //                    return;
 
-                    case SorceType.EntryWithoutPic:
-                        ValueSet(ep.SorceName, false, true);
-                        // Entweder ein Dummy eintrag (Bildzeichen-Liste, wo Haupt das Bild sein sollte, aber eben nur bei den 3 Seitensichten eines da ist
-                        // Oder datenbank wird von einem andern PC aus gestartet
-                        return;
-                }
-            }
-        }
-        Develop.DebugPrint_NichtImplementiert();
-    }
+    //                case SorceType.EntryWithoutPic:
+    //                    ValueSet(ep.SorceName, false, true);
+    //                    // Entweder ein Dummy eintrag (Bildzeichen-Liste, wo Haupt das Bild sein sollte, aber eben nur bei den 3 Seitensichten eines da ist
+    //                    // Oder datenbank wird von einem andern PC aus gestartet
+    //                    return;
+    //            }
+    //        }
+    //    }
+    //    Develop.DebugPrint_NichtImplementiert();
+    //}
 
     private void FillCellNow() {
         if (IsFilling) { return; }
@@ -476,18 +476,8 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         GetTmpVariables(); // Falls der Key inzwischen nicht mehr in der Collection ist, deswegen neu prüfen. RowREmoved greift zwar, kann aber durchaus erst nach RowSortesd/CursorposChanges auftreten.
         if (_tmpColumn == null || _tmpRow == null) { return; }
         var oldVal = _tmpRow.CellGetString(_tmpColumn);
-        string newValue;
-        switch (_tmpColumn.Format) {
-            case DataFormat.Link_To_Filesystem:
-                var tmp = Value.SplitAndCutByCrToList();
-                var tmp2 = tmp.Select(file => _tmpColumn.SimplyFile(file)).ToList();
-                newValue = tmp2.JoinWithCr();
-                break;
+        var newValue = Value;
 
-            default:
-                newValue = Value;
-                break;
-        }
         if (oldVal == newValue) { return; }
 
         var tmpR2 = _tmpRow; // Manchmal wird die Sortierung verändert, was zur Folge hat, dass der Cursor verschwindet, wass die _tmpRow verwirft....
@@ -573,17 +563,17 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
             case EditTypeTable.None:
                 return;
 
-            case EditTypeTable.FileHandling_InDateiSystem:
-                // korrektheit der Zelle bereits geprüft
-                var l = Table.FileSystem(_tmpColumn);
+            //case EditTypeTable.FileHandling_InDateiSystem:
+            //    // korrektheit der Zelle bereits geprüft
+            //    var l = Table.FileSystem(_tmpColumn);
 
-                if (l == null) { return; }
+            //    if (l == null) { return; }
 
-                foreach (var thisF in l) {
-                    lbx.Item.Add(thisF.FileNameWithSuffix(), _tmpColumn, ShortenStyle.Replaced, _tmpColumn.BildTextVerhalten);
-                }
+            //    foreach (var thisF in l) {
+            //        lbx.Item.Add(thisF.FileNameWithSuffix(), _tmpColumn, ShortenStyle.Replaced, _tmpColumn.BildTextVerhalten);
+            //    }
 
-                return;
+            //    return;
 
             case EditTypeTable.Textfeld:
                 lbx.Add_Text();
@@ -604,13 +594,14 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
             case "dateiöffnen":
                 if (e.HotItem is TextListItem t) {
                     if (FileExists(t.Internal)) {
-                        var b = Converter.FileToByte(t.Internal);
-                        b = Cryptography.SimpleCrypt(b, FileEncryptionKey, -1);
-                        var tmp = TempFile(string.Empty, string.Empty, t.Internal.FileSuffix());
-                        Converter.ByteToFile(tmp, b);
-                        ExecuteFile(tmp, string.Empty, true, false);
-                        MessageBox.Show("Warte...");
-                        DeleteFile(tmp, true);
+                        ExecuteFile(t.Internal);
+                        //var b = Converter.FileToByte(t.Internal);
+                        ////b = Cryptography.SimpleCrypt(b, FileEncryptionKey, -1);
+                        //var tmp = TempFile(string.Empty, string.Empty, t.Internal.FileSuffix());
+                        //Converter.ByteToFile(tmp, b);
+                        //ExecuteFile(tmp, string.Empty, true, false);
+                        //MessageBox.Show("Warte...");
+                        //DeleteFile(tmp, true);
                     }
                 }
                 break;
@@ -732,24 +723,24 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         }
 
         switch (_tmpColumn.Format) {
-            case DataFormat.Link_To_Filesystem:
-                var tmp = _tmpRow.CellGetList(_tmpColumn);
-                List<string> tmp2 = new();
-                foreach (var file in tmp) {
-                    var tmpF = _tmpColumn.BestFile(file, false);
-                    if (FileExists(tmpF)) {
-                        tmp2.Add(tmpF);
-                    } else {
-                        tmp2.Add(file);
-                    }
-                }
-                ValueSet(tmp2.JoinWithCr(), true, true);
-                //if (Value.ToUpper() != tmp2.JoinWithCr().ToUpper()) {
-                //    // Dieser Fehler tritt auf, wenn ein BestFile nicht gefunden wurde, weil es auf der Festplatte nicht (mehr) existiert
-                //  Ode noch ni existiert hat
-                //    Develop.DebugPrint(enFehlerArt.Warnung, "Werte ungleich: " + Value + " - " + tmp2.JoinWithCr());
-                //}
-                break;
+            //case DataFormat.Link_To_Filesystem:
+            //    var tmp = _tmpRow.CellGetList(_tmpColumn);
+            //    List<string> tmp2 = new();
+            //    foreach (var file in tmp) {
+            //        var tmpF = _tmpColumn.BestFile(file, false);
+            //        if (FileExists(tmpF)) {
+            //            tmp2.Add(tmpF);
+            //        } else {
+            //            tmp2.Add(file);
+            //        }
+            //    }
+            //    ValueSet(tmp2.JoinWithCr(), true, true);
+            //    //if (Value.ToUpper() != tmp2.JoinWithCr().ToUpper()) {
+            //    //    // Dieser Fehler tritt auf, wenn ein BestFile nicht gefunden wurde, weil es auf der Festplatte nicht (mehr) existiert
+            //    //  Ode noch ni existiert hat
+            //    //    Develop.DebugPrint(enFehlerArt.Warnung, "Werte ungleich: " + Value + " - " + tmp2.JoinWithCr());
+            //    //}
+            //    break;
 
             case DataFormat.Verknüpfung_zu_anderer_Datenbank:
                 GetRealColumn(_tmpColumn, _tmpRow);
@@ -780,13 +771,12 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
                 Caption = "[?]";
                 //EditType = EditTypeFormula.None;
                 QuickInfo = string.Empty;
-                FileEncryptionKey = string.Empty;
             } else {
                 Caption = _columnName + ":";
             }
         } else {
             Caption = _tmpColumn.ReadableText() + ":";
-            FileEncryptionKey = _database.FileEncryptionKey;
+
             if (string.IsNullOrEmpty(_columnName)) {
                 //EditType = _tmpColumn.EditType;
                 QuickInfo = _tmpColumn.QuickInfoText(string.Empty);

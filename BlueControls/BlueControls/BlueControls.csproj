@@ -173,7 +173,6 @@
     <Compile Include="Enums\Symbol.cs" />
     <Compile Include="Enums\TableDrawColumn.cs" />
     <Compile Include="Enums\TableDrawType.cs" />
-    <Compile Include="Enums\SorceType.cs" />
     <Compile Include="Enums\ConectorStyle.cs" />
     <Compile Include="Enums\ASCIIKey.cs" />
     <Compile Include="Enums\ComboboxStyle.cs" />
