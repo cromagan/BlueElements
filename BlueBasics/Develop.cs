@@ -52,6 +52,10 @@ public static class Develop {
     [DefaultValue(false)]
     public static bool Exited { get; private set; }
 
+    public static string OrigingLanguage { get; private set; }
+
+    public static string OrigingNumberDecimalSeparator { get; private set; }
+
     [DefaultValue(false)]
     public static bool ServiceStarted { get; private set; }
 
@@ -253,6 +257,13 @@ public static class Develop {
     public static void StartService() {
         if (ServiceStarted) { return; }
         ServiceStarted = true;
+
+        OrigingLanguage = System.Threading.Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName.ToUpper();
+
+        var info = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
+
+        OrigingNumberDecimalSeparator = info.NumberDecimalSeparator;
+
         CultureInfo ci = new("de-DE");
         ci.NumberFormat.CurrencyGroupSeparator = string.Empty;
         ci.NumberFormat.NumberGroupSeparator = string.Empty;
@@ -261,6 +272,9 @@ public static class Develop {
         System.Windows.Forms.Application.CurrentCulture = ci;
         CultureInfo.DefaultThreadCurrentCulture = ci;
         CultureInfo.DefaultThreadCurrentUICulture = ci;
+        System.Windows.Forms.Application.EnableVisualStyles();
+        System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
+
         TraceLogging_Start(TempFile(string.Empty, AppName() + "-Trace.html"));
         System.Windows.Forms.Timer check = new();
         check.Tick += CloseAfter12Hours;

@@ -143,9 +143,11 @@ public sealed class Database : IDisposable {
         _muf.ToListOfByte += ToListOfByte;
         _muf.DoBackGroundWork += DoBackGroundWork;
 
-        CultureInfo culture = new("de-DE");
-        CultureInfo.DefaultThreadCurrentCulture = culture;
-        CultureInfo.DefaultThreadCurrentUICulture = culture;
+        Develop.StartService();
+
+        //CultureInfo culture = new("de-DE");
+        //CultureInfo.DefaultThreadCurrentCulture = culture;
+        //CultureInfo.DefaultThreadCurrentUICulture = culture;
         Cell = new CellCollection(this);
 
         Row = new RowCollection(this);

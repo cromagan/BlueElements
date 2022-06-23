@@ -29,11 +29,12 @@ internal static class Program {
     /// </summary>
     [STAThread]
     private static void Main() {
-        CultureInfo culture = new("de-DE");
-        CultureInfo.DefaultThreadCurrentCulture = culture;
-        CultureInfo.DefaultThreadCurrentUICulture = culture;
-        System.Windows.Forms.Application.EnableVisualStyles();
-        System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
+        BlueBasics.Develop.StartService();
+        //CultureInfo culture = new("de-DE");
+        //CultureInfo.DefaultThreadCurrentCulture = culture;
+        //CultureInfo.DefaultThreadCurrentUICulture = culture;
+        //System.Windows.Forms.Application.EnableVisualStyles();
+        //System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
         System.Windows.Forms.Application.Run(new MainWindow(true));
     }
 

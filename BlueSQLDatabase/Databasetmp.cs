@@ -44,9 +44,10 @@ public class Databasetmp : IDatabase {
     #region Constructors
 
     public Databasetmp(string filename, bool readOnly, bool create) {
-        CultureInfo culture = new("de-DE");
-        CultureInfo.DefaultThreadCurrentCulture = culture;
-        CultureInfo.DefaultThreadCurrentUICulture = culture;
+        Develop.StartService();
+        //CultureInfo culture = new("de-DE");
+        //CultureInfo.DefaultThreadCurrentCulture = culture;
+        //CultureInfo.DefaultThreadCurrentUICulture = culture;
 
         ReadOnly = readOnly;
 
