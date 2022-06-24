@@ -339,9 +339,12 @@ public partial class TableView : Form {
     }
 
     protected void DatabaseSet(Database? database, string viewcode) {
+        if (Table.Database != database) {
+            Formula.Database = null;
+            FormulaBETA.ConnectedFormula = null;
+        }
+
         Table.Database = database;
-        Formula.Database = database;
-        SetFormulaBETA();
 
         FilterLeiste.Table = Table;
 
@@ -353,67 +356,33 @@ public partial class TableView : Form {
         tbcDatabaseSelector.Enabled = true;
         Table.Enabled = true;
 
-        //if (Table.Database == null) {
-        //    SetDatabasetoNothing();
-        //} else {
-        //    //if (Table.Database.Ansicht != Ansicht.Unverändert) {
-        //    //    _ansicht = Table.Database.Ansicht;
-        //    //}
-        //}
-        //InitView();
-        //CheckButtons();
-        //CaptionAnzeige();
-        //CheckButtons();
         if (Table.View_RowFirst() != null && database != null) {
             Table.CursorPos_Set(database.Column[0], Table.View_RowFirst(), false);
         }
     }
 
-    protected virtual void FillFormula() {
+    protected virtual void FillFormula(RowItem? r) {
         if (tbcSidebar.SelectedTab == tabFormula) {
             if (Formula is null || Formula.IsDisposed) { return; }
             if (!Formula.Visible) { return; }
 
-            if (Formula.Width < 30 || Formula.Height < 10) {
-                Formula.Database = null;
-                return;
+            if (Formula.Width < 30 || Formula.Height < 10) { return; }
+
+            Formula.Database = r?.Database;
+
+            if (r != null) {
+                Formula.ShowingRowKey = r.Key;
+            } else {
+                Formula.ShowingRowKey = -1;
             }
-
-            Formula.Database = Table.Database;
-            //if (e.Column != null) { Formula.Database = e.Column.Database; }
-            //if (e.RowData?.Row != null) { Formula.Database = e.RowData.Row.Database; }
-
-            Formula.ShowingRowKey = Table.CursorPosRow is RowData r ? r.Row.Key : -1;
         }
-
-        //protected override void FillFormula() {
-        //    if (tbcSidebar.SelectedTab == tabFormulaBeta) {
-        //        if (FormulaBETA is null || FormulaBETA.IsDisposed) { return; }
-        //        if (!FormulaBETA.Visible) { return; }
-
-        //        FormulaBETA.ConnectedFormula =
-
-        //        FormulaBETA.InputRow = Table?.CursorPosRow?.Row;
-
-        //        //if (Table?.CursorPosRow?.Row is RowItem r) {
-        //        //    var k = Table.Database.Column.Exists("kommission");
-        //        //    if (k != null) { FormulaBETA.Set("kommission", r.CellGetString(k)); }
-        //        //}
-        //        return;
-        //    }
-
-        //    base.FillFormula();
-        //}
 
         if (tbcSidebar.SelectedTab == tabFormulaBeta) {
             if (FormulaBETA is null || FormulaBETA.IsDisposed) { return; }
             if (!FormulaBETA.Visible) { return; }
-
-            SetFormulaBETA();
-            FormulaBETA.InputRow = Table?.CursorPosRow?.Row;
-
-            //FormulaBETA.Set("row", Table?.CursorPosRow?.Row);
-            //FormulaBETA.Set("key", Table?.CursorPosRow?.Row?.CellFirstString());
+            if (FormulaBETA.Width < 30 || FormulaBETA.Height < 10) { return; }
+            SetFormulaBETA(r?.Database);
+            FormulaBETA.InputRow = r;
         }
     }
 
@@ -873,15 +842,15 @@ public partial class TableView : Form {
     //    if (tmpDatabase == null) { return; }
     //    DatabaseSet(tmpDatabase);
     //}
-    private void Formula_SizeChanged(object sender, System.EventArgs e) => FillFormula();
+    private void Formula_SizeChanged(object sender, System.EventArgs e) => FillFormula(Table?.CursorPosRow?.Row);
 
-    private void Formula_VisibleChanged(object sender, System.EventArgs e) => FillFormula();
+    private void Formula_VisibleChanged(object sender, System.EventArgs e) => FillFormula(Table?.CursorPosRow?.Row);
 
     private void LoadTab_FileOk(object sender, CancelEventArgs e) => SwitchTabToDatabase(LoadTab.FileName);
 
-    private void SetFormulaBETA() {
-        if (Table?.Database != null) {
-            var f = Table?.Database.FormulaFileName();
+    private void SetFormulaBETA(Database? db) {
+        if (db != null) {
+            var f = db.FormulaFileName();
 
             if (f != null) {
                 var tmpFormula = ConnectedFormula.ConnectedFormula.GetByFilename(f);
@@ -903,7 +872,7 @@ public partial class TableView : Form {
 
         btnUnterschiede_CheckedChanged(null, System.EventArgs.Empty);
 
-        FillFormula();
+        FillFormula(e?.RowData?.Row);
     }
 
     private void Table_ViewChanged(object sender, System.EventArgs e) => Table.WriteColumnArrangementsInto(cbxColumnArr, Table.Database, Table.Arrangement);
@@ -956,7 +925,7 @@ public partial class TableView : Form {
         DatabaseSet(DB, s[1]);
     }
 
-    private void tbcSidebar_SelectedIndexChanged(object sender, System.EventArgs e) => FillFormula();
+    private void tbcSidebar_SelectedIndexChanged(object sender, System.EventArgs e) => FillFormula(Table?.CursorPosRow?.Row);
 
     #endregion
 }

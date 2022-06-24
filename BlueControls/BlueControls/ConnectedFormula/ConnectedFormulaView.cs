@@ -58,6 +58,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone {
         get => _cf;
         set {
             if (_cf == value) { return; }
+            InputRow = null;
 
             if (_cf != null) {
                 _cf.Changed -= _cf_Changed;

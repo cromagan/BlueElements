@@ -30,7 +30,7 @@ internal class Method_ContainsWhitch : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain, VariableListString.ShortName_Plain }, new() { VariableString.ShortName_Plain, VariableListString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain, VariableListString.ShortName_Plain }, new() { VariableBool.ShortName_Plain }, new() { VariableString.ShortName_Plain, VariableListString.ShortName_Plain } };
     public override string Description => "Prüft ob eine der Zeichenketten als ganzes Wort vorkommt. Gibt dann als Liste alle gefundenen Strings zurück.";
 
     public override bool EndlessArgs => true;
@@ -43,7 +43,7 @@ internal class Method_ContainsWhitch : Method {
 
     public override string StartSequence => "(";
 
-    public override string Syntax => "ContainsWhich(String, Value1, Value2, ...)";
+    public override string Syntax => "ContainsWhich(String, CaseSensitive, Value1, Value2, ...)";
 
     #endregion
 
@@ -61,7 +61,7 @@ internal class Method_ContainsWhitch : Method {
 
         var wordlist = new List<string>();
 
-        for (var z = 1; z < attvar.Attributes.Count; z++) {
+        for (var z = 2; z < attvar.Attributes.Count; z++) {
             if (attvar.Attributes[z] is VariableString vs) { wordlist.Add(vs.ValueString); }
             if (attvar.Attributes[z] is VariableListString vl) { wordlist.AddRange(vl.ValueList); }
         }
@@ -69,7 +69,8 @@ internal class Method_ContainsWhitch : Method {
 
         #endregion
 
-        const RegexOptions rx = RegexOptions.IgnoreCase;
+        var rx = RegexOptions.IgnoreCase;
+        if (((VariableBool)attvar.Attributes[1]).ValueBool) { rx = RegexOptions.None; }
 
         if (attvar.Attributes[0] is VariableString vs2) {
             foreach (var thisW in wordlist.Where(thisW => vs2.ValueString.ContainsWord(thisW, rx))) {

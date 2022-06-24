@@ -1699,6 +1699,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
                 PermissionGroupsChangeCell.Clear();
                 _textBearbeitungErlaubt = false;
                 _dropdownBearbeitungErlaubt = false;
+                _bildTextVerhalten = BildTextVerhalten.Interpretiere_Bool;
 
                 if (setAll) {
                     ForeColor = Color.FromArgb(128, 0, 0);
