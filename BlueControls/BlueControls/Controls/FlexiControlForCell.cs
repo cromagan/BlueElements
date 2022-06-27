@@ -485,7 +485,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
 
         tmpR2.Database.WaitEditable();
         tmpR2.CellSet(tmpC2, newValue);
-        if (oldVal != _tmpRow.CellGetString(tmpC2)) { tmpR2.DoAutomatic(false, false, 1, "value changed"); }
+        if (oldVal != tmpR2.CellGetString(tmpC2)) { tmpR2.DoAutomatic(false, false, 1, "value changed"); }
     }
 
     private ColumnItem? GetRealColumn(ColumnItem? column, RowItem? row) {
