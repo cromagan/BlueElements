@@ -11,6 +11,13 @@ namespace BlueControls.Controls {
         /// </summary>
         /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
         protected override void Dispose(bool disposing) {
+
+            if(disposing) {
+                InputRow = null;
+                ConnectedFormula = null;
+            }
+
+
             if (disposing && (components != null)) {
                 ConnectedFormula = null;
                 components.Dispose();

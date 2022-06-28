@@ -96,6 +96,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         get => _row;
         private set {
             if (value == _row) { return; }
+            Develop.DebugPrint_Disposed(IsDisposed);
             _row = value;
             Script = null;
             DoChilds(this, _row, ParentCol);
@@ -325,6 +326,9 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
             #endregion
         }
+
+        if (_disposing || IsDisposed) { return; } // Multitasking...
+
         UpdateMyCollection();
     }
 

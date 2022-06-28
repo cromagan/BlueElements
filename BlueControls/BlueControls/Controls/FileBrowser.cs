@@ -151,6 +151,9 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
     public void ParentPath() => btnZurück_Click(null, System.EventArgs.Empty);
 
     public bool ParseVariables(List<Variable>? list) {
+
+        Develop.DebugPrint_Disposed(IsDisposed);
+
         var ct = string.Empty;
 
         if (list != null) {

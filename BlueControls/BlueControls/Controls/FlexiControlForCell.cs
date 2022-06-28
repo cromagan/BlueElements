@@ -382,6 +382,9 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
             Invoke(new Action(() => _Database_Loaded(sender, e)));
             return;
         }
+        if(Disposing || IsDisposed) { return; }
+
+
         UpdateColumnData();
         SetValueFromCell();
     }
@@ -716,6 +719,9 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     }
 
     private void SetValueFromCell() {
+        Develop.DebugPrint_Disposed(IsDisposed);
+
+
         if (_tmpColumn == null || _tmpRow == null) {
             ValueSet(string.Empty, true, true);
             InfoText = string.Empty;

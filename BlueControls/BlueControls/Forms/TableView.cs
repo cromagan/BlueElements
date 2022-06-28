@@ -324,7 +324,10 @@ public partial class TableView : Form {
 
             if (Formula.Width < 30 || Formula.Height < 10) { return; }
 
-            Formula.Database = r?.Database;
+
+            if (r?.Database != null) {
+                Formula.Database = r?.Database;
+            }
 
             if (r != null) {
                 Formula.ShowingRowKey = r.Key;
@@ -337,7 +340,10 @@ public partial class TableView : Form {
             if (FormulaBETA is null || FormulaBETA.IsDisposed) { return; }
             if (!FormulaBETA.Visible) { return; }
             if (FormulaBETA.Width < 30 || FormulaBETA.Height < 10) { return; }
-            SetFormulaBETA(r?.Database);
+
+            if (r?.Database != null) {
+                SetFormulaBETA(r?.Database);
+            }
             FormulaBETA.InputRow = r;
         }
     }
