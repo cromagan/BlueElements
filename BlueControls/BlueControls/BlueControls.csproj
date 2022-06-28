@@ -234,12 +234,6 @@
     <Compile Include="Forms\TableView.Designer.cs">
       <DependentUpon>TableView.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\TableView_OLD.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\TableView_OLD.Designer.cs">
-      <DependentUpon>TableView_OLD.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\InputBoxListBoxStyle.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -738,10 +732,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\TableView.resx">
       <DependentUpon>TableView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\TableView_OLD.resx">
-      <DependentUpon>TableView_OLD.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\InputBoxListBoxStyle.resx">
       <DependentUpon>InputBoxListBoxStyle.cs</DependentUpon>

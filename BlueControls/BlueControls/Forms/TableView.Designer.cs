@@ -35,6 +35,10 @@ namespace BlueControls.Forms {
             this.btnSaveAs = new BlueControls.Controls.Button();
             this.btnNeuDB = new BlueControls.Controls.Button();
             this.tabAllgemein = new System.Windows.Forms.TabPage();
+            this.grpAnsichtWahl = new BlueControls.Controls.GroupBox();
+            this.chkAnsichtTableFormular = new BlueControls.Controls.Button();
+            this.chkAnsichtFormular = new BlueControls.Controls.Button();
+            this.chkAnsichtNurTabelle = new BlueControls.Controls.Button();
             this.grpAnsicht = new BlueControls.Controls.GroupBox();
             this.btnUnterschiede = new BlueControls.Controls.Button();
             this.btnAlleSchließen = new BlueControls.Controls.Button();
@@ -42,12 +46,24 @@ namespace BlueControls.Forms {
             this.capSpaltenanordnung = new BlueControls.Controls.Caption();
             this.capZeilen1 = new BlueControls.Controls.Caption();
             this.cbxColumnArr = new BlueControls.Controls.ComboBox();
+            this.grpHilfen = new BlueControls.Controls.GroupBox();
+            this.ckbZeilenclickInsClipboard = new BlueControls.Controls.Button();
+            this.btnNummerierung = new BlueControls.Controls.Button();
+            this.btnSuchFenster = new BlueControls.Controls.Button();
+            this.grpFormularSteuerung = new BlueControls.Controls.GroupBox();
+            this.btnNeu = new BlueControls.Controls.Button();
+            this.btnTextSuche = new BlueControls.Controls.Button();
+            this.btnLoeschen = new BlueControls.Controls.Button();
+            this.txbTextSuche = new BlueControls.Controls.TextBox();
+            this.btnVorwärts = new BlueControls.Controls.Button();
+            this.btnZurück = new BlueControls.Controls.Button();
             this.tabAdmin = new System.Windows.Forms.TabPage();
             this.grpAdminZeilen = new BlueControls.Controls.GroupBox();
             this.btnSuchenUndErsetzen = new BlueControls.Controls.Button();
             this.btnZeileLöschen = new BlueControls.Controls.Button();
             this.btnDatenüberprüfung = new BlueControls.Controls.Button();
             this.grpAdminBearbeiten = new BlueControls.Controls.GroupBox();
+            this.btnFormular = new BlueControls.Controls.Button();
             this.btnPowerBearbeitung = new BlueControls.Controls.Button();
             this.btnSpaltenanordnung = new BlueControls.Controls.Button();
             this.btnLayouts = new BlueControls.Controls.Button();
@@ -78,13 +94,15 @@ namespace BlueControls.Forms {
             this.capZeilen2 = new BlueControls.Controls.Caption();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
-            this.btnFormular = new BlueControls.Controls.Button();
             this.ribMain.SuspendLayout();
             this.tabFile.SuspendLayout();
             this.grpOrdner.SuspendLayout();
             this.grpDatei.SuspendLayout();
             this.tabAllgemein.SuspendLayout();
+            this.grpAnsichtWahl.SuspendLayout();
             this.grpAnsicht.SuspendLayout();
+            this.grpHilfen.SuspendLayout();
+            this.grpFormularSteuerung.SuspendLayout();
             this.tabAdmin.SuspendLayout();
             this.grpAdminZeilen.SuspendLayout();
             this.grpAdminBearbeiten.SuspendLayout();
@@ -115,7 +133,7 @@ namespace BlueControls.Forms {
             this.ribMain.Location = new System.Drawing.Point(0, 0);
             this.ribMain.Name = "ribMain";
             this.ribMain.SelectedIndex = 1;
-            this.ribMain.Size = new System.Drawing.Size(1008, 110);
+            this.ribMain.Size = new System.Drawing.Size(1329, 110);
             this.ribMain.TabDefault = this.tabFile;
             this.ribMain.TabDefaultOrder = null;
             this.ribMain.TabIndex = 93;
@@ -128,7 +146,7 @@ namespace BlueControls.Forms {
             this.tabFile.Location = new System.Drawing.Point(4, 25);
             this.tabFile.Margin = new System.Windows.Forms.Padding(0);
             this.tabFile.Name = "tabFile";
-            this.tabFile.Size = new System.Drawing.Size(1000, 81);
+            this.tabFile.Size = new System.Drawing.Size(1321, 81);
             this.tabFile.TabIndex = 3;
             this.tabFile.Text = "Datei";
             // 
@@ -238,12 +256,61 @@ namespace BlueControls.Forms {
             // tabAllgemein
             // 
             this.tabAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.tabAllgemein.Controls.Add(this.grpAnsichtWahl);
             this.tabAllgemein.Controls.Add(this.grpAnsicht);
+            this.tabAllgemein.Controls.Add(this.grpHilfen);
+            this.tabAllgemein.Controls.Add(this.grpFormularSteuerung);
             this.tabAllgemein.Location = new System.Drawing.Point(4, 25);
             this.tabAllgemein.Name = "tabAllgemein";
-            this.tabAllgemein.Size = new System.Drawing.Size(1000, 81);
+            this.tabAllgemein.Size = new System.Drawing.Size(1321, 81);
             this.tabAllgemein.TabIndex = 1;
             this.tabAllgemein.Text = "Allgemein";
+            // 
+            // grpAnsichtWahl
+            // 
+            this.grpAnsichtWahl.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpAnsichtWahl.CausesValidation = false;
+            this.grpAnsichtWahl.Controls.Add(this.chkAnsichtTableFormular);
+            this.grpAnsichtWahl.Controls.Add(this.chkAnsichtFormular);
+            this.grpAnsichtWahl.Controls.Add(this.chkAnsichtNurTabelle);
+            this.grpAnsichtWahl.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpAnsichtWahl.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
+            this.grpAnsichtWahl.Location = new System.Drawing.Point(954, 0);
+            this.grpAnsichtWahl.Name = "grpAnsichtWahl";
+            this.grpAnsichtWahl.Size = new System.Drawing.Size(260, 81);
+            this.grpAnsichtWahl.TabIndex = 5;
+            this.grpAnsichtWahl.TabStop = false;
+            this.grpAnsichtWahl.Text = "Ansichten-Auswahl";
+            // 
+            // chkAnsichtTableFormular
+            // 
+            this.chkAnsichtTableFormular.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
+            this.chkAnsichtTableFormular.Location = new System.Drawing.Point(8, 46);
+            this.chkAnsichtTableFormular.Name = "chkAnsichtTableFormular";
+            this.chkAnsichtTableFormular.Size = new System.Drawing.Size(240, 22);
+            this.chkAnsichtTableFormular.TabIndex = 14;
+            this.chkAnsichtTableFormular.Text = "Tabelle und Formular nebeneinander";
+            this.chkAnsichtTableFormular.Click += new System.EventHandler(this.Ansicht_Click);
+            // 
+            // chkAnsichtFormular
+            // 
+            this.chkAnsichtFormular.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
+            this.chkAnsichtFormular.Location = new System.Drawing.Point(8, 24);
+            this.chkAnsichtFormular.Name = "chkAnsichtFormular";
+            this.chkAnsichtFormular.Size = new System.Drawing.Size(192, 22);
+            this.chkAnsichtFormular.TabIndex = 13;
+            this.chkAnsichtFormular.Text = "Überschriften und Formular";
+            this.chkAnsichtFormular.Click += new System.EventHandler(this.Ansicht_Click);
+            // 
+            // chkAnsichtNurTabelle
+            // 
+            this.chkAnsichtNurTabelle.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
+            this.chkAnsichtNurTabelle.Location = new System.Drawing.Point(8, 2);
+            this.chkAnsichtNurTabelle.Name = "chkAnsichtNurTabelle";
+            this.chkAnsichtNurTabelle.Size = new System.Drawing.Size(104, 22);
+            this.chkAnsichtNurTabelle.TabIndex = 12;
+            this.chkAnsichtNurTabelle.Text = "Nur Tabelle";
+            this.chkAnsichtNurTabelle.Click += new System.EventHandler(this.Ansicht_Click);
             // 
             // grpAnsicht
             // 
@@ -257,7 +324,7 @@ namespace BlueControls.Forms {
             this.grpAnsicht.Controls.Add(this.cbxColumnArr);
             this.grpAnsicht.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAnsicht.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAnsicht.Location = new System.Drawing.Point(0, 0);
+            this.grpAnsicht.Location = new System.Drawing.Point(626, 0);
             this.grpAnsicht.Margin = new System.Windows.Forms.Padding(0);
             this.grpAnsicht.Name = "grpAnsicht";
             this.grpAnsicht.Padding = new System.Windows.Forms.Padding(0);
@@ -332,6 +399,142 @@ namespace BlueControls.Forms {
             this.cbxColumnArr.TabIndex = 2;
             this.cbxColumnArr.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.cbxColumnArr_ItemClicked);
             // 
+            // grpHilfen
+            // 
+            this.grpHilfen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpHilfen.CausesValidation = false;
+            this.grpHilfen.Controls.Add(this.ckbZeilenclickInsClipboard);
+            this.grpHilfen.Controls.Add(this.btnNummerierung);
+            this.grpHilfen.Controls.Add(this.btnSuchFenster);
+            this.grpHilfen.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpHilfen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
+            this.grpHilfen.Location = new System.Drawing.Point(370, 0);
+            this.grpHilfen.Name = "grpHilfen";
+            this.grpHilfen.Size = new System.Drawing.Size(256, 81);
+            this.grpHilfen.TabIndex = 6;
+            this.grpHilfen.TabStop = false;
+            this.grpHilfen.Text = "Hilfen";
+            // 
+            // ckbZeilenclickInsClipboard
+            // 
+            this.ckbZeilenclickInsClipboard.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
+            this.ckbZeilenclickInsClipboard.Location = new System.Drawing.Point(96, 24);
+            this.ckbZeilenclickInsClipboard.Name = "ckbZeilenclickInsClipboard";
+            this.ckbZeilenclickInsClipboard.Size = new System.Drawing.Size(152, 22);
+            this.ckbZeilenclickInsClipboard.TabIndex = 13;
+            this.ckbZeilenclickInsClipboard.Text = "Zeilenclick = Clipboard";
+            // 
+            // btnNummerierung
+            // 
+            this.btnNummerierung.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
+            this.btnNummerierung.Location = new System.Drawing.Point(96, 2);
+            this.btnNummerierung.Margin = new System.Windows.Forms.Padding(4);
+            this.btnNummerierung.Name = "btnNummerierung";
+            this.btnNummerierung.QuickInfo = "Ist diese Option aktiviert, werden<br>temporäre Nummern von Spalten eingeblendet";
+            this.btnNummerierung.Size = new System.Drawing.Size(112, 22);
+            this.btnNummerierung.TabIndex = 12;
+            this.btnNummerierung.Text = "Nummerierung";
+            this.btnNummerierung.CheckedChanged += new System.EventHandler(this.btnNummerierung_CheckedChanged);
+            // 
+            // btnSuchFenster
+            // 
+            this.btnSuchFenster.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnSuchFenster.ImageCode = "Lupe";
+            this.btnSuchFenster.Location = new System.Drawing.Point(8, 2);
+            this.btnSuchFenster.Name = "btnSuchFenster";
+            this.btnSuchFenster.Size = new System.Drawing.Size(80, 66);
+            this.btnSuchFenster.TabIndex = 11;
+            this.btnSuchFenster.Text = "Suchfenster öffnen";
+            this.btnSuchFenster.Click += new System.EventHandler(this.btnSuchFenster_Click);
+            // 
+            // grpFormularSteuerung
+            // 
+            this.grpFormularSteuerung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpFormularSteuerung.CausesValidation = false;
+            this.grpFormularSteuerung.Controls.Add(this.btnNeu);
+            this.grpFormularSteuerung.Controls.Add(this.btnTextSuche);
+            this.grpFormularSteuerung.Controls.Add(this.btnLoeschen);
+            this.grpFormularSteuerung.Controls.Add(this.txbTextSuche);
+            this.grpFormularSteuerung.Controls.Add(this.btnVorwärts);
+            this.grpFormularSteuerung.Controls.Add(this.btnZurück);
+            this.grpFormularSteuerung.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpFormularSteuerung.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
+            this.grpFormularSteuerung.Location = new System.Drawing.Point(0, 0);
+            this.grpFormularSteuerung.Name = "grpFormularSteuerung";
+            this.grpFormularSteuerung.Size = new System.Drawing.Size(370, 81);
+            this.grpFormularSteuerung.TabIndex = 4;
+            this.grpFormularSteuerung.TabStop = false;
+            this.grpFormularSteuerung.Text = "Formular-Ansicht-Steuerung";
+            // 
+            // btnNeu
+            // 
+            this.btnNeu.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnNeu.ImageCode = "PlusZeichen";
+            this.btnNeu.Location = new System.Drawing.Point(8, 2);
+            this.btnNeu.Name = "btnNeu";
+            this.btnNeu.Size = new System.Drawing.Size(56, 66);
+            this.btnNeu.TabIndex = 2;
+            this.btnNeu.Text = "Neu";
+            this.btnNeu.Click += new System.EventHandler(this.btnNeu_Click);
+            // 
+            // btnTextSuche
+            // 
+            this.btnTextSuche.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnTextSuche.Enabled = false;
+            this.btnTextSuche.ImageCode = "Lupe|16";
+            this.btnTextSuche.Location = new System.Drawing.Point(240, 24);
+            this.btnTextSuche.Name = "btnTextSuche";
+            this.btnTextSuche.QuickInfo = "Nächsten Eintrag anzeigen,<br>der obigen Text enthält";
+            this.btnTextSuche.Size = new System.Drawing.Size(120, 22);
+            this.btnTextSuche.TabIndex = 7;
+            this.btnTextSuche.Text = "Textsuche";
+            this.btnTextSuche.Click += new System.EventHandler(this.btnTextSuche_Click);
+            // 
+            // btnLoeschen
+            // 
+            this.btnLoeschen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnLoeschen.ImageCode = "Papierkorb";
+            this.btnLoeschen.Location = new System.Drawing.Point(64, 2);
+            this.btnLoeschen.Name = "btnLoeschen";
+            this.btnLoeschen.Size = new System.Drawing.Size(56, 66);
+            this.btnLoeschen.TabIndex = 3;
+            this.btnLoeschen.Text = "löschen";
+            this.btnLoeschen.Click += new System.EventHandler(this.btnLoeschen_Click);
+            // 
+            // txbTextSuche
+            // 
+            this.txbTextSuche.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbTextSuche.Location = new System.Drawing.Point(240, 2);
+            this.txbTextSuche.Name = "txbTextSuche";
+            this.txbTextSuche.Size = new System.Drawing.Size(120, 22);
+            this.txbTextSuche.TabIndex = 6;
+            this.txbTextSuche.Enter += new System.EventHandler(this.txbTextSuche_Enter);
+            this.txbTextSuche.TextChanged += new System.EventHandler(this.txbTextSuche_TextChanged);
+            // 
+            // btnVorwärts
+            // 
+            this.btnVorwärts.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnVorwärts.ImageCode = "Pfeil_Rechts";
+            this.btnVorwärts.Location = new System.Drawing.Point(184, 2);
+            this.btnVorwärts.Name = "btnVorwärts";
+            this.btnVorwärts.QuickInfo = "Nächsten Eintrag anzeigen";
+            this.btnVorwärts.Size = new System.Drawing.Size(48, 66);
+            this.btnVorwärts.TabIndex = 5;
+            this.btnVorwärts.Text = "vor";
+            this.btnVorwärts.Click += new System.EventHandler(this.btnVorwärts_Click);
+            // 
+            // btnZurück
+            // 
+            this.btnZurück.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnZurück.ImageCode = "Pfeil_Links";
+            this.btnZurück.Location = new System.Drawing.Point(136, 2);
+            this.btnZurück.Name = "btnZurück";
+            this.btnZurück.QuickInfo = "Vorherigen Eintrag anzeigen";
+            this.btnZurück.Size = new System.Drawing.Size(48, 66);
+            this.btnZurück.TabIndex = 4;
+            this.btnZurück.Text = "zurück";
+            this.btnZurück.Click += new System.EventHandler(this.btnZurück_Click);
+            // 
             // tabAdmin
             // 
             this.tabAdmin.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
@@ -340,7 +543,7 @@ namespace BlueControls.Forms {
             this.tabAdmin.Controls.Add(this.grpAdminAllgemein);
             this.tabAdmin.Location = new System.Drawing.Point(4, 25);
             this.tabAdmin.Name = "tabAdmin";
-            this.tabAdmin.Size = new System.Drawing.Size(1000, 81);
+            this.tabAdmin.Size = new System.Drawing.Size(1321, 81);
             this.tabAdmin.TabIndex = 0;
             this.tabAdmin.Text = "Administration";
             // 
@@ -411,6 +614,17 @@ namespace BlueControls.Forms {
             this.grpAdminBearbeiten.TabIndex = 9;
             this.grpAdminBearbeiten.TabStop = false;
             this.grpAdminBearbeiten.Text = "Bearbeiten";
+            // 
+            // btnFormular
+            // 
+            this.btnFormular.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnFormular.ImageCode = "Textfeld|16|||||||||Stift";
+            this.btnFormular.Location = new System.Drawing.Point(8, 2);
+            this.btnFormular.Name = "btnFormular";
+            this.btnFormular.Size = new System.Drawing.Size(56, 66);
+            this.btnFormular.TabIndex = 44;
+            this.btnFormular.Text = "Formular-Editor";
+            this.btnFormular.Click += new System.EventHandler(this.btnFormular_Click);
             // 
             // btnPowerBearbeitung
             // 
@@ -502,7 +716,7 @@ namespace BlueControls.Forms {
             this.tabExport.Controls.Add(this.grpImport);
             this.tabExport.Location = new System.Drawing.Point(4, 25);
             this.tabExport.Name = "tabExport";
-            this.tabExport.Size = new System.Drawing.Size(1000, 81);
+            this.tabExport.Size = new System.Drawing.Size(1321, 81);
             this.tabExport.TabIndex = 2;
             this.tabExport.Text = "Import/Export";
             // 
@@ -590,17 +804,19 @@ namespace BlueControls.Forms {
             this.pnlDatabaseSelect.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlDatabaseSelect.Location = new System.Drawing.Point(0, 0);
             this.pnlDatabaseSelect.Name = "pnlDatabaseSelect";
-            this.pnlDatabaseSelect.Size = new System.Drawing.Size(739, 24);
+            this.pnlDatabaseSelect.Size = new System.Drawing.Size(972, 24);
             this.pnlDatabaseSelect.TabIndex = 21;
             // 
             // tbcDatabaseSelector
             // 
+            this.tbcDatabaseSelector.Database = null;
             this.tbcDatabaseSelector.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tbcDatabaseSelector.HotTrack = true;
             this.tbcDatabaseSelector.Location = new System.Drawing.Point(0, 0);
             this.tbcDatabaseSelector.Name = "tbcDatabaseSelector";
+            this.tbcDatabaseSelector.RowKey = ((long)(-1));
             this.tbcDatabaseSelector.SelectedIndex = 0;
-            this.tbcDatabaseSelector.Size = new System.Drawing.Size(739, 24);
+            this.tbcDatabaseSelector.Size = new System.Drawing.Size(972, 24);
             this.tbcDatabaseSelector.TabDefault = null;
             this.tbcDatabaseSelector.TabDefaultOrder = null;
             this.tbcDatabaseSelector.TabIndex = 20;
@@ -613,7 +829,7 @@ namespace BlueControls.Forms {
             this.pnlSerachBar.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlSerachBar.Location = new System.Drawing.Point(0, 24);
             this.pnlSerachBar.Name = "pnlSerachBar";
-            this.pnlSerachBar.Size = new System.Drawing.Size(739, 40);
+            this.pnlSerachBar.Size = new System.Drawing.Size(972, 40);
             this.pnlSerachBar.TabIndex = 24;
             // 
             // FilterLeiste
@@ -628,7 +844,7 @@ namespace BlueControls.Forms {
             this.FilterLeiste.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.Nothing;
             this.FilterLeiste.Location = new System.Drawing.Point(0, 0);
             this.FilterLeiste.Name = "FilterLeiste";
-            this.FilterLeiste.Size = new System.Drawing.Size(739, 40);
+            this.FilterLeiste.Size = new System.Drawing.Size(972, 40);
             this.FilterLeiste.TabIndex = 22;
             this.FilterLeiste.TabStop = false;
             // 
@@ -639,12 +855,13 @@ namespace BlueControls.Forms {
             this.Table.Location = new System.Drawing.Point(0, 64);
             this.Table.Name = "Table";
             this.Table.ShowWaitScreen = true;
-            this.Table.Size = new System.Drawing.Size(739, 531);
+            this.Table.Size = new System.Drawing.Size(972, 531);
             this.Table.TabIndex = 0;
             this.Table.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.TableView_ContextMenu_Init);
             this.Table.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.TableView_ContextMenuItemClicked);
             this.Table.CursorPosChanged += new System.EventHandler<BlueDatabase.EventArgs.CellExtEventArgs>(this.Table_CursorPosChanged);
             this.Table.DatabaseChanged += new System.EventHandler(this.TableView_DatabaseChanged);
+            this.Table.EditBeforeBeginEdit += new System.EventHandler<BlueDatabase.EventArgs.CellCancelEventArgs>(this.Table_EditBeforeBeginEdit);
             this.Table.ViewChanged += new System.EventHandler(this.Table_ViewChanged);
             this.Table.VisibleRowsChanged += new System.EventHandler(this.Table_VisibleRowsChanged);
             this.Table.EnabledChanged += new System.EventHandler(this.TableView_EnabledChanged);
@@ -666,8 +883,8 @@ namespace BlueControls.Forms {
             // 
             this.SplitContainer1.Panel2.Controls.Add(this.tbcSidebar);
             this.SplitContainer1.Panel2.Margin = new System.Windows.Forms.Padding(27, 25, 27, 25);
-            this.SplitContainer1.Size = new System.Drawing.Size(1008, 595);
-            this.SplitContainer1.SplitterDistance = 739;
+            this.SplitContainer1.Size = new System.Drawing.Size(1329, 595);
+            this.SplitContainer1.SplitterDistance = 972;
             this.SplitContainer1.SplitterWidth = 11;
             this.SplitContainer1.TabIndex = 94;
             // 
@@ -675,12 +892,14 @@ namespace BlueControls.Forms {
             // 
             this.tbcSidebar.Controls.Add(this.tabFormula);
             this.tbcSidebar.Controls.Add(this.tabFormulaBeta);
+            this.tbcSidebar.Database = null;
             this.tbcSidebar.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tbcSidebar.HotTrack = true;
             this.tbcSidebar.Location = new System.Drawing.Point(0, 0);
             this.tbcSidebar.Name = "tbcSidebar";
+            this.tbcSidebar.RowKey = ((long)(-1));
             this.tbcSidebar.SelectedIndex = 0;
-            this.tbcSidebar.Size = new System.Drawing.Size(258, 595);
+            this.tbcSidebar.Size = new System.Drawing.Size(346, 595);
             this.tbcSidebar.TabDefault = null;
             this.tbcSidebar.TabDefaultOrder = null;
             this.tbcSidebar.TabIndex = 21;
@@ -693,7 +912,7 @@ namespace BlueControls.Forms {
             this.tabFormula.Location = new System.Drawing.Point(4, 25);
             this.tabFormula.Name = "tabFormula";
             this.tabFormula.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFormula.Size = new System.Drawing.Size(250, 566);
+            this.tabFormula.Size = new System.Drawing.Size(338, 566);
             this.tabFormula.TabIndex = 0;
             this.tabFormula.Text = "Formular";
             // 
@@ -703,7 +922,7 @@ namespace BlueControls.Forms {
             this.Formula.Location = new System.Drawing.Point(3, 3);
             this.Formula.MinimumSize = new System.Drawing.Size(200, 200);
             this.Formula.Name = "Formula";
-            this.Formula.Size = new System.Drawing.Size(244, 560);
+            this.Formula.Size = new System.Drawing.Size(332, 560);
             this.Formula.TabIndex = 0;
             this.Formula.Text = "Formula";
             this.Formula.SizeChanged += new System.EventHandler(this.Formula_SizeChanged);
@@ -715,7 +934,7 @@ namespace BlueControls.Forms {
             this.tabFormulaBeta.Controls.Add(this.FormulaBETA);
             this.tabFormulaBeta.Location = new System.Drawing.Point(4, 25);
             this.tabFormulaBeta.Name = "tabFormulaBeta";
-            this.tabFormulaBeta.Size = new System.Drawing.Size(250, 566);
+            this.tabFormulaBeta.Size = new System.Drawing.Size(338, 566);
             this.tabFormulaBeta.TabIndex = 1;
             this.tabFormulaBeta.Text = "Formular (BETA)";
             // 
@@ -726,7 +945,7 @@ namespace BlueControls.Forms {
             this.FormulaBETA.InputRow = null;
             this.FormulaBETA.Location = new System.Drawing.Point(0, 0);
             this.FormulaBETA.Name = "FormulaBETA";
-            this.FormulaBETA.Size = new System.Drawing.Size(250, 566);
+            this.FormulaBETA.Size = new System.Drawing.Size(338, 566);
             this.FormulaBETA.TabIndex = 0;
             // 
             // pnlStatusBar
@@ -736,7 +955,7 @@ namespace BlueControls.Forms {
             this.pnlStatusBar.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pnlStatusBar.Location = new System.Drawing.Point(0, 705);
             this.pnlStatusBar.Name = "pnlStatusBar";
-            this.pnlStatusBar.Size = new System.Drawing.Size(1008, 24);
+            this.pnlStatusBar.Size = new System.Drawing.Size(1329, 24);
             this.pnlStatusBar.TabIndex = 95;
             // 
             // capStatusbar
@@ -745,7 +964,7 @@ namespace BlueControls.Forms {
             this.capStatusbar.Dock = System.Windows.Forms.DockStyle.Fill;
             this.capStatusbar.Location = new System.Drawing.Point(304, 0);
             this.capStatusbar.Name = "capStatusbar";
-            this.capStatusbar.Size = new System.Drawing.Size(704, 24);
+            this.capStatusbar.Size = new System.Drawing.Size(1025, 24);
             this.capStatusbar.Translate = false;
             // 
             // capZeilen2
@@ -769,22 +988,11 @@ namespace BlueControls.Forms {
             this.SaveTab.Title = "Bitte neuen Dateinamen der Datenbank wählen.";
             this.SaveTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
             // 
-            // btnFormular
-            // 
-            this.btnFormular.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnFormular.ImageCode = "Textfeld|16|||||||||Stift";
-            this.btnFormular.Location = new System.Drawing.Point(8, 2);
-            this.btnFormular.Name = "btnFormular";
-            this.btnFormular.Size = new System.Drawing.Size(56, 66);
-            this.btnFormular.TabIndex = 44;
-            this.btnFormular.Text = "Formular-Editor";
-            this.btnFormular.Click += new System.EventHandler(this.btnFormular_Click);
-            // 
             // TableView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1008, 729);
+            this.ClientSize = new System.Drawing.Size(1329, 729);
             this.Controls.Add(this.SplitContainer1);
             this.Controls.Add(this.ribMain);
             this.Controls.Add(this.pnlStatusBar);
@@ -797,7 +1005,10 @@ namespace BlueControls.Forms {
             this.grpOrdner.ResumeLayout(false);
             this.grpDatei.ResumeLayout(false);
             this.tabAllgemein.ResumeLayout(false);
+            this.grpAnsichtWahl.ResumeLayout(false);
             this.grpAnsicht.ResumeLayout(false);
+            this.grpHilfen.ResumeLayout(false);
+            this.grpFormularSteuerung.ResumeLayout(false);
             this.tabAdmin.ResumeLayout(false);
             this.grpAdminZeilen.ResumeLayout(false);
             this.grpAdminBearbeiten.ResumeLayout(false);
@@ -876,5 +1087,20 @@ namespace BlueControls.Forms {
         protected System.Windows.Forms.TabPage tabFormulaBeta;
         private Controls.ConnectedFormulaView FormulaBETA;
         private Controls.Button btnFormular;
+        private Controls.GroupBox grpFormularSteuerung;
+        private Controls.Button btnNeu;
+        private Controls.Button btnTextSuche;
+        private Controls.Button btnLoeschen;
+        private Controls.TextBox txbTextSuche;
+        private Controls.Button btnVorwärts;
+        private Controls.Button btnZurück;
+        private Controls.Button chkAnsichtTableFormular;
+        private Controls.Button chkAnsichtFormular;
+        private Controls.Button chkAnsichtNurTabelle;
+        private Controls.GroupBox grpHilfen;
+        private Controls.Button ckbZeilenclickInsClipboard;
+        private Controls.Button btnNummerierung;
+        private Controls.Button btnSuchFenster;
+        protected Controls.GroupBox grpAnsichtWahl;
     }
 }

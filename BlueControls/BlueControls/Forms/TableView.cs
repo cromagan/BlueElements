@@ -43,20 +43,16 @@ using static BlueBasics.Generic;
 namespace BlueControls.Forms;
 
 public partial class TableView : Form {
-    //protected readonly List<string> DBView = new();
 
     #region Fields
 
-    protected Ansicht _ansicht = Ansicht.Nur_Tabelle;
+    private Ansicht _ansicht = Ansicht.Tabelle_und_Formular_nebeneinander;
 
     private bool _firstOne = true;
 
-    //private readonly List<Database> DBStore = new();
     private Database? _originalDb;
 
     #endregion
-
-    //private int PrevIndexNo = -1;
 
     #region Constructors
 
@@ -64,21 +60,9 @@ public partial class TableView : Form {
 
     public TableView(Database? database, bool loadTabVisible, bool adminTabVisible) {
         InitializeComponent();
-        //var bmp = new System.Drawing.Bitmap(111,112);
-        //var gr = System.Drawing.Graphics.FromImage(bmp);
-        //gr.Clear(System.Drawing.Color.Gray);
-        //gr.Dispose();
-        //var stUTF8 = BlueBasics.modConverter.BitmapToStringUnicode(bmp, System.Drawing.Imaging.ImageFormat.Png);
-        //var b = stUTF8.UTF8_ToByte();
-        //var newstUTF8 = b.ToStringUTF8();
-        //var tmpb = newstUTF8.UTF8_ToByte();
-        //var eq = b.SequenceEqual(tmpb);
-        //var newbmp = BlueBasics.modConverter.StringUnicodeToBitmap(newstUTF8);
-        //Copyright.Text = "(c) 2010-" + DateTime.Now.Year + " Christian Peter";
 
         if (!adminTabVisible) {
             grpAdminAllgemein.Visible = false;
-            //grpBearbeitung.Visible = false;
         }
         if (!loadTabVisible) {
             ribMain.Controls.Remove(tabFile);
@@ -116,11 +100,6 @@ public partial class TableView : Form {
         }
     }
 
-    //        ChangeDatabase(TableView.Database);
-    //        TableView.DatabaseChanged += TableView_DatabaseChanged;
-    //        TableView.EnabledChanged += TableView_EnabledChanged;
-    //    }
-    //}
     public static void OpenColumnEditor(ColumnItem? column, RowItem? row, Table? tableview) {
         if (column == null) { return; }
         if (row == null) {
@@ -130,14 +109,6 @@ public partial class TableView : Form {
         ColumnItem? columnLinked = null;
         var posError = false;
         switch (column.Format) {
-            //case DataFormat.Columns_für_LinkedCellDropdown:
-            //    var txt = row.CellGetString(column);
-            //    if (IntTryParse(txt, out var colKey)) {
-            //        columnLinked = column.LinkedDatabase().Column.SearchByKey(colKey);
-            //    }
-            //    break;
-
-            //case DataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
             case DataFormat.Verknüpfung_zu_anderer_Datenbank:
             case DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
                 (columnLinked, _, _) = CellCollection.LinkedCellData(column, row, true, false);
@@ -159,21 +130,6 @@ public partial class TableView : Form {
         bearbColumn.Repair();
     }
 
-    //[DefaultValue((Table?)null)]
-    //public Table? Table {
-    //    get => TableView;
-    //    set {
-    //        if (TableView == value) { return; }
-    //        if (TableView != null) {
-    //            TableView.DatabaseChanged -= TableView_DatabaseChanged;
-    //            TableView.EnabledChanged -= TableView_EnabledChanged;
-    //            ChangeDatabase(null);
-    //        }
-    //        TableView = value;
-    //        Check_OrderButtons();
-    //        if (TableView == null) {
-    //            return;
-    //        }
     public static void OpenColumnEditor(ColumnItem? column, Table? tableview) {
         using ColumnEditor w = new(column, tableview);
         w.ShowDialog();
@@ -316,12 +272,12 @@ public partial class TableView : Form {
         var datenbankDa = Convert.ToBoolean(Table.Database != null);
         btnNeuDB.Enabled = true;
         btnOeffnen.Enabled = true;
-        //btnNeu.Enabled = datenbankDa && Table.Database.PermissionCheck(Table.Database.PermissionGroupsNewRow, null);
-        //btnLoeschen.Enabled = datenbankDa;
+        btnNeu.Enabled = datenbankDa && Table.Database.PermissionCheck(Table.Database.PermissionGroupsNewRow, null);
+        btnLoeschen.Enabled = datenbankDa;
         btnDrucken.Enabled = datenbankDa;
-        //Ansicht0.Enabled = datenbankDa;
-        //Ansicht1.Enabled = datenbankDa;
-        //Ansicht2.Enabled = datenbankDa;
+        chkAnsichtNurTabelle.Enabled = datenbankDa;
+        chkAnsichtFormular.Enabled = datenbankDa;
+        chkAnsichtTableFormular.Enabled = datenbankDa;
         btnDatenbankenSpeicherort.Enabled = datenbankDa && !string.IsNullOrEmpty(Table.Database.Filename);
         //SuchenUndErsetzen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
         //AngezeigteZeilenLöschen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
@@ -331,9 +287,9 @@ public partial class TableView : Form {
         btnSaveAs.Enabled = datenbankDa;
         btnDrucken.Item["csv"].Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
         btnDrucken.Item["html"].Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
-        //btnVorwärts.Enabled = datenbankDa;
-        //btnZurück.Enabled = datenbankDa;
-        //such.Enabled = datenbankDa;
+        btnVorwärts.Enabled = datenbankDa;
+        btnZurück.Enabled = datenbankDa;
+        txbTextSuche.Enabled = datenbankDa;
         btnSuchenUndErsetzen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
         FilterLeiste.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
     }
@@ -397,6 +353,11 @@ public partial class TableView : Form {
         CheckButtons();
     }
 
+    protected override void OnShown(System.EventArgs e) {
+        base.OnShown(e);
+        InitView();
+    }
+
     protected virtual void ParseView(string ToParse) {
         if (string.IsNullOrEmpty(ToParse)) { return; }
         foreach (var pair in ToParse.GetAllTags()) {
@@ -404,24 +365,21 @@ public partial class TableView : Form {
                 case "tableview":
                     Table.ParseView(pair.Value.FromNonCritical());
                     break;
-                //case "prio3":
-                //    btnPrio3.Checked = pair.Value.FromPlusMinus();
-                //    break;
+
                 case "maintab":
                     ribMain.SelectedIndex = int.Parse(pair.Value);
                     break;
-                //case "belegwahl":
-                // cbxBelegWahl.Text = pair.Value.FromNonCritical();
-                //return;
+
+                case "ansicht":
+                    _ansicht = (Ansicht)int.Parse(pair.Value);
+                    InitView();
+                    break;
+
                 default:
                     DebugPrint(FehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
                     break;
             }
         }
-        //        case "arrangementnr":
-        //            pair.Value
-        //            TableView.ParseView(i);
-        //d
     }
 
     /// <summary>
@@ -623,35 +581,21 @@ public partial class TableView : Form {
     protected virtual string ViewToString() {
         var s = "{" +
                 "MainTab=" + ribMain.SelectedIndex.ToString() + ", " +
-                "TableView=" + Table.ViewToString().ToNonCritical() +
+                "TableView=" + Table.ViewToString().ToNonCritical() + ", " +
+                "Ansicht=" + ((int)_ansicht).ToString() +
                 "}";
         return s;
     }
 
-    //    if (PrevIndexNo > -1 && DBStore[PrevIndexNo] != Table.Database) { PrevIndexNo = -1; }
-    //    if (toIndex != PrevIndexNo && PrevIndexNo > -1 && DBStore[PrevIndexNo] != null) {
-    //        DBView[PrevIndexNo] = ViewToString();
-    //    }
-    //    PrevIndexNo = toIndex;
-    //    if (Table.Database == db) {
-    //        Table.Database = null; // um den Filtern klar zu machen, das ändert sich was
-    //    }
     private void _originalDB_Disposing(object sender, System.EventArgs e) => ChangeDatabase(null);
 
-    //protected void TabSetDatabaseAndEnable(int toIndex, Database db) {
-    //    tbcDatabaseSelector.Enabled = false;
-    //    Table.Enabled = false;
-    //    tbcDatabaseSelector.TabPages[toIndex].Enabled = true;
-    //    while (DBStore.Count <= toIndex) {
-    //        DBStore.Add(null);
-    //        DBView.Add(string.Empty);
-    //    }
-    //    if (DBStore[toIndex] != db) { DBView[toIndex] = string.Empty; }
-    //    DBStore[toIndex] = db;
-    //    if (tbcDatabaseSelector.SelectedIndex != toIndex) {
-    //        tbcDatabaseSelector.SelectedIndex = toIndex;
-    //        return; // Selected Index changed soll diese Routine hier aufrufen
-    //    }
+    private void Ansicht_Click(object sender, System.EventArgs e) {
+        if (chkAnsichtFormular.Checked) { _ansicht = Ansicht.Überschriften_und_Formular; } else if (chkAnsichtNurTabelle.Checked) { _ansicht = Ansicht.Nur_Tabelle; } else { _ansicht = Ansicht.Tabelle_und_Formular_nebeneinander; }
+
+        InitView();
+        CheckButtons();
+    }
+
     private void btnAlleErweitern_Click(object sender, System.EventArgs e) => Table.ExpandAll();
 
     private void btnAlleSchließen_Click(object sender, System.EventArgs e) => Table.CollapesAll();
@@ -697,6 +641,30 @@ public partial class TableView : Form {
         SwitchTabToDatabase(e.Item.Internal);
     }
 
+    private void btnLoeschen_Click(object sender, System.EventArgs e) {
+        Formula.HideViewEditor();
+        if (chkAnsichtFormular.Checked) {
+            if (Formula.ShowingRow == null) {
+                MessageBox.Show("Kein Eintrag gewählt.", ImageCode.Information, "OK");
+                return;
+            }
+            var tmpr = Formula.ShowingRow;
+            if (MessageBox.Show("Soll der Eintrag<br><b>" + tmpr.CellFirstString() + "</b><br>wirklich <b>gelöscht</b> werden?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            SuchEintragNoSave(Direction.Unten, out var column, out var row);
+            Table.CursorPos_Set(column, row, false);
+            Table.Database.Row.Remove(tmpr);
+        } else {
+            Table.Database.Row.Remove(Table.Filter, Table.PinnedRows);
+        }
+    }
+
+    private void btnNeu_Click(object sender, System.EventArgs e) {
+        var r = Table.Database.Column.First().SortType == SortierTyp.Datum_Uhrzeit
+    ? Table.Database.Row.Add(NameRepair(DateTime.Now.ToString(Constants.Format_Date5), null))
+    : Table.Database.Row.Add(NameRepair("Neuer Eintrag", null));
+        Table.CursorPos_Set(Table.Database.Column.First(), Table.SortedRows().Get(r), true);
+    }
+
     private void btnNeuDB_Click(object sender, System.EventArgs e) {
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
 
@@ -711,13 +679,15 @@ public partial class TableView : Form {
         SwitchTabToDatabase(SaveTab.FileName);
     }
 
+    private void btnNummerierung_CheckedChanged(object sender, System.EventArgs e) => Table.ShowNumber = btnNummerierung.Checked;
+
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
         LoadTab.ShowDialog();
     }
 
     private void btnPowerBearbeitung_Click(object sender, System.EventArgs e) {
-        Notification.Show("20 Sekunden (fast) rechtefreies<br>Vearbeiten akiviert.", ImageCode.Stift);
+        Notification.Show("20 Sekunden (fast) rechtefreies<br>bearbeiten akiviert.", ImageCode.Stift);
         Table.PowerEdit = DateTime.Now.AddSeconds(20);
     }
 
@@ -752,9 +722,79 @@ public partial class TableView : Form {
 
     private void btnSuchenUndErsetzen_Click(object sender, System.EventArgs e) => Table.OpenSearchAndReplace();
 
+    private void btnSuchFenster_Click(object sender, System.EventArgs e) {
+        var x = new BlueControls.BlueDatabaseDialogs.Search(Table);
+        x.Show();
+    }
+
     private void btnTemporärenSpeicherortÖffnen_Click(object sender, System.EventArgs e) {
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
         ExecuteFile(Path.GetTempPath());
+    }
+
+    private void btnTextSuche_Click(object sender, System.EventArgs e) {
+        Formula.HideViewEditor();
+        var suchtT = txbTextSuche.Text.Trim();
+        if (string.IsNullOrEmpty(suchtT)) {
+            MessageBox.Show("Bitte Text zum Suchen eingeben.", ImageCode.Information, "OK");
+            return;
+        }
+        Table.SearchNextText(suchtT, Table, null, Table.CursorPosRow, out _, out var gefRow, true);
+        //var CheckRow = BlueFormulax.ShowingRow;
+        //RowItem GefRow = null;
+        //if (CheckRow == null) { CheckRow = TableView.View_RowFirst(); }
+        //var Count = 0;
+        //do
+        //{
+        //    if (Count > TableView.Database.Row.Count() + 1) { break; }
+        //    if (GefRow != null && GefRow != BlueFormulax.ShowingRow) { break; }
+        //    Count++;
+        //    CheckRow = TableView.View_NextRow(CheckRow);
+        //    if (CheckRow == null) { CheckRow = TableView.View_RowFirst(); }
+        //    foreach (var ThisColumnItem in TableView.Database.Column)
+        //    {
+        //        if (ThisColumnItem != null)
+        //        {
+        //            if (!ThisColumnItem.IgnoreAtRowFilter)
+        //            {
+        //                var IsT = CheckRow.CellGetString(ThisColumnItem);
+        //                if (!string.IsNullOrEmpty(IsT))
+        //                {
+        //                    if (ThisColumnItem.Format == DataFormat.Text_mit_Formatierung)
+        //                    {
+        //                        var l = new ExtText(enDesign.TextBox, enStates.Standard);
+        //                        l.HtmlText = IsT;
+        //                        IsT = l.PlainText;
+        //                    }
+        //                    // Allgemeine Prüfung
+        //                    if (IsT.ToLower().Contains(SuchtT.ToLower()))
+        //                    {
+        //                        GefRow = CheckRow;
+        //                    }
+        //                    // Spezielle Format-Prüfung
+        //                    var SuchT2 = DataFormat.CleanFormat(SuchtT, ThisColumnItem.Format);
+        //                    IsT = DataFormat.CleanFormat(IsT, ThisColumnItem.Format);
+        //                    if (!string.IsNullOrEmpty(SuchT2) && !string.IsNullOrEmpty(IsT))
+        //                    {
+        //                        if (IsT.ToLower().Contains(SuchT2.ToLower()))
+        //                        {
+        //                            GefRow = CheckRow;
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //} while (true);
+        if (gefRow == null) {
+            MessageBox.Show("Kein Eintrag gefunden!", ImageCode.Information, "OK");
+        } else {
+            if (gefRow?.Row == Formula.ShowingRow) {
+                MessageBox.Show("Text nur im <b>aktuellen Eintrag</b> gefunden,<br>aber sonst keine weiteren Einträge!", ImageCode.Information, "OK");
+            } else {
+                Table.CursorPos_Set(Table.Database.Column[0], gefRow, true);
+            }
+        }
     }
 
     private void btnUnterschiede_CheckedChanged(object sender, System.EventArgs e) => Table.Unterschiede = btnUnterschiede.Checked ? Table.CursorPosRow.Row : null;
@@ -789,11 +829,23 @@ public partial class TableView : Form {
         btnVorherigeVersion.Enabled = true;
     }
 
+    private void btnVorwärts_Click(object sender, System.EventArgs e) {
+        Formula.HideViewEditor();
+        SuchEintragNoSave(Direction.Unten, out var column, out var row);
+        Table.CursorPos_Set(column, row, false);
+    }
+
     private void btnZeileLöschen_Click(object sender, System.EventArgs e) {
         if (!Table.Database.IsAdministrator()) { return; }
         var m = MessageBox.Show("Angezeigte Zeilen löschen?", ImageCode.Warnung, "Ja", "Nein");
         if (m != 0) { return; }
         Table.Database.Row.Remove(Table.Filter, Table.PinnedRows);
+    }
+
+    private void btnZurück_Click(object sender, System.EventArgs e) {
+        Formula.HideViewEditor();
+        SuchEintragNoSave(Direction.Oben, out var column, out var row);
+        Table.CursorPos_Set(column, row, false);
     }
 
     private void cbxColumnArr_ItemClicked(object sender, BasicListItemEventArgs e) {
@@ -830,23 +882,101 @@ public partial class TableView : Form {
         tabAdmin.Enabled = true;
     }
 
-    //private void DatabaseSetx(string filename) {
-    //    DatabaseSet(null as Database);
-    //    if (!FileExists(filename)) {
-    //        CheckButtons();
-    //        return;
-    //    }
-    //    btnLetzteDateien.AddFileName(filename, string.Empty);
-    //    LoadTab.FileName = filename;
-    //    var tmpDatabase = Database.GetByFilename(filename, false, false);
-    //    if (tmpDatabase == null) { return; }
-    //    DatabaseSet(tmpDatabase);
-    //}
+    private void Check_SuchButton() => btnTextSuche.Enabled = Table.Database != null && Table.Database.Row.Count >= 1 && !string.IsNullOrEmpty(txbTextSuche.Text) && !string.IsNullOrEmpty(txbTextSuche.Text.RemoveChars(" "));
+
     private void Formula_SizeChanged(object sender, System.EventArgs e) => FillFormula(Table?.CursorPosRow?.Row);
 
     private void Formula_VisibleChanged(object sender, System.EventArgs e) => FillFormula(Table?.CursorPosRow?.Row);
 
+    private void InitView() {
+        Formula.HideViewEditor();
+
+        if (DesignMode) {
+            grpFormularSteuerung.Visible = true;
+            tbcSidebar.Visible = true;
+            grpHilfen.Visible = true;
+            grpAnsicht.Visible = true;
+            FilterLeiste.Visible = true;
+            SplitContainer1.Panel2Collapsed = false;
+            return;
+        }
+
+        chkAnsichtNurTabelle.Checked = _ansicht == Ansicht.Nur_Tabelle;
+        chkAnsichtFormular.Checked = _ansicht == Ansicht.Überschriften_und_Formular;
+        chkAnsichtTableFormular.Checked = _ansicht == Ansicht.Tabelle_und_Formular_nebeneinander;
+
+        Table?.Filter?.Clear();
+
+        switch (_ansicht) {
+            case Ansicht.Nur_Tabelle:
+                grpFormularSteuerung.Visible = false;
+                Table.Design = BlueTableAppearance.Standard;
+                tbcSidebar.Visible = false;
+                grpHilfen.Visible = true;
+                grpAnsicht.Visible = true;
+                FilterLeiste.Visible = true;
+                SplitContainer1.IsSplitterFixed = false;
+                SplitContainer1.Panel2Collapsed = true;
+                break;
+
+            case Ansicht.Überschriften_und_Formular:
+                grpFormularSteuerung.Visible = true;
+                Table.Design = BlueTableAppearance.OnlyMainColumnWithoutHead;
+                tbcSidebar.Visible = true;
+                grpHilfen.Visible = false;
+                grpAnsicht.Visible = false;
+                FilterLeiste.Visible = false;
+                SplitContainer1.SplitterDistance = 250;
+                SplitContainer1.IsSplitterFixed = true;
+                SplitContainer1.Panel2Collapsed = false;
+                break;
+
+            case Ansicht.Tabelle_und_Formular_nebeneinander:
+                grpFormularSteuerung.Visible = false;
+                Table.Design = BlueTableAppearance.Standard;
+                tbcSidebar.Visible = true;
+                grpHilfen.Visible = true;
+                grpAnsicht.Visible = true;
+                FilterLeiste.Visible = true;
+                SplitContainer1.IsSplitterFixed = false;
+                SplitContainer1.Panel2Collapsed = false;
+                SplitContainer1.SplitterDistance = Math.Max(SplitContainer1.SplitterDistance, SplitContainer1.Width / 2);
+                break;
+
+            default:
+                DebugPrint(_ansicht);
+                break;
+        }
+
+        if (Table.Visible) {
+            if (Table.Database != null) {
+                if (Table.CursorPosRow == null && Table.View_RowFirst() != null) {
+                    Table.CursorPos_Set(Table.Database.Column[0], Table.View_RowFirst(), false);
+                }
+                if (Table.CursorPosRow != null) {
+                    FillFormula(Table.CursorPosRow.Row);
+                }
+            }
+        } else {
+            FillFormula(null);
+        }
+    }
+
     private void LoadTab_FileOk(object sender, CancelEventArgs e) => SwitchTabToDatabase(LoadTab.FileName);
+
+    private string NameRepair(string istName, RowItem? vRow) {
+        var newName = istName;
+        var istZ = 0;
+        do {
+            var changed = false;
+            if (Table.Database.Row.Any(thisRow => thisRow != null && thisRow != vRow && string.Equals(thisRow.CellFirstString(), newName, StringComparison.CurrentCultureIgnoreCase))) {
+                istZ++;
+                newName = istName + " (" + istZ + ")";
+                changed = true;
+            }
+            if (!changed) { return newName; }
+        } while (true);
+    }
 
     private void SetFormulaBETA(Database? db) {
         if (db != null) {
@@ -864,15 +994,42 @@ public partial class TableView : Form {
         FormulaBETA.ConnectedFormula = null;
     }
 
+    private void SuchEintragNoSave(Direction richtung, out ColumnItem? column, out RowData? row) {
+        column = Table.Database.Column[0];
+        row = null;
+        if (Table.Database.Row.Count < 1) { return; }
+        // Temporär berechnen, um geflacker zu vermeiden (Endabled - > Disabled bei Nothing)
+        if (Convert.ToBoolean(richtung & Direction.Unten)) {
+            row = Table.View_NextRow(Table.CursorPosRow);
+            if (row == null) { row = Table.View_RowFirst(); }
+        }
+        if (Convert.ToBoolean(richtung & Direction.Oben)) {
+            row = Table.View_PreviousRow(Table.CursorPosRow);
+            if (row == null) { row = Table.View_RowLast(); }
+        }
+        if (row == null) { row = Table.View_RowFirst(); }
+    }
+
     private void Table_CursorPosChanged(object sender, CellExtEventArgs e) {
         if (InvokeRequired) {
             Invoke(new Action(() => Table_CursorPosChanged(sender, e)));
             return;
         }
 
+        if (ckbZeilenclickInsClipboard.Checked) {
+            Table.CopyToClipboard(e.Column, e.RowData.Row, false);
+            Table.Focus();
+        }
+
         btnUnterschiede_CheckedChanged(null, System.EventArgs.Empty);
 
         FillFormula(e?.RowData?.Row);
+    }
+
+    private void Table_EditBeforeBeginEdit(object sender, CellCancelEventArgs e) {
+        if (Table.Design == BlueTableAppearance.OnlyMainColumnWithoutHead) {
+            e.CancelReason = "In dieser Ansicht kann der Eintrag nicht bearbeitet werden.";
+        }
     }
 
     private void Table_ViewChanged(object sender, System.EventArgs e) => Table.WriteColumnArrangementsInto(cbxColumnArr, Table.Database, Table.Arrangement);
@@ -926,6 +1083,12 @@ public partial class TableView : Form {
     }
 
     private void tbcSidebar_SelectedIndexChanged(object sender, System.EventArgs e) => FillFormula(Table?.CursorPosRow?.Row);
+
+    private void txbTextSuche_Enter(object sender, System.EventArgs e) {
+        if (btnTextSuche.Enabled) { btnTextSuche_Click(btnTextSuche, System.EventArgs.Empty); }
+    }
+
+    private void txbTextSuche_TextChanged(object sender, System.EventArgs e) => Check_SuchButton();
 
     #endregion
 }

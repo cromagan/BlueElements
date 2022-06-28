@@ -273,7 +273,11 @@ public static class Develop {
         CultureInfo.DefaultThreadCurrentCulture = ci;
         CultureInfo.DefaultThreadCurrentUICulture = ci;
         System.Windows.Forms.Application.EnableVisualStyles();
-        System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
+
+        try {
+            // Try Block erforderlich, weil im der Designmode ab und zu abstürzt
+            System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
+        } catch { }
 
         TraceLogging_Start(TempFile(string.Empty, AppName() + "-Trace.html"));
         System.Windows.Forms.Timer check = new();
