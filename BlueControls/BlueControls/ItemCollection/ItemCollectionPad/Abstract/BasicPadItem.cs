@@ -56,8 +56,8 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     /// <remarks></remarks>
     private bool _beiExportSichtbar = true;
 
+    private string _page = string.Empty;
     private ItemCollectionPad _parent;
-    private string _seite = string.Empty;
     private PadStyles _style = PadStyles.Style_Standard;
 
     private RectangleF _usedArea;
@@ -110,6 +110,16 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
 
     public bool IsParsing { get; private set; }
 
+    [Description("Ist Page befüllt, wird das Item nur angezeigt, wenn die anzuzeigende Seite mit dem String übereinstimmt.")]
+    public string Page {
+        get => _page;
+        set {
+            if (_page == value) { return; }
+            _page = value;
+            OnChanged();
+        }
+    }
+
     public ItemCollectionPad Parent {
         get => _parent;
         set {
@@ -123,16 +133,6 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     }
 
     public virtual string QuickInfo { get; set; } = string.Empty;
-
-    [Description("Ist Seite befüllt, wird das Item nur angezeigt, wenn die anzuzeigende Seite mit dem String übereinstimmt.")]
-    public string Seite {
-        get => _seite;
-        set {
-            if (_seite == value) { return; }
-            _seite = value;
-            OnChanged();
-        }
-    }
 
     public PadStyles Stil {
         get => _style;
@@ -276,16 +276,18 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
         var line = 1f;
         if (zoom > 1) { line = zoom; }
         foreach (var thisV in ConnectsTo) {
-            if (Parent.Contains(thisV.OtherItem) && thisV != null && thisV.OtherItem != this) {
-                if (!forPrinting || thisV.OtherItem.Bei_Export_sichtbar) {
-                    var t1 = ItemConnection.GetConnectionPoint(this, thisV.MyItemType, thisV.OtherItem).ZoomAndMove(zoom, shiftX, shiftY);
-                    var t2 = ItemConnection.GetConnectionPoint(thisV.OtherItem, thisV.OtherItemType, this).ZoomAndMove(zoom, shiftX, shiftY);
+            if (!forPrinting || thisV.Bei_Export_sichtbar) {
+                if (thisV != null && Parent.Contains(thisV.OtherItem) && thisV.OtherItem != this) {
+                    if (!forPrinting || thisV.OtherItem.Bei_Export_sichtbar) {
+                        var t1 = ItemConnection.GetConnectionPoint(this, thisV.MyItemType, thisV.OtherItem).ZoomAndMove(zoom, shiftX, shiftY);
+                        var t2 = ItemConnection.GetConnectionPoint(thisV.OtherItem, thisV.OtherItemType, this).ZoomAndMove(zoom, shiftX, shiftY);
 
-                    if (Geometry.GetLenght(t1, t2) > 1) {
-                        gr.DrawLine(new Pen(Color.Gray, line), t1, t2);
-                        var wi = Geometry.Winkel(t1, t2);
-                        if (thisV.ArrowOnMyItem) { DimensionPadItem.DrawArrow(gr, t1, wi, Color.Gray, zoom * 20); }
-                        if (thisV.ArrowOnOtherItem) { DimensionPadItem.DrawArrow(gr, t2, wi + 180, Color.Gray, zoom * 20); }
+                        if (Geometry.GetLenght(t1, t2) > 1) {
+                            gr.DrawLine(new Pen(Color.Gray, line), t1, t2);
+                            var wi = Geometry.Winkel(t1, t2);
+                            if (thisV.ArrowOnMyItem) { DimensionPadItem.DrawArrow(gr, t1, wi, Color.Gray, zoom * 20); }
+                            if (thisV.ArrowOnOtherItem) { DimensionPadItem.DrawArrow(gr, t2, wi + 180, Color.Gray, zoom * 20); }
+                        }
                     }
                 }
             }
@@ -440,7 +442,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
                 return true;
 
             case "page":
-                Seite = value.FromNonCritical();
+                _page = value.FromNonCritical();
                 return true;
 
             default:
@@ -462,7 +464,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
         var t = "{";
         t = t + "ClassID=" + ClassId() + ", ";
         t = t + "InternalName=" + Internal.ToNonCritical() + ", ";
-        t = t + "Page=" + Seite.ToNonCritical() + ", ";
+        t = t + "Page=" + _page.ToNonCritical() + ", ";
         if (Tags.Count > 0) {
             foreach (var thisTag in Tags) {
                 t = t + "Tag=" + thisTag.ToNonCritical() + ", ";

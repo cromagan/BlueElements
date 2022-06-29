@@ -194,7 +194,7 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
         if (GetRowFrom == null) {
             Skin.Draw_FormatedText(gr, "Datenquelle fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), CaptionFnt.Scale(zoom), true);
         } else {
-            base.DrawFakeControl(positionModified, zoom, CaptionPosition, gr, Überschrift);
+            CustomizableShowPadItem.DrawFakeControl(gr, positionModified, zoom, CaptionPosition, Überschrift);
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);

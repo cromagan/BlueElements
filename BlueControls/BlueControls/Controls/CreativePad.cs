@@ -110,7 +110,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
             if (_currentPage == value) { return; }
             _currentPage = value;
             OnDrawModeChanged();
-            Invalidate();
+            Unselect();
         }
     }
 
@@ -157,7 +157,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
             if (_showInPrintMode == value) { return; }
             _showInPrintMode = value;
             OnDrawModeChanged();
-            Invalidate();
+            Unselect();
         }
     }
 
@@ -514,6 +514,10 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     private void _Item_ItemAdded(object sender, ListEventArgs e) {
         if (_item.Count == 1 || Fitting) { ZoomFit(); }
         Invalidate();
+
+        var it = (BasicPadItem)e.Item;
+        it.Page = CurrentPage;
+
         OnItemAdded(e);
     }
 
@@ -577,7 +581,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         if (pointToMove == null) {
             foreach (var thisIt in _itemsToMove) {
                 if (thisIt is BasicPadItem bpi && bpi.PointsForSuccesfullyMove.Count > 0) {
-                    pointToMove = bpi.PointsForSuccesfullyMove[0]; break;
+                    pointToMove = bpi.PointsForSuccesfullyMove[0];
+                    break;
                 }
             }
         }

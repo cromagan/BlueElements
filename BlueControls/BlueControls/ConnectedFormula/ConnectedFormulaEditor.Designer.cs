@@ -38,6 +38,7 @@ namespace BlueControls.Forms {
             this.btnEingangsZeile = new BlueControls.Controls.Button();
             this.btnZeileHinzu = new BlueControls.Controls.Button();
             this.grpOptik = new BlueControls.Controls.GroupBox();
+            this.btnRegisterKarte = new BlueControls.Controls.Button();
             this.btnTabControlAdd = new BlueControls.Controls.Button();
             this.tabFile = new System.Windows.Forms.TabPage();
             this.grpDatei = new BlueControls.Controls.GroupBox();
@@ -49,7 +50,6 @@ namespace BlueControls.Forms {
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
             this.LoadTabDatabase = new System.Windows.Forms.OpenFileDialog();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.btnRegisterKarte = new BlueControls.Controls.Button();
             this.grpDesign.SuspendLayout();
             this.tabHintergrund.SuspendLayout();
             this.Ribbon.SuspendLayout();
@@ -84,6 +84,7 @@ namespace BlueControls.Forms {
             // 
             // Pad
             // 
+            this.Pad.Location = new System.Drawing.Point(0, 136);
             this.Pad.Size = new System.Drawing.Size(602, 363);
             this.Pad.GotNewItemCollection += new System.EventHandler(this.Pad_GotNewItemCollection);
             // 
@@ -292,6 +293,20 @@ namespace BlueControls.Forms {
             this.grpOptik.TabStop = false;
             this.grpOptik.Text = "Optik";
             // 
+            // btnRegisterKarte
+            // 
+            this.btnRegisterKarte.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnRegisterKarte.ImageCode = "PlusZeichen|16|||00FF00||||||Zeile";
+            this.btnRegisterKarte.Location = new System.Drawing.Point(72, 2);
+            this.btnRegisterKarte.Name = "btnRegisterKarte";
+            this.btnRegisterKarte.QuickInfo = "Fügt eine weiter Formularseite hinzu.\r\nDiese kann dann in einem Register dargeste" +
+    "llt werden.\r\n\r\nEin solches Formular muss einen Zeile-Eingang\r\nbesitzen, um Werte" +
+    " empfangen zu können.";
+            this.btnRegisterKarte.Size = new System.Drawing.Size(80, 66);
+            this.btnRegisterKarte.TabIndex = 6;
+            this.btnRegisterKarte.Text = "Formular hinzufügen";
+            this.btnRegisterKarte.Click += new System.EventHandler(this.btnRegisterKarte_Click);
+            // 
             // btnTabControlAdd
             // 
             this.btnTabControlAdd.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
@@ -401,21 +416,9 @@ namespace BlueControls.Forms {
             this.tabPage1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabPage1.Location = new System.Drawing.Point(4, 25);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Size = new System.Drawing.Size(876, 0);
+            this.tabPage1.Size = new System.Drawing.Size(966, 0);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Visible = false;
-            // 
-            // btnRegisterKarte
-            // 
-            this.btnRegisterKarte.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnRegisterKarte.ImageCode = "PlusZeichen|16|||00FF00||||||Zeile";
-            this.btnRegisterKarte.Location = new System.Drawing.Point(72, 2);
-            this.btnRegisterKarte.Name = "btnRegisterKarte";
-            this.btnRegisterKarte.QuickInfo = resources.GetString("btnRegisterKarte.QuickInfo");
-            this.btnRegisterKarte.Size = new System.Drawing.Size(80, 66);
-            this.btnRegisterKarte.TabIndex = 6;
-            this.btnRegisterKarte.Text = "Registerkarte hinzufügen";
-            this.btnRegisterKarte.Click += new System.EventHandler(this.btnRegisterKarte_Click);
             // 
             // ConnectedFormulaEditor
             // 

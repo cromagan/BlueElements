@@ -331,90 +331,22 @@ public class RowWithFilterPaditem : RectanglePadItem, IReadableText, IAcceptAndS
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, RectangleF modifiedPosition, float zoom, float shiftX, float shiftY, bool forPrinting) {
-        DrawColorScheme(gr, modifiedPosition, zoom, Id);
+    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+        if (!forPrinting) {
+            DrawColorScheme(gr, positionModified, zoom, Id);
 
-        if (Database != null) {
-            var txt = "eine Zeile aus\r\n";
+            if (Database != null) {
+                var txt = "eine Zeile aus " + Database.Caption;
 
-            txt = txt + Database.Caption;
-
-            //if (!string.IsNullOrEmpty(_VerbindungsID)) {
-            //    txt = txt + "\r\nKlon-ID: " + _VerbindungsID;
-            //}
-
-            Skin.Draw_FormatedText(gr, txt, QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, modifiedPosition.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
+                Skin.Draw_FormatedText(gr, txt, QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
+            } else {
+                Skin.Draw_FormatedText(gr, "Bezug fehlt", QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
+            }
+        } else {
+            CustomizableShowPadItem.DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
         }
 
-        //gr.FillRectangle(new SolidBrush(Color.FromArgb(128, 255, 255, 255)), modifiedPosition);
-        //drawingCoordinates.Inflate(-Padding, -Padding);
-        //RectangleF r1 = new(drawingCoordinates.Left + Padding, drawingCoordinates.Top + Padding,
-        //    drawingCoordinates.Width - (Padding * 2), drawingCoordinates.Height - (Padding * 2));
-        //RectangleF r2 = new();
-        //RectangleF r3 = new();
-        //if (Bitmap != null) {
-        //    r3 = new RectangleF(0, 0, Bitmap.Width, Bitmap.Height);
-        //    switch (Bild_Modus) {
-        //        case enSizeModes.Verzerren: {
-        //                r2 = r1;
-        //                break;
-        //            }
-
-        //        case enSizeModes.BildAbschneiden: {
-        //                var scale = Math.Max((drawingCoordinates.Width - (Padding * 2)) / Bitmap.Width, (drawingCoordinates.Height - (Padding * 2)) / Bitmap.Height);
-        //                var tmpw = (drawingCoordinates.Width - (Padding * 2)) / scale;
-        //                var tmph = (drawingCoordinates.Height - (Padding * 2)) / scale;
-        //                r3 = new RectangleF((Bitmap.Width - tmpw) / 2, (Bitmap.Height - tmph) / 2, tmpw, tmph);
-        //                r2 = r1;
-        //                break;
-        //            }
-        //        default: // Is = enSizeModes.WeißerRand
-        //            {
-        //                var scale = Math.Min((drawingCoordinates.Width - (Padding * 2)) / Bitmap.Width, (drawingCoordinates.Height - (Padding * 2)) / Bitmap.Height);
-        //                r2 = new RectangleF(((drawingCoordinates.Width - (Bitmap.Width * scale)) / 2) + drawingCoordinates.Left, ((drawingCoordinates.Height - (Bitmap.Height * scale)) / 2) + drawingCoordinates.Top, Bitmap.Width * scale, Bitmap.Height * scale);
-        //                break;
-        //            }
-        //    }
-        //}
-        //var trp = drawingCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
-        //gr.TranslateTransform(trp.X, trp.Y);
-        //gr.RotateTransform(-Drehwinkel);
-        //r1 = new RectangleF(r1.Left - trp.X, r1.Top - trp.Y, r1.Width, r1.Height);
-        //r2 = new RectangleF(r2.Left - trp.X, r2.Top - trp.Y, r2.Width, r2.Height);
-        //if (Hintergrund_Weiß_Füllen) {
-        //    gr.FillRectangle(Brushes.White, r1);
-        //}
-        //try {
-        //    if (Bitmap != null) {
-        //        if (forPrinting) {
-        //            gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
-        //            gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
-        //        } else {
-        //            gr.InterpolationMode = InterpolationMode.Low;
-        //            gr.PixelOffsetMode = PixelOffsetMode.HighSpeed;
-        //        }
-        //        gr.DrawImage(Bitmap, r2, r3, GraphicsUnit.Pixel);
-        //    }
-        //} catch {
-        //    Generic.CollectGarbage();
-        //}
-        //if (Stil != PadStyles.Undefiniert) {
-        //    if (Parent.SheetStyleScale > 0 && Parent.SheetStyle != null) {
-        //        gr.DrawRectangle(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(zoom * Parent.SheetStyleScale), r1);
-        //    }
-        //}
-        //foreach (var thisQi in Overlays) {
-        //    gr.DrawImage(thisQi, r2.Left + 8, r2.Top + 8);
-        //}
-        //gr.TranslateTransform(-trp.X, -trp.Y);
-        //gr.ResetTransform();
-        //if (!forPrinting) {
-        //    if (!string.IsNullOrEmpty(Platzhalter_Für_Layout)) {
-        //        Font f = new("Arial", 8);
-        //        BlueFont.DrawString(gr, Platzhalter_Für_Layout, f, Brushes.Black, drawingCoordinates.Left, drawingCoordinates.Top);
-        //    }
-        //}
-        base.DrawExplicit(gr, modifiedPosition, zoom, shiftX, shiftY, forPrinting);
+        base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
     protected override BasicPadItem? TryCreate(string id, string name) {
@@ -562,7 +494,7 @@ public class RowWithFilterPaditem : RectanglePadItem, IReadableText, IAcceptAndS
             var GetValueFrom = Parent[thisRow.CellGetString("suchtxt")];
 
             if (GetValueFrom != null) {
-                ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, GetValueFrom, ConnectionType.Bottom, false));
+                ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, GetValueFrom, ConnectionType.Bottom, false, false));
             }
         }
     }

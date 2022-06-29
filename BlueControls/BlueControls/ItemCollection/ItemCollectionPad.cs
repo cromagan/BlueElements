@@ -322,8 +322,8 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         var p = new List<string>();
 
         foreach (var thisp in this) {
-            if (!string.IsNullOrEmpty(thisp.Seite)) {
-                p.AddIfNotExists(thisp.Seite);
+            if (!string.IsNullOrEmpty(thisp.Page)) {
+                p.AddIfNotExists(thisp.Page);
             }
         }
 
@@ -674,6 +674,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         var arrow2 = false;
         var con1 = ConnectionType.Auto;
         var con2 = ConnectionType.Auto;
+        var pm = true;
 
         foreach (var thisIt in x) {
             switch (thisIt.Key) {
@@ -700,10 +701,14 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
                 case "type2":
                     con2 = (ConnectionType)IntParse(thisIt.Value);
                     break;
+
+                case "print":
+                    pm = thisIt.Value.FromPlusMinus();
+                    break;
             }
         }
         if (item1 == null || item2 == null) { return; }
-        item1.ConnectsTo.Add(new ItemConnection(con1, arrow1, item2, con2, arrow2));
+        item1.ConnectsTo.Add(new ItemConnection(con1, arrow1, item2, con2, arrow2, pm));
     }
 
     private void CreateItems(string toParse) {
@@ -726,7 +731,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
             if (SheetStyle == null || SheetStyleScale < 0.1d) { return true; }
             foreach (var thisItem in this.Where(thisItem => thisItem != null)) {
                 gr.PixelOffsetMode = PixelOffsetMode.None;
-                if (string.IsNullOrEmpty(seite) || thisItem.Seite.ToLower() == seite.ToLower()) {
+                if (string.IsNullOrEmpty(seite) || thisItem.Page.ToLower() == seite.ToLower()) {
                     thisItem.Draw(gr, zoom, shiftX, shiftY, sizeOfParentControl, forPrinting);
                 }
             }

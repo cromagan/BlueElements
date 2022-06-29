@@ -201,8 +201,8 @@ public class ConnectedFormula : IChangedFeedback, IDisposable {
 
     public void RepairAfterParse(object sender, System.EventArgs e) {
         foreach (var thisIt in PadData) {
-            if (string.IsNullOrEmpty(thisIt.Seite)) {
-                thisIt.Seite = "Head";
+            if (string.IsNullOrEmpty(thisIt.Page)) {
+                thisIt.Page = "Head";
             }
         }
     }

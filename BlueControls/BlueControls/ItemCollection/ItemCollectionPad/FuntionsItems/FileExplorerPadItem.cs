@@ -108,11 +108,15 @@ public class FileExplorerPadItem : CustomizableShowPadItem, IItemToControl {
     protected override string ClassId() => "FI-FileExplorer";
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-        var id = -1; if (GetRowFrom != null) { id = GetRowFrom.Id; }
+        var id = -1;
+        if (GetRowFrom != null) { id = GetRowFrom.Id; }
 
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, id);
         }
+
+        CustomizableShowPadItem.DrawFakeControl(gr, positionModified, zoom, BlueDatabase.Enums.ÜberschriftAnordnung.Über_dem_Feld, "C:\\");
+
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 

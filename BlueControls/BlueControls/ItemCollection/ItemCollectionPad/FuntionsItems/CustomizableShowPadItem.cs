@@ -90,7 +90,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
     }
 
     [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
-    public string DatenquelleWählen {
+    public string Datenquelle_wählen {
         get => string.Empty;
         set {
             var x = new ItemCollectionList.ItemCollectionList();
@@ -150,9 +150,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
 
     #region Methods
 
-    public abstract Control? CreateControl(ConnectedFormulaView parent);
-
-    public void DrawFakeControl(RectangleF positionModified, float zoom, ÜberschriftAnordnung captionPosition, Graphics gr, string captiontxt) {
+    public static void DrawFakeControl(Graphics gr, RectangleF positionModified, float zoom, ÜberschriftAnordnung captionPosition, string captiontxt) {
         Point cap;
         var uc = positionModified.ToRect();
 
@@ -183,7 +181,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
 
         if (cap.X >= 0) {
             var e = new RectangleF(positionModified.Left + cap.X * zoom, positionModified.Top + cap.Y * zoom, positionModified.Width, 16 * zoom);
-            Skin.Draw_FormatedText(gr, captiontxt + ":", null, Alignment.Top_Left, e.ToRect(), CaptionFnt.Scale(zoom), true);
+            Skin.Draw_FormatedText(gr, captiontxt, null, Alignment.Top_Left, e.ToRect(), CaptionFnt.Scale(zoom), true);
         }
 
         if (uc.Width > 0 && uc.Height > 0) {
@@ -191,9 +189,11 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
         }
     }
 
+    public abstract Control? CreateControl(ConnectedFormulaView parent);
+
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
-        l.Add(new FlexiControlForProperty<string>(() => DatenquelleWählen, ImageCode.Pfeil_Rechts));
+        l.Add(new FlexiControlForProperty<string>(() => Datenquelle_wählen, ImageCode.Pfeil_Rechts));
         l.Add(new FlexiControlForProperty<string>(() => Datenbank));
 
         l.Add(new FlexiControl());
@@ -229,7 +229,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
         ConnectsTo.Clear();
 
         if (GetRowFrom != null) {
-            ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, (BasicPadItem)GetRowFrom, ConnectionType.Bottom, false));
+            ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, (BasicPadItem)GetRowFrom, ConnectionType.Bottom, false, false));
         }
     }
 

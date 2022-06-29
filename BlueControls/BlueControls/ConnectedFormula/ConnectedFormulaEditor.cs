@@ -122,12 +122,12 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     private void btnRegisterKarte_Click(object sender, System.EventArgs e) {
         var n = InputBox.Show("Formular-Name:");
-        if (string.IsNullOrEmpty((n))) { return; }
+        if (string.IsNullOrEmpty(n)) { return; }
 
         var it = new RowInputPadItem(string.Empty);
         it.Bei_Export_sichtbar = false;
-        it.Seite = n;
         Pad.AddCentered(it);
+        it.Page = n;
     }
 
     private void btnTabControlAdd_Click(object sender, System.EventArgs e) {

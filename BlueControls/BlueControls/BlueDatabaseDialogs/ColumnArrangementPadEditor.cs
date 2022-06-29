@@ -433,7 +433,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
                                 var c = thisc.Column.Database.Column.SearchByKey(key);
                                 if (c != null) {
                                     var rkcolit = (ColumnPadItem)Pad.Item[c.Name];
-                                    rkcolit?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false, databItem, ConnectionType.Top, true));
+                                    rkcolit?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false, databItem, ConnectionType.Top, true, false));
                                 }
                             }// else if (!string.IsNullOrEmpty(column.LinkedCellFilter[z]) && column.LinkedCellFilter[z].StartsWith("@")) {
                             //    fi.Add(new FilterItem(linkedDatabase.Column[z], enFilterType.Istgleich, column.LinkedCellFilter[z].Substring(1)));
@@ -449,13 +449,11 @@ public partial class ColumnArrangementPadEditor : PadEditor {
                             var it2 = new ColumnPadItem(c2);
                             Pad.Item.Add(it2);
                             it2.SetLeftTopPoint(kx, 600);
-                            it2.ConnectsTo.Add(new ItemConnection(ConnectionType.Top, false, it,
-                                ConnectionType.Bottom, true));
+                            it2.ConnectsTo.Add(new ItemConnection(ConnectionType.Top, false, it, ConnectionType.Bottom, true, false));
                             kx = it2.UsedArea.Right;
 
                             // und noch die Datenbank auf die Spalte zeigen lassem
-                            databItem?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false,
-                                it2, ConnectionType.Bottom, false));
+                            databItem?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false, it2, ConnectionType.Bottom, false, false));
                         }
 
                         #endregion

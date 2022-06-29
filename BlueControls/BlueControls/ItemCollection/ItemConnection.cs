@@ -17,6 +17,7 @@
 
 using BlueBasics.Enums;
 using BlueControls.Enums;
+using System.ComponentModel;
 using System.Drawing;
 using static BlueBasics.Extensions;
 
@@ -32,16 +33,32 @@ public class ItemConnection {
     internal readonly BasicPadItem OtherItem;
     internal readonly ConnectionType OtherItemType;
 
+    private bool _beiExportSichtbar = true;
+
     #endregion
 
     #region Constructors
 
-    public ItemConnection(ConnectionType myItemType, bool arrowOnMyItem, BasicPadItem otheritem, ConnectionType otherItemType, bool arrowOnOtherItem) {
+    public ItemConnection(ConnectionType myItemType, bool arrowOnMyItem, BasicPadItem otheritem, ConnectionType otherItemType, bool arrowOnOtherItem, bool showinPrintMode) {
         OtherItem = otheritem;
         OtherItemType = otherItemType;
         MyItemType = myItemType;
         ArrowOnMyItem = arrowOnMyItem;
         ArrowOnOtherItem = arrowOnOtherItem;
+        _beiExportSichtbar = showinPrintMode;
+    }
+
+    #endregion
+
+    #region Properties
+
+    [Description("Wird bei einem Export (wie z. B. Drucken) nur angezeigt, wenn das Häkchen gesetzt ist.")]
+    public bool Bei_Export_sichtbar {
+        get => _beiExportSichtbar;
+        set {
+            if (_beiExportSichtbar == value) { return; }
+            _beiExportSichtbar = value;
+        }
     }
 
     #endregion
@@ -77,6 +94,7 @@ public class ItemConnection {
         t = t + "Item2=" + OtherItem.Internal.ToNonCritical() + ", ";
         t = t + "Arrow2=" + ArrowOnOtherItem.ToPlusMinus() + ", ";
         t = t + "Type2=" + ((int)OtherItemType).ToString() + ", ";
+        t = t + "Print=" + _beiExportSichtbar.ToPlusMinus() + ", ";
 
         return t.TrimEnd(", ") + "}";
     }

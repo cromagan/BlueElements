@@ -195,9 +195,6 @@
     <Compile Include="EventArgs\MoveEventArgs.cs" />
     <Compile Include="EventArgs\PositionEventArgs.cs" />
     <Compile Include="EventArgs\MouseEventArgs1_1.cs" />
-    <Compile Include="Controls\FlexiControlForProperty_OLD.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Extended Text\ExtChar.cs" />
     <Compile Include="Extended Text\ExtCharCRLFCode.cs" />
     <Compile Include="Extended Text\ExtCharTabCode.cs" />
@@ -700,10 +697,6 @@
       <DependentUpon>FlexiControlForProperty.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controls\FlexiControlForProperty_OLD.resx">
-      <DependentUpon>FlexiControlForProperty_OLD.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Controls\FormulaManualDesign.resx">
       <DependentUpon>FormulaManualDesign.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -717,6 +710,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ConnectedFormula\ConnectedFormulaEditor.resx">
       <DependentUpon>ConnectedFormulaEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\DialogWithOkAndCancel.resx">
       <DependentUpon>DialogWithOkAndCancel.cs</DependentUpon>

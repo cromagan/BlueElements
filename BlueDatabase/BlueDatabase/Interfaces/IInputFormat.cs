@@ -196,7 +196,7 @@ public static class IInputFormatExtensions {
 
             case VarType.Float:
                 //https://regex101.com/r/onr0NZ/1
-                t.Regex = @"(^-?([1-9]\d*)|^0)([.]\d*[1-9])?$";
+                t.Regex = @"(^-?([1-9]\d*)|^0)([.|,]\d*[1-9])?$";
                 t.AllowedChars = Constants.Char_Numerals + ",";
                 t.Suffix = string.Empty;
                 t.Prefix = string.Empty;

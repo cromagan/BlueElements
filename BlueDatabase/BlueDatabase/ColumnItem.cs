@@ -1581,7 +1581,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
                 if (c != null) {
                     this.GetStyleFrom(c);
                     BildTextVerhalten = c.BildTextVerhalten;
-                    //ScriptType = c.ScriptType;
+                    ScriptType = c.ScriptType; // 29.06.2022 Wieder aktivert. Grund: Plananalyse waren zwei vershieden Typen bei den Zeitn. So erschien immer automatisch eine 0 bei den Stnden, und es war nicht ersichtlich warum.
                     Translate = c.Translate;
                 }
             }

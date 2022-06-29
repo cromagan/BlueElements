@@ -163,7 +163,12 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         }
 
         var cy = new FlexiControl();
-        cy.Caption = Column.ReadableText() + ":";
+        if (Column == null) {
+            cy.Caption = "?Kein Bezug?:";
+        } else {
+            cy.Caption = Column.ReadableText() + ":";
+        }
+
         cy.EditType = EditType;
         cy.CaptionPosition = CaptionPosition;
         cy.DisabledReason = "Keine Verknüpfung vorhanden.";
@@ -293,7 +298,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         } else if (Column == null) {
             Skin.Draw_FormatedText(gr, "Spalte fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), CaptionFnt.Scale(zoom), true);
         } else {
-            base.DrawFakeControl(positionModified, zoom, CaptionPosition, gr, Column.ReadableText());
+            CustomizableShowPadItem.DrawFakeControl(gr, positionModified, zoom, CaptionPosition, Column.ReadableText() + ":");
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
@@ -320,7 +325,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         ConnectsTo.Clear();
 
         if (GetRowFrom != null) {
-            ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, (BasicPadItem)GetRowFrom, ConnectionType.Bottom, false));
+            ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, (BasicPadItem)GetRowFrom, ConnectionType.Bottom, false, false));
         }
     }
 
