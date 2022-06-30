@@ -142,16 +142,20 @@ public class RowInputPadItem : RectanglePadItem, IReadableText, IContentHolder, 
 
     protected override string ClassId() => "FI-InputRow";
 
-    protected override void DrawExplicit(Graphics gr, RectangleF modifiedPosition, float zoom, float shiftX, float shiftY, bool forPrinting) {
-        gr.DrawRectangle(new Pen(Color.Black, zoom), modifiedPosition);
+    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+        gr.DrawRectangle(new Pen(Color.Black, zoom), positionModified);
 
-        var t = "Eingangs-Zeilen-Spalte\r\n" + _spaltenname;
+        if (!forPrinting) {
+            var t = "Eingangs-Zeilen-Spalte\r\n" + _spaltenname;
 
-        Skin.Draw_FormatedText(gr, t, SymbolForReadableText(), Alignment.Horizontal_Vertical_Center, modifiedPosition.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
+            Skin.Draw_FormatedText(gr, t, SymbolForReadableText(), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
 
-        //gr.FillRectangle(new SolidBrush(Color.FromArgb(128, 255, 255, 255)), modifiedPosition);
+            //gr.FillRectangle(new SolidBrush(Color.FromArgb(128, 255, 255, 255)), positionModified);
+        } else {
+            CustomizableShowPadItem.DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Links_neben_Dem_Feld, _spaltenname + ":");
+        }
 
-        base.DrawExplicit(gr, modifiedPosition, zoom, shiftX, shiftY, forPrinting);
+        base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
     protected override BasicPadItem? TryCreate(string id, string name) {

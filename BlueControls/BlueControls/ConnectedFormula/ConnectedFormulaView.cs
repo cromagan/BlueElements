@@ -37,6 +37,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone {
 
     public bool Generated = false;
 
+    private readonly string _pageToShow = string.Empty;
     private ConnectedFormula.ConnectedFormula? _cf;
 
     private RowItem? _inputrow = null;
@@ -45,8 +46,11 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone {
 
     #region Constructors
 
-    public ConnectedFormulaView() {
+    public ConnectedFormulaView() : this("Head") { }
+
+    public ConnectedFormulaView(string page) {
         InitializeComponent();
+        _pageToShow = page;
         GenerateView();
     }
 
@@ -177,16 +181,18 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone {
             var addfactor = Size.Width / _cf.PadData.SheetSizeInPix.Width;
 
             foreach (var thisit in _cf.PadData) {
-                var o = SearchOrGenerate(thisit);
+                if (string.Equals(_pageToShow, thisit.Page, System.StringComparison.InvariantCultureIgnoreCase)) {
+                    var o = SearchOrGenerate(thisit);
 
-                if (o is System.Windows.Forms.Control c) {
-                    unused.Remove(c);
-                    c.Visible = true;
-                    var ua = thisit.UsedArea;
-                    c.Left = (int)(ua.Left * addfactor);
-                    c.Top = (int)(ua.Top / Umrechnungsfaktor2);
-                    c.Width = (int)(ua.Width * addfactor);
-                    c.Height = (int)(ua.Height / Umrechnungsfaktor2);
+                    if (o is System.Windows.Forms.Control c) {
+                        unused.Remove(c);
+                        c.Visible = true;
+                        var ua = thisit.UsedArea;
+                        c.Left = (int)(ua.Left * addfactor);
+                        c.Top = (int)(ua.Top / Umrechnungsfaktor2);
+                        c.Width = (int)(ua.Width * addfactor);
+                        c.Height = (int)(ua.Height / Umrechnungsfaktor2);
+                    }
                 }
             }
             Generated = true;

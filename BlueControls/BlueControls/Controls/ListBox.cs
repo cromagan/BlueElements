@@ -196,7 +196,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ItemCollectionList? Suggestions { get; } = new();
+    public ItemCollectionList Suggestions { get; } = new();
 
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;

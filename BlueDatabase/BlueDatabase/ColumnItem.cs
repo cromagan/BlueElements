@@ -2091,7 +2091,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
                 //if (_MultiLine && _DropdownBearbeitungErlaubt && EditType_To_Check == enEditTypeFormula.Listbox_3_Zeilen) { return true; }
                 if (_multiLine && _dropdownBearbeitungErlaubt && editTypeToCheck == EditTypeFormula.Listbox) { return true; }
                 if (editTypeToCheck == EditTypeFormula.nur_als_Text_anzeigen) { return true; }
-                //if (!_multiLine && editTypeToCheck == EditTypeFormula.Ja_Nein_Knopf) { return true; }
+                if (!_multiLine && editTypeToCheck == EditTypeFormula.Ja_Nein_Knopf && _bildTextVerhalten == BildTextVerhalten.Interpretiere_Bool) { return true; }
                 return false;
 
             case DataFormat.Verknüpfung_zu_anderer_Datenbank:

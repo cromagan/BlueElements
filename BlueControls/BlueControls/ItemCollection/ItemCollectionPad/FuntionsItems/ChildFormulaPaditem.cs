@@ -40,30 +40,34 @@ public class ChildFormulaPaditem : CustomizableShowPadItem, IItemToControl {
     public static BlueFont? ChapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard);
     public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
     public Controls.ListBox Childs = new();
-    public ListExt<string> NotAllowedChilds = new();
-    private string _path = string.Empty;
+    //public ListExt<string> NotAllowedChilds = new();
+    //private string _path = string.Empty;
+
+    private ConnectedFormula.ConnectedFormula? _cf;
 
     #endregion
 
     #region Constructors
 
-    public ChildFormulaPaditem() : this(UniqueInternal(), string.Empty, null) { }
+    public ChildFormulaPaditem() : this(UniqueInternal(), null) { }
 
-    public ChildFormulaPaditem(string intern, string filename, List<string>? notAllowedChilds) : base(intern) {
-        _path = filename.FilePath();
+    public ChildFormulaPaditem(string intern, ConnectedFormula.ConnectedFormula? cf) : base(intern) {
+        //_path = filename.FilePath();
 
-        if (notAllowedChilds != null) {
-            NotAllowedChilds.AddRange(notAllowedChilds);
+        //if (notAllowedChilds != null) {
+        //    NotAllowedChilds.AddRange(notAllowedChilds);
+        //}
+        //NotAllowedChilds.AddIfNotExists(filename);
+        _cf = cf;
+        if (_cf != null) {
+            _cf.NotAllowedChilds.Changed += NotAllowedChilds_Changed;
         }
-        NotAllowedChilds.AddIfNotExists(filename);
-
-        NotAllowedChilds.Changed += NotAllowedChilds_Changed;
         Childs.ListOrItemChanged += Childs_ListOrItemChanged;
         Childs.ContextMenuInit += Childs_ContextMenuInit;
         Childs.ContextMenuItemClicked += Childs_ContextMenuItemClicked;
     }
 
-    public ChildFormulaPaditem(string intern) : this(intern, string.Empty, null) { }
+    public ChildFormulaPaditem(string intern) : this(intern, null) { }
 
     #endregion
 
@@ -122,8 +126,16 @@ public class ChildFormulaPaditem : CustomizableShowPadItem, IItemToControl {
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
         switch (tag) {
+            case "parent":
+                _cf = ConnectedFormula.ConnectedFormula.GetByFilename(value.FromNonCritical());
+                if (_cf != null) {
+                    _cf.NotAllowedChilds.Changed += NotAllowedChilds_Changed;
+                }
+                //_path = value.FromNonCritical();
+                return true;
+
             case "path":
-                _path = value.FromNonCritical();
+                //_path = value.FromNonCritical();
                 return true;
 
             case "childs":
@@ -133,9 +145,9 @@ public class ChildFormulaPaditem : CustomizableShowPadItem, IItemToControl {
                 return true;
 
             case "notallowedchilds":
-                var tmp2 = value.FromNonCritical().SplitAndCutBy("|");
-                NotAllowedChilds.Clear();
-                NotAllowedChilds.AddRange(tmp2);
+                //var tmp2 = value.FromNonCritical().SplitAndCutBy("|");
+                //NotAllowedChilds.Clear();
+                //NotAllowedChilds.AddRange(tmp2);
                 return true;
         }
         return false;
@@ -147,9 +159,12 @@ public class ChildFormulaPaditem : CustomizableShowPadItem, IItemToControl {
         var t = base.ToString();
         t = t.Substring(0, t.Length - 1) + ", ";
 
-        t = t + "Path=" + _path.ToNonCritical() + ", ";
+        if (_cf != null) {
+            t = t + "Parent=" + _cf.Filename.ToNonCritical() + ", ";
+        }
+        //t = t + "Path=" + _path.ToNonCritical() + ", ";
         t = t + "Childs=" + Childs.Item.ToListOfString().JoinWith("|").ToNonCritical() + ", ";
-        t = t + "NotAllowedChilds=" + NotAllowedChilds.JoinWith("|").ToNonCritical() + ", ";
+        //t = t + "NotAllowedChilds=" + NotAllowedChilds.JoinWith("|").ToNonCritical() + ", ";
         return t.Trim(", ") + "}";
     }
 
@@ -159,24 +174,27 @@ public class ChildFormulaPaditem : CustomizableShowPadItem, IItemToControl {
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
-            NotAllowedChilds.Changed -= NotAllowedChilds_Changed;
+            if (_cf != null) {
+                _cf.NotAllowedChilds.Changed -= NotAllowedChilds_Changed;
+            }
+
             Childs.ListOrItemChanged -= Childs_ListOrItemChanged;
             Childs.ContextMenuInit -= Childs_ContextMenuInit;
             Childs.ContextMenuItemClicked -= Childs_ContextMenuItemClicked;
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, RectangleF modifiedPosition, float zoom, float shiftX, float shiftY, bool forPrinting) {
-        //DrawColorScheme(gr, modifiedPosition, zoom, Id);
+    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+        //DrawColorScheme(gr, positionModified, zoom, Id);
         //s
         var headh = 25 * zoom;
         var headb = 70 * zoom;
 
-        var body = new RectangleF(modifiedPosition.X, modifiedPosition.Y + headh, modifiedPosition.Width, modifiedPosition.Height - headh);
+        var body = new RectangleF(positionModified.X, positionModified.Y + headh, positionModified.Width, positionModified.Height - headh);
         var c = -1;
         foreach (var thisC in Childs.Item) {
             c++;
-            var it = new RectangleF(modifiedPosition.X + c * headb, modifiedPosition.Y, headb, headh);
+            var it = new RectangleF(positionModified.X + c * headb, positionModified.Y, headb, headh);
 
             gr.FillRectangle(new SolidBrush(Color.FromArgb(255, 200, 200, 200)), it);
 
@@ -187,9 +205,9 @@ public class ChildFormulaPaditem : CustomizableShowPadItem, IItemToControl {
         gr.FillRectangle(new SolidBrush(Color.FromArgb(255, 200, 200, 200)), body);
         gr.DrawRectangle(new Pen(Color.Black, zoom), body);
 
-        //Skin.Draw_FormatedText(gr, _text, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, modifiedPosition.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
+        //Skin.Draw_FormatedText(gr, _text, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
         Skin.Draw_FormatedText(gr, "Register-\r\nkarten", null, Alignment.Horizontal_Vertical_Center, body.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
-        base.DrawExplicit(gr, modifiedPosition, zoom, shiftX, shiftY, forPrinting);
+        base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
     protected override BasicPadItem? TryCreate(string id, string name) {
@@ -207,7 +225,7 @@ public class ChildFormulaPaditem : CustomizableShowPadItem, IItemToControl {
         if (e.ClickedComand.ToLower() == "bearbeiten") {
             MultiUserFile.SaveAll(false);
 
-            var x = new ConnectedFormulaEditor(((BasicListItem)e.HotItem).Internal, NotAllowedChilds);
+            var x = new ConnectedFormulaEditor(((BasicListItem)e.HotItem).Internal, _cf.NotAllowedChilds);
             x.ShowDialog();
             MultiUserFile.SaveAll(false);
             x.Dispose();
@@ -221,7 +239,7 @@ public class ChildFormulaPaditem : CustomizableShowPadItem, IItemToControl {
     private void NotAllowedChilds_Changed(object sender, System.EventArgs e) {
         UpdateList();
 
-        foreach (var thisl in NotAllowedChilds) {
+        foreach (var thisl in _cf.NotAllowedChilds) {
             Childs.Item.Remove(thisl);
         }
 
@@ -232,12 +250,23 @@ public class ChildFormulaPaditem : CustomizableShowPadItem, IItemToControl {
         Childs.AddAllowed = AddType.OnlySuggests;
         Childs.RemoveAllowed = true;
         Childs.MoveAllowed = true;
-
-        var l = new List<string>();
-        l.AddRange(System.IO.Directory.GetFiles(_path, "*.cfo"));
-        l.RemoveRange(NotAllowedChilds);
         Childs.Suggestions.Clear();
-        Childs.Suggestions.AddRange(l);
+
+        foreach (var thisf in System.IO.Directory.GetFiles(_cf.Filename.FilePath(), "*.cfo")) {
+            if (!_cf.NotAllowedChilds.Contains(thisf)) {
+                Childs.Suggestions.Add(thisf, ImageCode.Diskette);
+            }
+        }
+
+        foreach (var thisf in _cf.PadData.AllPages()) {
+            if (!_cf.NotAllowedChilds.Contains(thisf) && !string.Equals("Head", thisf, StringComparison.InvariantCultureIgnoreCase)) {
+                Childs.Suggestions.Add(thisf, ImageCode.Formel);
+            }
+        }
+
+        //l.RemoveRange(NotAllowedChilds);
+
+        //Childs.Suggestions.AddRange(l);
     }
 
     #endregion

@@ -143,6 +143,13 @@ public class ConnectedFormula : IChangedFeedback, IDisposable {
 
     #endregion
 
+    /// <summary>
+    /// Gibt das Formular zurück.
+    /// Zuerst wird geprüft, ob es bereits geladen ist. Falls nicht, wird es geladen.
+    /// </summary>
+    /// <param name="filename"></param>
+    /// <returns></returns>
+
     #region Methods
 
     public static ConnectedFormula? GetByFilename(string filename) {

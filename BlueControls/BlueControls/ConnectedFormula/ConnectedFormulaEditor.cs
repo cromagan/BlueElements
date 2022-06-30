@@ -133,7 +133,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
     private void btnTabControlAdd_Click(object sender, System.EventArgs e) {
         if (_cf == null) { return; }
 
-        var x = new ChildFormulaPaditem(string.Empty, _cf.Filename, _cf.NotAllowedChilds);
+        var x = new ChildFormulaPaditem(string.Empty, _cf);
         x.Bei_Export_sichtbar = true;
         Pad.AddCentered(x);
     }

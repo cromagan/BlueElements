@@ -150,20 +150,20 @@ public class ConstantTextPaditem : FixedRectanglePadItem, IReadableText, IConten
 
     protected override string ClassId() => "FI-ConstantText";
 
-    protected override void DrawExplicit(Graphics gr, RectangleF modifiedPosition, float zoom, float shiftX, float shiftY, bool forPrinting) {
-        //DrawColorScheme(gr, modifiedPosition, zoom, Id);
+    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+        //DrawColorScheme(gr, positionModified, zoom, Id);
         //s
-        gr.DrawRectangle(new Pen(Color.Black, zoom), modifiedPosition);
+        gr.DrawRectangle(new Pen(Color.Black, zoom), positionModified);
 
         var t = string.Empty;
         //if (!string.IsNullOrEmpty(_ID)) { t = _ID + ": "; }
         t = t + _text;
 
-        Skin.Draw_FormatedText(gr, t, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, modifiedPosition.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
+        Skin.Draw_FormatedText(gr, t, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
 
-        gr.FillRectangle(new SolidBrush(Color.FromArgb(128, 255, 255, 255)), modifiedPosition);
+        gr.FillRectangle(new SolidBrush(Color.FromArgb(128, 255, 255, 255)), positionModified);
 
-        base.DrawExplicit(gr, modifiedPosition, zoom, shiftX, shiftY, forPrinting);
+        base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
     protected override BasicPadItem? TryCreate(string id, string name) {

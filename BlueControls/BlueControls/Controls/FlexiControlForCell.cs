@@ -215,7 +215,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
                 if (items.Count > 0) {
                     items.AddSeparator();
                 }
-                items.AddRange(x);
+                items.AddClonesFrom(x);
             }
         }
         hotItem = _tmpColumn;
