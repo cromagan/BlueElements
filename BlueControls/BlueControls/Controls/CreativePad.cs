@@ -275,7 +275,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     public List<BasicPadItem> HotItems(MouseEventArgs? e) {
         if (e == null || _item == null) { return new List<BasicPadItem>(); }
         Point p = new((int)((e.X + ShiftX) / Zoom), (int)((e.Y + ShiftY) / Zoom));
-        return _item.Where(thisItem => thisItem != null && thisItem.Contains(p, Zoom)).ToList();
+        return _item.Where(thisItem => thisItem != null &&
+                                        thisItem.IsVisibleOnPage(CurrentPage) &&
+                                        thisItem.Contains(p, Zoom)).ToList();
     }
 
     public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);

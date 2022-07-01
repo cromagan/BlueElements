@@ -32,7 +32,7 @@ using BlueBasics.Enums;
 
 namespace BlueControls.ItemCollection;
 
-public class ChildFormulaPaditem : CustomizableShowPadItem, IItemToControl {
+public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
 
     #region Fields
 
@@ -40,8 +40,6 @@ public class ChildFormulaPaditem : CustomizableShowPadItem, IItemToControl {
     public static BlueFont? ChapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard);
     public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
     public Controls.ListBox Childs = new();
-    //public ListExt<string> NotAllowedChilds = new();
-    //private string _path = string.Empty;
 
     private ConnectedFormula.ConnectedFormula? _cf;
 
@@ -49,15 +47,9 @@ public class ChildFormulaPaditem : CustomizableShowPadItem, IItemToControl {
 
     #region Constructors
 
-    public ChildFormulaPaditem() : this(UniqueInternal(), null) { }
+    public TabFormulaPaditem() : this(UniqueInternal(), null) { }
 
-    public ChildFormulaPaditem(string intern, ConnectedFormula.ConnectedFormula? cf) : base(intern) {
-        //_path = filename.FilePath();
-
-        //if (notAllowedChilds != null) {
-        //    NotAllowedChilds.AddRange(notAllowedChilds);
-        //}
-        //NotAllowedChilds.AddIfNotExists(filename);
+    public TabFormulaPaditem(string intern, ConnectedFormula.ConnectedFormula? cf) : base(intern) {
         _cf = cf;
         if (_cf != null) {
             _cf.NotAllowedChilds.Changed += NotAllowedChilds_Changed;
@@ -67,7 +59,7 @@ public class ChildFormulaPaditem : CustomizableShowPadItem, IItemToControl {
         Childs.ContextMenuItemClicked += Childs_ContextMenuItemClicked;
     }
 
-    public ChildFormulaPaditem(string intern) : this(intern, null) { }
+    public TabFormulaPaditem(string intern) : this(intern, null) { }
 
     #endregion
 
@@ -92,13 +84,22 @@ public class ChildFormulaPaditem : CustomizableShowPadItem, IItemToControl {
             t.Text = thisc.Internal.FileNameWithoutSuffix();
             c3.TabPages.Add(t);
 
-            var cf = ConnectedFormula.ConnectedFormula.GetByFilename(thisc.Internal);
+            ConnectedFormula.ConnectedFormula? cf;
+            string pg;
+
+            if (thisc.Internal.EndsWith(".cfo", StringComparison.InvariantCultureIgnoreCase)) {
+                cf = ConnectedFormula.ConnectedFormula.GetByFilename(thisc.Internal);
+                pg = "Head";
+            } else {
+                cf = _cf;
+                pg = thisc.Internal;
+            }
 
             if (cf != null) {
                 var cc = new ConnectedFormulaView();
-
                 t.Controls.Add(cc);
                 cc.ConnectedFormula = cf;
+                cc.Page = pg;
                 cc.Dock = DockStyle.Fill;
             }
         }
@@ -212,7 +213,7 @@ public class ChildFormulaPaditem : CustomizableShowPadItem, IItemToControl {
 
     protected override BasicPadItem? TryCreate(string id, string name) {
         if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-            return new ChildFormulaPaditem(name);
+            return new TabFormulaPaditem(name);
         }
         return null;
     }
@@ -263,10 +264,6 @@ public class ChildFormulaPaditem : CustomizableShowPadItem, IItemToControl {
                 Childs.Suggestions.Add(thisf, ImageCode.Formel);
             }
         }
-
-        //l.RemoveRange(NotAllowedChilds);
-
-        //Childs.Suggestions.AddRange(l);
     }
 
     #endregion

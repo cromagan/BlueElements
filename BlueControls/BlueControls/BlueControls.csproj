@@ -320,7 +320,7 @@
     <Compile Include="Forms\Notification.Designer.cs">
       <DependentUpon>Notification.cs</DependentUpon>
     </Compile>
-    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\ChildFormulaPaditem.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\TabFormulaPaditem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\CustomizableShowPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\RowInputPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\VariableFieldPadItem.cs" />

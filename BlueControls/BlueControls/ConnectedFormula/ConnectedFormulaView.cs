@@ -31,16 +31,19 @@ using static BlueControls.ConnectedFormula.ConnectedFormula;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class ConnectedFormulaView : GenericControl, IBackgroundNone {
+public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAcceptRowKey {
 
     #region Fields
 
     public bool Generated = false;
 
-    private readonly string _pageToShow = string.Empty;
     private ConnectedFormula.ConnectedFormula? _cf;
+    private Database? _database = null;
 
-    private RowItem? _inputrow = null;
+    //private RowItem? _inputrow = null;
+    private string _pageToShow = "Head";
+
+    private long _rowkey = -1;
 
     #endregion
 
@@ -62,7 +65,8 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone {
         get => _cf;
         set {
             if (_cf == value) { return; }
-            InputRow = null;
+            RowKey = -1;
+            Database = null;
 
             if (_cf != null) {
                 _cf.Changed -= _cf_Changed;
@@ -73,16 +77,40 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone {
                 _cf.Changed += _cf_Changed;
             }
 
-            _cf_Changed(null, null);
+            InvalidateView();
         }
     }
 
-    public RowItem? InputRow {
-        get => _inputrow;
+    public Database? Database {
+        get => _database;
         set {
-            if (value == _inputrow) { return; }
-            _inputrow = value;
-            SetInputRow();
+            if (_database != value) {
+                RowKey = -1;
+                _database = value;
+                InvalidateView();
+            }
+        }
+    }
+
+    public string Page {
+        get => _pageToShow;
+        set {
+            if (string.Equals(_pageToShow, value, System.StringComparison.InvariantCultureIgnoreCase)) { return; }
+            RowKey = -1;
+
+            _pageToShow = value;
+
+            InvalidateView();
+        }
+    }
+
+    public long RowKey {
+        get => _rowkey;
+        set {
+            if (_rowkey != value) {
+                _rowkey = value;
+                InvalidateView();
+            }
         }
     }
 
@@ -90,8 +118,26 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone {
 
     #region Methods
 
+    public void InvalidateView() {
+        Generated = false;
+        Invalidate(); // Sonst wird es nie neu gezeichnet
+    }
+
+    //public RowItem? InputRow {
+    //    get => _inputrow;
+    //    set {
+    //        if (value == _inputrow) { return; }
+    //        _inputrow = value;
+    //        SetInputRow();
+    //    }
+    //}
     public System.Windows.Forms.Control? SearchOrGenerate(ItemCollection.BasicPadItem thisit) {
         if (thisit == null) { return null; }
+
+        if (thisit.Page != Page) {
+            Develop.DebugPrint("Falscher Seitenaufruf!");
+            return null;
+        }
 
         foreach (var thisC in Controls) {
             if (thisC is System.Windows.Forms.Control c) {
@@ -116,22 +162,12 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone {
         return null;
     }
 
-    protected override void DrawControl(Graphics gr, States state) => Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
+    protected override void DrawControl(Graphics gr, States state) {
+        Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
+        GenerateView();
+        SetInputRow();
+    }
 
-    //            case TabControl tb:
-    //                foreach (var thstp in tb.TabPages) {
-    //                    if (thstp is System.Windows.Forms.TabPage tp) {
-    //                        foreach (var cfvm in tp.Controls) {
-    //                            if (cfvm is ConnectedFormulaView cfv) {
-    //                                cfv.Set(id, value);
-    //                            }
-    //                        }
-    //                    }
-    //                }
-    //                break;
-    //        }
-    //    }
-    //}
     protected override void OnSizeChanged(System.EventArgs e) {
         if (IsDisposed) { return; }
         base.OnSizeChanged(e);
@@ -153,19 +189,9 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone {
     //                }
     //                break;
     private void _cf_Changed(object sender, System.EventArgs e) {
-        Generated = false;
-        GenerateView();
+        InvalidateView();
     }
 
-    //            case FlexiControlRowSelector fcrs:
-    //                if (value is RowItem rvalue) {
-    //                    if (fcrs.VerbindungsId.Equals(id, System.StringComparison.InvariantCultureIgnoreCase)) {
-    //                        if (fcrs.FilterDefiniton.Row.Count == 0) {
-    //                            fcrs.ValueSet(rvalue.Key.ToString(), true, true);
-    //                        }
-    //                    }
-    //                }
-    //                break;
     private void GenerateView() {
         if (Generated) { return; }
         Generated = false;
@@ -181,7 +207,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone {
             var addfactor = Size.Width / _cf.PadData.SheetSizeInPix.Width;
 
             foreach (var thisit in _cf.PadData) {
-                if (string.Equals(_pageToShow, thisit.Page, System.StringComparison.InvariantCultureIgnoreCase)) {
+                if (thisit.IsVisibleOnPage(_pageToShow)) {
                     var o = SearchOrGenerate(thisit);
 
                     if (o is System.Windows.Forms.Control c) {
@@ -209,57 +235,30 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone {
         if (!Generated) { return; }
 
         foreach (var thisIt in _cf.PadData) {
-            if (thisIt is RowInputPadItem ripi) {
+            if (thisIt is RowInputPadItem ripi && ripi.IsVisibleOnPage(Page)) {
                 var c = SearchOrGenerate(ripi);
 
                 if (c is FlexiControlForCell fcfc) {
-                    ColumnItem? co = null;
-                    if (_inputrow != null) {
-                        if (ripi.Spaltenname.Equals("#first", System.StringComparison.InvariantCultureIgnoreCase)) {
-                            co = _inputrow?.Database?.Column.First();
-                        } else {
-                            co = _inputrow?.Database?.Column.Exists(ripi.Spaltenname);
-                        }
+                    ColumnItem? co;
+
+                    if (ripi.Spaltenname.Equals("#first", System.StringComparison.InvariantCultureIgnoreCase)) {
+                        co = Database?.Column.First();
+                    } else {
+                        co = Database?.Column.Exists(ripi.Spaltenname);
                     }
+                    fcfc.Database = Database;
 
                     if (co != null) {
-                        fcfc.Database = _inputrow?.Database;
                         fcfc.ColumnKey = co.Key;
-                        fcfc.RowKey = _inputrow!.Key;
+                        fcfc.RowKey = RowKey;
                     } else {
-                        fcfc.Database = null;
                         fcfc.RowKey = -1;
                         fcfc.ColumnKey = -1;
                     }
                 }
             }
         }
-
-        //foreach(var thisC in Controls) {
-        //    if(thisC is FlexiControlForCell fcfc) {
-        //        if(fcfc.Tag is string id) {
-        //            if(_cf[id] is RowInputPadItem)
-
-        //        }
-
-        //    }
-
-        //}
     }
 
     #endregion
-
-    ///// <summary>
-    ///// Setzt eine Variablen-ID auf diesen Wert.
-    ///// String werden in Konstante Felder geschrieben.
-    ///// Row wird in RowSelector geschrieben
-    ///// </summary>
-    ///// <param name="id"></param>
-    ///// <param name="value"></param>
-    //public void Set(string id, object? value) {
-    //    foreach (var thisCon in Controls) {
-    //        switch (thisCon) {
-    //            case ConnectedFormulaView cf:
-    //                cf.Set(id, value);
-    //                break;
 }

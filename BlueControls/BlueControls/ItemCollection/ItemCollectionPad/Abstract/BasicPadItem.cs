@@ -356,6 +356,12 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     /// <param name="he"></param>
     public abstract void InitialPosition(int x, int y, int width, int height);
 
+    public bool IsVisibleOnPage(string page) {
+        if (string.IsNullOrEmpty(_page)) { return true; }
+
+        return string.Equals(_page, page, StringComparison.InvariantCultureIgnoreCase);
+    }
+
     public void Move(float x, float y) {
         if (x == 0 && y == 0) { return; }
         foreach (var t in PointsForSuccesfullyMove) {

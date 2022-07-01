@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueControls.Enums;
 using System.Windows.Forms;
 using BlueControls.Interfaces;
@@ -79,7 +81,7 @@ public class TabControl : AbstractTabControl, IAcceptRowKey {
         foreach (var thisTab in TabPages) {
             if (thisTab is TabPage tp) {
                 foreach (var thisControl in tp.Controls) {
-                    if (thisControl is IAcceptRowKey iar && thisControl is not TabControl) {
+                    if (thisControl is IAcceptRowKey iar and not TabControl) {
                         iar.RowKey = -1;
                         iar.Database = Database;
                         iar.RowKey = RowKey;
@@ -87,6 +89,7 @@ public class TabControl : AbstractTabControl, IAcceptRowKey {
                 }
             }
         }
+        Invalidate();
     }
 
     #endregion

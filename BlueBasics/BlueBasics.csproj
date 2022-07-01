@@ -113,6 +113,7 @@
     <Compile Include="Extensions\RectangleFExtension.cs" />
     <Compile Include="Cryptogaphy.cs" />
     <Compile Include="HTML.cs" />
+    <Compile Include="Interfaces\IDisposeableExtended.cs" />
     <Compile Include="Interfaces\IStringable.cs" />
     <Compile Include="Interfaces\IReadableText.cs" />
     <Compile Include="MultiUserFile\MultiUserFile.cs" />

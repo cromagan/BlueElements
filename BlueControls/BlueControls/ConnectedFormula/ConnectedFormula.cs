@@ -211,6 +211,10 @@ public class ConnectedFormula : IChangedFeedback, IDisposable {
             if (string.IsNullOrEmpty(thisIt.Page)) {
                 thisIt.Page = "Head";
             }
+
+            foreach (var thisCon in thisIt.ConnectsTo) {
+                thisCon.Bei_Export_sichtbar = false;
+            }
         }
     }
 

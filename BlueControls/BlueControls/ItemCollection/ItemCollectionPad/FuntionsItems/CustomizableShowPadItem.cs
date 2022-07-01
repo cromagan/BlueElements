@@ -95,7 +95,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
         set {
             var x = new ItemCollectionList.ItemCollectionList();
             foreach (var thisR in Parent) {
-                if (thisR is ICalculateOneRowItemLevel rfp) {
+                if (thisR.IsVisibleOnPage(Page) && thisR is ICalculateOneRowItemLevel rfp) {
                     x.Add(rfp, thisR.Internal);
                 }
             }

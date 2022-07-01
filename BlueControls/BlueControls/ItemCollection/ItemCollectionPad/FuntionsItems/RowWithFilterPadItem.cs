@@ -385,7 +385,7 @@ public class RowWithFilterPaditem : RectanglePadItem, IReadableText, IAcceptAndS
 
         if (Parent != null) {
             foreach (var thisPadItem in Parent) {
-                if (thisPadItem is IContentHolder efpi) {
+                if (thisPadItem.IsVisibleOnPage(Page) && thisPadItem is IContentHolder efpi) {
                     var rek = false;
                     if (efpi is IAcceptAndSends aas) { rek = aas.IsRecursiveWith(this); }
 

@@ -324,7 +324,6 @@ public partial class TableView : Form {
 
             if (Formula.Width < 30 || Formula.Height < 10) { return; }
 
-
             if (r?.Database != null) {
                 Formula.Database = r?.Database;
             }
@@ -344,7 +343,12 @@ public partial class TableView : Form {
             if (r?.Database != null) {
                 SetFormulaBETA(r?.Database);
             }
-            FormulaBETA.InputRow = r;
+            FormulaBETA.Database = r?.Database;
+            if (r != null) {
+                FormulaBETA.RowKey = r.Key;
+            } else {
+                FormulaBETA.RowKey = -1;
+            }
         }
     }
 
@@ -992,11 +996,13 @@ public partial class TableView : Form {
                 var tmpFormula = ConnectedFormula.ConnectedFormula.GetByFilename(f);
                 if (tmpFormula != null) {
                     FormulaBETA.ConnectedFormula = tmpFormula;
+                    FormulaBETA.Database = db;
                     return;
                 }
             }
         }
 
+        FormulaBETA.Database = null;
         FormulaBETA.ConnectedFormula = null;
     }
 

@@ -13,7 +13,8 @@ namespace BlueControls.Controls {
         protected override void Dispose(bool disposing) {
 
             if(disposing) {
-                InputRow = null;
+                RowKey = -1;
+                Database = null;
                 ConnectedFormula = null;
             }
 

@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using BlueBasics;
@@ -54,6 +55,11 @@ public partial class PadEditorReadOnly : Form {
     private void btnZoomFit_Click(object sender, System.EventArgs e) => Pad.ZoomFit();
 
     private void DoPages() {
+        if (InvokeRequired) {
+            Invoke(new Action(() => DoPages()));
+            return;
+        }
+
         var x = new List<string>();
 
         if (Pad?.Item != null) { x.AddRange(Pad.Item.AllPages()); }

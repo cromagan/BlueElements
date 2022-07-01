@@ -183,6 +183,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
     private static void DoChilds_OneRowKey(IAcceptRowKey fcfc, RowItem row, Database? database) {
         // Normales Zellenfeld
+        if (fcfc.IsDisposed) { return; }
 
         fcfc.Database = database;
 

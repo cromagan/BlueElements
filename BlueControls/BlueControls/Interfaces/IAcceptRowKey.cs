@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueDatabase;
+using BlueBasics.Interfaces;
 
 namespace BlueControls.Interfaces;
 
@@ -25,7 +26,7 @@ namespace BlueControls.Interfaces;
 /// Wird verwendet, wenn ein Steuerelement einen Zeilenschlüssel empfangen
 /// und damit umgehen kann.
 /// </summary>
-public interface IAcceptRowKey {
+public interface IAcceptRowKey : IDisposeableExtended {
 
     #region Properties
 

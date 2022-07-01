@@ -61,15 +61,6 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
         }
     }
 
-    //public EditTypeFormula EditType {
-    //    get => _bearbeitung;
-    //    set {
-    //        if (_bearbeitung == value) { return; }
-    //        _bearbeitung = value;
-    //        OnChanged();
-    //    }
-    //}
-
     public string Überschrift {
         get => _überschrift;
         set {

@@ -80,18 +80,8 @@ public class RowInputPadItem : RectanglePadItem, IReadableText, IContentHolder, 
         var c3 = new FlexiControlForCell();
         c3.Width = 200;
         c3.Height = 32;
-
-        //if (string.IsNullOrEmpty(_ID)) {
         c3.CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
-        //} else {
-        //    c3.CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
-        //    c3.Caption = _ID;
-        //}
-
         c3.EditType = EditTypeFormula.nur_als_Text_anzeigen;
-        //c3.DisabledReason = "Dieser Wert kommt wird von einer anderen Datenbank gelesen.;
-
-        //c3.ValueSet(string.Empty, true, true);
         c3.Tag = Internal;
         return c3;
     }
@@ -99,15 +89,8 @@ public class RowInputPadItem : RectanglePadItem, IReadableText, IContentHolder, 
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
         l.Add(new FlexiControlForProperty<string>(() => Spaltenname));
-        //l.Add(new FlexiControlForProperty<string>(() => ID));
         return l;
     }
-
-    //public bool IsRecursiveWith(IAcceptAndSends obj) {
-    //    if (obj == this) { return true; }
-
-    //    return false;
-    //}
 
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
@@ -115,17 +98,11 @@ public class RowInputPadItem : RectanglePadItem, IReadableText, IContentHolder, 
             case "column":
                 Spaltenname = value.FromNonCritical();
                 return true;
-
-                //case "id":
-                //    _ID = value.FromNonCritical();
-                //    return true;
         }
         return false;
     }
 
     public string ReadableText() {
-        //if (!string.IsNullOrEmpty(_ID)) { return "Konstanter Wert: " + _text + "(" + _ID + ")"; }
-
         return "Einganszeilen-Spalte: " + _spaltenname;
     }
 
@@ -136,21 +113,17 @@ public class RowInputPadItem : RectanglePadItem, IReadableText, IContentHolder, 
         t = t.Substring(0, t.Length - 1) + ", ";
 
         t = t + "Column=" + _spaltenname.ToNonCritical() + ", ";
-        //t = t + "ID=" + _ID.ToNonCritical() + ", ";
         return t.Trim(", ") + "}";
     }
 
     protected override string ClassId() => "FI-InputRow";
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-        gr.DrawRectangle(new Pen(Color.Black, zoom), positionModified);
-
         if (!forPrinting) {
+            gr.DrawRectangle(new Pen(Color.Black, zoom), positionModified);
             var t = "Eingangs-Zeilen-Spalte\r\n" + _spaltenname;
 
             Skin.Draw_FormatedText(gr, t, SymbolForReadableText(), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
-
-            //gr.FillRectangle(new SolidBrush(Color.FromArgb(128, 255, 255, 255)), positionModified);
         } else {
             CustomizableShowPadItem.DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Links_neben_Dem_Feld, _spaltenname + ":");
         }

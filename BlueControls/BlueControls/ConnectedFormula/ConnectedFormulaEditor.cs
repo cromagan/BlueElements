@@ -52,7 +52,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     private void btnEingangsZeile_Click(object sender, System.EventArgs e) {
         var it = new RowInputPadItem(string.Empty);
-        it.Bei_Export_sichtbar = false;
+        //it.Bei_Export_sichtbar = false;
         Pad.AddCentered(it);
     }
 
@@ -125,7 +125,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
         if (string.IsNullOrEmpty(n)) { return; }
 
         var it = new RowInputPadItem(string.Empty);
-        it.Bei_Export_sichtbar = false;
+        //it.Bei_Export_sichtbar = false;
         Pad.AddCentered(it);
         it.Page = n;
     }
@@ -133,7 +133,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
     private void btnTabControlAdd_Click(object sender, System.EventArgs e) {
         if (_cf == null) { return; }
 
-        var x = new ChildFormulaPaditem(string.Empty, _cf);
+        var x = new TabFormulaPaditem(string.Empty, _cf);
         x.Bei_Export_sichtbar = true;
         Pad.AddCentered(x);
     }

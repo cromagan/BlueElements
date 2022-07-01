@@ -942,7 +942,6 @@ namespace BlueControls.Forms {
             // 
             this.FormulaBETA.ConnectedFormula = null;
             this.FormulaBETA.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.FormulaBETA.InputRow = null;
             this.FormulaBETA.Location = new System.Drawing.Point(0, 0);
             this.FormulaBETA.Name = "FormulaBETA";
             this.FormulaBETA.Size = new System.Drawing.Size(338, 566);

@@ -19,6 +19,7 @@
 
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
+using BlueBasics.Interfaces;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -30,7 +31,7 @@ using static BlueBasics.Generic;
 
 namespace BlueBasics.MultiUserFile;
 
-public sealed class MultiUserFile : IDisposable {
+public sealed class MultiUserFile : IDisposeableExtended {
 
     #region Fields
 
@@ -151,8 +152,6 @@ public sealed class MultiUserFile : IDisposable {
 
     public bool AutoDeleteBak { get; set; }
 
-    public bool Disposed { get; private set; }
-
     /// <summary>
     /// Load oder SaveAsAndChangeTo benutzen
     /// </summary>
@@ -167,6 +166,8 @@ public sealed class MultiUserFile : IDisposable {
             }
         }
     }
+
+    public bool IsDisposed { get; private set; }
 
     /// <summary>
     /// Ab aktuell die "Save" Routine vom Code aufgerufen wird, und diese auf einen erfolgreichen Speichervorgang abwartet
@@ -264,7 +265,7 @@ public sealed class MultiUserFile : IDisposable {
     }
 
     public void Dispose(bool disposing) {
-        if (!Disposed) {
+        if (!IsDisposed) {
             _all_Files.Remove(this);
             if (disposing) {
                 // TODO: verwalteten Zustand (verwaltete Objekte) entsorgen.
@@ -278,7 +279,7 @@ public sealed class MultiUserFile : IDisposable {
             _pureBinSaver.Dispose();
             _checker.Dispose();
             _checker.Dispose();
-            Disposed = true;
+            IsDisposed = true;
         }
     }
 
@@ -475,7 +476,7 @@ public sealed class MultiUserFile : IDisposable {
     }
 
     public void OnConnectedControlsStopAllWorking(MultiUserFileStopWorkingEventArgs e) {
-        if (Disposed) { return; }
+        if (IsDisposed) { return; }
         if (e.AllreadyStopped.Contains(Filename.ToLower())) { return; }
         e.AllreadyStopped.Add(Filename.ToLower());
         ConnectedControlsStopAllWorking?.Invoke(this, e);
@@ -643,7 +644,7 @@ public sealed class MultiUserFile : IDisposable {
     }
 
     protected void OnLoaded(LoadedEventArgs e) {
-        if (Disposed) { return; }
+        if (IsDisposed) { return; }
         Loaded?.Invoke(this, e);
     }
 
@@ -856,7 +857,7 @@ public sealed class MultiUserFile : IDisposable {
     }
 
     private void OnLoading(LoadingEventArgs e) {
-        if (Disposed) { return; }
+        if (IsDisposed) { return; }
         Loading?.Invoke(this, e);
     }
 
@@ -869,7 +870,7 @@ public sealed class MultiUserFile : IDisposable {
     }
 
     private void OnSavedToDisk() {
-        if (Disposed) { return; }
+        if (IsDisposed) { return; }
         SavedToDisk?.Invoke(this, System.EventArgs.Empty);
     }
 
