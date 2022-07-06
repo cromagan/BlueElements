@@ -102,8 +102,10 @@ internal sealed partial class DatabaseHeadEditor {
         txbStandardFormulaFile.Text = _database.StandardFormulaFile;
         txbZeilenQuickInfo.Text = _database.ZeilenQuickInfo.Replace("<br>", "\r");
         tbxUndoAnzahl.Text = _database.UndoCount.ToString();
+
         PermissionGroups_NewRow.Suggestions.Clear();
         PermissionGroups_NewRow.Suggestions.AddRange(_database.Permission_AllUsed(false));
+
         DatenbankAdmin.Suggestions.Clear();
         DatenbankAdmin.Suggestions.AddRange(_database.Permission_AllUsed(false));
 

@@ -217,8 +217,15 @@ public class ListExt<T> : List<T>, IChangedFeedback, IDisposable {
 
     public new void Sort() {
         if (Count < 2) { return; }
+        List<T> tmp;
 
-        var tmp = new List<T>(this);
+        try {
+            tmp = new List<T>(this); //Ja, kann Fehler verursachen!
+        } catch {
+            Sort();
+            return;
+        }
+
         base.Sort();
 
         try {

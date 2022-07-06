@@ -29,14 +29,63 @@ using BlueDatabase.Enums;
 using BlueControls.Interfaces;
 using System.Windows.Forms;
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Controls;
+using BlueControls.Enums;
+
+using BlueControls.EventArgs;
+using BlueControls.Forms;
+using BlueControls.ItemCollection;
+using BlueDatabase;
+using System;
+
+using System.Collections.Generic;
+using System.Drawing;
+
+using BlueControls.ItemCollection.ItemCollectionList;
+
+using static BlueBasics.Converter;
+
+using BlueBasics.EventArgs;
+
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.EventArgs;
+using BlueDatabase.Enums;
+
+using BlueDatabase.EventArgs;
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+using static BlueBasics.FileOperations;
+
+using static BlueBasics.Converter;
+
+using BlueScript.Variables;
+
 namespace BlueControls.ItemCollection;
 
+/// <summary>
+/// Standard für Objekte, die einen Datenbank/Zeilenbezug haben.
+/// Stellt auch alle Methode breit, zum Einrichten der Breite und Benutzer-Sichtbarkeiten.
+/// Nur Tabs, die ein solches Objekt habe, werden als anzeigewürdig gewertet
+/// </summary>
 public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl {
 
     #region Fields
 
     public static BlueFont? CaptionFnt = Skin.GetBlueFont(Design.Caption, States.Standard);
 
+    public ListExt<string> VisibleFor = new();
     private ICalculateOneRowItemLevel? _getValueFrom = null;
 
     #endregion
@@ -51,7 +100,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
 
     #region Properties
 
-    public string BreiteBerechnen {
+    public string Breite_berechnen {
         get => string.Empty;
         set {
             var li = new ItemCollectionList.ItemCollectionList();
@@ -131,7 +180,32 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
         }
     }
 
-    public string Standardhöhe {
+    public string Sichtbarkeit {
+        get => string.Empty;
+        set {
+            ItemCollectionList.ItemCollectionList aa = new();
+            aa.AddRange(Permission_AllUsed());
+            aa.Sort();
+            aa.CheckBehavior = CheckBehavior.MultiSelection;
+            aa.Check(VisibleFor, true);
+            var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:", aa, AddType.Text, true);
+            if (b == null) { return; }
+            VisibleFor.Clear();
+            VisibleFor.AddRange(b.ToArray());
+
+            if (VisibleFor.Count > 1 && VisibleFor.Contains("#Everybody", false)) {
+                VisibleFor.Clear();
+            }
+
+            if (VisibleFor.Count == 0) {
+                VisibleFor.Add("#Everybody");
+            }
+
+            OnChanged();
+        }
+    }
+
+    public string Standardhöhe_setzen {
         get => string.Empty;
         set {
             var x = UsedArea;
@@ -197,9 +271,9 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
         l.Add(new FlexiControlForProperty<string>(() => Datenbank));
 
         l.Add(new FlexiControl());
-
-        l.Add(new FlexiControlForProperty<string>(() => Standardhöhe, ImageCode.GrößeÄndern));
-        l.Add(new FlexiControlForProperty<string>(() => BreiteBerechnen, ImageCode.GrößeÄndern));
+        l.Add(new FlexiControlForProperty<string>(() => Sichtbarkeit, ImageCode.Schild));
+        l.Add(new FlexiControlForProperty<string>(() => Standardhöhe_setzen, ImageCode.GrößeÄndern));
+        l.Add(new FlexiControlForProperty<string>(() => Breite_berechnen, ImageCode.GrößeÄndern));
 
         return l;
     }
@@ -210,6 +284,11 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
             case "getvaluefrom":
                 GetRowFrom = (ICalculateOneRowItemLevel)Parent[value.FromNonCritical()];
                 return true;
+
+            case "visiblefor":
+                VisibleFor.Clear();
+                VisibleFor.AddRange((value.FromNonCritical()).SplitAndCutByCr());
+                return true;
         }
         return false;
     }
@@ -218,11 +297,29 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
         var t = base.ToString();
         t = t.Substring(0, t.Length - 1) + ", ";
 
+        if (VisibleFor.Count > 0) {
+            t = t + "VisibleFor=" + (VisibleFor.JoinWithCr()).ToNonCritical() + ", ";
+        }
+
         if (GetRowFrom != null) {
             t = t + "GetValueFrom=" + GetRowFrom.Internal.ToNonCritical() + ", ";
         }
 
         return t.Trim(", ") + "}";
+    }
+
+    private List<string> Permission_AllUsed() {
+        var l = new List<string>();
+        foreach (var thisIt in Parent) {
+            if (thisIt is CustomizableShowPadItem csi) {
+                l.AddRange(csi.VisibleFor);
+            }
+        }
+
+        l.Add("#Everybody");
+        l.Add("#User: " + BlueBasics.Generic.UserName());
+
+        return l.SortedDistinctList();
     }
 
     private void RepairConnections() {

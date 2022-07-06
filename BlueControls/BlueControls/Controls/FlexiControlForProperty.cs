@@ -39,33 +39,50 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
     #region Fields
 
-    private readonly Accessor<T>? _accessor;
+    private readonly Accessor<T> _accessor;
     private readonly bool _isButton;
 
     #endregion
 
     #region Constructors
 
+    /// <summary>
+    /// Anzeige als Dropdown-Feld
+    /// </summary>
+    /// <param name="expr"></param>
+    /// <param name="list"></param>
     public FlexiControlForProperty(Expression<Func<T>> expr, ItemCollectionList? list) : this(expr, 1, list, ImageCode.None) { }
 
+    /// <summary>
+    /// Anzeige als Textfeld, mit der angegeben Anzahl an Zeilen.
+    /// </summary>
+    /// <param name="expr"></param>
+    /// <param name="rowCount"></param>
     public FlexiControlForProperty(Expression<Func<T>> expr, int rowCount) : this(expr, rowCount, null, ImageCode.None) { }
 
+    /// <summary>
+    /// Anzeige als Button
+    /// </summary>
+    /// <param name="expr"></param>
+    /// <param name="image"></param>
     public FlexiControlForProperty(Expression<Func<T>> expr, ImageCode image) : this(expr, 1, null, image) { }
 
+    /// <summary>
+    /// Je nach Datentyp eine andere Anzeige
+    /// </summary>
+    /// <param name="expr"></param>
     public FlexiControlForProperty(Expression<Func<T>> expr) : this(expr, 1, null, ImageCode.None) { }
 
-    //public FlexiControlForProperty(object expr) : this(expr, 1, null, ImageCode.None) { }
+    public FlexiControlForProperty() : this(null, 1, null, ImageCode.None) { }
 
-    public FlexiControlForProperty() : base() {
+    private FlexiControlForProperty(Expression<Func<T>> expr, int rowCount, ItemCollectionList? list, ImageCode image) : base() {
+        _accessor = new Accessor<T>(expr);
+
         GenFehlerText();
         _IdleTimer.Tick += Checker_Tick;
         CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
         EditType = EditTypeFormula.Textfeld;
         Size = new Size(200, 24);
-    }
-
-    private FlexiControlForProperty(Expression<Func<T>> expr, int rowCount, ItemCollectionList? list, ImageCode image) : this() {
-        _accessor = new Accessor<T?>(expr);
 
         _isButton = (image != ImageCode.None);
 
