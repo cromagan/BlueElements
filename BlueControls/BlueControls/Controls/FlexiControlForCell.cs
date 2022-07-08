@@ -382,8 +382,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
             Invoke(new Action(() => _Database_Loaded(sender, e)));
             return;
         }
-        if(Disposing || IsDisposed) { return; }
-
+        if (Disposing || IsDisposed) { return; }
 
         UpdateColumnData();
         SetValueFromCell();
@@ -529,14 +528,19 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     }
 
     private void GetTmpVariables() {
-        if (_database != null) {
-            _tmpColumn = string.IsNullOrEmpty(_columnName)
-                ? _database.Column.SearchByKey(_colKey)
-                : _database.Column[_columnName];
-            _tmpRow = _database.Row.SearchByKey(_rowKey);
-        } else {
-            _tmpColumn = null;
-            _tmpRow = null;
+        try {
+            if (_database != null) {
+                _tmpColumn = string.IsNullOrEmpty(_columnName)
+                    ? _database.Column.SearchByKey(_colKey)
+                    : _database.Column[_columnName];
+                _tmpRow = _database.Row.SearchByKey(_rowKey);
+            } else {
+                _tmpColumn = null;
+                _tmpRow = null;
+            }
+        } catch {
+            // Multitasking sei dank kann _database trotzem null sein...
+            GetTmpVariables();
         }
     }
 
@@ -720,7 +724,6 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
 
     private void SetValueFromCell() {
         Develop.DebugPrint_Disposed(IsDisposed);
-
 
         if (_tmpColumn == null || _tmpRow == null) {
             ValueSet(string.Empty, true, true);
