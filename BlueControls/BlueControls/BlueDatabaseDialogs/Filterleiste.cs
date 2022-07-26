@@ -98,16 +98,12 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
                 _tableView.PinnedChanged -= _TableView_PinnedOrFilterChanged;
                 _tableView.EnabledChanged -= _TableView_EnabledChanged;
                 _tableView.ViewChanged -= _TableView_ViewChanged;
-                //ChangeDatabase(null);
             }
             _tableView = value;
             GetÄhnlich();
             FillFilters();
             if (_tableView != null) {
-                //ChangeDatabase(_TableView.Database);
                 _tableView.DatabaseChanged += _TableView_DatabaseChanged;
-                //_TableView.CursorPosChanged += _TableView_CursorPosChanged;
-                //_TableView.ViewChanged += _TableView_ViewChanged;
                 _tableView.FilterChanged += _TableView_PinnedOrFilterChanged;
                 _tableView.PinnedChanged += _TableView_PinnedOrFilterChanged;
                 _tableView.EnabledChanged += _TableView_EnabledChanged;

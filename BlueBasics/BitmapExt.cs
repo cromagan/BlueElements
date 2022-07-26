@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -36,7 +37,7 @@ namespace BlueBasics;
 // Todo: Obselete Routinen:
 // Image_FromFile
 // Resize
-public class BitmapExt {
+public class BitmapExt : IDisposeableExtended {
 
     #region Fields
 
@@ -78,10 +79,9 @@ public class BitmapExt {
 
     public int[]? Bits { get; private set; }
 
-    // Int32 = int
-    public bool Disposed { get; private set; }
-
     public int Height { get; private set; }
+
+    public bool IsDisposed { get; private set; }
 
     public Size Size => new(Width, Height);
 
@@ -900,8 +900,8 @@ public class BitmapExt {
     }
 
     public void Dispose() {
-        if (Disposed) { return; }
-        Disposed = true;
+        if (IsDisposed) { return; }
+        IsDisposed = true;
         _bitmap?.Dispose();
         BitsHandle.Free();
     }

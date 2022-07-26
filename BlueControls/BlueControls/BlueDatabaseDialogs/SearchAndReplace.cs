@@ -44,8 +44,8 @@ internal sealed partial class SearchAndReplace : Form {
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         _blueTable = table;
-        _blueTable.CursorPosChanged += CursorPosChanged;
-        CursorPosChanged(_blueTable, new CellExtEventArgs(_blueTable.CursorPosColumn, _blueTable.CursorPosRow));
+        _blueTable.SelectedCellChanged += SelectedCellChanged;
+        SelectedCellChanged(_blueTable, new CellExtEventArgs(_blueTable.CursorPosColumn, _blueTable.CursorPosRow));
     }
 
     #endregion
@@ -54,7 +54,7 @@ internal sealed partial class SearchAndReplace : Form {
 
     protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
         base.OnFormClosing(e);
-        _blueTable.CursorPosChanged -= CursorPosChanged;
+        _blueTable.SelectedCellChanged -= SelectedCellChanged;
     }
 
     private void Alt_TextChange(object sender, System.EventArgs e) => Checkbuttons();
@@ -102,12 +102,6 @@ internal sealed partial class SearchAndReplace : Form {
             if (!ErsetzeKomplett.Checked) { canDo = false; }
         }
         ers.Enabled = canDo;
-    }
-
-    private void CursorPosChanged(object sender, CellExtEventArgs e) {
-        NurinAktuellerSpalte.Text = e.Column == null ? "Nur in der <b>aktuell gewählten Spalte</b> ersetzen."
-            : "Nur in Spalte <b>'" + e.Column.ReadableText() + "'</b> ersetzen.";
-        Checkbuttons();
     }
 
     private void ers_Click(object sender, System.EventArgs e) {
@@ -171,6 +165,12 @@ internal sealed partial class SearchAndReplace : Form {
         p?.Close();
         MessageBox.Show(count + " Ersetzung(en) vorgenommen.", ImageCode.Information, "OK");
         _isWorking = false;
+    }
+
+    private void SelectedCellChanged(object sender, CellExtEventArgs e) {
+        NurinAktuellerSpalte.Text = e.Column == null ? "Nur in der <b>aktuell gewählten Spalte</b> ersetzen."
+            : "Nur in Spalte <b>'" + e.Column.ReadableText() + "'</b> ersetzen.";
+        Checkbuttons();
     }
 
     private void Something_CheckedChanged(object sender, System.EventArgs e) => Checkbuttons();

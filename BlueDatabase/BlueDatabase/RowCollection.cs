@@ -177,13 +177,16 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposable {
     }
 
     public RowItem? Add(string valueOfCellInFirstColumn, bool runScriptOfNewRow) {
+        Develop.DebugPrint_Disposed(Database);
+
         if (string.IsNullOrEmpty(valueOfCellInFirstColumn)) {
             Develop.DebugPrint("Value = 0");
             return null;
         }
-        RowItem row = new(Database);
+
+        RowItem row = new(Database!);
         Add(row);
-        row.CellSet(Database.Column[0], valueOfCellInFirstColumn);
+        row.CellSet(Database!.Column[0], valueOfCellInFirstColumn);
         Database.Cell.SystemSet(Database.Column.SysRowCreator, row, Database.UserName);
         Database.Cell.SystemSet(Database.Column.SysRowCreateDate, row, DateTime.Now.ToString(Constants.Format_Date5));
         // Dann die Inital-Werte reinschreiben

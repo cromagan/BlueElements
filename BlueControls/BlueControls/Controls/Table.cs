@@ -47,7 +47,7 @@ using static BlueBasics.FileOperations;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-[DefaultEvent("CursorPosChanged")]
+[DefaultEvent("SelectedRowChanged")]
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
 public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITranslateable {
@@ -139,8 +139,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
 
-    public event EventHandler<CellExtEventArgs> CursorPosChanged;
-
     public event EventHandler DatabaseChanged;
 
     public new event EventHandler<CellDoubleClickEventArgs> DoubleClick;
@@ -154,6 +152,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public event EventHandler PinnedChanged;
 
     public event EventHandler<RowEventArgs> RowAdded;
+
+    public event EventHandler<CellExtEventArgs> SelectedCellChanged;
+
+    public event EventHandler<RowEventArgs> SelectedRowChanged;
 
     public event EventHandler ViewChanged;
 
@@ -667,13 +669,18 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             row = null;
         }
 
+        var SameRow = _cursorPosRow == row;
+
         if (_cursorPosColumn == column && _cursorPosRow == row) { return; }
         _mouseOverText = string.Empty;
         _cursorPosColumn = column;
         _cursorPosRow = row;
         if (ensureVisible) { EnsureVisible(_cursorPosColumn, _cursorPosRow); }
         Invalidate();
-        OnCursorPosChanged(new CellExtEventArgs(_cursorPosColumn, _cursorPosRow));
+
+        OnSelectedCellChanged(new CellExtEventArgs(_cursorPosColumn, _cursorPosRow));
+
+        if (!SameRow) { OnSelectedRowChanged(new RowEventArgs(_cursorPosRow?.Row)); }
     }
 
     public void Draw_Column_Head(Graphics gr, ColumnViewItem viewItem, Rectangle displayRectangleWoSlider, int lfdNo) {
@@ -3096,21 +3103,22 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void OnColumnArrangementChanged() => ColumnArrangementChanged?.Invoke(this, System.EventArgs.Empty);
 
-    private void OnCursorPosChanged(CellExtEventArgs e) => CursorPosChanged?.Invoke(this, e);
-
     private void OnDatabaseChanged() => DatabaseChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void OnEditBeforeBeginEdit(CellCancelEventArgs e) => EditBeforeBeginEdit?.Invoke(this, e);
 
-    //private void OnEditBeforeNewRow(RowCancelEventArgs e) => EditBeforeNewRow?.Invoke(this, e);
-
     private void OnFilterChanged() => FilterChanged?.Invoke(this, System.EventArgs.Empty);
 
+    //private void OnEditBeforeNewRow(RowCancelEventArgs e) => EditBeforeNewRow?.Invoke(this, e);
     private void OnNeedButtonArgs(ButtonCellEventArgs e) => NeedButtonArgs?.Invoke(this, e);
 
     private void OnPinnedChanged() => PinnedChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void OnRowAdded(object sender, RowEventArgs e) => RowAdded?.Invoke(sender, e);
+
+    private void OnSelectedCellChanged(CellExtEventArgs e) => SelectedCellChanged?.Invoke(this, e);
+
+    private void OnSelectedRowChanged(RowEventArgs e) => SelectedRowChanged?.Invoke(this, e);
 
     private void OnViewChanged() {
         ViewChanged?.Invoke(this, System.EventArgs.Empty);

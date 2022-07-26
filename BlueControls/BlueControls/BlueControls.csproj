@@ -605,6 +605,12 @@
     <Compile Include="Controls\ZoomPad.Designer.cs">
       <DependentUpon>ZoomPad.cs</DependentUpon>
     </Compile>
+    <Compile Include="VariableEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VariableEditor.Designer.cs">
+      <DependentUpon>VariableEditor.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="BlueDatabaseDialogs\FlexiControlForFilter.resx">
@@ -837,6 +843,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ScriptEditorDatabase.resx">
       <DependentUpon>ScriptEditorDatabase.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VariableEditor.resx">
+      <DependentUpon>VariableEditor.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

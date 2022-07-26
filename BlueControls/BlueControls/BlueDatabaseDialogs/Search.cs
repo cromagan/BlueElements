@@ -42,8 +42,8 @@ public sealed partial class Search : Form {
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         _blueTable = table;
-        _blueTable.CursorPosChanged += CursorPosChanged;
-        CursorPosChanged(_blueTable, new CellExtEventArgs(_blueTable.CursorPosColumn, _blueTable.CursorPosRow));
+        _blueTable.SelectedCellChanged += SelectedCellChanged;
+        SelectedCellChanged(_blueTable, new CellExtEventArgs(_blueTable.CursorPosColumn, _blueTable.CursorPosRow));
     }
 
     #endregion
@@ -52,7 +52,7 @@ public sealed partial class Search : Form {
 
     protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
         base.OnFormClosing(e);
-        _blueTable.CursorPosChanged -= CursorPosChanged;
+        _blueTable.SelectedCellChanged -= SelectedCellChanged;
     }
 
     private void btnSuchInCell_Click(object? sender, System.EventArgs e) {
@@ -106,12 +106,12 @@ public sealed partial class Search : Form {
         txbSuchText.Focus();
     }
 
-    private void CursorPosChanged(object sender, CellExtEventArgs e) {
+    private void Search_Load(object sender, System.EventArgs e) => txbSuchText.Focus();
+
+    private void SelectedCellChanged(object sender, CellExtEventArgs e) {
         _row = e.RowData;
         _col = e.Column;
     }
-
-    private void Search_Load(object sender, System.EventArgs e) => txbSuchText.Focus();
 
     private string SuchText() {
         var suchtT = txbSuchText.Text.Trim();

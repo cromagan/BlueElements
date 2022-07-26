@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -203,6 +204,12 @@ public static class Develop {
     public static void Debugprint_BackgroundThread() {
         if (!Thread.CurrentThread.IsBackground) { return; }
         DebugPrint(FehlerArt.Warnung, "Totes Fenster!");
+    }
+
+    public static void DebugPrint_Disposed(IDisposeableExtended? obj) {
+        if (obj != null && !obj.IsDisposed) { return; }
+        if (IsHostRunning()) { Debugger.Break(); }
+        DebugPrint(FehlerArt.Fehler, "Das Objekt wurde zur Laufzeit verworfen.");
     }
 
     public static void DebugPrint_Disposed(bool disposedValue) {

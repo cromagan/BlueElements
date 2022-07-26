@@ -22,15 +22,13 @@ namespace BlueControls {
             this.txtSkript = new FastColoredTextBoxNS.FastColoredTextBox();
             this.grpRoutinen = new BlueControls.Controls.GroupBox();
             this.lstFunktionen = new BlueControls.Controls.ListBox();
-            this.grpVariablen = new BlueControls.Controls.GroupBox();
-            this.tableVariablen = new BlueControls.Controls.Table();
-            this.filterVariablen = new BlueControls.BlueDatabaseDialogs.Filterleiste();
+            this.grpVariablen = new VariableEditor();
             this.grpAusgabeFenster = new BlueControls.Controls.GroupBox();
             this.txbSkriptInfo = new BlueControls.Controls.TextBox();
             this.grpMainBar = new BlueControls.Controls.GroupBox();
+            this.btnZusatzDateien = new BlueControls.Controls.Button();
             this.btnBefehlsUebersicht = new BlueControls.Controls.Button();
             this.btnTest = new BlueControls.Controls.Button();
-            this.btnZusatzDateien = new BlueControls.Controls.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -42,7 +40,6 @@ namespace BlueControls {
             this.grpCode.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtSkript)).BeginInit();
             this.grpRoutinen.SuspendLayout();
-            this.grpVariablen.SuspendLayout();
             this.grpAusgabeFenster.SuspendLayout();
             this.grpMainBar.SuspendLayout();
             this.SuspendLayout();
@@ -122,6 +119,7 @@ namespace BlueControls {
             this.txtSkript.CharWidth = 8;
             this.txtSkript.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txtSkript.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
+            this.txtSkript.Font = new System.Drawing.Font("Courier New", 9.75F);
             this.txtSkript.IsReplaceMode = false;
             this.txtSkript.Language = FastColoredTextBoxNS.Language.CSharp;
             this.txtSkript.LeftBracket = '(';
@@ -168,40 +166,13 @@ namespace BlueControls {
             // 
             // grpVariablen
             // 
-            this.grpVariablen.Controls.Add(this.tableVariablen);
-            this.grpVariablen.Controls.Add(this.filterVariablen);
             this.grpVariablen.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.grpVariablen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.NormalBold;
             this.grpVariablen.Location = new System.Drawing.Point(0, 0);
             this.grpVariablen.Name = "grpVariablen";
             this.grpVariablen.Size = new System.Drawing.Size(603, 173);
             this.grpVariablen.TabIndex = 3;
             this.grpVariablen.TabStop = false;
             this.grpVariablen.Text = "Variablen";
-            // 
-            // tableVariablen
-            // 
-            this.tableVariablen.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tableVariablen.Location = new System.Drawing.Point(8, 64);
-            this.tableVariablen.Name = "tableVariablen";
-            this.tableVariablen.ShowWaitScreen = true;
-            this.tableVariablen.Size = new System.Drawing.Size(584, 101);
-            this.tableVariablen.TabIndex = 2;
-            this.tableVariablen.Text = "tabVariablen";
-            // 
-            // filterVariablen
-            // 
-            this.filterVariablen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.filterVariablen.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.filterVariablen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.filterVariablen.Location = new System.Drawing.Point(8, 24);
-            this.filterVariablen.Name = "filterVariablen";
-            this.filterVariablen.Size = new System.Drawing.Size(584, 40);
-            this.filterVariablen.TabIndex = 1;
-            this.filterVariablen.TabStop = false;
             // 
             // grpAusgabeFenster
             // 
@@ -241,6 +212,18 @@ namespace BlueControls {
             this.grpMainBar.TabIndex = 5;
             this.grpMainBar.TabStop = false;
             // 
+            // btnZusatzDateien
+            // 
+            this.btnZusatzDateien.ImageCode = "Ordner|16";
+            this.btnZusatzDateien.Location = new System.Drawing.Point(272, 8);
+            this.btnZusatzDateien.Name = "btnZusatzDateien";
+            this.btnZusatzDateien.QuickInfo = "Den Ordner der Zusatzdatein öffnen.\r\nIn diesen können z.B. Skript-Routinen enthal" +
+    "ten sein\r\ndie mit CallByFilename aufgerufen werden können.";
+            this.btnZusatzDateien.Size = new System.Drawing.Size(120, 32);
+            this.btnZusatzDateien.TabIndex = 2;
+            this.btnZusatzDateien.Text = "Zusatzdateien";
+            this.btnZusatzDateien.Click += new System.EventHandler(this.btnZusatzDateien_Click);
+            // 
             // btnBefehlsUebersicht
             // 
             this.btnBefehlsUebersicht.ImageCode = "Tabelle|16";
@@ -261,18 +244,6 @@ namespace BlueControls {
             this.btnTest.Text = "Testen";
             this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
-            // btnZusatzDateien
-            // 
-            this.btnZusatzDateien.ImageCode = "Ordner|16";
-            this.btnZusatzDateien.Location = new System.Drawing.Point(272, 8);
-            this.btnZusatzDateien.Name = "btnZusatzDateien";
-            this.btnZusatzDateien.QuickInfo = "Den Ordner der Zusatzdatein öffnen.\r\nIn diesen können z.B. Skript-Routinen enthal" +
-    "ten sein\r\ndie mit CallByFilename aufgerufen werden können.";
-            this.btnZusatzDateien.Size = new System.Drawing.Size(120, 32);
-            this.btnZusatzDateien.TabIndex = 2;
-            this.btnZusatzDateien.Text = "Zusatzdateien";
-            this.btnZusatzDateien.Click += new System.EventHandler(this.btnZusatzDateien_Click);
-            // 
             // ScriptEditor
             // 
             this.Controls.Add(this.splitContainer1);
@@ -291,7 +262,6 @@ namespace BlueControls {
             this.grpCode.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.txtSkript)).EndInit();
             this.grpRoutinen.ResumeLayout(false);
-            this.grpVariablen.ResumeLayout(false);
             this.grpAusgabeFenster.ResumeLayout(false);
             this.grpMainBar.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -301,14 +271,12 @@ namespace BlueControls {
 
         #endregion
         private FastColoredTextBoxNS.FastColoredTextBox txtSkript;
-        private Controls.Table tableVariablen;
-        private BlueDatabaseDialogs.Filterleiste filterVariablen;
         private Controls.GroupBox grpAusgabeFenster;
         private Controls.TextBox txbSkriptInfo;
         private SplitContainer splitContainer1;
         private SplitContainer splitContainer2;
         private Controls.GroupBox grpCode;
-        private Controls.GroupBox grpVariablen;
+        private VariableEditor grpVariablen;
         protected Controls.GroupBox grpMainBar;
         protected Controls.Button btnBefehlsUebersicht;
         protected Controls.Button btnTest;

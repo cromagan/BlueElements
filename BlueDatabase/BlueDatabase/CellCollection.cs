@@ -281,7 +281,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
     /// <param name="previewsValue"></param>
     /// <param name="doAlways">Auch wenn der PreviewsValue gleich dem CurrentValue ist, wird die Routine durchberechnet</param>
     public void DoSpecialFormats(ColumnItem? column, RowItem? row, string previewsValue, bool doAlways) {
-        if (_database == null || _database.Disposed) { return; }
+        if (_database == null || _database.IsDisposed) { return; }
         if (row == null) { return; }
         if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
 
@@ -978,7 +978,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
     /// <param name="rowKey"></param>
     /// <param name="currentvalue"></param>
     private void SetSameValueOfKey(ColumnItem? column, RowItem ownRow, string currentvalue) {
-        if (_database == null || _database.Disposed) { return; }
+        if (_database == null || _database.IsDisposed) { return; }
         if (column == null) { return; }
         List<RowItem>? rows = null;
 

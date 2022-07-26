@@ -1022,9 +1022,15 @@ public partial class TableView : Form {
         if (row == null) { row = Table.View_RowFirst(); }
     }
 
-    private void Table_CursorPosChanged(object sender, CellExtEventArgs e) {
+    private void Table_EditBeforeBeginEdit(object sender, CellCancelEventArgs e) {
+        if (Table.Design == BlueTableAppearance.OnlyMainColumnWithoutHead) {
+            e.CancelReason = "In dieser Ansicht kann der Eintrag nicht bearbeitet werden.";
+        }
+    }
+
+    private void Table_SelectedCellChanged(object sender, CellExtEventArgs e) {
         if (InvokeRequired) {
-            Invoke(new Action(() => Table_CursorPosChanged(sender, e)));
+            Invoke(new Action(() => Table_SelectedCellChanged(sender, e)));
             return;
         }
 
@@ -1032,16 +1038,17 @@ public partial class TableView : Form {
             Table.CopyToClipboard(e.Column, e.RowData.Row, false);
             Table.Focus();
         }
-
-        btnUnterschiede_CheckedChanged(null, System.EventArgs.Empty);
-
-        FillFormula(e?.RowData?.Row);
     }
 
-    private void Table_EditBeforeBeginEdit(object sender, CellCancelEventArgs e) {
-        if (Table.Design == BlueTableAppearance.OnlyMainColumnWithoutHead) {
-            e.CancelReason = "In dieser Ansicht kann der Eintrag nicht bearbeitet werden.";
+    private void Table_SelectedRowChanged(object sender, RowEventArgs e) {
+        if (InvokeRequired) {
+            Invoke(new Action(() => Table_SelectedRowChanged(sender, e)));
+            return;
         }
+
+        btnUnterschiede_CheckedChanged(this, System.EventArgs.Empty);
+
+        FillFormula(e?.Row);
     }
 
     private void Table_ViewChanged(object sender, System.EventArgs e) => Table.WriteColumnArrangementsInto(cbxColumnArr, Table.Database, Table.Arrangement);

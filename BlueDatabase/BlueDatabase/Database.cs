@@ -34,12 +34,13 @@ using System.Threading.Tasks;
 using static BlueBasics.FileOperations;
 using static BlueBasics.Converter;
 using BlueScript.Variables;
+using BlueBasics.Interfaces;
 
 namespace BlueDatabase;
 
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public sealed class Database : IDisposable {
+public sealed class Database : IDisposable, IDisposeableExtended {
 
     #region Fields
 
@@ -274,8 +275,6 @@ public sealed class Database : IDisposable {
         }
     }
 
-    public bool Disposed { get; private set; }
-
     public string Filename => _muf.Filename;
 
     [Browsable(false)]
@@ -296,6 +295,7 @@ public sealed class Database : IDisposable {
         }
     }
 
+    public bool IsDisposed { get; private set; }
     public bool IsLoading => _muf.IsLoading;
 
     public bool IsParsing => _muf.IsParsing;
@@ -584,12 +584,6 @@ public sealed class Database : IDisposable {
     public string DefaultLayoutPath() => string.IsNullOrEmpty(_muf.Filename) ? string.Empty : Filename.FilePath() + "Layouts\\";
 
     public void DiscardPendingChanges(object sender, System.EventArgs e) => ChangeWorkItems(ItemState.Pending, ItemState.Undo);
-
-    void IDisposable.Dispose() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
-    }
 
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
@@ -950,7 +944,7 @@ public sealed class Database : IDisposable {
     }
 
     public void OnScriptError(RowCancelEventArgs e) {
-        if (Disposed) { return; }
+        if (IsDisposed) { return; }
         ScriptError?.Invoke(this, e);
     }
 
@@ -1328,22 +1322,22 @@ public sealed class Database : IDisposable {
     }
 
     internal void OnDropMessage(FehlerArt type, string message) {
-        if (Disposed) { return; }
+        if (IsDisposed) { return; }
         DropMessage?.Invoke(this, new MessageEventArgs(type, message));
     }
 
     internal void OnGenerateLayoutInternal(GenerateLayoutInternalEventargs e) {
-        if (Disposed) { return; }
+        if (IsDisposed) { return; }
         GenerateLayoutInternal?.Invoke(this, e);
     }
 
     internal void OnProgressbarInfo(ProgressbarEventArgs e) {
-        if (Disposed) { return; }
+        if (IsDisposed) { return; }
         ProgressbarInfo?.Invoke(this, e);
     }
 
     internal void OnViewChanged() {
-        if (Disposed) { return; }
+        if (IsDisposed) { return; }
         ViewChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
@@ -1539,7 +1533,8 @@ public sealed class Database : IDisposable {
     }
 
     private void Dispose(bool disposing) {
-        if (!Disposed) { return; }
+        if (IsDisposed) { return; }
+        IsDisposed = true;
 
         OnDisposing();
         AllFiles.Remove(this);
@@ -1803,33 +1798,37 @@ public sealed class Database : IDisposable {
     }
 
     private void OnExporting(CancelEventArgs e) {
-        if (Disposed) { return; }
+        if (IsDisposed) { return; }
         Exporting?.Invoke(this, e);
     }
 
     private void OnLoaded(object sender, LoadedEventArgs e) {
+        if (IsDisposed) { return; }
         Loaded?.Invoke(this, e);
     }
 
     private void OnLoading(object sender, LoadingEventArgs e) {
+        if (IsDisposed) { return; }
         Loading?.Invoke(this, e);
     }
 
     private void OnNeedPassword(PasswordEventArgs e) {
-        if (Disposed) { return; }
+        if (IsDisposed) { return; }
         NeedPassword?.Invoke(this, e);
     }
 
     private void OnSavedToDisk(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
         SavedToDisk?.Invoke(this, e);
     }
 
     private void OnShouldICancelSaveOperations(object sender, CancelEventArgs e) {
+        if (IsDisposed) { return; }
         ShouldICancelSaveOperations?.Invoke(this, e);
     }
 
     private void OnSortParameterChanged() {
-        if (Disposed) { return; }
+        if (IsDisposed) { return; }
         SortParameterChanged?.Invoke(this, System.EventArgs.Empty);
     }
 

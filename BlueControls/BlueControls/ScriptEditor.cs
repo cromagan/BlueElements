@@ -35,7 +35,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueControls;
 
-public partial class ScriptEditor : GroupBox, IContextMenu, IDisposable // System.Windows.Forms.UserControl, IContextMenu//
+public partial class ScriptEditor : GroupBox, IContextMenu, IDisposable //  System.Windows.Forms.UserControl, IContextMenu//
 {
     #region Fields
 
@@ -51,7 +51,6 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposable // Syste
 
     public ScriptEditor() {
         InitializeComponent();
-        GenerateVariableTable();
     }
 
     #endregion
@@ -152,23 +151,6 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposable // Syste
         }
     }
 
-    protected void WriteVariablesToTable(Script s) {
-        if (s?.Variables != null) {
-            foreach (var thisv in s.Variables) {
-                var ro = tableVariablen.Database.Row.Add(thisv.Name);
-                ro.CellSet("typ", thisv.ShortName);
-                ro.CellSet("RO", thisv.Readonly);
-                ro.CellSet("System", thisv.SystemVariable);
-
-                var tmpi = thisv.ReadableText;
-                if (tmpi.Length > 500) { tmpi = tmpi.Substring(0, 500) + "..."; }
-
-                ro.CellSet("Inhalt", tmpi);
-                ro.CellSet("Kommentar", thisv.Coment);
-            }
-        }
-    }
-
     private void btnBefehlsUebersicht_Click(object sender, System.EventArgs e) {
         if (_befehlsReferenz != null && _befehlsReferenz.Visible) {
             _befehlsReferenz.Close();
@@ -182,7 +164,8 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposable // Syste
 
     private void btnTest_Click(object sender, System.EventArgs e) {
         Message("Starte Skript");
-        tableVariablen.Database?.Row.Clear();
+
+        grpVariablen.Clear();
 
         var s = GenerateAndDoScript();
 
@@ -190,8 +173,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposable // Syste
             //Message("Interner Fehler. Skript nicht ausgeführt.");
             return;
         }
-
-        WriteVariablesToTable(s);
+        grpVariablen.WriteVariablesToTable(s.Variables);
         WriteComandsToList(s);
         UpdateSubs(s?.ReducedScriptText);
 
@@ -204,30 +186,6 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposable // Syste
 
     private void btnZusatzDateien_Click(object sender, System.EventArgs e) {
         OpenAdditionalFileFolder();
-    }
-
-    private void GenerateVariableTable() {
-        Database x = new(true);
-        x.Column.Add("Name", "N", VarType.Text, "Variablenname");
-        x.Column.Add("Typ", "T", VarType.Text, "Variablentyp");
-        x.Column.Add("RO", "R", VarType.Bit, "Readonly, Schreibgeschützt");
-        x.Column.Add("System", "S", VarType.Bit, "Systemspalte\r\nIm Script nicht verfügbar");
-        x.Column.Add("Inhalt", "I", VarType.Text, "Inhalt (gekürzte Ansicht)");
-        x.Column.Add("Kommentar", "K", VarType.Text, "Komentar");
-
-        foreach (var thisColumn in x.Column.Where(thisColumn => string.IsNullOrEmpty(thisColumn.Identifier))) {
-            thisColumn.MultiLine = true;
-            thisColumn.TextBearbeitungErlaubt = false;
-            thisColumn.DropdownBearbeitungErlaubt = false;
-        }
-
-        x.RepairAfterParse(null, null);
-        x.ColumnArrangements[1].ShowAllColumns();
-        x.ColumnArrangements[1].HideSystemColumns();
-        x.SortDefinition = new RowSortDefinition(x, "Name", true);
-        tableVariablen.Database = x;
-        tableVariablen.Arrangement = 1;
-        filterVariablen.Table = tableVariablen;
     }
 
     private void lstFunktionen_ItemClicked(object sender, BasicListItemEventArgs e) {
@@ -268,20 +226,22 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposable // Syste
             var hoveredWordnew = new Range(txtSkript, e.Place, e.Place).GetFragment("[A-Za-z0-9_]").Text;
             _lastWord = hoveredWordnew;
 
-            foreach (var r in tableVariablen.Database.Row) {
-                if (string.Equals(r.CellFirstString(), hoveredWordnew, StringComparison.CurrentCultureIgnoreCase)) {
-                    var inh = r.CellGetString("Inhalt");
-                    _lastVariableContent = inh;
-                    inh = inh.Replace("\r", ";");
-                    inh = inh.Replace("\n", ";");
-                    if (inh.Length > 25) { inh = inh.Substring(0, 20) + "..."; }
-                    var ro = string.Empty;
-                    if (r.CellGetBoolean("RO")) { ro = "[ReadOnly] "; }
+            var r = grpVariablen.RowOfVariable(hoveredWordnew);
 
-                    e.ToolTipTitle = ro + "(" + r.CellGetString("Typ") + ") " + hoveredWordnew + " = " + inh;
-                    e.ToolTipText = r.CellGetString("Kommentar") + " ";
-                    return;
-                }
+            //foreach (var r in tableVariablen.Database.Row) {
+            if (r != null) {
+                //if (string.Equals(r.CellFirstString(), hoveredWordnew, StringComparison.CurrentCultureIgnoreCase)) {
+                var inh = r.CellGetString("Inhalt");
+                _lastVariableContent = inh;
+                inh = inh.Replace("\r", ";");
+                inh = inh.Replace("\n", ";");
+                if (inh.Length > 25) { inh = inh.Substring(0, 20) + "..."; }
+                var ro = string.Empty;
+                if (r.CellGetBoolean("RO")) { ro = "[ReadOnly] "; }
+
+                e.ToolTipTitle = ro + "(" + r.CellGetString("Typ") + ") " + hoveredWordnew + " = " + inh;
+                e.ToolTipText = r.CellGetString("Kommentar") + " ";
+                return;
             }
         } catch (Exception ex) {
             Develop.DebugPrint(ex);

@@ -26,7 +26,7 @@ using System.Linq;
 
 namespace BlueBasics;
 
-public class ListExt<T> : List<T>, IChangedFeedback, IDisposable {
+public class ListExt<T> : List<T>, IChangedFeedback, IDisposable, IDisposeableExtended {
 
     #region Fields
 
@@ -70,10 +70,10 @@ public class ListExt<T> : List<T>, IChangedFeedback, IDisposable {
 
     #region Properties
 
-    public bool Disposed { get; private set; }
+    public bool IsDisposed { get; private set; }
 
     public bool ThrowEvents {
-        get => !Disposed && _throwEvents;
+        get => !IsDisposed && _throwEvents;
         set {
             if (_throwEvents == value) { Develop.DebugPrint(FehlerArt.Fehler, "Set ThrowEvents-Fehler! " + value.ToPlusMinus()); }
             _throwEvents = value;
@@ -86,12 +86,12 @@ public class ListExt<T> : List<T>, IChangedFeedback, IDisposable {
 
     public new T this[int index] {
         get {
-            Develop.DebugPrint_Disposed(Disposed);
+            Develop.DebugPrint_Disposed(IsDisposed);
             if (index >= Count || index < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Index falsch: " + index); }
             return base[index];
         }
         set {
-            Develop.DebugPrint_Disposed(Disposed);
+            Develop.DebugPrint_Disposed(IsDisposed);
 
             if (base[index] is string s1 && value is string s2 && s1 == s2) { return; }
 
@@ -115,7 +115,7 @@ public class ListExt<T> : List<T>, IChangedFeedback, IDisposable {
     #region Methods
 
     public new void Add(T item) {
-        Develop.DebugPrint_Disposed(Disposed);
+        Develop.DebugPrint_Disposed(IsDisposed);
         base.Add(item);
         OnItemAdded(item);
     }
@@ -137,7 +137,7 @@ public class ListExt<T> : List<T>, IChangedFeedback, IDisposable {
     }
 
     public new void AddRange(IEnumerable<T>? collection) {
-        Develop.DebugPrint_Disposed(Disposed);
+        Develop.DebugPrint_Disposed(IsDisposed);
         if (collection is null) { return; }
         // base.AddRange(collection);
         foreach (var item in collection) {
@@ -250,7 +250,7 @@ public class ListExt<T> : List<T>, IChangedFeedback, IDisposable {
     }
 
     public void Swap(int index1, int index2) {
-        Develop.DebugPrint_Disposed(Disposed);
+        Develop.DebugPrint_Disposed(IsDisposed);
         if (index1 == index2) { return; }
         // Der Swap geht so, und nicht anders! Es müssen die Items im Original-Array geswapt werden!
         // Wichtig auch der Zugriff auf die base (nicht auf this). Dadurch werden keine Add/Remove Event ausgelöst.
@@ -259,7 +259,7 @@ public class ListExt<T> : List<T>, IChangedFeedback, IDisposable {
     }
 
     public override string ToString() {
-        Develop.DebugPrint_Disposed(Disposed);
+        Develop.DebugPrint_Disposed(IsDisposed);
         try {
             if (typeof(IStringable).IsAssignableFrom(typeof(T))) {
                 System.Text.StringBuilder a = new();
@@ -281,11 +281,11 @@ public class ListExt<T> : List<T>, IChangedFeedback, IDisposable {
     public new void TrimExcess() => Develop.DebugPrint_NichtImplementiert();
 
     protected virtual void Dispose(bool disposing) {
-        if (!Disposed) {
+        if (!IsDisposed) {
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
-            Disposed = true;  // Keine Events, fix!
+            IsDisposed = true;  // Keine Events, fix!
             _throwEvents = false;
             base.Clear();
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben

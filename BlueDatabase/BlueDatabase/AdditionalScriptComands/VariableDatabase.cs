@@ -55,7 +55,7 @@ public class VariableDatabase : Variable {
     }
 
     public override bool GetFromStringPossible => false;
-    public override bool IsNullOrEmpty => _db == null || _db.Disposed;
+    public override bool IsNullOrEmpty => _db == null || _db.IsDisposed;
     public override string ShortName => "dbs";
     public override bool ToStringPossible => false;
 
