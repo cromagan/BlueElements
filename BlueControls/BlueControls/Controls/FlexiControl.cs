@@ -72,6 +72,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private Caption? _infoCaption;
     private string _infoText = string.Empty;
     private bool _multiLine;
+    private bool _pauseValueChanged = false;
     private string _regex = string.Empty;
     private bool _showInfoWhenDisabled;
     private bool _spellChecking;
@@ -252,6 +253,16 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     public string OriginalText { get; set; } = string.Empty;
 
+    [DefaultValue(false)]
+    public bool PauseValueChanged {
+        get => _pauseValueChanged;
+        set {
+            if (_pauseValueChanged == value) { return; }
+            _pauseValueChanged = value;
+            RaiseEventIfChanged();
+        }
+    }
+
     [Browsable(false)]
     [DefaultValue("")]
     public string Prefix { get; set; } = string.Empty;
@@ -429,7 +440,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 c = Control_Create_SwapListBox();
                 break;
 
-            //default:
+                //default:
                 //Develop.DebugPrint(_editType);
                 //return null;
         }
@@ -714,6 +725,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     private void _IdleTimer_Tick(object sender, System.EventArgs e) {
         if (LastTextChange == null) { return; }
+        if (_pauseValueChanged) { return; }
         if (DateTime.UtcNow.Subtract((DateTime)LastTextChange).TotalSeconds < 20) { return; }
         Focus(); // weitere Tastatureingabn verhindern. Z.B: wenn was mariert wird und dann entfernen gedrück wird. Wenn die Box neu sortiert wird, ist dsa ergebnis nicht schön
         RaiseEventIfChanged();
@@ -926,7 +938,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     private void RaiseEventIfChanged() {
         if (LastTextChange == null) { return; }
-        if(IsDisposed) { return; }
+        if (_pauseValueChanged) { return; }
+        if (IsDisposed) { return; }
         LastTextChange = null;
         OnValueChanged();
     }

@@ -434,7 +434,18 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
         #endregion
 
+
+
+        #region Nur eine Zeile? auswählen!
+        // nicht vorher auf null setzen, um Blinki zu vermeiden
+        if (cb.Item.Count == 1) {
+            ValueSet(cb.Item[0].Internal, true, true);
+        }
+
+        #endregion
+
         #region  Prüfen ob die aktuelle Auswahl passt
+        // am Ende auf null setzen, um Blinki zu vermeiden
 
         if (cb.Item[Value] == null) {
             ValueSet(string.Empty, true, true);
@@ -442,13 +453,9 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
         #endregion
 
-        #region Nur eine Zeile? auswählen!
 
-        if (cb.Item.Count == 1) {
-            ValueSet(cb.Item[0].Internal, true, true);
-        }
 
-        #endregion
+
     }
 
     #endregion

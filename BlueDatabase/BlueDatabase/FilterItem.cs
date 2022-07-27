@@ -274,17 +274,21 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
     public QuickImage? SymbolForReadableText() => null;
 
     public string ToString(bool withdatabaseTag) {
-        if (!IsOk()) { return string.Empty; }
-        var result = "{Type=" + (int)_filterType;
+        try {
+            if (!IsOk()) { return string.Empty; }
+            var result = "{Type=" + (int)_filterType;
 
-        if (Database != null && withdatabaseTag) { result = result + ", Database=" + Database.Filename.ToNonCritical(); }
+            if (Database != null && withdatabaseTag) { result = result + ", Database=" + Database.Filename.ToNonCritical(); }
 
-        if (_column != null) { result = result + ", " + _column.ParsableColumnKey(); }
-        foreach (var t in SearchValue) {
-            result = result + ", Value=" + t.ToNonCritical();
+            if (_column != null) { result = result + ", " + _column.ParsableColumnKey(); }
+            foreach (var t in SearchValue) {
+                result = result + ", Value=" + t.ToNonCritical();
+            }
+            if (!string.IsNullOrEmpty(Herkunft)) { result = result + ", Herkunft=" + Herkunft.ToNonCritical(); }
+            return result + "}";
+        } catch {
+            return ToString(withdatabaseTag);
         }
-        if (!string.IsNullOrEmpty(Herkunft)) { result = result + ", Herkunft=" + Herkunft.ToNonCritical(); }
-        return result + "}";
     }
 
     public override string ToString() => ToString(false);

@@ -89,9 +89,12 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
     public string Pfad {
         get => txbPfad.Text;
         set {
-            txbPfad.Text = value;
-            txbPfad_Enter(null, null);
-            CheckButtons();
+            if (value != txbPfad.Text) {
+
+                txbPfad.Text = value;
+                txbPfad_Enter(null, null);
+                CheckButtons();
+            }
         }
     }
 

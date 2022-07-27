@@ -234,11 +234,16 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
         GenerateView();
         if (!Generated) { return; }
 
+        var listf = new List<FlexiControlForCell>();
+
         foreach (var thisIt in _cf.PadData) {
             if (thisIt is RowInputPadItem ripi && ripi.IsVisibleOnPage(Page)) {
                 var c = SearchOrGenerate(ripi);
 
                 if (c is FlexiControlForCell fcfc) {
+                    listf.Add(fcfc);
+                    fcfc.PauseValueChanged = true;
+
                     ColumnItem? co;
 
                     if (ripi.Spaltenname.Equals("#first", System.StringComparison.InvariantCultureIgnoreCase)) {
@@ -257,6 +262,10 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
                     }
                 }
             }
+        }
+
+        foreach (var fcfc in listf) {
+            fcfc.PauseValueChanged = false;
         }
     }
 
