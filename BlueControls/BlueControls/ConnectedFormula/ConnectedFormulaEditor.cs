@@ -217,9 +217,9 @@ public partial class ConnectedFormulaEditor : PadEditor {
             Pad.Item = null;
         } else {
             Pad.Item = _cf.PadData;
-            Pad.Item.SheetSizeInMm = new SizeF(PixelToMm(500, 300), PixelToMm(850, 300));
-            Pad.Item.GridShow = 0.5f;
-            Pad.Item.GridSnap = 0.5f;
+            //Pad.Item.SheetSizeInMm = new SizeF(PixelToMm(500, 300), PixelToMm(850, 300));
+            //Pad.Item.GridShow = 0.5f;
+            //Pad.Item.GridSnap = 0.5f;
         }
     }
 

@@ -232,6 +232,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
             if (value == _sheetSizeInMm) { return; }
             _sheetSizeInMm = new SizeF(value.Width, value.Height);
             GenPoints();
+            OnChanged();
         }
     }
 

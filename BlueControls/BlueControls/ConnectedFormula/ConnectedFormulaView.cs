@@ -81,6 +81,10 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
         }
     }
 
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public Database? Database {
         get => _database;
         set {
@@ -92,6 +96,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
         }
     }
 
+    [DefaultValue("Head")]
     public string Page {
         get => _pageToShow;
         set {
@@ -104,6 +109,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
         }
     }
 
+    [DefaultValue(-1)]
     public long RowKey {
         get => _rowkey;
         set {
@@ -123,14 +129,6 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
         Invalidate(); // Sonst wird es nie neu gezeichnet
     }
 
-    //public RowItem? InputRow {
-    //    get => _inputrow;
-    //    set {
-    //        if (value == _inputrow) { return; }
-    //        _inputrow = value;
-    //        SetInputRow();
-    //    }
-    //}
     public System.Windows.Forms.Control? SearchOrGenerate(ItemCollection.BasicPadItem thisit) {
         if (thisit == null) { return null; }
 
@@ -181,13 +179,6 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
         SetInputRow();
     }
 
-    //            case FlexiControl fc:
-    //                if (value is string values) {
-    //                    if (fc.Caption.Equals(id, System.StringComparison.InvariantCultureIgnoreCase)) {
-    //                        fc.ValueSet(values, true, true);
-    //                    }
-    //                }
-    //                break;
     private void _cf_Changed(object sender, System.EventArgs e) {
         InvalidateView();
     }

@@ -194,7 +194,10 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
 
                 case "#duplicate":
                     done = true;
-                    _item.Add((BasicPadItem)((ICloneable)thisItem).Clone());
+                    if (_item != null) {
+                        _item.Add((BasicPadItem)((ICloneable)thisItem).Clone());
+                    }
+
                     break;
             }
         }
@@ -203,6 +206,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     }
 
     public void CopyPrinterSettingsToWorkingArea() {
+        if (_item == null || _item.IsDisposed) { return; }
         if (DruckerDokument.DefaultPageSettings.Landscape) {
             _item.SheetSizeInMm = new SizeF((int)(DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4 / 100));
             _item.RandinMm = new Padding((int)(DruckerDokument.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Bottom * 25.4 / 100));

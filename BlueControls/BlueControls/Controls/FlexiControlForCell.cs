@@ -119,6 +119,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         }
     }
 
+    [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]

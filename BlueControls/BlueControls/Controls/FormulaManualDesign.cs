@@ -49,6 +49,7 @@ public partial class FormulaManualDesign : System.Windows.Forms.Panel {
 
     #region Properties
 
+    [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]

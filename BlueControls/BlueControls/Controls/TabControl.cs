@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using System.ComponentModel;
 using BlueControls.Enums;
 using System.Windows.Forms;
 using BlueControls.Interfaces;
@@ -42,6 +43,10 @@ public class TabControl : AbstractTabControl, IAcceptRowKey {
 
     #region Properties
 
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public Database? Database {
         get => _database;
         set {
@@ -52,6 +57,7 @@ public class TabControl : AbstractTabControl, IAcceptRowKey {
         }
     }
 
+    [DefaultValue(-1)]
     public long RowKey {
         get => _rowkey; set {
             if (_rowkey != value) {

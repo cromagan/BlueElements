@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -31,12 +33,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Windows.Controls;
+using BlueControls.ItemCollection;
 using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
 using MessageBox = BlueControls.Forms.MessageBox;
 using BlueDatabase.Enums;
-
-#nullable enable
 
 namespace BlueControls.Controls;
 
@@ -76,6 +78,7 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
 
     #region Properties
 
+    [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -228,6 +231,12 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
         _control?.Clear();
     }
 
+    public void ConvertToNewFormula(ConnectedFormula.ConnectedFormula cf) {
+        // Siehe: View_Init
+
+        GenerateTabsToNewFormula(cf);
+    }
+
     public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
         hotItem = null;
         if (_database == null) {
@@ -311,39 +320,6 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
         ShowingRowKey = r;
     }
 
-    //private void _Database_RowKeyChanged(object sender, KeyChangedEventArgs e) {
-    //    // Ist aktuell nur möglich,wenn Pending Changes eine neue Zeile machen
-    //    // Jedes FlexControl beachtet für sich die Änderung
-    //    if (e.KeyOld == _savedRowKey) { _savedRowKey = e.KeyNew; }
-    //}
-
-    //private void _Database_RowChecked(object sender, RowCheckedEventArgs e) {
-    //if (e.Row.Key != _ShowingRowKey) { return; }
-    //var nr = int.MaxValue;
-    //var ColNr = int.MaxValue;
-    //for (var cc = 0; cc < e.ColumnsWithErrors.Count; cc++) {
-    //    var p = e.ColumnsWithErrors[cc].Split('|');
-    //    foreach (var ThisColumnItem in e.Row.Database.Column) {
-    //        if (ThisColumnItem != null) {
-    //            if (p[0].ToUpper() == ThisColumnItem.Name.ToUpper()) {
-    //                //Bitte jeden Fehler anzeigen..... Es verursacht mehr Rätsel, wenn die Zeile einfach Fehlerhaft ist und überhaut kein Hinweis kommt
-    //                var CD = SearchViewItem(ThisColumnItem);
-    //                var View = SearchColumnView(ThisColumnItem);
-    //                var tmp = CD == null
-    //                    ? ThisColumnItem.Index() + 200000
-    //                    : View == CurrentView() ? ThisColumnItem.Index() : ThisColumnItem.Index() + 100000;
-    //                if (tmp < ColNr) {
-    //                    ColNr = tmp;
-    //                    nr = cc;
-    //                }
-    //            }
-    //        }
-    //    }
-    //}
-    //if (nr < int.MaxValue) {
-    //    _ = e.ColumnsWithErrors[nr].Split('|');
-    //}
-    //}
     private void _Database_StoreView(object sender, LoadingEventArgs e) {
         if (e.OnlyReload) { return; }
         _savedRowKey = ShowingRowKey;
@@ -654,6 +630,63 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
         }
     }
 
+    private void GenerateTabsToNewFormula(ConnectedFormula.ConnectedFormula cf) {
+
+        #region  Tabs ermitteln
+
+        var n = new List<string> { "Head" };
+
+        if (_database.Views.Count > 0) {
+            foreach (var thisView in _database.Views) {
+                if (thisView != null && thisView != _database.Views[0]) {
+                    n.Add(thisView.Name);
+                }
+            }
+        }
+
+        #endregion
+
+        #region  Tab Item selbst
+
+        var tabit = new TabFormulaPaditem(string.Empty);
+        tabit.Page = "Head";
+        cf.PadData.Add(tabit);
+
+        #endregion
+
+        foreach (var thisN in n) {
+
+            #region  Input Item
+
+            var it1 = new RowInputPadItem(string.Empty);
+            it1.Page = thisN;
+            it1.Spaltenname = "#first";
+            it1.SetCoordinates(new RectangleF(0, -100, 50, 50), true);
+            cf.PadData.Add(it1);
+
+            #endregion
+
+            #region  Selections Item
+
+            var it2 = new RowWithFilterPaditem(string.Empty);
+            it2.Page = thisN;
+            it2.Anzeige = "~" + _database.Column[0].Name + "~";
+            var r = it2.FilterDefiniton.Row.Add(_database.Column[0].Name);
+            r.CellSet("art", "=");
+            r.CellSet("suchtxt", it1.Internal);
+            it1.SetCoordinates(new RectangleF(70, -100, 50, 50), true);
+            cf.PadData.Add(it2);
+
+            #endregion
+
+            if (thisN == "Head") {
+                tabit.GetRowFrom = it2;
+            } else {
+                tabit.Formulare.Add(thisN);
+            }
+        }
+    }
+
     private void lbxColumns_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         var item = (BasicListItem)e.HotItem;
         if (item == null) { return; }
@@ -786,9 +819,6 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
     }
 
     private void SortColumnList() {
-
-        #region Zuerst die Überschriften (Namen der Views) erstellen oder löschen
-
         for (var viewNo = -1; viewNo < _database.Views.Count; viewNo++) {
             string? nam;
             switch (viewNo) {
@@ -813,10 +843,6 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
             }
         }
 
-        #endregion
-
-        #region Dann die Spalten den Überschriften zuordnen
-
         var columNo = -1;
         do {
             if (lbxColumns.Item.RemoveNull()) { columNo = -1; }
@@ -834,8 +860,6 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
                 }
             }
         } while (true);
-
-        #endregion
 
         lbxColumns.Item.Sort();
         lbxColumns.Invalidate();

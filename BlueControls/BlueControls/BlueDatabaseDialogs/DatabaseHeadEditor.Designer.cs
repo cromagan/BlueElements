@@ -76,6 +76,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capExperimentellWarnung = new BlueControls.Controls.Caption();
             this.capBinInfo = new BlueControls.Controls.Caption();
             this.btnSave = new BlueControls.Controls.Button();
+            this.btnWandeln = new BlueControls.Controls.Button();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
             this.GlobalTab.SuspendLayout();
@@ -316,6 +317,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // Tab_Allgemein
             // 
             this.Tab_Allgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.Tab_Allgemein.Controls.Add(this.btnWandeln);
             this.Tab_Allgemein.Controls.Add(this.txbStandardFormulaFile);
             this.Tab_Allgemein.Controls.Add(this.capStandardFormulaFile);
             this.Tab_Allgemein.Controls.Add(this.txbAdditionalFiles);
@@ -347,7 +349,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txbStandardFormulaFile.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbStandardFormulaFile.Location = new System.Drawing.Point(8, 424);
             this.txbStandardFormulaFile.Name = "txbStandardFormulaFile";
-            this.txbStandardFormulaFile.Size = new System.Drawing.Size(552, 24);
+            this.txbStandardFormulaFile.Size = new System.Drawing.Size(440, 24);
             this.txbStandardFormulaFile.TabIndex = 47;
             this.txbStandardFormulaFile.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
@@ -682,6 +684,16 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnSave.Text = "Speichern";
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
+            // btnWandeln
+            // 
+            this.btnWandeln.Location = new System.Drawing.Point(456, 424);
+            this.btnWandeln.Name = "btnWandeln";
+            this.btnWandeln.QuickInfo = "Wandel das \"alte Formular\" in das \"neue Format\" um\r\nund setzt den Pfad hier.";
+            this.btnWandeln.Size = new System.Drawing.Size(104, 24);
+            this.btnWandeln.TabIndex = 48;
+            this.btnWandeln.Text = "Wandeln";
+            this.btnWandeln.Click += new System.EventHandler(this.btnWandeln_Click);
+            // 
             // DatabaseHeadEditor
             // 
             this.ClientSize = new System.Drawing.Size(1050, 677);
@@ -761,5 +773,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private Button btnAlleUndos;
         private TextBox txbStandardFormulaFile;
         private Caption capStandardFormulaFile;
+        private Button btnWandeln;
     }
 }

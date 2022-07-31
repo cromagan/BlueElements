@@ -112,17 +112,6 @@ public class RowWithFilterPaditem : RectanglePadItem, IReadableText, IAcceptAndS
         }
     }
 
-    //public EditTypeFormula EditType {
-    //    get => _bearbeitung;
-    //    set {
-    //        if (value != EditTypeFormula.Textfeld_mit_Auswahlknopf) { value = EditTypeFormula.Textfeld_mit_Auswahlknopf; }
-
-    //        if (_bearbeitung == value) { return; }
-    //        _bearbeitung = value;
-    //        OnChanged();
-    //    }
-    //}
-
     public string Filter_hinzufügen {
         get => string.Empty;
         set {
@@ -157,16 +146,6 @@ public class RowWithFilterPaditem : RectanglePadItem, IReadableText, IAcceptAndS
             OnChanged();
         }
     }
-
-    //[Description("Mit dieser Verbindungs-ID können formularübergeifend Filter an\r\nan andere Filterelemnte übergeben werden bzw.\r\nempfangen werden.\r\nZiegt KEIN Pfeil auf dieses Element, übernimmt es den Wert.\r\nAndernfalls empfängt es den Wert.")]
-    //public string VerbindungsID {
-    //    get => _VerbindungsID;
-    //    set {
-    //        if (_VerbindungsID == value) { return; }
-    //        _VerbindungsID = value;
-    //        OnChanged();
-    //    }
-    //}
 
     protected override int SaveOrder => 1;
 

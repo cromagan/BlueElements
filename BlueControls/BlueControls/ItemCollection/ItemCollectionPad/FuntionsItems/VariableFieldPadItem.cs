@@ -210,73 +210,10 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
 
     #endregion
 
-    //private void RepairConnections() {
-    //    ConnectsTo.Clear();
-
-    //    if (GetRowFrom != null) {
-    //        ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, (BasicPadItem)GetRowFrom, ConnectionType.Bottom, false));
-    //    }
-    //}
-
     // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
     // ~BitmapPadItem()
     // {
     //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
     //     Dispose(disposing: false);
     // }
-    //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
-    //{
-    //    base.DoStyleCommands(sender, Tags, ref CloseMenu);
-    //    if (Tags.TagGet("Bildschirmbereich wählen").FromPlusMinus())
-    //    {
-    //        CloseMenu = false;
-    //        if (Bitmap != null)
-    //        {
-    //            if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-    //        }
-    //        Bitmap = ScreenShot.GrabArea(null, 2000, 2000).Pic;
-    //        return;
-    //    }
-    //    if (Tags.TagGet("Datei laden").FromPlusMinus())
-    //    {
-    //        CloseMenu = false;
-    //        if (Bitmap != null)
-    //        {
-    //            if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-    //        }
-    //        var e = new System.Windows.Forms.OpenFileDialog();
-    //        e.CheckFileExists = true;
-    //        e.Multiselect = false;
-    //        e.Title = "Bild wählen:";
-    //        e.Filter = "PNG Portable Network Graphics|*.png|JPG Jpeg Interchange|*.jpg|Bmp Windows Bitmap|*.bmp";
-    //        e.ShowDialog();
-    //        if (!FileExists(e.FileName))
-    //        {
-    //            return;
-    //        }
-    //        Bitmap = (Bitmap)Generic.Image_FromFile(e.FileName);
-    //        return;
-    //    }
-    //    if (Tags.TagGet("Skalieren").FromPlusMinus())
-    //    {
-    //        CloseMenu = false;
-    //        var t = InputBox.Show("Skalierfaktor oder Formel eingeben:", "1", DataFormat.Text);
-    //        var sc = modErgebnis.Ergebnis(t);
-    //        if (sc == null || sc == 1)
-    //        {
-    //            Notification.Show("Keine Änderung vorgenommen.");
-    //            return;
-    //        }
-    //        var x = p_RU.X - p_LO.X;
-    //        var y = p_RU.Y - p_LO.Y;
-    //        p_RU.X = (float)((float)p_LO.X + (float)x * sc);
-    //        p_RU.Y = (float)((float)p_LO.Y + (float)y * sc);
-    //        KeepInternalLogic();
-    //        return;
-    //    }
-    //    Hintergrund_weiß_füllen = Tags.TagGet("Hintergrund weiß füllen").FromPlusMinus();
-    //    Bild_Modus = (enSizeModes)IntParse(Tags.TagGet("Bild-Modus"));
-    //    Stil = (PadStyles)IntParse(Tags.TagGet("Umrandung"));
-    //    Platzhalter_für_Layout = Tags.TagGet("Platzhalter für Layout").FromNonCritical();
-    //}
 }

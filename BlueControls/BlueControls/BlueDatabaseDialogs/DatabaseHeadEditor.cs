@@ -27,6 +27,7 @@ using BlueDatabase.Enums;
 using System;
 using System.IO;
 using System.Linq;
+using System.Windows.Controls;
 using BlueControls.ItemCollection.ItemCollectionList;
 using MessageBox = BlueControls.Forms.MessageBox;
 using static BlueBasics.Converter;
@@ -305,6 +306,18 @@ internal sealed partial class DatabaseHeadEditor {
     private void btnSperreAufheben_Click(object sender, System.EventArgs e) {
         _database.UnlockHard();
         MessageBox.Show("Erledigt.", ImageCode.Information, "OK");
+    }
+
+    private void btnWandeln_Click(object sender, System.EventArgs e) {
+        var x = new ConnectedFormula.ConnectedFormula();
+        var tmp = new Formula();
+        tmp.Size = x.PadData.SheetSizeInPix.ToSize();
+        tmp.Database = _database;
+        tmp.ConvertToNewFormula(x);
+
+        var f = @"D:\test.cfo";
+        BlueBasics.FileOperations.DeleteFile(f, true);
+        x.SaveAsAndChangeTo(f);
     }
 
     private void Database_Disposing(object sender, System.EventArgs e) {

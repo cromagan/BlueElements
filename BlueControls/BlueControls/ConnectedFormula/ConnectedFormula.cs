@@ -21,6 +21,7 @@ using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using static BlueBasics.Develop;
 using BlueDatabase;
 using BlueBasics;
@@ -32,7 +33,7 @@ using BlueBasics.EventArgs;
 
 namespace BlueControls.ConnectedFormula;
 
-public class ConnectedFormula : IChangedFeedback, IDisposable {
+public class ConnectedFormula : IChangedFeedback, IDisposeableExtended {
 
     #region Fields
 
@@ -40,19 +41,16 @@ public class ConnectedFormula : IChangedFeedback, IDisposable {
     public static readonly ListExt<ConnectedFormula> AllFiles = new();
     public static readonly float StandardHöhe = 3.5f;
 
-    //public static readonly float Umrechnungsfaktor = Converter.PixelToMm(1, 300);
     public static readonly float Umrechnungsfaktor2 = MmToPixel(StandardHöhe, 300) / 44;
 
     public readonly ListExt<string> DatabaseFiles = new();
     public readonly ListExt<string> NotAllowedChilds = new();
 
-    private readonly BlueBasics.MultiUserFile.MultiUserFile _muf;
     private string _createDate;
-
     private string _creator;
-    private bool _disposedValue;
     private int _id = -1;
-    private ItemCollectionPad _padData;
+    private BlueBasics.MultiUserFile.MultiUserFile? _muf;
+    private ItemCollectionPad? _padData;
 
     private bool _saved;
     private bool _saving;
@@ -61,8 +59,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposable {
 
     #region Constructors
 
-    public ConnectedFormula() : this(string.Empty) {
-    }
+    public ConnectedFormula() : this(string.Empty) { }
 
     private ConnectedFormula(string filename) {
         AllFiles.Add(this);
@@ -93,6 +90,10 @@ public class ConnectedFormula : IChangedFeedback, IDisposable {
         //}
         _saved = true;
 
+        _padData.SheetSizeInMm = new SizeF(PixelToMm(500, 300), PixelToMm(850, 300));
+        _padData.GridShow = 0.5f;
+        _padData.GridSnap = 0.5f;
+
         DatabaseFiles.Changed += DatabaseFiles_Changed;
         NotAllowedChilds.Changed += NotAllowedChilds_Changed;
     }
@@ -122,17 +123,25 @@ public class ConnectedFormula : IChangedFeedback, IDisposable {
 
     public string Filename => _muf.Filename;
 
-    public ItemCollectionPad PadData {
+    // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+    // ~ConnectedFormula()
+    // {
+    //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+    //     Dispose(disposing: false);
+    // }
+    public bool IsDisposed { get; private set; }
+
+    public ItemCollectionPad? PadData {
         get => _padData;
         private set {
             if (_padData == value) { return; }
 
             if (_padData != null) {
-                PadData.Changed -= PadData_Changed;
+                _padData.Changed -= PadData_Changed;
             }
             _padData = value;
             if (_padData != null) {
-                PadData.Changed += PadData_Changed;
+                _padData.Changed += PadData_Changed;
             }
 
             if (_saving || _muf.IsParsing || _muf.IsLoading) { return; }
@@ -143,15 +152,14 @@ public class ConnectedFormula : IChangedFeedback, IDisposable {
 
     #endregion
 
+    #region Methods
+
     /// <summary>
     /// Gibt das Formular zurück.
     /// Zuerst wird geprüft, ob es bereits geladen ist. Falls nicht, wird es geladen.
     /// </summary>
     /// <param name="filename"></param>
     /// <returns></returns>
-
-    #region Methods
-
     public static ConnectedFormula? GetByFilename(string filename) {
         foreach (var thisFile in AllFiles) {
             if (thisFile != null && string.Equals(thisFile.Filename, filename, StringComparison.OrdinalIgnoreCase)) {
@@ -162,32 +170,6 @@ public class ConnectedFormula : IChangedFeedback, IDisposable {
         return !FileExists(filename) ? null : new ConnectedFormula(filename);
     }
 
-    ///// <summary>
-    ///// Sucht die Datenbank im Speicher. Wird sie nicht gefunden, wird sie geladen.
-    ///// </summary>
-    ///// <param name="filename"></param>
-    ///// <param name="checkOnlyFilenameToo"></param>
-    ///// <param name="readOnly"></param>
-    ///// <returns></returns>
-    //public static ConnectedFormula? GetByFilename(string filename) {
-    //    var tmpCF = _muf.GetByFilename(filename, false);
-
-    //    if (tmpCF is ConnectedFormula cf) { return cf; }
-
-    //    if (tmpCF != null) { return null; }//  Daten im Speicher, aber keine Datenbank!
-
-    //    return !FileExists(filename) ? null : new ConnectedFormula(filename);
-    //}
-
-    //public string PadData {
-    //    get => _padData;
-    //    set {
-    //        if (value == _padData) { return; }
-    //        _padData = value;
-    //        _saved = false;
-    //        OnChanged();
-    //    }
-    //}
     public void DiscardPendingChanges(object sender, System.EventArgs e) => _saved = true;
 
     void IDisposable.Dispose() {
@@ -221,15 +203,18 @@ public class ConnectedFormula : IChangedFeedback, IDisposable {
     internal void SaveAsAndChangeTo(string fileName) => _muf.SaveAsAndChangeTo(fileName);
 
     protected virtual void Dispose(bool disposing) {
-        if (!_disposedValue) {
+        if (!IsDisposed) {
             AllFiles.Remove(this);
             if (disposing) {
+                _muf.Save(true);
+                _muf.Dispose();
+                _muf = null;
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
 
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen
-            _disposedValue = true;
+            IsDisposed = true;
         }
     }
 
@@ -356,11 +341,4 @@ public class ConnectedFormula : IChangedFeedback, IDisposable {
     }
 
     #endregion
-
-    // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
-    // ~ConnectedFormula()
-    // {
-    //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-    //     Dispose(disposing: false);
-    // }
 }
