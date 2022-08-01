@@ -183,8 +183,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     [DefaultValue("")]
     public new string Text {
-        get => _eTxt == null ? string.Empty : _formatierungErlaubt ? _eTxt.HtmlText : _eTxt.PlainText;
+        get => _eTxt == null || IsDisposed ? string.Empty : _formatierungErlaubt ? _eTxt.HtmlText : _eTxt.PlainText;
         set {
+            if(IsDisposed) { return; }
             if (!string.IsNullOrEmpty(value)) {
                 value = value.Replace("\n", string.Empty);
                 value = value.Replace("\r", "\r\n");

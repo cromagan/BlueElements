@@ -48,7 +48,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
     //private readonly RowWithFilterPaditem _rwf;
     private bool _disposing = false;
 
-    private RowItem _row;
+    private RowItem? _row;
     private List<RowItem>? _rows;
 
     #endregion
@@ -93,10 +93,11 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
     public Database? Database { get; }
 
     public RowItem? Row {
-        get => _row;
+        get => IsDisposed ? null : _row;
         private set {
+            if (IsDisposed) { return; }
             if (value == _row) { return; }
-            Develop.DebugPrint_Disposed(IsDisposed);
+
             _row = value;
             Script = null;
             DoChilds(this, _row, ParentCol);
@@ -196,7 +197,6 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
     private static void DoChilds_VariableList(IAcceptVariableList fcfc, Script? script, RowItem row, Database? database) {
         // Normales Zellenfeld
-
         fcfc.ParseVariables(script?.Variables);
     }
 
@@ -383,6 +383,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
     //}
 
     private void UpdateMyCollection() {
+        if (IsDisposed) { return; }
         if (!Allinitialized) { CreateSubControls(); }
 
         #region Combobox suchen

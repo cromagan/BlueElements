@@ -371,7 +371,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// <param name="updateControls"></param>
     /// <param name="alwaysValueChanged">Steuerelemente, wie Button, Checkboxen, DropDownListen müssen hier TRUE setzen. Auch Texte, die in einem Stück gesetzt werden.</param>
     public void ValueSet(string newvalue, bool updateControls, bool alwaysValueChanged) {
-        Develop.DebugPrint_Disposed(IsDisposed);
+        if (IsDisposed) { return; }
         if (newvalue == null) { newvalue = string.Empty; }
         if (Value == null && string.IsNullOrEmpty(newvalue)) { return; }
         if (Value == newvalue) { return; }

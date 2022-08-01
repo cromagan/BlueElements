@@ -147,12 +147,14 @@ public sealed class ExtText : ListExt<ExtChar> {
 
     public string PlainText {
         get {
+            if(IsDisposed) { return string.Empty; }
             if (_tmpPlainText == null) {
                 _tmpPlainText = ConvertCharToPlainText(0, Count - 1);
             }
             return _tmpPlainText;
         }
         set {
+            if(IsDisposed) { return; }
             if (PlainText == value) { return; }
             ConvertTextToChar(value, false);
             OnChanged();

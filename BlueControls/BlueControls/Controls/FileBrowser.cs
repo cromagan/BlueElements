@@ -87,8 +87,9 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
     }
 
     public string Pfad {
-        get => txbPfad.Text;
+        get => IsDisposed ? string.Empty : txbPfad.Text;
         set {
+            if (IsDisposed) { return; }
             if (value != txbPfad.Text) {
 
                 txbPfad.Text = value;
@@ -155,7 +156,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
 
     public bool ParseVariables(List<Variable>? list) {
 
-        Develop.DebugPrint_Disposed(IsDisposed);
+        if (IsDisposed) { return false; }
 
         var ct = string.Empty;
 
@@ -388,6 +389,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
     }
 
     private void ÖffnePfad(string newPath) {
+        if(IsDisposed) { return; }
         if (_isLoading) { return; }
         _isLoading = true;
 
@@ -560,6 +562,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
     }
 
     private void txbPfad_Enter(object? sender, System.EventArgs? e) {
+        if (IsDisposed) { return; }
         ÖffnePfad(txbPfad.Text);
     }
 
