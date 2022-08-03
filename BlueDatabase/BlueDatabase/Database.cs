@@ -40,7 +40,7 @@ namespace BlueDatabase;
 
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public sealed class Database : IDisposable, IDisposeableExtended {
+public sealed class Database : IDisposable, IDisposableExtended {
 
     #region Fields
 

@@ -19,7 +19,7 @@ using System;
 
 namespace BlueBasics.Interfaces;
 
-public interface IDisposeableExtended : IDisposable {
+public interface IDisposableExtended : IDisposable {
 
     #region Properties
 

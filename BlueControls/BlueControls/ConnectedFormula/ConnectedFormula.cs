@@ -33,7 +33,7 @@ using BlueBasics.EventArgs;
 
 namespace BlueControls.ConnectedFormula;
 
-public class ConnectedFormula : IChangedFeedback, IDisposeableExtended {
+public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
 
     #region Fields
 

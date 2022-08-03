@@ -31,7 +31,7 @@ using static BlueBasics.Generic;
 
 namespace BlueBasics.MultiUserFile;
 
-public sealed class MultiUserFile : IDisposeableExtended {
+public sealed class MultiUserFile : IDisposableExtended {
 
     #region Fields
 

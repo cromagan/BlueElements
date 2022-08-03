@@ -3,7 +3,7 @@ using BlueControls.Controls;
 
 namespace BlueControls.Forms
 {
-    public partial class PictureView : Form
+    public partial class PictureView 
         {
 			//Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
 			[DebuggerNonUserCode()]
@@ -11,7 +11,10 @@ namespace BlueControls.Forms
 			{
 				if (disposing )
 				{
-				}
+                FileList.Changed -= FileList_Changed;
+                FileList.Dispose();
+
+                }
 				base.Dispose(disposing);
 			}
 			//Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.

@@ -26,7 +26,7 @@ namespace BlueControls.Interfaces;
 /// Wird verwendet, wenn ein Steuerelement einen Zeilenschlüssel empfangen
 /// und damit umgehen kann.
 /// </summary>
-public interface IAcceptRowKey : IDisposeableExtended {
+public interface IAcceptRowKey : IDisposableExtended {
 
     #region Properties
 

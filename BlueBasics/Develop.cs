@@ -206,7 +206,7 @@ public static class Develop {
         DebugPrint(FehlerArt.Warnung, "Totes Fenster!");
     }
 
-    public static void DebugPrint_Disposed(IDisposeableExtended? obj) {
+    public static void DebugPrint_Disposed(IDisposableExtended? obj) {
         if (obj != null && !obj.IsDisposed) { return; }
         if (IsHostRunning()) { Debugger.Break(); }
         DebugPrint(FehlerArt.Fehler, "Das Objekt wurde zur Laufzeit verworfen.");

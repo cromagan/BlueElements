@@ -37,7 +37,7 @@ namespace BlueBasics;
 // Todo: Obselete Routinen:
 // Image_FromFile
 // Resize
-public class BitmapExt : IDisposeableExtended {
+public class BitmapExt : IDisposableExtended {
 
     #region Fields
 
