@@ -520,6 +520,7 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
             int widthInPixelOfParent;
             int heightOfParent;
             int moveIn;
+
             if (viewN == 0) {
                 widthInPixelOfParent = Width - 4;
                 heightOfParent = Height;
@@ -530,6 +531,7 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
                 widthInPixelOfParent = Tabs.Width - 10 - (Skin.PaddingSmal * 4);
                 moveIn = Skin.PaddingSmal * 2;
             }
+
             var widthInPixelOfColumn = (widthInPixelOfParent - (viewSpalten * Skin.PaddingSmal)) / (viewSpalten + 1);
             foreach (var thisViewItem in thisView) {
                 if (thisViewItem?.Column != null) {
@@ -632,20 +634,6 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
 
     private void GenerateTabsToNewFormula(ConnectedFormula.ConnectedFormula cf) {
 
-        #region  Tabs ermitteln
-
-        var n = new List<string> { "Head" };
-
-        if (_database.Views.Count > 0) {
-            foreach (var thisView in _database.Views) {
-                if (thisView != null && thisView != _database.Views[0]) {
-                    n.Add(thisView.Name);
-                }
-            }
-        }
-
-        #endregion
-
         #region  Tab Item selbst
 
         var tabit = new TabFormulaPaditem(string.Empty);
@@ -654,12 +642,12 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
 
         #endregion
 
-        foreach (var thisN in n) {
+        foreach (var thisView in _database.Views) {
 
-            #region  Input Item
+            #region Input Item
 
             var it1 = new RowInputPadItem(string.Empty);
-            it1.Page = thisN;
+
             it1.Spaltenname = "#first";
             it1.SetCoordinates(new RectangleF(0, -100, 50, 50), true);
             cf.PadData.Add(it1);
@@ -669,7 +657,7 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
             #region  Selections Item
 
             var it2 = new RowWithFilterPaditem(string.Empty);
-            it2.Page = thisN;
+
             it2.Anzeige = "~" + _database.Column[0].Name + "~";
             var r = it2.FilterDefiniton.Row.Add(_database.Column[0].Name);
             r.CellSet("art", "=");
@@ -679,10 +667,36 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
 
             #endregion
 
-            if (thisN == "Head") {
-                tabit.GetRowFrom = it2;
-            } else {
+            #region TabItem, InputItem und SelectionsItem finalisieren
+
+            var thisN = "Head";
+            if (thisView != _database.Views[0]) {
+                thisN = thisView.Name;
                 tabit.Formulare.Add(thisN);
+            } else {
+                tabit.GetRowFrom = it2;
+            }
+            it1.Page = thisN;
+            it2.Page = thisN;
+
+            #endregion
+
+            var spf = View_AnzahlSpalten(thisView);
+            foreach (var thisIt in thisView) {
+                var it3 = new EditFieldPadItem(string.Empty);
+                it3.GetRowFrom = it2;
+                it3.Column = thisIt.Column;
+                it3.Page = thisN;
+                it3.CaptionPosition = thisIt.ÜberschriftAnordnung;
+                it3.EditType = thisIt.EditType;
+                cf.PadData.Add(it3);
+                it3.SetXPosition(spf, thisIt.Spalte_X1, thisIt.Width);
+
+                var x = it3.UsedArea;
+                //x.Width = (Parent.SheetSizeInPix.Width - (MmToPixel(0.5f, 300) * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
+                //x.X = x.Width * (aufXPosition - 1) + MmToPixel(0.5f, 300) * (aufXPosition - 1)
+                x.Height = MmToPixel(Math.Max(thisIt.Height, 0) * 3, 300) + MmToPixel(0.5f, 300);
+                it3.SetCoordinates(x, true);
             }
         }
     }

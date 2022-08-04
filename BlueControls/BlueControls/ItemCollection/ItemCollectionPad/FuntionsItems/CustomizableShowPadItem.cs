@@ -120,13 +120,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
 
             var anzbr = IntParse(doit[0]);
             var npos = IntParse(doit[1]);
-            var x = UsedArea;
-            x.Width = (Parent.SheetSizeInPix.Width - (MmToPixel(0.5f, 300) * (anzbr - 1))) / anzbr;
-            x.X = x.Width * (npos - 1) + MmToPixel(0.5f, 300) * (npos - 1);
-
-            SetCoordinates(x, true);
-
-            //OnChanged();
+            SetXPosition(anzbr, npos, 1);
         }
     }
 
@@ -291,6 +285,13 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
                 return true;
         }
         return false;
+    }
+
+    public void SetXPosition(int anzahlSpaltenImFormular, int aufXPosition, int breiteInspalten) {
+        var x = UsedArea;
+        x.Width = (Parent.SheetSizeInPix.Width - (MmToPixel(0.5f, 300) * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
+        x.X = x.Width * (aufXPosition - 1) + MmToPixel(0.5f, 300) * (aufXPosition - 1);
+        SetCoordinates(x, true);
     }
 
     public override string ToString() {

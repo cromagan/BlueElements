@@ -2106,8 +2106,10 @@ public sealed class Database : IDisposable, IDisposableExtended {
         if (e.Bmp != null) { return; }
         try {
             if (string.IsNullOrWhiteSpace(AdditionaFilesPfadWhole())) { return; }
-            if (FileExists(AdditionaFilesPfadWhole() + e.Name + ".png")) {
-                e.Bmp = new BitmapExt(AdditionaFilesPfadWhole() + e.Name + ".png");
+            var n = e.Name.RemoveChars(Constants.Char_DateiSonderZeichen);
+
+            if (FileExists(AdditionaFilesPfadWhole() + n + ".png")) {
+                e.Bmp = new BitmapExt(AdditionaFilesPfadWhole() + n + ".png");
             }
         } catch { }
     }
