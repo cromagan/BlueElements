@@ -91,7 +91,6 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         set {
             if (IsDisposed) { return; }
             if (value != txbPfad.Text) {
-
                 txbPfad.Text = value;
                 txbPfad_Enter(null, null);
                 CheckButtons();
@@ -155,7 +154,6 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
     public void ParentPath() => btnZurück_Click(null, System.EventArgs.Empty);
 
     public bool ParseVariables(List<Variable>? list) {
-
         if (IsDisposed) { return false; }
 
         var ct = string.Empty;
@@ -239,7 +237,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         var tags = (List<string>)(it.Tag);
 
         e.UserMenu.Add(ContextMenuComands.Ausschneiden, !tags.TagGet("Folder").FromPlusMinus());
-        e.UserMenu.Add(ContextMenuComands.Einfügen, tags.TagGet("CryptetFolder").FromPlusMinus() && !string.IsNullOrEmpty(_ausschneiden));
+        e.UserMenu.Add(ContextMenuComands.Einfügen, tags.TagGet("Folder").FromPlusMinus() && !string.IsNullOrEmpty(_ausschneiden));
         e.UserMenu.AddSeparator();
         e.UserMenu.Add(ContextMenuComands.Umbenennen, FileExists(it.Internal));
         e.UserMenu.Add(ContextMenuComands.Löschen, FileExists(it.Internal));
@@ -329,25 +327,29 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         if (File.Exists(e.Item.Internal)) {
             var tags = (List<string>)e.Item.Tag;
 
-            switch (tags.TagGet("Suffix")) {
-                case "URL":
+            switch (e.Item.Internal.FileType()) {
+                case FileFormat.Link:
                     LaunchBrowser(tags.TagGet("URL"));
                     return;
 
-                case "JPG":
-                case "PNG":
-                case "BMP":
-                case "TIF":
-                    var pc = Image_FromFile(e.Item.Internal);
-                    if (pc != null) {
-                        var d = new PictureView((Bitmap)pc);
+                case FileFormat.Image:
+                    var l = new List<string>();
+
+                    foreach (var thisS in lsbFiles.Item) {
+                        if (thisS.Internal.FileType() == FileFormat.Image && FileExists(thisS.Internal))
+                            l.Add(thisS.Internal);
+                    }
+
+                    var no = l.IndexOf(e.Item.Internal);
+                    if (no > -1) {
+                        var d = new PictureView(l, true, e.Item.Internal.FilePath(), no);
                         d.WindowState = System.Windows.Forms.FormWindowState.Maximized;
                         d.Show();
                     }
 
                     return;
 
-                case "TXT":
+                case FileFormat.Textdocument:
                     ExecuteFile("Notepad.exe", e.Item.Internal);
                     return;
             }
@@ -389,7 +391,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
     }
 
     private void ÖffnePfad(string newPath) {
-        if(IsDisposed) { return; }
+        if (IsDisposed) { return; }
         if (_isLoading) { return; }
         _isLoading = true;
 
@@ -410,7 +412,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
 
         foreach (var fileName in allF) {
             if (AddThis(fileName, true)) {
-                var suffix = fileName.FileSuffix().ToUpper();
+                //var suffix = fileName.FileSuffix().ToUpper();
                 var p = new BitmapListItem(QuickImage.Get(fileName.FileType(), 64), fileName, fileName.FileNameWithoutSuffix());
 
                 p.Padding = 6;
@@ -431,7 +433,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
 
                 var tags = new List<string>();
                 tags.TagSet("Folder", bool.FalseString);
-                tags.TagSet("Suffix", suffix);
+                //tags.TagSet("Suffix", suffix);
                 p.Tag = tags;
                 lsbFiles.Item.Add(p);
             }
@@ -450,7 +452,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
                 //    tags.TagSet("CryptetFolder", bool.TrueString);
                 //} else {
                 p = new BitmapListItem(QuickImage.Get("Ordner|64"), thisString, thisString.FileNameWithoutSuffix());
-                tags.TagSet("CryptetFolder", bool.FalseString);
+                //tags.TagSet("CryptetFolder", bool.FalseString);
                 //}
 
                 tags.TagSet("Folder", bool.TrueString);

@@ -36,27 +36,25 @@ public partial class PictureView : Form, IDisposableExtended {
 
     #region Constructors
 
-    public PictureView() : this(null, false, string.Empty, -1) { }
+    public PictureView() : this(null, false, string.Empty, -1, -1) { }
 
-    public PictureView(List<string>? fileList, bool mitScreenResize, string windowCaption) : this(fileList, mitScreenResize, windowCaption, -1) { }
+    public PictureView(List<string>? fileList, bool mitScreenResize, string windowCaption, int imageno) : this(fileList, mitScreenResize, windowCaption, -1, imageno) { }
 
-    public PictureView(Bitmap? bmp) : this(null, false, string.Empty, -1) {
+    public PictureView(Bitmap? bmp) : this(null, false, string.Empty, -1, -1) {
         Pad.Bmp = bmp;
         Pad.ZoomFit();
         btnZoomIn.Checked = true;
         btnChoose.Enabled = false;
     }
 
-    public PictureView(List<string>? fileList, bool mitScreenResize, string windowCaption, int openOnScreen) : base() {
+    public PictureView(List<string>? fileList, bool mitScreenResize, string windowCaption, int openOnScreen, int imageno) : base() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
-   
 
         FileList.Clear();
         if (fileList != null) { FileList.AddRange(fileList); }
 
         FileList.Changed += FileList_Changed;
-
 
         if (mitScreenResize) {
             if (System.Windows.Forms.Screen.AllScreens.Length == 1 || openOnScreen < 0) {
@@ -78,7 +76,9 @@ public partial class PictureView : Form, IDisposableExtended {
 
         btnZoomIn.Checked = true;
         btnChoose.Enabled = false;
-        FileList_Changed(this, System.EventArgs.Empty);
+
+        //FileList_Changed(this, System.EventArgs.Empty);
+        LoadPic(imageno);
     }
 
     #endregion
@@ -128,8 +128,6 @@ public partial class PictureView : Form, IDisposableExtended {
     }
 
     private void FileList_Changed(object sender, System.EventArgs e) {
- 
-
         LoadPic(0);
     }
 

@@ -78,7 +78,7 @@ public partial class EasyPicMulti : GenericControl, IBackgroundNone // System.Wi
     }
 
     private void btnSchnittView_Click(object sender, System.EventArgs e) {
-        PictureView x = new(Files, false, string.Empty);
+        PictureView x = new(Files, false, string.Empty, 0);
         x.Show();
     }
 
