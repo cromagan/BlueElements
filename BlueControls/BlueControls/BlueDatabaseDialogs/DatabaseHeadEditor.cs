@@ -374,7 +374,7 @@ internal sealed partial class DatabaseHeadEditor {
         x.ColumnArrangements[1].Hide("hidden");
         x.ColumnArrangements[1].HideSystemColumns();
         x.SortDefinition = new RowSortDefinition(x, "Index", true);
-        tblUndo.Database = x;
+        tblUndo.DatabaseSet(x, string.Empty);
         tblUndo.Arrangement = 1;
         for (var n = 0; n < _database.Works.Count; n++) {
             AddUndoToTable(_database.Works[n], n, string.Empty, false);

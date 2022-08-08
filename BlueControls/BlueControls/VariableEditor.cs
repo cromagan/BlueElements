@@ -103,7 +103,7 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
         x.ColumnArrangements[1].ShowAllColumns();
         x.ColumnArrangements[1].HideSystemColumns();
         x.SortDefinition = new RowSortDefinition(x, "Name", true);
-        tableVariablen.Database = x;
+        tableVariablen.DatabaseSet(x, string.Empty);
         tableVariablen.Arrangement = 1;
         filterVariablen.Table = tableVariablen;
     }

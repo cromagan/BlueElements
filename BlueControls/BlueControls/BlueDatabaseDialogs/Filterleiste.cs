@@ -132,7 +132,10 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
         #region ZeilenFilter befüllen
 
-        txbZeilenFilter.Text = _tableView?.Database != null && _tableView.Filter.IsRowFilterActiv()
+        txbZeilenFilter.Text = _tableView != null &&
+            _tableView.Database != null &&
+            _tableView.Filter != null &&
+            _tableView.Filter.IsRowFilterActiv()
             ? _tableView.Filter.RowFilterText
             : string.Empty;
 

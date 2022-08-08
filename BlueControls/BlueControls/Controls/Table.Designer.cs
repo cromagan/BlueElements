@@ -16,7 +16,7 @@ namespace BlueControls.Controls
             {
                 if (disposing)
                 {
-                    Database = null; // Wichtig (nicht _Database) um Events zu lösen
+                    DatabaseSet(null, string.Empty); // Wichtig (nicht _Database) um Events zu lösen
                 }
             }
             finally

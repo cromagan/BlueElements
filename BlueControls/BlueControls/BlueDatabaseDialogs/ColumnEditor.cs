@@ -534,10 +534,10 @@ internal sealed partial class ColumnEditor {
         _column.LinkedDatabaseFile = cbxLinkedDatabase.Text;
 
         var linkdb = _column.LinkedDatabase;
-        if (linkdb == null) { tblFilterliste.Database = null; }
-        if (tblFilterliste.Database == null) { tblFilterliste.Database = null; }
 
-        if (tblFilterliste.Database != null && tblFilterliste.Database.Tags.TagGet("Filename") != linkdb.Filename) { tblFilterliste.Database = null; }
+        if (linkdb == null || tblFilterliste.Database == null) { tblFilterliste.DatabaseSet(null, string.Empty); }
+
+        if (tblFilterliste.Database != null && tblFilterliste.Database.Tags.TagGet("Filename") != linkdb.Filename) { tblFilterliste.DatabaseSet(null, string.Empty); }
 
         if (linkdb == null) { return; }
 
@@ -564,7 +564,7 @@ internal sealed partial class ColumnEditor {
             x.ColumnArrangements[1].Hide("visible");
             x.ColumnArrangements[1].HideSystemColumns();
             x.SortDefinition = new RowSortDefinition(x, "Count", false);
-            tblFilterliste.Database = x;
+            tblFilterliste.DatabaseSet(x, string.Empty);
             tblFilterliste.Arrangement = 1;
 
             x.Tags.TagSet("Filename", linkdb.Filename);

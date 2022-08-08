@@ -68,7 +68,7 @@ public class RowWithFilterPaditem : RectanglePadItem, IReadableText, IAcceptAndS
         FilterTable.Size = new Size(968, 400);
 
         FilterDefiniton = GenerateFilterDatabase();
-        FilterTable.Database = FilterDefiniton;
+        FilterTable.DatabaseSet(FilterDefiniton, string.Empty);
 
         FilterTable.Arrangement = 1;
 

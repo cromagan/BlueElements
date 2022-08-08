@@ -193,71 +193,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public Database? Database {
         get => _database;
-        set {
-            if (_database == value) { return; }
-            CloseAllComponents();
-            _collapsed.Clear();
-            PinnedRows.Clear();
-            _mouseOverColumn = null;
-            _mouseOverRow = null;
-            _cursorPosColumn = null;
-            _cursorPosRow = null;
-            _unterschiede = null;
-            _mouseOverText = string.Empty;
-            if (_database != null) {
-                // auch Disposed Datenbanken die Bezüge entfernen!
-                _database.Cell.CellValueChanged -= _Database_CellValueChanged;
-                _database.ConnectedControlsStopAllWorking -= _Database_StopAllWorking;
-                _database.Loaded -= _Database_DatabaseLoaded;
-                _database.Loading -= _Database_StoreView;
-                _database.ViewChanged -= _Database_ViewChanged;
-                //_Database.RowKeyChanged -= _Database_RowKeyChanged;
-                //_Database.ColumnKeyChanged -= _Database_ColumnKeyChanged;
-                _database.Column.ItemInternalChanged -= _Database_ColumnContentChanged;
-                _database.SortParameterChanged -= _Database_SortParameterChanged;
-                _database.Row.RowRemoving -= Row_RowRemoving;
-                _database.Row.RowRemoved -= _Database_RowRemoved;
-                _database.Row.RowAdded -= _Database_Row_RowAdded;
-                _database.Column.ItemRemoved -= _Database_ViewChanged;
-                _database.Column.ItemAdded -= _Database_ViewChanged;
-                _database.SavedToDisk -= _Database_SavedToDisk;
-                _database.ColumnArrangements.ItemInternalChanged -= ColumnArrangements_ItemInternalChanged;
-                _database.ProgressbarInfo -= _Database_ProgressbarInfo;
-                _database.DropMessage -= _Database_DropMessage;
-                _database.Disposing -= _Database_Disposing;
-                _database.Save(false);         // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
-            }
-            ShowWaitScreen = true;
-            Refresh(); // um die Uhr anzuzeigen
-            _database = value;
-            InitializeSkin(); // Neue Schriftgrößen
-            if (_database != null) {
-                _database.Cell.CellValueChanged += _Database_CellValueChanged;
-                _database.ConnectedControlsStopAllWorking += _Database_StopAllWorking;
-                _database.Loaded += _Database_DatabaseLoaded;
-                _database.Loading += _Database_StoreView;
-                _database.ViewChanged += _Database_ViewChanged;
-                //_Database.RowKeyChanged += _Database_RowKeyChanged;
-                //_Database.ColumnKeyChanged += _Database_ColumnKeyChanged;
-                _database.Column.ItemInternalChanged += _Database_ColumnContentChanged;
-                _database.SortParameterChanged += _Database_SortParameterChanged;
-                _database.Row.RowRemoving += Row_RowRemoving;
-                _database.Row.RowRemoved += _Database_RowRemoved;
-                _database.Row.RowAdded += _Database_Row_RowAdded;
-                _database.Column.ItemAdded += _Database_ViewChanged;
-                _database.Column.ItemRemoving += Column_ItemRemoving;
-                _database.Column.ItemRemoved += _Database_ViewChanged;
-                _database.SavedToDisk += _Database_SavedToDisk;
-                _database.ColumnArrangements.ItemInternalChanged += ColumnArrangements_ItemInternalChanged;
-                _database.ProgressbarInfo += _Database_ProgressbarInfo;
-                _database.DropMessage += _Database_DropMessage;
-                _database.Disposing += _Database_Disposing;
-            }
-            _Database_DatabaseLoaded(this, new LoadedEventArgs(false));
-            ShowWaitScreen = false;
-            Invalidate();
-            OnDatabaseChanged();
-        }
     }
 
     [DefaultValue(BlueTableAppearance.Standard)]
@@ -282,6 +217,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public bool DropMessages { get; set; }
+
     public FilterCollection? Filter { get; private set; }
 
     [DefaultValue(1.0f)]
@@ -290,9 +226,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public List<RowItem?> PinnedRows { get; } = new();
 
     public DateTime PowerEdit {
-        private get => _database.PowerEdit;
+        //private get => _database?.PowerEdit;
         set {
-            Database.PowerEdit = value;
+            if (_database == null || _database.IsDisposed) { return; }
+            _database.PowerEdit = value;
             Invalidate_SortedRowData(); // Neue Zeilen können nun erlaubt sein
         }
     }
@@ -452,44 +389,23 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Draw_CellTransparentDirect(gr, text, fitInRect, d.bFont, column, 16, style, bildTextverhalten, state);
     }
 
-    //public static List<string?>? FileSystem(ColumnItem? tmpColumn) {
-    //    if (tmpColumn == null) { return null; }
-
-    //    var f = GetFilesWithFileSelector(tmpColumn.Database.Filename.FilePath(), tmpColumn.MultiLine);
-
-    //    if (f == null) { return null; }
-
-    //    List<string> delList = new();
-    //    List<string> newFiles = new();
-
-    //    foreach (var thisf in f) {
-    //        var b = FileToByte(thisf);
-
-    //        if (!string.IsNullOrEmpty(tmpColumn.Database.FileEncryptionKey)) { b = Cryptography.SimpleCrypt(b, tmpColumn.Database.FileEncryptionKey, 1); }
-
-    //        var neu = thisf.FileNameWithSuffix();
-    //        neu = tmpColumn.BestFile(neu.FileNameWithSuffix(), true);
-    //        ByteToFile(neu, b);
-
-    //        newFiles.Add(neu);
-    //        delList.Add(thisf);
-    //    }
-
-    //    FileDialogs.DeleteFile(delList, true);
-    //    return newFiles;
-    //}
-
     public static Size FormatedText_NeededSize(ColumnItem? column, string originalText, BlueFont? font, ShortenStyle style, int minSize, BildTextVerhalten bildTextverhalten) {
         var (s, quickImage) = CellItem.GetDrawingData(column, originalText, style, bildTextverhalten);
         return Skin.FormatedText_NeededSize(s, quickImage, font, minSize);
     }
 
+    //    FileDialogs.DeleteFile(delList, true);
+    //    return newFiles;
+    //}
     public static void ImportCsv(Database database, string csvtxt) {
         using Import x = new(database, csvtxt);
         x.ShowDialog();
         x.Dispose();
     }
 
+    //        newFiles.Add(neu);
+    //        delList.Add(thisf);
+    //    }
     public static void SearchNextText(string searchTxt, Table tableView, ColumnItem? column, RowData? row, out ColumnItem? foundColumn, out RowData? foundRow, bool vereinfachteSuche) {
         searchTxt = searchTxt.Trim();
         var ca = tableView.CurrentArrangement;
@@ -651,6 +567,25 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
+    public void CheckView() {
+        if (Filter == null) {
+            Filter = new FilterCollection(_database, String.Empty);
+            Filter.Changed += Filter_Changed;
+            OnFilterChanged();
+        }
+
+        if (_arrangementNr != 1) {
+            if (_database?.ColumnArrangements == null || _arrangementNr >= _database.ColumnArrangements.Count || CurrentArrangement == null || !_database.PermissionCheck(CurrentArrangement.PermissionGroups_Show, null)) {
+                _arrangementNr = 1;
+            }
+        }
+
+        if (_mouseOverColumn != null && _mouseOverColumn.Database != _database) { _mouseOverColumn = null; }
+        if (_mouseOverRow != null && _mouseOverRow.Row != null && _mouseOverRow.Row.Database != _database) { _mouseOverRow = null; }
+        if (_cursorPosColumn != null && _cursorPosColumn.Database != _database) { _cursorPosColumn = null; }
+        if (_cursorPosRow != null && _cursorPosRow.Row != null && _cursorPosRow.Row.Database != _database) { _cursorPosRow = null; }
+    }
+
     public void CollapesAll() {
         _collapsed.Clear();
         if (Database != null) {
@@ -681,6 +616,69 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         OnSelectedCellChanged(new CellExtEventArgs(_cursorPosColumn, _cursorPosRow));
 
         if (!SameRow) { OnSelectedRowChanged(new RowEventArgs(_cursorPosRow?.Row)); }
+    }
+
+    public void DatabaseSet(Database? value, string viewCode) {
+        if (_database == value && string.IsNullOrEmpty(viewCode)) { return; }
+
+        CloseAllComponents();
+
+        if (_database != null) {
+            // auch Disposed Datenbanken die Bezüge entfernen!
+            _database.Cell.CellValueChanged -= _Database_CellValueChanged;
+            _database.ConnectedControlsStopAllWorking -= _Database_StopAllWorking;
+            _database.Loaded -= _Database_DatabaseLoaded;
+            _database.Loading -= _Database_StoreView;
+            _database.ViewChanged -= _Database_ViewChanged;
+            //_Database.RowKeyChanged -= _Database_RowKeyChanged;
+            //_Database.ColumnKeyChanged -= _Database_ColumnKeyChanged;
+            _database.Column.ItemInternalChanged -= _Database_ColumnContentChanged;
+            _database.SortParameterChanged -= _Database_SortParameterChanged;
+            _database.Row.RowRemoving -= Row_RowRemoving;
+            _database.Row.RowRemoved -= _Database_RowRemoved;
+            _database.Row.RowAdded -= _Database_Row_RowAdded;
+            _database.Column.ItemRemoved -= _Database_ViewChanged;
+            _database.Column.ItemAdded -= _Database_ViewChanged;
+            _database.SavedToDisk -= _Database_SavedToDisk;
+            _database.ColumnArrangements.ItemInternalChanged -= ColumnArrangements_ItemInternalChanged;
+            _database.ProgressbarInfo -= _Database_ProgressbarInfo;
+            _database.DropMessage -= _Database_DropMessage;
+            _database.Disposing -= _Database_Disposing;
+            _database.Save(false);         // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
+        }
+        ShowWaitScreen = true;
+        Refresh(); // um die Uhr anzuzeigen
+        _database = value;
+        InitializeSkin(); // Neue Schriftgrößen
+        if (_database != null) {
+            _database.Cell.CellValueChanged += _Database_CellValueChanged;
+            _database.ConnectedControlsStopAllWorking += _Database_StopAllWorking;
+            _database.Loaded += _Database_DatabaseLoaded;
+            _database.Loading += _Database_StoreView;
+            _database.ViewChanged += _Database_ViewChanged;
+            //_Database.RowKeyChanged += _Database_RowKeyChanged;
+            //_Database.ColumnKeyChanged += _Database_ColumnKeyChanged;
+            _database.Column.ItemInternalChanged += _Database_ColumnContentChanged;
+            _database.SortParameterChanged += _Database_SortParameterChanged;
+            _database.Row.RowRemoving += Row_RowRemoving;
+            _database.Row.RowRemoved += _Database_RowRemoved;
+            _database.Row.RowAdded += _Database_Row_RowAdded;
+            _database.Column.ItemAdded += _Database_ViewChanged;
+            _database.Column.ItemRemoving += Column_ItemRemoving;
+            _database.Column.ItemRemoved += _Database_ViewChanged;
+            _database.SavedToDisk += _Database_SavedToDisk;
+            _database.ColumnArrangements.ItemInternalChanged += ColumnArrangements_ItemInternalChanged;
+            _database.ProgressbarInfo += _Database_ProgressbarInfo;
+            _database.DropMessage += _Database_DropMessage;
+            _database.Disposing += _Database_Disposing;
+        }
+
+        ParseView(viewCode);
+        //ResetView();
+        //CheckView();
+
+        ShowWaitScreen = false;
+        OnDatabaseChanged();
     }
 
     public void Draw_Column_Head(Graphics gr, ColumnViewItem viewItem, Rectangle displayRectangleWoSlider, int lfdNo) {
@@ -936,62 +934,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    public void ParseView(string toParse) {
-        if (string.IsNullOrEmpty(toParse)) { return; }
-        PinnedRows.Clear();
-        _collapsed.Clear();
-        foreach (var pair in toParse.GetAllTags()) {
-            switch (pair.Key) {
-                case "arrangementnr":
-                    Arrangement = IntParse(pair.Value);
-                    break;
-
-                case "filters":
-                    Filter.Parse(pair.Value);
-                    break;
-
-                case "sliderx":
-                    SliderX.Maximum = Math.Max(SliderX.Maximum, IntParse(pair.Value));
-                    SliderX.Value = IntParse(pair.Value);
-                    break;
-
-                case "slidery":
-                    SliderY.Maximum = Math.Max(SliderY.Maximum, IntParse(pair.Value));
-                    SliderY.Value = IntParse(pair.Value);
-                    break;
-
-                case "cursorpos":
-                    Database.Cell.DataOfCellKey(pair.Value, out var column, out var row);
-                    CursorPos_Set(column, SortedRows().Get(row), false);
-                    break;
-
-                case "tempsort":
-                    _sortDefinitionTemporary = new RowSortDefinition(_database, pair.Value);
-                    break;
-
-                case "pin":
-                    PinnedRows.Add(_database.Row.SearchByKey(LongParse(pair.Value)));
-                    break;
-
-                case "collapsed":
-                    _collapsed.Add(pair.Value.FromNonCritical());
-                    break;
-
-                case "reduced":
-                    var c = _database.Column.SearchByKey(LongParse(pair.Value));
-                    var cv = CurrentArrangement[c];
-                    if (cv != null) { cv.TmpReduced = true; }
-                    break;
-
-                default:
-                    Develop.DebugPrint(FehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
-                    break;
-            }
-        }
-        Filter.OnChanged();
-        Invalidate_FilteredRows(); // beim Parsen wirft der Filter kein Event ab
-    }
-
     public void Pin(List<RowItem>? rows) {
         // Arbeitet mit Rows, weil nur eine Anpinngug möglich ist
 
@@ -1016,6 +958,31 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         PinnedRows.Remove(row);
         Invalidate_SortedRowData();
         OnPinnedChanged();
+    }
+
+    public void ResetView() {
+        if (Filter != null) {
+            Filter.Changed -= Filter_Changed;
+            Filter = null;
+            OnFilterChanged();
+        }
+        PinnedRows.Clear();
+        _collapsed.Clear();
+
+        _mouseOverText = string.Empty;
+        _sortDefinitionTemporary = null;
+        _mouseOverColumn = null;
+        _mouseOverRow = null;
+        _cursorPosColumn = null;
+        _cursorPosRow = null;
+        _arrangementNr = 1;
+        _unterschiede = null;
+
+        Invalidate_AllColumnArrangements();
+        Invalidate_HeadSize();
+        Invalidate_FilteredRows();
+        OnViewChanged();
+        Invalidate();
     }
 
     public List<RowData> SortedRows() {
@@ -1261,12 +1228,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     protected override bool IsInputKey(System.Windows.Forms.Keys keyData) =>
-        // Ganz wichtig diese Routine!
-        // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
-        keyData switch {
-            System.Windows.Forms.Keys.Up or System.Windows.Forms.Keys.Down or System.Windows.Forms.Keys.Left or System.Windows.Forms.Keys.Right => true,
-            _ => false
-        };
+            // Ganz wichtig diese Routine!
+            // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
+            keyData switch {
+                System.Windows.Forms.Keys.Up or System.Windows.Forms.Keys.Down or System.Windows.Forms.Keys.Left or System.Windows.Forms.Keys.Right => true,
+                _ => false
+            };
 
     protected override void OnClick(System.EventArgs e) {
         base.OnClick(e);
@@ -1684,19 +1651,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    //private static void Database_DropConstructorMessage(object sender, MessageEventArgs e) {
-    //    if (!e.Shown) {
-    //        e.Shown = true;
-    //        Notification.Show(e.Message, ImageCode.Datenbank);
-    //    }
-
-    //    if (e.Type is enFehlerArt.DevelopInfo or enFehlerArt.Info) { return; }
-
-    //    if (e.WrittenToLogifile) { return; }
-    //    e.WrittenToLogifile = true;
-    //    Develop.DebugPrint(e.Type, e.Message);
-    //}
-
     private static void DB_GenerateLayoutInternal(object sender, GenerateLayoutInternalEventargs e) {
         if (e.Handled) { return; }
         e.Handled = true;
@@ -1704,6 +1658,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         pad.SaveAsBitmap(e.Filename);
     }
 
+    //    if (e.WrittenToLogifile) { return; }
+    //    e.WrittenToLogifile = true;
+    //    Develop.DebugPrint(e.Type, e.Message);
+    //}
     private static void Draw_CellTransparentDirect(Graphics gr, string toDraw, Rectangle drawarea, BlueFont? font, ColumnItem? contentHolderCellColumn, int pix16, ShortenStyle style, BildTextVerhalten bildTextverhalten, States state) {
         if (toDraw == null) { toDraw = string.Empty; }
 
@@ -1723,6 +1681,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
+    //    if (e.Type is enFehlerArt.DevelopInfo or enFehlerArt.Info) { return; }
     private static void Draw_CellTransparentDirect_OneLine(Graphics gr, string drawString, ColumnItem? contentHolderColumnStyle, Rectangle drawarea, int txtYPix, bool changeToDot, BlueFont? font, int pix16, ShortenStyle style, BildTextVerhalten bildTextverhalten, States state) {
         Rectangle r = new(drawarea.Left, drawarea.Top + txtYPix, drawarea.Width, pix16);
 
@@ -1738,6 +1697,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Skin.Draw_FormatedText(gr, tmpData.Item1, tmpImageCode, (Alignment)contentHolderColumnStyle.Align, r, null, false, font, false);
     }
 
+    //private static void Database_DropConstructorMessage(object sender, MessageEventArgs e) {
+    //    if (!e.Shown) {
+    //        e.Shown = true;
+    //        Notification.Show(e.Message, ImageCode.Datenbank);
+    //    }
     private static int GetPix(int pix, BlueFont? f, double scale) => Skin.FormatedText_NeededSize("@|", null, f, (int)((pix * scale) + 0.5)).Height;
 
     private static bool Mouse_IsInAutofilter(ColumnViewItem viewItem, System.Windows.Forms.MouseEventArgs e) => viewItem != null && viewItem.TmpAutoFilterLocation.Width != 0 && viewItem.Column.AutoFilterSymbolPossible() && viewItem.TmpAutoFilterLocation.Contains(e.X, e.Y);
@@ -1747,7 +1711,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private static void NotEditableInfo(string reason) => Notification.Show(reason, ImageCode.Kreuz);
 
     private static void UserEdited(Table table, string newValue, ColumnItem? column, RowItem? row, string chapter, bool formatWarnung) {
-        if (column == null) {
+        if (column == null || column.Database == null || column.Database.Column.Count == 0) {
             NotEditableInfo("Keine Spalte angegeben.");
             return;
         }
@@ -1841,69 +1805,27 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Invalidate_SortedRowData();
     }
 
+    private void _Database_DatabaseLoaded(object sender, LoadedEventArgs e) {
+        // Wird auch bei einem Reload ausgeführt.
+        // Es kann aber sein, dass eine Ansicht zurückgeholt wurde, und die Werte stimmen.
+        // Deswegen prüfen, ob wirklich alles gelöscht werden muss, oder weiter behalten werden kann.
+        // Auf Nothing muss auch geprüft werden, da bei einem Dispose oder beim Beenden sich die Datenbank auch änsdert....
+
+        if (!string.IsNullOrEmpty(_storedView)) {
+            ParseView(_storedView);
+            _storedView = string.Empty;
+        } else {
+            ResetView();
+            CheckView();
+        }
+    }
+
     //private void _Database_ColumnKeyChanged(object sender, KeyChangedEventArgs e) {
     //    // Ist aktuell nur möglich,wenn Pending Changes eine neue Zeile machen
     //    if (string.IsNullOrEmpty(_StoredView)) { return; }
     //    _StoredView = ColumnCollection.ChangeKeysInString(_StoredView, e.KeyOld, e.KeyNew);
     //}
-
-    private void _Database_DatabaseLoaded(object sender, LoadedEventArgs e) {
-        // Wird auch bei einem Reload ausgeführt.
-        // Es kann aber sein, dass eine Ansicht zurückgeholt wurde, und die Werte stimmen.
-        // Deswegen prüfen, ob wirklich alles geleöscht werden muss, oder weiter behalten werden kann.
-        // Auf Nothing  muss auch geprüft werden, da bei einem Dispose oder beim Beenden sich die Datenbank auch änsdert....
-        Invalidate_HeadSize();
-        var f = string.Empty;
-        _mouseOverText = string.Empty;
-        if (Filter != null) {
-            if (e.OnlyReload) { f = Filter.ToString(); }
-            Filter.Changed -= Filter_Changed;
-            Filter = null;
-        }
-        if (_database != null) {
-            Filter = new FilterCollection(_database, f);
-            Filter.Changed += Filter_Changed;
-            if (e.OnlyReload) {
-                if (_arrangementNr != 1) {
-                    if (_database.ColumnArrangements == null || _arrangementNr >= _database.ColumnArrangements.Count || CurrentArrangement == null || !_database.PermissionCheck(CurrentArrangement.PermissionGroups_Show, null)) {
-                        _arrangementNr = 1;
-                    }
-                }
-                if (_mouseOverColumn != null && _mouseOverColumn.Database != _database) {
-                    _mouseOverColumn = null;
-                    _mouseOverRow = null;
-                }
-                if (_cursorPosColumn != null && _cursorPosColumn.Database != _database) {
-                    _cursorPosColumn = null;
-                    _cursorPosRow = null;
-                }
-            } else {
-                _mouseOverColumn = null;
-                _mouseOverRow = null;
-                _cursorPosColumn = null;
-                _cursorPosRow = null;
-                _arrangementNr = 1;
-            }
-        } else {
-            _mouseOverColumn = null;
-            _mouseOverRow = null;
-            _cursorPosColumn = null;
-            _cursorPosRow = null;
-            _arrangementNr = 1;
-        }
-        _sortDefinitionTemporary = null;
-        Invalidate_AllColumnArrangements();
-        Invalidate_HeadSize();
-        Invalidate_FilteredRows();
-        OnViewChanged();
-        if (e.OnlyReload) {
-            if (string.IsNullOrEmpty(_storedView)) { Develop.DebugPrint("Stored View Empty!"); }
-            ParseView(_storedView);
-            _storedView = string.Empty;
-        }
-    }
-
-    private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
+    private void _Database_Disposing(object sender, System.EventArgs e) => DatabaseSet(null, string.Empty);
 
     private void _Database_DropMessage(object sender, MessageEventArgs e) {
         if (_database.IsAdministrator() && DropMessages) {
@@ -1928,14 +1850,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Invalidate_FilteredRows();
     }
 
+    private void _Database_RowRemoved(object sender, System.EventArgs e) => Invalidate_FilteredRows();
+
     //private void _Database_RowKeyChanged(object sender, KeyChangedEventArgs e) {
     //    // Ist aktuell nur möglich, wenn Pending Changes eine neue Zeile machen
     //    if (string.IsNullOrEmpty(_StoredView)) { return; }
     //    _StoredView = _StoredView.Replace("RowKey=" + e.KeyOld + "}", "RowKey=" + e.KeyNew + "}");
     //}
-
-    private void _Database_RowRemoved(object sender, System.EventArgs e) => Invalidate_FilteredRows();
-
     private void _Database_SavedToDisk(object sender, System.EventArgs e) => Invalidate();
 
     private void _Database_SortParameterChanged(object sender, System.EventArgs e) => Invalidate_SortedRowData();
@@ -1943,8 +1864,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private void _Database_StopAllWorking(object sender, MultiUserFileStopWorkingEventArgs e) => CloseAllComponents();
 
     private void _Database_StoreView(object sender, System.EventArgs e) =>
-        //if (!string.IsNullOrEmpty(_StoredView)) { Develop.DebugPrint("Stored View nicht Empty!"); }
-        _storedView = ViewToString();
+            //if (!string.IsNullOrEmpty(_StoredView)) { Develop.DebugPrint("Stored View nicht Empty!"); }
+            _storedView = ViewToString();
 
     private void _Database_ViewChanged(object sender, System.EventArgs e) {
         InitializeSkin(); // Sicher ist sicher, um die neuen Schrift-Größen zu haben.
@@ -2325,12 +2246,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Develop.Debugprint_BackgroundThread();
     }
 
-    //private void Cell_Edit_FileSystem(ColumnItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow) {
-    //    var l = FileSystem(cellInThisDatabaseColumn);
-    //    if (l == null) { return; }
-    //    UserEdited(this, l.JoinWithCr(), cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, cellInThisDatabaseRow?.Chapter, false);
-    //}
-
     private bool Cell_Edit_TextBox(ColumnItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, ColumnItem? contentHolderCellColumn, RowItem? contentHolderCellRow, TextBox Box, int addWith, int isHeight) {
         if (contentHolderCellColumn != cellInThisDatabaseColumn) {
             if (contentHolderCellRow == null) {
@@ -2377,6 +2292,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         return true;
     }
 
+    //private void Cell_Edit_FileSystem(ColumnItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow) {
+    //    var l = FileSystem(cellInThisDatabaseColumn);
+    //    if (l == null) { return; }
+    //    UserEdited(this, l.JoinWithCr(), cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, cellInThisDatabaseRow?.Chapter, false);
+    //}
     private void CellOnCoordinate(int xpos, int ypos, out ColumnItem? column, out RowData? row) {
         column = ColumnOnCoordinate(xpos);
         row = RowOnCoordinate(ypos);
@@ -2527,8 +2447,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private void CursorPos_Set(ColumnItem? column, RowItem? row, bool ensureVisible, string chapter) => CursorPos_Set(column, SortedRows().Get(row, chapter), ensureVisible);
 
     private Rectangle DisplayRectangleWithoutSlider() => _design == BlueTableAppearance.Standard
-        ? new Rectangle(DisplayRectangle.Left, DisplayRectangle.Left, DisplayRectangle.Width - SliderY.Width, DisplayRectangle.Height - SliderX.Height)
-        : new Rectangle(DisplayRectangle.Left, DisplayRectangle.Left, DisplayRectangle.Width - SliderY.Width, DisplayRectangle.Height);
+            ? new Rectangle(DisplayRectangle.Left, DisplayRectangle.Left, DisplayRectangle.Width - SliderY.Width, DisplayRectangle.Height - SliderX.Height)
+            : new Rectangle(DisplayRectangle.Left, DisplayRectangle.Left, DisplayRectangle.Width - SliderY.Width, DisplayRectangle.Height);
 
     private void Draw_Border(Graphics gr, ColumnViewItem column, Rectangle displayRectangleWoSlider, bool onlyhead) {
         var yPos = displayRectangleWoSlider.Height;
@@ -3127,6 +3047,69 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void OnVisibleRowsChanged() => VisibleRowsChanged?.Invoke(this, System.EventArgs.Empty);
 
+    /// <summary>
+    /// Reset - Parse - CheckView
+    /// </summary>
+    /// <param name="toParse"></param>
+    private void ParseView(string toParse) {
+        ResetView();
+
+        if (!string.IsNullOrEmpty(toParse)) {
+            foreach (var pair in toParse.GetAllTags()) {
+                switch (pair.Key) {
+                    case "arrangementnr":
+                        Arrangement = IntParse(pair.Value);
+                        break;
+
+                    case "filters":
+                        Filter = new FilterCollection(_database, pair.Value);
+                        Filter.Changed += Filter_Changed;
+                        OnFilterChanged();
+                        break;
+
+                    case "sliderx":
+                        SliderX.Maximum = Math.Max(SliderX.Maximum, IntParse(pair.Value));
+                        SliderX.Value = IntParse(pair.Value);
+                        break;
+
+                    case "slidery":
+                        SliderY.Maximum = Math.Max(SliderY.Maximum, IntParse(pair.Value));
+                        SliderY.Value = IntParse(pair.Value);
+                        break;
+
+                    case "cursorpos":
+                        Database.Cell.DataOfCellKey(pair.Value, out var column, out var row);
+                        CursorPos_Set(column, SortedRows().Get(row), false);
+                        break;
+
+                    case "tempsort":
+                        _sortDefinitionTemporary = new RowSortDefinition(_database, pair.Value);
+                        break;
+
+                    case "pin":
+                        PinnedRows.Add(_database.Row.SearchByKey(LongParse(pair.Value)));
+                        break;
+
+                    case "collapsed":
+                        _collapsed.Add(pair.Value.FromNonCritical());
+                        break;
+
+                    case "reduced":
+                        var c = _database.Column.SearchByKey(LongParse(pair.Value));
+                        var cv = CurrentArrangement[c];
+                        if (cv != null) { cv.TmpReduced = true; }
+                        break;
+
+                    default:
+                        Develop.DebugPrint(FehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
+                        break;
+                }
+            }
+        }
+
+        CheckView();
+    }
+
     private int Row_DrawHeight(RowItem? vrow, Rectangle displayRectangleWoSlider) {
         if (_design == BlueTableAppearance.OnlyMainColumnWithoutHead) { return Cell_ContentSize(this, _database.Column[0], vrow, _cellFont, _pix16).Height; }
         var tmp = _pix18;
@@ -3200,18 +3183,18 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         ? _sortDefinitionTemporary
         : _database.SortDefinition?.Columns != null ? _database.SortDefinition : null;
 
-    private void TXTBox_Close(TextBox btBxx) {
-        if (btBxx == null) { return; }
-        if (!btBxx.Visible) { return; }
-        if (btBxx.Tag == null || string.IsNullOrEmpty(btBxx.Tag.ToString())) {
-            btBxx.Visible = false;
-            return; // Ohne Dem hier wird ganz am Anfang ein Ereignis ausgelöst
+    private void TXTBox_Close(TextBox textbox) {
+        if (textbox == null || _database == null || _database.IsDisposed) { return; }
+        if (!textbox.Visible) { return; }
+        if (textbox.Tag == null || string.IsNullOrEmpty(textbox.Tag.ToString())) {
+            textbox.Visible = false;
+            return; // Ohne dem hier wird ganz am Anfang ein Ereignis ausgelöst
         }
-        var w = btBxx.Text;
-        var tmpTag = (string)btBxx.Tag;
-        Database.Cell.DataOfCellKey(tmpTag, out var column, out var row);
-        btBxx.Tag = null;
-        btBxx.Visible = false;
+        var w = textbox.Text;
+        var tmpTag = (string)textbox.Tag;
+        _database.Cell.DataOfCellKey(tmpTag, out var column, out var row);
+        textbox.Tag = null;
+        textbox.Visible = false;
         UserEdited(this, w, column, row, _cursorPosRow?.Chapter, true);
         Focus();
     }
@@ -3223,7 +3206,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (CurrentArrangement?[_database.Column[0]] == null) { return false; }
         if (!_database.PermissionCheck(_database.PermissionGroupsNewRow, null)) { return false; }
 
-        if (PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0) { return true; }
+        if (_database.PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0) { return true; }
 
         return CellCollection.UserEditPossible(_database.Column[0], null, ErrorReason.EditNormaly);
     }

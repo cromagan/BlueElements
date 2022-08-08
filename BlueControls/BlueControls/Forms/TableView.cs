@@ -294,27 +294,49 @@ public partial class TableView : Form {
         FilterLeiste.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
     }
 
-    protected void DatabaseSet(Database? database, string viewcode) {
+    protected virtual void DatabaseSet(Database? database, string toParse) {
         if (Table.Database != database) {
             Formula.Database = null;
             FormulaBETA.ConnectedFormula = null;
         }
 
-        Table.Database = database;
-
         FilterLeiste.Table = Table;
+        var did = false;
 
-        if (!string.IsNullOrEmpty(viewcode)) {
-            ParseView(viewcode);
+        if (!string.IsNullOrEmpty(toParse)) {
+            foreach (var pair in toParse.GetAllTags()) {
+                switch (pair.Key) {
+                    case "tableview":
+                        Table.DatabaseSet(database, pair.Value.FromNonCritical());
+                        did = true;
+                        break;
+
+                    case "maintab":
+                        ribMain.SelectedIndex = int.Parse(pair.Value);
+                        break;
+
+                    case "ansicht":
+                        _ansicht = (Ansicht)int.Parse(pair.Value);
+                        InitView();
+                        break;
+
+                    default:
+                        DebugPrint(FehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
+                        break;
+                }
+            }
+        }
+
+        if (!did) {
+            Table.DatabaseSet(database, string.Empty);
+            if (Table.View_RowFirst() != null && database != null) {
+                Table.CursorPos_Set(database.Column[0], Table.View_RowFirst(), false);
+            }
         }
 
         Table.ShowWaitScreen = false;
         tbcDatabaseSelector.Enabled = true;
         Table.Enabled = true;
-
-        if (Table.View_RowFirst() != null && database != null) {
-            Table.CursorPos_Set(database.Column[0], Table.View_RowFirst(), false);
-        }
     }
 
     protected virtual void FillFormula(RowItem? r) {
@@ -366,30 +388,6 @@ public partial class TableView : Form {
     protected override void OnShown(System.EventArgs e) {
         base.OnShown(e);
         InitView();
-    }
-
-    protected virtual void ParseView(string ToParse) {
-        if (string.IsNullOrEmpty(ToParse)) { return; }
-        foreach (var pair in ToParse.GetAllTags()) {
-            switch (pair.Key) {
-                case "tableview":
-                    Table.ParseView(pair.Value.FromNonCritical());
-                    break;
-
-                case "maintab":
-                    ribMain.SelectedIndex = int.Parse(pair.Value);
-                    break;
-
-                case "ansicht":
-                    _ansicht = (Ansicht)int.Parse(pair.Value);
-                    InitView();
-                    break;
-
-                default:
-                    DebugPrint(FehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
-                    break;
-            }
-        }
     }
 
     /// <summary>
@@ -589,10 +587,11 @@ public partial class TableView : Form {
     //    Table.Enabled = true;
     //}
     protected virtual string ViewToString() {
+        //Reihenfolge wichtig, da die Ansicht vieles auf standard zurück setzt
         var s = "{" +
+                "Ansicht=" + ((int)_ansicht).ToString() + ", " +
                 "MainTab=" + ribMain.SelectedIndex.ToString() + ", " +
-                "TableView=" + Table.ViewToString().ToNonCritical() + ", " +
-                "Ansicht=" + ((int)_ansicht).ToString() +
+                "TableView=" + Table.ViewToString().ToNonCritical() +
                 "}";
         return s;
     }
@@ -813,7 +812,7 @@ public partial class TableView : Form {
         btnVorherigeVersion.Enabled = false;
         if (_originalDb != null && Table.Database != _originalDb) {
             _originalDb.Disposing -= _originalDB_Disposing;
-            Table.Database = _originalDb;
+            Table.DatabaseSet(_originalDb, string.Empty);
             _originalDb = null;
             btnVorherigeVersion.Text = "Vorherige Version";
             btnVorherigeVersion.Enabled = true;
@@ -832,7 +831,7 @@ public partial class TableView : Form {
             return;
         }
 
-        Table.Database = Database.GetByFilename(files[0], false, true);
+        Table.DatabaseSet(Database.GetByFilename(files[0], false, true), string.Empty);
         _originalDb = merker;
         _originalDb.Disposing += _originalDB_Disposing;
         btnVorherigeVersion.Text = "zurück";
