@@ -717,7 +717,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         QuickImage? trichterIcon = null;
         var trichterState = States.Undefiniert;
         viewItem.TmpAutoFilterLocation = new Rectangle((int)viewItem.OrderTmpSpalteX1 + Column_DrawWidth(viewItem, displayRectangleWoSlider) - AutoFilterSize, HeadSize() - AutoFilterSize, AutoFilterSize, AutoFilterSize);
-        var filtIt = Filter[viewItem.Column];
+        FilterItem? filtIt = null;
+        if (Filter != null) {            filtIt = Filter[viewItem.Column];        }
+
+
         if (viewItem.Column.AutoFilterSymbolPossible()) {
             if (filtIt != null) {
                 trichterState = States.Checked;
@@ -730,7 +733,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         var trichterSize = (AutoFilterSize - 4).ToString();
         if (filtIt != null) {
             trichterIcon = QuickImage.Get("Trichter|" + trichterSize + "|||FF0000");
-        } else if (Filter.MayHasRowFilter(viewItem.Column)) {
+        } else if (Filter != null && Filter.MayHasRowFilter(viewItem.Column)) {
             trichterIcon = QuickImage.Get("Trichter|" + trichterSize + "|||227722");
         } else if (viewItem.Column.AutoFilterSymbolPossible()) {
             trichterIcon = Autofilter_Sinnvoll(viewItem.Column)
