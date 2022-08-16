@@ -615,7 +615,7 @@ public partial class TableView : Form {
     }
 
     private void btnDatenbankenSpeicherort_Click(object sender, System.EventArgs e) {
-        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+        BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
         ExecuteFile(Table.Database.Filename.FilePath());
     }
 
@@ -719,6 +719,11 @@ public partial class TableView : Form {
         SwitchTabToDatabase(SaveTab.FileName);
     }
 
+    private void btnSaveLoad_Click(object sender, System.EventArgs e) {
+        Table?.Database?.Load_Reload();
+        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(true);
+    }
+
     private void btnSpaltenanordnung_Click(object sender, System.EventArgs e) {
         var x = new ColumnArrangementPadEditor(Table.Database);
         x.ShowDialog();
@@ -737,7 +742,7 @@ public partial class TableView : Form {
     }
 
     private void btnTemporärenSpeicherortÖffnen_Click(object sender, System.EventArgs e) {
-        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+        BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
         ExecuteFile(Path.GetTempPath());
     }
 
@@ -1085,7 +1090,7 @@ public partial class TableView : Form {
         Table.Enabled = false;
         Table.Refresh();
 
-        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+        BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
 
         var s = (List<string>)(e.TabPage.Tag);
 

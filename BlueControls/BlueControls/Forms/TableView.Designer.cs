@@ -94,6 +94,7 @@ namespace BlueControls.Forms {
             this.capZeilen2 = new BlueControls.Controls.Caption();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
+            this.btnSaveLoad = new BlueControls.Controls.Button();
             this.ribMain.SuspendLayout();
             this.tabFile.SuspendLayout();
             this.grpOrdner.SuspendLayout();
@@ -556,7 +557,7 @@ namespace BlueControls.Forms {
             this.grpAdminZeilen.Controls.Add(this.btnDatenüberprüfung);
             this.grpAdminZeilen.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAdminZeilen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAdminZeilen.Location = new System.Drawing.Point(472, 0);
+            this.grpAdminZeilen.Location = new System.Drawing.Point(544, 0);
             this.grpAdminZeilen.Name = "grpAdminZeilen";
             this.grpAdminZeilen.Size = new System.Drawing.Size(232, 81);
             this.grpAdminZeilen.TabIndex = 8;
@@ -608,7 +609,7 @@ namespace BlueControls.Forms {
             this.grpAdminBearbeiten.Controls.Add(this.btnLayouts);
             this.grpAdminBearbeiten.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAdminBearbeiten.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAdminBearbeiten.Location = new System.Drawing.Point(208, 0);
+            this.grpAdminBearbeiten.Location = new System.Drawing.Point(280, 0);
             this.grpAdminBearbeiten.Name = "grpAdminBearbeiten";
             this.grpAdminBearbeiten.Size = new System.Drawing.Size(264, 81);
             this.grpAdminBearbeiten.TabIndex = 9;
@@ -664,6 +665,7 @@ namespace BlueControls.Forms {
             // 
             this.grpAdminAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpAdminAllgemein.CausesValidation = false;
+            this.grpAdminAllgemein.Controls.Add(this.btnSaveLoad);
             this.grpAdminAllgemein.Controls.Add(this.btnVorherigeVersion);
             this.grpAdminAllgemein.Controls.Add(this.btnDatenbankKopf);
             this.grpAdminAllgemein.Controls.Add(this.btnSpaltenUebersicht);
@@ -671,7 +673,7 @@ namespace BlueControls.Forms {
             this.grpAdminAllgemein.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAdminAllgemein.Location = new System.Drawing.Point(0, 0);
             this.grpAdminAllgemein.Name = "grpAdminAllgemein";
-            this.grpAdminAllgemein.Size = new System.Drawing.Size(208, 81);
+            this.grpAdminAllgemein.Size = new System.Drawing.Size(280, 81);
             this.grpAdminAllgemein.TabIndex = 7;
             this.grpAdminAllgemein.TabStop = false;
             this.grpAdminAllgemein.Text = "Allgemein";
@@ -809,7 +811,6 @@ namespace BlueControls.Forms {
             // 
             // tbcDatabaseSelector
             // 
-            this.tbcDatabaseSelector.Database = null;
             this.tbcDatabaseSelector.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tbcDatabaseSelector.HotTrack = true;
             this.tbcDatabaseSelector.Location = new System.Drawing.Point(0, 0);
@@ -859,10 +860,10 @@ namespace BlueControls.Forms {
             this.Table.TabIndex = 0;
             this.Table.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.TableView_ContextMenu_Init);
             this.Table.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.TableView_ContextMenuItemClicked);
-            this.Table.SelectedCellChanged += new System.EventHandler<BlueDatabase.EventArgs.CellExtEventArgs>(this.Table_SelectedCellChanged);
-            this.Table.SelectedRowChanged += new System.EventHandler<BlueDatabase.EventArgs.RowEventArgs>(this.Table_SelectedRowChanged);
             this.Table.DatabaseChanged += new System.EventHandler(this.TableView_DatabaseChanged);
             this.Table.EditBeforeBeginEdit += new System.EventHandler<BlueDatabase.EventArgs.CellCancelEventArgs>(this.Table_EditBeforeBeginEdit);
+            this.Table.SelectedCellChanged += new System.EventHandler<BlueDatabase.EventArgs.CellExtEventArgs>(this.Table_SelectedCellChanged);
+            this.Table.SelectedRowChanged += new System.EventHandler<BlueDatabase.EventArgs.RowEventArgs>(this.Table_SelectedRowChanged);
             this.Table.ViewChanged += new System.EventHandler(this.Table_ViewChanged);
             this.Table.VisibleRowsChanged += new System.EventHandler(this.Table_VisibleRowsChanged);
             this.Table.EnabledChanged += new System.EventHandler(this.TableView_EnabledChanged);
@@ -893,7 +894,6 @@ namespace BlueControls.Forms {
             // 
             this.tbcSidebar.Controls.Add(this.tabFormula);
             this.tbcSidebar.Controls.Add(this.tabFormulaBeta);
-            this.tbcSidebar.Database = null;
             this.tbcSidebar.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tbcSidebar.HotTrack = true;
             this.tbcSidebar.Location = new System.Drawing.Point(0, 0);
@@ -945,6 +945,7 @@ namespace BlueControls.Forms {
             this.FormulaBETA.Dock = System.Windows.Forms.DockStyle.Fill;
             this.FormulaBETA.Location = new System.Drawing.Point(0, 0);
             this.FormulaBETA.Name = "FormulaBETA";
+            this.FormulaBETA.RowKey = ((long)(-1));
             this.FormulaBETA.Size = new System.Drawing.Size(338, 566);
             this.FormulaBETA.TabIndex = 0;
             // 
@@ -987,6 +988,17 @@ namespace BlueControls.Forms {
             this.SaveTab.Filter = "*.MDB Datenbanken|*.MDB|*.* Alle Dateien|*";
             this.SaveTab.Title = "Bitte neuen Dateinamen der Datenbank wählen.";
             this.SaveTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
+            // 
+            // btnSaveLoad
+            // 
+            this.btnSaveLoad.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnSaveLoad.ImageCode = "Diskette";
+            this.btnSaveLoad.Location = new System.Drawing.Point(208, 2);
+            this.btnSaveLoad.Name = "btnSaveLoad";
+            this.btnSaveLoad.Size = new System.Drawing.Size(64, 66);
+            this.btnSaveLoad.TabIndex = 43;
+            this.btnSaveLoad.Text = "Speichern";
+            this.btnSaveLoad.Click += new System.EventHandler(this.btnSaveLoad_Click);
             // 
             // TableView
             // 
@@ -1102,5 +1114,6 @@ namespace BlueControls.Forms {
         private Controls.Button btnNummerierung;
         private Controls.Button btnSuchFenster;
         protected Controls.GroupBox grpAnsichtWahl;
+        private Controls.Button btnSaveLoad;
     }
 }

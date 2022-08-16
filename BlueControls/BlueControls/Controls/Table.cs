@@ -644,7 +644,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             _database.ProgressbarInfo -= _Database_ProgressbarInfo;
             _database.DropMessage -= _Database_DropMessage;
             _database.Disposing -= _Database_Disposing;
-            _database.Save(false);         // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
+            BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
+            //_database.Save(false);         // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
         }
         ShowWaitScreen = true;
         Refresh(); // um die Uhr anzuzeigen
@@ -718,8 +719,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         var trichterState = States.Undefiniert;
         viewItem.TmpAutoFilterLocation = new Rectangle((int)viewItem.OrderTmpSpalteX1 + Column_DrawWidth(viewItem, displayRectangleWoSlider) - AutoFilterSize, HeadSize() - AutoFilterSize, AutoFilterSize, AutoFilterSize);
         FilterItem? filtIt = null;
-        if (Filter != null) {            filtIt = Filter[viewItem.Column];        }
-
+        if (Filter != null) { filtIt = Filter[viewItem.Column]; }
 
         if (viewItem.Column.AutoFilterSymbolPossible()) {
             if (filtIt != null) {
@@ -881,7 +881,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             cancel = true;
             return;
         }
-        Database?.Load_Reload();
+        BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
+
+        //Database?.Load_Reload();
         if (e == null) {
             cancel = true;
             return;

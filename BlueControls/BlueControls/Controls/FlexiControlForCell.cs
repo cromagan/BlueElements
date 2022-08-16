@@ -379,11 +379,18 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
 
     private void _Database_Loaded(object sender, LoadedEventArgs e) {
-        if (InvokeRequired) {
-            Invoke(new Action(() => _Database_Loaded(sender, e)));
-            return;
-        }
         if (Disposing || IsDisposed) { return; }
+
+        if (InvokeRequired) {
+            try {
+                Invoke(new Action(() => _Database_Loaded(sender, e)));
+                return;
+            } catch {
+                // Kann dank Multitasking disposed sein
+                _Database_Loaded(sender, e); // am Anfang der Routine wird auf disposed geprüft
+                return;
+            }
+        }
 
         UpdateColumnData();
         SetValueFromCell();

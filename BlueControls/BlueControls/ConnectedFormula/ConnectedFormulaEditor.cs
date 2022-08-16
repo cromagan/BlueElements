@@ -82,14 +82,14 @@ public partial class ConnectedFormulaEditor : PadEditor {
     }
 
     private void btnLetzteDateien_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) {
-        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+        BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
 
         if (e?.Item == null) { return; }
         FormulaSet(e.Item.Internal, null);
     }
 
     private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e) {
-        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(true);
 
         if (sender == btnSaveAs) {
             if (_cf == null) { return; }
@@ -114,7 +114,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
     }
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
-        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+        BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
         LoadTab.ShowDialog();
     }
 

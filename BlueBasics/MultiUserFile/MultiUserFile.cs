@@ -47,7 +47,6 @@ public sealed class MultiUserFile : IDisposableExtended {
     private DateTime _canWriteNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
     private bool _checkedAndReloadNeed;
     private int _checkerTickCount = -5;
-    private byte[] _data_On_Disk;
     private bool _doingTempFile;
     private string _editNormalyError = string.Empty;
     private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
@@ -83,7 +82,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         ReCreateWatcher();
         _checkedAndReloadNeed = true;
         _lastSaveCode = string.Empty;
-        _data_On_Disk = Array.Empty<byte>();
+        //_data_On_Disk = Array.Empty<byte>();
         ReadOnly = readOnly;
         AutoDeleteBak = false;
         BlockReload(false);
@@ -198,15 +197,25 @@ public sealed class MultiUserFile : IDisposableExtended {
 
     #region Methods
 
+    public static void ForceLoadSaveAll() {
+        var x = _all_Files.Count;
+        foreach (var thisFile in _all_Files) {
+            thisFile?.ForceLoadSave();
+            if (x != _all_Files.Count) {
+                // Die Auflistung wurde verändert! Selten, aber kann passieren!
+                ForceLoadSaveAll();
+                return;
+            }
+        }
+    }
+
     /// <summary>
     ///
     /// </summary>
     /// <param name="mustSave">Falls TRUE wird zuvor automatisch ein Speichervorgang mit FALSE eingeleitet, um so viel wie möglich zu speichern - falls eine Datei blockiert ist.</param>
     public static void SaveAll(bool mustSave) {
         if (mustSave) { SaveAll(false); } // Beenden, was geht, dann erst der muss
-        // Parallel.ForEach(AllFiles, thisFile => {
-        //    thisFile?.Save(mustSave);
-        // });
+
         var x = _all_Files.Count;
         foreach (var thisFile in _all_Files) {
             thisFile?.Save(mustSave);
@@ -374,12 +383,11 @@ public sealed class MultiUserFile : IDisposableExtended {
         }
     }
 
-    /// <summary>
-    /// gibt die Möglichkeit, Fehler in ein Protokoll zu schreiben, wenn nach dem Reload eine Inkonsitenz aufgetreten ist.
-    /// Nicht für Reperaturzwecke gedacht.
-    /// </summary>
-    //protected abstract void CheckDataAfterReload();
-    // Dient zur Erkennung redundanter Aufrufe.
+    public void ForceLoadSave() {
+        CancelBackGroundWorker();
+        _checkerTickCount = Math.Max(ReloadDelaySecond, 10) + 10;
+    }
+
     public bool IsFileAllowedToLoad(string fileName) {
         foreach (var thisFile in _all_Files) {
             if (thisFile != null && string.Equals(thisFile.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
@@ -442,7 +450,7 @@ public sealed class MultiUserFile : IDisposableExtended {
 
         var (bLoaded, tmpLastSaveCode) = LoadBytesFromDisk(Enums.ErrorReason.Load);
         if (bLoaded == null) { IsLoading = false; return; }
-        _data_On_Disk = bLoaded;
+        //_data_On_Disk = bLoaded;
         //PrepeareDataForCheckingBeforeLoad();
         ParseInternal(bLoaded);
         _lastSaveCode = tmpLastSaveCode; // initialize setzt zurück
@@ -558,7 +566,7 @@ public sealed class MultiUserFile : IDisposableExtended {
     public void SaveAsAndChangeTo(string newFileName) {
         if (string.Equals(newFileName, Filename, StringComparison.OrdinalIgnoreCase)) { Develop.DebugPrint(FehlerArt.Fehler, "Dateiname unterscheiden sich nicht!"); }
         Save(true); // Original-Datei speichern, die ist ja dann weg.
-        // Jetzt kann es aber immern noch sein, das PendingChanges da sind.
+        // Jetzt kann es aber immer noch sein, das PendingChanges da sind.
         // Wenn kein Dateiname angegeben ist oder bei Readonly wird die Datei nicht gespeichert und die Pendings bleiben erhalten!
         RemoveWatcher();
         Filename = newFileName;
@@ -569,7 +577,7 @@ public sealed class MultiUserFile : IDisposableExtended {
             x.Flush();
             x.Close();
         }
-        _data_On_Disk = l;
+        //_data_On_Disk = l;
         _lastSaveCode = GetFileInfo(Filename, true);
         _checkedAndReloadNeed = false;
         CreateWatcher();
@@ -964,8 +972,8 @@ public sealed class MultiUserFile : IDisposableExtended {
         // --- TmpFile wird zum Haupt ---
         RenameFile(tmpFileName, Filename, true);
 
-        // ---- Steuerelemente Sagen, was gespeichert wurde
-        _data_On_Disk = savedDataUncompressed;
+        //// ---- Steuerelemente Sagen, was gespeichert wurde
+        //_data_On_Disk = savedDataUncompressed;
 
         // Und nun den Block entfernen
         CanWrite(Filename, 30); // sobald die Hauptdatei wieder frei ist
@@ -1046,9 +1054,12 @@ public sealed class MultiUserFile : IDisposableExtended {
         _checkedAndReloadNeed = true;
     }
 
-    private void Watcher_Error(object sender, ErrorEventArgs e) =>
-        // Im Verzeichnis wurden zu viele Änderungen gleichzeitig vorgenommen...
-        _checkedAndReloadNeed = true;
+    /// <summary>
+    /// Im Verzeichnis wurden zu viele Änderungen gleichzeitig vorgenommen...
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void Watcher_Error(object sender, ErrorEventArgs e) => _checkedAndReloadNeed = true;
 
     private void Watcher_Renamed(object sender, RenamedEventArgs e) {
         if (!string.Equals(e.FullPath, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
