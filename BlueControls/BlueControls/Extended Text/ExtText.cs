@@ -147,14 +147,14 @@ public sealed class ExtText : ListExt<ExtChar> {
 
     public string PlainText {
         get {
-            if(IsDisposed) { return string.Empty; }
+            if (IsDisposed) { return string.Empty; }
             if (_tmpPlainText == null) {
                 _tmpPlainText = ConvertCharToPlainText(0, Count - 1);
             }
             return _tmpPlainText;
         }
         set {
-            if(IsDisposed) { return; }
+            if (IsDisposed) { return; }
             if (PlainText == value) { return; }
             ConvertTextToChar(value, false);
             OnChanged();
@@ -167,7 +167,11 @@ public sealed class ExtText : ListExt<ExtChar> {
             if (value == _state) { return; }
             _state = value;
 
-            Parallel.ForEach(this, ch => { ch.State = _state; });
+            try {
+                Parallel.ForEach(this, ch => {
+                    if (ch != null) { ch.State = _state; }
+                });
+            } catch { }
             OnChanged();
         }
     }
@@ -457,17 +461,17 @@ public sealed class ExtText : ListExt<ExtChar> {
                 if (isRich) {
                     switch (ch) {
                         case '<': {
-                            DoHtmlCode(cactext, pos, ref zeichen, ref bf, ref stufe, ref markstate);
-                            var op = 1;
-                            do {
-                                pos++;
-                                if (pos > lang) { break; }
-                                if (cactext[pos] == '>') { op--; }
-                                if (cactext[pos] == '<') { op++; }
-                                if (op == 0) { break; }
-                            } while (true);
-                            break;
-                        }
+                                DoHtmlCode(cactext, pos, ref zeichen, ref bf, ref stufe, ref markstate);
+                                var op = 1;
+                                do {
+                                    pos++;
+                                    if (pos > lang) { break; }
+                                    if (cactext[pos] == '>') { op--; }
+                                    if (cactext[pos] == '<') { op++; }
+                                    if (op == 0) { break; }
+                                } while (true);
+                                break;
+                            }
 
                         case '&':
                             DoSpecialEntities(cactext, ref pos, ref zeichen, ref bf, ref stufe, ref markstate);

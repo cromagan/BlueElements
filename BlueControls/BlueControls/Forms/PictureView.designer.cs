@@ -32,6 +32,7 @@ namespace BlueControls.Forms
             this.Pad = new BlueControls.Controls.ZoomPic();
             this.Ribbon = new BlueControls.Controls.RibbonBar();
             this.tabBearbeiten = new System.Windows.Forms.TabPage();
+            this.btnTopMost = new BlueControls.Controls.Button();
             this.grpWerkzeuge = new BlueControls.Controls.GroupBox();
             this.btnChoose = new BlueControls.Controls.Button();
             this.grpSeiten.SuspendLayout();
@@ -116,8 +117,11 @@ namespace BlueControls.Forms
             this.Pad.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Pad.Location = new System.Drawing.Point(0, 110);
             this.Pad.Name = "Pad";
+            this.Pad.ShiftX = -1F;
+            this.Pad.ShiftY = -1F;
             this.Pad.Size = new System.Drawing.Size(1334, 571);
             this.Pad.TabIndex = 0;
+            this.Pad.Zoom = 1F;
             this.Pad.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Pad_MouseUp);
             // 
             // Ribbon
@@ -129,11 +133,14 @@ namespace BlueControls.Forms
             this.Ribbon.Name = "Ribbon";
             this.Ribbon.SelectedIndex = 0;
             this.Ribbon.Size = new System.Drawing.Size(1334, 110);
+            this.Ribbon.TabDefault = null;
+            this.Ribbon.TabDefaultOrder = null;
             this.Ribbon.TabIndex = 2;
             // 
             // tabBearbeiten
             // 
             this.tabBearbeiten.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.tabBearbeiten.Controls.Add(this.btnTopMost);
             this.tabBearbeiten.Controls.Add(this.grpWerkzeuge);
             this.tabBearbeiten.Controls.Add(this.grpSeiten);
             this.tabBearbeiten.Location = new System.Drawing.Point(4, 25);
@@ -141,6 +148,18 @@ namespace BlueControls.Forms
             this.tabBearbeiten.Size = new System.Drawing.Size(1326, 81);
             this.tabBearbeiten.TabIndex = 0;
             this.tabBearbeiten.Text = "Steuerung";
+            // 
+            // btnTopMost
+            // 
+            this.btnTopMost.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnTopMost.ButtonStyle = ((BlueControls.Enums.ButtonStyle)(((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Button_Big) 
+            | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnTopMost.ImageCode = "Pinnadel|24";
+            this.btnTopMost.Location = new System.Drawing.Point(1294, 0);
+            this.btnTopMost.Name = "btnTopMost";
+            this.btnTopMost.Size = new System.Drawing.Size(32, 32);
+            this.btnTopMost.TabIndex = 2;
+            this.btnTopMost.CheckedChanged += new System.EventHandler(this.btnTopMost_CheckedChanged);
             // 
             // grpWerkzeuge
             // 
@@ -178,7 +197,6 @@ namespace BlueControls.Forms
             this.Name = "PictureView";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "(c) Christian Peter";
-            this.TopMost = true;
             this.grpSeiten.ResumeLayout(false);
             this.Ribbon.ResumeLayout(false);
             this.tabBearbeiten.ResumeLayout(false);
@@ -197,5 +215,6 @@ namespace BlueControls.Forms
 			protected GroupBox grpWerkzeuge;
 			private Button btnZoomFit;
 			private Button btnZoomIn;
+        public Button btnTopMost;
     }
 	}

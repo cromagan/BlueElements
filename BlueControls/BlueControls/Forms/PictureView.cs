@@ -87,13 +87,15 @@ public partial class PictureView : Form, IDisposableExtended {
 
     protected void LoadPic(int nr) {
         _nr = nr;
-        if (FileList != null && nr < FileList.Count) {
+        if (FileList != null && nr < FileList.Count && nr > -1) {
             try {
                 Pad.Bmp = (Bitmap)BitmapExt.Image_FromFile(FileList[nr]);
             } catch (Exception ex) {
                 Pad.Bmp = null;
                 Develop.DebugPrint(ex);
             }
+        } else {
+            Pad.Bmp = null;
         }
 
         if (FileList == null || FileList.Count < 2) {
@@ -109,6 +111,10 @@ public partial class PictureView : Form, IDisposableExtended {
         }
 
         Pad.ZoomFit();
+    }
+
+    private void btnTopMost_CheckedChanged(object sender, System.EventArgs e) {
+        TopMost = btnTopMost.Checked;
     }
 
     private void btnVor_Click(object sender, System.EventArgs e) {
