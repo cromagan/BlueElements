@@ -66,8 +66,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tbxAuswaehlbareWerte = new BlueControls.Controls.TextBox();
             this.capImmerWerte = new BlueControls.Controls.Caption();
             this.btnCanBeEmpty = new BlueControls.Controls.Button();
-            this.cbxDropDownKey = new BlueControls.Controls.ComboBox();
-            this.capDropDownKey = new BlueControls.Controls.Caption();
             this.btnLogUndo = new BlueControls.Controls.Button();
             this.btnIgnoreLock = new BlueControls.Controls.Button();
             this.lbxCellEditor = new BlueControls.Controls.ListBox();
@@ -599,8 +597,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpAuswahlmenuOptionen.Controls.Add(this.tbxAuswaehlbareWerte);
             this.grpAuswahlmenuOptionen.Controls.Add(this.capImmerWerte);
             this.grpAuswahlmenuOptionen.Controls.Add(this.btnCanBeEmpty);
-            this.grpAuswahlmenuOptionen.Controls.Add(this.cbxDropDownKey);
-            this.grpAuswahlmenuOptionen.Controls.Add(this.capDropDownKey);
             this.grpAuswahlmenuOptionen.Location = new System.Drawing.Point(32, 80);
             this.grpAuswahlmenuOptionen.Name = "grpAuswahlmenuOptionen";
             this.grpAuswahlmenuOptionen.Size = new System.Drawing.Size(536, 392);
@@ -613,12 +609,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnOtherValuesToo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.btnOtherValuesToo.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
-            this.btnOtherValuesToo.Location = new System.Drawing.Point(8, 304);
+            this.btnOtherValuesToo.Location = new System.Drawing.Point(8, 352);
             this.btnOtherValuesToo.Name = "btnOtherValuesToo";
             this.btnOtherValuesToo.Size = new System.Drawing.Size(512, 32);
             this.btnOtherValuesToo.TabIndex = 7;
             this.btnOtherValuesToo.Text = "Auch Werte, die in anderen Zellen derselben Spalte vorhanden sind, werden zum Aus" +
-    "wählen vorgschlagen";
+    "wählen vorgeschlagen";
             // 
             // tbxAuswaehlbareWerte
             // 
@@ -630,7 +626,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tbxAuswaehlbareWerte.MultiLine = true;
             this.tbxAuswaehlbareWerte.Name = "tbxAuswaehlbareWerte";
             this.tbxAuswaehlbareWerte.Regex = null;
-            this.tbxAuswaehlbareWerte.Size = new System.Drawing.Size(520, 231);
+            this.tbxAuswaehlbareWerte.Size = new System.Drawing.Size(520, 280);
             this.tbxAuswaehlbareWerte.SpellChecking = true;
             this.tbxAuswaehlbareWerte.TabIndex = 0;
             // 
@@ -651,29 +647,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnCanBeEmpty.Size = new System.Drawing.Size(328, 16);
             this.btnCanBeEmpty.TabIndex = 6;
             this.btnCanBeEmpty.Text = "Alles abwählen erlaubt (leere Zelle möglich)";
-            // 
-            // cbxDropDownKey
-            // 
-            this.cbxDropDownKey.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbxDropDownKey.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxDropDownKey.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxDropDownKey.Location = new System.Drawing.Point(232, 344);
-            this.cbxDropDownKey.Name = "cbxDropDownKey";
-            this.cbxDropDownKey.Regex = null;
-            this.cbxDropDownKey.Size = new System.Drawing.Size(296, 24);
-            this.cbxDropDownKey.TabIndex = 3;
-            // 
-            // capDropDownKey
-            // 
-            this.capDropDownKey.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.capDropDownKey.CausesValidation = false;
-            this.capDropDownKey.Location = new System.Drawing.Point(24, 336);
-            this.capDropDownKey.Name = "capDropDownKey";
-            this.capDropDownKey.Size = new System.Drawing.Size(208, 40);
-            this.capDropDownKey.Text = "...aber nur, wenn der Inhalt dieser Spalte gleich ist:";
-            this.capDropDownKey.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // btnLogUndo
             // 
@@ -1316,6 +1289,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabControl.HotTrack = true;
             this.tabControl.Location = new System.Drawing.Point(0, 120);
             this.tabControl.Name = "tabControl";
+            this.tabControl.RowKey = ((long)(-1));
             this.tabControl.SelectedIndex = 0;
             this.tabControl.Size = new System.Drawing.Size(1001, 516);
             this.tabControl.TabDefault = this.tabDatenFormat;
@@ -1485,6 +1459,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tblFilterliste.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.tblFilterliste.DropMessages = false;
             this.tblFilterliste.Location = new System.Drawing.Point(8, 80);
             this.tblFilterliste.Name = "tblFilterliste";
             this.tblFilterliste.ShowWaitScreen = true;
@@ -1673,8 +1648,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Caption capAlign;
         private ComboBox cbxVorschlagSpalte;
         private Caption capVorschlag;
-        private ComboBox cbxDropDownKey;
-        private Caption capDropDownKey;
         private GroupBox grpAuswahlmenuOptionen;
         private TextBox txbAutoRemove;
         private Caption capAutoRemove;

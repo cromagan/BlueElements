@@ -30,7 +30,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using static BlueBasics.FileOperations;
 using static BlueBasics.Converter;
 using BlueScript.Variables;
@@ -46,7 +45,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
 
     public const string DatabaseVersion = "4.00";
     public static readonly ListExt<Database> AllFiles = new();
-    public readonly SQLBack? _sql;
+    public readonly SqlBack? _sql;
     public readonly CellCollection Cell;
     public readonly ColumnCollection Column;
     public readonly ListExt<ColumnViewCollection> ColumnArrangements = new();
@@ -80,8 +79,6 @@ public sealed class Database : IDisposable, IDisposableExtended {
     private string _additionaFilesPfad;
 
     private string _additionaFilesPfadtmp = string.Empty;
-
-    private Ansicht _ansicht;
 
     private string _caption = string.Empty;
 
@@ -146,7 +143,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
 
         Develop.StartService();
 
-        if (FileExists(filename)) { _sql = new SQLBack("D:\\" + filename.FileNameWithoutSuffix() + ".mdb", true); }
+        if (FileExists(filename)) { _sql = new SqlBack("D:\\" + filename.FileNameWithoutSuffix() + ".mdf", true); }
 
         //CultureInfo culture = new("de-DE");
         //CultureInfo.DefaultThreadCurrentCulture = culture;
@@ -239,15 +236,6 @@ public sealed class Database : IDisposable, IDisposableExtended {
     }
 
     [Browsable(false)]
-    public Ansicht Ansicht {
-        get => _ansicht;
-        set {
-            if (_ansicht == value) { return; }
-            AddPending(DatabaseDataType.Ansicht, -1, -1, ((int)_ansicht).ToString(), ((int)value).ToString(), true);
-        }
-    }
-
-    [Browsable(false)]
     [Description("Der Name der Datenbank.")]
     public string Caption {
         get => _caption;
@@ -262,7 +250,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
         get => _createDate;
         set {
             if (_createDate == value) { return; }
-            AddPending(DatabaseDataType.CreateDate, -1, -1, _createDate, value, true);
+            AddPending(DatabaseDataType.CreateDateUTC, -1, -1, _createDate, value, true);
         }
     }
 
@@ -375,7 +363,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
         get => _zeilenQuickInfo;
         set {
             if (_zeilenQuickInfo == value) { return; }
-            AddPending(DatabaseDataType.ZeilenQuickInfo, -1, -1, _zeilenQuickInfo, value, true);
+            AddPending(DatabaseDataType.RowQuickInfo, -1, -1, _zeilenQuickInfo, value, true);
         }
     }
 
@@ -1254,7 +1242,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
         if (columnKey < -100) { Develop.DebugPrint(FehlerArt.Fehler, "ColKey darf hier nicht <-100 sein!"); }
         Works.Add(new WorkItem(comand, columnKey, rowKey, previousValue, changedTo, UserName));
 
-        _sql.Checkin(comand, columnKey, rowKey, previousValue, changedTo, UserName);
+        _sql?.AddUndo(Filename.FileNameWithoutSuffix(), comand, columnKey, rowKey, previousValue, changedTo, UserName);
     }
 
     internal void BlockReload(bool crashIsCurrentlyLoading) {
@@ -1525,7 +1513,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
     //                        break;
     private void DatabaseAdmin_ListOrItemChanged(object sender, System.EventArgs e) {
         if (_muf.IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
-        AddPending(DatabaseDataType.DatenbankAdmin, -1, DatenbankAdmin.JoinWithCr(), false);
+        AddPending(DatabaseDataType.DatabaseAdminGroups, -1, DatenbankAdmin.JoinWithCr(), false);
     }
 
     //            protected override void OnItemAdded(ColumnItem item) {//    base.OnItemAdded(item);//    Database.CheckViewsAndArrangements();//}//protected override void OnItemRemoved() {//    base.OnItemRemoved();//    Database.CheckViewsAndArrangements();//    Database.Layouts.Check();//}
@@ -1684,7 +1672,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
         //}
         // Und nun alles ausführen!
         foreach (var thisPending in Works.Where(thisPending => thisPending.State == ItemState.Pending)) {
-            if (thisPending.Comand == DatabaseDataType.co_Name) {
+            if (thisPending.Comand == DatabaseDataType.ColumnName) {
                 thisPending.ChangedTo = Column.Freename(thisPending.ChangedTo);
             }
             ExecutePending(thisPending);
@@ -1742,7 +1730,6 @@ public sealed class Database : IDisposable, IDisposableExtended {
         LoadedVersion = DatabaseVersion;
         _rulesScript = string.Empty;
         _globalScale = 1f;
-        _ansicht = Ansicht.Unverändert;
         _additionaFilesPfad = "AdditionalFiles";
         _zeilenQuickInfo = string.Empty;
         _sortDefinition = null;
@@ -1835,9 +1822,12 @@ public sealed class Database : IDisposable, IDisposableExtended {
     }
 
     private string ParseThis(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
-        if (type is >= DatabaseDataType.Info_ColumDataSart and <= DatabaseDataType.Info_ColumnDataEnd) {
+        _sql?.CheckIn(Filename.FileNameWithoutSuffix(), type, value, column, row, width, height);
+
+        if ((int)type is >= 100 and <= 199) {
             return column.Load(type, value);
         }
+
         switch (type) {
             case DatabaseDataType.Formatkennung:
                 break;
@@ -1867,7 +1857,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
                 _creator = value;
                 break;
 
-            case DatabaseDataType.CreateDate:
+            case DatabaseDataType.CreateDateUTC:
                 _createDate = value;
                 break;
 
@@ -1875,7 +1865,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
                 _muf.ReloadDelaySecond = IntParse(value);
                 break;
 
-            case DatabaseDataType.DatenbankAdmin:
+            case DatabaseDataType.DatabaseAdminGroups:
                 DatenbankAdmin.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
                 break;
 
@@ -1891,7 +1881,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
                 _globalScale = DoubleParse(value);
                 break;
 
-            case DatabaseDataType.FilterImagePfad:
+            case (DatabaseDataType)65://DatabaseDataType.FilterImagePfad:
                 //_filterImagePfad = value;
                 break;
 
@@ -1903,12 +1893,11 @@ public sealed class Database : IDisposable, IDisposableExtended {
                 _standardFormulaFile = value;
                 break;
 
-            case DatabaseDataType.ZeilenQuickInfo:
+            case DatabaseDataType.RowQuickInfo:
                 _zeilenQuickInfo = value;
                 break;
 
-            case DatabaseDataType.Ansicht:
-                _ansicht = (Ansicht)IntParse(value);
+            case (DatabaseDataType)53: //DatabaseDataType.Ansicht:
                 break;
 
             case DatabaseDataType.Tags:
@@ -1955,7 +1944,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
                 }
                 break;
 
-            case DatabaseDataType.PermissionGroups_NewRow:
+            case DatabaseDataType.PermissionGroupsNewRow:
                 PermissionGroupsNewRow.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
                 break;
 
@@ -2003,7 +1992,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
             //    //_JoinTyp = (enJoinTyp)IntParse(value);
             //    break;
 
-            case DatabaseDataType.VerwaisteDaten:
+            case (DatabaseDataType)62://DatabaseDataType.VerwaisteDaten:
                 //_verwaisteDaten = (VerwaisteDaten)IntParse(value);
                 break;
 
@@ -2014,7 +2003,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
                 _rulesScript = value;
                 break;
 
-            case DatabaseDataType.FileEncryptionKey:
+            case (DatabaseDataType)22://  DatabaseDataType.FileEncryptionKey:
                 //_fileEncryptionKey = value;
                 break;
 
@@ -2101,7 +2090,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
 
     private void PermissionGroups_NewRow_ListOrItemChanged(object sender, System.EventArgs e) {
         if (_muf.IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
-        AddPending(DatabaseDataType.PermissionGroups_NewRow, -1, PermissionGroupsNewRow.JoinWithCr(), false);
+        AddPending(DatabaseDataType.PermissionGroupsNewRow, -1, PermissionGroupsNewRow.JoinWithCr(), false);
     }
 
     private void QuickImage_NeedImage(object sender, NeedImageEventArgs e) {
@@ -2147,22 +2136,22 @@ public sealed class Database : IDisposable, IDisposableExtended {
             SaveToByteList(l, DatabaseDataType.GlobalShowPass, _globalShowPass);
             //SaveToByteList(l, DatabaseDataType.FileEncryptionKey, _fileEncryptionKey);
             SaveToByteList(l, DatabaseDataType.Creator, _creator);
-            SaveToByteList(l, DatabaseDataType.CreateDate, _createDate);
+            SaveToByteList(l, DatabaseDataType.CreateDateUTC, _createDate);
             SaveToByteList(l, DatabaseDataType.Caption, _caption);
             //SaveToByteList(l, enDatabaseDataType.JoinTyp, ((int)_JoinTyp).ToString());
             //SaveToByteList(l, DatabaseDataType.VerwaisteDaten, ((int)_verwaisteDaten).ToString());
             SaveToByteList(l, DatabaseDataType.Tags, Tags.JoinWithCr());
-            SaveToByteList(l, DatabaseDataType.PermissionGroups_NewRow, PermissionGroupsNewRow.JoinWithCr());
-            SaveToByteList(l, DatabaseDataType.DatenbankAdmin, DatenbankAdmin.JoinWithCr());
+            SaveToByteList(l, DatabaseDataType.PermissionGroupsNewRow, PermissionGroupsNewRow.JoinWithCr());
+            SaveToByteList(l, DatabaseDataType.DatabaseAdminGroups, DatenbankAdmin.JoinWithCr());
             SaveToByteList(l, DatabaseDataType.GlobalScale, _globalScale.ToString(Constants.Format_Float1));
-            SaveToByteList(l, DatabaseDataType.Ansicht, ((int)_ansicht).ToString());
+            //SaveToByteList(l, DatabaseDataType.Ansicht, ((int)_ansicht).ToString());
             SaveToByteList(l, DatabaseDataType.ReloadDelaySecond, _muf.ReloadDelaySecond.ToString());
             //SaveToByteList(l, enDatabaseDataType.ImportScript, _ImportScript);
             SaveToByteList(l, DatabaseDataType.RulesScript, _rulesScript);
             //SaveToByteList(l, enDatabaseDataType.BinaryDataInOne, Bins.ToString(true));
             //SaveToByteList(l, enDatabaseDataType.FilterImagePfad, _filterImagePfad);
             SaveToByteList(l, DatabaseDataType.AdditionaFilesPfad, _additionaFilesPfad);
-            SaveToByteList(l, DatabaseDataType.ZeilenQuickInfo, _zeilenQuickInfo);
+            SaveToByteList(l, DatabaseDataType.RowQuickInfo, _zeilenQuickInfo);
             SaveToByteList(l, DatabaseDataType.StandardFormulaFile, _standardFormulaFile);
             Column.SaveToByteList(l);
             //Row.SaveToByteList(l);

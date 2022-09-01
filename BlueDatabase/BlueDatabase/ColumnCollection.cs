@@ -23,7 +23,6 @@ using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using static BlueBasics.FileOperations;
 
 namespace BlueDatabase;
@@ -122,7 +121,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
 
     public ColumnItem Add(long colKey, string internalName, string caption, string suffix, VarType format, string quickinfo) {
         Database.AddPending(DatabaseDataType.AddColumn, colKey, -1, string.Empty, colKey.ToString(), true);
-        // Ruft anschließen AddFromParserAuf, der die Spalte endgülrig dazumacht
+        // Ruft anschließen AddFromParser Auf, der die Spalte endgültig dazumacht
         var c = SearchByKey(colKey);
         c.Name = internalName;
         c.Caption = caption;
@@ -281,11 +280,11 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
                     if (base[s2] != null) {
                         // Evtl. Doppelte Namen einzigartig machen
                         if (string.Equals(base[s1].Name, base[s2].Name, StringComparison.CurrentCultureIgnoreCase)) {
-                            base[s2].Load(DatabaseDataType.co_Name, base[s2].Name + "0");
+                            base[s2].Load(DatabaseDataType.ColumnName, base[s2].Name + "0");
                         }
                         // Evtl. Doppelte Identifier eleminieren
                         if (!string.IsNullOrEmpty(base[s1].Identifier) && string.Equals(base[s1].Identifier, base[s2].Identifier, StringComparison.CurrentCultureIgnoreCase)) {
-                            base[s2].Load(DatabaseDataType.co_Identifier, string.Empty);
+                            base[s2].Load(DatabaseDataType.ColumnIdentify, string.Empty);
                         }
                     }
                 }
@@ -389,7 +388,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
             return;
         }
         var c = Add(identifier);
-        c.Load(DatabaseDataType.co_Identifier, identifier);
+        c.Load(DatabaseDataType.ColumnIdentify, identifier);
         c.ResetSystemToDefault(true);
     }
 

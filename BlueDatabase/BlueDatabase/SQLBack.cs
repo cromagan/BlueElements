@@ -15,100 +15,80 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Data.SqlClient;
 using System.Data;
-using System.Data.Common;
 using BlueBasics;
 using System.IO;
-using System.Globalization;
-using System.Windows.Forms;
 using BlueDatabase.Enums;
-using System.Drawing;
+using BlueBasics.Enums;
 
 namespace BlueDatabase;
+
 //https://www.c-sharpcorner.com/article/create-a-sql-server-database-dynamically-in-C-Sharp/
 //https://www.ictdemy.com/csharp/databases/introduction-to-databases-in-csharp-net
-
 //https://docs.microsoft.com/en-us/troubleshoot/developer/visualstudio/csharp/language-compilers/create-sql-server-database-programmatically
-public class SQLBack {
+public class SqlBack {
 
     #region Fields
 
-    private SqlConnection _connection;
+    private readonly SqlConnection _connection;
     private string _filename;
 
     #endregion
 
     #region Constructors
 
-    public SQLBack(string filename, bool create) {
+    public SqlBack(string filename, bool create) {
         Develop.StartService();
         //CultureInfo culture = new("de-DE");
         //CultureInfo.DefaultThreadCurrentCulture = culture;
         //CultureInfo.DefaultThreadCurrentUICulture = culture;
 
-        if (create && !File.Exists(filename)) { CreateDatabase(filename); }
+        _filename = filename.FilePath() + filename.FileNameWithoutSuffix() + ".mdf";
 
-        _connection = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" + filename + ";Integrated Security=True;Trusted_Connection=Yes;");
+        if (create && !File.Exists(_filename)) { CreateDatabase(_filename); }
 
-        _connection.Open();
+        _connection = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" + _filename + ";Integrated Security=True;Trusted_Connection=Yes;");
 
         var x = ListTables();
+
+        #region Main
+
         if (!x.Contains("Main")) { CreateTable("Main"); }
-        if (!x.Contains("Style")) { CreateTable("Style", new List<string>() { "DBNAME", "TYPE" }); }
+
+        #endregion
+
+        #region Style
+
+        if (!x.Contains("Style")) { CreateTable("Style", new List<string>() { "DBNAME", "TYPE", "COLUMNNAME" }); }
+        var colStyle = GetColumnNames("Style");
+        if (colStyle == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
+        if (!colStyle.Contains("VALUE")) { AddColumn("Style", "VALUE", "VARCHAR(MAX)"); }
+
+        #endregion
+
+        #region  Undo
+
         if (!x.Contains("Undo")) { CreateTable("Undo"); }
 
-        // DatabaseDataType comand, long columnKey, long rowKey, string previousValue, string changedTo, string userName
         var colUndo = GetColumnNames("Undo");
+        if (colUndo == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
         if (!colUndo.Contains("DBNAME")) { AddColumn("Undo", "DBNAME"); }
         if (!colUndo.Contains("COMAND")) { AddColumn("Undo", "COMAND"); }
         if (!colUndo.Contains("COLUMNKEY")) { AddColumn("Undo", "COLUMNKEY"); }
         if (!colUndo.Contains("ROWKEY")) { AddColumn("Undo", "ROWKEY"); }
-        if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn("Undo", "PREVIOUSVALUE"); }
-        if (!colUndo.Contains("CHANGEDTO")) { AddColumn("Undo", "CHANGEDTO"); }
+        if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn("Undo", "PREVIOUSVALUE", "VARCHAR(MAX)"); }
+        if (!colUndo.Contains("CHANGEDTO")) { AddColumn("Undo", "CHANGEDTO", "VARCHAR(MAX)"); }
         if (!colUndo.Contains("USERNAME")) { AddColumn("Undo", "USERNAME"); }
         if (!colUndo.Contains("DATETIMEUTC")) { AddColumn("Undo", "DATETIMEUTC"); }
-        _connection.Close();
 
-        //Cell = new CellCollection(this);
+        #endregion
 
-        //Row = new RowCollection(this);
-        //Row.RowRemoving += Row_RowRemoving;
-        //Row.RowAdded += Row_RowAdded;
-
-        //Column = new ColumnCollection(this);
-        //Column.ItemRemoving += Column_ItemRemoving;
-        //Column.ItemRemoved += Column_ItemRemoved;
-        //Column.ItemAdded += Column_ItemAdded;
-
-        //Works = new ListExt<WorkItem>();
-        //_filesAfterLoadingLCase = new List<string>();
-        //ColumnArrangements.Changed += ColumnArrangements_ListOrItemChanged;
-        //Layouts.Changed += Layouts_ListOrItemChanged;
-        //Layouts.ItemSeted += Layouts_ItemSeted;
-        //Views.Changed += Views_ListOrItemChanged;
-        //PermissionGroupsNewRow.Changed += PermissionGroups_NewRow_ListOrItemChanged;
-        //Tags.Changed += DatabaseTags_ListOrItemChanged;
-        //Export.Changed += Export_ListOrItemChanged;
-        //DatenbankAdmin.Changed += DatabaseAdmin_ListOrItemChanged;
-
-        //Initialize();
-
-        //UserGroup = "#Administrator";
-        //if (!string.IsNullOrEmpty(filename)) {
-        //    //DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + filename.FileNameWithoutSuffix()));
-        //    Load(filename, create);
-        //} else if (stream != null) {
-        //    LoadFromStream(stream);
-        //} else {
-        //    RepairAfterParse();
-        //}
-        //QuickImage.NeedImage += QuickImage_NeedImage;
+        CloseConnection();
     }
 
     #endregion
@@ -134,22 +114,90 @@ public class SQLBack {
 
     #region Methods
 
-    public void Checkin(DatabaseDataType comand, long columnKey, long rowKey, string previousValue, string changedTo, string userName) {
-        throw new NotImplementedException();
+    public bool AddUndo(string dbname, DatabaseDataType comand, long columnKey, long rowKey, string previousValue, string changedTo, string userName) {
+        if (!OpenConnection()) { return false; }
+
+        string cmdString = "INSERT INTO Undo (DBNAME, COMAND, COLUMNKEY, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, DATETIMEUTC) VALUES (@DBNAME, @COMAND, @COLUMNKEY, @ROWKEY, @PREVIOUSVALUE ,@CHANGEDTO, @USERNAME, @DATETIMEUTC)";
+        using SqlCommand comm = new SqlCommand();
+        comm.Connection = _connection;
+        comm.CommandText = cmdString;
+        comm.Parameters.AddWithValue("@DBNAME", dbname);
+        comm.Parameters.AddWithValue("@COMAND", ((int)comand).ToString());
+        comm.Parameters.AddWithValue("@COLUMNKEY", columnKey.ToString());
+        comm.Parameters.AddWithValue("@ROWKEY", rowKey.ToString());
+        comm.Parameters.AddWithValue("@PREVIOUSVALUE", previousValue);
+        comm.Parameters.AddWithValue("@CHANGEDTO", changedTo);
+        comm.Parameters.AddWithValue("@USERNAME", userName);
+        comm.Parameters.AddWithValue("@DATETIMEUTC", DateTime.UtcNow.ToString(Constants.Format_Date));
+
+        return ExecuteCommand(comm);
     }
 
+    public bool CheckIn(string database, DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
+        if (!OpenConnection()) { return false; }
+
+        if (column == null && row == null) {
+            switch (type) {
+                case DatabaseDataType.Formatkennung: break;
+                case DatabaseDataType.Werbung: break;
+                case DatabaseDataType.EOF: break;
+                case DatabaseDataType.co_SaveContent: break;
+                case DatabaseDataType.CryptionState: break;
+                case DatabaseDataType.CryptionTest: break;
+                default:
+                    return SetStyleDate(database, type, string.Empty, value);
+            }
+        }
+
+        //ce_Value_withoutSizeData = 200,
+        //ce_Value_withSizeData = 201,
+
+        //[Obsolete]
+        //ce_UTF8Value_withoutSizeData = 202,
+
+        //[Obsolete]
+        //ce_UTF8Value_withSizeData = 203,
+
+        ////Dummy_ce_ValueWithoutSizeUncrypted = 204,
+        //dummyComand_RemoveRow = 220,
+
+        //dummyComand_AddRow = 221,
+
+        ////	dummyComand_AddUndo = 222,
+        //dummyComand_RemoveColumn = 223,
+
+        //AddColumn = 224,
+        //UndoCount = 249,
+
+        ////PendingsInOne = 250,
+        //UndoInOne = 251,
+
+        ////   StatisticInOneOld = 252
+        ////StatisticOld = 253
+        ////UndoOld = 254
+        //EOF = 255
+        //co_SaveContent
+        //co_showUndo
+        //co_editType
+        CloseConnection();
+        return true;
+    }
+
+    /// <summary>
+    /// Dateiendung wird immer mdf benutzt!
+    /// </summary>
+    /// <param name="filename"></param>
+    /// <returns></returns>
     public bool CreateDatabase(string filename) {
         //var myConn = new SqlConnection("Server=localhost;Integrated security=SSPI;database=master");
-        // var myConn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database1.mdf;Integrated Security=True");
-
+        //var myConn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database1.mdf;Integrated Security=True");
         //var myConn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;Integrated Security=True");
-
         //var myConn = new SqlConnection("Integrated Security=SSPI;Initial Catalog=;Data Source=localhost;");
-
         // var myConn = new SqlConnection("Server=(local)\\netsdk;uid=sa;pwd=;database=master");
 
         var myConn = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;Integrated security=SSPI;database=master");
         var dbn = filename.FileNameWithoutSuffix();
+        filename = filename.FilePath() + filename.FileNameWithoutSuffix() + ".mdf";
 
         var str = "CREATE DATABASE " + dbn + " ON PRIMARY " +
                   "(NAME = " + dbn + "_Data, " +
@@ -168,8 +216,9 @@ public class SQLBack {
             myCommand.ExecuteNonQuery();
             //MessageBox.Show("DataBase is Created Successfully", "MyProgram", MessageBoxButtons.OK, MessageBoxIcon.Information);
             ok = true;
-        } catch (System.Exception ex) {
-            MessageBox.Show(ex.ToString(), "MyProgram", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        } catch (Exception ex) {
+            Develop.DebugPrint(ex);
+            //MessageBox.Show(ex.ToString(), "MyProgram", MessageBoxButtons.OK, MessageBoxIcon.Information);
         } finally {
             if (myConn.State == ConnectionState.Open) {
                 myConn.Close();
@@ -178,151 +227,175 @@ public class SQLBack {
         return ok;
     }
 
-    public List<string> GetColumnNames(string tableName) {
+    /// <summary>
+    /// Gibt die Spaltenname in Grosschreibung zurück
+    /// </summary>
+    /// <param name="table"></param>
+    /// <returns></returns>
+    public List<string>? GetColumnNames(string table) {
+        if (!OpenConnection()) { return null; }
+
         List<string> columns = new List<string>();
 
-        using var com = new SqlCommand(@"SELECT * FROM " + tableName, _connection);
+        using var com = new SqlCommand(@"SELECT * FROM " + table, _connection);
         using var reader = com.ExecuteReader(CommandBehavior.SchemaOnly);
-        //listBoxColumns.Items.Clear();
-        DataTable schemaTable = reader.GetSchemaTable();
+
+        var schemaTable = reader.GetSchemaTable();
+        if (schemaTable == null) { return null; }
+
         foreach (DataRow colRow in schemaTable.Rows) {
-            columns.Add(colRow.Field<String>("ColumnName"));
+            columns.Add(colRow.Field<string>("ColumnName").ToUpper());
         }
 
-        ////string strConnect = ".........";
-        ////using (SqlConnection con = new SqlConnection(strConnect)) {
-        ////    con.Open();
-        //using var com = new SqlCommand(@"SELECT COLUMN_NAME
-        //                         FROM INFORMATION_SCHEMA.COLUMNS
-        //                         WHERE TABLE_NAME = @yourtablename", _connection);
-        //com.Parameters.AddWithValue("@yourtableName", tableName);
-        //using var reader = com.ExecuteReader();
-
-        //var schemaTable = reader.GetSchemaTable();
-        //foreach (DataRow colRow in schemaTable.Rows)
-        //    listBoxColumns.Items.Add(colRow.Field<String>("ColumnName"));
-
-        //var tmp = reader["COLUMN_NAME"];
-
-        //columns.Add(tmp.ToString());
-
-        //}
+        CloseConnection();
         return columns;
     }
 
     public List<string> ListTables() {
         List<string> tables = new();
-        //_connection.Open();
+
+        OpenConnection();
+
         DataTable dt = _connection.GetSchema("Tables");
         foreach (DataRow row in dt.Rows) {
             string tablename = (string)row[2];
             tables.Add(tablename);
         }
-        //_connection.Close();
+
+        CloseConnection();
+
         return tables;
     }
 
-    private void AddColumn(string table, string column) {
-        //using (DbConnection connection = new SqlConnection("Your connection string")) {
-        //    connection.Open();
-        using var command = new SqlCommand("alter table " + table + " add " + column + " VARCHAR(255) default '' NOT NULL", _connection);
-        command.ExecuteNonQuery();
-        //}
+    private bool AddColumn(string table, string column) => ExecuteCommand("alter table " + table + " add " + column + " VARCHAR(255) default '' NOT NULL");
+
+    private bool AddColumn(string table, string column, string type) => ExecuteCommand("alter table " + table + " add " + column + " " + type + " default '' NOT NULL");
+
+    private bool CloseConnection() {
+        if (_connection.State == ConnectionState.Open) { _connection.Close(); }
+
+        return _connection.State == ConnectionState.Closed;
     }
 
-    //public List<string> ListColumns(string oftable) {
-    //    try {
-    //        var dt = _connection.GetSchema(oftable);
-
-    //        foreach (var thisol in dt.Columns) {
-    //            thisol.
-
-    //        }
-
-    //        //using var cmd = new SqlCommand();
-    //        //cmd.Connection = _connection;
-
-    //        //   https://zetcode.com/csharp/sqlserver/
-    //        //SELECT *
-    //        ////  FROM INFORMATION_SCHEMA.COLUMNS
-    //        //   WHERE TABLE_NAME = N'Customers'
-    //        //cmd.CommandText = "DROP TABLE IF EXISTS " + name;
-    //        //cmd.ExecuteNonQuery();
-
-    //        ////cmd.CommandText = @"CREATE TABLE cars(
-    //        ////    id int identity(1,1) NOT NULL PRIMARY KEY,
-    //        ////    name VARCHAR(255) NOT NULL,
-    //        ////    price INT
-    //        ////)";
-
-    //        //cmd.CommandText = @"CREATE TABLE " + name + "(" +
-    //        //                  "id int identity(1,1) NOT NULL PRIMARY KEY," +
-    //        //                  ")";
-    //        //cmd.ExecuteNonQuery();
-    //        //return true;
-    //    } catch {
-    //        //return false;
-    //    }
-
-    //    //List<string> tables = new();
-    //    ////_connection.Open();
-    //    //DataTable dt = _connection.GetSchema("Tables");
-    //    //foreach (DataRow row in dt.Rows) {
-    //    //    string tablename = (string)row[2];
-    //    //    tables.Add(tablename);
-    //    //}
-    //    ////_connection.Close();
-    //    //return tables;
-    //}
-
     private bool CreateTable(string name) {
-        try {
-            using var cmd = new SqlCommand();
-            cmd.Connection = _connection;
-
-            //   https://zetcode.com/csharp/sqlserver/
-
-            cmd.CommandText = "DROP TABLE IF EXISTS " + name;
-            cmd.ExecuteNonQuery();
-
-            //cmd.CommandText = @"CREATE TABLE cars(
-            //    id int identity(1,1) NOT NULL PRIMARY KEY,
-            //    name VARCHAR(255) NOT NULL,
-            //    price INT
-            //)";
-
-            cmd.CommandText = @"CREATE TABLE " + name + "(" +
-                              "id int identity(1,1) NOT NULL PRIMARY KEY," +
-                              ")";
-            cmd.ExecuteNonQuery();
-            return true;
-        } catch {
-            return false;
-        }
+        if (!ExecuteCommand("DROP TABLE IF EXISTS " + name)) { return false; }
+        return ExecuteCommand(@"CREATE TABLE " + name + "(" + "id int identity(1,1) NOT NULL PRIMARY KEY, " + ")");
     }
 
     private bool CreateTable(string name, List<string> keycolumns) {
-        try {
-            using var cmd = new SqlCommand();
-            cmd.Connection = _connection;
+        if (!ExecuteCommand("DROP TABLE IF EXISTS " + name)) { return false; }
 
-            //   https://zetcode.com/csharp/sqlserver/
+        var t = @"CREATE TABLE " + name + "(";
 
-            cmd.CommandText = "DROP TABLE IF EXISTS " + name;
-            cmd.ExecuteNonQuery();
-
-            cmd.CommandText = @"CREATE TABLE " + name + "(";
-
-            foreach (var thiskey in keycolumns) {
-                cmd.CommandText += thiskey + " VARCHAR(255) default '' NOT NULL,";
-            }
-            cmd.CommandText += ")";
-
-            cmd.ExecuteNonQuery();
-            return true;
-        } catch {
-            return false;
+        foreach (var thiskey in keycolumns) {
+            t += thiskey + " VARCHAR(255) default '' NOT NULL,";
         }
+        t += ")";
+
+        return ExecuteCommand(t);
+    }
+
+    private bool ExecuteCommand(string commandtext) {
+        if (!OpenConnection()) { return false; }
+
+        using var command = new SqlCommand(commandtext, _connection);
+
+        return ExecuteCommand(command);
+    }
+
+    private bool ExecuteCommand(SqlCommand command) {
+        if (!OpenConnection()) { return false; }
+
+        try {
+            command.ExecuteNonQuery();
+            return true;
+        } catch (Exception ex) {
+            Develop.DebugPrint(ex);
+            return false;
+        } finally {
+            CloseConnection();
+        }
+    }
+
+    private string? GetStyleData(string dbname, string type, string columnName) {
+        if (!OpenConnection()) { return null; }
+
+        using var q = _connection.CreateCommand();
+
+        q.CommandText = @"select VALUE from Style " +
+                        "where DBNAME = @DBNAME " +
+                        "and TYPE = @TYPE " +
+                        "and COLUMNNAME = @COLUMNNAME";
+
+        q.Parameters.AddWithValue("@DBNAME", dbname);
+        q.Parameters.AddWithValue("@TYPE", type);
+        q.Parameters.AddWithValue("@COLUMNNAME", columnName);
+
+        using var reader = q.ExecuteReader();
+        if (reader.Read()) {
+            // you may want to check if value is NULL: reader.IsDBNull(0)
+            var value = reader[0].ToString();
+
+            if (reader.Read()) {
+                // Doppelter Wert?!?Ersten Wert zurückgeben, um unendliche erweiterungen zu erhindern
+                Develop.DebugPrint(dbname + " " + type + " " + columnName + " doppelt in Style vorhanden!");
+            }
+
+            CloseConnection();
+            return value;
+        }
+
+        CloseConnection();    // Nix vorhanden!
+        return null;
+    }
+
+    private bool OpenConnection() {
+        if (_connection.State == ConnectionState.Closed) {
+            _connection.Open();
+        }
+
+        return _connection.State == ConnectionState.Open;
+    }
+
+    /// <summary>
+    /// Gibt TRUE zurück, wenn alles ok ist.
+    /// Entweder der Wert gesetzt wurde, der Wert aktuell ist oder der Wert unwichtig ist.
+    /// </summary>
+    /// <param name="dbname"></param>
+    /// <param name="type"></param>
+    /// <param name="columnName"></param>
+    /// <param name="newValue"></param>
+    /// <returns></returns>
+    private bool SetStyleDate(string dbname, DatabaseDataType type, string columnName, string newValue) {
+        var t = type.ToString();
+
+        if (t == ((int)type).ToString()) { return true; }
+
+        if (type == DatabaseDataType.AddColumn) { return true; }
+
+        var isVal = GetStyleData(dbname, t, string.Empty);
+
+        string cmdString;
+
+        if (isVal is null) {
+            cmdString = "INSERT INTO Style (DBNAME, TYPE, COLUMNNAME, VALUE)  VALUES (@DBNAME, @TYPE, @COLUMNNAME, @VALUE)";
+        } else if (isVal != newValue) {
+            cmdString = "UPDATE Style SET VALUE = @VALUE WHERE DBNAME = @DBNAME AND TYPE = @TYPE AND COLUMNNAME = @COLUMNNAME";
+        } else {
+            return true;
+        }
+
+        if (!OpenConnection()) { return false; }
+
+        using SqlCommand comm = new SqlCommand();
+        comm.Connection = _connection;
+        comm.CommandText = cmdString;
+        comm.Parameters.AddWithValue("@DBNAME", dbname);
+        comm.Parameters.AddWithValue("@TYPE", type);
+        comm.Parameters.AddWithValue("@COLUMNNAME", columnName);
+        comm.Parameters.AddWithValue("@VALUE", newValue);
+
+        return ExecuteCommand(comm);
     }
 
     #endregion

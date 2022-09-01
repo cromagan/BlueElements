@@ -148,16 +148,16 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
 
         l.AddRange(column.DropDownItems);
         if (column.DropdownWerteAndererZellenAnzeigen) {
-            if (column.DropdownKey >= 0 && checkedItemsAtRow != null) {
-                var cc = column.Database.Column.SearchByKey(column.DropdownKey);
-                FilterCollection f = new(column.Database)
-                {
-                    new FilterItem(cc, FilterType.Istgleich_GroßKleinEgal, checkedItemsAtRow.CellGetString(cc))
-                };
-                l.AddRange(column.Contents(f, null));
-            } else {
-                l.AddRange(column.Contents());
-            }
+            //if (column.DropdownKey >= 0 && checkedItemsAtRow != null) {
+            //    var cc = column.Database.Column.SearchByKey(column.DropdownKey);
+            //    FilterCollection f = new(column.Database)
+            //    {
+            //        new FilterItem(cc, FilterType.Istgleich_GroßKleinEgal, checkedItemsAtRow.CellGetString(cc))
+            //    };
+            //    l.AddRange(column.Contents(f, null));
+            //} else {
+            l.AddRange(column.Contents());
+            //}
         }
         switch (column.Format) {
             //case DataFormat.Columns_für_LinkedCellDropdown:

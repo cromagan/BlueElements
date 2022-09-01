@@ -406,8 +406,8 @@ internal sealed partial class ColumnEditor {
 
         cbxSchlüsselspalte.Item.Clear();
         cbxSchlüsselspalte.Item.Add("#Ohne", "-1");
-        cbxDropDownKey.Item.Clear();
-        cbxDropDownKey.Item.Add("#Ohne", "-1");
+        //cbxDropDownKey.Item.Clear();
+        //cbxDropDownKey.Item.Add("#Ohne", "-1");
         cbxVorschlagSpalte.Item.Clear();
         cbxVorschlagSpalte.Item.Add("#Ohne", "-1");
         // Einige Dropdown-Menüs sind abhängig von der LinkedDatabase und werden in dessen TextChanged-Event befüllt
@@ -415,16 +415,16 @@ internal sealed partial class ColumnEditor {
         foreach (var thisColumn in _column.Database.Column) {
             if ((thisColumn.Format == DataFormat.RelationText || !thisColumn.MultiLine) && thisColumn.Format.CanBeCheckedByRules()) { cbxSchlüsselspalte.Item.Add(thisColumn); }
             if (thisColumn.Format.CanBeCheckedByRules() && !thisColumn.MultiLine && !thisColumn.Format.NeedTargetDatabase()) {
-                cbxDropDownKey.Item.Add(thisColumn);
+                //cbxDropDownKey.Item.Add(thisColumn);
                 cbxVorschlagSpalte.Item.Add(thisColumn);
             }
         }
         cbxSchlüsselspalte.Item.Sort();
         cbxVorschlagSpalte.Item.Sort();
-        cbxDropDownKey.Item.Sort();
+        //cbxDropDownKey.Item.Sort();
 
         SetKeyTo(cbxSchlüsselspalte, _column.KeyColumnKey);
-        SetKeyTo(cbxDropDownKey, _column.DropdownKey);
+        //SetKeyTo(cbxDropDownKey, _column.DropdownKey);
         SetKeyTo(cbxVorschlagSpalte, _column.VorschlagsColumn);
         cbxLinkedDatabase_TextChanged(null, System.EventArgs.Empty);
     }
@@ -513,7 +513,6 @@ internal sealed partial class ColumnEditor {
         _column.LinkedDatabaseFile = cbxLinkedDatabase.Text; // Muss vor LinkedCell_RowKey zurückgeschrieben werden
         _column.KeyColumnKey = ColumKeyFrom(_column.Database, cbxSchlüsselspalte.Text);
         _column.LinkedCell_ColumnKeyOfLinkedDatabase = ColumKeyFrom(_column.LinkedDatabase, cbxTargetColumn.Text); // LINKED DATABASE
-        _column.DropdownKey = ColumKeyFrom(_column.Database, cbxDropDownKey.Text);
         _column.VorschlagsColumn = ColumKeyFrom(_column.Database, cbxVorschlagSpalte.Text);
         _column.Align = (AlignmentHorizontal)IntParse(cbxAlign.Text);
         _column.AdditionalCheck = (AdditionalCheck)IntParse(cbxAdditionalCheck.Text);

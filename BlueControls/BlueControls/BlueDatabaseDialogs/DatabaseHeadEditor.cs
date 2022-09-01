@@ -73,7 +73,6 @@ internal sealed partial class DatabaseHeadEditor {
         base.OnLoad(e);
         cbxAnsicht.Item.Clear();
         cbxAnsicht.Item.AddRange(typeof(Ansicht));
-        cbxAnsicht.Text = ((int)_database.Ansicht).ToString();
         PermissionGroups_NewRow.Item.Clear();
         PermissionGroups_NewRow.Item.AddRange(_database.PermissionGroupsNewRow);
         DatenbankAdmin.Item.Clear();
@@ -478,7 +477,6 @@ internal sealed partial class DatabaseHeadEditor {
             _database.PermissionGroupsNewRow.Remove("#Administrator");
         }
         //_database.VerwaisteDaten = (VerwaisteDaten)IntParse(cbxVerwaisteDaten.Text);
-        _database.Ansicht = (Ansicht)IntParse(cbxAnsicht.Text);
 
         #region Sortierung
 

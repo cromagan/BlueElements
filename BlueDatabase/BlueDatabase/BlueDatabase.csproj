@@ -99,6 +99,7 @@
     <Compile Include="AdditionalScriptComands\VariableFilterItem.cs" />
     <Compile Include="CellCollection.cs" />
     <Compile Include="CellItem.cs" />
+    <Compile Include="Enums\Ansicht.cs" />
     <Compile Include="SQLBack.cs" />
     <Compile Include="Enums\AlignmentHorizontal.cs" />
     <Compile Include="Enums\AdditionalCheck.cs" />
@@ -122,7 +123,6 @@
     <Compile Include="Enums\ColumnLineStyle.cs" />
     <Compile Include="Enums\EditTypeTable.cs" />
     <Compile Include="Enums\ExportTyp.cs" />
-    <Compile Include="Enums\Ansicht.cs" />
     <Compile Include="Enums\BildTextVerhalten.cs" />
     <Compile Include="Enums\FirstRow.cs" />
     <Compile Include="Enums\Routinen.cs" />

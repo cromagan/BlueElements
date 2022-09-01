@@ -569,7 +569,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public void CheckView() {
         if (Filter == null) {
-            Filter = new FilterCollection(_database, String.Empty);
+            Filter = new FilterCollection(_database, string.Empty);
             Filter.Changed += Filter_Changed;
             OnFilterChanged();
         }

@@ -76,7 +76,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
     private bool _dropdownBearbeitungErlaubt;
 
     //private bool _ZellenZusammenfassen;
-    private long _dropDownKey;
+    //private long _dropDownKey;
 
     private bool _dropdownWerteAndererZellenAnzeigen;
     private bool _editTrotzSperreErlaubt;
@@ -156,7 +156,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         _linkedCellColumnKeyOfLinkedDatabase = -1;
         _sortType = SortierTyp.Original_String;
         //_ZellenZusammenfassen = false;
-        _dropDownKey = -1;
+        //_dropDownKey = -1;
         _vorschlagsColumn = -1;
         _align = AlignmentHorizontal.Links;
         _keyColumnKey = -1;
@@ -233,7 +233,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _additionalCheck;
         set {
             if (_additionalCheck == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_AdditionalCheck, this, ((int)_additionalCheck).ToString(), ((int)value).ToString(), true);
+            Database?.AddPending(DatabaseDataType.dditionalCheck, this, ((int)_additionalCheck).ToString(), ((int)value).ToString(), true);
             OnChanged();
         }
     }
@@ -242,7 +242,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _adminInfo;
         set {
             if (_adminInfo == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_AdminInfo, this, _adminInfo, value, true);
+            Database?.AddPending(DatabaseDataType.ColumnAdminInfo, this, _adminInfo, value, true);
             OnChanged();
         }
     }
@@ -251,7 +251,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _afterEditAutoCorrect;
         set {
             if (_afterEditAutoCorrect == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_AfterEdit_AutoCorrect, this, _afterEditAutoCorrect.ToPlusMinus(), value.ToPlusMinus(), true);
+            Database?.AddPending(DatabaseDataType.AutoCorrectAfterEdit, this, _afterEditAutoCorrect.ToPlusMinus(), value.ToPlusMinus(), true);
             OnChanged();
         }
     }
@@ -260,7 +260,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _afterEditDoUCase;
         set {
             if (_afterEditDoUCase == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_AfterEdit_DoUcase, this, _afterEditDoUCase.ToPlusMinus(), value.ToPlusMinus(), true);
+            Database?.AddPending(DatabaseDataType.DoUcaseAfterEdit, this, _afterEditDoUCase.ToPlusMinus(), value.ToPlusMinus(), true);
             OnChanged();
         }
     }
@@ -269,7 +269,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _multiLine && _afterEditQuickSortRemoveDouble;
         set {
             if (_afterEditQuickSortRemoveDouble == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_AfterEdit_QuickSortAndRemoveDouble, this, _afterEditQuickSortRemoveDouble.ToPlusMinus(), value.ToPlusMinus(), true);
+            Database?.AddPending(DatabaseDataType.SortAndRemoveDoubleAfterEdit, this, _afterEditQuickSortRemoveDouble.ToPlusMinus(), value.ToPlusMinus(), true);
             OnChanged();
         }
     }
@@ -278,7 +278,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _afterEditRunden;
         set {
             if (_afterEditRunden == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_AfterEdit_Runden, this, _afterEditRunden.ToString(), value.ToString(), true);
+            Database?.AddPending(DatabaseDataType.RoundAfterEdit, this, _afterEditRunden.ToString(), value.ToString(), true);
             OnChanged();
         }
     }
@@ -287,7 +287,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _align;
         set {
             if (_align == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_Align, this, ((int)_align).ToString(), ((int)value).ToString(), true);
+            Database?.AddPending(DatabaseDataType.ColumnAlign, this, ((int)_align).ToString(), ((int)value).ToString(), true);
             OnChanged();
         }
     }
@@ -296,7 +296,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _allowedChars;
         set {
             if (_allowedChars == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_AllowedChars, this, _allowedChars, value, true);
+            Database?.AddPending(DatabaseDataType.AllowedChars, this, _allowedChars, value, true);
             OnChanged();
         }
     }
@@ -307,7 +307,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _autoFilterJoker;
         set {
             if (_autoFilterJoker == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_AutoFilterJoker, this, _autoFilterJoker, value, true);
+            Database?.AddPending(DatabaseDataType.AutoFilterJoker, this, _autoFilterJoker, value, true);
             OnChanged();
         }
     }
@@ -316,7 +316,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _autoRemove;
         set {
             if (_autoRemove == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_AutoRemove, this, _autoRemove, value, true);
+            Database?.AddPending(DatabaseDataType.AutoRemoveCharAfterEdit, this, _autoRemove, value, true);
             OnChanged();
         }
     }
@@ -325,7 +325,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _backColor;
         set {
             if (_backColor.ToArgb() == value.ToArgb()) { return; }
-            Database?.AddPending(DatabaseDataType.co_BackColor, this, _backColor.ToArgb().ToString(), value.ToArgb().ToString(), true);
+            Database?.AddPending(DatabaseDataType.BackColor, this, _backColor.ToArgb().ToString(), value.ToArgb().ToString(), true);
             OnChanged();
         }
     }
@@ -352,7 +352,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _bildCodeConstantHeight;
         set {
             if (_bildCodeConstantHeight == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_BildCode_ConstantHeight, this, _bildCodeConstantHeight, value, true);
+            Database?.AddPending(DatabaseDataType.ConstantHeightOfImageCode, this, _bildCodeConstantHeight, value, true);
             Invalidate_ColumAndContent();
             OnChanged();
         }
@@ -362,7 +362,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _bildTextVerhalten;
         set {
             if (_bildTextVerhalten == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_BildTextVerhalten, this, ((int)_bildTextVerhalten).ToString(), ((int)value).ToString(), true);
+            Database?.AddPending(DatabaseDataType.BehaviorOfImageAndText, this, ((int)_bildTextVerhalten).ToString(), ((int)value).ToString(), true);
             OnChanged();
         }
     }
@@ -372,7 +372,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         set {
             value = value.Replace("<br>", "\r", RegexOptions.IgnoreCase);
             if (_caption == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_Caption, this, _caption, value, true);
+            Database?.AddPending(DatabaseDataType.ColumnCaption, this, _caption, value, true);
             Invalidate_TmpVariables();
             OnChanged();
         }
@@ -382,7 +382,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _captionBitmapTxt;
         set {
             if (_captionBitmapTxt == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_CaptionBitmapTXT, this, _captionBitmapTxt, value, false);
+            Database?.AddPending(DatabaseDataType.CaptionBitmapCode, this, _captionBitmapTxt, value, false);
             _captionBitmapTxt = value;
             Invalidate_TmpVariables();
             OnChanged();
@@ -393,7 +393,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _cellInitValue;
         set {
             if (_cellInitValue == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_CellInitValue, this, _cellInitValue, value, true);
+            Database?.AddPending(DatabaseDataType.CellInitValue, this, _cellInitValue, value, true);
             OnChanged();
         }
     }
@@ -418,7 +418,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _dropdownAllesAbwählenErlaubt;
         set {
             if (_dropdownAllesAbwählenErlaubt == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_DropdownAllesAbwählenErlaubt, this, _dropdownAllesAbwählenErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
+            Database?.AddPending(DatabaseDataType.DropdownDeselectAllAllowed, this, _dropdownAllesAbwählenErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
             OnChanged();
         }
     }
@@ -427,7 +427,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _dropdownBearbeitungErlaubt;
         set {
             if (_dropdownBearbeitungErlaubt == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_DropdownBearbeitungErlaubt, this, _dropdownBearbeitungErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
+            Database?.AddPending(DatabaseDataType.EditableWithDropdown, this, _dropdownBearbeitungErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
             OnChanged();
         }
     }
@@ -445,20 +445,20 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
     //        OnChanged();
     //    }
     //}
-    public long DropdownKey {
-        get => _dropDownKey;
-        set {
-            if (_dropDownKey == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_DropDownKey, this, _dropDownKey.ToString(), value.ToString(), true);
-            OnChanged();
-        }
-    }
+    //public long DropdownKey {
+    //    get => _dropDownKey;
+    //    set {
+    //        if (_dropDownKey == value) { return; }
+    //        Database?.AddPending(DatabaseDataType.co_DropDownKey, this, _dropDownKey.ToString(), value.ToString(), true);
+    //        OnChanged();
+    //    }
+    //}
 
     public bool DropdownWerteAndererZellenAnzeigen {
         get => _dropdownWerteAndererZellenAnzeigen;
         set {
             if (_dropdownWerteAndererZellenAnzeigen == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_DropdownWerteAndererZellenAnzeigen, this, _dropdownWerteAndererZellenAnzeigen.ToPlusMinus(), value.ToPlusMinus(), true);
+            Database?.AddPending(DatabaseDataType.ShowValuesOfOtherCellsInDropdown, this, _dropdownWerteAndererZellenAnzeigen.ToPlusMinus(), value.ToPlusMinus(), true);
             OnChanged();
         }
     }
@@ -467,7 +467,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _editTrotzSperreErlaubt;
         set {
             if (_editTrotzSperreErlaubt == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_EditTrotzSperreErlaubt, this, _editTrotzSperreErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
+            Database?.AddPending(DatabaseDataType.EditAllowedDespiteLock, this, _editTrotzSperreErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
             OnChanged();
         }
     }
@@ -485,7 +485,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _filterOptions;
         set {
             if (_filterOptions == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_FilterOptions, this, ((int)_filterOptions).ToString(), ((int)value).ToString(), true);
+            Database?.AddPending(DatabaseDataType.FilterOptions, this, ((int)_filterOptions).ToString(), ((int)value).ToString(), true);
             Invalidate_TmpVariables();
             OnChanged();
         }
@@ -495,7 +495,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _foreColor;
         set {
             if (_foreColor.ToArgb() == value.ToArgb()) { return; }
-            Database?.AddPending(DatabaseDataType.co_ForeColor, this, _foreColor.ToArgb().ToString(), value.ToArgb().ToString(), true);
+            Database?.AddPending(DatabaseDataType.ForeColor, this, _foreColor.ToArgb().ToString(), value.ToArgb().ToString(), true);
             OnChanged();
         }
     }
@@ -504,7 +504,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _format;
         set {
             if (_format == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_Format, this, ((int)_format).ToString(), ((int)value).ToString(), true);
+            Database?.AddPending(DatabaseDataType.ColumnFormat, this, ((int)_format).ToString(), ((int)value).ToString(), true);
             Invalidate_ColumAndContent();
             OnChanged();
         }
@@ -514,7 +514,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _formatierungErlaubt;
         set {
             if (_formatierungErlaubt == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_FormatierungErlaubt, this, _formatierungErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
+            Database?.AddPending(DatabaseDataType.TextFormatingAllowed, this, _formatierungErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
             OnChanged();
         }
     }
@@ -523,7 +523,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _identifier;
         set {
             if (_identifier == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_Identifier, this, _identifier, value, true);
+            Database?.AddPending(DatabaseDataType.ColumnIdentify, this, _identifier, value, true);
             OnChanged();
         }
     }
@@ -532,7 +532,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => !_format.Autofilter_möglich() || _ignoreAtRowFilter;
         set {
             if (_ignoreAtRowFilter == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_BeiZeilenfilterIgnorieren, this, _ignoreAtRowFilter.ToPlusMinus(), value.ToPlusMinus(), true);
+            Database?.AddPending(DatabaseDataType.IgnoreAtRowFilter, this, _ignoreAtRowFilter.ToPlusMinus(), value.ToPlusMinus(), true);
             OnChanged();
         }
     }
@@ -548,7 +548,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
             if (_keyColumnKey == value) { return; }
             var c = Database?.Column.SearchByKey(_keyColumnKey);
             c?.CheckIfIAmAKeyColumn();
-            Database?.AddPending(DatabaseDataType.co_KeyColumnKey, this, _keyColumnKey.ToString(), value.ToString(), true);
+            Database?.AddPending(DatabaseDataType.KeyColumnKey, this, _keyColumnKey.ToString(), value.ToString(), true);
             c = Database?.Column.SearchByKey(_keyColumnKey);
             c?.CheckIfIAmAKeyColumn();
             OnChanged();
@@ -559,7 +559,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _lineLeft;
         set {
             if (_lineLeft == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_LineLeft, this, ((int)_lineLeft).ToString(), ((int)value).ToString(), true);
+            Database?.AddPending(DatabaseDataType.LineStyleLeft, this, ((int)_lineLeft).ToString(), ((int)value).ToString(), true);
             OnChanged();
         }
     }
@@ -568,7 +568,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _lineRight;
         set {
             if (_lineRight == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_LinieRight, this, ((int)_lineRight).ToString(), ((int)value).ToString(), true);
+            Database?.AddPending(DatabaseDataType.LineStyleRight, this, ((int)_lineRight).ToString(), ((int)value).ToString(), true);
             OnChanged();
         }
     }
@@ -580,7 +580,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _linkedCellColumnKeyOfLinkedDatabase;
         set {
             if (_linkedCellColumnKeyOfLinkedDatabase == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_LinkedCell_ColumnKeyOfLinkedDatabase, this, _linkedCellColumnKeyOfLinkedDatabase.ToString(), value.ToString(), true);
+            Database?.AddPending(DatabaseDataType.ColumnKeyOfLinkedDatabase, this, _linkedCellColumnKeyOfLinkedDatabase.ToString(), value.ToString(), true);
             Invalidate_ColumAndContent();
             OnChanged();
         }
@@ -604,7 +604,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _linkedDatabaseFile;
         set {
             if (_linkedDatabaseFile == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_LinkedDatabase, this, _linkedDatabaseFile, value, true);
+            Database?.AddPending(DatabaseDataType.LinkedDatabase, this, _linkedDatabaseFile, value, true);
             Invalidate_TmpVariables();
             OnChanged();
         }
@@ -615,7 +615,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         set {
             if (!_format.MultilinePossible()) { value = false; }
             if (_multiLine == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_MultiLine, this, _multiLine.ToPlusMinus(), value.ToPlusMinus(), true);
+            Database?.AddPending(DatabaseDataType.MultiLine, this, _multiLine.ToPlusMinus(), value.ToPlusMinus(), true);
             Invalidate_ColumAndContent();
             OnChanged();
         }
@@ -629,7 +629,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
             if (Database?.Column.Exists(value) != null) { return; }
             if (string.IsNullOrEmpty(value)) { return; }
             var old = _name;
-            Database?.AddPending(DatabaseDataType.co_Name, this, _name, value, true);
+            Database?.AddPending(DatabaseDataType.ColumnName, this, _name, value, true);
             Database?.Column_NameChanged(old, this);
             OnChanged();
         }
@@ -639,7 +639,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _prefix;
         set {
             if (_prefix == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_Prefix, this, _prefix, value, true);
+            Database?.AddPending(DatabaseDataType.Prefix, this, _prefix, value, true);
             Invalidate_ColumAndContent();
             OnChanged();
         }
@@ -649,7 +649,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _quickInfo;
         set {
             if (_quickInfo == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_QuickInfo, this, _quickInfo, value, true);
+            Database?.AddPending(DatabaseDataType.ColumnQuickInfo, this, _quickInfo, value, true);
             OnChanged();
         }
     }
@@ -658,7 +658,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _regex;
         set {
             if (_regex == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_Regex, this, _regex, value, true);
+            Database?.AddPending(DatabaseDataType.RegexCheck, this, _regex, value, true);
             OnChanged();
         }
     }
@@ -676,7 +676,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _scriptType;
         set {
             if (_scriptType == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_ScriptType, this, ((int)_scriptType).ToString(), ((int)value).ToString(), true);
+            Database?.AddPending(DatabaseDataType.ScriptType, this, ((int)_scriptType).ToString(), ((int)value).ToString(), true);
             OnChanged();
         }
     }
@@ -685,7 +685,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _multiLine && _showMultiLineInOneLine;
         set {
             if (_showMultiLineInOneLine == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_ShowMultiLineInOneLine, this, _showMultiLineInOneLine.ToPlusMinus(), value.ToPlusMinus(), true);
+            Database?.AddPending(DatabaseDataType.ShowMultiLineInOneLine, this, _showMultiLineInOneLine.ToPlusMinus(), value.ToPlusMinus(), true);
             Invalidate_ColumAndContent();
             OnChanged();
         }
@@ -704,7 +704,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _sortType;
         set {
             if (_sortType == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_SortType, this, ((int)_sortType).ToString(), ((int)value).ToString(), true);
+            Database?.AddPending(DatabaseDataType.SortType, this, ((int)_sortType).ToString(), ((int)value).ToString(), true);
             OnChanged();
         }
     }
@@ -713,7 +713,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _spellCheckingEnabled;
         set {
             if (_spellCheckingEnabled == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_SpellCheckingEnabled, this, _spellCheckingEnabled.ToPlusMinus(), value.ToPlusMinus(), true);
+            Database?.AddPending(DatabaseDataType.SpellCheckingEnabled, this, _spellCheckingEnabled.ToPlusMinus(), value.ToPlusMinus(), true);
             OnChanged();
         }
     }
@@ -725,7 +725,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _suffix;
         set {
             if (_suffix == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_Suffix, this, _suffix, value, true);
+            Database?.AddPending(DatabaseDataType.Suffix, this, _suffix, value, true);
             Invalidate_ColumAndContent();
             OnChanged();
         }
@@ -735,7 +735,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => Database?.PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0 || _textBearbeitungErlaubt;
         set {
             if (_textBearbeitungErlaubt == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_TextBearbeitungErlaubt, this, _textBearbeitungErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
+            Database?.AddPending(DatabaseDataType.EditableWithTextInput, this, _textBearbeitungErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
             OnChanged();
         }
     }
@@ -744,7 +744,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _translate;
         set {
             if (_translate == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_Translate, this, ((int)_translate).ToString(), ((int)value).ToString(), true);
+            Database?.AddPending(DatabaseDataType.DoOpticalTranslation, this, ((int)_translate).ToString(), ((int)value).ToString(), true);
             OnChanged();
         }
     }
@@ -753,7 +753,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _ueberschrift1;
         set {
             if (_ueberschrift1 == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_Ueberschrift1, this, _ueberschrift1, value, true);
+            Database?.AddPending(DatabaseDataType.CaptionGroup1, this, _ueberschrift1, value, true);
             OnChanged();
         }
     }
@@ -762,7 +762,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _ueberschrift2;
         set {
             if (_ueberschrift2 == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_Ueberschrift2, this, _ueberschrift2, value, true);
+            Database?.AddPending(DatabaseDataType.CaptionGroup2, this, _ueberschrift2, value, true);
             OnChanged();
         }
     }
@@ -771,7 +771,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _ueberschrift3;
         set {
             if (_ueberschrift3 == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_Ueberschrift3, this, _ueberschrift3, value, true);
+            Database?.AddPending(DatabaseDataType.CaptionGroup3, this, _ueberschrift3, value, true);
             OnChanged();
         }
     }
@@ -787,7 +787,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _vorschlagsColumn;
         set {
             if (_vorschlagsColumn == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_VorschlagColumn, this, _vorschlagsColumn.ToString(), value.ToString(), true);
+            Database?.AddPending(DatabaseDataType.MakeSuggestionFromSameKeyColumn, this, _vorschlagsColumn.ToString(), value.ToString(), true);
             OnChanged();
         }
     }
@@ -997,7 +997,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         KeyColumnKey = source.KeyColumnKey;
         //LinkedCell_RowKeyIsInColumn = source.LinkedCell_RowKeyIsInColumn;
         LinkedCell_ColumnKeyOfLinkedDatabase = source.LinkedCell_ColumnKeyOfLinkedDatabase;
-        DropdownKey = source.DropdownKey;
+        //DropdownKey = source.DropdownKey;
         VorschlagsColumn = source.VorschlagsColumn;
         Align = source.Align;
         SortType = source.SortType;
@@ -2217,52 +2217,52 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
 
     internal string Load(DatabaseDataType art, string wert) {
         switch (art) {
-            case DatabaseDataType.co_Name:
+            case DatabaseDataType.ColumnName:
                 _name = wert;
                 Invalidate_TmpVariables();
                 break;
 
-            case DatabaseDataType.co_Caption:
+            case DatabaseDataType.ColumnCaption:
                 _caption = wert;
                 break;
 
-            case DatabaseDataType.co_Format:
+            case DatabaseDataType.ColumnFormat:
                 _format = (DataFormat)IntParse(wert);
                 break;
 
-            case DatabaseDataType.co_ForeColor:
+            case DatabaseDataType.ForeColor:
                 _foreColor = Color.FromArgb(IntParse(wert));
                 break;
 
-            case DatabaseDataType.co_BackColor:
+            case DatabaseDataType.BackColor:
                 _backColor = Color.FromArgb(IntParse(wert));
                 break;
 
-            case DatabaseDataType.co_LineLeft:
+            case DatabaseDataType.LineStyleLeft:
                 _lineLeft = (ColumnLineStyle)IntParse(wert);
                 break;
 
-            case DatabaseDataType.co_LinieRight:
+            case DatabaseDataType.LineStyleRight:
                 _lineRight = (ColumnLineStyle)IntParse(wert);
                 break;
 
-            case DatabaseDataType.co_QuickInfo:
+            case DatabaseDataType.ColumnQuickInfo:
                 _quickInfo = wert;
                 break;
             //case enDatabaseDataType.co_Intelligenter_Multifilter: _Intelligenter_Multifilter = Wert; break;
-            case DatabaseDataType.co_DauerFilterPos:
+            case (DatabaseDataType)194://DatabaseDataType.co_DauerFilterPos:
                 //_dauerFilterPos = wert.PointParse();
                 break;
 
-            case DatabaseDataType.co_Ueberschrift1:
+            case DatabaseDataType.CaptionGroup1:
                 _ueberschrift1 = wert;
                 break;
 
-            case DatabaseDataType.co_Ueberschrift2:
+            case DatabaseDataType.CaptionGroup2:
                 _ueberschrift2 = wert;
                 break;
 
-            case DatabaseDataType.co_Ueberschrift3:
+            case DatabaseDataType.CaptionGroup3:
                 _ueberschrift3 = wert;
                 break;
 
@@ -2272,7 +2272,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
             //    }
             //    break;
 
-            case DatabaseDataType.co_Identifier:
+            case DatabaseDataType.ColumnIdentify:
                 _identifier = wert;
                 ResetSystemToDefault(false);
                 Database.Column.GetSystems();
@@ -2282,111 +2282,111 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
                 _editType = (EditTypeFormula)IntParse(wert);
                 break;
 
-            case DatabaseDataType.co_MultiLine:
+            case DatabaseDataType.MultiLine:
                 _multiLine = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.co_DropDownItems:
+            case DatabaseDataType.DropDownItems:
                 DropDownItems.SplitAndCutByCr_QuickSortAndRemoveDouble(wert);
                 break;
 
-            case DatabaseDataType.co_LinkedCellFilter:
+            case DatabaseDataType.LinkedCellFilter:
                 LinkedCellFilter.SplitAndCutByCr(wert);
                 break;
 
-            case DatabaseDataType.co_OpticalReplace:
+            case DatabaseDataType.OpticalTextReplace:
                 OpticalReplace.SplitAndCutByCr(wert);
                 break;
 
-            case DatabaseDataType.co_AfterEdit_AutoReplace:
+            case DatabaseDataType.AutoReplaceAfterEdit:
                 AfterEditAutoReplace.SplitAndCutByCr(wert);
                 break;
 
-            case DatabaseDataType.co_Regex:
+            case DatabaseDataType.RegexCheck:
                 _regex = wert;
                 break;
 
-            case DatabaseDataType.co_Tags:
+            case DatabaseDataType.ColumnTags:
                 Tags.SplitAndCutByCr(wert);
                 break;
 
-            case DatabaseDataType.co_AutoFilterJoker:
+            case DatabaseDataType.AutoFilterJoker:
                 _autoFilterJoker = wert;
                 break;
 
-            case DatabaseDataType.co_PermissionGroups_ChangeCell:
+            case DatabaseDataType.PermissionGroupsChangeCell:
                 PermissionGroupsChangeCell.SplitAndCutByCr_QuickSortAndRemoveDouble(wert);
                 break;
 
-            case DatabaseDataType.co_AllowedChars:
+            case DatabaseDataType.AllowedChars:
                 _allowedChars = wert;
                 break;
 
-            case DatabaseDataType.co_FilterOptions:
+            case DatabaseDataType.FilterOptions:
                 _filterOptions = (FilterOptions)IntParse(wert);
                 break;
 
-            case DatabaseDataType.co_AutoFilterErlaubt_alt:
-                _filterOptions = FilterOptions.None;
-                if (wert.FromPlusMinus()) { _filterOptions |= FilterOptions.Enabled; }
+            case (DatabaseDataType)138://   case DatabaseDataType.co_AutoFilterErlaubt_alt:
+                //_filterOptions = FilterOptions.None;
+                //if (wert.FromPlusMinus()) { _filterOptions |= FilterOptions.Enabled; }
                 break;
 
-            case DatabaseDataType.co_AutoFilterTextFilterErlaubt_alt:
-                if (wert.FromPlusMinus()) { _filterOptions |= FilterOptions.TextFilterEnabled; }
+            case (DatabaseDataType)139:// case DatabaseDataType.co_AutoFilterTextFilterErlaubt_alt:
+                //if (wert.FromPlusMinus()) { _filterOptions |= FilterOptions.TextFilterEnabled; }
                 break;
 
-            case DatabaseDataType.co_AutoFilterErweitertErlaubt_alt:
-                if (wert.FromPlusMinus()) { _filterOptions |= FilterOptions.ExtendedFilterEnabled; }
+            case (DatabaseDataType)140://  case DatabaseDataType.co_AutoFilterErweitertErlaubt_alt:
+                //if (wert.FromPlusMinus()) { _filterOptions |= FilterOptions.ExtendedFilterEnabled; }
                 break;
 
-            case DatabaseDataType.co_BeiZeilenfilterIgnorieren:
+            case DatabaseDataType.IgnoreAtRowFilter:
                 _ignoreAtRowFilter = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.co_CompactView_alt:
+            case (DatabaseDataType)152:// case DatabaseDataType.co_CompactView_alt:
                 break;
 
             case DatabaseDataType.co_ShowUndo:
                 _showUndo = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.co_ShowMultiLineInOneLine:
+            case DatabaseDataType.ShowMultiLineInOneLine:
                 _showMultiLineInOneLine = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.co_TextBearbeitungErlaubt:
+            case DatabaseDataType.EditableWithTextInput:
                 _textBearbeitungErlaubt = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.co_DropdownBearbeitungErlaubt:
+            case DatabaseDataType.EditableWithDropdown:
                 _dropdownBearbeitungErlaubt = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.co_SpellCheckingEnabled:
+            case DatabaseDataType.SpellCheckingEnabled:
                 _spellCheckingEnabled = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.co_DropdownAllesAbwählenErlaubt:
+            case DatabaseDataType.DropdownDeselectAllAllowed:
                 _dropdownAllesAbwählenErlaubt = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.co_DropdownWerteAndererZellenAnzeigen:
+            case DatabaseDataType.ShowValuesOfOtherCellsInDropdown:
                 _dropdownWerteAndererZellenAnzeigen = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.co_AfterEdit_QuickSortAndRemoveDouble:
+            case DatabaseDataType.SortAndRemoveDoubleAfterEdit:
                 _afterEditQuickSortRemoveDouble = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.co_AfterEdit_Runden:
+            case DatabaseDataType.RoundAfterEdit:
                 _afterEditRunden = IntParse(wert);
                 break;
 
-            case DatabaseDataType.co_AfterEdit_DoUcase:
+            case DatabaseDataType.DoUcaseAfterEdit:
                 _afterEditDoUCase = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.co_AfterEdit_AutoCorrect:
+            case DatabaseDataType.AutoCorrectAfterEdit:
                 _afterEditAutoCorrect = wert.FromPlusMinus();
                 break;
 
@@ -2394,84 +2394,84 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
                 _saveContent = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.co_AutoRemove:
+            case DatabaseDataType.AutoRemoveCharAfterEdit:
                 _autoRemove = wert;
                 break;
 
-            case DatabaseDataType.co_AdminInfo:
+            case DatabaseDataType.ColumnAdminInfo:
                 _adminInfo = wert;
                 break;
 
-            case DatabaseDataType.co_CaptionBitmapTXT:
+            case DatabaseDataType.CaptionBitmapCode:
                 _captionBitmapTxt = wert;
                 break;
 
-            case DatabaseDataType.co_Suffix:
+            case DatabaseDataType.Suffix:
                 _suffix = wert;
                 break;
 
-            case DatabaseDataType.co_LinkedDatabase:
+            case DatabaseDataType.LinkedDatabase:
                 _linkedDatabaseFile = wert;
                 break;
 
-            case DatabaseDataType.co_LinkKeyKennung:
+            case (DatabaseDataType)167:// DatabaseDataType.co_LinkKeyKennung:
                 //_linkedKeyKennung = wert;
                 break;
 
-            case DatabaseDataType.co_BestFile_StandardSuffix:
+            case (DatabaseDataType)168://DatabaseDataType.co_BestFile_StandardSuffix:
                 //_bestFileStandardSuffix = wert;
                 break;
 
-            case DatabaseDataType.co_BestFile_StandardFolder:
+            case (DatabaseDataType)169://DatabaseDataType.co_BestFile_StandardFolder:
                 //_bestFileStandardFolder = wert;
                 break;
 
-            case DatabaseDataType.co_BildCode_ConstantHeight:
+            case DatabaseDataType.ConstantHeightOfImageCode:
                 if (wert == "0") { wert = string.Empty; }
                 _bildCodeConstantHeight = wert;
                 break;
 
-            case DatabaseDataType.co_Prefix:
+            case DatabaseDataType.Prefix:
                 _prefix = wert;
                 break;
 
-            case DatabaseDataType.co_Translate:
+            case DatabaseDataType.DoOpticalTranslation:
                 _translate = (TranslationType)IntParse(wert);
                 break;
 
-            case DatabaseDataType.co_AdditionalCheck:
+            case DatabaseDataType.dditionalCheck:
                 _additionalCheck = (AdditionalCheck)IntParse(wert);
                 break;
 
-            case DatabaseDataType.co_ScriptType:
+            case DatabaseDataType.ScriptType:
                 _scriptType = (ScriptType)IntParse(wert);
                 break;
 
-            case DatabaseDataType.co_BildTextVerhalten:
+            case DatabaseDataType.BehaviorOfImageAndText:
                 _bildTextVerhalten = (BildTextVerhalten)IntParse(wert);
                 break;
 
-            case DatabaseDataType.co_EditTrotzSperreErlaubt:
+            case DatabaseDataType.EditAllowedDespiteLock:
                 _editTrotzSperreErlaubt = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.co_FormatierungErlaubt:
+            case DatabaseDataType.TextFormatingAllowed:
                 _formatierungErlaubt = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.co_CellInitValue:
+            case DatabaseDataType.CellInitValue:
                 _cellInitValue = wert;
                 break;
 
-            case DatabaseDataType.co_KeyColumnKey:
+            case DatabaseDataType.KeyColumnKey:
                 _keyColumnKey = LongParse(wert);
                 break;
 
-            case DatabaseDataType.co_LinkedCell_RowKeyIsInColumn:
+            case (DatabaseDataType)179://DatabaseDataType.co_LinkedCell_RowKeyIsInColumn:
                 //_linkedCellRowKeyIsInColumn = LongParse(wert);
                 break;
 
-            case DatabaseDataType.co_LinkedCell_ColumnKeyOfLinkedDatabase:
+            case DatabaseDataType.ColumnKeyOfLinkedDatabase:
                 _linkedCellColumnKeyOfLinkedDatabase = LongParse(wert);
                 break;
 
@@ -2481,7 +2481,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
             //case enDatabaseDataType.co_LinkedCell_ColumnValueAdd:
             //    break;
 
-            case DatabaseDataType.co_SortType:
+            case DatabaseDataType.SortType:
                 if (string.IsNullOrEmpty(wert)) {
                     _sortType = SortierTyp.Original_String;
                 } else {
@@ -2490,15 +2490,15 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
                 break;
 
             //case enDatabaseDataType.co_ZellenZusammenfassen: _ZellenZusammenfassen = Wert.FromPlusMinus(); break;
-            case DatabaseDataType.co_DropDownKey:
-                _dropDownKey = LongParse(wert);
+            case (DatabaseDataType)184://case DatabaseDataType.co_DropDownKey:
+                //_dropDownKey = LongParse(wert);
                 break;
 
-            case DatabaseDataType.co_VorschlagColumn:
+            case DatabaseDataType.MakeSuggestionFromSameKeyColumn:
                 _vorschlagsColumn = LongParse(wert);
                 break;
 
-            case DatabaseDataType.co_Align:
+            case DatabaseDataType.ColumnAlign:
                 _align = (AlignmentHorizontal)IntParse(wert);
                 if (_align == (AlignmentHorizontal)(-1)) { _align = AlignmentHorizontal.Links; }
                 break;
@@ -2519,79 +2519,79 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
     internal string ParsableColumnKey() => ColumnCollection.ParsableColumnKey(this);
 
     internal void SaveToByteList(ref List<byte> l) {
-        Database.SaveToByteList(l, DatabaseDataType.co_Name, _name, Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_Caption, _caption, Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_Format, ((int)_format).ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_Ueberschrift1, _ueberschrift1, Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_Ueberschrift2, _ueberschrift2, Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_Ueberschrift3, _ueberschrift3, Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_MultiLine, _multiLine.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_CellInitValue, _cellInitValue, Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_AfterEdit_QuickSortAndRemoveDouble, _afterEditQuickSortRemoveDouble.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_AfterEdit_DoUcase, _afterEditDoUCase.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_AfterEdit_AutoCorrect, _afterEditAutoCorrect.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_AfterEdit_Runden, _afterEditRunden.ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_AutoRemove, _autoRemove, Key);
+        Database.SaveToByteList(l, DatabaseDataType.ColumnName, _name, Key);
+        Database.SaveToByteList(l, DatabaseDataType.ColumnCaption, _caption, Key);
+        Database.SaveToByteList(l, DatabaseDataType.ColumnFormat, ((int)_format).ToString(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.CaptionGroup1, _ueberschrift1, Key);
+        Database.SaveToByteList(l, DatabaseDataType.CaptionGroup2, _ueberschrift2, Key);
+        Database.SaveToByteList(l, DatabaseDataType.CaptionGroup3, _ueberschrift3, Key);
+        Database.SaveToByteList(l, DatabaseDataType.MultiLine, _multiLine.ToPlusMinus(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.CellInitValue, _cellInitValue, Key);
+        Database.SaveToByteList(l, DatabaseDataType.SortAndRemoveDoubleAfterEdit, _afterEditQuickSortRemoveDouble.ToPlusMinus(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.DoUcaseAfterEdit, _afterEditDoUCase.ToPlusMinus(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.AutoCorrectAfterEdit, _afterEditAutoCorrect.ToPlusMinus(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.RoundAfterEdit, _afterEditRunden.ToString(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.AutoRemoveCharAfterEdit, _autoRemove, Key);
         Database.SaveToByteList(l, DatabaseDataType.co_SaveContent, _saveContent.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_FilterOptions, ((int)_filterOptions).ToString(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.FilterOptions, ((int)_filterOptions).ToString(), Key);
         //Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilter_Dauerfilter, ((int)_AutoFilter_Dauerfilter).ToString(), Key);
         //Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterErlaubt, _AutofilterErlaubt.ToPlusMinus(), Key);
         //Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterTextFilterErlaubt, _AutofilterTextFilterErlaubt.ToPlusMinus(), Key);
         //Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterErweitertErlaubt, _AutoFilterErweitertErlaubt.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_AutoFilterJoker, _autoFilterJoker, Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_BeiZeilenfilterIgnorieren, _ignoreAtRowFilter.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_TextBearbeitungErlaubt, _textBearbeitungErlaubt.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_SpellCheckingEnabled, _spellCheckingEnabled.ToPlusMinus(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.AutoFilterJoker, _autoFilterJoker, Key);
+        Database.SaveToByteList(l, DatabaseDataType.IgnoreAtRowFilter, _ignoreAtRowFilter.ToPlusMinus(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.EditableWithTextInput, _textBearbeitungErlaubt.ToPlusMinus(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.SpellCheckingEnabled, _spellCheckingEnabled.ToPlusMinus(), Key);
         //  Database.SaveToByteList(l, enDatabaseDataType.co_CompactView, _CompactView.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_ShowMultiLineInOneLine, _showMultiLineInOneLine.ToPlusMinus(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.ShowMultiLineInOneLine, _showMultiLineInOneLine.ToPlusMinus(), Key);
         Database.SaveToByteList(l, DatabaseDataType.co_ShowUndo, _showUndo.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_FormatierungErlaubt, _formatierungErlaubt.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_ForeColor, _foreColor.ToArgb().ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_BackColor, _backColor.ToArgb().ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_LineLeft, ((int)_lineLeft).ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_LinieRight, ((int)_lineRight).ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_DropdownBearbeitungErlaubt, _dropdownBearbeitungErlaubt.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_DropDownItems, DropDownItems.JoinWithCr(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_LinkedCellFilter, LinkedCellFilter.JoinWithCr(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_OpticalReplace, OpticalReplace.JoinWithCr(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_AfterEdit_AutoReplace, AfterEditAutoReplace.JoinWithCr(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_Regex, _regex, Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_DropdownAllesAbwählenErlaubt, _dropdownAllesAbwählenErlaubt.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_DropdownWerteAndererZellenAnzeigen, _dropdownWerteAndererZellenAnzeigen.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_QuickInfo, _quickInfo, Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_AdminInfo, _adminInfo, Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_CaptionBitmapTXT, _captionBitmapTxt, Key);
+        Database.SaveToByteList(l, DatabaseDataType.TextFormatingAllowed, _formatierungErlaubt.ToPlusMinus(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.ForeColor, _foreColor.ToArgb().ToString(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.BackColor, _backColor.ToArgb().ToString(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.LineStyleLeft, ((int)_lineLeft).ToString(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.LineStyleRight, ((int)_lineRight).ToString(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.EditableWithDropdown, _dropdownBearbeitungErlaubt.ToPlusMinus(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.DropDownItems, DropDownItems.JoinWithCr(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.LinkedCellFilter, LinkedCellFilter.JoinWithCr(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.OpticalTextReplace, OpticalReplace.JoinWithCr(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.AutoReplaceAfterEdit, AfterEditAutoReplace.JoinWithCr(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.RegexCheck, _regex, Key);
+        Database.SaveToByteList(l, DatabaseDataType.DropdownDeselectAllAllowed, _dropdownAllesAbwählenErlaubt.ToPlusMinus(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.ShowValuesOfOtherCellsInDropdown, _dropdownWerteAndererZellenAnzeigen.ToPlusMinus(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.ColumnQuickInfo, _quickInfo, Key);
+        Database.SaveToByteList(l, DatabaseDataType.ColumnAdminInfo, _adminInfo, Key);
+        Database.SaveToByteList(l, DatabaseDataType.CaptionBitmapCode, _captionBitmapTxt, Key);
         //Database.SaveToByteList(l, enDatabaseDataType.co_CaptionBitmapUTF8, modConverter.BitmapToStringUnicode(_CaptionBitmap, ImageFormat.Png), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_AllowedChars, _allowedChars, Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_PermissionGroups_ChangeCell, PermissionGroupsChangeCell.JoinWithCr(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.AllowedChars, _allowedChars, Key);
+        Database.SaveToByteList(l, DatabaseDataType.PermissionGroupsChangeCell, PermissionGroupsChangeCell.JoinWithCr(), Key);
         Database.SaveToByteList(l, DatabaseDataType.co_EditType, ((int)_editType).ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_Tags, Tags.JoinWithCr(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_EditTrotzSperreErlaubt, _editTrotzSperreErlaubt.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_Suffix, _suffix, Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_LinkedDatabase, _linkedDatabaseFile, Key);
+        Database.SaveToByteList(l, DatabaseDataType.ColumnTags, Tags.JoinWithCr(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.EditAllowedDespiteLock, _editTrotzSperreErlaubt.ToPlusMinus(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.Suffix, _suffix, Key);
+        Database.SaveToByteList(l, DatabaseDataType.LinkedDatabase, _linkedDatabaseFile, Key);
         //Database.SaveToByteList(l, enDatabaseDataType.co_LinkKeyKennung, _linkedKeyKennung, Key);
         //Database.SaveToByteList(l, DatabaseDataType.co_BestFile_StandardFolder, _bestFileStandardFolder, Key);
         //Database.SaveToByteList(l, DatabaseDataType.co_BestFile_StandardSuffix, _bestFileStandardSuffix, Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_BildCode_ConstantHeight, _bildCodeConstantHeight, Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_BildTextVerhalten, ((int)_bildTextVerhalten).ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_Translate, ((int)_translate).ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_AdditionalCheck, ((int)_additionalCheck).ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_ScriptType, ((int)_scriptType).ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_Prefix, _prefix, Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_KeyColumnKey, _keyColumnKey.ToString(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.ConstantHeightOfImageCode, _bildCodeConstantHeight, Key);
+        Database.SaveToByteList(l, DatabaseDataType.BehaviorOfImageAndText, ((int)_bildTextVerhalten).ToString(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.DoOpticalTranslation, ((int)_translate).ToString(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.dditionalCheck, ((int)_additionalCheck).ToString(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.ScriptType, ((int)_scriptType).ToString(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.Prefix, _prefix, Key);
+        Database.SaveToByteList(l, DatabaseDataType.KeyColumnKey, _keyColumnKey.ToString(), Key);
         //Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_RowKeyIsInColumn, _linkedCellRowKeyIsInColumn.ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_LinkedCell_ColumnKeyOfLinkedDatabase, _linkedCellColumnKeyOfLinkedDatabase.ToString(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.ColumnKeyOfLinkedDatabase, _linkedCellColumnKeyOfLinkedDatabase.ToString(), Key);
         //Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_ColumnValueFoundIn, _LinkedCell_ColumnValueFoundIn.ToString(), Key);
         //Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_ColumnValueAdd, _LinkedCell_ColumnValueAdd, Key);
         //Database.SaveToByteList(l, enDatabaseDataType.co_ZellenZusammenfassen, _ZellenZusammenfassen.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_DropDownKey, _dropDownKey.ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_VorschlagColumn, _vorschlagsColumn.ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_Align, ((int)_align).ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_SortType, ((int)_sortType).ToString(), Key);
+        //Database.SaveToByteList(l, DatabaseDataType.co_DropDownKey, _dropDownKey.ToString(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.MakeSuggestionFromSameKeyColumn, _vorschlagsColumn.ToString(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.ColumnAlign, ((int)_align).ToString(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.SortType, ((int)_sortType).ToString(), Key);
         //Database.SaveToByteList(l, enDatabaseDataType.co_Intelligenter_Multifilter, _Intelligenter_Multifilter, Key);
         //Database.SaveToByteList(l, enDatabaseDataType.co_DauerFilterPos, _dauerFilterPos.ToString(), Key);
         //Kennung UNBEDINGT zum Schluss, damit die Standard-Werte gesetzt werden können
-        Database.SaveToByteList(l, DatabaseDataType.co_Identifier, _identifier, Key);
+        Database.SaveToByteList(l, DatabaseDataType.ColumnIdentify, _identifier, Key);
     }
 
     private void _TMP_LinkedDatabase_Cell_CellValueChanged(object sender, CellEventArgs e) {
@@ -2656,7 +2656,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
     //}
 
     private void AfterEdit_AutoReplace_ListOrItemChanged(object sender, System.EventArgs e) {
-        Database.AddPending(DatabaseDataType.co_AfterEdit_AutoReplace, Key, AfterEditAutoReplace.JoinWithCr(), false);
+        Database.AddPending(DatabaseDataType.AutoReplaceAfterEdit, Key, AfterEditAutoReplace.JoinWithCr(), false);
         OnChanged();
     }
 
@@ -2695,7 +2695,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
     }
 
     private void DropDownItems_ListOrItemChanged(object sender, System.EventArgs e) {
-        Database.AddPending(DatabaseDataType.co_DropDownItems, Key, DropDownItems.JoinWithCr(), false);
+        Database.AddPending(DatabaseDataType.DropDownItems, Key, DropDownItems.JoinWithCr(), false);
         OnChanged();
     }
 
@@ -2775,23 +2775,23 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
     }
 
     private void LinkedCellFilters_ListOrItemChanged(object sender, System.EventArgs e) {
-        Database.AddPending(DatabaseDataType.co_LinkedCellFilter, Key, LinkedCellFilter.JoinWithCr(), false);
+        Database.AddPending(DatabaseDataType.LinkedCellFilter, Key, LinkedCellFilter.JoinWithCr(), false);
         OnChanged();
     }
 
     private void OpticalReplacer_ListOrItemChanged(object sender, System.EventArgs e) {
-        Database.AddPending(DatabaseDataType.co_OpticalReplace, Key, OpticalReplace.JoinWithCr(), false);
+        Database.AddPending(DatabaseDataType.OpticalTextReplace, Key, OpticalReplace.JoinWithCr(), false);
         Invalidate_ColumAndContent();
         OnChanged();
     }
 
     private void PermissionGroups_ChangeCell_ListOrItemChanged(object sender, System.EventArgs e) {
-        Database.AddPending(DatabaseDataType.co_PermissionGroups_ChangeCell, Key, PermissionGroupsChangeCell.JoinWithCr(), false);
+        Database.AddPending(DatabaseDataType.PermissionGroupsChangeCell, Key, PermissionGroupsChangeCell.JoinWithCr(), false);
         OnChanged();
     }
 
     private void Tags_ListOrItemChanged(object sender, System.EventArgs e) {
-        Database.AddPending(DatabaseDataType.co_Tags, Key, Tags.JoinWithCr(), false);
+        Database.AddPending(DatabaseDataType.ColumnTags, Key, Tags.JoinWithCr(), false);
         OnChanged();
     }
 
