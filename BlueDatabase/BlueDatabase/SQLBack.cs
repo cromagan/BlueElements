@@ -304,7 +304,7 @@ public class SqlBack {
         if (!ExecuteCommand(t)) { return false; }
         //if (!ExecuteCommand("SET IDENTITY_INSERT " + name + " ON")) { return false; }
 
-        t = "ALTER TABLE " + name + " ADD CONSTRAINT PK_STYLE PRIMARY KEY CLUSTERED(" + keycolumns.JoinWith(", ").ToUpper() + ")";
+        t = "ALTER TABLE " + name + " ADD CONSTRAINT PK_" + name.ToUpper() + " PRIMARY KEY CLUSTERED(" + keycolumns.JoinWith(", ").ToUpper() + ")";
 
         return ExecuteCommand(t);
     }
@@ -336,7 +336,7 @@ public class SqlBack {
 
         using var q = _connection.CreateCommand();
 
-        q.CommandText = @"select "+ column.Name.ToUpper()+" from Main " +
+        q.CommandText = @"select " + column.Name.ToUpper() + " from Main " +
                         "where RK = @RK";
 
         //q.Parameters.AddWithValue("@COLUMNNAME", column.Name.ToUpper());
