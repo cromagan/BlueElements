@@ -129,7 +129,7 @@ public enum DatabaseDataType : byte {
     ForeColor = 104,
     BackColor = 105,
 
-    dditionalCheck = 106,
+    AdditionalFormatCheck = 106,
 
     ScriptType = 107,
 

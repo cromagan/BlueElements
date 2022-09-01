@@ -59,15 +59,18 @@ public class SqlBack {
         #region Main
 
         if (!x.Contains("Main")) { CreateTable("Main"); }
+        ExecuteCommand("SET IDENTITY_INSERT Main ON");
 
         #endregion
 
         #region Style
 
         if (!x.Contains("Style")) { CreateTable("Style", new List<string>() { "DBNAME", "TYPE", "COLUMNNAME" }); }
+
         var colStyle = GetColumnNames("Style");
         if (colStyle == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
-        if (!colStyle.Contains("VALUE")) { AddColumn("Style", "VALUE", "VARCHAR(MAX)"); }
+
+        if (!colStyle.Contains("VALUE")) { AddColumn("Style", "VALUE", "VARCHAR(8000)"); }
 
         #endregion
 
@@ -81,8 +84,8 @@ public class SqlBack {
         if (!colUndo.Contains("COMAND")) { AddColumn("Undo", "COMAND"); }
         if (!colUndo.Contains("COLUMNKEY")) { AddColumn("Undo", "COLUMNKEY"); }
         if (!colUndo.Contains("ROWKEY")) { AddColumn("Undo", "ROWKEY"); }
-        if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn("Undo", "PREVIOUSVALUE", "VARCHAR(MAX)"); }
-        if (!colUndo.Contains("CHANGEDTO")) { AddColumn("Undo", "CHANGEDTO", "VARCHAR(MAX)"); }
+        if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn("Undo", "PREVIOUSVALUE", "VARCHAR(8000)"); }
+        if (!colUndo.Contains("CHANGEDTO")) { AddColumn("Undo", "CHANGEDTO", "VARCHAR(8000)"); }
         if (!colUndo.Contains("USERNAME")) { AddColumn("Undo", "USERNAME"); }
         if (!colUndo.Contains("DATETIMEUTC")) { AddColumn("Undo", "DATETIMEUTC"); }
 
@@ -121,7 +124,7 @@ public class SqlBack {
         using SqlCommand comm = new SqlCommand();
         comm.Connection = _connection;
         comm.CommandText = cmdString;
-        comm.Parameters.AddWithValue("@DBNAME", dbname);
+        comm.Parameters.AddWithValue("@DBNAME", dbname.ToUpper());
         comm.Parameters.AddWithValue("@COMAND", ((int)comand).ToString());
         comm.Parameters.AddWithValue("@COLUMNKEY", columnKey.ToString());
         comm.Parameters.AddWithValue("@ROWKEY", rowKey.ToString());
@@ -147,40 +150,36 @@ public class SqlBack {
                 default:
                     return SetStyleDate(database, type, string.Empty, value);
             }
+
+            CloseConnection();
+            return true;
         }
 
-        //ce_Value_withoutSizeData = 200,
-        //ce_Value_withSizeData = 201,
+        if (column != null && row == null) {
+            switch (type) {
+                case DatabaseDataType.co_EditType: break;
+                case DatabaseDataType.co_SaveContent: break;
+                case DatabaseDataType.co_ShowUndo: break;
+                case DatabaseDataType.ColumnName: break;
 
-        //[Obsolete]
-        //ce_UTF8Value_withoutSizeData = 202,
+                default:
+                    if (type == DatabaseDataType.ColumnCaption) { AddColumnToMain(column.Name); }
 
-        //[Obsolete]
-        //ce_UTF8Value_withSizeData = 203,
+                    return SetStyleDate(database, type, column.Name.ToUpper(), value);
+            }
+            CloseConnection();
+            return true;
+        }
 
-        ////Dummy_ce_ValueWithoutSizeUncrypted = 204,
-        //dummyComand_RemoveRow = 220,
+        if (column != null && row != null) {
+            SetCellValue(column, row, value);
 
-        //dummyComand_AddRow = 221,
+            CloseConnection();
+            return true;
+        }
 
-        ////	dummyComand_AddUndo = 222,
-        //dummyComand_RemoveColumn = 223,
-
-        //AddColumn = 224,
-        //UndoCount = 249,
-
-        ////PendingsInOne = 250,
-        //UndoInOne = 251,
-
-        ////   StatisticInOneOld = 252
-        ////StatisticOld = 253
-        ////UndoOld = 254
-        //EOF = 255
-        //co_SaveContent
-        //co_showUndo
-        //co_editType
         CloseConnection();
-        return true;
+        return false;
     }
 
     /// <summary>
@@ -271,6 +270,14 @@ public class SqlBack {
 
     private bool AddColumn(string table, string column, string type) => ExecuteCommand("alter table " + table + " add " + column + " " + type + " default '' NOT NULL");
 
+    private void AddColumnToMain(string columnName) {
+        columnName = columnName.ToUpper();
+
+        var colMain = GetColumnNames("Main");
+        if (colMain == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
+        if (!colMain.Contains(columnName)) { AddColumn("Main", columnName, "VARCHAR(8000)"); }
+    }
+
     private bool CloseConnection() {
         if (_connection.State == ConnectionState.Open) { _connection.Close(); }
 
@@ -279,18 +286,32 @@ public class SqlBack {
 
     private bool CreateTable(string name) {
         if (!ExecuteCommand("DROP TABLE IF EXISTS " + name)) { return false; }
-        return ExecuteCommand(@"CREATE TABLE " + name + "(" + "id int identity(1,1) NOT NULL PRIMARY KEY, " + ")");
+        return ExecuteCommand(@"CREATE TABLE " + name + "(" + "RK bigint identity(1,1) NOT NULL PRIMARY KEY, " + ")");
     }
 
     private bool CreateTable(string name, List<string> keycolumns) {
         if (!ExecuteCommand("DROP TABLE IF EXISTS " + name)) { return false; }
 
+        // http://www.sql-server-helper.com/error-messages/msg-8110.aspx
+
+        //CREATE TABLE[dbo].[DNC] (
+        //    [AreaCode]       CHAR(3) NOT NULL,
+        //[PhoneNumber]    CHAR(7) NOT NULL,
+        //[PhoneType]      CHAR(1),
+        //CONSTRAINT[PK_DNC] PRIMARY KEY CLUSTERED( [AreaCode], [PhoneNumber] )
+        //)
+
         var t = @"CREATE TABLE " + name + "(";
 
         foreach (var thiskey in keycolumns) {
-            t += thiskey + " VARCHAR(255) default '' NOT NULL,";
+            t += thiskey.ToUpper() + " VARCHAR(255) default '' NOT NULL,";
         }
         t += ")";
+
+        if (!ExecuteCommand(t)) { return false; }
+        if (!ExecuteCommand("SET IDENTITY_INSERT Style ON")) { return false; }
+
+        t = "ALTER TABLE " + name + " ADD CONSTRAINT PK_STYLE PRIMARY KEY CLUSTERED(" + keycolumns.JoinWith(", ").ToUpper() + ")";
 
         return ExecuteCommand(t);
     }
@@ -317,6 +338,35 @@ public class SqlBack {
         }
     }
 
+    private string? GetCellValue(ColumnItem column, RowItem row) {
+        if (!OpenConnection()) { return null; }
+
+        using var q = _connection.CreateCommand();
+
+        q.CommandText = @"select @COLUMNNAME from Main " +
+                        "where RK = @RK";
+
+        q.Parameters.AddWithValue("@COLUMNNAME", column.Name.ToUpper());
+        q.Parameters.AddWithValue("@RK", row.Key.ToString());
+
+        using var reader = q.ExecuteReader();
+        if (reader.Read()) {
+            // you may want to check if value is NULL: reader.IsDBNull(0)
+            var value = reader[0].ToString();
+
+            if (reader.Read()) {
+                // Doppelter Wert?!?Ersten Wert zurückgeben, um unendliche erweiterungen zu erhindern
+                Develop.DebugPrint(column.Key.ToString() + " doppelt in MAIN vorhanden!");
+            }
+
+            CloseConnection();
+            return value;
+        }
+
+        CloseConnection();    // Nix vorhanden!
+        return null;
+    }
+
     private string? GetStyleData(string dbname, string type, string columnName) {
         if (!OpenConnection()) { return null; }
 
@@ -327,9 +377,9 @@ public class SqlBack {
                         "and TYPE = @TYPE " +
                         "and COLUMNNAME = @COLUMNNAME";
 
-        q.Parameters.AddWithValue("@DBNAME", dbname);
+        q.Parameters.AddWithValue("@DBNAME", dbname.ToUpper());
         q.Parameters.AddWithValue("@TYPE", type);
-        q.Parameters.AddWithValue("@COLUMNNAME", columnName);
+        q.Parameters.AddWithValue("@COLUMNNAME", columnName.ToUpper());
 
         using var reader = q.ExecuteReader();
         if (reader.Read()) {
@@ -366,6 +416,41 @@ public class SqlBack {
     /// <param name="columnName"></param>
     /// <param name="newValue"></param>
     /// <returns></returns>
+    private bool SetCellValue(ColumnItem column, RowItem row, string newValue) {
+        var isVal = GetCellValue(column, row);
+
+        string cmdString;
+
+        if (isVal is null) {
+            cmdString = "INSERT INTO Main (RK, " + column.Name.ToUpper() + " ) VALUES (@RK, @VALUE )";
+        } else if (isVal != newValue) {
+            cmdString = "UPDATE @DBNAME @COLUMNNAME = @VALUE WHERE RK = @RK";
+        } else {
+            return true;
+        }
+
+        if (!OpenConnection()) { return false; }
+
+        using SqlCommand comm = new SqlCommand();
+        comm.Connection = _connection;
+        comm.CommandText = cmdString;
+        comm.Parameters.AddWithValue("@DBNAME", "Main");
+        comm.Parameters.AddWithValue("@RK", row.Key);
+        comm.Parameters.AddWithValue("@COLUMNNAME", column.Name.ToUpper());
+        comm.Parameters.AddWithValue("@VALUE", newValue);
+
+        return ExecuteCommand(comm);
+    }
+
+    /// <summary>
+    /// Gibt TRUE zurück, wenn alles ok ist.
+    /// Entweder der Wert gesetzt wurde, der Wert aktuell ist oder der Wert unwichtig ist.
+    /// </summary>
+    /// <param name="dbname"></param>
+    /// <param name="type"></param>
+    /// <param name="columnName"></param>
+    /// <param name="newValue"></param>
+    /// <returns></returns>
     private bool SetStyleDate(string dbname, DatabaseDataType type, string columnName, string newValue) {
         var t = type.ToString();
 
@@ -373,7 +458,9 @@ public class SqlBack {
 
         if (type == DatabaseDataType.AddColumn) { return true; }
 
-        var isVal = GetStyleData(dbname, t, string.Empty);
+        columnName = columnName.ToUpper();
+
+        var isVal = GetStyleData(dbname, t, columnName);
 
         string cmdString;
 
@@ -390,8 +477,8 @@ public class SqlBack {
         using SqlCommand comm = new SqlCommand();
         comm.Connection = _connection;
         comm.CommandText = cmdString;
-        comm.Parameters.AddWithValue("@DBNAME", dbname);
-        comm.Parameters.AddWithValue("@TYPE", type);
+        comm.Parameters.AddWithValue("@DBNAME", dbname.ToUpper());
+        comm.Parameters.AddWithValue("@TYPE", t);
         comm.Parameters.AddWithValue("@COLUMNNAME", columnName);
         comm.Parameters.AddWithValue("@VALUE", newValue);
 

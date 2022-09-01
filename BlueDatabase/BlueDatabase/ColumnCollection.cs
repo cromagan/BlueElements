@@ -109,7 +109,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
 
     public ColumnItem Add(string internalName) => Add(NextColumnKey(), internalName, internalName, string.Empty, VarType.Text, string.Empty);
 
-    public ColumnItem Add(long colKey) => Add(colKey, string.Empty, string.Empty, string.Empty, VarType.Text, string.Empty);
+    public ColumnItem Add(long colKey) => Add(colKey, string.Empty, string.Empty, string.Empty, VarType.Unbekannt, string.Empty);
 
     public ColumnItem Add() => Add(NextColumnKey(), string.Empty, string.Empty, string.Empty, VarType.Text, string.Empty);
 
@@ -125,7 +125,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         var c = SearchByKey(colKey);
         c.Name = internalName;
         c.Caption = caption;
-        c.SetFormat(format);
+        if (format != VarType.Unbekannt) { c.SetFormat(format); }
         c.Suffix = suffix;
         c.Quickinfo = quickinfo;
         return c;

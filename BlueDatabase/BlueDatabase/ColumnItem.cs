@@ -233,7 +233,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         get => _additionalCheck;
         set {
             if (_additionalCheck == value) { return; }
-            Database?.AddPending(DatabaseDataType.dditionalCheck, this, ((int)_additionalCheck).ToString(), ((int)value).ToString(), true);
+            Database?.AddPending(DatabaseDataType.AdditionalFormatCheck, this, ((int)_additionalCheck).ToString(), ((int)value).ToString(), true);
             OnChanged();
         }
     }
@@ -2439,7 +2439,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
                 _translate = (TranslationType)IntParse(wert);
                 break;
 
-            case DatabaseDataType.dditionalCheck:
+            case DatabaseDataType.AdditionalFormatCheck:
                 _additionalCheck = (AdditionalCheck)IntParse(wert);
                 break;
 
@@ -2575,7 +2575,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         Database.SaveToByteList(l, DatabaseDataType.ConstantHeightOfImageCode, _bildCodeConstantHeight, Key);
         Database.SaveToByteList(l, DatabaseDataType.BehaviorOfImageAndText, ((int)_bildTextVerhalten).ToString(), Key);
         Database.SaveToByteList(l, DatabaseDataType.DoOpticalTranslation, ((int)_translate).ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.dditionalCheck, ((int)_additionalCheck).ToString(), Key);
+        Database.SaveToByteList(l, DatabaseDataType.AdditionalFormatCheck, ((int)_additionalCheck).ToString(), Key);
         Database.SaveToByteList(l, DatabaseDataType.ScriptType, ((int)_scriptType).ToString(), Key);
         Database.SaveToByteList(l, DatabaseDataType.Prefix, _prefix, Key);
         Database.SaveToByteList(l, DatabaseDataType.KeyColumnKey, _keyColumnKey.ToString(), Key);

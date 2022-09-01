@@ -1822,11 +1822,12 @@ public sealed class Database : IDisposable, IDisposableExtended {
     }
 
     private string ParseThis(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
-        _sql?.CheckIn(Filename.FileNameWithoutSuffix(), type, value, column, row, width, height);
-
         if ((int)type is >= 100 and <= 199) {
+            _sql?.CheckIn(Filename.FileNameWithoutSuffix(), type, value, column, null, -1, -1);
             return column.Load(type, value);
         }
+
+        _sql?.CheckIn(Filename.FileNameWithoutSuffix(), type, value, column, row, width, height);
 
         switch (type) {
             case DatabaseDataType.Formatkennung:
