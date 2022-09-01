@@ -46,6 +46,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
 
     public const string DatabaseVersion = "4.00";
     public static readonly ListExt<Database> AllFiles = new();
+    public readonly SQLBack? _sql;
     public readonly CellCollection Cell;
     public readonly ColumnCollection Column;
     public readonly ListExt<ColumnViewCollection> ColumnArrangements = new();
@@ -75,8 +76,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
 
     //private readonly List<string> _filesAfterLoadingLCase;
 
-    private readonly BlueBasics.MultiUserFile.MultiUserFile _muf;
-
+    private readonly BlueBasics.MultiUserFile.MultiUserFile? _muf;
     private string _additionaFilesPfad;
 
     private string _additionaFilesPfadtmp = string.Empty;
@@ -145,6 +145,8 @@ public sealed class Database : IDisposable, IDisposableExtended {
         _muf.DoBackGroundWork += DoBackGroundWork;
 
         Develop.StartService();
+
+        if (FileExists(filename)) { _sql = new SQLBack("D:\\" + filename.FileNameWithoutSuffix() + ".mdb", true); }
 
         //CultureInfo culture = new("de-DE");
         //CultureInfo.DefaultThreadCurrentCulture = culture;
@@ -235,8 +237,6 @@ public sealed class Database : IDisposable, IDisposableExtended {
             Cell.InvalidateAllSizes();
         }
     }
-
-    public double AgeOfBlockDatei => _muf.AgeOfBlockDatei;
 
     [Browsable(false)]
     public Ansicht Ansicht {
@@ -1253,6 +1253,8 @@ public sealed class Database : IDisposable, IDisposableExtended {
         if (rowKey < -100) { Develop.DebugPrint(FehlerArt.Fehler, "RowKey darf hier nicht <-100 sein!"); }
         if (columnKey < -100) { Develop.DebugPrint(FehlerArt.Fehler, "ColKey darf hier nicht <-100 sein!"); }
         Works.Add(new WorkItem(comand, columnKey, rowKey, previousValue, changedTo, UserName));
+
+        _sql.Checkin(comand, columnKey, rowKey, previousValue, changedTo, UserName);
     }
 
     internal void BlockReload(bool crashIsCurrentlyLoading) {

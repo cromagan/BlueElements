@@ -23,7 +23,6 @@ using System.Threading.Tasks;
 using System.Data.SqlClient;
 using System.Data;
 using BlueBasics;
-using BlueBasics.DatabaseInterfaces;
 using System.IO;
 using System.Globalization;
 
@@ -32,7 +31,7 @@ namespace BlueSQLDatabase;
 //https://www.ictdemy.com/csharp/databases/introduction-to-databases-in-csharp-net
 
 //https://docs.microsoft.com/en-us/troubleshoot/developer/visualstudio/csharp/language-compilers/create-sql-server-database-programmatically
-public class Databasetmp : IDatabase {
+public class Databasetmp {
 
     #region Fields
 

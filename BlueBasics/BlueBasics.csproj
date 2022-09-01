@@ -98,7 +98,6 @@
   <ItemGroup>
     <Compile Include="Accessor.cs" />
     <Compile Include="BitmapExt.cs" />
-    <Compile Include="DatabaseInterfaces\IDatabase.cs" />
     <Compile Include="Enums\SortierTyp.cs" />
     <Compile Include="EventArgs\MultiUserFileBackGroundWorker.cs" />
     <Compile Include="EventArgs\MultiUserToListEventArgs.cs" />
@@ -417,6 +416,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Balken.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DatabaseInterfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

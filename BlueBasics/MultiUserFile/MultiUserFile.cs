@@ -136,19 +136,6 @@ public sealed class MultiUserFile : IDisposableExtended {
 
     #region Properties
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <returns>-1 wenn keine vorhanden ist, ansonsten das Alter in Sekunden</returns>
-    public double AgeOfBlockDatei {
-        get {
-            if (!FileExists(Blockdateiname())) { return -1; }
-            FileInfo f = new(Blockdateiname());
-            var sec = DateTime.UtcNow.Subtract(f.CreationTimeUtc).TotalSeconds;
-            return Math.Max(0, sec); // ganz frische Dateien werden einen Bruchteil von Sekunden in der Zukunft erzeugt.
-        }
-    }
-
     public bool AutoDeleteBak { get; set; }
 
     /// <summary>
@@ -190,6 +177,19 @@ public sealed class MultiUserFile : IDisposableExtended {
                 return true;
             }
             return false;
+        }
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns>-1 wenn keine vorhanden ist, ansonsten das Alter in Sekunden</returns>
+    private double AgeOfBlockDatei {
+        get {
+            if (!FileExists(Blockdateiname())) { return -1; }
+            FileInfo f = new(Blockdateiname());
+            var sec = DateTime.UtcNow.Subtract(f.CreationTimeUtc).TotalSeconds;
+            return Math.Max(0, sec); // ganz frische Dateien werden einen Bruchteil von Sekunden in der Zukunft erzeugt.
         }
     }
 

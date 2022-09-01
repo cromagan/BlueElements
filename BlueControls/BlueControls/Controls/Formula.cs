@@ -179,7 +179,7 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
     }
 
     public static ColumnViewCollection? SearchColumnView(ColumnItem? column) {
-        if (column == null) { return null; }
+        if (column == null || column.Database == null) { return null; }
         foreach (var thisView in column.Database.Views) {
             if (thisView != null) {
                 if (thisView.Any(thisViewItem => thisViewItem?.Column != null && thisViewItem.Column == column)) {

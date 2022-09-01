@@ -71,6 +71,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
@@ -97,6 +99,7 @@
     <Compile Include="AdditionalScriptComands\VariableFilterItem.cs" />
     <Compile Include="CellCollection.cs" />
     <Compile Include="CellItem.cs" />
+    <Compile Include="SQLBack.cs" />
     <Compile Include="Enums\AlignmentHorizontal.cs" />
     <Compile Include="Enums\AdditionalCheck.cs" />
     <Compile Include="Enums\EditTypeFormula.cs" />
