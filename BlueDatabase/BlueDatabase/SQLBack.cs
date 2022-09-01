@@ -58,14 +58,14 @@ public class SqlBack {
 
         #region Main
 
-        if (!x.Contains("Main")) { CreateTable("Main"); }
-        ExecuteCommand("SET IDENTITY_INSERT Main ON");
+        if (!x.Contains("Main")) { CreateTable("Main", new List<string>() { "RK" }); }
+        //ExecuteCommand("SET IDENTITY_INSERT Main ON");
 
         #endregion
 
         #region Style
 
-        if (!x.Contains("Style")) { CreateTable("Style", new List<string>() { "DBNAME", "TYPE", "COLUMNNAME" }); }
+        if (!x.Contains("Style")) { CreateTable("Style", new List<string>() { "DBNAME", "COLUMNNAME", "TYPE" }); }
 
         var colStyle = GetColumnNames("Style");
         if (colStyle == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
@@ -294,22 +294,15 @@ public class SqlBack {
 
         // http://www.sql-server-helper.com/error-messages/msg-8110.aspx
 
-        //CREATE TABLE[dbo].[DNC] (
-        //    [AreaCode]       CHAR(3) NOT NULL,
-        //[PhoneNumber]    CHAR(7) NOT NULL,
-        //[PhoneType]      CHAR(1),
-        //CONSTRAINT[PK_DNC] PRIMARY KEY CLUSTERED( [AreaCode], [PhoneNumber] )
-        //)
-
         var t = @"CREATE TABLE " + name + "(";
 
         foreach (var thiskey in keycolumns) {
-            t += thiskey.ToUpper() + " VARCHAR(255) default '' NOT NULL,";
+            t += thiskey.ToUpper() + " VARCHAR(255) default '' NOT NULL, ";
         }
         t += ")";
 
         if (!ExecuteCommand(t)) { return false; }
-        if (!ExecuteCommand("SET IDENTITY_INSERT Style ON")) { return false; }
+        //if (!ExecuteCommand("SET IDENTITY_INSERT " + name + " ON")) { return false; }
 
         t = "ALTER TABLE " + name + " ADD CONSTRAINT PK_STYLE PRIMARY KEY CLUSTERED(" + keycolumns.JoinWith(", ").ToUpper() + ")";
 
@@ -343,10 +336,10 @@ public class SqlBack {
 
         using var q = _connection.CreateCommand();
 
-        q.CommandText = @"select @COLUMNNAME from Main " +
+        q.CommandText = @"select "+ column.Name.ToUpper()+" from Main " +
                         "where RK = @RK";
 
-        q.Parameters.AddWithValue("@COLUMNNAME", column.Name.ToUpper());
+        //q.Parameters.AddWithValue("@COLUMNNAME", column.Name.ToUpper());
         q.Parameters.AddWithValue("@RK", row.Key.ToString());
 
         using var reader = q.ExecuteReader();
@@ -424,7 +417,7 @@ public class SqlBack {
         if (isVal is null) {
             cmdString = "INSERT INTO Main (RK, " + column.Name.ToUpper() + " ) VALUES (@RK, @VALUE )";
         } else if (isVal != newValue) {
-            cmdString = "UPDATE @DBNAME @COLUMNNAME = @VALUE WHERE RK = @RK";
+            cmdString = "UPDATE Main SET " + column.Name.ToUpper() + " = @VALUE WHERE RK = @RK";
         } else {
             return true;
         }
@@ -434,9 +427,9 @@ public class SqlBack {
         using SqlCommand comm = new SqlCommand();
         comm.Connection = _connection;
         comm.CommandText = cmdString;
-        comm.Parameters.AddWithValue("@DBNAME", "Main");
+        //comm.Parameters.AddWithValue("@DBNAME", "Main");
         comm.Parameters.AddWithValue("@RK", row.Key);
-        comm.Parameters.AddWithValue("@COLUMNNAME", column.Name.ToUpper());
+        //comm.Parameters.AddWithValue("@COLUMNNAME", column.Name.ToUpper());
         comm.Parameters.AddWithValue("@VALUE", newValue);
 
         return ExecuteCommand(comm);
