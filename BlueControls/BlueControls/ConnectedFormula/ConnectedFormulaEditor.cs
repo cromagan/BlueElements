@@ -108,7 +108,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
         }
         if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
 
-        _cf.SaveAsAndChangeTo(SaveTab.FileName);
+        _cf?.SaveAsAndChangeTo(SaveTab.FileName);
 
         FormulaSet(SaveTab.FileName, null);
     }

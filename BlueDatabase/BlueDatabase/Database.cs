@@ -67,7 +67,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
 
     public readonly string UserName = Generic.UserName().ToUpper();
 
-    public readonly ListExt<ColumnViewCollection?> Views = new();
+    public readonly ListExt<ColumnViewCollection> Views = new();
 
     public string UserGroup;
 
@@ -143,7 +143,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
 
         Develop.StartService();
 
-        if (FileExists(filename)) { _sql = new SqlBack("D:\\" + filename.FileNameWithoutSuffix() + ".mdf", true); }
+        //if (FileExists(filename)) { _sql = new SqlBack("D:\\" + filename.FileNameWithoutSuffix() + ".mdf", true); }
 
         //CultureInfo culture = new("de-DE");
         //CultureInfo.DefaultThreadCurrentCulture = culture;

@@ -226,7 +226,7 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
         if (e.ClickedComand.ToLower() == "bearbeiten") {
             MultiUserFile.SaveAll(false);
 
-            var x = new ConnectedFormulaEditor(((BasicListItem)e.HotItem).Internal, _cf.NotAllowedChilds);
+            var x = new ConnectedFormulaEditor(((BasicListItem)e.HotItem).Internal, _cf?.NotAllowedChilds);
             x.ShowDialog();
             MultiUserFile.SaveAll(false);
             x.Dispose();
@@ -253,15 +253,19 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
         Childs.MoveAllowed = true;
         Childs.Suggestions.Clear();
 
-        foreach (var thisf in System.IO.Directory.GetFiles(_cf.Filename.FilePath(), "*.cfo")) {
-            if (!_cf.NotAllowedChilds.Contains(thisf)) {
-                Childs.Suggestions.Add(thisf, ImageCode.Diskette);
+        if (_cf != null && System.IO.File.Exists(_cf.Filename)) {
+            foreach (var thisf in System.IO.Directory.GetFiles(_cf.Filename.FilePath(), "*.cfo")) {
+                if (!_cf.NotAllowedChilds.Contains(thisf)) {
+                    Childs.Suggestions.Add(thisf, ImageCode.Diskette);
+                }
             }
         }
 
-        foreach (var thisf in _cf.PadData.AllPages()) {
-            if (!_cf.NotAllowedChilds.Contains(thisf) && !string.Equals("Head", thisf, StringComparison.InvariantCultureIgnoreCase)) {
-                Childs.Suggestions.Add(thisf, ImageCode.Formel);
+        if (_cf != null && _cf.PadData != null) {
+            foreach (var thisf in _cf.PadData.AllPages()) {
+                if (!_cf.NotAllowedChilds.Contains(thisf) && !string.Equals("Head", thisf, StringComparison.InvariantCultureIgnoreCase)) {
+                    Childs.Suggestions.Add(thisf, ImageCode.Formel);
+                }
             }
         }
     }

@@ -231,10 +231,139 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
         _control?.Clear();
     }
 
-    public void ConvertToNewFormula(ConnectedFormula.ConnectedFormula cf) {
-        // Siehe: View_Init
+    public void GenerateTabsToNewFormula(ConnectedFormula.ConnectedFormula cf) {
+        Generate_Tabs();
 
-        GenerateTabsToNewFormula(cf);
+        #region  Tab Item selbst tabit
+
+        var tabit = new TabFormulaPaditem(string.Empty);
+        tabit.Page = "Head";
+        cf.PadData.Add(tabit);
+
+        #endregion
+
+        var count = -1;
+
+        foreach (var thisView in _database.Views) {
+            count++;
+            var viewSpalten = View_AnzahlSpalten(thisView);
+            var belegterBereichTop = new int[viewSpalten + 1];
+            var viewN = _database.Views.IndexOf(thisView);
+            int widthInPixelOfParent;
+            int heightOfParent;
+            int moveIn;
+
+            #region Input Item it1
+
+            var it1 = new RowInputPadItem(string.Empty);
+            cf.PadData.Add(it1);
+            it1.Spaltenname = "#first";
+            it1.SetCoordinates(new RectangleF(0, -50, 150, 30), true);
+
+            #endregion
+
+            #region  Selections Item it2
+
+            var it2 = new RowWithFilterPaditem(string.Empty);
+            cf.PadData.Add(it2);
+            it2.Database = Database;
+            it2.Anzeige = "~" + _database.Column[0].Name + "~";
+            var r = it2.FilterDefiniton.Row.Add(_database.Column[0].Name);
+            r.CellSet("FilterArt", "=");
+            r.CellSet("suchtxt", it1.Internal);
+            it2.SetCoordinates(new RectangleF(160, -50, 300, 30), true);
+
+            #endregion
+
+            #region TabItem, InputItem und SelectionsItem finalisieren, Positionsdaten abfragen
+
+            string thisN;
+            if (viewN == 0) {
+                thisN = "Head";
+                tabit.GetRowFrom = it2;
+                widthInPixelOfParent = Width - 4;
+                heightOfParent = Height;
+                moveIn = 0;
+            } else {
+                thisN = thisView.Name;
+                tabit.Formulare.Add(thisN);
+                heightOfParent = Tabs.Height - Tabs.TabPages[count - 1].Top;
+                widthInPixelOfParent = Width - Skin.PaddingSmal * 4;// Tabs.Width - 10 - Skin.PaddingSmal * 4;
+                moveIn = Skin.PaddingSmal * 2;
+            }
+
+            it1.Page = thisN;
+            it2.Page = thisN;
+
+            #endregion
+
+            #region  Alle Steuerelemente erstellen (temporär it3)
+
+            var widthInPixelOfColumn = (widthInPixelOfParent - viewSpalten * Skin.PaddingSmal) / (viewSpalten + 1);
+            foreach (var thisViewItem in thisView) {
+                if (thisViewItem?.Column != null) {
+
+                    #region Die Koordinaten in Pixel des Steuerelements objPx
+
+                    // X und Width richtig berechnen, Height ignoriern, und Y schon mal ein Stück runter rutschen
+                    var objPx = new Rectangle(thisViewItem.Spalte_X1 * widthInPixelOfColumn + thisViewItem.Spalte_X1 * Skin.PaddingSmal + moveIn,
+                        moveIn,
+                        thisViewItem.Width * widthInPixelOfColumn + (thisViewItem.Width - 1) * Skin.PaddingSmal,
+                        0);
+
+                    // Nun endgültig Y berechnen
+                    for (var spnr = thisViewItem.Spalte_X1; spnr < thisViewItem.Spalte_X1 + thisViewItem.Width; spnr++) {
+                        objPx.Y = Math.Max(belegterBereichTop[spnr], objPx.Y);
+                    }
+                    if (objPx.Y > 0) { objPx.Y += 8; }
+
+                    // Height berechnen
+                    objPx.Height = Math.Max(thisViewItem.Height, 0) * 16 + 8;
+                    if (thisViewItem.ÜberschriftAnordnung is ÜberschriftAnordnung.Ohne_mit_Abstand or ÜberschriftAnordnung.Über_dem_Feld) {
+                        objPx.Height += Skin.PaddingSmal + 16;
+                    }
+                    if (thisViewItem.Height == 31) {
+                        objPx.Height = heightOfParent - objPx.Y - Skin.PaddingSmal * 3;
+                        if (objPx.Height < 16) { objPx.Height = 16; }
+                    }
+
+                    #endregion
+
+                    #region Belegten Bereich sperren
+
+                    for (var spnr = thisViewItem.Spalte_X1; spnr < thisViewItem.Spalte_X1 + thisViewItem.Width; spnr++) {
+                        belegterBereichTop[spnr] = Math.Max(belegterBereichTop[spnr], objPx.Bottom);
+                    }
+
+                    #endregion
+
+                    #region Item erstellen it3
+
+                    var it3 = new EditFieldPadItem(string.Empty);
+                    it3.GetRowFrom = it2;
+                    it3.Column = thisViewItem.Column;
+                    it3.Page = thisN;
+                    it3.CaptionPosition = thisViewItem.ÜberschriftAnordnung;
+                    it3.EditType = thisViewItem.EditType;
+                    cf.PadData.Add(it3);
+                    //it3.SetXPosition(viewSpalten, thisViewItem.Spalte_X1, thisViewItem.Width);
+                    //var x = it3.UsedArea;
+                    ////x.Width = (Parent.SheetSizeInPix.Width - (MmToPixel(0.5f, 300) * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
+                    ////x.X = x.Width * (aufXPosition - 1) + MmToPixel(0.5f, 300) * (aufXPosition - 1)
+                    //x.Height = MmToPixel(Math.Max(thisViewItem.Height, 0) * 3, 300) + MmToPixel(0.5f, 300);
+                    it3.SetCoordinates(objPx, true);
+
+                    #endregion
+                }
+
+                if (viewN == 0) {
+                    SetTabcontrolToPosition(belegterBereichTop[0] + 3);
+                    tabit.SetCoordinates(new RectangleF(Tabs.Left, Tabs.Top, Tabs.Width, Tabs.Height), true);
+                }
+            }
+
+            #endregion
+        }
     }
 
     public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
@@ -511,6 +640,8 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
     }
 
     private void Control_RepairSize_All() {
+        if (_database == null) { return; }
+
         var count = -1;
         foreach (var thisView in _database.Views) {
             count++;
@@ -528,35 +659,50 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
                 moveIn = 0;
             } else {
                 heightOfParent = Tabs.Height - Tabs.TabPages[count - 1].Top;
-                widthInPixelOfParent = Tabs.Width - 10 - (Skin.PaddingSmal * 4);
+                widthInPixelOfParent = Tabs.Width - 10 - Skin.PaddingSmal * 4;
                 moveIn = Skin.PaddingSmal * 2;
             }
 
-            var widthInPixelOfColumn = (widthInPixelOfParent - (viewSpalten * Skin.PaddingSmal)) / (viewSpalten + 1);
+            var widthInPixelOfColumn = (widthInPixelOfParent - viewSpalten * Skin.PaddingSmal) / (viewSpalten + 1);
             foreach (var thisViewItem in thisView) {
                 if (thisViewItem?.Column != null) {
-                    Rectangle objPx = new() {
-                        Width = (thisViewItem.Width * widthInPixelOfColumn) + ((thisViewItem.Width - 1) * Skin.PaddingSmal),
-                        X = (thisViewItem.Spalte_X1 * widthInPixelOfColumn) + (thisViewItem.Spalte_X1 * Skin.PaddingSmal) + moveIn,
-                        Y = moveIn
-                    }; // Die Koordinaten in Pixel des Steuerelements
-                    for (var z = thisViewItem.Spalte_X1; z < thisViewItem.Spalte_X1 + thisViewItem.Width; z++) // Spalte_X2
-                    {
-                        objPx.Y = Math.Max(belegterBereichTop[z], objPx.Y);
+
+                    #region Die Koordinaten in Pixel des Steuerelements objPx
+
+                    // X und Width richtig berechnen, Height ignoriern, und Y schon mal ein Stück runter rutschen
+                    var objPx = new Rectangle(thisViewItem.Spalte_X1 * widthInPixelOfColumn + thisViewItem.Spalte_X1 * Skin.PaddingSmal + moveIn,
+                                            moveIn,
+                                            thisViewItem.Width * widthInPixelOfColumn + (thisViewItem.Width - 1) * Skin.PaddingSmal,
+                                            0);
+
+                    // Nun endgültig Y berechnen
+                    for (var spnr = thisViewItem.Spalte_X1; spnr < thisViewItem.Spalte_X1 + thisViewItem.Width; spnr++) {
+                        objPx.Y = Math.Max(belegterBereichTop[spnr], objPx.Y);
                     }
                     if (objPx.Y > 0) { objPx.Y += 8; }
-                    objPx.Height = (Math.Max(thisViewItem.Height, 0) * 16) + 8;
+
+                    // Height berechnen
+                    objPx.Height = Math.Max(thisViewItem.Height, 0) * 16 + 8;
                     if (thisViewItem.ÜberschriftAnordnung is ÜberschriftAnordnung.Ohne_mit_Abstand or ÜberschriftAnordnung.Über_dem_Feld) {
                         objPx.Height += Skin.PaddingSmal + 16;
                     }
                     if (thisViewItem.Height == 31) {
-                        objPx.Height = heightOfParent - objPx.Y - (Skin.PaddingSmal * 3);
+                        objPx.Height = heightOfParent - objPx.Y - Skin.PaddingSmal * 3;
                         if (objPx.Height < 16) { objPx.Height = 16; }
                     }
-                    for (var z = thisViewItem.Spalte_X1; z < thisViewItem.Spalte_X1 + thisViewItem.Width; z++) // Spalte_X2
-                    {
-                        belegterBereichTop[z] = Math.Max(belegterBereichTop[z], objPx.Bottom);
+
+                    #endregion
+
+                    #region Belegten Bereich sperren
+
+                    for (var spnr = thisViewItem.Spalte_X1; spnr < thisViewItem.Spalte_X1 + thisViewItem.Width; spnr++) {
+                        belegterBereichTop[spnr] = Math.Max(belegterBereichTop[spnr], objPx.Bottom);
                     }
+
+                    #endregion
+
+                    #region Koordianten des Controls nun setzen
+
                     GenericControl? conVi = ControlOf(thisViewItem);
                     if (conVi != null) {
                         conVi.Location = new Point(objPx.X, objPx.Y);
@@ -564,16 +710,14 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
                         conVi.Visible = true;
                         conVi.BringToFront();
                     }
+
+                    #endregion
                 }
             }
-            if (viewN == 0) { SetButtonsToPosition(belegterBereichTop[0] + 3); }
+            if (viewN == 0) { SetTabcontrolToPosition(belegterBereichTop[0] + 3); }
         }
     }
 
-    //private void Tabs_SelectedIndexChanged(object sender, System.EventArgs e)
-    //{
-    //    if (Editor.Visible) { ColumnsEinfärben(); }
-    //}
     private FlexiControlForCell? ControlOf(ColumnViewItem thisViewItem) => _control.FirstOrDefault(thisControl => thisControl != null && !thisControl.IsDisposed && thisControl.Tag == thisViewItem);
 
     private void Controls_SetCorrectEnabledState_All() {
@@ -628,75 +772,6 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
                 tempPage.Enabled = _database.PermissionCheck(thisView.PermissionGroups_Show, null);
                 Tabs.TabPages.Add(tempPage);
                 tempPage.MouseUp += Tabs_MouseUp;
-            }
-        }
-    }
-
-    private void GenerateTabsToNewFormula(ConnectedFormula.ConnectedFormula cf) {
-
-        #region  Tab Item selbst
-
-        var tabit = new TabFormulaPaditem(string.Empty);
-        tabit.Page = "Head";
-        cf.PadData.Add(tabit);
-
-        #endregion
-
-        foreach (var thisView in _database.Views) {
-
-            #region Input Item
-
-            var it1 = new RowInputPadItem(string.Empty);
-
-            it1.Spaltenname = "#first";
-            it1.SetCoordinates(new RectangleF(0, -100, 50, 50), true);
-            cf.PadData.Add(it1);
-
-            #endregion
-
-            #region  Selections Item
-
-            var it2 = new RowWithFilterPaditem(string.Empty);
-
-            it2.Anzeige = "~" + _database.Column[0].Name + "~";
-            var r = it2.FilterDefiniton.Row.Add(_database.Column[0].Name);
-            r.CellSet("art", "=");
-            r.CellSet("suchtxt", it1.Internal);
-            it1.SetCoordinates(new RectangleF(70, -100, 50, 50), true);
-            cf.PadData.Add(it2);
-
-            #endregion
-
-            #region TabItem, InputItem und SelectionsItem finalisieren
-
-            var thisN = "Head";
-            if (thisView != _database.Views[0]) {
-                thisN = thisView.Name;
-                tabit.Formulare.Add(thisN);
-            } else {
-                tabit.GetRowFrom = it2;
-            }
-            it1.Page = thisN;
-            it2.Page = thisN;
-
-            #endregion
-
-            var spf = View_AnzahlSpalten(thisView);
-            foreach (var thisIt in thisView) {
-                var it3 = new EditFieldPadItem(string.Empty);
-                it3.GetRowFrom = it2;
-                it3.Column = thisIt.Column;
-                it3.Page = thisN;
-                it3.CaptionPosition = thisIt.ÜberschriftAnordnung;
-                it3.EditType = thisIt.EditType;
-                cf.PadData.Add(it3);
-                it3.SetXPosition(spf, thisIt.Spalte_X1, thisIt.Width);
-
-                var x = it3.UsedArea;
-                //x.Width = (Parent.SheetSizeInPix.Width - (MmToPixel(0.5f, 300) * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
-                //x.X = x.Width * (aufXPosition - 1) + MmToPixel(0.5f, 300) * (aufXPosition - 1)
-                x.Height = MmToPixel(Math.Max(thisIt.Height, 0) * 3, 300) + MmToPixel(0.5f, 300);
-                it3.SetCoordinates(x, true);
             }
         }
     }
@@ -784,7 +859,7 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
         }
     }
 
-    private void SetButtonsToPosition(int topPos) {
+    private void SetTabcontrolToPosition(int topPos) {
         var sph = 1;
         var spf = 1;
         var widthOfParent = Width - 4;
@@ -803,8 +878,8 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
         if (spf >= sph || spf == 0) {
             Tabs.Width = widthOfParent;
         } else {
-            var widthOfColum = (widthOfParent - (sph * Skin.PaddingSmal)) / (sph + 1);
-            Tabs.Width = (widthOfColum * (spf + 1)) + (spf * Skin.PaddingSmal);
+            var widthOfColum = (widthOfParent - sph * Skin.PaddingSmal) / (sph + 1);
+            Tabs.Width = widthOfColum * (spf + 1) + spf * Skin.PaddingSmal;
         }
         Tabs.Height = Height - topPos;
     }

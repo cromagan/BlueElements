@@ -312,7 +312,7 @@ internal sealed partial class DatabaseHeadEditor {
         var tmp = new Formula();
         tmp.Size = x.PadData.SheetSizeInPix.ToSize();
         tmp.Database = _database;
-        tmp.ConvertToNewFormula(x);
+        tmp.GenerateTabsToNewFormula(x);
 
         var f = @"D:\test.cfo";
         BlueBasics.FileOperations.DeleteFile(f, true);
