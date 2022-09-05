@@ -154,7 +154,7 @@ public partial class PadEditor : PadEditorReadOnly {
         if (flexis.Count == 0) { return; }
         var top = Skin.Padding;
         foreach (var thisFlexi in flexis) {
-            if (thisFlexi != null) {
+            if (thisFlexi != null && !thisFlexi.IsDisposed) {
                 tabElementEigenschaften.Controls.Add(thisFlexi);
                 //thisFlexi.DisabledReason = string.Empty;
                 thisFlexi.Left = Skin.Padding;

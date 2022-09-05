@@ -116,7 +116,10 @@ public sealed class BlueFont : IReadableTextWithChanging {
 
                 case "fontsize":
                     FontSize = FloatParse(pair.Value.FromNonCritical());
-                    if (FontSize < 0.1F) { Develop.DebugPrint(FehlerArt.Fehler, "Fontsize=" + FontSize); }
+                    if (FontSize < 0.1F) { 
+                        FontSize = 0.1f;
+                        //Develop.DebugPrint(FehlerArt.Warnung, "Fontsize=" + FontSize); 
+                    }
                     break;
 
                 case "color":

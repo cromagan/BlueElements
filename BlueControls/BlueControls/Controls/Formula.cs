@@ -236,7 +236,7 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
 
         #region  Tab Item selbst tabit
 
-        var tabit = new TabFormulaPaditem(string.Empty);
+        var tabit = new TabFormulaPaditem(string.Empty, cf);
         tabit.Page = "Head";
         cf.PadData.Add(tabit);
 
@@ -251,7 +251,7 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
             var viewN = _database.Views.IndexOf(thisView);
             int widthInPixelOfParent;
             int heightOfParent;
-            int moveIn;
+            int moveFromtop;
 
             #region Input Item it1
 
@@ -268,6 +268,8 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
             cf.PadData.Add(it2);
             it2.Database = Database;
             it2.Anzeige = "~" + _database.Column[0].Name + "~";
+            it2.CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
+            it2.Überschrift = "Gewählt";
             var r = it2.FilterDefiniton.Row.Add(_database.Column[0].Name);
             r.CellSet("FilterArt", "=");
             r.CellSet("suchtxt", it1.Internal);
@@ -283,13 +285,13 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
                 tabit.GetRowFrom = it2;
                 widthInPixelOfParent = Width - 4;
                 heightOfParent = Height;
-                moveIn = 0;
+                moveFromtop = 0;
             } else {
                 thisN = thisView.Name;
-                tabit.Formulare.Add(thisN);
-                heightOfParent = Tabs.Height - Tabs.TabPages[count - 1].Top;
+                tabit.Childs.Add_Text(thisN);
+                heightOfParent = (int)((Tabs.Height - Tabs.TabPages[count - 1].Top) * 0.9);
                 widthInPixelOfParent = Width - Skin.PaddingSmal * 4;// Tabs.Width - 10 - Skin.PaddingSmal * 4;
-                moveIn = Skin.PaddingSmal * 2;
+                moveFromtop = Skin.PaddingSmal;
             }
 
             it1.Page = thisN;
@@ -306,8 +308,8 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
                     #region Die Koordinaten in Pixel des Steuerelements objPx
 
                     // X und Width richtig berechnen, Height ignoriern, und Y schon mal ein Stück runter rutschen
-                    var objPx = new Rectangle(thisViewItem.Spalte_X1 * widthInPixelOfColumn + thisViewItem.Spalte_X1 * Skin.PaddingSmal + moveIn,
-                        moveIn,
+                    var objPx = new Rectangle(thisViewItem.Spalte_X1 * widthInPixelOfColumn + thisViewItem.Spalte_X1 * Skin.PaddingSmal + moveFromtop,
+                        moveFromtop,
                         thisViewItem.Width * widthInPixelOfColumn + (thisViewItem.Width - 1) * Skin.PaddingSmal,
                         0);
 
@@ -315,16 +317,16 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
                     for (var spnr = thisViewItem.Spalte_X1; spnr < thisViewItem.Spalte_X1 + thisViewItem.Width; spnr++) {
                         objPx.Y = Math.Max(belegterBereichTop[spnr], objPx.Y);
                     }
-                    if (objPx.Y > 0) { objPx.Y += 8; }
+                    if (objPx.Y > 0) { objPx.Y += 6; }
 
                     // Height berechnen
-                    objPx.Height = Math.Max(thisViewItem.Height, 0) * 16 + 8;
+                    objPx.Height = Math.Max(thisViewItem.Height, 0) * 15 + 11;
                     if (thisViewItem.ÜberschriftAnordnung is ÜberschriftAnordnung.Ohne_mit_Abstand or ÜberschriftAnordnung.Über_dem_Feld) {
-                        objPx.Height += Skin.PaddingSmal + 16;
+                        objPx.Height += Skin.PaddingSmal + 15;
                     }
                     if (thisViewItem.Height == 31) {
                         objPx.Height = heightOfParent - objPx.Y - Skin.PaddingSmal * 3;
-                        if (objPx.Height < 16) { objPx.Height = 16; }
+                        if (objPx.Height < 14) { objPx.Height = 14; }
                     }
 
                     #endregion
@@ -358,6 +360,7 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
 
                 if (viewN == 0) {
                     SetTabcontrolToPosition(belegterBereichTop[0] + 3);
+
                     tabit.SetCoordinates(new RectangleF(Tabs.Left, Tabs.Top, Tabs.Width, Tabs.Height), true);
                 }
             }

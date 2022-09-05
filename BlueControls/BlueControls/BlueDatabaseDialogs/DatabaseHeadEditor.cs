@@ -308,15 +308,31 @@ internal sealed partial class DatabaseHeadEditor {
     }
 
     private void btnWandeln_Click(object sender, System.EventArgs e) {
+        if (string.IsNullOrEmpty(txbStandardFormulaFile.Text)) {
+            MessageBox.Show("Feld Formulardatei muss befüllt sein.", ImageCode.Warnung, "OK");
+            return;
+        }
+
+        var fn = txbStandardFormulaFile.Text;//        _database.AdditionaFilesPfadWhole() + _database.Filename.FileNameWithoutSuffix() + ".cfo";
+
+        if (File.Exists(fn)) {
+            if (!BlueControls.Forms.FileDialogs.DeleteFile(fn, true)) { return; }
+        }
+
         var x = new ConnectedFormula.ConnectedFormula();
         var tmp = new Formula();
         tmp.Size = x.PadData.SheetSizeInPix.ToSize();
+        //tmp.Height = 800;
         tmp.Database = _database;
         tmp.GenerateTabsToNewFormula(x);
 
-        var f = @"D:\test.cfo";
-        BlueBasics.FileOperations.DeleteFile(f, true);
-        x.SaveAsAndChangeTo(f);
+        //BlueBasics.FileOperations.DeleteFile(f, true);
+        x.SaveAsAndChangeTo(fn);
+
+       // txbStandardFormulaFile.Text = fn.FileNameWithoutSuffix();
+
+        using var L = new ConnectedFormulaEditor(fn, null);
+        L.ShowDialog();
     }
 
     private void Database_Disposing(object sender, System.EventArgs e) {

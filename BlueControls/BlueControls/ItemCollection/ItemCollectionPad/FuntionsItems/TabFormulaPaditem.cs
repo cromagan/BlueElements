@@ -65,8 +65,6 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
 
     #region Properties
 
-    public ListExt<string> Formulare { get; } = new();
-
     protected override int SaveOrder => 1000;
 
     #endregion
