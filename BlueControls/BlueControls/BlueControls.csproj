@@ -427,12 +427,6 @@
     <Compile Include="BlueDatabaseDialogs\DatabaseHeadEditor.Designer.cs">
       <DependentUpon>DatabaseHeadEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\FormulaQuickSelect.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\FormulaQuickSelect.Designer.cs">
-      <DependentUpon>FormulaQuickSelect.cs</DependentUpon>
-    </Compile>
     <Compile Include="BlueDatabaseDialogs\Import.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -658,10 +652,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="BlueDatabaseDialogs\DatabaseHeadEditor.resx">
       <DependentUpon>DatabaseHeadEditor.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\FormulaQuickSelect.resx">
-      <DependentUpon>FormulaQuickSelect.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="BlueDatabaseDialogs\Import.resx">

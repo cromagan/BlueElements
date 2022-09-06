@@ -134,12 +134,12 @@ public class GenericControl : System.Windows.Forms.Control {
                 return PartentType.Nothing;
 
             case GroupBox: {
-                if (control.Parent is System.Windows.Forms.TabPage tp) {
-                    if (tp.Parent == null) { return PartentType.Unbekannt; }
-                    if (tp.Parent is RibbonBar) { return PartentType.RibbonGroupBox; }
+                    if (control.Parent is System.Windows.Forms.TabPage tp) {
+                        if (tp.Parent == null) { return PartentType.Unbekannt; }
+                        if (tp.Parent is RibbonBar) { return PartentType.RibbonGroupBox; }
+                    }
+                    return PartentType.GroupBox;
                 }
-                return PartentType.GroupBox;
-            }
 
             case LastFilesCombo:
                 return PartentType.LastFilesCombo;
@@ -194,8 +194,8 @@ public class GenericControl : System.Windows.Forms.Control {
             case Caption:
                 return PartentType.Caption;
 
-            case Formula:
-                return PartentType.Formula;
+            //case Formula:
+            //    return PartentType.Formula;
 
             case Form:
                 return PartentType.Form;

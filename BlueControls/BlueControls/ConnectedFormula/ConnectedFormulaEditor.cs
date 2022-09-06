@@ -25,6 +25,9 @@ using BlueControls.ItemCollection;
 using BlueDatabase;
 using static BlueBasics.Converter;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollection.ItemCollectionList;
+using BlueDatabase.Enums;
+using System;
 
 namespace BlueControls.Forms;
 
@@ -49,6 +52,19 @@ public partial class ConnectedFormulaEditor : PadEditor {
     #endregion
 
     #region Methods
+
+    public static List<BasicListItem> GetAllowedEditTypes(ColumnItem? column) {
+        var l = new List<BasicListItem>();
+        if (column == null) { return l; }
+        var t = typeof(EditTypeFormula);
+
+        foreach (int z1 in Enum.GetValues(t)) {
+            if (column.UserEditDialogTypeInFormula((EditTypeFormula)z1)) {
+                l.Add(new TextListItem(Enum.GetName(t, z1).Replace("_", " "), z1.ToString(), null, false, true, string.Empty));
+            }
+        }
+        return l;
+    }
 
     private void btnEingangsZeile_Click(object sender, System.EventArgs e) {
         var it = new RowInputPadItem(string.Empty);

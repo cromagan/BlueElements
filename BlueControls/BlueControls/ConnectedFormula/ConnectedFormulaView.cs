@@ -21,6 +21,7 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using BlueDatabase;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -44,6 +45,8 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
     private string _pageToShow = "Head";
 
     private long _rowkey = -1;
+
+    private RowItem? _tmpShowingRow;
 
     #endregion
 
@@ -115,14 +118,41 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
         set {
             if (_rowkey != value) {
                 _rowkey = value;
+                _tmpShowingRow = _database?.Row.SearchByKey(_rowkey);
                 InvalidateView();
             }
+        }
+    }
+
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public RowItem? ShowingRow {
+        get {
+            Develop.DebugPrint_Disposed(IsDisposed);
+            return _tmpShowingRow;
         }
     }
 
     #endregion
 
     #region Methods
+
+    public void GetConnectedFormulaFromDatabase(Database db) {
+        if (db != null) {
+            var f = db.FormulaFileName();
+
+            if (f != null) {
+                var tmpFormula = BlueControls.ConnectedFormula.ConnectedFormula.GetByFilename(f);
+                if (tmpFormula != null) {
+                    ConnectedFormula = tmpFormula;
+                    return;
+                }
+            }
+        }
+
+        ConnectedFormula = null;
+    }
 
     public void InvalidateView() {
         Generated = false;

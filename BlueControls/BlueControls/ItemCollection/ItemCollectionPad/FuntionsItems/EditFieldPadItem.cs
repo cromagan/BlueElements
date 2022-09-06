@@ -32,6 +32,7 @@ using BlueDatabase.Enums;
 
 using BlueBasics.Interfaces;
 using BlueControls.Interfaces;
+using BlueControls.Forms;
 
 namespace BlueControls.ItemCollection;
 
@@ -188,7 +189,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         u.AddRange(typeof(ÜberschriftAnordnung));
         l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
         var b = new ItemCollection.ItemCollectionList.ItemCollectionList();
-        b.AddRange(Formula.GetAllowedEditTypes(Column));
+        b.AddRange(ConnectedFormulaEditor.GetAllowedEditTypes(Column));
         l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
         l.Add(new FlexiControl());
         l.Add(new FlexiControlForProperty<string>(() => Spalten_QuickInfo, 5));

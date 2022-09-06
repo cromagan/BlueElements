@@ -34,7 +34,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-internal sealed partial class DatabaseHeadEditor {
+public sealed partial class DatabaseHeadEditor {
 
     #region Fields
 
@@ -56,6 +56,15 @@ internal sealed partial class DatabaseHeadEditor {
     #endregion
 
     #region Methods
+
+    public static void FormularWandeln(Database _database, string fn) {
+        var x = new ConnectedFormula.ConnectedFormula();
+        var tmp = new Formula();
+        tmp.Size = x.PadData.SheetSizeInPix.ToSize();
+        tmp.Database = _database;
+        tmp.GenerateTabsToNewFormula(x);
+        x.SaveAsAndChangeTo(fn);
+    }
 
     protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
         if (_frmHeadEditorFormClosingIsin) { return; }
@@ -319,17 +328,7 @@ internal sealed partial class DatabaseHeadEditor {
             if (!BlueControls.Forms.FileDialogs.DeleteFile(fn, true)) { return; }
         }
 
-        var x = new ConnectedFormula.ConnectedFormula();
-        var tmp = new Formula();
-        tmp.Size = x.PadData.SheetSizeInPix.ToSize();
-        //tmp.Height = 800;
-        tmp.Database = _database;
-        tmp.GenerateTabsToNewFormula(x);
-
-        //BlueBasics.FileOperations.DeleteFile(f, true);
-        x.SaveAsAndChangeTo(fn);
-
-       // txbStandardFormulaFile.Text = fn.FileNameWithoutSuffix();
+        FormularWandeln(_database, fn);
 
         using var L = new ConnectedFormulaEditor(fn, null);
         L.ShowDialog();

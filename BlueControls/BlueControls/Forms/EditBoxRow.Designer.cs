@@ -28,7 +28,7 @@ namespace BlueControls.Forms
         /// </summary>
         private void InitializeComponent()
         {
-            this.formToEdit = new BlueControls.Controls.Formula();
+            this.formToEdit = new BlueControls.Controls.ConnectedFormulaView();
             this.SuspendLayout();
             // 
             // formToEdit
@@ -52,6 +52,6 @@ namespace BlueControls.Forms
         }
         #endregion
 
-        private Controls.Formula formToEdit;
+        private BlueControls.Controls.ConnectedFormulaView formToEdit;
     }
 }

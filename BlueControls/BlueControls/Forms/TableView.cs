@@ -296,8 +296,7 @@ public partial class TableView : Form {
 
     protected virtual void DatabaseSet(Database? database, string toParse) {
         if (Table.Database != database) {
-            Formula.Database = null;
-            FormulaBETA.ConnectedFormula = null;
+            Formula.ConnectedFormula = null;
         }
 
         FilterLeiste.Table = Table;
@@ -343,33 +342,16 @@ public partial class TableView : Form {
         if (tbcSidebar.SelectedTab == tabFormula) {
             if (Formula is null || Formula.IsDisposed) { return; }
             if (!Formula.Visible) { return; }
-
             if (Formula.Width < 30 || Formula.Height < 10) { return; }
 
             if (r?.Database != null) {
-                Formula.Database = r?.Database;
+                SetFormula(r?.Database);
             }
-
+            Formula.Database = r?.Database;
             if (r != null) {
-                Formula.ShowingRowKey = r.Key;
+                Formula.RowKey = r.Key;
             } else {
-                Formula.ShowingRowKey = -1;
-            }
-        }
-
-        if (tbcSidebar.SelectedTab == tabFormulaBeta) {
-            if (FormulaBETA is null || FormulaBETA.IsDisposed) { return; }
-            if (!FormulaBETA.Visible) { return; }
-            if (FormulaBETA.Width < 30 || FormulaBETA.Height < 10) { return; }
-
-            if (r?.Database != null) {
-                SetFormulaBETA(r?.Database);
-            }
-            FormulaBETA.Database = r?.Database;
-            if (r != null) {
-                FormulaBETA.RowKey = r.Key;
-            } else {
-                FormulaBETA.RowKey = -1;
+                Formula.RowKey = -1;
             }
         }
     }
@@ -651,7 +633,6 @@ public partial class TableView : Form {
     }
 
     private void btnLoeschen_Click(object sender, System.EventArgs e) {
-        Formula.HideViewEditor();
         if (chkAnsichtFormular.Checked) {
             if (Formula.ShowingRow == null) {
                 MessageBox.Show("Kein Eintrag gewählt.", ImageCode.Information, "OK");
@@ -747,7 +728,6 @@ public partial class TableView : Form {
     }
 
     private void btnTextSuche_Click(object sender, System.EventArgs e) {
-        Formula.HideViewEditor();
         var suchtT = txbTextSuche.Text.Trim();
         if (string.IsNullOrEmpty(suchtT)) {
             MessageBox.Show("Bitte Text zum Suchen eingeben.", ImageCode.Information, "OK");
@@ -844,7 +824,6 @@ public partial class TableView : Form {
     }
 
     private void btnVorwärts_Click(object sender, System.EventArgs e) {
-        Formula.HideViewEditor();
         SuchEintragNoSave(Direction.Unten, out var column, out var row);
         Table.CursorPos_Set(column, row, false);
     }
@@ -857,7 +836,6 @@ public partial class TableView : Form {
     }
 
     private void btnZurück_Click(object sender, System.EventArgs e) {
-        Formula.HideViewEditor();
         SuchEintragNoSave(Direction.Oben, out var column, out var row);
         Table.CursorPos_Set(column, row, false);
     }
@@ -898,13 +876,7 @@ public partial class TableView : Form {
 
     private void Check_SuchButton() => btnTextSuche.Enabled = Table.Database != null && Table.Database.Row.Count >= 1 && !string.IsNullOrEmpty(txbTextSuche.Text) && !string.IsNullOrEmpty(txbTextSuche.Text.RemoveChars(" "));
 
-    private void Formula_SizeChanged(object sender, System.EventArgs e) => FillFormula(Table?.CursorPosRow?.Row);
-
-    private void Formula_VisibleChanged(object sender, System.EventArgs e) => FillFormula(Table?.CursorPosRow?.Row);
-
     private void InitView() {
-        Formula.HideViewEditor();
-
         if (DesignMode) {
             grpFormularSteuerung.Visible = true;
             tbcSidebar.Visible = true;
@@ -992,22 +964,15 @@ public partial class TableView : Form {
         } while (true);
     }
 
-    private void SetFormulaBETA(Database? db) {
+    private void SetFormula(Database? db) {
         if (db != null) {
-            var f = db.FormulaFileName();
-
-            if (f != null) {
-                var tmpFormula = ConnectedFormula.ConnectedFormula.GetByFilename(f);
-                if (tmpFormula != null) {
-                    FormulaBETA.ConnectedFormula = tmpFormula;
-                    FormulaBETA.Database = db;
-                    return;
-                }
-            }
+            Formula.GetConnectedFormulaFromDatabase(db);
+            Formula.Database = db;
+            return;
         }
 
-        FormulaBETA.Database = null;
-        FormulaBETA.ConnectedFormula = null;
+        Formula.Database = null;
+        Formula.ConnectedFormula = null;
     }
 
     private void SuchEintragNoSave(Direction richtung, out ColumnItem? column, out RowData? row) {

@@ -115,9 +115,9 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
             //    return true;
 
             default:
-                if (Parent is Formula f) {
-                    return f.ContextMenuItemClickedInternalProcessig(sender, e);
-                }
+                //if (Parent is Formula f) {
+                //    return f.ContextMenuItemClickedInternalProcessig(sender, e);
+                //}
                 break;
         }
         return false;

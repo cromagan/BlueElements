@@ -193,9 +193,9 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
                 return true;
 
             default:
-                if (Parent is Formula f) {
-                    return f.ContextMenuItemClickedInternalProcessig(sender, e);
-                }
+                //if (Parent is Formula f) {
+                //    return f.ContextMenuItemClickedInternalProcessig(sender, e);
+                //}
                 break;
         }
         return false;
@@ -209,16 +209,16 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         if (_tmpColumn != null && _tmpRow != null && _tmpColumn.Database.IsAdministrator()) {
             items.Add(ContextMenuComands.VorherigenInhaltWiederherstellen);
         }
-        if (Parent is Formula f) {
-            ItemCollectionList x = new(BlueListBoxAppearance.KontextMenu);
-            f.GetContextMenuItems(null, x, out _, tags, ref cancel, ref translate);
-            if (x.Count > 0) {
-                if (items.Count > 0) {
-                    items.AddSeparator();
-                }
-                items.AddClonesFrom(x);
-            }
-        }
+        //if (Parent is Formula f) {
+        //    ItemCollectionList x = new(BlueListBoxAppearance.KontextMenu);
+        //    f.GetContextMenuItems(null, x, out _, tags, ref cancel, ref translate);
+        //    if (x.Count > 0) {
+        //        if (items.Count > 0) {
+        //            items.AddSeparator();
+        //        }
+        //        items.AddClonesFrom(x);
+        //    }
+        //}
         hotItem = _tmpColumn;
     }
 

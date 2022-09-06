@@ -86,9 +86,7 @@ namespace BlueControls.Forms {
             this.SplitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tbcSidebar = new BlueControls.Controls.TabControl();
             this.tabFormula = new System.Windows.Forms.TabPage();
-            this.Formula = new BlueControls.Controls.Formula();
-            this.tabFormulaBeta = new System.Windows.Forms.TabPage();
-            this.FormulaBETA = new BlueControls.Controls.ConnectedFormulaView();
+            this.Formula = new BlueControls.Controls.ConnectedFormulaView();
             this.pnlStatusBar = new System.Windows.Forms.Panel();
             this.capStatusbar = new BlueControls.Controls.Caption();
             this.capZeilen2 = new BlueControls.Controls.Caption();
@@ -119,7 +117,6 @@ namespace BlueControls.Forms {
             this.SplitContainer1.SuspendLayout();
             this.tbcSidebar.SuspendLayout();
             this.tabFormula.SuspendLayout();
-            this.tabFormulaBeta.SuspendLayout();
             this.pnlStatusBar.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -893,7 +890,6 @@ namespace BlueControls.Forms {
             // tbcSidebar
             // 
             this.tbcSidebar.Controls.Add(this.tabFormula);
-            this.tbcSidebar.Controls.Add(this.tabFormulaBeta);
             this.tbcSidebar.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tbcSidebar.HotTrack = true;
             this.tbcSidebar.Location = new System.Drawing.Point(0, 0);
@@ -912,42 +908,19 @@ namespace BlueControls.Forms {
             this.tabFormula.Controls.Add(this.Formula);
             this.tabFormula.Location = new System.Drawing.Point(4, 25);
             this.tabFormula.Name = "tabFormula";
-            this.tabFormula.Padding = new System.Windows.Forms.Padding(3);
             this.tabFormula.Size = new System.Drawing.Size(338, 566);
-            this.tabFormula.TabIndex = 0;
+            this.tabFormula.TabIndex = 1;
             this.tabFormula.Text = "Formular";
             // 
             // Formula
             // 
+            this.Formula.ConnectedFormula = null;
             this.Formula.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Formula.Location = new System.Drawing.Point(3, 3);
-            this.Formula.MinimumSize = new System.Drawing.Size(200, 200);
+            this.Formula.Location = new System.Drawing.Point(0, 0);
             this.Formula.Name = "Formula";
-            this.Formula.Size = new System.Drawing.Size(332, 560);
+            this.Formula.RowKey = ((long)(-1));
+            this.Formula.Size = new System.Drawing.Size(338, 566);
             this.Formula.TabIndex = 0;
-            this.Formula.Text = "Formula";
-            this.Formula.SizeChanged += new System.EventHandler(this.Formula_SizeChanged);
-            this.Formula.VisibleChanged += new System.EventHandler(this.Formula_VisibleChanged);
-            // 
-            // tabFormulaBeta
-            // 
-            this.tabFormulaBeta.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabFormulaBeta.Controls.Add(this.FormulaBETA);
-            this.tabFormulaBeta.Location = new System.Drawing.Point(4, 25);
-            this.tabFormulaBeta.Name = "tabFormulaBeta";
-            this.tabFormulaBeta.Size = new System.Drawing.Size(338, 566);
-            this.tabFormulaBeta.TabIndex = 1;
-            this.tabFormulaBeta.Text = "Formular (BETA)";
-            // 
-            // FormulaBETA
-            // 
-            this.FormulaBETA.ConnectedFormula = null;
-            this.FormulaBETA.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.FormulaBETA.Location = new System.Drawing.Point(0, 0);
-            this.FormulaBETA.Name = "FormulaBETA";
-            this.FormulaBETA.RowKey = ((long)(-1));
-            this.FormulaBETA.Size = new System.Drawing.Size(338, 566);
-            this.FormulaBETA.TabIndex = 0;
             // 
             // pnlStatusBar
             // 
@@ -1036,7 +1009,6 @@ namespace BlueControls.Forms {
             this.SplitContainer1.ResumeLayout(false);
             this.tbcSidebar.ResumeLayout(false);
             this.tabFormula.ResumeLayout(false);
-            this.tabFormulaBeta.ResumeLayout(false);
             this.pnlStatusBar.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -1065,11 +1037,9 @@ namespace BlueControls.Forms {
         private Controls.GroupBox grpAdminBearbeiten;
         private Controls.GroupBox grpAdminAllgemein;
         protected Controls.TabControl tbcSidebar;
-        protected System.Windows.Forms.TabPage tabFormula;
         private System.Windows.Forms.Panel pnlStatusBar;
         public Controls.Caption capStatusbar;
         private Controls.Caption capZeilen2;
-        protected Controls.Formula Formula;
         protected System.Windows.Forms.TabPage tabAllgemein;
         protected Controls.Button btnUnterschiede;
         private Controls.Caption capSpaltenanordnung;
@@ -1096,8 +1066,8 @@ namespace BlueControls.Forms {
         private System.Windows.Forms.OpenFileDialog LoadTab;
         private System.Windows.Forms.SaveFileDialog SaveTab;
         private Controls.Button btnSuchenUndErsetzen;
-        protected System.Windows.Forms.TabPage tabFormulaBeta;
-        private Controls.ConnectedFormulaView FormulaBETA;
+        protected System.Windows.Forms.TabPage tabFormula;
+        private Controls.ConnectedFormulaView Formula;
         private Controls.Button btnFormular;
         private Controls.GroupBox grpFormularSteuerung;
         private Controls.Button btnNeu;

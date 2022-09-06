@@ -165,22 +165,9 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
 
     #region Methods
 
-    public static List<BasicListItem> GetAllowedEditTypes(ColumnItem? column) {
-        var l = new List<BasicListItem>();
-        if (column == null) { return l; }
-        var t = typeof(EditTypeFormula);
-
-        foreach (int z1 in Enum.GetValues(t)) {
-            if (column.UserEditDialogTypeInFormula((EditTypeFormula)z1)) {
-                l.Add(new TextListItem(Enum.GetName(t, z1).Replace("_", " "), z1.ToString(), null, false, true, string.Empty));
-            }
-        }
-        return l;
-    }
-
     public static ColumnViewCollection? SearchColumnView(ColumnItem? column) {
         if (column == null || column.Database == null) { return null; }
-        foreach (var thisView in column.Database.Views) {
+        foreach (var thisView in column.Database.OldFormulaViews) {
             if (thisView != null) {
                 if (thisView.Any(thisViewItem => thisViewItem?.Column != null && thisViewItem.Column == column)) {
                     return thisView;
@@ -193,12 +180,12 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
         if (_database == null) { return true; }
         switch (e.ClickedComand.ToLower()) {
-            case "#schnelleingabe":
-                if (ShowingRow == null) { return true; }
-                FormulaQuickSelect sh = new(ShowingRow);
-                sh.ShowDialog();
-                sh.Dispose();
-                return true;
+            //case "#schnelleingabe":
+            //    if (ShowingRow == null) { return true; }
+            //    FormulaQuickSelect sh = new(ShowingRow);
+            //    sh.ShowDialog();
+            //    sh.Dispose();
+            //    return true;
 
             case "#ansicht":
                 ShowViewEditor();
@@ -244,11 +231,11 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
 
         var count = -1;
 
-        foreach (var thisView in _database.Views) {
+        foreach (var thisView in _database.OldFormulaViews) {
             count++;
             var viewSpalten = View_AnzahlSpalten(thisView);
             var belegterBereichTop = new int[viewSpalten + 1];
-            var viewN = _database.Views.IndexOf(thisView);
+            var viewN = _database.OldFormulaViews.IndexOf(thisView);
             int widthInPixelOfParent;
             int heightOfParent;
             int moveFromtop;
@@ -320,7 +307,7 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
                     if (objPx.Y > 0) { objPx.Y += 6; }
 
                     // Height berechnen
-                    objPx.Height = Math.Max(thisViewItem.Height, 0) * 15 + 11;
+                    objPx.Height = Math.Max(thisViewItem.Height, 0) * 15 + 9;
                     if (thisViewItem.ÜberschriftAnordnung is ÜberschriftAnordnung.Ohne_mit_Abstand or ÜberschriftAnordnung.Über_dem_Feld) {
                         objPx.Height += Skin.PaddingSmal + 15;
                     }
@@ -361,7 +348,7 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
                 if (viewN == 0) {
                     SetTabcontrolToPosition(belegterBereichTop[0] + 3);
 
-                    tabit.SetCoordinates(new RectangleF(Tabs.Left, Tabs.Top, Tabs.Width, Tabs.Height), true);
+                    tabit.SetCoordinates(new RectangleF(Tabs.Left, Tabs.Top, Tabs.Width, Tabs.Height - 57), true);
                 }
             }
 
@@ -468,17 +455,17 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
     }
 
     private void Arrangement_Swap(int ri) {
-        var vn = _database.Views.IndexOf(CurrentView());
-        if (vn < 1 || vn >= _database.Views.Count) { return; }
+        var vn = _database.OldFormulaViews.IndexOf(CurrentView());
+        if (vn < 1 || vn >= _database.OldFormulaViews.Count) { return; }
         if (ri is 0 or > 1 or < -1) { return; }
         if (vn < 2 && ri < 0) { return; }
-        if (vn >= _database.Views.Count - 1 && ri > 0) { return; }
+        if (vn >= _database.OldFormulaViews.Count - 1 && ri > 0) { return; }
 
-        var tmpx1 = _database.Views[vn];
-        var tmpx2 = _database.Views[vn + ri];
+        var tmpx1 = _database.OldFormulaViews[vn];
+        var tmpx2 = _database.OldFormulaViews[vn + ri];
         // Binding List Changes müsste reagieren
-        _database.Views[vn] = tmpx2;
-        _database.Views[vn + ri] = tmpx1;
+        _database.OldFormulaViews[vn] = tmpx2;
+        _database.OldFormulaViews[vn + ri] = tmpx1;
         RedoView();
     }
 
@@ -490,7 +477,7 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
     private void btnAnsichtHinzufuegen_Click(object sender, System.EventArgs e) {
         var ex = InputBox.Show("Geben sie den Namen<br>der neuen Ansicht ein:", "", VarType.Text);
         if (string.IsNullOrEmpty(ex)) { return; }
-        _database.Views.Add(new ColumnViewCollection(_database, "", ex));
+        _database.OldFormulaViews.Add(new ColumnViewCollection(_database, "", ex));
         RedoView();
         SortColumnList();
     }
@@ -498,10 +485,10 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
     private void btnAnsichtloeschen_Click(object sender, System.EventArgs e) {
         var currView = CurrentView();
         if (currView == null) { return; }
-        var i = _database.Views.IndexOf(currView);
+        var i = _database.OldFormulaViews.IndexOf(currView);
         if (i < 1) { return; } // 0 darf auch nicht gelöscht werden
         if (MessageBox.Show("Ansicht <b>'" + currView.Name + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-        _database.Views.RemoveAt(i);
+        _database.OldFormulaViews.RemoveAt(i);
         RedoView();
         SortColumnList();
     }
@@ -569,7 +556,7 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
         aa.AddRange(_database.Permission_AllUsed(false));
         aa.CheckBehavior = CheckBehavior.MultiSelection;
         aa.Check(currView.PermissionGroups_Show, true);
-        if (_database.Views.Count > 1 && currView == _database.Views[1]) {
+        if (_database.OldFormulaViews.Count > 1 && currView == _database.OldFormulaViews[1]) {
             aa["#Everybody"].Enabled = false;
             aa["#Everybody"].Checked = true;
         }
@@ -579,7 +566,7 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
         currView.PermissionGroups_Show.Clear();
         currView.PermissionGroups_Show.AddRange(b.ToArray());
         currView.PermissionGroups_Show.RemoveString("#Administrator", false);
-        if (currView == _database.Views[1]) { currView.PermissionGroups_Show.Add("#Everybody"); }
+        if (currView == _database.OldFormulaViews[1]) { currView.PermissionGroups_Show.Add("#Everybody"); }
     }
 
     private void btnReiterNachLinks_Click(object sender, System.EventArgs e) => Arrangement_Swap(-1);
@@ -588,7 +575,7 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
 
     private void btnRename_Click(object sender, System.EventArgs e) {
         var currView = CurrentView();
-        if (currView == null || currView == _database.Views[0]) { return; }
+        if (currView == null || currView == _database.OldFormulaViews[0]) { return; }
         var n = InputBox.Show("Umbenennen:", currView.Name, VarType.Text);
         if (!string.IsNullOrEmpty(n)) { currView.Name = n; }
         RedoView();
@@ -625,9 +612,9 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
     private void Control_Create_All() {
         var count = -1;
         _control = new List<FlexiControlForCell>();
-        foreach (var thisView in _database.Views) {
+        foreach (var thisView in _database.OldFormulaViews) {
             if (thisView != null) {
-                var index = _database.Views.IndexOf(thisView);
+                var index = _database.OldFormulaViews.IndexOf(thisView);
                 count++;
                 foreach (var thisViewItem in thisView) {
                     if (thisViewItem?.Column != null) {
@@ -646,11 +633,11 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
         if (_database == null) { return; }
 
         var count = -1;
-        foreach (var thisView in _database.Views) {
+        foreach (var thisView in _database.OldFormulaViews) {
             count++;
             var viewSpalten = View_AnzahlSpalten(thisView);
             var belegterBereichTop = new int[viewSpalten + 1];
-            var viewN = _database.Views.IndexOf(thisView);
+            var viewN = _database.OldFormulaViews.IndexOf(thisView);
             int widthInPixelOfParent;
             int heightOfParent;
             int moveIn;
@@ -731,10 +718,10 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
     }
 
     private ColumnViewCollection? CurrentView() {
-        if (_database.Views.Count == 0) { return null; }
-        if (Tabs.SelectedIndex + 1 > _database.Views.Count - 1) { Develop.DebugPrint(FehlerArt.Fehler, "Index zu hoch"); }
-        if (_database.Views[Tabs.SelectedIndex + 1] == null) { Develop.DebugPrint(FehlerArt.Fehler, "View ist Nothing"); }
-        return _database.Views[Tabs.SelectedIndex + 1];
+        if (_database.OldFormulaViews.Count == 0) { return null; }
+        if (Tabs.SelectedIndex + 1 > _database.OldFormulaViews.Count - 1) { Develop.DebugPrint(FehlerArt.Fehler, "Index zu hoch"); }
+        if (_database.OldFormulaViews[Tabs.SelectedIndex + 1] == null) { Develop.DebugPrint(FehlerArt.Fehler, "View ist Nothing"); }
+        return _database.OldFormulaViews[Tabs.SelectedIndex + 1];
     }
 
     private void Editor_CheckButtons(bool blinki) {
@@ -752,7 +739,7 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
             if (viewItem.Column != null) {
                 if (blinki) {
                     cbxControlType.Item.Clear();
-                    cbxControlType.Item.AddRange(GetAllowedEditTypes(viewItem.Column));
+                    cbxControlType.Item.AddRange(ConnectedFormulaEditor.GetAllowedEditTypes(viewItem.Column));
                 }
                 cbxControlType.Text = ((int)viewItem.EditType).ToString();
             } else {
@@ -764,9 +751,9 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
     private ColumnItem? EditorSelectedColumn() => lbxColumns.Item.Checked().Count != 1 ? null : _database.Column.SearchByKey(LongParse(lbxColumns.Item.Checked()[0].Internal));
 
     private void Generate_Tabs() {
-        if (_database.Views.Count < 1) { return; }
-        foreach (var thisView in _database.Views) {
-            if (thisView != null && thisView != _database.Views[0]) {
+        if (_database.OldFormulaViews.Count < 1) { return; }
+        foreach (var thisView in _database.OldFormulaViews) {
+            if (thisView != null && thisView != _database.OldFormulaViews[0]) {
                 _tabGeneratorCount++;
                 System.Windows.Forms.TabPage tempPage = new() {
                     Text = "Seite #" + _tabGeneratorCount
@@ -786,7 +773,7 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
         var cd = SearchViewItem(_database.Column.SearchByKey(LongParse(item.Internal)));
         if (cd == null) {
             e.UserMenu.Add("Zum Kopfbereich hinzufügen", "#AddColumnToHead", ImageCode.Sonne);
-            e.UserMenu.Add("Zum Körperbereich hinzufügen", "#AddColumnToBody", ImageCode.Kreis, _database.Views.Count > 1);
+            e.UserMenu.Add("Zum Körperbereich hinzufügen", "#AddColumnToBody", ImageCode.Kreis, _database.OldFormulaViews.Count > 1);
         } else {
             e.UserMenu.Add("Dieses Feld ausblenden", "#RemoveColumnFromView", ImageCode.Kreuz, Convert.ToBoolean(cd != null));
         }
@@ -800,16 +787,16 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
         switch (e.ClickedComand) {
             case "#RemoveColumnFromView":
                 if (viewItem != null) {
-                    _database.Views[0]?.Remove(viewItem);
+                    _database.OldFormulaViews[0]?.Remove(viewItem);
                     currView?.Remove(viewItem);
                 }
                 break;
 
             case "#AddColumnToHead":
-                if (_database.Views.Count == 0) {
-                    _database.Views.Add(new ColumnViewCollection(_database, string.Empty, "##Head###"));
+                if (_database.OldFormulaViews.Count == 0) {
+                    _database.OldFormulaViews.Add(new ColumnViewCollection(_database, string.Empty, "##Head###"));
                 }
-                _database.Views[0].Add(column, false);
+                _database.OldFormulaViews[0].Add(column, false);
                 break;
 
             case "#AddColumnToBody":
@@ -869,8 +856,8 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
         if (grpEditor.Visible) {
             widthOfParent = Width - grpEditor.Width - 8;
         }
-        foreach (var thisView in _database.Views) {
-            if (_database.Views.IndexOf(thisView) == 0) {
+        foreach (var thisView in _database.OldFormulaViews) {
+            if (_database.OldFormulaViews.IndexOf(thisView) == 0) {
                 sph = Math.Max(sph, View_AnzahlSpalten(thisView));
             } else {
                 spf = Math.Max(spf, View_AnzahlSpalten(thisView));
@@ -911,7 +898,7 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
     }
 
     private void SortColumnList() {
-        for (var viewNo = -1; viewNo < _database.Views.Count; viewNo++) {
+        for (var viewNo = -1; viewNo < _database.OldFormulaViews.Count; viewNo++) {
             string? nam;
             switch (viewNo) {
                 case -1:
@@ -923,7 +910,7 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
                     break;
 
                 default:
-                    nam = _database.Views[viewNo] == null ? string.Empty : _database.Views[viewNo].Name + " "; // Leerzeichen wegen evtl. leeren namen
+                    nam = _database.OldFormulaViews[viewNo] == null ? string.Empty : _database.OldFormulaViews[viewNo].Name + " "; // Leerzeichen wegen evtl. leeren namen
                     break;
             }
 
@@ -947,7 +934,7 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
                     lbxColumns.Item.Remove(thisItem);
                 } else {
                     var cv = SearchColumnView(co);
-                    var sort = cv == null ? 0 : _database.Views.IndexOf(cv) + 1;
+                    var sort = cv == null ? 0 : _database.OldFormulaViews.IndexOf(cv) + 1;
                     thisItem.UserDefCompareKey = sort.ToString(Constants.Format_Integer3) + "|Z" + thisItem.CompareKey();
                 }
             }
@@ -987,7 +974,7 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
         Control_Create_All();
         Control_RepairSize_All();
         Controls_SetCorrectEnabledState_All();
-        Tabs.Visible = _database.Views.Count > 0;
+        Tabs.Visible = _database.OldFormulaViews.Count > 0;
         _inited = true;
         if (Tabs.TabPages.Count >= 0) { Tabs.SelectedIndex = 0; }
     }

@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace BlueControls.BlueDatabaseDialogs
 {
-    internal sealed partial class DatabaseHeadEditor : Form
+    public sealed partial class DatabaseHeadEditor : Form
     {
         //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]

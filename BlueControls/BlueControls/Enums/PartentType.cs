@@ -36,8 +36,10 @@ public enum PartentType {
     Caption = 13,
     TabPage = 14,
     TabControl = 15,
-    Formula = 16,
+
+    //Formula = 16,
     RibbonControl = 17,
+
     RibbonPage = 18,
     RibbonGroupBox = 19,
     LastFilesCombo = 20,

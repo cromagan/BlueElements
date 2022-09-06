@@ -32,7 +32,7 @@ public partial class EditBoxRow : DialogWithOkAndCancel {
 
         if (row != null) {
             formToEdit.Database = row.Database;
-            formToEdit.ShowingRowKey = row.Key;
+            formToEdit.RowKey = row.Key;
         }
 
         Setup(txt, formToEdit, formToEdit.MinimumSize.Width + 50);
