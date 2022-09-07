@@ -377,6 +377,8 @@ public sealed class Database : IDisposable, IDisposableExtended {
     /// <param name="readOnly"></param>
     /// <returns></returns>
     public static Database? GetByFilename(string filename, bool checkOnlyFilenameToo, bool readOnly) {
+        if (string.IsNullOrEmpty(filename)) { return null; }
+
         foreach (var thisFile in AllFiles) {
             if (thisFile != null && string.Equals(thisFile.Filename, filename, StringComparison.OrdinalIgnoreCase)) {
                 thisFile.BlockReload(false);

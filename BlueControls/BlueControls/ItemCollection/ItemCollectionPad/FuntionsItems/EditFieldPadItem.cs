@@ -149,7 +149,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
 
     #region Methods
 
-    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
+    public override System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
         if (GetRowFrom is ICalculateOneRowItemLevel rfw2) {
             var ff = parent.SearchOrGenerate((BasicPadItem)rfw2);
 

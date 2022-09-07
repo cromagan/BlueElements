@@ -71,38 +71,11 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
 
     #region Methods
 
-    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
+    public override System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
         var c3 = new Controls.TabControl();
         c3.Tag = Internal;
 
-        #region  Tabs erstellen
-
-        foreach (var thisc in Childs.Item) {
-            var t = new TabPage();
-            t.Text = thisc.Internal.FileNameWithoutSuffix();
-            c3.TabPages.Add(t);
-
-            ConnectedFormula.ConnectedFormula? cf;
-            string pg;
-
-            if (thisc.Internal.EndsWith(".cfo", StringComparison.InvariantCultureIgnoreCase)) {
-                cf = ConnectedFormula.ConnectedFormula.GetByFilename(thisc.Internal);
-                pg = "Head";
-            } else {
-                cf = _cf;
-                pg = thisc.Internal;
-            }
-
-            if (cf != null) {
-                var cc = new ConnectedFormulaView();
-                t.Controls.Add(cc);
-                cc.ConnectedFormula = cf;
-                cc.Page = pg;
-                cc.Dock = DockStyle.Fill;
-            }
-        }
-
-        #endregion
+        //CreateTabs(c3);
 
         if (GetRowFrom is ICalculateOneRowItemLevel rfw2) {
             var ff = parent.SearchOrGenerate((BasicPadItem)rfw2);
@@ -110,6 +83,68 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
         }
 
         return c3;
+    }
+
+    public void CreateTabs(Controls.TabControl c3, string? myGroup, string? myName) {
+
+        #region  Tabs erstellen
+
+        foreach (var thisc in Childs.Item) {
+            ConnectedFormula.ConnectedFormula? cf;
+            string pg;
+            string pgvis;
+
+            if (thisc.Internal.EndsWith(".cfo", StringComparison.InvariantCultureIgnoreCase)) {
+                cf = ConnectedFormula.ConnectedFormula.GetByFilename(thisc.Internal);
+                pg = "Head";
+                pgvis = string.Empty;
+            } else {
+                cf = _cf;
+                pg = thisc.Internal;
+                pgvis = thisc.Internal;
+            }
+
+            TabPage? existTab = null;
+
+            foreach (var thisTab in c3.TabPages) {
+                if (thisTab is TabPage tb) {
+                    if (tb.Name == thisc.Internal.FileNameWithoutSuffix()) {
+                        existTab = tb;
+                        break;
+                    }
+                }
+            }
+
+            if (cf != null) {
+                if (cf.HasVisibleItemsForMe(pgvis, myGroup, myName)) {
+                    if (existTab == null) {
+                        var t = new TabPage();
+                        t.Name = thisc.Internal.FileNameWithoutSuffix();
+                        t.Text = thisc.Internal.FileNameWithoutSuffix();
+                        c3.TabPages.Add(t);
+
+                        var cc = new ConnectedFormulaView();
+                        t.Controls.Add(cc);
+                        cc.ConnectedFormula = cf;
+                        cc.Page = pg;
+                        cc.Dock = DockStyle.Fill;
+                    }
+                } else {
+                    if (existTab != null) {
+                        foreach (var thisC in existTab.Controls) {
+                            if (thisC is IDisposable c) {
+                                c.Dispose();
+                            }
+                        }
+
+                        c3.TabPages.Remove(existTab);
+                        existTab.Dispose();
+                    }
+                }
+            }
+        }
+
+        #endregion
     }
 
     public override List<GenericControl> GetStyleOptions() {

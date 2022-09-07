@@ -233,12 +233,22 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
 
                     if (o is System.Windows.Forms.Control c) {
                         unused.Remove(c);
-                        c.Visible = true;
+
+                        if (thisit is CustomizableShowPadItem cspi) {
+                            c.Visible = cspi.IsVisibleForMe(_database?.UserGroup, _database?.UserName);
+                        } else {
+                            c.Visible = true;
+                        }
+
                         var ua = thisit.UsedArea;
                         c.Left = (int)(ua.Left * addfactor);
                         c.Top = (int)(ua.Top / Umrechnungsfaktor2);
                         c.Width = (int)(ua.Width * addfactor);
                         c.Height = (int)(ua.Height / Umrechnungsfaktor2);
+
+                        if (thisit is TabFormulaPaditem c3) {
+                            c3.CreateTabs((Controls.TabControl)c, _database?.UserGroup, _database?.UserName);
+                        }
                     }
                 }
             }

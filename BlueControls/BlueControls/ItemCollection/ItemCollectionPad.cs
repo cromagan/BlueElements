@@ -732,7 +732,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
             if (SheetStyle == null || SheetStyleScale < 0.1d) { return true; }
             foreach (var thisItem in this.Where(thisItem => thisItem != null)) {
                 gr.PixelOffsetMode = PixelOffsetMode.None;
-                if (string.IsNullOrEmpty(seite) || thisItem.Page.ToLower() == seite.ToLower()) {
+                if (string.IsNullOrEmpty(seite) || thisItem.Page.Equals(seite, StringComparison.InvariantCultureIgnoreCase)) {
                     thisItem.Draw(gr, zoom, shiftX, shiftY, sizeOfParentControl, forPrinting);
                 }
             }

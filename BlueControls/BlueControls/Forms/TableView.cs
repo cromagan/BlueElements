@@ -1057,6 +1057,8 @@ public partial class TableView : Form {
 
         BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
 
+        if (e.TabPage == null) { return; }
+
         var s = (List<string>)(e.TabPage.Tag);
 
         var DB = Database.GetByFilename(s[0], false, false);

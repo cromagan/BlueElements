@@ -76,7 +76,7 @@ public class RowInputPadItem : RectanglePadItem, IReadableText, IContentHolder, 
 
     #region Methods
 
-    public Control CreateControl(ConnectedFormulaView parent) {
+    public Control? CreateControl(ConnectedFormulaView parent) {
         var c3 = new FlexiControlForCell();
         c3.Width = 200;
         c3.Height = 32;

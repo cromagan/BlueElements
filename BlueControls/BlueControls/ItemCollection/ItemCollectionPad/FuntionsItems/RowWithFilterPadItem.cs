@@ -153,7 +153,7 @@ public class RowWithFilterPaditem : RectanglePadItem, IReadableText, IAcceptAndS
 
     #region Methods
 
-    public Control CreateControl(ConnectedFormulaView parent) {
+    public Control? CreateControl(ConnectedFormulaView parent) {
         var c = new FlexiControlRowSelector(Database, this.Parent, FilterDefiniton, _überschrift, _anzeige);
         c.EditType = _bearbeitung;
         c.CaptionPosition = CaptionPosition;

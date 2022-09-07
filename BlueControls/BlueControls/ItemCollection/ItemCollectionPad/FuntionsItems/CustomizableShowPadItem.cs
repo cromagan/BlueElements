@@ -179,21 +179,23 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
         set {
             ItemCollectionList.ItemCollectionList aa = new();
             aa.AddRange(Permission_AllUsed());
+
+            if (aa["#Administrator"] == null) { aa.Add("#Administrator"); }
             aa.Sort();
             aa.CheckBehavior = CheckBehavior.MultiSelection;
             aa.Check(VisibleFor, true);
             var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:", aa, AddType.Text, true);
             if (b == null) { return; }
             VisibleFor.Clear();
+
             VisibleFor.AddRange(b.ToArray());
 
             if (VisibleFor.Count > 1 && VisibleFor.Contains("#Everybody", false)) {
                 VisibleFor.Clear();
-            }
-
-            if (VisibleFor.Count == 0) {
                 VisibleFor.Add("#Everybody");
             }
+
+            if (VisibleFor.Count == 0) { VisibleFor.Add("#Administrator"); }
 
             OnChanged();
         }
@@ -257,7 +259,9 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
         }
     }
 
-    public abstract Control? CreateControl(ConnectedFormulaView parent);
+    public virtual Control? CreateControl(ConnectedFormulaView parent) {
+        throw new NotImplementedException();
+    }
 
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
@@ -282,6 +286,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
             case "visiblefor":
                 VisibleFor.Clear();
                 VisibleFor.AddRange((value.FromNonCritical()).SplitAndCutByCr());
+                if (VisibleFor.Count == 0) { VisibleFor.Add("#Everybody"); }
                 return true;
         }
         return false;
@@ -298,15 +303,29 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
         var t = base.ToString();
         t = t.Substring(0, t.Length - 1) + ", ";
 
-        if (VisibleFor.Count > 0) {
-            t = t + "VisibleFor=" + (VisibleFor.JoinWithCr()).ToNonCritical() + ", ";
-        }
+        if (VisibleFor.Count == 0) { VisibleFor.Add("#Everybody"); }
+
+        t = t + "VisibleFor=" + (VisibleFor.JoinWithCr()).ToNonCritical() + ", ";
 
         if (GetRowFrom != null) {
             t = t + "GetValueFrom=" + GetRowFrom.Internal.ToNonCritical() + ", ";
         }
 
         return t.Trim(", ") + "}";
+    }
+
+    internal bool IsVisibleForMe(string? myGroup, string? myName) {
+        if (myGroup == null || myName == null) { return false; }
+
+        if (VisibleFor == null || VisibleFor.Count == 0 || VisibleFor.Contains("#Everybody", false)) { return true; }
+
+        if (myGroup.Equals("#Administrator", StringComparison.InvariantCultureIgnoreCase)) { return true; }
+
+        if (VisibleFor.Contains(myGroup, false)) { return true; }
+
+        if (VisibleFor.Contains("#USER: " + myName, false)) { return true; }
+        if (VisibleFor.Contains("#USER:" + myName, false)) { return true; }
+        return false;
     }
 
     private List<string> Permission_AllUsed() {

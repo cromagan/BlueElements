@@ -161,6 +161,8 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
     /// <param name="filename"></param>
     /// <returns></returns>
     public static ConnectedFormula? GetByFilename(string filename) {
+        if (string.IsNullOrEmpty(filename)) { return null; }
+
         foreach (var thisFile in AllFiles) {
             if (thisFile != null && string.Equals(thisFile.Filename, filename, StringComparison.OrdinalIgnoreCase)) {
                 return thisFile;
@@ -198,6 +200,29 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
                 thisCon.Bei_Export_sichtbar = false;
             }
         }
+    }
+
+    /// <summary>
+    /// Prüft, ob das Formular sichtbare Elemente hat.
+    /// Zeilenselectionen werden dabei ignoriert.
+    /// </summary>
+    /// <param name="page">Wird dieser Wert leer gelassen, wird das komplette Formular geprüft</param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    internal bool HasVisibleItemsForMe(string page, string? myGroup, string? myName) {
+        if (_padData == null) { return false; }
+
+        foreach (var thisItem in _padData) {
+            if (string.IsNullOrEmpty(page) ||
+                string.IsNullOrEmpty(thisItem.Page) ||
+                page.Equals(thisItem.Page, StringComparison.InvariantCultureIgnoreCase)) {
+                if (thisItem is CustomizableShowPadItem cspi) {
+                    if (cspi.IsVisibleForMe(myGroup, myName)) { return true; }
+                }
+            }
+        }
+
+        return false;
     }
 
     internal void SaveAsAndChangeTo(string fileName) => _muf.SaveAsAndChangeTo(fileName);
@@ -307,7 +332,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
         #region ein bischen aufräumen zuvor
 
         _saving = true;
-        PadData.Sort();
+        //PadData.Sort();
 
         _id = -1;
 

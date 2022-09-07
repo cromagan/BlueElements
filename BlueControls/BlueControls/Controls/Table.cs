@@ -3118,6 +3118,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private int Row_DrawHeight(RowItem? vrow, Rectangle displayRectangleWoSlider) {
         if (_design == BlueTableAppearance.OnlyMainColumnWithoutHead) { return Cell_ContentSize(this, _database.Column[0], vrow, _cellFont, _pix16).Height; }
         var tmp = _pix18;
+        if(CurrentArrangement == null) { return tmp; }
+
         foreach (var thisViewItem in CurrentArrangement) {
             if (thisViewItem?.Column != null && !vrow.CellIsNullOrEmpty(thisViewItem.Column)) {
                 tmp = Math.Max(tmp, Cell_ContentSize(this, thisViewItem.Column, vrow, _cellFont, _pix16).Height);

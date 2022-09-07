@@ -84,7 +84,7 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
 
     #region Methods
 
-    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
+    public override System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
         var c = new FlexiControl();
         c.Caption = Überschrift + ":";
         c.EditType = _bearbeitung;

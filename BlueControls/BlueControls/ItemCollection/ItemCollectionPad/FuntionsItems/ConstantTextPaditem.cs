@@ -73,7 +73,7 @@ public class ConstantTextPaditem : FixedRectanglePadItem, IReadableText, IConten
 
     #region Methods
 
-    public Control CreateControl(ConnectedFormulaView parent) {
+    public Control? CreateControl(ConnectedFormulaView parent) {
         var c3 = new FlexiControl();
         c3.Width = 100;
         c3.Height = 16;
