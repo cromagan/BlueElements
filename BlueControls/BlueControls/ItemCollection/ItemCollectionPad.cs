@@ -229,7 +229,8 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
     public SizeF SheetSizeInMm {
         get => _sheetSizeInMm;
         set {
-            if (value == _sheetSizeInMm) { return; }
+            if (Math.Abs(value.Width - _sheetSizeInMm.Width) < 0.0001 &&
+                Math.Abs(value.Height - _sheetSizeInMm.Height) < 0.0001) { return; }
             _sheetSizeInMm = new SizeF(value.Width, value.Height);
             GenPoints();
             OnChanged();

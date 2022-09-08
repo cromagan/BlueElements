@@ -16,11 +16,13 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.EventArgs;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using BlueDatabase;
+using BlueDatabase.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -37,11 +39,9 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
     #region Fields
 
     public bool Generated = false;
-
     private ConnectedFormula.ConnectedFormula? _cf;
     private Database? _database = null;
 
-    //private RowItem? _inputrow = null;
     private string _pageToShow = "Head";
 
     private long _rowkey = -1;
@@ -72,11 +72,14 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
             Database = null;
 
             if (_cf != null) {
+                _cf.Loaded -= _cf_Loaded;
                 _cf.Changed -= _cf_Changed;
             }
+
             _cf = value;
 
             if (_cf != null) {
+                _cf.Loaded += _cf_Loaded;
                 _cf.Changed += _cf_Changed;
             }
 
@@ -91,11 +94,21 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
     public Database? Database {
         get => _database;
         set {
-            if (_database != value) {
-                RowKey = -1;
-                _database = value;
-                InvalidateView();
+            if (value == _database) { return; }
+            RowKey = -1;
+
+            if (_database != null) {
+                _database.Disposing -= _Database_Disposing;
+                _database.Row.RowRemoving -= Row_RowRemoving;
             }
+            _database = value;
+
+            if (_database != null) {
+                _database.Disposing += _Database_Disposing;
+                _database.Row.RowRemoving += Row_RowRemoving;
+            }
+
+            InvalidateView();
         }
     }
 
@@ -119,7 +132,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
             if (_rowkey != value) {
                 _rowkey = value;
                 _tmpShowingRow = _database?.Row.SearchByKey(_rowkey);
-                InvalidateView();
+                SetInputRow();
             }
         }
     }
@@ -213,6 +226,12 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
         InvalidateView();
     }
 
+    private void _cf_Loaded(object sender, LoadedEventArgs e) {
+        InvalidateView();
+    }
+
+    private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
+
     private void GenerateView() {
         if (Generated) { return; }
         Generated = false;
@@ -224,40 +243,48 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
             }
         }
 
-        if (_cf != null && Visible) {
-            var addfactor = Size.Width / _cf.PadData.SheetSizeInPix.Width;
+        if (_cf != null) {
+            if (Visible || Controls.Count > 0) {
+                var addfactor = Size.Width / _cf.PadData.SheetSizeInPix.Width;
 
-            foreach (var thisit in _cf.PadData) {
-                if (thisit.IsVisibleOnPage(_pageToShow)) {
-                    var o = SearchOrGenerate(thisit);
+                foreach (var thisit in _cf.PadData) {
+                    if (thisit.IsVisibleOnPage(_pageToShow)) {
+                        var o = SearchOrGenerate(thisit);
 
-                    if (o is System.Windows.Forms.Control c) {
-                        unused.Remove(c);
+                        if (o is System.Windows.Forms.Control c) {
+                            unused.Remove(c);
 
-                        if (thisit is CustomizableShowPadItem cspi) {
-                            c.Visible = cspi.IsVisibleForMe(_database?.UserGroup, _database?.UserName);
-                        } else {
-                            c.Visible = true;
-                        }
+                            if (thisit is CustomizableShowPadItem cspi) {
+                                c.Visible = cspi.IsVisibleForMe(_database?.UserGroup, _database?.UserName);
+                            } else {
+                                c.Visible = true;
+                            }
 
-                        var ua = thisit.UsedArea;
-                        c.Left = (int)(ua.Left * addfactor);
-                        c.Top = (int)(ua.Top / Umrechnungsfaktor2);
-                        c.Width = (int)(ua.Width * addfactor);
-                        c.Height = (int)(ua.Height / Umrechnungsfaktor2);
+                            var ua = thisit.UsedArea;
+                            c.Left = (int)(ua.Left * addfactor);
+                            c.Top = (int)(ua.Top / Umrechnungsfaktor2);
+                            c.Width = (int)(ua.Width * addfactor);
+                            c.Height = (int)(ua.Height / Umrechnungsfaktor2);
 
-                        if (thisit is TabFormulaPaditem c3) {
-                            c3.CreateTabs((Controls.TabControl)c, _database?.UserGroup, _database?.UserName);
+                            if (thisit is TabFormulaPaditem c3) {
+                                c3.CreateTabs((Controls.TabControl)c, _database?.UserGroup, _database?.UserName);
+                            }
                         }
                     }
                 }
+                Generated = true;
             }
-            Generated = true;
         }
 
         foreach (var thisc in unused) {
             Controls.Remove(thisc);
             thisc.Dispose();
+        }
+    }
+
+    private void Row_RowRemoving(object sender, RowEventArgs e) {
+        if (_rowkey == e.Row.Key) {
+            RowKey = -1;
         }
     }
 

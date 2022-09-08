@@ -95,7 +95,6 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
                 _database.Row.RowRemoving -= Row_RowRemoving;
                 _database.Column.ItemRemoved -= _Database_ColumnRemoved;
                 _database.Column.ItemInternalChanged -= _Database_ItemInternalChanged;
-                //_Database.RowKeyChanged -= _Database_RowKeyChanged;
                 _database.Disposing -= _Database_Disposing;
                 _database.Save(false); // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
             }
@@ -106,7 +105,6 @@ public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
                 _database.Row.RowRemoving += Row_RowRemoving;
                 _database.Column.ItemRemoved += _Database_ColumnRemoved;
                 _database.Column.ItemInternalChanged += _Database_ItemInternalChanged;
-                //_Database.RowKeyChanged += _Database_RowKeyChanged;
                 _database.Disposing += _Database_Disposing;
             }
             _inited = false;

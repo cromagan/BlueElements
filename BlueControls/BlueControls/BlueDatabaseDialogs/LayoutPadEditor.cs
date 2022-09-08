@@ -31,6 +31,12 @@ namespace BlueControls.BlueDatabaseDialogs;
 
 public partial class LayoutPadEditor : PadEditorWithFileAccess {
 
+    #region Fields
+
+    private Database? _database;
+
+    #endregion
+
     #region Constructors
 
     //private string _LoadedLayout = string.Empty;
@@ -38,10 +44,9 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+
         Database = database;
         scriptEditor.Database = database;
-        Database.Disposing += Database_Disposing;
-        Database.ShouldICancelSaveOperations += Database_ShouldICancelDiscOperations;
 
         BefülleLayoutDropdown();
         CheckButtons();
@@ -51,7 +56,23 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
 
     #region Properties
 
-    public Database? Database { get; private set; }
+    public Database? Database {
+        get => _database;
+        private set {
+            if (value == _database) { return; }
+
+            if (_database != null) {
+                _database.Disposing -= Database_Disposing;
+                _database.ShouldICancelSaveOperations -= Database_ShouldICancelDiscOperations;
+            }
+            _database = value;
+
+            if (_database != null) {
+                _database.Disposing += Database_Disposing;
+                _database.ShouldICancelSaveOperations += Database_ShouldICancelDiscOperations;
+            }
+        }
+    }
 
     #endregion
 
