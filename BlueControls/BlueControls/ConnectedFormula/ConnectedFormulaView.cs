@@ -56,8 +56,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
 
     public ConnectedFormulaView(string page) {
         InitializeComponent();
-        _pageToShow = page;
-        GenerateView();
+        DoFormulaDatabaseAndRow(null, null, -1, page);
     }
 
     #endregion
@@ -67,23 +66,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
     public ConnectedFormula.ConnectedFormula? ConnectedFormula {
         get => _cf;
         set {
-            if (_cf == value) { return; }
-            RowKey = -1;
-            Database = null;
-
-            if (_cf != null) {
-                _cf.Loaded -= _cf_Loaded;
-                _cf.Changed -= _cf_Changed;
-            }
-
-            _cf = value;
-
-            if (_cf != null) {
-                _cf.Loaded += _cf_Loaded;
-                _cf.Changed += _cf_Changed;
-            }
-
-            InvalidateView();
+            DoFormulaDatabaseAndRow(value, Database, RowKey, Page);
         }
     }
 
@@ -94,21 +77,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
     public Database? Database {
         get => _database;
         set {
-            if (value == _database) { return; }
-            RowKey = -1;
-
-            if (_database != null) {
-                _database.Disposing -= _Database_Disposing;
-                _database.Row.RowRemoving -= Row_RowRemoving;
-            }
-            _database = value;
-
-            if (_database != null) {
-                _database.Disposing += _Database_Disposing;
-                _database.Row.RowRemoving += Row_RowRemoving;
-            }
-
-            InvalidateView();
+            DoFormulaDatabaseAndRow(ConnectedFormula, value, RowKey, Page);
         }
     }
 
@@ -116,12 +85,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
     public string Page {
         get => _pageToShow;
         set {
-            if (string.Equals(_pageToShow, value, System.StringComparison.InvariantCultureIgnoreCase)) { return; }
-            RowKey = -1;
-
-            _pageToShow = value;
-
-            InvalidateView();
+            DoFormulaDatabaseAndRow(ConnectedFormula, Database, RowKey, value);
         }
     }
 
@@ -129,11 +93,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
     public long RowKey {
         get => _rowkey;
         set {
-            if (_rowkey != value) {
-                _rowkey = value;
-                _tmpShowingRow = _database?.Row.SearchByKey(_rowkey);
-                SetInputRow();
-            }
+            DoFormulaDatabaseAndRow(ConnectedFormula, Database, value, Page);
         }
     }
 
@@ -151,7 +111,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
 
     #region Methods
 
-    public void GetConnectedFormulaFromDatabase(Database db) {
+    public void GetConnectedFormulaFromDatabase(Database? db) {
         if (db != null) {
             var f = db.FormulaFileName();
 
@@ -212,8 +172,9 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
     protected override void OnSizeChanged(System.EventArgs e) {
         if (IsDisposed) { return; }
         base.OnSizeChanged(e);
-        Generated = false;
-        GenerateView();
+        if (!Generated) { return; }
+
+        InvalidateView();
     }
 
     protected override void OnVisibleChanged(System.EventArgs e) {
@@ -232,9 +193,61 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
 
     private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
 
+    private void DoFormulaDatabaseAndRow(ConnectedFormula.ConnectedFormula? cf, Database? database, long rowKey, string page) {
+        if (_cf == cf &&
+            _database == database &&
+            _rowkey == rowKey &&
+            _pageToShow.Equals(page, StringComparison.InvariantCultureIgnoreCase)) { return; }
+
+        _rowkey = -1;
+        _tmpShowingRow = null;
+        if (Generated) { SetInputRow(); }
+
+        _tmpShowingRow = null;
+
+        if (_cf != cf) {
+            if (_cf != null) {
+                _cf.Loaded -= _cf_Loaded;
+                _cf.Changed -= _cf_Changed;
+            }
+
+            _cf = cf;
+
+            if (_cf != null) {
+                _cf.Loaded += _cf_Loaded;
+                _cf.Changed += _cf_Changed;
+            }
+        }
+
+        if (_database != database) {
+            if (_database != null) {
+                _database.Disposing -= _Database_Disposing;
+                _database.Row.RowRemoving -= Row_RowRemoving;
+            }
+            _database = database;
+
+            if (_database != null) {
+                _database.Disposing += _Database_Disposing;
+                _database.Row.RowRemoving += Row_RowRemoving;
+            }
+        }
+
+        _pageToShow = page;
+
+        InvalidateView();
+
+        //if (string.Equals(_pageToShow, value, System.StringComparison.InvariantCultureIgnoreCase)) { return; }
+        //RowKey = -1;
+
+        if (rowKey != -1 && _database != null && _cf != null) {
+            _rowkey = rowKey;
+            _tmpShowingRow = _database?.Row.SearchByKey(_rowkey);
+            SetInputRow();
+        }
+    }
+
     private void GenerateView() {
         if (Generated) { return; }
-        Generated = false;
 
         var unused = new List<System.Windows.Forms.Control>();
         foreach (var thisco in Controls) {

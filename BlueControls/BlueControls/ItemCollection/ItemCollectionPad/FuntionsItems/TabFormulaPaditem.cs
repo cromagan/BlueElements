@@ -123,10 +123,10 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
                         t.Text = thisc.Internal.FileNameWithoutSuffix();
                         c3.TabPages.Add(t);
 
-                        var cc = new ConnectedFormulaView();
+                        var cc = new ConnectedFormulaView(pg);
                         t.Controls.Add(cc);
                         cc.ConnectedFormula = cf;
-                        cc.Page = pg;
+                        //cc.Page = pg;
                         cc.Dock = DockStyle.Fill;
                     }
                 } else {

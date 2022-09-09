@@ -113,6 +113,7 @@ namespace BeCreative {
             this.Name = "Start";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "BeCreative! - (c) Christian Peter";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Start_FormClosing);
             this.ResumeLayout(false);
 
         }
