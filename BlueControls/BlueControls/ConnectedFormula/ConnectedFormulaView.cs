@@ -199,6 +199,8 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
             _rowkey == rowKey &&
             _pageToShow.Equals(page, StringComparison.InvariantCultureIgnoreCase)) { return; }
 
+        SuspendLayout();
+
         _rowkey = -1;
         _tmpShowingRow = null;
         if (Generated) { SetInputRow(); }
@@ -244,6 +246,9 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
             _tmpShowingRow = _database?.Row.SearchByKey(_rowkey);
             SetInputRow();
         }
+
+        ResumeLayout();
+        Invalidate();
     }
 
     private void GenerateView() {

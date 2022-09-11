@@ -517,16 +517,17 @@ public sealed class RowItem : ICanBeEmpty, IDisposable {
                 var v = CellToVariable(thisCol, this);
                 if (v != null) { vars.AddRange(v); }
             }
-            vars.Add(new VariableString("User", Generic.UserName(), true, false, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
+            vars.Add(new VariableString("User", Database.UserName, true, false, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
             vars.Add(new VariableString("Usergroup", Database.UserGroup, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
             vars.Add(new VariableBool("Administrator", Database.IsAdministrator(), true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
             vars.Add(new VariableDatabase("Database", Database, true, true, string.Empty));
+            vars.Add(new VariableString("DatabasePath", Database.Filename.FilePath(), true, false, "Der Dateipfad der Datenbank."));
 
             #endregion Variablen für Skript erstellen
 
             #region Script ausführen
 
-            Script sc = new(vars, Database.AdditionaFilesPfadWhole()) {
+            Script sc = new(vars, Database.AdditionaFilesPfadWhole(), startRoutine.Equals("script testing", StringComparison.InvariantCultureIgnoreCase)) {
                 ScriptText = Database.RulesScript
             };
             sc.Parse();

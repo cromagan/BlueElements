@@ -117,9 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="btnTabControlAdd.QuickInfo" xml:space="preserve">
+    <value>Fügt ein Steuerelement mit Registerkarten hinzu.
+Pro Registerkarte kann ein Unterformular gewählt werden.
+Diese Unterformulare müssen eine "Zeileneingang" beinhalten.
+Gleichzeitig muss dieses Element an ein "Zeile mit Filterung"
+angeschlossen sein, um zu funktionieren.</value>
+  </data>
   <data name="btnEingangsZeile.QuickInfo" xml:space="preserve">
     <value>Fügt einen möglichen externen Übergabepunkt zu.
-Mit dieser Option kann ein Wert einer Zeile
+Mit diesem Elemtent kann ein Wert einer Zeile
 aus einem übergeordneten Formular empfangen werden.
 Da dieses Element jede Zeile empfangen kann - auch wenn es 
 von verschiedenen Stellen mit verschiedenen Datenbanken befüllt wird -
@@ -128,12 +135,12 @@ muss der interne Spaltenname als Text eingegeben werden.
 Mit einer "Zeile mit Filterung" kann dann dieser Wert verwendet werden,
 auch Zwitter Lösungen mit dem Filter "wenn nicht leer" sind möglich.</value>
   </data>
-  <data name="btnTabControlAdd.QuickInfo" xml:space="preserve">
-    <value>Fügt ein Steuerelement mit Registerkarten hinzu.
-Pro Registerkarte kann ein Unterformular gewählt werden.
-Diese Unterformulare müssen eine "Zeileneingang" beinhalten.
-Gleichzeitig muss dieses Element an ein "Zeile mit Filterung"
-angeschlossen sein, um zu funktionieren.</value>
+  <data name="btnZeileHinzu.QuickInfo" xml:space="preserve">
+    <value>Dieses Element ist Vorraussetzung für die Anzeige weiterer Felder.
+Stellt eine Zeile einer Datenbank bereit.
+Durch einer Vorfilterung können bestimmte Zeilen einer Datenbank ausgewählt werden.
+
+Aus dieser können dann die Felder extrahiert werden.</value>
   </data>
   <metadata name="LoadTab.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>644, 56</value>

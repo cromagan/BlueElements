@@ -88,7 +88,7 @@ public class TabControl : AbstractTabControl, IAcceptRowKey {
             if (thisTab is TabPage tp) {
                 foreach (var thisControl in tp.Controls) {
                     if (thisControl is IAcceptRowKey iar and not TabControl) {
-                        iar.RowKey = -1;
+                        //iar.RowKey = -1;
                         iar.Database = Database;
                         iar.RowKey = RowKey;
                     }

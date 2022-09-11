@@ -120,7 +120,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposable //  Syst
     }
 
     protected virtual Script? GenerateAndDoScript() {
-        var s = new Script(null, string.Empty);
+        var s = new Script(null, string.Empty, true);
         s.Parse();
         return s;
     }

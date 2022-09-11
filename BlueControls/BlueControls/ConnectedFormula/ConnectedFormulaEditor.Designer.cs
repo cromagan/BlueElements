@@ -31,7 +31,7 @@ namespace BlueControls.Forms {
             this.btnPfeileAusblenden = new BlueControls.Controls.Button();
             this.grpFelder = new BlueControls.Controls.GroupBox();
             this.btnVariable = new BlueControls.Controls.Button();
-            this.grpFileExplorer = new BlueControls.Controls.Button();
+            this.btnFileExplorer = new BlueControls.Controls.Button();
             this.btnKonstante = new BlueControls.Controls.Button();
             this.btnFeldHinzu = new BlueControls.Controls.Button();
             this.groupBox1 = new BlueControls.Controls.GroupBox();
@@ -50,6 +50,7 @@ namespace BlueControls.Forms {
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
             this.LoadTabDatabase = new System.Windows.Forms.OpenFileDialog();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.btnBild = new BlueControls.Controls.Button();
             this.grpDesign.SuspendLayout();
             this.tabHintergrund.SuspendLayout();
             this.Ribbon.SuspendLayout();
@@ -126,8 +127,8 @@ namespace BlueControls.Forms {
             this.tabEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabEditor.Controls.Add(this.grpVorschau);
             this.tabEditor.Controls.Add(this.grpFelder);
-            this.tabEditor.Controls.Add(this.groupBox1);
             this.tabEditor.Controls.Add(this.grpOptik);
+            this.tabEditor.Controls.Add(this.groupBox1);
             this.tabEditor.Location = new System.Drawing.Point(4, 25);
             this.tabEditor.Margin = new System.Windows.Forms.Padding(0);
             this.tabEditor.Name = "tabEditor";
@@ -142,7 +143,7 @@ namespace BlueControls.Forms {
             this.grpVorschau.Controls.Add(this.btnPfeileAusblenden);
             this.grpVorschau.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpVorschau.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpVorschau.Location = new System.Drawing.Point(600, 0);
+            this.grpVorschau.Location = new System.Drawing.Point(648, 0);
             this.grpVorschau.Name = "grpVorschau";
             this.grpVorschau.Size = new System.Drawing.Size(160, 81);
             this.grpVorschau.TabIndex = 1;
@@ -175,15 +176,17 @@ namespace BlueControls.Forms {
             // grpFelder
             // 
             this.grpFelder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpFelder.Controls.Add(this.btnBild);
             this.grpFelder.Controls.Add(this.btnVariable);
-            this.grpFelder.Controls.Add(this.grpFileExplorer);
+            this.grpFelder.Controls.Add(this.btnTabControlAdd);
+            this.grpFelder.Controls.Add(this.btnFileExplorer);
             this.grpFelder.Controls.Add(this.btnKonstante);
             this.grpFelder.Controls.Add(this.btnFeldHinzu);
             this.grpFelder.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpFelder.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpFelder.Location = new System.Drawing.Point(312, 0);
+            this.grpFelder.Location = new System.Drawing.Point(240, 0);
             this.grpFelder.Name = "grpFelder";
-            this.grpFelder.Size = new System.Drawing.Size(288, 81);
+            this.grpFelder.Size = new System.Drawing.Size(408, 81);
             this.grpFelder.TabIndex = 0;
             this.grpFelder.TabStop = false;
             this.grpFelder.Text = "Felder";
@@ -192,38 +195,38 @@ namespace BlueControls.Forms {
             // 
             this.btnVariable.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnVariable.ImageCode = "Variable|16|||||||||PlusZeichen";
-            this.btnVariable.Location = new System.Drawing.Point(136, 2);
+            this.btnVariable.Location = new System.Drawing.Point(208, 2);
             this.btnVariable.Name = "btnVariable";
             this.btnVariable.QuickInfo = "Ein Feld, das eine Variable \r\neines Zeilen-Skriptes dargestellen kann.\r\nImmer sch" +
     "reibgeschützt.";
             this.btnVariable.Size = new System.Drawing.Size(64, 66);
             this.btnVariable.TabIndex = 4;
-            this.btnVariable.Text = "Variablenf. hinzufügen";
+            this.btnVariable.Text = "Variablen anzeigen";
             this.btnVariable.Click += new System.EventHandler(this.btnVariable_Click);
             // 
-            // grpFileExplorer
+            // btnFileExplorer
             // 
-            this.grpFileExplorer.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.grpFileExplorer.ImageCode = "Ordner|16|||||||||PlusZeichen";
-            this.grpFileExplorer.Location = new System.Drawing.Point(200, 2);
-            this.grpFileExplorer.Name = "grpFileExplorer";
-            this.grpFileExplorer.QuickInfo = "Ein Feld, das ein Verzeichniss darstelle kann.\r\nEs können Variablen eines Zeilen-" +
-    "Skriptes benutzt werden.";
-            this.grpFileExplorer.Size = new System.Drawing.Size(80, 66);
-            this.grpFileExplorer.TabIndex = 3;
-            this.grpFileExplorer.Text = "Verz.-Ansicht hinzufügen";
-            this.grpFileExplorer.Click += new System.EventHandler(this.grpFileExplorer_Click);
+            this.btnFileExplorer.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnFileExplorer.ImageCode = "Ordner|16|||||||||PlusZeichen";
+            this.btnFileExplorer.Location = new System.Drawing.Point(272, 2);
+            this.btnFileExplorer.Name = "btnFileExplorer";
+            this.btnFileExplorer.QuickInfo = "Fügt ein Feld hinzu, das ein Verzeichniss darstellen kann.\r\nEs können Variablen e" +
+    "ines Zeilen-Skriptes benutzt werden.";
+            this.btnFileExplorer.Size = new System.Drawing.Size(64, 66);
+            this.btnFileExplorer.TabIndex = 3;
+            this.btnFileExplorer.Text = "Verzeich-niss";
+            this.btnFileExplorer.Click += new System.EventHandler(this.grpFileExplorer_Click);
             // 
             // btnKonstante
             // 
             this.btnKonstante.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnKonstante.ImageCode = "Textfeld|16|||||||||PlusZeichen";
-            this.btnKonstante.Location = new System.Drawing.Point(72, 2);
+            this.btnKonstante.Location = new System.Drawing.Point(80, 2);
             this.btnKonstante.Name = "btnKonstante";
             this.btnKonstante.QuickInfo = "Fügt einen konstanten Wert hinzu,\r\nder für Filterungen benutzt werden\r\nkann.";
             this.btnKonstante.Size = new System.Drawing.Size(64, 66);
             this.btnKonstante.TabIndex = 2;
-            this.btnKonstante.Text = "Konstante hinzufügen";
+            this.btnKonstante.Text = "Konstante für Filter";
             this.btnKonstante.Click += new System.EventHandler(this.btnKonstante_Click);
             // 
             // btnFeldHinzu
@@ -232,11 +235,12 @@ namespace BlueControls.Forms {
             this.btnFeldHinzu.ImageCode = "Stift|16|||||||||PlusZeichen";
             this.btnFeldHinzu.Location = new System.Drawing.Point(8, 2);
             this.btnFeldHinzu.Name = "btnFeldHinzu";
-            this.btnFeldHinzu.QuickInfo = "Fügt ein Feld hinzu.\r\nDieses kann entweder von einer Zeile\r\nbefüllt werden, oder " +
-    "frei eingegeben werden";
-            this.btnFeldHinzu.Size = new System.Drawing.Size(64, 66);
+            this.btnFeldHinzu.QuickInfo = "Fügt ein Feld hinzu, mit der z.B. eine Zelle einer \r\nSpalte bearbeitet werden kan" +
+    "n.\r\n\r\nDieses Feld kann entweder von einer Zeile\r\nbefüllt werden, oder frei einge" +
+    "geben werden";
+            this.btnFeldHinzu.Size = new System.Drawing.Size(72, 66);
             this.btnFeldHinzu.TabIndex = 1;
-            this.btnFeldHinzu.Text = "Feld hinzufügen";
+            this.btnFeldHinzu.Text = "Zellen-Bearbeitung";
             this.btnFeldHinzu.Click += new System.EventHandler(this.btnFeldHinzu_Click);
             // 
             // groupBox1
@@ -246,7 +250,7 @@ namespace BlueControls.Forms {
             this.groupBox1.Controls.Add(this.btnZeileHinzu);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Left;
             this.groupBox1.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.groupBox1.Location = new System.Drawing.Point(160, 0);
+            this.groupBox1.Location = new System.Drawing.Point(0, 0);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(152, 81);
             this.groupBox1.TabIndex = 3;
@@ -257,7 +261,7 @@ namespace BlueControls.Forms {
             // 
             this.btnEingangsZeile.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnEingangsZeile.ImageCode = "Pfeil_Unten|16|||00FF00||||||Zeile";
-            this.btnEingangsZeile.Location = new System.Drawing.Point(72, 2);
+            this.btnEingangsZeile.Location = new System.Drawing.Point(8, 2);
             this.btnEingangsZeile.Name = "btnEingangsZeile";
             this.btnEingangsZeile.QuickInfo = resources.GetString("btnEingangsZeile.QuickInfo");
             this.btnEingangsZeile.Size = new System.Drawing.Size(72, 66);
@@ -269,11 +273,9 @@ namespace BlueControls.Forms {
             // 
             this.btnZeileHinzu.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnZeileHinzu.ImageCode = "Trichter|16|||||||||Zeile";
-            this.btnZeileHinzu.Location = new System.Drawing.Point(8, 2);
+            this.btnZeileHinzu.Location = new System.Drawing.Point(80, 2);
             this.btnZeileHinzu.Name = "btnZeileHinzu";
-            this.btnZeileHinzu.QuickInfo = "Stellt eine Zeile einer Datenbank bereit.\r\nDurch einer Vorfilterung können bestim" +
-    "mte Zeilen\r\neiner Datenbank ausgewählt werden.\r\nAus dieser könne Felder extrahie" +
-    "rt werden.";
+            this.btnZeileHinzu.QuickInfo = resources.GetString("btnZeileHinzu.QuickInfo");
             this.btnZeileHinzu.Size = new System.Drawing.Size(64, 66);
             this.btnZeileHinzu.TabIndex = 0;
             this.btnZeileHinzu.Text = "Zeile mit Filterung";
@@ -283,12 +285,11 @@ namespace BlueControls.Forms {
             // 
             this.grpOptik.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpOptik.Controls.Add(this.btnRegisterKarte);
-            this.grpOptik.Controls.Add(this.btnTabControlAdd);
             this.grpOptik.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpOptik.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpOptik.Location = new System.Drawing.Point(0, 0);
+            this.grpOptik.Location = new System.Drawing.Point(152, 0);
             this.grpOptik.Name = "grpOptik";
-            this.grpOptik.Size = new System.Drawing.Size(160, 81);
+            this.grpOptik.Size = new System.Drawing.Size(88, 81);
             this.grpOptik.TabIndex = 2;
             this.grpOptik.TabStop = false;
             this.grpOptik.Text = "Optik";
@@ -297,11 +298,11 @@ namespace BlueControls.Forms {
             // 
             this.btnRegisterKarte.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnRegisterKarte.ImageCode = "PlusZeichen|16|||00FF00||||||Zeile";
-            this.btnRegisterKarte.Location = new System.Drawing.Point(72, 2);
+            this.btnRegisterKarte.Location = new System.Drawing.Point(0, 2);
             this.btnRegisterKarte.Name = "btnRegisterKarte";
             this.btnRegisterKarte.QuickInfo = "Fügt eine weiter Formularseite hinzu.\r\nDiese kann dann in einem Register dargeste" +
-    "llt werden.\r\n\r\nEin solches Formular muss einen Zeile-Eingang\r\nbesitzen, um Werte" +
-    " empfangen zu können.";
+    "llt werden.\r\n\r\nEin solches Formular muss einen Zeilen-Eingang\r\nbesitzen, um Wert" +
+    "e empfangen zu können.";
             this.btnRegisterKarte.Size = new System.Drawing.Size(80, 66);
             this.btnRegisterKarte.TabIndex = 6;
             this.btnRegisterKarte.Text = "Formular hinzufügen";
@@ -311,12 +312,12 @@ namespace BlueControls.Forms {
             // 
             this.btnTabControlAdd.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnTabControlAdd.ImageCode = "Bruchlinie|16|||||||||PlusZeichen";
-            this.btnTabControlAdd.Location = new System.Drawing.Point(8, 2);
+            this.btnTabControlAdd.Location = new System.Drawing.Point(144, 2);
             this.btnTabControlAdd.Name = "btnTabControlAdd";
             this.btnTabControlAdd.QuickInfo = resources.GetString("btnTabControlAdd.QuickInfo");
             this.btnTabControlAdd.Size = new System.Drawing.Size(64, 66);
             this.btnTabControlAdd.TabIndex = 3;
-            this.btnTabControlAdd.Text = "Register hinzufügen";
+            this.btnTabControlAdd.Text = "Register-Karte";
             this.btnTabControlAdd.Click += new System.EventHandler(this.btnTabControlAdd_Click);
             // 
             // tabFile
@@ -420,6 +421,19 @@ namespace BlueControls.Forms {
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Visible = false;
             // 
+            // btnBild
+            // 
+            this.btnBild.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnBild.ImageCode = "Bild|16|||||||||PlusZeichen";
+            this.btnBild.Location = new System.Drawing.Point(336, 2);
+            this.btnBild.Name = "btnBild";
+            this.btnBild.QuickInfo = "Fügt ein Feld hinzu, das ein Bild darstellen kann.\r\nEs können Variablen eines Zei" +
+    "len-Skriptes benutzt werden.";
+            this.btnBild.Size = new System.Drawing.Size(64, 66);
+            this.btnBild.TabIndex = 5;
+            this.btnBild.Text = "Bild";
+            this.btnBild.Click += new System.EventHandler(this.btnBild_Click);
+            // 
             // ConnectedFormulaEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -465,12 +479,13 @@ namespace BlueControls.Forms {
         private System.Windows.Forms.OpenFileDialog LoadTab;
         private System.Windows.Forms.SaveFileDialog SaveTab;
         private System.Windows.Forms.OpenFileDialog LoadTabDatabase;
-        private Controls.Button grpFileExplorer;
+        private Controls.Button btnFileExplorer;
         private Controls.GroupBox groupBox1;
         private Controls.GroupBox grpOptik;
         private Controls.Button btnVariable;
         private Controls.Button btnEingangsZeile;
         private System.Windows.Forms.TabPage tabPage1;
         private Controls.Button btnRegisterKarte;
+        private Controls.Button btnBild;
     }
 }

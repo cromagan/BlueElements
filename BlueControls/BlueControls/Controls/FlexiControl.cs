@@ -507,11 +507,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             case Line:
                 break;
 
-            case EasyPic:
-                // Control.ImageChanged += EasyPicImageChanged;
-                // Einzig und alleine eigene Datenbank kann den dazugehörigen Wert generieren.
-                break;
-
             case SwapListBox swapListBox:
                 swapListBox.ItemAdded += SwapListBox_ItemAdded;
                 swapListBox.ItemRemoved += SwapListBox_ItemRemoved;
@@ -564,9 +559,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
             case Caption _:
             case Line:
-                break;
-
-            case EasyPic:
                 break;
 
             case ListBox listBox:
@@ -1055,11 +1047,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private void UpdateValueTo_Combobox(TextBox control) => control.Text = Value;
 
     /// <summary>
-    /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling  muss TRUE sein.
-    /// </summary>
-    private void UpdateValueTo_EasyPic(EasyPic control) => control.FromFile(Value);
-
-    /// <summary>
     /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
     /// </summary>
     private void UpdateValueTo_ListBox(ItemCollectionList main) => main.SetValuesTo(Value.SplitAndCutByCrToList());
@@ -1084,10 +1071,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
                 case TextBox textBox:
                     UpdateValueTo_TextBox(textBox);
-                    break;
-
-                case EasyPic easyPic:
-                    UpdateValueTo_EasyPic(easyPic);
                     break;
 
                 case ListBox listBox:

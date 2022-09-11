@@ -799,7 +799,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
                 vars.Add(new VariableString("Row", ein[z], false, false, "Der Original-Text. Dieser kann (und soll) manipuliert werden."));
                 vars.Add(new VariableBool("IsCaption", spalteZuordnen && z == 0, true, false, "Wenn TRUE, ist das die erste Zeile, die Überschriften enthält."));
                 vars.Add(new VariableString("Seperator", splitChar, true, false, "Das Trennzeichen"));
-                var x = new BlueScript.Script(vars, string.Empty);
+                var x = new BlueScript.Script(vars, string.Empty, false);
                 x.ScriptText = script;
                 if (!x.Parse()) {
                     OnDropMessage(FehlerArt.Warnung, "Skript-Fehler, Import kann nicht ausgeführt werden.");

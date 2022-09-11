@@ -41,6 +41,7 @@ public class Script {
     /// </summary>
     public readonly string AdditionalFilesPath;
 
+    public readonly bool OnlyTesting;
     public readonly List<Variable>? Variables;
     public bool EndScript;
 
@@ -89,13 +90,14 @@ public class Script {
     //    //   //objects.Sort();
     //    return objects;
     //}
-    public Script(List<Variable>? variablen, string additionalFilesPath) {
+    public Script(List<Variable>? variablen, string additionalFilesPath, bool onlyTesting) {
         if (Comands == null) { Comands = GetEnumerableOfType<Method>(); }
         if (VarTypes == null) {
             VarTypes = GetEnumerableOfType<Variable>("NAME");
             VarTypes.Sort();
         }
 
+        OnlyTesting = onlyTesting;
         Variables = variablen;
 
         AdditionalFilesPath = (additionalFilesPath.Trim("\\") + "\\").CheckPath();

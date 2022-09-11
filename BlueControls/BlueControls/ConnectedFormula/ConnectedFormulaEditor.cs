@@ -66,6 +66,21 @@ public partial class ConnectedFormulaEditor : PadEditor {
         return l;
     }
 
+    private void btnBild_Click(object sender, System.EventArgs e) {
+        var l = Pad.LastClickedItem;
+
+        var x = new EasyPicPadItem(string.Empty);
+
+        if (l is ICalculateOneRowItemLevel ri) {
+            x.GetRowFrom = ri;
+        }
+        if (l is CustomizableShowPadItem efi && efi.GetRowFrom != null) {
+            x.GetRowFrom = efi.GetRowFrom;
+        }
+
+        Pad.AddCentered(x);
+    }
+
     private void btnEingangsZeile_Click(object sender, System.EventArgs e) {
         var it = new RowInputPadItem(string.Empty);
         //it.Bei_Export_sichtbar = false;

@@ -32,7 +32,7 @@ internal class Method_Split : Method {
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
 
-    public override string Returns => VariableString.ShortName_Plain;
+    public override string Returns => VariableListString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "Split(String, Trennzeichen)";
 
@@ -44,9 +44,10 @@ internal class Method_Split : Method {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        return !string.IsNullOrEmpty(attvar.ErrorMessage)
-            ? DoItFeedback.AttributFehler(this, attvar)
-            : new DoItFeedback(((VariableString)attvar.Attributes[0]).ValueString.SplitBy(((VariableString)attvar.Attributes[1]).ValueString));
+
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+
+        return new DoItFeedback(((VariableString)attvar.Attributes[0]).ValueString.SplitBy(((VariableString)attvar.Attributes[1]).ValueString));
     }
 
     #endregion
