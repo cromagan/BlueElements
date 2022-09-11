@@ -157,7 +157,7 @@ public class SqlBack {
 
         if (column != null && row == null) {
             switch (type) {
-                case DatabaseDataType.co_EditType: break;
+                //case DatabaseDataType.co_EditType: break;
                 case DatabaseDataType.co_SaveContent: break;
                 case DatabaseDataType.co_ShowUndo: break;
                 case DatabaseDataType.ColumnName: break;

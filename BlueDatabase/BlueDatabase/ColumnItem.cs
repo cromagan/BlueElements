@@ -63,8 +63,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
     private string _autoRemove;
     private Color _backColor;
 
-    //private string _bestFileStandardFolder;
-    //private string _bestFileStandardSuffix;
     private string _bildCodeConstantHeight;
 
     private BildTextVerhalten _bildTextVerhalten;
@@ -75,12 +73,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
     private bool _dropdownAllesAbwählenErlaubt;
     private bool _dropdownBearbeitungErlaubt;
 
-    //private bool _ZellenZusammenfassen;
-    //private long _dropDownKey;
-
     private bool _dropdownWerteAndererZellenAnzeigen;
     private bool _editTrotzSperreErlaubt;
-    private EditTypeFormula _editType;
     private FilterOptions _filterOptions;
     private Color _foreColor;
     private DataFormat _format;
@@ -88,7 +82,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
     private string _identifier;
     private bool _ignoreAtRowFilter;
 
-    //private enDauerfilter _AutoFilter_Dauerfilter;
     private long _keyColumnKey;
 
     private ColumnLineStyle _lineLeft;
@@ -160,7 +153,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         _vorschlagsColumn = -1;
         _align = AlignmentHorizontal.Links;
         _keyColumnKey = -1;
-        _editType = EditTypeFormula.Textfeld;
         _identifier = string.Empty;
         _allowedChars = string.Empty;
         _adminInfo = string.Empty;
@@ -468,15 +460,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         set {
             if (_editTrotzSperreErlaubt == value) { return; }
             Database?.AddPending(DatabaseDataType.EditAllowedDespiteLock, this, _editTrotzSperreErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
-            OnChanged();
-        }
-    }
-
-    public EditTypeFormula EditType {
-        get => _editType;
-        set {
-            if (_editType == value) { return; }
-            Database?.AddPending(DatabaseDataType.co_EditType, this, ((int)_editType).ToString(), ((int)value).ToString(), true);
             OnChanged();
         }
     }
@@ -954,7 +937,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
     /// Nur der Name bleibt unverändert.
     /// </summary>
     /// <param name="source"></param>
-    public void CloneFrom(ColumnItem? source) {
+    public void CloneFrom(ColumnItem source) {
         Caption = source.Caption;
         CaptionBitmap = source.CaptionBitmap;
         Format = source.Format;
@@ -965,7 +948,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         ForeColor = source.ForeColor;
         BackColor = source.BackColor;
         EditTrotzSperreErlaubt = source.EditTrotzSperreErlaubt;
-        EditType = source.EditType;
         Identifier = source.Identifier;
 
         if (PermissionGroupsChangeCell.IsDifferentTo(source.PermissionGroupsChangeCell)) {
@@ -2278,8 +2260,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
                 Database.Column.GetSystems();
                 break;
 
-            case DatabaseDataType.co_EditType:
-                _editType = (EditTypeFormula)IntParse(wert);
+            case (DatabaseDataType)147: // DatabaseDataType.co_EditType:
+                //_editType = (EditTypeFormula)IntParse(wert);
                 break;
 
             case DatabaseDataType.MultiLine:
@@ -2564,7 +2546,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         //Database.SaveToByteList(l, enDatabaseDataType.co_CaptionBitmapUTF8, modConverter.BitmapToStringUnicode(_CaptionBitmap, ImageFormat.Png), Key);
         Database.SaveToByteList(l, DatabaseDataType.AllowedChars, _allowedChars, Key);
         Database.SaveToByteList(l, DatabaseDataType.PermissionGroupsChangeCell, PermissionGroupsChangeCell.JoinWithCr(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_EditType, ((int)_editType).ToString(), Key);
         Database.SaveToByteList(l, DatabaseDataType.ColumnTags, Tags.JoinWithCr(), Key);
         Database.SaveToByteList(l, DatabaseDataType.EditAllowedDespiteLock, _editTrotzSperreErlaubt.ToPlusMinus(), Key);
         Database.SaveToByteList(l, DatabaseDataType.Suffix, _suffix, Key);

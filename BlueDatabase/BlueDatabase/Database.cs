@@ -59,7 +59,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
 
     public readonly LayoutCollection Layouts = new();
 
-    public readonly ListExt<ColumnViewCollection> OldFormulaViews = new();
+    //public readonly ListExt<ColumnViewCollection> OldFormulaViews = new();
     public readonly ListExt<string> PermissionGroupsNewRow = new();
 
     public readonly RowCollection Row;
@@ -162,7 +162,6 @@ public sealed class Database : IDisposable, IDisposableExtended {
         ColumnArrangements.Changed += ColumnArrangements_ListOrItemChanged;
         Layouts.Changed += Layouts_ListOrItemChanged;
         Layouts.ItemSeted += Layouts_ItemSeted;
-        OldFormulaViews.Changed += Views_ListOrItemChanged;
         PermissionGroupsNewRow.Changed += PermissionGroups_NewRow_ListOrItemChanged;
         Tags.Changed += DatabaseTags_ListOrItemChanged;
         Export.Changed += Export_ListOrItemChanged;
@@ -1146,9 +1145,9 @@ public sealed class Database : IDisposable, IDisposableExtended {
         foreach (var thisArrangement in ColumnArrangements) {
             e.AddRange(thisArrangement.PermissionGroups_Show);
         }
-        foreach (var thisArrangement in OldFormulaViews) {
-            e.AddRange(thisArrangement.PermissionGroups_Show);
-        }
+        //foreach (var thisArrangement in OldFormulaViews) {
+        //    e.AddRange(thisArrangement.PermissionGroups_Show);
+        //}
         e.Add("#Everybody");
         e.Add("#User: " + UserName);
         if (cellLevel) {
@@ -1271,11 +1270,11 @@ public sealed class Database : IDisposable, IDisposableExtended {
     internal string Column_UsedIn(ColumnItem? column) {
         var t = string.Empty;
         if (SortDefinition.Columns.Contains(column)) { t += " - Sortierung<br>"; }
-        var view = false;
-        foreach (var thisView in OldFormulaViews) {
-            if (thisView[column] != null) { view = true; }
-        }
-        if (view) { t += " - Formular-Ansichten<br>"; }
+        //var view = false;
+        //foreach (var thisView in OldFormulaViews) {
+        //    if (thisView[column] != null) { view = true; }
+        //}
+        //if (view) { t += " - Formular-Ansichten<br>"; }
         var cola = false;
         var first = true;
         foreach (var thisView in ColumnArrangements) {
@@ -1432,10 +1431,10 @@ public sealed class Database : IDisposable, IDisposableExtended {
             ColumnArrangements[z].Repair(z, true);
         }
 
-        for (var z = 0; z < Math.Max(2, OldFormulaViews.Count); z++) {
-            if (OldFormulaViews.Count < z + 1) { OldFormulaViews.Add(new ColumnViewCollection(this, string.Empty)); }
-            OldFormulaViews[z].Repair(z, false);
-        }
+        //for (var z = 0; z < Math.Max(2, OldFormulaViews.Count); z++) {
+        //    if (OldFormulaViews.Count < z + 1) { OldFormulaViews.Add(new ColumnViewCollection(this, string.Empty)); }
+        //    OldFormulaViews[z].Repair(z, false);
+        //}
     }
 
     private void Column_ItemAdded(object sender, ListEventArgs e) => CheckViewsAndArrangements();
@@ -1539,7 +1538,6 @@ public sealed class Database : IDisposable, IDisposableExtended {
         ColumnArrangements.Changed -= ColumnArrangements_ListOrItemChanged;
         Layouts.Changed -= Layouts_ListOrItemChanged;
         Layouts.ItemSeted -= Layouts_ItemSeted;
-        OldFormulaViews.Changed -= Views_ListOrItemChanged;
         PermissionGroupsNewRow.Changed -= PermissionGroups_NewRow_ListOrItemChanged;
         Tags.Changed -= DatabaseTags_ListOrItemChanged;
         Export.Changed -= Export_ListOrItemChanged;
@@ -1556,7 +1554,6 @@ public sealed class Database : IDisposable, IDisposableExtended {
         Row.Dispose();
         Works.Dispose();
         ColumnArrangements.Dispose();
-        OldFormulaViews.Dispose();
         Tags.Dispose();
         Export.Dispose();
         DatenbankAdmin.Dispose();
@@ -1715,7 +1712,6 @@ public sealed class Database : IDisposable, IDisposableExtended {
         Works.Clear();
         ColumnArrangements.Clear();
         Layouts.Clear();
-        OldFormulaViews.Clear();
         PermissionGroupsNewRow.Clear();
         Tags.Clear();
         Export.Clear();
@@ -1937,12 +1933,12 @@ public sealed class Database : IDisposable, IDisposableExtended {
                 }
                 break;
 
-            case DatabaseDataType.Views:
-                OldFormulaViews.Clear();
-                List<string> vi = new(value.SplitAndCutByCr());
-                foreach (var t in vi) {
-                    OldFormulaViews.Add(new ColumnViewCollection(this, t));
-                }
+            case (DatabaseDataType)33://DatabaseDataType.Views:
+                //OldFormulaViews.Clear();
+                //List<string> vi = new(value.SplitAndCutByCr());
+                //foreach (var t in vi) {
+                //    OldFormulaViews.Add(new ColumnViewCollection(this, t));
+                //}
                 break;
 
             case DatabaseDataType.PermissionGroupsNewRow:
@@ -2165,7 +2161,6 @@ public sealed class Database : IDisposable, IDisposableExtended {
             }
             //SaveToByteList(l, enDatabaseDataType.Rules_ALT, Rules.ToString(true));
             SaveToByteList(l, DatabaseDataType.ColumnArrangement, ColumnArrangements.ToString());
-            SaveToByteList(l, DatabaseDataType.Views, OldFormulaViews.ToString());
             SaveToByteList(l, DatabaseDataType.Layouts, Layouts.JoinWithCr());
             SaveToByteList(l, DatabaseDataType.AutoExport, Export.ToString(true));
             // Beim Erstellen des Undo-Speichers die Works nicht verändern, da auch bei einem nicht
@@ -2193,12 +2188,12 @@ public sealed class Database : IDisposable, IDisposableExtended {
         }
     }
 
-    private void Views_ListOrItemChanged(object sender, System.EventArgs e) {
-        if (_muf.IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt werden. Kann zu Endlosschleifen führen.
-        AddPending(DatabaseDataType.Views, -1, OldFormulaViews.ToString(true), false);
-    }
-
     #endregion
+
+    //private void Views_ListOrItemChanged(object sender, System.EventArgs e) {
+    //    if (_muf.IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt werden. Kann zu Endlosschleifen führen.
+    //    AddPending(DatabaseDataType.Views, -1, OldFormulaViews.ToString(true), false);
+    //}
 
     // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
     // ~Database()

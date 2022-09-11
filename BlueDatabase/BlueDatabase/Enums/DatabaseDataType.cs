@@ -68,7 +68,7 @@ public enum DatabaseDataType : byte {
     PermissionGroupsNewRow = 31,
 
     ColumnArrangement = 32,
-    Views = 33,
+    //Views = 33,
 
     //[Obsolete]
     //LastRowKey = 34,
@@ -181,7 +181,7 @@ public enum DatabaseDataType : byte {
     ShowValuesOfOtherCellsInDropdown = 144,
     SortAndRemoveDoubleAfterEdit = 145,
     IgnoreAtRowFilter = 146,
-    co_EditType = 147,
+    //co_EditType = 147,
 
     // co_SpaltenGröße = 148
     // co_ÜberschriftAnordnung = 149

@@ -55,16 +55,16 @@ public sealed partial class DatabaseHeadEditor {
 
     #endregion
 
-    #region Methods
+    //public static void FormularWandeln(Database _database, string fn) {
+    //    var x = new ConnectedFormula.ConnectedFormula();
+    //    var tmp = new Formula();
+    //    tmp.Size = x.PadData.SheetSizeInPix.ToSize();
+    //    tmp.Database = _database;
+    //    tmp.GenerateTabsToNewFormula(x);
+    //    x.SaveAsAndChangeTo(fn);
+    //}
 
-    public static void FormularWandeln(Database _database, string fn) {
-        var x = new ConnectedFormula.ConnectedFormula();
-        var tmp = new Formula();
-        tmp.Size = x.PadData.SheetSizeInPix.ToSize();
-        tmp.Database = _database;
-        tmp.GenerateTabsToNewFormula(x);
-        x.SaveAsAndChangeTo(fn);
-    }
+    #region Methods
 
     protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
         if (_frmHeadEditorFormClosingIsin) { return; }
@@ -257,7 +257,7 @@ public sealed partial class DatabaseHeadEditor {
         ItemCollectionList I = new()
         {
             { "Anordnungen der Spaltenansichten", ((int)DatabaseDataType.ColumnArrangement).ToString() },
-            { "Formulare", ((int)DatabaseDataType.Views).ToString() },
+            //{ "Formulare", ((int)DatabaseDataType.Views).ToString() },
             //I.Add("Regeln", ((int)enDatabaseDataType.Rules_ALT).ToString());
             { "Undo-Speicher", ((int)DatabaseDataType.UndoInOne).ToString() },
             { "Auto-Export", ((int)DatabaseDataType.AutoExport).ToString() },
@@ -314,24 +314,6 @@ public sealed partial class DatabaseHeadEditor {
     private void btnSperreAufheben_Click(object sender, System.EventArgs e) {
         _database.UnlockHard();
         MessageBox.Show("Erledigt.", ImageCode.Information, "OK");
-    }
-
-    private void btnWandeln_Click(object sender, System.EventArgs e) {
-        if (string.IsNullOrEmpty(txbStandardFormulaFile.Text)) {
-            MessageBox.Show("Feld Formulardatei muss befüllt sein.", ImageCode.Warnung, "OK");
-            return;
-        }
-
-        var fn = txbStandardFormulaFile.Text;//        _database.AdditionaFilesPfadWhole() + _database.Filename.FileNameWithoutSuffix() + ".cfo";
-
-        if (File.Exists(fn)) {
-            if (!BlueControls.Forms.FileDialogs.DeleteFile(fn, true)) { return; }
-        }
-
-        FormularWandeln(_database, fn);
-
-        using var L = new ConnectedFormulaEditor(fn, null);
-        L.ShowDialog();
     }
 
     private void Database_Disposing(object sender, System.EventArgs e) {
