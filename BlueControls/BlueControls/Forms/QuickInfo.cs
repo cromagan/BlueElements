@@ -34,7 +34,9 @@ public partial class QuickInfo : FloatingForm {
 
     #region Constructors
 
-    private QuickInfo() : base(Enums.Design.Form_QuickInfo) => InitializeComponent();
+    private QuickInfo() : base(Enums.Design.Form_QuickInfo) {
+        InitializeComponent();
+    }
 
     private QuickInfo(string text) : this() {
         //InitializeComponent();

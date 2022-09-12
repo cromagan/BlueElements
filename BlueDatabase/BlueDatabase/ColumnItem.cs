@@ -851,7 +851,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
                         l[z] = l[z].Replace(rep[0], r, RegexOptions.IgnoreCase);
                         //if (l[z].ToLower() == rep[0].ToLower()) { l[z] = r; }
                     } else {
-                        if (string.Equals(l[z], rep[0], StringComparison.CurrentCultureIgnoreCase)) { l[z] = r; }
+                        if (string.Equals(l[z], rep[0], StringComparison.OrdinalIgnoreCase)) { l[z] = r; }
                     }
                 }
             }
@@ -870,67 +870,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
     }
 
     public bool AutoFilterSymbolPossible() => FilterOptions.HasFlag(FilterOptions.Enabled) && Format.Autofilter_möglich();
-
-    ///// <summary>
-    ///// Gibt einen Dateinamen mit Pfad und Suffix zurück, der sich aus dem Standard-Angaben der Spalte zusammensetzt.
-    ///// Existiert in keiner Spalte und auch nicht auf der Festplatte.
-    ///// </summary>
-    //public string BestFile() => BestFile(string.Empty, true);
-
-    ///// <summary>
-    ///// Gibt den Dateinamen mit Pfad und Suffix zurück, der sich aus dem Standard-Angaben der Zelle und dem hier übergebebenen Dateinamen zusammensetzt.
-    ///// </summary>
-    ///// <param name="filename">Der Dateiname. Ein evtl. fehlender Pfad und ein evtl. fehlendes Suffix werden ergänzt. </param>
-    ///// <param name="mustBeFree">Wenn True wird ein Dateiname zurückgegeben, der noch nicht im Verzeichnis vorhanden ist.</param>
-    ///// <returns> Gibt den Dateinamen mit Pfad und Suffix zurück</returns>
-    //public string BestFile(string filename, bool mustBeFree) {
-    //    if (_format != DataFormat.Link_To_Filesystem) { Develop.DebugPrint(FehlerArt.Fehler, "Nur bei Link_To_Filesystem erlaubt!"); }
-
-    //    if (string.IsNullOrEmpty(filename)) {
-    //        if (!mustBeFree) { return string.Empty; }
-    //        filename = (_name.Substring(0, 1) + DateTime.Now.ToString("mm.fff")).RemoveChars(Constants.Char_DateiSonderZeichen + ".");
-    //    }
-    //    if (filename.Contains("\r")) { Develop.DebugPrint_NichtImplementiert(); }
-
-    //    // Wenn FileNameWithoutPath kein Suffix hat, das Standard Suffix hinzufügen
-    //    var suffix = filename.FileSuffix();
-    //    var cleanfilename = filename;
-    //    if (string.IsNullOrEmpty(suffix)) {
-    //        suffix = _bestFileStandardSuffix.ToLower();
-    //    } else {
-    //        cleanfilename = filename.FileNameWithoutSuffix();
-    //    }
-
-    //    // Den Standardfolder benutzen. Falls dieser fehlt, 'Files' benutzen.
-    //    var directory = _bestFileStandardFolder.Trim("\\");
-    //    if (string.IsNullOrEmpty(directory)) { directory = "Files"; }
-
-    //    // Ist nur ein Unterverzeichnis angegeben, den Datenbankpfad benutzen und das Unterverzeichniss anhängen
-    //    if (directory.Substring(1, 1) != ":" && directory.Substring(0, 1) != "\\") { directory = Database.Filename.FilePath() + directory; }
-    //    if (!mustBeFree) {
-    //        return (directory.TrimEnd("\\") + "\\" + cleanfilename + "." + suffix).TrimEnd(".");
-    //    }
-    //    var nr = -1;
-    //    do {
-    //        nr++;
-    //        var tmpname = cleanfilename;
-    //        if (nr > 0) { tmpname += nr.ToString(Constants.Format_Integer2); }
-    //        var ok = true;
-    //        foreach (var columnitem in Database.Column) {
-    //            if (columnitem.Format == DataFormat.Link_To_Filesystem) {
-    //                var r = Database.Row[new FilterItem(columnitem, FilterType.Istgleich_GroßKleinEgal, tmpname)];
-    //                if (r != null) {
-    //                    ok = false;
-    //                    break;
-    //                }
-    //            }
-    //        }
-    //        if (ok) {
-    //            var tmp = (directory.TrimEnd("\\") + "\\" + tmpname + "." + suffix.ToLower()).TrimEnd(".");
-    //            if (!FileExists(tmp)) { return tmp; }
-    //        }
-    //    } while (true);
-    //}
 
     /// <summary>
     /// Überschreibt alle Spalteeigenschaften mit dem der Vorlage.
@@ -1127,7 +1066,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
 
         //if (!Constants.Char_AZ.Contains(Name.Substring(0, 1).ToUpper())) { return "Der Spaltenname muss mit einem Buchstaben beginnen."; }
 
-        if (Database.Column.Any(thisColumn => thisColumn != this && thisColumn != null && string.Equals(_name, thisColumn.Name, StringComparison.CurrentCultureIgnoreCase))) {
+        if (Database.Column.Any(thisColumn => thisColumn != this && thisColumn != null && string.Equals(_name, thisColumn.Name, StringComparison.OrdinalIgnoreCase))) {
             return "Spalten-Name bereits vorhanden.";
         }
 
@@ -1417,7 +1356,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
 
     public string ReadableText() {
         var ret = _caption;
-        if (Database.Column.Any(thisColumnItem => thisColumnItem != null && thisColumnItem != this && string.Equals(thisColumnItem.Caption, _caption, StringComparison.CurrentCultureIgnoreCase))) {
+        if (Database.Column.Any(thisColumnItem => thisColumnItem != null && thisColumnItem != this && string.Equals(thisColumnItem.Caption, _caption, StringComparison.OrdinalIgnoreCase))) {
             var done = false;
             if (!string.IsNullOrEmpty(_ueberschrift3)) {
                 ret = _ueberschrift3 + "/" + ret;
@@ -1948,12 +1887,12 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
     //        Develop.DebugPrint(FehlerArt.Fehler, "Nur bei Link_To_Filesystem erlaubt!");
     //    }
     //    var tmpfile = fullFileName.FileNameWithoutSuffix();
-    //    if (string.Equals(tmpfile, fullFileName, StringComparison.CurrentCultureIgnoreCase)) { return tmpfile; }
-    //    if (string.Equals(BestFile(tmpfile, false), fullFileName, StringComparison.CurrentCultureIgnoreCase)) { return tmpfile; }
+    //    if (string.Equals(tmpfile, fullFileName, StringComparison.OrdinalIgnoreCase)) { return tmpfile; }
+    //    if (string.Equals(BestFile(tmpfile, false), fullFileName, StringComparison.OrdinalIgnoreCase)) { return tmpfile; }
     //    tmpfile = fullFileName.FileNameWithSuffix();
-    //    return string.Equals(tmpfile, fullFileName, StringComparison.CurrentCultureIgnoreCase)
+    //    return string.Equals(tmpfile, fullFileName, StringComparison.OrdinalIgnoreCase)
     //        ? tmpfile
-    //        : string.Equals(BestFile(tmpfile, false), fullFileName, StringComparison.CurrentCultureIgnoreCase) ? tmpfile : fullFileName;
+    //        : string.Equals(BestFile(tmpfile, false), fullFileName, StringComparison.OrdinalIgnoreCase) ? tmpfile : fullFileName;
     //}
 
     public void Statisik(List<FilterItem>? filter, List<RowItem>? pinnedRows) {

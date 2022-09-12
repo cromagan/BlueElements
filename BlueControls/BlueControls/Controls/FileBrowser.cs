@@ -19,7 +19,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using BlueBasics;
@@ -32,11 +31,9 @@ using static BlueBasics.Generic;
 using static BlueBasics.FileOperations;
 using BlueControls.Enums;
 using CryptoExplorer;
-using static BlueBasics.BitmapExt;
 using BlueControls.Interfaces;
 using BlueScript.Variables;
 using System.Drawing.Imaging;
-using System.Windows.Data;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
@@ -258,7 +255,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
                 var I = new FileInfo(it.Internal);
                 //var attribute = I.Attributes;
 
-                bool ask = Convert.ToBoolean(I.Attributes & FileAttributes.ReadOnly);
+                var ask = Convert.ToBoolean(I.Attributes & FileAttributes.ReadOnly);
 
                 if (FileDialogs.DeleteFile(I.FullName, ask)) {
                     //FileDialogs.DeleteFile(ThumbFile(I.FullName), false);
@@ -336,8 +333,9 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
                     var l = new List<string>();
 
                     foreach (var thisS in lsbFiles.Item) {
-                        if (thisS.Internal.FileType() == FileFormat.Image && FileExists(thisS.Internal))
+                        if (thisS.Internal.FileType() == FileFormat.Image && FileExists(thisS.Internal)) {
                             l.Add(thisS.Internal);
+                        }
                     }
 
                     var no = l.IndexOf(e.Item.Internal);
@@ -354,12 +352,10 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
                     return;
             }
 
-            string tmp;
-
             //if (FileExists(CryoptErkennungsFile(txbPfad.Text.TrimEnd("\\") + "\\"))) {
             //    tmp = CryptedFileName(e.Item.Internal, 10);
             //} else {
-            tmp = e.Item.Internal;
+            var tmp = e.Item.Internal;
             //}
 
             var x = GestStandardCommand("." + tmp.FileSuffix());
@@ -444,14 +440,13 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         var allD = Directory.GetDirectories(newPath, "*", SearchOption.TopDirectoryOnly);
         foreach (var thisString in allD) {
             if (AddThis(thisString, false)) {
-                BitmapListItem p;
                 var tags = new List<string>();
 
                 //if (IsCyrpted(thisString)) {
                 //    p = new BitmapListItem(QuickImage.Get("Ordner|64|||FF0000"), thisString, thisString.FileNameWithoutSuffix());
                 //    tags.TagSet("CryptetFolder", bool.TrueString);
                 //} else {
-                p = new BitmapListItem(QuickImage.Get("Ordner|64"), thisString, thisString.FileNameWithoutSuffix());
+                var p = new BitmapListItem(QuickImage.Get("Ordner|64"), thisString, thisString.FileNameWithoutSuffix());
                 //tags.TagSet("CryptetFolder", bool.FalseString);
                 //}
 
@@ -483,9 +478,9 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         var myKey = Registry.ClassesRoot.OpenSubKey(subkey);
         if (myKey == null) {
             return false;
-        } else {
-            return true;
         }
+
+        return true;
     }
 
     private void ThumbGenerator_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e) {

@@ -74,7 +74,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     public string FileName {
         get => _filename;
         set {
-            if (value.Equals(_filename, StringComparison.InvariantCultureIgnoreCase)) { return; }
+            if (value.Equals(_filename, StringComparison.OrdinalIgnoreCase)) { return; }
 
             _filename = value;
 
@@ -139,7 +139,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
 
         if (MessageBox.Show("Vorhandenes Bild löschen?", ImageCode.Warnung, "Löschen", "Abbruch") != 0) { return false; }
 
-        if (BlueBasics.FileOperations.DeleteFile(_filename, false)) {
+        if (DeleteFile(_filename, false)) {
             _bitmap = null;
             ZoomFitInvalidateAndCheckButtons();
             return true;
@@ -258,7 +258,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     private bool HasFileName() {
         if (string.IsNullOrEmpty(_filename)) { return false; }
 
-        if (_filename.FileSuffix().Equals("PNG", StringComparison.InvariantCultureIgnoreCase)) { return false; }
+        if (_filename.FileSuffix().Equals("PNG", StringComparison.OrdinalIgnoreCase)) { return false; }
 
         if (string.IsNullOrEmpty(_filename.FilePath())) { return false; }
 

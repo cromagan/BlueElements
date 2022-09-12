@@ -43,10 +43,10 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
     private readonly ListExt<System.Windows.Forms.Control> _parents = new();
 
-    private readonly string _showformat = string.Empty;
+    private readonly string _showformat;
 
     //private readonly RowWithFilterPaditem _rwf;
-    private bool _disposing = false;
+    private bool _disposing;
 
     private RowItem? _row;
     private List<RowItem>? _rows;
@@ -126,7 +126,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
                     (_, _, con.Script) = row.DoAutomatic("to be sure");
                 }
 
-                DoChilds_VariableList(rv, con.Script, row, con.Database);
+                DoChilds_VariableList(rv, con.Script);
                 did = true;
             }
 
@@ -182,7 +182,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         }
     }
 
-    private static void DoChilds_OneRowKey(IAcceptRowKey fcfc, RowItem row, Database? database) {
+    private static void DoChilds_OneRowKey(IAcceptRowKey fcfc, RowItem? row, Database? database) {
         // Normales Zellenfeld
         if (fcfc.IsDisposed) { return; }
 
@@ -195,7 +195,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         }
     }
 
-    private static void DoChilds_VariableList(IAcceptVariableList fcfc, Script? script, RowItem row, Database? database) {
+    private static void DoChilds_VariableList(IAcceptVariableList fcfc, Script? script) {
         // Normales Zellenfeld
         fcfc.ParseVariables(script?.Variables);
     }
@@ -219,7 +219,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
                 #region Type ermitteln
 
-                bool onlyifhasvalue = false;
+                var onlyifhasvalue = false;
 
                 FilterType ft;
                 switch (thisR.CellGetString("Filterart").ToLower()) {

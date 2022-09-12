@@ -25,7 +25,9 @@ public partial class Tool_Bruchlinie {
 
     #region Constructors
 
-    public Tool_Bruchlinie() : base() => InitializeComponent();
+    public Tool_Bruchlinie() : base() {
+        InitializeComponent();
+    }
 
     #endregion
 

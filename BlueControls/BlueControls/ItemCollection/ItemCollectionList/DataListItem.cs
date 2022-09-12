@@ -143,7 +143,7 @@ public class DataListItem : BasicListItem {
                 binim.Height * scale);
         }
         var trp = drawingCoordinates.PointOf(Alignment.Horizontal_Vertical_Center);
-        scaledImagePosition = new RectangleF(scaledImagePosition.Left - trp.X, scaledImagePosition.Top - trp.Y, scaledImagePosition.Width, scaledImagePosition.Height);
+        scaledImagePosition = scaledImagePosition with { X = scaledImagePosition.Left - trp.X, Y = scaledImagePosition.Top - trp.Y };
         gr.TranslateTransform(trp.X, trp.Y);
         if (_bin != null) { gr.DrawImage(binim, scaledImagePosition, areaOfWholeImage, GraphicsUnit.Pixel); }
         foreach (var thisQi in Overlays) {

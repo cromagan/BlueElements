@@ -53,7 +53,9 @@ public sealed partial class ScreenShot {
         _feedBack = new ScreenData();
     }
 
-    private ScreenShot(string text) : this() => _drawText = text;
+    private ScreenShot(string text) : this() {
+        _drawText = text;
+    }
 
     #endregion
 
@@ -305,7 +307,7 @@ public sealed partial class ScreenShot {
     //    if (e.Button == System.Windows.Forms.MouseButtons.Left) { HookEndPoint = new Point(LastMouse.X, LastMouse.Y); }
     //}
 
-    private void PrintText(Graphics gr, System.Windows.Forms.MouseEventArgs e) {
+    private void PrintText(Graphics gr, System.Windows.Forms.MouseEventArgs? e) {
         Brush bs = new SolidBrush(Color.FromArgb(150, 0, 0, 0));
         Brush bf = new SolidBrush(Color.FromArgb(255, 255, 0, 0));
         Font fn = new("Arial", DrawSize, FontStyle.Bold);

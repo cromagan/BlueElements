@@ -527,7 +527,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposable {
 
             #region Script ausführen
 
-            Script sc = new(vars, Database.AdditionaFilesPfadWhole(), startRoutine.Equals("script testing", StringComparison.InvariantCultureIgnoreCase)) {
+            Script sc = new(vars, Database.AdditionaFilesPfadWhole(), startRoutine.Equals("script testing", StringComparison.OrdinalIgnoreCase)) {
                 ScriptText = Database.RulesScript
             };
             sc.Parse();

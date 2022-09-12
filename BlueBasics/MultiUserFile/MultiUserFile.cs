@@ -933,7 +933,7 @@ public sealed class MultiUserFile : IDisposableExtended {
     /// <param name="fileInfoBeforeSaving"></param>
     /// <param name="savedDataUncompressed"></param>
     /// <returns></returns>
-    private string SaveRoutine(bool fromParallelProzess, string tmpFileName, string fileInfoBeforeSaving, byte[] savedDataUncompressed) {
+    private string SaveRoutine(bool fromParallelProzess, string? tmpFileName, string? fileInfoBeforeSaving, byte[]? savedDataUncompressed) {
         if (ReadOnly) { return Feedback("Datei ist Readonly"); }
         if (tmpFileName == null || string.IsNullOrEmpty(tmpFileName) ||
             fileInfoBeforeSaving == null || string.IsNullOrEmpty(fileInfoBeforeSaving) ||

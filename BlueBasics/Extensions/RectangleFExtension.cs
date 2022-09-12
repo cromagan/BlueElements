@@ -53,10 +53,10 @@ public static partial class Extensions {
     /// Erweitert das Rechteck, dass ein Kreis mit den angegebenen Parametern ebenfalls umschlossen wird.
     /// </summary>
     public static RectangleF ExpandTo(this RectangleF r, PointF middle, float radius) {
-        r = r.ExpandTo(new PointF(middle.X, middle.Y + radius));
-        r = r.ExpandTo(new PointF(middle.X, middle.Y - radius));
-        r = r.ExpandTo(new PointF(middle.X + radius, middle.Y));
-        r = r.ExpandTo(new PointF(middle.X - radius, middle.Y));
+        r = r.ExpandTo(middle with { Y = middle.Y + radius });
+        r = r.ExpandTo(middle with { Y = middle.Y - radius });
+        r = r.ExpandTo(middle with { X = middle.X + radius });
+        r = r.ExpandTo(middle with { X = middle.X - radius });
         return r;
     }
 
@@ -90,15 +90,33 @@ public static partial class Extensions {
 
     public static PointF PointOf(this RectangleF r, Alignment p) {
         switch (p) {
-            case Alignment.Bottom_Left: return new PointF(r.Left, r.Bottom);
-            case Alignment.Bottom_Right: return new PointF(r.Right, r.Bottom);
-            case Alignment.Top_Left: return new PointF(r.Left, r.Top);
-            case Alignment.Top_Right: return new PointF(r.Right, r.Top);
-            case Alignment.Bottom_HorizontalCenter: return new PointF((int)(r.Left + (r.Width / 2.0)), r.Bottom);
-            case Alignment.Top_HorizontalCenter: return new PointF((int)(r.Left + (r.Width / 2.0)), r.Top);
-            case Alignment.VerticalCenter_Left: return new PointF(r.Left, (int)(r.Top + (r.Height / 2.0)));
-            case Alignment.VerticalCenter_Right: return new PointF(r.Right, (int)(r.Top + (r.Height / 2.0)));
-            case Alignment.Horizontal_Vertical_Center: return new Point((int)(r.Left + (r.Width / 2.0)), (int)(r.Top + (r.Height / 2.0)));
+            case Alignment.Bottom_Left:
+                return new PointF(r.Left, r.Bottom);
+
+            case Alignment.Bottom_Right:
+                return new PointF(r.Right, r.Bottom);
+
+            case Alignment.Top_Left:
+                return new PointF(r.Left, r.Top);
+
+            case Alignment.Top_Right:
+                return new PointF(r.Right, r.Top);
+
+            case Alignment.Bottom_HorizontalCenter:
+                return new PointF((int)(r.Left + (r.Width / 2.0)), r.Bottom);
+
+            case Alignment.Top_HorizontalCenter:
+                return new PointF((int)(r.Left + (r.Width / 2.0)), r.Top);
+
+            case Alignment.VerticalCenter_Left:
+                return new PointF(r.Left, (int)(r.Top + (r.Height / 2.0)));
+
+            case Alignment.VerticalCenter_Right:
+                return new PointF(r.Right, (int)(r.Top + (r.Height / 2.0)));
+
+            case Alignment.Horizontal_Vertical_Center:
+                return new Point((int)(r.Left + (r.Width / 2.0)), (int)(r.Top + (r.Height / 2.0)));
+
             default:
                 Develop.DebugPrint(p);
                 return Point.Empty;

@@ -79,7 +79,7 @@ public static class VariableExtensions {
         if (vars == null || vars.Count == 0) { return null; }
 
         return vars.FirstOrDefault(thisv =>
-            !thisv.SystemVariable && string.Equals(thisv.Name, name, StringComparison.CurrentCultureIgnoreCase));
+            !thisv.SystemVariable && string.Equals(thisv.Name, name, StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>

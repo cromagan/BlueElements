@@ -43,7 +43,7 @@ public static class Berechnung {
         var lastMin = 1;
         var okMin = -1;
         while (true) {
-            lastMin = formel.IndexOf("-", lastMin);
+            lastMin = formel.IndexOf("-", lastMin, StringComparison.Ordinal);
             if (lastMin < 1) { break; }
             var vorZ = formel.Substring(lastMin - 1, 1);
             if (vorZ.IsNumeral()) { okMin = lastMin; }
@@ -60,8 +60,8 @@ public static class Berechnung {
             // --------------------------------------------------------------------------------------------------------------------------------
             // --- Eine Klammer auflösen, im Formelstring ersetzen und         mittels Rekursivität die nun einfachere Formel berechnen.
             // --------------------------------------------------------------------------------------------------------------------------------
-            var a = formel.LastIndexOf("(");
-            var e = formel.IndexOf(")", a);
+            var a = formel.LastIndexOf("(", StringComparison.Ordinal);
+            var e = formel.IndexOf(")", a, StringComparison.Ordinal);
             if (a >= e) { return null; }
             // if (a > 2 && Formel.IndexOf(",", a) > a && Formel.IndexOf(",", a) < e)
             // {
@@ -142,7 +142,7 @@ public static class Berechnung {
         if (formel.Replace(".", ",").IsNumeral()) { return DoubleParse(formel.Replace(".", ",")); }
         // TMP = Math.Max(Math.Max(-1, Formel.LastIndexOf("=")), Math.Max(Formel.LastIndexOf("<"), Formel.LastIndexOf(">")));
         var tmp = Math.Max(formel.LastIndexOf("+"), LastMinusIndex(formel));
-        if (tmp < 0) { tmp = Math.Max(formel.LastIndexOf("/"), formel.LastIndexOf("*")); }
+        if (tmp < 0) { tmp = Math.Max(formel.LastIndexOf("/", StringComparison.Ordinal), formel.LastIndexOf("*", StringComparison.Ordinal)); }
         if (tmp < 1) { return null; }
         // --------------------------------------------------------------------------------------------------------------------------------
         // --- Berechnung nötig, String Splitten berechnen und das Ergebnis zurückgeben
@@ -173,27 +173,27 @@ public static class Berechnung {
 
             case "+":
                 return w1 + w2;
-            // case ">":
-            //    if (w1 > w2) { return -1; }
-            //    return 0;
-            // case ">=":
-            // case "=>":
-            //    if (w1 >= w2) { return -1; }
-            //    return 0;
-            // case "<":
-            //    if (w1 < w2) { return -1; }
-            //    return 0;
-            // case "<=":
-            // case "=<":
-            //    if (w1 <= w2) { return -1; }
-            //    return 0;
-            // case "=":
-            //    if (w1 == w2) { return -1; }
-            //    return 0;
-            // case "<>":
-            // case "><":
-            //    if (w1 != w2) { return -1; }
-            //    return 0;
+                // case ">":
+                //    if (w1 > w2) { return -1; }
+                //    return 0;
+                // case ">=":
+                // case "=>":
+                //    if (w1 >= w2) { return -1; }
+                //    return 0;
+                // case "<":
+                //    if (w1 < w2) { return -1; }
+                //    return 0;
+                // case "<=":
+                // case "=<":
+                //    if (w1 <= w2) { return -1; }
+                //    return 0;
+                // case "=":
+                //    if (w1 == w2) { return -1; }
+                //    return 0;
+                // case "<>":
+                // case "><":
+                //    if (w1 != w2) { return -1; }
+                //    return 0;
         }
         return null;
     }

@@ -33,7 +33,9 @@ public class VariableRowItem : Variable {
 
     #region Constructors
 
-    public VariableRowItem(string name, RowItem? value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _row = value;
+    public VariableRowItem(string name, RowItem? value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) {
+        _row = value;
+    }
 
     public VariableRowItem(string name) : this(name, null, true, false, string.Empty) { }
 

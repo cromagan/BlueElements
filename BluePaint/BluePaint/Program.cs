@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System;
-using System.Globalization;
 
 namespace BluePaint;
 

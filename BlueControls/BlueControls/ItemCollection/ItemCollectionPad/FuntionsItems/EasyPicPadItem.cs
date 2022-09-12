@@ -62,7 +62,7 @@ public class EasyPicPadItem : CustomizableShowPadItem, IItemToControl {
 
     #region Methods
 
-    public System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
+    public override System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
         var cx = new EasyPic();
         cx.OriginalText = Bild_Dateiname;
         cx.Tag = Internal;
@@ -110,7 +110,7 @@ public class EasyPicPadItem : CustomizableShowPadItem, IItemToControl {
             DrawColorScheme(gr, positionModified, zoom, id);
         }
 
-        CustomizableShowPadItem.DrawFakeControl(gr, positionModified, zoom, BlueDatabase.Enums.ÜberschriftAnordnung.Über_dem_Feld, "Bilddatei");
+        DrawFakeControl(gr, positionModified, zoom, BlueDatabase.Enums.ÜberschriftAnordnung.Über_dem_Feld, "Bilddatei");
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }

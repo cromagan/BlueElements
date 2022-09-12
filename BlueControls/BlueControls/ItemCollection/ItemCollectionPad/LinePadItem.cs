@@ -116,18 +116,6 @@ public class LinePadItem : BasicPadItem {
         _point2.SetTo(x + width, y + height / 2);
     }
 
-    //public void Move(float x, float y) {
-    //    _LastRecalc = DateTime.Now.AddHours(-1);
-    //    Point1.SetTo(Point1.X + x, Point1.Y + y);
-    //    Point2.SetTo(Point2.X + x, Point2.Y + y);
-    //}
-    //public override void SetCoordinates(RectangleF r)
-    //{
-    //    _LastRecalc = DateTime.Now.AddHours(-1);
-    //    Point1.SetTo(r.PointOf(enAlignment.Top_Left));
-    //    Point2.SetTo(r.PointOf(enAlignment.Bottom_Right));
-    //    base.SetCoordinates(r);
-    //}
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
         switch (tag) {
@@ -143,9 +131,6 @@ public class LinePadItem : BasicPadItem {
     public void SetCoordinates(float px1, float py1, float px2, float py2) {
         _point1.SetTo(px1, py1);
         _point2.SetTo(px2, py2);
-        //p_ML.SetTo(r.PointOf(enAlignment.VerticalCenter_Left));
-        //p_MR.SetTo(r.PointOf(enAlignment.VerticalCenter_Right));
-        //base.SetCoordinates(r);
     }
 
     public override string ToString() {
@@ -197,7 +182,7 @@ public class LinePadItem : BasicPadItem {
         return null;
     }
 
-    private static bool SchneidetDas(BasicPadItem thisBasicItem, PointM p1, PointM p2) {
+    private static bool SchneidetDas(BasicPadItem? thisBasicItem, PointM p1, PointM p2) {
         if (thisBasicItem == null) { return false; }
         if (thisBasicItem is not LinePadItem) {
             var a = thisBasicItem.UsedArea;

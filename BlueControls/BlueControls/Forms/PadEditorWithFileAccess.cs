@@ -27,7 +27,9 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
     #region Constructors
 
-    public PadEditorWithFileAccess() : base() => InitializeComponent();
+    public PadEditorWithFileAccess() : base() {
+        InitializeComponent();
+    }
 
     #endregion
 

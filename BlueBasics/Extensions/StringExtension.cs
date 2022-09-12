@@ -83,9 +83,9 @@ public static partial class Extensions {
                     return w >= 0
                         ? compareKeySOk + "A" + w.ToString(Constants.Format_Integer10)
                         : compareKeySOk + w.ToString(Constants.Format_Integer10);
-                } else {
-                    return compareKeySNok + isValue;
                 }
+
+                return compareKeySNok + isValue;
 
             case SortierTyp.Original_String:
                 return Constants.SecondSortChar + isValue;
@@ -105,9 +105,9 @@ public static partial class Extensions {
                     if (dw >= 0) { t = "A" + t; }
                     while (t.Length < 15) { t += "0"; }
                     return compareKeySOk + t;
-                } else {
-                    return compareKeySNok + isValue;
                 }
+
+                return compareKeySNok + isValue;
 
             case SortierTyp.Datum_Uhrzeit:
                 return DateTimeTryParse(isValue, out var d) ? compareKeySNok + d.ToString(Constants.Format_Date) : compareKeySNok + isValue;
@@ -324,7 +324,7 @@ public static partial class Extensions {
         startIndex++;
         while (true) {
             if (startIndex > input.Length - 1) { return -1; }
-            startIndex = input.IndexOf(value, startIndex);
+            startIndex = input.IndexOf(value, startIndex, StringComparison.Ordinal);
             if (startIndex < 0) { return -1; }
             if (startIndex > 0 && startIndex < input.Length - value.Length) {
                 if (input[startIndex - 1].IsWordSeperator() && input[startIndex + value.Length].IsWordSeperator()) {
@@ -421,7 +421,7 @@ public static partial class Extensions {
                 if (!checkforSeparatorbefore || pos == 0 || tr.Contains(txt.Substring(pos - 1, 1))) {
                     foreach (var thisEnd in searchfor) {
                         if (pos + thisEnd.Length <= maxl) {
-                            if (string.Equals(txt.Substring(pos, thisEnd.Length), thisEnd, StringComparison.CurrentCultureIgnoreCase)) {
+                            if (string.Equals(txt.Substring(pos, thisEnd.Length), thisEnd, StringComparison.OrdinalIgnoreCase)) {
                                 if (!checkforSeparatorafter || pos + thisEnd.Length >= maxl || tr.Contains(txt.Substring(pos + thisEnd.Length, 1))) {
                                     return (pos, thisEnd);
                                 }
@@ -488,9 +488,9 @@ public static partial class Extensions {
         List<string> txt = new();
         var enx = 0;
         while (true) {
-            var bgx = vText.ToUpper().IndexOf(e[0].ToUpper(), enx);
+            var bgx = vText.ToUpper().IndexOf(e[0].ToUpper(), enx, StringComparison.Ordinal);
             if (bgx < 0) { break; }
-            enx = vText.ToUpper().IndexOf(e[1].ToUpper(), bgx + e[0].Length);
+            enx = vText.ToUpper().IndexOf(e[1].ToUpper(), bgx + e[0].Length, StringComparison.Ordinal);
             if (bgx + e[0].Length > enx) { break; }
             txt.Add(vText.Substring(bgx + e[0].Length, enx - bgx - e[0].Length));
         }
@@ -522,7 +522,7 @@ public static partial class Extensions {
         var oldPos = 0;
         while (true) {
             if (string.IsNullOrEmpty(tXt)) { return tXt; }
-            var posx = tXt.ToUpper().IndexOf(alt.ToUpper(), oldPos);
+            var posx = tXt.ToUpper().IndexOf(alt.ToUpper(), oldPos, StringComparison.Ordinal);
             if (posx >= 0) {
                 tXt = tXt.Substring(0, posx) + neu + tXt.Substring(posx + alt.Length);
                 oldPos = posx + neu.Length;

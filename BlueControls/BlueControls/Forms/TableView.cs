@@ -253,7 +253,7 @@ public partial class TableView : Form {
         Table.Export_HTML();
     }
 
-    protected void ChangeDatabaseInTab(string filename, System.Windows.Forms.TabPage xtab) {
+    protected void ChangeDatabaseInTab(string filename, System.Windows.Forms.TabPage? xtab) {
         if (xtab == null) { return; }
 
         tbcDatabaseSelector.Enabled = false;
@@ -384,7 +384,7 @@ public partial class TableView : Form {
 
         foreach (var thisT in tbcDatabaseSelector.TabPages) {
             if (thisT is System.Windows.Forms.TabPage tp && tp.Tag is List<string> s) {
-                if (s[0].Equals(filename, StringComparison.InvariantCultureIgnoreCase)) {
+                if (s[0].Equals(filename, StringComparison.OrdinalIgnoreCase)) {
                     tbcDatabaseSelector.SelectedTab = tp;
 
                     if (_firstOne) {
@@ -616,7 +616,7 @@ public partial class TableView : Form {
         DebugPrint_InvokeRequired(InvokeRequired, true);
         if (Table.Database == null) { return; }
 
-        var x = new BlueControls.Forms.ConnectedFormulaEditor(Table?.Database.FormulaFileName(), null);
+        var x = new ConnectedFormulaEditor(Table?.Database.FormulaFileName(), null);
         x.ShowDialog();
         x.Dispose();
     }
@@ -718,7 +718,7 @@ public partial class TableView : Form {
     private void btnSuchenUndErsetzen_Click(object sender, System.EventArgs e) => Table.OpenSearchAndReplace();
 
     private void btnSuchFenster_Click(object sender, System.EventArgs e) {
-        var x = new BlueControls.BlueDatabaseDialogs.Search(Table);
+        var x = new Search(Table);
         x.Show();
     }
 
@@ -955,7 +955,7 @@ public partial class TableView : Form {
         var istZ = 0;
         do {
             var changed = false;
-            if (Table.Database.Row.Any(thisRow => thisRow != null && thisRow != vRow && string.Equals(thisRow.CellFirstString(), newName, StringComparison.CurrentCultureIgnoreCase))) {
+            if (Table.Database.Row.Any(thisRow => thisRow != null && thisRow != vRow && string.Equals(thisRow.CellFirstString(), newName, StringComparison.OrdinalIgnoreCase))) {
                 istZ++;
                 newName = istName + " (" + istZ + ")";
                 changed = true;
@@ -1009,7 +1009,7 @@ public partial class TableView : Form {
         }
     }
 
-    private void Table_SelectedRowChanged(object sender, RowEventArgs e) {
+    private void Table_SelectedRowChanged(object sender, RowEventArgs? e) {
         if (InvokeRequired) {
             Invoke(new Action(() => Table_SelectedRowChanged(sender, e)));
             return;
@@ -1049,7 +1049,7 @@ public partial class TableView : Form {
         e.TabPage.Tag = s;
     }
 
-    private void tbcDatabaseSelector_Selected(object sender, System.Windows.Forms.TabControlEventArgs e) {
+    private void tbcDatabaseSelector_Selected(object? sender, System.Windows.Forms.TabControlEventArgs e) {
         Table.ShowWaitScreen = true;
         tbcDatabaseSelector.Enabled = false;
         Table.Enabled = false;

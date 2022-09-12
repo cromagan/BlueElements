@@ -185,7 +185,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     public new string Text {
         get => _eTxt == null || IsDisposed ? string.Empty : _formatierungErlaubt ? _eTxt.HtmlText : _eTxt.PlainText;
         set {
-            if(IsDisposed) { return; }
+            if (IsDisposed) { return; }
             if (!string.IsNullOrEmpty(value)) {
                 value = value.Replace("\n", string.Empty);
                 value = value.Replace("\r", "\r\n");
@@ -492,7 +492,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             if (position > 0 && !_eTxt[position - 1].IsWordSeperator()) { return false; }
             if (position + word.Length < _eTxt.Count && !_eTxt[position + word.Length].IsWordSeperator()) { return false; }
             var tt = _eTxt.ConvertCharToPlainText(position, position + word.Length - 1);
-            return string.Equals(word, tt, StringComparison.CurrentCultureIgnoreCase);
+            return string.Equals(word, tt, StringComparison.OrdinalIgnoreCase);
         } catch (Exception) {
             return WordStarts(word, position);
         }

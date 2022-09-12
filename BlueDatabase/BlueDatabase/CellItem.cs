@@ -128,14 +128,19 @@ public class CellItem {
             case BildTextVerhalten.Interpretiere_Bool:
                 if (originalText == "+") {
                     return column == column.Database.Column.SysCorrect ? QuickImage.Get("Häkchen|" + gr + "||||||||80") : QuickImage.Get("Häkchen|" + gr);
-                } else if (originalText == "-") {
+                }
+
+                if (originalText == "-") {
                     return column == column.Database.Column.SysCorrect ? QuickImage.Get("Warnung|" + gr) :
                         QuickImage.Get("Kreuz|" + gr);
-                } else if (originalText.ToLower() == "o") {
+                }
+                if (originalText.ToLower() == "o") {
                     return QuickImage.Get("Kreis2|" + gr);
-                } else if (originalText.ToLower() == "?") {
+                }
+                if (originalText.ToLower() == "?") {
                     return QuickImage.Get("Fragezeichen|" + gr);
                 }
+
                 return null;
 
             case BildTextVerhalten.Bild_oder_Text:

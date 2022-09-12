@@ -46,7 +46,9 @@ public partial class Notification : FloatingForm {
     #region Constructors
 
     // Startzeit für UnloadAfterSek
-    private Notification() : base(Enums.Design.Form_DesktopBenachrichtigung) => InitializeComponent();
+    private Notification() : base(Enums.Design.Form_DesktopBenachrichtigung) {
+        InitializeComponent();
+    }
 
     private Notification(string text) : this() {
         capTXT.Text = text;

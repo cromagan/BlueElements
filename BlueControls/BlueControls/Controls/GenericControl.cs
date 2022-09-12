@@ -110,7 +110,7 @@ public class GenericControl : System.Windows.Forms.Control {
 
     #region Methods
 
-    public static System.Windows.Forms.Form? ParentForm(System.Windows.Forms.Control o) {
+    public static System.Windows.Forms.Form? ParentForm(System.Windows.Forms.Control? o) {
         if (o == null || o.IsDisposed) { return null; }
 
         do {

@@ -25,7 +25,9 @@ public class ButtonCellEventArgs : CellEventArgs {
 
     #region Constructors
 
-    public ButtonCellEventArgs(ColumnItem? column, RowItem? row) : base(column, row) => Text = "Click";
+    public ButtonCellEventArgs(ColumnItem? column, RowItem? row) : base(column, row) {
+        Text = "Click";
+    }
 
     #endregion
 

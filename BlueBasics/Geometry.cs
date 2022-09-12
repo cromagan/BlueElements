@@ -150,11 +150,11 @@ public static class Geometry {
         // < 0.000001 ist 0 gleich, weil ansonsten zu große ergebnisse rauskommen
         if (Math.Abs(pY - qY) < 0.0000001d) // genau Waagerecht
         {
-            return new PointF(maus.X, pY);
+            return maus with { Y = pY };
         }
         if (Math.Abs(pX - qX) < 0.0000001d) // genau Senkrecht
         {
-            return new PointF(pX, maus.Y);
+            return maus with { X = pX };
         }
         var m1 = (pY - qY) / (pX - qX);
         var m2 = -1 / m1;

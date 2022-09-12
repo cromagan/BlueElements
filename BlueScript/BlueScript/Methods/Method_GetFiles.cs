@@ -17,7 +17,6 @@
 
 using System.Collections.Generic;
 using System.IO;
-using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
@@ -54,7 +53,7 @@ internal class Method_GetFiles : Method {
             return new DoItFeedback("Verzeichnis existiert nicht");
         }
 
-        return new DoItFeedback(System.IO.Directory.GetFiles(pf, ((VariableString)attvar.Attributes[1]).ValueString));
+        return new DoItFeedback(Directory.GetFiles(pf, ((VariableString)attvar.Attributes[1]).ValueString));
     }
 
     #endregion

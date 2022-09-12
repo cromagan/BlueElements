@@ -28,49 +28,8 @@ using static BlueBasics.Converter;
 using BlueDatabase.Enums;
 using BlueControls.Interfaces;
 using System.Windows.Forms;
-
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Controls;
-using BlueControls.Enums;
-
-using BlueControls.EventArgs;
 using BlueControls.Forms;
-using BlueControls.ItemCollection;
-using BlueDatabase;
 using System;
-
-using System.Collections.Generic;
-using System.Drawing;
-
-using BlueControls.ItemCollection.ItemCollectionList;
-
-using static BlueBasics.Converter;
-
-using BlueBasics.EventArgs;
-
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
-using BlueDatabase.Enums;
-
-using BlueDatabase.EventArgs;
-
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using static BlueBasics.FileOperations;
-
-using static BlueBasics.Converter;
-
-using BlueScript.Variables;
 
 namespace BlueControls.ItemCollection;
 
@@ -86,7 +45,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
     public static BlueFont? CaptionFnt = Skin.GetBlueFont(Design.Caption, States.Standard);
 
     public ListExt<string> VisibleFor = new();
-    private ICalculateOneRowItemLevel? _getValueFrom = null;
+    private ICalculateOneRowItemLevel? _getValueFrom;
 
     #endregion
 
@@ -112,7 +71,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
                 }
             }
 
-            var x2 = Forms.InputBoxListBoxStyle.Show("Bitte Breite und Position wählen:", li, AddType.None, true);
+            var x2 = InputBoxListBoxStyle.Show("Bitte Breite und Position wählen:", li, AddType.None, true);
 
             if (x2 == null || x2.Count != 1) { return; }
 
@@ -145,7 +104,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
 
             x.Add("<Keine Quelle>");
 
-            var it = Forms.InputBoxListBoxStyle.Show("Quelle wählen:", x, AddType.None, true);
+            var it = InputBoxListBoxStyle.Show("Quelle wählen:", x, AddType.None, true);
 
             if (it == null || it.Count != 1) { return; }
 
@@ -259,9 +218,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
         }
     }
 
-    public virtual Control? CreateControl(ConnectedFormulaView parent) {
-        throw new NotImplementedException();
-    }
+    public virtual Control? CreateControl(ConnectedFormulaView parent) => throw new NotImplementedException();
 
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
@@ -319,7 +276,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
 
         if (VisibleFor == null || VisibleFor.Count == 0 || VisibleFor.Contains("#Everybody", false)) { return true; }
 
-        if (myGroup.Equals("#Administrator", StringComparison.InvariantCultureIgnoreCase)) { return true; }
+        if (myGroup.Equals("#Administrator", StringComparison.OrdinalIgnoreCase)) { return true; }
 
         if (VisibleFor.Contains(myGroup, false)) { return true; }
 
@@ -337,7 +294,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
         }
 
         l.Add("#Everybody");
-        l.Add("#User: " + BlueBasics.Generic.UserName());
+        l.Add("#User: " + Generic.UserName());
 
         return l.SortedDistinctList();
     }

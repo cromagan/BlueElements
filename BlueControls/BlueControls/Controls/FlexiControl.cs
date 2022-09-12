@@ -72,7 +72,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private Caption? _infoCaption;
     private string _infoText = string.Empty;
     private bool _multiLine;
-    private bool _pauseValueChanged = false;
+    private bool _pauseValueChanged;
     private string _regex = string.Empty;
     private bool _showInfoWhenDisabled;
     private bool _spellChecking;
@@ -370,7 +370,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// <param name="newvalue"></param>
     /// <param name="updateControls"></param>
     /// <param name="alwaysValueChanged">Steuerelemente, wie Button, Checkboxen, DropDownListen müssen hier TRUE setzen. Auch Texte, die in einem Stück gesetzt werden.</param>
-    public void ValueSet(string newvalue, bool updateControls, bool alwaysValueChanged) {
+    public void ValueSet(string? newvalue, bool updateControls, bool alwaysValueChanged) {
         if (IsDisposed) { return; }
         if (newvalue == null) { newvalue = string.Empty; }
         if (Value == null && string.IsNullOrEmpty(newvalue)) { return; }

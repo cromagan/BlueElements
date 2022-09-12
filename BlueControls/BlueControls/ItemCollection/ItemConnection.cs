@@ -27,13 +27,13 @@ public class ItemConnection {
 
     #region Fields
 
-    internal readonly bool ArrowOnMyItem = false;
-    internal readonly bool ArrowOnOtherItem = false;
+    internal readonly bool ArrowOnMyItem;
+    internal readonly bool ArrowOnOtherItem;
     internal readonly ConnectionType MyItemType;
     internal readonly BasicPadItem OtherItem;
     internal readonly ConnectionType OtherItemType;
 
-    private bool _beiExportSichtbar = true;
+    private bool _beiExportSichtbar;
 
     #endregion
 

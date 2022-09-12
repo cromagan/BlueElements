@@ -59,7 +59,9 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
     #region Constructors
 
-    public ZoomPicWithPoints() : base() => InitializeComponent();
+    public ZoomPicWithPoints() : base() {
+        InitializeComponent();
+    }
 
     #endregion
 
@@ -140,7 +142,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
         return GenerateBitmapListItem(Bmp, Tags);
     }
 
-    public PointM? GetPoint(string name) => _points.FirstOrDefault(thisp => thisp != null && string.Equals(thisp.Name, name, StringComparison.CurrentCultureIgnoreCase));
+    public PointM? GetPoint(string name) => _points.FirstOrDefault(thisp => thisp != null && string.Equals(thisp.Name, name, StringComparison.OrdinalIgnoreCase));
 
     public void LetUserAddAPoint(string pointName, Helpers helper, BlueBasics.Enums.Orientation mittelline) {
         _mittelLinie = mittelline;

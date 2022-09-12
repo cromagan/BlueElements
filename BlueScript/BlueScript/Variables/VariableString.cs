@@ -31,7 +31,9 @@ public class VariableString : Variable {
 
     #region Constructors
 
-    public VariableString(string name, string value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _valueString = value.RestoreCriticalVariableChars();
+    public VariableString(string name, string value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) {
+        _valueString = value.RestoreCriticalVariableChars();
+    }
 
     /// <summary>
     /// Wichtig für: GetEnumerableOfType<Variable>("NAME");

@@ -127,7 +127,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
             try {
                 if (string.IsNullOrEmpty(@internal)) { return null; }
 
-                return this.FirstOrDefault(thisItem => thisItem != null && string.Equals(@internal, thisItem.Internal, StringComparison.CurrentCultureIgnoreCase));
+                return this.FirstOrDefault(thisItem => thisItem != null && string.Equals(@internal, thisItem.Internal, StringComparison.OrdinalIgnoreCase));
             } catch {
                 return this[@internal];
             }
@@ -472,14 +472,14 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         Sort();
     }
 
-    public void AddRange(string[] values) {
+    public void AddRange(string[]? values) {
         if (values == null) { return; }
         foreach (var thisstring in values) {
             if (this[thisstring] == null) { Add(thisstring); }
         }
     }
 
-    public void AddRange(ListExt<string> values) {
+    public void AddRange(ListExt<string>? values) {
         if (values == null) { return; }
 
         foreach (var thisstring in values.Where(thisstring => this[thisstring] == null)) {
@@ -487,7 +487,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         }
     }
 
-    public void AddRange(List<string> values, ColumnItem? columnStyle, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
+    public void AddRange(List<string>? values, ColumnItem? columnStyle, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
         if (values == null) { return; }
         if (values.Count > 10000) {
             Develop.DebugPrint(FehlerArt.Fehler, "Values > 100000");
@@ -498,7 +498,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         }
     }
 
-    public void AddRange(List<RowItem?> list, string layoutId) {
+    public void AddRange(List<RowItem?>? list, string layoutId) {
         if (list == null || list.Count == 0) { return; }
 
         foreach (var thisRow in list) {
@@ -506,7 +506,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         }
     }
 
-    public void AddRange(List<string> list) {
+    public void AddRange(List<string>? list) {
         if (list == null) { return; }
 
         foreach (var thisstring in list.Where(thisstring => !string.IsNullOrEmpty(thisstring) && this[thisstring] == null)) {

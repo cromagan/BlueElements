@@ -75,7 +75,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
     public FlexiControlForProperty() : this(null, 1, null, ImageCode.None) { }
 
-    private FlexiControlForProperty(Expression<Func<T>> expr, int rowCount, ItemCollectionList? list, ImageCode image) : base() {
+    private FlexiControlForProperty(Expression<Func<T>>? expr, int rowCount, ItemCollectionList? list, ImageCode image) : base() {
         _accessor = new Accessor<T>(expr);
 
         GenFehlerText();

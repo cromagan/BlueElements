@@ -94,7 +94,7 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable {
     }
 
     public void Hide(string columnName) {
-        foreach (var thisViewItem in this.Where(thisViewItem => thisViewItem != null && (thisViewItem.Column == null || string.Equals(thisViewItem.Column.Name, columnName, StringComparison.CurrentCultureIgnoreCase)))) {
+        foreach (var thisViewItem in this.Where(thisViewItem => thisViewItem != null && (thisViewItem.Column == null || string.Equals(thisViewItem.Column.Name, columnName, StringComparison.OrdinalIgnoreCase)))) {
             Remove(thisViewItem);
             Hide(columnName);
             return;
@@ -284,7 +284,6 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable {
                 tmp.AddIfNotExists("#Everybody");
                 break;
         }
-
 
         tmp = tmp.SortedDistinctList();
 

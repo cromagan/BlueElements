@@ -57,7 +57,9 @@ public partial class ZoomPad : GenericControl {
 
     #region Constructors
 
-    public ZoomPad() : base(true, true) => InitializeComponent();
+    public ZoomPad() : base(true, true) {
+        InitializeComponent();
+    }
 
     #endregion
 

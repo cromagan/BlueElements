@@ -226,7 +226,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposable {
 
     public List<RowData?> CalculateSortedRows(List<FilterItem>? filter, RowSortDefinition rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) => CalculateSortedRows(CalculateFilteredRows(filter), rowSortDefinition, pinnedRows, reUseMe);
 
-    public List<RowData?> CalculateSortedRows(List<RowItem?> filteredRows, RowSortDefinition rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) {
+    public List<RowData?> CalculateSortedRows(List<RowItem?> filteredRows, RowSortDefinition? rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) {
         var lockMe = new object();
         VisibleRowCount = 0;
 

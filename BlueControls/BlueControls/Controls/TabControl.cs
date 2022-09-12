@@ -29,7 +29,7 @@ public class TabControl : AbstractTabControl, IAcceptRowKey {
 
     #region Fields
 
-    private Database? _database = null;
+    private Database? _database;
 
     private long _rowkey = -1;
 
@@ -37,7 +37,9 @@ public class TabControl : AbstractTabControl, IAcceptRowKey {
 
     #region Constructors
 
-    public TabControl() : base() => BackColor = Skin.Color_Back(Design.TabStrip_Body, States.Standard);
+    public TabControl() : base() {
+        BackColor = Skin.Color_Back(Design.TabStrip_Body, States.Standard);
+    }
 
     #endregion
 

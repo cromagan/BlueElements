@@ -29,7 +29,7 @@ public static class BasicListItemExtensions {
 
     #region Methods
 
-    public static List<string> ToListOfString(this List<BasicListItem> items) {
+    public static List<string> ToListOfString(this List<BasicListItem>? items) {
         List<string> w = new();
         if (items == null) { return w; }
 
@@ -155,7 +155,7 @@ public abstract class BasicListItem : IComparable, ICloneable {
 
     public int CompareTo(object obj) {
         if (obj is BasicListItem tobj) {
-            return CompareKey().CompareTo(tobj.CompareKey());
+            return string.Compare(CompareKey(), tobj.CompareKey(), StringComparison.OrdinalIgnoreCase);
         }
 
         Develop.DebugPrint(FehlerArt.Fehler, "Falscher Objecttyp!");
@@ -167,7 +167,7 @@ public abstract class BasicListItem : IComparable, ICloneable {
     public void Draw(Graphics gr, int xModifier, int yModifier, Design controldesign, Design itemdesign, States vState, bool drawBorderAndBack, string filterText, bool translate) {
         if (Parent == null) { Develop.DebugPrint(FehlerArt.Fehler, "Parent nicht definiert"); }
         if (itemdesign == Design.Undefiniert) { return; }
-        Rectangle positionModified = new(Pos.X - xModifier, Pos.Y - yModifier, Pos.Width, Pos.Height);
+        Rectangle positionModified = Pos with { X = Pos.X - xModifier, Y = Pos.Y - yModifier };
         DrawExplicit(gr, positionModified, itemdesign, vState, drawBorderAndBack, translate);
         if (drawBorderAndBack) {
             if (!string.IsNullOrEmpty(filterText) && !FilterMatch(filterText)) {

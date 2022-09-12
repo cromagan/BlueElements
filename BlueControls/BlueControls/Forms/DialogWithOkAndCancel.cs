@@ -83,7 +83,7 @@ public partial class DialogWithOkAndCancel : Form {
         butAbbrechen.Top = bottomOfLowestControl;
     }
 
-    public void Setup(string txt, GenericControl centerControl, int minWidth) {
+    public void Setup(string txt, GenericControl? centerControl, int minWidth) {
         var wi = Skin.Padding * 2;
         var he = Skin.Padding * 2;
 

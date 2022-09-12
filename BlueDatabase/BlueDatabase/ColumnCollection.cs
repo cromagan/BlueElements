@@ -279,11 +279,11 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
                 for (var s2 = s1 + 1; s2 < Count; s2++) {
                     if (base[s2] != null) {
                         // Evtl. Doppelte Namen einzigartig machen
-                        if (string.Equals(base[s1].Name, base[s2].Name, StringComparison.CurrentCultureIgnoreCase)) {
+                        if (string.Equals(base[s1].Name, base[s2].Name, StringComparison.OrdinalIgnoreCase)) {
                             base[s2].Load(DatabaseDataType.ColumnName, base[s2].Name + "0");
                         }
                         // Evtl. Doppelte Identifier eleminieren
-                        if (!string.IsNullOrEmpty(base[s1].Identifier) && string.Equals(base[s1].Identifier, base[s2].Identifier, StringComparison.CurrentCultureIgnoreCase)) {
+                        if (!string.IsNullOrEmpty(base[s1].Identifier) && string.Equals(base[s1].Identifier, base[s2].Identifier, StringComparison.OrdinalIgnoreCase)) {
                             base[s2].Load(DatabaseDataType.ColumnIdentify, string.Empty);
                         }
                     }
@@ -336,7 +336,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         Database.ColumnArrangements[0].ShowAllColumns(); // Damit die Datenbank mitbekommt, das sich da was geändert hat
     }
 
-    internal static string ParsableColumnKey(ColumnItem column) => column == null ? "ColumnKey=?" : ParsableColumnKey(column.Key);
+    internal static string ParsableColumnKey(ColumnItem? column) => column == null ? "ColumnKey=?" : ParsableColumnKey(column.Key);
 
     internal static string ParsableColumnKey(long key) => "ColumnKey=" + key;
 
@@ -384,7 +384,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     }
 
     private void AddSystem(string identifier) {
-        if (this.Any(thisColumn => thisColumn != null && string.Equals(thisColumn.Identifier, identifier, StringComparison.CurrentCultureIgnoreCase))) {
+        if (this.Any(thisColumn => thisColumn != null && string.Equals(thisColumn.Identifier, identifier, StringComparison.OrdinalIgnoreCase))) {
             return;
         }
         var c = Add(identifier);

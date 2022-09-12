@@ -691,7 +691,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
     /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
     /// </summary>
     /// <returns></returns>
-    public void Export_HTML(string filename, List<ColumnItem?> columnList, List<RowData?> sortedRows, bool execute) {
+    public void Export_HTML(string filename, List<ColumnItem?>? columnList, List<RowData?>? sortedRows, bool execute) {
         if (columnList == null || columnList.Count == 0) {
             columnList = Column.Where(thisColumnItem => thisColumnItem != null).ToList();
         }
@@ -1160,7 +1160,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
         return e.SortedDistinctList();
     }
 
-    public bool PermissionCheck(ListExt<string> allowed, RowItem? row) {
+    public bool PermissionCheck(ListExt<string>? allowed, RowItem? row) {
         try {
             if (IsAdministrator()) { return true; }
             if (PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0) { return true; }
@@ -1180,9 +1180,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
         Layouts.Check();
     }
 
-    public bool Save(bool mustSave) {
-        return _muf.Save(mustSave);
-    }
+    public bool Save(bool mustSave) => _muf.Save(mustSave);
 
     public void SaveAsAndChangeTo(string fileName) {
         _muf.SaveAsAndChangeTo(fileName);
@@ -1763,11 +1761,11 @@ public sealed class Database : IDisposable, IDisposableExtended {
         return;
     }
 
-    private void Layouts_ItemSeted(object sender, ListEventArgs e) {
+    private void Layouts_ItemSeted(object sender, ListEventArgs? e) {
         if (e != null) {
             var x = (string)e.Item;
             if (!x.StartsWith("{ID=#")) { Develop.DebugPrint("ID nicht gefunden: " + x); }
-            var ko = x.IndexOf(", ");
+            var ko = x.IndexOf(", ", StringComparison.Ordinal);
             var id = x.Substring(4, ko - 4);
             InvalidateExports(id);
         }

@@ -23,7 +23,9 @@ public partial class Tool_Screenshot {
 
     #region Constructors
 
-    public Tool_Screenshot() : base() => InitializeComponent();
+    public Tool_Screenshot() : base() {
+        InitializeComponent();
+    }
 
     #endregion
 

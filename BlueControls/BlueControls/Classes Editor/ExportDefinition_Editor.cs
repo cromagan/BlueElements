@@ -33,7 +33,9 @@ internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<Expo
 {
     #region Constructors
 
-    public ExportDefinition_Editor() : base() => InitializeComponent();
+    public ExportDefinition_Editor() : base() {
+        InitializeComponent();
+    }
 
     #endregion
 

@@ -98,7 +98,7 @@ public partial class PadEditor : PadEditorReadOnly {
     private void btnAddLine_Click(object sender, System.EventArgs e) {
         var p = Pad.MiddleOfVisiblesScreen();
         var w = (int)(300 / Pad.Zoom);
-        LinePadItem b = new(PadStyles.Style_Standard, new Point(p.X - w, p.Y), new Point(p.X + w, p.Y));
+        LinePadItem b = new(PadStyles.Style_Standard, p with { X = p.X - w }, p with { X = p.X + w });
         Pad.AddCentered(b);
     }
 

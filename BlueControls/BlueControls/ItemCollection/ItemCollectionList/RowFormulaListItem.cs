@@ -101,7 +101,7 @@ public class RowFormulaListItem : BasicListItem {
 
     public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth) {
         if (_tmpBmp == null) { GeneratePic(); }
-        return _tmpBmp == null ? 200 : _tmpBmp.Height;
+        return _tmpBmp?.Height ?? 200;
 
         //var sc = ((float)_tmpBmp.Height / _tmpBmp.Width);
 

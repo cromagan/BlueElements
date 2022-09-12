@@ -60,9 +60,9 @@ public class VariableSub : Variable {
     public override string ReadableText => SubName;
 
     public override string ShortName => "sub";
-    public string SubCode { get; } = string.Empty;
-    public string SubName { get; private set; } = string.Empty;
-    public int SubOnLine { get; } = 0;
+    public string SubCode { get; }
+    public string SubName { get; private set; }
+    public int SubOnLine { get; }
     public override bool ToStringPossible => false;
     public override string ValueForReplace => SubName.RemoveCriticalVariableChars();
 

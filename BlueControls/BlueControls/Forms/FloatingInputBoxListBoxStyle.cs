@@ -42,7 +42,9 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
     #region Constructors
 
-    private FloatingInputBoxListBoxStyle() : base(Design.Form_QuickInfo) => InitializeComponent();
+    private FloatingInputBoxListBoxStyle() : base(Design.Form_QuickInfo) {
+        InitializeComponent();
+    }
 
     private FloatingInputBoxListBoxStyle(ItemCollectionList? items, int xpos, int ypos, int steuerWi, object tag, Control? connectedControl, bool translate) : base(connectedControl, items.ControlDesign) {
         InitializeComponent();

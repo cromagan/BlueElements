@@ -40,7 +40,7 @@ public partial class RelationDiagram : PadEditor {
 
     //private bool RelationsValid;
     //   Dim ItS As New Size(60, 80)
-    public RelationDiagram(Database database) {
+    public RelationDiagram(Database? database) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.

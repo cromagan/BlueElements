@@ -116,9 +116,9 @@ public sealed class BlueFont : IReadableTextWithChanging {
 
                 case "fontsize":
                     FontSize = FloatParse(pair.Value.FromNonCritical());
-                    if (FontSize < 0.1F) { 
+                    if (FontSize < 0.1F) {
                         FontSize = 0.1f;
-                        //Develop.DebugPrint(FehlerArt.Warnung, "Fontsize=" + FontSize); 
+                        //Develop.DebugPrint(FehlerArt.Warnung, "Fontsize=" + FontSize);
                     }
                     break;
 
@@ -258,7 +258,7 @@ public sealed class BlueFont : IReadableTextWithChanging {
         }
         BlueFont f = new(code);
         FontsAll.Add(f);
-        //if (!string.Equals(f._code.Replace(" ", ""), code.Replace(" ", ""), StringComparison.CurrentCultureIgnoreCase)) {
+        //if (!string.Equals(f._code.Replace(" ", ""), code.Replace(" ", ""), StringComparison.OrdinalIgnoreCase)) {
         //    Develop.DebugPrint("Schrift-Fehlerhaft: " + code + " (" + f._code + ")");
         //}
         return f;
@@ -447,7 +447,7 @@ public sealed class BlueFont : IReadableTextWithChanging {
 
         if (Kapitälchen && char.ToUpper(c) != c) {
             s = MeasureString("." + char.ToUpper(c) + ".", StringFormat.GenericTypographic);
-            s = new SizeF(s.Width * 0.8f, s.Height);
+            s = s with { Width = s.Width * 0.8f };
         } else if (OnlyUpper) {
             s = MeasureString("." + char.ToUpper(c) + ".", _fontOl, StringFormat.GenericTypographic);
         } else if (OnlyLower) {

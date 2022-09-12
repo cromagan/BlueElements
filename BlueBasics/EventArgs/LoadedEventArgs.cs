@@ -21,7 +21,9 @@ public class LoadedEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public LoadedEventArgs(bool onlyReload) => OnlyReload = onlyReload;
+    public LoadedEventArgs(bool onlyReload) {
+        OnlyReload = onlyReload;
+    }
 
     #endregion
 

@@ -44,13 +44,14 @@ public static class Polygons {
             (float)(rect.PointOf(Alignment.VerticalCenter_Right).Y - (rect.Height * 0.18)));
         PointF plusUnten = new((float)(rect.Left + (rect.Width * 0.5)),
             (float)(rect.PointOf(Alignment.VerticalCenter_Right).Y + (rect.Height * 0.18)));
-        p.AddLine(rect.PointOf(Alignment.VerticalCenter_Right), new PointF(plusUnten.X, rect.Bottom));
+        p.AddLine(rect.PointOf(Alignment.VerticalCenter_Right), plusUnten with { Y = rect.Bottom });
         p.AddLine(p.GetLastPoint(), plusUnten);
-        p.AddLine(p.GetLastPoint(), new PointF(rect.Left, plusUnten.Y));
-        p.AddLine(p.GetLastPoint(), new PointF(rect.Left, plusOben.Y));
+        p.AddLine(p.GetLastPoint(), plusUnten with { X = rect.Left });
+        p.AddLine(p.GetLastPoint(), plusOben with { X = rect.Left });
         p.AddLine(p.GetLastPoint(), plusOben);
-        p.AddLine(p.GetLastPoint(), new PointF(plusOben.X, rect.Top));
+        p.AddLine(p.GetLastPoint(), plusOben with { Y = rect.Top });
         p.CloseFigure();
+
         return p;
     }
 

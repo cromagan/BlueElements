@@ -51,7 +51,9 @@ public class WorkItem : IParseable {
         Date = DateTime.UtcNow;
     }
 
-    public WorkItem(string s) => Parse(s);
+    public WorkItem(string s) {
+        Parse(s);
+    }
 
     #endregion
 

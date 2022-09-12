@@ -48,7 +48,9 @@ public partial class MainWindow {
         tabRibbonbar.SelectedIndex = 1;
     }
 
-    public MainWindow(string filename, bool loadSaveEnabled) : this(loadSaveEnabled) => LoadFromDisk(filename);
+    public MainWindow(string filename, bool loadSaveEnabled) : this(loadSaveEnabled) {
+        LoadFromDisk(filename);
+    }
 
     private MainWindow() : this(true) { }
 

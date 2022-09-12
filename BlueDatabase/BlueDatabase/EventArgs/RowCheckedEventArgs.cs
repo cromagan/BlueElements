@@ -23,7 +23,9 @@ public class RowCheckedEventArgs : RowEventArgs {
 
     #region Constructors
 
-    public RowCheckedEventArgs(RowItem row, List<string> columnsWithErrors) : base(row) => ColumnsWithErrors = columnsWithErrors;
+    public RowCheckedEventArgs(RowItem row, List<string> columnsWithErrors) : base(row) {
+        ColumnsWithErrors = columnsWithErrors;
+    }
 
     #endregion
 

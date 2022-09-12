@@ -88,37 +88,37 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
                 }
                 return true;
 
-            //case "#filterverschieben":
-            //    if (e.HotItem is ColumnItem col2) {
-            //        var pc = (Filterleiste)Parent; // Parent geht verlren, wenn der Filter selbst disposed und neu erzeugt wird
-            //        while (true) {
-            //            var nx = InputBox.Show("X, von 0 bis 10000", col2.DauerFilterPos.X.ToString(), enVarType.Integer);
-            //            if (string.IsNullOrEmpty(nx)) { return true; }
-            //            var nxi = Converter.IntParse(nx);
-            //            nxi = Math.Max(nxi, 0);
-            //            nxi = Math.Min(nxi, 10000);
-            //            var ny = InputBox.Show("Y, von 0 bis 10000", col2.DauerFilterPos.Y.ToString(), enVarType.Integer);
-            //            if (string.IsNullOrEmpty(ny)) { return true; }
-            //            var nyi = Converter.IntParse(ny);
-            //            nyi = Math.Max(nyi, 0);
-            //            nyi = Math.Min(nyi, 10000);
-            //            col2.DauerFilterPos = new Point(nxi, nyi);
-            //            pc.FillFilters();
-            //        }
-            //    }
-            //    return true;
+                //case "#filterverschieben":
+                //    if (e.HotItem is ColumnItem col2) {
+                //        var pc = (Filterleiste)Parent; // Parent geht verlren, wenn der Filter selbst disposed und neu erzeugt wird
+                //        while (true) {
+                //            var nx = InputBox.Show("X, von 0 bis 10000", col2.DauerFilterPos.X.ToString(), enVarType.Integer);
+                //            if (string.IsNullOrEmpty(nx)) { return true; }
+                //            var nxi = Converter.IntParse(nx);
+                //            nxi = Math.Max(nxi, 0);
+                //            nxi = Math.Min(nxi, 10000);
+                //            var ny = InputBox.Show("Y, von 0 bis 10000", col2.DauerFilterPos.Y.ToString(), enVarType.Integer);
+                //            if (string.IsNullOrEmpty(ny)) { return true; }
+                //            var nyi = Converter.IntParse(ny);
+                //            nyi = Math.Max(nyi, 0);
+                //            nyi = Math.Min(nyi, 10000);
+                //            col2.DauerFilterPos = new Point(nxi, nyi);
+                //            pc.FillFilters();
+                //        }
+                //    }
+                //    return true;
 
-            //case "#bildpfad":
-            //    var p = (string)((Filterleiste)Parent).pic.Tag;
-            //    ExecuteFile(p.FilePath());
-            //    MessageBox.Show("Aktuelle Datei:<br>" + p);
-            //    return true;
+                //case "#bildpfad":
+                //    var p = (string)((Filterleiste)Parent).pic.Tag;
+                //    ExecuteFile(p.FilePath());
+                //    MessageBox.Show("Aktuelle Datei:<br>" + p);
+                //    return true;
 
-            default:
-                //if (Parent is Formula f) {
-                //    return f.ContextMenuItemClickedInternalProcessig(sender, e);
-                //}
-                break;
+                //default:
+                //    //if (Parent is Formula f) {
+                //    //    return f.ContextMenuItemClickedInternalProcessig(sender, e);
+                //    //}
+                //    break;
         }
         return false;
     }

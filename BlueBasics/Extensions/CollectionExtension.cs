@@ -44,7 +44,7 @@ public static partial class Extensions {
     /// </summary>
     /// <param name="collection"></param>
     /// <returns></returns>
-    public static string JoinWithCr(this ICollection<string> collection) => collection == null || collection.Count == 0 ? string.Empty : collection.JoinWith("\r");
+    public static string JoinWithCr(this ICollection<string>? collection) => collection == null || collection.Count == 0 ? string.Empty : collection.JoinWith("\r");
 
     /// <summary>
     /// Gibt einen String zurück, der alle Elemet der Collection mittels einem Zeilenumbruch zusammenfügt.

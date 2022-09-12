@@ -73,7 +73,9 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
         _autoDelete = autodelete;
     }
 
-    public ExportDefinition(Database database, string toParse) : this(database) => Parse(toParse);
+    public ExportDefinition(Database database, string toParse) : this(database) {
+        Parse(toParse);
+    }
 
     public ExportDefinition(Database database) {
         Database = database;

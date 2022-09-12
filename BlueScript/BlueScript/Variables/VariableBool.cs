@@ -33,7 +33,9 @@ public class VariableBool : Variable {
 
     #region Constructors
 
-    public VariableBool(string name, bool value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _valuebool = value;
+    public VariableBool(string name, bool value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) {
+        _valuebool = value;
+    }
 
     /// <summary>
     /// Wichtig für: GetEnumerableOfType<Variable>("NAME");

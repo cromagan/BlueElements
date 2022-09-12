@@ -29,8 +29,8 @@ public class Accessor<T> {
 
     #region Fields
 
-    public readonly bool CanRead = false;
-    public readonly bool CanWrite = false;
+    public readonly bool CanRead;
+    public readonly bool CanWrite;
     public readonly string Name = "[unbekannt]";
     public readonly string QuickInfo = string.Empty;
 

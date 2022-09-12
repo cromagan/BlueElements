@@ -71,7 +71,7 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
 
     #region Methods
 
-    public override System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
+    public override Control? CreateControl(ConnectedFormulaView parent) {
         var c3 = new Controls.TabControl();
         c3.Tag = Internal;
 
@@ -94,7 +94,7 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
             string pg;
             string pgvis;
 
-            if (thisc.Internal.EndsWith(".cfo", StringComparison.InvariantCultureIgnoreCase)) {
+            if (thisc.Internal.EndsWith(".cfo", StringComparison.OrdinalIgnoreCase)) {
                 cf = ConnectedFormula.ConnectedFormula.GetByFilename(thisc.Internal);
                 pg = "Head";
                 pgvis = string.Empty;
@@ -224,7 +224,7 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
         var headh = 25 * zoom;
         var headb = 70 * zoom;
 
-        var body = new RectangleF(positionModified.X, positionModified.Y + headh, positionModified.Width, positionModified.Height - headh);
+        var body = positionModified with { Y = positionModified.Y + headh, Height = positionModified.Height - headh };
         var c = -1;
         foreach (var thisC in Childs.Item) {
             c++;
@@ -296,7 +296,7 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
 
         if (_cf != null && _cf.PadData != null) {
             foreach (var thisf in _cf.PadData.AllPages()) {
-                if (!_cf.NotAllowedChilds.Contains(thisf) && !string.Equals("Head", thisf, StringComparison.InvariantCultureIgnoreCase)) {
+                if (!_cf.NotAllowedChilds.Contains(thisf) && !string.Equals("Head", thisf, StringComparison.OrdinalIgnoreCase)) {
                     Childs.Suggestions.Add(thisf, ImageCode.Formel);
                 }
             }

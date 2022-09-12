@@ -215,7 +215,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
         foreach (var thisItem in _padData) {
             if (string.IsNullOrEmpty(page) ||
                 string.IsNullOrEmpty(thisItem.Page) ||
-                page.Equals(thisItem.Page, StringComparison.InvariantCultureIgnoreCase)) {
+                page.Equals(thisItem.Page, StringComparison.OrdinalIgnoreCase)) {
                 if (thisItem is CustomizableShowPadItem cspi) {
                     if (cspi.IsVisibleForMe(myGroup, myName)) { return true; }
                 }

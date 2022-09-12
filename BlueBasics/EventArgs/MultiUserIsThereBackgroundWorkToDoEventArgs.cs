@@ -21,7 +21,9 @@ public class MultiUserIsThereBackgroundWorkToDoEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public MultiUserIsThereBackgroundWorkToDoEventArgs() => BackGroundWork = false;
+    public MultiUserIsThereBackgroundWorkToDoEventArgs() {
+        BackGroundWork = false;
+    }
 
     #endregion
 

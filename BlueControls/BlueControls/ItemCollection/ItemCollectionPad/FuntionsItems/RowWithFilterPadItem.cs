@@ -45,7 +45,7 @@ public class RowWithFilterPaditem : RectanglePadItem, IReadableText, IAcceptAndS
 
     public readonly Database FilterDefiniton;
 
-    public Table? FilterTable = null;
+    public Table? FilterTable;
     private string _anzeige = string.Empty;
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
     private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Über_dem_Feld;
@@ -154,7 +154,7 @@ public class RowWithFilterPaditem : RectanglePadItem, IReadableText, IAcceptAndS
     #region Methods
 
     public Control? CreateControl(ConnectedFormulaView parent) {
-        var c = new FlexiControlRowSelector(Database, this.Parent, FilterDefiniton, _überschrift, _anzeige);
+        var c = new FlexiControlRowSelector(Database, Parent, FilterDefiniton, _überschrift, _anzeige);
         c.EditType = _bearbeitung;
         c.CaptionPosition = CaptionPosition;
         c.Tag = Internal;
@@ -268,9 +268,7 @@ public class RowWithFilterPaditem : RectanglePadItem, IReadableText, IAcceptAndS
         return "Zeile einer Datenbank";
     }
 
-    public QuickImage? SymbolForReadableText() {
-        return QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(Id));
-    }
+    public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(Id));
 
     public override string ToString() {
         var t = base.ToString();
@@ -399,10 +397,10 @@ public class RowWithFilterPaditem : RectanglePadItem, IReadableText, IAcceptAndS
         var cellKey = e.Tags.TagGet("CellKey");
         if (string.IsNullOrEmpty(cellKey)) { return; }
         RowItem? row = null;
-        bt.Database?.Cell.DataOfCellKey(cellKey, out var column, out row);
+        bt.Database?.Cell.DataOfCellKey(cellKey, out _, out row);
         if (row == null) { return; }
 
-        e.UserMenu.Add(BlueControls.Enums.ContextMenuComands.Löschen);
+        e.UserMenu.Add(ContextMenuComands.Löschen);
     }
 
     private void Filtertable_ContextMenuItemClicked(object sender, EventArgs.ContextMenuItemClickedEventArgs e) {
@@ -410,7 +408,7 @@ public class RowWithFilterPaditem : RectanglePadItem, IReadableText, IAcceptAndS
         var cellKey = e.Tags.TagGet("CellKey");
         if (string.IsNullOrEmpty(cellKey)) { return; }
         RowItem? row = null;
-        bt.Database?.Cell.DataOfCellKey(cellKey, out var column, out row);
+        bt.Database?.Cell.DataOfCellKey(cellKey, out _, out row);
         if (row == null) { return; }
 
         switch (e.ClickedComand.ToLower()) {
@@ -419,7 +417,7 @@ public class RowWithFilterPaditem : RectanglePadItem, IReadableText, IAcceptAndS
                 break;
 
             default:
-                BlueBasics.Develop.DebugPrint_MissingCommand(e.ClickedComand);
+                Develop.DebugPrint_MissingCommand(e.ClickedComand);
                 break;
         }
     }

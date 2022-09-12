@@ -59,11 +59,17 @@ public class BitmapExt : IDisposableExtended {
         }
     }
 
-    public BitmapExt(string filename, bool setDummyPicIfFails) => FromFile(filename, setDummyPicIfFails);
+    public BitmapExt(string filename, bool setDummyPicIfFails) {
+        FromFile(filename, setDummyPicIfFails);
+    }
 
-    public BitmapExt(int width, int height) => EmptyBitmap(width, height);
+    public BitmapExt(int width, int height) {
+        EmptyBitmap(width, height);
+    }
 
-    public BitmapExt() => EmptyBitmap(1, 1);
+    public BitmapExt() {
+        EmptyBitmap(1, 1);
+    }
 
     public BitmapExt(Icon icon) : this(icon.ToBitmap()) { }
 
@@ -71,7 +77,9 @@ public class BitmapExt : IDisposableExtended {
     /// Achtung, das eingehende Bild wird geclont!
     /// </summary>
     /// <param name="bmp"></param>
-    public BitmapExt(Bitmap bmp) => CloneFromBitmap(bmp);
+    public BitmapExt(Bitmap bmp) {
+        CloneFromBitmap(bmp);
+    }
 
     #endregion
 
@@ -217,7 +225,7 @@ public class BitmapExt : IDisposableExtended {
         return clipedArea;
     }
 
-    public static void Ausdünnen(Bitmap pic, int staerke) {
+    public static void Ausdünnen(Bitmap? pic, int staerke) {
         if (pic == null) { return; }
         for (var x = 0; x < pic.Width - 1; x++) {
             for (var y = 0; y < pic.Height - 1; y++) {
@@ -558,7 +566,7 @@ public class BitmapExt : IDisposableExtended {
     /// <param name="pos2">Linke obere Eckte des 2. Bildes</param>
     /// <param name="accuracy">Genauigkeit der Prüfung. Bei 1 wird jeder Pixel geprüft. Bei z.B. 3 wird nur jeder dritte Pixel geprüft.</param>
     /// <returns></returns>
-    public static bool IntersectsWith(Bitmap image1, Point pos1, Bitmap image2, Point pos2, int accuracy) {
+    public static bool IntersectsWith(Bitmap? image1, Point pos1, Bitmap? image2, Point pos2, int accuracy) {
         if (image1 == null || image2 == null) { return false; }
         Rectangle koord1 = new(pos1, image1.Size);
         Rectangle koord2 = new(pos2, image2.Size);
@@ -859,7 +867,7 @@ public class BitmapExt : IDisposableExtended {
         return l;
     }
 
-    public void CloneFromBitmap(Bitmap bmp) {
+    public void CloneFromBitmap(Bitmap? bmp) {
         if (bmp == null) {
             Width = -1;
             Height = -1;
@@ -895,7 +903,7 @@ public class BitmapExt : IDisposableExtended {
         using var gr = Graphics.FromImage(newBmp._bitmap);
         gr.Clear(Color.Transparent);
         gr.PixelOffsetMode = PixelOffsetMode.Half;
-        gr.DrawImage(_bitmap, new Rectangle(0, 0, re.Width, re.Height), re.Left, re.Top, re.Width, re.Height, GraphicsUnit.Pixel);
+        gr.DrawImage(_bitmap, re with { X = 0, Y = 0 }, re.Left, re.Top, re.Width, re.Height, GraphicsUnit.Pixel);
         return newBmp;
     }
 

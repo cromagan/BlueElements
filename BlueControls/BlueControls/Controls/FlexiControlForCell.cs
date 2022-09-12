@@ -31,12 +31,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Imaging;
-using System.Linq;
 using System.Windows.Forms;
 using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.FileOperations;
-using MessageBox = System.Windows.Forms.MessageBox;
 using BlueDatabase.Interfaces;
 
 namespace BlueControls.Controls;
@@ -192,11 +189,11 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
                 Table.DoUndo(_tmpColumn, _tmpRow);
                 return true;
 
-            default:
-                //if (Parent is Formula f) {
-                //    return f.ContextMenuItemClickedInternalProcessig(sender, e);
-                //}
-                break;
+                //default:
+                //    //if (Parent is Formula f) {
+                //    //    return f.ContextMenuItemClickedInternalProcessig(sender, e);
+                //    //}
+                //    break;
         }
         return false;
     }
@@ -426,7 +423,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         var newT = string.Empty;
         foreach (var thisString in e.ColumnsWithErrors) {
             var x = thisString.SplitAndCutBy("|");
-            if (_tmpColumn != null && string.Equals(x[0], _tmpColumn.Name, StringComparison.CurrentCultureIgnoreCase)) {
+            if (_tmpColumn != null && string.Equals(x[0], _tmpColumn.Name, StringComparison.OrdinalIgnoreCase)) {
                 if (!string.IsNullOrEmpty(InfoText)) { InfoText += "<br><hr><br>"; }
                 newT += x[1];
             }
@@ -460,7 +457,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     //                        return;
     //                    }
     //                    var fil2 = _tmpColumn.BestFile(_tmpColumn.Name + ".png", true);
-    //                    if (!string.Equals(fil2.FilePath(), ep.SorceName.FilePath(), StringComparison.CurrentCultureIgnoreCase)) {
+    //                    if (!string.Equals(fil2.FilePath(), ep.SorceName.FilePath(), StringComparison.OrdinalIgnoreCase)) {
     //                        ep.Bitmap.Save(fil2, ImageFormat.Png);
     //                    } else {
     //                        fil2 = ep.SorceName;

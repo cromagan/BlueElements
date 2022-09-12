@@ -301,7 +301,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
                         ChildPadItem? pad = null;
                         foreach (var it in Parent) {
                             if (it is ChildPadItem cp) {
-                                if (string.Equals(cp.Name, thisA, StringComparison.CurrentCultureIgnoreCase)) {
+                                if (string.Equals(cp.Name, thisA, StringComparison.OrdinalIgnoreCase)) {
                                     pad = cp;
                                     break;
                                 }

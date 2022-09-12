@@ -36,7 +36,9 @@ public abstract partial class GenericTool : GroupBox // System.Windows.Forms.Use
 
     #region Constructors
 
-    protected GenericTool() : base() => InitializeComponent();
+    protected GenericTool() : base() {
+        InitializeComponent();
+    }
 
     #endregion
 

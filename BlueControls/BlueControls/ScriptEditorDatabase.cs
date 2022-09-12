@@ -33,7 +33,9 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
 
     #region Constructors
 
-    public ScriptEditorDatabase() => InitializeComponent();
+    public ScriptEditorDatabase() {
+        InitializeComponent();
+    }
 
     #endregion
 

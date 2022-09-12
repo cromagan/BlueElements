@@ -62,7 +62,7 @@ public class FileExplorerPadItem : CustomizableShowPadItem, IItemToControl {
 
     #region Methods
 
-    public System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
+    public override System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
         var cx = new FileBrowser();
         cx.OriginalText = Pfad;
         cx.Tag = Internal;
@@ -110,7 +110,7 @@ public class FileExplorerPadItem : CustomizableShowPadItem, IItemToControl {
             DrawColorScheme(gr, positionModified, zoom, id);
         }
 
-        CustomizableShowPadItem.DrawFakeControl(gr, positionModified, zoom, BlueDatabase.Enums.ÜberschriftAnordnung.Über_dem_Feld, "C:\\");
+        DrawFakeControl(gr, positionModified, zoom, BlueDatabase.Enums.ÜberschriftAnordnung.Über_dem_Feld, "C:\\");
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }

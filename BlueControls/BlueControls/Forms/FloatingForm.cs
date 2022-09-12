@@ -42,7 +42,9 @@ public partial class FloatingForm : Form {
         AllBoxes.Add(this);
     }
 
-    protected FloatingForm(Control? connectedControl, Design design) : this(design) => _connectedControl = connectedControl;
+    protected FloatingForm(Control? connectedControl, Design design) : this(design) {
+        _connectedControl = connectedControl;
+    }
 
     #endregion
 

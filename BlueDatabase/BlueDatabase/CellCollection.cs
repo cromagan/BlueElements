@@ -170,17 +170,20 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
 
     public static string KeyOfCell(ColumnItem? column, RowItem? row) {
         // Alte verweise eleminieren.
-        column = column?.Database.Column.SearchByKey(column.Key);
-        row = row?.Database.Row.SearchByKey(row.Key);
-        return column == null && row == null
-            ? string.Empty
-            : column == null ? KeyOfCell(-1, row.Key) : row == null ? KeyOfCell(column.Key, -1) : KeyOfCell(column.Key, row.Key);
+        column = column?.Database?.Column.SearchByKey(column.Key);
+        row = row?.Database?.Row.SearchByKey(row.Key);
+
+        if (column != null && row != null) { return KeyOfCell(column.Key, row.Key); }
+        if (column == null && row != null) { return KeyOfCell(-1, row.Key); }
+        if (column != null && row == null) { return KeyOfCell(column.Key, -1); }
+
+        return string.Empty;
     }
 
     public static (ColumnItem? column, RowItem? row, string info) LinkedCellData(string column, RowItem? row, bool repairLinkedValue, bool addRowIfNotExists) {
         if (row == null) { return (null, null, "Keine Zeile angegeben."); }
 
-        var col = row.Database.Column[column];
+        var col = row.Database?.Column[column];
         return LinkedCellData(col, row, repairLinkedValue, addRowIfNotExists);
     }
 
@@ -225,27 +228,9 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
     /// </summary>
     /// <param name="column"></param>
     /// <param name="row"></param>
-    /// <param name="DateiRechtePrüfen"></param>
+    /// <param name="mode"></param>
     /// <returns></returns>
     public static bool UserEditPossible(ColumnItem? column, RowItem? row, ErrorReason mode) => string.IsNullOrEmpty(ErrorReason(column, row, mode));
-
-    ///// <summary>
-    ///// Gibt einen Datainamen/Pfad zurück, der sich aus dem Standard Angaben der Spalte und den Zelleninhalt zusammensetzt.
-    ///// Keine Garantie, dass die Datei auch existiert.
-    ///// </summary>
-    ///// <param name="column"></param>
-    ///// <param name="row"></param>
-    ///// <returns></returns>
-    //public string BestFile(string columnName, RowItem? row) => BestFile(_database.Column[columnName], row);
-
-    ///// <summary>
-    ///// Gibt einen Datainamen/Pfad zurück, der sich aus dem Standard Angaben der Spalte und den Zelleninhalt zusammensetzt.
-    ///// Keine Garantie, dass die Datei auch existiert.
-    ///// </summary>
-    ///// <param name="column"></param>
-    ///// <param name="row"></param>
-    ///// <returns></returns>
-    //public string BestFile(ColumnItem? column, RowItem? row) => column.BestFile(GetString(column, row), false);
 
     public void DataOfCellKey(string cellKey, out ColumnItem? column, out RowItem? row) {
         if (string.IsNullOrEmpty(cellKey)) {
@@ -255,8 +240,8 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
         }
         var cd = cellKey.SplitAndCutBy("|");
         if (cd.GetUpperBound(0) != 1) { Develop.DebugPrint(FehlerArt.Fehler, "Falscher CellKey übergeben: " + cellKey); }
-        column = _database.Column.SearchByKey(LongParse(cd[0]));
-        row = _database.Row.SearchByKey(LongParse(cd[1]));
+        column = _database?.Column.SearchByKey(LongParse(cd[0]));
+        row = _database?.Row.SearchByKey(LongParse(cd[1]));
     }
 
     public void Delete(ColumnItem column, long rowKey) {
@@ -277,7 +262,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
     /// Rechnet Cellbezüge und besondere Spalten neu durch, falls sich der Wert geändert hat.
     /// </summary>
     /// <param name="column"></param>
-    /// <param name="rowKey"></param>
+    /// <param name="row"></param>
     /// <param name="previewsValue"></param>
     /// <param name="doAlways">Auch wenn der PreviewsValue gleich dem CurrentValue ist, wird die Routine durchberechnet</param>
     public void DoSpecialFormats(ColumnItem? column, RowItem? row, string previewsValue, bool doAlways) {
@@ -325,11 +310,11 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
         }
     }
 
-    public bool GetBoolean(string columnName, RowItem? row) => GetBoolean(_database.Column[columnName], row);
+    public bool GetBoolean(string columnName, RowItem? row) => GetBoolean(_database?.Column[columnName], row);
 
     public bool GetBoolean(ColumnItem? column, RowItem? row) => GetString(column, row).FromPlusMinus();// Main Method
 
-    public Color GetColor(string columnName, RowItem? row) => GetColor(_database.Column[columnName], row);
+    public Color GetColor(string columnName, RowItem? row) => GetColor(_database?.Column[columnName], row);
 
     public Color GetColor(ColumnItem? column, RowItem? row) => Color.FromArgb(GetInteger(column, row)); // Main Method
 
@@ -341,7 +326,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
         return (colorBlue << 16) | (colorGreen << 8) | colorRed;
     }
 
-    public DateTime GetDateTime(string columnName, RowItem? row) => GetDateTime(_database.Column[columnName], row);
+    public DateTime GetDateTime(string columnName, RowItem? row) => GetDateTime(_database?.Column[columnName], row);
 
     public DateTime GetDateTime(ColumnItem? column, RowItem? row) // Main Method
     {
@@ -349,7 +334,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
         return string.IsNullOrEmpty(@string) ? default : DateTimeTryParse(@string, out var d) ? d : default;
     }
 
-    public double GetDouble(string columnName, RowItem? row) => GetDouble(_database.Column[columnName], row);
+    public double GetDouble(string columnName, RowItem? row) => GetDouble(_database?.Column[columnName], row);
 
     public double GetDouble(ColumnItem? column, RowItem? row) // Main Method
     {
@@ -357,7 +342,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
         return string.IsNullOrEmpty(x) ? 0 : DoubleParse(x);
     }
 
-    public int GetInteger(string columnName, RowItem? row) => GetInteger(_database.Column[columnName], row);
+    public int GetInteger(string columnName, RowItem? row) => GetInteger(_database?.Column[columnName], row);
 
     public int GetInteger(ColumnItem? column, RowItem? row) // Main Method
     {
@@ -365,11 +350,11 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
         return string.IsNullOrEmpty(x) ? 0 : IntParse(x);
     }
 
-    public List<string> GetList(string columnName, RowItem? row) => GetList(_database.Column[columnName], row);
+    public List<string> GetList(string columnName, RowItem? row) => GetList(_database?.Column[columnName], row);
 
     public List<string> GetList(ColumnItem? column, RowItem? row) => GetString(column, row).SplitAndCutByCrToList();// Main Method
 
-    public Point GetPoint(string columnName, RowItem? row) => GetPoint(_database.Column[columnName], row);
+    public Point GetPoint(string columnName, RowItem? row) => GetPoint(_database?.Column[columnName], row);
 
     public Point GetPoint(ColumnItem? column, RowItem? row) // Main Method
     {
@@ -377,12 +362,16 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
         return string.IsNullOrEmpty(@string) ? Point.Empty : @string.PointParse();
     }
 
-    public Size GetSizeOfCellContent(ColumnItem? column, RowItem? row) {
+    public Size GetSizeOfCellContent(ColumnItem column, RowItem row) {
         var cellKey = KeyOfCell(column, row);
-        return ContainsKey(cellKey) ? column.Database.Cell[cellKey].Size : Size.Empty;
+        if (column.Database != null && ContainsKey(cellKey)) {
+            return column.Database.Cell[cellKey].Size;
+        }
+
+        return Size.Empty;
     }
 
-    public string GetString(string columnName, RowItem? row) => GetString(_database.Column[columnName], row);
+    public string GetString(string columnName, RowItem? row) => GetString(_database?.Column[columnName], row);
 
     public string GetString(ColumnItem? column, RowItem? row) // Main Method
     {
@@ -516,7 +505,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
         }
     }
 
-    public void Set(string columnName, RowItem? row, string value) => Set(_database.Column[columnName], row, value);
+    public void Set(string columnName, RowItem? row, string value) => Set(_database?.Column[columnName], row, value);
 
     public void Set(ColumnItem? column, RowItem? row, string value) // Main Method
     {
@@ -782,7 +771,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
         }
     }
 
-    private static (ColumnItem? column, RowItem? row, string info) RepairLinkedCellValue(Database linkedDatabase, ColumnItem column, RowItem row, bool addRowIfNotExists) {
+    private static (ColumnItem? column, RowItem? row, string info) RepairLinkedCellValue(Database linkedDatabase, ColumnItem column, RowItem? row, bool addRowIfNotExists) {
         RowItem? targetRow = null;
 
         /// Spalte aus der Ziel-Datenbank ermitteln
@@ -975,7 +964,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
     /// Ändert bei allen anderen Spalten den Inhalt der Zelle ab (um diese gleich zuhalten), wenn diese Spalte der Key für die anderen ist.
     /// </summary>
     /// <param name="column"></param>
-    /// <param name="rowKey"></param>
+    /// <param name="ownRow"></param>
     /// <param name="currentvalue"></param>
     private void SetSameValueOfKey(ColumnItem? column, RowItem ownRow, string currentvalue) {
         if (_database == null || _database.IsDisposed) { return; }

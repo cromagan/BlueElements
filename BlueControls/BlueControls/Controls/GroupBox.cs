@@ -35,7 +35,9 @@ public partial class GroupBox : System.Windows.Forms.GroupBox {
 
     #region Constructors
 
-    public GroupBox() : base() => SetStandardValues();
+    public GroupBox() : base() {
+        SetStandardValues();
+    }
 
     #endregion
 

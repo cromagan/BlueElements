@@ -19,7 +19,9 @@ internal sealed partial class FilterItem_Editor : AbstractClassEditor<FilterItem
 
     #region Constructors
 
-    public FilterItem_Editor() : base() => InitializeComponent();
+    public FilterItem_Editor() : base() {
+        InitializeComponent();
+    }
 
     #endregion
 
@@ -66,7 +68,7 @@ internal sealed partial class FilterItem_Editor : AbstractClassEditor<FilterItem
         if (Item.FilterType != FilterType.KeinFilter) { tmpfc.Add(Item); }
         _autofilter = new AutoFilter(c, tmpfc, null);
         var p = btnFilterWahl.PointToScreen(Point.Empty);
-        _autofilter.Position_LocateToPosition(new Point(p.X, p.Y + btnFilterWahl.Height));
+        _autofilter.Position_LocateToPosition(p with { Y = p.Y + btnFilterWahl.Height });
         _autofilter.Show();
         _autofilter.FilterComand += AutoFilter_FilterComand;
         Develop.Debugprint_BackgroundThread();

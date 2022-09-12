@@ -25,7 +25,7 @@ using static BlueBasics.Develop;
 
 namespace BeCreative;
 
-public partial class Start : BlueControls.Forms.Form {
+public partial class Start : Form {
 
     #region Constructors
 
@@ -45,21 +45,21 @@ public partial class Start : BlueControls.Forms.Form {
     }
 
     private void btnDatenbank_Click(object sender, System.EventArgs e) {
-        var x = new BlueControls.Forms.TableView(null, true, true);
+        var x = new TableView(null, true, true);
 
         x.ShowDialog();
         x.Dispose();
     }
 
     private void btnFormular_Click(object sender, System.EventArgs e) {
-        var x = new BlueControls.Forms.ConnectedFormulaEditor();
+        var x = new ConnectedFormulaEditor();
 
         x.ShowDialog();
         x.Dispose();
     }
 
     private void btnHierachie_Click(object sender, System.EventArgs e) {
-        var x = new BlueControls.Forms.RelationDiagram(null);
+        var x = new RelationDiagram(null);
 
         x.ShowDialog();
         x.Dispose();

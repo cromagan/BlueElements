@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using System;
 using BlueBasics;
 using BlueDatabase.EventArgs;
 using System.Collections.Generic;
@@ -73,7 +74,7 @@ public static class Export {
     //    GenerateLayout_Internal(Row, 0, False, True, String.Empty)
     //    '   End If
     //End Sub
-    public static List<string> GenerateLayout_FileSystem(List<RowItem?> liste, string lad, string optionalFileName, bool eineGrosseDatei, string zielPfad) {
+    public static List<string> GenerateLayout_FileSystem(List<RowItem?>? liste, string lad, string optionalFileName, bool eineGrosseDatei, string zielPfad) {
         List<string> l = new();
         if (liste == null) { return l; }
         string sav;
@@ -490,12 +491,12 @@ public static class Export {
 
     public static void SaveAsBitmap(RowItem row, string layoutId, string filename) => row.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(row, layoutId, filename));
 
-    private static void InternalCreateLayout(List<RowItem?> rows, string fileLoaded, string saveFileName) {
+    private static void InternalCreateLayout(List<RowItem?>? rows, string fileLoaded, string saveFileName) {
         var head = string.Empty;
         var foot = string.Empty;
         var body = fileLoaded;
-        var stx = fileLoaded.ToUpper().IndexOf("//AS/300/AE");
-        var enx = fileLoaded.ToUpper().IndexOf("//AS/301/AE");
+        var stx = fileLoaded.ToUpper().IndexOf("//AS/300/AE", StringComparison.Ordinal);
+        var enx = fileLoaded.ToUpper().IndexOf("//AS/301/AE", StringComparison.Ordinal);
         if (stx > -1 && enx > stx) {
             head = fileLoaded.Substring(0, stx);
             body = fileLoaded.Substring(stx + 11, enx - stx - 11);

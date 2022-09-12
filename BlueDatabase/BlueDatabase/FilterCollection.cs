@@ -36,7 +36,9 @@ public sealed class FilterCollection : ListExt<FilterItem>, IParseable {
         if (Database != null) { Database.Disposing += Database_Disposing; }
     }
 
-    public FilterCollection(Database? database, string toParse) : this(database) => Parse(toParse);
+    public FilterCollection(Database? database, string toParse) : this(database) {
+        Parse(toParse);
+    }
 
     #endregion
 
@@ -54,7 +56,7 @@ public sealed class FilterCollection : ListExt<FilterItem>, IParseable {
         set {
             var f = this[null];
             if (f != null) {
-                if (string.Equals(f.SearchValue[0], value, StringComparison.CurrentCultureIgnoreCase)) { return; }
+                if (string.Equals(f.SearchValue[0], value, StringComparison.OrdinalIgnoreCase)) { return; }
                 f.SearchValue[0] = value;
                 return;
             }

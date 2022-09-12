@@ -40,7 +40,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
 
     #region Fields
 
-    public ColumnItem? Column = null;
+    public ColumnItem? Column;
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
 
     private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Über_dem_Feld;
@@ -84,7 +84,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         get => string.Empty;
         set {
             if (Column == null) { return; }
-            Forms.TableView.OpenColumnEditor(Column, null, null);
+            TableView.OpenColumnEditor(Column, null, null);
 
             OnChanged();
         }
@@ -108,7 +108,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
             var lst = new ItemCollectionList.ItemCollectionList();
             lst.AddRange(GetRowFrom.Database.Column, false);
 
-            var sho = Forms.InputBoxListBoxStyle.Show("Spalte wählen:", lst, AddType.None, true);
+            var sho = InputBoxListBoxStyle.Show("Spalte wählen:", lst, AddType.None, true);
 
             if (sho == null || sho.Count != 1) { return; }
 
@@ -299,7 +299,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         } else if (Column == null) {
             Skin.Draw_FormatedText(gr, "Spalte fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), CaptionFnt.Scale(zoom), true);
         } else {
-            CustomizableShowPadItem.DrawFakeControl(gr, positionModified, zoom, CaptionPosition, Column.ReadableText() + ":");
+            DrawFakeControl(gr, positionModified, zoom, CaptionPosition, Column.ReadableText() + ":");
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
@@ -322,15 +322,15 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         return null;
     }
 
-    private void RepairConnections() {
-        ConnectsTo.Clear();
-
-        if (GetRowFrom != null) {
-            ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, (BasicPadItem)GetRowFrom, ConnectionType.Bottom, false, false));
-        }
-    }
-
     #endregion
+
+    //private void RepairConnections() {
+    //    ConnectsTo.Clear();
+
+    //    if (GetRowFrom != null) {
+    //        ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, (BasicPadItem)GetRowFrom, ConnectionType.Bottom, false, false));
+    //    }
+    //}
 
     // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
     // ~BitmapPadItem()

@@ -123,7 +123,7 @@ public sealed class ColumnViewItem {
 
     #region Properties
 
-    public ColumnItem? Column { get; private set; }
+    public ColumnItem? Column { get; }
 
     /// <summary>
     /// Für FlexOptions

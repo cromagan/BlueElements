@@ -73,8 +73,6 @@ public partial class PadEditorReadOnly : Form {
         if (x.Count > 0) {
             tabSeiten.Visible = true;
 
-            var ist = new List<string>();
-
             foreach (var thisTab in tabSeiten.TabPages) {
                 var tb = (TabPage)thisTab;
 
@@ -119,12 +117,12 @@ public partial class PadEditorReadOnly : Form {
         DoPages();
     }
 
-    private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
+    private void Pad_MouseUp(object sender, MouseEventArgs e) {
         if (btnZoomIn.Checked) { Pad.ZoomIn(e); }
         if (btnZoomOut.Checked) { Pad.ZoomOut(e); }
     }
 
-    private void tabSeiten_Selected(object sender, System.Windows.Forms.TabControlEventArgs e) {
+    private void tabSeiten_Selected(object sender, TabControlEventArgs e) {
         var s = string.Empty;
 
         if (tabSeiten.SelectedTab != null) {

@@ -21,7 +21,9 @@ public class PasswordEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public PasswordEventArgs() => Handled = false;
+    public PasswordEventArgs() {
+        Handled = false;
+    }
 
     #endregion
 

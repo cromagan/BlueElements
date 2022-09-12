@@ -88,7 +88,7 @@ internal sealed partial class ColumnEditor {
         }
         // Diese Fehler sind so schwer und darf auf keinen Fall in die Umwelt gelassen werden
         if (string.IsNullOrEmpty(feh)) {
-            foreach (var _ in _column.Database.Column.Where(thisColumn => thisColumn != _column && thisColumn != null && string.Equals(tbxName.Text, thisColumn.Name, StringComparison.CurrentCultureIgnoreCase))) {
+            foreach (var _ in _column.Database.Column.Where(thisColumn => thisColumn != _column && thisColumn != null && string.Equals(tbxName.Text, thisColumn.Name, StringComparison.OrdinalIgnoreCase))) {
                 feh = "Spalten-Name bereits vorhanden.";
             }
         }
@@ -303,7 +303,7 @@ internal sealed partial class ColumnEditor {
         if (!string.IsNullOrEmpty(_column.Database.Filename)) {
             var all = Directory.GetFiles(_column.Database.Filename.FilePath(), "*.mdb", SearchOption.TopDirectoryOnly);
             foreach (var thisString in all) {
-                if (!string.Equals(thisString, _column.Database.Filename, StringComparison.CurrentCultureIgnoreCase)) { cbxLinkedDatabase.Item.Add(thisString.FileNameWithSuffix()); }
+                if (!string.Equals(thisString, _column.Database.Filename, StringComparison.OrdinalIgnoreCase)) { cbxLinkedDatabase.Item.Add(thisString.FileNameWithSuffix()); }
             }
         }
         cbxLinkedDatabase.Item.Sort();

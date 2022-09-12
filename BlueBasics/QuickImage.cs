@@ -84,7 +84,7 @@ public sealed class QuickImage : BitmapExt, IReadableText {
     /// <summary>
     /// QuickImages werden immer in den Speicher für spätere Zugriffe aufgenommen!
     /// </summary>
-    public QuickImage(string imagecode, Bitmap bmp) {
+    public QuickImage(string imagecode, Bitmap? bmp) {
         if (string.IsNullOrEmpty(imagecode)) { return; }
 
         if (Exists(imagecode)) { Develop.DebugPrint(FehlerArt.Warnung, "Doppeltes Bild:" + imagecode); }
@@ -128,27 +128,69 @@ public sealed class QuickImage : BitmapExt, IReadableText {
 
     public static ImageCode FileTypeImage(FileFormat file) {
         switch (file) {
-            case FileFormat.WordKind: return ImageCode.Word;
-            case FileFormat.ExcelKind: return ImageCode.Excel;
-            case FileFormat.PowerPointKind: return ImageCode.PowerPoint;
-            case FileFormat.Textdocument: return ImageCode.Textdatei;
-            case FileFormat.EMail: return ImageCode.Brief;
-            case FileFormat.Pdf: return ImageCode.PDF;
-            case FileFormat.HTML: return ImageCode.Globus;
-            case FileFormat.Image: return ImageCode.Bild;
-            case FileFormat.CompressedArchive: return ImageCode.Karton;
-            case FileFormat.Movie: return ImageCode.Filmrolle;
-            case FileFormat.Executable: return ImageCode.Anwendung;
-            case FileFormat.HelpFile: return ImageCode.Frage;
-            case FileFormat.Database: return ImageCode.Datenbank;
-            case FileFormat.XMLFile: return ImageCode.XML;
-            case FileFormat.Visitenkarte: return ImageCode.Visitenkarte;
-            case FileFormat.Sound: return ImageCode.Note;
-            case FileFormat.Unknown: return ImageCode.Datei;
-            case FileFormat.ProgrammingCode: return ImageCode.Skript;
-            case FileFormat.Link: return ImageCode.Undo;
-            case FileFormat.BlueCreativeFile: return ImageCode.Smiley;
-            case FileFormat.Icon: return ImageCode.Bild;
+            case FileFormat.WordKind:
+                return ImageCode.Word;
+
+            case FileFormat.ExcelKind:
+                return ImageCode.Excel;
+
+            case FileFormat.PowerPointKind:
+                return ImageCode.PowerPoint;
+
+            case FileFormat.Textdocument:
+                return ImageCode.Textdatei;
+
+            case FileFormat.EMail:
+                return ImageCode.Brief;
+
+            case FileFormat.Pdf:
+                return ImageCode.PDF;
+
+            case FileFormat.HTML:
+                return ImageCode.Globus;
+
+            case FileFormat.Image:
+                return ImageCode.Bild;
+
+            case FileFormat.CompressedArchive:
+                return ImageCode.Karton;
+
+            case FileFormat.Movie:
+                return ImageCode.Filmrolle;
+
+            case FileFormat.Executable:
+                return ImageCode.Anwendung;
+
+            case FileFormat.HelpFile:
+                return ImageCode.Frage;
+
+            case FileFormat.Database:
+                return ImageCode.Datenbank;
+
+            case FileFormat.XMLFile:
+                return ImageCode.XML;
+
+            case FileFormat.Visitenkarte:
+                return ImageCode.Visitenkarte;
+
+            case FileFormat.Sound:
+                return ImageCode.Note;
+
+            case FileFormat.Unknown:
+                return ImageCode.Datei;
+
+            case FileFormat.ProgrammingCode:
+                return ImageCode.Skript;
+
+            case FileFormat.Link:
+                return ImageCode.Undo;
+
+            case FileFormat.BlueCreativeFile:
+                return ImageCode.Smiley;
+
+            case FileFormat.Icon:
+                return ImageCode.Bild;
+
             default:
                 Develop.DebugPrint(file);
                 return ImageCode.Datei;
@@ -166,10 +208,10 @@ public sealed class QuickImage : BitmapExt, IReadableText {
         c.Append("|");
         if (effekt != ImageCodeEffect.Ohne) { c.Append((int)effekt); }
         c.Append("|");
-        if(färbung != "00ffffff") { c.Append(färbung); }
-     
+        if (färbung != "00ffffff") { c.Append(färbung); }
+
         c.Append("|");
-        if (changeGreenTo != "00ffffff") {               c.Append(changeGreenTo);            }
+        if (changeGreenTo != "00ffffff") { c.Append(changeGreenTo); }
         c.Append("|");
         if (helligkeit != 100) { c.Append(helligkeit); }
         c.Append("|");

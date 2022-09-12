@@ -237,7 +237,7 @@ public abstract class Method : IReadableText {
                 //}
             }
 
-            if (!ok) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht einer der erwarteten Typen '" + exceptetType.JoinWith ("' oder '") + "', sondern " + v.ShortName); }
+            if (!ok) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht einer der erwarteten Typen '" + exceptetType.JoinWith("' oder '") + "', sondern " + v.ShortName); }
 
             feedbackVariables.Add(v);
 
@@ -259,7 +259,7 @@ public abstract class Method : IReadableText {
             var comandtext = thiscomand + StartSequence;
             var l = comandtext.Length;
             if (pos + l < maxl) {
-                if (string.Equals(scriptText.Substring(pos, l), comandtext, StringComparison.CurrentCultureIgnoreCase)) {
+                if (string.Equals(scriptText.Substring(pos, l), comandtext, StringComparison.OrdinalIgnoreCase)) {
                     var f = GetEnd(scriptText, pos + thiscomand.Length, StartSequence.Length);
                     if (!string.IsNullOrEmpty(f.ErrorMessage)) {
                         return new CanDoFeedback(f.ContinuePosition, "Fehler bei " + comandtext + ": " + f.ErrorMessage, true);

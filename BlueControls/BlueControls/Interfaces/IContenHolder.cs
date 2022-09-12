@@ -23,10 +23,5 @@ namespace BlueControls.Interfaces;
 /// Wird verwendet, wenn das Item einen Wert abgeben kann.
 /// </summary>
 public interface IContentHolder : IReadableText, IItemToControl {
-
-    #region Properties
-
-    public string Internal { get; }
-
-    #endregion
+    //public string Internal { get; }
 }

@@ -32,7 +32,7 @@ public static partial class Extensions {
 
     #region Methods
 
-    public static bool AddIfNotExists<T>(this List<T> l, BindingList<T> values) {
+    public static bool AddIfNotExists<T>(this List<T> l, BindingList<T>? values) {
         if (values == null || values.Count == 0) { return false; }
         var ok1 = false;
         foreach (var thivalue in values) {
@@ -43,7 +43,7 @@ public static partial class Extensions {
         return ok1;
     }
 
-    public static bool AddIfNotExists<T>(this List<T> l, List<T> values) {
+    public static bool AddIfNotExists<T>(this List<T> l, List<T>? values) {
         if (values == null || values.Count == 0) { return false; }
         var ok1 = values.Count(thivalue => l.AddIfNotExists(thivalue)) > 0;
         return ok1;
@@ -58,7 +58,7 @@ public static partial class Extensions {
         return true;
     }
 
-    public static void CloneFrom<T>(this List<T> list1, List<T> list2) where T : IComparable {
+    public static void CloneFrom<T>(this List<T> list1, List<T>? list2) where T : IComparable {
         if (!list1.IsDifferentTo(list2)) { return; }
 
         //if (list2 == null) { list1 = null; return; }
@@ -116,7 +116,7 @@ public static partial class Extensions {
         return did;
     }
 
-    public static bool RemoveNullOrEmpty<T>(this List<T> l) where T : ICanBeEmpty {
+    public static bool RemoveNullOrEmpty<T>(this List<T>? l) where T : ICanBeEmpty {
         if (l == null || l.Count == 0) { return false; }
         var did = false;
         var z = 0;
@@ -155,7 +155,7 @@ public static partial class Extensions {
         }
     }
 
-    public static void RemoveString(this List<string?>? l, string value, bool caseSensitive) {
+    public static void RemoveString(this List<string?> l, string value, bool caseSensitive) {
         var cas = StringComparison.OrdinalIgnoreCase;
         if (!caseSensitive) { cas = StringComparison.Ordinal; }
         var z = 0;

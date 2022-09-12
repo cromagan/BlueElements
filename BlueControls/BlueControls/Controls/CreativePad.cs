@@ -94,7 +94,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
 
     public event EventHandler<System.EventArgs> ItemRemoved;
 
-    //public event EventHandler<ListEventArgs> ItemInternalChanged;
     public event EventHandler<ListEventArgs> ItemRemoving;
 
     public event PrintPageEventHandler PrintPage;
@@ -500,14 +499,17 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         Skin.Draw_Border(gr, Design.Table_And_Pad, state, DisplayRectangle);
     }
 
-    protected override bool IsInputKey(Keys keyData) {
+    protected override bool IsInputKey(Keys keyData) =>
         // http://technet.microsoft.com/de-de/subscriptions/control.isinputkey%28v=vs.100%29
         // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
         // Ganz wichtig diese Routine!
-        return (keyData is Keys.Up or Keys.Down or Keys.Left or Keys.Right);
-    }
+        (keyData is Keys.Up or Keys.Down or Keys.Left or Keys.Right);
 
-    protected override RectangleF MaxBounds() => _item == null ? new RectangleF(0, 0, 0, 0) : _item.MaxBounds(null);
+    protected override RectangleF MaxBounds() {
+        if (_item == null) { return new RectangleF(0, 0, 0, 0); }
+
+        return _item.MaxBounds(null);
+    }
 
     protected override void OnKeyUp(KeyEventArgs e) => DoKeyUp(e, true);
 

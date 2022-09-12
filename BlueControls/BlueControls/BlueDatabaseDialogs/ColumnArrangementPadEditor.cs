@@ -40,7 +40,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
     public readonly Database? Database;
 
-    public int Fixing = 0;
+    public int Fixing;
     public bool Generating;
 
     public bool Sorting;
@@ -51,7 +51,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
     #region Constructors
 
-    public ColumnArrangementPadEditor(Database database) : this() {
+    public ColumnArrangementPadEditor(Database? database) : this() {
         if (database == null || database.ReadOnly) {
             MessageBox.Show("Datenbank schreibgeschützt.", ImageCode.Information, "OK");
             Close();
@@ -65,7 +65,9 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         ShowOrder();
     }
 
-    private ColumnArrangementPadEditor() => InitializeComponent();
+    private ColumnArrangementPadEditor() {
+        InitializeComponent();
+    }
 
     #endregion
 

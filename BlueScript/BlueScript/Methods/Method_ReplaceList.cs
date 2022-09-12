@@ -52,7 +52,7 @@ internal class Method_ReplaceList : Method {
         var tmpList = ((VariableListString)attvar.Attributes[0]).ValueList;
 
         if (((VariableString)attvar.Attributes[3]).ValueString == ((VariableString)attvar.Attributes[4]).ValueString) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch."); }
-        if (!((VariableBool)attvar.Attributes[1]).ValueBool && string.Equals(((VariableString)attvar.Attributes[3]).ValueString, ((VariableString)attvar.Attributes[4]).ValueString, StringComparison.CurrentCultureIgnoreCase)) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch."); }
+        if (!((VariableBool)attvar.Attributes[1]).ValueBool && string.Equals(((VariableString)attvar.Attributes[3]).ValueString, ((VariableString)attvar.Attributes[4]).ValueString, StringComparison.OrdinalIgnoreCase)) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch."); }
 
         var ct = 0;
         bool again;
@@ -83,7 +83,7 @@ internal class Method_ReplaceList : Method {
                         }
                     } else {
                         // Not Case Sesitive
-                        if (string.Equals(tmpList[z], ((VariableString)attvar.Attributes[3]).ValueString, StringComparison.CurrentCultureIgnoreCase)) {
+                        if (string.Equals(tmpList[z], ((VariableString)attvar.Attributes[3]).ValueString, StringComparison.OrdinalIgnoreCase)) {
                             tmpList[z] = ((VariableString)attvar.Attributes[4]).ValueString;
                             again = true;
                         }

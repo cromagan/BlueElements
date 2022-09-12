@@ -39,7 +39,7 @@ public class ConstantTextPaditem : FixedRectanglePadItem, IReadableText, IConten
     public static BlueFont? ChapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard);
     public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
 
-    private string _text = string.Empty;
+    private string _text;
 
     #endregion
 
@@ -104,9 +104,7 @@ public class ConstantTextPaditem : FixedRectanglePadItem, IReadableText, IConten
         return false;
     }
 
-    public string ReadableText() {
-        return "Konstanter Wert: " + _text;
-    }
+    public string ReadableText() => "Konstanter Wert: " + _text;
 
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld, 16);
 

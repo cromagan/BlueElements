@@ -213,9 +213,9 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         return picture != null ? Item.Add((Bitmap)picture, f[0]) : Item.Add(Converter.FileToByte(f[0]), f[0]);
     }
 
-    public TextListItem? Add_Text(string val) {
+    public TextListItem? Add_Text(string? val) {
         if (val == null || string.IsNullOrEmpty(val)) { return null; }
-        if (Item.Any(thisItem => thisItem != null && string.Equals(thisItem.Internal, val, StringComparison.CurrentCultureIgnoreCase))) {
+        if (Item.Any(thisItem => thisItem != null && string.Equals(thisItem.Internal, val, StringComparison.OrdinalIgnoreCase))) {
             return null;
         }
         var i = Item.Add(val, val);
@@ -279,8 +279,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         if (SliderY.Visible) { paintModXx = SliderY.Width; }
         Rectangle borderCoords = new(DisplayRectangle.Left, DisplayRectangle.Top,
             DisplayRectangle.Width - paintModXx, DisplayRectangle.Height - paintModYx);
-        Rectangle visArea = new(borderCoords.X, (int)(borderCoords.Y + SliderY.Value),
-            borderCoords.Width, borderCoords.Height);
+        Rectangle visArea = borderCoords with { Y = (int)(borderCoords.Y + SliderY.Value) };
         if (borderCoords.Height > 0) {
             //// Kann sein, wenn PaintModY größer als die Höhe ist
             //if (_Appearance == BlueListBoxAppearance.Listbox)

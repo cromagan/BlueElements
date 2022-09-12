@@ -18,7 +18,6 @@
 namespace BlueDatabase.Enums;
 
 public enum ExportTyp {
-    Undefiniert = 0,
     DatenbankOriginalFormat = 1,
     DatenbankHTMLFormat = 2,
     DatenbankCSVFormat = 3,

@@ -41,9 +41,10 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
 
     public List<QuickImage> Overlays;
     public int Padding;
-    private bool _disposedValue;
 
     #endregion
+
+    //private bool _disposedValue;
 
     #region Constructors
 
@@ -113,14 +114,14 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
 
     #endregion
 
-    #region Methods
+    //public void Dispose() {
+    //    // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+    //    Dispose(true);
+    //    GC.SuppressFinalize(this);
+    //    base.Dispose();
+    //}
 
-    public void Dispose() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-        Dispose(true);
-        GC.SuppressFinalize(this);
-        base.Dispose();
-    }
+    #region Methods
 
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new()
@@ -218,6 +219,24 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
 
     protected override string ClassId() => "IMAGE";
 
+    protected override void Dispose(bool disposing) {
+        base.Dispose(disposing);
+        if (!_disposedValue) {
+            if (disposing) {
+                // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+            }
+
+            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
+            // TODO: Große Felder auf NULL setzen
+            if (Bitmap != null) {
+                Bitmap.Dispose();
+                Bitmap = null;
+            }
+
+            _disposedValue = true;
+        }
+    }
+
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         positionModified.Inflate(-Padding, -Padding);
         RectangleF r1 = new(positionModified.Left + Padding, positionModified.Top + Padding,
@@ -228,31 +247,31 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
             r3 = new RectangleF(0, 0, Bitmap.Width, Bitmap.Height);
             switch (Bild_Modus) {
                 case SizeModes.Verzerren: {
-                    r2 = r1;
-                    break;
-                }
+                        r2 = r1;
+                        break;
+                    }
 
                 case SizeModes.BildAbschneiden: {
-                    var scale = Math.Max((positionModified.Width - (Padding * 2)) / Bitmap.Width, (positionModified.Height - (Padding * 2)) / Bitmap.Height);
-                    var tmpw = (positionModified.Width - (Padding * 2)) / scale;
-                    var tmph = (positionModified.Height - (Padding * 2)) / scale;
-                    r3 = new RectangleF((Bitmap.Width - tmpw) / 2, (Bitmap.Height - tmph) / 2, tmpw, tmph);
-                    r2 = r1;
-                    break;
-                }
+                        var scale = Math.Max((positionModified.Width - (Padding * 2)) / Bitmap.Width, (positionModified.Height - (Padding * 2)) / Bitmap.Height);
+                        var tmpw = (positionModified.Width - (Padding * 2)) / scale;
+                        var tmph = (positionModified.Height - (Padding * 2)) / scale;
+                        r3 = new RectangleF((Bitmap.Width - tmpw) / 2, (Bitmap.Height - tmph) / 2, tmpw, tmph);
+                        r2 = r1;
+                        break;
+                    }
                 default: // Is = enSizeModes.WeißerRand
                 {
-                    var scale = Math.Min((positionModified.Width - (Padding * 2)) / Bitmap.Width, (positionModified.Height - (Padding * 2)) / Bitmap.Height);
-                    r2 = new RectangleF(((positionModified.Width - (Bitmap.Width * scale)) / 2) + positionModified.Left, ((positionModified.Height - (Bitmap.Height * scale)) / 2) + positionModified.Top, Bitmap.Width * scale, Bitmap.Height * scale);
-                    break;
-                }
+                        var scale = Math.Min((positionModified.Width - (Padding * 2)) / Bitmap.Width, (positionModified.Height - (Padding * 2)) / Bitmap.Height);
+                        r2 = new RectangleF(((positionModified.Width - (Bitmap.Width * scale)) / 2) + positionModified.Left, ((positionModified.Height - (Bitmap.Height * scale)) / 2) + positionModified.Top, Bitmap.Width * scale, Bitmap.Height * scale);
+                        break;
+                    }
             }
         }
         var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
         gr.TranslateTransform(trp.X, trp.Y);
         gr.RotateTransform(-Drehwinkel);
-        r1 = new RectangleF(r1.Left - trp.X, r1.Top - trp.Y, r1.Width, r1.Height);
-        r2 = new RectangleF(r2.Left - trp.X, r2.Top - trp.Y, r2.Width, r2.Height);
+        r1 = r1 with { X = r1.Left - trp.X, Y = r1.Top - trp.Y };
+        r2 = r2 with { X = r2.Left - trp.X, Y = r2.Top - trp.Y };
         if (Hintergrund_Weiß_Füllen) {
             gr.FillRectangle(Brushes.White, r1);
         }
@@ -294,24 +313,6 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
             return new BitmapPadItem(name);
         }
         return null;
-    }
-
-    private void Dispose(bool disposing) {
-        base.Dispose(disposing);
-        if (!_disposedValue) {
-            if (disposing) {
-                // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
-            }
-
-            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
-            // TODO: Große Felder auf NULL setzen
-            if (Bitmap != null) {
-                Bitmap.Dispose();
-                Bitmap = null;
-            }
-
-            _disposedValue = true;
-        }
     }
 
     #endregion

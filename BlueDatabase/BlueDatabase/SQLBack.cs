@@ -120,8 +120,8 @@ public class SqlBack {
     public bool AddUndo(string dbname, DatabaseDataType comand, long columnKey, long rowKey, string previousValue, string changedTo, string userName) {
         if (!OpenConnection()) { return false; }
 
-        string cmdString = "INSERT INTO Undo (DBNAME, COMAND, COLUMNKEY, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, DATETIMEUTC) VALUES (@DBNAME, @COMAND, @COLUMNKEY, @ROWKEY, @PREVIOUSVALUE ,@CHANGEDTO, @USERNAME, @DATETIMEUTC)";
-        using SqlCommand comm = new SqlCommand();
+        var cmdString = "INSERT INTO Undo (DBNAME, COMAND, COLUMNKEY, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, DATETIMEUTC) VALUES (@DBNAME, @COMAND, @COLUMNKEY, @ROWKEY, @PREVIOUSVALUE ,@CHANGEDTO, @USERNAME, @DATETIMEUTC)";
+        using var comm = new SqlCommand();
         comm.Connection = _connection;
         comm.CommandText = cmdString;
         comm.Parameters.AddWithValue("@DBNAME", dbname.ToUpper());
@@ -141,12 +141,24 @@ public class SqlBack {
 
         if (column == null && row == null) {
             switch (type) {
-                case DatabaseDataType.Formatkennung: break;
-                case DatabaseDataType.Werbung: break;
-                case DatabaseDataType.EOF: break;
-                case DatabaseDataType.co_SaveContent: break;
-                case DatabaseDataType.CryptionState: break;
-                case DatabaseDataType.CryptionTest: break;
+                case DatabaseDataType.Formatkennung:
+                    break;
+
+                case DatabaseDataType.Werbung:
+                    break;
+
+                case DatabaseDataType.EOF:
+                    break;
+
+                case DatabaseDataType.co_SaveContent:
+                    break;
+
+                case DatabaseDataType.CryptionState:
+                    break;
+
+                case DatabaseDataType.CryptionTest:
+                    break;
+
                 default:
                     return SetStyleDate(database, type, string.Empty, value);
             }
@@ -158,9 +170,14 @@ public class SqlBack {
         if (column != null && row == null) {
             switch (type) {
                 //case DatabaseDataType.co_EditType: break;
-                case DatabaseDataType.co_SaveContent: break;
-                case DatabaseDataType.co_ShowUndo: break;
-                case DatabaseDataType.ColumnName: break;
+                case DatabaseDataType.co_SaveContent:
+                    break;
+
+                case DatabaseDataType.co_ShowUndo:
+                    break;
+
+                case DatabaseDataType.ColumnName:
+                    break;
 
                 default:
                     if (type == DatabaseDataType.ColumnCaption) { AddColumnToMain(column.Name); }
@@ -234,7 +251,7 @@ public class SqlBack {
     public List<string>? GetColumnNames(string table) {
         if (!OpenConnection()) { return null; }
 
-        List<string> columns = new List<string>();
+        var columns = new List<string>();
 
         using var com = new SqlCommand(@"SELECT * FROM " + table, _connection);
         using var reader = com.ExecuteReader(CommandBehavior.SchemaOnly);
@@ -255,9 +272,9 @@ public class SqlBack {
 
         OpenConnection();
 
-        DataTable dt = _connection.GetSchema("Tables");
+        var dt = _connection.GetSchema("Tables");
         foreach (DataRow row in dt.Rows) {
-            string tablename = (string)row[2];
+            var tablename = (string)row[2];
             tables.Add(tablename);
         }
 
@@ -424,7 +441,7 @@ public class SqlBack {
 
         if (!OpenConnection()) { return false; }
 
-        using SqlCommand comm = new SqlCommand();
+        using var comm = new SqlCommand();
         comm.Connection = _connection;
         comm.CommandText = cmdString;
         //comm.Parameters.AddWithValue("@DBNAME", "Main");
@@ -467,7 +484,7 @@ public class SqlBack {
 
         if (!OpenConnection()) { return false; }
 
-        using SqlCommand comm = new SqlCommand();
+        using var comm = new SqlCommand();
         comm.Connection = _connection;
         comm.CommandText = cmdString;
         comm.Parameters.AddWithValue("@DBNAME", dbname.ToUpper());

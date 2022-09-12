@@ -168,7 +168,7 @@ public class BitmapListItem : BasicListItem {
                 _bitmap.Height * scale);
         }
         var trp = drawingCoordinates.PointOf(Alignment.Horizontal_Vertical_Center);
-        scaledImagePosition = new RectangleF(scaledImagePosition.Left - trp.X, scaledImagePosition.Top - trp.Y, scaledImagePosition.Width, scaledImagePosition.Height);
+        scaledImagePosition = scaledImagePosition with { X = scaledImagePosition.Left - trp.X, Y = scaledImagePosition.Top - trp.Y };
         lock (gr) {
             gr.TranslateTransform(trp.X, trp.Y);
             if (_bitmap != null) { gr.DrawImage(_bitmap, scaledImagePosition, areaOfWholeImage, GraphicsUnit.Pixel); }

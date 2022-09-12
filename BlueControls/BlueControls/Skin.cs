@@ -978,7 +978,7 @@ public static class Skin {
                     gr.FillRectangle(new SolidBrush(control.Parent.BackColor), r);
                     return;
                 }
-                gr.DrawImage(trb.BitmapOfControl(), r, new Rectangle(control.Left + r.Left, control.Top + r.Top, r.Width, r.Height), GraphicsUnit.Pixel);
+                gr.DrawImage(trb.BitmapOfControl(), r, r with { X = control.Left + r.Left, Y = control.Top + r.Top }, GraphicsUnit.Pixel);
                 break;
 
             case Form frm:
@@ -1254,17 +1254,38 @@ public static class Skin {
 
     public static Color IDColor(int id) {
         switch (id % 10) {
-            case 0: return Color.Red;
-            case 1: return Color.Blue;
-            case 2: return Color.Green;
-            case 3: return Color.Yellow;
-            case 4: return Color.Purple;
-            case 5: return Color.Cyan;
-            case 6: return Color.Orange;
-            case 7: return Color.LightBlue;
-            case 8: return Color.PaleVioletRed;
-            case 9: return Color.LightGreen;
-            default: return Color.Gray;
+            case 0:
+                return Color.Red;
+
+            case 1:
+                return Color.Blue;
+
+            case 2:
+                return Color.Green;
+
+            case 3:
+                return Color.Yellow;
+
+            case 4:
+                return Color.Purple;
+
+            case 5:
+                return Color.Cyan;
+
+            case 6:
+                return Color.Orange;
+
+            case 7:
+                return Color.LightBlue;
+
+            case 8:
+                return Color.PaleVioletRed;
+
+            case 9:
+                return Color.LightGreen;
+
+            default:
+                return Color.Gray;
         }
     }
 

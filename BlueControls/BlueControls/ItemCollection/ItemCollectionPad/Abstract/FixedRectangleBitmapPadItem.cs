@@ -59,14 +59,14 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem, IDisp
 
     #endregion
 
-    #region Methods
+    //public void Dispose() {
+    //    // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+    //    Dispose(true);
+    //    GC.SuppressFinalize(this);
+    //    base.Dispose();
+    //}
 
-    public void Dispose() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-        Dispose(true);
-        GC.SuppressFinalize(this);
-        base.Dispose();
-    }
+    #region Methods
 
     protected override RectangleF CalculateUsedArea() {
         if (_generatedBitmap == null) { GeneratePic(); } // Um die Size zu erhalten

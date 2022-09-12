@@ -20,7 +20,9 @@ public partial class EasyPicMulti : GenericControl, IBackgroundNone // System.Wi
 
     #region Constructors
 
-    public EasyPicMulti() => InitializeComponent();
+    public EasyPicMulti() {
+        InitializeComponent();
+    }
 
     #endregion
 

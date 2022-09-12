@@ -8,41 +8,42 @@ public class Html {
     #region Constructors
 
     // https://www.w3schools.com/html/html_tables.asp
-    public Html(string title) => Code = new List<string>
-    {
-        "<!DOctypex HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"",
-        "\"http://www.w3.org/TR/html4/strict.dtd\">",
-        "<html>",
-        "  <head>",
-        "    <title>" + title + "</title>",
-        "    <style type=\"text/css\">",
-        "      table {",
-        // Code.Add("              border-spacing: 5px;");// If the table has collapsed borders, border-spacing has no effect.
-        "              border: 1px solid gray;",
-        "              border-collapse: collapse;",
-        "            }",
-        "      td {",
-        "          padding: 3px;",
-        "          border: 1px solid black;",
-        "          border-collapse: collapse;",
-        "          }",
-        "      th {",
-        "          padding: 3px;",
-        "          border: 1px solid black;",
-        "          border-collapse: collapse;",
-        "          text-align: left;",
-        "          text-valign: middle;",
-        "          font-family: Arial, Helvetica, sans-serif;",
-        "          font-size: 12px;",
-        "          }",
-        "      p {",
-        "          font-family: Arial, Helvetica, sans-serif;",
-        "          font-size: 12px;",
-        "          }",
-        "    </style>",
-        "  </head>",
-        "<body>"
-    };
+    public Html(string title) {
+        Code = new List<string> {
+            "<!DOctypex HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"",
+            "\"http://www.w3.org/TR/html4/strict.dtd\">",
+            "<html>",
+            "  <head>",
+            "    <title>" + title + "</title>",
+            "    <style type=\"text/css\">",
+            "      table {",
+            // Code.Add("              border-spacing: 5px;");// If the table has collapsed borders, border-spacing has no effect.
+            "              border: 1px solid gray;",
+            "              border-collapse: collapse;",
+            "            }",
+            "      td {",
+            "          padding: 3px;",
+            "          border: 1px solid black;",
+            "          border-collapse: collapse;",
+            "          }",
+            "      th {",
+            "          padding: 3px;",
+            "          border: 1px solid black;",
+            "          border-collapse: collapse;",
+            "          text-align: left;",
+            "          text-valign: middle;",
+            "          font-family: Arial, Helvetica, sans-serif;",
+            "          font-size: 12px;",
+            "          }",
+            "      p {",
+            "          font-family: Arial, Helvetica, sans-serif;",
+            "          font-size: 12px;",
+            "          }",
+            "    </style>",
+            "  </head>",
+            "<body>"
+        };
+    }
 
     #endregion
 

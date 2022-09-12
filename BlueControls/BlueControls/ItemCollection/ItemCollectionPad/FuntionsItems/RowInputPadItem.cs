@@ -41,7 +41,7 @@ public class RowInputPadItem : RectanglePadItem, IReadableText, IContentHolder, 
     public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
 
     //private string _ID = string.Empty;
-    private string _spaltenname = string.Empty;
+    private string _spaltenname;
 
     #endregion
 
@@ -102,9 +102,7 @@ public class RowInputPadItem : RectanglePadItem, IReadableText, IContentHolder, 
         return false;
     }
 
-    public string ReadableText() {
-        return "Einganszeilen-Spalte: " + _spaltenname;
-    }
+    public string ReadableText() => "Einganszeilen-Spalte: " + _spaltenname;
 
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Zeile, 10, Color.Transparent, Color.Green);
 

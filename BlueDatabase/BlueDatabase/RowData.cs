@@ -110,7 +110,7 @@ public class RowData : IComparable {
 
     public int CompareTo(object obj) {
         if (obj is RowData robj) {
-            return CompareKey().CompareTo(robj.CompareKey());
+            return string.Compare(CompareKey(), robj.CompareKey(), StringComparison.OrdinalIgnoreCase);
         }
 
         Develop.DebugPrint(FehlerArt.Fehler, "Falscher Objecttyp!");

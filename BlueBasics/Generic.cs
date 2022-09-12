@@ -144,8 +144,8 @@ public static class Generic {
 
     public static long GetUniqueKey(int tmp, string type) {
         var x = DateTime.UtcNow.AddYears(-2020).Ticks;
-        var s = type + "\r\n" + Generic.UserName() + "\r\n" + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName;
-        long key = x + (s.GetHashCode() * 100000000) + tmp;
+        var s = type + "\r\n" + UserName() + "\r\n" + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName;
+        var key = x + (s.GetHashCode() * 100000000) + tmp;
         if (key < 0) { return key * -1; }
 
         return key;

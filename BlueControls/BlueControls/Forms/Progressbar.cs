@@ -36,7 +36,9 @@ public partial class Progressbar : FloatingForm {
 
     #region Constructors
 
-    private Progressbar() : base(Enums.Design.Form_BitteWarten) => InitializeComponent();
+    private Progressbar() : base(Enums.Design.Form_BitteWarten) {
+        InitializeComponent();
+    }
 
     private Progressbar(string text) : this() {
         // InitializeComponent();

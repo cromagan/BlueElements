@@ -89,7 +89,7 @@ public sealed partial class ExportDialog {
 
     #region Methods
 
-    public static void AddLayoutsOff(ItemCollectionList addHere, Database database, bool addDiskLayouts) {
+    public static void AddLayoutsOff(ItemCollectionList addHere, Database? database, bool addDiskLayouts) {
         if (database != null) {
             foreach (var t in database.Layouts) {
                 ItemCollectionPad p = new(t, string.Empty);
@@ -141,7 +141,7 @@ public sealed partial class ExportDialog {
                     PadInternal = new CreativePad(new ItemCollectionPad(layout, rowsForExport[startNr].Database, rowsForExport[startNr].Key))
                 };
                 pad.Item.Add(it);
-                it.SetCoordinates(new RectangleF(druckB.Left + (x * (oneItem.Width + abstand)), druckB.Top + (y * (oneItem.Height + abstand)), oneItem.Width, oneItem.Height), true);
+                it.SetCoordinates(oneItem with { X = druckB.Left + (x * (oneItem.Width + abstand)), Y = druckB.Top + (y * (oneItem.Height + abstand)) }, true);
                 startNr++;
                 if (startNr >= rowsForExport.Count) { break; }
             }

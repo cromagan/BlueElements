@@ -187,7 +187,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         if (_tableView?.Database != null && _tableView.Filter != null) {
             List<ColumnItem?> columSort = new();
             ColumnViewCollection? orderArrangement = null;
-            foreach (var thisArr in _tableView.Database.ColumnArrangements.Where(thisArr => string.Equals(thisArr.Name, AnsichtName, StringComparison.CurrentCultureIgnoreCase))) {
+            foreach (var thisArr in _tableView.Database.ColumnArrangements.Where(thisArr => string.Equals(thisArr.Name, AnsichtName, StringComparison.OrdinalIgnoreCase))) {
                 orderArrangement = thisArr;
             }
             if (orderArrangement is null) { orderArrangement = _tableView?.CurrentArrangement; }
@@ -381,7 +381,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         }
         var isF = _tableView.Filter.RowFilterText;
         var newF = txbZeilenFilter.Text;
-        if (string.Equals(isF, newF, StringComparison.CurrentCultureIgnoreCase)) { return; }
+        if (string.Equals(isF, newF, StringComparison.OrdinalIgnoreCase)) { return; }
         if (string.IsNullOrEmpty(newF)) {
             _tableView.Filter.Remove_RowFilter();
             DoÄhnlich();
@@ -414,7 +414,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         //f.Enabled = false;
         AutoFilter autofilter = new(f.Filter.Column, _tableView.Filter, _tableView.PinnedRows);
         var p = f.PointToScreen(Point.Empty);
-        autofilter.Position_LocateToPosition(new Point(p.X, p.Y + f.Height));
+        autofilter.Position_LocateToPosition(p with { Y = p.Y + f.Height });
         autofilter.Show();
         autofilter.FilterComand += AutoFilter_FilterComand;
         Develop.Debugprint_BackgroundThread();
@@ -454,7 +454,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     private void GetÄhnlich() {
         _ähnliche = null;
         if (_tableView?.Database != null && !string.IsNullOrEmpty(_ähnlicheAnsichtName)) {
-            foreach (var thisArr in _tableView.Database.ColumnArrangements.Where(thisArr => string.Equals(thisArr.Name, _ähnlicheAnsichtName, StringComparison.CurrentCultureIgnoreCase))) {
+            foreach (var thisArr in _tableView.Database.ColumnArrangements.Where(thisArr => string.Equals(thisArr.Name, _ähnlicheAnsichtName, StringComparison.OrdinalIgnoreCase))) {
                 _ähnliche = thisArr;
             }
         }

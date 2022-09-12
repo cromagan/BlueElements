@@ -21,7 +21,9 @@ public class MultiUserParseEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public MultiUserParseEventArgs(byte[] data) => Data = data;
+    public MultiUserParseEventArgs(byte[] data) {
+        Data = data;
+    }
 
     #endregion
 

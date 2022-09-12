@@ -33,7 +33,9 @@ public class VariableDateTime : Variable {
 
     #region Constructors
 
-    public VariableDateTime(string name, DateTime value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _valueDateTime = value;
+    public VariableDateTime(string name, DateTime value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) {
+        _valueDateTime = value;
+    }
 
     /// <summary>
     /// Wichtig für: GetEnumerableOfType<Variable>("NAME");

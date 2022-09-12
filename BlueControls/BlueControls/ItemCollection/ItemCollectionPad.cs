@@ -286,7 +286,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
                 return null;
             }
 
-            return this.FirstOrDefault(thisItem => thisItem != null && string.Equals(@internal, thisItem.Internal, StringComparison.CurrentCultureIgnoreCase));
+            return this.FirstOrDefault(thisItem => thisItem != null && string.Equals(@internal, thisItem.Internal, StringComparison.OrdinalIgnoreCase));
         }
     }
 
@@ -647,9 +647,9 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
     protected RectangleF MaxBounds() => MaxBounds(null);
 
     protected override void OnItemAdded(BasicPadItem item) {
-        if (item == null) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Null Item soll hinzugefügt werden!");
-        }
+        //if (item == null) {
+        //    Develop.DebugPrint(FehlerArt.Fehler, "Null Item soll hinzugefügt werden!");
+        //}
         if (string.IsNullOrEmpty(item.Internal)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + item.Internal);
         }
@@ -733,7 +733,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
             if (SheetStyle == null || SheetStyleScale < 0.1d) { return true; }
             foreach (var thisItem in this.Where(thisItem => thisItem != null)) {
                 gr.PixelOffsetMode = PixelOffsetMode.None;
-                if (string.IsNullOrEmpty(seite) || thisItem.Page.Equals(seite, StringComparison.InvariantCultureIgnoreCase)) {
+                if (string.IsNullOrEmpty(seite) || thisItem.Page.Equals(seite, StringComparison.OrdinalIgnoreCase)) {
                     thisItem.Draw(gr, zoom, shiftX, shiftY, sizeOfParentControl, forPrinting);
                 }
             }

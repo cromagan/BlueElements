@@ -26,7 +26,7 @@ public static partial class Extensions {
 
     #region Methods
 
-    public static PointF NearestPoint(this PointF p, List<PointF> pl) {
+    public static PointF NearestPoint(this PointF p, List<PointF>? pl) {
         if (pl == null || pl.Count == 0) { return PointF.Empty; }
         var minl = float.MaxValue;
         var rp = PointF.Empty;

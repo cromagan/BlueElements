@@ -134,7 +134,7 @@ public static class FileOperations {
         if (pfad.IndexOf("\\\\", 1) > 0) { Develop.DebugPrint("Achtung, Doppelslash: " + pfad); }
         if (pfad.Length > 1 && pfad.Substring(0, 1) == "\\" && pfad.Substring(0, 2) != "\\\\") { Develop.DebugPrint("Achtung, Doppelslash: " + pfad); }
 
-        if (pfad.Length > 1 && pfad.IndexOf(":", 2) > 0) { Develop.DebugPrint("Falscher Doppelpunktk: " + pfad); }
+        if (pfad.Length > 1 && pfad.IndexOf(":", 2, StringComparison.Ordinal) > 0) { Develop.DebugPrint("Falscher Doppelpunktk: " + pfad); }
 
         try {
             return Path.GetFullPath(pfad);
@@ -247,7 +247,7 @@ public static class FileOperations {
         if (string.IsNullOrEmpty(name)) { return string.Empty; }
         // Return Path.GetDirectoryName(Name) & "\" ' <---- Versagt ab 260 Zeichen
         name = name.Replace("/", "\\");
-        var z = name.LastIndexOf("\\");
+        var z = name.LastIndexOf("\\", StringComparison.Ordinal);
         return z < 0 ? string.Empty : name.Substring(0, z + 1);
     }
 

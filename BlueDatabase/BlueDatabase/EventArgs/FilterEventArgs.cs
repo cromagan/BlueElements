@@ -21,7 +21,9 @@ public class FilterEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public FilterEventArgs(FilterItem filter) => Filter = filter;
+    public FilterEventArgs(FilterItem filter) {
+        Filter = filter;
+    }
 
     #endregion
 

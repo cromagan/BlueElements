@@ -23,7 +23,9 @@ public class MultiUserFileStopWorkingEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public MultiUserFileStopWorkingEventArgs() => AllreadyStopped = new List<string>();
+    public MultiUserFileStopWorkingEventArgs() {
+        AllreadyStopped = new List<string>();
+    }
 
     #endregion
 

@@ -23,7 +23,6 @@ using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueDatabase;
 using BlueScript;
 using FastColoredTextBoxNS;
 using System;
@@ -127,7 +126,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposable //  Syst
 
     protected virtual void OpenAdditionalFileFolder() { }
 
-    protected void WriteComandsToList(Script s) {
+    protected void WriteComandsToList(Script? s) {
         if (!_menuDone) {
             _menuDone = true;
             _popupMenu = new AutocompleteMenu(txtSkript) {
@@ -230,7 +229,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposable //  Syst
 
             //foreach (var r in tableVariablen.Database.Row) {
             if (r != null) {
-                //if (string.Equals(r.CellFirstString(), hoveredWordnew, StringComparison.CurrentCultureIgnoreCase)) {
+                //if (string.Equals(r.CellFirstString(), hoveredWordnew, StringComparison.OrdinalIgnoreCase)) {
                 var inh = r.CellGetString("Inhalt");
                 _lastVariableContent = inh;
                 inh = inh.Replace("\r", ";");
@@ -248,7 +247,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposable //  Syst
         }
     }
 
-    private void UpdateSubs(string s) {
+    private void UpdateSubs(string? s) {
         lstFunktionen.Item.Clear();
 
         lstFunktionen.Item.Add("[Main]");

@@ -359,7 +359,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     public bool IsVisibleOnPage(string page) {
         if (string.IsNullOrEmpty(_page)) { return true; }
 
-        return string.Equals(_page, page, StringComparison.InvariantCultureIgnoreCase);
+        return string.Equals(_page, page, StringComparison.OrdinalIgnoreCase);
     }
 
     public void Move(float x, float y) {

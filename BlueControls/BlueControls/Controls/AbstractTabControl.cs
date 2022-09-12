@@ -162,7 +162,7 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
                 foreach (var thisTabName in tmp) {
                     foreach (var thisTab in TabPages) {
                         if (thisTab is TabPage tb) {
-                            if (string.Equals(tb.Text, thisTabName, StringComparison.CurrentCultureIgnoreCase)) {
+                            if (string.Equals(tb.Text, thisTabName, StringComparison.OrdinalIgnoreCase)) {
                                 neworder.AddIfNotExists(tb);
                             }
                         }

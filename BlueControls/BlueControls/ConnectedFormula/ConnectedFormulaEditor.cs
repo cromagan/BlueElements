@@ -19,11 +19,9 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using static BlueBasics.FileOperations;
 using BlueControls.ItemCollection;
 using BlueDatabase;
-using static BlueBasics.Converter;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase.Enums;
@@ -112,7 +110,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
         Pad.AddCentered(x);
     }
 
-    private void btnLetzteDateien_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) {
+    private void btnLetzteDateien_ItemClicked(object sender, EventArgs.BasicListItemEventArgs? e) {
         BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
 
         if (e?.Item == null) { return; }

@@ -1,5 +1,4 @@
-﻿using BlueScript.Enums;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using static BlueBasics.Converter;
 using BlueScript.Structures;
 using BlueScript;

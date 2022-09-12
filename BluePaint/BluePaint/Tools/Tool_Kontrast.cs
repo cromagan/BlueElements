@@ -29,7 +29,9 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
 {
     #region Constructors
 
-    public Tool_Kontrast() : base() => InitializeComponent();
+    public Tool_Kontrast() : base() {
+        InitializeComponent();
+    }
 
     #endregion
 

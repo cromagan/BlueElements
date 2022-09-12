@@ -93,9 +93,10 @@ internal sealed class QuickPic : Panel {
 
     #region Constructors
 
-    public QuickPic() =>
+    public QuickPic() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
+    }
 
     #endregion
 

@@ -45,7 +45,9 @@ public sealed class SystemInputHook {
 
     #region Constructors
 
-    public SystemInputHook() => Initialize();
+    public SystemInputHook() {
+        Initialize();
+    }
 
     #endregion
 

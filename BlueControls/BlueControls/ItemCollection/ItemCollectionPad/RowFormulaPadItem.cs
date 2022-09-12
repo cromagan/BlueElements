@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -149,7 +151,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
             case "firstvalue":
                 var n = value.FromNonCritical();
                 if (Row != null) {
-                    if (!string.Equals(Row.CellFirstString(), n, StringComparison.CurrentCultureIgnoreCase)) {
+                    if (!string.Equals(Row.CellFirstString(), n, StringComparison.OrdinalIgnoreCase)) {
                         MessageBox.Show("<b><u>Eintrag hat sich geändert:</b></u><br><b>Von: </b> " + n + "<br><b>Nach: </b>" + Row.CellFirstString(), ImageCode.Information, "OK");
                     }
                     return true; // Alles beim Alten

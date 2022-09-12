@@ -75,7 +75,7 @@ public static class Converter {
         }
     }
 
-    public static Bitmap? ByteToBitmap(byte[] value) {
+    public static Bitmap? ByteToBitmap(byte[]? value) {
         if (value == null || value.GetUpperBound(0) == 0) { return null; }
         try {
             using MemoryStream ms = new(value);
