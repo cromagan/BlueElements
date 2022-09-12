@@ -58,8 +58,8 @@ internal class Method_if : Method {
     public static bool? GetBool(string txt) {
         txt = txt.DeKlammere(true, false, false, true);
 
-        //            if (txt.Value.Equals("true", StringComparison.InvariantCultureIgnoreCase) ||
-        //                txt.Value.Equals("false", StringComparison.InvariantCultureIgnoreCase)) {
+        //            if (txt.Value.Equals("true", StringComparison.OrdinalIgnoreCase) ||
+        //                txt.Value.Equals("false", StringComparison.OrdinalIgnoreCase)) {
         //                if (Type is not VariableDataType.NotDefinedYet and not VariableDataType.Bool) { SetError("Variable ist kein Boolean"); return; }
         //                ValueString = txt.Value;
         //                Type = VariableDataType.Bool;
