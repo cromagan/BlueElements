@@ -44,18 +44,18 @@ public static class Export {
     //    };
     //    return InternalCreateLayout(TMPList, LoadedFile, string.Empty, ToNonCriticalText);
     //}
-    public static void CreateLayout(RowItem row, string loadFile, string saveFile) {
-        if (!FileExists(loadFile)) { return; }
+    public static string CreateLayout(RowItem row, string loadFile, string saveFile) {
+        if (!FileExists(loadFile)) { return "Datei nicht gefunden."; }
         List<RowItem?> tmpList = new()
         {
             row
         };
-        InternalCreateLayout(tmpList, File.ReadAllText(loadFile, Constants.Win1252), saveFile);
+        return InternalCreateLayout(tmpList, File.ReadAllText(loadFile, Constants.Win1252), saveFile);
     }
 
-    public static void CreateLayout(List<RowItem?> rows, string loadFile, string saveFile) {
-        if (!FileExists(loadFile)) { return; }
-        InternalCreateLayout(rows, File.ReadAllText(loadFile, Constants.Win1252), saveFile);
+    public static string CreateLayout(List<RowItem?> rows, string loadFile, string saveFile) {
+        if (!FileExists(loadFile)) { return "Datei nicht gefunden."; }
+        return InternalCreateLayout(rows, File.ReadAllText(loadFile, Constants.Win1252), saveFile);
     }
 
     //Shared Sub SaveAsBitmap(Row As RowItem)
@@ -78,18 +78,26 @@ public static class Export {
         List<string> l = new();
         if (liste == null) { return l; }
         string sav;
+        string fehler = string.Empty;
         if (liste.Count == 1 || eineGrosseDatei) {
-            sav = !string.IsNullOrEmpty(optionalFileName)
-                ? TempFile(optionalFileName.FilePath(), optionalFileName.FileNameWithoutSuffix(), lad.FileSuffix())
-                : TempFile(zielPfad, liste[0].CellFirstString(), lad.FileSuffix());
-            CreateLayout(liste, lad, sav);
+            if (!string.IsNullOrEmpty(optionalFileName)) {
+                sav = TempFile(optionalFileName.FilePath(), optionalFileName.FileNameWithoutSuffix(), lad.FileSuffix());
+            } else {
+                sav = TempFile(zielPfad, liste[0].CellFirstString(), lad.FileSuffix());
+            }
+
+            fehler = CreateLayout(liste, lad, sav);
             l.Add(sav);
         } else {
             foreach (var thisRow in liste) {
-                sav = !string.IsNullOrEmpty(optionalFileName)
-                    ? TempFile(optionalFileName.FilePath(), optionalFileName.FileNameWithoutSuffix(), lad.FileSuffix())
-                    : TempFile(zielPfad, thisRow.CellFirstString(), lad.FileSuffix());
-                CreateLayout(thisRow, lad, sav);
+                if (!string.IsNullOrEmpty(optionalFileName)) {
+                    sav = TempFile(optionalFileName.FilePath(), optionalFileName.FileNameWithoutSuffix(),
+                        lad.FileSuffix());
+                } else {
+                    sav = TempFile(zielPfad, thisRow.CellFirstString(), lad.FileSuffix());
+                }
+
+                fehler = CreateLayout(thisRow, lad, sav);
                 l.Add(sav);
             }
             //    If OpenIt Then ExecuteFile(ZielPfad)
@@ -100,7 +108,11 @@ public static class Export {
         //    Else
         //        MessageBox.Show("Datei konnte nicht erzeugt werden.", ImageCode.Information, "OK")
         //    End If
-        //End If
+        //End
+
+        if (!string.IsNullOrEmpty(fehler)) {
+            MessageBox.Show(fehler);
+        }
         return l;
     }
 
@@ -491,7 +503,7 @@ public static class Export {
 
     public static void SaveAsBitmap(RowItem row, string layoutId, string filename) => row.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(row, layoutId, filename));
 
-    private static void InternalCreateLayout(List<RowItem?>? rows, string fileLoaded, string saveFileName) {
+    private static string InternalCreateLayout(List<RowItem?>? rows, string fileLoaded, string saveFileName) {
         var head = string.Empty;
         var foot = string.Empty;
         var body = fileLoaded;
@@ -502,6 +514,9 @@ public static class Export {
             body = fileLoaded.Substring(stx + 11, enx - stx - 11);
             foot = fileLoaded.Substring(enx + 11);
         }
+
+        var f = string.Empty;
+
         var tmpSave = head;
         if (rows != null) {
             foreach (var thisRow in rows) // As Integer = 0 To Rows.GetUpperBound(0)
@@ -510,7 +525,12 @@ public static class Export {
                     var tmpBody = body;
 
                     var (_, _, script) = thisRow.DoAutomatic("export");
-                    if (script == null) { return; }
+                    if (script == null) { return "Script Fehler!"; }
+
+                    if (!string.IsNullOrEmpty(script.Error)) {
+                        f = f + thisRow.CellFirstString() + "\r\n";
+                    }
+
                     foreach (var thisV in script.Variables) {
                         tmpBody = thisV.ReplaceInText(tmpBody);
                     }
@@ -524,7 +544,10 @@ public static class Export {
         {
             WriteAllText(saveFileName, tmpSave, Constants.Win1252, false);
         }
-        //return tmpSave;
+
+        if (!string.IsNullOrEmpty(f)) { return "Fehler bei:\r\n" + f; }
+
+        return string.Empty;
     }
 
     #endregion
