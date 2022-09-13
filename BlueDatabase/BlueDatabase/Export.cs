@@ -74,11 +74,11 @@ public static class Export {
     //    GenerateLayout_Internal(Row, 0, False, True, String.Empty)
     //    '   End If
     //End Sub
-    public static List<string> GenerateLayout_FileSystem(List<RowItem?>? liste, string lad, string optionalFileName, bool eineGrosseDatei, string zielPfad) {
+    public static (List<string>? files, string error) GenerateLayout_FileSystem(List<RowItem?>? liste, string lad, string optionalFileName, bool eineGrosseDatei, string zielPfad) {
         List<string> l = new();
-        if (liste == null) { return l; }
+        if (liste == null) { return (null, "Keine Zeilen angegeben"); }
         string sav;
-        string fehler = string.Empty;
+        var fehler = string.Empty;
         if (liste.Count == 1 || eineGrosseDatei) {
             if (!string.IsNullOrEmpty(optionalFileName)) {
                 sav = TempFile(optionalFileName.FilePath(), optionalFileName.FileNameWithoutSuffix(), lad.FileSuffix());
@@ -111,9 +111,9 @@ public static class Export {
         //End
 
         if (!string.IsNullOrEmpty(fehler)) {
-            MessageBox.Show(fehler);
+            //MessageBox.Show(fehler);
         }
-        return l;
+        return (l, fehler);
     }
 
     //public static object ParseVariable(string platzhaltertxt, string variablename, object value) {
@@ -483,7 +483,7 @@ public static class Export {
     //        }
     //    } while (true);
     //}
-    public static List<string> SaveAs(RowItem row, string layout, string destinationFile) {
+    public static (List<string>? files, string error) SaveAs(RowItem row, string layout, string destinationFile) {
         List<RowItem?> l = new()
         {
             row
@@ -491,14 +491,14 @@ public static class Export {
         return GenerateLayout_FileSystem(l, layout, destinationFile, false, string.Empty);
     }
 
-    public static List<string> SaveAsBitmap(List<RowItem?> row, string layoutId, string path) {
+    public static (List<string>? files, string error) SaveAsBitmap(List<RowItem?> row, string layoutId, string path) {
         List<string> l = new();
         foreach (var thisRow in row) {
             var fn = TempFile(path, thisRow.CellFirstString(), "PNG");
             thisRow.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(thisRow, layoutId, fn));
             l.Add(fn);
         }
-        return l;
+        return (l, string.Empty);
     }
 
     public static void SaveAsBitmap(RowItem row, string layoutId, string filename) => row.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(row, layoutId, filename));

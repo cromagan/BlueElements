@@ -330,25 +330,33 @@ public sealed partial class ExportDialog {
             MessageBox.Show(f);
             return;
         }
+
         if (optBildSchateln.Checked) {
             tabBildSchachteln.Enabled = true;
             Tabs.SelectedTab = tabBildSchachteln;
             Attribute_Changed(null, System.EventArgs.Empty);
         }
+
         if (optDrucken.Checked) {
             tabDrucken.Enabled = true;
             Tabs.SelectedTab = tabDrucken;
             Button_PageSetup_Click(null, System.EventArgs.Empty);
             GeneratePrintPad(padPrint, 0, cbxLayoutWahl.Text, _rowsForExport, 0);
         }
+
         if (optSpeichern.Checked || optSpezialFormat.Checked) {
             tabStart.Enabled = false; // Geht ja gleich los
             tabDateiExport.Enabled = true;
             Tabs.SelectedTab = tabDateiExport;
-            var l = Database.Layouts.LayoutIdToIndex(cbxLayoutWahl.Text) > -1
+            var (files, error) = Database.Layouts.LayoutIdToIndex(cbxLayoutWahl.Text) > -1
                 ? Export.SaveAsBitmap(_rowsForExport, cbxLayoutWahl.Text, _zielPfad)
                 : Export.GenerateLayout_FileSystem(_rowsForExport, cbxLayoutWahl.Text, _saveTo, optSpezialFormat.Checked, _zielPfad);
-            lstExported.Item.AddRange(l);
+            lstExported.Item.AddRange(files);
+
+            if (!string.IsNullOrEmpty(error)) {
+                MessageBox.Show(error);
+                return;
+            }
         }
     }
 

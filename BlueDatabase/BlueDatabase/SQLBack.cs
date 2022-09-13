@@ -141,24 +141,12 @@ public class SqlBack {
 
         if (column == null && row == null) {
             switch (type) {
-                case DatabaseDataType.Formatkennung:
-                    break;
-
-                case DatabaseDataType.Werbung:
-                    break;
-
-                case DatabaseDataType.EOF:
-                    break;
-
-                case DatabaseDataType.co_SaveContent:
-                    break;
-
-                case DatabaseDataType.CryptionState:
-                    break;
-
-                case DatabaseDataType.CryptionTest:
-                    break;
-
+                case DatabaseDataType.Formatkennung: break;
+                case DatabaseDataType.Werbung: break;
+                case DatabaseDataType.EOF: break;
+                case DatabaseDataType.co_SaveContent: break;
+                case DatabaseDataType.CryptionState: break;
+                case DatabaseDataType.CryptionTest: break;
                 default:
                     return SetStyleDate(database, type, string.Empty, value);
             }
@@ -170,14 +158,9 @@ public class SqlBack {
         if (column != null && row == null) {
             switch (type) {
                 //case DatabaseDataType.co_EditType: break;
-                case DatabaseDataType.co_SaveContent:
-                    break;
-
-                case DatabaseDataType.co_ShowUndo:
-                    break;
-
-                case DatabaseDataType.ColumnName:
-                    break;
+                case DatabaseDataType.co_SaveContent: break;
+                case DatabaseDataType.co_ShowUndo: break;
+                case DatabaseDataType.ColumnName: break;
 
                 default:
                     if (type == DatabaseDataType.ColumnCaption) { AddColumnToMain(column.Name); }
