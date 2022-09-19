@@ -262,8 +262,8 @@ public sealed class PointM : IMoveable {
             }
         }
         t = t + "Name=" + Name.ToNonCritical() + ", ";
-        t = t + "X=" + _x + ", ";
-        t = t + "Y=" + _y + ", ";
+        t = t + "X=" + _x.ToString(Constants.Format_Float1).Replace(",",".") + ", ";
+        t = t + "Y=" + _y.ToString(Constants.Format_Float1).Replace(",", ".") + ", ";
         if (!string.IsNullOrEmpty(Tag)) { t = t + "Tag=" + Tag.ToNonCritical() + ", "; }
         return t.Trim(", ") + "}";
     }

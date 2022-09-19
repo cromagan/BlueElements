@@ -164,12 +164,14 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
         get => string.Empty;
         set {
             var x = UsedArea;
+
             var he = MmToPixel(ConnectedFormula.ConnectedFormula.StandardHöhe, 300);
-            x.Height = x.Height % he;
+            var he1 = MmToPixel(1, 300);
+            x.Height = (int)(x.Height / he) * he;
+            x.Height = (int)(x.Height / he1 + 0.99) * he1;
+
             if (x.Height < he) { x.Height = he; }
             SetCoordinates(x, true);
-
-            //OnChanged();
         }
     }
 

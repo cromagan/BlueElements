@@ -39,7 +39,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
 
     public const string Version = "0.01";
     public static readonly ListExt<ConnectedFormula> AllFiles = new();
-    public static readonly float StandardHöhe = 3.5f;
+    public static readonly float StandardHöhe = 1.75f;
 
     public static readonly float Umrechnungsfaktor2 = MmToPixel(StandardHöhe, 300) / 44;
 

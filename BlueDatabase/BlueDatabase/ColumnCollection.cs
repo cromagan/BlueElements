@@ -354,7 +354,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     //internal string Load_310(enDatabaseDataType type, string value) {
     //    switch (type) {
     //        case enDatabaseDataType.LastColumnKey:
-    //            _LastColumnKey = IntParse(value);
+    //            _LastColumnKey = LongParse(value);
     //            break;
 
     //        default:

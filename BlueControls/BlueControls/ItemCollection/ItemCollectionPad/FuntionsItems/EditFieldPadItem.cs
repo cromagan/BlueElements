@@ -112,7 +112,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
 
             if (sho == null || sho.Count != 1) { return; }
 
-            var k = IntParse(sho[0]);
+            var k = LongParse(sho[0]);
 
             var col = GetRowFrom.Database.Column.SearchByKey(k);
 
@@ -196,31 +196,6 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         l.Add(new FlexiControlForProperty<string>(() => Spalten_AdminInfo, 5));
         l.Add(new FlexiControl());
 
-        //if(_getValueFrom != null && _getValueFrom.Database is Database db) {
-        //      foreach(var thisC in db) {
-        //          s
-        //      }
-
-        //  }
-
-        //{
-        //    new FlexiControlForProperty(()=> this.Bildschirmbereich_wählen", ImageCode.Bild),
-        //    new FlexiControlForProperty(()=> this.Datei_laden", ImageCode.Ordner),
-        //    new FlexiControl(),
-        //    new FlexiControlForProperty(()=> this.Platzhalter_für_Layout", 2),
-        //    new FlexiControl()
-        //};
-        //ItemCollectionList.ItemCollectionList comms = new()
-        //{
-        //    { "Abschneiden", ((int)enSizeModes.BildAbschneiden).ToString(), QuickImage.Get("BildmodusAbschneiden|32") },
-        //    { "Verzerren", ((int)enSizeModes.Verzerren).ToString(), QuickImage.Get("BildmodusVerzerren|32") },
-        //    { "Einpassen", ((int)enSizeModes.EmptySpace).ToString(), QuickImage.Get("BildmodusEinpassen|32") }
-        //};
-        //l.Add(new FlexiControlForProperty(()=> this.Bild-Modus", comms));
-        //l.Add(new FlexiControl());
-        //AddLineStyleOption(l);
-        //l.Add(new FlexiControlForProperty(()=> this.Hintergrund_weiß_füllen"));
-        //l.AddRange(base.GetStyleOptions());
         return l;
     }
 
@@ -236,7 +211,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
 
         switch (tag) {
             case "column":
-                Column = GetRowFrom.Database.Column.SearchByKey(IntParse(value));
+                Column = GetRowFrom.Database.Column.SearchByKey(LongParse(value));
                 return true;
 
             case "edittype":

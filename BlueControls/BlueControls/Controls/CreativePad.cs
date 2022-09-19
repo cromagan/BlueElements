@@ -102,6 +102,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
 
     #region Properties
 
+    [DefaultValue(true)]
+    public bool ContextMenuAllowed { get; set; } = true;
+
     [DefaultValue("")]
     public string CurrentPage {
         get => _currentPage;
@@ -455,6 +458,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
                 break;
 
             case MouseButtons.Right:
+                if (!ContextMenuAllowed) { return; }
                 FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
                 break;
         }

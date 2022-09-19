@@ -38,6 +38,7 @@
             this.btnNeueAnsichtErstellen = new BlueControls.Controls.Button();
             this.btnAktuelleAnsichtLoeschen = new BlueControls.Controls.Button();
             this.grpDesign.SuspendLayout();
+            this.tabHintergrund.SuspendLayout();
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.grpAssistent.SuspendLayout();
@@ -49,13 +50,11 @@
             // 
             // tabRightSide
             // 
-            this.tabRightSide.Location = new System.Drawing.Point(612, 110);
-            this.tabRightSide.Size = new System.Drawing.Size(372, 340);
             // 
             // Pad
             // 
-            this.Pad.Size = new System.Drawing.Size(612, 340);
-            this.Pad.ItemAdded += new System.EventHandler<BlueBasics.EventArgs.ListEventArgs>(this.Item_ItemAdded);
+            this.Pad.ContextMenuAllowed = false;
+              this.Pad.ItemAdded += new System.EventHandler<BlueBasics.EventArgs.ListEventArgs>(this.Item_ItemAdded);
             this.Pad.ItemRemoved += new System.EventHandler<System.EventArgs>(this.Item_ItemRemoved);
             this.Pad.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Pad_MouseUp);
             // 
@@ -67,6 +66,7 @@
             this.Ribbon.TabDefaultOrder = new string[] {
         "Ansichten",
         "Start"};
+            this.Ribbon.Controls.SetChildIndex(this.tabHintergrund, 0);
             this.Ribbon.Controls.SetChildIndex(this.tabAnsichten, 0);
             this.Ribbon.Controls.SetChildIndex(this.tabExport, 0);
             this.Ribbon.Controls.SetChildIndex(this.tabStart, 0);
@@ -252,6 +252,7 @@
             this.Text = "Spalten-Editor";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.grpDesign.ResumeLayout(false);
+            this.tabHintergrund.ResumeLayout(false);
             this.Ribbon.ResumeLayout(false);
             this.tabStart.ResumeLayout(false);
             this.grpAssistent.ResumeLayout(false);
