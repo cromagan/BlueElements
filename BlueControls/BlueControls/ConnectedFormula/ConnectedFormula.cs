@@ -41,7 +41,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
     public static readonly ListExt<ConnectedFormula> AllFiles = new();
     public static readonly float StandardHöhe = 1.75f;
 
-    public static readonly float Umrechnungsfaktor2 = MmToPixel(StandardHöhe, 300) / 44;
+    public static readonly float Umrechnungsfaktor2 = MmToPixel(StandardHöhe, 300) / 22;
 
     public readonly ListExt<string> DatabaseFiles = new();
     public readonly ListExt<string> NotAllowedChilds = new();
