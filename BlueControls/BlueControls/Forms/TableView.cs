@@ -617,8 +617,8 @@ public partial class TableView : Form {
         if (Table.Database == null) { return; }
 
         var x = new ConnectedFormulaEditor(Table?.Database.FormulaFileName(), null);
-        x.ShowDialog();
-        x.Dispose();
+        x.Show();
+        //x.Dispose();
     }
 
     private void btnLayouts_Click(object sender, System.EventArgs e) {

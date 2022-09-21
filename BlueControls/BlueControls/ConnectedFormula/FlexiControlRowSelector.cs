@@ -100,7 +100,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
             _row = value;
             Script = null;
-            DoChilds(this, _row, ParentCol);
+            DoChilds(this, _row);
         }
     }
 
@@ -110,7 +110,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
     #region Methods
 
-    public static void DoChilds(ICalculateRowsControlLevel con, RowItem row, ItemCollectionPad? parent) {
+    public static void DoChilds(ICalculateRowsControlLevel con, RowItem? row) {
         //if (_disposing || IsDisposed) { return; }
 
         foreach (var thischild in con.Childs) {
@@ -334,17 +334,17 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
     }
 
     private void Childs_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
-        DoChilds(this, _row, ParentCol);
+        DoChilds(this, _row);
     }
 
     private void GetParentsList() {
         if (_disposing || IsDisposed || Parent == null) { return; }
 
         foreach (var thisR in FilterDefiniton.Row) {
-            var item = ParentCol[thisR.CellGetString("suchtxt")];
-            if (item != null) {
-                var c = ((ConnectedFormulaView)Parent).SearchOrGenerate(item);
-                _parents.Add(c);
+            var item = ParentCol?[thisR.CellGetString("suchtxt")];
+            if (item is IItemToControl itco) {
+                var c = ((ConnectedFormulaView)Parent).SearchOrGenerate(itco);
+                if (c != null) { _parents.Add(c); }
             }
         }
     }

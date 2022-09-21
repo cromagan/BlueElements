@@ -52,6 +52,7 @@ public class EasyPicPadItem : CustomizableShowPadItem, IItemToControl {
         set {
             if (value == _bild_Dateiname) { return; }
             _bild_Dateiname = value;
+            RaiseVersion();
             OnChanged();
         }
     }
@@ -63,15 +64,15 @@ public class EasyPicPadItem : CustomizableShowPadItem, IItemToControl {
     #region Methods
 
     public override System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
-        var cx = new EasyPic();
-        cx.OriginalText = Bild_Dateiname;
-        cx.Tag = Internal;
+        var con = new EasyPic();
+        con.OriginalText = Bild_Dateiname;
+        con.Name = DefaultItemToControlName();
 
         if (GetRowFrom is ICalculateOneRowItemLevel rfw2) {
-            var ff = parent.SearchOrGenerate((BasicPadItem)rfw2);
-            if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(cx); }
+            var ff = parent.SearchOrGenerate(rfw2);
+            if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(con); }
         }
-        return cx;
+        return con;
     }
 
     public override List<GenericControl> GetStyleOptions() {

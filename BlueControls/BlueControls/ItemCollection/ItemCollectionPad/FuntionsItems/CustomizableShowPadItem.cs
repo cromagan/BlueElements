@@ -36,9 +36,9 @@ namespace BlueControls.ItemCollection;
 /// <summary>
 /// Standard für Objekte, die einen Datenbank/Zeilenbezug haben.
 /// Stellt auch alle Methode breit, zum Einrichten der Breite und Benutzer-Sichtbarkeiten.
-/// Nur Tabs, die ein solches Objekt habe, werden als anzeigewürdig gewertet
+/// Nur Tabs, die ein solches Objekt haben, werden als anzeigewürdig gewertet
 /// </summary>
-public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl {
+public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IItemToControl {
 
     #region Fields
 
@@ -80,6 +80,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
             var anzbr = IntParse(doit[0]);
             var npos = IntParse(doit[1]);
             SetXPosition(anzbr, npos, 1);
+            RaiseVersion();
         }
     }
 
@@ -117,7 +118,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
             } else {
                 GetRowFrom = null;
             }
-
+            RaiseVersion();
             OnChanged();
         }
     }
@@ -129,6 +130,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
             if (value == _getValueFrom) { return; }
             _getValueFrom = value;
             RepairConnections();
+            RaiseVersion();
             OnChanged();
         }
     }
@@ -155,7 +157,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
             }
 
             if (VisibleFor.Count == 0) { VisibleFor.Add("#Administrator"); }
-
+            RaiseVersion();
             OnChanged();
         }
     }
@@ -171,6 +173,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
             x.Height = (int)(x.Height / he1 + 0.99) * he1;
 
             if (x.Height < he) { x.Height = he; }
+            RaiseVersion();
             SetCoordinates(x, true);
         }
     }
@@ -238,6 +241,10 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
         switch (tag) {
+            case "version":
+                Version = IntParse(value);
+                return true;
+
             case "getvaluefrom":
                 GetRowFrom = (ICalculateOneRowItemLevel)Parent[value.FromNonCritical()];
                 return true;
@@ -261,6 +268,8 @@ public abstract class CustomizableShowPadItem : RectanglePadItem, IItemToControl
     public override string ToString() {
         var t = base.ToString();
         t = t.Substring(0, t.Length - 1) + ", ";
+
+        t = t + "Version=" + Version + ", ";
 
         if (VisibleFor.Count == 0) { VisibleFor.Add("#Everybody"); }
 

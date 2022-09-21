@@ -159,6 +159,10 @@ public partial class ConnectedFormulaEditor : PadEditor {
         it.Page = n;
     }
 
+    private void btnSpeichern_Click(object sender, System.EventArgs e) {
+        BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
+    }
+
     private void btnTabControlAdd_Click(object sender, System.EventArgs e) {
         if (_cf == null) { return; }
 

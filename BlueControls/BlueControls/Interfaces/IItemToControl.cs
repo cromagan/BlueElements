@@ -30,6 +30,8 @@ public interface IItemToControl {
 
     public string Internal { get; }
 
+    public int Version { get; set; }
+
     #endregion
 
     #region Methods

@@ -119,6 +119,8 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     public bool Textbox_hasFocus() => txbZeilenFilter.Focused;
 
     internal void FillFilters() {
+        if (IsDisposed) { return; }
+
         if (InvokeRequired) {
             Invoke(new Action(FillFilters));
             return;

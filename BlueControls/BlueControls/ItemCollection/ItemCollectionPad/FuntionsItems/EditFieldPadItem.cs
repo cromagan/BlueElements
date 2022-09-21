@@ -33,6 +33,7 @@ using BlueDatabase.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Interfaces;
 using BlueControls.Forms;
+using System.Configuration;
 
 namespace BlueControls.ItemCollection;
 
@@ -59,6 +60,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         get => _überschiftanordung;
         set {
             if (_überschiftanordung == value) { return; }
+            RaiseVersion();
             _überschiftanordung = value;
             OnChanged();
         }
@@ -68,6 +70,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         get => _bearbeitung;
         set {
             if (_bearbeitung == value) { return; }
+            RaiseVersion();
             _bearbeitung = value;
             OnChanged();
         }
@@ -118,7 +121,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
 
             if (col == Column) { return; }
             Column = col;
-
+            RaiseVersion();
             OnChanged();
         }
     }
@@ -151,16 +154,16 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
 
     public override System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
         if (GetRowFrom is ICalculateOneRowItemLevel rfw2) {
-            var ff = parent.SearchOrGenerate((BasicPadItem)rfw2);
+            var ff = parent.SearchOrGenerate(rfw2);
 
-            var cx = new FlexiControlForCell();
-            cx.Database = Column.Database;
-            cx.ColumnKey = Column.Key;
-            cx.EditType = EditType;
-            cx.CaptionPosition = CaptionPosition;
-            cx.Tag = Internal;
-            if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(cx); }
-            return cx;
+            var con = new FlexiControlForCell();
+            con.Database = Column?.Database;
+            con.ColumnKey = Column?.Key ?? -1;
+            con.EditType = EditType;
+            con.CaptionPosition = CaptionPosition;
+            con.Name = DefaultItemToControlName();
+            if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(con); }
+            return con;
         }
 
         var cy = new FlexiControl();

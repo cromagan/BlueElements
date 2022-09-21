@@ -32,12 +32,14 @@ using System.ComponentModel;
 
 namespace BlueControls.ItemCollection;
 
-public class RowInputPadItem : RectanglePadItem, IReadableText, IContentHolder, IItemToControl {
+public class RowInputPadItem : RectanglePadItemWithVersion, IReadableText, IContentHolder, IItemToControl {
 
     #region Fields
 
     public static BlueFont? CellFont = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
+
     public static BlueFont? ChapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard);
+
     public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
 
     //private string _ID = string.Empty;
@@ -77,13 +79,13 @@ public class RowInputPadItem : RectanglePadItem, IReadableText, IContentHolder, 
     #region Methods
 
     public Control? CreateControl(ConnectedFormulaView parent) {
-        var c3 = new FlexiControlForCell();
-        c3.Width = 200;
-        c3.Height = 32;
-        c3.CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
-        c3.EditType = EditTypeFormula.nur_als_Text_anzeigen;
-        c3.Tag = Internal;
-        return c3;
+        var con = new FlexiControlForCell();
+        con.Width = 200;
+        con.Height = 32;
+        con.CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
+        con.EditType = EditTypeFormula.nur_als_Text_anzeigen;
+        con.Name = DefaultItemToControlName();
+        return con;
     }
 
     public override List<GenericControl> GetStyleOptions() {

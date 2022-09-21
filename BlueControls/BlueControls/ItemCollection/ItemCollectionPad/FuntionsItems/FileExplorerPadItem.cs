@@ -52,6 +52,7 @@ public class FileExplorerPadItem : CustomizableShowPadItem, IItemToControl {
         set {
             if (value == _pfad) { return; }
             _pfad = value;
+            RaiseVersion();
             OnChanged();
         }
     }
@@ -63,15 +64,15 @@ public class FileExplorerPadItem : CustomizableShowPadItem, IItemToControl {
     #region Methods
 
     public override System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
-        var cx = new FileBrowser();
-        cx.OriginalText = Pfad;
-        cx.Tag = Internal;
+        var con = new FileBrowser();
+        con.OriginalText = Pfad;
+        con.Name = DefaultItemToControlName();
 
         if (GetRowFrom is ICalculateOneRowItemLevel rfw2) {
-            var ff = parent.SearchOrGenerate((BasicPadItem)rfw2);
-            if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(cx); }
+            var ff = parent.SearchOrGenerate(rfw2);
+            if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(con); }
         }
-        return cx;
+        return con;
     }
 
     public override List<GenericControl> GetStyleOptions() {

@@ -121,28 +121,28 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
         Invalidate(); // Sonst wird es nie neu gezeichnet
     }
 
-    public System.Windows.Forms.Control? SearchOrGenerate(BasicPadItem? thisit) {
+    public System.Windows.Forms.Control? SearchOrGenerate(IItemToControl? thisit) {
         if (thisit == null) { return null; }
 
-        if (thisit.Page != Page) {
-            Develop.DebugPrint("Falscher Seitenaufruf!");
-            return null;
-        }
+        //if (thisit.Page != Page) {
+        //    Develop.DebugPrint("Falscher Seitenaufruf!");
+        //    return null;
+        //}
 
         foreach (var thisC in Controls) {
             if (thisC is System.Windows.Forms.Control c) {
-                if (c.Tag is string s) {
-                    if (s == thisit.Internal) { return c; }
+                if (c.Name is string s) {
+                    if (s == thisit.Internal + "-" + thisit.Version) { return c; }
                 }
             }
         }
 
         if (thisit is IItemToControl it) {
             var c = it.CreateControl(this);
-            if (c != null && c.Tag is string s && s == thisit.Internal) {
+            if (c != null && c.Name is string s && s == thisit.Internal + "-" + it.Version) {
                 //alles ok
             } else {
-                Develop.DebugPrint("Tag muß intern mit Internal beschrieben werden!");
+                Develop.DebugPrint("Name muß intern mit Internal-Version beschrieben werden!");
                 return null;
             }
             Controls.Add(c);
@@ -256,8 +256,8 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
                 var addfactor = Size.Width / _cf.PadData.SheetSizeInPix.Width;
 
                 foreach (var thisit in _cf.PadData) {
-                    if (thisit.IsVisibleOnPage(_pageToShow)) {
-                        var o = SearchOrGenerate(thisit);
+                    if (thisit.IsVisibleOnPage(_pageToShow) && thisit is IItemToControl thisitco) {
+                        var o = SearchOrGenerate(thisitco);
 
                         if (o is System.Windows.Forms.Control c) {
                             unused.Remove(c);

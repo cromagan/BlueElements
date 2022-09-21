@@ -72,20 +72,24 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
     #region Methods
 
     public override Control? CreateControl(ConnectedFormulaView parent) {
-        var c3 = new Controls.TabControl();
-        c3.Tag = Internal;
+        var con = new Controls.TabControl();
+        con.Name = DefaultItemToControlName();
 
-        //CreateTabs(c3);
+        //CreateTabs(con);
 
         if (GetRowFrom is ICalculateOneRowItemLevel rfw2) {
-            var ff = parent.SearchOrGenerate((BasicPadItem)rfw2);
-            if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(c3); }
+            var ff = parent.SearchOrGenerate(rfw2);
+            if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(con); }
         }
 
-        return c3;
+        return con;
     }
 
     public void CreateTabs(Controls.TabControl c3, string? myGroup, string? myName) {
+        // Eigentlich überpowert die Routine.
+        // Sie checkt und aktualisiert die Tabs.
+        // Da der Versioncheck aber verlangt, dass immer das tab-Control gelöscht und neu erstellt wird
+        // ist das eigentlich nicht nötig
 
         #region  Tabs erstellen
 
@@ -268,6 +272,7 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
 
     private void Childs_ListOrItemChanged(object sender, System.EventArgs e) {
         OnChanged();
+        RaiseVersion();
     }
 
     private void NotAllowedChilds_Changed(object sender, System.EventArgs e) {

@@ -31,7 +31,7 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollection;
 
-public class ConstantTextPaditem : FixedRectanglePadItem, IReadableText, IContentHolder, IItemToControl {
+public class ConstantTextPaditem : CustomizableShowPadItem, IReadableText, IContentHolder, IItemToControl {
 
     #region Fields
 
@@ -49,7 +49,7 @@ public class ConstantTextPaditem : FixedRectanglePadItem, IReadableText, IConten
 
     public ConstantTextPaditem(string intern, string text) : base(intern) {
         _text = text;
-        Size = new Size(150, 24);
+        //Size = new Size(150, 24);
     }
 
     public ConstantTextPaditem(string intern) : this(intern, string.Empty) { }
@@ -63,6 +63,7 @@ public class ConstantTextPaditem : FixedRectanglePadItem, IReadableText, IConten
         set {
             if (_text == value) { return; }
             _text = value;
+            RaiseVersion();
             OnChanged();
         }
     }
@@ -73,19 +74,19 @@ public class ConstantTextPaditem : FixedRectanglePadItem, IReadableText, IConten
 
     #region Methods
 
-    public Control? CreateControl(ConnectedFormulaView parent) {
-        var c3 = new FlexiControl();
-        c3.Width = 100;
-        c3.Height = 16;
+    public override Control? CreateControl(ConnectedFormulaView parent) {
+        var con = new FlexiControl();
+        con.Width = 100;
+        con.Height = 16;
 
-        c3.CaptionPosition = ÜberschriftAnordnung.ohne;
+        con.CaptionPosition = ÜberschriftAnordnung.ohne;
 
-        c3.EditType = EditTypeFormula.Textfeld;
-        c3.DisabledReason = "Konstanter Wert";
+        con.EditType = EditTypeFormula.Textfeld;
+        con.DisabledReason = "Konstanter Wert";
 
-        c3.ValueSet(Text, true, true);
-        c3.Tag = Internal;
-        return c3;
+        con.ValueSet(Text, true, true);
+        con.Name = DefaultItemToControlName();
+        return con;
     }
 
     public override List<GenericControl> GetStyleOptions() {

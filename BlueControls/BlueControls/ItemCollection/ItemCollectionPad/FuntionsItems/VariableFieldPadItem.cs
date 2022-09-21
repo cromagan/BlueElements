@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2022 Christian Peter
+// Copyright (con) 2022 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -37,8 +37,8 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
     #region Fields
 
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
-    private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Über_dem_Feld;
     private string _überschrift = string.Empty;
+    private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
     private string _variable = string.Empty;
 
     #endregion
@@ -52,11 +52,12 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
     #region Properties
 
     public ÜberschriftAnordnung CaptionPosition {
-        get => _überschiftanordung;
+        get => _überschriftanordung;
         set {
-            if (_überschiftanordung == value) { return; }
-            _überschiftanordung = value;
+            if (_überschriftanordung == value) { return; }
+            _überschriftanordung = value;
             OnChanged();
+            RaiseVersion();
         }
     }
 
@@ -66,6 +67,7 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
             if (_überschrift == value) { return; }
             _überschrift = value;
             OnChanged();
+            RaiseVersion();
         }
     }
 
@@ -76,6 +78,7 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
             if (_variable == value) { return; }
             _variable = value;
             OnChanged();
+            RaiseVersion();
         }
     }
 
@@ -84,22 +87,22 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
     #region Methods
 
     public override System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
-        var c = new FlexiControl();
-        c.Caption = Überschrift + ":";
-        c.EditType = _bearbeitung;
-        c.CaptionPosition = CaptionPosition;
-        c.Tag = Internal;
-        c.OriginalText = _variable;
+        var con = new FlexiControl();
+        con.Caption = Überschrift + ":";
+        con.EditType = _bearbeitung;
+        con.CaptionPosition = CaptionPosition;
+        con.Name = DefaultItemToControlName();
+        con.OriginalText = _variable;
         if (GetRowFrom is ICalculateOneRowItemLevel rfw2) {
-            var ff = parent.SearchOrGenerate((BasicPadItem)rfw2);
+            var ff = parent.SearchOrGenerate(rfw2);
 
-            if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(c); }
-            c.DisabledReason = "Dieser Wert ist nur eine Anzeige.";
+            if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(con); }
+            con.DisabledReason = "Dieser Wert ist nur eine Anzeige.";
         } else {
-            c.DisabledReason = "Keine gültige Verknüpfung";
+            con.DisabledReason = "Keine gültige Verknüpfung";
         }
 
-        return c;
+        return con;
     }
 
     public override List<GenericControl> GetStyleOptions() {
@@ -136,7 +139,7 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
                 return true;
 
             case "caption":
-                _überschiftanordung = (ÜberschriftAnordnung)IntParse(value);
+                _überschriftanordung = (ÜberschriftAnordnung)IntParse(value);
                 return true;
 
             case "captiontext":
@@ -166,7 +169,7 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
         t = t + "Variable=" + _variable.ToNonCritical() + ", ";
 
         t = t + "EditType=" + ((int)_bearbeitung).ToString() + ", ";
-        t = t + "Caption=" + ((int)_überschiftanordung).ToString() + ", ";
+        t = t + "Caption=" + ((int)_überschriftanordung).ToString() + ", ";
 
         return t.Trim(", ") + "}";
     }

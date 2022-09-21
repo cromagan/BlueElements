@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2022 Christian Peter
+// Copyright (con) 2022 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -35,20 +35,26 @@ using BlueControls.ConnectedFormula;
 
 namespace BlueControls.ItemCollection;
 
-public class RowWithFilterPaditem : RectanglePadItem, IReadableText, IAcceptAndSends, ICalculateOneRowItemLevel, IItemToControl {
+public class RowWithFilterPaditem : RectanglePadItemWithVersion, IReadableText, IAcceptAndSends, ICalculateOneRowItemLevel, IItemToControl {
 
     #region Fields
 
     public static BlueFont? CellFont = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
+
     public static BlueFont? ChapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard);
+
     public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
 
     public readonly Database FilterDefiniton;
 
     public Table? FilterTable;
+
     private string _anzeige = string.Empty;
+
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
+
     private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Über_dem_Feld;
+
     private string _überschrift = string.Empty;
 
     #endregion
@@ -154,11 +160,11 @@ public class RowWithFilterPaditem : RectanglePadItem, IReadableText, IAcceptAndS
     #region Methods
 
     public Control? CreateControl(ConnectedFormulaView parent) {
-        var c = new FlexiControlRowSelector(Database, Parent, FilterDefiniton, _überschrift, _anzeige);
-        c.EditType = _bearbeitung;
-        c.CaptionPosition = CaptionPosition;
-        c.Tag = Internal;
-        return c;
+        var con = new FlexiControlRowSelector(Database, Parent, FilterDefiniton, _überschrift, _anzeige);
+        con.EditType = _bearbeitung;
+        con.CaptionPosition = CaptionPosition;
+        con.Name = DefaultItemToControlName();
+        return con;
     }
 
     public override List<GenericControl> GetStyleOptions() {

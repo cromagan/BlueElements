@@ -312,6 +312,7 @@
     <Compile Include="Forms\Notification.Designer.cs">
       <DependentUpon>Notification.cs</DependentUpon>
     </Compile>
+    <Compile Include="ItemCollection\ItemCollectionPad\Abstract\RectanglePadItemWithVersion.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\EasyPicPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\TabFormulaPaditem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\CustomizableShowPadItem.cs" />
