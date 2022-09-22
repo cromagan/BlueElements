@@ -111,8 +111,8 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
 
     #region Methods
 
-    public override List<GenericControl> GetStyleOptions() {
-        List<GenericControl> l = new()
+    public override List<FlexiControl> GetStyleOptions() {
+        List<FlexiControl> l = new()
         {
             new FlexiControlForProperty<string>(() => Text, 5)
         };

@@ -328,8 +328,8 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     /// Gibt für das aktuelle Item das "Kontext-Menü" zurück.
     /// </summary>
     /// <returns></returns>
-    public virtual List<GenericControl> GetStyleOptions() {
-        List<GenericControl> l = new()
+    public virtual List<FlexiControl> GetStyleOptions() {
+        List<FlexiControl> l = new()
         {
             new FlexiControl(),
             new FlexiControlForProperty<string>(() => Gruppenzugehörigkeit),
@@ -504,9 +504,9 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
         return x;
     }
 
-    internal void AddLineStyleOption(List<GenericControl> l) => l.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(_parent.SheetStyle, true)));
+    internal void AddLineStyleOption(List<FlexiControl> l) => l.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(_parent.SheetStyle, true)));
 
-    internal void AddStyleOption(List<GenericControl> l) => l.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetFonts(_parent.SheetStyle)));
+    internal void AddStyleOption(List<FlexiControl> l) => l.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetFonts(_parent.SheetStyle)));
 
     internal BasicPadItem? Next() {
         var itemCount = _parent.IndexOf(this);

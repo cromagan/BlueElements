@@ -1755,7 +1755,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
         foreach (var thisExport in Export) {
             if (thisExport != null) {
                 if (thisExport.Typ == ExportTyp.EinzelnMitFormular) { e.BackGroundWork = true; return; }
-                if (DateTime.UtcNow.Subtract(thisExport.LastExportTimeUtc).TotalDays > thisExport.BackupInterval) { e.BackGroundWork = true; return; }
+                if (DateTime.UtcNow.Subtract(thisExport.LastExportTimeUtc).TotalDays > thisExport.BackupInterval * 50) { e.BackGroundWork = true; return; }
             }
         }
         return;

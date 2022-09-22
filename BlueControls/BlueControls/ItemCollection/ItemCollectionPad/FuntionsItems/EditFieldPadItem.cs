@@ -180,8 +180,8 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         return cy;
     }
 
-    public override List<GenericControl> GetStyleOptions() {
-        List<GenericControl> l = new();
+    public override List<FlexiControl> GetStyleOptions() {
+        List<FlexiControl> l = new();
 
         l.AddRange(base.GetStyleOptions());
         l.Add(new FlexiControlForProperty<string>(() => Spalte_wählen, ImageCode.Pfeil_Rechts));

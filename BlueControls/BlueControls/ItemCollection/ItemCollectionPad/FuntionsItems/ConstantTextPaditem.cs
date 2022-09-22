@@ -89,8 +89,8 @@ public class ConstantTextPaditem : CustomizableShowPadItem, IReadableText, ICont
         return con;
     }
 
-    public override List<GenericControl> GetStyleOptions() {
-        List<GenericControl> l = new();
+    public override List<FlexiControl> GetStyleOptions() {
+        List<FlexiControl> l = new();
         l.Add(new FlexiControlForProperty<string>(() => Text));
         return l;
     }

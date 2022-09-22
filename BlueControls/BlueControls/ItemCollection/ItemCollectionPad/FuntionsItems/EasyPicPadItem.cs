@@ -75,8 +75,8 @@ public class EasyPicPadItem : CustomizableShowPadItem, IItemToControl {
         return con;
     }
 
-    public override List<GenericControl> GetStyleOptions() {
-        List<GenericControl> l = new();
+    public override List<FlexiControl> GetStyleOptions() {
+        List<FlexiControl> l = new();
         l.AddRange(base.GetStyleOptions());
         l.Add(new FlexiControlForProperty<string>(() => Bild_Dateiname));
         return l;

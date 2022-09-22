@@ -150,19 +150,19 @@ public partial class PadEditor : PadEditorReadOnly {
     private void Pad_ClickedItemChanged(object sender, System.EventArgs e) {
         tabElementEigenschaften.Controls.Clear();
         if (Pad.LastClickedItem == null) { return; }
+
         var flexis = Pad.LastClickedItem.GetStyleOptions();
         if (flexis.Count == 0) { return; }
+
         var top = Skin.Padding;
         foreach (var thisFlexi in flexis) {
             if (thisFlexi != null && !thisFlexi.IsDisposed) {
                 tabElementEigenschaften.Controls.Add(thisFlexi);
-                //thisFlexi.DisabledReason = string.Empty;
                 thisFlexi.Left = Skin.Padding;
                 thisFlexi.Top = top;
                 thisFlexi.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
                 top = top + Skin.Padding + thisFlexi.Height;
                 thisFlexi.Width = tabElementEigenschaften.Width - (Skin.Padding * 4);
-                //ThisFlexi.ButtonClicked += FlexiButtonClick;
             }
         }
     }

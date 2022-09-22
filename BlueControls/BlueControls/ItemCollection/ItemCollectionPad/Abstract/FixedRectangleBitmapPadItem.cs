@@ -117,7 +117,7 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem, IDisp
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
-    //public override List<GenericControl> GetStyleOptions() {
+    //public override List<FlexiControl> GetStyleOptions() {
     //    List<FlexiControl> l = new()
     //    {
     //        new FlexiControl(),
