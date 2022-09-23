@@ -20,6 +20,7 @@ using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
+using System;
 using System.Drawing;
 using static BlueBasics.Converter;
 
@@ -148,7 +149,16 @@ public partial class PadEditor : PadEditorReadOnly {
     private void ckbRaster_CheckedChanged(object sender, System.EventArgs e) => Pad.Item.SnapMode = ckbRaster.Checked ? SnapMode.SnapToGrid : SnapMode.Ohne;
 
     private void Pad_ClickedItemChanged(object sender, System.EventArgs e) {
+        // FALLS ein PadEditor doppelt offen ist, kann ein Control Element aber nur
+        // einem Parent zugeordnet werden.
+        // Deswegen müssen die Element einzigartig sein (also extra für das Menü generiert werden)
+        // Und deswegen können sie auch disposed werden.
+
+        foreach (var thisControl in tabElementEigenschaften.Controls) {
+            if (thisControl is IDisposable d) { d.Dispose(); }
+        }
         tabElementEigenschaften.Controls.Clear();
+
         if (Pad.LastClickedItem == null) { return; }
 
         var flexis = Pad.LastClickedItem.GetStyleOptions();

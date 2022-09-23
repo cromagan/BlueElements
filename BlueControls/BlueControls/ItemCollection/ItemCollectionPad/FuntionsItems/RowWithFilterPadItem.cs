@@ -167,8 +167,8 @@ public class RowWithFilterPaditem : RectanglePadItemWithVersion, IReadableText, 
         return con;
     }
 
-    public override List<FlexiControl> GetStyleOptions() {
-        List<FlexiControl> l = new();
+    public override List<GenericControl> GetStyleOptions() {
+        List<GenericControl> l = new();
         if (Database == null) { return l; }
         l.Add(new FlexiControlForProperty<string>(() => Überschrift));
         l.Add(new FlexiControlForProperty<string>(() => Anzeige));

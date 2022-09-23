@@ -97,8 +97,8 @@ public class LinePadItem : BasicPadItem {
     //        Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
     //    }
     //}
-    public override List<FlexiControl> GetStyleOptions() {
-        List<FlexiControl> l = new();
+    public override List<GenericControl> GetStyleOptions() {
+        List<GenericControl> l = new();
         ItemCollectionList.ItemCollectionList verhalt = new()
         {
             { "Linie direkt zwischen zwei Punkten", ((int)ConectorStyle.Direct).ToString(), QuickImage.Get(ImageCode.Linie) },

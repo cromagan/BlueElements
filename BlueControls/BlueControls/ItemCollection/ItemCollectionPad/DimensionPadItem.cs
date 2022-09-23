@@ -167,8 +167,8 @@ public class DimensionPadItem : BasicPadItem {
                || Länge(new PointM(value), _textPoint) < ne * 10;
     }
 
-    public override List<FlexiControl> GetStyleOptions() {
-        List<FlexiControl> l = new()
+    public override List<GenericControl> GetStyleOptions() {
+        List<GenericControl> l = new()
         {
             new FlexiControlForProperty<float>(() => Länge_In_Mm),
             new FlexiControlForProperty<string>(() => Text_Oben),

@@ -19,12 +19,15 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.EventArgs;
+using BlueBasics.Interfaces;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
+using BlueControls.ItemCollection.ItemCollectionList;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -33,11 +36,8 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
 using System.Linq;
 using System.Windows.Forms;
-using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Geometry;
 using PageSetupDialog = BlueControls.Forms.PageSetupDialog;
-using BlueBasics.Interfaces;
-using BlueBasics.EventArgs;
 
 namespace BlueControls.Controls;
 

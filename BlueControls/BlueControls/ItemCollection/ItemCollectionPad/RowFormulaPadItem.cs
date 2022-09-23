@@ -113,8 +113,8 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
 
     #region Methods
 
-    public override List<FlexiControl> GetStyleOptions() {
-        List<FlexiControl> l = new()
+    public override List<GenericControl> GetStyleOptions() {
+        List<GenericControl> l = new()
         {
             new FlexiControlForProperty<string>(() => Datensatz_bearbeiten, ImageCode.Stift),
             new FlexiControl()

@@ -75,8 +75,8 @@ public class FileExplorerPadItem : CustomizableShowPadItem, IItemToControl {
         return con;
     }
 
-    public override List<FlexiControl> GetStyleOptions() {
-        List<FlexiControl> l = new();
+    public override List<GenericControl> GetStyleOptions() {
+        List<GenericControl> l = new();
         l.AddRange(base.GetStyleOptions());
         l.Add(new FlexiControlForProperty<string>(() => Pfad));
         return l;

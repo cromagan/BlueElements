@@ -56,7 +56,7 @@ public class SymbolPadItem : RectanglePadItem {
 
     #region Methods
 
-    public override List<FlexiControl> GetStyleOptions() {
+    public override List<GenericControl> GetStyleOptions() {
         ItemCollectionList.ItemCollectionList comms = new()
         {
             { "Ohne", ((int)Symbol.Ohne).ToString(), QuickImage.Get("Datei|32") },
@@ -65,7 +65,7 @@ public class SymbolPadItem : RectanglePadItem {
             { "Pfeil", ((int)Symbol.Pfeil).ToString(), QuickImage.Get("Pfeil_Rechts|32") },
             { "Bruchlinie", ((int)Symbol.Bruchlinie).ToString() }
         };
-        List<FlexiControl> l = new()
+        List<GenericControl> l = new()
         {
             new FlexiControlForProperty<Symbol>(() => Symbol, comms),
             new FlexiControlForProperty<float>(() => Randdicke),

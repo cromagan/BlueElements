@@ -19,18 +19,18 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.EventArgs;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.ItemCollection;
+using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
-using BlueBasics.EventArgs;
 
 namespace BlueControls.BlueDatabaseDialogs;
 

@@ -23,14 +23,14 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
+using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using BlueControls.ItemCollection.ItemCollectionList;
-using static BlueBasics.Converter;
 using System.Drawing;
+using System.Linq;
+using static BlueBasics.Converter;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -254,70 +254,70 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
     private void sFilter_ItemClicked(object sender, BasicListItemEventArgs e) {
         switch (e.Item.Internal.ToLower()) {
             case "filterleere": {
-                CloseAndDispose("Filter", new FilterItem(_column, FilterType.Istgleich | FilterType.MultiRowIgnorieren, ""));
-                break;
-            }
+                    CloseAndDispose("Filter", new FilterItem(_column, FilterType.Istgleich | FilterType.MultiRowIgnorieren, ""));
+                    break;
+                }
 
             case "filternichtleere": {
-                CloseAndDispose("Filter", new FilterItem(_column, FilterType.Ungleich_MultiRowIgnorieren, ""));
-                break;
-            }
+                    CloseAndDispose("Filter", new FilterItem(_column, FilterType.Ungleich_MultiRowIgnorieren, ""));
+                    break;
+                }
 
             case "clipboard": {
-                CloseAndDispose("DoClipboard", null);
-                break;
-            }
+                    CloseAndDispose("DoClipboard", null);
+                    break;
+                }
 
             case "nichtclipboard": {
-                CloseAndDispose("DoNotClipboard", null);
-                break;
-            }
+                    CloseAndDispose("DoNotClipboard", null);
+                    break;
+                }
 
             case "filterlöschen": {
-                CloseAndDispose("FilterDelete", null);
-                break;
-            }
+                    CloseAndDispose("FilterDelete", null);
+                    break;
+                }
 
             case "modusmultiund": {
-                ChangeToMultiUnd();
-                break;
-            }
+                    ChangeToMultiUnd();
+                    break;
+                }
 
             case "modusmultioder": {
-                ChangeToMultiOder();
-                break;
-            }
+                    ChangeToMultiOder();
+                    break;
+                }
 
             case "modusnegativ": {
-                _negativAuswahl = true;
-                _multiAuswahlUnd = false;
-                _multiAuswahlOder = false;
-                lsbStandardFilter.Item["FilterLeere"].Enabled = false;
-                lsbStandardFilter.Item["FilterNichtLeere"].Enabled = false;
-                lsbStandardFilter.Item["Clipboard"].Enabled = false;
-                lsbStandardFilter.Item["ModusMultiUnd"].Enabled = false;
-                lsbStandardFilter.Item["ModusMultiOder"].Enabled = false;
-                break;
-            }
+                    _negativAuswahl = true;
+                    _multiAuswahlUnd = false;
+                    _multiAuswahlOder = false;
+                    lsbStandardFilter.Item["FilterLeere"].Enabled = false;
+                    lsbStandardFilter.Item["FilterNichtLeere"].Enabled = false;
+                    lsbStandardFilter.Item["Clipboard"].Enabled = false;
+                    lsbStandardFilter.Item["ModusMultiUnd"].Enabled = false;
+                    lsbStandardFilter.Item["ModusMultiOder"].Enabled = false;
+                    break;
+                }
 
             case "einzigartig": {
-                CloseAndDispose("DoEinzigartig", null);
-                break;
-            }
+                    CloseAndDispose("DoEinzigartig", null);
+                    break;
+                }
 
             case "nichteinzigartig": {
-                CloseAndDispose("DoNichtEinzigartig", null);
-                break;
-            }
+                    CloseAndDispose("DoNichtEinzigartig", null);
+                    break;
+                }
 
             case "spaltenvergleich": {
-                CloseAndDispose("DoSpaltenvergleich", null);
-                break;
-            }
+                    CloseAndDispose("DoSpaltenvergleich", null);
+                    break;
+                }
             default: {
-                Develop.DebugPrint("Unbekannter Filter: " + e.Item.Internal);
-                break;
-            }
+                    Develop.DebugPrint("Unbekannter Filter: " + e.Item.Internal);
+                    break;
+                }
         }
     }
 

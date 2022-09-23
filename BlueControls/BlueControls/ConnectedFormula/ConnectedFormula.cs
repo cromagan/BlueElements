@@ -17,19 +17,19 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.EventArgs;
+using BlueBasics.Interfaces;
+using BlueControls.ItemCollection;
+using BlueDatabase;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using static BlueBasics.Develop;
-using BlueDatabase;
-using BlueBasics;
 using static BlueBasics.Converter;
-using BlueBasics.Interfaces;
-using BlueControls.ItemCollection;
+using static BlueBasics.Develop;
 using static BlueBasics.FileOperations;
-using BlueBasics.EventArgs;
 
 namespace BlueControls.ConnectedFormula;
 

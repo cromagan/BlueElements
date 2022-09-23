@@ -123,8 +123,8 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
 
     #region Methods
 
-    public override List<FlexiControl> GetStyleOptions() {
-        List<FlexiControl> l = new()
+    public override List<GenericControl> GetStyleOptions() {
+        List<GenericControl> l = new()
         {
             new FlexiControlForProperty<string>(() => Bildschirmbereich_wählen, ImageCode.Bild),
             new FlexiControlForProperty<string>(() => Datei_laden, ImageCode.Ordner),

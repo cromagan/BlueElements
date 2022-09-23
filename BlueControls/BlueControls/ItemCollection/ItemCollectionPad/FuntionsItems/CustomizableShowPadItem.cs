@@ -225,8 +225,8 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
 
     public virtual Control? CreateControl(ConnectedFormulaView parent) => throw new NotImplementedException();
 
-    public override List<FlexiControl> GetStyleOptions() {
-        List<FlexiControl> l = new();
+    public override List<GenericControl> GetStyleOptions() {
+        List<GenericControl> l = new();
         l.Add(new FlexiControlForProperty<string>(() => Datenquelle_wählen, ImageCode.Pfeil_Rechts));
         l.Add(new FlexiControlForProperty<string>(() => Datenbank));
 

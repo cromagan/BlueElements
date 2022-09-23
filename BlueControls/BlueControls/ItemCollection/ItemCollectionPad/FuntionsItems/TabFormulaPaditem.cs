@@ -151,8 +151,8 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
         #endregion
     }
 
-    public override List<FlexiControl> GetStyleOptions() {
-        List<FlexiControl> l = new();
+    public override List<GenericControl> GetStyleOptions() {
+        List<GenericControl> l = new();
 
         UpdateList();
         l.AddRange(base.GetStyleOptions());
