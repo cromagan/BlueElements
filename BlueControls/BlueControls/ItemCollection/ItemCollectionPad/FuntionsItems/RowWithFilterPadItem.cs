@@ -19,19 +19,19 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
+using BlueControls.ConnectedFormula;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueControls.Interfaces;
 using BlueDatabase;
+using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using BlueBasics.Interfaces;
 using System.ComponentModel;
-using BlueDatabase.Enums;
-using static BlueBasics.Converter;
-using BlueControls.Interfaces;
+using System.Drawing;
 using System.Windows.Forms;
-using BlueControls.ConnectedFormula;
+using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
 
@@ -46,8 +46,6 @@ public class RowWithFilterPaditem : RectanglePadItemWithVersion, IReadableText, 
     public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
 
     public readonly Database FilterDefiniton;
-
-    public Table? FilterTable;
 
     private string _anzeige = string.Empty;
 
@@ -68,19 +66,8 @@ public class RowWithFilterPaditem : RectanglePadItemWithVersion, IReadableText, 
 
         Id = id;
 
-        FilterTable = new Table();
-        FilterTable.DropMessages = false;
-        FilterTable.ShowWaitScreen = true;
-        FilterTable.Size = new Size(968, 400);
-
         FilterDefiniton = GenerateFilterDatabase();
-        FilterTable.DatabaseSet(FilterDefiniton, string.Empty);
-
-        FilterTable.Arrangement = 1;
-
         FilterDefiniton.Cell.CellValueChanged += Cell_CellValueChanged;
-        FilterTable.ContextMenuInit += FilterTable_ContextMenuInit;
-        FilterTable.ContextMenuItemClicked += Filtertable_ContextMenuItemClicked;
     }
 
     public RowWithFilterPaditem(string intern) : this(intern, null, 0) { }
@@ -167,45 +154,39 @@ public class RowWithFilterPaditem : RectanglePadItemWithVersion, IReadableText, 
         return con;
     }
 
+    public Table FilterTable() {
+        var FilterTable = new Table();
+        FilterTable.DropMessages = false;
+        FilterTable.ShowWaitScreen = true;
+        FilterTable.Size = new Size(968, 400);
+
+        FilterTable.DatabaseSet(FilterDefiniton, string.Empty);
+
+        FilterTable.Arrangement = 1;
+        FilterTable.ContextMenuInit += FilterTable_ContextMenuInit;
+        FilterTable.ContextMenuItemClicked += Filtertable_ContextMenuItemClicked;
+        FilterTable.Disposed += FilterTable_Disposed;
+
+        return FilterTable;
+    }
+
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
         if (Database == null) { return l; }
         l.Add(new FlexiControlForProperty<string>(() => Überschrift));
         l.Add(new FlexiControlForProperty<string>(() => Anzeige));
-        //l.Add(new FlexiControlForProperty<String>(() => Variable));
 
         var u = new ItemCollection.ItemCollectionList.ItemCollectionList();
         u.AddRange(typeof(ÜberschriftAnordnung));
         l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
-        //var b = new ItemCollection.ItemCollectionList.ItemCollectionList();
-        //b.AddRange(typeof(EditTypeFormula));
-        //l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
         l.Add(new FlexiControl());
 
-        //l.Add(new FlexiControlForProperty<string>(() => Database.Caption));
-        //l.Add(new FlexiControlForProperty(Database, "Caption"));
         l.Add(new FlexiControlForProperty<string>(() => Datenbankkopf, ImageCode.Datenbank));
-        //l.Add(new FlexiControlForProperty(()=> this.Datenbankkopf"));
-        //l.Add(new FlexiControl());
-        //l.Add(new FlexiControlForProperty<string>(() => VerbindungsID));
-        //l.Add(new FlexiControl());
 
         FilterDatabaseUpdate();
         l.Add(new FlexiControlForProperty<string>(() => Filter_hinzufügen, ImageCode.PlusZeichen));
-        l.Add(FilterTable);
+        l.Add(FilterTable());
 
-        //l.Add(new FlexiControl());
-        //l.Add(new FlexiControlForProperty<string>(() => Column.Ueberschrift1"));
-        //l.Add(new FlexiControlForProperty<string>(() => Column.Ueberschrift2"));
-        //l.Add(new FlexiControlForProperty<string>(() => Column.Ueberschrift3"));
-        //l.Add(new FlexiControl());
-        //l.Add(new FlexiControlForProperty(Database.t, "Quickinfo"));
-        //l.Add(new FlexiControlForProperty<string>(() => Column.AdminInfo"));
-
-        //if (AdditionalStyleOptions != null) {
-        //    l.Add(new FlexiControl());
-        //    l.AddRange(AdditionalStyleOptions);
-        //}
 
         return l;
     }
@@ -229,10 +210,6 @@ public class RowWithFilterPaditem : RectanglePadItemWithVersion, IReadableText, 
             case "database":
                 Database = Database.GetByFilename(value.FromNonCritical(), false, false);
                 return true;
-
-            //case "connectionid":
-            //    VerbindungsID = value.FromNonCritical();
-            //    return true;
 
             case "id":
                 Id = IntParse(value);
@@ -259,9 +236,6 @@ public class RowWithFilterPaditem : RectanglePadItemWithVersion, IReadableText, 
             case "showformat":
                 _anzeige = value.FromNonCritical();
                 return true;
-                //case "variable":
-                //    _variable = value.FromNonCritical();
-                //    return true;
         }
         return false;
     }
@@ -293,8 +267,6 @@ public class RowWithFilterPaditem : RectanglePadItemWithVersion, IReadableText, 
             t = t + "Database=" + Database.Filename.ToNonCritical() + ", ";
         }
 
-        //t = t + "ConnectionID=" + VerbindungsID.ToNonCritical() + ", ";
-
         if (FilterDefiniton != null) {
             t = t + "FilterDB=" + FilterDefiniton.Export_CSV(FirstRow.ColumnInternalName, (List<ColumnItem>)null, null).ToNonCritical() + ", ";
         }
@@ -309,8 +281,6 @@ public class RowWithFilterPaditem : RectanglePadItemWithVersion, IReadableText, 
 
         if (disposing) {
             FilterDefiniton.Cell.CellValueChanged -= Cell_CellValueChanged;
-            FilterTable.ContextMenuInit -= FilterTable_ContextMenuInit;
-            FilterTable.ContextMenuItemClicked -= Filtertable_ContextMenuItemClicked;
         }
     }
 
@@ -428,10 +398,16 @@ public class RowWithFilterPaditem : RectanglePadItemWithVersion, IReadableText, 
         }
     }
 
+    private void FilterTable_Disposed(object sender, System.EventArgs e) {
+        if (sender is Table t) {
+            t.ContextMenuInit -= FilterTable_ContextMenuInit;
+            t.ContextMenuItemClicked -= Filtertable_ContextMenuItemClicked;
+            t.Disposed += FilterTable_Disposed;
+        }
+    }
+
     private Database GenerateFilterDatabase() {
         Database x = new(false);
-        //x.Column.Add("count", "count", VarType.Integer);
-        //var vis = x.Column.Add("visible", "visible", VarType.Bit);
         var sp = x.Column.Add("Spalte", "Spalte", VarType.Text);
         sp.Align = AlignmentHorizontal.Rechts;
 
@@ -442,17 +418,14 @@ public class RowWithFilterPaditem : RectanglePadItemWithVersion, IReadableText, 
         fa.DropdownBearbeitungErlaubt = true;
         fa.DropDownItems.Add("=");
         fa.DropDownItems.Add("=!empty");
-        //fa.DropDownItems.Add("x");
         fa.OpticalReplace.Add("=|ist (GK egal)");
         fa.OpticalReplace.Add("=!empty|wenn nicht leer, ist");
-        //fa.OpticalReplace.Add("x|LÖSCHEN");
 
         var b1 = x.Column.Add("suchsym", " ", VarType.Text);
         b1.BildTextVerhalten = BildTextVerhalten.Nur_Bild;
         b1.ScriptType = ScriptType.String;
 
         var b = x.Column.Add("suchtxt", "Suchtext", VarType.Text);
-        //            //b.Quickinfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum suchen<br>Mischen wird nicht unterstützt.";
         b.MultiLine = false;
         b.TextBearbeitungErlaubt = false;
         b.DropdownAllesAbwählenErlaubt = true;
@@ -463,7 +436,6 @@ public class RowWithFilterPaditem : RectanglePadItemWithVersion, IReadableText, 
 
         x.RepairAfterParse(null, null);
         x.ColumnArrangements[1].ShowAllColumns();
-        //x.ColumnArrangements[1].Hide("visible");
         x.ColumnArrangements[1].HideSystemColumns();
         x.SortDefinition = new RowSortDefinition(x, "Spalte", false);
 

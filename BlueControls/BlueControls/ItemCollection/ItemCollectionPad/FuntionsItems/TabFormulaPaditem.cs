@@ -18,17 +18,17 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.MultiUserFile;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueControls.Forms;
+using BlueControls.Interfaces;
+using BlueControls.ItemCollection.ItemCollectionList;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using BlueControls.Interfaces;
 using System.Windows.Forms;
-using BlueControls.Forms;
-using BlueControls.ItemCollection.ItemCollectionList;
-using BlueBasics.MultiUserFile;
-using BlueBasics.Enums;
 
 namespace BlueControls.ItemCollection;
 
@@ -39,7 +39,7 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
     public static BlueFont? CellFont = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
     public static BlueFont? ChapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard);
     public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
-    public Controls.ListBox Childs = new();
+    private readonly List<string> _childs = new();
 
     private ConnectedFormula.ConnectedFormula? _cf;
 
@@ -54,9 +54,6 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
         if (_cf != null) {
             _cf.NotAllowedChilds.Changed += NotAllowedChilds_Changed;
         }
-        Childs.ListOrItemChanged += Childs_ListOrItemChanged;
-        Childs.ContextMenuInit += Childs_ContextMenuInit;
-        Childs.ContextMenuItemClicked += Childs_ContextMenuItemClicked;
     }
 
     public TabFormulaPaditem(string intern) : this(intern, null) { }
@@ -75,8 +72,6 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
         var con = new Controls.TabControl();
         con.Name = DefaultItemToControlName();
 
-        //CreateTabs(con);
-
         if (GetRowFrom is ICalculateOneRowItemLevel rfw2) {
             var ff = parent.SearchOrGenerate(rfw2);
             if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(con); }
@@ -93,26 +88,26 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
 
         #region  Tabs erstellen
 
-        foreach (var thisc in Childs.Item) {
+        foreach (var thisc in _childs) {
             ConnectedFormula.ConnectedFormula? cf;
             string pg;
             string pgvis;
 
-            if (thisc.Internal.EndsWith(".cfo", StringComparison.OrdinalIgnoreCase)) {
-                cf = ConnectedFormula.ConnectedFormula.GetByFilename(thisc.Internal);
+            if (thisc.EndsWith(".cfo", StringComparison.OrdinalIgnoreCase)) {
+                cf = ConnectedFormula.ConnectedFormula.GetByFilename(thisc);
                 pg = "Head";
                 pgvis = string.Empty;
             } else {
                 cf = _cf;
-                pg = thisc.Internal;
-                pgvis = thisc.Internal;
+                pg = thisc;
+                pgvis = thisc;
             }
 
             TabPage? existTab = null;
 
             foreach (var thisTab in c3.TabPages) {
                 if (thisTab is TabPage tb) {
-                    if (tb.Name == thisc.Internal.FileNameWithoutSuffix()) {
+                    if (tb.Name == thisc.FileNameWithoutSuffix()) {
                         existTab = tb;
                         break;
                     }
@@ -123,14 +118,13 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
                 if (cf.HasVisibleItemsForMe(pgvis, myGroup, myName)) {
                     if (existTab == null) {
                         var t = new TabPage();
-                        t.Name = thisc.Internal.FileNameWithoutSuffix();
-                        t.Text = thisc.Internal.FileNameWithoutSuffix();
+                        t.Name = thisc.FileNameWithoutSuffix();
+                        t.Text = thisc.FileNameWithoutSuffix();
                         c3.TabPages.Add(t);
 
                         var cc = new ConnectedFormulaView(pg);
                         t.Controls.Add(cc);
                         cc.ConnectedFormula = cf;
-                        //cc.Page = pg;
                         cc.Dock = DockStyle.Fill;
                     }
                 } else {
@@ -153,10 +147,8 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
 
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
-
-        UpdateList();
         l.AddRange(base.GetStyleOptions());
-        l.Add(Childs);
+        l.Add(Childs());
 
         return l;
     }
@@ -169,30 +161,23 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
                 if (_cf != null) {
                     _cf.NotAllowedChilds.Changed += NotAllowedChilds_Changed;
                 }
-                //_path = value.FromNonCritical();
                 return true;
 
             case "path":
-                //_path = value.FromNonCritical();
                 return true;
 
             case "childs":
                 var tmp = value.FromNonCritical().SplitAndCutBy("|");
-                Childs.Item.Clear();
-                Childs.Item.AddRange(tmp);
+                _childs.Clear();
+                _childs.AddRange(tmp);
                 return true;
 
             case "notallowedchilds":
-                //var tmp2 = value.FromNonCritical().SplitAndCutBy("|");
-                //NotAllowedChilds.Clear();
-                //NotAllowedChilds.AddRange(tmp2);
                 return true;
         }
         return false;
     }
 
-    //    return false;
-    //}
     public override string ToString() {
         var t = base.ToString();
         t = t.Substring(0, t.Length - 1) + ", ";
@@ -200,14 +185,10 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
         if (_cf != null) {
             t = t + "Parent=" + _cf.Filename.ToNonCritical() + ", ";
         }
-        //t = t + "Path=" + _path.ToNonCritical() + ", ";
-        t = t + "Childs=" + Childs.Item.ToListOfString().JoinWith("|").ToNonCritical() + ", ";
-        //t = t + "NotAllowedChilds=" + NotAllowedChilds.JoinWith("|").ToNonCritical() + ", ";
+        t = t + "Childs=" + _childs.JoinWith("|").ToNonCritical() + ", ";
         return t.Trim(", ") + "}";
     }
 
-    //public bool IsRecursiveWith(IRecursiveCheck obj) {
-    //    if (obj == this) { return true; }
     protected override string ClassId() => "FI-ChildFormula";
 
     protected override void Dispose(bool disposing) {
@@ -215,28 +196,24 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
             if (_cf != null) {
                 _cf.NotAllowedChilds.Changed -= NotAllowedChilds_Changed;
             }
-
-            Childs.ListOrItemChanged -= Childs_ListOrItemChanged;
-            Childs.ContextMenuInit -= Childs_ContextMenuInit;
-            Childs.ContextMenuItemClicked -= Childs_ContextMenuItemClicked;
         }
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         //DrawColorScheme(gr, positionModified, zoom, Id);
-        //s
+
         var headh = 25 * zoom;
         var headb = 70 * zoom;
 
         var body = positionModified with { Y = positionModified.Y + headh, Height = positionModified.Height - headh };
         var c = -1;
-        foreach (var thisC in Childs.Item) {
+        foreach (var thisC in _childs) {
             c++;
             var it = new RectangleF(positionModified.X + c * headb, positionModified.Y, headb, headh);
 
             gr.FillRectangle(new SolidBrush(Color.FromArgb(255, 200, 200, 200)), it);
 
-            Skin.Draw_FormatedText(gr, thisC.Internal.FileNameWithoutSuffix(), null, Alignment.Horizontal_Vertical_Center, it.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
+            Skin.Draw_FormatedText(gr, thisC.FileNameWithoutSuffix(), null, Alignment.Horizontal_Vertical_Center, it.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
             gr.DrawRectangle(new Pen(Color.Black, zoom), it);
         }
 
@@ -255,6 +232,46 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
         return null;
     }
 
+    private Controls.ListBox Childs() {
+        var childs = new Controls.ListBox();
+
+        childs.AddAllowed = AddType.OnlySuggests;
+        childs.RemoveAllowed = true;
+        childs.MoveAllowed = true;
+        childs.Suggestions.Clear();
+
+        if (_cf != null && System.IO.File.Exists(_cf.Filename)) {
+            foreach (var thisf in System.IO.Directory.GetFiles(_cf.Filename.FilePath(), "*.cfo")) {
+                if (!_cf.NotAllowedChilds.Contains(thisf)) {
+                    childs.Suggestions.Add(thisf, ImageCode.Diskette);
+                }
+            }
+        }
+
+        if (_cf != null && _cf.PadData != null) {
+            foreach (var thisf in _cf.PadData.AllPages()) {
+                if (!_cf.NotAllowedChilds.Contains(thisf) && !string.Equals("Head", thisf, StringComparison.OrdinalIgnoreCase)) {
+                    childs.Suggestions.Add(thisf, ImageCode.Formel);
+                }
+            }
+        }
+
+        foreach (var thisf in _childs) {
+            if (System.IO.File.Exists(thisf)) {
+                childs.Item.Add(thisf, ImageCode.Diskette);
+            } else {
+                childs.Item.Add(thisf, ImageCode.Formel);
+            }
+        }
+
+        childs.ListOrItemChanged += Childs_ListOrItemChanged;
+        childs.ContextMenuInit += Childs_ContextMenuInit;
+        childs.ContextMenuItemClicked += Childs_ContextMenuItemClicked;
+        childs.Disposed += Childs_Disposed;
+
+        return childs;
+    }
+
     private void Childs_ContextMenuInit(object sender, EventArgs.ContextMenuInitEventArgs e) {
         e.UserMenu.Add(ContextMenuComands.Bearbeiten);
     }
@@ -270,42 +287,28 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
         }
     }
 
+    private void Childs_Disposed(object sender, System.EventArgs e) {
+        if (sender is Controls.ListBox childs) {
+            childs.ListOrItemChanged -= Childs_ListOrItemChanged;
+            childs.ContextMenuInit -= Childs_ContextMenuInit;
+            childs.ContextMenuItemClicked -= Childs_ContextMenuItemClicked;
+            childs.Disposed -= Childs_Disposed;
+        }
+    }
+
     private void Childs_ListOrItemChanged(object sender, System.EventArgs e) {
+        _childs.Clear();
+        _childs.AddRange(((Controls.ListBox)sender).Item.ToListOfString());
         OnChanged();
         RaiseVersion();
     }
 
     private void NotAllowedChilds_Changed(object sender, System.EventArgs e) {
-        UpdateList();
-
         foreach (var thisl in _cf.NotAllowedChilds) {
-            Childs.Item.Remove(thisl);
+            _childs.Remove(thisl);
         }
 
         OnChanged();
-    }
-
-    private void UpdateList() {
-        Childs.AddAllowed = AddType.OnlySuggests;
-        Childs.RemoveAllowed = true;
-        Childs.MoveAllowed = true;
-        Childs.Suggestions.Clear();
-
-        if (_cf != null && System.IO.File.Exists(_cf.Filename)) {
-            foreach (var thisf in System.IO.Directory.GetFiles(_cf.Filename.FilePath(), "*.cfo")) {
-                if (!_cf.NotAllowedChilds.Contains(thisf)) {
-                    Childs.Suggestions.Add(thisf, ImageCode.Diskette);
-                }
-            }
-        }
-
-        if (_cf != null && _cf.PadData != null) {
-            foreach (var thisf in _cf.PadData.AllPages()) {
-                if (!_cf.NotAllowedChilds.Contains(thisf) && !string.Equals("Head", thisf, StringComparison.OrdinalIgnoreCase)) {
-                    Childs.Suggestions.Add(thisf, ImageCode.Formel);
-                }
-            }
-        }
     }
 
     #endregion

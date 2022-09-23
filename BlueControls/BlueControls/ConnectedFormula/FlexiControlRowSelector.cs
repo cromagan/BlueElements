@@ -73,11 +73,6 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         ParentCol = parent;
         Database = database;
         FilterDefiniton = filterdef;
-        //VerbindungsId = verbindungsId;
-
-        //if (!string.IsNullOrEmpty(verbindungsId)) {
-        //    RemoveSameID(verbindungsId);
-        //}
 
         AllConnectors.Add(this);
 
@@ -178,7 +173,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         if (string.IsNullOrEmpty(Value)) {
             Row = null;
         } else {
-            Row = Database.Row.SearchByKey(LongParse(Value));
+            Row = Database?.Row.SearchByKey(LongParse(Value));
         }
     }
 
@@ -213,7 +208,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
                 #region Column ermitteln
 
-                var column = Database.Column.SearchByKey(thisR.CellGetInteger("Spalte"));
+                var column = Database?.Column.SearchByKey(thisR.CellGetInteger("Spalte"));
 
                 #endregion
 
@@ -321,7 +316,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
             #region Zeile(n) ermitteln und Script löschen
 
-            _rows = Database.Row.CalculateFilteredRows(f);
+            _rows = Database?.Row.CalculateFilteredRows(f);
 
             Script = null;
 
@@ -372,16 +367,6 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         CalculateRows();
     }
 
-    //private void RemoveSameID(string verbindungsId) {
-    //    foreach (var thisConnector in AllConnectors) {
-    //        if (thisConnector.VerbindungsId == verbindungsId) {
-    //            AllConnectors.Remove(thisConnector);
-    //            RemoveSameID(verbindungsId);
-    //            return;
-    //        }
-    //    }
-    //}
-
     private void UpdateMyCollection() {
         if (IsDisposed) { return; }
         if (!Allinitialized) { CreateSubControls(); }
@@ -395,12 +380,6 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
         #endregion
 
-        //if (!string.IsNullOrEmpty(VerbindungsId) && FilterDefiniton.Row.Count == 0) {
-        //    DisabledReason = "Wert wird ferngesteuert.";
-        //    cb?.Item.Clear();
-        //    return;
-        //}
-
         if (cb == null) { return; }
 
         List<BasicListItem> ex = new();
@@ -410,9 +389,9 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
         if (_rows != null) {
             foreach (var thisR in _rows) {
-                if (cb.Item[thisR.Key.ToString()] == null) {
+                if (cb?.Item?[thisR.Key.ToString()] == null) {
                     var tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, true);
-                    cb.Item.Add(tmpQuickInfo, thisR.Key.ToString());
+                    cb?.Item?.Add(tmpQuickInfo, thisR.Key.ToString());
                     //cb.Item.Add(thisR, string.Empty);
                 } else {
                     foreach (var thisIt in ex) {
@@ -430,7 +409,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         #region Veraltete Zeilen entfernen
 
         foreach (var thisit in ex) {
-            cb.Item.Remove(thisit);
+            cb?.Item?.Remove(thisit);
         }
 
         #endregion
