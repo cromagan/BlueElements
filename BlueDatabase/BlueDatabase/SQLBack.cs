@@ -450,6 +450,7 @@ public class SqlBack {
         if (t == ((int)type).ToString()) { return true; }
 
         if (type == DatabaseDataType.AddColumn) { return true; }
+        if (type == DatabaseDataType.AutoExport) { return true; }
 
         columnName = columnName.ToUpper();
 

@@ -688,10 +688,10 @@ public sealed class MultiUserFile : IDisposableExtended {
         if (_checkerTickCount < 0) { return; }
 
         // Ausstehende Arbeiten ermittelen
-        var editable = string.IsNullOrEmpty(ErrorReason(Enums.ErrorReason.EditNormaly));
+
         var mustReload = ReloadNeeded;
-        var mustSave = editable && OnHasPendingChanges();
-        var mustBackup = editable && OnIsThereBackgroundWorkToDo();
+        var mustSave = OnHasPendingChanges();
+        var mustBackup = OnIsThereBackgroundWorkToDo();
         if (!mustReload && !mustSave && !mustBackup) {
             RepairOldBlockFiles();
             _checkerTickCount = 0;
@@ -709,6 +709,8 @@ public sealed class MultiUserFile : IDisposableExtended {
         if (_checkerTickCount > countSave && mustSave) { CancelBackGroundWorker(); }
         if (_checkerTickCount > ReloadDelaySecond && mustReload) { CancelBackGroundWorker(); }
         if (_backgroundWorker.IsBusy) { return; }
+
+        //if (string.IsNullOrEmpty(ErrorReason(Enums.ErrorReason.EditNormaly))) { return; }
 
         if (mustReload && mustSave) {
             if (!string.IsNullOrEmpty(ErrorReason(Enums.ErrorReason.Load))) { return; }
