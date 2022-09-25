@@ -258,9 +258,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposable {
 
     public void CellSet(ColumnItem? column, Point value) => Database.Cell.Set(column, this, value);
 
-    public void CellSet(string columnName, List<string?>? value) => Database.Cell.Set(Database.Column[columnName], this, value);
+    public void CellSet(string columnName, List<string>? value) => Database.Cell.Set(Database.Column[columnName], this, value);
 
-    public void CellSet(ColumnItem? column, List<string?>? value) => Database.Cell.Set(column, this, value);
+    public void CellSet(ColumnItem? column, List<string>? value) => Database.Cell.Set(column, this, value);
 
     public void CellSet(string columnName, DateTime value) => Database.Cell.Set(Database.Column[columnName], this, value);
 

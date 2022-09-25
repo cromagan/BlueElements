@@ -311,11 +311,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposable {
     /// <param name="filter"></param>
     /// <param name="pinnedRows"></param>
     /// <returns></returns>
-    public List<RowItem> CalculateVisibleRows(List<FilterItem>? filter, List<RowItem>? pinnedRows) {
+    public List<RowItem> CalculateVisibleRows(List<FilterItem>? filter, List<RowItem?>? pinnedRows) {
         List<RowItem> tmpVisibleRows = new();
         if (Database == null) { return tmpVisibleRows; }
 
-        if (pinnedRows == null) { pinnedRows = new List<RowItem>(); }
+        pinnedRows ??= new List<RowItem?>();
 
         var lockMe = new object();
         Parallel.ForEach(Database.Row, thisRowItem => {
@@ -345,7 +345,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposable {
         GC.SuppressFinalize(this);
     }
 
-    public string DoAutomatic(FilterCollection? filter, bool fullCheck, List<RowItem>? pinned, string startroutine) {
+    public string DoAutomatic(FilterCollection? filter, bool fullCheck, List<RowItem?>? pinned, string startroutine) {
         if (Database == null || Database.ReadOnly) { return "Datenbank schreibgeschützt."; }
         return DoAutomatic(CalculateVisibleRows(filter, pinned), fullCheck, startroutine);
     }

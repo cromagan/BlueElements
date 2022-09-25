@@ -50,7 +50,7 @@ public sealed class BlueFont : IReadableTextWithChanging {
     internal readonly bool Outline;
     internal readonly bool StrikeOut;
     internal readonly bool Underline;
-    private static readonly List<BlueFont?> FontsAll = new();
+    private static readonly List<BlueFont> FontsAll = new();
 
     private readonly SizeF[] _charSize;
     private readonly string _code;
@@ -207,9 +207,9 @@ public sealed class BlueFont : IReadableTextWithChanging {
         tmpfont.Dispose();
 
         _widthOf2Points = MeasureString("..", StringFormat.GenericTypographic).Width;
-        ///http://www.vb-helper.com/howto_net_rainbow_text.html
-        ///https://msdn.microsoft.com/de-de/library/xwf9s90b(v=vs.90).aspx
-        ///http://www.typo-info.de/schriftgrad.htm
+        //http://www.vb-helper.com/howto_net_rainbow_text.html
+        //https://msdn.microsoft.com/de-de/library/xwf9s90b(v=vs.90).aspx
+        //http://www.typo-info.de/schriftgrad.htm
         _zeilenabstand = _fontOl.Height;
         _pen = GeneratePen(1.0F);
         BrushColorMain = new SolidBrush(ColorMain);
@@ -239,18 +239,17 @@ public sealed class BlueFont : IReadableTextWithChanging {
         }
     }
 
-    public static BlueFont? Get(FontFamily font, float fontSize) => Get(font.Name, fontSize, false, false, false, false, false, "000000", "FFFFFF", false, false, false);
+    public static BlueFont Get(FontFamily font, float fontSize) => Get(font.Name, fontSize, false, false, false, false, false, "000000", "FFFFFF", false, false, false);
 
-    public static BlueFont? Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, string colorMain, string colorOutline, bool kapitälchen, bool onlyUpper, bool onlyLower) => Get(ToString(fontName, fontSize, bold, italic, underline, strikeout, outLine, colorMain, colorOutline, kapitälchen, onlyUpper, onlyLower));
+    public static BlueFont Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, string colorMain, string colorOutline, bool kapitälchen, bool onlyUpper, bool onlyLower) => Get(ToString(fontName, fontSize, bold, italic, underline, strikeout, outLine, colorMain, colorOutline, kapitälchen, onlyUpper, onlyLower));
 
-    public static BlueFont? Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, Color colorMain, Color colorOutline, bool kapitälchen, bool onlyUpper, bool onlyLower) => Get(fontName, fontSize, bold, italic, underline, strikeout, outLine, colorMain.ToHtmlCode(), colorOutline.ToHtmlCode(), kapitälchen, onlyUpper, onlyLower);
+    public static BlueFont Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, Color colorMain, Color colorOutline, bool kapitälchen, bool onlyUpper, bool onlyLower) => Get(fontName, fontSize, bold, italic, underline, strikeout, outLine, colorMain.ToHtmlCode(), colorOutline.ToHtmlCode(), kapitälchen, onlyUpper, onlyLower);
 
-    public static BlueFont? Get(string code) {
-        if (string.IsNullOrEmpty(code)) { return null; }
-        if (!code.Contains("{")) { code = "{Name=Arial, Size=10, Color=ff0000}"; }
-        var searchcode = code.ToUpper().Replace(" ", "");
+    public static BlueFont Get(string code) {
+        if (string.IsNullOrEmpty(code) || !code.Contains("{")) { code = "{Name=Arial, Size=10, Color=ff0000}"; }
+        var searchcode = code.ToUpper().Replace(" ", string.Empty);
         try {
-            foreach (var thisfont in FontsAll.Where(thisfont => thisfont.ToString().Replace(" ", "").ToUpper() == searchcode)) {
+            foreach (var thisfont in FontsAll.Where(thisfont => thisfont.ToString().Replace(" ", string.Empty).ToUpper() == searchcode)) {
                 return thisfont;
             }
         } catch {
@@ -258,9 +257,7 @@ public sealed class BlueFont : IReadableTextWithChanging {
         }
         BlueFont f = new(code);
         FontsAll.Add(f);
-        //if (!string.Equals(f._code.Replace(" ", ""), code.Replace(" ", ""), StringComparison.OrdinalIgnoreCase)) {
-        //    Develop.DebugPrint("Schrift-Fehlerhaft: " + code + " (" + f._code + ")");
-        //}
+
         return f;
     }
 
@@ -463,7 +460,7 @@ public sealed class BlueFont : IReadableTextWithChanging {
 
     internal float Oberlänge(float zoom) => _oberlänge * zoom;
 
-    internal BlueFont? Scale(double zoom) => Math.Abs(1 - zoom) < 0.01 ? this : Get(FontName, (float)(FontSize * zoom), Bold, Italic, Underline, StrikeOut, Outline, ColorMain, ColorOutline, Kapitälchen, OnlyUpper, OnlyLower);
+    internal BlueFont Scale(double zoom) => Math.Abs(1 - zoom) < 0.01 ? this : Get(FontName, (float)(FontSize * zoom), Bold, Italic, Underline, StrikeOut, Outline, ColorMain, ColorOutline, Kapitälchen, OnlyUpper, OnlyLower);
 
     internal List<string> SplitByWidth(string text, float maxWidth, int maxLines) {
         List<string> broken = new();

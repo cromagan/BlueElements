@@ -1241,16 +1241,18 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
     //    }
     //    return new ColumnItem(this, false);
     //}
-    public void GetUniques(List<RowItem?> rows, out List<string>? einzigartig, out List<string?>? nichtEinzigartig) {
+    public void GetUniques(List<RowItem?> rows, out List<string> einzigartig, out List<string> nichtEinzigartig) {
         einzigartig = new List<string>();
-        nichtEinzigartig = new List<string?>();
+        nichtEinzigartig = new List<string>();
         foreach (var thisRow in rows) {
-            var tmp = MultiLine ? thisRow.CellGetList(this) : new List<string?> { thisRow.CellGetString(this) };
-            foreach (var thisString in tmp) {
-                if (einzigartig.Contains(thisString)) {
-                    nichtEinzigartig.AddIfNotExists(thisString);
-                } else {
-                    einzigartig.AddIfNotExists(thisString);
+            if (thisRow != null) {
+                var tmp = MultiLine ? thisRow.CellGetList(this) : new List<string> { thisRow.CellGetString(this) };
+                foreach (var thisString in tmp) {
+                    if (einzigartig.Contains(thisString)) {
+                        nichtEinzigartig.AddIfNotExists(thisString);
+                    } else {
+                        einzigartig.AddIfNotExists(thisString);
+                    }
                 }
             }
         }
@@ -1303,7 +1305,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         Database.OnViewChanged();
     }
 
-    public bool IsFirst() => Convert.ToBoolean(Database.Column[0] == this);
+    public bool IsFirst() => Database?.Column[0] == this;
 
     public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
 
@@ -1323,7 +1325,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         do {
             columnCount--;
             if (columnCount < 0) { return null; }
-            if (Database.Column[columnCount] != null) { return Database.Column[columnCount]; }
+            if (Database?.Column[columnCount] != null) { return Database.Column[columnCount]; }
         } while (true);
     }
 
@@ -1895,7 +1897,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
     //        : string.Equals(BestFile(tmpfile, false), fullFileName, StringComparison.OrdinalIgnoreCase) ? tmpfile : fullFileName;
     //}
 
-    public void Statisik(List<FilterItem>? filter, List<RowItem>? pinnedRows) {
+    public void Statisik(List<FilterItem>? filter, List<RowItem?>? pinnedRows) {
         if (Database == null) { return; }
         var r = Database.Row.CalculateVisibleRows(filter, pinnedRows);
 

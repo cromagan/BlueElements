@@ -17,7 +17,7 @@
 
 using System;
 
-namespace CryptoExplorer;
+namespace BlueBasics.Enums;
 
 [Flags]
 public enum ThumbnailOptions {

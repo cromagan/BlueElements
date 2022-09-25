@@ -25,7 +25,6 @@ using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueScript.Variables;
-using CryptoExplorer;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;

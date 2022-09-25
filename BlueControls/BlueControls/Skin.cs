@@ -1197,18 +1197,18 @@ public static class Skin {
         }
     }
 
-    public static BlueFont? GetBlueFont(PadStyles format, RowItem? rowOfStyle) {
+    public static BlueFont GetBlueFont(PadStyles format, RowItem? rowOfStyle) {
         if (StyleDb == null) { InitStyles(); }
         return StyleDb == null || rowOfStyle == null ? BlueFont.Get(ErrorFont) : GetBlueFont(StyleDb, ((int)format).ToString(), rowOfStyle);
     }
 
-    public static BlueFont? GetBlueFont(Database styleDb, string column, RowItem? row) => GetBlueFont(styleDb, styleDb.Column[column], row);
+    public static BlueFont GetBlueFont(Database styleDb, string column, RowItem? row) => GetBlueFont(styleDb, styleDb.Column[column], row);
 
-    public static BlueFont? GetBlueFont(Database styleDb, ColumnItem? column, RowItem? row) {
+    public static BlueFont GetBlueFont(Database styleDb, ColumnItem? column, RowItem? row) {
         var @string = styleDb.Cell.GetString(column, row);
         if (string.IsNullOrEmpty(@string)) {
             Develop.DebugPrint("Schrift nicht definiert: " + styleDb.Filename + " - " + column.Name + " - " + row.CellFirstString());
-            return null;
+            return BlueFont.Get("Arial", 7, false, false, false, false, false, Color.Black, Color.Transparent, false, false, false);
         }
         return BlueFont.Get(@string);
     }

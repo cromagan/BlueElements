@@ -537,7 +537,7 @@ public partial class TableView : Form {
 
             case "Statistik":
                 if (!tbl.Database.IsAdministrator()) { return; }
-                column.Statisik(Table.Filter, Table.PinnedRows);
+                column?.Statisik(Table.Filter, Table.PinnedRows);
                 break;
 
             case "VorherigenInhaltWiederherstellen":

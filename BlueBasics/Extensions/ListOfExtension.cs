@@ -58,7 +58,7 @@ public static partial class Extensions {
         return true;
     }
 
-    public static void CloneFrom<T>(this List<T> list1, List<T>? list2) where T : IComparable {
+    public static void CloneFrom<T>(this List<T> list1, List<T> list2) where T : IComparable {
         if (!list1.IsDifferentTo(list2)) { return; }
 
         //if (list2 == null) { list1 = null; return; }
@@ -145,6 +145,8 @@ public static partial class Extensions {
     //    }
     // }
     public static void RemoveNullOrEmpty(this List<string?>? l) {
+        if (l == null || l.Count == 0) { return; }
+
         var z = 0;
         while (z < l.Count) {
             if (string.IsNullOrEmpty(l[z])) {
@@ -229,7 +231,7 @@ public static partial class Extensions {
     }
 
     public static void SplitAndCutByCr_QuickSortAndRemoveDouble(this List<string> list, string textToSplit) {
-        List<string?> l = new();
+        List<string> l = new();
         l.AddRange(textToSplit.SplitAndCutByCr());
         l = l.SortedDistinctList();
 
