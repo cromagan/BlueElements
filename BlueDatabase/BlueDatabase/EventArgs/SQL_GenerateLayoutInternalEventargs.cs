@@ -17,12 +17,11 @@
 
 namespace BlueDatabase.EventArgs;
 
-public class GenerateLayoutInternalEventargs : System.EventArgs {
+public class SQL_GenerateLayoutInternalEventargs : SQL_RowEventArgs {
 
     #region Constructors
 
-    public GenerateLayoutInternalEventargs(RowItem row, string layoutId, string saveTo) {
-        Row = row;
+    public SQL_GenerateLayoutInternalEventargs(SQL_RowItem row, string layoutId, string saveTo) : base(row) {
         LayoutId = layoutId;
         Filename = saveTo;
         Handled = false;
@@ -32,13 +31,10 @@ public class GenerateLayoutInternalEventargs : System.EventArgs {
 
     #region Properties
 
-    //public bool DirectPrint { get; set; }
-    //public bool DirectSave { get; set; }
     public string Filename { get; }
 
     public bool Handled { get; set; }
     public string LayoutId { get; }
-    public RowItem Row { get; }
 
     #endregion
 }

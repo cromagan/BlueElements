@@ -136,17 +136,29 @@ public class SqlBack {
         return ExecuteCommand(comm);
     }
 
-    public bool CheckIn(string database, DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
+    public bool CheckIn(string database, DatabaseDataType type, string value, SQL_ColumnItem? column, SQL_RowItem? row, int width, int height) {
         if (!OpenConnection()) { return false; }
 
         if (column == null && row == null) {
             switch (type) {
-                case DatabaseDataType.Formatkennung: break;
-                case DatabaseDataType.Werbung: break;
-                case DatabaseDataType.EOF: break;
-                case DatabaseDataType.co_SaveContent: break;
-                case DatabaseDataType.CryptionState: break;
-                case DatabaseDataType.CryptionTest: break;
+                case DatabaseDataType.Formatkennung:
+                    break;
+
+                case DatabaseDataType.Werbung:
+                    break;
+
+                case DatabaseDataType.EOF:
+                    break;
+
+                case DatabaseDataType.co_SaveContent:
+                    break;
+
+                case DatabaseDataType.CryptionState:
+                    break;
+
+                case DatabaseDataType.CryptionTest:
+                    break;
+
                 default:
                     return SetStyleDate(database, type, string.Empty, value);
             }
@@ -158,9 +170,77 @@ public class SqlBack {
         if (column != null && row == null) {
             switch (type) {
                 //case DatabaseDataType.co_EditType: break;
-                case DatabaseDataType.co_SaveContent: break;
-                case DatabaseDataType.co_ShowUndo: break;
-                case DatabaseDataType.ColumnName: break;
+                case DatabaseDataType.co_SaveContent:
+                    break;
+
+                case DatabaseDataType.co_ShowUndo:
+                    break;
+
+                case DatabaseDataType.ColumnName:
+                    break;
+
+                default:
+                    if (type == DatabaseDataType.ColumnCaption) { AddColumnToMain(column.Name); }
+
+                    return SetStyleDate(database, type, column.Name.ToUpper(), value);
+            }
+            CloseConnection();
+            return true;
+        }
+
+        if (column != null && row != null) {
+            SetCellValue(column, row, value);
+
+            CloseConnection();
+            return true;
+        }
+
+        CloseConnection();
+        return false;
+    }
+
+    public bool CheckIn(string database, DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
+        if (!OpenConnection()) { return false; }
+
+        if (column == null && row == null) {
+            switch (type) {
+                case DatabaseDataType.Formatkennung:
+                    break;
+
+                case DatabaseDataType.Werbung:
+                    break;
+
+                case DatabaseDataType.EOF:
+                    break;
+
+                case DatabaseDataType.co_SaveContent:
+                    break;
+
+                case DatabaseDataType.CryptionState:
+                    break;
+
+                case DatabaseDataType.CryptionTest:
+                    break;
+
+                default:
+                    return SetStyleDate(database, type, string.Empty, value);
+            }
+
+            CloseConnection();
+            return true;
+        }
+
+        if (column != null && row == null) {
+            switch (type) {
+                //case DatabaseDataType.co_EditType: break;
+                case DatabaseDataType.co_SaveContent:
+                    break;
+
+                case DatabaseDataType.co_ShowUndo:
+                    break;
+
+                case DatabaseDataType.ColumnName:
+                    break;
 
                 default:
                     if (type == DatabaseDataType.ColumnCaption) { AddColumnToMain(column.Name); }
@@ -331,6 +411,35 @@ public class SqlBack {
         }
     }
 
+    private string? GetCellValue(SQL_ColumnItem column, SQL_RowItem row) {
+        if (!OpenConnection()) { return null; }
+
+        using var q = _connection.CreateCommand();
+
+        q.CommandText = @"select " + column.Name.ToUpper() + " from Main " +
+                        "where RK = @RK";
+
+        //q.Parameters.AddWithValue("@COLUMNNAME", column.Name.ToUpper());
+        q.Parameters.AddWithValue("@RK", row.Key.ToString());
+
+        using var reader = q.ExecuteReader();
+        if (reader.Read()) {
+            // you may want to check if value is NULL: reader.IsDBNull(0)
+            var value = reader[0].ToString();
+
+            if (reader.Read()) {
+                // Doppelter Wert?!?Ersten Wert zurückgeben, um unendliche erweiterungen zu erhindern
+                Develop.DebugPrint(column.Key.ToString() + " doppelt in MAIN vorhanden!");
+            }
+
+            CloseConnection();
+            return value;
+        }
+
+        CloseConnection();    // Nix vorhanden!
+        return null;
+    }
+
     private string? GetCellValue(ColumnItem column, RowItem row) {
         if (!OpenConnection()) { return null; }
 
@@ -398,6 +507,41 @@ public class SqlBack {
         }
 
         return _connection.State == ConnectionState.Open;
+    }
+
+    /// <summary>
+    /// Gibt TRUE zurück, wenn alles ok ist.
+    /// Entweder der Wert gesetzt wurde, der Wert aktuell ist oder der Wert unwichtig ist.
+    /// </summary>
+    /// <param name="dbname"></param>
+    /// <param name="type"></param>
+    /// <param name="columnName"></param>
+    /// <param name="newValue"></param>
+    /// <returns></returns>
+    private bool SetCellValue(SQL_ColumnItem column, SQL_RowItem row, string newValue) {
+        var isVal = GetCellValue(column, row);
+
+        string cmdString;
+
+        if (isVal is null) {
+            cmdString = "INSERT INTO Main (RK, " + column.Name.ToUpper() + " ) VALUES (@RK, @VALUE )";
+        } else if (isVal != newValue) {
+            cmdString = "UPDATE Main SET " + column.Name.ToUpper() + " = @VALUE WHERE RK = @RK";
+        } else {
+            return true;
+        }
+
+        if (!OpenConnection()) { return false; }
+
+        using var comm = new SqlCommand();
+        comm.Connection = _connection;
+        comm.CommandText = cmdString;
+        //comm.Parameters.AddWithValue("@DBNAME", "Main");
+        comm.Parameters.AddWithValue("@RK", row.Key);
+        //comm.Parameters.AddWithValue("@COLUMNNAME", column.Name.ToUpper());
+        comm.Parameters.AddWithValue("@VALUE", newValue);
+
+        return ExecuteCommand(comm);
     }
 
     /// <summary>
