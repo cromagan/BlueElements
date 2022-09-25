@@ -346,6 +346,10 @@ public class SqlBack {
         return tables;
     }
 
+    public void Load(string filename, bool create) {
+        Develop.DebugPrint_NichtImplementiert();
+    }
+
     private bool AddColumn(string table, string column) => ExecuteCommand("alter table " + table + " add " + column + " VARCHAR(255) default '' NOT NULL");
 
     private bool AddColumn(string table, string column, string type) => ExecuteCommand("alter table " + table + " add " + column + " " + type + " default '' NOT NULL");

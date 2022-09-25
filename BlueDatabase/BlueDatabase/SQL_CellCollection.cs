@@ -509,7 +509,6 @@ public sealed class SQL_CellCollection : Dictionary<string, SQL_CellItem>, IDisp
 
     public void Set(SQL_ColumnItem? column, SQL_RowItem? row, string value) // Main Method
     {
-        _database.BlockReload(false);
         if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
         if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!!<br>" + _database.Filename); }
         if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
@@ -649,7 +648,6 @@ public sealed class SQL_CellCollection : Dictionary<string, SQL_CellItem>, IDisp
     internal void SetValueBehindLinkedValue(SQL_ColumnItem? column, SQL_RowItem? row, string value) {
         if (_database == null) { return; }
 
-        _database.BlockReload(false);
         if (column == null || _database.Column.SearchByKey(column.Key) == null) {
             _database?.DevelopWarnung("Spalte ungültig!");
             Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database?.Filename);
@@ -668,7 +666,6 @@ public sealed class SQL_CellCollection : Dictionary<string, SQL_CellItem>, IDisp
         if (ContainsKey(cellKey)) { oldValue = this[cellKey].Value; }
         if (value == oldValue) { return; }
 
-        _database?.WaitEditable();
         _database?.AddPending(DatabaseDataType.ce_Value_withoutSizeData, column.Key, row.Key, oldValue, value, true);
         column.UcaseNamesSortedByLenght = null;
         DoSpecialFormats(column, row, oldValue, false);
@@ -804,7 +801,6 @@ public sealed class SQL_CellCollection : Dictionary<string, SQL_CellItem>, IDisp
         #region Subroutine Ergebnis
 
         (SQL_ColumnItem? column, SQL_RowItem? row, string info) Ergebnis(string fehler) {
-            column.Database?.BlockReload(false);
             if (targetColumn != null && targetRow != null && string.IsNullOrEmpty(fehler)) {
                 column.Database?.Cell.SetValueBehindLinkedValue(column, row, KeyOfCell(targetColumn.Key, targetRow.Key));
                 return (targetColumn, targetRow, fehler);

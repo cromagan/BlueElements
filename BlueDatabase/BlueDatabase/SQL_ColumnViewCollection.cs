@@ -206,7 +206,7 @@ public sealed class SQL_ColumnViewCollection : ListExt<SQL_ColumnViewItem>, IPar
     }
 
     public void ShowAllColumns() {
-        if (Database.IsParsing) { return; }
+        if (Database.IsLoading) { return; }
         var ok = true;
         for (var z = 0; z < Database.Column.Count; z++) {
             if (z >= Count) {

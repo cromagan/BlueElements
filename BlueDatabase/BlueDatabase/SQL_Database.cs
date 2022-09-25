@@ -45,7 +45,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
 
     public const string SQL_DatabaseVersion = "4.00";
     public static readonly ListExt<SQL_Database> AllFiles = new();
-    public readonly SqlBack? _sql;
+    public readonly SqlBack _sql;
     public readonly SQL_CellCollection Cell;
     public readonly SQL_ColumnCollection Column;
     public readonly ListExt<SQL_ColumnViewCollection> ColumnArrangements = new();
@@ -73,7 +73,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
 
     //private readonly List<string> _filesAfterLoadingLCase;
 
-    private readonly BlueBasics.MultiUserFile.MultiUserFile? _muf;
     private string _additionaFilesPfad;
 
     private string _additionaFilesPfadtmp = string.Empty;
@@ -113,38 +112,22 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
 
     #region Constructors
 
-    //private string _WorkItemsBefore = string.Empty;
-    public SQL_Database(Stream stream) : this(stream, string.Empty, true, false) { }
+    public SQL_Database(bool readOnly) : this(string.Empty, readOnly, true) { }
 
-    public SQL_Database(bool readOnly) : this(null, string.Empty, readOnly, true) { }
-
-    public SQL_Database(string filename, bool readOnly, bool create) : this(null, filename, readOnly, create) { }
-
-    private SQL_Database(Stream? stream, string filename, bool readOnly, bool create) {
+    private SQL_Database(string filename, bool readOnly, bool create) {
         AllFiles.Add(this);
 
-        _muf = new BlueBasics.MultiUserFile.MultiUserFile(readOnly, true);
+        //_muf.Loaded += OnLoaded;
+        //_muf.Loading += OnLoading;
 
-        _muf.ConnectedControlsStopAllWorking += OnConnectedControlsStopAllWorking;
-        _muf.Loaded += OnLoaded;
-        _muf.Loading += OnLoading;
-        _muf.SavedToDisk += OnSavedToDisk;
-        _muf.ShouldICancelSaveOperations += OnShouldICancelSaveOperations;
-        _muf.DiscardPendingChanges += DiscardPendingChanges;
-        _muf.HasPendingChanges += HasPendingChanges;
-        _muf.RepairAfterParse += RepairAfterParse;
-        _muf.DoWorkAfterSaving += DoWorkAfterSaving;
-        _muf.IsThereBackgroundWorkToDo += IsThereBackgroundWorkToDo;
-        _muf.ParseExternal += ParseExternal;
-        _muf.DoBackGroundWork += DoBackGroundWork;
+        //_muf.RepairAfterParse += RepairAfterParse;
+        //_muf.IsThereBackgroundWorkToDo += IsThereBackgroundWorkToDo;
+        //_muf.DoBackGroundWork += DoBackGroundWork;
 
         Develop.StartService();
 
-        if (FileExists(filename)) { _sql = new SqlBack("D:\\" + filename.FileNameWithoutSuffix() + ".mdf", true); }
+        _sql = new SqlBack("D:\\" + filename.FileNameWithoutSuffix() + ".mdf", false);
 
-        //CultureInfo culture = new("de-DE");
-        //CultureInfo.DefaultThreadCurrentCulture = culture;
-        //CultureInfo.DefaultThreadCurrentUICulture = culture;
         Cell = new SQL_CellCollection(this);
 
         Row = new SQL_RowCollection(this);
@@ -171,9 +154,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         UserGroup = "#Administrator";
         if (!string.IsNullOrEmpty(filename)) {
             //DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + filename.FileNameWithoutSuffix()));
-            _muf.Load(filename, create);
-        } else if (stream != null) {
-            _muf.LoadFromStream(stream);
+            _sql.Load(filename, create);
         } else {
             RepairAfterParse(null, null);
         }
@@ -183,8 +164,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     #endregion
 
     #region Events
-
-    public event EventHandler<MultiUserFileStopWorkingEventArgs> ConnectedControlsStopAllWorking;
 
     public event EventHandler Disposing;
 
@@ -202,14 +181,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
 
     public event EventHandler<ProgressbarEventArgs> ProgressbarInfo;
 
-    public event EventHandler SavedToDisk;
-
     public event EventHandler<SQL_RowCancelEventArgs> ScriptError;
-
-    /// <summary>
-    /// Dient dazu, offene Dialoge abzufragen
-    /// </summary>
-    public event EventHandler<CancelEventArgs> ShouldICancelSaveOperations;
 
     public event EventHandler SortParameterChanged;
 
@@ -259,7 +231,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         }
     }
 
-    public string Filename => _muf.Filename;
+    public string Filename { get; private set; }
 
     [Browsable(false)]
     public double GlobalScale {
@@ -280,26 +252,13 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     }
 
     public bool IsDisposed { get; private set; }
-    public bool IsLoading => _muf.IsLoading;
-
-    public bool IsParsing => _muf.IsParsing;
+    public bool IsLoading { get; private set; }
 
     public string LoadedVersion { get; private set; }
 
     public DateTime PowerEdit { get; set; }
 
-    public bool ReadOnly => _muf.ReadOnly;
-
-    [Browsable(false)]
-    public int ReloadDelaySecond {
-        get => _muf.ReloadDelaySecond;
-        set {
-            if (_muf.ReloadDelaySecond == value) { return; }
-            AddPending(DatabaseDataType.ReloadDelaySecond, -1, -1, _muf.ReloadDelaySecond.ToString(), value.ToString(), true);
-        }
-    }
-
-    public bool ReloadNeeded => _muf.ReloadNeeded;
+    public bool ReadOnly { get; private set; }
 
     public string RulesScript {
         get => _rulesScript;
@@ -379,7 +338,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
 
         foreach (var thisFile in AllFiles) {
             if (thisFile != null && string.Equals(thisFile.Filename, filename, StringComparison.OrdinalIgnoreCase)) {
-                thisFile.BlockReload(false);
                 return thisFile;
             }
         }
@@ -387,7 +345,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         if (checkOnlyFilenameToo) {
             foreach (var thisFile in AllFiles) {
                 if (thisFile != null && thisFile.Filename.ToLower().FileNameWithSuffix() == filename.ToLower().FileNameWithSuffix()) {
-                    thisFile.BlockReload(false);
                     return thisFile;
                 }
             }
@@ -396,71 +353,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         if (!FileExists(filename)) { return null; }
 
         return new SQL_Database(filename, readOnly, false);
-    }
-
-    public static SQL_Database? LoadResource(Assembly assembly, string name, string blueBasicsSubDir, bool fehlerAusgeben, bool mustBeStream) {
-        if (Develop.IsHostRunning() && !mustBeStream) {
-            var x = -1;
-            string? pf;
-            do {
-                x++;
-                pf = string.Empty;
-                switch (x) {
-                    case 0:
-                        // BeCreative, At Home, 31.11.2021
-                        pf = System.Windows.Forms.Application.StartupPath + "\\..\\..\\..\\..\\BlueControls\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
-                        break;
-
-                    case 1:
-                        pf = System.Windows.Forms.Application.StartupPath + "\\..\\..\\..\\..\\..\\..\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
-                        break;
-
-                    case 2:
-                        pf = System.Windows.Forms.Application.StartupPath + "\\..\\..\\..\\..\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
-                        break;
-
-                    case 3:
-                        pf = System.Windows.Forms.Application.StartupPath + "\\..\\..\\..\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
-                        break;
-
-                    case 4:
-                        pf = System.Windows.Forms.Application.StartupPath + "\\" + name;
-                        break;
-
-                    case 5:
-                        pf = System.Windows.Forms.Application.StartupPath + "\\" + blueBasicsSubDir + "\\" + name;
-                        break;
-
-                    case 6:
-                        pf = System.Windows.Forms.Application.StartupPath + "\\..\\..\\..\\..\\..\\Visual Studio Git\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
-                        break;
-
-                    case 7:
-                        pf = System.Windows.Forms.Application.StartupPath + "\\..\\..\\..\\..\\Visual Studio Git\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
-                        break;
-
-                    case 8:
-                        // warscheinlich BeCreative, Firma
-                        pf = System.Windows.Forms.Application.StartupPath + "\\..\\..\\..\\..\\Visual Studio Git\\BlueElements\\BlueControls\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
-                        break;
-
-                    case 9:
-                        // Bildzeichen-Liste, Firma, 25.10.2021
-                        pf = System.Windows.Forms.Application.StartupPath + "\\..\\..\\..\\..\\..\\Visual Studio Git\\BlueElements\\BlueControls\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
-                        break;
-                }
-                if (FileExists(pf)) {
-                    var tmp = GetByFilename(pf, false, false);
-                    if (tmp != null) { return tmp; }
-                    tmp = new SQL_Database(pf, false, false);
-                    return tmp;
-                }
-            } while (pf != string.Empty);
-        }
-        var d = Generic.GetEmmbedResource(assembly, name);
-        if (d != null) { return new SQL_Database(d); }
-        if (fehlerAusgeben) { Develop.DebugPrint(FehlerArt.Fehler, "Ressource konnte nicht initialisiert werden: " + blueBasicsSubDir + " - " + name); }
-        return null;
     }
 
     /// <summary>
@@ -525,11 +417,11 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         return sortedRows;
     }
 
-    public bool BlockSaveOperations() => SQL_RowItem.DoingScript || _muf.BlockSaveOperations();
+    public bool BlockSaveOperations() => SQL_RowItem.DoingScript;
 
-    public void CancelBackGroundWorker() {
-        _muf.CancelBackGroundWorker();
-    }
+    //public void CancelBackGroundWorker() {
+    //    _muf.CancelBackGroundWorker();
+    //}
 
     public void CloneDataFrom(SQL_Database sourceSQL_Database) {
 
@@ -539,7 +431,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         GlobalShowPass = sourceSQL_Database.GlobalShowPass;
         DatenbankAdmin.CloneFrom(sourceSQL_Database.DatenbankAdmin);
         PermissionGroupsNewRow.CloneFrom(sourceSQL_Database.PermissionGroupsNewRow);
-        ReloadDelaySecond = sourceSQL_Database.ReloadDelaySecond;
+        //ReloadDelaySecond = sourceSQL_Database.ReloadDelaySecond;
         //VerwaisteDaten = sourceSQL_Database.VerwaisteDaten;
         ZeilenQuickInfo = sourceSQL_Database.ZeilenQuickInfo;
         StandardFormulaFile = sourceSQL_Database.StandardFormulaFile;
@@ -562,14 +454,12 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     /// Datenbankpfad mit Forms und abschließenden \
     /// </summary>
     /// <returns></returns>
-    public string DefaultFormulaPath() => string.IsNullOrEmpty(_muf.Filename) ? string.Empty : Filename.FilePath() + "Forms\\";
+    public string DefaultFormulaPath() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "Forms\\";
 
     /// <summary>
     /// Datenbankpfad mit Layouts und abschließenden \
     /// </summary>
-    public string DefaultLayoutPath() => string.IsNullOrEmpty(_muf.Filename) ? string.Empty : Filename.FilePath() + "Layouts\\";
-
-    public void DiscardPendingChanges(object sender, System.EventArgs e) => ChangeWorkItems(ItemState.Pending, ItemState.Undo);
+    public string DefaultLayoutPath() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "Layouts\\";
 
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
@@ -578,9 +468,9 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     }
 
     public string ErrorReason(ErrorReason mode) {
-        var f = _muf.ErrorReason(mode);
+        //var f = _muf.ErrorReason(mode);
 
-        if (!string.IsNullOrEmpty(f)) { return f; }
+        //if (!string.IsNullOrEmpty(f)) { return f; }
         if (mode == BlueBasics.Enums.ErrorReason.OnlyRead) { return string.Empty; }
 
         return IntParse(LoadedVersion.Replace(".", "")) > IntParse(SQL_DatabaseVersion.Replace(".", ""))
@@ -770,16 +660,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         return null;
     }
 
-    public void HasPendingChanges(object? sender, MultiUserFileHasPendingChangesEventArgs e) {
-        try {
-            if (_muf.ReadOnly) { return; }
-
-            e.HasPendingChanges = Works.Any(thisWork => thisWork.State == ItemState.Pending);
-        } catch {
-            HasPendingChanges(sender, e);
-        }
-    }
-
     public string Import(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart, bool dorowautmatic, string script) {
         // Vorbereitung des Textes -----------------------------
         importText = importText.Replace("\r\n", "\r").Trim("\r");
@@ -921,14 +801,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         return !string.IsNullOrEmpty(UserGroup) && DatenbankAdmin.Contains(UserGroup, false);
     }
 
-    public void Load_Reload() {
-        _muf.Load_Reload();
-    }
-
-    public void OnConnectedControlsStopAllWorking(object? sender, MultiUserFileStopWorkingEventArgs e) {
-        ConnectedControlsStopAllWorking?.Invoke(this, e);
-    }
-
     public void OnScriptError(SQL_RowCancelEventArgs e) {
         if (IsDisposed) { return; }
         ScriptError?.Invoke(this, e);
@@ -1048,90 +920,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         }
     }
 
-    public void ParseExternal(object sender, MultiUserParseEventArgs e2) {
-        Column.ThrowEvents = false;
-        DatabaseDataType art = 0;
-        var pointer = 0;
-        var inhalt = "";
-        SQL_ColumnItem? column = null;
-        SQL_RowItem? row = null;
-        var x = 0;
-        var y = 0;
-        long colKey = 0;
-        long rowKey = 0;
-        List<SQL_ColumnItem?> columnsOld = new();
-        columnsOld.AddRange(Column);
-        Column.Clear();
-        var oldPendings = Works.Where(thisWork => thisWork.State == ItemState.Pending).ToList();
-        Works.Clear();
-
-        var b = e2.Data;
-
-        do {
-            if (pointer >= b.Length) { break; }
-            Parse(b, ref pointer, ref art, ref colKey, ref rowKey, ref inhalt, ref x, ref y);
-            if (rowKey > -1) {
-                row = Row.SearchByKey(rowKey);
-                if (row == null) {
-                    row = new SQL_RowItem(this, rowKey);
-                    Row.Add(row);
-                }
-            }
-            if (colKey > -1) {
-                // Zuerst schauen, ob die Column schon (wieder) in der richtigen Collection ist
-                column = Column.SearchByKey(colKey);
-                if (column == null) {
-                    // Column noch nicht gefunden. Schauen, ob sie vor dem Reload vorhanden war und gg. hinzufügen
-                    foreach (var thisColumn in columnsOld) {
-                        if (thisColumn != null && thisColumn.Key == colKey) {
-                            column = thisColumn;
-                        }
-                    }
-                    if (column != null) {
-                        // Prima, gefunden! Noch die Collections korrigieren
-                        Column.AddFromParser(column);
-                        columnsOld.Remove(column);
-                    } else {
-                        // Nicht gefunden, als neu machen
-                        column = Column.Add(colKey);
-                    }
-                }
-            }
-            if (art == DatabaseDataType.CryptionState) {
-                if (inhalt.FromPlusMinus()) {
-                    PasswordEventArgs e = new();
-                    OnNeedPassword(e);
-                    b = Cryptography.SimpleCrypt(b, e.Password, -1, pointer, b.Length - 1);
-                    if (b[pointer + 1] != 3 || b[pointer + 2] != 0 || b[pointer + 3] != 0 || b[pointer + 4] != 2 || b[pointer + 5] != 79 || b[pointer + 6] != 75) {
-                        _muf.RemoveFilename();
-                        LoadedVersion = "9.99";
-                        //MessageBox.Show("Zugriff verweigrt, Passwort falsch!", ImageCode.Kritisch, "OK");
-                        break;
-                    }
-                }
-            }
-            var fehler = ParseThis(art, inhalt, column, row, x, y);
-            if (art == DatabaseDataType.EOF) { break; }
-            if (!string.IsNullOrEmpty(fehler)) {
-                LoadedVersion = "9.99";
-                Develop.DebugPrint("Schwerer Datenbankfehler:<br>Version: " + SQL_DatabaseVersion + "<br>Datei: " + Filename + "<br>Meldung: " + fehler);
-            }
-        } while (true);
-        // Spalten, die nach dem Reload nicht mehr benötigt werden, löschen
-        //ColumnsOld.DisposeAndRemoveAll();
-        Row.RemoveNullOrEmpty();
-        //Row.RemoveNullOrDisposed();
-        Cell.RemoveOrphans();
-        //LoadPicsIntoImageChache();
-        //_filesAfterLoadingLCase.Clear();
-        //_filesAfterLoadingLCase.AddRange(AllConnectedFilesLCase());
-        Works.AddRange(oldPendings);
-        oldPendings.Clear();
-        ExecutePending();
-        Column.ThrowEvents = true;
-        if (IntParse(LoadedVersion.Replace(".", "")) > IntParse(SQL_DatabaseVersion.Replace(".", ""))) { SetReadOnly(); }
-    }
-
     public List<string> Permission_AllUsed(bool cellLevel) {
         List<string> e = new();
         foreach (var thisSQL_ColumnItem in Column) {
@@ -1179,12 +967,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         Layouts.Check();
     }
 
-    public bool Save(bool mustSave) => _muf.Save(mustSave);
-
-    public void SaveAsAndChangeTo(string fileName) {
-        _muf.SaveAsAndChangeTo(fileName);
-    }
-
     public string UndoText(SQL_ColumnItem? column, SQL_RowItem? row) {
         if (Works == null || Works.Count == 0) { return string.Empty; }
         var cellKey = SQL_CellCollection.KeyOfCell(column, row);
@@ -1203,18 +985,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         return t;
     }
 
-    public void UnlockHard() {
-        _muf.UnlockHard();
-    }
-
-    public void WaitEditable() {
-        _muf.WaitEditable();
-    }
-
-    public void WaitParsed() {
-        _muf.WaitParsed();
-    }
-
     internal void AddPending(DatabaseDataType comand, SQL_ColumnItem column, string previousValue, string changedTo, bool executeNow) => AddPending(comand, column.Key, -1, previousValue, changedTo, executeNow);
 
     internal void AddPending(DatabaseDataType comand, long columnKey, string listExt, bool executeNow) => AddPending(comand, columnKey, -1, "", listExt, executeNow);
@@ -1223,8 +993,8 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         if (executeNow) {
             ParseThis(comand, changedTo, Column.SearchByKey(columnKey), Row.SearchByKey(rowKey), -1, -1);
         }
-        if (_muf.IsParsing) { return; }
-        if (_muf.ReadOnly) {
+        if (IsLoading) { return; }
+        if (ReadOnly) {
             if (!string.IsNullOrEmpty(Filename)) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Datei ist Readonly, " + comand + ", " + Filename);
             }
@@ -1232,17 +1002,13 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         }
         // Keine Doppelten Rausfiltern, ansonstn stimmen die Undo nicht mehr
 
-        if (comand != DatabaseDataType.AutoExport) { _muf.SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
+        //if (comand != DatabaseDataType.AutoExport) { _muf.SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
 
         if (rowKey < -100) { Develop.DebugPrint(FehlerArt.Fehler, "RowKey darf hier nicht <-100 sein!"); }
         if (columnKey < -100) { Develop.DebugPrint(FehlerArt.Fehler, "ColKey darf hier nicht <-100 sein!"); }
         Works.Add(new WorkItem(comand, columnKey, rowKey, previousValue, changedTo, UserName));
 
-        _sql?.AddUndo(Filename.FileNameWithoutSuffix(), comand, columnKey, rowKey, previousValue, changedTo, UserName);
-    }
-
-    internal void BlockReload(bool crashIsCurrentlyLoading) {
-        _muf.BlockReload(crashIsCurrentlyLoading);
+        _sql.AddUndo(Filename.FileNameWithoutSuffix(), comand, columnKey, rowKey, previousValue, changedTo, UserName);
     }
 
     internal void Column_NameChanged(string oldName, SQL_ColumnItem newName) {
@@ -1297,9 +1063,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
 
     internal void DevelopWarnung(string t) {
         try {
-            t += "\r\nParsing: " + _muf.IsParsing;
-            t += "\r\nLoading: " + _muf.IsLoading;
-            t += "\r\nSaving: " + _muf.IsSaving;
             t += "\r\nColumn-Count: " + Column.Count;
             t += "\r\nRow-Count: " + Row.Count;
             t += "\r\nFile: " + Filename;
@@ -1327,55 +1090,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         ViewChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
-    internal void SaveToByteList(List<byte> list, DatabaseDataType DatabaseDataType, string content) {
-        var b = content.UTF8_ToByte();
-        list.Add((byte)Routinen.DatenAllgemeinUTF8);
-        list.Add((byte)DatabaseDataType);
-        SaveToByteList(list, b.Length, 3);
-        list.AddRange(b);
-    }
-
-    internal void SaveToByteList(List<byte> list, KeyValuePair<string, CellItem> cell) {
-        if (string.IsNullOrEmpty(cell.Value.Value)) { return; }
-        Cell.DataOfCellKey(cell.Key, out var tColumn, out var tRow);
-        if (!tColumn.SaveContent) { return; }
-        var b = cell.Value.Value.UTF8_ToByte();
-        list.Add((byte)Routinen.CellFormatUTF8_V400);
-        list.Add((byte)DatabaseDataType.ce_Value_withSizeData);
-        SaveToByteList(list, b.Length, 3);
-        SaveToByteList(list, tColumn.Key, 7);
-        SaveToByteList(list, tRow.Key, 7);
-        list.AddRange(b);
-        var contentSize = Cell.ContentSizeToSave(cell, tColumn);
-        SaveToByteList(list, contentSize.Width, 2);
-        SaveToByteList(list, contentSize.Height, 2);
-    }
-
-    internal void SaveToByteList(List<byte> list, DatabaseDataType DatabaseDataType, string content, long columnKey) {
-        var b = content.UTF8_ToByte();
-        list.Add((byte)Routinen.ColumnUTF8_V400);
-        list.Add((byte)DatabaseDataType);
-        SaveToByteList(list, b.Length, 3);
-        SaveToByteList(list, columnKey, 7);
-        SaveToByteList(list, 0, 7); //Zeile-Unötig
-        list.AddRange(b);
-    }
-
-    //protected override void PrepeareDataForCheckingBeforeLoad() {
-    //    // Letztes WorkItem speichern, als Kontrolle
-    //    _WorkItemsBefore = string.Empty;
-    //    _LastWorkItem = string.Empty;
-    //    if (Works != null && Works.Count > 0) {
-    //        var c = 0;
-    //        do {
-    //            c++;
-    //            if (c > 20 || Works.Count - c < 20) { break; }
-    //            var wn = Works.Count - c;
-    //            if (Works[wn].LogsUndo(this) && Works[wn].HistorischRelevant) { _LastWorkItem = Works[wn].ToString(); }
-    //        } while (string.IsNullOrEmpty(_LastWorkItem));
-    //        _WorkItemsBefore = Works.ToString();
-    //    }
-    //}
     private static int NummerCode2(byte[] b, int pointer) => (b[pointer] * 255) + b[pointer + 1];
 
     private static int NummerCode3(byte[] b, int pointer) => (b[pointer] * 65025) + (b[pointer + 1] * 255) + b[pointer + 2];
@@ -1386,28 +1100,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
             nu += b[pointer + n] * (long)Math.Pow(255, 6 - n);
         }
         return nu;
-    }
-
-    private static void SaveToByteList(List<byte> list, long numberToAdd, int byteCount) {
-        //var tmp = numberToAdd;
-        //var nn = byteCount;
-
-        do {
-            byteCount--;
-            var te = (long)Math.Pow(255, byteCount);
-            var mu = (byte)Math.Truncate((decimal)(numberToAdd / te));
-
-            list.Add(mu);
-            numberToAdd %= te;
-        } while (byteCount > 0);
-
-        //if (nn == 3) {
-        //    if (NummerCode3(list.ToArray(), list.Count - nn) != tmp) { Debugger.Break(); }
-        //}
-
-        //if (nn == 7) {
-        //    if (NummerCode7(list.ToArray(), list.Count - nn) != tmp) { Debugger.Break(); }
-        //}
     }
 
     private void ChangeWorkItems(ItemState oldState, ItemState newState) {
@@ -1421,7 +1113,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     private void CheckViewsAndArrangements() {
         //if (ReadOnly) { return; }  // Gibt fehler bei Datenbanken, die nur Temporär erzeugt werden!
 
-        if (_muf.IsParsing) { return; }
+        if (IsLoading) { return; }
 
         for (var z = 0; z < Math.Max(2, ColumnArrangements.Count); z++) {
             if (ColumnArrangements.Count < z + 1) { ColumnArrangements.Add(new SQL_ColumnViewCollection(this, string.Empty)); }
@@ -1447,7 +1139,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     //    }
     //}
     private void Column_ItemRemoved(object sender, System.EventArgs e) {
-        if (_muf.IsParsing) { Develop.DebugPrint(FehlerArt.Warnung, "Parsing Falsch!"); }
+        if (IsLoading) { Develop.DebugPrint(FehlerArt.Warnung, "Parsing Falsch!"); }
         CheckViewsAndArrangements();
 
         Layouts.Check();
@@ -1488,7 +1180,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     //    }
     //}
     private void ColumnArrangements_ListOrItemChanged(object sender, System.EventArgs e) {
-        if (_muf.IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt werden. Kann zu Endlosschleifen führen.
+        if (IsLoading) { return; } // hier schon raus, es muss kein ToString ausgeführt werden. Kann zu Endlosschleifen führen.
         AddPending(DatabaseDataType.ColumnArrangement, -1, ColumnArrangements.ToString(), false);
     }
 
@@ -1499,7 +1191,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         OnDisposing();
         AllFiles.Remove(this);
 
-        _muf.Dispose();
         //base.Dispose(disposing); // speichert und löscht die ganzen Worker. setzt auch disposedValue und ReadOnly auf true
         if (disposing) {
             // TODO: verwalteten Zustand (verwaltete Objekte) entsorgen.
@@ -1565,7 +1256,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
 
             if (thisExport.IsOk()) {
                 var e2 = new MultiUserFileHasPendingChangesEventArgs();
-                HasPendingChanges(null, e2);
 
                 if (!e2.HasPendingChanges) {
                     CancelEventArgs ec = new(false);
@@ -1578,72 +1268,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
                 thisExport.DoBackUp(e.BackgroundWorker);
                 if (e.BackgroundWorker.CancellationPending) { return; }
             }
-        }
-    }
-
-    private void DoWorkAfterSaving(object sender, System.EventArgs e) {
-        ChangeWorkItems(ItemState.Pending, ItemState.Undo);
-        //var filesNewLCase = AllConnectedFilesLCase();
-        //List<string> writerFilesToDeleteLCase = new();
-        //if (_verwaisteDaten == VerwaisteDaten.Löschen) {
-        //    writerFilesToDeleteLCase = _filesAfterLoadingLCase.Except(filesNewLCase).ToList();
-        //}
-        //_filesAfterLoadingLCase.Clear();
-        //_filesAfterLoadingLCase.AddRange(filesNewLCase);
-        //if (writerFilesToDeleteLCase.Count > 0) { DeleteFile(writerFilesToDeleteLCase); }
-    }
-
-    private void ExecutePending() {
-        if (!_muf.IsParsing) { Develop.DebugPrint(FehlerArt.Fehler, "Nur während des Parsens möglich"); }
-
-        var e2 = new MultiUserFileHasPendingChangesEventArgs();
-        HasPendingChanges(null, e2);
-
-        if (!e2.HasPendingChanges) { return; }
-        // Erst die Neuen Zeilen / Spalten alle neutralisieren
-        //var dummy = -1000;
-        //foreach (var ThisPending in Works) {
-        //    if (ThisPending.State == enItemState.Pending) {
-        //        //if (ThisPending.Comand == enDatabaseDataType.dummyComand_AddRow) {
-        //        //    dummy--;
-        //        //    ChangeRowKeyInPending(ThisPending.RowKey, dummy);
-        //        //}
-        //        //if (ThisPending.Comand == enDatabaseDataType.AddColumn) {
-        //        //    dummy--;
-        //        //    ChangeColumnKeyInPending(ThisPending.ColKey, dummy);
-        //        //}
-        //    }
-        //}
-        //// Dann den neuen Zeilen / Spalten Tatsächlich eine neue ID zuweisen
-        //foreach (var ThisPending in Works) {
-        //    if (ThisPending.State == enItemState.Pending) {
-        //        switch (ThisPending.Comand) {
-        //            //case enDatabaseDataType.dummyComand_AddRow when _JoinTyp == enJoinTyp.Intelligent_zusammenfassen: {
-        //            //        var Value = SearchKeyValueInPendingsOf(ThisPending.RowKey);
-        //            //        var fRow = Row[Value];
-        //            //        if (!string.IsNullOrEmpty(Value) && fRow != null) {
-        //            //            ChangeRowKeyInPending(ThisPending.RowKey, fRow.Key);
-        //            //        } else {
-        //            //            ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
-        //            //        }
-        //            //        break;
-        //            //    }
-        //            //case enDatabaseDataType.dummyComand_AddRow:
-        //            //    ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
-        //            //    break;
-
-        //            //case enDatabaseDataType.AddColumn:
-        //            //    ChangeColumnKeyInPending(ThisPending.ColKey, Column.NextColumnKey);
-        //            //    break;
-        //        }
-        //    }
-        //}
-        // Und nun alles ausführen!
-        foreach (var thisPending in Works.Where(thisPending => thisPending.State == ItemState.Pending)) {
-            if (thisPending.Comand == DatabaseDataType.ColumnName) {
-                thisPending.ChangedTo = Column.Freename(thisPending.ChangedTo);
-            }
-            ExecutePending(thisPending);
         }
     }
 
@@ -1674,7 +1298,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     }
 
     private void Export_ListOrItemChanged(object sender, System.EventArgs e) {
-        if (_muf.IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+        if (IsLoading) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
         AddPending(DatabaseDataType.AutoExport, -1, Export.ToString(true), false);
     }
 
@@ -1690,7 +1314,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         _globalShowPass = string.Empty;
         _creator = UserName;
         _createDate = DateTime.Now.ToString(Constants.Format_Date5);
-        _muf.ReloadDelaySecond = 600;
         _undoCount = 300;
         _caption = string.Empty;
         //_verwaisteDaten = VerwaisteDaten.Ignorieren;
@@ -1703,7 +1326,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     }
 
     private void InvalidateExports(string layoutId) {
-        if (_muf.ReadOnly) { return; }
+        if (ReadOnly) { return; }
 
         foreach (var thisExport in Export) {
             if (thisExport != null) {
@@ -1717,10 +1340,10 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     }
 
     private void IsThereBackgroundWorkToDo(object sender, MultiUserIsThereBackgroundWorkToDoEventArgs e) {
-        var e2 = new MultiUserFileHasPendingChangesEventArgs();
-        HasPendingChanges(null, e2);
+        //var e2 = new MultiUserFileHasPendingChangesEventArgs();
+        //HasPendingChanges(null, e2);
 
-        if (e2.HasPendingChanges) { e.BackGroundWork = true; return; }
+        //if (e2.HasPendingChanges) { e.BackGroundWork = true; return; }
         CancelEventArgs ec = new(false);
         OnExporting(ec);
         if (ec.Cancel) { return; }
@@ -1745,7 +1368,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     }
 
     private void Layouts_ListOrItemChanged(object sender, System.EventArgs e) {
-        if (_muf.IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+        if (IsLoading) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
         AddPending(DatabaseDataType.Layouts, -1, Layouts.JoinWithCr(), false);
     }
 
@@ -1773,16 +1396,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         NeedPassword?.Invoke(this, e);
     }
 
-    private void OnSavedToDisk(object sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-        SavedToDisk?.Invoke(this, e);
-    }
-
-    private void OnShouldICancelSaveOperations(object sender, CancelEventArgs e) {
-        if (IsDisposed) { return; }
-        ShouldICancelSaveOperations?.Invoke(this, e);
-    }
-
     private void OnSortParameterChanged() {
         if (IsDisposed) { return; }
         SortParameterChanged?.Invoke(this, System.EventArgs.Empty);
@@ -1790,11 +1403,11 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
 
     private string ParseThis(DatabaseDataType type, string value, SQL_ColumnItem? column, SQL_RowItem? row, int width, int height) {
         if ((int)type is >= 100 and <= 199) {
-            _sql?.CheckIn(Filename.FileNameWithoutSuffix(), type, value, column, null, -1, -1);
+            _sql.CheckIn(Filename.FileNameWithoutSuffix(), type, value, column, null, -1, -1);
             return column.Load(type, value);
         }
 
-        _sql?.CheckIn(Filename.FileNameWithoutSuffix(), type, value, column, row, width, height);
+        _sql.CheckIn(Filename.FileNameWithoutSuffix(), type, value, column, row, width, height);
 
         switch (type) {
             case DatabaseDataType.Formatkennung:
@@ -1830,7 +1443,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
                 break;
 
             case DatabaseDataType.ReloadDelaySecond:
-                _muf.ReloadDelaySecond = IntParse(value);
+                //_muf.ReloadDelaySecond = IntParse(value);
                 break;
 
             case DatabaseDataType.DatabaseAdminGroups:
@@ -2027,7 +1640,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
             default:
                 if (LoadedVersion == SQL_DatabaseVersion) {
                     LoadedVersion = "9.99";
-                    if (!_muf.ReadOnly) {
+                    if (!ReadOnly) {
                         Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Datei: " + Filename);
                     }
                 }
@@ -2057,7 +1670,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     }
 
     private void PermissionGroups_NewRow_ListOrItemChanged(object sender, System.EventArgs e) {
-        if (_muf.IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+        if (IsLoading) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
         AddPending(DatabaseDataType.PermissionGroupsNewRow, -1, PermissionGroupsNewRow.JoinWithCr(), false);
     }
 
@@ -2074,25 +1687,21 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     }
 
     private void Row_RowAdded(object sender, SQL_RowEventArgs e) {
-        if (!_muf.IsParsing) {
-            AddPending(DatabaseDataType.dummyComand_AddRow, -1, e.Row.Key, "", e.Row.Key.ToString(), false);
-        }
+        //if (!_muf.IsParsing) {
+        //    AddPending(DatabaseDataType.dummyComand_AddRow, -1, e.Row.Key, "", e.Row.Key.ToString(), false);
+        //}
     }
 
     private void Row_RowRemoving(object sender, SQL_RowEventArgs e) => AddPending(DatabaseDataType.dummyComand_RemoveRow, -1, e.Row.Key, "", e.Row.Key.ToString(), false);
 
-    private void SetReadOnly() {
-        _muf.SetReadOnly();
-    }
-
     private void SQL_DatabaseAdmin_ListOrItemChanged(object sender, System.EventArgs e) {
-        if (_muf.IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+        if (IsLoading) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
         AddPending(DatabaseDataType.DatabaseAdminGroups, -1, DatenbankAdmin.JoinWithCr(), false);
     }
 
     //            protected override void OnItemAdded(SQL_ColumnItem item) {//    base.OnItemAdded(item);//    SQL_Database.CheckViewsAndArrangements();//}//protected override void OnItemRemoved() {//    base.OnItemRemoved();//    SQL_Database.CheckViewsAndArrangements();//    SQL_Database.Layouts.Check();//}
     private void SQL_DatabaseTags_ListOrItemChanged(object sender, System.EventArgs e) {
-        if (_muf.IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
+        if (IsLoading) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
         AddPending(DatabaseDataType.Tags, -1, Tags.JoinWithCr(), false);
     }
 

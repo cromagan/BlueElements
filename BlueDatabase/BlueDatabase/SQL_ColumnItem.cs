@@ -781,7 +781,6 @@ public sealed class SQL_ColumnItem : IReadableTextWithChanging, IDisposable, IIn
             Invalidate_TmpVariables();
             _tmpLinkedDatabase = value;
             if (_tmpLinkedDatabase != null) {
-                _tmpLinkedDatabase.ConnectedControlsStopAllWorking += _TMP_LinkedDatabase_ConnectedControlsStopAllWorking;
                 _tmpLinkedDatabase.Cell.CellValueChanged += _TMP_LinkedDatabase_Cell_CellValueChanged;
                 _tmpLinkedDatabase.Disposing += _TMP_LinkedDatabase_Disposing;
             }
@@ -2021,7 +2020,7 @@ public sealed class SQL_ColumnItem : IReadableTextWithChanging, IDisposable, IIn
                 if (editTypeToCheck == EditTypeFormula.None) { return true; }
                 //if (EditType_To_Check != enEditTypeFormula.Textfeld &&
                 //    EditType_To_Check != enEditTypeFormula.nur_als_Text_anzeigen) { return false; }
-                if (Database.IsParsing) { return true; }
+                if (Database.IsLoading) { return true; }
 
                 //var skriptgesteuert = LinkedCell_RowKeyIsInColumn == -9999;
                 //if (skriptgesteuert) {
@@ -2128,9 +2127,6 @@ public sealed class SQL_ColumnItem : IReadableTextWithChanging, IDisposable, IIn
         TmpCaptionTextSize = new SizeF(-1, -1);
         TmpCaptionBitmap = null;
         if (_tmpLinkedDatabase != null) {
-            //_TMP_LinkedDatabase.RowKeyChanged -= _TMP_LinkedDatabase_RowKeyChanged;
-            //_TMP_LinkedDatabase.ColumnKeyChanged -= _TMP_LinkedDatabase_ColumnKeyChanged;
-            _tmpLinkedDatabase.ConnectedControlsStopAllWorking -= _TMP_LinkedDatabase_ConnectedControlsStopAllWorking;
             _tmpLinkedDatabase.Cell.CellValueChanged -= _TMP_LinkedDatabase_Cell_CellValueChanged;
             _tmpLinkedDatabase.Disposing -= _TMP_LinkedDatabase_Disposing;
             _tmpLinkedDatabase = null;
@@ -2441,81 +2437,6 @@ public sealed class SQL_ColumnItem : IReadableTextWithChanging, IDisposable, IIn
 
     internal string ParsableColumnKey() => SQL_ColumnCollection.ParsableColumnKey(this);
 
-    internal void SaveToByteList(ref List<byte> l) {
-        Database.SaveToByteList(l, DatabaseDataType.ColumnName, _name, Key);
-        Database.SaveToByteList(l, DatabaseDataType.ColumnCaption, _caption, Key);
-        Database.SaveToByteList(l, DatabaseDataType.ColumnFormat, ((int)_format).ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.CaptionGroup1, _ueberschrift1, Key);
-        Database.SaveToByteList(l, DatabaseDataType.CaptionGroup2, _ueberschrift2, Key);
-        Database.SaveToByteList(l, DatabaseDataType.CaptionGroup3, _ueberschrift3, Key);
-        Database.SaveToByteList(l, DatabaseDataType.MultiLine, _multiLine.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.CellInitValue, _cellInitValue, Key);
-        Database.SaveToByteList(l, DatabaseDataType.SortAndRemoveDoubleAfterEdit, _afterEditQuickSortRemoveDouble.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.DoUcaseAfterEdit, _afterEditDoUCase.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.AutoCorrectAfterEdit, _afterEditAutoCorrect.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.RoundAfterEdit, _afterEditRunden.ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.AutoRemoveCharAfterEdit, _autoRemove, Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_SaveContent, _saveContent.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.FilterOptions, ((int)_filterOptions).ToString(), Key);
-        //Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilter_Dauerfilter, ((int)_AutoFilter_Dauerfilter).ToString(), Key);
-        //Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterErlaubt, _AutofilterErlaubt.ToPlusMinus(), Key);
-        //Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterTextFilterErlaubt, _AutofilterTextFilterErlaubt.ToPlusMinus(), Key);
-        //Database.SaveToByteList(l, enDatabaseDataType.co_AutoFilterErweitertErlaubt, _AutoFilterErweitertErlaubt.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.AutoFilterJoker, _autoFilterJoker, Key);
-        Database.SaveToByteList(l, DatabaseDataType.IgnoreAtRowFilter, _ignoreAtRowFilter.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.EditableWithTextInput, _textBearbeitungErlaubt.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.SpellCheckingEnabled, _spellCheckingEnabled.ToPlusMinus(), Key);
-        //  Database.SaveToByteList(l, enDatabaseDataType.co_CompactView, _CompactView.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.ShowMultiLineInOneLine, _showMultiLineInOneLine.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.co_ShowUndo, _showUndo.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.TextFormatingAllowed, _formatierungErlaubt.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.ForeColor, _foreColor.ToArgb().ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.BackColor, _backColor.ToArgb().ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.LineStyleLeft, ((int)_lineLeft).ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.LineStyleRight, ((int)_lineRight).ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.EditableWithDropdown, _dropdownBearbeitungErlaubt.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.DropDownItems, DropDownItems.JoinWithCr(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.LinkedCellFilter, LinkedCellFilter.JoinWithCr(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.OpticalTextReplace, OpticalReplace.JoinWithCr(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.AutoReplaceAfterEdit, AfterEditAutoReplace.JoinWithCr(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.RegexCheck, _regex, Key);
-        Database.SaveToByteList(l, DatabaseDataType.DropdownDeselectAllAllowed, _dropdownAllesAbwählenErlaubt.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.ShowValuesOfOtherCellsInDropdown, _dropdownWerteAndererZellenAnzeigen.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.ColumnQuickInfo, _quickInfo, Key);
-        Database.SaveToByteList(l, DatabaseDataType.ColumnAdminInfo, _adminInfo, Key);
-        Database.SaveToByteList(l, DatabaseDataType.CaptionBitmapCode, _captionBitmapTxt, Key);
-        //Database.SaveToByteList(l, enDatabaseDataType.co_CaptionBitmapUTF8, modConverter.BitmapToStringUnicode(_CaptionBitmap, ImageFormat.Png), Key);
-        Database.SaveToByteList(l, DatabaseDataType.AllowedChars, _allowedChars, Key);
-        Database.SaveToByteList(l, DatabaseDataType.PermissionGroupsChangeCell, PermissionGroupsChangeCell.JoinWithCr(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.ColumnTags, Tags.JoinWithCr(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.EditAllowedDespiteLock, _editTrotzSperreErlaubt.ToPlusMinus(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.Suffix, _suffix, Key);
-        Database.SaveToByteList(l, DatabaseDataType.LinkedDatabase, _linkedDatabaseFile, Key);
-        //Database.SaveToByteList(l, enDatabaseDataType.co_LinkKeyKennung, _linkedKeyKennung, Key);
-        //Database.SaveToByteList(l, DatabaseDataType.co_BestFile_StandardFolder, _bestFileStandardFolder, Key);
-        //Database.SaveToByteList(l, DatabaseDataType.co_BestFile_StandardSuffix, _bestFileStandardSuffix, Key);
-        Database.SaveToByteList(l, DatabaseDataType.ConstantHeightOfImageCode, _bildCodeConstantHeight, Key);
-        Database.SaveToByteList(l, DatabaseDataType.BehaviorOfImageAndText, ((int)_bildTextVerhalten).ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.DoOpticalTranslation, ((int)_translate).ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.AdditionalFormatCheck, ((int)_additionalCheck).ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.ScriptType, ((int)_scriptType).ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.Prefix, _prefix, Key);
-        Database.SaveToByteList(l, DatabaseDataType.KeyColumnKey, _keyColumnKey.ToString(), Key);
-        //Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_RowKeyIsInColumn, _linkedCellRowKeyIsInColumn.ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.ColumnKeyOfLinkedDatabase, _linkedCellColumnKeyOfLinkedDatabase.ToString(), Key);
-        //Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_ColumnValueFoundIn, _LinkedCell_ColumnValueFoundIn.ToString(), Key);
-        //Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_ColumnValueAdd, _LinkedCell_ColumnValueAdd, Key);
-        //Database.SaveToByteList(l, enDatabaseDataType.co_ZellenZusammenfassen, _ZellenZusammenfassen.ToPlusMinus(), Key);
-        //Database.SaveToByteList(l, DatabaseDataType.co_DropDownKey, _dropDownKey.ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.MakeSuggestionFromSameKeyColumn, _vorschlagsColumn.ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.ColumnAlign, ((int)_align).ToString(), Key);
-        Database.SaveToByteList(l, DatabaseDataType.SortType, ((int)_sortType).ToString(), Key);
-        //Database.SaveToByteList(l, enDatabaseDataType.co_Intelligenter_Multifilter, _Intelligenter_Multifilter, Key);
-        //Database.SaveToByteList(l, enDatabaseDataType.co_DauerFilterPos, _dauerFilterPos.ToString(), Key);
-        //Kennung UNBEDINGT zum Schluss, damit die Standard-Werte gesetzt werden können
-        Database.SaveToByteList(l, DatabaseDataType.ColumnIdentify, _identifier, Key);
-    }
-
     private void _TMP_LinkedDatabase_Cell_CellValueChanged(object sender, SQL_CellEventArgs e) {
         var tKey = SQL_CellCollection.KeyOfCell(e.Column, e.Row);
         foreach (var thisRow in Database.Row) {
@@ -2528,54 +2449,10 @@ public sealed class SQL_ColumnItem : IReadableTextWithChanging, IDisposable, IIn
         }
     }
 
-    //private void _TMP_LinkedDatabase_ColumnKeyChanged(object sender, KeyChangedEventArgs e) {
-    //    Database.BlockReload(false);
-    //    if (_Format != DataFormat.Columns_für_LinkedCellDropdown) {
-    //        var os = e.KeyOld.ToString();
-    //        var ns = e.KeyNew.ToString();
-    //        foreach (var ThisRow in Database.Row) {
-    //            if (Database.Cell.GetStringBehindLinkedValue(this, ThisRow) == os) {
-    //                Database.Cell.SetValueBehindLinkedValue(this, ThisRow, ns);
-    //            }
-    //        }
-    //    }
-    //    if (_Format != DataFormat.LinkedCell) {
-    //        var os = e.KeyOld.ToString() + "|";
-    //        var ns = e.KeyNew.ToString() + "|";
-    //        foreach (var ThisRow in Database.Row) {
-    //            var val = Database.Cell.GetStringBehindLinkedValue(this, ThisRow);
-    //            if (val.StartsWith(os)) {
-    //                Database.Cell.SetValueBehindLinkedValue(this, ThisRow, val.Replace(os, ns));
-    //            }
-    //        }
-    //    }
-    //}
-
-    private void _TMP_LinkedDatabase_ConnectedControlsStopAllWorking(object sender, MultiUserFileStopWorkingEventArgs e) => Database.OnConnectedControlsStopAllWorking(this, e);
-
-    //public bool IsParsing {
-    //    get {
-    //        Develop.DebugPrint(enFehlerArt.Fehler, "Kann nur über die Datenbank geparsed werden.");
-    //        return false;
-    //    }
-    //}
     private void _TMP_LinkedDatabase_Disposing(object sender, System.EventArgs e) {
         Invalidate_TmpVariables();
         Database.Dispose();
     }
-
-    //private void _TMP_LinkedDatabase_RowKeyChanged(object sender, KeyChangedEventArgs e) {
-    //    if (_Format != DataFormat.LinkedCell) {
-    //        var os = "|" + e.KeyOld.ToString();
-    //        var ns = "|" + e.KeyNew.ToString();
-    //        foreach (var ThisRow in Database.Row) {
-    //            var val = Database.Cell.GetStringBehindLinkedValue(this, ThisRow);
-    //            if (val.EndsWith(os)) {
-    //                Database.Cell.SetValueBehindLinkedValue(this, ThisRow, val.Replace(os, ns));
-    //            }
-    //        }
-    //    }
-    //}
 
     private void AfterEdit_AutoReplace_ListOrItemChanged(object sender, System.EventArgs e) {
         Database.AddPending(DatabaseDataType.AutoReplaceAfterEdit, Key, AfterEditAutoReplace.JoinWithCr(), false);

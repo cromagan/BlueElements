@@ -62,7 +62,6 @@ public sealed class SQL_ColumnCollection : ListExt<SQL_ColumnItem> {
     public new SQL_ColumnItem? this[int index] {
         get {
             if (Database == null) { return null; }
-            Database.BlockReload(false);
             if (index >= 0 && index < Count) {
                 return base[index];
             }
@@ -74,7 +73,6 @@ public sealed class SQL_ColumnCollection : ListExt<SQL_ColumnItem> {
 
     public SQL_ColumnItem? this[string columnName] {
         get {
-            Database?.BlockReload(false);
             var colum = Exists(columnName);
             if (colum is null) { Database?.DevelopWarnung("Spalte nicht gefunden: " + columnName); }
             return colum;
@@ -321,7 +319,6 @@ public sealed class SQL_ColumnCollection : ListExt<SQL_ColumnItem> {
         try {
             if (Database == null) { return null; }
             if (key < 0) { return null; } // Evtl. Gelöschte Spalte in irgendeiner Order
-            Database.BlockReload(false);
             return this.FirstOrDefault(thisColumn => thisColumn != null && thisColumn.Key == key);
         } catch {
             return SearchByKey(key); // Sammlung wurde verändert
@@ -349,32 +346,6 @@ public sealed class SQL_ColumnCollection : ListExt<SQL_ColumnItem> {
             tmp++;
         } while (SearchByKey(key) != null);
         return key;
-    }
-
-    //internal string Load_310(enDatabaseDataType type, string value) {
-    //    switch (type) {
-    //        case enDatabaseDataType.LastColumnKey:
-    //            _LastColumnKey = LongParse(value);
-    //            break;
-
-    //        default:
-    //            if (type.ToString() == ((int)type).ToString()) {
-    //                Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + type + "' nicht definiert.<br>Wert: " + value + "<br>Datei: " + Database.Filename);
-    //            } else {
-    //                return "Interner Fehler: Für den Datentyp  '" + type + "'  wurde keine Laderegel definiert.";
-    //            }
-    //            break;
-    //    }
-    //    return string.Empty;
-    //}
-
-    internal void SaveToByteList(List<byte> list) {
-        //Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString());
-        for (var columnCount = 0; columnCount < Count; columnCount++) {
-            if (this[columnCount] != null && !string.IsNullOrEmpty(this[columnCount].Name)) {
-                this[columnCount].SaveToByteList(ref list);
-            }
-        }
     }
 
     protected override void Dispose(bool disposing) {
