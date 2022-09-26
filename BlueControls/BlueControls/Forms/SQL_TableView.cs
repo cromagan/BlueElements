@@ -1022,26 +1022,26 @@ public partial class SQL_TableView : Form {
     }
 
     private void tbcDatabaseSelector_Selected(object? sender, System.Windows.Forms.TabControlEventArgs e) {
-        //Table.ShowWaitScreen = true;
-        //tbcDatabaseSelector.Enabled = false;
-        //Table.Enabled = false;
-        //Table.Refresh();
+        Table.ShowWaitScreen = true;
+        tbcDatabaseSelector.Enabled = false;
+        Table.Enabled = false;
+        Table.Refresh();
 
         //BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
 
-        //if (e.TabPage == null) { return; }
+        if (e.TabPage == null) { return; }
 
-        //var s = (List<string>)(e.TabPage.Tag);
+        var s = (List<string>)(e.TabPage.Tag);
 
-        //var DB = SLQ_Database.GetByFilename(s[0], false, false);
+        var DB = SQL_Database.GetByFilename(s[0], false, false);
 
-        //if (DB != null) {
-        //    btnLetzteDateien.AddFileName(DB.Filename, string.Empty);
-        //    LoadTab.FileName = DB.Filename;
-        //    e.TabPage.Text = DB.Filename.FileNameWithoutSuffix();
-        //}
+        if (DB != null) {
+            btnLetzteDateien.AddFileName(DB.Filename, string.Empty);
+            LoadTab.FileName = DB.Filename;
+            e.TabPage.Text = DB.Filename.FileNameWithoutSuffix();
+        }
 
-        //DatabaseSet(DB, s[1]);
+        DatabaseSet(DB, s[1]);
     }
 
     private void txbTextSuche_Enter(object sender, System.EventArgs e) {

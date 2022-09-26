@@ -123,7 +123,7 @@ public sealed class SQL_ColumnItem : IReadableTextWithChanging, IDisposable, IIn
     public SQL_ColumnItem(SQL_Database database, long columnkey) {
         Database = database;
         Database.Disposing += Database_Disposing;
-        if (columnkey < 0) { Develop.DebugPrint(FehlerArt.Fehler, "ColumnKey <0"); }
+        //if (columnkey < 0) { Develop.DebugPrint(FehlerArt.Fehler, "ColumnKey <0"); }
         var ex = Database.Column.SearchByKey(columnkey);
         if (ex != null) { Develop.DebugPrint(FehlerArt.Fehler, "Key existiert bereits"); }
         Key = columnkey;
@@ -520,7 +520,7 @@ public sealed class SQL_ColumnItem : IReadableTextWithChanging, IDisposable, IIn
         }
     }
 
-    public long Key { get; }
+    public long Key { get; set; }
 
     /// <summary>
     /// Hält Werte, dieser Spalte gleich, bezugnehmend der KeyColumn(key)
@@ -2134,273 +2134,213 @@ public sealed class SQL_ColumnItem : IReadableTextWithChanging, IDisposable, IIn
         TmpColumnContentWidth = null;
     }
 
-    internal string Load(DatabaseDataType art, string wert) {
-        switch (art) {
-            case DatabaseDataType.ColumnName:
+    internal string Load(string art, string wert) {
+        switch (art.ToLower()) {
+            case "columnname":
                 _name = wert;
                 Invalidate_TmpVariables();
                 break;
 
-            case DatabaseDataType.ColumnCaption:
+            case "columncaption":
                 _caption = wert;
                 break;
 
-            case DatabaseDataType.ColumnFormat:
+            case "columnformat":
                 _format = (DataFormat)IntParse(wert);
                 break;
 
-            case DatabaseDataType.ForeColor:
+            case "forecolor":
                 _foreColor = Color.FromArgb(IntParse(wert));
                 break;
 
-            case DatabaseDataType.BackColor:
+            case "backcolor":
                 _backColor = Color.FromArgb(IntParse(wert));
                 break;
 
-            case DatabaseDataType.LineStyleLeft:
+            case "linestyleleft":
                 _lineLeft = (ColumnLineStyle)IntParse(wert);
                 break;
 
-            case DatabaseDataType.LineStyleRight:
+            case "linestyleright":
                 _lineRight = (ColumnLineStyle)IntParse(wert);
                 break;
 
-            case DatabaseDataType.ColumnQuickInfo:
+            case "columnquickinfo":
                 _quickInfo = wert;
                 break;
-            //case enDatabaseDataType.co_Intelligenter_Multifilter: _Intelligenter_Multifilter = Wert; break;
-            case (DatabaseDataType)194://DatabaseDataType.co_DauerFilterPos:
-                //_dauerFilterPos = wert.PointParse();
-                break;
 
-            case DatabaseDataType.CaptionGroup1:
+            case "captiongroup1":
                 _ueberschrift1 = wert;
                 break;
 
-            case DatabaseDataType.CaptionGroup2:
+            case "captiongroup2":
                 _ueberschrift2 = wert;
                 break;
 
-            case DatabaseDataType.CaptionGroup3:
+            case "captiongroup3":
                 _ueberschrift3 = wert;
                 break;
 
-            //case enDatabaseDataType.co_CaptionBitmap:
-            //    if (!string.IsNullOrEmpty(Wert)) {
-            //        _CaptionBitmapTXT = "co_" + _Name;
-            //    }
-            //    break;
-
-            case DatabaseDataType.ColumnIdentify:
+            case "columnidentify":
                 _identifier = wert;
                 ResetSystemToDefault(false);
                 Database.Column.GetSystems();
                 break;
 
-            case (DatabaseDataType)147: // DatabaseDataType.co_EditType:
-                //_editType = (EditTypeFormula)IntParse(wert);
-                break;
-
-            case DatabaseDataType.MultiLine:
+            case "multiline":
                 _multiLine = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.DropDownItems:
+            case "dropdownitems":
                 DropDownItems.SplitAndCutByCr_QuickSortAndRemoveDouble(wert);
                 break;
 
-            case DatabaseDataType.LinkedCellFilter:
+            case "linkedcellfilter":
                 LinkedCellFilter.SplitAndCutByCr(wert);
                 break;
 
-            case DatabaseDataType.OpticalTextReplace:
+            case "opticaltextreplace":
                 OpticalReplace.SplitAndCutByCr(wert);
                 break;
 
-            case DatabaseDataType.AutoReplaceAfterEdit:
+            case "autoreplaceafteredit":
                 AfterEditAutoReplace.SplitAndCutByCr(wert);
                 break;
 
-            case DatabaseDataType.RegexCheck:
+            case "regexcheck":
                 _regex = wert;
                 break;
 
-            case DatabaseDataType.ColumnTags:
+            case "columntags":
                 Tags.SplitAndCutByCr(wert);
                 break;
 
-            case DatabaseDataType.AutoFilterJoker:
+            case "autofilterjoker":
                 _autoFilterJoker = wert;
                 break;
 
-            case DatabaseDataType.PermissionGroupsChangeCell:
+            case "permissiongroupschangecell":
                 PermissionGroupsChangeCell.SplitAndCutByCr_QuickSortAndRemoveDouble(wert);
                 break;
 
-            case DatabaseDataType.AllowedChars:
+            case "allowedchars":
                 _allowedChars = wert;
                 break;
 
-            case DatabaseDataType.FilterOptions:
+            case "filteroptions":
                 _filterOptions = (FilterOptions)IntParse(wert);
                 break;
 
-            case (DatabaseDataType)138://   case DatabaseDataType.co_AutoFilterErlaubt_alt:
-                //_filterOptions = FilterOptions.None;
-                //if (wert.FromPlusMinus()) { _filterOptions |= FilterOptions.Enabled; }
-                break;
-
-            case (DatabaseDataType)139:// case DatabaseDataType.co_AutoFilterTextFilterErlaubt_alt:
-                //if (wert.FromPlusMinus()) { _filterOptions |= FilterOptions.TextFilterEnabled; }
-                break;
-
-            case (DatabaseDataType)140://  case DatabaseDataType.co_AutoFilterErweitertErlaubt_alt:
-                //if (wert.FromPlusMinus()) { _filterOptions |= FilterOptions.ExtendedFilterEnabled; }
-                break;
-
-            case DatabaseDataType.IgnoreAtRowFilter:
+            case "ignoreatrowfilter":
                 _ignoreAtRowFilter = wert.FromPlusMinus();
                 break;
 
-            case (DatabaseDataType)152:// case DatabaseDataType.co_CompactView_alt:
-                break;
-
-            case DatabaseDataType.co_ShowUndo:
-                _showUndo = wert.FromPlusMinus();
-                break;
-
-            case DatabaseDataType.ShowMultiLineInOneLine:
+            case "showmultilineinoneline":
                 _showMultiLineInOneLine = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.EditableWithTextInput:
+            case "editablewithtextinput":
                 _textBearbeitungErlaubt = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.EditableWithDropdown:
+            case "editablewithdropdown":
                 _dropdownBearbeitungErlaubt = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.SpellCheckingEnabled:
+            case "spellcheckingenabled":
                 _spellCheckingEnabled = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.DropdownDeselectAllAllowed:
+            case "dropdowndeselectallallowed":
                 _dropdownAllesAbwählenErlaubt = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.ShowValuesOfOtherCellsInDropdown:
+            case "showvaluesofothercellsindropdown":
                 _dropdownWerteAndererZellenAnzeigen = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.SortAndRemoveDoubleAfterEdit:
+            case "sortandremovedoubleafteredit":
                 _afterEditQuickSortRemoveDouble = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.RoundAfterEdit:
+            case "roundafteredit":
                 _afterEditRunden = IntParse(wert);
                 break;
 
-            case DatabaseDataType.DoUcaseAfterEdit:
+            case "doucaseafteredit":
                 _afterEditDoUCase = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.AutoCorrectAfterEdit:
+            case "autocorrectafteredit":
                 _afterEditAutoCorrect = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.co_SaveContent:
-                _saveContent = wert.FromPlusMinus();
-                break;
-
-            case DatabaseDataType.AutoRemoveCharAfterEdit:
+            case "autoremovecharafteredit":
                 _autoRemove = wert;
                 break;
 
-            case DatabaseDataType.ColumnAdminInfo:
+            case "columnadmininfo":
                 _adminInfo = wert;
                 break;
 
-            case DatabaseDataType.CaptionBitmapCode:
+            case "captionbitmapcode":
                 _captionBitmapTxt = wert;
                 break;
 
-            case DatabaseDataType.Suffix:
+            case "suffix":
                 _suffix = wert;
                 break;
 
-            case DatabaseDataType.LinkedDatabase:
+            case "linkeddatabase":
                 _linkedDatabaseFile = wert;
                 break;
 
-            case (DatabaseDataType)167:// DatabaseDataType.co_LinkKeyKennung:
-                //_linkedKeyKennung = wert;
-                break;
-
-            case (DatabaseDataType)168://DatabaseDataType.co_BestFile_StandardSuffix:
-                //_bestFileStandardSuffix = wert;
-                break;
-
-            case (DatabaseDataType)169://DatabaseDataType.co_BestFile_StandardFolder:
-                //_bestFileStandardFolder = wert;
-                break;
-
-            case DatabaseDataType.ConstantHeightOfImageCode:
+            case "constantheightofimagecode":
                 if (wert == "0") { wert = string.Empty; }
                 _bildCodeConstantHeight = wert;
                 break;
 
-            case DatabaseDataType.Prefix:
+            case "prefix":
                 _prefix = wert;
                 break;
 
-            case DatabaseDataType.DoOpticalTranslation:
+            case "doopticaltranslation":
                 _translate = (TranslationType)IntParse(wert);
                 break;
 
-            case DatabaseDataType.AdditionalFormatCheck:
+            case "additionalformatcheck":
                 _additionalCheck = (AdditionalCheck)IntParse(wert);
                 break;
 
-            case DatabaseDataType.ScriptType:
+            case "scripttype":
                 _scriptType = (ScriptType)IntParse(wert);
                 break;
 
-            case DatabaseDataType.BehaviorOfImageAndText:
+            case "behaviorofimageandtext":
                 _bildTextVerhalten = (BildTextVerhalten)IntParse(wert);
                 break;
 
-            case DatabaseDataType.EditAllowedDespiteLock:
+            case "editalloweddespitelock":
                 _editTrotzSperreErlaubt = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.TextFormatingAllowed:
+            case "textformatingallowed":
                 _formatierungErlaubt = wert.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.CellInitValue:
+            case "cellinitvalue":
                 _cellInitValue = wert;
                 break;
 
-            case DatabaseDataType.KeyColumnKey:
+            case "keycolumnkey":
                 _keyColumnKey = LongParse(wert);
                 break;
 
-            case (DatabaseDataType)179://DatabaseDataType.co_LinkedCell_RowKeyIsInColumn:
-                //_linkedCellRowKeyIsInColumn = LongParse(wert);
-                break;
-
-            case DatabaseDataType.ColumnKeyOfLinkedDatabase:
+            case "columnkeyoflinkeddatabase":
                 _linkedCellColumnKeyOfLinkedDatabase = LongParse(wert);
                 break;
 
-            //case enDatabaseDataType.co_LinkedCell_ColumnValueFoundIn:
-            //    break;
-
-            //case enDatabaseDataType.co_LinkedCell_ColumnValueAdd:
-            //    break;
-
-            case DatabaseDataType.SortType:
+            case "sorttype":
                 if (string.IsNullOrEmpty(wert)) {
                     _sortType = SortierTyp.Original_String;
                 } else {
@@ -2408,29 +2348,18 @@ public sealed class SQL_ColumnItem : IReadableTextWithChanging, IDisposable, IIn
                 }
                 break;
 
-            //case enDatabaseDataType.co_ZellenZusammenfassen: _ZellenZusammenfassen = Wert.FromPlusMinus(); break;
-            case (DatabaseDataType)184://case DatabaseDataType.co_DropDownKey:
-                //_dropDownKey = LongParse(wert);
-                break;
-
-            case DatabaseDataType.MakeSuggestionFromSameKeyColumn:
+            case "makesuggestionfromsamekeycolumn":
                 _vorschlagsColumn = LongParse(wert);
                 break;
 
-            case DatabaseDataType.ColumnAlign:
+            case "columnalign":
                 _align = (AlignmentHorizontal)IntParse(wert);
                 if (_align == (AlignmentHorizontal)(-1)) { _align = AlignmentHorizontal.Links; }
                 break;
-            //case (enDatabaseDataType)189: break;
-            //case (enDatabaseDataType)192: break;
-            //case (enDatabaseDataType)193: break;
+
             default:
-                if (art.ToString() == ((int)art).ToString()) {
-                    //Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + Art + "' nicht definiert.<br>Wert: " + Wert + "<br>Datei: " + Database.Filename);
-                } else {
-                    return "Interner Fehler: Für den Datentyp  '" + art + "'  wurde keine Laderegel definiert.";
-                }
-                break;
+
+                return "Interner Fehler: Für den Datentyp  '" + art + "'  wurde keine Laderegel definiert.";
         }
         return string.Empty;
     }

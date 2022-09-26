@@ -68,6 +68,7 @@ namespace BlueControls.Forms {
             this.btnSpaltenanordnung = new BlueControls.Controls.Button();
             this.btnLayouts = new BlueControls.Controls.Button();
             this.grpAdminAllgemein = new BlueControls.Controls.GroupBox();
+            this.btnSaveLoad = new BlueControls.Controls.Button();
             this.btnVorherigeVersion = new BlueControls.Controls.Button();
             this.btnDatenbankKopf = new BlueControls.Controls.Button();
             this.btnSpaltenUebersicht = new BlueControls.Controls.Button();
@@ -92,7 +93,6 @@ namespace BlueControls.Forms {
             this.capZeilen2 = new BlueControls.Controls.Caption();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
-            this.btnSaveLoad = new BlueControls.Controls.Button();
             this.ribMain.SuspendLayout();
             this.tabFile.SuspendLayout();
             this.grpOrdner.SuspendLayout();
@@ -675,6 +675,17 @@ namespace BlueControls.Forms {
             this.grpAdminAllgemein.TabStop = false;
             this.grpAdminAllgemein.Text = "Allgemein";
             // 
+            // btnSaveLoad
+            // 
+            this.btnSaveLoad.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnSaveLoad.ImageCode = "Diskette";
+            this.btnSaveLoad.Location = new System.Drawing.Point(208, 2);
+            this.btnSaveLoad.Name = "btnSaveLoad";
+            this.btnSaveLoad.Size = new System.Drawing.Size(64, 66);
+            this.btnSaveLoad.TabIndex = 43;
+            this.btnSaveLoad.Text = "Speichern";
+            this.btnSaveLoad.Click += new System.EventHandler(this.btnSaveLoad_Click);
+            // 
             // btnVorherigeVersion
             // 
             this.btnVorherigeVersion.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
@@ -950,7 +961,7 @@ namespace BlueControls.Forms {
             // 
             // LoadTab
             // 
-            this.LoadTab.Filter = "*.MDB Datenbanken|*.MDB|*.* Alle Dateien|*";
+            this.LoadTab.Filter = "*.MDB Datenbanken|*.mdf|*.* Alle Dateien|*";
             this.LoadTab.Title = "Bitte Datenbank laden!";
             this.LoadTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
             // 
@@ -960,18 +971,7 @@ namespace BlueControls.Forms {
             this.SaveTab.Title = "Bitte neuen Dateinamen der Datenbank wählen.";
             this.SaveTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
             // 
-            // btnSaveLoad
-            // 
-            this.btnSaveLoad.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnSaveLoad.ImageCode = "Diskette";
-            this.btnSaveLoad.Location = new System.Drawing.Point(208, 2);
-            this.btnSaveLoad.Name = "btnSaveLoad";
-            this.btnSaveLoad.Size = new System.Drawing.Size(64, 66);
-            this.btnSaveLoad.TabIndex = 43;
-            this.btnSaveLoad.Text = "Speichern";
-            this.btnSaveLoad.Click += new System.EventHandler(this.btnSaveLoad_Click);
-            // 
-            // TableView
+            // SQL_TableView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;

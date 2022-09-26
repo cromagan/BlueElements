@@ -17,14 +17,14 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Data;
-using BlueBasics;
+using System.Data.SqlClient;
 using System.IO;
-using BlueDatabase.Enums;
-using BlueBasics.Enums;
 
 namespace BlueDatabase;
 
@@ -160,7 +160,7 @@ public class SqlBack {
                     break;
 
                 default:
-                    return SetStyleDate(database, type, string.Empty, value);
+                    return SetStyleData(database, type, string.Empty, value);
             }
 
             CloseConnection();
@@ -182,7 +182,7 @@ public class SqlBack {
                 default:
                     if (type == DatabaseDataType.ColumnCaption) { AddColumnToMain(column.Name); }
 
-                    return SetStyleDate(database, type, column.Name.ToUpper(), value);
+                    return SetStyleData(database, type, column.Name.ToUpper(), value);
             }
             CloseConnection();
             return true;
@@ -223,7 +223,7 @@ public class SqlBack {
                     break;
 
                 default:
-                    return SetStyleDate(database, type, string.Empty, value);
+                    return SetStyleData(database, type, string.Empty, value);
             }
 
             CloseConnection();
@@ -245,7 +245,7 @@ public class SqlBack {
                 default:
                     if (type == DatabaseDataType.ColumnCaption) { AddColumnToMain(column.Name); }
 
-                    return SetStyleDate(database, type, column.Name.ToUpper(), value);
+                    return SetStyleData(database, type, column.Name.ToUpper(), value);
             }
             CloseConnection();
             return true;
@@ -330,6 +330,31 @@ public class SqlBack {
         return columns;
     }
 
+    public Dictionary<string, string> GetStylDataAll(string dbname, string columnName) {
+        var l = new Dictionary<string, string>();
+
+        if (!OpenConnection()) { return l; }
+
+        using var q = _connection.CreateCommand();
+        // (DBNAME, TYPE, COLUMNNAME, VALUE)
+        q.CommandText = @"select TYPE, VALUE from Style " +
+                        "where DBNAME = @DBNAME " +
+                        "and COLUMNNAME = @COLUMNNAME";
+
+        q.Parameters.AddWithValue("@DBNAME", dbname.ToUpper());
+        q.Parameters.AddWithValue("@COLUMNNAME", columnName.ToUpper());
+
+        using var reader = q.ExecuteReader();
+
+        while (reader.Read()) {
+            // you may want to check if value is NULL: reader.IsDBNull(0)
+            l.Add(reader[0].ToString(), reader[1].ToString());
+        }
+
+        CloseConnection();    // Nix vorhanden!
+        return l;
+    }
+
     public List<string> ListTables() {
         List<string> tables = new();
 
@@ -344,10 +369,6 @@ public class SqlBack {
         CloseConnection();
 
         return tables;
-    }
-
-    public void Load(string filename, bool create) {
-        Develop.DebugPrint_NichtImplementiert();
     }
 
     private bool AddColumn(string table, string column) => ExecuteCommand("alter table " + table + " add " + column + " VARCHAR(255) default '' NOT NULL");
@@ -592,7 +613,7 @@ public class SqlBack {
     /// <param name="columnName"></param>
     /// <param name="newValue"></param>
     /// <returns></returns>
-    private bool SetStyleDate(string dbname, DatabaseDataType type, string columnName, string newValue) {
+    private bool SetStyleData(string dbname, DatabaseDataType type, string columnName, string newValue) {
         var t = type.ToString();
 
         if (t == ((int)type).ToString()) { return true; }

@@ -153,7 +153,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         UserGroup = "#Administrator";
         if (!string.IsNullOrEmpty(filename)) {
             //DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + filename.FileNameWithoutSuffix()));
-            _sql.Load(filename, create);
+            LoadFromSQLBack(filename);
         } else {
             RepairAfterParse(null, null);
         }
@@ -251,6 +251,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     }
 
     public bool IsDisposed { get; private set; }
+
     public bool IsLoading { get; private set; }
 
     public string LoadedVersion { get; private set; }
@@ -304,14 +305,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         }
     }
 
-    //public VerwaisteDaten VerwaisteDaten {
-    //    get => _verwaisteDaten;
-    //    set {
-    //        if (_verwaisteDaten == value) { return; }
-    //        AddPending(DatabaseDataType.VerwaisteDaten, -1, -1, ((int)_verwaisteDaten).ToString(), ((int)value).ToString(), true);
-    //    }
-    //}
-
     [Browsable(false)]
     public string ZeilenQuickInfo {
         get => _zeilenQuickInfo;
@@ -325,6 +318,13 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
 
     #region Methods
 
+    //public VerwaisteDaten VerwaisteDaten {
+    //    get => _verwaisteDaten;
+    //    set {
+    //        if (_verwaisteDaten == value) { return; }
+    //        AddPending(DatabaseDataType.VerwaisteDaten, -1, -1, ((int)_verwaisteDaten).ToString(), ((int)value).ToString(), true);
+    //    }
+    //}
     /// <summary>
     /// Sucht die Datenbank im Speicher. Wird sie nicht gefunden, wird sie geladen.
     /// </summary>
@@ -377,35 +377,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         return string.Empty;
     }
 
-    //public List<string> AllConnectedFilesLCase() {
-    //    List<string> columnAll = new();
-    //    var lockMe = new object();
-
-    //    foreach (var thisSQL_ColumnItem in Column) {
-    //        if (thisSQL_ColumnItem != null && thisSQL_ColumnItem.Format == DataFormat.Link_To_Filesystem) {
-    //            var tmp = thisSQL_ColumnItem.Contents();
-    //            Parallel.ForEach(tmp, thisTmp => {
-    //                var x = thisSQL_ColumnItem.BestFile(thisTmp, false).ToLower();
-    //                lock (lockMe) {
-    //                    columnAll.Add(x);
-    //                }
-    //            });
-    //        }
-    //    }
-    //    //foreach (var ThisSQL_ColumnItem in Column) {
-    //    //    if (ThisSQL_ColumnItem != null) {
-    //    //        if (ThisSQL_ColumnItem.Format == DataFormat.Link_To_Filesystem) {
-    //    //            var tmp = ThisSQL_ColumnItem.Contents();
-    //    //            foreach (var thisTmp in tmp) {
-    //    //                Column_All.AddIfNotExists(ThisSQL_ColumnItem.BestFile(thisTmp, false).ToLower());
-    //    //            }
-    //    //        }
-    //    //    }
-    //    //}
-
-    //    return columnAll.SortedDistinctList();
-    //}
-
     public List<SQL_RowData?> AllRows() {
         var sortedRows = new List<SQL_RowData?>();
         foreach (var thisSQL_RowItem in Row) {
@@ -416,11 +387,9 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         return sortedRows;
     }
 
-    public bool BlockSaveOperations() => SQL_RowItem.DoingScript;
-
-    //public void CancelBackGroundWorker() {
-    //    _muf.CancelBackGroundWorker();
+    //    return columnAll.SortedDistinctList();
     //}
+    public bool BlockSaveOperations() => SQL_RowItem.DoingScript;
 
     public void CloneDataFrom(SQL_Database sourceSQL_Database) {
 
@@ -449,12 +418,39 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         #endregion
     }
 
+    //    foreach (var thisSQL_ColumnItem in Column) {
+    //        if (thisSQL_ColumnItem != null && thisSQL_ColumnItem.Format == DataFormat.Link_To_Filesystem) {
+    //            var tmp = thisSQL_ColumnItem.Contents();
+    //            Parallel.ForEach(tmp, thisTmp => {
+    //                var x = thisSQL_ColumnItem.BestFile(thisTmp, false).ToLower();
+    //                lock (lockMe) {
+    //                    columnAll.Add(x);
+    //                }
+    //            });
+    //        }
+    //    }
+    //    //foreach (var ThisSQL_ColumnItem in Column) {
+    //    //    if (ThisSQL_ColumnItem != null) {
+    //    //        if (ThisSQL_ColumnItem.Format == DataFormat.Link_To_Filesystem) {
+    //    //            var tmp = ThisSQL_ColumnItem.Contents();
+    //    //            foreach (var thisTmp in tmp) {
+    //    //                Column_All.AddIfNotExists(ThisSQL_ColumnItem.BestFile(thisTmp, false).ToLower());
+    //    //            }
+    //    //        }
+    //    //    }
+    //    //}
+    //public void CancelBackGroundWorker() {
+    //    _muf.CancelBackGroundWorker();
+    //}
     /// <summary>
     /// Datenbankpfad mit Forms und abschlieﬂenden \
     /// </summary>
     /// <returns></returns>
     public string DefaultFormulaPath() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "Forms\\";
 
+    //public List<string> AllConnectedFilesLCase() {
+    //    List<string> columnAll = new();
+    //    var lockMe = new object();
     /// <summary>
     /// Datenbankpfad mit Layouts und abschlieﬂenden \
     /// </summary>
@@ -1371,6 +1367,20 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         AddPending(DatabaseDataType.Layouts, -1, Layouts.JoinWithCr(), false);
     }
 
+    private void LoadFromSQLBack(string filename) {
+        IsLoading = true;
+
+        Filename = filename;
+
+        var cols = _sql.GetColumnNames("Main");
+
+        foreach (var thisCol in cols) {
+            Column.Add(thisCol, _sql);
+        }
+
+        IsLoading = false;
+    }
+
     private void OnDisposing() {
         Disposing?.Invoke(this, System.EventArgs.Empty);
     }
@@ -1401,10 +1411,10 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     }
 
     private string ParseThis(DatabaseDataType type, string value, SQL_ColumnItem? column, SQL_RowItem? row, int width, int height) {
-        if ((int)type is >= 100 and <= 199) {
-            _sql.CheckIn(Filename.FileNameWithoutSuffix(), type, value, column, null, -1, -1);
-            return column.Load(type, value);
-        }
+        //if ((int)type is >= 100 and <= 199) {
+        //    _sql.CheckIn(Filename.FileNameWithoutSuffix(), type, value, column, null, -1, -1);
+        //    return column.Load(type, value);
+        //}
 
         _sql.CheckIn(Filename.FileNameWithoutSuffix(), type, value, column, row, width, height);
 
@@ -1618,10 +1628,10 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
                 if (Row.SearchByKey(addRowKey) == null) { Row.Add(new SQL_RowItem(this, addRowKey)); }
                 break;
 
-            case DatabaseDataType.AddColumn:
-                var addColumnKey = LongParse(value);
-                if (Column.SearchByKey(addColumnKey) == null) { Column.AddFromParser(new SQL_ColumnItem(this, addColumnKey)); }
-                break;
+            //case DatabaseDataType.AddColumn:
+            //    var addColumnKey = LongParse(value);
+            //    if (Column.SearchByKey(addColumnKey) == null) { Column.AddFromParser(new SQL_ColumnItem(this, addColumnKey)); }
+            //    break;
 
             case DatabaseDataType.dummyComand_RemoveRow:
                 var removeRowKey = LongParse(value);

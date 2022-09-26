@@ -129,17 +129,6 @@ public sealed class SQL_ColumnCollection : ListExt<SQL_ColumnItem> {
         return c;
     }
 
-    /// <summary>
-    /// Diese Routine sollte nur bei einem Reload benutzt werden. AddPending wir nicht mehr ausgelöst.
-    /// </summary>
-    /// <param name="column"></param>
-    /// <returns></returns>
-    public void AddFromParser(SQL_ColumnItem? column) {
-        if (column.Database != Database) { Develop.DebugPrint(FehlerArt.Fehler, "Parent-Datenbanken unterschiedlich!"); }
-        if (Contains(column)) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte bereits vorhanden!"); }
-        base.Add(column);
-    }
-
     public SQL_ColumnItem? Exists(string columnName) {
         if (Database == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Database ist null bei " + columnName);
@@ -278,11 +267,11 @@ public sealed class SQL_ColumnCollection : ListExt<SQL_ColumnItem> {
                     if (base[s2] != null) {
                         // Evtl. Doppelte Namen einzigartig machen
                         if (string.Equals(base[s1].Name, base[s2].Name, StringComparison.OrdinalIgnoreCase)) {
-                            base[s2].Load(DatabaseDataType.ColumnName, base[s2].Name + "0");
+                            base[s2].Load("ColumnName", base[s2].Name + "0");
                         }
                         // Evtl. Doppelte Identifier eleminieren
                         if (!string.IsNullOrEmpty(base[s1].Identifier) && string.Equals(base[s1].Identifier, base[s2].Identifier, StringComparison.OrdinalIgnoreCase)) {
-                            base[s2].Load(DatabaseDataType.ColumnIdentify, string.Empty);
+                            base[s2].Load("ColumnIdentify", string.Empty);
                         }
                     }
                 }
@@ -337,6 +326,19 @@ public sealed class SQL_ColumnCollection : ListExt<SQL_ColumnItem> {
 
     internal static string ParsableColumnKey(long key) => "ColumnKey=" + key;
 
+    internal void Add(string columnname, SqlBack sql) {
+        var x = new SQL_ColumnItem(Database, -1);
+
+        var l = sql.GetStylDataAll(Database.Filename.FileNameWithoutSuffix(), columnname);
+        if (l != null && l.Count > 0) {
+            foreach (var thisstyle in l) {
+                x.Load(thisstyle.Key, thisstyle.Value);
+            }
+        }
+
+        base.Add(x);
+    }
+
     internal long NextColumnKey() {
         var tmp = 0;
         long key;
@@ -359,7 +361,7 @@ public sealed class SQL_ColumnCollection : ListExt<SQL_ColumnItem> {
             return;
         }
         var c = Add(identifier);
-        c.Load(DatabaseDataType.ColumnIdentify, identifier);
+        c.Load("ColumnIdentify", identifier);
         c.ResetSystemToDefault(true);
     }
 
