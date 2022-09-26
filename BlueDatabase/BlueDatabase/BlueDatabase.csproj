@@ -97,6 +97,9 @@
     <Compile Include="AdditionalScriptComands\VariableDatabase.cs" />
     <Compile Include="AdditionalScriptComands\VariableRowItem.cs" />
     <Compile Include="AdditionalScriptComands\VariableFilterItem.cs" />
+    <Compile Include="EventArgs\SQL_FilterEventArgs.cs" />
+    <Compile Include="EventArgs\SQL_CellCancelEventArgs.cs" />
+    <Compile Include="EventArgs\SQL_CellExtEventArgs.cs" />
     <Compile Include="EventArgs\SQL_RowCancelEventArgs.cs" />
     <Compile Include="EventArgs\SQL_DoRowAutomaticEventArgs.cs" />
     <Compile Include="EventArgs\SQL_RowCheckedEventArgs.cs" />
