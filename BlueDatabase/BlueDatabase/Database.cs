@@ -20,8 +20,10 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
+using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
+using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -30,10 +32,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using static BlueBasics.FileOperations;
 using static BlueBasics.Converter;
-using BlueScript.Variables;
-using BlueBasics.Interfaces;
+using static BlueBasics.FileOperations;
 
 namespace BlueDatabase;
 
@@ -372,10 +372,10 @@ public sealed class Database : IDisposable, IDisposableExtended {
     /// Sucht die Datenbank im Speicher. Wird sie nicht gefunden, wird sie geladen.
     /// </summary>
     /// <param name="filename"></param>
-    /// <param name="checkOnlyFilenameToo"></param>
+    /// <param name="checkOnlyCaptionToo"></param>
     /// <param name="readOnly"></param>
     /// <returns></returns>
-    public static Database? GetByFilename(string filename, bool checkOnlyFilenameToo, bool readOnly) {
+    public static Database? GetByFilename(string filename, bool checkOnlyCaptionToo, bool readOnly) {
         if (string.IsNullOrEmpty(filename)) { return null; }
 
         foreach (var thisFile in AllFiles) {
@@ -385,7 +385,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
             }
         }
 
-        if (checkOnlyFilenameToo) {
+        if (checkOnlyCaptionToo) {
             foreach (var thisFile in AllFiles) {
                 if (thisFile != null && thisFile.Filename.ToLower().FileNameWithSuffix() == filename.ToLower().FileNameWithSuffix()) {
                     thisFile.BlockReload(false);

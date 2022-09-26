@@ -324,14 +324,15 @@ public sealed class MultiUserFile : IDisposableExtended {
                 _editNormalyError = "Sie haben im Verzeichnis der Datei keine Schreibrechte.";
                 return _editNormalyError;
             }
-            if (AgeOfBlockDatei > 60) {
-                _editNormalyError = "Eine Blockdatei ist anscheinend dauerhaft vorhanden. Administrator verständigen.";
-                return _editNormalyError;
-            }
         }
 
         //----------EditAcut, EditGeneral ----------------------------------------------------------------------
         if (mode.HasFlag(Enums.ErrorReason.EditAcut) || mode.HasFlag(Enums.ErrorReason.EditGeneral)) {
+            if (AgeOfBlockDatei > 60) {
+                _editNormalyError = "Eine Blockdatei ist anscheinend dauerhaft vorhanden. Administrator verständigen.";
+                return _editNormalyError;
+            }
+
             // Wird gespeichert, werden am Ende Penings zu Undos. Diese werden evtl nicht mitgespeichert.
             if (_pureBinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
             if (IsInSaveingLoop) { return "Aktuell werden Daten gespeichert."; }
@@ -689,11 +690,10 @@ public sealed class MultiUserFile : IDisposableExtended {
 
         // Ausstehende Arbeiten ermittelen
 
-        var mustReload = ReloadNeeded;
         var mustSave = OnHasPendingChanges();
         var mustBackup = OnIsThereBackgroundWorkToDo();
-        if (!mustReload && !mustSave && !mustBackup) {
-            RepairOldBlockFiles();
+
+        if (!_checkedAndReloadNeed && !mustSave && !mustBackup) {
             _checkerTickCount = 0;
             return;
         }
@@ -707,6 +707,9 @@ public sealed class MultiUserFile : IDisposableExtended {
         if (DateTime.UtcNow.Subtract(_lastUserActionUtc).TotalSeconds < countUserWork || BlockSaveOperations()) { CancelBackGroundWorker(); return; } // Benutzer arbeiten lassen
 
         if (_checkerTickCount > countSave && mustSave) { CancelBackGroundWorker(); }
+
+        var mustReload = ReloadNeeded;
+
         if (_checkerTickCount > ReloadDelaySecond && mustReload) { CancelBackGroundWorker(); }
         if (_backgroundWorker.IsBusy) { return; }
 
@@ -736,6 +739,7 @@ public sealed class MultiUserFile : IDisposableExtended {
 
         // Überhaupt nix besonderes. Ab und zu mal Reloaden
         if (mustReload && _checkerTickCount > ReloadDelaySecond) {
+            RepairOldBlockFiles();
             if (!string.IsNullOrEmpty(ErrorReason(Enums.ErrorReason.Load))) { return; }
             Load_Reload();
             _checkerTickCount = 0;
