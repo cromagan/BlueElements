@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
@@ -30,8 +29,8 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using static BlueBasics.FileOperations;
 using static BlueBasics.Converter;
+using static BlueBasics.FileOperations;
 
 namespace BlueDatabase;
 
@@ -2136,6 +2135,11 @@ public sealed class SQL_ColumnItem : IReadableTextWithChanging, IDisposable, IIn
 
     internal string Load(string art, string wert) {
         switch (art.ToLower()) {
+            case "columnkey":
+                Key = LongParse(wert);
+                Invalidate_TmpVariables();
+                break;
+
             case "columnname":
                 _name = wert;
                 Invalidate_TmpVariables();
@@ -2355,6 +2359,10 @@ public sealed class SQL_ColumnItem : IReadableTextWithChanging, IDisposable, IIn
             case "columnalign":
                 _align = (AlignmentHorizontal)IntParse(wert);
                 if (_align == (AlignmentHorizontal)(-1)) { _align = AlignmentHorizontal.Links; }
+                break;
+
+            case "eof":
+            case "undocount":
                 break;
 
             default:

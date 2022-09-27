@@ -421,26 +421,26 @@ public partial class SQL_Table : GenericControl, IContextMenu, IBackgroundNone, 
         ItemCollectionList i = new(BlueListBoxAppearance.KontextMenu) {
             CheckBehavior = CheckBehavior.AlwaysSingleSelection
         };
-        if (SQL_Database.Works == null || SQL_Database.Works.Count == 0) { return i; }
-        var isfirst = true;
-        TextListItem? las = null;
-        var lasNr = -1;
-        var co = 0;
-        for (var z = SQL_Database.Works.Count - 1; z >= 0; z--) {
-            if (SQL_Database.Works[z].CellKey == cellkey && SQL_Database.Works[z].HistorischRelevant) {
-                co++;
-                lasNr = z;
-                las = isfirst
-                    ? new TextListItem("Aktueller Text - ab " + SQL_Database.Works[z].Date + " UTC, geändert von " + SQL_Database.Works[z].User, "Cancel", null, false, true, string.Empty)
-                    : new TextListItem("ab " + SQL_Database.Works[z].Date + " UTC, geändert von " + SQL_Database.Works[z].User, co.ToString(Constants.Format_Integer5) + SQL_Database.Works[z].ChangedTo, null, false, true, string.Empty);
-                isfirst = false;
-                if (las != null) { i.Add(las); }
-            }
-        }
-        if (las != null) {
-            co++;
-            i.Add("vor " + SQL_Database.Works[lasNr].Date + " UTC", co.ToString(Constants.Format_Integer5) + SQL_Database.Works[lasNr].PreviousValue);
-        }
+        //if (SQL_Database.Works == null || SQL_Database.Works.Count == 0) { return i; }
+        //var isfirst = true;
+        //TextListItem? las = null;
+        //var lasNr = -1;
+        //var co = 0;
+        //for (var z = SQL_Database.Works.Count - 1; z >= 0; z--) {
+        //    if (SQL_Database.Works[z].CellKey == cellkey && SQL_Database.Works[z].HistorischRelevant) {
+        //        co++;
+        //        lasNr = z;
+        //        las = isfirst
+        //            ? new TextListItem("Aktueller Text - ab " + SQL_Database.Works[z].Date + " UTC, geändert von " + SQL_Database.Works[z].User, "Cancel", null, false, true, string.Empty)
+        //            : new TextListItem("ab " + SQL_Database.Works[z].Date + " UTC, geändert von " + SQL_Database.Works[z].User, co.ToString(Constants.Format_Integer5) + SQL_Database.Works[z].ChangedTo, null, false, true, string.Empty);
+        //        isfirst = false;
+        //        if (las != null) { i.Add(las); }
+        //    }
+        //}
+        //if (las != null) {
+        //    co++;
+        //    i.Add("vor " + SQL_Database.Works[lasNr].Date + " UTC", co.ToString(Constants.Format_Integer5) + SQL_Database.Works[lasNr].PreviousValue);
+        //}
         return i;
     }
 

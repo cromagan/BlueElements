@@ -58,7 +58,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
 
     public readonly LayoutCollection Layouts = new();
 
-    //public readonly ListExt<ColumnViewCollection> OldFormulaViews = new();
     public readonly ListExt<string> PermissionGroupsNewRow = new();
 
     public readonly SQL_RowCollection Row;
@@ -67,10 +66,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
 
     public readonly string UserName = Generic.UserName().ToUpper();
     public string UserGroup;
-
-    public ListExt<WorkItem> Works;
-
-    //private readonly List<string> _filesAfterLoadingLCase;
 
     private string _additionaFilesPfad;
 
@@ -125,7 +120,9 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
 
         Develop.StartService();
 
-        _sql = new SqlBack("D:\\" + filename.FileNameWithoutSuffix() + ".mdf", false);
+        _sql = new SqlBack(filename.FilePath() + filename.FileNameWithoutSuffix() + ".mdf", false);
+
+        // _sql = new SqlBack("D:\\" + filename.FileNameWithoutSuffix() + ".mdf", false);
 
         Cell = new SQL_CellCollection(this);
 
@@ -138,8 +135,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         Column.ItemRemoved += Column_ItemRemoved;
         Column.ItemAdded += Column_ItemAdded;
 
-        Works = new ListExt<WorkItem>();
-        //_filesAfterLoadingLCase = new List<string>();
         ColumnArrangements.Changed += ColumnArrangements_ListOrItemChanged;
         Layouts.Changed += Layouts_ListOrItemChanged;
         Layouts.ItemSeted += Layouts_ItemSeted;
@@ -801,120 +796,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         ScriptError?.Invoke(this, e);
     }
 
-    public void Parse(byte[] bLoaded, ref int pointer, ref DatabaseDataType type, ref long colKey, ref long rowKey, ref string value, ref int width, ref int height) {
-        int les;
-        switch ((Routinen)bLoaded[pointer]) {
-            case Routinen.CellFormat: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    les = NummerCode3(bLoaded, pointer + 2);
-                    colKey = NummerCode3(bLoaded, pointer + 5);
-                    rowKey = NummerCode3(bLoaded, pointer + 8);
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
-                    value = b.ToStringWin1252();
-                    width = NummerCode2(bLoaded, pointer + 11 + les);
-                    height = NummerCode2(bLoaded, pointer + 11 + les + 2);
-                    pointer += 11 + les + 4;
-                    break;
-                }
-            case Routinen.CellFormatUTF8: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    les = NummerCode3(bLoaded, pointer + 2);
-                    colKey = NummerCode3(bLoaded, pointer + 5);
-                    rowKey = NummerCode3(bLoaded, pointer + 8);
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
-                    value = b.ToStringUtf8();
-                    width = NummerCode2(bLoaded, pointer + 11 + les);
-                    height = NummerCode2(bLoaded, pointer + 11 + les + 2);
-                    pointer += 11 + les + 4;
-                    break;
-                }
-            case Routinen.CellFormatUTF8_V400: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    les = NummerCode3(bLoaded, pointer + 2);
-                    colKey = NummerCode7(bLoaded, pointer + 5);
-                    rowKey = NummerCode7(bLoaded, pointer + 12);
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 19, b, 0, les);
-                    value = b.ToStringUtf8();
-                    width = NummerCode2(bLoaded, pointer + 19 + les);
-                    height = NummerCode2(bLoaded, pointer + 19 + les + 2);
-                    pointer += 19 + les + 4;
-                    break;
-                }
-            case Routinen.DatenAllgemein: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    les = NummerCode3(bLoaded, pointer + 2);
-                    colKey = -1;
-                    rowKey = -1;
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 5, b, 0, les);
-                    value = b.ToStringWin1252();
-                    width = 0;
-                    height = 0;
-                    pointer += 5 + les;
-                    break;
-                }
-            case Routinen.DatenAllgemeinUTF8: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    les = NummerCode3(bLoaded, pointer + 2);
-                    colKey = -1;
-                    rowKey = -1;
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 5, b, 0, les);
-                    value = b.ToStringUtf8();
-                    width = 0;
-                    height = 0;
-                    pointer += 5 + les;
-                    break;
-                }
-            case Routinen.Column: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    les = NummerCode3(bLoaded, pointer + 2);
-                    colKey = NummerCode3(bLoaded, pointer + 5);
-                    rowKey = NummerCode3(bLoaded, pointer + 8);
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
-                    value = b.ToStringWin1252();
-                    width = 0;
-                    height = 0;
-                    pointer += 11 + les;
-                    break;
-                }
-            case Routinen.ColumnUTF8: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    les = NummerCode3(bLoaded, pointer + 2);
-                    colKey = NummerCode3(bLoaded, pointer + 5);
-                    rowKey = NummerCode3(bLoaded, pointer + 8);
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
-                    value = b.ToStringUtf8();
-                    width = 0;
-                    height = 0;
-                    pointer += 11 + les;
-                    break;
-                }
-            case Routinen.ColumnUTF8_V400: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    les = NummerCode3(bLoaded, pointer + 2);
-                    colKey = NummerCode7(bLoaded, pointer + 5);
-                    rowKey = NummerCode7(bLoaded, pointer + 12);
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 19, b, 0, les);
-                    value = b.ToStringUtf8();
-                    width = 0;
-                    height = 0;
-                    pointer += 19 + les;
-                    break;
-                }
-            default: {
-                    Develop.DebugPrint(FehlerArt.Fehler, "Laderoutine nicht definiert: " + bLoaded[pointer]);
-                    break;
-                }
-        }
-    }
-
     public List<string> Permission_AllUsed(bool cellLevel) {
         List<string> e = new();
         foreach (var thisSQL_ColumnItem in Column) {
@@ -963,20 +844,20 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     }
 
     public string UndoText(SQL_ColumnItem? column, SQL_RowItem? row) {
-        if (Works == null || Works.Count == 0) { return string.Empty; }
-        var cellKey = SQL_CellCollection.KeyOfCell(column, row);
+        //if (Works == null || Works.Count == 0) { return string.Empty; }
+        //var cellKey = SQL_CellCollection.KeyOfCell(column, row);
         var t = "";
-        for (var z = Works.Count - 1; z >= 0; z--) {
-            if (Works[z] != null && Works[z].CellKey == cellKey) {
-                if (Works[z].HistorischRelevant) {
-                    t = t + Works[z].UndoTextTableMouseOver() + "<br>";
-                }
-            }
-        }
-        t = t.Trim("<br>");
-        t = t.Trim("<hr>");
-        t = t.Trim("<br>");
-        t = t.Trim("<hr>");
+        //for (var z = Works.Count - 1; z >= 0; z--) {
+        //    if (Works[z] != null && Works[z].CellKey == cellKey) {
+        //        if (Works[z].HistorischRelevant) {
+        //            t = t + Works[z].UndoTextTableMouseOver() + "<br>";
+        //        }
+        //    }
+        //}
+        //t = t.Trim("<br>");
+        //t = t.Trim("<hr>");
+        //t = t.Trim("<br>");
+        //t = t.Trim("<hr>");
         return t;
     }
 
@@ -1001,7 +882,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
 
         if (rowKey < -100) { Develop.DebugPrint(FehlerArt.Fehler, "RowKey darf hier nicht <-100 sein!"); }
         if (columnKey < -100) { Develop.DebugPrint(FehlerArt.Fehler, "ColKey darf hier nicht <-100 sein!"); }
-        Works.Add(new WorkItem(comand, columnKey, rowKey, previousValue, changedTo, UserName));
+        //Works.Add(new WorkItem(comand, columnKey, rowKey, previousValue, changedTo, UserName));
 
         _sql.AddUndo(Filename.FileNameWithoutSuffix(), comand, columnKey, rowKey, previousValue, changedTo, UserName);
     }
@@ -1095,14 +976,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
             nu += b[pointer + n] * (long)Math.Pow(255, 6 - n);
         }
         return nu;
-    }
-
-    private void ChangeWorkItems(ItemState oldState, ItemState newState) {
-        foreach (var thisWork in Works) {
-            if (thisWork != null) {
-                if (thisWork.State == oldState) { thisWork.State = newState; }
-            }
-        }
     }
 
     private void CheckViewsAndArrangements() {
@@ -1209,7 +1082,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         Column.Dispose();
         Cell.Dispose();
         Row.Dispose();
-        Works.Dispose();
         ColumnArrangements.Dispose();
         Tags.Dispose();
         Export.Dispose();
@@ -1266,32 +1138,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         }
     }
 
-    private void ExecutePending(WorkItem thisPendingItem) {
-        if (thisPendingItem.State == ItemState.Pending) {
-            SQL_RowItem? row = null;
-            if (thisPendingItem.RowKey > -1) {
-                row = Row.SearchByKey(thisPendingItem.RowKey);
-                if (row == null) {
-                    if (thisPendingItem.Comand != DatabaseDataType.dummyComand_AddRow && thisPendingItem.User != UserName) {
-                        Develop.DebugPrint("Pending verworfen, Zeile gelöscht.<br>" + Filename + "<br>" + thisPendingItem.ToString());
-                        return;
-                    }
-                }
-            }
-            SQL_ColumnItem? col = null;
-            if (thisPendingItem.ColKey > -1) {
-                col = Column.SearchByKey(thisPendingItem.ColKey);
-                if (col == null) {
-                    if (thisPendingItem.Comand != DatabaseDataType.AddColumn && thisPendingItem.User != UserName) {
-                        Develop.DebugPrint("Pending verworfen, Spalte gelöscht.<br>" + Filename + "<br>" + thisPendingItem.ToString());
-                        return;
-                    }
-                }
-            }
-            ParseThis(thisPendingItem.Comand, thisPendingItem.ChangedTo, col, row, 0, 0);
-        }
-    }
-
     private void Export_ListOrItemChanged(object sender, System.EventArgs e) {
         if (IsLoading) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
         AddPending(DatabaseDataType.AutoExport, -1, Export.ToString(true), false);
@@ -1299,7 +1145,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
 
     private void Initialize() {
         Cell.Initialize();
-        Works.Clear();
         ColumnArrangements.Clear();
         Layouts.Clear();
         PermissionGroupsNewRow.Clear();
@@ -1372,11 +1217,27 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
 
         Filename = filename;
 
+        #region Spalten erstellen
+
         var cols = _sql.GetColumnNames("Main");
+        cols.Remove("RK");
 
         foreach (var thisCol in cols) {
             Column.Add(thisCol, _sql);
         }
+
+        #endregion
+
+        #region Datenbank Eigenschaften laden
+
+        var l = _sql.GetStylDataAll(Filename.FileNameWithoutSuffix(), string.Empty);
+        if (l != null && l.Count > 0) {
+            foreach (var thisstyle in l) {
+                ParseThis(thisstyle.Key, thisstyle.Value);
+            }
+        }
+
+        #endregion
 
         IsLoading = false;
     }
@@ -1410,12 +1271,122 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         SortParameterChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
-    private string ParseThis(DatabaseDataType type, string value, SQL_ColumnItem? column, SQL_RowItem? row, int width, int height) {
-        //if ((int)type is >= 100 and <= 199) {
-        //    _sql.CheckIn(Filename.FileNameWithoutSuffix(), type, value, column, null, -1, -1);
-        //    return column.Load(type, value);
-        //}
+    private string ParseThis(string type, string value) {
+        //if (IsLoading) { return string.Empty; }
 
+        //_sql.SetStyleData(Filename.FileNameWithoutSuffix(), type);
+
+        switch (type.ToLower()) {
+            case "version":
+                break;
+
+            case "creator":
+                _creator = value;
+                break;
+
+            case "createdateutc":
+                _createDate = value;
+                break;
+
+            case "reloaddelaysecond":
+                //_muf.ReloadDelaySecond = IntParse(value);
+                break;
+
+            case "databaseadmingroups":
+                DatenbankAdmin.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
+                break;
+
+            case "sortdefinition":
+                _sortDefinition = new SQL_RowSortDefinition(this, value);
+                break;
+
+            case "caption":
+                _caption = value;
+                break;
+
+            case "globalscale":
+                _globalScale = DoubleParse(value);
+                break;
+
+            case "additionafilespfad":
+                _additionaFilesPfad = value;
+                break;
+
+            case "standardformulafile":
+                _standardFormulaFile = value;
+                break;
+
+            case "rowquickinfo":
+                _zeilenQuickInfo = value;
+                break;
+
+            case "tags":
+                Tags.SplitAndCutByCr(value);
+                break;
+
+            case "layouts":
+                Layouts.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
+                break;
+
+            case "autoexport":
+                Export.Clear();
+                List<string> ae = new(value.SplitAndCutByCr());
+                foreach (var t in ae) {
+                    Export.Add(new SQL_ExportDefinition(this, t));
+                }
+                break;
+
+            case "columnarrangement":
+                ColumnArrangements.Clear();
+                List<string> ca = new(value.SplitAndCutByCr());
+                foreach (var t in ca) {
+                    ColumnArrangements.Add(new SQL_ColumnViewCollection(this, t));
+                }
+                break;
+
+            case "permissiongroupsnewrow":
+                PermissionGroupsNewRow.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
+                break;
+
+            case "globalshowpass":
+                _globalShowPass = value;
+                break;
+
+            case "rulesscript":
+                _rulesScript = value;
+                break;
+
+            case "undocount":
+                _undoCount = IntParse(value);
+                break;
+
+            case "undoonone":
+                //Works.Clear();
+                //var uio = value.SplitAndCutByCr();
+                //for (var z = 0; z <= uio.GetUpperBound(0); z++) {
+                //    WorkItem tmpWork = new(uio[z]) {
+                //        State = ItemState.Undo // Beim Erstellen des strings ist noch nicht sicher, ob gespeichter wird. Deswegen die alten "Pendings" zu Undos ändern.
+                //    };
+                //    Works.Add(tmpWork);
+                //}
+                break;
+
+            default:
+                return "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + " <br> Datei: " + Filename;
+                //if (LoadedVersion == SQL_DatabaseVersion) {
+                //    LoadedVersion = "9.99";
+                //    if (!ReadOnly) {
+                //        Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert": " + value + "<br>Datei": " + Filename);
+                //    }
+                //}
+
+                break;
+        }
+        return string.Empty;
+    }
+
+    private string ParseThis(DatabaseDataType type, string value, SQL_ColumnItem? column, SQL_RowItem? row, int width, int height) {
+        if (IsLoading) { return string.Empty; }
         _sql.CheckIn(Filename.FileNameWithoutSuffix(), type, value, column, row, width, height);
 
         switch (type) {
@@ -1613,14 +1584,14 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
                 break;
 
             case DatabaseDataType.UndoInOne:
-                Works.Clear();
-                var uio = value.SplitAndCutByCr();
-                for (var z = 0; z <= uio.GetUpperBound(0); z++) {
-                    WorkItem tmpWork = new(uio[z]) {
-                        State = ItemState.Undo // Beim Erstellen des strings ist noch nicht sicher, ob gespeichter wird. Deswegen die alten "Pendings" zu Undos ändern.
-                    };
-                    Works.Add(tmpWork);
-                }
+                //Works.Clear();
+                //var uio = value.SplitAndCutByCr();
+                //for (var z = 0; z <= uio.GetUpperBound(0); z++) {
+                //    WorkItem tmpWork = new(uio[z]) {
+                //        State = ItemState.Undo // Beim Erstellen des strings ist noch nicht sicher, ob gespeichter wird. Deswegen die alten "Pendings" zu Undos ändern.
+                //    };
+                //    Works.Add(tmpWork);
+                //}
                 break;
 
             case DatabaseDataType.dummyComand_AddRow:

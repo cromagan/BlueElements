@@ -202,6 +202,13 @@ public class SqlBack {
     public bool CheckIn(string database, DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
         if (!OpenConnection()) { return false; }
 
+        if ((int)type < 100) { column = null; row = null; }
+
+        if (type != DatabaseDataType.ce_Value_withoutSizeData && type != DatabaseDataType.ce_Value_withSizeData &&
+            type != DatabaseDataType.ce_UTF8Value_withoutSizeData && type != DatabaseDataType.ce_UTF8Value_withSizeData) {
+            row = null;
+        }
+
         if (column == null && row == null) {
             switch (type) {
                 case DatabaseDataType.Formatkennung:
@@ -330,6 +337,12 @@ public class SqlBack {
         return columns;
     }
 
+    /// <summary>
+    /// Wird kein Spaltenname angegeben, werden die Eigenschaften der Datenbank zurück gegeben.
+    /// </summary>
+    /// <param name="dbname"></param>
+    /// <param name="columnName"></param>
+    /// <returns></returns>
     public Dictionary<string, string> GetStylDataAll(string dbname, string columnName) {
         var l = new Dictionary<string, string>();
 
@@ -369,6 +382,64 @@ public class SqlBack {
         CloseConnection();
 
         return tables;
+    }
+
+    /// <summary>
+    /// Gibt TRUE zurück, wenn alles ok ist.
+    /// Entweder der Wert gesetzt wurde, der Wert aktuell ist oder der Wert unwichtig ist.
+    /// </summary>
+    /// <param name="dbname"></param>
+    /// <param name="type"></param>
+    /// <param name="columnName"></param>
+    /// <param name="newValue"></param>
+    /// <returns></returns>
+    public bool SetStyleData(string dbname, DatabaseDataType type, string columnName, string newValue) {
+        var t = type.ToString();
+
+        if (t == ((int)type).ToString()) { return true; }
+
+        if (type == DatabaseDataType.AddColumn) { return true; } // enthält zwar den Key, aber Wertlos, wenn der Spaltenname noch nicht bekannt ist...
+        if (type == DatabaseDataType.AutoExport) { return true; }
+        if (type == DatabaseDataType.UndoInOne) { return true; }
+
+        return SetStyleData(dbname, t, columnName, newValue);
+    }
+
+    /// <summary>
+    /// Gibt TRUE zurück, wenn alles ok ist.
+    /// Entweder der Wert gesetzt wurde, der Wert aktuell ist oder der Wert unwichtig ist.
+    /// </summary>
+    /// <param name="dbname"></param>
+    /// <param name="type"></param>
+    /// <param name="columnName"></param>
+    /// <param name="newValue"></param>
+    /// <returns></returns>
+    public bool SetStyleData(string dbname, string type, string columnName, string newValue) {
+        columnName = columnName.ToUpper();
+
+        var isVal = GetStyleData(dbname, type, columnName);
+
+        string cmdString;
+
+        if (isVal is null) {
+            cmdString = "INSERT INTO Style (DBNAME, TYPE, COLUMNNAME, VALUE)  VALUES (@DBNAME, @TYPE, @COLUMNNAME, @VALUE)";
+        } else if (isVal != newValue) {
+            cmdString = "UPDATE Style SET VALUE = @VALUE WHERE DBNAME = @DBNAME AND TYPE = @TYPE AND COLUMNNAME = @COLUMNNAME";
+        } else {
+            return true;
+        }
+
+        if (!OpenConnection()) { return false; }
+
+        using var comm = new SqlCommand();
+        comm.Connection = _connection;
+        comm.CommandText = cmdString;
+        comm.Parameters.AddWithValue("@DBNAME", dbname.ToUpper());
+        comm.Parameters.AddWithValue("@TYPE", type);
+        comm.Parameters.AddWithValue("@COLUMNNAME", columnName);
+        comm.Parameters.AddWithValue("@VALUE", newValue);
+
+        return ExecuteCommand(comm);
     }
 
     private bool AddColumn(string table, string column) => ExecuteCommand("alter table " + table + " add " + column + " VARCHAR(255) default '' NOT NULL");
@@ -599,50 +670,6 @@ public class SqlBack {
         //comm.Parameters.AddWithValue("@DBNAME", "Main");
         comm.Parameters.AddWithValue("@RK", row.Key);
         //comm.Parameters.AddWithValue("@COLUMNNAME", column.Name.ToUpper());
-        comm.Parameters.AddWithValue("@VALUE", newValue);
-
-        return ExecuteCommand(comm);
-    }
-
-    /// <summary>
-    /// Gibt TRUE zurück, wenn alles ok ist.
-    /// Entweder der Wert gesetzt wurde, der Wert aktuell ist oder der Wert unwichtig ist.
-    /// </summary>
-    /// <param name="dbname"></param>
-    /// <param name="type"></param>
-    /// <param name="columnName"></param>
-    /// <param name="newValue"></param>
-    /// <returns></returns>
-    private bool SetStyleData(string dbname, DatabaseDataType type, string columnName, string newValue) {
-        var t = type.ToString();
-
-        if (t == ((int)type).ToString()) { return true; }
-
-        if (type == DatabaseDataType.AddColumn) { return true; }
-        if (type == DatabaseDataType.AutoExport) { return true; }
-
-        columnName = columnName.ToUpper();
-
-        var isVal = GetStyleData(dbname, t, columnName);
-
-        string cmdString;
-
-        if (isVal is null) {
-            cmdString = "INSERT INTO Style (DBNAME, TYPE, COLUMNNAME, VALUE)  VALUES (@DBNAME, @TYPE, @COLUMNNAME, @VALUE)";
-        } else if (isVal != newValue) {
-            cmdString = "UPDATE Style SET VALUE = @VALUE WHERE DBNAME = @DBNAME AND TYPE = @TYPE AND COLUMNNAME = @COLUMNNAME";
-        } else {
-            return true;
-        }
-
-        if (!OpenConnection()) { return false; }
-
-        using var comm = new SqlCommand();
-        comm.Connection = _connection;
-        comm.CommandText = cmdString;
-        comm.Parameters.AddWithValue("@DBNAME", dbname.ToUpper());
-        comm.Parameters.AddWithValue("@TYPE", t);
-        comm.Parameters.AddWithValue("@COLUMNNAME", columnName);
         comm.Parameters.AddWithValue("@VALUE", newValue);
 
         return ExecuteCommand(comm);
