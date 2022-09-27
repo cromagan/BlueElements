@@ -132,7 +132,7 @@ public sealed class SQL_RowCollection : IEnumerable<SQL_RowItem>, IDisposable {
         } while (true);
     }
 
-    public void Add(SQL_RowItem? row) {
+    public void Add(SQL_RowItem row) {
         if (!_internal.TryAdd(row.Key, row)) { Develop.DebugPrint(FehlerArt.Fehler, "Add Failed"); }
         OnRowAdded(new SQL_RowEventArgs(row));
     }

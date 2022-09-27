@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics;
+using static BlueBasics.Converter;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using System;
@@ -382,6 +383,40 @@ public class SqlBack {
         CloseConnection();
 
         return tables;
+    }
+
+    public void LoadAllCells(string fileNameWithoutSuffix, SQL_RowCollection row) {
+        if (!OpenConnection()) { return; }
+
+        using var q = _connection.CreateCommand();
+
+        q.CommandText = @"select * from Main";
+
+        using var reader = q.ExecuteReader();
+
+        row.Clear();
+
+        while (reader.Read()) {
+            var rk = LongParse(reader[0].ToString());
+            var r = new SQL_RowItem(row.Database, rk);
+            row.Add(r);
+
+            for (var z = 1; z < reader.FieldCount; z++) {
+                row.Database.Cell.Load_310(row.Database.Column[z - 1], r, reader[z].ToString(), -1, -1);
+            }
+
+            //var n = 0;
+            //foreach (var thiss in reader) {
+            //    n++;
+            //    row.Database.Cell.Load_310(row.Database.Column[n], r, thiss.ToString(), -1, -1);
+            //    //row.Database.Cell.SetValueBehindLinkedValue(row.Database.Column[n], r, thiss.ToString());
+            //    //r.CellSet(row.Database.Column[n], thiss.ToString());
+            //}
+
+            ////l.Add(reader[0].ToString(), reader[1].ToString());
+        }
+
+        CloseConnection();
     }
 
     /// <summary>

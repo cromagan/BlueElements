@@ -158,7 +158,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
             //DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + filename.FileNameWithoutSuffix()));
             LoadFromSQLBack(filename);
         } else {
-            RepairAfterParse(null, null);
+            RepairAfterParse();
         }
         QuickImage.NeedImage += QuickImage_NeedImage;
     }
@@ -853,7 +853,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         return false;
     }
 
-    public void RepairAfterParse(object? sender, System.EventArgs? e) {
+    public void RepairAfterParse() {
         Column.Repair();
         CheckViewsAndArrangements();
         Layouts.Check();
@@ -1255,7 +1255,15 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
 
         #endregion
 
+        #region  Alle Zellen laden
+
+        _sql.LoadAllCells(Filename.FileNameWithoutSuffix(), Row);
+
+        #endregion
+
         IsLoading = false;
+
+        RepairAfterParse();
     }
 
     private void OnDisposing() {

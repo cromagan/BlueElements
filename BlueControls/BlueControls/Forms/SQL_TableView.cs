@@ -427,12 +427,12 @@ public partial class SQL_TableView : Form {
     }
 
     protected virtual void TableView_ContextMenu_Init(object sender, ContextMenuInitEventArgs e) {
-        var tbl = (Table)sender;
+        var tbl = (SQL_Table)sender;
         var cellKey = e.Tags.TagGet("Cellkey");
         if (string.IsNullOrEmpty(cellKey)) { return; }
         tbl.Database.Cell.DataOfCellKey(cellKey, out var column, out var row);
 
-        var editable = string.IsNullOrEmpty(CellCollection.ErrorReason(column, row, ErrorReason.EditNormaly));
+        var editable = string.IsNullOrEmpty(SQL_CellCollection.ErrorReason(column, row, ErrorReason.EditNormaly));
 
         if (_ansicht != Ansicht.Überschriften_und_Formular) {
             e.UserMenu.Add("Info", true);
