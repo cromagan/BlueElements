@@ -32,7 +32,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using static BlueBasics.Converter;
-using static BlueBasics.FileOperations;
+using static BlueBasics.IO;
 
 namespace BlueDatabase;
 
@@ -43,11 +43,17 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     #region Fields
 
     public const string SQL_DatabaseVersion = "4.00";
+
     public static readonly ListExt<SQL_Database> AllFiles = new();
+
     public readonly SqlBack _sql;
+
     public readonly SQL_CellCollection Cell;
+
     public readonly SQL_ColumnCollection Column;
+
     public readonly ListExt<SQL_ColumnViewCollection> ColumnArrangements = new();
+
     public readonly ListExt<string> DatenbankAdmin = new();
 
     /// <summary>
@@ -65,11 +71,14 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     public readonly ListExt<string> Tags = new();
 
     public readonly string UserName = Generic.UserName().ToUpper();
+
     public string UserGroup;
 
     private string _additionaFilesPfad;
 
-    private string _additionaFilesPfadtmp = string.Empty;
+    private string? _additionaFilesPfadtmp;
+
+    private string _cachePfad;
 
     private string _caption = string.Empty;
 
@@ -98,14 +107,13 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     //private enJoinTyp _JoinTyp;
     private int _undoCount;
 
-    //private VerwaisteDaten _verwaisteDaten;
-
     private string _zeilenQuickInfo = string.Empty;
 
     #endregion
 
     #region Constructors
 
+    //private VerwaisteDaten _verwaisteDaten;
     public SQL_Database(bool readOnly) : this(string.Empty, readOnly, true) { }
 
     private SQL_Database(string filename, bool readOnly, bool create) {
@@ -191,9 +199,18 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         get => _additionaFilesPfad;
         set {
             if (_additionaFilesPfad == value) { return; }
-            _additionaFilesPfadtmp = string.Empty;
-            AddPending(DatabaseDataType.AdditionaFilesPfad, -1, -1, _additionaFilesPfad, value, true);
+            _additionaFilesPfadtmp = null;
+            AddPending(DatabaseDataType.AdditionaFilesPath, -1, -1, _additionaFilesPfad, value, true);
             Cell.InvalidateAllSizes();
+        }
+    }
+
+    [Browsable(false)]
+    public string CachePfad {
+        get => _cachePfad;
+        set {
+            if (_cachePfad == value) { return; }
+            _cachePfad = value;
         }
     }
 
@@ -354,9 +371,8 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     /// </summary>
     /// <returns></returns>
     public string AdditionaFilesPfadWhole() {
-        // @ ist ein erkennungszeichen, dass der Pfad schon geprüft wurde, aber nicht vorhanden ist
-        if (_additionaFilesPfadtmp == "@") { return string.Empty; }
         if (!string.IsNullOrEmpty(_additionaFilesPfadtmp)) { return _additionaFilesPfadtmp; }
+
         var t = _additionaFilesPfad.CheckPath();
         if (PathExists(t)) {
             _additionaFilesPfadtmp = t;
@@ -368,7 +384,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
             _additionaFilesPfadtmp = t;
             return t;
         }
-        _additionaFilesPfadtmp = "@";
+        _additionaFilesPfadtmp = string.Empty;
         return string.Empty;
     }
 
@@ -1446,7 +1462,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
                 //_filterImagePfad = value;
                 break;
 
-            case DatabaseDataType.AdditionaFilesPfad:
+            case DatabaseDataType.AdditionaFilesPath:
                 _additionaFilesPfad = value;
                 break;
 
@@ -1655,14 +1671,40 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     }
 
     private void QuickImage_NeedImage(object sender, NeedImageEventArgs e) {
-        if (e.Bmp != null) { return; }
         try {
-            if (string.IsNullOrWhiteSpace(AdditionaFilesPfadWhole())) { return; }
-            var n = e.Name.RemoveChars(Constants.Char_DateiSonderZeichen);
+            if (e.Done) { return; }
+            e.Done = true;
 
-            if (FileExists(AdditionaFilesPfadWhole() + n + ".png")) {
-                e.Bmp = new BitmapExt(AdditionaFilesPfadWhole() + n + ".png");
+            if (string.IsNullOrWhiteSpace(AdditionaFilesPfadWhole())) { return; }
+
+            var name = e.Name.RemoveChars(Constants.Char_DateiSonderZeichen);
+            var hashname = name.GetHashString();
+
+            var fullname = AdditionaFilesPfadWhole() + name + ".png";
+            var fullhashname = CachePfad.TrimEnd("\\") + "\\" + hashname;
+
+            if (!string.IsNullOrWhiteSpace(CachePfad)) {
+                if (FileExists(fullhashname)) {
+                    FileInfo f = new(fullhashname);
+                    if (DateTime.Now.Subtract(f.CreationTime).TotalDays < 10) {
+                        if (f.Length < 5) { return; }
+                        e.Bmp = new BitmapExt(fullhashname);
+                        return;
+                    }
+                    DeleteFile(fullhashname, false);
+                }
             }
+
+            if (FileExists(fullname)) {
+                e.Bmp = new BitmapExt(fullname);
+                if (!string.IsNullOrWhiteSpace(CachePfad)) {
+                    BlueBasics.IO.CopyFile(fullname, fullhashname, false);
+                }
+                return;
+            }
+
+            var l = new List<string>();
+            l.Save(fullhashname, Encoding.UTF8, false);
         } catch { }
     }
 

@@ -25,7 +25,7 @@ using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using static BlueBasics.FileOperations;
+using static BlueBasics.IO;
 
 namespace BlueControls.Forms;
 

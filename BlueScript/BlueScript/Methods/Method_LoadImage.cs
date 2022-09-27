@@ -52,7 +52,7 @@ internal class Method_LoadImage : Method {
             return new DoItFeedback("Datei ist kein Bildformat: " + ((VariableString)attvar.Attributes[0]).ValueString);
         }
 
-        if (!FileOperations.FileExists(((VariableString)attvar.Attributes[0]).ValueString)) {
+        if (!IO.FileExists(((VariableString)attvar.Attributes[0]).ValueString)) {
             return new DoItFeedback("Datei nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString);
         }
 

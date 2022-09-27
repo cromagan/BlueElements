@@ -20,7 +20,7 @@ using System.IO;
 using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using static BlueBasics.FileOperations;
+using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
 

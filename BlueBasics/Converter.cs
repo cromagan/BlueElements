@@ -22,7 +22,7 @@ using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using static BlueBasics.FileOperations;
+using static BlueBasics.IO;
 
 #nullable enable
 

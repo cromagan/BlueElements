@@ -28,7 +28,7 @@ using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
-using static BlueBasics.FileOperations;
+using static BlueBasics.IO;
 
 namespace BlueBasics;
 

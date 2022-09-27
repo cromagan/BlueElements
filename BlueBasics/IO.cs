@@ -29,7 +29,7 @@ using static BlueBasics.Generic;
 
 namespace BlueBasics;
 
-public static class FileOperations {
+public static class IO {
 
     #region Fields
 

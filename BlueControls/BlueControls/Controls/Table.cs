@@ -40,7 +40,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
-using static BlueBasics.FileOperations;
+using static BlueBasics.IO;
 
 #nullable enable
 

@@ -28,7 +28,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using static BlueBasics.Converter;
-using static BlueBasics.FileOperations;
+using static BlueBasics.IO;
 
 namespace BlueDatabase;
 

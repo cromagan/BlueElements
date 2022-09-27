@@ -32,7 +32,7 @@ using System.IO;
 using System.Windows.Forms;
 using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
-using static BlueBasics.FileOperations;
+using static BlueBasics.IO;
 
 namespace BlueControls.Forms;
 

@@ -30,7 +30,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using BlueControls.ItemCollection.ItemCollectionList;
-using static BlueBasics.FileOperations;
+using static BlueBasics.IO;
 
 namespace BlueControls.Controls;
 

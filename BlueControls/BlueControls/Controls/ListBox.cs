@@ -206,7 +206,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     #region Methods
 
     public BasicListItem? Add_FromFileSystem() {
-        var f = FileOperations.GetFilesWithFileSelector(string.Empty, false);
+        var f = IO.GetFilesWithFileSelector(string.Empty, false);
         if (f is null) { return null; }
 
         var picture = BitmapExt.Image_FromFile(f[0]);

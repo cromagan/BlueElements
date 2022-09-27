@@ -25,12 +25,13 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
-using static BlueBasics.FileOperations;
+using static BlueBasics.IO;
 
 namespace BlueBasics;
 
@@ -142,7 +143,24 @@ public static class Generic {
         return l;
     }
 
-    public static long GetUniqueKey(int tmp, string type) {
+
+
+
+public static byte[] GetHash(this string inputString) {
+    using (HashAlgorithm algorithm = SHA256.Create())
+        return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
+}
+
+public static string GetHashString(this string inputString) {
+    StringBuilder sb = new StringBuilder();
+    foreach (byte b in GetHash(inputString))
+        sb.Append(b.ToString("X2"));
+
+    return sb.ToString();
+}
+
+
+public static long GetUniqueKey(int tmp, string type) {
         var x = DateTime.UtcNow.AddYears(-2020).Ticks;
         var s = type + "\r\n" + UserName() + "\r\n" + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName;
         var key = x + (s.GetHashCode() * 100000000) + tmp;

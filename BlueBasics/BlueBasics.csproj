@@ -139,7 +139,7 @@
     <Compile Include="Enums\ImageCodeEffect.cs" />
     <Compile Include="Enums\Orientation.cs" />
     <Compile Include="Enums\KeyCode.cs" />
-    <Compile Include="FileOperations.cs" />
+    <Compile Include="IO.cs" />
     <Compile Include="Interfaces\IChangedFeedback.cs" />
     <Compile Include="Extensions\CollectionExtension.cs" />
     <Compile Include="Interfaces\IntegerArrayExtension.cs" />

@@ -29,7 +29,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using BlueScript.Variables;
-using static BlueBasics.FileOperations;
+using static BlueBasics.IO;
 using MessageBox = BlueControls.Forms.MessageBox;
 using static BlueBasics.Converter;
 

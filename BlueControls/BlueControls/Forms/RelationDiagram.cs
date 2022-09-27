@@ -250,20 +250,20 @@ public partial class RelationDiagram : PadEditor {
     //            no = no.Replace(" ", "_");
     //            no = no.Replace(",", "_");
     //            no = no.Replace("__", "_");
-    //            var newn = FileOperations.TempFile(fl.SelectedPath, no, "png");
+    //            var newn = IO.TempFile(fl.SelectedPath, no, "png");
     //            r.GeneratedBitmap.Save(newn, System.Drawing.Imaging.ImageFormat.Png);
     //            foreach (var thisc in r.Row.Database.Column) {
     //                if (thisc.Format == DataFormat.Link_To_Filesystem) {
     //                    var l = r.Row.CellGetList(thisc);
     //                    foreach (var thiss in l) {
     //                        var f = thisc.BestFile(thiss, false);
-    //                        if (FileOperations.FileExists(f)) {
+    //                        if (IO.FileExists(f)) {
     //                            var n2 = r.Row.CellFirstString() + "-" + thisc.Caption;
     //                            n2 = n2.Replace(" ", "_");
     //                            n2 = n2.Replace(",", "_");
     //                            n2 = n2.Replace("__", "_");
-    //                            var newn2 = FileOperations.TempFile(fl.SelectedPath, n2, f.FileSuffix());
-    //                            FileOperations.CopyFile(f, newn2, true);
+    //                            var newn2 = IO.TempFile(fl.SelectedPath, n2, f.FileSuffix());
+    //                            IO.CopyFile(f, newn2, true);
     //                        }
     //                    }
     //                }
@@ -294,11 +294,11 @@ public partial class RelationDiagram : PadEditor {
                 no = no.Replace(" ", "_");
                 no = no.Replace(",", "_");
                 no = no.Replace("__", "_");
-                var newn = FileOperations.TempFile(fl.SelectedPath, no, "txt");
+                var newn = IO.TempFile(fl.SelectedPath, no, "txt");
                 t.Save(newn, Constants.Win1252, false);
             }
         }
-        var newn2 = FileOperations.TempFile(fl.SelectedPath, "+++ALLES+++", "txt");
+        var newn2 = IO.TempFile(fl.SelectedPath, "+++ALLES+++", "txt");
         l.Save(newn2, Constants.Win1252, true);
     }
 

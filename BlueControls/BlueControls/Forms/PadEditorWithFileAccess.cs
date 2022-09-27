@@ -19,7 +19,7 @@ using BlueBasics;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using System.IO;
-using static BlueBasics.FileOperations;
+using static BlueBasics.IO;
 
 namespace BlueControls.Forms;
 

@@ -24,7 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using BlueControls.ItemCollection.ItemCollectionList;
-using static BlueBasics.FileOperations;
+using static BlueBasics.IO;
 
 namespace BlueControls.ItemCollection;
 

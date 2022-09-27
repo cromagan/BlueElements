@@ -30,7 +30,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using static BlueBasics.FileOperations;
+using static BlueBasics.IO;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;

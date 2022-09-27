@@ -32,7 +32,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using static BlueBasics.BitmapExt;
-using static BlueBasics.FileOperations;
+using static BlueBasics.IO;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;

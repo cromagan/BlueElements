@@ -26,6 +26,7 @@ public class NeedImageEventArgs : System.EventArgs {
     public NeedImageEventArgs(string name) {
         Name = name;
         Bmp = null;
+        Done = false;
     }
 
     #endregion
@@ -33,6 +34,7 @@ public class NeedImageEventArgs : System.EventArgs {
     #region Properties
 
     public BitmapExt? Bmp { get; set; }
+    public bool Done { get; set; }
     public string Name { get; }
 
     #endregion

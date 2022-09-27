@@ -25,7 +25,7 @@ using System;
 using System.Drawing;
 using System.Linq;
 using static BlueBasics.Converter;
-using static BlueBasics.FileOperations;
+using static BlueBasics.IO;
 
 namespace BlueControls.Classes_Editor;
 

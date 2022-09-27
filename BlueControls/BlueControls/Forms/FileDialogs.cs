@@ -1,7 +1,7 @@
 ﻿using BlueBasics;
 using BlueBasics.Enums;
 using System.Collections.Generic;
-using static BlueBasics.FileOperations;
+using static BlueBasics.IO;
 
 namespace BlueControls.Forms;
 
@@ -64,7 +64,7 @@ public static class FileDialogs {
                 ? MessageBox.Show("Soll die Datei<br>\"" + filelist[0] + "\"<br>wirklich <b>gelöscht</b> werden?\"", ImageCode.Warnung, "Ja - löschen", "Nein - abbrechen")
                 : MessageBox.Show("Sollen wirklich " + filelist.Count + " Dateien<br><b>gelöscht</b> werden?\"", ImageCode.Warnung, "Ja - löschen", "Nein - abbrechen");
         }
-        return buttonNumber == 0 && FileOperations.DeleteFile(filelist);
+        return buttonNumber == 0 && IO.DeleteFile(filelist);
     }
 
     /// <summary>

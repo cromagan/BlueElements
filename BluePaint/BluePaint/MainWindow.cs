@@ -24,7 +24,7 @@ using BluePaint.EventArgs;
 using System;
 using System.Drawing;
 using static BlueBasics.BitmapExt;
-using static BlueBasics.FileOperations;
+using static BlueBasics.IO;
 
 namespace BluePaint;
 

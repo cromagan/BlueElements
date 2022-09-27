@@ -927,7 +927,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         }
         // und die Mains auffüllen
         foreach (var thisString in zuwenig) {
-            if (FileOperations.FileExists(thisString)) {
+            if (IO.FileExists(thisString)) {
                 if (thisString.FileType() == FileFormat.Image) {
                     Add(thisString, thisString, thisString.FileNameWithoutSuffix());
                 } else {

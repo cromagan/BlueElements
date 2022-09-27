@@ -29,7 +29,7 @@ using System.ComponentModel;
 using System.Drawing;
 using static BlueBasics.Converter;
 using static BlueBasics.Develop;
-using static BlueBasics.FileOperations;
+using static BlueBasics.IO;
 
 namespace BlueControls.ConnectedFormula;
 

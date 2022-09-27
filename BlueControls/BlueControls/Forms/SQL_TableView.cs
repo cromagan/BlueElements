@@ -32,7 +32,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using static BlueBasics.Develop;
-using static BlueBasics.FileOperations;
+using static BlueBasics.IO;
 using static BlueBasics.Converter;
 using BlueBasics.EventArgs;
 using BlueControls.ItemCollection.ItemCollectionList;
