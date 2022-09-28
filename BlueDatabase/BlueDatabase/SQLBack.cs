@@ -18,7 +18,6 @@
 #nullable enable
 
 using BlueBasics;
-using static BlueBasics.Converter;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using System;
@@ -26,6 +25,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
+using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
@@ -49,11 +49,31 @@ public class SqlBack {
         //CultureInfo.DefaultThreadCurrentCulture = culture;
         //CultureInfo.DefaultThreadCurrentUICulture = culture;
 
-        _filename = filename.FilePath() + filename.FileNameWithoutSuffix() + ".mdf";
+        _filename = filename.FilePath() + filename.FileNameWithoutSuffix().Replace(" ", "_") + ".mdf";
 
         if (create && !File.Exists(_filename)) { CreateDatabase(_filename); }
 
         _connection = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" + _filename + ";Integrated Security=True;Trusted_Connection=Yes;");
+
+        //#region Watcher
+
+        //// Create command
+        //// Command must use two part names for tables
+        //// SELECT <field> FROM dbo.Table rather than
+        //// SELECT <field> FROM Table
+        //// Query also can not use *, fields must be designated
+        //SqlCommand cmd = new SqlCommand("usp_GetMessages", _connection);
+        //cmd.CommandType = CommandType.StoredProcedure;
+
+        //// Clear any existing notifications
+        //cmd.Notification = null;
+
+        //// Create the dependency for this command
+        //SqlDependency dependency = new SqlDependency(cmd);
+
+        //// Add the event handler
+        //dependency.OnChange += Dependency_OnChange;
+        //#endregion
 
         var x = ListTables();
 
@@ -283,8 +303,8 @@ public class SqlBack {
         // var myConn = new SqlConnection("Server=(local)\\netsdk;uid=sa;pwd=;database=master");
 
         var myConn = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;Integrated security=SSPI;database=master");
-        var dbn = filename.FileNameWithoutSuffix();
-        filename = filename.FilePath() + filename.FileNameWithoutSuffix() + ".mdf";
+        var dbn = filename.FileNameWithoutSuffix().Replace(" ", "_");
+        filename = filename.FilePath() + dbn + ".mdf";
 
         var str = "CREATE DATABASE " + dbn + " ON PRIMARY " +
                   "(NAME = " + dbn + "_Data, " +

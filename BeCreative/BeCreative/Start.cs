@@ -45,7 +45,7 @@ public partial class Start : Form {
     }
 
     private void btnDatenbank_Click(object sender, System.EventArgs e) {
-        var x = new SQL_TableView(null, true, true);
+        var x = new TableView(null, true, true);
 
         x.ShowDialog();
         x.Dispose();

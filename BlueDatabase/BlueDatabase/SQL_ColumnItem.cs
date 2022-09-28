@@ -119,7 +119,7 @@ public sealed class SQL_ColumnItem : IReadableTextWithChanging, IDisposable, IIn
 
     #region Constructors
 
-    public SQL_ColumnItem(SQL_Database database, long columnkey) {
+    public SQL_ColumnItem(SQL_Database database, string columname, long columnkey) {
         Database = database;
         Database.Disposing += Database_Disposing;
         //if (columnkey < 0) { Develop.DebugPrint(FehlerArt.Fehler, "ColumnKey <0"); }
@@ -129,7 +129,7 @@ public sealed class SQL_ColumnItem : IReadableTextWithChanging, IDisposable, IIn
 
         #region Standard-Werte
 
-        _name = Database.Column.Freename(string.Empty);
+        _name = columname;
         _caption = string.Empty;
         //_CaptionBitmap = null;
         _format = DataFormat.Text;
@@ -2188,7 +2188,6 @@ public sealed class SQL_ColumnItem : IReadableTextWithChanging, IDisposable, IIn
             case "columnidentify":
                 _identifier = wert;
                 ResetSystemToDefault(false);
-                Database.Column.GetSystems();
                 break;
 
             case "multiline":

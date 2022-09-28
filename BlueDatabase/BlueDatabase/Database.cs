@@ -143,8 +143,12 @@ public sealed class Database : IDisposable, IDisposableExtended {
 
         Develop.StartService();
 
-        //if (FileExists(filename)) { _sql = new SqlBack("D:\\" + filename.FileNameWithoutSuffix() + ".mdf", true); }
-        //if (FileExists(filename)) { _sql = new SqlBack("C:\\01_DATA\\" + filename.FileNameWithoutSuffix() + ".mdf", true); }
+        var f2 = "C:\\01_DATA\\DB1234567890" + filename.FileNameWithoutSuffix() + ".mdf";
+
+        //var f2 = "D:\\" + filename.FileNameWithoutSuffix() + ".mdf";
+        if (FileExists(filename) && !FileExists(f2)) {
+            //_sql = new SqlBack(f2, true);
+        }
 
         //CultureInfo culture = new("de-DE");
         //CultureInfo.DefaultThreadCurrentCulture = culture;
@@ -1826,16 +1830,16 @@ public sealed class Database : IDisposable, IDisposableExtended {
 
     private string ParseThis(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
         if ((int)type is >= 100 and <= 199) {
-            _sql?.CheckIn(Filename.FileNameWithoutSuffix(), type, value, column, null, -1, -1);
+            _sql?.CheckIn(_sql.Filename.FileNameWithoutSuffix(), type, value, column, null, -1, -1);
 
             if (type == DatabaseDataType.ColumnName) {
-                _sql?.SetStyleData(Filename.FileNameWithoutSuffix(), "ColumnKey", value.ToUpper(), column.Key.ToString());
+                _sql?.SetStyleData(_sql.Filename.FileNameWithoutSuffix(), "ColumnKey", value.ToUpper(), column.Key.ToString());
             }
 
             return column.Load(type, value);
         }
 
-        _sql?.CheckIn(Filename.FileNameWithoutSuffix(), type, value, column, row, width, height);
+        _sql?.CheckIn(_sql.Filename.FileNameWithoutSuffix(), type, value, column, row, width, height);
 
         switch (type) {
             case DatabaseDataType.Formatkennung:

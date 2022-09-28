@@ -1199,12 +1199,12 @@ public static class Skin {
 
     public static BlueFont GetBlueFont(PadStyles format, RowItem? rowOfStyle) {
         if (StyleDb == null) { InitStyles(); }
-        return StyleDb == null || rowOfStyle == null ? BlueFont.Get(ErrorFont) : GetBlueFont(StyleDb, ((int)format).ToString(), rowOfStyle);
+        return StyleDb == null || rowOfStyle == null ? BlueFont.Get(ErrorFont) : GetBlueFont(StyleDb, "X" + ((int)format).ToString(), rowOfStyle);
     }
 
-    public static BlueFont GetBlueFont(Database styleDb, string column, RowItem? row) => GetBlueFont(styleDb, styleDb.Column[column], row);
+    private static BlueFont GetBlueFont(Database styleDb, string column, RowItem? row) => GetBlueFont(styleDb, styleDb.Column[column], row);
 
-    public static BlueFont GetBlueFont(Database styleDb, ColumnItem? column, RowItem? row) {
+    private static BlueFont GetBlueFont(Database styleDb, ColumnItem? column, RowItem? row) {
         var @string = styleDb.Cell.GetString(column, row);
         if (string.IsNullOrEmpty(@string)) {
             Develop.DebugPrint("Schrift nicht definiert: " + styleDb.Filename + " - " + column.Name + " - " + row.CellFirstString());

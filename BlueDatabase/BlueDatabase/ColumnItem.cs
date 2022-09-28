@@ -1064,7 +1064,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         if (string.IsNullOrEmpty(_name)) { return "Der Spaltenname ist nicht definiert."; }
         if (!Name.ContainsOnlyChars(Constants.AllowedCharsVariableName)) { return "Der Spaltenname enthält ungültige Zeichen. Erlaubt sind A-Z, 0-9 und _"; }
 
-        //if (!Constants.Char_AZ.Contains(Name.Substring(0, 1).ToUpper())) { return "Der Spaltenname muss mit einem Buchstaben beginnen."; }
+        if (!Constants.Char_AZ.Contains(Name.Substring(0, 1).ToUpper())) { return "Der Spaltenname muss mit einem Buchstaben beginnen."; }
 
         if (Database.Column.Any(thisColumn => thisColumn != this && thisColumn != null && string.Equals(_name, thisColumn.Name, StringComparison.OrdinalIgnoreCase))) {
             return "Spalten-Name bereits vorhanden.";

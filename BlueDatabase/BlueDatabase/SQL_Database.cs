@@ -1242,6 +1242,8 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
             Column.Add(thisCol, _sql);
         }
 
+        Column.GetSystems();
+
         #endregion
 
         #region Datenbank Eigenschaften laden
@@ -1623,10 +1625,10 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
                 if (Row.SearchByKey(addRowKey) == null) { Row.Add(new SQL_RowItem(this, addRowKey)); }
                 break;
 
-            //case DatabaseDataType.AddColumn:
-            //    var addColumnKey = LongParse(value);
-            //    if (Column.SearchByKey(addColumnKey) == null) { Column.AddFromParser(new SQL_ColumnItem(this, addColumnKey)); }
-            //    break;
+            case DatabaseDataType.AddColumn:
+                //    var addColumnKey = LongParse(value);
+                //    if (Column.SearchByKey(addColumnKey) == null) { Column.AddFromParser(new SQL_ColumnItem(this, addColumnKey)); }
+                break;
 
             case DatabaseDataType.dummyComand_RemoveRow:
                 var removeRowKey = LongParse(value);

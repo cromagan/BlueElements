@@ -327,7 +327,7 @@ public sealed class SQL_ColumnCollection : ListExt<SQL_ColumnItem> {
     internal static string ParsableColumnKey(long key) => "ColumnKey=" + key;
 
     internal void Add(string columnname, SqlBack sql) {
-        var x = new SQL_ColumnItem(Database, -1);
+        var x = new SQL_ColumnItem(Database, columnname, -1);
 
         var l = sql.GetStylDataAll(Database.Filename.FileNameWithoutSuffix(), columnname);
         if (l != null && l.Count > 0) {
