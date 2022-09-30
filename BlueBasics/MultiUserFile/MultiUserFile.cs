@@ -172,6 +172,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         get {
             if (string.IsNullOrEmpty(Filename)) { return false; }
             if (_checkedAndReloadNeed) { return true; }
+            _lastCheck = DateTime.Now;
             if (GetFileInfo(Filename, false) != _lastSaveCode) {
                 _checkedAndReloadNeed = true;
                 return true;
@@ -190,6 +191,22 @@ public sealed class MultiUserFile : IDisposableExtended {
             FileInfo f = new(Blockdateiname());
             var sec = DateTime.UtcNow.Subtract(f.CreationTimeUtc).TotalSeconds;
             return Math.Max(0, sec); // ganz frische Dateien werden einen Bruchteil von Sekunden in der Zukunft erzeugt.
+        }
+    }
+
+    private DateTime _lastCheck = DateTime.Now;
+
+    public bool ReloadNeededSoft {
+        get {
+            if (string.IsNullOrEmpty(Filename)) { return false; }
+            if (_checkedAndReloadNeed) { return true; }
+
+
+            if (DateTime.Now.Subtract(_lastCheck).TotalSeconds > 10) {
+                return ReloadNeeded;
+            }
+
+            return false;
         }
     }
 

@@ -380,6 +380,8 @@ public sealed class Database : IDisposable, IDisposableExtended {
         }
     }
 
+    public bool ReloadNeededSoft => _muf.ReloadNeededSoft;
+
     #endregion
 
     #region Methods

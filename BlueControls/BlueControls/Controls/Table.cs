@@ -26,6 +26,7 @@ using BlueControls.Extended_Text;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
+using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
@@ -38,7 +39,6 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 
@@ -2768,6 +2768,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         try {
             if (_database.ColumnArrangements == null || _arrangementNr >= _database.ColumnArrangements.Count) { return; }   // Kommt vor, dass spontan doch geparsed wird...
             Skin.Draw_Back(gr, Enums.Design.Table_And_Pad, state, base.DisplayRectangle, this, true);
+
             /// Maximale Rechten Pixel der Permanenten Columns ermitteln
             var permaX = 0;
             foreach (var viewItem in CurrentArrangement) {
@@ -2780,6 +2781,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     permaX = Math.Max(permaX, (int)viewItem.OrderTmpSpalteX1 + (int)viewItem.TmpDrawWidth);
                 }
             }
+
             Draw_Table_What(gr, sr, TableDrawColumn.NonPermament, TableDrawType.ColumnBackBody, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state);
             Draw_Table_What(gr, sr, TableDrawColumn.NonPermament, TableDrawType.Cells, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state);
             Draw_Table_What(gr, sr, TableDrawColumn.Permament, TableDrawType.ColumnBackBody, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state);
@@ -2793,7 +2795,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             Draw_Column_Head_Captions(gr);
             Skin.Draw_Border(gr, Enums.Design.Table_And_Pad, state, displayRectangleWoSlider);
 
-            if (Database.ReloadNeeded) { gr.DrawImage(QuickImage.Get(ImageCode.Uhr, 16), 8, 8); }
+            ////gr.Clear(Color.White);
+            //gr.DrawString("Test " + Constants.GlobalRND.Next().ToString(), new Font("Arial", 20), Brushes.Black, new Point(0, 0));
+
+            //return;
+
+            if (Database.ReloadNeededSoft) { gr.DrawImage(QuickImage.Get(ImageCode.Uhr, 16), 8, 8); }
 
             var e2 = new MultiUserFileHasPendingChangesEventArgs();
             Database.HasPendingChanges(null, e2);

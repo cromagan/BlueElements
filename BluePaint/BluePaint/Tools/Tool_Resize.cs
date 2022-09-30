@@ -83,6 +83,7 @@ public partial class Tool_Resize : GenericTool //BlueControls.Forms.Form //
             capInfo.Text = "Bitte gültigen Wert angeben.";
             return;
         }
+        capInfo.Translate = false;
         capInfo.Text = "Zielgröße: " + (int)(p.Width * pr) + " x " + (int)(p.Height * pr) + " Pixel";
     }
 
