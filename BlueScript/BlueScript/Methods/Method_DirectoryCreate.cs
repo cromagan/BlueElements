@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Extensions;
+using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
 
@@ -47,7 +48,7 @@ internal class Method_DirectoryCreate : Method {
 
         var p = ((VariableString)attvar.Attributes[0]).ValueString.TrimEnd("\\");
 
-        if (System.IO.Directory.Exists(p)) { return DoItFeedback.Wahr(); }
+        if (DirectoryExists(p)) { return DoItFeedback.Wahr(); }
 
         try {
             System.IO.Directory.CreateDirectory(p);

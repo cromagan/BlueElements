@@ -53,8 +53,8 @@ internal class Method_MoveFile : Method {
 
         var dep = ((VariableString)attvar.Attributes[1]).ValueString;
 
-        //if (!Directory.Exists(sop.FilePath())) { return new DoItFeedback("Verzeichnis existiert nicht"); }
-        if (!Directory.Exists(dep.FilePath())) { return new DoItFeedback("Ziel-Verzeichnis existiert nicht"); }
+        //if (!PathExists(sop.FilePath())) { return new DoItFeedback("Verzeichnis existiert nicht"); }
+        if (!DirectoryExists(dep.FilePath())) { return new DoItFeedback("Ziel-Verzeichnis existiert nicht"); }
         if (!FileExists(sop)) { return new DoItFeedback("Quelldatei existiert nicht."); }
 
         if (FileExists(dep)) {
@@ -63,7 +63,7 @@ internal class Method_MoveFile : Method {
 
         if (s.OnlyTesting) { return new DoItFeedback("Verschieben im Testmodus deaktiviert."); }
 
-        if (!RenameFile(sop, dep, false)) {
+        if (!MoveFile(sop, dep, false)) {
             return new DoItFeedback("Verschieben fehlgeschlagen.");
         }
 

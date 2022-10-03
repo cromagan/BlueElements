@@ -67,7 +67,7 @@ public sealed partial class ExportDialog {
             _zielPfad = Path.GetTempPath();
         }
         try {
-            if (!PathExists(_zielPfad)) {
+            if (!DirectoryExists(_zielPfad)) {
                 Directory.CreateDirectory(_zielPfad);
             }
         } catch { }
@@ -101,7 +101,7 @@ public sealed partial class ExportDialog {
         if (database != null) { path.Add(database.DefaultLayoutPath()); }
         if (!string.IsNullOrEmpty(database.AdditionaFilesPfadWhole())) { path.Add(database.AdditionaFilesPfadWhole()); }
         foreach (var thisP in path) {
-            if (PathExists(thisP)) {
+            if (DirectoryExists(thisP)) {
                 var e = Directory.GetFiles(thisP);
                 foreach (var thisFile in e) {
                     if (thisFile.FileType() is FileFormat.HTML or FileFormat.Textdocument or FileFormat.Visitenkarte or FileFormat.BlueCreativeFile or FileFormat.XMLFile) {

@@ -318,6 +318,8 @@ public sealed class Database : IDisposable, IDisposableExtended {
 
     public bool ReloadNeeded => _muf.ReloadNeeded;
 
+    public bool ReloadNeededSoft => _muf.ReloadNeededSoft;
+
     public string RulesScript {
         get => _rulesScript;
         set {
@@ -379,8 +381,6 @@ public sealed class Database : IDisposable, IDisposableExtended {
             AddPending(DatabaseDataType.RowQuickInfo, -1, -1, _zeilenQuickInfo, value, true);
         }
     }
-
-    public bool ReloadNeededSoft => _muf.ReloadNeededSoft;
 
     #endregion
 
@@ -490,13 +490,13 @@ public sealed class Database : IDisposable, IDisposableExtended {
         if (!string.IsNullOrEmpty(_additionaFilesPfadtmp)) { return _additionaFilesPfadtmp; }
 
         var t = _additionaFilesPfad.CheckPath();
-        if (PathExists(t)) {
+        if (DirectoryExists(t)) {
             _additionaFilesPfadtmp = t;
             return t;
         }
 
         t = (Filename.FilePath() + _additionaFilesPfad.Trim("\\") + "\\").CheckPath();
-        if (PathExists(t)) {
+        if (DirectoryExists(t)) {
             _additionaFilesPfadtmp = t;
             return t;
         }

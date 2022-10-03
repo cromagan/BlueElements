@@ -42,8 +42,9 @@ internal class Method_ToLower : Method {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.AttributFehler(this, attvar)
-            : new DoItFeedback(((VariableString)attvar.Attributes[0]).ValueString.ToLower(), string.Empty);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+
+        return new DoItFeedback(((VariableString)attvar.Attributes[0]).ValueString.ToLower(), string.Empty);
     }
 
     #endregion

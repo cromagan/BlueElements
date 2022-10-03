@@ -659,7 +659,7 @@ public partial class TableView : Form {
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
 
         SaveTab.ShowDialog();
-        if (!PathExists(SaveTab.FileName.FilePath())) { return; }
+        if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
         if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
         if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
@@ -689,7 +689,7 @@ public partial class TableView : Form {
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
 
         SaveTab.ShowDialog();
-        if (!PathExists(SaveTab.FileName.FilePath())) { return; }
+        if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
         if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
         if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }

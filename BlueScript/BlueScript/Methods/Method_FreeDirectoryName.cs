@@ -17,31 +17,32 @@
 
 using System.Collections.Generic;
 using System.IO;
+using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
 
-internal class Method_GetFiles : Method {
+internal class Method_FreeDirectoryName : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
-    public override string Description => "Gibt alle Dateien im angegebenen Verzeichis zurück. Komplett, mit Pfad und Suffix";
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain } };
+    public override string Description => "Gibt einen zufälligen Ordnernamen (ohne Pfad) zurück, der im anggebenen Verzeichnis nicht existiert.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
 
-    public override string Returns => VariableListString.ShortName_Plain;
+    public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "GetFiles(Path, Suffix)";
+    public override string Syntax => "FreeDirectoryName(Path)";
 
     #endregion
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "getfiles" };
+    public override List<string> Comand(Script? s) => new() { "freedirectoryname" };
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
@@ -54,7 +55,20 @@ internal class Method_GetFiles : Method {
             return new DoItFeedback("Verzeichnis existiert nicht");
         }
 
-        return new DoItFeedback(Directory.GetFiles(pf, ((VariableString)attvar.Attributes[1]).ValueString));
+        var zeichen = Constants.Char_AZ.ToLower() + Constants.Char_Numerals + Constants.Char_AZ.ToUpper();
+        // Ja, lower und upper macht keinen sinn, sieht aber verrückter aus
+
+        do {
+            var p = string.Empty;
+            while (p.Length < 20) {
+                var pos = Constants.GlobalRND.Next(zeichen.Length);
+                p += zeichen.Substring(pos, 1);
+            }
+
+            if (!DirectoryExists(pf + p)) {
+                return new DoItFeedback(p, string.Empty);
+            }
+        } while (true);
     }
 
     #endregion

@@ -302,7 +302,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
                 return "Automatisch löschen darf bei diesem Intervall maximal " + (_backupInterval * 1000) + " sein.";
             }
         }
-        return !string.IsNullOrEmpty(_verzeichnis) && !PathExists(_verzeichnis)
+        return !string.IsNullOrEmpty(_verzeichnis) && !DirectoryExists(_verzeichnis)
             ? "Das Zielverzeichnis existiert nicht."
             : !CanWriteInDirectory(_verzeichnis) ? "Sie besitzen im Zielverzeichnis keine Schreibrechte." : string.Empty;
     }
@@ -567,7 +567,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
             savePath = !string.IsNullOrEmpty(Database.Filename)
                 ? Database.Filename.FilePath() + "Backup\\"
                 : (System.Windows.Forms.Application.StartupPath + "\\Backup\\").CheckPath();
-            if (!PathExists(savePath)) { Directory.CreateDirectory(savePath); }
+            if (!DirectoryExists(savePath)) { Directory.CreateDirectory(savePath); }
         }
         var singleFileExport = savePath + Database.Filename.FileNameWithoutSuffix().StarkeVereinfachung(" _-+") + "_" + DateTime.Now.ToString(Constants.Format_Date4);
         List<string> added = new();

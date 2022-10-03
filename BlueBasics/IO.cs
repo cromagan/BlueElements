@@ -196,6 +196,8 @@ public static class IO {
 
     public static bool DeleteFile(string file, bool toBeSure) => !FileExists(file) || ProcessFile(TryDeleteFile, file, file, toBeSure);
 
+    public static bool DirectoryExists(string pfad) => pfad.Length >= 3 && Directory.Exists(pfad.CheckPath());
+
     public static bool ExecuteFile(string fileName, string arguments = "", bool waitForExit = false, bool logException = true) {
         try {
             if (string.IsNullOrEmpty(fileName) && string.IsNullOrEmpty(arguments)) { return false; }
@@ -353,7 +355,9 @@ public static class IO {
         return x;
     }
 
-    public static bool PathExists(string pfad) => pfad.Length >= 3 && Directory.Exists(pfad.CheckPath());
+    public static bool MoveDirectory(string oldName, string newName, bool toBeSure) => ProcessFile(TryMoveDirectory, oldName, newName, toBeSure);
+
+    public static bool MoveFile(string oldName, string newName, bool toBeSure) => ProcessFile(TryMoveFile, oldName, newName, toBeSure);
 
     /// <summary>
     /// Gibt einen höher gelegenden Ordner mit abschließenden \ zurück
@@ -382,8 +386,6 @@ public static class IO {
         }
     }
 
-    public static bool RenameFile(string oldName, string newName, bool toBeSure) => ProcessFile(TryRenameFile, oldName, newName, toBeSure);
-
     public static string TempFile(string newPath, string filename) {
         var dn = filename.FileNameWithoutSuffix();
         var ds = filename.FileSuffix();
@@ -405,7 +407,7 @@ public static class IO {
         if (string.IsNullOrEmpty(wunschname)) { wunschname = UserName() + DateTime.Now.ToString(Constants.Format_Date6); }
         var z = -1;
         pfad = pfad.CheckPath();
-        if (!PathExists(pfad)) { Directory.CreateDirectory(pfad); }
+        if (!DirectoryExists(pfad)) { Directory.CreateDirectory(pfad); }
         wunschname = wunschname.RemoveChars(Constants.Char_DateiSonderZeichen);
         string? filename;
         do {
@@ -427,7 +429,7 @@ public static class IO {
             filename = filename.CheckFile();
 
             var pfad = filename.FilePath();
-            if (!PathExists(pfad)) { Directory.CreateDirectory(pfad); }
+            if (!DirectoryExists(pfad)) { Directory.CreateDirectory(pfad); }
 
             File.WriteAllText(filename, contents, encoding);
             if (executeAfter) { ExecuteFile(filename); }
@@ -499,7 +501,7 @@ public static class IO {
 
     private static bool TryDeleteDir(string pfad, string _) {
         pfad = pfad.CheckPath();
-        if (!PathExists(pfad)) { return true; }
+        if (!DirectoryExists(pfad)) { return true; }
         try {
             Directory.Delete(pfad, true);
         } catch {
@@ -530,7 +532,20 @@ public static class IO {
         return true;  // Kein Fileexists - evtl. hat ein anderer just den Pfad neu erstellt
     }
 
-    private static bool TryRenameFile(string oldName, string newName) {
+    private static bool TryMoveDirectory(string oldName, string newName) {
+        if (oldName == newName) { return true; }
+        if (!DirectoryExists(oldName)) { return false; }
+        if (DirectoryExists(newName)) { return false; }
+        try {
+            Directory.Move(oldName, newName);
+        } catch {
+            //Develop.DebugPrint(enFehlerArt.Info, ex);
+            return false;
+        }
+        return true; // FileExists(newName) && !FileExists(oldName);
+    }
+
+    private static bool TryMoveFile(string oldName, string newName) {
         if (oldName == newName) { return true; }
         if (!FileExists(oldName)) { return false; }
         if (FileExists(newName)) { return false; }

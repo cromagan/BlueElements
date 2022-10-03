@@ -188,7 +188,7 @@ public static partial class Extensions {
 
     public static void Save(this List<string> l, string dateiName, System.Text.Encoding code, bool executeAfter) {
         var t = l.JoinWith("\r\n").TrimEnd("\r\n");
-        if (!PathExists(dateiName.FilePath())) {
+        if (!DirectoryExists(dateiName.FilePath())) {
             Directory.CreateDirectory(dateiName.FilePath());
         }
         WriteAllText(dateiName, t, code, executeAfter);

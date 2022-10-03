@@ -374,13 +374,13 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         if (!string.IsNullOrEmpty(_additionaFilesPfadtmp)) { return _additionaFilesPfadtmp; }
 
         var t = _additionaFilesPfad.CheckPath();
-        if (PathExists(t)) {
+        if (DirectoryExists(t)) {
             _additionaFilesPfadtmp = t;
             return t;
         }
 
         t = (Filename.FilePath() + _additionaFilesPfad.Trim("\\") + "\\").CheckPath();
-        if (PathExists(t)) {
+        if (DirectoryExists(t)) {
             _additionaFilesPfadtmp = t;
             return t;
         }

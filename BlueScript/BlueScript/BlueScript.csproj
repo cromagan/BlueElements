@@ -55,6 +55,9 @@
     <Compile Include="Methods\Method_BitmapToBase64.cs" />
     <Compile Include="Methods\Method_CallByFilename.cs" />
     <Compile Include="Methods\Method_ContainsWhich.cs" />
+    <Compile Include="Methods\Method_DirectoryExists.cs" />
+    <Compile Include="Methods\Method_FreeDirectoryName.cs" />
+    <Compile Include="Methods\Method_MoveDirectory.cs" />
     <Compile Include="Methods\Method_MoveFile.cs" />
     <Compile Include="Methods\Method_FreeFileName.cs" />
     <Compile Include="Methods\Method_GetFiles.cs" />
@@ -81,6 +84,7 @@
     <Compile Include="Methods\Method_ExtractTags.cs" />
     <Compile Include="Methods\Method_Call.cs" />
     <Compile Include="Methods\Method_Sub.cs" />
+    <Compile Include="Methods\Method_FileExists.cs" />
     <Compile Include="Methods\Method_TrimEnd.cs" />
     <Compile Include="Methods\Method_TrimStart.cs" />
     <Compile Include="Methods\Method_TrimSuffix.cs" />

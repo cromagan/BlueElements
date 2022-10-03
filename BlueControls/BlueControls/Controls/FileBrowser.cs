@@ -221,9 +221,9 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
     private void CheckButtons() {
         txbPfad.Enabled = Enabled && string.IsNullOrEmpty(OriginalText);
         lsbFiles.Enabled = Enabled;
-        btnAddScreenShot.Enabled = PathExists(txbPfad.Text);
-        btnExplorerÖffnen.Enabled = PathExists(txbPfad.Text);
-        btnZurück.Enabled = PathExists(txbPfad.Text);
+        btnAddScreenShot.Enabled = DirectoryExists(txbPfad.Text);
+        btnExplorerÖffnen.Enabled = DirectoryExists(txbPfad.Text);
+        btnZurück.Enabled = DirectoryExists(txbPfad.Text);
     }
 
     private void lsbFiles_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
@@ -275,7 +275,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
 
                 nn = n.FilePath() + nn + "." + n.FileSuffix();
 
-                RenameFile(it.Internal, nn, true);
+                MoveFile(it.Internal, nn, true);
 
                 Reload();
                 break;
@@ -303,7 +303,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
                     return;
                 }
 
-                RenameFile(_ausschneiden, ziel, true);
+                MoveFile(_ausschneiden, ziel, true);
 
                 //if (FileExists(ThumbFile(_ausschneiden))) {
                 //    RenameFile(ThumbFile(_ausschneiden), ThumbFile(ziel), true);
@@ -398,7 +398,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
 
         lsbFiles.Item.Clear();
 
-        if (!PathExists(newPath)) {
+        if (!DirectoryExists(newPath)) {
             _isLoading = false;
             return;
         }
@@ -486,7 +486,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         //ThumbGenerator.SetApartmentState
 
         var newPath = txbPfad.Text.Trim("\\") + "\\";
-        if (!PathExists(newPath)) { return; }
+        if (!DirectoryExists(newPath)) { return; }
 
         var allF = Directory.GetFiles(newPath, "*", SearchOption.TopDirectoryOnly);
 

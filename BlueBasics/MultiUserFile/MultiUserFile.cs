@@ -53,6 +53,7 @@ public sealed class MultiUserFile : IDisposableExtended {
     private string _filename;
     private string _inhaltBlockdatei = string.Empty;
     private bool _initialLoadDone;
+    private DateTime _lastCheck = DateTime.Now;
     private DateTime _lastMessageUtc = DateTime.UtcNow.AddMinutes(-10);
     private string _lastSaveCode;
     private DateTime _lastUserActionUtc = new(1900, 1, 1);
@@ -181,6 +182,19 @@ public sealed class MultiUserFile : IDisposableExtended {
         }
     }
 
+    public bool ReloadNeededSoft {
+        get {
+            if (string.IsNullOrEmpty(Filename)) { return false; }
+            if (_checkedAndReloadNeed) { return true; }
+
+            if (DateTime.Now.Subtract(_lastCheck).TotalSeconds > 10) {
+                return ReloadNeeded;
+            }
+
+            return false;
+        }
+    }
+
     /// <summary>
     ///
     /// </summary>
@@ -191,22 +205,6 @@ public sealed class MultiUserFile : IDisposableExtended {
             FileInfo f = new(Blockdateiname());
             var sec = DateTime.UtcNow.Subtract(f.CreationTimeUtc).TotalSeconds;
             return Math.Max(0, sec); // ganz frische Dateien werden einen Bruchteil von Sekunden in der Zukunft erzeugt.
-        }
-    }
-
-    private DateTime _lastCheck = DateTime.Now;
-
-    public bool ReloadNeededSoft {
-        get {
-            if (string.IsNullOrEmpty(Filename)) { return false; }
-            if (_checkedAndReloadNeed) { return true; }
-
-
-            if (DateTime.Now.Subtract(_lastCheck).TotalSeconds > 10) {
-                return ReloadNeeded;
-            }
-
-            return false;
         }
     }
 
@@ -990,10 +988,10 @@ public sealed class MultiUserFile : IDisposableExtended {
         }
 
         // Haupt-Datei wird zum Backup umbenannt
-        if (!RenameFile(Filename, Backupdateiname(), false)) { return Feedback("Umbenennen der Hauptdatei fehlgeschlagen"); }
+        if (!MoveFile(Filename, Backupdateiname(), false)) { return Feedback("Umbenennen der Hauptdatei fehlgeschlagen"); }
 
         // --- TmpFile wird zum Haupt ---
-        RenameFile(tmpFileName, Filename, true);
+        MoveFile(tmpFileName, Filename, true);
 
         //// ---- Steuerelemente Sagen, was gespeichert wurde
         //_data_On_Disk = savedDataUncompressed;

@@ -16,45 +16,37 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using System.IO;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
 
-internal class Method_GetFiles : Method {
+#nullable enable
+
+internal class Method_DirectoryExists : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
-    public override string Description => "Gibt alle Dateien im angegebenen Verzeichis zurück. Komplett, mit Pfad und Suffix";
+    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain } };
+    public override string Description => "Prüft, ob ein Verzeichnis existiert";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
-
-    public override string Returns => VariableListString.ShortName_Plain;
+    public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "GetFiles(Path, Suffix)";
+    public override string Syntax => "DirectoryExists(FilePath)";
 
     #endregion
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "getfiles" };
+    public override List<string> Comand(Script? s) => new() { "directoryexists" };
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-        var pf = ((VariableString)attvar.Attributes[0]).ValueString;
-
-        if (!DirectoryExists(pf)) {
-            return new DoItFeedback("Verzeichnis existiert nicht");
-        }
-
-        return new DoItFeedback(Directory.GetFiles(pf, ((VariableString)attvar.Attributes[1]).ValueString));
+        return new DoItFeedback(BlueBasics.IO.DirectoryExists(((VariableString)attvar.Attributes[0]).ValueString));
     }
 
     #endregion

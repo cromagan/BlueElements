@@ -129,7 +129,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
         }
 
         SaveTab.ShowDialog();
-        if (!PathExists(SaveTab.FileName.FilePath())) { return; }
+        if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
         if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
         if (sender == btnNeuDB) {

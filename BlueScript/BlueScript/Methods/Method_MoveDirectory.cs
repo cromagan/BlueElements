@@ -17,44 +17,51 @@
 
 using System.Collections.Generic;
 using System.IO;
+using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
 
-internal class Method_GetFiles : Method {
+internal class Method_MoveDirectory : Method {
 
     #region Properties
 
     public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
-    public override string Description => "Gibt alle Dateien im angegebenen Verzeichis zurück. Komplett, mit Pfad und Suffix";
+    public override string Description => "Verschiebt einen Ordner.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
+    public override string EndSequence => ");";
     public override bool GetCodeBlockAfter => false;
 
-    public override string Returns => VariableListString.ShortName_Plain;
+    public override string Returns => string.Empty;
     public override string StartSequence => "(";
-    public override string Syntax => "GetFiles(Path, Suffix)";
+    public override string Syntax => "MoveDirectory(SourceCompleteName, DestinatonCompleteName)";
 
     #endregion
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "getfiles" };
+    public override List<string> Comand(Script? s) => new() { "movedirectory" };
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
 
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-        var pf = ((VariableString)attvar.Attributes[0]).ValueString;
+        var sop = ((VariableString)attvar.Attributes[0]).ValueString;
+        if (!DirectoryExists(sop)) { return new DoItFeedback("Quell-Verzeichnis existiert nicht."); }
+        var dep = ((VariableString)attvar.Attributes[1]).ValueString;
 
-        if (!DirectoryExists(pf)) {
-            return new DoItFeedback("Verzeichnis existiert nicht");
+        if (DirectoryExists(dep)) { return new DoItFeedback("Ziel-Verzeichnis existiert bereits."); }
+
+        if (s.OnlyTesting) { return new DoItFeedback("Verschieben im Testmodus deaktiviert."); }
+
+        if (!MoveDirectory(sop, dep, false)) {
+            return new DoItFeedback("Verschieben fehlgeschlagen.");
         }
 
-        return new DoItFeedback(Directory.GetFiles(pf, ((VariableString)attvar.Attributes[1]).ValueString));
+        return DoItFeedback.Null();
     }
 
     #endregion

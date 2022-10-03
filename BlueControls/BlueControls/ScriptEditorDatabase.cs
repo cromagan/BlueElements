@@ -103,7 +103,7 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
             Message("Keine Datenbank geladen.");
             return;
         }
-        if (PathExists(_database.AdditionaFilesPfadWhole())) { ExecuteFile(_database.AdditionaFilesPfadWhole()); }
+        if (DirectoryExists(_database.AdditionaFilesPfadWhole())) { ExecuteFile(_database.AdditionaFilesPfadWhole()); }
     }
 
     private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;

@@ -139,13 +139,18 @@ public class BitmapListItem : BasicListItem {
     public bool ImageLoaded() => _bitmap != null;
 
     protected override Size ComputeSizeUntouchedForListBox() {
-        if (_bitmap == null) { return new Size(300, 300); }
+        try {
+            if (_bitmap == null) { return new Size(300, 300); }
 
-        var sc = (float)_bitmap.Height / _bitmap.Width;
+            var sc = (float)_bitmap.Height / _bitmap.Width;
 
-        if (sc > 1) { sc = 1; }
+            if (sc > 1) { sc = 1; }
 
-        return new Size(300, (int)(sc * 300));
+            return new Size(300, (int)(sc * 300));
+        } catch {
+            //... wird an anderer Stelle verwendet...
+            return ComputeSizeUntouchedForListBox();
+        }
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate) {
@@ -159,13 +164,17 @@ public class BitmapListItem : BasicListItem {
         GetImage();
         if (!string.IsNullOrEmpty(_caption) && _captiontmp.Count == 0) { _captiontmp = bFont.SplitByWidth(_caption, drawingCoordinates.Width, _captionlines); }
         if (_bitmap != null) {
-            areaOfWholeImage = new RectangleF(0, 0, _bitmap.Width, _bitmap.Height);
-            var scale = (float)Math.Min((drawingCoordinates.Width - (Padding * 2)) / (double)_bitmap.Width,
-                (drawingCoordinates.Height - (Padding * 2) - (_captionlines * ConstMy)) / (double)_bitmap.Height);
-            scaledImagePosition = new RectangleF(((drawingCoordinates.Width - (_bitmap.Width * scale)) / 2) + drawingCoordinates.Left,
-                ((drawingCoordinates.Height - (_bitmap.Height * scale)) / 2) + drawingCoordinates.Top - (_captionlines * ConstMy / 2),
-                _bitmap.Width * scale,
-                _bitmap.Height * scale);
+            try {
+                areaOfWholeImage = new RectangleF(0, 0, _bitmap.Width, _bitmap.Height);
+                var scale = (float)Math.Min((drawingCoordinates.Width - (Padding * 2)) / (double)_bitmap.Width,
+                    (drawingCoordinates.Height - (Padding * 2) - (_captionlines * ConstMy)) / (double)_bitmap.Height);
+                scaledImagePosition = new RectangleF(((drawingCoordinates.Width - (_bitmap.Width * scale)) / 2) + drawingCoordinates.Left,
+                    ((drawingCoordinates.Height - (_bitmap.Height * scale)) / 2) + drawingCoordinates.Top - (_captionlines * ConstMy / 2),
+                    _bitmap.Width * scale,
+                    _bitmap.Height * scale);
+            } catch {
+                return;
+            }
         }
         var trp = drawingCoordinates.PointOf(Alignment.Horizontal_Vertical_Center);
         scaledImagePosition = scaledImagePosition with { X = scaledImagePosition.Left - trp.X, Y = scaledImagePosition.Top - trp.Y };

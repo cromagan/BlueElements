@@ -178,7 +178,7 @@ public partial class MainWindow {
 
     private void btnSaveAs_Click(object? sender, System.EventArgs e) {
         SaveTab.ShowDialog();
-        if (!PathExists(SaveTab.FileName.FilePath())) { return; }
+        if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
         if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
         if (FileExists(SaveTab.FileName)) {
             if (MessageBox.Show("Datei bereits vorhanden.<br>Überschreiben?", ImageCode.Frage, "Ja", "Nein") != 0) { return; }

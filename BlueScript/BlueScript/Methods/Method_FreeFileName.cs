@@ -15,11 +15,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System.Collections.Generic;
-using System.IO;
 using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
@@ -51,7 +50,7 @@ internal class Method_FreeFileName : Method {
 
         var pf = ((VariableString)attvar.Attributes[0]).ValueString;
 
-        if (!Directory.Exists(pf)) {
+        if (!DirectoryExists(pf)) {
             return new DoItFeedback("Verzeichnis existiert nicht");
         }
 
@@ -66,7 +65,7 @@ internal class Method_FreeFileName : Method {
             }
 
             if (!FileExists(pf + p + ((VariableString)attvar.Attributes[1]).ValueString)) {
-                return new DoItFeedback(p,string.Empty);
+                return new DoItFeedback(p, string.Empty);
             }
         } while (true);
     }

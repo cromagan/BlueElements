@@ -173,7 +173,7 @@ public static class IInputFormatExtensions {
             case VarType.Url:
                 //    https://regex101.com/r/S2CbwM/1
                 t.Regex = @"^(https:|http:|www\.)\S*$";
-                t.AllowedChars = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + "._/";
+                t.AllowedChars = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + ":.-_/";
                 t.Suffix = string.Empty;
                 t.Prefix = string.Empty;
                 t.FormatierungErlaubt = false;
@@ -185,7 +185,7 @@ public static class IInputFormatExtensions {
             case VarType.Email:
                 //http://emailregex.com/
                 t.Regex = @"^[a-z0-9A-Z._-]{1,40}[@][a-z0-9A-Z._-]{1,40}[.][a-zA-Z]{1,3}$";
-                t.AllowedChars = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + "@._";
+                t.AllowedChars = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + "@.-_";
                 t.Suffix = string.Empty;
                 t.Prefix = string.Empty;
                 t.FormatierungErlaubt = false;
