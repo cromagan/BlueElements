@@ -93,7 +93,7 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
         con.CaptionPosition = CaptionPosition;
         con.Name = DefaultItemToControlName();
         con.OriginalText = _variable;
-        if (GetRowFrom is ICalculateOneRowItemLevel rfw2) {
+        if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
             var ff = parent.SearchOrGenerate(rfw2);
 
             if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(con); }

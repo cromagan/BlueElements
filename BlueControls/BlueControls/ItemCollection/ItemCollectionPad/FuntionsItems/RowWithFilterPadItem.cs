@@ -35,15 +35,9 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
 
-public class RowWithFilterPaditem : RectanglePadItemWithVersion, IReadableText, IAcceptAndSends, ICalculateOneRowItemLevel, IItemToControl {
+public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, IAcceptAndSends, ICalculateRowsItemLevel, IItemToControl {
 
     #region Fields
-
-    public static BlueFont? CellFont = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
-
-    public static BlueFont? ChapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard);
-
-    public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
 
     public readonly Database FilterDefiniton;
 
@@ -59,9 +53,9 @@ public class RowWithFilterPaditem : RectanglePadItemWithVersion, IReadableText, 
 
     #region Constructors
 
-    public RowWithFilterPaditem(Database? db, int id) : this(string.Empty, db, id) { }
+    public RowWithFilterPadItem(Database? db, int id) : this(string.Empty, db, id) { }
 
-    public RowWithFilterPaditem(string intern, Database? db, int id) : base(intern) {
+    public RowWithFilterPadItem(string intern, Database? db, int id) : base(intern) {
         Database = db;
 
         Id = id;
@@ -70,7 +64,7 @@ public class RowWithFilterPaditem : RectanglePadItemWithVersion, IReadableText, 
         FilterDefiniton.Cell.CellValueChanged += Cell_CellValueChanged;
     }
 
-    public RowWithFilterPaditem(string intern) : this(intern, null, 0) { }
+    public RowWithFilterPadItem(string intern) : this(intern, null, 0) { }
 
     #endregion
 
@@ -186,7 +180,6 @@ public class RowWithFilterPaditem : RectanglePadItemWithVersion, IReadableText, 
         FilterDatabaseUpdate();
         l.Add(new FlexiControlForProperty<string>(() => Filter_hinzufügen, ImageCode.PlusZeichen));
         l.Add(FilterTable());
-
 
         return l;
     }
@@ -304,7 +297,7 @@ public class RowWithFilterPaditem : RectanglePadItemWithVersion, IReadableText, 
 
     protected override BasicPadItem? TryCreate(string id, string name) {
         if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-            return new RowWithFilterPaditem(name);
+            return new RowWithFilterPadItem(name);
         }
         return null;
     }

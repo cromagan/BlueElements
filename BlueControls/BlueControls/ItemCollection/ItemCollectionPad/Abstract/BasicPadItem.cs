@@ -37,6 +37,12 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
 
     #region Fields
 
+    public static BlueFont? CellFont = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
+
+    public static BlueFont? ChapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard);
+
+    public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
+
     public readonly ListExt<ItemConnection> ConnectsTo = new();
 
     public readonly ListExt<PointM> MovablePoint = new();

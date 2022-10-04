@@ -304,7 +304,7 @@ public static class Converter {
     //public static string Path2SerialNr(string path)
     //{
     //    if (path.Substring(1, 2) != ":\\") { return path; }
-    //    if (!PathExists(path.Substring(0, 3))) { return path; }
+    //    if (!DirectoryExists(path.Substring(0, 3))) { return path; }
     //    return GetDriveSerialNumber(path) + path.Substring(1);
     //}
     //public static string SerialNr2Path(string pfad)

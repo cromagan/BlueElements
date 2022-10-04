@@ -121,7 +121,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
                 //case "Speichern":
                 //    System.Windows.Forms.FolderBrowserDialog savOrt = new();
                 //    savOrt.ShowDialog();
-                //    if (!PathExists(savOrt.SelectedPath)) {
+                //    if (!DirectoryExists(savOrt.SelectedPath)) {
                 //        MessageBox.Show("Abbruch!", ImageCode.Warnung, "OK");
                 //        return true;
                 //    }

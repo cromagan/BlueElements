@@ -18,7 +18,6 @@
 #nullable enable
 
 using BlueBasics.Interfaces;
-using BlueDatabase;
 
 namespace BlueControls.Interfaces;
 
@@ -26,11 +25,9 @@ namespace BlueControls.Interfaces;
 /// Wird verwendet, wenn das PadItem Zeilen berechnen kann und dann das
 /// erzeugte Control es an Childs weiter geben kann.
 /// </summary>
-public interface ICalculateOneRowItemLevel : IReadableText, IItemToControl {
+public interface ICalculateRowsItemLevel : IHasDatabase, IReadableText, IItemToControl {
 
     #region Properties
-
-    public Database? Database { get; set; }
 
     /// <summary>
     /// Laufende Nummer, bestimmt die Einfärbung

@@ -68,7 +68,7 @@ public class FileExplorerPadItem : CustomizableShowPadItem, IItemToControl {
         con.OriginalText = Pfad;
         con.Name = DefaultItemToControlName();
 
-        if (GetRowFrom is ICalculateOneRowItemLevel rfw2) {
+        if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
             var ff = parent.SearchOrGenerate(rfw2);
             if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(con); }
         }

@@ -506,7 +506,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
 
                 //        if (!FileExists(th)) {
                 //            var thumbnail = GetThumbnail(thisString, rEadable);
-                //            if (!PathExists(th.FilePath())) {
+                //            if (!DirectoryExists(th.FilePath())) {
                 //                Directory.CreateDirectory(th.FilePath());
                 //            }
 

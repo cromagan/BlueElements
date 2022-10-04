@@ -31,13 +31,9 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollection;
 
-public class ConstantTextPaditem : CustomizableShowPadItem, IReadableText, IContentHolder, IItemToControl {
+public class ConstantTextPadItem : CustomizableShowPadItem, IReadableText, IContentHolder, IItemToControl {
 
     #region Fields
-
-    public static BlueFont? CellFont = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
-    public static BlueFont? ChapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard);
-    public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
 
     private string _text;
 
@@ -45,14 +41,14 @@ public class ConstantTextPaditem : CustomizableShowPadItem, IReadableText, ICont
 
     #region Constructors
 
-    public ConstantTextPaditem() : this(UniqueInternal(), string.Empty) { }
+    public ConstantTextPadItem() : this(UniqueInternal(), string.Empty) { }
 
-    public ConstantTextPaditem(string intern, string text) : base(intern) {
+    public ConstantTextPadItem(string intern, string text) : base(intern) {
         _text = text;
         //Size = new Size(150, 24);
     }
 
-    public ConstantTextPaditem(string intern) : this(intern, string.Empty) { }
+    public ConstantTextPadItem(string intern) : this(intern, string.Empty) { }
 
     #endregion
 
@@ -133,7 +129,7 @@ public class ConstantTextPaditem : CustomizableShowPadItem, IReadableText, ICont
 
     protected override BasicPadItem? TryCreate(string id, string name) {
         if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-            return new ConstantTextPaditem(name);
+            return new ConstantTextPadItem(name);
         }
         return null;
     }

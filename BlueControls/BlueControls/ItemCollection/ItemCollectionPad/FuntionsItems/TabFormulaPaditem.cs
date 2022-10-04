@@ -32,13 +32,10 @@ using System.Windows.Forms;
 
 namespace BlueControls.ItemCollection;
 
-public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
+public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
 
     #region Fields
 
-    public static BlueFont? CellFont = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
-    public static BlueFont? ChapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard);
-    public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
     private readonly List<string> _childs = new();
 
     private ConnectedFormula.ConnectedFormula? _cf;
@@ -47,16 +44,16 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
 
     #region Constructors
 
-    public TabFormulaPaditem() : this(UniqueInternal(), null) { }
+    public TabFormulaPadItem() : this(UniqueInternal(), null) { }
 
-    public TabFormulaPaditem(string intern, ConnectedFormula.ConnectedFormula? cf) : base(intern) {
+    public TabFormulaPadItem(string intern, ConnectedFormula.ConnectedFormula? cf) : base(intern) {
         _cf = cf;
         if (_cf != null) {
             _cf.NotAllowedChilds.Changed += NotAllowedChilds_Changed;
         }
     }
 
-    public TabFormulaPaditem(string intern) : this(intern, null) { }
+    public TabFormulaPadItem(string intern) : this(intern, null) { }
 
     #endregion
 
@@ -72,7 +69,7 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
         var con = new Controls.TabControl();
         con.Name = DefaultItemToControlName();
 
-        if (GetRowFrom is ICalculateOneRowItemLevel rfw2) {
+        if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
             var ff = parent.SearchOrGenerate(rfw2);
             if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(con); }
         }
@@ -227,7 +224,7 @@ public class TabFormulaPaditem : CustomizableShowPadItem, IItemToControl {
 
     protected override BasicPadItem? TryCreate(string id, string name) {
         if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-            return new TabFormulaPaditem(name);
+            return new TabFormulaPadItem(name);
         }
         return null;
     }

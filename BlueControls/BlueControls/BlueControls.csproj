@@ -119,6 +119,7 @@
     <Compile Include="Forms\SQL_TableView.Designer.cs">
       <DependentUpon>SQL_TableView.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interfaces\IHasDatabase.cs" />
     <Compile Include="ItemCollection\ItemCollectionList\SQL_CellLikeListItem.cs" />
     <Compile Include="ConnectedFormula\ConnectedFormula.cs" />
     <Compile Include="ConnectedFormula\ConnectedFormulaView.cs">
@@ -317,7 +318,7 @@
       <DependentUpon>frmBefehlsreferenz.cs</DependentUpon>
     </Compile>
     <Compile Include="Interfaces\IAcceptVariableList.cs" />
-    <Compile Include="Interfaces\ICalculateOneRowItemLevel.cs" />
+    <Compile Include="Interfaces\ICalculateRowsItemLevel.cs" />
     <Compile Include="Interfaces\IDisabledReason.cs" />
     <Compile Include="Interfaces\ICalculateRowsControlLevel.cs" />
     <Compile Include="Interfaces\IContenHolder.cs" />
@@ -334,14 +335,15 @@
     </Compile>
     <Compile Include="ItemCollection\ItemCollectionPad\Abstract\RectanglePadItemWithVersion.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\EasyPicPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\TabFormulaPaditem.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\DatabaseSourcePadItem.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\TabFormulaPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\CustomizableShowPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\RowInputPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\VariableFieldPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\FileExplorerPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\EditFieldPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Abstract\FixedRectanglePadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\ConstantTextPaditem.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\ConstantTextPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\RowWithFilterPadItem.cs" />
     <Compile Include="ItemCollection\ItemConnection.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Temporär\PhysicPadItem.cs" />

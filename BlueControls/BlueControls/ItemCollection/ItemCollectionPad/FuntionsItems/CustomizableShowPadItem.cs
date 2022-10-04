@@ -45,7 +45,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
     public static BlueFont? CaptionFnt = Skin.GetBlueFont(Design.Caption, States.Standard);
 
     public ListExt<string> VisibleFor = new();
-    private ICalculateOneRowItemLevel? _getValueFrom;
+    private ICalculateRowsItemLevel? _getValueFrom;
 
     #endregion
 
@@ -98,7 +98,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
         set {
             var x = new ItemCollectionList.ItemCollectionList();
             foreach (var thisR in Parent) {
-                if (thisR.IsVisibleOnPage(Page) && thisR is ICalculateOneRowItemLevel rfp) {
+                if (thisR.IsVisibleOnPage(Page) && thisR is ICalculateRowsItemLevel rfp) {
                     x.Add(rfp, thisR.Internal);
                 }
             }
@@ -111,7 +111,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
 
             var t = Parent[it[0]];
 
-            if (t is ICalculateOneRowItemLevel rfp2) {
+            if (t is ICalculateRowsItemLevel rfp2) {
                 if (rfp2 != GetRowFrom) {
                     GetRowFrom = rfp2;
                 }
@@ -123,7 +123,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
         }
     }
 
-    public ICalculateOneRowItemLevel? GetRowFrom {
+    public ICalculateRowsItemLevel? GetRowFrom {
         get => _getValueFrom;
 
         set {
@@ -246,7 +246,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
                 return true;
 
             case "getvaluefrom":
-                GetRowFrom = (ICalculateOneRowItemLevel)Parent[value.FromNonCritical()];
+                GetRowFrom = (ICalculateRowsItemLevel)Parent[value.FromNonCritical()];
                 return true;
 
             case "visiblefor":

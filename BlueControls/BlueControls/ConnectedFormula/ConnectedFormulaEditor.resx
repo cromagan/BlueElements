@@ -117,6 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="btnRegisterKarte.QuickInfo" xml:space="preserve">
+    <value>Fügt eine weiter Registerkarte hinzu.
+Diese kann dann in einem Registersammlung dargestellt werden.
+
+Ein solches Register ist ein wie ein eigens Formular und muss
+einen Zeilen-Eingang besitzen, um Werte empfangen zu können.</value>
+  </data>
   <data name="btnTabControlAdd.QuickInfo" xml:space="preserve">
     <value>Fügt ein Steuerelement mit Registerkarten hinzu.
 Pro Registerkarte kann ein Unterformular gewählt werden.

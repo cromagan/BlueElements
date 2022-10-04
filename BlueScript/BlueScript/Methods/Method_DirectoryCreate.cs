@@ -54,7 +54,7 @@ internal class Method_DirectoryCreate : Method {
             System.IO.Directory.CreateDirectory(p);
         } catch { }
 
-        return !System.IO.Directory.Exists(p) ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
+        return !DirectoryExists(p) ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
     }
 
     #endregion

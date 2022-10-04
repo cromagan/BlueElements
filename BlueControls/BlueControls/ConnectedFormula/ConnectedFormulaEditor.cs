@@ -51,25 +51,14 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     #region Methods
 
-    public static List<BasicListItem> GetAllowedEditTypes(ColumnItem? column) {
-        var l = new List<BasicListItem>();
-        if (column == null) { return l; }
-        var t = typeof(EditTypeFormula);
 
-        foreach (int z1 in Enum.GetValues(t)) {
-            if (column.UserEditDialogTypeInFormula((EditTypeFormula)z1)) {
-                l.Add(new TextListItem(Enum.GetName(t, z1).Replace("_", " "), z1.ToString(), null, false, true, string.Empty));
-            }
-        }
-        return l;
-    }
 
     private void btnBild_Click(object sender, System.EventArgs e) {
         var l = Pad.LastClickedItem;
 
         var x = new EasyPicPadItem(string.Empty);
 
-        if (l is ICalculateOneRowItemLevel ri) {
+        if (l is ICalculateRowsItemLevel ri) {
             x.GetRowFrom = ri;
         }
         if (l is CustomizableShowPadItem efi && efi.GetRowFrom != null) {
@@ -90,7 +79,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         var x = new EditFieldPadItem(string.Empty);
 
-        if (l is ICalculateOneRowItemLevel ri) {
+        if (l is ICalculateRowsItemLevel ri) {
             x.GetRowFrom = ri;
         }
         if (l is CustomizableShowPadItem efi && efi.GetRowFrom != null) {
@@ -105,7 +94,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
     }
 
     private void btnKonstante_Click(object sender, System.EventArgs e) {
-        var x = new ConstantTextPaditem();
+        var x = new ConstantTextPadItem();
         //x.Bei_Export_Sichtbar = false;
         Pad.AddCentered(x);
     }
@@ -166,7 +155,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
     private void btnTabControlAdd_Click(object sender, System.EventArgs e) {
         if (_cf == null) { return; }
 
-        var x = new TabFormulaPaditem(string.Empty, _cf);
+        var x = new TabFormulaPadItem(string.Empty, _cf);
         x.Bei_Export_sichtbar = true;
         Pad.AddCentered(x);
     }
@@ -176,7 +165,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         var x = new VariableFieldPadItem(string.Empty);
 
-        if (l is ICalculateOneRowItemLevel ri) {
+        if (l is ICalculateRowsItemLevel ri) {
             x.GetRowFrom = ri;
         }
 
@@ -195,7 +184,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
     }
 
     private void btnZeileHinzu_Click(object sender, System.EventArgs e) {
-        var it = new RowWithFilterPaditem(string.Empty);
+        var it = new RowWithFilterPadItem(string.Empty);
         Pad.AddCentered(it);
         ChooseDatabaseAndId(it);
     }
@@ -203,7 +192,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
     private void CheckButtons() {
     }
 
-    private void ChooseDatabaseAndId(ICalculateOneRowItemLevel? it) {
+    private void ChooseDatabaseAndId(ICalculateRowsItemLevel? it) {
         if (_cf == null || it == null) { return; }
 
         if (string.IsNullOrEmpty(LoadTabDatabase.InitialDirectory)) {
@@ -261,7 +250,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         var x = new FileExplorerPadItem(string.Empty);
 
-        if (l is ICalculateOneRowItemLevel ri) {
+        if (l is ICalculateRowsItemLevel ri) {
             x.GetRowFrom = ri;
         }
         if (l is CustomizableShowPadItem efi && efi.GetRowFrom != null) {

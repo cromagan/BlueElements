@@ -15,15 +15,18 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics.Enums;
 using BlueControls.Forms;
+using BlueControls.Interfaces;
 using BlueDatabase;
 using System.ComponentModel;
 using static BlueBasics.Extensions;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public sealed partial class Import {
+public sealed partial class Import  {
 
     #region Fields
 

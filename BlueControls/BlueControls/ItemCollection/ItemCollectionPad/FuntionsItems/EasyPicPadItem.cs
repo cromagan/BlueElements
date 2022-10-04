@@ -68,7 +68,7 @@ public class EasyPicPadItem : CustomizableShowPadItem, IItemToControl {
         con.OriginalText = Bild_Dateiname;
         con.Name = DefaultItemToControlName();
 
-        if (GetRowFrom is ICalculateOneRowItemLevel rfw2) {
+        if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
             var ff = parent.SearchOrGenerate(rfw2);
             if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(con); }
         }

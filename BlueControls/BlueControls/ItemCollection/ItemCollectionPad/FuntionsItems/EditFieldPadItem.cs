@@ -34,6 +34,7 @@ using BlueBasics.Interfaces;
 using BlueControls.Interfaces;
 using BlueControls.Forms;
 using System.Configuration;
+using BlueControls.ItemCollection.ItemCollectionList;
 
 namespace BlueControls.ItemCollection;
 
@@ -153,7 +154,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
     #region Methods
 
     public override System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
-        if (GetRowFrom is ICalculateOneRowItemLevel rfw2) {
+        if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
             var ff = parent.SearchOrGenerate(rfw2);
 
             var con = new FlexiControlForCell();
@@ -192,7 +193,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         u.AddRange(typeof(ÜberschriftAnordnung));
         l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
         var b = new ItemCollection.ItemCollectionList.ItemCollectionList();
-        b.AddRange(ConnectedFormulaEditor.GetAllowedEditTypes(Column));
+        b.AddRange(EditFieldPadItem.GetAllowedEditTypes(Column));
         l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
         l.Add(new FlexiControl());
         l.Add(new FlexiControlForProperty<string>(() => Spalten_QuickInfo, 5));
@@ -201,6 +202,21 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
 
         return l;
     }
+
+    public static List<BasicListItem> GetAllowedEditTypes(ColumnItem? column) {
+        var l = new List<BasicListItem>();
+        if (column == null) { return l; }
+        var t = typeof(EditTypeFormula);
+
+        foreach (int z1 in Enum.GetValues(t)) {
+            if (column.UserEditDialogTypeInFormula((EditTypeFormula)z1)) {
+                l.Add(new TextListItem(Enum.GetName(t, z1).Replace("_", " "), z1.ToString(), null, false, true, string.Empty));
+            }
+        }
+        return l;
+    }
+
+
 
     public bool IsRecursiveWith(IAcceptAndSends obj) {
         if (obj == this) { return true; }

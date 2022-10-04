@@ -35,27 +35,25 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
     #region Fields
 
-    public static readonly List<FlexiControlRowSelector> AllConnectors = new();
-    public readonly Database FilterDefiniton;
+    public readonly Database? FilterDefiniton;
 
-    //public readonly string VerbindungsId = string.Empty;
     public ItemCollectionPad? ParentCol;
 
     private readonly ListExt<System.Windows.Forms.Control> _parents = new();
 
     private readonly string _showformat;
 
-    //private readonly RowWithFilterPaditem _rwf;
     private bool _disposing;
 
     private RowItem? _row;
+
     private List<RowItem>? _rows;
 
     #endregion
 
     #region Constructors
 
-    public FlexiControlRowSelector(Database? database, ItemCollectionPad parent, Database filterdef, string caption, string showFormat) : base() {
+    public FlexiControlRowSelector(Database? database, ItemCollectionPad parent, Database? filterdef, string caption, string showFormat) : base() {
         CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
         EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
 
@@ -66,15 +64,14 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         }
         _showformat = showFormat;
 
-        if (string.IsNullOrEmpty(_showformat) && database != null && database.Column.Count > 0) {
-            _showformat = "~" + database.Column[0].Name + "~";
+        if (string.IsNullOrEmpty(_showformat) && database != null && database.Column.Count > 0 && database.Column[0] is ColumnItem fc) {
+            _showformat = "~" + fc.Name + "~";
         }
 
         ParentCol = parent;
         Database = database;
         FilterDefiniton = filterdef;
 
-        AllConnectors.Add(this);
 
         // den Rest initialisieren, bei OnParentChanged
         // weil der Parent gebraucht wird um Filter zu erstellen
@@ -85,7 +82,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
     #region Properties
 
     public ListExt<System.Windows.Forms.Control> Childs { get; } = new();
-    public Database? Database { get; }
+    public Database? Database { get; set; }
 
     public RowItem? Row {
         get => IsDisposed ? null : _row;
@@ -140,7 +137,6 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         if (disposing) {
             _disposing = true;
 
-            AllConnectors.Remove(this);
 
             Tag = null;
 
@@ -247,7 +243,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
                     var connected = ParentCol[thisR.CellGetString("suchtxt")];
 
                     switch (connected) {
-                        case ConstantTextPaditem ctpi:
+                        case ConstantTextPadItem ctpi:
 
                             if (Parent is ConnectedFormulaView cfvx) {
                                 var se2 = cfvx.SearchOrGenerate(ctpi);

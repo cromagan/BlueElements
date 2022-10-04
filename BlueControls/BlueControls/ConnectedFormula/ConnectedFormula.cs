@@ -339,7 +339,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
         DatabaseFiles.Clear();
 
         foreach (var thisit in PadData) {
-            if (thisit is RowWithFilterPaditem rwf) {
+            if (thisit is RowWithFilterPadItem rwf) {
                 if (rwf.Database != null) {
                     DatabaseFiles.AddIfNotExists(rwf.Database.Filename);
                     _id = Math.Max(_id, rwf.Id);

@@ -274,7 +274,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
                             c.Width = (int)(ua.Width * addfactor);
                             c.Height = (int)(ua.Height / Umrechnungsfaktor2);
 
-                            if (thisit is TabFormulaPaditem c3) {
+                            if (thisit is TabFormulaPadItem c3) {
                                 c3.CreateTabs((TabControl)c, _database?.UserGroup, _database?.UserName);
                             }
                         }

@@ -14,7 +14,7 @@ public static class FileDialogs {
     //{
     //    int ButtonNumber = 0;
     //    Pfad = Pfad.CheckPath();
-    //    if (!PathExists(Pfad)) { return; }
+    //    if (!DirectoryExists(Pfad)) { return; }
     //    if (Meldungen)
     //    {
     //        ButtonNumber = MessageBox.Show("Soll der Ordner \"" + Pfad + "\"<br>und dessen Inhalt wirklich <b>gelöscht</b> werden?\"", ImageCode.Warnung, "Ja - löschen", "Nein - abbrechen");

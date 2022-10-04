@@ -36,13 +36,6 @@ public class RowInputPadItem : RectanglePadItemWithVersion, IReadableText, ICont
 
     #region Fields
 
-    public static BlueFont? CellFont = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
-
-    public static BlueFont? ChapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard);
-
-    public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
-
-    //private string _ID = string.Empty;
     private string _spaltenname;
 
     #endregion

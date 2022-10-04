@@ -17,23 +17,15 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueScript;
+using BlueDatabase;
 
 namespace BlueControls.Interfaces;
 
-/// <summary>
-/// Ähnlich zu ICalculateRowsItemLevel.
-/// Hier sind die Wert zu finden, wenn das Control Zeilen berechnen kann und
-/// diese an Childs weiter geben kann.
-/// </summary>
-public interface ICalculateRowsControlLevel : IHasDatabase {
+public interface IHasDatabase {
 
     #region Properties
 
-    public ListExt<System.Windows.Forms.Control> Childs { get; }
-
-    public Script? Script { get; set; }
+    public Database? Database { get; set; }
 
     #endregion
 }
