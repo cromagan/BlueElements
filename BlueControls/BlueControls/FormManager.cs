@@ -80,7 +80,13 @@ namespace BildzeichenListe {
             forms.Remove((Form)sender);
             if (FirstWindowShown && !forms.Any()) {
                 if (sender != _lastStartForm) {
-                    _lastStartForm = NewModeSelectionForm();
+
+
+                    if (NewModeSelectionForm != null) {
+                        _lastStartForm = NewModeSelectionForm();
+                    } else {
+                        _lastStartForm = null;
+                    }
 
                     if (_lastStartForm != null) {
                         Current.RegisterForm(_lastStartForm);

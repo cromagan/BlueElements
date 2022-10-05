@@ -600,7 +600,7 @@ public sealed class SQL_CellCollection : Dictionary<string, SQL_CellItem>, IDisp
         }
     }
 
-    internal void Load_310(SQL_ColumnItem? column, SQL_RowItem? row, string value, int width, int height) {
+    public void Load_310(SQL_ColumnItem? column, SQL_RowItem? row, string value, int width, int height) {
         if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Row konnte nicht generiert werden."); }
         if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Column konnte nicht generiert werden."); }
         var cellKey = KeyOfCell(column, row);
