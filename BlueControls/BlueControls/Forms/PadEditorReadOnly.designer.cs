@@ -277,7 +277,6 @@ namespace BlueControls.Forms {
             this.Name = "PadEditorReadOnly";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "(c) Christian Peter";
-            this.TopMost = true;
             this.Ribbon.ResumeLayout(false);
             this.tabStart.ResumeLayout(false);
             this.grpAssistent.ResumeLayout(false);

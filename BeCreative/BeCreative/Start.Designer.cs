@@ -75,7 +75,6 @@ namespace BeCreative {
             this.btnTextEditor.Size = new System.Drawing.Size(64, 80);
             this.btnTextEditor.TabIndex = 3;
             this.btnTextEditor.Text = "Text-Editor";
-            this.btnTextEditor.Click += new System.EventHandler(this.btnTextEditor_Click);
             // 
             // btnBildEditor
             // 
@@ -126,7 +125,6 @@ namespace BeCreative {
             this.Name = "Start";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "BeCreative! - (c) Christian Peter";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Start_FormClosing);
             this.ResumeLayout(false);
 
         }

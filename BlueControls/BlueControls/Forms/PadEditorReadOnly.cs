@@ -17,10 +17,10 @@
 
 #nullable enable
 
+using BlueBasics;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using BlueBasics;
 
 namespace BlueControls.Forms;
 
@@ -32,10 +32,6 @@ public partial class PadEditorReadOnly : Form {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-
-        if (Develop.IsHostRunning()) {
-            TopMost = false;
-        }
     }
 
     #endregion

@@ -316,7 +316,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Name = "Import";
             this.ShowInTaskbar = false;
             this.Text = "Einträge importieren:";
-            this.TopMost = true;
             this.BlueFrame1.ResumeLayout(false);
             this.BlueFrame3.ResumeLayout(false);
             this.GroupBox1.ResumeLayout(false);

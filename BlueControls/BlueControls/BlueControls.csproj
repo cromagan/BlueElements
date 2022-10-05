@@ -113,6 +113,7 @@
       <DependentUpon>Filterleiste.cs</DependentUpon>
     </Compile>
     <Compile Include="BlueFont.cs" />
+    <Compile Include="FormManager.cs" />
     <Compile Include="Forms\SQL_TableView.cs">
       <SubType>Form</SubType>
     </Compile>

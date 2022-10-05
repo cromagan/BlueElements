@@ -22,13 +22,11 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.ConnectedFormula;
 using BlueControls.Controls;
-using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
@@ -36,12 +34,6 @@ using static BlueBasics.Converter;
 namespace BlueControls.ItemCollection;
 
 public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText, ICalculateRowsItemLevel, IItemToControl {
-
-    #region Fields
-
-
-
-    #endregion
 
     #region Constructors
 
@@ -51,7 +43,6 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
         Database = db;
 
         Id = id;
-
     }
 
     public DatabaseSourcePadItem(string intern) : this(intern, null, 0) { }
@@ -59,9 +50,6 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
     #endregion
 
     #region Properties
-
-
-
 
     public Database? Database { get; set; }
 
@@ -73,13 +61,10 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
         }
     }
 
-
-
     /// <summary>
     /// Laufende Nummer, bestimmt die Einfärbung
     /// </summary>
     public int Id { get; set; }
-
 
     protected override int SaveOrder => 1;
 
@@ -95,8 +80,6 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
         return con;
     }
 
-
-
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
         if (Database == null) { return l; }
@@ -104,8 +87,6 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
         l.Add(new FlexiControlForProperty<string>(() => Datenbankkopf, ImageCode.Datenbank));
         return l;
     }
-
-
 
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
@@ -117,8 +98,6 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
             case "id":
                 Id = IntParse(value);
                 return true;
-
-
         }
         return false;
     }
@@ -137,13 +116,11 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
         var t = base.ToString();
         t = t.Substring(0, t.Length - 1) + ", ";
 
-
         t = t + "ID=" + Id.ToString() + ", ";
 
         if (Database != null) {
             t = t + "Database=" + Database.Filename.ToNonCritical() + ", ";
         }
-
 
         return t.Trim(", ") + "}";
     }
@@ -154,7 +131,6 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
         base.Dispose(disposing);
 
         if (disposing) {
-
         }
     }
 
@@ -169,7 +145,7 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
             } else {
                 Skin.Draw_FormatedText(gr, "Bezug fehlt", QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
             }
-        } 
+        }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }

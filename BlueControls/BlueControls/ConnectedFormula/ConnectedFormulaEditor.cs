@@ -19,10 +19,7 @@
 
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
-using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
-using BlueDatabase.Enums;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using static BlueBasics.IO;
@@ -50,8 +47,6 @@ public partial class ConnectedFormulaEditor : PadEditor {
     #endregion
 
     #region Methods
-
-
 
     private void btnBild_Click(object sender, System.EventArgs e) {
         var l = Pad.LastClickedItem;

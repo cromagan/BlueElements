@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BildzeichenListe;
+using System;
 using System.Globalization;
 using System.Windows.Forms;
 
@@ -18,8 +19,13 @@ internal static class Program {
         CultureInfo.DefaultThreadCurrentCulture = culture;
         CultureInfo.DefaultThreadCurrentUICulture = culture;
         Application.SetCompatibleTextRenderingDefault(false);
-        Application.Run(new Start());
-        BlueBasics.Develop.TraceLogging_End();
+
+        FormManager.NewModeSelectionForm = Start.NewForm;
+        FormManager.ExecuteAtEnd = Start.Ende;
+        FormManager.StartForm = new Start();
+        System.Windows.Forms.Application.Run(FormManager.Current);
+        //Application.Run(new Start());
+        //BlueBasics.Develop.TraceLogging_End();
     }
 
     #endregion

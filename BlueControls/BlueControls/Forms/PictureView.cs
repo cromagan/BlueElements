@@ -72,7 +72,6 @@ public partial class PictureView : Form, IDisposableExtended {
         }
 
         if (!string.IsNullOrEmpty(windowCaption)) { Text = windowCaption; }
-        //if (Develop.IsHostRunning()) { TopMost = false; }
 
         btnZoomIn.Checked = true;
         btnChoose.Enabled = false;

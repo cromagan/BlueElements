@@ -236,7 +236,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Name = "SearchAndReplace";
             this.ShowInTaskbar = false;
             this.Text = "Suchen und Ersetzen";
-            this.TopMost = true;
             this.Suchen.ResumeLayout(false);
             this.BlueFrame1.ResumeLayout(false);
             this.BlueFrame2.ResumeLayout(false);

@@ -72,7 +72,6 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         Database = database;
         FilterDefiniton = filterdef;
 
-
         // den Rest initialisieren, bei OnParentChanged
         // weil der Parent gebraucht wird um Filter zu erstellen
     }
@@ -136,7 +135,6 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
         if (disposing) {
             _disposing = true;
-
 
             Tag = null;
 

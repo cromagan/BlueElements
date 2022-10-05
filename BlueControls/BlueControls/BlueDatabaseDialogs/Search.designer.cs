@@ -112,7 +112,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Name = "Search";
             this.ShowInTaskbar = false;
             this.Text = "Suchen";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.Search_Load);
             this.grpSonderzeichen.ResumeLayout(false);
             this.ResumeLayout(false);

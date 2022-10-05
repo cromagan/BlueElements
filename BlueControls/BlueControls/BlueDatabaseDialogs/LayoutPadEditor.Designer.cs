@@ -274,7 +274,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.ClientSize = new System.Drawing.Size(1340, 612);
             this.Name = "LayoutPadEditor";
             this.Text = "Druck-Layout";
-            this.TopMost = false;
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.tabDatei.ResumeLayout(false);
             this.grpDateiSystem.ResumeLayout(false);

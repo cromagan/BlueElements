@@ -72,7 +72,6 @@ public partial class PadEditor : PadEditorReadOnly {
         cbxSchriftGröße.Item.Add("150%", "150");
         cbxSchriftGröße.Item.Sort();
         cbxSchriftGröße.Text = "100";
-        if (Develop.IsHostRunning()) { TopMost = false; }
     }
 
     #endregion

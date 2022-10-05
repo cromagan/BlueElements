@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BildzeichenListe;
 using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Forms;
@@ -37,52 +38,7 @@ public partial class Start : Form {
 
     #region Methods
 
-    private void btnBildEditor_Click(object sender, System.EventArgs e) {
-        var x = new BluePaint.MainWindow(true);
-
-        x.ShowDialog();
-        x.Dispose();
-    }
-
-    private void btnDatenbank_Click(object sender, System.EventArgs e) {
-        var x = new TableView(null, true, true);
-
-        x.ShowDialog();
-        x.Dispose();
-    }
-
-    private void btnDatenbankSQL_Click(object sender, System.EventArgs e) {
-        var x = new SQL_TableView(null, true, true);
-
-        x.ShowDialog();
-        x.Dispose();
-    }
-
-    private void btnFormular_Click(object sender, System.EventArgs e) {
-        var x = new ConnectedFormulaEditor();
-
-        x.ShowDialog();
-        x.Dispose();
-    }
-
-    private void btnHierachie_Click(object sender, System.EventArgs e) {
-        var x = new RelationDiagram(null);
-
-        x.ShowDialog();
-        x.Dispose();
-    }
-
-    private void btnLayout_Click(object sender, System.EventArgs e) {
-        var x = new LayoutPadEditor((Database)null);
-
-        x.ShowDialog();
-        x.Dispose();
-    }
-
-    private void btnTextEditor_Click(object sender, System.EventArgs e) {
-    }
-
-    private void Start_FormClosing(object sender, System.Windows.Forms.FormClosingEventArgs e) {
+    public static void Ende() {
         DebugPrint(FehlerArt.Info, "Schließe Programm...");
 
         var P = Progressbar.Show("Programm wird beendet<br><i>Speichern aller Datenbanken");
@@ -97,6 +53,41 @@ public partial class Start : Form {
 
         P?.Close();
         TraceLogging_End();
+    }
+
+    internal static System.Windows.Forms.Form? NewForm() {
+        return new Start();
+    }
+
+    private void btnBildEditor_Click(object sender, System.EventArgs e) {
+        DoForm(new BluePaint.MainWindow(true));
+    }
+
+    private void btnDatenbank_Click(object sender, System.EventArgs e) {
+        DoForm(new TableView(null, true, true));
+    }
+
+    private void btnDatenbankSQL_Click(object sender, System.EventArgs e) {
+        DoForm(new SQL_TableView(null, true, true));
+    }
+
+    private void btnFormular_Click(object sender, System.EventArgs e) {
+        DoForm(new ConnectedFormulaEditor());
+    }
+
+    private void btnHierachie_Click(object sender, System.EventArgs e) {
+        DoForm(new RelationDiagram(null));
+    }
+
+    private void btnLayout_Click(object sender, System.EventArgs e) {
+        DoForm(new LayoutPadEditor((Database)null));
+    }
+
+    private void DoForm(Form frm) {
+        FormManager.Current.RegisterForm(frm);
+        frm.Show();
+        Close();
+        frm.BringToFront();
     }
 
     #endregion

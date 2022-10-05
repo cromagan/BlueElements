@@ -252,7 +252,6 @@ namespace BlueControls.Forms
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.Text = "Schriftart";
-            this.TopMost = true;
             this.BlueFrame1.ResumeLayout(false);
             this.BlueFrame2.ResumeLayout(false);
             ((ISupportInitialize)(this.Sample)).EndInit();

@@ -17,13 +17,13 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueScript.Methods;
+using BlueScript.Structures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueScript.Structures;
-using BlueScript.Methods;
 using static BlueBasics.Extensions;
 
 namespace BlueScript.Variables;

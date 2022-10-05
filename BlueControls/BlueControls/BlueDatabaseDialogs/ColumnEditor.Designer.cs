@@ -1541,7 +1541,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "ColumnEditor";
             this.Text = "Spalten-Eigenschaften";
-            this.TopMost = true;
             this.tabAnzeige.ResumeLayout(false);
             this.tabBearbeitung.ResumeLayout(false);
             this.grpAuswahlmenuOptionen.ResumeLayout(false);
