@@ -29,6 +29,7 @@ using static BlueBasics.Generic;
 
 namespace BlueBasics;
 
+// ReSharper disable once InconsistentNaming
 public static class IO {
 
     #region Fields
@@ -131,7 +132,7 @@ public static class IO {
         pfad = pfad.Replace("%homepath%", homep, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
         if (pfad.Substring(pfad.Length - 1) != "\\") { pfad += "\\"; }
-        if (pfad.IndexOf("\\\\", 1) > 0) { Develop.DebugPrint("Achtung, Doppelslash: " + pfad); }
+        if (pfad.IndexOf("\\\\", 1, StringComparison.Ordinal) > 0) { Develop.DebugPrint("Achtung, Doppelslash: " + pfad); }
         if (pfad.Length > 1 && pfad.Substring(0, 1) == "\\" && pfad.Substring(0, 2) != "\\\\") { Develop.DebugPrint("Achtung, Doppelslash: " + pfad); }
 
         if (pfad.Length > 1 && pfad.IndexOf(":", 2, StringComparison.Ordinal) > 0) { Develop.DebugPrint("Falscher Doppelpunktk: " + pfad); }
