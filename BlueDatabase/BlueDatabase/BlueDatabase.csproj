@@ -106,6 +106,7 @@
     <Compile Include="EventArgs\SQL_RowEventArgs.cs" />
     <Compile Include="EventArgs\SQL_CellEventArgs.cs" />
     <Compile Include="EventArgs\SQL_GenerateLayoutInternalEventargs.cs" />
+    <Compile Include="SQLBackMicrosoftCE.cs" />
     <Compile Include="SQL_Export.cs" />
     <Compile Include="SQL_FilterCollection.cs" />
     <Compile Include="SQL_FilterItem.cs" />
@@ -124,7 +125,7 @@
     <Compile Include="CellItem.cs" />
     <Compile Include="SQL_Database.cs" />
     <Compile Include="Enums\Ansicht.cs" />
-    <Compile Include="SQLBack.cs" />
+    <Compile Include="SQLBackAbstract.cs" />
     <Compile Include="Enums\AlignmentHorizontal.cs" />
     <Compile Include="Enums\AdditionalCheck.cs" />
     <Compile Include="Enums\EditTypeFormula.cs" />

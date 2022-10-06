@@ -45,7 +45,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
 
     public const string DatabaseVersion = "4.00";
     public static readonly ListExt<Database> AllFiles = new();
-    public readonly SqlBack? _sql;
+    public readonly SQLBackAbstract? _sql;
     public readonly CellCollection Cell;
     public readonly ColumnCollection Column;
     public readonly ListExt<ColumnViewCollection> ColumnArrangements = new();

@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+// https://stackoverflow.com/questions/34002901/need-for-sqlconnection-and-oracleconnection-if-odbcconnection-can-be-used-in-th
 #nullable enable
 
 using BlueBasics;
@@ -23,64 +24,59 @@ using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+using System.Data.Common;
+using System.Drawing;
 using System.IO;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
+public static class SQLExtension {
+
+    #region Methods
+
+
+    public static void AddParameterWithValue(this DbCommand? command, string parameterName, object parameterValue) {
+        // https://stackoverflow.com/questions/21608362/missing-addwithvalue-from-dbcommand-parameters
+
+        if (command == null) { return; }
+        var parameter = command.CreateParameter();
+        parameter.ParameterName = parameterName;
+        parameter.Value = parameterValue;
+        command.Parameters.Add(parameter);
+    }
+
+    #endregion
+}
+
 //https://www.c-sharpcorner.com/article/create-a-sql-server-database-dynamically-in-C-Sharp/
 //https://www.ictdemy.com/csharp/databases/introduction-to-databases-in-csharp-net
 //https://docs.microsoft.com/en-us/troubleshoot/developer/visualstudio/csharp/language-compilers/create-sql-server-database-programmatically
-public class SqlBack {
+public abstract class SQLBackAbstract {
 
     #region Fields
 
-    private readonly SqlConnection _connection;
+    protected readonly DbConnection _connection;
     private string _filename;
+
+    public abstract string VarChar4000 { get; }
+    public abstract string VarChar255 { get; }
 
     #endregion
 
     #region Constructors
 
-    public SqlBack(string filename, bool create) {
+    public SQLBackAbstract(string filename, bool create) {
         Develop.StartService();
-        //CultureInfo culture = new("de-DE");
-        //CultureInfo.DefaultThreadCurrentCulture = culture;
-        //CultureInfo.DefaultThreadCurrentUICulture = culture;
 
-        _filename = filename.FilePath() + filename.FileNameWithoutSuffix().Replace(" ", "_") + ".mdf";
-
-        if (create && !File.Exists(_filename)) { CreateDatabase(_filename); }
-
-        _connection = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" + _filename + ";Integrated Security=True;Trusted_Connection=Yes;");
-
-        //#region Watcher
-
-        //// Create command
-        //// Command must use two part names for tables
-        //// SELECT <field> FROM dbo.Table rather than
-        //// SELECT <field> FROM Table
-        //// Query also can not use *, fields must be designated
-        //SqlCommand cmd = new SqlCommand("usp_GetMessages", _connection);
-        //cmd.CommandType = CommandType.StoredProcedure;
-
-        //// Clear any existing notifications
-        //cmd.Notification = null;
-
-        //// Create the dependency for this command
-        //SqlDependency dependency = new SqlDependency(cmd);
-
-        //// Add the event handler
-        //dependency.OnChange += Dependency_OnChange;
-        //#endregion
+        _connection = CreateConnection(filename, create);
+        _filename = filename;
 
         var x = ListTables();
 
         #region Main
 
-        if (!x.Contains("Main")) { CreateTable("Main", new List<string>() { "RK" }); }
-        //ExecuteCommand("SET IDENTITY_INSERT Main ON");
+        if (!x.Contains("MAIN")) { CreateTable("MAIN", new List<string>() { "RK" }); }
 
         #endregion
 
@@ -91,7 +87,7 @@ public class SqlBack {
         var colStyle = GetColumnNames("Style");
         if (colStyle == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
 
-        if (!colStyle.Contains("VALUE")) { AddColumn("Style", "VALUE", "VARCHAR(8000)"); }
+        if (!colStyle.Contains("VALUE")) { AddColumn("Style", "VALUE", VarChar4000); }
 
         #endregion
 
@@ -105,8 +101,8 @@ public class SqlBack {
         if (!colUndo.Contains("COMAND")) { AddColumn("Undo", "COMAND"); }
         if (!colUndo.Contains("COLUMNKEY")) { AddColumn("Undo", "COLUMNKEY"); }
         if (!colUndo.Contains("ROWKEY")) { AddColumn("Undo", "ROWKEY"); }
-        if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn("Undo", "PREVIOUSVALUE", "VARCHAR(8000)"); }
-        if (!colUndo.Contains("CHANGEDTO")) { AddColumn("Undo", "CHANGEDTO", "VARCHAR(8000)"); }
+        if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn("Undo", "PREVIOUSVALUE", VarChar4000); }
+        if (!colUndo.Contains("CHANGEDTO")) { AddColumn("Undo", "CHANGEDTO", VarChar4000); }
         if (!colUndo.Contains("USERNAME")) { AddColumn("Undo", "USERNAME"); }
         if (!colUndo.Contains("DATETIMEUTC")) { AddColumn("Undo", "DATETIMEUTC"); }
 
@@ -114,6 +110,9 @@ public class SqlBack {
 
         CloseConnection();
     }
+
+    protected abstract bool CreateTable(string v);
+    protected abstract bool CreateTable(string v, List<string> list);
 
     #endregion
 
@@ -142,17 +141,16 @@ public class SqlBack {
         if (!OpenConnection()) { return false; }
 
         var cmdString = "INSERT INTO Undo (DBNAME, COMAND, COLUMNKEY, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, DATETIMEUTC) VALUES (@DBNAME, @COMAND, @COLUMNKEY, @ROWKEY, @PREVIOUSVALUE ,@CHANGEDTO, @USERNAME, @DATETIMEUTC)";
-        using var comm = new SqlCommand();
-        comm.Connection = _connection;
+        using var comm = _connection.CreateCommand();
         comm.CommandText = cmdString;
-        comm.Parameters.AddWithValue("@DBNAME", dbname.ToUpper());
-        comm.Parameters.AddWithValue("@COMAND", ((int)comand).ToString());
-        comm.Parameters.AddWithValue("@COLUMNKEY", columnKey.ToString());
-        comm.Parameters.AddWithValue("@ROWKEY", rowKey.ToString());
-        comm.Parameters.AddWithValue("@PREVIOUSVALUE", previousValue);
-        comm.Parameters.AddWithValue("@CHANGEDTO", changedTo);
-        comm.Parameters.AddWithValue("@USERNAME", userName);
-        comm.Parameters.AddWithValue("@DATETIMEUTC", DateTime.UtcNow.ToString(Constants.Format_Date));
+        comm.AddParameterWithValue("@DBNAME", dbname.ToUpper());
+        comm.AddParameterWithValue("@COMAND", ((int)comand).ToString());
+        comm.AddParameterWithValue("@COLUMNKEY", columnKey.ToString());
+        comm.AddParameterWithValue("@ROWKEY", rowKey.ToString());
+        comm.AddParameterWithValue("@PREVIOUSVALUE", previousValue);
+        comm.AddParameterWithValue("@CHANGEDTO", changedTo);
+        comm.AddParameterWithValue("@USERNAME", userName);
+        comm.AddParameterWithValue("@DATETIMEUTC", DateTime.UtcNow.ToString(Constants.Format_Date));
 
         return ExecuteCommand(comm);
     }
@@ -291,50 +289,6 @@ public class SqlBack {
     }
 
     /// <summary>
-    /// Dateiendung wird immer mdf benutzt!
-    /// </summary>
-    /// <param name="filename"></param>
-    /// <returns></returns>
-    public bool CreateDatabase(string filename) {
-        //var myConn = new SqlConnection("Server=localhost;Integrated security=SSPI;database=master");
-        //var myConn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database1.mdf;Integrated Security=True");
-        //var myConn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;Integrated Security=True");
-        //var myConn = new SqlConnection("Integrated Security=SSPI;Initial Catalog=;Data Source=localhost;");
-        // var myConn = new SqlConnection("Server=(local)\\netsdk;uid=sa;pwd=;database=master");
-
-        var myConn = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;Integrated security=SSPI;database=master");
-        var dbn = filename.FileNameWithoutSuffix().Replace(" ", "_");
-        filename = filename.FilePath() + dbn + ".mdf";
-
-        var str = "CREATE DATABASE " + dbn + " ON PRIMARY " +
-                  "(NAME = " + dbn + "_Data, " +
-                  "FILENAME = '" + filename + "', " +
-                  "SIZE = 2MB, MAXSIZE = 512MB, FILEGROWTH = 1MB)" +
-                  "LOG ON (NAME = " + dbn + "_Log, " +
-                  "FILENAME = '" + filename.TrimEnd(".mdf") + "Log.ldf', " +
-                  "SIZE = 1MB, " +
-                  "MAXSIZE = 50MB, " +
-                  "FILEGROWTH = 1MB)";
-
-        var myCommand = new SqlCommand(str, myConn);
-        var ok = false;
-        try {
-            myConn.Open();
-            myCommand.ExecuteNonQuery();
-            //MessageBox.Show("DataBase is Created Successfully", "MyProgram", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            ok = true;
-        } catch (Exception ex) {
-            Develop.DebugPrint(ex);
-            //MessageBox.Show(ex.ToString(), "MyProgram", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        } finally {
-            if (myConn.State == ConnectionState.Open) {
-                myConn.Close();
-            }
-        }
-        return ok;
-    }
-
-    /// <summary>
     /// Gibt die Spaltenname in Grosschreibung zurück
     /// </summary>
     /// <param name="table"></param>
@@ -344,7 +298,9 @@ public class SqlBack {
 
         var columns = new List<string>();
 
-        using var com = new SqlCommand(@"SELECT * FROM " + table, _connection);
+        using var com = _connection.CreateCommand();
+        com.CommandText = @"SELECT * FROM " + table;
+
         using var reader = com.ExecuteReader(CommandBehavior.SchemaOnly);
 
         var schemaTable = reader.GetSchemaTable();
@@ -375,8 +331,8 @@ public class SqlBack {
                         "where DBNAME = @DBNAME " +
                         "and COLUMNNAME = @COLUMNNAME";
 
-        q.Parameters.AddWithValue("@DBNAME", dbname.ToUpper());
-        q.Parameters.AddWithValue("@COLUMNNAME", columnName.ToUpper());
+        q.AddParameterWithValue("@DBNAME", dbname.ToUpper());
+        q.AddParameterWithValue("@COLUMNNAME", columnName.ToUpper());
 
         using var reader = q.ExecuteReader();
 
@@ -389,21 +345,7 @@ public class SqlBack {
         return l;
     }
 
-    public List<string> ListTables() {
-        List<string> tables = new();
-
-        OpenConnection();
-
-        var dt = _connection.GetSchema("Tables");
-        foreach (DataRow row in dt.Rows) {
-            var tablename = (string)row[2];
-            tables.Add(tablename);
-        }
-
-        CloseConnection();
-
-        return tables;
-    }
+    public abstract List<string> ListTables();
 
     public void LoadAllCells(string fileNameWithoutSuffix, SQL_RowCollection row) {
         if (!OpenConnection()) { return; }
@@ -486,18 +428,19 @@ public class SqlBack {
 
         if (!OpenConnection()) { return false; }
 
-        using var comm = new SqlCommand();
-        comm.Connection = _connection;
+        using var comm = _connection.CreateCommand();
         comm.CommandText = cmdString;
-        comm.Parameters.AddWithValue("@DBNAME", dbname.ToUpper());
-        comm.Parameters.AddWithValue("@TYPE", type);
-        comm.Parameters.AddWithValue("@COLUMNNAME", columnName);
-        comm.Parameters.AddWithValue("@VALUE", newValue);
+        comm.AddParameterWithValue("@DBNAME", dbname.ToUpper());
+        comm.AddParameterWithValue("@TYPE", type);
+        comm.AddParameterWithValue("@COLUMNNAME", columnName);
+        comm.AddParameterWithValue("@VALUE", newValue);
 
         return ExecuteCommand(comm);
     }
 
-    private bool AddColumn(string table, string column) => ExecuteCommand("alter table " + table + " add " + column + " VARCHAR(255) default '' NOT NULL");
+    protected abstract DbConnection CreateConnection(string filename, bool create);
+
+    private bool AddColumn(string table, string column) => ExecuteCommand("alter table " + table + " add " + column + " " + VarChar255  + " default '' NOT NULL");
 
     private bool AddColumn(string table, string column, string type) => ExecuteCommand("alter table " + table + " add " + column + " " + type + " default '' NOT NULL");
 
@@ -506,49 +449,26 @@ public class SqlBack {
 
         var colMain = GetColumnNames("Main");
         if (colMain == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
-        if (!colMain.Contains(columnName)) { AddColumn("Main", columnName, "VARCHAR(8000)"); }
+        if (!colMain.Contains(columnName)) { AddColumn("Main", columnName, VarChar4000); }
     }
 
-    private bool CloseConnection() {
+    protected bool CloseConnection() {
         if (_connection.State == ConnectionState.Open) { _connection.Close(); }
 
         return _connection.State == ConnectionState.Closed;
     }
 
-    private bool CreateTable(string name) {
-        if (!ExecuteCommand("DROP TABLE IF EXISTS " + name)) { return false; }
-        return ExecuteCommand(@"CREATE TABLE " + name + "(" + "RK bigint identity(1,1) NOT NULL PRIMARY KEY, " + ")");
-    }
 
-    private bool CreateTable(string name, List<string> keycolumns) {
-        if (!ExecuteCommand("DROP TABLE IF EXISTS " + name)) { return false; }
-
-        // http://www.sql-server-helper.com/error-messages/msg-8110.aspx
-
-        var t = @"CREATE TABLE " + name + "(";
-
-        foreach (var thiskey in keycolumns) {
-            t += thiskey.ToUpper() + " VARCHAR(255) default '' NOT NULL, ";
-        }
-        t += ")";
-
-        if (!ExecuteCommand(t)) { return false; }
-        //if (!ExecuteCommand("SET IDENTITY_INSERT " + name + " ON")) { return false; }
-
-        t = "ALTER TABLE " + name + " ADD CONSTRAINT PK_" + name.ToUpper() + " PRIMARY KEY CLUSTERED(" + keycolumns.JoinWith(", ").ToUpper() + ")";
-
-        return ExecuteCommand(t);
-    }
-
-    private bool ExecuteCommand(string commandtext) {
+    protected bool ExecuteCommand(string commandtext) {
         if (!OpenConnection()) { return false; }
 
-        using var command = new SqlCommand(commandtext, _connection);
+        using var command = _connection.CreateCommand();
+        command.CommandText = commandtext;
 
         return ExecuteCommand(command);
     }
 
-    private bool ExecuteCommand(SqlCommand command) {
+    private bool ExecuteCommand(DbCommand command) {
         if (!OpenConnection()) { return false; }
 
         try {
@@ -570,8 +490,8 @@ public class SqlBack {
         q.CommandText = @"select " + column.Name.ToUpper() + " from Main " +
                         "where RK = @RK";
 
-        //q.Parameters.AddWithValue("@COLUMNNAME", column.Name.ToUpper());
-        q.Parameters.AddWithValue("@RK", row.Key.ToString());
+        //q.AddParameterWithValue("@COLUMNNAME", column.Name.ToUpper());
+        q.AddParameterWithValue("@RK", row.Key.ToString());
 
         using var reader = q.ExecuteReader();
         if (reader.Read()) {
@@ -599,8 +519,8 @@ public class SqlBack {
         q.CommandText = @"select " + column.Name.ToUpper() + " from Main " +
                         "where RK = @RK";
 
-        //q.Parameters.AddWithValue("@COLUMNNAME", column.Name.ToUpper());
-        q.Parameters.AddWithValue("@RK", row.Key.ToString());
+        //q.AddParameterWithValue("@COLUMNNAME", column.Name.ToUpper());
+        q.AddParameterWithValue("@RK", row.Key.ToString());
 
         using var reader = q.ExecuteReader();
         if (reader.Read()) {
@@ -630,9 +550,9 @@ public class SqlBack {
                         "and TYPE = @TYPE " +
                         "and COLUMNNAME = @COLUMNNAME";
 
-        q.Parameters.AddWithValue("@DBNAME", dbname.ToUpper());
-        q.Parameters.AddWithValue("@TYPE", type);
-        q.Parameters.AddWithValue("@COLUMNNAME", columnName.ToUpper());
+        q.AddParameterWithValue("@DBNAME", dbname.ToUpper());
+        q.AddParameterWithValue("@TYPE", type);
+        q.AddParameterWithValue("@COLUMNNAME", columnName.ToUpper());
 
         using var reader = q.ExecuteReader();
         if (reader.Read()) {
@@ -652,7 +572,7 @@ public class SqlBack {
         return null;
     }
 
-    private bool OpenConnection() {
+    protected bool OpenConnection() {
         if (_connection.State == ConnectionState.Closed) {
             _connection.Open();
         }
@@ -684,13 +604,10 @@ public class SqlBack {
 
         if (!OpenConnection()) { return false; }
 
-        using var comm = new SqlCommand();
-        comm.Connection = _connection;
+        using var comm = _connection.CreateCommand();
         comm.CommandText = cmdString;
-        //comm.Parameters.AddWithValue("@DBNAME", "Main");
-        comm.Parameters.AddWithValue("@RK", row.Key);
-        //comm.Parameters.AddWithValue("@COLUMNNAME", column.Name.ToUpper());
-        comm.Parameters.AddWithValue("@VALUE", newValue);
+        comm.AddParameterWithValue("@RK", row.Key);
+        comm.AddParameterWithValue("@VALUE", newValue);
 
         return ExecuteCommand(comm);
     }
@@ -719,13 +636,10 @@ public class SqlBack {
 
         if (!OpenConnection()) { return false; }
 
-        using var comm = new SqlCommand();
-        comm.Connection = _connection;
+        using var comm = _connection.CreateCommand();
         comm.CommandText = cmdString;
-        //comm.Parameters.AddWithValue("@DBNAME", "Main");
-        comm.Parameters.AddWithValue("@RK", row.Key);
-        //comm.Parameters.AddWithValue("@COLUMNNAME", column.Name.ToUpper());
-        comm.Parameters.AddWithValue("@VALUE", newValue);
+        comm.AddParameterWithValue("@RK", row.Key);
+        comm.AddParameterWithValue("@VALUE", newValue);
 
         return ExecuteCommand(comm);
     }
