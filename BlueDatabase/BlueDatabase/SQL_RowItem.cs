@@ -521,7 +521,7 @@ public sealed class SQL_RowItem : ICanBeEmpty, IDisposable {
             vars.Add(new VariableString("Usergroup", Database.UserGroup, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
             vars.Add(new VariableBool("Administrator", Database.IsAdministrator(), true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
             //vars.Add(new VariableDatabase("Database", Database, true, true, string.Empty));
-            vars.Add(new VariableString("DatabasePath", Database.Filename.FilePath(), true, false, "Der Dateipfad der Datenbank."));
+            //vars.Add(new VariableString("DatabasePath", Database.Filename.FilePath(), true, false, "Der Dateipfad der Datenbank."));
 
             #endregion Variablen für Skript erstellen
 

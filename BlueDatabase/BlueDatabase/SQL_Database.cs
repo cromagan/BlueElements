@@ -114,9 +114,9 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     #region Constructors
 
     //private VerwaisteDaten _verwaisteDaten;
-    public SQL_Database(bool readOnly) : this(string.Empty, readOnly, true) { }
+    public SQL_Database(bool readOnly) : this(null, readOnly) { }
 
-    private SQL_Database(string filename, bool readOnly, bool create) {
+    private SQL_Database(SQLBackAbstract sql, bool readOnly) {
         AllFiles.Add(this);
 
         //_muf.Loaded += OnLoaded;
@@ -126,11 +126,13 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         //_muf.IsThereBackgroundWorkToDo += IsThereBackgroundWorkToDo;
         //_muf.DoBackGroundWork += DoBackGroundWork;
 
+        _sql = sql;
+
         Develop.StartService();
 
-        _sql = new SQLBackMicrosoftCE(filename.FilePath() + filename.FileNameWithoutSuffix() + ".mdf", false);
+        _sql = sql;
 
-        // _sql = new SqlBack("D:\\" + filename.FileNameWithoutSuffix() + ".mdf", false);
+        // _sql = new SqlBack("D:\\" + tablename.FileNameWithoutSuffix() + ".mdf", false);
 
         Cell = new SQL_CellCollection(this);
 
@@ -154,9 +156,9 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         Initialize();
 
         UserGroup = "#Administrator";
-        if (!string.IsNullOrEmpty(filename)) {
-            //DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + filename.FileNameWithoutSuffix()));
-            LoadFromSQLBack(filename);
+        if (sql != null) {
+            //DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + tablename.FileNameWithoutSuffix()));
+            LoadFromSQLBack(sql);
         } else {
             RepairAfterParse();
         }
@@ -242,8 +244,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         }
     }
 
-    public string Filename { get; private set; }
-
     [Browsable(false)]
     public double GlobalScale {
         get => _globalScale;
@@ -308,6 +308,8 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         }
     }
 
+    public string TableName { get => _sql.TableName; }
+
     [Browsable(false)]
     public int UndoCount {
         get => _undoCount;
@@ -340,30 +342,21 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     /// <summary>
     /// Sucht die Datenbank im Speicher. Wird sie nicht gefunden, wird sie geladen.
     /// </summary>
-    /// <param name="filename"></param>
+    /// <param name="tablename"></param>
     /// <param name="checkOnlyCaptionToo"></param>
     /// <param name="readOnly"></param>
     /// <returns></returns>
-    public static SQL_Database? GetByFilename(string filename, bool checkOnlyCaptionToo, bool readOnly) {
-        if (string.IsNullOrEmpty(filename)) { return null; }
+    public static SQL_Database? GetByFilename(string tablename, bool readOnly) {
+        if (string.IsNullOrEmpty(tablename)) { return null; }
 
         foreach (var thisFile in AllFiles) {
-            if (thisFile != null && string.Equals(thisFile.Filename, filename, StringComparison.OrdinalIgnoreCase)) {
+            if (thisFile != null && string.Equals(thisFile.TableName, tablename, StringComparison.OrdinalIgnoreCase)) {
                 return thisFile;
             }
         }
 
-        if (checkOnlyCaptionToo) {
-            foreach (var thisFile in AllFiles) {
-                if (thisFile != null && thisFile.Filename.ToLower().FileNameWithSuffix() == filename.ToLower().FileNameWithSuffix()) {
-                    return thisFile;
-                }
-            }
-        }
-
-        if (!FileExists(filename)) { return null; }
-
-        return new SQL_Database(filename, readOnly, false);
+        return null;
+        //return new SQL_Database(tablename, readOnly, false);
     }
 
     /// <summary>
@@ -379,11 +372,6 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
             return t;
         }
 
-        t = (Filename.FilePath() + _additionaFilesPfad.Trim("\\") + "\\").CheckPath();
-        if (DirectoryExists(t)) {
-            _additionaFilesPfadtmp = t;
-            return t;
-        }
         _additionaFilesPfadtmp = string.Empty;
         return string.Empty;
     }
@@ -457,7 +445,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     /// Datenbankpfad mit Forms und abschließenden \
     /// </summary>
     /// <returns></returns>
-    public string DefaultFormulaPath() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "Forms\\";
+    public string DefaultFormulaPath() => string.IsNullOrEmpty(AdditionaFilesPfadWhole()) ? string.Empty : AdditionaFilesPfadWhole() + "Forms\\";
 
     //public List<string> AllConnectedFilesLCase() {
     //    List<string> columnAll = new();
@@ -465,7 +453,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     /// <summary>
     /// Datenbankpfad mit Layouts und abschließenden \
     /// </summary>
-    public string DefaultLayoutPath() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "Layouts\\";
+    public string DefaultLayoutPath() => string.IsNullOrEmpty(AdditionaFilesPfadWhole()) ? string.Empty : AdditionaFilesPfadWhole() + "Layouts\\";
 
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
@@ -597,7 +585,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
             filename = TempFile(string.Empty, "Export", "html");
         }
 
-        Html da = new(Filename.FileNameWithoutSuffix());
+        Html da = new(TableName);
         da.AddCaption(_caption);
         da.TableBeginn();
         da.RowBeginn();
@@ -887,8 +875,8 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         }
         if (IsLoading) { return; }
         if (ReadOnly) {
-            if (!string.IsNullOrEmpty(Filename)) {
-                Develop.DebugPrint(FehlerArt.Warnung, "Datei ist Readonly, " + comand + ", " + Filename);
+            if (!string.IsNullOrEmpty(TableName)) {
+                Develop.DebugPrint(FehlerArt.Warnung, "Datei ist Readonly, " + comand + ", " + TableName);
             }
             return;
         }
@@ -900,7 +888,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         if (columnKey < -100) { Develop.DebugPrint(FehlerArt.Fehler, "ColKey darf hier nicht <-100 sein!"); }
         //Works.Add(new WorkItem(comand, columnKey, rowKey, previousValue, changedTo, UserName));
 
-        _sql.AddUndo(Filename.FileNameWithoutSuffix(), comand, columnKey, rowKey, previousValue, changedTo, UserName);
+        _sql.AddUndo(TableName, comand, columnKey, rowKey, previousValue, changedTo, UserName);
     }
 
     internal void Column_NameChanged(string oldName, SQL_ColumnItem newName) {
@@ -957,7 +945,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         try {
             t += "\r\nColumn-Count: " + Column.Count;
             t += "\r\nRow-Count: " + Row.Count;
-            t += "\r\nFile: " + Filename;
+            t += "\r\nTable: " + TableName;
         } catch { }
         Develop.DebugPrint(FehlerArt.Warnung, t);
     }
@@ -1228,10 +1216,8 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         AddPending(DatabaseDataType.Layouts, -1, Layouts.JoinWithCr(), false);
     }
 
-    private void LoadFromSQLBack(string filename) {
+    private void LoadFromSQLBack(SQLBackAbstract sql) {
         IsLoading = true;
-
-        Filename = filename;
 
         #region Spalten erstellen
 
@@ -1248,7 +1234,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
 
         #region Datenbank Eigenschaften laden
 
-        var l = _sql.GetStylDataAll(Filename.FileNameWithoutSuffix(), string.Empty);
+        var l = _sql.GetStylDataAll(TableName, string.Empty);
         if (l != null && l.Count > 0) {
             foreach (var thisstyle in l) {
                 ParseThis(thisstyle.Key, thisstyle.Value);
@@ -1259,7 +1245,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
 
         #region  Alle Zellen laden
 
-        _sql.LoadAllCells(Filename.FileNameWithoutSuffix(), Row);
+        _sql.LoadAllCells(TableName, Row);
 
         #endregion
 
@@ -1398,7 +1384,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
                 break;
 
             default:
-                return "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + " <br> Datei: " + Filename;
+                return "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + " <br> Table: " + TableName;
                 //if (LoadedVersion == SQL_DatabaseVersion) {
                 //    LoadedVersion = "9.99";
                 //    if (!ReadOnly) {
@@ -1413,7 +1399,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
 
     private string ParseThis(DatabaseDataType type, string value, SQL_ColumnItem? column, SQL_RowItem? row, int width, int height) {
         if (IsLoading) { return string.Empty; }
-        _sql.CheckIn(Filename.FileNameWithoutSuffix(), type, value, column, row, width, height);
+        _sql.CheckIn(TableName, type, value, column, row, width, height);
 
         switch (type) {
             case DatabaseDataType.Formatkennung:
@@ -1647,7 +1633,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
                 if (LoadedVersion == SQL_DatabaseVersion) {
                     LoadedVersion = "9.99";
                     if (!ReadOnly) {
-                        Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Datei: " + Filename);
+                        Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Table: " + TableName);
                     }
                 }
 

@@ -278,7 +278,7 @@ public partial class SQL_TableView : Form {
         chkAnsichtNurTabelle.Enabled = datenbankDa;
         chkAnsichtFormular.Enabled = datenbankDa;
         chkAnsichtTableFormular.Enabled = datenbankDa;
-        btnDatenbankenSpeicherort.Enabled = datenbankDa && !string.IsNullOrEmpty(Table.Database.Filename);
+        btnDatenbankenSpeicherort.Enabled = datenbankDa && !string.IsNullOrEmpty(Table.Database.AdditionaFilesPfad);
         //SuchenUndErsetzen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
         //AngezeigteZeilenLöschen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
         //Datenüberprüfung.Enabled = datenbankDa;
@@ -598,7 +598,7 @@ public partial class SQL_TableView : Form {
 
     private void btnDatenbankenSpeicherort_Click(object sender, System.EventArgs e) {
         BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
-        ExecuteFile(Table.Database.Filename.FilePath());
+        ExecuteFile(Table.Database.AdditionaFilesPfad);
     }
 
     private void btnDatenüberprüfung_Click(object sender, System.EventArgs e) {
@@ -1033,13 +1033,13 @@ public partial class SQL_TableView : Form {
 
         var s = (List<string>)(e.TabPage.Tag);
 
-        var DB = SQL_Database.GetByFilename(s[0], false, false);
+        var DB = SQL_Database.GetByFilename(s[0].FileNameWithoutSuffix(), false);
 
-        if (DB != null) {
-            btnLetzteDateien.AddFileName(DB.Filename, string.Empty);
-            LoadTab.FileName = DB.Filename;
-            e.TabPage.Text = DB.Filename.FileNameWithoutSuffix();
-        }
+        //if (DB != null) {
+        //    btnLetzteDateien.AddFileName(DB.Filename, string.Empty);
+        //    LoadTab.FileName = DB.Filename;
+        //    e.TabPage.Text = DB.Filename.FileNameWithoutSuffix();
+        //}
 
         DatabaseSet(DB, s[1]);
     }

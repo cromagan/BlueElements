@@ -15,38 +15,47 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-
 // https://stackoverflow.com/questions/34002901/need-for-sqlconnection-and-oracleconnection-if-odbcconnection-can-be-used-in-th
 #nullable enable
 
 using BlueBasics;
-using BlueBasics.Enums;
-using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Data.SqlClient;
 using System.IO;
-using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
 //https://www.c-sharpcorner.com/article/create-a-sql-server-database-dynamically-in-C-Sharp/
 //https://www.ictdemy.com/csharp/databases/introduction-to-databases-in-csharp-net
 //https://docs.microsoft.com/en-us/troubleshoot/developer/visualstudio/csharp/language-compilers/create-sql-server-database-programmatically
-public class SQLBackMicrosoftCE : SQLBackAbstract{
-    public override string VarChar4000 => "VARCHAR(4000)";
-    public override string VarChar255 => "VARCHAR(255)";
+public class SQLBackMicrosoftCE : SQLBackAbstract {
 
-    public SQLBackMicrosoftCE(string filename, bool create) : base(filename, create) { }
+    #region Constructors
 
-    protected override DbConnection CreateConnection(string filename, bool create) {
+    public SQLBackMicrosoftCE(string filename, bool create, string tablename) : base(tablename) {
         if (create && !File.Exists(filename)) { CreateDatabase(filename); }
 
-       return new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" + filename + ";Integrated Security=True;Trusted_Connection=Yes;");
+        _connection = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" + filename + ";Integrated Security=True;Trusted_Connection=Yes;");
 
+        RepairAll();
+
+        //_filename = filename;
     }
+
+    #endregion
+
+    #region Properties
+
+    public override string Primary => "bigint identity(1,1) NOT NULL";
+    public override string VarChar255 => "VARCHAR(255)";
+    public override string VarChar4000 => "VARCHAR(4000)";
+
+    #endregion
+
+    #region Methods
+
     /// <summary>
     /// Dateiendung wird immer mdf benutzt!
     /// </summary>
@@ -91,11 +100,25 @@ public class SQLBackMicrosoftCE : SQLBackAbstract{
         return ok;
     }
 
+    public override List<string> ListTables() {
+        List<string> tables = new();
 
+        OpenConnection();
+
+        var dt = _connection.GetSchema("Tables");
+        foreach (DataRow row in dt.Rows) {
+            var tablename = (string)row[2];
+            tables.Add(tablename);
+        }
+
+        CloseConnection();
+
+        return tables;
+    }
 
     protected override bool CreateTable(string name) {
-       if (!ExecuteCommand("DROP TABLE IF EXISTS " + name)) { return false; }
-        return ExecuteCommand(@"CREATE TABLE " + name + "(RK bigint identity(1,1) NOT NULL PRIMARY KEY)");
+        if (!ExecuteCommand("DROP TABLE IF EXISTS " + name)) { return false; }
+        return ExecuteCommand(@"CREATE TABLE " + name + "(RK " + Primary + " NOT NULL PRIMARY KEY)");
     }
 
     protected override bool CreateTable(string name, List<string> keycolumns) {
@@ -118,25 +141,7 @@ public class SQLBackMicrosoftCE : SQLBackAbstract{
         return ExecuteCommand(t);
     }
 
-
-
-
-    public override List<string> ListTables()    {
-        List<string> tables = new();
-
-        OpenConnection();
-
-        var dt = _connection.GetSchema("Tables");
-        foreach (DataRow row in dt.Rows) {
-            var tablename = (string)row[2];
-            tables.Add(tablename);
-        }
-
-        CloseConnection();
-
-        return tables;
-    }
-    #region Constructors
+    #endregion
 
     //public SQLBackMicrosoftCE(string filename, bool create)  {
     //    Develop.StartService();
@@ -209,7 +214,4 @@ public class SQLBackMicrosoftCE : SQLBackAbstract{
 
     //    CloseConnection();
     //}
-
-    #endregion
-
 }

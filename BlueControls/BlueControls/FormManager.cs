@@ -80,8 +80,6 @@ public class FormManager : ApplicationContext {
         forms.Remove((Form)sender);
         if (FirstWindowShown && !forms.Any()) {
             if (sender != _lastStartForm) {
-
-
                 if (NewModeSelectionForm != null) {
                     _lastStartForm = NewModeSelectionForm();
                 } else {

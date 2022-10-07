@@ -268,7 +268,7 @@ public sealed class SQL_CellCollection : Dictionary<string, SQL_CellItem>, IDisp
     public void DoSpecialFormats(SQL_ColumnItem? column, SQL_RowItem? row, string previewsValue, bool doAlways) {
         if (_database == null || _database.IsDisposed) { return; }
         if (row == null) { return; }
-        if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
+        if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.TableName); }
 
         var currentValue = GetString(column, row);
 
@@ -376,8 +376,8 @@ public sealed class SQL_CellCollection : Dictionary<string, SQL_CellItem>, IDisp
     public string GetString(SQL_ColumnItem? column, SQL_RowItem? row) // Main Method
     {
         try {
-            if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
-            if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + _database.Filename); }
+            if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.TableName); }
+            if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + _database.TableName); }
             if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 var (lcolumn, lrow, _) = LinkedCellData(column, row, false, false);
                 return lcolumn != null && lrow != null ? lrow.CellGetString(lcolumn) : string.Empty;
@@ -414,6 +414,20 @@ public sealed class SQL_CellCollection : Dictionary<string, SQL_CellItem>, IDisp
     public bool IsNullOrEmpty(string cellKey) {
         DataOfCellKey(cellKey, out var column, out var row);
         return IsNullOrEmpty(column, row);
+    }
+
+    public void Load_310(SQL_ColumnItem? column, SQL_RowItem? row, string value, int width, int height) {
+        if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Row konnte nicht generiert werden."); }
+        if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Column konnte nicht generiert werden."); }
+        var cellKey = KeyOfCell(column, row);
+        if (ContainsKey(cellKey)) {
+            var c = this[cellKey];
+            c.Value = value; // Auf jeden Fall setzen. Auch falls es nachher entfernt wird, so ist es sicher leer
+            c.Size = width > 0 ? new Size(width, height) : Size.Empty;
+            if (string.IsNullOrEmpty(value)) { Remove(cellKey); }
+        } else {
+            Add(cellKey, new SQL_CellItem(value, width, height));
+        }
     }
 
     public bool MatchesTo(SQL_ColumnItem? column, SQL_RowItem? row, SQL_FilterItem filter) {
@@ -509,8 +523,8 @@ public sealed class SQL_CellCollection : Dictionary<string, SQL_CellItem>, IDisp
 
     public void Set(SQL_ColumnItem? column, SQL_RowItem? row, string value) // Main Method
     {
-        if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
-        if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!!<br>" + _database.Filename); }
+        if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.TableName); }
+        if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!!<br>" + _database.TableName); }
         if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             var (lcolumn, lrow, _) = LinkedCellData(column, row, true, !string.IsNullOrEmpty(value));
             lrow?.CellSet(lcolumn, value);
@@ -600,20 +614,6 @@ public sealed class SQL_CellCollection : Dictionary<string, SQL_CellItem>, IDisp
         }
     }
 
-    public void Load_310(SQL_ColumnItem? column, SQL_RowItem? row, string value, int width, int height) {
-        if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Row konnte nicht generiert werden."); }
-        if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Column konnte nicht generiert werden."); }
-        var cellKey = KeyOfCell(column, row);
-        if (ContainsKey(cellKey)) {
-            var c = this[cellKey];
-            c.Value = value; // Auf jeden Fall setzen. Auch falls es nachher entfernt wird, so ist es sicher leer
-            c.Size = width > 0 ? new Size(width, height) : Size.Empty;
-            if (string.IsNullOrEmpty(value)) { Remove(cellKey); }
-        } else {
-            Add(cellKey, new SQL_CellItem(value, width, height));
-        }
-    }
-
     internal void OnCellValueChanged(SQL_CellEventArgs e) {
         e.Column.UcaseNamesSortedByLenght = null;
         CellValueChanged?.Invoke(this, e);
@@ -650,12 +650,12 @@ public sealed class SQL_CellCollection : Dictionary<string, SQL_CellItem>, IDisp
 
         if (column == null || _database.Column.SearchByKey(column.Key) == null) {
             _database?.DevelopWarnung("Spalte ungültig!");
-            Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database?.Filename);
+            Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database?.TableName);
             return;
         }
         if (row == null || _database?.Row.SearchByKey(row.Key) == null) {
             _database?.DevelopWarnung("Zeile ungültig!!");
-            Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!!<br>" + _database?.Filename);
+            Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!!<br>" + _database?.TableName);
             return;
         }
 
@@ -677,8 +677,8 @@ public sealed class SQL_CellCollection : Dictionary<string, SQL_CellItem>, IDisp
     }
 
     internal void SystemSet(SQL_ColumnItem? column, SQL_RowItem? row, string value) {
-        if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
-        if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + _database.Filename); }
+        if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.TableName); }
+        if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + _database.TableName); }
         if (string.IsNullOrEmpty(column.Identifier)) { Develop.DebugPrint(FehlerArt.Fehler, "SystemSet nur bei System-Spalten möglich: " + ToString()); }
         if (!column.SaveContent) { return; }
         var cellKey = KeyOfCell(column, row);

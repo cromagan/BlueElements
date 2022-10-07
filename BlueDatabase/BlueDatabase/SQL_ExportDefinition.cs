@@ -268,9 +268,9 @@ public sealed class SQL_ExportDefinition : IParseable, IReadableTextWithChanging
     }
 
     public string ErrorReason() {
-        if (string.IsNullOrEmpty(Database.Filename)) {
-            return "Nur von Datenbanken, die auch auf der Festplatte gespeichert sind, kann ein Export stattfinden.";
-        }
+        //if (string.IsNullOrEmpty(Database.Filename)) {
+        //    return "Nur von Datenbanken, die auch auf der Festplatte gespeichert sind, kann ein Export stattfinden.";
+        //}
 
         if (!string.IsNullOrEmpty(Database.GlobalShowPass) && _typ != ExportTyp.DatenbankOriginalFormat) {
             return "Von passwortgeschützten Datenbanken können nur Exporte im Originalformat stattfinden.";
@@ -564,37 +564,37 @@ public sealed class SQL_ExportDefinition : IParseable, IReadableTextWithChanging
         if (!string.IsNullOrEmpty(_verzeichnis)) {
             savePath = _verzeichnis.CheckPath();
         } else {
-            savePath = !string.IsNullOrEmpty(Database.Filename)
-                ? Database.Filename.FilePath() + "Backup\\"
+            savePath = !string.IsNullOrEmpty(Database.TableName)
+                ? Database.AdditionaFilesPfad + "Backup\\"
                 : (System.Windows.Forms.Application.StartupPath + "\\Backup\\").CheckPath();
             if (!DirectoryExists(savePath)) { Directory.CreateDirectory(savePath); }
         }
-        var singleFileExport = savePath + Database.Filename.FileNameWithoutSuffix().StarkeVereinfachung(" _-+") + "_" + DateTime.Now.ToString(Constants.Format_Date4);
+        var singleFileExport = savePath + Database.TableName.StarkeVereinfachung(" _-+") + "_" + DateTime.Now.ToString(Constants.Format_Date4);
         List<string> added = new();
         var tim2 = DateTime.UtcNow;
         var tim = tim2.ToString(Constants.Format_Date5);
         try {
             switch (_typ) {
-                case ExportTyp.DatenbankOriginalFormat:
-                    if (_backupInterval > (float)DateTime.UtcNow.Subtract(_lastExportTimeUtc).TotalDays) { return false; }
-                    singleFileExport = TempFile(singleFileExport + ".MDB");
-                    if (!FileExists(singleFileExport)) { File.Copy(Database.Filename, singleFileExport); }
-                    added.Add(singleFileExport + "|" + tim);
-                    break;
+                //case ExportTyp.DatenbankOriginalFormat:
+                //    if (_backupInterval > (float)DateTime.UtcNow.Subtract(_lastExportTimeUtc).TotalDays) { return false; }
+                //    singleFileExport = TempFile(singleFileExport + ".MDB");
+                //    if (!FileExists(singleFileExport)) { File.Copy(Database.Filename, singleFileExport); }
+                //    added.Add(singleFileExport + "|" + tim);
+                //    break;
 
-                case ExportTyp.DatenbankCSVFormat:
-                    if (_backupInterval > (float)DateTime.UtcNow.Subtract(_lastExportTimeUtc).TotalDays) { return false; }
-                    singleFileExport = TempFile(singleFileExport + ".CSV");
-                    if (!FileExists(singleFileExport)) { WriteAllText(singleFileExport, Database.Export_CSV(FirstRow.ColumnInternalName, _exportSpaltenAnsicht, _filter, null), Constants.Win1252, false); }
-                    added.Add(singleFileExport + "|" + tim);
-                    break;
+                //case ExportTyp.DatenbankCSVFormat:
+                //    if (_backupInterval > (float)DateTime.UtcNow.Subtract(_lastExportTimeUtc).TotalDays) { return false; }
+                //    singleFileExport = TempFile(singleFileExport + ".CSV");
+                //    if (!FileExists(singleFileExport)) { WriteAllText(singleFileExport, Database.Export_CSV(FirstRow.ColumnInternalName, _exportSpaltenAnsicht, _filter, null), Constants.Win1252, false); }
+                //    added.Add(singleFileExport + "|" + tim);
+                //    break;
 
-                case ExportTyp.DatenbankHTMLFormat:
-                    if (_backupInterval > (float)DateTime.UtcNow.Subtract(_lastExportTimeUtc).TotalDays) { return false; }
-                    singleFileExport = TempFile(singleFileExport + ".HTML");
-                    if (!FileExists(singleFileExport)) { Database.Export_HTML(singleFileExport, _exportSpaltenAnsicht, _filter, null); }
-                    added.Add(singleFileExport + "|" + tim);
-                    break;
+                //case ExportTyp.DatenbankHTMLFormat:
+                //    if (_backupInterval > (float)DateTime.UtcNow.Subtract(_lastExportTimeUtc).TotalDays) { return false; }
+                //    singleFileExport = TempFile(singleFileExport + ".HTML");
+                //    if (!FileExists(singleFileExport)) { Database.Export_HTML(singleFileExport, _exportSpaltenAnsicht, _filter, null); }
+                //    added.Add(singleFileExport + "|" + tim);
+                //    break;
 
                 case ExportTyp.EinzelnMitFormular:
                     foreach (var thisrow in Database.Row) {

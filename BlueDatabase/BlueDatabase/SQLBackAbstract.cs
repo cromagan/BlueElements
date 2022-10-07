@@ -25,8 +25,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Drawing;
-using System.IO;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
@@ -34,7 +32,6 @@ namespace BlueDatabase;
 public static class SQLExtension {
 
     #region Methods
-
 
     public static void AddParameterWithValue(this DbCommand? command, string parameterName, object parameterValue) {
         // https://stackoverflow.com/questions/21608362/missing-addwithvalue-from-dbcommand-parameters
@@ -56,82 +53,33 @@ public abstract class SQLBackAbstract {
 
     #region Fields
 
-    protected readonly DbConnection _connection;
-    private string _filename;
-
-    public abstract string VarChar4000 { get; }
-    public abstract string VarChar255 { get; }
+    protected DbConnection? _connection;
 
     #endregion
 
     #region Constructors
 
-    public SQLBackAbstract(string filename, bool create) {
-        Develop.StartService();
+    public SQLBackAbstract(string tablename) {
+        tablename = tablename.ToUpper();
 
-        _connection = CreateConnection(filename, create);
-        _filename = filename;
+        if (tablename is "SYS_STYLE" or "SYS_UNDO") {
+            Develop.DebugPrint(FehlerArt.Fehler, tablename + " ist geschützt!");
+            return;
+        }
 
-        var x = ListTables();
-
-        #region Main
-
-        if (!x.Contains("MAIN")) { CreateTable("MAIN", new List<string>() { "RK" }); }
-
-        #endregion
-
-        #region Style
-
-        if (!x.Contains("Style")) { CreateTable("Style", new List<string>() { "DBNAME", "COLUMNNAME", "TYPE" }); }
-
-        var colStyle = GetColumnNames("Style");
-        if (colStyle == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
-
-        if (!colStyle.Contains("VALUE")) { AddColumn("Style", "VALUE", VarChar4000); }
-
-        #endregion
-
-        #region  Undo
-
-        if (!x.Contains("Undo")) { CreateTable("Undo"); }
-
-        var colUndo = GetColumnNames("Undo");
-        if (colUndo == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
-        if (!colUndo.Contains("DBNAME")) { AddColumn("Undo", "DBNAME"); }
-        if (!colUndo.Contains("COMAND")) { AddColumn("Undo", "COMAND"); }
-        if (!colUndo.Contains("COLUMNKEY")) { AddColumn("Undo", "COLUMNKEY"); }
-        if (!colUndo.Contains("ROWKEY")) { AddColumn("Undo", "ROWKEY"); }
-        if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn("Undo", "PREVIOUSVALUE", VarChar4000); }
-        if (!colUndo.Contains("CHANGEDTO")) { AddColumn("Undo", "CHANGEDTO", VarChar4000); }
-        if (!colUndo.Contains("USERNAME")) { AddColumn("Undo", "USERNAME"); }
-        if (!colUndo.Contains("DATETIMEUTC")) { AddColumn("Undo", "DATETIMEUTC"); }
-
-        #endregion
-
-        CloseConnection();
+        TableName = tablename;
     }
-
-    protected abstract bool CreateTable(string v);
-    protected abstract bool CreateTable(string v, List<string> list);
 
     #endregion
 
     #region Properties
 
-    /// <summary>
-    /// Load oder SaveAsAndChangeTo benutzen
-    /// </summary>
-    public string Filename {
-        get => _filename;
-        private set {
-            if (string.IsNullOrEmpty(value)) {
-                _filename = string.Empty;
-            } else {
-                var tmp = Path.GetFullPath(value);
-                _filename = tmp;
-            }
-        }
-    }
+    public abstract string Primary { get; }
+    public string TableName { get; private set; } = string.Empty;
+    //private string _filename;
+
+    public abstract string VarChar255 { get; }
+    public abstract string VarChar4000 { get; }
 
     #endregion
 
@@ -381,6 +329,48 @@ public abstract class SQLBackAbstract {
         CloseConnection();
     }
 
+    public void RepairAll() {
+        Develop.StartService();
+
+        var x = ListTables();
+
+        #region Main
+
+        if (!x.Contains("MAIN")) { CreateTable("MAIN", new List<string>() { "RK" }); }
+
+        #endregion
+
+        #region Style
+
+        if (!x.Contains("Style")) { CreateTable("Style", new List<string>() { "DBNAME", "COLUMNNAME", "TYPE" }); }
+
+        var colStyle = GetColumnNames("Style");
+        if (colStyle == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
+
+        if (!colStyle.Contains("VALUE")) { AddColumn("Style", "VALUE", VarChar4000); }
+
+        #endregion
+
+        #region  Undo
+
+        if (!x.Contains("Undo")) { CreateTable("Undo"); }
+
+        var colUndo = GetColumnNames("Undo");
+        if (colUndo == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
+        if (!colUndo.Contains("DBNAME")) { AddColumn("Undo", "DBNAME"); }
+        if (!colUndo.Contains("COMAND")) { AddColumn("Undo", "COMAND"); }
+        if (!colUndo.Contains("COLUMNKEY")) { AddColumn("Undo", "COLUMNKEY"); }
+        if (!colUndo.Contains("ROWKEY")) { AddColumn("Undo", "ROWKEY"); }
+        if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn("Undo", "PREVIOUSVALUE", VarChar4000); }
+        if (!colUndo.Contains("CHANGEDTO")) { AddColumn("Undo", "CHANGEDTO", VarChar4000); }
+        if (!colUndo.Contains("USERNAME")) { AddColumn("Undo", "USERNAME"); }
+        if (!colUndo.Contains("DATETIMEUTC")) { AddColumn("Undo", "DATETIMEUTC"); }
+
+        #endregion
+
+        CloseConnection();
+    }
+
     /// <summary>
     /// Gibt TRUE zurück, wenn alles ok ist.
     /// Entweder der Wert gesetzt wurde, der Wert aktuell ist oder der Wert unwichtig ist.
@@ -438,9 +428,34 @@ public abstract class SQLBackAbstract {
         return ExecuteCommand(comm);
     }
 
-    protected abstract DbConnection CreateConnection(string filename, bool create);
+    protected bool CloseConnection() {
+        if (_connection.State == ConnectionState.Open) { _connection.Close(); }
 
-    private bool AddColumn(string table, string column) => ExecuteCommand("alter table " + table + " add " + column + " " + VarChar255  + " default '' NOT NULL");
+        return _connection.State == ConnectionState.Closed;
+    }
+
+    protected abstract bool CreateTable(string v);
+
+    protected abstract bool CreateTable(string v, List<string> list);
+
+    protected bool ExecuteCommand(string commandtext) {
+        if (!OpenConnection()) { return false; }
+
+        using var command = _connection.CreateCommand();
+        command.CommandText = commandtext;
+
+        return ExecuteCommand(command);
+    }
+
+    protected bool OpenConnection() {
+        if (_connection.State == ConnectionState.Closed) {
+            _connection.Open();
+        }
+
+        return _connection.State == ConnectionState.Open;
+    }
+
+    private bool AddColumn(string table, string column) => ExecuteCommand("alter table " + table + " add " + column + " " + VarChar255 + " default '' NOT NULL");
 
     private bool AddColumn(string table, string column, string type) => ExecuteCommand("alter table " + table + " add " + column + " " + type + " default '' NOT NULL");
 
@@ -450,22 +465,6 @@ public abstract class SQLBackAbstract {
         var colMain = GetColumnNames("Main");
         if (colMain == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
         if (!colMain.Contains(columnName)) { AddColumn("Main", columnName, VarChar4000); }
-    }
-
-    protected bool CloseConnection() {
-        if (_connection.State == ConnectionState.Open) { _connection.Close(); }
-
-        return _connection.State == ConnectionState.Closed;
-    }
-
-
-    protected bool ExecuteCommand(string commandtext) {
-        if (!OpenConnection()) { return false; }
-
-        using var command = _connection.CreateCommand();
-        command.CommandText = commandtext;
-
-        return ExecuteCommand(command);
     }
 
     private bool ExecuteCommand(DbCommand command) {
@@ -570,14 +569,6 @@ public abstract class SQLBackAbstract {
 
         CloseConnection();    // Nix vorhanden!
         return null;
-    }
-
-    protected bool OpenConnection() {
-        if (_connection.State == ConnectionState.Closed) {
-            _connection.Open();
-        }
-
-        return _connection.State == ConnectionState.Open;
     }
 
     /// <summary>

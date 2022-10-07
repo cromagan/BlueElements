@@ -574,8 +574,8 @@ public sealed class SQL_ColumnItem : IReadableTextWithChanging, IDisposable, IIn
             if (string.IsNullOrEmpty(_linkedDatabaseFile)) { return null; }
 
             Tmp_LinkedDatabase = _linkedDatabaseFile.Contains(@"\")
-                ? SQL_Database.GetByFilename(_linkedDatabaseFile, true, false)
-                : SQL_Database.GetByFilename(Database.Filename.FilePath() + _linkedDatabaseFile, true, false);
+                ? SQL_Database.GetByFilename(_linkedDatabaseFile.FileNameWithoutSuffix(), false)
+                : SQL_Database.GetByFilename(Database.TableName.FilePath() + _linkedDatabaseFile, false);
 
             if (_tmpLinkedDatabase != null) { _tmpLinkedDatabase.UserGroup = Database.UserGroup; }
             return _tmpLinkedDatabase;
@@ -1508,7 +1508,7 @@ public sealed class SQL_ColumnItem : IReadableTextWithChanging, IDisposable, IIn
             }
 
             if (ScriptType == ScriptType.undefiniert) {
-                Develop.DebugPrint(FehlerArt.Warnung, "Umsetzung fehlgeschlagen: " + Caption + " " + Database.Filename);
+                Develop.DebugPrint(FehlerArt.Warnung, "Umsetzung fehlgeschlagen: " + Caption + " " + Database.TableName);
             }
 
             ResetSystemToDefault(false);

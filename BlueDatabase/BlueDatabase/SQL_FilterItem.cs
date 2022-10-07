@@ -181,7 +181,8 @@ public sealed class SQL_FilterItem : IParseable, IReadableTextWithChanging, ICan
 
                 case "database":
                     if (Database != null) { Database.Disposing -= Database_Disposing; }
-                    Database = SQL_Database.GetByFilename(pair.Value.FromNonCritical(), false, false);
+                    //Database = SQL_Database.GetByFilename(pair.Value.FromNonCritical(), false, false);
+                    Develop.DebugPrint_NichtImplementiert();
                     Database.Disposing += Database_Disposing;
                     break;
 
@@ -278,7 +279,7 @@ public sealed class SQL_FilterItem : IParseable, IReadableTextWithChanging, ICan
             if (!IsOk()) { return string.Empty; }
             var result = "{Type=" + (int)_filterType;
 
-            if (Database != null && withdatabaseTag) { result = result + ", Database=" + Database.Filename.ToNonCritical(); }
+            if (Database != null && withdatabaseTag) { result = result + ", Database=" + Database.TableName; }
 
             if (_column != null) { result = result + ", " + _column.ParsableColumnKey(); }
             foreach (var t in SearchValue) {

@@ -162,9 +162,9 @@ public sealed class SQL_ColumnCollection : ListExt<SQL_ColumnItem> {
     }
 
     public void GenerateOverView() {
-        Html da = new(Database.Filename.FileNameWithoutSuffix());
+        Html da = new(Database.TableName.FileNameWithoutSuffix());
         da.AddCaption("Spaltenliste von: " + Database.Caption);
-        da.Add("  <Font face=\"Arial\" Size=\"4\">" + Database.Filename + "</h1><br>");
+        da.Add("  <Font face=\"Arial\" Size=\"4\">" + Database.TableName + "</h1><br>");
         da.TableBeginn();
         da.RowBeginn();
         da.CellAdd("#");
@@ -329,7 +329,7 @@ public sealed class SQL_ColumnCollection : ListExt<SQL_ColumnItem> {
     internal void Add(string columnname, SQLBackAbstract sql) {
         var x = new SQL_ColumnItem(Database, columnname, -1);
 
-        var l = sql.GetStylDataAll(Database.Filename.FileNameWithoutSuffix(), columnname);
+        var l = sql.GetStylDataAll(Database.TableName.FileNameWithoutSuffix(), columnname);
         if (l != null && l.Count > 0) {
             foreach (var thisstyle in l) {
                 x.Load(thisstyle.Key, thisstyle.Value);
