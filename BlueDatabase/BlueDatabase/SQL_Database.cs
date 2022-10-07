@@ -131,7 +131,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
 
         Develop.StartService();
 
-        // _sql = new SqlBack("D:\\" + tablename.FileNameWithoutSuffix() + ".mdf", false);
+        // CopyToSQL = new SqlBack("D:\\" + tablename.FileNameWithoutSuffix() + ".mdf", false);
 
         Cell = new SQL_CellCollection(this);
 
@@ -1285,7 +1285,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     private string ParseThis(string type, string value) {
         //if (IsLoading) { return string.Empty; }
 
-        //_sql.SetStyleData(Filename.FileNameWithoutSuffix(), type);
+        //CopyToSQL.SetStyleData(Filename.FileNameWithoutSuffix(), type);
 
         switch (type.ToLower()) {
             case "version":

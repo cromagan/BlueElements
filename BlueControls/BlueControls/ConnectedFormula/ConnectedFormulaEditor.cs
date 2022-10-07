@@ -201,7 +201,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         _cf.DatabaseFiles.AddIfNotExists(LoadTabDatabase.FileName);
 
-        var db = Database.GetByFilename(LoadTabDatabase.FileName, false, false);
+        var db = Database.GetByFilename(LoadTabDatabase.FileName, false, false, null);
         if (db == null) { return; }
 
         it.Database = db;

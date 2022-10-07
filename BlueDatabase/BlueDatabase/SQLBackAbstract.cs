@@ -29,22 +29,21 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public static class SQLExtension {
+//public static class SQLExtension {
+//    #region Methods
 
-    #region Methods
+//    public static void AddParameterWithValue(this DbCommand? command, string parameterName, object parameterValue) {
+//        // https://stackoverflow.com/questions/21608362/missing-addwithvalue-from-dbcommand-parameters
 
-    public static void AddParameterWithValue(this DbCommand? command, string parameterName, object parameterValue) {
-        // https://stackoverflow.com/questions/21608362/missing-addwithvalue-from-dbcommand-parameters
+//        if (command == null) { return; }
+//        var parameter = command.CreateParameter();
+//        parameter.ParameterName = parameterName;
+//        parameter.Value = parameterValue;
+//        command.Parameters.Add(parameter);
+//    }
 
-        if (command == null) { return; }
-        var parameter = command.CreateParameter();
-        parameter.ParameterName = parameterName;
-        parameter.Value = parameterValue;
-        command.Parameters.Add(parameter);
-    }
-
-    #endregion
-}
+//    #endregion
+//}
 
 //https://www.c-sharpcorner.com/article/create-a-sql-server-database-dynamically-in-C-Sharp/
 //https://www.ictdemy.com/csharp/databases/introduction-to-databases-in-csharp-net
@@ -83,17 +82,19 @@ public abstract class SQLBackAbstract {
     public bool AddUndo(string tablename, DatabaseDataType comand, long columnKey, long rowKey, string previousValue, string changedTo, string userName) {
         if (!OpenConnection()) { return false; }
 
-        var cmdString = "INSERT INTO " + SYS_UNDO + " (TABLENAME, COMAND, COLUMNKEY, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, DATETIMEUTC) VALUES (@TABLENAME, @COMAND, @COLUMNKEY, @ROWKEY, @PREVIOUSVALUE ,@CHANGEDTO, @USERNAME, @DATETIMEUTC)";
+        var cmdString = "INSERT INTO " + SYS_UNDO +
+            " (TABLENAME, COMAND, COLUMNKEY, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, DATETIMEUTC) VALUES (" +
+            "'" + Prefix_Table + tablename.ToUpper() + "'," +
+            "'" + ((int)comand).ToString() + "'," +
+            "'" + columnKey.ToString() + "'," +
+            "'" + rowKey.ToString() + "'," +
+            "'" + previousValue + "'," +
+            "'" + changedTo + "'," +
+            "'" + userName + "'," +
+            "'" + DateTime.UtcNow.ToString(Constants.Format_Date) + ")";
+
         using var comm = _connection.CreateCommand();
         comm.CommandText = cmdString;
-        comm.AddParameterWithValue("@TABLENAME", Prefix_Table + tablename.ToUpper());
-        comm.AddParameterWithValue("@COMAND", ((int)comand).ToString());
-        comm.AddParameterWithValue("@COLUMNKEY", columnKey.ToString());
-        comm.AddParameterWithValue("@ROWKEY", rowKey.ToString());
-        comm.AddParameterWithValue("@PREVIOUSVALUE", previousValue);
-        comm.AddParameterWithValue("@CHANGEDTO", changedTo);
-        comm.AddParameterWithValue("@USERNAME", userName);
-        comm.AddParameterWithValue("@DATETIMEUTC", DateTime.UtcNow.ToString(Constants.Format_Date));
 
         return ExecuteCommand(comm);
     }
@@ -293,11 +294,8 @@ public abstract class SQLBackAbstract {
         using var q = _connection.CreateCommand();
         // (DBNAME, TYPE, COLUMNNAME, VALUE)
         q.CommandText = @"select TYPE, VALUE from " + SYS_STYLE + " " +
-                        "where TABLENAME = @TABLENAME " +
-                        "and COLUMNNAME = @COLUMNNAME";
-
-        q.AddParameterWithValue("@TABLENAME", Prefix_Table + tablename.ToUpper());
-        q.AddParameterWithValue("@COLUMNNAME", columnName.ToUpper());
+                        "where TABLENAME = '" + Prefix_Table + tablename.ToUpper() + "' " +
+                        "and COLUMNNAME = '" + columnName.ToUpper() + "'";
 
         using var reader = q.ExecuteReader();
 
@@ -388,26 +386,21 @@ public abstract class SQLBackAbstract {
 
         var isVal = GetStyleData(tablename, type, columnName);
 
+        if (string.IsNullOrEmpty(columnName)) { columnName = "~Database~"; }
+
         string cmdString;
 
         if (isVal is null) {
-            cmdString = "INSERT INTO " + SYS_STYLE + " (TABLENAME, TYPE, COLUMNNAME, VALUE)  VALUES (@TABLENAME, @TYPE, @COLUMNNAME, @VALUE)";
+            cmdString = "INSERT INTO " + SYS_STYLE + " (TABLENAME, TYPE, COLUMNNAME, VALUE)  VALUES ('" + Prefix_Table + tablename.ToUpper() + "', '" + type + "', '" + columnName.ToUpper() + "', '" + newValue + "')";
         } else if (isVal != newValue) {
-            cmdString = "UPDATE " + SYS_STYLE + " SET VALUE = @VALUE WHERE TABLENAME = @TABLENAME AND TYPE = @TYPE AND COLUMNNAME = @COLUMNNAME";
+            cmdString = "UPDATE " + SYS_STYLE + " SET VALUE = '" + newValue + "' WHERE TABLENAME = '" + Prefix_Table + tablename.ToUpper() + "' AND TYPE = '" + type + "' AND COLUMNNAME = '" + columnName.ToUpper() + "'";
         } else {
             return true;
         }
 
         if (!OpenConnection()) { return false; }
 
-        using var comm = _connection.CreateCommand();
-        comm.CommandText = cmdString;
-        comm.AddParameterWithValue("@TABLENAME", Prefix_Table + tablename.ToUpper());
-        comm.AddParameterWithValue("@TYPE", type);
-        comm.AddParameterWithValue("@COLUMNNAME", columnName);
-        comm.AddParameterWithValue("@VALUE", newValue);
-
-        return ExecuteCommand(comm);
+        return ExecuteCommand(cmdString);
     }
 
     protected bool CloseConnection() {
@@ -448,7 +441,9 @@ public abstract class SQLBackAbstract {
 
         #region Main
 
-        if (!x.Contains(Prefix_Table + tablename.ToUpper())) { CreateTable(Prefix_Table + tablename.ToUpper(), new List<string>() { "RK" }); }
+        if (!string.IsNullOrEmpty(tablename)) {
+            if (!x.Contains(Prefix_Table + tablename.ToUpper())) { CreateTable(Prefix_Table + tablename.ToUpper(), new List<string>() { "RK" }); }
+        }
 
         #endregion
 
@@ -540,10 +535,10 @@ public abstract class SQLBackAbstract {
         using var q = _connection.CreateCommand();
 
         q.CommandText = @"select " + column.Name.ToUpper() + " from " + Prefix_Table + tablename.ToUpper() + " " +
-                        "where RK = @RK";
+                        "where RK = '" + row.Key + "'";
 
-        //q.AddParameterWithValue("@COLUMNNAME", column.Name.ToUpper());
-        q.AddParameterWithValue("@RK", row.Key.ToString());
+        ////q.AddParameterWithValue("'"+columnName.ToUpper()+"'", column.Name.ToUpper());
+        //q.AddParameterWithValue("'"+row.Key+"'", row.Key.ToString());
 
         using var reader = q.ExecuteReader();
         if (reader.Read()) {
@@ -569,10 +564,10 @@ public abstract class SQLBackAbstract {
         using var q = _connection.CreateCommand();
 
         q.CommandText = @"select " + column.Name.ToUpper() + " from " + Prefix_Table + tablename.ToUpper() + " " +
-                        "where RK = @RK";
+                        "where RK = '" + row.Key + "'";
 
-        //q.AddParameterWithValue("@COLUMNNAME", column.Name.ToUpper());
-        q.AddParameterWithValue("@RK", row.Key.ToString());
+        //q.AddParameterWithValue("'"+columnName.ToUpper()+"'", column.Name.ToUpper());
+        //q.AddParameterWithValue("'"+row.Key+"'", row.Key.ToString());
 
         using var reader = q.ExecuteReader();
         if (reader.Read()) {
@@ -597,14 +592,12 @@ public abstract class SQLBackAbstract {
 
         using var q = _connection.CreateCommand();
 
-        q.CommandText = @"select VALUE from " + SYS_STYLE + " " +
-                        "where TABLENAME = @TABLENAME " +
-                        "and TYPE = @TYPE " +
-                        "and COLUMNNAME = @COLUMNNAME";
+        if (string.IsNullOrEmpty(columnName)) { columnName = "~Database~"; }
 
-        q.AddParameterWithValue("@TABLENAME", Prefix_Table + tablename.ToUpper());
-        q.AddParameterWithValue("@TYPE", type);
-        q.AddParameterWithValue("@COLUMNNAME", columnName.ToUpper());
+        q.CommandText = @"select VALUE from " + SYS_STYLE + " " +
+                        "where TABLENAME = '" + Prefix_Table + tablename.ToUpper() + "' " +
+                        "and TYPE = '" + type + "' " +
+                        "and COLUMNNAME = '" + columnName.ToUpper() + "' ";
 
         using var reader = q.ExecuteReader();
         if (reader.Read()) {
@@ -639,9 +632,9 @@ public abstract class SQLBackAbstract {
         string cmdString;
 
         if (isVal is null) {
-            cmdString = "INSERT INTO " + Prefix_Table + tablename.ToUpper() + " (RK, " + column.Name.ToUpper() + " ) VALUES (@RK, @VALUE )";
+            cmdString = "INSERT INTO " + Prefix_Table + tablename.ToUpper() + " (RK, " + column.Name.ToUpper() + " ) VALUES ('" + row.Key + "', '" + newValue + "' )";
         } else if (isVal != newValue) {
-            cmdString = "UPDATE " + Prefix_Table + tablename.ToUpper() + " SET " + column.Name.ToUpper() + " = @VALUE WHERE RK = @RK";
+            cmdString = "UPDATE " + Prefix_Table + tablename.ToUpper() + " SET " + column.Name.ToUpper() + " = '" + newValue + "' WHERE RK = '" + row.Key + "'";
         } else {
             return true;
         }
@@ -650,8 +643,8 @@ public abstract class SQLBackAbstract {
 
         using var comm = _connection.CreateCommand();
         comm.CommandText = cmdString;
-        comm.AddParameterWithValue("@RK", row.Key);
-        comm.AddParameterWithValue("@VALUE", newValue);
+        //comm.AddParameterWithValue("'"+row.Key+"'", row.Key);
+        //comm.AddParameterWithValue("'"+newValue+"'", newValue);
 
         return ExecuteCommand(comm);
     }
@@ -671,21 +664,16 @@ public abstract class SQLBackAbstract {
         string cmdString;
 
         if (isVal is null) {
-            cmdString = "INSERT INTO " + Prefix_Table + tablename.ToUpper() + " (RK, " + column.Name.ToUpper() + " ) VALUES (@RK, @VALUE )";
+            cmdString = "INSERT INTO " + Prefix_Table + tablename.ToUpper() + " (RK, " + column.Name.ToUpper() + " ) VALUES ('" + row.Key + "', '" + newValue + "' )";
         } else if (isVal != newValue) {
-            cmdString = "UPDATE " + Prefix_Table + tablename.ToUpper() + " SET " + column.Name.ToUpper() + " = @VALUE WHERE RK = @RK";
+            cmdString = "UPDATE " + Prefix_Table + tablename.ToUpper() + " SET " + column.Name.ToUpper() + " = '" + newValue + "' WHERE RK = '" + row.Key + "'";
         } else {
             return true;
         }
 
         if (!OpenConnection()) { return false; }
 
-        using var comm = _connection.CreateCommand();
-        comm.CommandText = cmdString;
-        comm.AddParameterWithValue("@RK", row.Key);
-        comm.AddParameterWithValue("@VALUE", newValue);
-
-        return ExecuteCommand(comm);
+        return ExecuteCommand(cmdString);
     }
 
     #endregion

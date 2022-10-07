@@ -137,7 +137,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
                 return true;
 
             case "database":
-                _database = Database.GetByFilename(value, false, false);
+                _database = Database.GetByFilename(value, false, false, null);
                 _database.Disposing += _Database_Disposing;
                 return true;
 

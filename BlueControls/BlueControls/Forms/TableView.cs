@@ -816,7 +816,7 @@ public partial class TableView : Form {
             return;
         }
 
-        Table.DatabaseSet(Database.GetByFilename(files[0], false, true), string.Empty);
+        Table.DatabaseSet(Database.GetByFilename(files[0], false, true, null), string.Empty);
         _originalDb = merker;
         _originalDb.Disposing += _originalDB_Disposing;
         btnVorherigeVersion.Text = "zurück";
@@ -948,6 +948,8 @@ public partial class TableView : Form {
         }
     }
 
+    public SQLBackAbstract? CopyToSQL { get; set; } = null;
+
     private void LoadTab_FileOk(object sender, CancelEventArgs e) => SwitchTabToDatabase(LoadTab.FileName);
 
     private string NameRepair(string istName, RowItem? vRow) {
@@ -1061,7 +1063,7 @@ public partial class TableView : Form {
 
         var s = (List<string>)(e.TabPage.Tag);
 
-        var DB = Database.GetByFilename(s[0], false, false);
+        var DB = Database.GetByFilename(s[0], false, false, CopyToSQL);
 
         if (DB != null) {
             btnLetzteDateien.AddFileName(DB.Filename, string.Empty);

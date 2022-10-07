@@ -138,7 +138,7 @@ internal static class Dictionary {
         _dictWords.Row.Add(wort);
     }
 
-    private static void Init() => _dictWords = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.MDB", "Dictionary", true, false);
+    private static void Init() => _dictWords = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.MDB", "Dictionary", true, false, null);
 
     #endregion
 }

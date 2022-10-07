@@ -201,7 +201,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         if (base.ParseThis(tag, value)) { return true; }
         switch (tag) {
             case "database":
-                Database = Database.GetByFilename(value.FromNonCritical(), false, false);
+                Database = Database.GetByFilename(value.FromNonCritical(), false, false, null);
                 return true;
 
             case "id":

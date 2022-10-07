@@ -39,7 +39,7 @@ public abstract class MethodDatabase : Method {
 
             var newf = db.Filename.FilePath() + name + ".mdb";
 
-            return Database.GetByFilename(newf, true, false);
+            return Database.GetByFilename(newf, true, false, null);
         }
 
         return null;

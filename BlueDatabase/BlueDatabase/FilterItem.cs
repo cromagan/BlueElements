@@ -181,7 +181,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
 
                 case "database":
                     if (Database != null) { Database.Disposing -= Database_Disposing; }
-                    Database = Database.GetByFilename(pair.Value.FromNonCritical(), false, false);
+                    Database = Database.GetByFilename(pair.Value.FromNonCritical(), false, false,  Database?.CopyToSQL);
                     Database.Disposing += Database_Disposing;
                     break;
 

@@ -45,7 +45,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
 
     public const string DatabaseVersion = "4.00";
     public static readonly ListExt<Database> AllFiles = new();
-    public readonly SQLBackAbstract? _sql;
+    public readonly SQLBackAbstract? CopyToSQL;
     public readonly CellCollection Cell;
     public readonly ColumnCollection Column;
     public readonly ListExt<ColumnViewCollection> ColumnArrangements = new();
@@ -116,13 +116,13 @@ public sealed class Database : IDisposable, IDisposableExtended {
     #region Constructors
 
     //private string _WorkItemsBefore = string.Empty;
-    public Database(Stream stream) : this(stream, string.Empty, true, false) { }
+    public Database(Stream stream) : this(stream, string.Empty, true, false, null) { }
 
-    public Database(bool readOnly) : this(null, string.Empty, readOnly, true) { }
+    public Database(bool readOnly) : this(null, string.Empty, readOnly, true, null) { }
 
-    public Database(string filename, bool readOnly, bool create) : this(null, filename, readOnly, create) { }
+    public Database(string filename, bool readOnly, bool create, SQLBackAbstract? sql) : this(null, filename, readOnly, create, sql) { }
 
-    private Database(Stream? stream, string filename, bool readOnly, bool create) {
+    private Database(Stream? stream, string filename, bool readOnly, bool create, SQLBackAbstract? sql) {
         AllFiles.Add(this);
 
         _muf = new BlueBasics.MultiUserFile.MultiUserFile(readOnly, true);
@@ -143,12 +143,13 @@ public sealed class Database : IDisposable, IDisposableExtended {
 
         Develop.StartService();
 
-        var f2 = "C:\\01_DATA\\DB1234567890" + filename.FileNameWithoutSuffix() + ".mdf";
+        //var f2 = "C:\\01_DATA\\DB1234567890" + filename.FileNameWithoutSuffix() + ".mdf";
 
-        //var f2 = "D:\\" + filename.FileNameWithoutSuffix() + ".mdf";
-        if (FileExists(filename) && !FileExists(f2)) {
-            //_sql = new SqlBack(f2, true);
-        }
+        ////var f2 = "D:\\" + filename.FileNameWithoutSuffix() + ".mdf";
+        //if (FileExists(filename) && !FileExists(f2)) {
+        //    CopyToSQL = new SqlBack(f2, true);
+        //}
+        CopyToSQL = sql;
 
         //CultureInfo culture = new("de-DE");
         //CultureInfo.DefaultThreadCurrentCulture = culture;
@@ -393,7 +394,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
     /// <param name="checkOnlyCaptionToo"></param>
     /// <param name="readOnly"></param>
     /// <returns></returns>
-    public static Database? GetByFilename(string filename, bool checkOnlyCaptionToo, bool readOnly) {
+    public static Database? GetByFilename(string filename, bool checkOnlyCaptionToo, bool readOnly, SQLBackAbstract? sql) {
         if (string.IsNullOrEmpty(filename)) { return null; }
 
         foreach (var thisFile in AllFiles) {
@@ -414,10 +415,10 @@ public sealed class Database : IDisposable, IDisposableExtended {
 
         if (!FileExists(filename)) { return null; }
 
-        return new Database(filename, readOnly, false);
+        return new Database(filename, readOnly, false, sql);
     }
 
-    public static Database? LoadResource(Assembly assembly, string name, string blueBasicsSubDir, bool fehlerAusgeben, bool mustBeStream) {
+    public static Database? LoadResource(Assembly assembly, string name, string blueBasicsSubDir, bool fehlerAusgeben, bool mustBeStream,SQLBackAbstract? sql) {
         if (Develop.IsHostRunning() && !mustBeStream) {
             var x = -1;
             string? pf;
@@ -469,9 +470,9 @@ public sealed class Database : IDisposable, IDisposableExtended {
                         break;
                 }
                 if (FileExists(pf)) {
-                    var tmp = GetByFilename(pf, false, false);
+                    var tmp = GetByFilename(pf, false, false, sql);
                     if (tmp != null) { return tmp; }
-                    tmp = new Database(pf, false, false);
+                    tmp = new Database(pf, false, false, sql);
                     return tmp;
                 }
             } while (pf != string.Empty);
@@ -1254,7 +1255,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
         if (columnKey < -100) { Develop.DebugPrint(FehlerArt.Fehler, "ColKey darf hier nicht <-100 sein!"); }
         Works.Add(new WorkItem(comand, columnKey, rowKey, previousValue, changedTo, UserName));
 
-        _sql?.AddUndo(Filename.FileNameWithoutSuffix(), comand, columnKey, rowKey, previousValue, changedTo, UserName);
+        CopyToSQL?.AddUndo(Filename.FileNameWithoutSuffix(), comand, columnKey, rowKey, previousValue, changedTo, UserName);
     }
 
     internal void BlockReload(bool crashIsCurrentlyLoading) {
@@ -1832,16 +1833,16 @@ public sealed class Database : IDisposable, IDisposableExtended {
 
     private string ParseThis(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
         if ((int)type is >= 100 and <= 199) {
-            _sql?.CheckIn(Filename.FileNameWithoutSuffix(), type, value, column, null, -1, -1);
+            CopyToSQL?.CheckIn(Filename.FileNameWithoutSuffix(), type, value, column, null, -1, -1);
 
             if (type == DatabaseDataType.ColumnName) {
-                _sql?.SetStyleData(Filename.FileNameWithoutSuffix(), "ColumnKey", value.ToUpper(), column.Key.ToString());
+                CopyToSQL?.SetStyleData(Filename.FileNameWithoutSuffix(), "ColumnKey", value.ToUpper(), column.Key.ToString());
             }
 
             return column.Load(type, value);
         }
 
-        _sql?.CheckIn(Filename.FileNameWithoutSuffix(), type, value, column, row, width, height);
+        CopyToSQL?.CheckIn(Filename.FileNameWithoutSuffix(), type, value, column, row, width, height);
 
         switch (type) {
             case DatabaseDataType.Formatkennung:

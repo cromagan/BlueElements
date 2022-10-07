@@ -300,7 +300,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
         if (_saving || _muf.IsParsing || _muf.IsLoading) { return; }
 
         foreach (var thisfile in DatabaseFiles) {
-            Database.GetByFilename(thisfile, false, false);
+            Database.GetByFilename(thisfile, false, false, null);
         }
 
         _saved = false;

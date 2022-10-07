@@ -575,8 +575,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
             if (string.IsNullOrEmpty(_linkedDatabaseFile)) { return null; }
 
             Tmp_LinkedDatabase = _linkedDatabaseFile.Contains(@"\")
-                ? Database.GetByFilename(_linkedDatabaseFile, true, false)
-                : Database.GetByFilename(Database.Filename.FilePath() + _linkedDatabaseFile, true, false);
+                ? Database.GetByFilename(_linkedDatabaseFile, true, false, Database?.CopyToSQL)
+                : Database.GetByFilename(Database.Filename.FilePath() + _linkedDatabaseFile, true, false, Database?.CopyToSQL);
 
             if (_tmpLinkedDatabase != null) { _tmpLinkedDatabase.UserGroup = Database.UserGroup; }
             return _tmpLinkedDatabase;

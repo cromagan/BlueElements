@@ -223,10 +223,10 @@ public sealed partial class DatabaseHeadEditor {
         foreach (var thisf in alle) {
             nDb++;
             x.Update(nDb);
-            var db = Database.GetByFilename(thisf, false, true);
+            var db = Database.GetByFilename(thisf, false, true, null);
             var disp = db == null;
             if (db == null) {
-                db = new Database(thisf, true, false);
+                db = new Database(thisf, true, false, null);
             }
             if (db.Caption == _database.Caption) {
                 for (var n = 0; n < db.Works.Count; n++) {
