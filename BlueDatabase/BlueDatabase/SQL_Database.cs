@@ -114,9 +114,9 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     #region Constructors
 
     //private VerwaisteDaten _verwaisteDaten;
-    public SQL_Database(bool readOnly) : this(null, readOnly) { }
+    public SQL_Database(bool readOnly) : this(null, readOnly, string.Empty) { }
 
-    private SQL_Database(SQLBackAbstract sql, bool readOnly) {
+    private SQL_Database(SQLBackAbstract sql, bool readOnly, string tablename) {
         AllFiles.Add(this);
 
         //_muf.Loaded += OnLoaded;
@@ -127,10 +127,9 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         //_muf.DoBackGroundWork += DoBackGroundWork;
 
         _sql = sql;
+        TableName = tablename.ToUpper();
 
         Develop.StartService();
-
-        _sql = sql;
 
         // _sql = new SqlBack("D:\\" + tablename.FileNameWithoutSuffix() + ".mdf", false);
 
@@ -158,7 +157,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         UserGroup = "#Administrator";
         if (sql != null) {
             //DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + tablename.FileNameWithoutSuffix()));
-            LoadFromSQLBack(sql);
+            LoadFromSQLBack();
         } else {
             RepairAfterParse();
         }
@@ -308,7 +307,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         }
     }
 
-    public string TableName { get => _sql.TableName; }
+    public string TableName { get; private set; } = string.Empty;
 
     [Browsable(false)]
     public int UndoCount {
@@ -346,7 +345,7 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
     /// <param name="checkOnlyCaptionToo"></param>
     /// <param name="readOnly"></param>
     /// <returns></returns>
-    public static SQL_Database? GetByFilename(string tablename, bool readOnly) {
+    public static SQL_Database? GetByFilename(string tablename, bool readOnly, SQLBackAbstract? sql) {
         if (string.IsNullOrEmpty(tablename)) { return null; }
 
         foreach (var thisFile in AllFiles) {
@@ -354,9 +353,9 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
                 return thisFile;
             }
         }
+        if (sql == null) { return null; }
 
-        return null;
-        //return new SQL_Database(tablename, readOnly, false);
+        return new SQL_Database(sql.OtherTable(tablename), readOnly, tablename);
     }
 
     /// <summary>
@@ -1216,12 +1215,12 @@ public sealed class SQL_Database : IDisposable, IDisposableExtended {
         AddPending(DatabaseDataType.Layouts, -1, Layouts.JoinWithCr(), false);
     }
 
-    private void LoadFromSQLBack(SQLBackAbstract sql) {
+    private void LoadFromSQLBack() {
         IsLoading = true;
 
         #region Spalten erstellen
 
-        var cols = _sql.GetColumnNames("Main");
+        var cols = _sql.GetColumnNames(SQLBackAbstract.Prefix_Table + TableName.ToUpper());
         cols.Remove("RK");
 
         foreach (var thisCol in cols) {

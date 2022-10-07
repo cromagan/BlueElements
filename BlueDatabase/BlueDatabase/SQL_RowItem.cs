@@ -23,13 +23,13 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueScript;
+using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using BlueScript.Variables;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;

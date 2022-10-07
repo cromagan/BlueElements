@@ -34,14 +34,16 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
 
     #region Constructors
 
-    public SQLBackMicrosoftCE(string filename, bool create, string tablename) : base(tablename) {
-        if (create && !File.Exists(filename)) { CreateDatabase(filename); }
+    public SQLBackMicrosoftCE(SQLBackMicrosoftCE sql, string tablename) : base() {
+        _connection = sql._connection;
+        RepairAll(tablename.ToUpper());
+    }
 
+    public SQLBackMicrosoftCE(string filename, bool create, string tablename) : base() {
+        if (create && !File.Exists(filename)) { CreateDatabase(filename); }
         _connection = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" + filename + ";Integrated Security=True;Trusted_Connection=Yes;");
 
-        RepairAll();
-
-        //_filename = filename;
+        RepairAll(tablename.ToUpper());
     }
 
     #endregion
@@ -116,6 +118,10 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
         return tables;
     }
 
+    public override SQLBackAbstract OtherTable(string tablename) {
+        return new SQLBackMicrosoftCE(this, tablename);
+    }
+
     protected override bool CreateTable(string name) {
         if (!ExecuteCommand("DROP TABLE IF EXISTS " + name)) { return false; }
         return ExecuteCommand(@"CREATE TABLE " + name + "(RK " + Primary + " NOT NULL PRIMARY KEY)");
@@ -142,76 +148,4 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
     }
 
     #endregion
-
-    //public SQLBackMicrosoftCE(string filename, bool create)  {
-    //    Develop.StartService();
-    //    //CultureInfo culture = new("de-DE");
-    //    //CultureInfo.DefaultThreadCurrentCulture = culture;
-    //    //CultureInfo.DefaultThreadCurrentUICulture = culture;
-
-    //    _filename = filename.FilePath() + filename.FileNameWithoutSuffix().Replace(" ", "_") + ".mdf";
-
-    //    if (create && !File.Exists(_filename)) { CreateDatabase(_filename); }
-
-    //    _connection = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" + _filename + ";Integrated Security=True;Trusted_Connection=Yes;");
-
-    //    //#region Watcher
-
-    //    //// Create command
-    //    //// Command must use two part names for tables
-    //    //// SELECT <field> FROM dbo.Table rather than
-    //    //// SELECT <field> FROM Table
-    //    //// Query also can not use *, fields must be designated
-    //    //SqlCommand cmd = new SqlCommand("usp_GetMessages", _connection);
-    //    //cmd.CommandType = CommandType.StoredProcedure;
-
-    //    //// Clear any existing notifications
-    //    //cmd.Notification = null;
-
-    //    //// Create the dependency for this command
-    //    //SqlDependency dependency = new SqlDependency(cmd);
-
-    //    //// Add the event handler
-    //    //dependency.OnChange += Dependency_OnChange;
-    //    //#endregion
-
-    //    var x = ListTables();
-
-    //    #region Main
-
-    //    if (!x.Contains("Main")) { CreateTable("Main", new List<string>() { "RK" }); }
-    //    //ExecuteCommand("SET IDENTITY_INSERT Main ON");
-
-    //    #endregion
-
-    //    #region Style
-
-    //    if (!x.Contains("Style")) { CreateTable("Style", new List<string>() { "DBNAME", "COLUMNNAME", "TYPE" }); }
-
-    //    var colStyle = GetColumnNames("Style");
-    //    if (colStyle == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
-
-    //    if (!colStyle.Contains("VALUE")) { AddColumn("Style", "VALUE", "VARCHAR(8000)"); }
-
-    //    #endregion
-
-    //    #region  Undo
-
-    //    if (!x.Contains("Undo")) { CreateTable("Undo"); }
-
-    //    var colUndo = GetColumnNames("Undo");
-    //    if (colUndo == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
-    //    if (!colUndo.Contains("DBNAME")) { AddColumn("Undo", "DBNAME"); }
-    //    if (!colUndo.Contains("COMAND")) { AddColumn("Undo", "COMAND"); }
-    //    if (!colUndo.Contains("COLUMNKEY")) { AddColumn("Undo", "COLUMNKEY"); }
-    //    if (!colUndo.Contains("ROWKEY")) { AddColumn("Undo", "ROWKEY"); }
-    //    if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn("Undo", "PREVIOUSVALUE", "VARCHAR(8000)"); }
-    //    if (!colUndo.Contains("CHANGEDTO")) { AddColumn("Undo", "CHANGEDTO", "VARCHAR(8000)"); }
-    //    if (!colUndo.Contains("USERNAME")) { AddColumn("Undo", "USERNAME"); }
-    //    if (!colUndo.Contains("DATETIMEUTC")) { AddColumn("Undo", "DATETIMEUTC"); }
-
-    //    #endregion
-
-    //    CloseConnection();
-    //}
 }
