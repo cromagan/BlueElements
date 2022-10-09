@@ -38,7 +38,7 @@ namespace BlueDatabase;
 
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public sealed class SQL_Database : IDisposable, IDisposableExtended {
+public sealed class SQL_Database : DatabaseAbstract, IDisposable, IDisposableExtended {
 
     #region Fields
 

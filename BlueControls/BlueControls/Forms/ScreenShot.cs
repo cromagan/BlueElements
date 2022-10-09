@@ -177,13 +177,19 @@ public sealed partial class ScreenShot {
 
     private ScreenData GrabAreaInternal(System.Windows.Forms.Form? frm) {
         try {
-            System.Windows.Forms.FormWindowState ws = 0;
+            //System.Windows.Forms.FormWindowState ws = 0;
+            var op = 0d;
 
             QuickInfo.Close();
+
             if (frm != null) {
-                ws = frm.WindowState;
-                frm.WindowState = System.Windows.Forms.FormWindowState.Minimized;
-                Generic.Pause(0.5, true); // 0.3 ist zu wenig!
+                //ws = frm.WindowState;
+                op = frm.Opacity;
+                frm.Opacity = 0;
+                frm.Refresh();
+                //Develop.DoEvents();
+                //frm.WindowState = System.Windows.Forms.FormWindowState.Minimized;
+                //Generic.Pause(0.5, true); // 0.3 ist zu wenig!
             }
 
             _screenShotBmp = GrabAllScreens();
@@ -199,7 +205,10 @@ public sealed partial class ScreenShot {
             OnMouseMove(null);
             ShowDialog();
 
-            if (frm != null) { frm.WindowState = ws; }
+            if (frm != null) {
+                frm.Opacity = op;
+                //frm.WindowState = ws;
+            }
             // New Bitmap davor, um die Bitmaptiefe zu korrigiern
             //if (MaxW > 0 && MaxH > 0) {
             //    // Auch hier NEW Bitmap, da evtl. das Original-Bild zurück gegeben wird.

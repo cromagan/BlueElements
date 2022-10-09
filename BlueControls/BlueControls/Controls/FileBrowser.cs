@@ -201,7 +201,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
     }
 
     private void btnAddScreenShot_Click(object sender, System.EventArgs e) {
-        var i = ScreenShot.GrabArea(null);
+        var i = ScreenShot.GrabArea(ParentForm());
 
         var dateiPng = TempFile(txbPfad.Text.TrimEnd("\\"), "Screenshot " + DateTime.Now.ToString(Constants.Format_Date4), "PNG");
         i.Save(dateiPng, ImageFormat.Png);

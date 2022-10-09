@@ -39,16 +39,16 @@ namespace BlueDatabase;
 
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public sealed class Database : IDisposable, IDisposableExtended {
+public sealed class Database : DatabaseAbstract, IDisposable, IDisposableExtended {
 
     #region Fields
 
     public const string DatabaseVersion = "4.00";
     public static readonly ListExt<Database> AllFiles = new();
-    public readonly SQLBackAbstract? CopyToSQL;
     public readonly CellCollection Cell;
     public readonly ColumnCollection Column;
     public readonly ListExt<ColumnViewCollection> ColumnArrangements = new();
+    public readonly SQLBackAbstract? CopyToSQL;
     public readonly ListExt<string> DatenbankAdmin = new();
 
     /// <summary>
@@ -418,7 +418,7 @@ public sealed class Database : IDisposable, IDisposableExtended {
         return new Database(filename, readOnly, false, sql);
     }
 
-    public static Database? LoadResource(Assembly assembly, string name, string blueBasicsSubDir, bool fehlerAusgeben, bool mustBeStream,SQLBackAbstract? sql) {
+    public static Database? LoadResource(Assembly assembly, string name, string blueBasicsSubDir, bool fehlerAusgeben, bool mustBeStream, SQLBackAbstract? sql) {
         if (Develop.IsHostRunning() && !mustBeStream) {
             var x = -1;
             string? pf;

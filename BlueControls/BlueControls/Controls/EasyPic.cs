@@ -217,6 +217,15 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         ZoomFitInvalidateAndCheckButtons();
     }
 
+    private void btnScreenshot_Click(object sender, System.EventArgs e) {
+        if (!DeleteImageInFileSystem()) { return; }
+        if (!HasFileName()) { return; }
+        _bitmap = ScreenShot.GrabArea(ParentForm());
+
+        SaveNewPicToDisc();
+        ZoomFitInvalidateAndCheckButtons();
+    }
+
     private void DelP_Click(object sender, System.EventArgs e) {
         DeleteImageInFileSystem();
     }
@@ -273,15 +282,6 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         OpenDia.ShowDialog();
     }
 
-    private void MakePic_Click(object sender, System.EventArgs e) {
-        if (!DeleteImageInFileSystem()) { return; }
-        if (!HasFileName()) { return; }
-        _bitmap = ScreenShot.GrabArea(ParentForm());
-
-        SaveNewPicToDisc();
-        ZoomFitInvalidateAndCheckButtons();
-    }
-
     private void OpenDia_FileOk(object sender, CancelEventArgs e) {
         if (!HasFileName()) { return; }
         _bitmap = (Bitmap)Image_FromFile(OpenDia.FileName);
@@ -300,11 +300,11 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         _panelMoveDirection = -1;
         _PanelMover.Enabled = true;
         if (_bitmap == null) {
-            DelP.Enabled = false;
+            btnDeleteImage.Enabled = false;
             Invalidate();
             return;
         }
-        DelP.Enabled = true;
+        btnDeleteImage.Enabled = true;
         Invalidate();
     }
 

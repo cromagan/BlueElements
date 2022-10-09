@@ -97,6 +97,7 @@
     <Compile Include="AdditionalScriptComands\VariableDatabase.cs" />
     <Compile Include="AdditionalScriptComands\VariableRowItem.cs" />
     <Compile Include="AdditionalScriptComands\VariableFilterItem.cs" />
+    <Compile Include="DatabaseAbstract.cs" />
     <Compile Include="EventArgs\SQL_FilterEventArgs.cs" />
     <Compile Include="EventArgs\SQL_CellCancelEventArgs.cs" />
     <Compile Include="EventArgs\SQL_CellExtEventArgs.cs" />
@@ -178,6 +179,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="DatabaseAbstract.resx">
+      <DependentUpon>DatabaseAbstract.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="SQL_Database.resx">
       <DependentUpon>SQL_Database.cs</DependentUpon>
       <SubType>Designer</SubType>
