@@ -72,7 +72,6 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
         _muf.ShouldICancelSaveOperations += OnShouldICancelSaveOperations;
         _muf.DiscardPendingChanges += DiscardPendingChanges;
         _muf.HasPendingChanges += HasPendingChanges;
-        _muf.RepairAfterParse += RepairAfterParse;
         _muf.DoWorkAfterSaving += DoWorkAfterSaving;
         _muf.IsThereBackgroundWorkToDo += IsThereBackgroundWorkToDo;
         _muf.ParseExternal += ParseExternal;
@@ -144,7 +143,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
                 _padData.Changed += PadData_Changed;
             }
 
-            if (_saving || _muf.IsParsing || _muf.IsLoading) { return; }
+            if (_saving || _muf.IsLoading) { return; }
 
             _saved = false;
         }
@@ -189,18 +188,6 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
     }
 
     public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
-
-    public void RepairAfterParse(object sender, System.EventArgs e) {
-        foreach (var thisIt in PadData) {
-            if (string.IsNullOrEmpty(thisIt.Page)) {
-                thisIt.Page = "Head";
-            }
-
-            foreach (var thisCon in thisIt.ConnectsTo) {
-                thisCon.Bei_Export_sichtbar = false;
-            }
-        }
-    }
 
     /// <summary>
     /// Prüft, ob das Formular sichtbare Elemente hat.
@@ -297,23 +284,35 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
     }
 
     private void DatabaseFiles_Changed(object sender, System.EventArgs e) {
-        if (_saving || _muf.IsParsing || _muf.IsLoading) { return; }
+        if (_saving || _muf.IsLoading) { return; }
 
         foreach (var thisfile in DatabaseFiles) {
-            Database.GetByFilename(thisfile, false, false, null);
+            DatabaseAbstract.GetByID(thisfile, false, false, null, thisfile.FileNameWithoutSuffix());
         }
 
         _saved = false;
     }
 
     private void NotAllowedChilds_Changed(object sender, System.EventArgs e) {
-        if (_saving || _muf.IsParsing || _muf.IsLoading) { return; }
+        if (_saving || _muf.IsLoading) { return; }
         _saved = false;
     }
 
     private void OnConnectedControlsStopAllWorking(object sender, MultiUserFileStopWorkingEventArgs e) => ConnectedControlsStopAllWorking?.Invoke(this, e);
 
-    private void OnLoaded(object sender, LoadedEventArgs e) => Loaded?.Invoke(this, e);
+    private void OnLoaded(object sender, LoadedEventArgs e) {
+        foreach (var thisIt in PadData) {
+            if (string.IsNullOrEmpty(thisIt.Page)) {
+                thisIt.Page = "Head";
+            }
+
+            foreach (var thisCon in thisIt.ConnectsTo) {
+                thisCon.Bei_Export_sichtbar = false;
+            }
+        }
+
+        Loaded?.Invoke(this, e);
+    }
 
     private void OnLoading(object sender, LoadingEventArgs e) => Loading?.Invoke(this, e);
 
@@ -322,7 +321,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
     private void OnShouldICancelSaveOperations(object sender, CancelEventArgs e) => ShouldICancelSaveOperations?.Invoke(this, e);
 
     private void PadData_Changed(object sender, System.EventArgs e) {
-        if (_saving || _muf.IsParsing || _muf.IsLoading) { return; }
+        if (_saving || _muf.IsLoading) { return; }
 
         _saved = false;
     }

@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System.Drawing;
 using BlueBasics;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using System.Drawing;
 
 namespace BlueControls.ItemCollection.ItemCollectionList;
 
@@ -73,7 +73,7 @@ public class CellLikeListItem : BasicListItem {
 
     public override bool FilterMatch(string filterText) {
         if (base.FilterMatch(filterText)) { return true; }
-        var txt = CellItem.ValueReadable(_styleLikeThis, Internal, ShortenStyle.Both, _styleLikeThis.BildTextVerhalten, true);
+        var txt = CellItem.ValueReadable(_styleLikeThis, Internal, ShortenStyle.Both, _styleLikeThis.BehaviorOfImageAndText, true);
         return txt.ToUpper().Contains(filterText.ToUpper());
     }
 

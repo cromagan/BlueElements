@@ -25,7 +25,7 @@ public interface IHasDatabase {
 
     #region Properties
 
-    public Database? Database { get; set; }
+    public DatabaseAbstract? Database { get; set; }
 
     #endregion
 }

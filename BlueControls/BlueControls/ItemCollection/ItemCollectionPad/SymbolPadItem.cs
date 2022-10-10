@@ -19,13 +19,13 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
-using static BlueBasics.Polygons;
 using static BlueBasics.Converter;
-using System;
+using static BlueBasics.Polygons;
 
 namespace BlueControls.ItemCollection;
 

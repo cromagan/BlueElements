@@ -30,7 +30,6 @@ namespace BeCreative {
             this.btnTextEditor = new BlueControls.Controls.Button();
             this.btnBildEditor = new BlueControls.Controls.Button();
             this.btnHierachie = new BlueControls.Controls.Button();
-            this.btnDatenbankSQL = new BlueControls.Controls.Button();
             this.SuspendLayout();
             // 
             // btnDatenbank
@@ -98,23 +97,11 @@ namespace BeCreative {
             this.btnHierachie.Text = "Hierachie-Editor";
             this.btnHierachie.Click += new System.EventHandler(this.btnHierachie_Click);
             // 
-            // btnDatenbankSQL
-            // 
-            this.btnDatenbankSQL.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big;
-            this.btnDatenbankSQL.ImageCode = "Tabelle|16";
-            this.btnDatenbankSQL.Location = new System.Drawing.Point(208, 16);
-            this.btnDatenbankSQL.Name = "btnDatenbankSQL";
-            this.btnDatenbankSQL.Size = new System.Drawing.Size(64, 80);
-            this.btnDatenbankSQL.TabIndex = 6;
-            this.btnDatenbankSQL.Text = "SQL-Datenbank-Editor";
-            this.btnDatenbankSQL.Click += new System.EventHandler(this.btnDatenbankSQL_Click);
-            // 
             // Start
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(279, 188);
-            this.Controls.Add(this.btnDatenbankSQL);
+            this.ClientSize = new System.Drawing.Size(221, 188);
             this.Controls.Add(this.btnHierachie);
             this.Controls.Add(this.btnBildEditor);
             this.Controls.Add(this.btnTextEditor);
@@ -137,6 +124,5 @@ namespace BeCreative {
         private BlueControls.Controls.Button btnTextEditor;
         private BlueControls.Controls.Button btnBildEditor;
         private BlueControls.Controls.Button btnHierachie;
-        private BlueControls.Controls.Button btnDatenbankSQL;
     }
 }

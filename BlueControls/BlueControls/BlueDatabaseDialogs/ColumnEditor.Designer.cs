@@ -299,7 +299,7 @@ namespace BlueControls.BlueDatabaseDialogs {
     "ispiel:</i></u>Beispiel-Text|Bsp.-Txt";
             this.txbReplacer.Regex = null;
             this.txbReplacer.Size = new System.Drawing.Size(985, 221);
-            this.txbReplacer.SpellChecking = true;
+            this.txbReplacer.SpellCheckingEnabled = true;
             this.txbReplacer.TabIndex = 35;
             // 
             // capBildCodeImageNotfound
@@ -627,7 +627,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tbxAuswaehlbareWerte.Name = "tbxAuswaehlbareWerte";
             this.tbxAuswaehlbareWerte.Regex = null;
             this.tbxAuswaehlbareWerte.Size = new System.Drawing.Size(520, 280);
-            this.tbxAuswaehlbareWerte.SpellChecking = true;
+            this.tbxAuswaehlbareWerte.SpellCheckingEnabled = true;
             this.tbxAuswaehlbareWerte.TabIndex = 0;
             // 
             // capImmerWerte
@@ -741,7 +741,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbAutoReplace.QuickInfo = resources.GetString("txbAutoReplace.QuickInfo");
             this.txbAutoReplace.Regex = null;
             this.txbAutoReplace.Size = new System.Drawing.Size(985, 192);
-            this.txbAutoReplace.SpellChecking = true;
+            this.txbAutoReplace.SpellCheckingEnabled = true;
             this.txbAutoReplace.TabIndex = 39;
             // 
             // capAutoReplace
@@ -994,7 +994,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tbxAdminInfo.Name = "tbxAdminInfo";
             this.tbxAdminInfo.Regex = null;
             this.tbxAdminInfo.Size = new System.Drawing.Size(473, 428);
-            this.tbxAdminInfo.SpellChecking = true;
+            this.tbxAdminInfo.SpellCheckingEnabled = true;
             this.tbxAdminInfo.TabIndex = 3;
             this.tbxAdminInfo.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
@@ -1009,7 +1009,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tbxQuickinfo.Name = "tbxQuickinfo";
             this.tbxQuickinfo.Regex = null;
             this.tbxQuickinfo.Size = new System.Drawing.Size(496, 428);
-            this.tbxQuickinfo.SpellChecking = true;
+            this.tbxQuickinfo.SpellCheckingEnabled = true;
             this.tbxQuickinfo.TabIndex = 0;
             this.tbxQuickinfo.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 

@@ -121,7 +121,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     #region Properties
 
     [DefaultValue(AdditionalCheck.None)]
-    public AdditionalCheck AdditionalCheck {
+    public AdditionalCheck AdditionalFormatCheck {
         get => _additionalCheck;
         set {
             if (_additionalCheck == value) { return; }
@@ -289,7 +289,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     [DefaultValue(false)]
-    public bool SpellChecking {
+    public bool SpellCheckingEnabled {
         get => _spellChecking;
         set {
             if (_spellChecking == value) { return; }

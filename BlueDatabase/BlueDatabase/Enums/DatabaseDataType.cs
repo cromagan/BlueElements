@@ -198,7 +198,7 @@ public enum DatabaseDataType : byte {
     //co_TagsInternal_ALT = 157,
     //    co_QuickInfoImage = 158
 
-    //co_CaptionBitmap = 159,
+    //co_CaptionBitmapCode = 159,
 
     Suffix = 160,
     DoUcaseAfterEdit = 161,

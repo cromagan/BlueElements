@@ -42,9 +42,9 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
 
     #region Constructors
 
-    public FilterItem(Database? database, FilterType filterType, string searchValue) : this(database, filterType, new List<string> { searchValue }) { }
+    public FilterItem(DatabaseAbstract? database, FilterType filterType, string searchValue) : this(database, filterType, new List<string> { searchValue }) { }
 
-    public FilterItem(Database? database, FilterType filterType, IReadOnlyCollection<string>? searchValue) {
+    public FilterItem(DatabaseAbstract? database, FilterType filterType, IReadOnlyCollection<string>? searchValue) {
         Database = database;
         if (Database != null) {
             Database.Disposing += Database_Disposing;
@@ -55,7 +55,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
         SearchValue.Changed += SearchValue_ListOrItemChanged;
     }
 
-    public FilterItem(Database database, string filterCode) {
+    public FilterItem(DatabaseAbstract database, string filterCode) {
         Database = database;
         if (Database != null) {
             Database.Disposing += Database_Disposing;
@@ -116,7 +116,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
     /// <summary>
     /// Der Edit-Dialog braucht die Datenbank, um mit Texten die Spalte zu suchen.
     /// </summary>
-    public Database? Database { get; private set; }
+    public DatabaseAbstract? Database { get; private set; }
 
     public FilterType FilterType {
         get => _filterType;
@@ -181,7 +181,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
 
                 case "database":
                     if (Database != null) { Database.Disposing -= Database_Disposing; }
-                    Database = Database.GetByFilename(pair.Value.FromNonCritical(), false, false,  Database?.CopyToSQL);
+                    Database = DatabaseAbstract.GetByID(pair.Value.FromNonCritical(), false, false, null, pair.Value.FromNonCritical().FileNameWithoutSuffix());
                     Database.Disposing += Database_Disposing;
                     break;
 
@@ -278,7 +278,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
             if (!IsOk()) { return string.Empty; }
             var result = "{Type=" + (int)_filterType;
 
-            if (Database != null && withdatabaseTag) { result = result + ", Database=" + Database.Filename.ToNonCritical(); }
+            if (Database != null && withdatabaseTag) { result = result + ", Database=" + Database.ConnectionID.ToNonCritical(); }
 
             if (_column != null) { result = result + ", " + _column.ParsableColumnKey(); }
             foreach (var t in SearchValue) {

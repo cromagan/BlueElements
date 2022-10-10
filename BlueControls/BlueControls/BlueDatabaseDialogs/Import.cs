@@ -35,7 +35,7 @@ public sealed partial class Import {
 
     #region Constructors
 
-    public Import(Database? database, string importtext) : base() {
+    public Import(DatabaseAbstract? database, string importtext) : base() {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -55,7 +55,7 @@ public sealed partial class Import {
 
     #region Properties
 
-    public Database? Database { get; }
+    public DatabaseAbstract? Database { get; }
 
     #endregion
 

@@ -19,9 +19,9 @@
 
 using BlueBasics.Enums;
 using BlueDatabase;
+using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Linq;
-using BlueScript.Variables;
 
 namespace BlueControls;
 
@@ -75,7 +75,7 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
     }
 
     private void GenerateVariableTable() {
-        Database x = new(true);
+        Database x = new(true, "Script-Variablen");
         x.Column.Add("Name", "N", VarType.Text, "Variablenname");
         x.Column.Add("Typ", "T", VarType.Text, "Variablentyp");
         x.Column.Add("RO", "R", VarType.Bit, "Readonly, Schreibgeschützt");
@@ -89,7 +89,7 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
             thisColumn.DropdownBearbeitungErlaubt = false;
         }
 
-        x.RepairAfterParse(null, null);
+        x.RepairAfterParse();
         x.ColumnArrangements[1].ShowAllColumns();
         x.ColumnArrangements[1].HideSystemColumns();
         x.SortDefinition = new RowSortDefinition(x, "Name", true);

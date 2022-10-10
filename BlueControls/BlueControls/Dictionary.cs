@@ -36,21 +36,19 @@ internal static class Dictionary {
 
     public static bool IsSpellChecking;
     internal static readonly object LockSpellChecking = new();
-    private static Database? _dictWords;
+    private static DatabaseAbstract? _dictWords;
 
     #endregion
 
     #region Methods
 
-    public static bool DictionaryRunning(bool tryToInit) {
-        if (tryToInit && _dictWords == null) {
-            Init();
-        }
+    public static bool DictionaryRunning(bool trytoinit) {
+        if (trytoinit && _dictWords == null) { Init(); }
         return _dictWords != null;
     }
 
     public static bool IsWordOk(string word) {
-        if (!DictionaryRunning(true)) { return true; }
+        if (!DictionaryRunning(false)) { return true; }
         if (string.IsNullOrEmpty(word)) { return true; }
         if (word.Length == 1) { return true; }
         if (word.IsNumeral()) { return true; }

@@ -19,6 +19,7 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -35,13 +36,38 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
     #region Constructors
 
     public SQLBackMicrosoftCE(SQLBackMicrosoftCE sql, string tablename) : base() {
+        if (!IsValidTableName(tablename)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Tabellename ungültig: " + tablename);
+        }
+
+        Filename = sql.Filename;
         _connection = sql._connection;
         RepairAll(tablename.ToUpper());
     }
 
-    public SQLBackMicrosoftCE(string filename, bool create, string tablename) : base() {
+    public SQLBackMicrosoftCE(string filename, bool create) : base() {
         if (create && !File.Exists(filename)) { CreateDatabase(filename); }
-        _connection = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" + filename + ";Integrated Security=True;Trusted_Connection=Yes;");
+
+        ConnectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" + filename + ";" +
+                           "Integrated Security=True;Trusted_Connection=Yes;";
+
+        Filename = filename;
+        _connection = new SqlConnection(ConnectionString);
+
+        RepairAll(string.Empty);
+    }
+
+    public SQLBackMicrosoftCE(string filename, bool create, string tablename) : base() {
+        if (!IsValidTableName(tablename)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Tabellename ungültig: " + tablename);
+        }
+
+        if (create && !File.Exists(filename)) { CreateDatabase(filename); }
+
+        ConnectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" + filename + ";" +
+                           "Integrated Security=True;Trusted_Connection=Yes;";
+
+        _connection = new SqlConnection(ConnectionString);
 
         RepairAll(tablename.ToUpper());
     }
@@ -50,7 +76,9 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
 
     #region Properties
 
-    public override string Primary => "bigint identity(1,1) NOT NULL";
+    public override string ConnectionString { get; protected set; }
+    public override string ID => "Microsoft SQL Server";
+    public override string Primary => "bigint identity(1,1)";
     public override string VarChar255 => "VARCHAR(255)";
     public override string VarChar4000 => "VARCHAR(4000)";
 
@@ -102,7 +130,9 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
         return ok;
     }
 
-    public override List<string> ListTables() {
+    public override SQLBackAbstract OtherTable(string tablename) => new SQLBackMicrosoftCE(this, tablename);
+
+    protected override List<string> AllTables() {
         List<string> tables = new();
 
         OpenConnection();
@@ -118,20 +148,16 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
         return tables;
     }
 
-    public override SQLBackAbstract OtherTable(string tablename) {
-        return new SQLBackMicrosoftCE(this, tablename);
+    protected override bool CreateTable(string tablename) {
+        if (!ExecuteCommand("DROP TABLE IF EXISTS " + tablename)) { return false; }
+        return ExecuteCommand(@"CREATE TABLE " + tablename + "(RK " + Primary + " NOT NULL PRIMARY KEY)");
     }
 
-    protected override bool CreateTable(string name) {
-        if (!ExecuteCommand("DROP TABLE IF EXISTS " + name)) { return false; }
-        return ExecuteCommand(@"CREATE TABLE " + name + "(RK " + Primary + " NOT NULL PRIMARY KEY)");
-    }
-
-    protected override bool CreateTable(string name, List<string> keycolumns) {
-        if (!ExecuteCommand("DROP TABLE IF EXISTS " + name)) { return false; }
+    protected override bool CreateTable(string tablename, List<string> keycolumns) {
+        if (!ExecuteCommand("DROP TABLE IF EXISTS " + tablename)) { return false; }
         // http://www.sql-server-helper.com/error-messages/msg-8110.aspx
 
-        var t = @"CREATE TABLE " + name + "(";
+        var t = @"CREATE TABLE " + tablename + "(";
 
         foreach (var thiskey in keycolumns) {
             t += thiskey.ToUpper() + " VARCHAR(255) default '' NOT NULL, ";
@@ -142,7 +168,7 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
         if (!ExecuteCommand(t)) { return false; }
         //if (!ExecuteCommand("SET IDENTITY_INSERT " + name + " ON")) { return false; }
 
-        t = "ALTER TABLE " + name + " ADD CONSTRAINT (PK_" + name.ToUpper() + " PRIMARY KEY CLUSTERED(" + keycolumns.JoinWith(", ").ToUpper() + "))";
+        t = "ALTER TABLE " + tablename + " ADD CONSTRAINT PK_" + tablename.ToUpper() + " PRIMARY KEY CLUSTERED(" + keycolumns.JoinWith(", ").ToUpper() + ")";
 
         return ExecuteCommand(t);
     }

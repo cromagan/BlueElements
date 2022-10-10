@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Structures;
-using static BlueBasics.Constants;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using static BlueBasics.Constants;
 
 namespace BlueScript.Methods;
 

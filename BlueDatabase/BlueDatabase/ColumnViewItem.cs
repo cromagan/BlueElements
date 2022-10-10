@@ -47,7 +47,7 @@ public sealed class ColumnViewItem {
         _viewType = type;
     }
 
-    public ColumnViewItem(Database database, string codeToParse, ColumnViewCollection parent) : this(parent) {
+    public ColumnViewItem(DatabaseAbstract database, string codeToParse, ColumnViewCollection parent) : this(parent) {
         foreach (var pair in codeToParse.GetAllTags()) {
             switch (pair.Key) {
                 case "column":

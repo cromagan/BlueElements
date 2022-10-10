@@ -19,11 +19,11 @@
 
 using BlueBasics;
 using BlueControls.Controls;
+using BlueControls.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using BlueControls.Interfaces;
 
 namespace BlueControls.ItemCollection;
 

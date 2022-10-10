@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System.Collections.Generic;
 
 namespace BlueDatabase.EventArgs;
@@ -23,7 +25,7 @@ public class RowCheckedEventArgs : RowEventArgs {
 
     #region Constructors
 
-    public RowCheckedEventArgs(RowItem row, List<string> columnsWithErrors) : base(row) {
+    public RowCheckedEventArgs(RowItem row, List<string>? columnsWithErrors) : base(row) {
         ColumnsWithErrors = columnsWithErrors;
     }
 
@@ -31,7 +33,7 @@ public class RowCheckedEventArgs : RowEventArgs {
 
     #region Properties
 
-    public List<string> ColumnsWithErrors { get; }
+    public List<string>? ColumnsWithErrors { get; }
 
     #endregion
 }

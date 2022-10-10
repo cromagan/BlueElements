@@ -248,15 +248,15 @@ public class CellItem {
         }
         List<string> ret = new();
         if (!column.MultiLine) {
-            ret.Add(ValueReadable(column, Row.CellGetString(column), Style, column.BildTextVerhalten, true));
+            ret.Add(ValueReadable(column, Row.CellGetString(column), Style, column.BehaviorOfImageAndText, true));
             return ret;
         }
         var x = Row.CellGetList(column);
         foreach (var thisstring in x) {
-            ret.Add(ValueReadable(column, thisstring, Style, column.BildTextVerhalten, true));
+            ret.Add(ValueReadable(column, thisstring, Style, column.BehaviorOfImageAndText, true));
         }
         if (x.Count == 0) {
-            var tmp = ValueReadable(column, string.Empty, Style, column.BildTextVerhalten, true);
+            var tmp = ValueReadable(column, string.Empty, Style, column.BehaviorOfImageAndText, true);
             if (!string.IsNullOrEmpty(tmp)) { ret.Add(tmp); }
         }
         return ret;
@@ -273,7 +273,7 @@ public class CellItem {
         if (string.IsNullOrEmpty(replacedText)) { return null; }
 
         var gr = Math.Truncate(column.Database.GlobalScale * 16).ToString(Constants.Format_Integer1);
-        if (!string.IsNullOrEmpty(column.BildCode_ConstantHeight)) { gr = column.BildCode_ConstantHeight; }
+        if (!string.IsNullOrEmpty(column.ConstantHeightOfImageCode)) { gr = column.ConstantHeightOfImageCode; }
 
         var x = (replacedText + "||").SplitBy("|");
         var gr2 = (gr + "||").SplitBy("|");

@@ -39,7 +39,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
     #region Fields
 
     private ConnectedFormula.ConnectedFormula? _cf;
-    private Database? _database;
+    private DatabaseAbstract? _database;
     private bool _generated;
     private string _pageToShow = "Head";
     private long _rowkey = -1;
@@ -69,7 +69,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public Database? Database {
+    public DatabaseAbstract? Database {
         get => _database;
         set => DoFormulaDatabaseAndRow(ConnectedFormula, value, RowKey, Page);
     }
@@ -100,9 +100,9 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
 
     #region Methods
 
-    public void GetConnectedFormulaFromDatabase(Database? db) {
-        if (db != null) {
-            var f = db.FormulaFileName();
+    public void GetConnectedFormulaFromDatabase(DatabaseAbstract? database) {
+        if (database != null) {
+            var f = database.FormulaFileName();
 
             if (f != null) {
                 var tmpFormula = GetByFilename(f);
@@ -183,7 +183,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
 
     private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
 
-    private void DoFormulaDatabaseAndRow(ConnectedFormula.ConnectedFormula? cf, Database? database, long rowKey, string page) {
+    private void DoFormulaDatabaseAndRow(ConnectedFormula.ConnectedFormula? cf, DatabaseAbstract? database, long rowKey, string page) {
         if (_cf == cf &&
             _database == database &&
             _rowkey == rowKey &&

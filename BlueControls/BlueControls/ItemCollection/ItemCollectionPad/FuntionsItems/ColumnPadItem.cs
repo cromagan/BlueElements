@@ -58,7 +58,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     public string Datenbank {
         get {
             if (Column?.Database == null) { return "?"; }
-            return Column.Database.Filename.FileNameWithSuffix();
+            return Column.Database.TableName;
         }
     }
 
@@ -91,9 +91,9 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         l.Add(new FlexiControl());
         l.Add(new FlexiControlForProperty<string>(() => Column.Caption));
         l.Add(new FlexiControl());
-        l.Add(new FlexiControlForProperty<string>(() => Column.Ueberschrift1));
-        l.Add(new FlexiControlForProperty<string>(() => Column.Ueberschrift2));
-        l.Add(new FlexiControlForProperty<string>(() => Column.Ueberschrift3));
+        l.Add(new FlexiControlForProperty<string>(() => Column.CaptionGroup1));
+        l.Add(new FlexiControlForProperty<string>(() => Column.CaptionGroup2));
+        l.Add(new FlexiControlForProperty<string>(() => Column.CaptionGroup3));
         l.Add(new FlexiControl());
         l.Add(new FlexiControlForProperty<string>(() => Column.Quickinfo, 5));
         l.Add(new FlexiControlForProperty<string>(() => Column.AdminInfo, 5));
@@ -117,7 +117,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         var t = base.ToString();
         t = t.Substring(0, t.Length - 1) + ", ";
         if (Column != null) {
-            t = t + "Database=" + Column.Database.Filename.ToNonCritical() + ", ";
+            t = t + "Database=" + Column.Database.ConnectionID.ToNonCritical() + ", ";
             t = t + "ColumnKey=" + Column.Key + ", ";
             t = t + "ColumnName=" + Column.Name.ToNonCritical() + ", ";
         }
@@ -152,7 +152,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         //Table.Draw_FormatedText(gr,)
 
         for (var z = 0; z < 3; z++) {
-            var n = Column.Ueberschrift(z);
+            var n = Column.CaptionGroup(z);
             if (!string.IsNullOrEmpty(n)) {
                 Skin.Draw_FormatedText(gr, n, null, Alignment.Horizontal_Vertical_Center, new Rectangle(0, z * 16, bmp.Width, 61), null, false, ColumnFont, true);
             }
@@ -169,7 +169,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
         var r = Column.Database.Row.First();
         if (r != null) {
-            Table.Draw_FormatedText(gr, r.CellGetString(Column), Column, new Rectangle(0, 210, bmp.Width, 90), Design.Table_Cell, States.Standard, BlueDatabase.Enums.ShortenStyle.Replaced, Column.BildTextVerhalten);
+            Table.Draw_FormatedText(gr, r.CellGetString(Column), Column, new Rectangle(0, 210, bmp.Width, 90), Design.Table_Cell, States.Standard, BlueDatabase.Enums.ShortenStyle.Replaced, Column.BehaviorOfImageAndText);
         }
 
         GeneratedBitmap = bmp;

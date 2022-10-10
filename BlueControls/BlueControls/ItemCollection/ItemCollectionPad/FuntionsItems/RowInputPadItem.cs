@@ -19,16 +19,15 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.Controls;
-using BlueControls.Enums;
+using BlueControls.Interfaces;
+using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using BlueBasics.Interfaces;
-using BlueControls.Interfaces;
-using System.Windows.Forms;
-using BlueDatabase.Enums;
 using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace BlueControls.ItemCollection;
 

@@ -22,11 +22,11 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using BlueScript.Variables;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;

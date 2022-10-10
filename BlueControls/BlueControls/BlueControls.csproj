@@ -82,12 +82,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Allgemein.cs" />
-    <Compile Include="BlueDatabaseDialogs\SQL_AutoFilter.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\SQL_AutoFilter.Designer.cs">
-      <DependentUpon>SQL_AutoFilter.cs</DependentUpon>
-    </Compile>
     <Compile Include="BlueDatabaseDialogs\FlexiControlForFilter.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -114,14 +108,7 @@
     </Compile>
     <Compile Include="BlueFont.cs" />
     <Compile Include="FormManager.cs" />
-    <Compile Include="Forms\SQL_TableView.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\SQL_TableView.Designer.cs">
-      <DependentUpon>SQL_TableView.cs</DependentUpon>
-    </Compile>
     <Compile Include="Interfaces\IHasDatabase.cs" />
-    <Compile Include="ItemCollection\ItemCollectionList\SQL_CellLikeListItem.cs" />
     <Compile Include="ConnectedFormula\ConnectedFormula.cs" />
     <Compile Include="ConnectedFormula\ConnectedFormulaView.cs">
       <SubType>Component</SubType>
@@ -155,12 +142,6 @@
     </Compile>
     <Compile Include="Controls\SwapListBox.Designer.cs">
       <DependentUpon>SwapListBox.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\SQL_Table.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\SQL_Table.Designer.cs">
-      <DependentUpon>SQL_Table.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\ZoomPic.cs">
       <SubType>Component</SubType>
@@ -204,7 +185,6 @@
     <Compile Include="EventArgs\ButtonCellEventArgs.cs" />
     <Compile Include="EventArgs\CellDoubleClickEventArgs.cs" />
     <Compile Include="EventArgs\CellValueChangingByUserEventArgs.cs" />
-    <Compile Include="EventArgs\SQL_FilterComandEventArgs.cs" />
     <Compile Include="EventArgs\MouseEventArgs1_1DownAndCurrent.cs" />
     <Compile Include="EventArgs\MoveEventArgs.cs" />
     <Compile Include="EventArgs\PositionEventArgs.cs" />
@@ -618,10 +598,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="BlueDatabaseDialogs\SQL_AutoFilter.resx">
-      <DependentUpon>SQL_AutoFilter.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="BlueDatabaseDialogs\FlexiControlForFilter.resx">
       <DependentUpon>FlexiControlForFilter.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -711,10 +687,6 @@
     <EmbeddedResource Include="Controls\SwapListBox.resx">
       <DependentUpon>SwapListBox.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controls\SQL_Table.resx">
-      <DependentUpon>SQL_Table.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Designer Support\frmQuickPic.resx">
       <DependentUpon>frmQuickPic.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -734,9 +706,6 @@
     <EmbeddedResource Include="Forms\EditBoxRow.resx">
       <DependentUpon>EditBoxRow.cs</DependentUpon>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\SQL_TableView.resx">
-      <DependentUpon>SQL_TableView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\TableView.resx">
       <DependentUpon>TableView.cs</DependentUpon>

@@ -50,7 +50,7 @@ public partial class TableView : Form {
 
     private bool _firstOne = true;
 
-    private Database? _originalDb;
+    private DatabaseAbstract? _originalDb;
 
     #endregion
 
@@ -58,7 +58,7 @@ public partial class TableView : Form {
 
     public TableView() : this(null, true, true) { }
 
-    public TableView(Database? database, bool loadTabVisible, bool adminTabVisible) {
+    public TableView(DatabaseAbstract? database, bool loadTabVisible, bool adminTabVisible) {
         InitializeComponent();
 
         if (!adminTabVisible) {
@@ -84,14 +84,20 @@ public partial class TableView : Form {
 
     #endregion
 
+    #region Properties
+
+    public SQLBackAbstract? CopyToSQL { get; set; } = null;
+
+    #endregion
+
     #region Methods
 
     public static void CheckDatabase(object? sender, LoadedEventArgs? e) {
-        if (sender is Database database && !database.ReadOnly) {
+        if (sender is DatabaseAbstract database && !database.ReadOnly) {
             if (database.IsAdministrator()) {
                 foreach (var thisColumnItem in database.Column) {
                     while (!thisColumnItem.IsOk()) {
-                        DebugPrint(FehlerArt.Info, "Datenbank:" + database.Filename + "\r\nSpalte:" + thisColumnItem.Name + "\r\nSpaltenfehler: " + thisColumnItem.ErrorReason() + "\r\nUser: " + database.UserName + "\r\nGroup: " + database.UserGroup + "\r\nAdmins: " + database.DatenbankAdmin.JoinWith(";"));
+                        DebugPrint(FehlerArt.Info, "Datenbank:" + database.ConnectionID + "\r\nSpalte:" + thisColumnItem.Name + "\r\nSpaltenfehler: " + thisColumnItem.ErrorReason() + "\r\nUser: " + database.UserName + "\r\nGroup: " + database.UserGroup + "\r\nAdmins: " + database.DatenbankAdmin.JoinWith(";"));
                         MessageBox.Show("Die folgende Spalte enthält einen Fehler:<br>" + thisColumnItem.ErrorReason() + "<br><br>Bitte reparieren.", ImageCode.Information, "OK");
                         OpenColumnEditor(thisColumnItem, null);
                     }
@@ -140,7 +146,7 @@ public partial class TableView : Form {
     /// Löst das DatabaseLoadedEvengt aus, weil es fast einem Neuladen gleichkommt.
     /// </summary>
     /// <param name="db"></param>
-    public static void OpenDatabaseHeadEditor(Database db) {
+    public static void OpenDatabaseHeadEditor(DatabaseAbstract db) {
         db.OnConnectedControlsStopAllWorking(null, new MultiUserFileStopWorkingEventArgs());
         if (!db.IsLoading) { db.Load_Reload(); } // Die Routine wird evtl. in der Laderoutine aufgerufen. z.B. bei Fehlerhaften Regeln
         using DatabaseHeadEditor w = new(db);
@@ -148,7 +154,7 @@ public partial class TableView : Form {
         // DB.OnLoaded(new LoadedEventArgs(true));
     }
 
-    public static void OpenLayoutEditor(Database db, string layoutToOpen) {
+    public static void OpenLayoutEditor(DatabaseAbstract db, string layoutToOpen) {
         var x = db.ErrorReason(ErrorReason.EditNormaly);
         if (!string.IsNullOrEmpty(x)) {
             MessageBox.Show(x);
@@ -160,7 +166,7 @@ public partial class TableView : Form {
         w.ShowDialog();
     }
 
-    public static ItemCollectionList Vorgängerversionen(Database db) {
+    public static ItemCollectionList Vorgängerversionen(DatabaseAbstract db) {
         List<string> zusatz = new();
         ItemCollectionList l = new();
         foreach (var thisExport in db.Export) {
@@ -176,13 +182,6 @@ public partial class TableView : Form {
                     }
                 });
 
-                //foreach (var ThisString in ThisExport.BereitsExportiert) {
-                //    var t = ThisString.SplitAndCutBy("|");
-                //    if (FileExists(t[0])) {
-                //        var q1 = QuickImage.Get(ImageCode.Kugel, 16, Extensions.MixColor(Color.Red, Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / ThisExport.AutoDelete).ToHTMLCode(), "");
-                //        L.Add(t[1], t[0], q1, true, t[1].CompareKey(enSortierTyp.Datum_Uhrzeit));
-                //    }
-                //}
                 zusatz.AddRange(Directory.GetFiles(thisExport.Verzeichnis, db.Filename.FileNameWithoutSuffix() + "_*.MDB"));
             }
         }
@@ -202,14 +201,17 @@ public partial class TableView : Form {
         }
     }
 
-    protected void AddTabPage(string filename) {
+    /// <summary>
+    /// Erstellt einen Reiter mit den nötigen Tags um eine Datenbank laden zu können - lädt die Datenbank aber selbst nicht.
+    /// </summary>
+    /// <param name="connectionID"></param>
+    protected void AddTabPage(string connectionID) {
         var NTabPage = new System.Windows.Forms.TabPage {
             Name = tbcDatabaseSelector.TabCount.ToString(),
-            Text = filename.FileNameWithoutSuffix(),
-            Tag = new List<string>() { filename, string.Empty }
+            Text = connectionID.FileNameWithoutSuffix(),
+            Tag = new List<string>() { connectionID, string.Empty }
         };
         tbcDatabaseSelector.Controls.Add(NTabPage);
-        //return NTabPage;
     }
 
     protected virtual void btnCSVClipboard_Click(object sender, System.EventArgs e) {
@@ -294,7 +296,7 @@ public partial class TableView : Form {
         FilterLeiste.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
     }
 
-    protected virtual void DatabaseSet(Database? database, string toParse) {
+    protected virtual void DatabaseSet(DatabaseAbstract? database, string toParse) {
         if (Table.Database != database) {
             Formula.ConnectedFormula = null;
         }
@@ -376,15 +378,14 @@ public partial class TableView : Form {
     /// Sucht den Tab mit der angegebenen Datenbank.
     /// Ist kein Reiter vorhanden, wird ein neuer erzeugt.
     /// </summary>
-    /// <param name="filename"></param>
+    /// <param name="connectionId"></param>
     /// <returns></returns>
-    protected bool SwitchTabToDatabase(string filename) {
-        if (string.IsNullOrEmpty(filename)) { return false; }
-        if (!FileExists(filename)) { return false; }
+    protected bool SwitchTabToDatabase(string connectionId) {
+        if (string.IsNullOrEmpty(connectionId)) { return false; }
 
         foreach (var thisT in tbcDatabaseSelector.TabPages) {
             if (thisT is System.Windows.Forms.TabPage tp && tp.Tag is List<string> s) {
-                if (s[0].Equals(filename, StringComparison.OrdinalIgnoreCase)) {
+                if (s[0].Equals(connectionId, StringComparison.OrdinalIgnoreCase)) {
                     tbcDatabaseSelector.SelectedTab = tp;
 
                     if (_firstOne) {
@@ -397,33 +398,13 @@ public partial class TableView : Form {
             }
         }
 
-        AddTabPage(filename);
-        return SwitchTabToDatabase(filename);
+        AddTabPage(connectionId);
+        return SwitchTabToDatabase(connectionId); // Rekursiver Aufruf, nun sollt der Tab ja gefunden werden.
     }
 
-    //protected bool ShowDatabase(string dbName) {
-    //    var found = -1;
-    //    var db = EnsureLoaded(dbName, true);
-    //    if (db == null) {
-    //        DebugPrint(FehlerArt.Warnung, "Datenbank '" + dbName + "' nicht gefunden");
-    //        return false;
-    //    }
-    //    for (var count = 0; count < tbcDatabaseSelector.TabCount; count++) {
-    //        if (tbcDatabaseSelector.TabPages[count].Text.ToUpper() == dbName.ToUpper()) {
-    //            found = count;
-    //        }
-    //    }
-    //    if (found >= 0) {
-    //        tbcDatabaseSelector.SelectedIndex = found;
-    //        return true;
-    //    }
-    //    AddTabPagex(db.Filename);
-    //    tbcDatabaseSelector.SelectedIndex = tbcDatabaseSelector.TabCount - 1;
-    //    return true;
-    //}
-    protected bool SwitchTabToDatabase(Database? database) {
+    protected bool SwitchTabToDatabase(DatabaseAbstract? database) {
         if (database == null) { return false; }
-        return SwitchTabToDatabase(database.Filename);
+        return SwitchTabToDatabase(database.ConnectionID);
     }
 
     protected virtual void TableView_ContextMenu_Init(object sender, ContextMenuInitEventArgs e) {
@@ -664,7 +645,7 @@ public partial class TableView : Form {
 
         if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
 
-        var db = new Database(false);
+        var db = new Database(false, string.Empty);
         db.SaveAsAndChangeTo(SaveTab.FileName);
         SwitchTabToDatabase(SaveTab.FileName);
     }
@@ -684,20 +665,18 @@ public partial class TableView : Form {
     private void btnSaveAs_Click(object sender, System.EventArgs e) {
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
 
-        if (Table.Database == null) { return; }
+        if (Table.Database is Database db) {
+            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
 
-        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+            SaveTab.ShowDialog();
+            if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
+            if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
-        SaveTab.ShowDialog();
-        if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
-        if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
+            if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
 
-        if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
-
-        var db = Table.Database;
-
-        db.SaveAsAndChangeTo(SaveTab.FileName);
-        SwitchTabToDatabase(SaveTab.FileName);
+            db.SaveAsAndChangeTo(SaveTab.FileName);
+            SwitchTabToDatabase(SaveTab.FileName);
+        }
     }
 
     private void btnSaveLoad_Click(object sender, System.EventArgs e) {
@@ -795,6 +774,7 @@ public partial class TableView : Form {
 
     private void btnVorherigeVersion_Click(object sender, System.EventArgs e) {
         btnVorherigeVersion.Enabled = false;
+
         if (_originalDb != null && Table.Database != _originalDb) {
             _originalDb.Disposing -= _originalDB_Disposing;
             Table.DatabaseSet(_originalDb, string.Empty);
@@ -816,7 +796,7 @@ public partial class TableView : Form {
             return;
         }
 
-        Table.DatabaseSet(Database.GetByFilename(files[0], false, true, null), string.Empty);
+        Table.DatabaseSet(Database.GetByID(files[0], false, true, Table.Database, files[0].FileNameWithoutSuffix()), string.Empty);
         _originalDb = merker;
         _originalDb.Disposing += _originalDB_Disposing;
         btnVorherigeVersion.Text = "zurück";
@@ -845,7 +825,7 @@ public partial class TableView : Form {
         Table.Arrangement = int.Parse(e.Item.Internal);
     }
 
-    private void ChangeDatabase(Database? database) {
+    private void ChangeDatabase(DatabaseAbstract? database) {
         if (_originalDb != null) {
             _originalDb.Disposing -= _originalDB_Disposing;
         }
@@ -948,8 +928,6 @@ public partial class TableView : Form {
         }
     }
 
-    public SQLBackAbstract? CopyToSQL { get; set; } = null;
-
     private void LoadTab_FileOk(object sender, CancelEventArgs e) => SwitchTabToDatabase(LoadTab.FileName);
 
     private string NameRepair(string istName, RowItem? vRow) {
@@ -966,10 +944,10 @@ public partial class TableView : Form {
         } while (true);
     }
 
-    private void SetFormula(Database? db) {
-        if (db != null) {
-            Formula.GetConnectedFormulaFromDatabase(db);
-            Formula.Database = db;
+    private void SetFormula(DatabaseAbstract? database) {
+        if (database != null) {
+            Formula.GetConnectedFormulaFromDatabase(database);
+            Formula.Database = database;
             return;
         }
 
@@ -1051,6 +1029,11 @@ public partial class TableView : Form {
         e.TabPage.Tag = s;
     }
 
+    /// <summary>
+    /// Diese Routine lädt die Datenbank, falls nötig.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void tbcDatabaseSelector_Selected(object? sender, System.Windows.Forms.TabControlEventArgs e) {
         Table.ShowWaitScreen = true;
         tbcDatabaseSelector.Enabled = false;
@@ -1063,12 +1046,17 @@ public partial class TableView : Form {
 
         var s = (List<string>)(e.TabPage.Tag);
 
-        var DB = Database.GetByFilename(s[0], false, false, CopyToSQL);
+        var DB = Database.GetByID(s[0], false, false, null, s[0].FileNameWithoutSuffix());
 
         if (DB != null) {
-            btnLetzteDateien.AddFileName(DB.Filename, string.Empty);
-            LoadTab.FileName = DB.Filename;
-            e.TabPage.Text = DB.Filename.FileNameWithoutSuffix();
+            if (!string.IsNullOrEmpty(DB.Filename)) {
+                btnLetzteDateien.AddFileName(DB.Filename, string.Empty);
+            } else {
+                btnLetzteDateien.AddFileName(DB.ConnectionID, string.Empty);
+            }
+
+            LoadTab.FileName = DB.ConnectionID;
+            e.TabPage.Text = DB.TableName;
         }
 
         DatabaseSet(DB, s[1]);

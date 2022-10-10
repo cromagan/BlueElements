@@ -48,7 +48,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
 
     private string _columnName = string.Empty;
 
-    private Database? _database;
+    private DatabaseAbstract? _database;
 
     private long _rowKey = -1;
 
@@ -63,7 +63,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     // Für den Designer
     public FlexiControlForCell() : this(null, -1, ÜberschriftAnordnung.Über_dem_Feld, EditTypeFormula.None) { }
 
-    public FlexiControlForCell(Database? database, long columnKey, ÜberschriftAnordnung captionPosition, EditTypeFormula editType) : base() {
+    public FlexiControlForCell(DatabaseAbstract? database, long columnKey, ÜberschriftAnordnung captionPosition, EditTypeFormula editType) : base() {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -120,7 +120,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public Database? Database {
+    public DatabaseAbstract? Database {
         get => _database;
         set {
             if (value == _database) { return; }
@@ -526,7 +526,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         } else {
             if (column == null) { return null; }  // Bei Steuerelementen, die manuell hinzugefügt werden
             if (row == null) { return null; }  // Beim initualisieren des Controls und Linked Cell kann das vorkommen
-            Develop.DebugPrint("Column nicht gefunden: " + column.Name + " " + column.Database.Filename);
+            Develop.DebugPrint("Column nicht gefunden: " + column.Name + " " + column.Database.ConnectionID);
         }
 
         return gbColumn;

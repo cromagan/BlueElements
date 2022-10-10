@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueDatabase;
@@ -27,7 +29,7 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
 {
     #region Fields
 
-    private Database? _database;
+    private DatabaseAbstract? _database;
 
     #endregion
 
@@ -41,7 +43,7 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
 
     #region Properties
 
-    public Database? Database {
+    public DatabaseAbstract? Database {
         get => _database;
         set {
             if (_database != null) {

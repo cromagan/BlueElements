@@ -26,8 +26,8 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading;
-using static BlueBasics.IO;
 using static BlueBasics.Generic;
+using static BlueBasics.IO;
 
 namespace BlueBasics.MultiUserFile;
 
@@ -58,6 +58,7 @@ public sealed class MultiUserFile : IDisposableExtended {
     private string _lastSaveCode;
     private DateTime _lastUserActionUtc = new(1900, 1, 1);
     private int _loadingThreadId = -1;
+    private object _lockload = new();
     private FileSystemWatcher? _watcher;
 
     #endregion
@@ -122,8 +123,6 @@ public sealed class MultiUserFile : IDisposableExtended {
 
     public event EventHandler<MultiUserParseEventArgs> ParseExternal;
 
-    public event EventHandler RepairAfterParse;
-
     public event EventHandler SavedToDisk;
 
     /// <summary>
@@ -162,8 +161,6 @@ public sealed class MultiUserFile : IDisposableExtended {
     public bool IsInSaveingLoop { get; private set; }
 
     public bool IsLoading { get; private set; }
-
-    public bool IsParsing { get; private set; }
 
     public bool IsSaving { get; private set; }
 
@@ -324,7 +321,7 @@ public sealed class MultiUserFile : IDisposableExtended {
             if (DateTime.UtcNow.Subtract(_lastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; }  // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
             if (_pureBinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
             if (_backgroundWorker.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell das Neuladen."; }
-            if (IsParsing) { return "Es werden aktuell Daten geparsed."; }
+            //if (IsLoading) { return "Es werden bereits Daten geladen."; }
             //if (BlockDiskOperations()) { return "Reload unmöglich, vererbte Klasse gab Fehler zurück"; }
             return string.Empty;
         }
@@ -447,56 +444,76 @@ public sealed class MultiUserFile : IDisposableExtended {
     /// Ein bereits eventuell bestehender Ladevorgang wird abgewartet.
     /// </summary>
     public void Load_Reload() {
+        if (string.IsNullOrEmpty(Filename)) { return; }
         WaitLoaded(true);
 
-        if (string.IsNullOrEmpty(Filename)) { return; }
+        lock (_lockload) {
+            IsLoading = true;
+            _loadingThreadId = Thread.CurrentThread.ManagedThreadId;
 
-        IsLoading = true;
-        _loadingThreadId = Thread.CurrentThread.ManagedThreadId;
+            //// Wichtig, das _LastSaveCode geprüft wird, das ReloadNeeded im EasyMode immer false zurück gibt.
+            //if (!string.IsNullOrEmpty(_LastSaveCode) && !ReloadNeeded) { IsLoading = false; return; }
+            //var OnlyReload = !string.IsNullOrEmpty(_LastSaveCode);
+            if (_initialLoadDone && !ReloadNeeded) {
+                IsLoading = false;
+                return;
+            } // Wird in der Schleife auch geprüft
 
-        //// Wichtig, das _LastSaveCode geprüft wird, das ReloadNeeded im EasyMode immer false zurück gibt.
-        //if (!string.IsNullOrEmpty(_LastSaveCode) && !ReloadNeeded) { IsLoading = false; return; }
-        //var OnlyReload = !string.IsNullOrEmpty(_LastSaveCode);
-        if (_initialLoadDone && !ReloadNeeded) { IsLoading = false; return; } // Wird in der Schleife auch geprüft
+            LoadingEventArgs ec = new(_initialLoadDone);
+            OnLoading(ec);
 
-        LoadingEventArgs ec = new(_initialLoadDone);
-        OnLoading(ec);
+            if (_initialLoadDone && ReadOnly && ec.TryCancel) {
+                IsLoading = false;
+                return;
+            }
 
-        if (_initialLoadDone && ReadOnly && ec.TryCancel) { IsLoading = false; return; }
+            var (bLoaded, tmpLastSaveCode) = LoadBytesFromDisk(Enums.ErrorReason.Load);
+            if (bLoaded == null) {
+                IsLoading = false;
+                return;
+            }
 
-        var (bLoaded, tmpLastSaveCode) = LoadBytesFromDisk(Enums.ErrorReason.Load);
-        if (bLoaded == null) { IsLoading = false; return; }
-        //_data_On_Disk = bLoaded;
-        //PrepeareDataForCheckingBeforeLoad();
-        ParseInternal(bLoaded);
-        _lastSaveCode = tmpLastSaveCode; // initialize setzt zurück
+            OnParseExternal(bLoaded);
 
-        var onlyReload = _initialLoadDone;
-        _initialLoadDone = true;
-        _checkedAndReloadNeed = false;
+            _lastSaveCode = tmpLastSaveCode; // initialize setzt zurück
 
-        //CheckDataAfterReload();
-        OnLoaded(new LoadedEventArgs(onlyReload));
-        RepairOldBlockFiles();
+            var onlyReload = _initialLoadDone;
+            _initialLoadDone = true;
+            _checkedAndReloadNeed = false;
 
-        IsLoading = false;
-        WaitLoaded(true); // nur um BlockReload neu zu setzen
+            //CheckDataAfterReload();
+            RepairOldBlockFiles();
+
+            IsLoading = false;
+
+            OnLoaded(new LoadedEventArgs(onlyReload));
+            BlockReload(false);
+        }
     }
 
     public void LoadFromStream(Stream stream) {
-        OnLoading(new LoadingEventArgs(false));
-        byte[] bLoaded;
-        using (BinaryReader r = new(stream)) {
-            bLoaded = r.ReadBytes((int)stream.Length);
-            r.Close();
+        lock (_lockload) {
+            IsLoading = true;
+
+            OnLoading(new LoadingEventArgs(false));
+            byte[] bLoaded;
+            using (BinaryReader r = new(stream)) {
+                bLoaded = r.ReadBytes((int)stream.Length);
+                r.Close();
+            }
+
+            if (bLoaded.Length > 4 && BitConverter.ToInt32(bLoaded, 0) == 67324752) {
+                // Gezipte Daten-Kennung gefunden
+                bLoaded = UnzipIt(bLoaded);
+            }
+
+            OnParseExternal(bLoaded);
+
+            IsLoading = false;
+
+            OnLoaded(new LoadedEventArgs(false));
+            BlockReload(false);
         }
-        if (bLoaded.Length > 4 && BitConverter.ToInt32(bLoaded, 0) == 67324752) {
-            // Gezipte Daten-Kennung gefunden
-            bLoaded = UnzipIt(bLoaded);
-        }
-        ParseInternal(bLoaded);
-        OnLoaded(new LoadedEventArgs(false));
-        RepairOldBlockFiles();
     }
 
     public void OnConnectedControlsStopAllWorking(MultiUserFileStopWorkingEventArgs e) {
@@ -622,22 +639,6 @@ public sealed class MultiUserFile : IDisposableExtended {
         }
     }
 
-    /// <summary>
-    /// Darf nur von einem Background-Thread aufgerufen werden.
-    /// Nach einer Minute wird der trotzdem diese Routine verlassen, vermutlich liegt dann ein Fehler vor,
-    /// da der Parse unabhängig vom Netzwerk ist
-    /// </summary>
-    public void WaitParsed() {
-        if (!Thread.CurrentThread.IsBackground) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Darf nur von einem BackgroundThread aufgerufen werden!");
-        }
-        var x = DateTime.Now;
-        while (IsParsing) {
-            Develop.DoEvents();
-            if (DateTime.Now.Subtract(x).TotalSeconds > 60) { return; }
-        }
-    }
-
     internal bool BlockDateiCheck() {
         if (AgeOfBlockDatei < 0) {
             //Develop.DebugPrint(enFehlerArt.Info, "Block-Datei Konflikt: Block-Datei zu jung\r\n" + Filename + "\r\nSoll: " + _inhaltBlockdatei);
@@ -654,17 +655,6 @@ public sealed class MultiUserFile : IDisposableExtended {
             return false;
         }
         return true;
-    }
-
-    internal void ParseInternal(byte[] bLoaded) {
-        if (IsParsing) { Develop.DebugPrint(FehlerArt.Fehler, "Doppelter Parse!"); }
-        IsParsing = true;
-        OnParseExternal(bLoaded);
-        IsParsing = false;
-        // Repair NACH ExecutePendung, vielleicht ist es schon repariert
-        // Repair NACH _isParsing, da es auch abgespeichert werden soll
-        //OnParsed();
-        OnRepairAfterParse();
     }
 
     protected void OnLoaded(LoadedEventArgs e) {
@@ -894,10 +884,6 @@ public sealed class MultiUserFile : IDisposableExtended {
         ParseExternal?.Invoke(this, new MultiUserParseEventArgs(toParse));
     }
 
-    private void OnRepairAfterParse() {
-        RepairAfterParse?.Invoke(this, System.EventArgs.Empty);
-    }
-
     private void OnSavedToDisk() {
         if (IsDisposed) { return; }
         SavedToDisk?.Invoke(this, System.EventArgs.Empty);
@@ -1049,7 +1035,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         var x = DateTime.Now;
         while (IsLoading) {
             Develop.DoEvents();
-            if (!hardmode && !IsParsing) { return; }
+            if (!hardmode) { return; }
             if (DateTime.Now.Subtract(x).TotalMinutes > 1) {
                 if (hardmode) {
                     Develop.DebugPrint(FehlerArt.Warnung, "WaitLoaded hängt: " + Filename);

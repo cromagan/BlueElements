@@ -17,8 +17,8 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Structures;
+using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 

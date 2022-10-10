@@ -27,19 +27,19 @@ public class VariableDatabase : Variable {
 
     #region Fields
 
-    private Database? _db;
+    private DatabaseAbstract? _db;
 
     #endregion
 
     #region Constructors
 
-    public VariableDatabase(string name, Database? value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) {
+    public VariableDatabase(string name, DatabaseAbstract? value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) {
         _db = value;
     }
 
     public VariableDatabase(string name) : this(name, null, true, false, string.Empty) { }
 
-    public VariableDatabase(Database? value) : this(DummyName(), value, true, false, string.Empty) { }
+    public VariableDatabase(DatabaseAbstract? value) : this(DummyName(), value, true, false, string.Empty) { }
 
     #endregion
 
@@ -48,7 +48,7 @@ public class VariableDatabase : Variable {
     public static string ShortName_Variable => "*dbs";
     public override int CheckOrder => 99;
 
-    public Database? Database {
+    public DatabaseAbstract? Database {
         get => _db;
         set {
             if (Readonly) { return; }

@@ -22,10 +22,10 @@ using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
+using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using System.Collections.Generic;
 using System.Linq;
-using BlueControls.ItemCollection.ItemCollectionList;
 
 namespace BlueControls.Forms;
 
@@ -34,7 +34,7 @@ public partial class RelationDiagram : PadEditor {
     #region Fields
 
     private readonly ColumnItem? _column;
-    private Database? _database;
+    private DatabaseAbstract? _database;
 
     #endregion
 
@@ -42,7 +42,7 @@ public partial class RelationDiagram : PadEditor {
 
     //private bool RelationsValid;
     //   Dim ItS As New Size(60, 80)
-    public RelationDiagram(Database? database) {
+    public RelationDiagram(DatabaseAbstract? database) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.

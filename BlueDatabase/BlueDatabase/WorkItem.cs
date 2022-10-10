@@ -231,7 +231,7 @@ public class WorkItem : IParseable {
         return "<b>alt: </b>" + a + "<b> <IMAGECODE=Pfeil_Rechts_Scrollbar|8|16> neu: </b>" + n + "     <i>(" + Date + ", " + User + ")</i>";
     }
 
-    internal bool LogsUndo(Database database) => database.Column.SearchByKey(ColKey) is ColumnItem c && c.ShowUndo;
+    internal bool LogsUndo(DatabaseAbstract database) => database.Column.SearchByKey(ColKey) is ColumnItem c && c.ShowUndo;
 
     #endregion
 }

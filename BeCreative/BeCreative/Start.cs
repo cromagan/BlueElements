@@ -30,9 +30,7 @@ public partial class Start : Form {
 
     #region Constructors
 
-    public Start() {
-        InitializeComponent();
-    }
+    public Start() => InitializeComponent();
 
     #endregion
 
@@ -55,33 +53,17 @@ public partial class Start : Form {
         TraceLogging_End();
     }
 
-    internal static System.Windows.Forms.Form? NewForm() {
-        return new Start();
-    }
+    internal static System.Windows.Forms.Form? NewForm() => new Start();
 
-    private void btnBildEditor_Click(object sender, System.EventArgs e) {
-        DoForm(new BluePaint.MainWindow(true));
-    }
+    private void btnBildEditor_Click(object sender, System.EventArgs e) => DoForm(new BluePaint.MainWindow(true));
 
-    private void btnDatenbank_Click(object sender, System.EventArgs e) {
-        DoForm(new TableView(null, true, true));
-    }
+    private void btnDatenbank_Click(object sender, System.EventArgs e) => DoForm(new TableView(null, true, true));
 
-    private void btnDatenbankSQL_Click(object sender, System.EventArgs e) {
-        DoForm(new SQL_TableView(null, true, true));
-    }
+    private void btnFormular_Click(object sender, System.EventArgs e) => DoForm(new ConnectedFormulaEditor());
 
-    private void btnFormular_Click(object sender, System.EventArgs e) {
-        DoForm(new ConnectedFormulaEditor());
-    }
+    private void btnHierachie_Click(object sender, System.EventArgs e) => DoForm(new RelationDiagram(null));
 
-    private void btnHierachie_Click(object sender, System.EventArgs e) {
-        DoForm(new RelationDiagram(null));
-    }
-
-    private void btnLayout_Click(object sender, System.EventArgs e) {
-        DoForm(new LayoutPadEditor((Database)null));
-    }
+    private void btnLayout_Click(object sender, System.EventArgs e) => DoForm(new LayoutPadEditor((Database)null));
 
     private void DoForm(Form frm) {
         FormManager.Current.RegisterForm(frm);

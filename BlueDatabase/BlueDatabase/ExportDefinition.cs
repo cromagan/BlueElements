@@ -66,18 +66,18 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
     /// <param name="typ"></param>
     /// <param name="backupinterval">Intervall der Backups in Tagen</param>
     /// <param name="autodelete">Das maximale Alter der Backups in Tagen, nachdem sie gelöscht werden</param>
-    public ExportDefinition(Database database, string verzeichnis, ExportTyp typ, float backupinterval, float autodelete) : this(database) {
+    public ExportDefinition(DatabaseAbstract database, string verzeichnis, ExportTyp typ, float backupinterval, float autodelete) : this(database) {
         _verzeichnis = verzeichnis;
         _typ = typ;
         _backupInterval = backupinterval;
         _autoDelete = autodelete;
     }
 
-    public ExportDefinition(Database database, string toParse) : this(database) {
+    public ExportDefinition(DatabaseAbstract database, string toParse) : this(database) {
         Parse(toParse);
     }
 
-    public ExportDefinition(Database database) {
+    public ExportDefinition(DatabaseAbstract database) {
         Database = database;
         Database.Disposing += Database_Disposing;
         _verzeichnis = string.Empty;
@@ -137,7 +137,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
     }
 
     public ListExt<string> BereitsExportiert { get; private set; }
-    public Database? Database { get; private set; }
+    public DatabaseAbstract? Database { get; private set; }
 
     public string ExportFormularId {
         get => _exportFormularId;
@@ -268,7 +268,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
     }
 
     public string ErrorReason() {
-        if (string.IsNullOrEmpty(Database.Filename)) {
+        if (string.IsNullOrEmpty(Database.Filename) && _typ != ExportTyp.EinzelnMitFormular) {
             return "Nur von Datenbanken, die auch auf der Festplatte gespeichert sind, kann ein Export stattfinden.";
         }
 

@@ -17,9 +17,9 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript;
 using BlueScript.Structures;
+using System.Collections.Generic;
 
 namespace BlueDatabase.AdditionalScriptComands;
 

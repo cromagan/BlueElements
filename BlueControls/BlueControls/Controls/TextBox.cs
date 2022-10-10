@@ -25,15 +25,15 @@ using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
-using BlueDatabase.EventArgs;
 
 namespace BlueControls.Controls;
 
@@ -109,7 +109,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     #region Properties
 
     [DefaultValue(AdditionalCheck.None)]
-    public AdditionalCheck AdditionalCheck { get; set; } = AdditionalCheck.None;
+    public AdditionalCheck AdditionalFormatCheck { get; set; } = AdditionalCheck.None;
 
     [DefaultValue("")]
     public string AllowedChars {
@@ -163,7 +163,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     [DefaultValue(false)]
-    public bool SpellChecking {
+    public bool SpellCheckingEnabled {
         get => _spellChecking;
         set {
             if (_spellChecking == value) { return; }
@@ -598,7 +598,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             }
         }
         Skin.Draw_Border(gr, _eTxt.Design, state, DisplayRectangle);
-        if (_mustCheck && !Dictionary.IsSpellChecking && Dictionary.DictionaryRunning(true) && !SpellChecker.CancellationPending && !SpellChecker.IsBusy) { SpellChecker.RunWorkerAsync(); }
+        if (_mustCheck && !Dictionary.IsSpellChecking && Dictionary.DictionaryRunning(!DesignMode) && !SpellChecker.CancellationPending && !SpellChecker.IsBusy) { SpellChecker.RunWorkerAsync(); }
     }
 
     protected virtual Design GetDesign() => Design.TextBox;
@@ -833,7 +833,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     private void CheckIfTextIsChanded(string newPlainText) {
         if (newPlainText == _lastCheckedText) { return; }
         _lastCheckedText = newPlainText;
-        if (Dictionary.DictionaryRunning(true)) { _mustCheck = true; }
+        if (Dictionary.DictionaryRunning(!DesignMode)) { _mustCheck = true; }
         OnTextChanged();
     }
 
@@ -1078,7 +1078,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             Dictionary.IsSpellChecking = true;
             if (!_spellChecking) { return; }
 
-            if (!Dictionary.DictionaryRunning(true)) { return; }
+            if (!Dictionary.DictionaryRunning(!DesignMode)) { return; }
             if (_eTxt == null) { return; }
 
             var pos = 0;

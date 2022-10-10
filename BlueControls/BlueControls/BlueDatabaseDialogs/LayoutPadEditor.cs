@@ -33,14 +33,14 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
 
     #region Fields
 
-    private Database? _database;
+    private DatabaseAbstract? _database;
 
     #endregion
 
     #region Constructors
 
     //private string _LoadedLayout = string.Empty;
-    public LayoutPadEditor(Database database) : base() {
+    public LayoutPadEditor(DatabaseAbstract database) : base() {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -56,7 +56,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
 
     #region Properties
 
-    public Database? Database {
+    public DatabaseAbstract? Database {
         get => _database;
         private set {
             if (value == _database) { return; }
@@ -185,7 +185,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
         if (!string.IsNullOrEmpty(Database.AdditionaFilesPfadWhole())) {
             ExecuteFile(Database.AdditionaFilesPfadWhole());
         }
-        ExecuteFile(Database.Filename.FilePath() + "Layouts\\");
+        ExecuteFile(Database.DefaultLayoutPath());
     }
 
     private void btnTextEditor_Click(object sender, System.EventArgs e) => ExecuteFile("notepad.exe", cbxLayout.Text, false);

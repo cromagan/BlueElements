@@ -19,13 +19,13 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using static BlueBasics.Converter;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using System;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.Globalization;
+using static BlueBasics.Converter;
 
 namespace BlueControls.Forms;
 

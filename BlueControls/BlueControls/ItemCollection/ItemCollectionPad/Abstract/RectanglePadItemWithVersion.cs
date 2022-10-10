@@ -18,12 +18,6 @@
 #nullable enable
 
 using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Controls;
-using BlueControls.EventArgs;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
@@ -44,9 +38,7 @@ public abstract class RectanglePadItemWithVersion : RectanglePadItem {
 
     #region Methods
 
-    public string DefaultItemToControlName() {
-        return Internal + "-" + Version;
-    }
+    public string DefaultItemToControlName() => Internal + "-" + Version;
 
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }

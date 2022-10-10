@@ -17,9 +17,9 @@
 
 #nullable enable
 
-using System;
 using BlueBasics;
 using BlueDatabase.EventArgs;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using static BlueBasics.IO;

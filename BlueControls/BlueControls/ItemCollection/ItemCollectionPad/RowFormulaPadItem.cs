@@ -34,7 +34,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
 
     #region Fields
 
-    private Database? _database;
+    private DatabaseAbstract? _database;
     private string _lastQuickInfo;
     private string _layoutId;
     private long _rowKey;
@@ -48,11 +48,11 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
 
     public RowFormulaPadItem(string internalname) : this(internalname, null, -1, string.Empty) { }
 
-    public RowFormulaPadItem(Database database, long rowkey) : this(database, rowkey, string.Empty) { }
+    public RowFormulaPadItem(DatabaseAbstract database, long rowkey) : this(database, rowkey, string.Empty) { }
 
-    public RowFormulaPadItem(Database database, long rowkey, string layoutId) : this(string.Empty, database, rowkey, layoutId) { }
+    public RowFormulaPadItem(DatabaseAbstract database, long rowkey, string layoutId) : this(string.Empty, database, rowkey, layoutId) { }
 
-    public RowFormulaPadItem(string internalname, Database? database, long rowkey, string layoutId) : base(internalname) {
+    public RowFormulaPadItem(string internalname, DatabaseAbstract? database, long rowkey, string layoutId) : base(internalname) {
         _database = database;
         if (_database != null) { _database.Disposing += _Database_Disposing; }
         _rowKey = rowkey;
@@ -137,7 +137,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
                 return true;
 
             case "database":
-                _database = Database.GetByFilename(value, false, false, null);
+                _database = DatabaseAbstract.GetByID(value.FromNonCritical(), false, false, null, value.FromNonCritical().FileNameWithoutSuffix());
                 _database.Disposing += _Database_Disposing;
                 return true;
 
@@ -174,7 +174,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
         var t = base.ToString();
         t = t.Substring(0, t.Length - 1) + ", ";
         t = t + "LayoutID=" + _layoutId.ToNonCritical() + ", ";
-        if (_database != null) { t = t + "Database=" + _database.Filename.ToNonCritical() + ", "; }
+        if (_database != null) { t = t + "Database=" + _database.ConnectionID.ToNonCritical() + ", "; }
         if (_rowKey != 0) { t = t + "RowKey=" + _rowKey + ", "; }
         if (Row is RowItem r) { t = t + "FirstValue=" + r.CellFirstString().ToNonCritical() + ", "; }
         return t.Trim(", ") + "}";

@@ -23,13 +23,13 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueScript;
+using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using BlueScript.Variables;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
@@ -45,7 +45,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposable {
 
     #region Constructors
 
-    public RowItem(Database? database, long key) {
+    public RowItem(DatabaseAbstract? database, long key) {
         Database = database;
         Key = key;
         _tmpQuickInfo = null;
@@ -55,7 +55,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposable {
         }
     }
 
-    public RowItem(Database database) : this(database, database.Row.NextRowKey()) { }
+    public RowItem(DatabaseAbstract database) : this(database, database.Row.NextRowKey()) { }
 
     #endregion
 
@@ -84,7 +84,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposable {
     /// </summary>
     public static bool DoingScript { get; private set; }
 
-    public Database? Database { get; private set; }
+    public DatabaseAbstract? Database { get; private set; }
     public long Key { get; }
 
     public string QuickInfo {
@@ -336,13 +336,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposable {
         if (startroutine == "script testing") { return (true, string.Empty, script); }
 
         // checkPerformed geht von Dateisystemfehlern aus
-        if (!string.IsNullOrEmpty(script.Error)) {
-            Database.OnScriptError(new RowCancelEventArgs(this, "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode));
-            return (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
+        if (script != null) {
+            if (!string.IsNullOrEmpty(script.Error)) {
+                Database.OnScriptError(new RowCancelEventArgs(this, "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode));
+                return (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
+            }
+
+            if (script.Variables == null || !((VariableBool)script.Variables.GetSystem("CellChangesEnabled")).ValueBool) { return (true, string.Empty, script); }
         }
-
-        if (script?.Variables == null || !((VariableBool)script.Variables.GetSystem("CellChangesEnabled")).ValueBool) { return (true, string.Empty, script); }
-
         // Dann die Abschließenden Korrekturen vornehmen
         foreach (var thisColum in Database.Column.Where(thisColum => thisColum != null)) {
             if (fullCheck) {
@@ -365,36 +366,35 @@ public sealed class RowItem : ICanBeEmpty, IDisposable {
             }
         }
 
-        List<string> cols = new();
         var infoTxt = "<b><u>" + CellGetString(Database.Column[0]) + "</b></u><br><br>";
 
-        var fs = script.Feedback.SplitAndCutByCrToList().SortedDistinctList();
-        foreach (var thiss in fs) {
-            cols.AddIfNotExists(thiss);
-            var t = thiss.SplitBy("|");
-            var thisc = Database.Column[t[0]];
-            if (thisc != null) {
-                infoTxt = infoTxt + "<b>" + thisc.ReadableText() + ":</b> " + t[1] + "<br><hr><br>";
+        if (script != null) {
+            List<string> cols = new();
+            var fs = script.Feedback.SplitAndCutByCrToList().SortedDistinctList();
+            foreach (var thiss in fs) {
+                cols.AddIfNotExists(thiss);
+                var t = thiss.SplitBy("|");
+                var thisc = Database.Column[t[0]];
+                if (thisc != null) {
+                    infoTxt = infoTxt + "<b>" + thisc.ReadableText() + ":</b> " + t[1] + "<br><hr><br>";
+                }
             }
+
+            if (cols.Count == 0) {
+                infoTxt += "Diese Zeile ist fehlerfrei.";
+            }
+
+            if (Database.Column.SysCorrect.SaveContent) {
+                if (IsNullOrEmpty(Database.Column.SysCorrect) || cols.Count == 0 != CellGetBoolean(Database.Column.SysCorrect)) {
+                    CellSet(Database.Column.SysCorrect, cols.Count == 0);
+                }
+            }
+            OnRowChecked(new RowCheckedEventArgs(this, cols));
+        } else {
+            infoTxt += "Kein Skript vorhanden.";
+            OnRowChecked(new RowCheckedEventArgs(this, null));
         }
 
-        //foreach (var thisc in Database.Column) {
-        //    var n = thisc.Name + "_error";
-        //    var va = BlueScript.Variablen.GetSystem(n);
-        //    if (va != null) {
-        //        cols.Add(thisc.Name + "|" + va.ValueString);
-        //        _InfoTXT = _InfoTXT + "<b>" + thisc.ReadableText() + ":</b> " + va.ValueString + "<br><hr><br>";
-        //    }
-        //}
-        if (cols.Count == 0) {
-            infoTxt += "Diese Zeile ist fehlerfrei.";
-        }
-        if (Database.Column.SysCorrect.SaveContent) {
-            if (IsNullOrEmpty(Database.Column.SysCorrect) || cols.Count == 0 != CellGetBoolean(Database.Column.SysCorrect)) {
-                CellSet(Database.Column.SysCorrect, cols.Count == 0);
-            }
-        }
-        OnRowChecked(new RowCheckedEventArgs(this, cols));
         return (true, infoTxt, script);
     }
 
@@ -503,8 +503,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposable {
     /// Führt alle Regeln aus und löst das Ereignis DoSpecialRules aus. Setzt ansonsten keine Änderungen, wie z.B. SysCorrect oder Runden-Befehle.
     /// </summary>
     /// <returns>Gibt Regeln, die einen Fehler verursachen zurück. z.B. SPALTE1|Die Splate darf nicht leer sein.</returns>
-    private Script DoRules(string startRoutine) {
+    private Script? DoRules(string startRoutine) {
         try {
+            if (Database == null || Database.IsDisposed || string.IsNullOrWhiteSpace(Database.RulesScript)) { return null; }
+
             List<Variable> vars = new()
             {
                 new VariableString("Startroutine", startRoutine, true, false, "ACHTUNG: Keinesfalls dürfen Startroutinenabhängig Werte verändert werden.\r\nMögliche Werte:\r\nnew row\r\nvalue changed\r\nscript testing\r\nmanual check\r\nto be sure\r\nimport\r\nexport\r\nscript"),
@@ -521,7 +523,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposable {
             vars.Add(new VariableString("Usergroup", Database.UserGroup, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
             vars.Add(new VariableBool("Administrator", Database.IsAdministrator(), true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
             vars.Add(new VariableDatabase("Database", Database, true, true, string.Empty));
-            vars.Add(new VariableString("DatabasePath", Database.Filename.FilePath(), true, false, "Der Dateipfad der Datenbank."));
+
+            if (!string.IsNullOrEmpty(Database.AdditionaFilesPfadWhole())) {
+                vars.Add(new VariableString("AdditionaFilesPfad", Database.AdditionaFilesPfadWhole(), true, false, "Der Dateipfad der Datenbank, in dem zusäzliche Daten gespeichert werden."));
+            }
+            //vars.Add(new VariableString("DatabasePath", Database.Filename2.FilePath(), true, false, "Der Dateipfad der Datenbank."));
 
             #endregion Variablen für Skript erstellen
 

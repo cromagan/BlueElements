@@ -42,7 +42,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposable {
 
     #region Constructors
 
-    public RowCollection(Database database) {
+    public RowCollection(DatabaseAbstract database) {
         Database = database;
         Database.Disposing += Database_Disposing;
         //Initialize();
@@ -77,7 +77,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposable {
     #region Properties
 
     public int Count => _internal.Count;
-    public Database? Database { get; private set; }
+    public DatabaseAbstract? Database { get; private set; }
 
     public long VisibleRowCount { get; private set; }
 
@@ -123,7 +123,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposable {
             var unique = ("X" + DateTime.Now.ToString("mm.fff") + x.ToString(Constants.Format_Integer5)).RemoveChars(Constants.Char_DateiSonderZeichen + ".");
             var ok = true;
 
-            foreach (var thisfile in Database.AllFiles) {
+            foreach (var thisfile in DatabaseAbstract.AllFiles) {
                 var row = thisfile.Row[unique];
                 if (row != null) { ok = false; break; }
             }

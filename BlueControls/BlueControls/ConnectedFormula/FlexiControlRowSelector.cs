@@ -53,7 +53,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
     #region Constructors
 
-    public FlexiControlRowSelector(Database? database, ItemCollectionPad parent, Database? filterdef, string caption, string showFormat) : base() {
+    public FlexiControlRowSelector(DatabaseAbstract? database, ItemCollectionPad parent, Database? filterdef, string caption, string showFormat) : base() {
         CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
         EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
 
@@ -81,7 +81,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
     #region Properties
 
     public ListExt<System.Windows.Forms.Control> Childs { get; } = new();
-    public Database? Database { get; set; }
+    public DatabaseAbstract? Database { get; set; }
 
     public RowItem? Row {
         get => IsDisposed ? null : _row;
@@ -171,7 +171,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         }
     }
 
-    private static void DoChilds_OneRowKey(IAcceptRowKey fcfc, RowItem? row, Database? database) {
+    private static void DoChilds_OneRowKey(IAcceptRowKey fcfc, RowItem? row, DatabaseAbstract? database) {
         // Normales Zellenfeld
         if (fcfc.IsDisposed) { return; }
 

@@ -38,13 +38,13 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable {
 
     #region Constructors
 
-    public ColumnViewCollection(Database database, string code) {
+    public ColumnViewCollection(DatabaseAbstract database, string code) {
         Database = database;
         Database.Disposing += Database_Disposing;
         Parse(code);
     }
 
-    public ColumnViewCollection(Database database, string code, string newname) {
+    public ColumnViewCollection(DatabaseAbstract database, string code, string newname) {
         Database = database;
         Database.Disposing += Database_Disposing;
         Parse(code);
@@ -55,7 +55,7 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable {
 
     #region Properties
 
-    public Database? Database { get; private set; }
+    public DatabaseAbstract? Database { get; private set; }
     public bool IsParsing { get; private set; }
 
     public string Name {
@@ -206,7 +206,7 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable {
     }
 
     public void ShowAllColumns() {
-        if (Database.IsParsing) { return; }
+        if (Database.IsLoading) { return; }
         var ok = true;
         for (var z = 0; z < Database.Column.Count; z++) {
             if (z >= Count) {

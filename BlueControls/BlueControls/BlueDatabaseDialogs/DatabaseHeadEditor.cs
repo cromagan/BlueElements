@@ -17,16 +17,13 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.MultiUserFile;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Forms;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
-using System.IO;
 using System.Linq;
 using static BlueBasics.Converter;
 using MessageBox = BlueControls.Forms.MessageBox;
@@ -37,17 +34,17 @@ public sealed partial class DatabaseHeadEditor {
 
     #region Fields
 
-    private Database? _database;
+    private DatabaseAbstract? _database;
     private bool _frmHeadEditorFormClosingIsin;
 
     #endregion
 
     #region Constructors
 
-    public DatabaseHeadEditor(Database cDatabase) {
+    public DatabaseHeadEditor(DatabaseAbstract database) {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
-        _database = cDatabase;
+        _database = database;
         _database.Disposing += Database_Disposing;
         _database.ShouldICancelSaveOperations += Database_ShouldICancelSaveOperations;
     }
@@ -204,91 +201,7 @@ public sealed partial class DatabaseHeadEditor {
         }
     }
 
-    private void btnAlleUndos_Click(object sender, System.EventArgs e) {
-        btnAlleUndos.Enabled = false;
-        var l = TableView.Vorgängerversionen(_database);
-        if (l.Count < 1) {
-            MessageBox.Show("Keine Vorgänger gefunden.");
-            return;
-        }
-        l.CheckBehavior = CheckBehavior.MultiSelection;
-        var alle = InputBoxListBoxStyle.Show("Datenbaken, die geladen werden sollen, wählen:", l, AddType.None, true);
-        if (alle.Count < 1) {
-            MessageBox.Show("Abbruch.");
-            btnAlleUndos.Enabled = true;
-            return;
-        }
-        var nDb = 0;
-        var x = Progressbar.Show("Lade Vorgänger Datenbanken", alle.Count);
-        foreach (var thisf in alle) {
-            nDb++;
-            x.Update(nDb);
-            var db = Database.GetByFilename(thisf, false, true, null);
-            var disp = db == null;
-            if (db == null) {
-                db = new Database(thisf, true, false, null);
-            }
-            if (db.Caption == _database.Caption) {
-                for (var n = 0; n < db.Works.Count; n++) {
-                    AddUndoToTable(db.Works[n], n, db.Filename.FileNameWithoutSuffix(), true);
-                }
-            }
-            if (disp) { db.Dispose(); }
-        }
-        x.Close();
-    }
-
     private void btnClipboard_Click(object sender, System.EventArgs e) => Generic.CopytoClipboard(tblUndo.Export_CSV(FirstRow.ColumnCaption));
-
-    private void btnFremdImport_Click(object sender, System.EventArgs e) {
-        if (_database.ReadOnly) { return; }
-        WriteInfosBack();
-        string getFromFile;
-        System.Windows.Forms.OpenFileDialog openFileDialog1 = new() {
-            CheckFileExists = true,
-            Filter = "Datenbanken|*.mdb"
-        };
-        if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
-            getFromFile = openFileDialog1.FileName;
-        } else {
-            return;
-        }
-        ItemCollectionList I = new()
-        {
-            { "Anordnungen der Spaltenansichten", ((int)DatabaseDataType.ColumnArrangement).ToString() },
-            //{ "Formulare", ((int)DatabaseDataType.Views).ToString() },
-            //I.Add("Regeln", ((int)enDatabaseDataType.Rules_ALT).ToString());
-            { "Undo-Speicher", ((int)DatabaseDataType.UndoInOne).ToString() },
-            { "Auto-Export", ((int)DatabaseDataType.AutoExport).ToString() },
-            //{ "Binäre Daten im Kopf der Datenbank", ((int)enDatabaseDataType.BinaryDataInOne).ToString() },
-            { "Eingebettete Layouts", ((int)DatabaseDataType.Layouts).ToString() },
-            { "Tags des Datenbankkopfes", ((int)DatabaseDataType.Tags).ToString() },
-            { "Standard-Sortierung", ((int)DatabaseDataType.SortDefinition).ToString() }
-        };
-        I.Sort();
-        var what = InputBoxComboStyle.Show("Welchen Code:", I, false);
-        if (string.IsNullOrEmpty(what)) { return; }
-        var b = MultiUserFile.UnzipIt(File.ReadAllBytes(getFromFile));
-        DatabaseDataType art = 0;
-        var pointer = 0;
-        long colKey = 0;
-        long rowKey = 0;
-        var x = 0;
-        var y = 0;
-        var inhalt = string.Empty;
-        var such = (DatabaseDataType)IntParse(what);
-        do {
-            if (pointer > b.Length) { break; }
-            _database.Parse(b, ref pointer, ref art, ref colKey, ref rowKey, ref inhalt, ref x, ref y);
-            if (such == art) {
-                _database.InjectCommand(art, inhalt);
-                //_Database.AddPending(Art, -1, -1, "", Inhalt, true);
-                MessageBox.Show("<b>Importiert:</b><br>" + inhalt, ImageCode.Information, "OK");
-            }
-        } while (art != DatabaseDataType.EOF);
-        RemoveDatabase();
-        Close();
-    }
 
     private void btnSave_Click(object sender, System.EventArgs e) {
         btnSave.Enabled = false;
@@ -337,13 +250,13 @@ public sealed partial class DatabaseHeadEditor {
     }
 
     private void GenerateInfoText() {
-        var t = "<b>Datei:</b><tab>" + _database.Filename + "<br>";
+        var t = "<b>Datei:</b><tab>" + _database.ConnectionID + "<br>";
         t = t + "<b>Zeilen:</b><tab>" + (_database.Row.Count() - 1);
         capInfo.Text = t.TrimEnd("<br>");
     }
 
     private void GenerateUndoTabelle() {
-        Database x = new(true);
+        Database x = new(true, "Undo " + _database.ConnectionID);
         x.Column.Add("hidden", "hidden", VarType.Text);
         x.Column.Add("Index", "Index", VarType.Integer);
         x.Column.Add("db", "Herkunft", VarType.Text);
@@ -362,17 +275,21 @@ public sealed partial class DatabaseHeadEditor {
             thisColumn.MultiLine = true;
             thisColumn.TextBearbeitungErlaubt = false;
             thisColumn.DropdownBearbeitungErlaubt = false;
-            thisColumn.BildTextVerhalten = BildTextVerhalten.Bild_oder_Text;
+            thisColumn.BehaviorOfImageAndText = BildTextVerhalten.Bild_oder_Text;
         }
-        x.RepairAfterParse(null, null);
+
+        x.RepairAfterParse();
         x.ColumnArrangements[1].ShowAllColumns();
         x.ColumnArrangements[1].Hide("hidden");
         x.ColumnArrangements[1].HideSystemColumns();
         x.SortDefinition = new RowSortDefinition(x, "Index", true);
         tblUndo.DatabaseSet(x, string.Empty);
         tblUndo.Arrangement = 1;
-        for (var n = 0; n < _database.Works.Count; n++) {
-            AddUndoToTable(_database.Works[n], n, string.Empty, false);
+
+        if (_database is Database db) {
+            for (var n = 0; n < db.Works.Count; n++) {
+                AddUndoToTable(db.Works[n], n, string.Empty, false);
+            }
         }
     }
 

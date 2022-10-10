@@ -23,13 +23,13 @@ using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollection.ItemCollectionList;
 using BlueScript;
+using BlueScript.Variables;
 using FastColoredTextBoxNS;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BlueControls.ItemCollection.ItemCollectionList;
-using BlueScript.Variables;
 using static BlueBasics.Extensions;
 
 namespace BlueControls;

@@ -29,7 +29,7 @@ public interface IInputFormat {
 
     #region Properties
 
-    public AdditionalCheck AdditionalCheck { get; set; }
+    public AdditionalCheck AdditionalFormatCheck { get; set; }
 
     //public enAlignmentHorizontal Align { get; set; }
     public string AllowedChars { get; set; }
@@ -43,7 +43,7 @@ public interface IInputFormat {
     public string Regex { get; set; }
 
     //public enSortierTyp SortType { get; set; }
-    public bool SpellChecking { get; set; }
+    public bool SpellCheckingEnabled { get; set; }
 
     public string Suffix { get; set; }
 
@@ -62,13 +62,13 @@ public static class IInputFormatExtensions {
     /// <param name="t"></param>
     /// <param name="source"></param>
     public static void GetStyleFrom(this IInputFormat? t, IInputFormat? source) {
-        t.AdditionalCheck = source.AdditionalCheck;
+        t.AdditionalFormatCheck = source.AdditionalFormatCheck;
         t.AllowedChars = source.AllowedChars;
         t.Prefix = source.Prefix;
         t.Regex = source.Regex;
         t.Suffix = source.Suffix;
         t.MultiLine = source.MultiLine;
-        t.SpellChecking = source.SpellChecking;
+        t.SpellCheckingEnabled = source.SpellCheckingEnabled;
         t.FormatierungErlaubt = source.FormatierungErlaubt;
     }
 
@@ -85,7 +85,7 @@ public static class IInputFormatExtensions {
             if (!string.IsNullOrEmpty(formatToCheck.AllowedChars) && !thisString.ContainsOnlyChars(formatToCheck.AllowedChars)) { return false; }
             if (!string.IsNullOrEmpty(formatToCheck.Regex) && !thisString.RegexMatch(formatToCheck.Regex)) { return false; }
 
-            switch (formatToCheck.AdditionalCheck) {
+            switch (formatToCheck.AdditionalFormatCheck) {
                 case AdditionalCheck.None:
                     break;
 
@@ -102,7 +102,7 @@ public static class IInputFormatExtensions {
                     break;
 
                 default:
-                    Develop.DebugPrint(formatToCheck.AdditionalCheck);
+                    Develop.DebugPrint(formatToCheck.AdditionalFormatCheck);
                     break;
             }
         }
@@ -110,13 +110,13 @@ public static class IInputFormatExtensions {
         //return l.All(thisString => string.IsNullOrEmpty(thisString) || thisString.IsFormat(format, additionalRegex));
     }
 
-    public static bool IsFormatIdentical(this IInputFormat t, IInputFormat source) => t.AdditionalCheck == source.AdditionalCheck &&
+    public static bool IsFormatIdentical(this IInputFormat t, IInputFormat source) => t.AdditionalFormatCheck == source.AdditionalFormatCheck &&
         t.AllowedChars == source.AllowedChars &&
         t.Prefix == source.Prefix &&
         t.Regex == source.Regex &&
         t.Suffix == source.Suffix &&
         t.MultiLine == source.MultiLine &&
-        t.SpellChecking == source.SpellChecking &&
+        t.SpellCheckingEnabled == source.SpellCheckingEnabled &&
         t.FormatierungErlaubt == source.FormatierungErlaubt;
 
     /// <summary>
@@ -132,8 +132,8 @@ public static class IInputFormatExtensions {
                 t.Suffix = string.Empty;
                 t.Prefix = string.Empty;
                 t.FormatierungErlaubt = false;
-                t.AdditionalCheck = AdditionalCheck.None;
-                t.SpellChecking = true;
+                t.AdditionalFormatCheck = AdditionalCheck.None;
+                t.SpellCheckingEnabled = true;
                 t.MultiLine = false;
                 return;
 
@@ -143,8 +143,8 @@ public static class IInputFormatExtensions {
                 t.Suffix = string.Empty;
                 t.Prefix = string.Empty;
                 t.FormatierungErlaubt = false;
-                t.AdditionalCheck = AdditionalCheck.None;
-                t.SpellChecking = false;
+                t.AdditionalFormatCheck = AdditionalCheck.None;
+                t.SpellCheckingEnabled = false;
                 t.MultiLine = false;
                 return;
 
@@ -154,8 +154,8 @@ public static class IInputFormatExtensions {
                 t.Suffix = string.Empty;
                 t.Prefix = string.Empty;
                 t.FormatierungErlaubt = true;
-                t.AdditionalCheck = AdditionalCheck.None;
-                t.SpellChecking = true;
+                t.AdditionalFormatCheck = AdditionalCheck.None;
+                t.SpellCheckingEnabled = true;
                 t.MultiLine = true;
                 return;
 
@@ -165,8 +165,8 @@ public static class IInputFormatExtensions {
                 t.Suffix = string.Empty;
                 t.Prefix = string.Empty;
                 t.FormatierungErlaubt = false;
-                t.AdditionalCheck = AdditionalCheck.DateTime;
-                t.SpellChecking = false;
+                t.AdditionalFormatCheck = AdditionalCheck.DateTime;
+                t.SpellCheckingEnabled = false;
                 t.MultiLine = false;
                 return;
 
@@ -177,8 +177,8 @@ public static class IInputFormatExtensions {
                 t.Suffix = string.Empty;
                 t.Prefix = string.Empty;
                 t.FormatierungErlaubt = false;
-                t.AdditionalCheck = AdditionalCheck.None;
-                t.SpellChecking = false;
+                t.AdditionalFormatCheck = AdditionalCheck.None;
+                t.SpellCheckingEnabled = false;
                 t.MultiLine = false;
                 return;
 
@@ -189,8 +189,8 @@ public static class IInputFormatExtensions {
                 t.Suffix = string.Empty;
                 t.Prefix = string.Empty;
                 t.FormatierungErlaubt = false;
-                t.AdditionalCheck = AdditionalCheck.None;
-                t.SpellChecking = false;
+                t.AdditionalFormatCheck = AdditionalCheck.None;
+                t.SpellCheckingEnabled = false;
                 t.MultiLine = false;
                 return;
 
@@ -201,8 +201,8 @@ public static class IInputFormatExtensions {
                 t.Suffix = string.Empty;
                 t.Prefix = string.Empty;
                 t.FormatierungErlaubt = false;
-                t.AdditionalCheck = AdditionalCheck.Float;
-                t.SpellChecking = false;
+                t.AdditionalFormatCheck = AdditionalCheck.Float;
+                t.SpellCheckingEnabled = false;
                 t.MultiLine = false;
                 return;
 
@@ -212,8 +212,8 @@ public static class IInputFormatExtensions {
                 t.Suffix = string.Empty;
                 t.Prefix = string.Empty;
                 t.FormatierungErlaubt = false;
-                t.AdditionalCheck = AdditionalCheck.Integer;
-                t.SpellChecking = false;
+                t.AdditionalFormatCheck = AdditionalCheck.Integer;
+                t.SpellCheckingEnabled = false;
                 t.MultiLine = false;
                 return;
 
@@ -224,8 +224,8 @@ public static class IInputFormatExtensions {
                 t.Suffix = string.Empty;
                 t.Prefix = string.Empty;
                 t.FormatierungErlaubt = false;
-                t.AdditionalCheck = AdditionalCheck.None;
-                t.SpellChecking = false;
+                t.AdditionalFormatCheck = AdditionalCheck.None;
+                t.SpellCheckingEnabled = false;
                 t.MultiLine = false;
                 return;
 
@@ -235,8 +235,8 @@ public static class IInputFormatExtensions {
                 t.Suffix = string.Empty;
                 t.Prefix = string.Empty;
                 t.FormatierungErlaubt = false;
-                t.AdditionalCheck = AdditionalCheck.DateTime;
-                t.SpellChecking = false;
+                t.AdditionalFormatCheck = AdditionalCheck.DateTime;
+                t.SpellCheckingEnabled = false;
                 t.MultiLine = false;
                 return;
 

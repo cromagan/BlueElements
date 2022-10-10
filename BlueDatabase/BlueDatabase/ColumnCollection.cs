@@ -31,7 +31,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
 
     #region Constructors
 
-    public ColumnCollection(Database database) : base() {
+    public ColumnCollection(DatabaseAbstract database) : base() {
         Database = database;
         Database.Disposing += Database_Disposing;
     }
@@ -40,7 +40,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
 
     #region Properties
 
-    public Database? Database { get; private set; }
+    public DatabaseAbstract? Database { get; private set; }
     public ColumnItem? SysChapter { get; private set; }
 
     public ColumnItem? SysCorrect { get; private set; }
@@ -104,14 +104,14 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         return originalString;
     }
 
-    [Obsolete("Direkter Aufruf nicht erlaubt!", true)]
-    public new ColumnItem? Add(ColumnItem column) => null;
+    //[Obsolete("Direkter Aufruf nicht erlaubt!", true)]
+    //public new ColumnItem? Add(ColumnItem column) => null;
 
     public ColumnItem Add(string internalName) => Add(NextColumnKey(), internalName, internalName, string.Empty, VarType.Text, string.Empty);
 
-    public ColumnItem Add(long colKey) => Add(colKey, string.Empty, string.Empty, string.Empty, VarType.Unbekannt, string.Empty);
+    public ColumnItem Add(long colKey) => Add(colKey, Freename(string.Empty), string.Empty, string.Empty, VarType.Unbekannt, string.Empty);
 
-    public ColumnItem Add() => Add(NextColumnKey(), string.Empty, string.Empty, string.Empty, VarType.Text, string.Empty);
+    public ColumnItem Add() => Add(NextColumnKey(), Freename(string.Empty), string.Empty, string.Empty, VarType.Text, string.Empty);
 
     public ColumnItem Add(string internalName, string caption, VarType format) => Add(NextColumnKey(), internalName, caption, string.Empty, format, string.Empty);
 
@@ -120,9 +120,15 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     public ColumnItem Add(string internalName, string caption, string suffix, VarType format) => Add(NextColumnKey(), internalName, caption, suffix, format, string.Empty);
 
     public ColumnItem Add(long colKey, string internalName, string caption, string suffix, VarType format, string quickinfo) {
-        Database.AddPending(DatabaseDataType.AddColumn, colKey, -1, string.Empty, colKey.ToString(), true);
+        if (!ColumnItem.IsValidColumnName(internalName)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht erlaubt!");
+        }
+
+        Database.ChangeData(DatabaseDataType.AddColumn, colKey, -1, string.Empty, colKey.ToString(), true);
         // Ruft anschließen AddFromParser Auf, der die Spalte endgültig dazumacht
+
         var c = SearchByKey(colKey);
+
         c.Name = internalName;
         c.Caption = caption;
         if (format != VarType.Unbekannt) { c.SetFormat(format); }
@@ -175,9 +181,9 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     }
 
     public void GenerateOverView() {
-        Html da = new(Database.Filename.FileNameWithoutSuffix());
+        Html da = new(Database.TableName);
         da.AddCaption("Spaltenliste von: " + Database.Caption);
-        da.Add("  <Font face=\"Arial\" Size=\"4\">" + Database.Filename + "</h1><br>");
+        da.Add("  <Font face=\"Arial\" Size=\"4\">" + Database.TableName + "</h1><br>");
         da.TableBeginn();
         da.RowBeginn();
         da.CellAdd("#");
@@ -197,7 +203,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
             da.CellAdd(lfdn.ToString());
             da.CellAdd(thisColumnItem.Name);
             da.CellAdd(thisColumnItem.Caption.Replace("\r", "<br>"));
-            da.CellAdd((thisColumnItem.Ueberschrift1 + "/" + thisColumnItem.Ueberschrift2 + "/" + thisColumnItem.Ueberschrift3 + "/").TrimEnd("/"));
+            da.CellAdd((thisColumnItem.CaptionGroup1 + "/" + thisColumnItem.CaptionGroup2 + "/" + thisColumnItem.CaptionGroup3 + "/").TrimEnd("/"));
             da.CellAdd(thisColumnItem.Format.ToString());
             da.CellAdd(thisColumnItem.Quickinfo.Replace("\r", "<br>"));
             da.CellAdd(thisColumnItem.AdminInfo.Replace("\r", "<br>"));
@@ -210,6 +216,10 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         da.Save(TempFile("", "Spaltenliste.html"), true);
     }
 
+    /// <summary>
+    /// Setzt die fest vermerkten Spalten zurück und durchsucht die Spalten nach dem Identifier.
+    /// Es werden nur die gefunden Spalten gemerkt - keine neuen erstellt!
+    /// </summary>
     public void GetSystems() {
         SysLocked = null;
         SysRowCreateDate = null;
@@ -218,6 +228,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         SysRowChanger = null;
         SysRowChangeDate = null;
         SysChapter = null;
+
         foreach (var thisColumnItem in this.Where(thisColumnItem => thisColumnItem != null)) {
             switch (thisColumnItem.Identifier) {
                 case "":
@@ -280,11 +291,11 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
                     if (base[s2] != null) {
                         // Evtl. Doppelte Namen einzigartig machen
                         if (string.Equals(base[s1].Name, base[s2].Name, StringComparison.OrdinalIgnoreCase)) {
-                            base[s2].Load(DatabaseDataType.ColumnName, base[s2].Name + "0");
+                            base[s2].Name = base[s2].Name + "0";
                         }
                         // Evtl. Doppelte Identifier eleminieren
                         if (!string.IsNullOrEmpty(base[s1].Identifier) && string.Equals(base[s1].Identifier, base[s2].Identifier, StringComparison.OrdinalIgnoreCase)) {
-                            base[s2].Load(DatabaseDataType.ColumnIdentify, string.Empty);
+                            base[s2].Identifier = string.Empty;
                         }
                     }
                 }
@@ -368,15 +379,6 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     //    return string.Empty;
     //}
 
-    internal void SaveToByteList(List<byte> list) {
-        //Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString());
-        for (var columnCount = 0; columnCount < Count; columnCount++) {
-            if (this[columnCount] != null && !string.IsNullOrEmpty(this[columnCount].Name)) {
-                this[columnCount].SaveToByteList(ref list);
-            }
-        }
-    }
-
     protected override void Dispose(bool disposing) {
         Database.Disposing -= Database_Disposing;
         Database = null;
@@ -387,8 +389,14 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         if (this.Any(thisColumn => thisColumn != null && string.Equals(thisColumn.Identifier, identifier, StringComparison.OrdinalIgnoreCase))) {
             return;
         }
-        var c = Add(identifier);
-        c.Load(DatabaseDataType.ColumnIdentify, identifier);
+
+        var nam = identifier.ToUpper();
+        nam = nam.Replace("SYSTEM: ", "SYS_");
+        nam = nam.Replace(" ", "");
+
+        var c = Add(nam);
+        c.Identifier = identifier;
+        //c.SetValueInternal(DatabaseDataType.ColumnIdentify, identifier);
         c.ResetSystemToDefault(true);
     }
 

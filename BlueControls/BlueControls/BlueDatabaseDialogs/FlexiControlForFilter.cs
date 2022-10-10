@@ -209,7 +209,7 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
         if (listFilterString.Count == 0) {
             cbx.Item.Add("Keine weiteren Einträge vorhanden", "|~", ImageCode.Kreuz, false);
         } else if (listFilterString.Count < 400) {
-            cbx.Item.AddRange(listFilterString, Filter.Column, ShortenStyle.Replaced, Filter.Column.BildTextVerhalten);
+            cbx.Item.AddRange(listFilterString, Filter.Column, ShortenStyle.Replaced, Filter.Column.BehaviorOfImageAndText);
             cbx.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
         } else {
             cbx.Item.Add("Zu viele Einträge", "|~", ImageCode.Kreuz, false);

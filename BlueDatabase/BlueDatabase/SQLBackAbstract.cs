@@ -52,7 +52,6 @@ public abstract class SQLBackAbstract {
 
     #region Fields
 
-    public const string Prefix_Table = "TAB_";
     public const string SYS_STYLE = "SYS_STYLE";
     public const string SYS_UNDO = "SYS_UNDO";
     protected DbConnection? _connection;
@@ -67,31 +66,52 @@ public abstract class SQLBackAbstract {
 
     #region Properties
 
+    public bool ConnectionOk => _connection != null;
+    public abstract string ConnectionString { get; protected set; }
+
+    /// <summary>
+    /// Falls die Datenbank von einer lokalen Datei geladen wurde, ist hier der Dateiname enthalten.
+    /// </summary>
+    public string Filename { get; protected set; } = string.Empty;
+
+    public abstract string ID { get; }
     public abstract string Primary { get; }
 
     public abstract string VarChar255 { get; }
 
-    //public string TableName { get; private set; } = string.Empty;
-    //private string _filename;
     public abstract string VarChar4000 { get; }
 
     #endregion
 
     #region Methods
 
+    public static bool IsValidTableName(string tablename) {
+        var t = tablename.ToUpper();
+
+        if (t.StartsWith("SYS_")) {
+            return false;
+        }
+
+        if (!t.ContainsOnlyChars(Constants.Char_AZ + Constants.Char_Numerals + "_")) {
+            return false;
+        }
+
+        return true;
+    }
+
     public bool AddUndo(string tablename, DatabaseDataType comand, long columnKey, long rowKey, string previousValue, string changedTo, string userName) {
         if (!OpenConnection()) { return false; }
 
         var cmdString = "INSERT INTO " + SYS_UNDO +
             " (TABLENAME, COMAND, COLUMNKEY, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, DATETIMEUTC) VALUES (" +
-            "'" + Prefix_Table + tablename.ToUpper() + "'," +
+            "'" + tablename.ToUpper() + "'," +
             "'" + ((int)comand).ToString() + "'," +
             "'" + columnKey.ToString() + "'," +
             "'" + rowKey.ToString() + "'," +
             "'" + previousValue + "'," +
             "'" + changedTo + "'," +
             "'" + userName + "'," +
-            "'" + DateTime.UtcNow.ToString(Constants.Format_Date) + ")";
+            "'" + DateTime.UtcNow.ToString(Constants.Format_Date) + "')";
 
         using var comm = _connection.CreateCommand();
         comm.CommandText = cmdString;
@@ -99,91 +119,6 @@ public abstract class SQLBackAbstract {
         return ExecuteCommand(comm);
     }
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="tablename">ohne Präfix</param>
-    /// <param name="type"></param>
-    /// <param name="value"></param>
-    /// <param name="column"></param>
-    /// <param name="row"></param>
-    /// <param name="width"></param>
-    /// <param name="height"></param>
-    /// <returns></returns>
-    public bool CheckIn(string tablename, DatabaseDataType type, string value, SQL_ColumnItem? column, SQL_RowItem? row, int width, int height) {
-        if (!OpenConnection()) { return false; }
-
-        if (column == null && row == null) {
-            switch (type) {
-                case DatabaseDataType.Formatkennung:
-                    break;
-
-                case DatabaseDataType.Werbung:
-                    break;
-
-                case DatabaseDataType.EOF:
-                    break;
-
-                case DatabaseDataType.co_SaveContent:
-                    break;
-
-                case DatabaseDataType.CryptionState:
-                    break;
-
-                case DatabaseDataType.CryptionTest:
-                    break;
-
-                default:
-                    return SetStyleData(tablename, type, string.Empty, value);
-            }
-
-            CloseConnection();
-            return true;
-        }
-
-        if (column != null && row == null) {
-            switch (type) {
-                //case DatabaseDataType.co_EditType: break;
-                case DatabaseDataType.co_SaveContent:
-                    break;
-
-                case DatabaseDataType.co_ShowUndo:
-                    break;
-
-                case DatabaseDataType.ColumnName:
-                    break;
-
-                default:
-                    if (type == DatabaseDataType.ColumnCaption) { AddColumnToMain(tablename, column.Name); }
-
-                    return SetStyleData(tablename, type, column.Name.ToUpper(), value);
-            }
-            CloseConnection();
-            return true;
-        }
-
-        if (column != null && row != null) {
-            SetCellValue(tablename, column, row, value);
-
-            CloseConnection();
-            return true;
-        }
-
-        CloseConnection();
-        return false;
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="tablename">ohne Präfix</param>
-    /// <param name="type"></param>
-    /// <param name="value"></param>
-    /// <param name="column"></param>
-    /// <param name="row"></param>
-    /// <param name="width"></param>
-    /// <param name="height"></param>
-    /// <returns></returns>
     public bool CheckIn(string tablename, DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
         if (!OpenConnection()) { return false; }
 
@@ -257,7 +192,6 @@ public abstract class SQLBackAbstract {
     /// <summary>
     /// Gibt die Spaltenname in Grosschreibung zurück
     /// </summary>
-    /// <param name="tablename">MIT Präfix TAB_ oder SYS_</param>
     /// <returns></returns>
     public List<string>? GetColumnNames(string tablename) {
         if (!OpenConnection()) { return null; }
@@ -283,7 +217,6 @@ public abstract class SQLBackAbstract {
     /// <summary>
     /// Wird kein Spaltenname angegeben, werden die Eigenschaften der Datenbank zurück gegeben.
     /// </summary>
-    /// <param name="tablename">Ohne Präfix TAB_</param>
     /// <param name="columnName"></param>
     /// <returns></returns>
     public Dictionary<string, string> GetStylDataAll(string tablename, string columnName) {
@@ -294,7 +227,7 @@ public abstract class SQLBackAbstract {
         using var q = _connection.CreateCommand();
         // (DBNAME, TYPE, COLUMNNAME, VALUE)
         q.CommandText = @"select TYPE, VALUE from " + SYS_STYLE + " " +
-                        "where TABLENAME = '" + Prefix_Table + tablename.ToUpper() + "' " +
+                        "where TABLENAME = '" + tablename.ToUpper() + "' " +
                         "and COLUMNNAME = '" + columnName.ToUpper() + "'";
 
         using var reader = q.ExecuteReader();
@@ -308,19 +241,12 @@ public abstract class SQLBackAbstract {
         return l;
     }
 
-    public abstract List<string> ListTables();
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="tablename">ohne Präfix</param>
-    /// <param name="row"></param>
-    public void LoadAllCells(string tablename, SQL_RowCollection row) {
+    public void LoadAllCells(string tablename, RowCollection row) {
         if (!OpenConnection()) { return; }
 
         using var q = _connection.CreateCommand();
 
-        q.CommandText = @"select * from " + Prefix_Table + tablename.ToUpper();
+        q.CommandText = @"select * from " + tablename.ToUpper();
 
         using var reader = q.ExecuteReader();
 
@@ -328,7 +254,7 @@ public abstract class SQLBackAbstract {
 
         while (reader.Read()) {
             var rk = LongParse(reader[0].ToString());
-            var r = new SQL_RowItem(row.Database, rk);
+            var r = new RowItem(row.Database, rk);
             row.Add(r);
 
             for (var z = 1; z < reader.FieldCount; z++) {
@@ -351,98 +277,20 @@ public abstract class SQLBackAbstract {
 
     public abstract SQLBackAbstract OtherTable(string tablename);
 
-    /// <summary>
-    /// Gibt TRUE zurück, wenn alles ok ist.
-    /// Entweder der Wert gesetzt wurde, der Wert aktuell ist oder der Wert unwichtig ist.
-    /// </summary>
-    /// <param name="tablename">ohne Präfix</param>
-    /// <param name="type"></param>
-    /// <param name="columnName"></param>
-    /// <param name="newValue"></param>
-    /// <returns></returns>
-    public bool SetStyleData(string tablename, DatabaseDataType type, string columnName, string newValue) {
-        var t = type.ToString();
-
-        if (t == ((int)type).ToString()) { return true; }
-
-        if (type == DatabaseDataType.AddColumn) { return true; } // enthält zwar den Key, aber Wertlos, wenn der Spaltenname noch nicht bekannt ist...
-        if (type == DatabaseDataType.AutoExport) { return true; }
-        if (type == DatabaseDataType.UndoInOne) { return true; }
-
-        return SetStyleData(tablename, t, columnName, newValue);
-    }
-
-    /// <summary>
-    /// Gibt TRUE zurück, wenn alles ok ist.
-    /// Entweder der Wert gesetzt wurde, der Wert aktuell ist oder der Wert unwichtig ist.
-    /// </summary>
-    /// <param name="tablename">ohne Präfix</param>
-    /// <param name="type"></param>
-    /// <param name="columnName"></param>
-    /// <param name="newValue"></param>
-    /// <returns></returns>
-    public bool SetStyleData(string tablename, string type, string columnName, string newValue) {
-        columnName = columnName.ToUpper();
-
-        var isVal = GetStyleData(tablename, type, columnName);
-
-        if (string.IsNullOrEmpty(columnName)) { columnName = "~Database~"; }
-
-        string cmdString;
-
-        if (isVal is null) {
-            cmdString = "INSERT INTO " + SYS_STYLE + " (TABLENAME, TYPE, COLUMNNAME, VALUE)  VALUES ('" + Prefix_Table + tablename.ToUpper() + "', '" + type + "', '" + columnName.ToUpper() + "', '" + newValue + "')";
-        } else if (isVal != newValue) {
-            cmdString = "UPDATE " + SYS_STYLE + " SET VALUE = '" + newValue + "' WHERE TABLENAME = '" + Prefix_Table + tablename.ToUpper() + "' AND TYPE = '" + type + "' AND COLUMNNAME = '" + columnName.ToUpper() + "'";
-        } else {
-            return true;
-        }
-
-        if (!OpenConnection()) { return false; }
-
-        return ExecuteCommand(cmdString);
-    }
-
-    protected bool CloseConnection() {
-        if (_connection.State == ConnectionState.Open) { _connection.Close(); }
-
-        return _connection.State == ConnectionState.Closed;
-    }
-
-    protected abstract bool CreateTable(string v);
-
-    protected abstract bool CreateTable(string v, List<string> list);
-
-    protected bool ExecuteCommand(string commandtext) {
-        if (!OpenConnection()) { return false; }
-
-        using var command = _connection.CreateCommand();
-        command.CommandText = commandtext;
-
-        return ExecuteCommand(command);
-    }
-
-    protected bool OpenConnection() {
-        if (_connection.State == ConnectionState.Closed) {
-            _connection.Open();
-        }
-
-        return _connection.State == ConnectionState.Open;
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="tablename">ohne Präfix</param>
-    protected void RepairAll(string tablename) {
+    public void RepairAll(string tablename) {
         Develop.StartService();
 
-        var x = ListTables();
+        if (!IsValidTableName(tablename)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Tabellename ungültig: " + tablename);
+            return;
+        }
+
+        var x = AllTables();
 
         #region Main
 
         if (!string.IsNullOrEmpty(tablename)) {
-            if (!x.Contains(Prefix_Table + tablename.ToUpper())) { CreateTable(Prefix_Table + tablename.ToUpper(), new List<string>() { "RK" }); }
+            if (!x.Contains(tablename.ToUpper())) { CreateTable(tablename.ToUpper(), new List<string>() { "RK" }); }
         }
 
         #endregion
@@ -479,33 +327,104 @@ public abstract class SQLBackAbstract {
     }
 
     /// <summary>
-    ///
+    /// Gibt TRUE zurück, wenn alles ok ist.
+    /// Entweder der Wert gesetzt wurde, der Wert aktuell ist oder der Wert unwichtig ist.
     /// </summary>
-    /// <param name="tablename">mit Präfix</param>
-    /// <param name="column"></param>
+    /// <param name="tablename"></param>
+    /// <param name="type"></param>
+    /// <param name="columnName"></param>
+    /// <param name="newValue"></param>
     /// <returns></returns>
+    public bool SetStyleData(string tablename, DatabaseDataType type, string columnName, string newValue) {
+        var t = type.ToString();
+
+        if (t == ((int)type).ToString()) { return true; }
+
+        if (type == DatabaseDataType.AddColumn) { return true; } // enthält zwar den Key, aber Wertlos, wenn der Spaltenname noch nicht bekannt ist...
+        if (type == DatabaseDataType.AutoExport) { return true; }
+        if (type == DatabaseDataType.UndoInOne) { return true; }
+
+        return SetStyleData(tablename, t, columnName, newValue);
+    }
+
+    /// <summary>
+    /// Gibt TRUE zurück, wenn alles ok ist.
+    /// Entweder der Wert gesetzt wurde, der Wert aktuell ist oder der Wert unwichtig ist.
+    /// </summary>
+    /// <param name="tablename"></param>
+    /// <param name="type"></param>
+    /// <param name="columnName"></param>
+    /// <param name="newValue"></param>
+    /// <returns></returns>
+    public bool SetStyleData(string tablename, string type, string columnName, string newValue) {
+        columnName = columnName.ToUpper();
+
+        var isVal = GetStyleData(tablename, type, columnName);
+
+        if (string.IsNullOrEmpty(columnName)) { columnName = "~Database~"; }
+
+        string cmdString;
+
+        if (isVal is null) {
+            cmdString = "INSERT INTO " + SYS_STYLE + " (TABLENAME, TYPE, COLUMNNAME, VALUE)  VALUES ('" + tablename.ToUpper() + "', '" + type + "', '" + columnName.ToUpper() + "', '" + newValue + "')";
+        } else if (isVal != newValue) {
+            cmdString = "UPDATE " + SYS_STYLE + " SET VALUE = '" + newValue + "' WHERE TABLENAME = '" + tablename.ToUpper() + "' AND TYPE = '" + type + "' AND COLUMNNAME = '" + columnName.ToUpper() + "'";
+        } else {
+            return true;
+        }
+
+        if (!OpenConnection()) { return false; }
+
+        return ExecuteCommand(cmdString);
+    }
+
+    public List<string> Tables() {
+        var l = AllTables();
+
+        l.Remove(SYS_STYLE);
+        l.Remove(SYS_UNDO);
+        return l;
+    }
+
+    protected abstract List<string> AllTables();
+
+    protected bool CloseConnection() {
+        if (_connection.State == ConnectionState.Open) { _connection.Close(); }
+
+        return _connection.State == ConnectionState.Closed;
+    }
+
+    protected abstract bool CreateTable(string tablename);
+
+    protected abstract bool CreateTable(string tablename, List<string> keycolumns);
+
+    protected bool ExecuteCommand(string commandtext) {
+        if (!OpenConnection()) { return false; }
+
+        using var command = _connection.CreateCommand();
+        command.CommandText = commandtext;
+
+        return ExecuteCommand(command);
+    }
+
+    protected bool OpenConnection() {
+        if (_connection.State == ConnectionState.Closed) {
+            _connection.Open();
+        }
+
+        return _connection.State == ConnectionState.Open;
+    }
+
     private bool AddColumn(string tablename, string column) => ExecuteCommand("alter table " + tablename.ToUpper() + " add " + column + " " + VarChar255 + " default '' NOT NULL");
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="tablename">mit Präfix</param>
-    /// <param name="column"></param>
-    /// <param name="type"></param>
-    /// <returns></returns>
     private bool AddColumn(string tablename, string column, string type) => ExecuteCommand("alter table " + tablename.ToUpper() + " add " + column + " " + type + " default '' NOT NULL");
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="tablename">ohne Präfix</param>
-    /// <param name="columnName"></param>
     private void AddColumnToMain(string tablename, string columnName) {
         columnName = columnName.ToUpper();
 
-        var colMain = GetColumnNames(Prefix_Table + tablename.ToUpper());
+        var colMain = GetColumnNames(tablename.ToUpper());
         if (colMain == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
-        if (!colMain.Contains(columnName)) { AddColumn(Prefix_Table + tablename.ToUpper(), columnName, VarChar4000); }
+        if (!colMain.Contains(columnName)) { AddColumn(tablename.ToUpper(), columnName, VarChar4000); }
     }
 
     private bool ExecuteCommand(DbCommand command) {
@@ -522,19 +441,12 @@ public abstract class SQLBackAbstract {
         }
     }
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="tablename">ohne Präfix</param>
-    /// <param name="column"></param>
-    /// <param name="row"></param>
-    /// <returns></returns>
-    private string? GetCellValue(string tablename, SQL_ColumnItem column, SQL_RowItem row) {
+    private string? GetCellValue(string tablename, ColumnItem column, RowItem row) {
         if (!OpenConnection()) { return null; }
 
         using var q = _connection.CreateCommand();
 
-        q.CommandText = @"select " + column.Name.ToUpper() + " from " + Prefix_Table + tablename.ToUpper() + " " +
+        q.CommandText = @"select " + column.Name.ToUpper() + " from " + tablename.ToUpper() + " " +
                         "where RK = '" + row.Key + "'";
 
         ////q.AddParameterWithValue("'"+columnName.ToUpper()+"'", column.Name.ToUpper());
@@ -547,36 +459,7 @@ public abstract class SQLBackAbstract {
 
             if (reader.Read()) {
                 // Doppelter Wert?!?Ersten Wert zurückgeben, um unendliche erweiterungen zu erhindern
-                Develop.DebugPrint(column.Key.ToString() + " doppelt in " + Prefix_Table + tablename.ToUpper() + " vorhanden!");
-            }
-
-            CloseConnection();
-            return value;
-        }
-
-        CloseConnection();    // Nix vorhanden!
-        return null;
-    }
-
-    private string? GetCellValue(string tablename, ColumnItem column, RowItem row) {
-        if (!OpenConnection()) { return null; }
-
-        using var q = _connection.CreateCommand();
-
-        q.CommandText = @"select " + column.Name.ToUpper() + " from " + Prefix_Table + tablename.ToUpper() + " " +
-                        "where RK = '" + row.Key + "'";
-
-        //q.AddParameterWithValue("'"+columnName.ToUpper()+"'", column.Name.ToUpper());
-        //q.AddParameterWithValue("'"+row.Key+"'", row.Key.ToString());
-
-        using var reader = q.ExecuteReader();
-        if (reader.Read()) {
-            // you may want to check if value is NULL: reader.IsDBNull(0)
-            var value = reader[0].ToString();
-
-            if (reader.Read()) {
-                // Doppelter Wert?!?Ersten Wert zurückgeben, um unendliche erweiterungen zu erhindern
-                Develop.DebugPrint(column.Key.ToString() + " doppelt in MAIN vorhanden!");
+                Develop.DebugPrint(column.Key.ToString() + " doppelt in " + tablename.ToUpper() + " vorhanden!");
             }
 
             CloseConnection();
@@ -595,7 +478,7 @@ public abstract class SQLBackAbstract {
         if (string.IsNullOrEmpty(columnName)) { columnName = "~Database~"; }
 
         q.CommandText = @"select VALUE from " + SYS_STYLE + " " +
-                        "where TABLENAME = '" + Prefix_Table + tablename.ToUpper() + "' " +
+                        "where TABLENAME = '" + tablename.ToUpper() + "' " +
                         "and TYPE = '" + type + "' " +
                         "and COLUMNNAME = '" + columnName.ToUpper() + "' ";
 
@@ -606,7 +489,7 @@ public abstract class SQLBackAbstract {
 
             if (reader.Read()) {
                 // Doppelter Wert?!?Ersten Wert zurückgeben, um unendliche erweiterungen zu erhindern
-                Develop.DebugPrint(Prefix_Table + tablename.ToUpper() + " " + type + " " + columnName + " doppelt in Style vorhanden!");
+                Develop.DebugPrint(tablename.ToUpper() + " " + type + " " + columnName + " doppelt in Style vorhanden!");
             }
 
             CloseConnection();
@@ -621,39 +504,17 @@ public abstract class SQLBackAbstract {
     /// Gibt TRUE zurück, wenn alles ok ist.
     /// Entweder der Wert gesetzt wurde, der Wert aktuell ist oder der Wert unwichtig ist.
     /// </summary>
-    /// <param name="tablename">ohne Präfix</param>
+    /// <param name="tablename"></param>
     /// <param name="type"></param>
     /// <param name="columnName"></param>
     /// <param name="newValue"></param>
     /// <returns></returns>
-    private bool SetCellValue(string tablename, SQL_ColumnItem column, SQL_RowItem row, string newValue) {
-        var isVal = GetCellValue(tablename, column, row);
-
-        string cmdString;
-
-        if (isVal is null) {
-            cmdString = "INSERT INTO " + Prefix_Table + tablename.ToUpper() + " (RK, " + column.Name.ToUpper() + " ) VALUES ('" + row.Key + "', '" + newValue + "' )";
-        } else if (isVal != newValue) {
-            cmdString = "UPDATE " + Prefix_Table + tablename.ToUpper() + " SET " + column.Name.ToUpper() + " = '" + newValue + "' WHERE RK = '" + row.Key + "'";
-        } else {
-            return true;
-        }
-
-        if (!OpenConnection()) { return false; }
-
-        using var comm = _connection.CreateCommand();
-        comm.CommandText = cmdString;
-        //comm.AddParameterWithValue("'"+row.Key+"'", row.Key);
-        //comm.AddParameterWithValue("'"+newValue+"'", newValue);
-
-        return ExecuteCommand(comm);
-    }
 
     /// <summary>
     /// Gibt TRUE zurück, wenn alles ok ist.
     /// Entweder der Wert gesetzt wurde, der Wert aktuell ist oder der Wert unwichtig ist.
     /// </summary>
-    /// <param name="tablename">ohne Präfix</param>
+    /// <param name="tablename"></param>
     /// <param name="type"></param>
     /// <param name="columnName"></param>
     /// <param name="newValue"></param>
@@ -664,9 +525,9 @@ public abstract class SQLBackAbstract {
         string cmdString;
 
         if (isVal is null) {
-            cmdString = "INSERT INTO " + Prefix_Table + tablename.ToUpper() + " (RK, " + column.Name.ToUpper() + " ) VALUES ('" + row.Key + "', '" + newValue + "' )";
+            cmdString = "INSERT INTO " + tablename.ToUpper() + " (RK, " + column.Name.ToUpper() + " ) VALUES ('" + row.Key + "', '" + newValue + "' )";
         } else if (isVal != newValue) {
-            cmdString = "UPDATE " + Prefix_Table + tablename.ToUpper() + " SET " + column.Name.ToUpper() + " = '" + newValue + "' WHERE RK = '" + row.Key + "'";
+            cmdString = "UPDATE " + tablename.ToUpper() + " SET " + column.Name.ToUpper() + " = '" + newValue + "' WHERE RK = '" + row.Key + "'";
         } else {
             return true;
         }

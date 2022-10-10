@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using static BlueBasics.Converter;
-using BlueScript.Structures;
-using BlueScript;
+﻿using BlueScript;
 using BlueScript.Methods;
+using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using static BlueBasics.Converter;
 
 #nullable enable
 

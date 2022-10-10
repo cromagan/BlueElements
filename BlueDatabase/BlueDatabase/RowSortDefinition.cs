@@ -34,25 +34,25 @@ public sealed class RowSortDefinition : IParseable {
     #region Fields
 
     public readonly ListExt<ColumnItem> Columns = new();
-    public Database Database;
+    public DatabaseAbstract Database;
 
     #endregion
 
     #region Constructors
 
-    public RowSortDefinition(Database database, string code) {
+    public RowSortDefinition(DatabaseAbstract database, string code) {
         Database = database;
         Parse(code);
     }
 
-    public RowSortDefinition(Database database, string columnName, bool reverse) {
+    public RowSortDefinition(DatabaseAbstract database, string columnName, bool reverse) {
         Database = database;
         Initialize();
         Reverse = reverse;
         SetColumn(new List<string> { columnName });
     }
 
-    public RowSortDefinition(Database database, List<string> columnNames, bool reverse) {
+    public RowSortDefinition(DatabaseAbstract database, List<string> columnNames, bool reverse) {
         Initialize();
         Database = database;
         Reverse = reverse;

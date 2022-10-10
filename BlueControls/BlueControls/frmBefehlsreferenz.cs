@@ -1,6 +1,6 @@
 ﻿using BlueScript;
-using System.Windows.Forms;
 using BlueScript.Methods;
+using System.Windows.Forms;
 
 namespace BlueControls;
 

@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using System.ComponentModel;
 using BlueControls.Enums;
-using System.Windows.Forms;
 using BlueControls.Interfaces;
 using BlueDatabase;
+using System.ComponentModel;
+using System.Windows.Forms;
 
 namespace BlueControls.Controls;
 
@@ -29,7 +29,7 @@ public class TabControl : AbstractTabControl, IAcceptRowKey {
 
     #region Fields
 
-    private Database? _database;
+    private DatabaseAbstract? _database;
 
     private long _rowkey = -1;
 
@@ -49,7 +49,7 @@ public class TabControl : AbstractTabControl, IAcceptRowKey {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public Database? Database {
+    public DatabaseAbstract? Database {
         get => _database;
         set {
             if (_database != value) {

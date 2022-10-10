@@ -35,14 +35,14 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
 
     #region Fields
 
-    private Database? _database;
+    private DatabaseAbstract? _database;
     private bool _disposedValue;
 
     #endregion
 
     #region Constructors
 
-    public CellCollection(Database database) : base() {
+    public CellCollection(DatabaseAbstract database) : base() {
         _database = database;
         _database.Disposing += _database_Disposing;
         //       Cell = New Dictionary(Of String, CellItem)
@@ -123,7 +123,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
             if (row.Database != column.Database) { return LanguageTool.DoTranslate("Interner Fehler: Bezug der Datenbank zur Zeile ist fehlerhaft."); }
 
             if (column.Database.PowerEdit.Subtract(DateTime.Now).TotalSeconds < 0) {
-                if (column != column.Database.Column.SysLocked && row.CellGetBoolean(column.Database.Column.SysLocked) && !column.EditTrotzSperreErlaubt) { return LanguageTool.DoTranslate("Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden."); }
+                if (column != column.Database.Column.SysLocked && row.CellGetBoolean(column.Database.Column.SysLocked) && !column.EditAllowedDespiteLock) { return LanguageTool.DoTranslate("Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden."); }
             }
         } else {
             //Auf neue Zeile wird geprüft
@@ -146,7 +146,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
             : string.Empty;
     }
 
-    public static (List<FilterItem> filter, string info) GetFilterFromLinkedCellData(Database linkedDatabase, ColumnItem column, RowItem? row) {
+    public static (List<FilterItem> filter, string info) GetFilterFromLinkedCellData(DatabaseAbstract linkedDatabase, ColumnItem column, RowItem? row) {
         var fi = new List<FilterItem>();
 
         for (var z = 0; z < Math.Min(column.LinkedCellFilter.Count, linkedDatabase.Column.Count); z++) {
@@ -268,7 +268,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
     public void DoSpecialFormats(ColumnItem? column, RowItem? row, string previewsValue, bool doAlways) {
         if (_database == null || _database.IsDisposed) { return; }
         if (row == null) { return; }
-        if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
+        if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.ConnectionID); }
 
         var currentValue = GetString(column, row);
 
@@ -376,8 +376,8 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
     public string GetString(ColumnItem? column, RowItem? row) // Main Method
     {
         try {
-            if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
-            if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + _database.Filename); }
+            if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.ConnectionID); }
+            if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + _database.ConnectionID); }
             if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 var (lcolumn, lrow, _) = LinkedCellData(column, row, false, false);
                 return lcolumn != null && lrow != null ? lrow.CellGetString(lcolumn) : string.Empty;
@@ -414,6 +414,20 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
     public bool IsNullOrEmpty(string cellKey) {
         DataOfCellKey(cellKey, out var column, out var row);
         return IsNullOrEmpty(column, row);
+    }
+
+    public void Load_310(ColumnItem? column, RowItem? row, string value, int width, int height) {
+        if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Row konnte nicht generiert werden."); }
+        if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Column konnte nicht generiert werden."); }
+        var cellKey = KeyOfCell(column, row);
+        if (ContainsKey(cellKey)) {
+            var c = this[cellKey];
+            c.Value = value; // Auf jeden Fall setzen. Auch falls es nachher entfernt wird, so ist es sicher leer
+            c.Size = width > 0 ? new Size(width, height) : Size.Empty;
+            if (string.IsNullOrEmpty(value)) { Remove(cellKey); }
+        } else {
+            Add(cellKey, new CellItem(value, width, height));
+        }
     }
 
     public bool MatchesTo(ColumnItem? column, RowItem? row, FilterItem filter) {
@@ -510,8 +524,8 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
     public void Set(ColumnItem? column, RowItem? row, string value) // Main Method
     {
         _database.BlockReload(false);
-        if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
-        if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!!<br>" + _database.Filename); }
+        if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.ConnectionID); }
+        if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!!<br>" + _database.ConnectionID); }
         if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             var (lcolumn, lrow, _) = LinkedCellData(column, row, true, !string.IsNullOrEmpty(value));
             lrow?.CellSet(lcolumn, value);
@@ -601,20 +615,6 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
         }
     }
 
-    internal void Load_310(ColumnItem? column, RowItem? row, string value, int width, int height) {
-        if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Row konnte nicht generiert werden."); }
-        if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Column konnte nicht generiert werden."); }
-        var cellKey = KeyOfCell(column, row);
-        if (ContainsKey(cellKey)) {
-            var c = this[cellKey];
-            c.Value = value; // Auf jeden Fall setzen. Auch falls es nachher entfernt wird, so ist es sicher leer
-            c.Size = width > 0 ? new Size(width, height) : Size.Empty;
-            if (string.IsNullOrEmpty(value)) { Remove(cellKey); }
-        } else {
-            Add(cellKey, new CellItem(value, width, height));
-        }
-    }
-
     internal void OnCellValueChanged(CellEventArgs e) {
         e.Column.UcaseNamesSortedByLenght = null;
         CellValueChanged?.Invoke(this, e);
@@ -638,13 +638,6 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
         }
     }
 
-    internal void SaveToByteList(ref List<byte> l) {
-        RemoveOrphans();
-        foreach (var thisString in this) {
-            _database.SaveToByteList(l, thisString);
-        }
-    }
-
     /// <summary>
     /// Diese Routine setzt dern Wert direkt in die Zelle. Verlinkete Zellen werden nicht weiter verfolgt.
     /// Deswegenkan nur mit dieser Routine der Cell-Link eingefügt werden.
@@ -659,12 +652,12 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
         _database.BlockReload(false);
         if (column == null || _database.Column.SearchByKey(column.Key) == null) {
             _database?.DevelopWarnung("Spalte ungültig!");
-            Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database?.Filename);
+            Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database?.ConnectionID);
             return;
         }
         if (row == null || _database?.Row.SearchByKey(row.Key) == null) {
             _database?.DevelopWarnung("Zeile ungültig!!");
-            Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!!<br>" + _database?.Filename);
+            Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!!<br>" + _database?.ConnectionID);
             return;
         }
 
@@ -676,7 +669,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
         if (value == oldValue) { return; }
 
         _database?.WaitEditable();
-        _database?.AddPending(DatabaseDataType.ce_Value_withoutSizeData, column.Key, row.Key, oldValue, value, true);
+        _database?.ChangeData(DatabaseDataType.ce_Value_withoutSizeData, column.Key, row.Key, oldValue, value, true);
         column.UcaseNamesSortedByLenght = null;
         DoSpecialFormats(column, row, oldValue, false);
         SystemSet(_database?.Column.SysRowChanger, row, _database?.UserName);
@@ -687,8 +680,8 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
     }
 
     internal void SystemSet(ColumnItem? column, RowItem? row, string value) {
-        if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
-        if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + _database.Filename); }
+        if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.ConnectionID); }
+        if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + _database.ConnectionID); }
         if (string.IsNullOrEmpty(column.Identifier)) { Develop.DebugPrint(FehlerArt.Fehler, "SystemSet nur bei System-Spalten möglich: " + ToString()); }
         if (!column.SaveContent) { return; }
         var cellKey = KeyOfCell(column, row);
@@ -699,7 +692,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
             Add(cellKey, new CellItem(string.Empty, 0, 0));
         }
         if (value == @string) { return; }
-        _database.AddPending(DatabaseDataType.ce_Value_withoutSizeData, column.Key, row.Key, @string, value, true);
+        _database.ChangeData(DatabaseDataType.ce_Value_withoutSizeData, column.Key, row.Key, @string, value, true);
     }
 
     private static bool CompareValues(string istValue, string filterValue, FilterType typ) {
@@ -771,7 +764,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
         }
     }
 
-    private static (ColumnItem? column, RowItem? row, string info) RepairLinkedCellValue(Database linkedDatabase, ColumnItem column, RowItem? row, bool addRowIfNotExists) {
+    private static (ColumnItem? column, RowItem? row, string info) RepairLinkedCellValue(DatabaseAbstract linkedDatabase, ColumnItem column, RowItem? row, bool addRowIfNotExists) {
         RowItem? targetRow = null;
 
         /// Spalte aus der Ziel-Datenbank ermitteln

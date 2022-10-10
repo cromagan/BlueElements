@@ -23,6 +23,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
+using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using System;
 using System.Collections.Generic;
@@ -30,7 +31,6 @@ using System.Drawing;
 using System.Drawing.Printing;
 using System.IO;
 using System.Windows.Forms;
-using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 
@@ -49,11 +49,11 @@ public sealed partial class ExportDialog {
 
     #region Constructors
 
-    public ExportDialog(Database db, string autosaveFile) : this(db, null, autosaveFile) { }
+    public ExportDialog(DatabaseAbstract db, string autosaveFile) : this(db, null, autosaveFile) { }
 
-    public ExportDialog(Database db, List<RowItem>? rows) : this(db, rows, string.Empty) { }
+    public ExportDialog(DatabaseAbstract db, List<RowItem>? rows) : this(db, rows, string.Empty) { }
 
-    public ExportDialog(Database db, List<RowItem>? rows, string autosaveFile) {
+    public ExportDialog(DatabaseAbstract db, List<RowItem>? rows, string autosaveFile) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -81,7 +81,7 @@ public sealed partial class ExportDialog {
 
     #region Properties
 
-    public Database? Database { get; private set; }
+    public DatabaseAbstract? Database { get; private set; }
 
     #endregion
 
@@ -89,7 +89,7 @@ public sealed partial class ExportDialog {
 
     #region Methods
 
-    public static void AddLayoutsOff(ItemCollectionList addHere, Database? database, bool addDiskLayouts) {
+    public static void AddLayoutsOff(ItemCollectionList addHere, DatabaseAbstract? database, bool addDiskLayouts) {
         if (database != null) {
             foreach (var t in database.Layouts) {
                 ItemCollectionPad p = new(t, string.Empty);

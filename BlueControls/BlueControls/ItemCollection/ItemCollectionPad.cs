@@ -23,6 +23,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
+using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -31,10 +32,9 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Windows.Forms;
-using BlueScript.Variables;
-using MessageBox = BlueControls.Forms.MessageBox;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollection;
 
@@ -83,7 +83,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         if (Skin.StyleDb != null) { _sheetStyle = Skin.StyleDb.Row.First(); }
     }
 
-    public ItemCollectionPad(string layoutId, Database? database, long rowkey) : this(database.Layouts[database.Layouts.LayoutIdToIndex(layoutId)], string.Empty) {
+    public ItemCollectionPad(string layoutId, DatabaseAbstract? database, long rowkey) : this(database.Layouts[database.Layouts.LayoutIdToIndex(layoutId)], string.Empty) {
         // Wenn nur die Row ankommt und diese null ist, kann gar nix generiert werden
         ResetVariables();
         ParseVariable(database.Row.SearchByKey(rowkey));

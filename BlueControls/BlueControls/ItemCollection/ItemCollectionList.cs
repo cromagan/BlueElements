@@ -17,10 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -29,6 +25,10 @@ using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 
 namespace BlueControls.ItemCollection.ItemCollectionList;
 
@@ -138,92 +138,6 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
 
     #region Methods
 
-    public static void GetItemCollection(ItemCollectionList? e, SQL_ColumnItem? column, SQL_RowItem? checkedItemsAtRow, ShortenStyle style, int maxItems) {
-        List<string> marked = new();
-        List<string> l = new();
-        if (e == null) { return; }
-        e.Clear();
-        e.CheckBehavior = CheckBehavior.MultiSelection; // Es kann ja mehr als nur eines angewählt sein, auch wenn nicht erlaubt!
-        if (column == null) { return; }
-
-        l.AddRange(column.DropDownItems);
-        if (column.DropdownWerteAndererZellenAnzeigen) {
-            //if (column.DropdownKey >= 0 && checkedItemsAtRow != null) {
-            //    var cc = column.Database.Column.SearchByKey(column.DropdownKey);
-            //    FilterCollection f = new(column.Database)
-            //    {
-            //        new FilterItem(cc, FilterType.Istgleich_GroßKleinEgal, checkedItemsAtRow.CellGetString(cc))
-            //    };
-            //    l.AddRange(column.Contents(f, null));
-            //} else {
-            l.AddRange(column.Contents());
-            //}
-        }
-        switch (column.Format) {
-            //case DataFormat.Columns_für_LinkedCellDropdown:
-            //    var db = column.LinkedDatabase();
-            //    if (db != null && !string.IsNullOrEmpty(column.LinkedKeyKennung)) {
-            //        foreach (var thisColumn in db.Column) {
-            //            if (thisColumn.Name.ToLower().StartsWith(column.LinkedKeyKennung.ToLower())) {
-            //                l.Add(thisColumn.Key.ToString());
-            //            }
-            //        }
-            //    }
-            //    //l = l.SortedDistinctList(); // Sind nur die Keys....
-            //    if (l.Count == 0) {
-            //        Notification.Show("Keine Spalten gefunden, die<br>mit '" + column.LinkedKeyKennung + "' beginnen.", ImageCode.Information);
-            //    }
-            //    break;
-
-            case DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
-                var db2 = column.LinkedDatabase;
-                if (db2 == null) { Notification.Show("Verknüpfte Datenbank nicht vorhanden", ImageCode.Information); return; }
-
-                /// Spalte aus der Ziel-Datenbank ermitteln
-                var targetColumn = db2.Column.SearchByKey(column.LinkedCell_ColumnKeyOfLinkedDatabase);
-                if (targetColumn == null) { Notification.Show("Die Spalte ist in der Zieldatenbank nicht vorhanden."); return; }
-
-                var (filter, info) = SQL_CellCollection.GetFilterFromLinkedCellData(db2, column, checkedItemsAtRow);
-                if (!string.IsNullOrEmpty(info)) {
-                    Notification.Show("Keine Zeilen in der Quell-Datenbank vorhanden.", ImageCode.Information);
-                }
-
-                //                    var r = LinkedDatabase.Row.CalculateFilteredRows(filter);
-
-                //q
-
-                l.AddRange(targetColumn.Contents(filter, null));
-                if (l.Count == 0) {
-                    Notification.Show("Keine Zeilen in der Quell-Datenbank vorhanden.", ImageCode.Information);
-                }
-                break;
-        }
-
-        if (column.Database.Row.Count > 0) {
-            if (checkedItemsAtRow != null) {
-                if (!checkedItemsAtRow.CellIsNullOrEmpty(column)) {
-                    if (column.MultiLine) {
-                        marked = checkedItemsAtRow.CellGetList(column);
-                    } else {
-                        marked.Add(checkedItemsAtRow.CellGetString(column));
-                    }
-                }
-                l.AddRange(marked);
-            }
-            l = l.SortedDistinctList();
-        }
-        if (maxItems > 0 && l.Count > maxItems) {
-            return;
-        }
-        e.AddRange(l, column, style, column.BildTextVerhalten);
-        if (checkedItemsAtRow != null) {
-            foreach (var t in marked) {
-                if (e[t] is BasicListItem bli) { bli.Checked = true; }
-            }
-        }
-        e.Sort();
-    }
-
     public static void GetItemCollection(ItemCollectionList? e, ColumnItem? column, RowItem? checkedItemsAtRow, ShortenStyle style, int maxItems) {
         List<string> marked = new();
         List<string> l = new();
@@ -301,7 +215,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         if (maxItems > 0 && l.Count > maxItems) {
             return;
         }
-        e.AddRange(l, column, style, column.BildTextVerhalten);
+        e.AddRange(l, column, style, column.BehaviorOfImageAndText);
         if (checkedItemsAtRow != null) {
             foreach (var t in marked) {
                 if (e[t] is BasicListItem bli) { bli.Checked = true; }
@@ -386,13 +300,6 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
 
     public BitmapListItem Add(string filename, string internalname, string caption) {
         BitmapListItem i = new(filename, internalname, caption);
-        Add(i);
-        return i;
-    }
-
-    public SQL_CellLikeListItem Add(string internalAndReadableText, SQL_ColumnItem? columnStyle, ShortenStyle style, BildTextVerhalten bildTextverhaltent, bool enabled) {
-        SQL_CellLikeListItem i = new(internalAndReadableText, columnStyle, style, enabled,
-            bildTextverhaltent);
         Add(i);
         return i;
     }
@@ -531,19 +438,6 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         return Add(readableText, @internal, symbol, enabled);
     }
 
-    public BasicListItem? Add(string value, SQL_ColumnItem? columnStyle, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
-        if (this[value] == null) {
-            //if (columnStyle.Format == DataFormat.Link_To_Filesystem && value.FileType() == FileFormat.Image) {
-            //    return Add(columnStyle.BestFile(value, false), value, value, columnStyle.Database.FileEncryptionKey);
-            //}
-
-            SQL_CellLikeListItem i = new(value, columnStyle, style, true, bildTextverhalten);
-            Add(i);
-            return i;
-        }
-        return null;
-    }
-
     public BasicListItem? Add(string value, ColumnItem? columnStyle, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
         if (this[value] == null) {
             //if (columnStyle.Format == DataFormat.Link_To_Filesystem && value.FileType() == FileFormat.Image) {
@@ -564,13 +458,6 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
     /// <returns></returns>
     public TextListItem Add(ColumnItem column) => Add(column, column.Key.ToString());
 
-    /// <summary>
-    /// Fügt die Spalte hinzu. Als interner Name wird der Column.Key verwendet.
-    /// </summary>
-    /// <param name="column"></param>
-    /// <returns></returns>
-    public TextListItem Add(SQL_ColumnItem column) => Add(column, column.Key.ToString());
-
     public void AddRange(Type type) {
         foreach (int z1 in Enum.GetValues(type)) {
             if (this[z1.ToString()] == null) { Add(Enum.GetName(type, z1).Replace("_", " "), z1.ToString()); }
@@ -590,17 +477,6 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
 
         foreach (var thisstring in values.Where(thisstring => this[thisstring] == null)) {
             Add(thisstring, thisstring);
-        }
-    }
-
-    public void AddRange(List<string>? values, SQL_ColumnItem? columnStyle, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
-        if (values == null) { return; }
-        if (values.Count > 10000) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Values > 100000");
-            return;
-        }
-        foreach (var thisstring in values) {
-            Add(thisstring, columnStyle, style, bildTextverhalten); // If Item(thisstring) Is Nothing Then Add(New CellLikeItem(thisstring, ColumnStyle))
         }
     }
 
@@ -894,7 +770,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
                         if (sameh != thisItem.SizeUntouchedForListBox().Height) { or = Orientation.Waagerecht; }
                         sameh = thisItem.SizeUntouchedForListBox().Height;
                     }
-                    if (thisItem is not TextListItem and not SQL_CellLikeListItem) { or = Orientation.Waagerecht; }
+                    if (thisItem is not TextListItem) { or = Orientation.Waagerecht; }
                 }
             }
             return (w, h, hall, or);

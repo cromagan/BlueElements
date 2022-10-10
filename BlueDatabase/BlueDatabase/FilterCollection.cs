@@ -31,12 +31,12 @@ public sealed class FilterCollection : ListExt<FilterItem>, IParseable {
 
     #region Constructors
 
-    public FilterCollection(Database? database) {
+    public FilterCollection(DatabaseAbstract? database) {
         Database = database;
         if (Database != null) { Database.Disposing += Database_Disposing; }
     }
 
-    public FilterCollection(Database? database, string toParse) : this(database) {
+    public FilterCollection(DatabaseAbstract? database, string toParse) : this(database) {
         Parse(toParse);
     }
 
@@ -44,7 +44,7 @@ public sealed class FilterCollection : ListExt<FilterItem>, IParseable {
 
     #region Properties
 
-    public Database? Database { get; private set; }
+    public DatabaseAbstract? Database { get; private set; }
 
     public bool IsParsing { get; private set; }
 

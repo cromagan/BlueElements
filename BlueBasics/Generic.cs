@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics.Enums;
 using Microsoft.Win32;
 using System;
@@ -125,7 +127,11 @@ public static class Generic {
         return img;
     }
 
-    public static Stream GetEmmbedResource(Assembly assembly, string name) => (from thisString in assembly.GetManifestResourceNames() where thisString.EndsWith("." + name) select assembly.GetManifestResourceStream(thisString)).FirstOrDefault();
+    public static Stream? GetEmmbedResource(Assembly assembly, string name) {
+        return assembly.GetManifestResourceNames()
+            .Where(thisString => thisString.EndsWith("." + name))
+            .Select(thisString => assembly.GetManifestResourceStream(thisString)).FirstOrDefault();
+    }
 
     public static List<T> GetEnumerableOfType<T>(params object[] constructorArgs) where T : class {
         List<T> l = new();
@@ -143,24 +149,20 @@ public static class Generic {
         return l;
     }
 
+    public static byte[] GetHash(this string inputString) {
+        using (HashAlgorithm algorithm = SHA256.Create())
+            return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
+    }
 
+    public static string GetHashString(this string inputString) {
+        StringBuilder sb = new StringBuilder();
+        foreach (byte b in GetHash(inputString))
+            sb.Append(b.ToString("X2"));
 
+        return sb.ToString();
+    }
 
-public static byte[] GetHash(this string inputString) {
-    using (HashAlgorithm algorithm = SHA256.Create())
-        return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
-}
-
-public static string GetHashString(this string inputString) {
-    StringBuilder sb = new StringBuilder();
-    foreach (byte b in GetHash(inputString))
-        sb.Append(b.ToString("X2"));
-
-    return sb.ToString();
-}
-
-
-public static long GetUniqueKey(int tmp, string type) {
+    public static long GetUniqueKey(int tmp, string type) {
         var x = DateTime.UtcNow.AddYears(-2020).Ticks;
         var s = type + "\r\n" + UserName() + "\r\n" + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName;
         var key = x + (s.GetHashCode() * 100000000) + tmp;

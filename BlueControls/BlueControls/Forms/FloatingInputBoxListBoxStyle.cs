@@ -21,11 +21,11 @@ using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollection.ItemCollectionList;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueControls.ItemCollection.ItemCollectionList;
 
 namespace BlueControls.Forms;
 

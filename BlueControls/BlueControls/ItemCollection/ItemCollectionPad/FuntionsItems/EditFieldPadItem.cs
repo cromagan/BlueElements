@@ -19,22 +19,20 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueControls.Forms;
+using BlueControls.Interfaces;
+using BlueControls.ItemCollection.ItemCollectionList;
+using BlueDatabase;
+using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using MessageBox = BlueControls.Forms.MessageBox;
 using static BlueBasics.Converter;
-using BlueDatabase;
-using BlueDatabase.Enums;
-
-using BlueBasics.Interfaces;
-using BlueControls.Interfaces;
-using BlueControls.Forms;
-using System.Configuration;
-using BlueControls.ItemCollection.ItemCollectionList;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollection;
 
@@ -153,6 +151,19 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
 
     #region Methods
 
+    public static List<BasicListItem> GetAllowedEditTypes(ColumnItem? column) {
+        var l = new List<BasicListItem>();
+        if (column == null) { return l; }
+        var t = typeof(EditTypeFormula);
+
+        foreach (int z1 in Enum.GetValues(t)) {
+            if (column.UserEditDialogTypeInFormula((EditTypeFormula)z1)) {
+                l.Add(new TextListItem(Enum.GetName(t, z1).Replace("_", " "), z1.ToString(), null, false, true, string.Empty));
+            }
+        }
+        return l;
+    }
+
     public override System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
         if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
             var ff = parent.SearchOrGenerate(rfw2);
@@ -202,21 +213,6 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
 
         return l;
     }
-
-    public static List<BasicListItem> GetAllowedEditTypes(ColumnItem? column) {
-        var l = new List<BasicListItem>();
-        if (column == null) { return l; }
-        var t = typeof(EditTypeFormula);
-
-        foreach (int z1 in Enum.GetValues(t)) {
-            if (column.UserEditDialogTypeInFormula((EditTypeFormula)z1)) {
-                l.Add(new TextListItem(Enum.GetName(t, z1).Replace("_", " "), z1.ToString(), null, false, true, string.Empty));
-            }
-        }
-        return l;
-    }
-
-
 
     public bool IsRecursiveWith(IAcceptAndSends obj) {
         if (obj == this) { return true; }

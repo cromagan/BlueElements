@@ -30,22 +30,16 @@ public abstract class MethodDatabase : Method {
 
     protected ColumnItem? Column(Script s, string name) => MyDatabase(s)?.Column.Exists(name);
 
-    protected Database? DatabaseOf(Script s, string name) {
+    protected DatabaseAbstract? DatabaseOf(Script s, string name) {
         if (s.Variables != null) {
             var db = MyDatabase(s);
-            if (db == null) { return null; }
-
-            if (string.IsNullOrEmpty(db.Filename)) { return null; }
-
-            var newf = db.Filename.FilePath() + name + ".mdb";
-
-            return Database.GetByFilename(newf, true, false, null);
+            return DatabaseAbstract.GetByID(name, true, false, db, name.FileNameWithoutSuffix());
         }
 
         return null;
     }
 
-    protected Database? MyDatabase(Script s) {
+    protected DatabaseAbstract? MyDatabase(Script s) {
         if (s.Variables != null) {
             var f = s.Variables.GetSystem("Database");
             if (f is VariableDatabase db) { return db.Database; }

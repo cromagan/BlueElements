@@ -43,44 +43,6 @@ public static class LanguageTool {
     /// <param name="column"></param>
     /// <param name="style"></param>
     /// <returns></returns>
-    public static string ColumnReplace(string txt, SQL_ColumnItem? column, ShortenStyle style) {
-        if (column == null) { return txt; }
-
-        if (!string.IsNullOrEmpty(txt)) {
-            if (!string.IsNullOrEmpty(column.Prefix)) { txt = DoTranslate(column.Prefix, true) + " " + txt; }
-            if (!string.IsNullOrEmpty(column.Suffix)) { txt = txt + " " + DoTranslate(column.Suffix, true); }
-        }
-        if (Translation != null) { return ColumnReplaceTranslated(txt, column); }
-        if (style == ShortenStyle.Unreplaced || column.OpticalReplace.Count == 0) { return txt; }
-        var ot = txt;
-        foreach (var thisString in column.OpticalReplace) {
-            var x = thisString.SplitAndCutBy("|");
-            if (x.Length == 2 && !string.IsNullOrEmpty(x[0]) && !string.IsNullOrEmpty(x[1])) {
-                if (x[0] == txt) { txt = x[1]; break; }
-
-                //if (string.IsNullOrEmpty(x[0])) {
-                //    if (string.IsNullOrEmpty(txt)) { txt = x[1]; }
-                //} else {
-                //    txt = txt.Replace(x[0], x[1]);
-                //}
-            }
-            //if (x.Length == 1 && !thisString.StartsWith("|")) { txt = txt.Replace(x[0], string.Empty); }
-        }
-
-        if (style is ShortenStyle.Replaced or ShortenStyle.HTML || ot == txt) {
-            return txt;
-        }
-
-        return ot + " (" + txt + ")";
-    }
-
-    /// <summary>
-    /// Fügt Präfix und Suffix hinzu und ersetzt den Text nach dem gewünschten Stil.
-    /// </summary>
-    /// <param name="txt"></param>
-    /// <param name="column"></param>
-    /// <param name="style"></param>
-    /// <returns></returns>
     public static string ColumnReplace(string txt, ColumnItem? column, ShortenStyle style) {
         if (column == null) { return txt; }
 
@@ -151,9 +113,7 @@ public static class LanguageTool {
         }
     }
 
-    private static string ColumnReplaceTranslated(string newTxt, SQL_ColumnItem? column) => column.Translate == TranslationType.Übersetzen ? DoTranslate(newTxt, false) : newTxt;
-
-    private static string ColumnReplaceTranslated(string newTxt, ColumnItem? column) => column.Translate == TranslationType.Übersetzen ? DoTranslate(newTxt, false) : newTxt;
+    private static string ColumnReplaceTranslated(string newTxt, ColumnItem? column) => column.DoOpticalTranslation == TranslationType.Übersetzen ? DoTranslate(newTxt, false) : newTxt;
 
     #endregion
 }

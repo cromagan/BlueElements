@@ -24,9 +24,9 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
-using static BlueBasics.Converter;
 using System;
 using System.Drawing;
+using static BlueBasics.Converter;
 using static BlueBasics.Geometry;
 
 namespace BlueControls;
@@ -262,7 +262,7 @@ public sealed class PointM : IMoveable {
             }
         }
         t = t + "Name=" + Name.ToNonCritical() + ", ";
-        t = t + "X=" + _x.ToString(Constants.Format_Float1).Replace(",",".") + ", ";
+        t = t + "X=" + _x.ToString(Constants.Format_Float1).Replace(",", ".") + ", ";
         t = t + "Y=" + _y.ToString(Constants.Format_Float1).Replace(",", ".") + ", ";
         if (!string.IsNullOrEmpty(Tag)) { t = t + "Tag=" + Tag.ToNonCritical() + ", "; }
         return t.Trim(", ") + "}";

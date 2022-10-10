@@ -89,7 +89,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         }
     }
 
-    public Database? Database { get; set; }
+    public DatabaseAbstract? Database { get; set; }
 
     public string Datenbankkopf {
         get => string.Empty;
@@ -201,7 +201,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         if (base.ParseThis(tag, value)) { return true; }
         switch (tag) {
             case "database":
-                Database = Database.GetByFilename(value.FromNonCritical(), false, false, null);
+                Database = DatabaseAbstract.GetByID(value.FromNonCritical(), false, false, null, value.FromNonCritical().FileNameWithoutSuffix());
                 return true;
 
             case "id":
@@ -257,7 +257,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         t = t + "ID=" + Id.ToString() + ", ";
 
         if (Database != null) {
-            t = t + "Database=" + Database.Filename.ToNonCritical() + ", ";
+            t = t + "Database=" + Database.ConnectionID.ToNonCritical() + ", ";
         }
 
         if (FilterDefiniton != null) {
@@ -400,7 +400,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
     }
 
     private Database GenerateFilterDatabase() {
-        Database x = new(false);
+        Database x = new(false, "Filterdatabase " + Internal);
         var sp = x.Column.Add("Spalte", "Spalte", VarType.Text);
         sp.Align = AlignmentHorizontal.Rechts;
 
@@ -415,7 +415,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         fa.OpticalReplace.Add("=!empty|wenn nicht leer, ist");
 
         var b1 = x.Column.Add("suchsym", " ", VarType.Text);
-        b1.BildTextVerhalten = BildTextVerhalten.Nur_Bild;
+        b1.BehaviorOfImageAndText = BildTextVerhalten.Nur_Bild;
         b1.ScriptType = ScriptType.String;
 
         var b = x.Column.Add("suchtxt", "Suchtext", VarType.Text);
@@ -427,7 +427,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
         FilterDatabaseUpdate();
 
-        x.RepairAfterParse(null, null);
+        x.RepairAfterParse();
         x.ColumnArrangements[1].ShowAllColumns();
         x.ColumnArrangements[1].HideSystemColumns();
         x.SortDefinition = new RowSortDefinition(x, "Spalte", false);

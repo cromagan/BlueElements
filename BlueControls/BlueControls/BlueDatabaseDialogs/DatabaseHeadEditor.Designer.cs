@@ -67,12 +67,10 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lbxExportSets = new BlueControls.Controls.ListBox();
             this.Tab_Undo = new System.Windows.Forms.TabPage();
             this.btnClipboard = new BlueControls.Controls.Button();
-            this.btnAlleUndos = new BlueControls.Controls.Button();
             this.tbxUndoAnzahl = new BlueControls.Controls.TextBox();
             this.capUndoAnzahl = new BlueControls.Controls.Caption();
             this.tblUndo = new BlueControls.Controls.Table();
             this.Tab_Expermimentell = new System.Windows.Forms.TabPage();
-            this.btnFremdImport = new BlueControls.Controls.Button();
             this.capExperimentellWarnung = new BlueControls.Controls.Caption();
             this.capBinInfo = new BlueControls.Controls.Caption();
             this.btnSave = new BlueControls.Controls.Button();
@@ -572,7 +570,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.Tab_Undo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.Tab_Undo.Controls.Add(this.btnClipboard);
-            this.Tab_Undo.Controls.Add(this.btnAlleUndos);
             this.Tab_Undo.Controls.Add(this.tbxUndoAnzahl);
             this.Tab_Undo.Controls.Add(this.capUndoAnzahl);
             this.Tab_Undo.Controls.Add(this.tblUndo);
@@ -591,16 +588,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnClipboard.TabIndex = 3;
             this.btnClipboard.Text = "Clipboard";
             this.btnClipboard.Click += new System.EventHandler(this.btnClipboard_Click);
-            // 
-            // btnAlleUndos
-            // 
-            this.btnAlleUndos.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnAlleUndos.Location = new System.Drawing.Point(688, 8);
-            this.btnAlleUndos.Name = "btnAlleUndos";
-            this.btnAlleUndos.Size = new System.Drawing.Size(168, 32);
-            this.btnAlleUndos.TabIndex = 2;
-            this.btnAlleUndos.Text = "Alle Undos generieren";
-            this.btnAlleUndos.Click += new System.EventHandler(this.btnAlleUndos_Click);
             // 
             // tbxUndoAnzahl
             // 
@@ -636,22 +623,12 @@ namespace BlueControls.BlueDatabaseDialogs
             // Tab_Expermimentell
             // 
             this.Tab_Expermimentell.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.Tab_Expermimentell.Controls.Add(this.btnFremdImport);
             this.Tab_Expermimentell.Controls.Add(this.capExperimentellWarnung);
             this.Tab_Expermimentell.Location = new System.Drawing.Point(4, 25);
             this.Tab_Expermimentell.Name = "Tab_Expermimentell";
             this.Tab_Expermimentell.Size = new System.Drawing.Size(1039, 616);
             this.Tab_Expermimentell.TabIndex = 8;
             this.Tab_Expermimentell.Text = "Experimentell";
-            // 
-            // btnFremdImport
-            // 
-            this.btnFremdImport.Location = new System.Drawing.Point(16, 112);
-            this.btnFremdImport.Name = "btnFremdImport";
-            this.btnFremdImport.Size = new System.Drawing.Size(256, 48);
-            this.btnFremdImport.TabIndex = 1;
-            this.btnFremdImport.Text = "Import aus fremder Datenbank";
-            this.btnFremdImport.Click += new System.EventHandler(this.btnFremdImport_Click);
             // 
             // capExperimentellWarnung
             // 
@@ -741,7 +718,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private Button btnSpaltenuebersicht;
         private  System.Windows.Forms.TabPage Tab_Expermimentell;
         private Caption capExperimentellWarnung;
-        private Button btnFremdImport;
         private Table tblUndo;
         private Caption capNeueZeilenInfo;
         private Caption capUndoAnzahl;
@@ -758,7 +734,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private Button btnSave;
         private ScriptEditorDatabase scriptEditor;
         private Button btnClipboard;
-        private Button btnAlleUndos;
         private TextBox txbStandardFormulaFile;
         private Caption capStandardFormulaFile;
     }

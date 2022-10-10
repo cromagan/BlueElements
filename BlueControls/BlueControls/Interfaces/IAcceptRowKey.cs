@@ -17,8 +17,8 @@
 
 #nullable enable
 
-using BlueDatabase;
 using BlueBasics.Interfaces;
+using BlueDatabase;
 
 namespace BlueControls.Interfaces;
 
@@ -30,7 +30,7 @@ public interface IAcceptRowKey : IDisposableExtended {
 
     #region Properties
 
-    public Database? Database { get; set; }
+    public DatabaseAbstract? Database { get; set; }
 
     public long RowKey { get; set; }
 

@@ -51,7 +51,7 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
 
     #region Properties
 
-    public Database? Database { get; set; }
+    public DatabaseAbstract? Database { get; set; }
 
     public string Datenbankkopf {
         get => string.Empty;
@@ -92,7 +92,7 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
         if (base.ParseThis(tag, value)) { return true; }
         switch (tag) {
             case "database":
-                Database = Database.GetByFilename(value.FromNonCritical(), false, false, null);
+                Database = DatabaseAbstract.GetByID(value.FromNonCritical(), false, false, null, value.FromNonCritical().FileNameWithoutSuffix());
                 return true;
 
             case "id":
@@ -119,7 +119,7 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
         t = t + "ID=" + Id.ToString() + ", ";
 
         if (Database != null) {
-            t = t + "Database=" + Database.Filename.ToNonCritical() + ", ";
+            t = t + "Database=" + Database.ConnectionID.ToNonCritical() + ", ";
         }
 
         return t.Trim(", ") + "}";

@@ -22,6 +22,7 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,6 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Reflection;
 using System.Windows.Forms;
-using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.Polygons;
 
 //  = A3 & ".Design.Add(enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
@@ -839,7 +839,7 @@ public static class Skin {
     public static readonly Dictionary<Design, Dictionary<States, clsDesign>> Design = new();
     public static readonly float Scale = (float)Math.Round(SystemInformation.VirtualScreen.Width / System.Windows.SystemParameters.VirtualScreenWidth, 2);
     public static bool Inited;
-    public static Database? StyleDb;
+    public static DatabaseAbstract? StyleDb;
     internal static Pen? PenLinieDick;
     internal static Pen? PenLinieDünn;
     internal static Pen? PenLinieKräftig;
@@ -1202,17 +1202,6 @@ public static class Skin {
         return StyleDb == null || rowOfStyle == null ? BlueFont.Get(ErrorFont) : GetBlueFont(StyleDb, "X" + ((int)format).ToString(), rowOfStyle);
     }
 
-    private static BlueFont GetBlueFont(Database styleDb, string column, RowItem? row) => GetBlueFont(styleDb, styleDb.Column[column], row);
-
-    private static BlueFont GetBlueFont(Database styleDb, ColumnItem? column, RowItem? row) {
-        var @string = styleDb.Cell.GetString(column, row);
-        if (string.IsNullOrEmpty(@string)) {
-            Develop.DebugPrint("Schrift nicht definiert: " + styleDb.Filename + " - " + column.Name + " - " + row.CellFirstString());
-            return BlueFont.Get("Arial", 7, false, false, false, false, false, Color.Black, Color.Transparent, false, false, false);
-        }
-        return BlueFont.Get(@string);
-    }
-
     public static BlueFont GetBlueFont(Design design, States state) => DesignOf(design, state).bFont;
 
     /// <summary>
@@ -1289,7 +1278,7 @@ public static class Skin {
         }
     }
 
-    public static void InitStyles() => StyleDb = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.MDB", "Styles", true, false,null);
+    public static void InitStyles() => StyleDb = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.MDB", "Styles", true, false, null);
 
     // Der Abstand von z.B. in Textboxen: Text Linke Koordinate
     public static void LoadSkin() {
@@ -1572,6 +1561,8 @@ public static class Skin {
 
     internal static Color Color_Border(Design vDesign, States vState) => DesignOf(vDesign, vState).BorderColor1;
 
+    internal static BlueFont? GetBlueFont(int design, States state, RowItem? rowOfStyle, int stufe) => design > 10000 ? GetBlueFont((PadStyles)design, rowOfStyle, stufe) : GetBlueFont((Design)design, state, stufe);
+
     //private static void Draw_Back_Verlauf_Vertical_Glanzpunkt(Graphics GR, RowItem Row, Rectangle r) {
     //    var cb = new ColorBlend();
     //    var c1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
@@ -1670,9 +1661,6 @@ public static class Skin {
     //    GR.FillRectangle(b, new Rectangle(rect.Left + r2, rect.Top, rect.Width - r, rect.Height));
     //    GR.FillRectangle(b, new Rectangle(rect.Left, rect.Top + r2, rect.Width, rect.Height - r));
     //}
-
-    internal static BlueFont? GetBlueFont(int design, States state, RowItem? rowOfStyle, int stufe) => design > 10000 ? GetBlueFont((PadStyles)design, rowOfStyle, stufe) : GetBlueFont((Design)design, state, stufe);
-
     internal static BlueFont? GetBlueFont(PadStyles padStyle, RowItem? rowOfStyle, int stufe) {
         switch (stufe) {
             case 4:
@@ -1750,6 +1738,17 @@ public static class Skin {
         }
         Develop.DebugPrint(FehlerArt.Fehler, "Stufe " + stufe + " nicht definiert.");
         return GetBlueFont(design, state);
+    }
+
+    private static BlueFont GetBlueFont(DatabaseAbstract styleDb, string column, RowItem? row) => GetBlueFont(styleDb, styleDb.Column[column], row);
+
+    private static BlueFont GetBlueFont(DatabaseAbstract styleDb, ColumnItem? column, RowItem? row) {
+        var @string = styleDb.Cell.GetString(column, row);
+        if (string.IsNullOrEmpty(@string)) {
+            Develop.DebugPrint("Schrift nicht definiert: " + styleDb.ConnectionID + " - " + column.Name + " - " + row.CellFirstString());
+            return BlueFont.Get("Arial", 7, false, false, false, false, false, Color.Black, Color.Transparent, false, false, false);
+        }
+        return BlueFont.Get(@string);
     }
 
     private static GraphicsPath? Kontur(Kontur kon, Rectangle r) => kon switch {

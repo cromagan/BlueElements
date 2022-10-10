@@ -105,7 +105,7 @@ namespace BlueControls.Forms {
             // 
             // txbRasterFangen
             // 
-            this.txbRasterFangen.AdditionalCheck = BlueDatabase.Enums.AdditionalCheck.Float;
+            this.txbRasterFangen.AdditionalFormatCheck = BlueDatabase.Enums.AdditionalCheck.Float;
             this.txbRasterFangen.AllowedChars = "0123456789,";
             this.txbRasterFangen.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbRasterFangen.Location = new System.Drawing.Point(128, 46);
@@ -119,7 +119,7 @@ namespace BlueControls.Forms {
             // 
             // txbRasterAnzeige
             // 
-            this.txbRasterAnzeige.AdditionalCheck = BlueDatabase.Enums.AdditionalCheck.Float;
+            this.txbRasterAnzeige.AdditionalFormatCheck = BlueDatabase.Enums.AdditionalCheck.Float;
             this.txbRasterAnzeige.AllowedChars = "0123456789,";
             this.txbRasterAnzeige.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbRasterAnzeige.Location = new System.Drawing.Point(128, 24);

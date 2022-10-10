@@ -88,7 +88,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
         get {
             if (GetRowFrom?.Database == null) { return "?"; }
 
-            return GetRowFrom.Database.Filename.FileNameWithSuffix();
+            return GetRowFrom.Database.TableName;
         }
     }
 

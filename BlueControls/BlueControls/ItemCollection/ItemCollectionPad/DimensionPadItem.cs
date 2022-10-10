@@ -26,9 +26,9 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
+using static BlueBasics.Converter;
 using static BlueBasics.Geometry;
 using static BlueBasics.Polygons;
-using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
 

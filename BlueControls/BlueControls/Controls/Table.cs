@@ -70,7 +70,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private BlueFont? _columnFont;
     private ColumnItem? _cursorPosColumn;
     private RowData? _cursorPosRow;
-    private Database? _database;
+    private DatabaseAbstract? _database;
     private BlueTableAppearance _design = BlueTableAppearance.Standard;
     private List<RowItem>? _filteredRows;
     private int? _headSize;
@@ -181,9 +181,15 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    public ColumnViewCollection? CurrentArrangement => _database?.ColumnArrangements == null || _database.ColumnArrangements.Count <= _arrangementNr
-        ? null
-        : _database.ColumnArrangements[_arrangementNr];
+    public ColumnViewCollection? CurrentArrangement {
+        get {
+            if (_database?.ColumnArrangements == null || _database.ColumnArrangements.Count <= _arrangementNr) {
+                return null;
+            }
+
+            return _database.ColumnArrangements[_arrangementNr];
+        }
+    }
 
     public ColumnItem? CursorPosColumn => _cursorPosColumn;
     public RowData? CursorPosRow => _cursorPosRow;
@@ -191,7 +197,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public Database? Database => _database;
+    public DatabaseAbstract? Database => _database;
 
     [DefaultValue(BlueTableAppearance.Standard)]
     public BlueTableAppearance Design {
@@ -313,17 +319,17 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         } else if (column.MultiLine) {
             var tmp = column.Database.Cell.GetList(column, row);
             if (column.ShowMultiLineInOneLine) {
-                contentSize = FormatedText_NeededSize(column, tmp.JoinWith("; "), cellFont, ShortenStyle.Replaced, pix16, column.BildTextVerhalten);
+                contentSize = FormatedText_NeededSize(column, tmp.JoinWith("; "), cellFont, ShortenStyle.Replaced, pix16, column.BehaviorOfImageAndText);
             } else {
                 foreach (var thisString in tmp) {
-                    var tmpSize = FormatedText_NeededSize(column, thisString, cellFont, ShortenStyle.Replaced, pix16, column.BildTextVerhalten);
+                    var tmpSize = FormatedText_NeededSize(column, thisString, cellFont, ShortenStyle.Replaced, pix16, column.BehaviorOfImageAndText);
                     contentSize.Width = Math.Max(tmpSize.Width, contentSize.Width);
                     contentSize.Height += Math.Max(tmpSize.Height, pix16);
                 }
             }
         } else {
             var @string = column.Database.Cell.GetString(column, row);
-            contentSize = FormatedText_NeededSize(column, @string, cellFont, ShortenStyle.Replaced, pix16, column.BildTextVerhalten);
+            contentSize = FormatedText_NeededSize(column, @string, cellFont, ShortenStyle.Replaced, pix16, column.BehaviorOfImageAndText);
         }
         contentSize.Width = Math.Max(contentSize.Width, pix16);
         contentSize.Height = Math.Max(contentSize.Height, pix16);
@@ -395,7 +401,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     //    FileDialogs.DeleteFile(delList, true);
     //    return newFiles;
     //}
-    public static void ImportCsv(Database database, string csvtxt) {
+    public static void ImportCsv(DatabaseAbstract database, string csvtxt) {
         using Import x = new(database, csvtxt);
         x.ShowDialog();
         x.Dispose();
@@ -505,34 +511,50 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         return column.TmpColumnContentWidth is int w ? w : 0;
     }
 
-    public static ItemCollectionList UndoItems(Database database, string cellkey) {
+    public static ItemCollectionList UndoItems(DatabaseAbstract db, string cellkey) {
         ItemCollectionList i = new(BlueListBoxAppearance.KontextMenu) {
             CheckBehavior = CheckBehavior.AlwaysSingleSelection
         };
-        if (database.Works == null || database.Works.Count == 0) { return i; }
-        var isfirst = true;
-        TextListItem? las = null;
-        var lasNr = -1;
-        var co = 0;
-        for (var z = database.Works.Count - 1; z >= 0; z--) {
-            if (database.Works[z].CellKey == cellkey && database.Works[z].HistorischRelevant) {
+
+        if (db is Database database) {
+            if (database.Works == null || database.Works.Count == 0) {
+                return i;
+            }
+
+            var isfirst = true;
+            TextListItem? las = null;
+            var lasNr = -1;
+            var co = 0;
+            for (var z = database.Works.Count - 1; z >= 0; z--) {
+                if (database.Works[z].CellKey == cellkey && database.Works[z].HistorischRelevant) {
+                    co++;
+                    lasNr = z;
+                    las = isfirst
+                        ? new TextListItem(
+                            "Aktueller Text - ab " + database.Works[z].Date + " UTC, geändert von " +
+                            database.Works[z].User, "Cancel", null, false, true, string.Empty)
+                        : new TextListItem(
+                            "ab " + database.Works[z].Date + " UTC, geändert von " + database.Works[z].User,
+                            co.ToString(Constants.Format_Integer5) + database.Works[z].ChangedTo, null, false, true,
+                            string.Empty);
+                    isfirst = false;
+                    if (las != null) {
+                        i.Add(las);
+                    }
+                }
+            }
+
+            if (las != null) {
                 co++;
-                lasNr = z;
-                las = isfirst
-                    ? new TextListItem("Aktueller Text - ab " + database.Works[z].Date + " UTC, geändert von " + database.Works[z].User, "Cancel", null, false, true, string.Empty)
-                    : new TextListItem("ab " + database.Works[z].Date + " UTC, geändert von " + database.Works[z].User, co.ToString(Constants.Format_Integer5) + database.Works[z].ChangedTo, null, false, true, string.Empty);
-                isfirst = false;
-                if (las != null) { i.Add(las); }
+                i.Add("vor " + database.Works[lasNr].Date + " UTC",
+                    co.ToString(Constants.Format_Integer5) + database.Works[lasNr].PreviousValue);
             }
         }
-        if (las != null) {
-            co++;
-            i.Add("vor " + database.Works[lasNr].Date + " UTC", co.ToString(Constants.Format_Integer5) + database.Works[lasNr].PreviousValue);
-        }
+
         return i;
     }
 
-    public static void WriteColumnArrangementsInto(ComboBox? columnArrangementSelector, Database? database, int showingNo) {
+    public static void WriteColumnArrangementsInto(ComboBox? columnArrangementSelector, DatabaseAbstract? database, int showingNo) {
         //if (InvokeRequired) {
         //    Invoke(new Action(() => WriteColumnArrangementsInto(columnArrangementSelector)));
         //    return;
@@ -616,7 +638,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (!SameRow) { OnSelectedRowChanged(new RowEventArgs(_cursorPosRow?.Row)); }
     }
 
-    public void DatabaseSet(Database? value, string viewCode) {
+    public void DatabaseSet(DatabaseAbstract? value, string viewCode) {
         if (_database == value && string.IsNullOrEmpty(viewCode)) { return; }
 
         CloseAllComponents();
@@ -689,11 +711,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         gr.FillRectangle(new SolidBrush(Color.FromArgb(100, 200, 200, 200)), (int)viewItem.OrderTmpSpalteX1, 0, Column_DrawWidth(viewItem, displayRectangleWoSlider), HeadSize());
 
         var down = 0;
-        if (!string.IsNullOrEmpty(viewItem.Column.Ueberschrift3)) {
+        if (!string.IsNullOrEmpty(viewItem.Column.CaptionGroup3)) {
             down = ColumnCaptionSizeY * 3;
-        } else if (!string.IsNullOrEmpty(viewItem.Column.Ueberschrift2)) {
+        } else if (!string.IsNullOrEmpty(viewItem.Column.CaptionGroup2)) {
             down = ColumnCaptionSizeY * 2;
-        } else if (!string.IsNullOrEmpty(viewItem.Column.Ueberschrift1)) {
+        } else if (!string.IsNullOrEmpty(viewItem.Column.CaptionGroup1)) {
             down = ColumnCaptionSizeY;
         }
 
@@ -777,20 +799,20 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         #region Spalten-Kopf-Bild erzeugen
 
-        if (!string.IsNullOrEmpty(viewItem.Column.CaptionBitmap) && viewItem.Column.TmpCaptionBitmap == null) {
-            viewItem.Column.TmpCaptionBitmap = QuickImage.Get(viewItem.Column.CaptionBitmap + "|100");
+        if (!string.IsNullOrEmpty(viewItem.Column.CaptionBitmapCode) && viewItem.Column.TmpCaptionBitmapCode == null) {
+            viewItem.Column.TmpCaptionBitmapCode = QuickImage.Get(viewItem.Column.CaptionBitmapCode + "|100");
         }
 
         #endregion
 
-        if (viewItem.Column.TmpCaptionBitmap != null && !viewItem.Column.TmpCaptionBitmap.IsError) {
+        if (viewItem.Column.TmpCaptionBitmapCode != null && !viewItem.Column.TmpCaptionBitmapCode.IsError) {
 
             #region Spalte mit Bild zeichnen
 
             Point pos = new(
                 (int)viewItem.OrderTmpSpalteX1 +
                 (int)((Column_DrawWidth(viewItem, displayRectangleWoSlider) - fs.Width) / 2.0), 3 + down);
-            gr.DrawImageInRectAspectRatio(viewItem.Column.TmpCaptionBitmap, (int)viewItem.OrderTmpSpalteX1 + 2, (int)(pos.Y + fs.Height), Column_DrawWidth(viewItem, displayRectangleWoSlider) - 4, HeadSize() - (int)(pos.Y + fs.Height) - 6 - 18);
+            gr.DrawImageInRectAspectRatio(viewItem.Column.TmpCaptionBitmapCode, (int)viewItem.OrderTmpSpalteX1 + 2, (int)(pos.Y + fs.Height), Column_DrawWidth(viewItem, displayRectangleWoSlider) - 4, HeadSize() - (int)(pos.Y + fs.Height) - 6 - 18);
             // Dann der Text
             gr.TranslateTransform(pos.X, pos.Y);
             //GR.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
@@ -819,7 +841,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         #region Sortierrichtung Zeichnen
 
         var tmpSortDefinition = SortUsed();
-        if ((tmpSortDefinition != null && tmpSortDefinition.UsedForRowSort(viewItem.Column)) || viewItem.Column == Database.Column.SysChapter) {
+        if (tmpSortDefinition != null && (tmpSortDefinition.UsedForRowSort(viewItem.Column) || viewItem.Column == Database.Column.SysChapter)) {
             if (tmpSortDefinition.Reverse) {
                 gr.DrawImage(QuickImage.Get("ZA|11|5||||50"), (float)(viewItem.OrderTmpSpalteX1 + (Column_DrawWidth(viewItem, displayRectangleWoSlider) / 2.0) - 6), HeadSize() - 6 - AutoFilterSize);
             } else {
@@ -875,7 +897,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
         hotItem = null;
-        if (_database.IsParsing || _database.IsLoading) {
+        if (_database.IsLoading) {
             cancel = true;
             return;
         }
@@ -1146,8 +1168,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     internal static void StartDatabaseService() {
         if (_serviceStarted) { return; }
         _serviceStarted = true;
-        Database.AllFiles.ItemAdded += AllFiles_ItemAdded;
-        Database.AllFiles.ItemRemoving += AllFiles_ItemRemoving;
+        DatabaseAbstract.AllFiles.ItemAdded += AllFiles_ItemAdded;
+        DatabaseAbstract.AllFiles.ItemRemoving += AllFiles_ItemRemoving;
         //Database.DropConstructorMessage += Database_DropConstructorMessage;
     }
 
@@ -1639,7 +1661,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private static void AllFiles_ItemAdded(object sender, ListEventArgs e) {
-        if (e.Item is Database db) {
+        if (e.Item is DatabaseAbstract db) {
             db.NeedPassword += Database_NeedPassword;
             db.GenerateLayoutInternal += DB_GenerateLayoutInternal;
             db.Loaded += TableView.CheckDatabase;
@@ -1647,7 +1669,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private static void AllFiles_ItemRemoving(object sender, ListEventArgs e) {
-        if (e.Item is Database db) {
+        if (e.Item is DatabaseAbstract db) {
             db.NeedPassword -= Database_NeedPassword;
             db.GenerateLayoutInternal -= DB_GenerateLayoutInternal;
             db.Loaded -= TableView.CheckDatabase;
@@ -2366,19 +2388,19 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private SizeF ColumnHead_Size(ColumnItem? column) {
         float wi;
         float he;
-        Bitmap captionBitmap = null; // TODO: Caption Bitmap neu erstellen
-        if (captionBitmap != null && captionBitmap.Width > 10) {
+        Bitmap CaptionBitmapCode = null; // TODO: Caption Bitmap neu erstellen
+        if (CaptionBitmapCode != null && CaptionBitmapCode.Width > 10) {
             wi = Math.Max(50, ColumnCaptionText_Size(column).Width + 4);
             he = 50 + ColumnCaptionText_Size(column).Height + 3;
         } else {
             wi = ColumnCaptionText_Size(column).Height + 4;
             he = ColumnCaptionText_Size(column).Width + 3;
         }
-        if (!string.IsNullOrEmpty(column.Ueberschrift3)) {
+        if (!string.IsNullOrEmpty(column.CaptionGroup3)) {
             he += ColumnCaptionSizeY * 3;
-        } else if (!string.IsNullOrEmpty(column.Ueberschrift2)) {
+        } else if (!string.IsNullOrEmpty(column.CaptionGroup2)) {
             he += ColumnCaptionSizeY * 2;
-        } else if (!string.IsNullOrEmpty(column.Ueberschrift1)) {
+        } else if (!string.IsNullOrEmpty(column.CaptionGroup1)) {
             he += ColumnCaptionSizeY;
         }
         return new SizeF(wi, he);
@@ -2398,7 +2420,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private bool ComputeAllColumnPositions() {
         //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
-        if (Database.IsParsing) { return false; }
+        if (Database.IsLoading) { return false; }
         try {
             // Kommt vor, dass spontan doch geparsed wird...
             if (_database.ColumnArrangements == null || _arrangementNr >= _database.ColumnArrangements.Count) { return false; }
@@ -2573,7 +2595,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         var toDraw = contentHolderCellRow.CellGetString(contentHolderCellColumn);
 
-        Draw_CellTransparentDirect(gr, toDraw, cellrectangle, font, contentHolderCellColumn, _pix16, ShortenStyle.Replaced, contentHolderCellColumn.BildTextVerhalten, state);
+        Draw_CellTransparentDirect(gr, toDraw, cellrectangle, font, contentHolderCellColumn, _pix16, ShortenStyle.Replaced, contentHolderCellColumn.BehaviorOfImageAndText, state);
     }
 
     private void Draw_Column_Body(Graphics gr, ColumnViewItem cellInThisDatabaseColumn, Rectangle displayRectangleWoSlider) {
@@ -2691,8 +2713,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 viewItem.ViewType == ViewType.PermanentColumn ||
                 (int)viewItem.OrderTmpSpalteX1 + (int)viewItem.TmpDrawWidth > permaX) {
                 for (var u = 0; u < 3; u++) {
-                    var n = viewItem?.Column.Ueberschrift(u);
-                    var v = bvi[u]?.Column.Ueberschrift(u);
+                    var n = viewItem?.Column.CaptionGroup(u);
+                    var v = bvi[u]?.Column.CaptionGroup(u);
                     if (n != v) {
                         if (!string.IsNullOrEmpty(v) && lastViewItem != null) {
                             var le = Math.Max(0, (int)bvi[u].OrderTmpSpalteX1);
@@ -2800,12 +2822,19 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             //return;
 
-            if (Database.ReloadNeededSoft) { gr.DrawImage(QuickImage.Get(ImageCode.Uhr, 16), 8, 8); }
+            if (Database.ReloadNeededSoft) {
+                gr.DrawImage(QuickImage.Get(ImageCode.Uhr, 16), 8, 8);
+            }
 
-            var e2 = new MultiUserFileHasPendingChangesEventArgs();
-            Database.HasPendingChanges(null, e2);
+            if (Database is Database db) {
+                var e2 = new MultiUserFileHasPendingChangesEventArgs();
+                db.HasPendingChanges(null, e2);
 
-            if (e2.HasPendingChanges) { gr.DrawImage(QuickImage.Get(ImageCode.Stift, 16), 16, 8); }
+                if (e2.HasPendingChanges) {
+                    gr.DrawImage(QuickImage.Get(ImageCode.Stift, 16), 16, 8);
+                }
+            }
+
             if (Database.ReadOnly) { gr.DrawImage(QuickImage.Get(ImageCode.Schloss, 32), 16, 8); }
         } catch {
             Invalidate();
