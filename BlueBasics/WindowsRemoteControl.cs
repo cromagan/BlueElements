@@ -46,7 +46,7 @@ public static class WindowsRemoteControl {
     }
 
     [Flags]
-    private enum MOUSEEVENTF {
+    private enum Mouseeventf {
         MOVE = 0x0001,  // mouse move
         LEFTDOWN = 0x0002,  // left button down
         LEFTUP = 0x0004,  // left button up
@@ -161,7 +161,7 @@ public static class WindowsRemoteControl {
         input_move.mi.dx = (int)Math.Round(x * (65535 / ScreenWidth), 0);
         input_move.mi.dy = (int)Math.Round(y * (65535 / ScreenHeight), 0);
         input_move.mi.mouseData = 0;
-        input_move.mi.dwFlags = MOUSEEVENTF.MOVE | MOUSEEVENTF.ABSOLUTE;
+        input_move.mi.dwFlags = Mouseeventf.MOVE | Mouseeventf.ABSOLUTE;
         input_move.mi.time = 0;
         input_move.mi.dwExtraInfo = GetMessageExtraInfo();
         INPUT[] input = { input_move };
@@ -334,7 +334,7 @@ public static class WindowsRemoteControl {
         public int dx;
         public int dy;
         public int mouseData;
-        public MOUSEEVENTF dwFlags;
+        public Mouseeventf dwFlags;
         public int time;
         public IntPtr dwExtraInfo;
     }

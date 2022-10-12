@@ -247,16 +247,16 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
 
     private void lsbFiles_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         var it = ((BitmapListItem)e.HotItem);
-        var tags = (List<string>)(it.Tag);
+        //var tags = (List<string>)(it.Tag);
 
         switch (e.ClickedComand) {
             case "Löschen":
                 var I = new FileInfo(it.Internal);
                 //var attribute = I.Attributes;
 
-                var ask = Convert.ToBoolean(I.Attributes & FileAttributes.ReadOnly);
+                var silent = !I.Attributes.HasFlag( FileAttributes.ReadOnly);
 
-                if (FileDialogs.DeleteFile(I.FullName, ask)) {
+                if (FileDialogs.DeleteFile(I.FullName, !silent)) {
                     //FileDialogs.DeleteFile(ThumbFile(I.FullName), false);
                     Reload();
                 }

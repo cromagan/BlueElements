@@ -349,23 +349,12 @@ public static class Converter {
     //    SerialNr2Path_LastSearch = string.Empty;
     //    return pfad;
     //}
-    /// <summary>
-    /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
-    /// </summary>
-    /// <param name="s"></param>
-    /// <returns></returns>
-    //public static int IntParse(string s) {
-    //    if (string.IsNullOrEmpty(s)) { return 0; }
-    //    if (int.TryParse(s, out var result)) { return result; }
-    //    Develop.DebugPrint(enFehlerArt.Warnung, "Int kann nicht geparsed werden: " + s);
-    //    return 0;
-    //}
+
     public static float MmToPixel(float mM, int dPi) => mM * dPi / 25.4f;
 
     public static float PixelToMm(float pixel, int dPi) => pixel / dPi * 25.4f;
 
-    // public static string UTF8toString(string S) {
-    // }
+
     public static string StringtoUtf8(this string s) => Encoding.Default.GetString(Encoding.UTF8.GetBytes(s));
 
     public static Bitmap? StringUnicodeToBitmap(string unicodeTxt) {

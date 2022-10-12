@@ -88,7 +88,7 @@ public class Accessor<T> {
 
     #region Methods
 
-    public T Get() {
+    public T? Get() {
         if (_getter != null) { return _getter(); }
         Develop.DebugPrint("Getter ist null!");
         return default;

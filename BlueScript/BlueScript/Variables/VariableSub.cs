@@ -38,7 +38,7 @@ public class VariableSub : Variable {
     /// <summary>
     /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="value"></param>
     public VariableSub(string value) : this(DummyName(), value, 0, string.Empty, false, string.Empty) { }
 
     public VariableSub(string name, string subName, int subOnLine, string subCode) : this(name, subName, subOnLine, subCode, false, string.Empty) { }

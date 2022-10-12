@@ -130,19 +130,32 @@ public static class Geometry {
         }
         if (sp == null) { return PointF.Empty; }
         const float tol = 0.0001f;
-        return sp.X < Math.Min(line1Start.X, line1End.X) - tol
-            ? PointF.Empty
-            : sp.X > Math.Max(line1Start.X, line1End.X) + tol
-                ? PointF.Empty
-                : sp.X < Math.Min(line2Start.X, line2End.X) - tol
-                    ? PointF.Empty
-                    : sp.X > Math.Max(line2Start.X, line2End.X) + tol
-                        ? PointF.Empty
-                        : sp.Y < Math.Min(line1Start.Y, line1End.Y) - tol
-                            ? PointF.Empty
-                            : sp.Y > Math.Max(line1Start.Y, line1End.Y) + tol
-                                ? PointF.Empty
-                                : sp.Y < Math.Min(line2Start.Y, line2End.Y) - tol ? PointF.Empty : sp.Y > Math.Max(line2Start.Y, line2End.Y) + tol ? PointF.Empty : sp;
+        if (sp.X < Math.Min(line1Start.X, line1End.X) - tol) {
+            return PointF.Empty;
+        }
+
+        if (sp.X > Math.Max(line1Start.X, line1End.X) + tol) {
+            return PointF.Empty;
+        }
+        if (sp.X < Math.Min(line2Start.X, line2End.X) - tol) {
+            return PointF.Empty;
+        }
+        if (sp.X > Math.Max(line2Start.X, line2End.X) + tol) {
+            return PointF.Empty;
+        }
+        if (sp.Y < Math.Min(line1Start.Y, line1End.Y) - tol) {
+            return PointF.Empty;
+        }
+        if (sp.Y > Math.Max(line1Start.Y, line1End.Y) + tol) {
+            return PointF.Empty;
+        }
+        if (sp.Y < Math.Min(line2Start.Y, line2End.Y) - tol) {
+            return PointF.Empty;
+        }
+        if (sp.Y > Math.Max(line2Start.Y, line2End.Y) + tol) {
+            return PointF.Empty;
+        }
+        return sp;
     }
 
     public static PointF PointOnLine(PointF maus, float pX, float pY, float qX, float qY) {

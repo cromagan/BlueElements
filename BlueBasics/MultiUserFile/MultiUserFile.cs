@@ -37,8 +37,9 @@ public sealed class MultiUserFile : IDisposableExtended {
 
     public int ReloadDelaySecond = 10;
     private static readonly ListExt<MultiUserFile> _all_Files = new();
-    private readonly BackgroundWorker _backgroundWorker;
+
     private readonly Timer _checker;
+    private readonly object _lockload = new();
     private readonly BackgroundWorker _pureBinSaver;
     private readonly long _startTick = DateTime.UtcNow.Ticks;
     private readonly bool _zipped;
@@ -58,7 +59,6 @@ public sealed class MultiUserFile : IDisposableExtended {
     private string _lastSaveCode;
     private DateTime _lastUserActionUtc = new(1900, 1, 1);
     private int _loadingThreadId = -1;
-    private object _lockload = new();
     private FileSystemWatcher? _watcher;
 
     #endregion
@@ -74,11 +74,6 @@ public sealed class MultiUserFile : IDisposableExtended {
         };
         _pureBinSaver.DoWork += PureBinSaver_DoWork;
         _pureBinSaver.ProgressChanged += PureBinSaver_ProgressChanged;
-        _backgroundWorker = new BackgroundWorker {
-            WorkerReportsProgress = false,
-            WorkerSupportsCancellation = true
-        };
-        _backgroundWorker.DoWork += BackgroundWorker_DoWork;
         _checker = new Timer(Checker_Tick);
         Filename = string.Empty;// KEIN Filename. Ansonsten wird davon ausgegangen, dass die Datei gleich geladen wird.Dann können abgeleitete Klasse aber keine Initialisierung mehr vornehmen.
         ReCreateWatcher();
@@ -109,13 +104,7 @@ public sealed class MultiUserFile : IDisposableExtended {
 
     public event EventHandler DiscardPendingChanges;
 
-    public event EventHandler<MultiUserFileBackgroundWorkerEventArgs> DoBackGroundWork;
-
-    public event EventHandler DoWorkAfterSaving;
-
     public event EventHandler<MultiUserFileHasPendingChangesEventArgs> HasPendingChanges;
-
-    public event EventHandler<MultiUserIsThereBackgroundWorkToDoEventArgs> IsThereBackgroundWorkToDo;
 
     public event EventHandler<LoadedEventArgs> Loaded;
 
@@ -124,6 +113,8 @@ public sealed class MultiUserFile : IDisposableExtended {
     public event EventHandler<MultiUserParseEventArgs> ParseExternal;
 
     public event EventHandler SavedToDisk;
+
+    public event EventHandler Saving;
 
     /// <summary>
     /// Dient dazu, offene Dialoge abzufragen
@@ -273,9 +264,9 @@ public sealed class MultiUserFile : IDisposableExtended {
         return e.Cancel;
     }
 
-    public void CancelBackGroundWorker() {
-        if (_backgroundWorker.IsBusy && !_backgroundWorker.CancellationPending) { _backgroundWorker.CancelAsync(); }
-    }
+    //public void CancelBackGroundWorker() {
+    //    if (_backgroundWorker.IsBusy && !_backgroundWorker.CancellationPending) { _backgroundWorker.CancelAsync(); }
+    //}
 
     // Dieser Code wird hinzugefügt, um das Dispose-Muster richtig zu implementieren.
     public void Dispose() {
@@ -320,7 +311,6 @@ public sealed class MultiUserFile : IDisposableExtended {
 
             if (DateTime.UtcNow.Subtract(_lastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; }  // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
             if (_pureBinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
-            if (_backgroundWorker.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell das Neuladen."; }
             //if (IsLoading) { return "Es werden bereits Daten geladen."; }
             //if (BlockDiskOperations()) { return "Reload unmöglich, vererbte Klasse gab Fehler zurück"; }
             return string.Empty;
@@ -353,7 +343,6 @@ public sealed class MultiUserFile : IDisposableExtended {
 
         //----------EditGeneral, Save------------------------------------------------------------------------------------------
         if (mode.HasFlag(Enums.ErrorReason.EditGeneral) || mode.HasFlag(Enums.ErrorReason.Save)) {
-            if (_backgroundWorker.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
             if (ReloadNeeded) { return "Die Datei muss neu eingelesen werden."; }
         }
 
@@ -397,7 +386,6 @@ public sealed class MultiUserFile : IDisposableExtended {
     }
 
     public void ForceLoadSave() {
-        CancelBackGroundWorker();
         _checkerTickCount = Math.Max(ReloadDelaySecond, 10) + 10;
     }
 
@@ -523,11 +511,11 @@ public sealed class MultiUserFile : IDisposableExtended {
         ConnectedControlsStopAllWorking?.Invoke(this, e);
     }
 
-    public void RemoveFilename() {
-        Filename = string.Empty;
-        ReCreateWatcher();
-        SetReadOnly();
-    }
+    //public void RemoveFilename() {
+    //    Filename = string.Empty;
+    //    ReCreateWatcher();
+    //    SetReadOnly();
+    //}
 
     public void RepairOldBlockFiles() {
         if (DateTime.UtcNow.Subtract(_lastMessageUtc).TotalMinutes < 1) { return; }
@@ -568,12 +556,14 @@ public sealed class MultiUserFile : IDisposableExtended {
         //    return false;
         //}
         if (string.IsNullOrEmpty(Filename)) { return false; }
+
+        OnSaving();
         OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs()); // Sonst meint der Benutzer evtl. noch, er könne Weiterarbeiten... Und Controlls haben die Möglichkeit, ihre Änderungen einzuchecken
         var d = DateTime.UtcNow; // Manchmal ist eine Block-Datei vorhanden, die just in dem Moment gelöscht wird. Also ein ganz kurze "Löschzeit" eingestehen.
         if (!mustSave && AgeOfBlockDatei >= 0) { RepairOldBlockFiles(); return false; }
         while (OnHasPendingChanges()) {
             IsInSaveingLoop = true;
-            CancelBackGroundWorker();
+            //CancelBackGroundWorker();
             Load_Reload();
             var (tmpFileName, fileInfoBeforeSaving, dataUncompressed) = WriteTempFileToDisk(false); // Dateiname, Stand der Originaldatei, was gespeichert wurde
             var f = SaveRoutine(false, tmpFileName, fileInfoBeforeSaving, dataUncompressed);
@@ -657,7 +647,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         return true;
     }
 
-    protected void OnLoaded(LoadedEventArgs e) {
+    private void OnLoaded(LoadedEventArgs e) {
         if (IsDisposed) { return; }
         Loaded?.Invoke(this, e);
     }
@@ -678,8 +668,6 @@ public sealed class MultiUserFile : IDisposableExtended {
         return compressedFileStream.ToArray();
     }
 
-    private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) => OnDoBackGroundWork((BackgroundWorker)sender);
-
     private string Backupdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
 
     private string Blockdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".blk";
@@ -696,9 +684,8 @@ public sealed class MultiUserFile : IDisposableExtended {
         // Ausstehende Arbeiten ermittelen
 
         var mustSave = OnHasPendingChanges();
-        var mustBackup = OnIsThereBackgroundWorkToDo();
 
-        if (!_checkedAndReloadNeed && !mustSave && !mustBackup) {
+        if (!_checkedAndReloadNeed && !mustSave) {
             _checkerTickCount = 0;
             return;
         }
@@ -707,16 +694,15 @@ public sealed class MultiUserFile : IDisposableExtended {
         ReloadDelaySecond = Math.Max(ReloadDelaySecond, 10);
         var countBackUp = Math.Min((ReloadDelaySecond / 10f) + 1, 10); // Soviele Sekunden können vergehen, bevor Backups gemacht werden. Der Wert muss kleiner sein, als Count_Save
         var countSave = (countBackUp * 2) + 1; // Soviele Sekunden können vergehen, bevor gespeichert werden muss. Muss größer sein, als Backup. Weil ansonsten der Backup-BackgroundWorker beendet wird
-        var countUserWork = (countSave / 5f) + 2; // Soviele Sekunden hat die User-Bearbeitung vorrang. Verhindert, dass die Bearbeitung des Users spontan abgebrochen wird.
 
-        if (DateTime.UtcNow.Subtract(_lastUserActionUtc).TotalSeconds < countUserWork || BlockSaveOperations()) { CancelBackGroundWorker(); return; } // Benutzer arbeiten lassen
+        //if (DateTime.UtcNow.Subtract(_lastUserActionUtc).TotalSeconds < countUserWork || BlockSaveOperations()) { CancelBackGroundWorker(); return; } // Benutzer arbeiten lassen
 
-        if (_checkerTickCount > countSave && mustSave) { CancelBackGroundWorker(); }
+        //if (_checkerTickCount > countSave && mustSave) { CancelBackGroundWorker(); }
 
         var mustReload = ReloadNeeded;
 
-        if (_checkerTickCount > ReloadDelaySecond && mustReload) { CancelBackGroundWorker(); }
-        if (_backgroundWorker.IsBusy) { return; }
+        //if (_checkerTickCount > ReloadDelaySecond && mustReload) { CancelBackGroundWorker(); }
+        //if (_backgroundWorker.IsBusy) { return; }
 
         //if (string.IsNullOrEmpty(ErrorReason(Enums.ErrorReason.EditNormaly))) { return; }
 
@@ -734,13 +720,13 @@ public sealed class MultiUserFile : IDisposableExtended {
             return;
         }
 
-        if (mustBackup && !mustReload && !mustSave && _checkerTickCount >= countBackUp && string.IsNullOrEmpty(ErrorReason(Enums.ErrorReason.EditAcut))) {
-            var nowsek = (DateTime.UtcNow.Ticks - _startTick) / 30000000;
-            if (nowsek % 20 != 0) { return; } // Lasten startabhängig verteilen. Bei Pending changes ist es eh immer true;
+        //if (mustBackup && !mustReload && !mustSave && _checkerTickCount >= countBackUp && string.IsNullOrEmpty(ErrorReason(Enums.ErrorReason.EditAcut))) {
+        //    var nowsek = (DateTime.UtcNow.Ticks - _startTick) / 30000000;
+        //    if (nowsek % 20 != 0) { return; } // Lasten startabhängig verteilen. Bei Pending changes ist es eh immer true;
 
-            StartBackgroundWorker();
-            return;
-        }
+        //    StartBackgroundWorker();
+        //    return;
+        //}
 
         // Überhaupt nix besonderes. Ab und zu mal Reloaden
         if (mustReload && _checkerTickCount > ReloadDelaySecond) {
@@ -852,27 +838,10 @@ public sealed class MultiUserFile : IDisposableExtended {
         DiscardPendingChanges?.Invoke(this, System.EventArgs.Empty);
     }
 
-    private void OnDoBackGroundWork(BackgroundWorker bgw) {
-        DoBackGroundWork?.Invoke(this, new MultiUserFileBackgroundWorkerEventArgs(bgw));
-    }
-
-    /// <summary>
-    ///  Der Richtige Ort, um das "PendingChanges" flag auf false zu setzen.
-    /// </summary>
-    private void OnDoWorkAfterSaving() {
-        DoWorkAfterSaving?.Invoke(this, System.EventArgs.Empty);
-    }
-
     private bool OnHasPendingChanges() {
         var x = new MultiUserFileHasPendingChangesEventArgs();
         HasPendingChanges?.Invoke(this, x);
         return x.HasPendingChanges;
-    }
-
-    private bool OnIsThereBackgroundWorkToDo() {
-        var x = new MultiUserIsThereBackgroundWorkToDoEventArgs();
-        IsThereBackgroundWorkToDo?.Invoke(this, x);
-        return x.BackGroundWork;
     }
 
     private void OnLoading(LoadingEventArgs e) {
@@ -887,6 +856,11 @@ public sealed class MultiUserFile : IDisposableExtended {
     private void OnSavedToDisk() {
         if (IsDisposed) { return; }
         SavedToDisk?.Invoke(this, System.EventArgs.Empty);
+    }
+
+    private void OnSaving() {
+        if (IsDisposed) { return; }
+        Saving?.Invoke(this, System.EventArgs.Empty);
     }
 
     private void OnShouldICancelSaveOperations(CancelEventArgs e) => ShouldICancelSaveOperations?.Invoke(this, e);
@@ -1004,7 +978,6 @@ public sealed class MultiUserFile : IDisposableExtended {
 
         _checkedAndReloadNeed = false;
         _lastSaveCode = fileinfo;
-        OnDoWorkAfterSaving();
         OnSavedToDisk();
         IsSaving = false;
         return string.Empty;
@@ -1013,15 +986,6 @@ public sealed class MultiUserFile : IDisposableExtended {
             //Develop.DebugPrint(enFehlerArt.Info, "Speichern der Datei abgebrochen.<br>Datei: " + Filename + "<br><br>Grund:<br>" + txt);
             RepairOldBlockFiles();
             return txt;
-        }
-    }
-
-    private void StartBackgroundWorker() {
-        try {
-            if (!string.IsNullOrEmpty(ErrorReason(Enums.ErrorReason.EditNormaly))) { return; }
-            if (!_backgroundWorker.IsBusy) { _backgroundWorker.RunWorkerAsync(); }
-        } catch {
-            StartBackgroundWorker();
         }
     }
 

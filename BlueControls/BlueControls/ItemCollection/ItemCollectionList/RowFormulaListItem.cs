@@ -113,7 +113,7 @@ public class RowFormulaListItem : BasicListItem {
     protected override Size ComputeSizeUntouchedForListBox() {
         try {
             if (_tmpBmp == null) { GeneratePic(); }
-            return _tmpBmp == null ? new Size(200, 200) : _tmpBmp.Size;
+            return _tmpBmp?.Size ?? new Size(200, 200);
         } catch {
             return ComputeSizeUntouchedForListBox();
         }

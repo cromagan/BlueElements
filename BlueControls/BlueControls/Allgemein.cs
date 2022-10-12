@@ -58,10 +58,17 @@ public static class Allgemein {
         if (cancel) { return null; }
         ContextMenuInitEventArgs ec = new(hotItem, tags, userMenu);
         par.OnContextMenuInit(ec);
-        return ec.Cancel ? null
-            : thisContextMenu != null && thisContextMenu.Count > 0 ? par
-            : userMenu.Count > 0 ? par
-            : null;
+        if (ec.Cancel) {
+            return null;
+        }
+
+        if (thisContextMenu != null && thisContextMenu.Count > 0) {
+            return par;
+        }
+        if (userMenu.Count > 0) {
+            return par;
+        }
+        return null;
     }
 
     #endregion

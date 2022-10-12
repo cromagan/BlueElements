@@ -104,7 +104,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposable {
         }
     }
 
-    public RowItem this[FilterCollection? filter] => Database == null ? null : _internal.Values.FirstOrDefault(thisRow => thisRow != null && thisRow.MatchesTo(filter));
+    public RowItem? this[FilterCollection? filter] => Database == null ? null : _internal.Values.FirstOrDefault(thisRow => thisRow != null && thisRow.MatchesTo(filter));
 
     #endregion
 

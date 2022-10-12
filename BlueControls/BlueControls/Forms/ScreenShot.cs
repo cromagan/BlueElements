@@ -102,8 +102,6 @@ public sealed partial class ScreenShot {
     /// Erstellt einen Screenshot, dann kann der User einen Bereich wählen - und gibt diesen zurück.
     /// </summary>
     /// <param name="frm">Diese Form wird automatisch minimiert und wieder maximiert.</param>
-    /// <param name="MaxW">Die Maximale Breite des Bildes. Evtl. wird das Bild herunterskaliert.</param>
-    /// <param name="MaxH">Die Maximale Höhe des Bildes. Evtl. wird das Bild herunterskaliert.</param>
     /// <returns></returns>
     /// <remarks></remarks>
     public static ScreenData GrabArea(System.Windows.Forms.Form? frm) {

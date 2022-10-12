@@ -71,8 +71,6 @@ public sealed class DatabaseSQL : DatabaseAbstract {
 
     public override void BlockReload(bool crashIsCurrentlyLoading) { }
 
-    public override void CancelBackGroundWorker() { }
-
     public override void Load_Reload() { }
 
     public override bool Save(bool mustSave) => _sql.ConnectionOk;

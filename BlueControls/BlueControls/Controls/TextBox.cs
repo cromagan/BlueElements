@@ -971,7 +971,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             Value = 0f,
             Visible = true
         };
-        _sliderY.ValueChanged += new EventHandler(SliderY_ValueChange);
+        _sliderY.ValueChanged += SliderY_ValueChange;
         Controls.Add(_sliderY);
     }
 

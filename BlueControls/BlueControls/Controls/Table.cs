@@ -225,7 +225,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public FilterCollection? Filter { get; private set; }
 
     [DefaultValue(1.0f)]
-    public double FontScale => _database == null ? 1f : _database.GlobalScale;
+    public double FontScale => _database?.GlobalScale ?? 1f;
 
     public List<RowItem?> PinnedRows { get; } = new();
 
@@ -271,7 +271,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public RowSortDefinition SortDefinitionTemporary {
+    public RowSortDefinition? SortDefinitionTemporary {
         get => _sortDefinitionTemporary;
         set {
             if (_sortDefinitionTemporary != null && value != null && _sortDefinitionTemporary.ToString() == value.ToString()) { return; }
@@ -287,7 +287,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public RowItem Unterschiede {
+    public RowItem? Unterschiede {
         get => _unterschiede;
         set {
             //if (_Unterschiede != null && value != null && _sortDefinitionTemporary.ToString() == value.ToString()) { return; }
@@ -1010,7 +1010,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Invalidate();
     }
 
-    public List<RowData> SortedRows() {
+    public List<RowData>? SortedRows() {
         if (_sortedRowData != null) { return _sortedRowData; }
 
         try {
@@ -1020,10 +1020,15 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             var expanded = true;
             var lastCap = string.Empty;
 
-            var sortedRowDataNew = Database == null
-                ? new List<RowData?>()
-                : Database.Row.CalculateSortedRows(FilteredRows(), SortUsed(), PinnedRows, _sortedRowData);
-            if (!_sortedRowData.IsDifferentTo(sortedRowDataNew)) { return _sortedRowData; }
+            List<RowData?> sortedRowDataNew;
+            if (Database == null) {
+                sortedRowDataNew = new List<RowData?>();
+            } else {
+                sortedRowDataNew =
+                    Database.Row.CalculateSortedRows(FilteredRows(), SortUsed(), PinnedRows, _sortedRowData);
+            }
+
+            if (_sortedRowData != null && !_sortedRowData.IsDifferentTo(sortedRowDataNew)) { return _sortedRowData; }
 
             _sortedRowData = new List<RowData>();
 

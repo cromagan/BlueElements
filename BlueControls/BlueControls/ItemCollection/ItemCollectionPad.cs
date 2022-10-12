@@ -92,8 +92,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
     /// <summary>
     ///
     /// </summary>
-    /// <param name="value"></param>
-    /// <param name="needPrinterData"></param>
+    /// <param name="toParse"></param>
     /// <param name="useThisId">Wenn das Blatt bereits eine Id hat, muss die Id verwendet werden. Wird das Feld leer gelassen, wird die beinhaltete Id benutzt.</param>
     public ItemCollectionPad(string toParse, string useThisId) : this() {
         if (string.IsNullOrEmpty(toParse) || toParse.Length < 3) { return; }

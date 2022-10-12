@@ -170,7 +170,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
             if (DesignMode) { Refresh(); }// Damit das skin Geinittet wird
             DrawControl(null, States.Standard);
         }
-        return _eText != null ? _eText.LastSize() : new Size(1, 1);
+        return _eText?.LastSize() ?? new Size(1, 1);
     }
 
     protected override void DrawControl(Graphics? gr, States state) {

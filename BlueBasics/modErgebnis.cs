@@ -141,7 +141,7 @@ public static class Berechnung {
         // --------------------------------------------------------------------------------------------------------------------------------
         if (formel.Replace(".", ",").IsNumeral()) { return DoubleParse(formel.Replace(".", ",")); }
         // TMP = Math.Max(Math.Max(-1, Formel.LastIndexOf("=")), Math.Max(Formel.LastIndexOf("<"), Formel.LastIndexOf(">")));
-        var tmp = Math.Max(formel.LastIndexOf("+"), LastMinusIndex(formel));
+        var tmp = Math.Max(formel.LastIndexOf("+", StringComparison.Ordinal), LastMinusIndex(formel));
         if (tmp < 0) { tmp = Math.Max(formel.LastIndexOf("/", StringComparison.Ordinal), formel.LastIndexOf("*", StringComparison.Ordinal)); }
         if (tmp < 1) { return null; }
         // --------------------------------------------------------------------------------------------------------------------------------

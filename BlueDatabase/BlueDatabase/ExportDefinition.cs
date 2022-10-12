@@ -560,16 +560,25 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
 
     internal bool DoBackUp(BackgroundWorker worker) {
         if (!IsOk()) { return false; }
+
         string savePath;
+
         if (!string.IsNullOrEmpty(_verzeichnis)) {
             savePath = _verzeichnis.CheckPath();
+        } else if (!string.IsNullOrEmpty(Database.AdditionaFilesPfad)) {
+            savePath = Database.AdditionaFilesPfad + "Backup\\";
+        } else if (!string.IsNullOrEmpty(Database.Filename)) {
+            savePath = Database.Filename.FilePath() + "Backup\\";
         } else {
-            savePath = !string.IsNullOrEmpty(Database.Filename)
-                ? Database.Filename.FilePath() + "Backup\\"
-                : (System.Windows.Forms.Application.StartupPath + "\\Backup\\").CheckPath();
-            if (!DirectoryExists(savePath)) { Directory.CreateDirectory(savePath); }
+            savePath = (System.Windows.Forms.Application.StartupPath + "\\Backup\\").CheckPath();
         }
+
+        if (!DirectoryExists(savePath)) { Directory.CreateDirectory(savePath); }
+
+
         var singleFileExport = savePath + Database.Filename.FileNameWithoutSuffix().StarkeVereinfachung(" _-+") + "_" + DateTime.Now.ToString(Constants.Format_Date4);
+        
+        
         List<string> added = new();
         var tim2 = DateTime.UtcNow;
         var tim = tim2.ToString(Constants.Format_Date5);

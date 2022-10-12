@@ -77,7 +77,11 @@ public class Method_Row : MethodDatabase {
 
         if (r.Count > 1) { return new DoItFeedback("Datenbankfehler, zu viele Einträge gefunden. Zuvor Prüfen mit RowCount."); }
 
-        return r == null || r.Count is 0 or > 1 ? RowToObjectFeedback(null) : RowToObjectFeedback(r[0]);
+        if (r == null || r.Count is 0 or > 1) {
+            return RowToObjectFeedback(null);
+        }
+
+        return RowToObjectFeedback(r[0]);
     }
 
     #endregion

@@ -32,6 +32,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 
@@ -73,6 +74,9 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
     public string UserGroup;
 
+    private readonly BackgroundWorker _backgroundWorker;
+    private readonly Timer _checker;
+    private readonly long _startTick = DateTime.UtcNow.Ticks;
     private string _additionaFilesPfad;
 
     private string? _additionaFilesPfadtmp;
@@ -81,6 +85,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
     private string _caption = string.Empty;
 
+    private int _checkerTickCount = -5;
     private string _createDate = string.Empty;
 
     private string _creator = string.Empty;
@@ -89,6 +94,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
     private string _globalShowPass = string.Empty;
 
+    private DateTime _lastUserActionUtc = new(1900, 1, 1);
     private int _reloadDelaySecond;
     private string _rulesScript = string.Empty;
 
@@ -135,6 +141,15 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         Layouts.ItemSeted += Layouts_ItemSeted;
 
         Export.Changed += Export_ListOrItemChanged;
+
+        _backgroundWorker = new BackgroundWorker {
+            WorkerReportsProgress = false,
+            WorkerSupportsCancellation = true
+        };
+        _backgroundWorker.DoWork += BackgroundWorker_DoWork;
+        _checker = new Timer(Checker_Tick);
+        _checker.Change(2000, 2000);
+
     }
 
     #endregion
@@ -250,6 +265,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     public bool IsDisposed { get; private set; }
 
     public abstract bool IsLoading { get; protected set; }
+
     public string LoadedVersion { get; private set; }
 
     public DateTime PowerEdit { get; set; }
@@ -355,7 +371,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
         if (FileExists(filename)) {
             if (filename.FileSuffix().ToLower() == "mdb") {
-                return new Database(filename, readOnly, false, null, tablename);
+                return new Database(filename, readOnly, false, tablename);
             }
 
             if (filename.FileSuffix().ToLower() == "mdf") {
@@ -435,7 +451,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
                 if (FileExists(pf)) {
                     var tmp = GetByID(pf, false, false, null, pf.FileNameWithoutSuffix());
                     if (tmp != null) { return tmp; }
-                    tmp = new Database(pf, false, false, sql, pf.FileNameWithoutSuffix());
+                    tmp = new Database(pf, false, false, pf.FileNameWithoutSuffix());
                     return tmp;
                 }
             } while (pf != string.Empty);
@@ -484,7 +500,9 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
     public abstract void BlockReload(bool crashIsCurrentlyLoading);
 
-    public abstract void CancelBackGroundWorker();
+    public void CancelBackGroundWorker() {
+        if (_backgroundWorker.IsBusy && !_backgroundWorker.CancellationPending) { _backgroundWorker.CancelAsync(); }
+    }
 
     public void ChangeData(DatabaseDataType comand, ColumnItem column, string previousValue, string changedTo, bool executeNow) => ChangeData(comand, column.Key, -1, previousValue, changedTo, executeNow);
 
@@ -567,6 +585,14 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
         if (!string.IsNullOrEmpty(f)) { return f; }
         if (mode == BlueBasics.Enums.ErrorReason.OnlyRead) { return string.Empty; }
+
+        if (mode.HasFlag(BlueBasics.Enums.ErrorReason.Load)) {
+            if (_backgroundWorker.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell das Neuladen."; }
+        }
+        if (mode.HasFlag(BlueBasics.Enums.ErrorReason.EditGeneral) || mode.HasFlag(BlueBasics.Enums.ErrorReason.Save)) {
+            if (_backgroundWorker.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
+            if (ReloadNeeded) { return "Die Datei muss neu eingelesen werden."; }
+        }
 
         return IntParse(LoadedVersion.Replace(".", "")) > IntParse(DatabaseVersion.Replace(".", ""))
             ? "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."
@@ -1100,7 +1126,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
             case DatabaseDataType.dummyComand_RemoveRow:
                 var removeRowKey = LongParse(value);
-                if (Row.SearchByKey(removeRowKey) is RowItem) { Row.Remove(removeRowKey); }
+                if (Row.SearchByKey(removeRowKey) != null) { Row.Remove(removeRowKey); }
                 break;
 
             case DatabaseDataType.dummyComand_RemoveColumn:
@@ -1288,6 +1314,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
     protected void OnLoading(object sender, LoadingEventArgs e) {
         if (IsDisposed) { return; }
+        CancelBackGroundWorker();
         Loading?.Invoke(this, e);
     }
 
@@ -1296,14 +1323,109 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         NeedPassword?.Invoke(this, e);
     }
 
-    protected void OnSavedToDisk(object sender, System.EventArgs e) {
+    protected virtual void OnSavedToDisk(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         SavedToDisk?.Invoke(this, e);
     }
 
-    protected abstract void SetUserDidSomething();
+    protected virtual void SetUserDidSomething() {
+        _lastUserActionUtc = DateTime.UtcNow;
+    }
 
     protected abstract string SpecialErrorReason(ErrorReason mode);
+
+    private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
+        if (ReadOnly) { return; }
+
+        foreach (var thisExport in Export) {
+            if (_backgroundWorker.CancellationPending) { return; }
+
+            if (IsLoading) { return; }
+
+            if (thisExport.IsOk()) {
+                //var e2 = new MultiUserFileHasPendingChangesEventArgs();
+                //HasPendingChanges(null, e2);
+
+                //if (!e2.HasPendingChanges) {
+                CancelEventArgs ec = new(false);
+                OnExporting(ec);
+                if (ec.Cancel) { return; }
+                //}
+
+                thisExport.DeleteOutdatedBackUps(_backgroundWorker);
+                if (_backgroundWorker.CancellationPending) { return; }
+                thisExport.DoBackUp(_backgroundWorker);
+                if (_backgroundWorker.CancellationPending) { return; }
+            }
+        }
+    }
+
+    private bool BlockSaveOperations() {
+        var e = new CancelEventArgs();
+
+        OnShouldICancelSaveOperations(this, e);
+        return e.Cancel;
+    }
+
+    private void Checker_Tick(object state) {
+        if (IsLoading) { return; }
+
+        _checkerTickCount++;
+        if (_checkerTickCount < 0) { return; }
+
+        if (DateTime.UtcNow.Subtract(_lastUserActionUtc).TotalSeconds < 10 || BlockSaveOperations()) { CancelBackGroundWorker(); return; } // Benutzer arbeiten lassen
+
+        var mustBackup = IsThereBackgroundWorkToDo();
+
+        if (!mustBackup) {
+            _checkerTickCount = 0;
+            return;
+        }
+
+        // Zeiten berechnen
+        ReloadDelaySecond = Math.Max(ReloadDelaySecond, 10);
+        var countBackUp = Math.Min((ReloadDelaySecond / 10f) + 1, 10); // Soviele Sekunden können vergehen, bevor Backups gemacht werden. Der Wert muss kleiner sein, als Count_Save
+
+        //if (DateTime.UtcNow.Subtract(_lastUserActionUtc).TotalSeconds < countUserWork || BlockSaveOperations()) { CancelBackGroundWorker(); return; } // Benutzer arbeiten lassen
+
+        ////if (_checkerTickCount > countSave && mustSave) { CancelBackGroundWorker(); }
+
+        //var mustReload = ReloadNeeded;
+
+        //if (_checkerTickCount > ReloadDelaySecond && mustReload) { CancelBackGroundWorker(); }
+        //if (_backgroundWorker.IsBusy) { return; }
+
+        //if (string.IsNullOrEmpty(ErrorReason(Enums.ErrorReason.EditNormaly))) { return; }
+
+        //if (mustReload && mustSave) {
+        //    if (!string.IsNullOrEmpty(ErrorReason(BlueBasics.Enums.ErrorReason.Load))) { return; }
+        //    // Checker_Tick_count nicht auf 0 setzen, dass der Saver noch stimmt.
+        //    Load_Reload();
+        //    return;
+        //}
+
+        //if (mustSave && _checkerTickCount > countSave) {
+        //    if (!string.IsNullOrEmpty(ErrorReason(BlueBasics.Enums.ErrorReason.Save))) { return; }
+        //    if (!_pureBinSaver.IsBusy) { _pureBinSaver.RunWorkerAsync(); } // Eigentlich sollte diese Abfrage überflüssig sein. Ist sie aber nicht
+        //    _checkerTickCount = 0;
+        //    return;
+        //}
+
+        if (mustBackup && _checkerTickCount >= countBackUp && string.IsNullOrEmpty(ErrorReason(BlueBasics.Enums.ErrorReason.EditAcut))) {
+            var nowsek = (DateTime.UtcNow.Ticks - _startTick) / 30000000;
+            if (nowsek % 20 != 0) { return; } // Lasten startabhängig verteilen. Bei Pending changes ist es eh immer true;
+
+            StartBackgroundWorker();
+        }
+
+        //// Überhaupt nix besonderes. Ab und zu mal Reloaden
+        //if (mustReload && _checkerTickCount > ReloadDelaySecond) {
+        //    RepairOldBlockFiles();
+        //    if (!string.IsNullOrEmpty(ErrorReason(BlueBasics.Enums.ErrorReason.Load))) { return; }
+        //    Load_Reload();
+        //    _checkerTickCount = 0;
+        //}
+    }
 
     private void CheckViewsAndArrangements() {
         //if (ReadOnly) { return; }  // Gibt fehler bei Datenbanken, die nur Temporär erzeugt werden!
@@ -1362,6 +1484,25 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
                 }
             }
         }
+    }
+
+    private bool IsThereBackgroundWorkToDo() {
+        //var e2 = new MultiUserFileHasPendingChangesEventArgs();
+        //HasPendingChanges(null, e2);
+
+        //if (e2.HasPendingChanges) { e.BackGroundWork = true; return; }
+        CancelEventArgs ec = new(false);
+        OnExporting(ec);
+        if (ec.Cancel) { return false; }
+
+        foreach (var thisExport in Export) {
+            if (thisExport != null) {
+                if (thisExport.Typ == ExportTyp.EinzelnMitFormular) { return true; }
+                if (DateTime.UtcNow.Subtract(thisExport.LastExportTimeUtc).TotalDays > thisExport.BackupInterval * 50) { return true; }
+            }
+        }
+
+        return false;
     }
 
     private void Layouts_ItemSeted(object sender, ListEventArgs? e) {
@@ -1457,6 +1598,15 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     }
 
     private void Row_RowRemoving(object sender, RowEventArgs e) => ChangeData(DatabaseDataType.dummyComand_RemoveRow, -1, e.Row.Key, "", e.Row.Key.ToString(), false);
+
+    private void StartBackgroundWorker() {
+        try {
+            if (!string.IsNullOrEmpty(ErrorReason(BlueBasics.Enums.ErrorReason.EditNormaly))) { return; }
+            if (!_backgroundWorker.IsBusy) { _backgroundWorker.RunWorkerAsync(); }
+        } catch {
+            StartBackgroundWorker();
+        }
+    }
 
     #endregion
 }

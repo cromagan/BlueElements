@@ -112,6 +112,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     public event EventHandler NeedRefresh;
 
     [Obsolete("Value Changed benutzen", true)]
+    // ReSharper disable once UnusedMember.Global
     public new event EventHandler TextChanged;
 
     public event EventHandler ValueChanged;

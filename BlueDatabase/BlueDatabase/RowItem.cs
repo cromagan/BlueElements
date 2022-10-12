@@ -127,32 +127,32 @@ public sealed class RowItem : ICanBeEmpty, IDisposable {
 
         var vars = new List<Variable>();
 
-        switch (column.Format) {
-            //case DataFormat.Verknüpfung_zu_anderer_Datenbank:
-            //    //if (column.LinkedCell_RowKeyIsInColumn == -9999) {
-            //    wert = string.Empty; // Beim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss.
-            //    //vars.Add(new Variable(column.Name + "_link", string.Empty, VariableDataType.String, true, true, "Dieser Wert kann nur mit SetLink verändert werden.\r\nBeim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss."));
-            //    //} else {
-            //    //    qi = "Spalte: " + column.ReadableText() + "\r\nDer Inhalt wird zur Startzeit des Skripts festgelegt.";
-            //    //    ro = true;
-            //    //}
-            //    break;
+        //switch (column.Format) {
+        //    //case DataFormat.Verknüpfung_zu_anderer_Datenbank:
+        //    //    //if (column.LinkedCell_RowKeyIsInColumn == -9999) {
+        //    //    wert = string.Empty; // Beim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss.
+        //    //    //vars.Add(new Variable(column.Name + "_link", string.Empty, VariableDataType.String, true, true, "Dieser Wert kann nur mit SetLink verändert werden.\r\nBeim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss."));
+        //    //    //} else {
+        //    //    //    qi = "Spalte: " + column.ReadableText() + "\r\nDer Inhalt wird zur Startzeit des Skripts festgelegt.";
+        //    //    //    ro = true;
+        //    //    //}
+        //    //    break;
 
-            //case DataFormat.Link_To_Filesystem:
-            //    qi = "Spalte: " + column.ReadableText() + "\r\nFalls die Datei auf der Festplatte existiert, wird eine weitere\r\nVariable erzeugt: " + column.Name + "_FileName";
-            //    var f = column.Database.Cell.BestFile(column, row);
-            //    if (f.FileType() == FileFormat.Image && IO.FileExists(f)) {
-            //        vars.Add(new VariableString(column.Name + "_FileName", f, true, false, "Spalte: " + column.ReadableText() + "\r\nEnthält den vollen Dateinamen der Datei der zugehörigen Zelle.\r\nDie Existenz der Datei wurde geprüft und die Datei existert.\r\nAuf die Datei kann evtl. mit LoadImage zugegriffen werden."));
-            //    }
-            //    break;
+        //    //case DataFormat.Link_To_Filesystem:
+        //    //    qi = "Spalte: " + column.ReadableText() + "\r\nFalls die Datei auf der Festplatte existiert, wird eine weitere\r\nVariable erzeugt: " + column.Name + "_FileName";
+        //    //    var f = column.Database.Cell.BestFile(column, row);
+        //    //    if (f.FileType() == FileFormat.Image && IO.FileExists(f)) {
+        //    //        vars.Add(new VariableString(column.Name + "_FileName", f, true, false, "Spalte: " + column.ReadableText() + "\r\nEnthält den vollen Dateinamen der Datei der zugehörigen Zelle.\r\nDie Existenz der Datei wurde geprüft und die Datei existert.\r\nAuf die Datei kann evtl. mit LoadImage zugegriffen werden."));
+        //    //    }
+        //    //    break;
 
-            //case DataFormat.Columns_für_LinkedCellDropdown:
-            //    if (IntTryParse(wert, out var colKey)) {
-            //        var c = column.LinkedDatabase().Column.SearchByKey(colKey);
-            //        if (c != null) { wert = c.Name; }
-            //    }
-            //    break;
-        }
+        //    //case DataFormat.Columns_für_LinkedCellDropdown:
+        //    //    if (IntTryParse(wert, out var colKey)) {
+        //    //        var c = column.LinkedDatabase().Column.SearchByKey(colKey);
+        //    //        if (c != null) { wert = c.Name; }
+        //    //    }
+        //    //    break;
+        //}
 
         switch (column.ScriptType) {
             case ScriptType.Bool:
@@ -456,8 +456,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposable {
 
                 erg = erg.Replace("~" + thisColumnItem.Name.ToUpper() + "~", txt, RegexOptions.IgnoreCase);
                 while (erg.ToUpper().Contains("~" + thisColumnItem.Name.ToUpper() + "(")) {
-                    var x = erg.ToUpper().IndexOf("~" + thisColumnItem.Name.ToUpper() + "(");
-                    var x2 = erg.IndexOf(")", x);
+                    var x = erg.ToUpper().IndexOf("~" + thisColumnItem.Name.ToUpper() + "(", StringComparison.Ordinal);
+                    var x2 = erg.IndexOf(")", x, StringComparison.Ordinal);
                     if (x2 < x) { return erg; }
                     var ww = erg.Substring(x + thisColumnItem.Name.Length + 2, x2 - x - thisColumnItem.Name.Length - 2);
                     ww = ww.Replace(" ", string.Empty).ToUpper();

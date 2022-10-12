@@ -72,8 +72,6 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
         _muf.ShouldICancelSaveOperations += OnShouldICancelSaveOperations;
         _muf.DiscardPendingChanges += DiscardPendingChanges;
         _muf.HasPendingChanges += HasPendingChanges;
-        _muf.DoWorkAfterSaving += DoWorkAfterSaving;
-        _muf.IsThereBackgroundWorkToDo += IsThereBackgroundWorkToDo;
         _muf.ParseExternal += ParseExternal;
         _muf.ToListOfByte += ToListOfByte;
 
@@ -230,10 +228,6 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
         }
     }
 
-    protected void DoWorkAfterSaving(object sender, System.EventArgs e) => _saved = true;
-
-    protected void IsThereBackgroundWorkToDo(object sender, MultiUserIsThereBackgroundWorkToDoEventArgs e) { e.BackGroundWork = false; }
-
     protected void ParseExternal(object sender, MultiUserParseEventArgs e) {
         var toParse = e.Data.ToStringWin1252();
         if (string.IsNullOrEmpty(toParse)) { return; }
@@ -316,7 +310,10 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
 
     private void OnLoading(object sender, LoadingEventArgs e) => Loading?.Invoke(this, e);
 
-    private void OnSavedToDisk(object sender, System.EventArgs e) => SavedToDisk?.Invoke(this, e);
+    private void OnSavedToDisk(object sender, System.EventArgs e) {
+        _saved = true;
+        SavedToDisk?.Invoke(this, e);
+    }
 
     private void OnShouldICancelSaveOperations(object sender, CancelEventArgs e) => ShouldICancelSaveOperations?.Invoke(this, e);
 

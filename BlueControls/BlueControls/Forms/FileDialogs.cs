@@ -70,7 +70,7 @@ public static class FileDialogs {
     /// <summary>
     ///
     /// </summary>
-    /// <param name="Filelist"></param>
+    /// <param name="file"></param>
     /// <param name="Meldungen"></param>
     /// <returns>True, wenn mindestens eine DAtei gelöscht wurde.</returns>
     public static bool DeleteFile(string file, bool rückfrage) {

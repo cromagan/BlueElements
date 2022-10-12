@@ -1350,7 +1350,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
             }
         }
         ret = ret.Replace("\n", "\r").Replace("\r\r", "\r");
-        var i = ret.IndexOf("-\r");
+        var i = ret.IndexOf("-\r", StringComparison.Ordinal);
         if (i > 0 && i < ret.Length - 3) {
             var tzei = ret.Substring(i + 2, 1);
             if (tzei.ToLower() == tzei) {

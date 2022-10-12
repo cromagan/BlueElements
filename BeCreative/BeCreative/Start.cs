@@ -63,7 +63,7 @@ public partial class Start : Form {
 
     private void btnHierachie_Click(object sender, System.EventArgs e) => DoForm(new RelationDiagram(null));
 
-    private void btnLayout_Click(object sender, System.EventArgs e) => DoForm(new LayoutPadEditor((Database)null));
+    private void btnLayout_Click(object sender, System.EventArgs e) => DoForm(new LayoutPadEditor(null as Database));
 
     private void DoForm(Form frm) {
         FormManager.Current.RegisterForm(frm);

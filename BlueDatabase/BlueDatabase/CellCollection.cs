@@ -95,8 +95,8 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
     /// Optional zusätzlich mit den Dateirechten.
     /// </summary>
     /// <param name="row"></param>
-    /// <param name="DateiRechtePrüfen"></param>
     /// <param name="column"></param>
+    /// <param name="mode"></param>
     /// <returns></returns>
     public static string ErrorReason(ColumnItem? column, RowItem? row, ErrorReason mode) {
         if (mode == BlueBasics.Enums.ErrorReason.OnlyRead) { return string.Empty; }

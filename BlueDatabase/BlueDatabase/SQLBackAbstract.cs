@@ -415,9 +415,9 @@ public abstract class SQLBackAbstract {
         return _connection.State == ConnectionState.Open;
     }
 
-    private bool AddColumn(string tablename, string column) => ExecuteCommand("alter table " + tablename.ToUpper() + " add " + column + " " + VarChar255 + " default '' NOT NULL");
+    private void AddColumn(string tablename, string column) => ExecuteCommand("alter table " + tablename.ToUpper() + " add " + column + " " + VarChar255 + " default '' NOT NULL");
 
-    private bool AddColumn(string tablename, string column, string type) => ExecuteCommand("alter table " + tablename.ToUpper() + " add " + column + " " + type + " default '' NOT NULL");
+    private void AddColumn(string tablename, string column, string type) => ExecuteCommand("alter table " + tablename.ToUpper() + " add " + column + " " + type + " default '' NOT NULL");
 
     private void AddColumnToMain(string tablename, string columnName) {
         columnName = columnName.ToUpper();

@@ -45,13 +45,13 @@ public sealed class Database : DatabaseAbstract {
 
     #region Constructors
 
-    public Database(Stream stream, string tablename) : this(stream, string.Empty, true, false, null, tablename) { }
+    public Database(Stream stream, string tablename) : this(stream, string.Empty, true, false, tablename) { }
 
-    public Database(bool readOnly, string tablename) : this(null, string.Empty, readOnly, true, null, tablename) { }
+    public Database(bool readOnly, string tablename) : this(null, string.Empty, readOnly, true, tablename) { }
 
-    public Database(string filename, bool readOnly, bool create, SQLBackAbstract? sql, string tablename) : this(null, filename, readOnly, create, sql, tablename) { }
+    public Database(string filename, bool readOnly, bool create, string tablename) : this(null, filename, readOnly, create, tablename) { }
 
-    private Database(Stream? stream, string filename, bool readOnly, bool create, SQLBackAbstract? sql, string tablename) : base(tablename, readOnly) {
+    private Database(Stream? stream, string filename, bool readOnly, bool create, string tablename) : base(tablename, readOnly) {
         AllFiles.Add(this);
 
         _muf = new BlueBasics.MultiUserFile.MultiUserFile(readOnly, true);
@@ -63,11 +63,8 @@ public sealed class Database : DatabaseAbstract {
         _muf.ShouldICancelSaveOperations += OnShouldICancelSaveOperations;
         _muf.DiscardPendingChanges += DiscardPendingChanges;
         _muf.HasPendingChanges += HasPendingChanges;
-        _muf.DoWorkAfterSaving += DoWorkAfterSaving;
-        _muf.IsThereBackgroundWorkToDo += IsThereBackgroundWorkToDo;
         _muf.ParseExternal += ParseExternal;
         _muf.ToListOfByte += ToListOfByte;
-        _muf.DoBackGroundWork += DoBackGroundWork;
 
         Develop.StartService();
 
@@ -109,10 +106,7 @@ public sealed class Database : DatabaseAbstract {
         _muf.BlockReload(crashIsCurrentlyLoading);
     }
 
-    public override void CancelBackGroundWorker() => _muf?.CancelBackGroundWorker();
-
     public void DiscardPendingChanges(object sender, System.EventArgs e) => ChangeWorkItems(ItemState.Pending, ItemState.Undo);
-
 
     public void HasPendingChanges(object? sender, MultiUserFileHasPendingChangesEventArgs e) {
         try {
@@ -124,10 +118,8 @@ public sealed class Database : DatabaseAbstract {
         }
     }
 
-
     public override void Load_Reload() => _muf?.Load_Reload();
 
-    
     public void Parse(byte[] bLoaded, ref int pointer, ref DatabaseDataType type, ref long colKey, ref long rowKey, ref string value, ref int width, ref int height) {
         int les;
         switch ((Routinen)bLoaded[pointer]) {
@@ -462,9 +454,9 @@ public sealed class Database : DatabaseAbstract {
 
     internal void SaveToByteList(List<byte> list, ColumnCollection c) {
         //Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString());
-        for (var columnCount = 0; columnCount < c.Count; columnCount++) {
-            if (c[columnCount] != null && !string.IsNullOrEmpty(c[columnCount].Name)) {
-                SaveToByteList(c[columnCount], ref list);
+        foreach (var columnitem in c) {
+            if (columnitem != null && !string.IsNullOrEmpty(columnitem.Name)) {
+                SaveToByteList(columnitem, ref list);
             }
         }
     }
@@ -519,6 +511,18 @@ public sealed class Database : DatabaseAbstract {
         // KEINE Vorage mitgeben, weil sonst eine Endlosschleife aufgerufen wird!
     }
 
+    protected override void Initialize() {
+        base.Initialize();
+        _muf.ReloadDelaySecond = 600;
+        Works.Clear();
+    }
+
+    protected override void OnSavedToDisk(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
+        ChangeWorkItems(ItemState.Pending, ItemState.Undo);
+        base.OnSavedToDisk(sender, e);
+    }
+
     protected override void SetUserDidSomething() => _muf.SetUserDidSomething();
 
     protected override string SpecialErrorReason(ErrorReason mode) => _muf.ErrorReason(mode);
@@ -563,42 +567,6 @@ public sealed class Database : DatabaseAbstract {
                 if (thisWork.State == oldState) { thisWork.State = newState; }
             }
         }
-    }
-
-    private void DoBackGroundWork(object sender, MultiUserFileBackgroundWorkerEventArgs e) {
-        if (ReadOnly) { return; }
-
-        foreach (var thisExport in Export) {
-            if (e.BackgroundWorker.CancellationPending) { return; }
-
-            if (thisExport.IsOk()) {
-                var e2 = new MultiUserFileHasPendingChangesEventArgs();
-                HasPendingChanges(null, e2);
-
-                if (!e2.HasPendingChanges) {
-                    CancelEventArgs ec = new(false);
-                    OnExporting(ec);
-                    if (ec.Cancel) { return; }
-                }
-
-                thisExport.DeleteOutdatedBackUps(e.BackgroundWorker);
-                if (e.BackgroundWorker.CancellationPending) { return; }
-                thisExport.DoBackUp(e.BackgroundWorker);
-                if (e.BackgroundWorker.CancellationPending) { return; }
-            }
-        }
-    }
-
-    private void DoWorkAfterSaving(object sender, System.EventArgs e) {
-        ChangeWorkItems(ItemState.Pending, ItemState.Undo);
-        //var filesNewLCase = AllConnectedFilesLCase();
-        //List<string> writerFilesToDeleteLCase = new();
-        //if (_verwaisteDaten == VerwaisteDaten.Löschen) {
-        //    writerFilesToDeleteLCase = _filesAfterLoadingLCase.Except(filesNewLCase).ToList();
-        //}
-        //_filesAfterLoadingLCase.Clear();
-        //_filesAfterLoadingLCase.AddRange(filesNewLCase);
-        //if (writerFilesToDeleteLCase.Count > 0) { DeleteFile(writerFilesToDeleteLCase); }
     }
 
     private void ExecutePending() {
@@ -678,29 +646,6 @@ public sealed class Database : DatabaseAbstract {
                 }
             }
             SetValueInternal(thisPendingItem.Comand, thisPendingItem.ChangedTo, col, row, 0, 0);
-        }
-    }
-
-    private void Initialize() {
-        base.Initialize();
-        _muf.ReloadDelaySecond = 600;
-        Works.Clear();
-    }
-
-    private void IsThereBackgroundWorkToDo(object sender, MultiUserIsThereBackgroundWorkToDoEventArgs e) {
-        var e2 = new MultiUserFileHasPendingChangesEventArgs();
-        HasPendingChanges(null, e2);
-
-        if (e2.HasPendingChanges) { e.BackGroundWork = true; return; }
-        CancelEventArgs ec = new(false);
-        OnExporting(ec);
-        if (ec.Cancel) { return; }
-
-        foreach (var thisExport in Export) {
-            if (thisExport != null) {
-                if (thisExport.Typ == ExportTyp.EinzelnMitFormular) { e.BackGroundWork = true; return; }
-                if (DateTime.UtcNow.Subtract(thisExport.LastExportTimeUtc).TotalDays > thisExport.BackupInterval * 50) { e.BackGroundWork = true; return; }
-            }
         }
     }
 

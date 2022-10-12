@@ -53,7 +53,7 @@ internal class Method_Remove : Method {
                 tmpList!.RemoveString(vs.ValueString, ((VariableBool)attvar.Attributes[1]).ValueBool);
             }
             if (attvar.Attributes[z] is VariableListString vl) {
-                tmpList!.RemoveString(vl.ValueList, ((VariableBool)attvar.Attributes[1]).ValueBool);
+                tmpList.RemoveString(vl.ValueList, ((VariableBool)attvar.Attributes[1]).ValueBool);
             }
         }
         ((VariableListString)attvar.Attributes[0]).ValueList = tmpList;

@@ -23,7 +23,7 @@ internal static class Program {
         FormManager.NewModeSelectionForm = Start.NewForm;
         FormManager.ExecuteAtEnd = Start.Ende;
         FormManager.StartForm = new Start();
-        System.Windows.Forms.Application.Run(FormManager.Current);
+        Application.Run(FormManager.Current);
         //Application.Run(new Start());
         //BlueBasics.Develop.TraceLogging_End();
     }

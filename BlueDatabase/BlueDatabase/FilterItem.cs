@@ -198,7 +198,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
                     break;
 
                 case "value":
-                    SearchValue.Add(pair.Value.FromNonCritical());
+                    SearchValue.AddIfNotExists(pair.Value.FromNonCritical());
                     break;
 
                 case "herkunft":
@@ -210,7 +210,8 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
                     break;
             }
         }
-        if (toParse.Contains(", Value=}") || toParse.Contains(", Value=,")) { SearchValue.Add(""); }
+        if (toParse.Contains(", Value=}") || toParse.Contains(", Value=,")) { SearchValue.AddIfNotExists(""); }
+
         IsParsing = false;
     }
 

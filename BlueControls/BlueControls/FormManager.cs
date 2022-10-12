@@ -1,4 +1,23 @@
-﻿using BlueBasics;
+﻿// Authors:
+// Christian Peter
+//
+// Copyright (c) 2022 Christian Peter
+// https://github.com/cromagan/BlueElements
+//
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#nullable enable
+
+using BlueBasics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,17 +33,17 @@ public class FormManager : ApplicationContext {
     public static dExecuteAtEnd ExecuteAtEnd = null;
     public static bool First = true;
     public static bool FirstWindowShown = false;
-    public static List<Form> forms = new();
+    public static List<Form> Forms = new();
 
     public static dNewModeSelectionForm NewModeSelectionForm = null;
-    public static System.Windows.Forms.Form StartForm;
+    public static Form? StartForm;
 
     //I'm using Lazy here, because an exception is thrown if any Forms have been
     //created before calling Application.SetCompatibleTextRenderingDefault(false)
     //in the Program class
     private static readonly Lazy<FormManager> _current = new();
 
-    private System.Windows.Forms.Form _lastStartForm = null;
+    private Form? _lastStartForm = null;
 
     #endregion
 
@@ -51,7 +70,7 @@ public class FormManager : ApplicationContext {
 
     public delegate void dExecuteAtEnd();
 
-    public delegate System.Windows.Forms.Form? dNewModeSelectionForm();
+    public delegate Form? dNewModeSelectionForm();
 
     #endregion
 
@@ -72,13 +91,13 @@ public class FormManager : ApplicationContext {
 
     public void RegisterForm(Form frm) {
         frm.FormClosed += onFormClosed;
-        forms.Add(frm);
+        Forms.Add(frm);
     }
 
     //When each form closes, close the application if no other open forms
     private void onFormClosed(object sender, System.EventArgs e) {
-        forms.Remove((Form)sender);
-        if (FirstWindowShown && !forms.Any()) {
+        Forms.Remove((Form)sender);
+        if (FirstWindowShown && !Forms.Any()) {
             if (sender != _lastStartForm) {
                 if (NewModeSelectionForm != null) {
                     _lastStartForm = NewModeSelectionForm();
