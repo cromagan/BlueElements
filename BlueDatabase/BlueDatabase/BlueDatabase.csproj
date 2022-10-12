@@ -101,7 +101,7 @@
     <Compile Include="SQLBackMicrosoftCE.cs" />
     <Compile Include="CellCollection.cs" />
     <Compile Include="CellItem.cs" />
-    <Compile Include="SQL_Database.cs" />
+    <Compile Include="DatabaseSQL.cs" />
     <Compile Include="Enums\Ansicht.cs" />
     <Compile Include="SQLBackAbstract.cs" />
     <Compile Include="Enums\AlignmentHorizontal.cs" />
@@ -160,8 +160,8 @@
       <DependentUpon>DatabaseAbstract.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL_Database.resx">
-      <DependentUpon>SQL_Database.cs</DependentUpon>
+    <EmbeddedResource Include="DatabaseSQL.resx">
+      <DependentUpon>DatabaseSQL.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Database.resx">

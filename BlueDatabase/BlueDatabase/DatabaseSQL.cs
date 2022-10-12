@@ -27,7 +27,7 @@ namespace BlueDatabase;
 
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public sealed class SQL_Database : DatabaseAbstract {
+public sealed class DatabaseSQL : DatabaseAbstract {
 
     #region Fields
 
@@ -37,7 +37,7 @@ public sealed class SQL_Database : DatabaseAbstract {
 
     #region Constructors
 
-    public SQL_Database(SQLBackAbstract sql, bool readOnly, string tablename) : base(tablename, readOnly) {
+    public DatabaseSQL(SQLBackAbstract sql, bool readOnly, string tablename) : base(tablename, readOnly) {
         AllFiles.Add(this);
 
         _sql = sql;
@@ -72,28 +72,6 @@ public sealed class SQL_Database : DatabaseAbstract {
     public override void BlockReload(bool crashIsCurrentlyLoading) { }
 
     public override void CancelBackGroundWorker() { }
-
-    public override void ChangeData(DatabaseDataType comand, long columnKey, long rowKey, string previousValue, string changedTo, bool executeNow) {
-        if (executeNow) {
-            SetValueInternal(comand, changedTo, Column.SearchByKey(columnKey), Row.SearchByKey(rowKey), -1, -1);
-        }
-        if (IsLoading) { return; }
-        if (ReadOnly) {
-            if (!string.IsNullOrEmpty(TableName)) {
-                Develop.DebugPrint(FehlerArt.Warnung, "Datei ist Readonly, " + comand + ", " + TableName);
-            }
-            return;
-        }
-        // Keine Doppelten Rausfiltern, ansonstn stimmen die Undo nicht mehr
-
-        //if (comand != DatabaseDataType.AutoExport) { _muf.SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
-
-        if (rowKey < -100) { Develop.DebugPrint(FehlerArt.Fehler, "RowKey darf hier nicht <-100 sein!"); }
-        if (columnKey < -100) { Develop.DebugPrint(FehlerArt.Fehler, "ColKey darf hier nicht <-100 sein!"); }
-        //Works.Add(new WorkItem(comand, columnKey, rowKey, previousValue, changedTo, UserName));
-
-        _sql.AddUndo(TableName, comand, columnKey, rowKey, previousValue, changedTo, UserName);
-    }
 
     public override void Load_Reload() { }
 
@@ -133,13 +111,19 @@ public sealed class SQL_Database : DatabaseAbstract {
         Column.Add(x);
     }
 
+    protected override void AddUndo(string tableName, DatabaseDataType comand, long columnKey, long rowKey, string previousValue, string changedTo, string userName) {
+        _sql.AddUndo(TableName, comand, columnKey, rowKey, previousValue, changedTo, UserName);
+    }
+
     protected override DatabaseAbstract? GetOtherTable(string filename, bool readOnly) {
         if (!SQLBackAbstract.IsValidTableName(filename)) {
             return null;
         }
 
-        return new SQL_Database(_sql, readOnly, filename);
+        return new DatabaseSQL(_sql, readOnly, filename);
     }
+
+    protected override void SetUserDidSomething() { }
 
     protected override string SpecialErrorReason(ErrorReason mode) => string.Empty;
 

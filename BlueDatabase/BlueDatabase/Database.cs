@@ -37,7 +37,6 @@ public sealed class Database : DatabaseAbstract {
 
     #region Fields
 
-    public readonly SQLBackAbstract? CopyToSql;
     public ListExt<WorkItem>? Works;
 
     private readonly BlueBasics.MultiUserFile.MultiUserFile? _muf;
@@ -71,18 +70,6 @@ public sealed class Database : DatabaseAbstract {
         _muf.DoBackGroundWork += DoBackGroundWork;
 
         Develop.StartService();
-
-        //var f2 = "C:\\01_DATA\\DB1234567890" + filename.FileNameWithoutSuffix() + ".mdf";
-
-        ////var f2 = "D:\\" + filename.FileNameWithoutSuffix() + ".mdf";
-        //if (FileExists(filename) && !FileExists(f2)) {
-        //    CopyToSQL = new SqlBack(f2, true);
-        //}
-        CopyToSql = sql;
-
-        //CultureInfo culture = new("de-DE");
-        //CultureInfo.DefaultThreadCurrentCulture = culture;
-        //CultureInfo.DefaultThreadCurrentUICulture = culture;
 
         Works = new ListExt<WorkItem>();
 
@@ -122,37 +109,10 @@ public sealed class Database : DatabaseAbstract {
         _muf.BlockReload(crashIsCurrentlyLoading);
     }
 
-    //    return columnAll.SortedDistinctList();
-    //}
-    public bool BlockSaveOperations() => RowItem.DoingScript || _muf.BlockSaveOperations();
-
     public override void CancelBackGroundWorker() => _muf?.CancelBackGroundWorker();
 
-    public override void ChangeData(DatabaseDataType comand, long columnKey, long rowKey, string previousValue, string changedTo, bool executeNow) {
-        if (executeNow) {
-            SetValueInternal(comand, changedTo, Column.SearchByKey(columnKey), Row.SearchByKey(rowKey), -1, -1);
-        }
-
-        if (_muf.IsLoading) { return; }
-
-        if (ReadOnly) {
-            if (!string.IsNullOrEmpty(Filename)) {
-                Develop.DebugPrint(FehlerArt.Warnung, "Datei ist Readonly, " + comand + ", " + Filename);
-            }
-            return;
-        }
-        // Keine Doppelten Rausfiltern, ansonstn stimmen die Undo nicht mehr
-
-        if (comand != DatabaseDataType.AutoExport) { _muf.SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
-
-        if (rowKey < -100) { Develop.DebugPrint(FehlerArt.Fehler, "RowKey darf hier nicht <-100 sein!"); }
-        if (columnKey < -100) { Develop.DebugPrint(FehlerArt.Fehler, "ColKey darf hier nicht <-100 sein!"); }
-        Works.Add(new WorkItem(comand, columnKey, rowKey, previousValue, changedTo, UserName));
-
-        CopyToSql?.AddUndo(TableName, comand, columnKey, rowKey, previousValue, changedTo, UserName);
-    }
-
     public void DiscardPendingChanges(object sender, System.EventArgs e) => ChangeWorkItems(ItemState.Pending, ItemState.Undo);
+
 
     public void HasPendingChanges(object? sender, MultiUserFileHasPendingChangesEventArgs e) {
         try {
@@ -164,8 +124,10 @@ public sealed class Database : DatabaseAbstract {
         }
     }
 
+
     public override void Load_Reload() => _muf?.Load_Reload();
 
+    
     public void Parse(byte[] bLoaded, ref int pointer, ref DatabaseDataType type, ref long colKey, ref long rowKey, ref string value, ref int width, ref int height) {
         int les;
         switch ((Routinen)bLoaded[pointer]) {
@@ -373,15 +335,15 @@ public sealed class Database : DatabaseAbstract {
     }
 
     public override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
-        if ((int)type is >= 100 and <= 199) {
-            CopyToSql?.CheckIn(TableName, type, value, column, null, -1, -1);
+        //if ((int)type is >= 100 and <= 199) {
+        //    CopyToSql?.CheckIn(TableName, type, value, column, null, -1, -1);
 
-            if (type == DatabaseDataType.ColumnName) {
-                CopyToSql?.SetStyleData(TableName, "ColumnKey", value.ToUpper(), column.Key.ToString());
-            }
-        } else {
-            CopyToSql?.CheckIn(TableName, type, value, column, row, width, height);
-        }
+        //    if (type == DatabaseDataType.ColumnName) {
+        //        CopyToSql?.SetStyleData(TableName, "ColumnKey", value.ToUpper(), column.Key.ToString());
+        //    }
+        //} else {
+        //    CopyToSql?.CheckIn(TableName, type, value, column, row, width, height);
+        //}
 
         var r = base.SetValueInternal(type, value, column, row, width, height);
 
@@ -538,6 +500,10 @@ public sealed class Database : DatabaseAbstract {
         SaveToByteList(list, contentSize.Height, 2);
     }
 
+    protected override void AddUndo(string tableName, DatabaseDataType comand, long columnKey, long rowKey, string previousValue, string changedTo, string userName) {
+        Works.Add(new WorkItem(comand, columnKey, rowKey, previousValue, changedTo, UserName));
+    }
+
     protected override void Dispose(bool disposing) {
         _muf.Dispose();
         Works.Dispose();
@@ -552,6 +518,8 @@ public sealed class Database : DatabaseAbstract {
         return GetByID(newpf, false, readOnly, null, tablename);
         // KEINE Vorage mitgeben, weil sonst eine Endlosschleife aufgerufen wird!
     }
+
+    protected override void SetUserDidSomething() => _muf.SetUserDidSomething();
 
     protected override string SpecialErrorReason(ErrorReason mode) => _muf.ErrorReason(mode);
 

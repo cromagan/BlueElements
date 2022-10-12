@@ -370,7 +370,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
                     x.RepairAll(tabn);
                 }
 
-                return new SQL_Database(x, false, tabn);
+                return new DatabaseSQL(x, false, tabn);
             }
         }
 
@@ -490,7 +490,26 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
     public void ChangeData(DatabaseDataType comand, long columnKey, string listExt, bool executeNow) => ChangeData(comand, columnKey, -1, "", listExt, executeNow);
 
-    public abstract void ChangeData(DatabaseDataType comand, long columnKey, long rowKey, string previousValue, string changedTo, bool executeNow);
+    public void ChangeData(DatabaseDataType comand, long columnKey, long rowKey, string previousValue, string changedTo, bool executeNow) {
+        if (executeNow) {
+            SetValueInternal(comand, changedTo, Column.SearchByKey(columnKey), Row.SearchByKey(rowKey), -1, -1);
+        }
+        if (IsLoading) { return; }
+        if (ReadOnly) {
+            if (!string.IsNullOrEmpty(TableName)) {
+                Develop.DebugPrint(FehlerArt.Warnung, "Datei ist Readonly, " + comand + ", " + TableName);
+            }
+            return;
+        }
+        // Keine Doppelten Rausfiltern, ansonstn stimmen die Undo nicht mehr
+
+        if (comand != DatabaseDataType.AutoExport) { SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
+
+        if (rowKey < -100) { Develop.DebugPrint(FehlerArt.Fehler, "RowKey darf hier nicht <-100 sein!"); }
+        if (columnKey < -100) { Develop.DebugPrint(FehlerArt.Fehler, "ColKey darf hier nicht <-100 sein!"); }
+
+        AddUndo(TableName, comand, columnKey, rowKey, previousValue, changedTo, UserName);
+    }
 
     public void CloneDataFrom(Database sourceDatabase) {
 
@@ -501,7 +520,6 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         DatenbankAdmin.CloneFrom(sourceDatabase.DatenbankAdmin);
         PermissionGroupsNewRow.CloneFrom(sourceDatabase.PermissionGroupsNewRow);
         ReloadDelaySecond = sourceDatabase.ReloadDelaySecond;
-        //VerwaisteDaten = sourceDatabase.VerwaisteDaten;
         ZeilenQuickInfo = sourceDatabase.ZeilenQuickInfo;
         StandardFormulaFile = sourceDatabase.StandardFormulaFile;
 
@@ -1192,6 +1210,8 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         ViewChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
+    protected abstract void AddUndo(string tableName, DatabaseDataType comand, long columnKey, long rowKey, string previousValue, string changedTo, string userName);
+
     protected virtual void Dispose(bool disposing) {
         if (IsDisposed) { return; }
         IsDisposed = true;
@@ -1280,6 +1300,8 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         if (IsDisposed) { return; }
         SavedToDisk?.Invoke(this, e);
     }
+
+    protected abstract void SetUserDidSomething();
 
     protected abstract string SpecialErrorReason(ErrorReason mode);
 
