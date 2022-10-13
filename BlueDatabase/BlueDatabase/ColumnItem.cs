@@ -35,7 +35,7 @@ using static BlueBasics.IO;
 
 namespace BlueDatabase;
 
-public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputFormat {
+public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended, IInputFormat {
 
     #region Fields
 
@@ -71,7 +71,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
     private string _captionGroup3;
     private string _cellInitValue;
     private string _constantHeightOfImageCode;
-    private bool _disposedValue;
+
     private TranslationType _doOpticalTranslation;
     private bool _dropdownAllesAbwählenErlaubt;
     private bool _dropdownBearbeitungErlaubt;
@@ -501,7 +501,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         }
     }
 
-    public long Key { get; }
+    public long Key { get; private set; }
 
     /// <summary>
     /// Hält Werte, dieser Spalte gleich, bezugnehmend der KeyColumn(key)
@@ -731,6 +731,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
         }
     }
 
+    public bool IsDisposed{get;private set;}
+
     #endregion
 
     #region Methods
@@ -846,11 +848,16 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
     }
 
     /// <summary>
-    /// Überschreibt alle Spalteeigenschaften mit dem der Vorlage.
-    /// Nur der Name bleibt unverändert.
+    /// Überschreibt alle Spalteeigenschaften mit der der Vorlage.
     /// </summary>
     /// <param name="source"></param>
-    public void CloneFrom(ColumnItem source) {
+    public void CloneFrom(ColumnItem source, bool nameAndKeyToo) {
+
+        if(nameAndKeyToo) {
+            Name = source.Name;
+            Key = source.Key;
+        }
+
         Caption = source.Caption;
         CaptionBitmapCode = source.CaptionBitmapCode;
         Format = source.Format;
@@ -2409,7 +2416,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
     private void Dispose(bool disposing) {
-        if (!_disposedValue) {
+        if (!IsDisposed) {
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
@@ -2436,7 +2443,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposable, IInputF
             AfterEditAutoReplace.Dispose();
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen
-            _disposedValue = true;
+            IsDisposed = true;
         }
     }
 

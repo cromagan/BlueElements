@@ -72,6 +72,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
     public readonly string UserName = Generic.UserName().ToUpper();
 
+    public DatabaseAbstract? Mirror;
     public string UserGroup;
 
     private readonly BackgroundWorker _backgroundWorker;
@@ -106,6 +107,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     private string _standardFormulaFile = string.Empty;
 
     private int _undoCount;
+
     private string _zeilenQuickInfo = string.Empty;
 
     #endregion
@@ -149,7 +151,6 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         _backgroundWorker.DoWork += BackgroundWorker_DoWork;
         _checker = new Timer(Checker_Tick);
         _checker.Change(2000, 2000);
-
     }
 
     #endregion
@@ -512,6 +513,8 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         if (executeNow) {
             SetValueInternal(comand, changedTo, Column.SearchByKey(columnKey), Row.SearchByKey(rowKey), -1, -1);
         }
+        Mirror?.ChangeData(comand, columnKey, rowKey, previousValue, changedTo, executeNow);
+
         if (IsLoading) { return; }
         if (ReadOnly) {
             if (!string.IsNullOrEmpty(TableName)) {
@@ -529,30 +532,43 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         AddUndo(TableName, comand, columnKey, rowKey, previousValue, changedTo, UserName);
     }
 
-    public void CloneDataFrom(Database sourceDatabase) {
+    /// <summary>
+    /// Einstellungen der Quell-Datenbank auf diese hier übertragen
+    /// </summary>
+    /// <param name="sourceDatabase"></param>
+    public void CloneFrom(DatabaseAbstract sourceDatabase, bool cellDataToo) {
 
-        #region Einstellungen der Ursprünglichen Datenbank auf die Kopie übertragen
+        Column.CloneFrom(sourceDatabase);
 
-        RulesScript = sourceDatabase.RulesScript;
+        if(cellDataToo) { Row.CloneFrom(sourceDatabase); }
+
+
+
+        AdditionaFilesPfad = sourceDatabase.AdditionaFilesPfad;
+        CachePfad = sourceDatabase.CachePfad; // Nicht so wichtig ;-)
+        Caption = sourceDatabase.Caption;
+        CreateDate = sourceDatabase.CreateDate;
+        Creator = sourceDatabase.Creator;
+        //Filename - nope
+        GlobalScale = sourceDatabase.GlobalScale;
         GlobalShowPass = sourceDatabase.GlobalShowPass;
-        DatenbankAdmin.CloneFrom(sourceDatabase.DatenbankAdmin);
-        PermissionGroupsNewRow.CloneFrom(sourceDatabase.PermissionGroupsNewRow);
         ReloadDelaySecond = sourceDatabase.ReloadDelaySecond;
-        ZeilenQuickInfo = sourceDatabase.ZeilenQuickInfo;
-        StandardFormulaFile = sourceDatabase.StandardFormulaFile;
-
-        if (SortDefinition.ToString() != sourceDatabase.SortDefinition.ToString()) {
+        RulesScript = sourceDatabase.RulesScript;
+        if (SortDefinition == null || SortDefinition.ToString() != sourceDatabase.SortDefinition.ToString()) {
             SortDefinition = new RowSortDefinition(this, sourceDatabase.SortDefinition.ToString());
         }
+        StandardFormulaFile = sourceDatabase.StandardFormulaFile;
+        UndoCount = sourceDatabase.UndoCount;
+        ZeilenQuickInfo = sourceDatabase.ZeilenQuickInfo;
 
-        foreach (var ThisColumn in Column) {
-            var l = sourceDatabase.Column.Exists(ThisColumn.Name);
-            if (l != null) {
-                ThisColumn.CloneFrom(l);
-            }
+        DatenbankAdmin.CloneFrom(sourceDatabase.DatenbankAdmin);
+        PermissionGroupsNewRow.CloneFrom(sourceDatabase.PermissionGroupsNewRow);
+        ColumnArrangements.Clear();
+        foreach (var t in sourceDatabase.ColumnArrangements) {
+            ColumnArrangements.Add(new ColumnViewCollection(this, t.ToString()));
         }
 
-        #endregion
+
     }
 
     /// <summary>

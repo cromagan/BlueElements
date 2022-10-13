@@ -76,7 +76,6 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
 
     #region Properties
 
-    public override string ConnectionString { get; protected set; }
     public override string ID => "Microsoft SQL Server";
     public override string Primary => "bigint identity(1,1)";
     public override string VarChar255 => "VARCHAR(255)";

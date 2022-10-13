@@ -131,6 +131,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
 
         c.Name = internalName;
         c.Caption = caption;
+
         if (format != VarType.Unbekannt) { c.SetFormat(format); }
         c.Suffix = suffix;
         c.Quickinfo = quickinfo;
@@ -401,6 +402,26 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     }
 
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
+    internal void CloneFrom(DatabaseAbstract sourceDatabase) {
+
+        // Spalten, die zu viel sind, löschen
+        foreach (var ThisColumn in this) {
+            var l = sourceDatabase.Column.Exists(ThisColumn.Name);
+            if (l == null) { Remove(ThisColumn); }
+        }
+
+
+        // Spalten erzeugen und Format übertragen
+        foreach (var ThisColumn in sourceDatabase.Column) {
+            var l = Exists(ThisColumn.Name);
+            if (l == null) {
+                l = Add(ThisColumn.Key, ThisColumn.Name, ThisColumn.Caption, ThisColumn.Suffix, VarType.Unbekannt, ThisColumn.Quickinfo);
+            }
+            l.CloneFrom(ThisColumn, true);
+        }
+
+
+    }
 
     #endregion
 }

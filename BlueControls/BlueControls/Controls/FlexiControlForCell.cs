@@ -482,6 +482,8 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         if (!Enabled) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
         GetTmpVariables(); // Falls der Key inzwischen nicht mehr in der Collection ist, deswegen neu prüfen. RowREmoved greift zwar, kann aber durchaus erst nach RowSortesd/CursorposChanges auftreten.
         if (_tmpColumn == null || _tmpRow == null) { return; }
+        if (_tmpColumn.IsDisposed || _tmpRow.IsDisposed) { return; }
+
         var oldVal = _tmpRow.CellGetString(_tmpColumn);
         var newValue = Value;
 
@@ -534,11 +536,15 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
 
     private void GetTmpVariables() {
         try {
-            if (_database != null) {
-                _tmpColumn = string.IsNullOrEmpty(_columnName)
-                    ? _database.Column.SearchByKey(_colKey)
-                    : _database.Column[_columnName];
+            if (_database != null && !_database.IsDisposed) {
+
+                if (string.IsNullOrEmpty(_columnName)) {
+                    _tmpColumn = _database.Column.SearchByKey(_colKey);
+                } else {
+                    _tmpColumn = _database.Column[_columnName];
+                }
                 _tmpRow = _database.Row.SearchByKey(_rowKey);
+
             } else {
                 _tmpColumn = null;
                 _tmpRow = null;

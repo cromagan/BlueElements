@@ -531,7 +531,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
             lrow?.CellSet(lcolumn, value);
             return;
         }
-        SetValueBehindLinkedValue(column, row, value);
+        SetValueBehindLinkedValue(column, row, value, true);
     }
 
     public void Set(string columnName, RowItem? row, bool value) => Set(_database?.Column[columnName], row, value.ToPlusMinus());
@@ -640,13 +640,14 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
 
     /// <summary>
     /// Diese Routine setzt dern Wert direkt in die Zelle. Verlinkete Zellen werden nicht weiter verfolgt.
-    /// Deswegenkan nur mit dieser Routine der Cell-Link eingefügt werden.
-    /// Die Routine blockt zwar den Reload, aber eine endgültige prüfung verhindet ein Ändern, wenn sich der Wert nicht verändert hat
+    /// Deswegen kann nur mit dieser Routine der Cell-Link eingefügt werden.
+    /// Die Routine blockt zwar den Reload, aber eine endgültige Prüfung verhindet ein Ändern, wenn sich der Wert nicht verändert hat
     /// </summary>
     /// <param name="column"></param>
     /// <param name="row"></param>
     /// <param name="value"></param>
-    internal void SetValueBehindLinkedValue(ColumnItem? column, RowItem? row, string value) {
+    /// <param name="changeSysColumns"></param>
+    internal void SetValueBehindLinkedValue(ColumnItem? column, RowItem? row, string value, bool changeSysColumns) {
         if (_database == null) { return; }
 
         _database.BlockReload(false);
@@ -672,8 +673,12 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
         _database?.ChangeData(DatabaseDataType.ce_Value_withoutSizeData, column.Key, row.Key, oldValue, value, true);
         column.UcaseNamesSortedByLenght = null;
         DoSpecialFormats(column, row, oldValue, false);
-        SystemSet(_database?.Column.SysRowChanger, row, _database?.UserName);
-        SystemSet(_database.Column.SysRowChangeDate, row, DateTime.Now.ToString(Constants.Format_Date5));
+
+        if (changeSysColumns) {
+            SystemSet(_database?.Column.SysRowChanger, row, _database?.UserName);
+            SystemSet(_database.Column.SysRowChangeDate, row, DateTime.Now.ToString(Constants.Format_Date5));
+        }
+
         Invalidate_CellContentSize(column, row);
         column.Invalidate_TmpColumnContentWidth();
         OnCellValueChanged(new CellEventArgs(column, row));
@@ -806,11 +811,11 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
         (ColumnItem? column, RowItem? row, string info) Ergebnis(string fehler) {
             column.Database?.BlockReload(false);
             if (targetColumn != null && targetRow != null && string.IsNullOrEmpty(fehler)) {
-                column.Database?.Cell.SetValueBehindLinkedValue(column, row, KeyOfCell(targetColumn.Key, targetRow.Key));
+                column.Database?.Cell.SetValueBehindLinkedValue(column, row, KeyOfCell(targetColumn.Key, targetRow.Key), true);
                 return (targetColumn, targetRow, fehler);
             }
 
-            if (column != null && row != null) { column.Database?.Cell.SetValueBehindLinkedValue(column, row, string.Empty); }
+            if (column != null && row != null) { column.Database?.Cell.SetValueBehindLinkedValue(column, row, string.Empty, true); }
             return (targetColumn, targetRow, fehler);
         }
 

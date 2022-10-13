@@ -67,7 +67,7 @@ public abstract class SQLBackAbstract {
     #region Properties
 
     public bool ConnectionOk => _connection != null;
-    public abstract string ConnectionString { get; protected set; }
+    public string ConnectionString { get; protected set; }
 
     /// <summary>
     /// Falls die Datenbank von einer lokalen Datei geladen wurde, ist hier der Dateiname enthalten.
@@ -170,7 +170,7 @@ public abstract class SQLBackAbstract {
                     break;
 
                 default:
-                    if (type == DatabaseDataType.ColumnCaption) { AddColumnToMain(tablename, column.Name); }
+                    if (type == DatabaseDataType.Caption) { AddColumnToMain(tablename, column.Name, column.Key); }
 
                     return SetStyleData(tablename, type, column.Name.ToUpper(), value);
             }
@@ -302,7 +302,7 @@ public abstract class SQLBackAbstract {
         var colStyle = GetColumnNames(SYS_STYLE);
         if (colStyle == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
 
-        if (!colStyle.Contains("VALUE")) { AddColumn(SYS_STYLE, "VALUE", VarChar4000); }
+        if (!colStyle.Contains("VALUE")) { AddColumn(SYS_STYLE, "VALUE", VarChar4000, true); }
 
         #endregion
 
@@ -312,14 +312,14 @@ public abstract class SQLBackAbstract {
 
         var colUndo = GetColumnNames(SYS_UNDO);
         if (colUndo == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
-        if (!colUndo.Contains("TABLENAME")) { AddColumn(SYS_UNDO, "TABLENAME"); }
-        if (!colUndo.Contains("COMAND")) { AddColumn(SYS_UNDO, "COMAND"); }
-        if (!colUndo.Contains("COLUMNKEY")) { AddColumn(SYS_UNDO, "COLUMNKEY"); }
-        if (!colUndo.Contains("ROWKEY")) { AddColumn(SYS_UNDO, "ROWKEY"); }
-        if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn(SYS_UNDO, "PREVIOUSVALUE", VarChar4000); }
-        if (!colUndo.Contains("CHANGEDTO")) { AddColumn(SYS_UNDO, "CHANGEDTO", VarChar4000); }
-        if (!colUndo.Contains("USERNAME")) { AddColumn(SYS_UNDO, "USERNAME"); }
-        if (!colUndo.Contains("DATETIMEUTC")) { AddColumn(SYS_UNDO, "DATETIMEUTC"); }
+        if (!colUndo.Contains("TABLENAME")) { AddColumn(SYS_UNDO, "TABLENAME",false); }
+        if (!colUndo.Contains("COMAND")) { AddColumn(SYS_UNDO, "COMAND", false); }
+        if (!colUndo.Contains("COLUMNKEY")) { AddColumn(SYS_UNDO, "COLUMNKEY", false); }
+        if (!colUndo.Contains("ROWKEY")) { AddColumn(SYS_UNDO, "ROWKEY",true); }
+        if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn(SYS_UNDO, "PREVIOUSVALUE", VarChar4000, true); }
+        if (!colUndo.Contains("CHANGEDTO")) { AddColumn(SYS_UNDO, "CHANGEDTO", VarChar4000, true); }
+        if (!colUndo.Contains("USERNAME")) { AddColumn(SYS_UNDO, "USERNAME",false); }
+        if (!colUndo.Contains("DATETIMEUTC")) { AddColumn(SYS_UNDO, "DATETIMEUTC", false); }
 
         #endregion
 
@@ -415,16 +415,26 @@ public abstract class SQLBackAbstract {
         return _connection.State == ConnectionState.Open;
     }
 
-    private void AddColumn(string tablename, string column) => ExecuteCommand("alter table " + tablename.ToUpper() + " add " + column + " " + VarChar255 + " default '' NOT NULL");
+    private void AddColumn(string tablename, string column, bool nullable) => AddColumn(tablename, column, VarChar255, nullable);
 
-    private void AddColumn(string tablename, string column, string type) => ExecuteCommand("alter table " + tablename.ToUpper() + " add " + column + " " + type + " default '' NOT NULL");
+    private void AddColumn(string tablename, string column, string type, bool nullable) {
 
-    private void AddColumnToMain(string tablename, string columnName) {
+
+        var n = " NOT NULL";
+        if (nullable) { n = string.Empty; }
+
+        ExecuteCommand("alter table " + tablename.ToUpper() + " add " + column + " " + type + " default ''" + n);
+    }
+
+    public void AddColumnToMain(string tablename, string columnName, long columnKey) {
         columnName = columnName.ToUpper();
 
         var colMain = GetColumnNames(tablename.ToUpper());
         if (colMain == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
-        if (!colMain.Contains(columnName)) { AddColumn(tablename.ToUpper(), columnName, VarChar4000); }
+        if (!colMain.Contains(columnName)) { AddColumn(tablename.ToUpper(), columnName, VarChar4000, true); }
+
+       SetStyleData(tablename, "ColumnKey", columnName.ToUpper(), columnKey.ToString());
+
     }
 
     private bool ExecuteCommand(DbCommand command) {

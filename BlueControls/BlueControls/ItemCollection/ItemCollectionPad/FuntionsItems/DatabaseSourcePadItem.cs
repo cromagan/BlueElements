@@ -73,7 +73,7 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
     #region Methods
 
     public Control? CreateControl(ConnectedFormulaView parent) {
-        var con = new FlexiControlRowSelector(Database, Parent, null, "Datenbank", String.Empty);
+        var con = new FlexiControlRowSelector(Database, Parent, null, "Datenbank", string.Empty);
         con.EditType = EditTypeFormula.None;
         con.CaptionPosition = ÜberschriftAnordnung.ohne;
         con.Name = DefaultItemToControlName();

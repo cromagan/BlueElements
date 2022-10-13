@@ -173,7 +173,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         }
         var newc = Database.Column.Add();
         if (vorlage != null) {
-            newc.CloneFrom(vorlage);
+            newc.CloneFrom(vorlage, false);
             if (mitDaten) {
                 foreach (var thisR in Database.Row) {
                     thisR.CellSet(newc, thisR.CellGetString(vorlage));

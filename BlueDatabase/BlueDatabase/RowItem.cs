@@ -34,11 +34,10 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class RowItem : ICanBeEmpty, IDisposable {
+public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
 
     #region Fields
 
-    private bool _disposedValue;
     private string? _tmpQuickInfo;
 
     #endregion
@@ -85,7 +84,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposable {
     public static bool DoingScript { get; private set; }
 
     public DatabaseAbstract? Database { get; private set; }
-    public long Key { get; }
+    public bool IsDisposed { get; private set; }
+    public long Key { get; private set; }
 
     public string QuickInfo {
         get {
@@ -230,7 +230,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposable {
 
     public string CellGetString(string columnName) => Database.Cell.GetString(Database.Column[columnName], this);
 
-    public string CellGetString(ColumnItem? column) => Database.Cell.GetString(column, this);
+    public string CellGetString(ColumnItem? column) {
+        if (Database == null) { return string.Empty; }
+        return Database.Cell.GetString(column, this);
+    }
 
     public List<string> CellGetValuesReadable(ColumnItem? column, ShortenStyle style) => Database.Cell.ValuesReadable(column, this, style);
 
@@ -265,6 +268,20 @@ public sealed class RowItem : ICanBeEmpty, IDisposable {
     public void CellSet(string columnName, DateTime value) => Database.Cell.Set(Database.Column[columnName], this, value);
 
     public void CellSet(ColumnItem? column, DateTime value) => Database.Cell.Set(column, this, value);
+
+    /// <summary>
+    /// Überschreibt alle Zellen-Werte mit der der Vorlage.
+    /// </summary>
+    /// <param name="source"></param>
+    public void CloneFrom(RowItem source, bool nameAndKeyToo) {
+        if (nameAndKeyToo) {
+            Key = source.Key;
+        }
+
+        foreach (var thisColumn in Database.Column) {
+            Database.Cell.SetValueBehindLinkedValue(thisColumn, this, source.Database.Cell.GetStringBehindLinkedValue(source.Database.Column.SearchByKey(thisColumn.Key), source), true);
+        }
+    }
 
     /// <summary>
     /// Erstellt einen sortierfähigen String eine Zeile mit der Standard sortierung
@@ -485,7 +502,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposable {
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
     private void Dispose(bool disposing) {
-        if (!_disposedValue) {
+        if (!IsDisposed) {
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
@@ -495,7 +512,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposable {
             Database.Disposing -= Database_Disposing;
             Database = null;
             _tmpQuickInfo = null;
-            _disposedValue = true;
+            IsDisposed = true;
         }
     }
 

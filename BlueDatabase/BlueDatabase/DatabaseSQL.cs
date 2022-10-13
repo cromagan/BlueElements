@@ -80,7 +80,7 @@ public sealed class DatabaseSQL : DatabaseAbstract {
             _sql?.CheckIn(TableName, type, value, column, null, -1, -1);
 
             if (type == DatabaseDataType.ColumnName) {
-                _sql?.SetStyleData(TableName, "ColumnKey", value.ToUpper(), column.Key.ToString());
+                _sql?.AddColumnToMain(TableName, value.ToUpper(), column.Key); // !!!Value benutzen, weil der Columnname erst noch fest reingeschreiben werden muss
             }
         } else {
             _sql?.CheckIn(TableName, type, value, column, row, width, height);

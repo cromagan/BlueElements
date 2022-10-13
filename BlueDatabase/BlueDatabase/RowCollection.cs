@@ -532,6 +532,27 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposable {
     private void OnDoSpecialRules(object sender, DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
 
     private void OnRowChecked(object sender, RowCheckedEventArgs e) => RowChecked?.Invoke(this, e);
+    internal void CloneFrom(DatabaseAbstract sourceDatabase) {
+
+        // Zeilen, die zu viel sind, löschen
+        foreach (var thisRow in this) {
+            var l = sourceDatabase.Row.SearchByKey(thisRow.Key);
+            if (l == null) { Remove(thisRow); }
+        }
+
+
+        // Zeilen erzeugen und Format übertragen
+        foreach (var thisRow in sourceDatabase.Row) {
+            var l = SearchByKey(thisRow.Key);
+            if (l == null) {
+                l = new RowItem(Database, thisRow.Key);
+                this.Add(l);
+            }
+            l.CloneFrom(thisRow, true);
+        }
+
+
+    }
 
     #endregion
 }
