@@ -1150,7 +1150,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (_sortDefinitionTemporary?.Columns != null) {
             x = x + ", TempSort=" + _sortDefinitionTemporary;
         }
-        x = x + ", CursorPos=" + CellCollection.KeyOfCell(_cursorPosColumn, _cursorPosRow?.Row);
+
+        if (_cursorPosColumn != null && _cursorPosRow?.Row != null) {
+            x = x + ", CursorPos=" + CellCollection.KeyOfCell(_cursorPosColumn, _cursorPosRow?.Row);
+        }
         return x + "}";
     }
 

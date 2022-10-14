@@ -85,6 +85,9 @@ public sealed class Database : DatabaseAbstract {
 
     #region Properties
 
+    /// <summary>
+    /// Entspricht dem Dateinamen
+    /// </summary>
     public override string ConnectionID => _muf != null ? _muf.Filename : string.Empty;
 
     public override string Filename => _muf != null ? _muf.Filename : string.Empty;
@@ -397,7 +400,7 @@ public sealed class Database : DatabaseAbstract {
         SaveToByteList(l, DatabaseDataType.AutoCorrectAfterEdit, c.AfterEditAutoCorrect.ToPlusMinus(), key);
         SaveToByteList(l, DatabaseDataType.RoundAfterEdit, c.AfterEditRunden.ToString(), key);
         SaveToByteList(l, DatabaseDataType.AutoRemoveCharAfterEdit, c.AutoRemove, key);
-        SaveToByteList(l, DatabaseDataType.co_SaveContent, c.SaveContent.ToPlusMinus(), key);
+        SaveToByteList(l, DatabaseDataType.SaveContent, c.SaveContent.ToPlusMinus(), key);
         SaveToByteList(l, DatabaseDataType.FilterOptions, ((int)c.FilterOptions).ToString(), key);
         SaveToByteList(l, DatabaseDataType.AutoFilterJoker, c.AutoFilterJoker, key);
         SaveToByteList(l, DatabaseDataType.IgnoreAtRowFilter, c.IgnoreAtRowFilter.ToPlusMinus(), key);

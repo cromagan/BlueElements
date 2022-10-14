@@ -279,7 +279,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
         }
 
         foreach (var thisColumn in Database.Column) {
-            Database.Cell.SetValueBehindLinkedValue(thisColumn, this, source.Database.Cell.GetStringBehindLinkedValue(source.Database.Column.SearchByKey(thisColumn.Key), source), true);
+            Database.Cell.SetValueBehindLinkedValue(thisColumn, this, source.Database.Cell.GetStringBehindLinkedValue(source.Database.Column.SearchByKey(thisColumn.Key), source), false);
         }
     }
 

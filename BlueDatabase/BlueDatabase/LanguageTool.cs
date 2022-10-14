@@ -27,7 +27,7 @@ public static class LanguageTool {
 
     #region Fields
 
-    public static Database? Translation = null;
+    public static DatabaseAbstract? Translation = null;
     private static readonly object?[] EmptyArgs = Array.Empty<object>();
     private static string _english = string.Empty;
     private static string _german = string.Empty;

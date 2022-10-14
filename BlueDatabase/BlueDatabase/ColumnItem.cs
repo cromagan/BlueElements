@@ -85,6 +85,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     private string _identifier;
     private bool _ignoreAtRowFilter;
 
+    private long _key = -1;
     private long _keyColumnKey;
 
     private ColumnLineStyle _lineLeft;
@@ -125,7 +126,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         if (columnkey < 0) { Develop.DebugPrint(FehlerArt.Fehler, "ColumnKey <0"); }
         var ex = Database.Column.SearchByKey(columnkey);
         if (ex != null) { Develop.DebugPrint(FehlerArt.Fehler, "Key existiert bereits"); }
-        Key = columnkey;
+        _key = columnkey;
 
         #region Standard-Werte
 
@@ -501,7 +502,16 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         }
     }
 
-    public long Key { get; private set; }
+    public bool IsDisposed { get; private set; }
+
+    public long Key {
+        get => _key;
+        private set {
+            if (_key == value) { return; }
+            Database?.ChangeData(DatabaseDataType.ColumnKey, this, Key.ToString(), value.ToString(), true);
+            OnChanged();
+        }
+    }
 
     /// <summary>
     /// Hält Werte, dieser Spalte gleich, bezugnehmend der KeyColumn(key)
@@ -629,7 +639,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         get => _saveContent;
         set {
             if (_saveContent == value) { return; }
-            Database?.ChangeData(DatabaseDataType.co_SaveContent, this, _saveContent.ToPlusMinus(), value.ToPlusMinus(), true);
+            Database?.ChangeData(DatabaseDataType.SaveContent, this, _saveContent.ToPlusMinus(), value.ToPlusMinus(), true);
             OnChanged();
         }
     }
@@ -730,8 +740,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             }
         }
     }
-
-    public bool IsDisposed{get;private set;}
 
     #endregion
 
@@ -852,9 +860,10 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     /// </summary>
     /// <param name="source"></param>
     public void CloneFrom(ColumnItem source, bool nameAndKeyToo) {
-
-        if(nameAndKeyToo) {
+        if (nameAndKeyToo) {
             Name = source.Name;
+            Database.ChangeData(DatabaseDataType.ColumnKey, Key, -1, Key.ToString(), source.Key.ToString(), true);
+
             Key = source.Key;
         }
 
@@ -2108,6 +2117,11 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         //Develop.CheckStackForOverflow();
 
         switch (type) {
+            case DatabaseDataType.ColumnKey:
+                _key = LongParse(newvalue);
+                Invalidate_TmpVariables();
+                break;
+
             case DatabaseDataType.ColumnName:
                 _name = newvalue;
                 Invalidate_TmpVariables();
@@ -2251,7 +2265,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 _afterEditAutoCorrect = newvalue.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.co_SaveContent:
+            case DatabaseDataType.SaveContent:
                 _saveContent = newvalue.FromPlusMinus();
                 break;
 

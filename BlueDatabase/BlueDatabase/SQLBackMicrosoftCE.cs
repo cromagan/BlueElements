@@ -41,6 +41,7 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
         }
 
         Filename = sql.Filename;
+        ConnectionString = sql.ConnectionString;
         _connection = sql._connection;
         RepairAll(tablename.ToUpper());
     }
@@ -76,8 +77,9 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
 
     #region Properties
 
-    public override string ID => "Microsoft SQL Server";
+    //public override string ID => "Microsoft SQL Server";
     public override string Primary => "bigint identity(1,1)";
+
     public override string VarChar255 => "VARCHAR(255)";
     public override string VarChar4000 => "VARCHAR(4000)";
 

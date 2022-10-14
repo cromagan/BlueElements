@@ -57,7 +57,7 @@ public sealed class DatabaseSQL : DatabaseAbstract {
 
     #region Properties
 
-    public override string ConnectionID => _sql.ID + "|" + _sql.ConnectionString + "|" + TableName.ToUpper();
+    public override string ConnectionID => _sql.ConnectionID(TableName);
 
     public override string Filename => _sql.Filename;
 
@@ -113,12 +113,12 @@ public sealed class DatabaseSQL : DatabaseAbstract {
         _sql.AddUndo(TableName, comand, columnKey, rowKey, previousValue, changedTo, UserName);
     }
 
-    protected override DatabaseAbstract? GetOtherTable(string filename, bool readOnly) {
-        if (!SQLBackAbstract.IsValidTableName(filename)) {
+    protected override DatabaseAbstract? GetOtherTable(string tablename, bool readOnly) {
+        if (!SQLBackAbstract.IsValidTableName(tablename)) {
             return null;
         }
 
-        return new DatabaseSQL(_sql, readOnly, filename);
+        return new DatabaseSQL(_sql, readOnly, tablename);
     }
 
     protected override void SetUserDidSomething() { }

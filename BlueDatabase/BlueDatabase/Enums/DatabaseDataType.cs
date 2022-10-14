@@ -247,12 +247,12 @@ public enum DatabaseDataType : byte {
     //co_ZellenZusammenfassen = 189,
     AutoRemoveCharAfterEdit = 190,
 
-    co_SaveContent = 191,
+    SaveContent = 191,
 
     //co_AutoFilter_Dauerfilter = 192,
     //co_Intelligenter_Multifilter = 193,
 
-    //    co_DauerFilterPos = 194,
+    ColumnKey = 194,   //    co_DauerFilterPos = 194,
 
     AutoReplaceAfterEdit = 195,
     FilterOptions = 196,
@@ -270,6 +270,10 @@ public enum DatabaseDataType : byte {
     ce_UTF8Value_withSizeData = 203,
 
     //Dummy_ce_ValueWithoutSizeUncrypted = 204,
+
+
+
+
     dummyComand_RemoveRow = 220,
 
     dummyComand_AddRow = 221,

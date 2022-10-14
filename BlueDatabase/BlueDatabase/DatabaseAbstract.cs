@@ -351,32 +351,42 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     /// <param name="checkOnlyCaptionToo"></param>
     /// <param name="readOnly"></param>
     /// <returns></returns>
-    public static DatabaseAbstract? GetByID(string filename, bool checkOnlyCaptionToo, bool readOnly, DatabaseAbstract? vorlage, string tablename) {
-        if (string.IsNullOrEmpty(filename)) { return null; }
+    public static DatabaseAbstract? GetByID(string connectionID, bool checkOnlyCaptionToo, bool readOnly, DatabaseAbstract? vorlage, string tablename) {
+        if (string.IsNullOrEmpty(connectionID)) { return null; }
 
         foreach (var thisFile in AllFiles) {
-            if (thisFile is DatabaseAbstract db && string.Equals(thisFile.ConnectionID, filename, StringComparison.OrdinalIgnoreCase)) {
+            if (thisFile is DatabaseAbstract db && string.Equals(thisFile.ConnectionID, connectionID, StringComparison.OrdinalIgnoreCase)) {
                 thisFile.BlockReload(false);
                 return db;
             }
         }
 
+        #region wenn captiontoo angewählt wurde, schauen ob eine ConnectionID einem Dateinamen entspricht
+
         if (checkOnlyCaptionToo) {
             foreach (var thisFile in AllFiles) {
-                if (thisFile is DatabaseAbstract db && thisFile.TableName.ToLower() == filename.ToLower().FileNameWithSuffix()) {
+                if (thisFile is DatabaseAbstract db && thisFile.TableName.ToLower() == connectionID.ToLower().FileNameWithSuffix()) {
                     thisFile.BlockReload(false);
                     return db;
                 }
             }
         }
 
-        if (FileExists(filename)) {
-            if (filename.FileSuffix().ToLower() == "mdb") {
-                return new Database(filename, readOnly, false, tablename);
+        #endregion
+
+        if (vorlage != null) {
+            return vorlage.GetOtherTable(tablename, readOnly);
+        }
+
+        #region Wenn die Connection einem Dateinamen entspricht, versuchen den zu laden
+
+        if (FileExists(connectionID)) {
+            if (connectionID.FileSuffix().ToLower() == "mdb") {
+                return new Database(connectionID, readOnly, false, tablename);
             }
 
-            if (filename.FileSuffix().ToLower() == "mdf") {
-                var x = new SQLBackMicrosoftCE(filename, false);
+            if (connectionID.FileSuffix().ToLower() == "mdf") {
+                var x = new SQLBackMicrosoftCE(connectionID, false);
 
                 var tables = x.Tables();
                 var tabn = string.Empty;
@@ -391,8 +401,15 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
             }
         }
 
-        if (vorlage != null) {
-            return vorlage.GetOtherTable(filename, readOnly);
+        #endregion
+
+        //SQLBackAbstract.GetSQLBacks();
+
+        if (SQLBackAbstract.ConnectedSQLBack != null) {
+            foreach (var thisSQL in SQLBackAbstract.ConnectedSQLBack) {
+                var h = thisSQL.HandleMe(connectionID);
+                if (h != null) { return new DatabaseSQL(h, readOnly, tablename); }
+            }
         }
 
         return null;
@@ -505,10 +522,37 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         if (_backgroundWorker.IsBusy && !_backgroundWorker.CancellationPending) { _backgroundWorker.CancelAsync(); }
     }
 
+    /// <summary>
+    /// Das hier ist die richtige Methode, um einen Wert dauerhaft zu setzen.
+    /// </summary>
+    /// <param name="comand"></param>
+    /// <param name="columnKey"></param>
+    /// <param name="rowKey"></param>
+    /// <param name="previousValue"></param>
+    /// <param name="changedTo"></param>
+    /// <param name="executeNow"></param>
     public void ChangeData(DatabaseDataType comand, ColumnItem column, string previousValue, string changedTo, bool executeNow) => ChangeData(comand, column.Key, -1, previousValue, changedTo, executeNow);
 
+    /// <summary>
+    /// Das hier ist die richtige Methode, um einen Wert dauerhaft zu setzen.
+    /// </summary>
+    /// <param name="comand"></param>
+    /// <param name="columnKey"></param>
+    /// <param name="rowKey"></param>
+    /// <param name="previousValue"></param>
+    /// <param name="changedTo"></param>
+    /// <param name="executeNow"></param>
     public void ChangeData(DatabaseDataType comand, long columnKey, string listExt, bool executeNow) => ChangeData(comand, columnKey, -1, "", listExt, executeNow);
 
+    /// <summary>
+    /// Das hier ist die richtige Methode, um einen Wert dauerhaft zu setzen.
+    /// </summary>
+    /// <param name="comand"></param>
+    /// <param name="columnKey"></param>
+    /// <param name="rowKey"></param>
+    /// <param name="previousValue"></param>
+    /// <param name="changedTo"></param>
+    /// <param name="executeNow"></param>
     public void ChangeData(DatabaseDataType comand, long columnKey, long rowKey, string previousValue, string changedTo, bool executeNow) {
         if (executeNow) {
             SetValueInternal(comand, changedTo, Column.SearchByKey(columnKey), Row.SearchByKey(rowKey), -1, -1);
@@ -537,12 +581,9 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     /// </summary>
     /// <param name="sourceDatabase"></param>
     public void CloneFrom(DatabaseAbstract sourceDatabase, bool cellDataToo) {
-
         Column.CloneFrom(sourceDatabase);
 
-        if(cellDataToo) { Row.CloneFrom(sourceDatabase); }
-
-
+        if (cellDataToo) { Row.CloneFrom(sourceDatabase); }
 
         AdditionaFilesPfad = sourceDatabase.AdditionaFilesPfad;
         CachePfad = sourceDatabase.CachePfad; // Nicht so wichtig ;-)
@@ -567,8 +608,6 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         foreach (var t in sourceDatabase.ColumnArrangements) {
             ColumnArrangements.Add(new ColumnViewCollection(this, t.ToString()));
         }
-
-
     }
 
     /// <summary>
@@ -1585,7 +1624,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
             if (!string.IsNullOrWhiteSpace(CachePfad)) {
                 if (FileExists(fullhashname)) {
                     FileInfo f = new(fullhashname);
-                    if (DateTime.Now.Subtract(f.CreationTime).TotalDays < 10) {
+                    if (DateTime.Now.Subtract(f.CreationTime).TotalDays < 20) {
                         if (f.Length < 5) { return; }
                         e.Bmp = new BitmapExt(fullhashname);
                         return;
@@ -1598,6 +1637,12 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
                 e.Bmp = new BitmapExt(fullname);
                 if (!string.IsNullOrWhiteSpace(CachePfad)) {
                     BlueBasics.IO.CopyFile(fullname, fullhashname, false);
+                    try {
+                        //File.SetLastWriteTime(fullhashname, DateTime.Now);
+                        File.SetCreationTime(fullhashname, DateTime.Now);
+                        //var x = new FileInfo(fullname);
+                        //x.CreationTime = DateTime.Now;
+                    } catch { }
                 }
                 return;
             }

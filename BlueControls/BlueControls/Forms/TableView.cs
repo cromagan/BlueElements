@@ -46,6 +46,7 @@ public partial class TableView : Form {
 
     #region Fields
 
+    public static SQLBackAbstract? SQL = null;
     private Ansicht _ansicht = Ansicht.Tabelle_und_Formular_nebeneinander;
 
     private bool _firstOne = true;
@@ -192,6 +193,10 @@ public partial class TableView : Form {
         return l;
     }
 
+    public virtual bool ConnectSQL() {
+        return false;
+    }
+
     public void ResetDatabaseSettings() {
         foreach (var thisT in tbcDatabaseSelector.TabPages) {
             if (thisT is System.Windows.Forms.TabPage tp && tp.Tag is List<string> s) {
@@ -208,7 +213,7 @@ public partial class TableView : Form {
     protected void AddTabPage(string connectionID) {
         var NTabPage = new System.Windows.Forms.TabPage {
             Name = tbcDatabaseSelector.TabCount.ToString(),
-            Text = connectionID.FileNameWithoutSuffix(),
+            Text = connectionID.Split('|').Last().FileNameWithoutSuffix(),
             Tag = new List<string>() { connectionID, string.Empty }
         };
         tbcDatabaseSelector.Controls.Add(NTabPage);
@@ -255,7 +260,7 @@ public partial class TableView : Form {
         Table.Export_HTML();
     }
 
-    protected void ChangeDatabaseInTab(string filename, System.Windows.Forms.TabPage? xtab) {
+    protected void ChangeDatabaseInTab(string connectionID, System.Windows.Forms.TabPage? xtab) {
         if (xtab == null) { return; }
 
         tbcDatabaseSelector.Enabled = false;
@@ -264,7 +269,7 @@ public partial class TableView : Form {
         Table.Refresh();
 
         var s = (List<string>)(xtab.Tag);
-        s[0] = filename;
+        s[0] = connectionID;
         s[1] = string.Empty;
         xtab.Tag = s;
         tbcDatabaseSelector_Selected(null, new System.Windows.Forms.TabControlEventArgs(xtab, tbcDatabaseSelector.TabPages.IndexOf(xtab), System.Windows.Forms.TabControlAction.Selected));
@@ -1046,7 +1051,7 @@ public partial class TableView : Form {
 
         var s = (List<string>)(e.TabPage.Tag);
 
-        var DB = Database.GetByID(s[0], false, false, null, s[0].FileNameWithoutSuffix());
+        var DB = Database.GetByID(s[0], false, false, null, s[0].Split('|').Last().FileNameWithoutSuffix());
 
         if (DB != null) {
             if (!string.IsNullOrEmpty(DB.Filename)) {

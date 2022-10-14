@@ -672,9 +672,10 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
         _database?.WaitEditable();
         _database?.ChangeData(DatabaseDataType.ce_Value_withoutSizeData, column.Key, row.Key, oldValue, value, true);
         column.UcaseNamesSortedByLenght = null;
-        DoSpecialFormats(column, row, oldValue, false);
 
         if (changeSysColumns) {
+            DoSpecialFormats(column, row, oldValue, false);
+
             SystemSet(_database?.Column.SysRowChanger, row, _database?.UserName);
             SystemSet(_database.Column.SysRowChangeDate, row, DateTime.Now.ToString(Constants.Format_Date5));
         }
