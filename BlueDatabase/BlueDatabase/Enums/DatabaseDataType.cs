@@ -19,6 +19,23 @@ using System;
 
 namespace BlueDatabase.Enums;
 
+public static class DatabaseDataTypeExtension {
+
+    #region Methods
+
+    public static bool IsCellValue(this DatabaseDataType type) => (int)type is >= 200 and <= 205;
+
+    public static bool IsColumnTag(this DatabaseDataType type) => (int)type is >= 100 and <= 199;
+
+    public static bool IsCommand(this DatabaseDataType type) => (int)type is >= 220 and <= 230;
+
+    public static bool IsDatabaseTag(this DatabaseDataType type) => (int)type is < 100 or  >= 249;
+
+    public static bool Nameless(this DatabaseDataType type) => type.ToString() == ((int)type).ToString();
+
+    #endregion
+}
+
 public enum DatabaseDataType : byte {
 
     // Fehler = 0
@@ -271,9 +288,6 @@ public enum DatabaseDataType : byte {
 
     //Dummy_ce_ValueWithoutSizeUncrypted = 204,
 
-
-
-
     dummyComand_RemoveRow = 220,
 
     dummyComand_AddRow = 221,
@@ -281,7 +295,9 @@ public enum DatabaseDataType : byte {
     //	dummyComand_AddUndo = 222,
     dummyComand_RemoveColumn = 223,
 
-    AddColumn = 224,
+    AddColumnKeyInfo = 224,
+    AddColumnNameInfo = 225,
+
     UndoCount = 249,
 
     //PendingsInOne = 250,

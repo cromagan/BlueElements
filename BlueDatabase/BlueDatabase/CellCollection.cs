@@ -670,7 +670,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
         if (value == oldValue) { return; }
 
         _database?.WaitEditable();
-        _database?.ChangeData(DatabaseDataType.ce_Value_withoutSizeData, column.Key, row.Key, oldValue, value, true);
+        _database?.ChangeData(DatabaseDataType.ce_Value_withoutSizeData, column, row.Key, oldValue, value, true);
         column.UcaseNamesSortedByLenght = null;
 
         if (changeSysColumns) {
@@ -698,7 +698,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
             Add(cellKey, new CellItem(string.Empty, 0, 0));
         }
         if (value == @string) { return; }
-        _database.ChangeData(DatabaseDataType.ce_Value_withoutSizeData, column.Key, row.Key, @string, value, true);
+        _database.ChangeData(DatabaseDataType.ce_Value_withoutSizeData, column, row.Key, @string, value, true);
     }
 
     private static bool CompareValues(string istValue, string filterValue, FilterType typ) {

@@ -76,16 +76,7 @@ public sealed class DatabaseSQL : DatabaseAbstract {
     public override bool Save(bool mustSave) => _sql.ConnectionOk;
 
     public override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
-        if ((int)type is >= 100 and <= 199) {
-            _sql?.CheckIn(TableName, type, value, column, null, -1, -1);
-
-            if (type == DatabaseDataType.ColumnName) {
-                _sql?.AddColumnToMain(TableName, value.ToUpper(), column.Key); // !!!Value benutzen, weil der Columnname erst noch fest reingeschreiben werden muss
-            }
-        } else {
-            _sql?.CheckIn(TableName, type, value, column, row, width, height);
-        }
-
+        _sql?.CheckIn(TableName, type, value, column, row, width, height);
         return base.SetValueInternal(type, value, column, row, width, height);
     }
 
@@ -109,8 +100,8 @@ public sealed class DatabaseSQL : DatabaseAbstract {
         Column.Add(x);
     }
 
-    protected override void AddUndo(string tableName, DatabaseDataType comand, long columnKey, long rowKey, string previousValue, string changedTo, string userName) {
-        _sql.AddUndo(TableName, comand, columnKey, rowKey, previousValue, changedTo, UserName);
+    protected override void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, long rowKey, string previousValue, string changedTo, string userName) {
+        _sql.AddUndo(TableName, comand, column, rowKey, previousValue, changedTo, UserName);
     }
 
     protected override DatabaseAbstract? GetOtherTable(string tablename, bool readOnly) {

@@ -107,9 +107,13 @@ public abstract class SQLBackAbstract {
         return true;
     }
 
-    //public static void GetSQLBacks() {
-    //    if (PossibleSQLBacks == null) { PossibleSQLBacks = GetEnumerableOfType<SQLBackAbstract>(); }
-    //}
+    /// <summary>
+    /// Erstellt eine Spalte nur bei Bedarf.
+    /// Aber der Key wird aktualisiert.
+    /// </summary>
+    /// <param name="tablename"></param>
+    /// <param name="columnName"></param>
+    /// <param name="columnKey"></param>
     public void AddColumnToMain(string tablename, string columnName, long columnKey) {
         columnName = columnName.ToUpper();
 
@@ -117,17 +121,19 @@ public abstract class SQLBackAbstract {
         if (colMain == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
         if (!colMain.Contains(columnName)) { AddColumn(tablename.ToUpper(), columnName, VarChar4000, true); }
 
-        SetStyleData(tablename, "ColumnKey", columnName.ToUpper(), columnKey.ToString());
+        SetStyleData(tablename, DatabaseDataType.ColumnKey, columnName.ToUpper(), columnKey.ToString());
     }
 
-    public bool AddUndo(string tablename, DatabaseDataType comand, long columnKey, long rowKey, string previousValue, string changedTo, string userName) {
+    public bool AddUndo(string tablename, DatabaseDataType comand, ColumnItem? column, long rowKey, string previousValue, string changedTo, string userName) {
         if (!OpenConnection()) { return false; }
 
+        var n = (column?.Name) ?? "~Database~";
+
         var cmdString = "INSERT INTO " + SYS_UNDO +
-            " (TABLENAME, COMAND, COLUMNKEY, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, DATETIMEUTC) VALUES (" +
+            " (TABLENAME, COMAND, COLUMNNAME, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, DATETIMEUTC) VALUES (" +
             "'" + tablename.ToUpper() + "'," +
-            "'" + ((int)comand).ToString() + "'," +
-            "'" + columnKey.ToString() + "'," +
+            "'" + comand.ToString() + "'," +
+            "'" + n + "'," +
             "'" + rowKey.ToString() + "'," +
             "'" + previousValue + "'," +
             "'" + changedTo + "'," +
@@ -143,68 +149,75 @@ public abstract class SQLBackAbstract {
     public bool CheckIn(string tablename, DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
         if (!OpenConnection()) { return false; }
 
-        if ((int)type < 100) { column = null; row = null; }
+        #region Ignorieren
 
-        if (type != DatabaseDataType.ce_Value_withoutSizeData && type != DatabaseDataType.ce_Value_withSizeData &&
-            type != DatabaseDataType.ce_UTF8Value_withoutSizeData && type != DatabaseDataType.ce_UTF8Value_withSizeData) {
-            row = null;
+        switch (type) {
+            case DatabaseDataType.Formatkennung:
+            case DatabaseDataType.Werbung:
+            case DatabaseDataType.CryptionState:
+            case DatabaseDataType.CryptionTest:
+                break;
+
+            case DatabaseDataType.SaveContent:
+            case DatabaseDataType.co_ShowUndo:
+                break;
+
+            case DatabaseDataType.EOF:
+                break;
+
+            default:
+                break;
         }
 
-        if (column == null && row == null) {
-            switch (type) {
-                case DatabaseDataType.Formatkennung:
-                    break;
+        #endregion
 
-                case DatabaseDataType.Werbung:
-                    break;
+        #region Datenbank Eigenschaften
 
-                case DatabaseDataType.EOF:
-                    break;
-
-                case DatabaseDataType.SaveContent:
-                    break;
-
-                case DatabaseDataType.CryptionState:
-                    break;
-
-                case DatabaseDataType.CryptionTest:
-                    break;
-
-                default:
-                    return SetStyleData(tablename, type, string.Empty, value);
-            }
-
-            CloseConnection();
-            return true;
+        if (type.IsDatabaseTag()) {
+            return SetStyleData(tablename, type, string.Empty, value);
         }
 
-        if (column != null && row == null) {
-            switch (type) {
-                //case DatabaseDataType.co_EditType: break;
-                case DatabaseDataType.SaveContent:
-                    break;
+        #endregion
 
-                case DatabaseDataType.co_ShowUndo:
-                    break;
+        #region Spalten Eigenschaften
 
-                case DatabaseDataType.ColumnName:
-                    break;
-
-                default:
-                    if (type == DatabaseDataType.Caption) { AddColumnToMain(tablename, column.Name, column.Key); }
-
-                    return SetStyleData(tablename, type, column.Name.ToUpper(), value);
-            }
-            CloseConnection();
-            return true;
+        if (type.IsDatabaseTag()) {
+            if (type == DatabaseDataType.ColumnName) { RenameColumn(tablename, column.Name.ToUpper(), value.ToUpper()); }
+            return SetStyleData(tablename, type, column.Name.ToUpper(), value);
         }
 
-        if (column != null && row != null) {
+        #endregion
+
+        #region Zellen-Wert
+
+        if (type.IsCellValue()) {
             SetCellValue(tablename, column, row, value);
 
             CloseConnection();
             return true;
         }
+
+        #endregion
+
+        #region Befehle
+
+        if (type.IsCommand()) {
+            switch (type) {
+                case DatabaseDataType.AddColumnKeyInfo:
+                    // Ignoreieren, macht AddColumnNameInfo
+                    return true;
+
+                case DatabaseDataType.AddColumnNameInfo:
+                    AddColumnToMain(tablename, column.Name, column.Key);
+                    return true;
+
+                default:
+                    Develop.DebugPrint(FehlerArt.Fehler, type.ToString() + " nicht definiert!");
+                    return false;
+            }
+        }
+
+        #endregion
 
         CloseConnection();
         return false;
@@ -339,7 +352,7 @@ public abstract class SQLBackAbstract {
         if (colUndo == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
         if (!colUndo.Contains("TABLENAME")) { AddColumn(SYS_UNDO, "TABLENAME", false); }
         if (!colUndo.Contains("COMAND")) { AddColumn(SYS_UNDO, "COMAND", false); }
-        if (!colUndo.Contains("COLUMNKEY")) { AddColumn(SYS_UNDO, "COLUMNKEY", false); }
+        if (!colUndo.Contains("COLUMNNAME")) { AddColumn(SYS_UNDO, "COLUMNNAME", false); }
         if (!colUndo.Contains("ROWKEY")) { AddColumn(SYS_UNDO, "ROWKEY", true); }
         if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn(SYS_UNDO, "PREVIOUSVALUE", VarChar4000, true); }
         if (!colUndo.Contains("CHANGEDTO")) { AddColumn(SYS_UNDO, "CHANGEDTO", VarChar4000, true); }
@@ -361,46 +374,13 @@ public abstract class SQLBackAbstract {
     /// <param name="newValue"></param>
     /// <returns></returns>
     public bool SetStyleData(string tablename, DatabaseDataType type, string columnName, string newValue) {
-        var t = type.ToString();
-
-        if (t == ((int)type).ToString()) { return true; }
-
-        if (type == DatabaseDataType.AddColumn) { return true; } // enthält zwar den Key, aber Wertlos, wenn der Spaltenname noch nicht bekannt ist...
+        if (type.Nameless()) { return true; }
+        //q
+        //if (type == DatabaseDataType.AddColumnKeyInfo) { return true; } // enthält zwar den Key, aber Wertlos, wenn der Spaltenname noch nicht bekannt ist...
         if (type == DatabaseDataType.AutoExport) { return true; }
         if (type == DatabaseDataType.UndoInOne) { return true; }
 
-        return SetStyleData(tablename, t, columnName, newValue);
-    }
-
-    /// <summary>
-    /// Gibt TRUE zurück, wenn alles ok ist.
-    /// Entweder der Wert gesetzt wurde, der Wert aktuell ist oder der Wert unwichtig ist.
-    /// </summary>
-    /// <param name="tablename"></param>
-    /// <param name="type"></param>
-    /// <param name="columnName"></param>
-    /// <param name="newValue"></param>
-    /// <returns></returns>
-    public bool SetStyleData(string tablename, string type, string columnName, string newValue) {
-        columnName = columnName.ToUpper();
-
-        var isVal = GetStyleData(tablename, type, columnName);
-
-        if (string.IsNullOrEmpty(columnName)) { columnName = "~Database~"; }
-
-        string cmdString;
-
-        if (isVal is null) {
-            cmdString = "INSERT INTO " + SYS_STYLE + " (TABLENAME, TYPE, COLUMNNAME, VALUE)  VALUES ('" + tablename.ToUpper() + "', '" + type + "', '" + columnName.ToUpper() + "', '" + newValue + "')";
-        } else if (isVal != newValue) {
-            cmdString = "UPDATE " + SYS_STYLE + " SET VALUE = '" + newValue + "' WHERE TABLENAME = '" + tablename.ToUpper() + "' AND TYPE = '" + type + "' AND COLUMNNAME = '" + columnName.ToUpper() + "'";
-        } else {
-            return true;
-        }
-
-        if (!OpenConnection()) { return false; }
-
-        return ExecuteCommand(cmdString);
+        return SetStyleData(tablename, type.ToString(), columnName, newValue);
     }
 
     /// <summary>
@@ -545,15 +525,21 @@ public abstract class SQLBackAbstract {
         return null;
     }
 
-    /// <summary>
-    /// Gibt TRUE zurück, wenn alles ok ist.
-    /// Entweder der Wert gesetzt wurde, der Wert aktuell ist oder der Wert unwichtig ist.
-    /// </summary>
-    /// <param name="tablename"></param>
-    /// <param name="type"></param>
-    /// <param name="columnName"></param>
-    /// <param name="newValue"></param>
-    /// <returns></returns>
+    private void RenameColumn(string tablename, string oldname, string newname) {
+        //https://www.1keydata.com/sql/alter-table-rename-column.html
+        var cmdString = @"ALTER TABLE " + tablename + " RENAME COLUMN " + oldname + " TO " + newname;
+        ExecuteCommand(cmdString);
+
+        //if (isVal is null) {
+        //    cmdString = "INSERT INTO " + SYS_STYLE + " (TABLENAME, TYPE, COLUMNNAME, VALUE)  VALUES ('" + tablename.ToUpper() + "', '" + type + "', '" + columnName.ToUpper() + "', '" + newValue + "')";
+        //} else if (isVal != newValue) {
+        cmdString = "UPDATE " + SYS_STYLE + " SET COLUMNNAME = '" + newname + "' WHERE TABLENAME = '" + tablename.ToUpper() + "' AND COLUMNNAME = '" + oldname.ToUpper() + "'";
+        //} else {
+        //    return true;
+        //}
+
+        ExecuteCommand(cmdString);
+    }
 
     /// <summary>
     /// Gibt TRUE zurück, wenn alles ok ist.
@@ -582,5 +568,46 @@ public abstract class SQLBackAbstract {
         return ExecuteCommand(cmdString);
     }
 
+    /// <summary>
+    /// Gibt TRUE zurück, wenn alles ok ist.
+    /// Entweder der Wert gesetzt wurde oder der Wert aktuell ist.
+    /// </summary>
+    /// <param name="tablename"></param>
+    /// <param name="type"></param>
+    /// <param name="columnName"></param>
+    /// <param name="newValue"></param>
+    /// <returns></returns>
+    private bool SetStyleData(string tablename, string type, string columnName, string newValue) {
+        columnName = columnName.ToUpper();
+
+        var isVal = GetStyleData(tablename, type, columnName);
+
+        if (string.IsNullOrEmpty(columnName)) { columnName = "~Database~"; }
+
+        string cmdString;
+
+        if (isVal is null) {
+            cmdString = "INSERT INTO " + SYS_STYLE + " (TABLENAME, TYPE, COLUMNNAME, VALUE)  VALUES ('" + tablename.ToUpper() + "', '" + type + "', '" + columnName.ToUpper() + "', '" + newValue + "')";
+        } else if (isVal != newValue) {
+            cmdString = "UPDATE " + SYS_STYLE + " SET VALUE = '" + newValue + "' WHERE TABLENAME = '" + tablename.ToUpper() + "' AND TYPE = '" + type + "' AND COLUMNNAME = '" + columnName.ToUpper() + "'";
+        } else {
+            return true;
+        }
+
+        if (!OpenConnection()) { return false; }
+
+        return ExecuteCommand(cmdString);
+    }
+
     #endregion
+
+    /// <summary>
+    /// Gibt TRUE zurück, wenn alles ok ist.
+    /// Entweder der Wert gesetzt wurde, der Wert aktuell ist oder der Wert unwichtig ist.
+    /// </summary>
+    /// <param name="tablename"></param>
+    /// <param name="type"></param>
+    /// <param name="columnName"></param>
+    /// <param name="newValue"></param>
+    /// <returns></returns>
 }

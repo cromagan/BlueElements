@@ -40,11 +40,11 @@ public class WorkItem : IParseable {
 
     #region Constructors
 
-    public WorkItem(DatabaseDataType comand, long colKey, long rowKey, string previousValue, string changedTo, string user) {
+    public WorkItem(DatabaseDataType comand, ColumnItem column, long rowkey, string previousValue, string changedTo, string user) {
         _state = ItemState.Pending;
         Comand = comand;
-        _colKey = colKey;
-        _rowKey = rowKey;
+        _colKey = column?.Key ?? -1;
+        _rowKey = rowkey;
         PreviousValue = previousValue;
         _changedTo = changedTo;
         User = user;

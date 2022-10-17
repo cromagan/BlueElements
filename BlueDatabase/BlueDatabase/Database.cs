@@ -330,16 +330,6 @@ public sealed class Database : DatabaseAbstract {
     }
 
     public override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
-        //if ((int)type is >= 100 and <= 199) {
-        //    CopyToSql?.CheckIn(TableName, type, value, column, null, -1, -1);
-
-        //    if (type == DatabaseDataType.ColumnName) {
-        //        CopyToSql?.SetStyleData(TableName, "ColumnKey", value.ToUpper(), column.Key.ToString());
-        //    }
-        //} else {
-        //    CopyToSql?.CheckIn(TableName, type, value, column, row, width, height);
-        //}
-
         var r = base.SetValueInternal(type, value, column, row, width, height);
 
         if (type == DatabaseDataType.ReloadDelaySecond) {
@@ -495,8 +485,8 @@ public sealed class Database : DatabaseAbstract {
         SaveToByteList(list, contentSize.Height, 2);
     }
 
-    protected override void AddUndo(string tableName, DatabaseDataType comand, long columnKey, long rowKey, string previousValue, string changedTo, string userName) {
-        Works.Add(new WorkItem(comand, columnKey, rowKey, previousValue, changedTo, UserName));
+    protected override void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, long rowKey, string previousValue, string changedTo, string userName) {
+        Works.Add(new WorkItem(comand, column, rowKey, previousValue, changedTo, UserName));
     }
 
     protected override void Dispose(bool disposing) {
@@ -587,7 +577,7 @@ public sealed class Database : DatabaseAbstract {
         //        //    dummy--;
         //        //    ChangeRowKeyInPending(ThisPending.RowKey, dummy);
         //        //}
-        //        //if (ThisPending.Comand == enDatabaseDataType.AddColumn) {
+        //        //if (ThisPending.Comand == enDatabaseDataType.AddColumnKeyInfo) {
         //        //    dummy--;
         //        //    ChangeColumnKeyInPending(ThisPending.ColKey, dummy);
         //        //}
@@ -611,7 +601,7 @@ public sealed class Database : DatabaseAbstract {
         //            //    ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
         //            //    break;
 
-        //            //case enDatabaseDataType.AddColumn:
+        //            //case enDatabaseDataType.AddColumnKeyInfo:
         //            //    ChangeColumnKeyInPending(ThisPending.ColKey, Column.NextColumnKey);
         //            //    break;
         //        }
@@ -642,7 +632,7 @@ public sealed class Database : DatabaseAbstract {
             if (thisPendingItem.ColKey > -1) {
                 col = Column.SearchByKey(thisPendingItem.ColKey);
                 if (col == null) {
-                    if (thisPendingItem.Comand != DatabaseDataType.AddColumn && thisPendingItem.User != UserName) {
+                    if (thisPendingItem.Comand != DatabaseDataType.AddColumnKeyInfo && thisPendingItem.User != UserName) {
                         Develop.DebugPrint("Pending verworfen, Spalte gelöscht.<br>" + ConnectionID + "<br>" + thisPendingItem.ToString());
                         return;
                     }

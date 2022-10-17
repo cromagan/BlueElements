@@ -97,7 +97,7 @@ public sealed class RowSortDefinition : IParseable {
 
                 case "column":
 
-                case "columnname": // Columname wichtig wegen CopyLayout
+                case "columnname": // ColumnName wichtig wegen CopyLayout
                     if (Database.Column[pair.Value] is ColumnItem c) { Columns.Add(c); }
 
                     break;

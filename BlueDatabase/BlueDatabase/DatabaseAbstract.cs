@@ -199,7 +199,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         set {
             if (_additionaFilesPfad == value) { return; }
             _additionaFilesPfadtmp = null;
-            ChangeData(DatabaseDataType.AdditionaFilesPath, -1, -1, _additionaFilesPfad, value, true);
+            ChangeData(DatabaseDataType.AdditionaFilesPath, null, -1, _additionaFilesPfad, value, true);
             Cell.InvalidateAllSizes();
         }
     }
@@ -219,7 +219,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         get => _caption;
         set {
             if (_caption == value) { return; }
-            ChangeData(DatabaseDataType.Caption, -1, -1, _caption, value, true);
+            ChangeData(DatabaseDataType.Caption, null, -1, _caption, value, true);
         }
     }
 
@@ -230,7 +230,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         get => _createDate;
         set {
             if (_createDate == value) { return; }
-            ChangeData(DatabaseDataType.CreateDateUTC, -1, -1, _createDate, value, true);
+            ChangeData(DatabaseDataType.CreateDateUTC, null, -1, _createDate, value, true);
         }
     }
 
@@ -239,7 +239,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         get => _creator.Trim();
         set {
             if (_creator == value) { return; }
-            ChangeData(DatabaseDataType.Creator, -1, -1, _creator, value, true);
+            ChangeData(DatabaseDataType.Creator, null, -1, _creator, value, true);
         }
     }
 
@@ -250,7 +250,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         get => _globalScale;
         set {
             if (_globalScale == value) { return; }
-            ChangeData(DatabaseDataType.GlobalScale, -1, -1, _globalScale.ToString(CultureInfo.InvariantCulture), value.ToString(CultureInfo.InvariantCulture), true);
+            ChangeData(DatabaseDataType.GlobalScale, null, -1, _globalScale.ToString(CultureInfo.InvariantCulture), value.ToString(CultureInfo.InvariantCulture), true);
             Cell.InvalidateAllSizes();
         }
     }
@@ -259,7 +259,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         get => _globalShowPass;
         set {
             if (_globalShowPass == value) { return; }
-            ChangeData(DatabaseDataType.GlobalShowPass, -1, -1, _globalShowPass, value, true);
+            ChangeData(DatabaseDataType.GlobalShowPass, null, -1, _globalShowPass, value, true);
         }
     }
 
@@ -278,7 +278,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         get => _reloadDelaySecond;
         set {
             if (_reloadDelaySecond == value) { return; }
-            ChangeData(DatabaseDataType.ReloadDelaySecond, -1, -1, _reloadDelaySecond.ToString(), value.ToString(), true);
+            ChangeData(DatabaseDataType.ReloadDelaySecond, null, -1, _reloadDelaySecond.ToString(), value.ToString(), true);
         }
     }
 
@@ -290,7 +290,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         get => _rulesScript;
         set {
             if (_rulesScript == value) { return; }
-            ChangeData(DatabaseDataType.RulesScript, -1, -1, _rulesScript, value, true);
+            ChangeData(DatabaseDataType.RulesScript, null, -1, _rulesScript, value, true);
         }
     }
 
@@ -303,7 +303,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
             if (_sortDefinition != null) { alt = _sortDefinition.ToString(); }
             if (value != null) { neu = value.ToString(); }
             if (alt == neu) { return; }
-            ChangeData(DatabaseDataType.SortDefinition, -1, -1, alt, neu, false);
+            ChangeData(DatabaseDataType.SortDefinition, null, -1, alt, neu, false);
             _sortDefinition = new RowSortDefinition(this, neu);
             OnSortParameterChanged();
         }
@@ -318,7 +318,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         get => _standardFormulaFile;
         set {
             if (_standardFormulaFile == value) { return; }
-            ChangeData(DatabaseDataType.StandardFormulaFile, -1, -1, _standardFormulaFile, value, true);
+            ChangeData(DatabaseDataType.StandardFormulaFile, null, -1, _standardFormulaFile, value, true);
         }
     }
 
@@ -327,7 +327,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         get => _undoCount;
         set {
             if (_undoCount == value) { return; }
-            ChangeData(DatabaseDataType.UndoCount, -1, -1, _undoCount.ToString(), value.ToString(), true);
+            ChangeData(DatabaseDataType.UndoCount, null, -1, _undoCount.ToString(), value.ToString(), true);
         }
     }
 
@@ -336,7 +336,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         get => _zeilenQuickInfo;
         set {
             if (_zeilenQuickInfo == value) { return; }
-            ChangeData(DatabaseDataType.RowQuickInfo, -1, -1, _zeilenQuickInfo, value, true);
+            ChangeData(DatabaseDataType.RowQuickInfo, null, -1, _zeilenQuickInfo, value, true);
         }
     }
 
@@ -531,7 +531,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     /// <param name="previousValue"></param>
     /// <param name="changedTo"></param>
     /// <param name="executeNow"></param>
-    public void ChangeData(DatabaseDataType comand, ColumnItem column, string previousValue, string changedTo, bool executeNow) => ChangeData(comand, column.Key, -1, previousValue, changedTo, executeNow);
+    public void ChangeData(DatabaseDataType comand, ColumnItem column, string previousValue, string changedTo, bool executeNow) => ChangeData(comand, column, -1, previousValue, changedTo, executeNow);
 
     /// <summary>
     /// Das hier ist die richtige Methode, um einen Wert dauerhaft zu setzen.
@@ -542,7 +542,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     /// <param name="previousValue"></param>
     /// <param name="changedTo"></param>
     /// <param name="executeNow"></param>
-    public void ChangeData(DatabaseDataType comand, long columnKey, string listExt, bool executeNow) => ChangeData(comand, columnKey, -1, "", listExt, executeNow);
+    public void ChangeData(DatabaseDataType comand, ColumnItem? column, string listExt, bool executeNow) => ChangeData(comand, column, -1, "", listExt, executeNow);
 
     /// <summary>
     /// Das hier ist die richtige Methode, um einen Wert dauerhaft zu setzen.
@@ -553,11 +553,11 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     /// <param name="previousValue"></param>
     /// <param name="changedTo"></param>
     /// <param name="executeNow"></param>
-    public void ChangeData(DatabaseDataType comand, long columnKey, long rowKey, string previousValue, string changedTo, bool executeNow) {
+    public void ChangeData(DatabaseDataType comand, ColumnItem? column, long rowKey, string previousValue, string changedTo, bool executeNow) {
         if (executeNow) {
-            SetValueInternal(comand, changedTo, Column.SearchByKey(columnKey), Row.SearchByKey(rowKey), -1, -1);
+            SetValueInternal(comand, changedTo, column, Row.SearchByKey(rowKey), -1, -1);
         }
-        Mirror?.ChangeData(comand, columnKey, rowKey, previousValue, changedTo, executeNow);
+        Mirror?.ChangeData(comand, column, rowKey, previousValue, changedTo, executeNow);
 
         if (IsLoading) { return; }
         if (ReadOnly) {
@@ -571,9 +571,9 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         if (comand != DatabaseDataType.AutoExport) { SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
 
         if (rowKey < -100) { Develop.DebugPrint(FehlerArt.Fehler, "RowKey darf hier nicht <-100 sein!"); }
-        if (columnKey < -100) { Develop.DebugPrint(FehlerArt.Fehler, "ColKey darf hier nicht <-100 sein!"); }
+        //if (columnKey < -100) { Develop.DebugPrint(FehlerArt.Fehler, "ColKey darf hier nicht <-100 sein!"); }
 
-        AddUndo(TableName, comand, columnKey, rowKey, previousValue, changedTo, UserName);
+        AddUndo(TableName, comand, column, rowKey, previousValue, changedTo, UserName);
     }
 
     /// <summary>
@@ -1042,7 +1042,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     }
 
     public virtual string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
-        if ((int)type is >= 100 and <= 199) {
+        if (type.IsColumnTag()) {
             return column.SetValueInternal(type, value);
         }
 
@@ -1174,9 +1174,14 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
                 if (Row.SearchByKey(addRowKey) == null) { Row.Add(new RowItem(this, addRowKey)); }
                 break;
 
-            case DatabaseDataType.AddColumn:
+            case DatabaseDataType.AddColumnKeyInfo: // TODO: Ummünzen auf AddColumnNameInfo
                 var addColumnKey = LongParse(value);
                 if (Column.SearchByKey(addColumnKey) == null) { Column.AddFromParser(new ColumnItem(this, addColumnKey)); }
+                break;
+
+            case DatabaseDataType.AddColumnNameInfo: // TODO: Ummünzen auf AddColumnNameInfo
+                //var addColumnKey = LongParse(value);
+                //if (Column.SearchByKey(addColumnKey) == null) { Column.AddFromParser(new ColumnItem(this, addColumnKey)); }
                 break;
 
             case DatabaseDataType.dummyComand_RemoveRow:
@@ -1291,7 +1296,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         ViewChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
-    protected abstract void AddUndo(string tableName, DatabaseDataType comand, long columnKey, long rowKey, string previousValue, string changedTo, string userName);
+    protected abstract void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, long rowKey, string previousValue, string changedTo, string userName);
 
     protected virtual void Dispose(bool disposing) {
         if (IsDisposed) { return; }
@@ -1503,28 +1508,28 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     }
 
     private void Column_ItemRemoving(object sender, ListEventArgs e) {
-        var key = ((ColumnItem)e.Item).Key;
-        ChangeData(DatabaseDataType.dummyComand_RemoveColumn, key, -1, string.Empty, key.ToString(), false);
+        var c = (ColumnItem)e.Item;
+        ChangeData(DatabaseDataType.dummyComand_RemoveColumn, c, -1, string.Empty, c.Key.ToString(), false);
     }
 
     private void ColumnArrangements_ListOrItemChanged(object sender, System.EventArgs e) {
         if (IsLoading) { return; } // hier schon raus, es muss kein ToString ausgeführt werden. Kann zu Endlosschleifen führen.
-        ChangeData(DatabaseDataType.ColumnArrangement, -1, ColumnArrangements.ToString(), false);
+        ChangeData(DatabaseDataType.ColumnArrangement, null, ColumnArrangements.ToString(), false);
     }
 
     private void DatabaseAdmin_ListOrItemChanged(object sender, System.EventArgs e) {
         if (IsLoading) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
-        ChangeData(DatabaseDataType.DatabaseAdminGroups, -1, DatenbankAdmin.JoinWithCr(), false);
+        ChangeData(DatabaseDataType.DatabaseAdminGroups, null, DatenbankAdmin.JoinWithCr(), false);
     }
 
     private void DatabaseTags_ListOrItemChanged(object sender, System.EventArgs e) {
         if (IsLoading) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
-        ChangeData(DatabaseDataType.Tags, -1, Tags.JoinWithCr(), false);
+        ChangeData(DatabaseDataType.Tags, null, Tags.JoinWithCr(), false);
     }
 
     private void Export_ListOrItemChanged(object sender, System.EventArgs e) {
         if (IsLoading) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
-        ChangeData(DatabaseDataType.AutoExport, -1, Export.ToString(true), false);
+        ChangeData(DatabaseDataType.AutoExport, null, Export.ToString(true), false);
     }
 
     private void InvalidateExports(string layoutId) {
@@ -1572,7 +1577,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
     private void Layouts_ListOrItemChanged(object sender, System.EventArgs e) {
         if (IsLoading) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
-        ChangeData(DatabaseDataType.Layouts, -1, Layouts.JoinWithCr(), false);
+        ChangeData(DatabaseDataType.Layouts, null, Layouts.JoinWithCr(), false);
     }
 
     private void OnDisposing() {
@@ -1605,7 +1610,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
     private void PermissionGroups_NewRow_ListOrItemChanged(object sender, System.EventArgs e) {
         if (IsLoading) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
-        ChangeData(DatabaseDataType.PermissionGroupsNewRow, -1, PermissionGroupsNewRow.JoinWithCr(), false);
+        ChangeData(DatabaseDataType.PermissionGroupsNewRow, null, PermissionGroupsNewRow.JoinWithCr(), false);
     }
 
     private void QuickImage_NeedImage(object sender, NeedImageEventArgs e) {
@@ -1654,11 +1659,11 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
     private void Row_RowAdded(object sender, RowEventArgs e) {
         if (IsLoading) {
-            ChangeData(DatabaseDataType.dummyComand_AddRow, -1, e.Row.Key, "", e.Row.Key.ToString(), false);
+            ChangeData(DatabaseDataType.dummyComand_AddRow, null, e.Row.Key, "", e.Row.Key.ToString(), false);
         }
     }
 
-    private void Row_RowRemoving(object sender, RowEventArgs e) => ChangeData(DatabaseDataType.dummyComand_RemoveRow, -1, e.Row.Key, "", e.Row.Key.ToString(), false);
+    private void Row_RowRemoving(object sender, RowEventArgs e) => ChangeData(DatabaseDataType.dummyComand_RemoveRow, null, e.Row.Key, "", e.Row.Key.ToString(), false);
 
     private void StartBackgroundWorker() {
         try {

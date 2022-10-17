@@ -120,7 +120,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
     public ColumnItem(DatabaseAbstract database, long columnkey) : this(database, database.Column.Freename(string.Empty), columnkey) { }
 
-    public ColumnItem(DatabaseAbstract database, string columname, long columnkey) {
+    public ColumnItem(DatabaseAbstract database, string columnname, long columnkey) {
         Database = database;
         Database.Disposing += Database_Disposing;
         if (columnkey < 0) { Develop.DebugPrint(FehlerArt.Fehler, "ColumnKey <0"); }
@@ -130,7 +130,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
         #region Standard-Werte
 
-        _name = columname;
+        _name = columnname;
         _caption = string.Empty;
         //_CaptionBitmapCode = null;
         _format = DataFormat.Text;
@@ -862,7 +862,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     public void CloneFrom(ColumnItem source, bool nameAndKeyToo) {
         if (nameAndKeyToo) {
             Name = source.Name;
-            Database.ChangeData(DatabaseDataType.ColumnKey, Key, -1, Key.ToString(), source.Key.ToString(), true);
+            Database.ChangeData(DatabaseDataType.ColumnKey, this, -1, this.ToString(), source.Key.ToString(), true);
 
             Key = source.Key;
         }
@@ -2423,7 +2423,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     //}
 
     private void AfterEdit_AutoReplace_ListOrItemChanged(object sender, System.EventArgs e) {
-        Database.ChangeData(DatabaseDataType.AutoReplaceAfterEdit, Key, AfterEditAutoReplace.JoinWithCr(), false);
+        Database.ChangeData(DatabaseDataType.AutoReplaceAfterEdit, this, AfterEditAutoReplace.JoinWithCr(), false);
         OnChanged();
     }
 
@@ -2462,7 +2462,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     }
 
     private void DropDownItems_ListOrItemChanged(object sender, System.EventArgs e) {
-        Database.ChangeData(DatabaseDataType.DropDownItems, Key, DropDownItems.JoinWithCr(), false);
+        Database.ChangeData(DatabaseDataType.DropDownItems, this, DropDownItems.JoinWithCr(), false);
         OnChanged();
     }
 
@@ -2542,23 +2542,23 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     }
 
     private void LinkedCellFilters_ListOrItemChanged(object sender, System.EventArgs e) {
-        Database.ChangeData(DatabaseDataType.LinkedCellFilter, Key, LinkedCellFilter.JoinWithCr(), false);
+        Database.ChangeData(DatabaseDataType.LinkedCellFilter, this, LinkedCellFilter.JoinWithCr(), false);
         OnChanged();
     }
 
     private void OpticalReplacer_ListOrItemChanged(object sender, System.EventArgs e) {
-        Database.ChangeData(DatabaseDataType.OpticalTextReplace, Key, OpticalReplace.JoinWithCr(), false);
+        Database.ChangeData(DatabaseDataType.OpticalTextReplace, this, OpticalReplace.JoinWithCr(), false);
         Invalidate_ColumAndContent();
         OnChanged();
     }
 
     private void PermissionGroups_ChangeCell_ListOrItemChanged(object sender, System.EventArgs e) {
-        Database.ChangeData(DatabaseDataType.PermissionGroupsChangeCell, Key, PermissionGroupsChangeCell.JoinWithCr(), false);
+        Database.ChangeData(DatabaseDataType.PermissionGroupsChangeCell, this, PermissionGroupsChangeCell.JoinWithCr(), false);
         OnChanged();
     }
 
     private void Tags_ListOrItemChanged(object sender, System.EventArgs e) {
-        Database.ChangeData(DatabaseDataType.ColumnTags, Key, Tags.JoinWithCr(), false);
+        Database.ChangeData(DatabaseDataType.ColumnTags, this, Tags.JoinWithCr(), false);
         OnChanged();
     }
 

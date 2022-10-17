@@ -52,7 +52,7 @@ public sealed class ColumnViewItem {
             switch (pair.Key) {
                 case "column":
 
-                case "columnname":// Columname wichtg, wegen CopyLayout
+                case "columnname":// ColumnName wichtg, wegen CopyLayout
                     Column = database.Column[pair.Value];
                     Column?.Repair(); // Alte Formate reparieren
                     break;

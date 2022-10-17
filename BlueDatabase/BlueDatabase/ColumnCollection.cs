@@ -124,7 +124,8 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
             Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht erlaubt!");
         }
 
-        Database.ChangeData(DatabaseDataType.AddColumn, colKey, -1, string.Empty, colKey.ToString(), true);
+        Database.ChangeData(DatabaseDataType.AddColumnKeyInfo, null, -1, string.Empty, colKey.ToString(), true);
+        Database.ChangeData(DatabaseDataType.AddColumnNameInfo, null, -1, string.Empty, internalName.ToUpper(), true);
         // Ruft anschließen AddFromParser Auf, der die Spalte endgültig dazumacht
 
         var c = SearchByKey(colKey);

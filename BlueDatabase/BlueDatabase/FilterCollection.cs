@@ -141,9 +141,9 @@ public sealed class FilterCollection : ListExt<FilterItem>, IParseable {
 
     public void RemoveOtherAndAddIfNotExists(ColumnItem? column, FilterType filterType, string filterBy, string herkunft) => RemoveOtherAndAddIfNotExists(new FilterItem(column, filterType, filterBy, herkunft));
 
-    public void RemoveOtherAndAddIfNotExists(string columName, FilterType filterType, string filterBy, string herkunft) {
-        var column = Database.Column[columName];
-        if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte '" + columName + "' nicht vorhanden."); }
+    public void RemoveOtherAndAddIfNotExists(string columnName, FilterType filterType, string filterBy, string herkunft) {
+        var column = Database.Column[columnName];
+        if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); }
         RemoveOtherAndAddIfNotExists(column, filterType, filterBy, herkunft);
     }
 
@@ -154,9 +154,9 @@ public sealed class FilterCollection : ListExt<FilterItem>, IParseable {
         Add(filterItem);
     }
 
-    public void RemoveOtherAndAddIfNotExists(string columName, FilterType filterType, List<string>? filterBy, string herkunft) {
-        var tmp = Database.Column[columName];
-        if (tmp == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte '" + columName + "' nicht vorhanden."); }
+    public void RemoveOtherAndAddIfNotExists(string columnName, FilterType filterType, List<string>? filterBy, string herkunft) {
+        var tmp = Database.Column[columnName];
+        if (tmp == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); }
         RemoveOtherAndAddIfNotExists(new FilterItem(tmp, filterType, filterBy, herkunft));
     }
 
