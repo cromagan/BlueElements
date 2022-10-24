@@ -124,13 +124,17 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
             Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht erlaubt!");
         }
 
-        Database.ChangeData(DatabaseDataType.AddColumnKeyInfo, null, -1, string.Empty, colKey.ToString(), true);
-        Database.ChangeData(DatabaseDataType.AddColumnNameInfo, null, -1, string.Empty, internalName.ToUpper(), true);
+        var c = SearchByKey(colKey) ?? Exists(internalName);
+        Database.ChangeData(DatabaseDataType.AddColumnNameInfo, c, null, string.Empty, internalName.ToUpper());
+        c = SearchByKey(colKey) ?? Exists(internalName);
+        Database.ChangeData(DatabaseDataType.AddColumnKeyInfo, c, null, string.Empty, colKey.ToString());
+
         // Ruft anschließen AddFromParser Auf, der die Spalte endgültig dazumacht
 
-        var c = SearchByKey(colKey);
+        c = SearchByKey(colKey) ?? Exists(internalName);
 
         c.Name = internalName;
+        c.Key = colKey;
         c.Caption = caption;
 
         if (format != VarType.Unbekannt) { c.SetFormat(format); }
@@ -346,7 +350,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         base.Swap(column1, column2);
         column1.Invalidate_ColumAndContent();
         column2.Invalidate_ColumAndContent();
-        Database.ColumnArrangements[0].ShowAllColumns(); // Damit die Datenbank mitbekommt, das sich da was geändert hat
+        //Database.ColumnArrangements[0].ShowAllColumns(); // Damit die Datenbank mitbekommt, das sich da was geändert hat
     }
 
     internal static string ParsableColumnKey(ColumnItem? column) => column == null ? "ColumnKey=?" : ParsableColumnKey(column.Key);
@@ -364,7 +368,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         return key;
     }
 
-    //internal string Load_310(enDatabaseDataType type, string value) {
+    //internal string SetValueInternal(enDatabaseDataType type, string value) {
     //    switch (type) {
     //        case enDatabaseDataType.LastColumnKey:
     //            _LastColumnKey = LongParse(value);
@@ -406,9 +410,13 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     internal void CloneFrom(DatabaseAbstract sourceDatabase) {
 
         // Spalten, die zu viel sind, löschen
+        var names = new List<ColumnItem>();
         foreach (var ThisColumn in this) {
             var l = sourceDatabase.Column.Exists(ThisColumn.Name);
-            if (l == null) { Remove(ThisColumn); }
+            if (l == null) { names.Add(ThisColumn); }
+        }
+        foreach(var thisname in names) {
+            Remove(thisname);
         }
 
 

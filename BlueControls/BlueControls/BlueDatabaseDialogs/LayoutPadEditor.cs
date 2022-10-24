@@ -23,6 +23,7 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
+using System;
 using System.ComponentModel;
 using System.Drawing;
 using static BlueBasics.IO;
@@ -143,7 +144,11 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
 
         ItemCollectionPad c = new();
         c.Caption = ex;
-        Database.Layouts.Add(c.ToString());
+
+        var lay = (LayoutCollection)Database.Layouts.Clone();
+        lay.Add(c.ToString());
+        Database.Layouts = lay;
+
         BefülleLayoutDropdown();
         LoadLayout(c.Id);
         CheckButtons();
@@ -157,7 +162,11 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
             return;
         }
         if (MessageBox.Show("Layout <b>'" + Pad.Item.Caption + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-        Database.Layouts.RemoveAt(ind);
+
+        var lay = (LayoutCollection)Database.Layouts.Clone();
+        lay.RemoveAt(ind);
+        Database.Layouts = lay;
+
         LoadLayout(string.Empty);
         BefülleLayoutDropdown();
         CheckButtons();
@@ -240,7 +249,15 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
         var ind = Database.Layouts.LayoutIdToIndex(Pad.Item.Id);
         if (ind > -1) {
             if (Database.Layouts[ind] == newl) { return; }
-            Database.Layouts[ind] = newl;
+
+            var lay = (LayoutCollection)Database.Layouts.Clone();
+            lay[ind] = newl;
+            Database.Layouts = lay;
+
+            if (!newl.StartsWith("{ID=#")) { Develop.DebugPrint("ID nicht gefunden: " + newl); }
+            var ko = newl.IndexOf(", ", StringComparison.Ordinal);
+            var id = newl.Substring(4, ko - 4);
+            Database.InvalidateExports(id);
         } else if (Pad.Item.Id.FileSuffix().ToUpper() == "BCR") {
             WriteAllText(Pad.Item.Id, newl, System.Text.Encoding.UTF8, false);
         }

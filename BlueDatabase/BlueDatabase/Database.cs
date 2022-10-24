@@ -63,7 +63,7 @@ public sealed class Database : DatabaseAbstract {
         _muf.ShouldICancelSaveOperations += OnShouldICancelSaveOperations;
         _muf.DiscardPendingChanges += DiscardPendingChanges;
         _muf.HasPendingChanges += HasPendingChanges;
-        _muf.ParseExternal += ParseExternal;
+        _muf.ParseExternal += Parse;
         _muf.ToListOfByte += ToListOfByte;
 
         Develop.StartService();
@@ -123,7 +123,7 @@ public sealed class Database : DatabaseAbstract {
 
     public override void Load_Reload() => _muf?.Load_Reload();
 
-    public void Parse(byte[] bLoaded, ref int pointer, ref DatabaseDataType type, ref long colKey, ref long rowKey, ref string value, ref int width, ref int height) {
+    public void Parse(byte[] bLoaded, ref int pointer, out DatabaseDataType type, ref long colKey, ref long rowKey, out string value, out int width, out int height) {
         int les;
         switch ((Routinen)bLoaded[pointer]) {
             case Routinen.CellFormat: {
@@ -231,34 +231,50 @@ public sealed class Database : DatabaseAbstract {
                     break;
                 }
             default: {
+                    type = (DatabaseDataType)0;
+                    value = string.Empty;
+                    width = 0;
+                    height= 0;
                     Develop.DebugPrint(FehlerArt.Fehler, "Laderoutine nicht definiert: " + bLoaded[pointer]);
                     break;
                 }
         }
     }
 
-    public void ParseExternal(object sender, MultiUserParseEventArgs e2) {
+    public void Parse(object sender, MultiUserParseEventArgs e) {
         Column.ThrowEvents = false;
-        DatabaseDataType art = 0;
         var pointer = 0;
-        var inhalt = "";
+
         ColumnItem? column = null;
         RowItem? row = null;
-        var x = 0;
-        var y = 0;
+
         long colKey = 0;
         long rowKey = 0;
+
+        #region Spalten merken und Variable leeren
+
         List<ColumnItem?> columnsOld = new();
         columnsOld.AddRange(Column);
         Column.Clear();
+
+        #endregion
+
+        #region Pendings merken und Variable leeren
+
         var oldPendings = Works?.Where(thisWork => thisWork.State == ItemState.Pending).ToList();
         Works?.Clear();
 
-        var b = e2.Data;
+        #endregion
+
+        var b = e.Data;
 
         do {
             if (pointer >= b.Length) { break; }
-            Parse(b, ref pointer, ref art, ref colKey, ref rowKey, ref inhalt, ref x, ref y);
+
+            Parse(b, ref pointer, out var art, ref colKey, ref rowKey, out var inhalt, out var x, out var y);
+
+            #region Zeile suchen oder erstellen
+
             if (rowKey > -1) {
                 row = Row.SearchByKey(rowKey);
                 if (row == null) {
@@ -266,6 +282,11 @@ public sealed class Database : DatabaseAbstract {
                     Row.Add(row);
                 }
             }
+
+            #endregion
+
+            #region Spalte suchen oder erstellen
+
             if (colKey > -1) {
                 // Zuerst schauen, ob die Column schon (wieder) in der richtigen Collection ist
                 column = Column.SearchByKey(colKey);
@@ -286,11 +307,16 @@ public sealed class Database : DatabaseAbstract {
                     }
                 }
             }
+
+            #endregion
+
+            #region Bei verschlüsselten Datenbanken das Passwort abfragen
+
             if (art == DatabaseDataType.CryptionState) {
                 if (inhalt.FromPlusMinus()) {
-                    PasswordEventArgs e = new();
-                    OnNeedPassword(e);
-                    b = Cryptography.SimpleCrypt(b, e.Password, -1, pointer, b.Length - 1);
+                    PasswordEventArgs e2 = new();
+                    OnNeedPassword(e2);
+                    b = Cryptography.SimpleCrypt(b, e2.Password, -1, pointer, b.Length - 1);
                     if (b[pointer + 1] != 3 || b[pointer + 2] != 0 || b[pointer + 3] != 0 || b[pointer + 4] != 2 || b[pointer + 5] != 79 || b[pointer + 6] != 75) {
                         SetReadOnly();
                         //MessageBox.Show("Zugriff verweigrt, Passwort falsch!", ImageCode.Kritisch, "OK");
@@ -298,56 +324,34 @@ public sealed class Database : DatabaseAbstract {
                     }
                 }
             }
+
+            #endregion
+
             var fehler = SetValueInternal(art, inhalt, column, row, x, y);
+
             if (art == DatabaseDataType.EOF) { break; }
             if (!string.IsNullOrEmpty(fehler)) {
                 SetReadOnly();
                 Develop.DebugPrint("Schwerer Datenbankfehler:<br>Version: " + DatabaseVersion + "<br>Datei: " + Filename + "<br>Meldung: " + fehler);
             }
         } while (true);
-        // Spalten, die nach dem Reload nicht mehr benötigt werden, löschen
-        //ColumnsOld.DisposeAndRemoveAll();
+
         Row.RemoveNullOrEmpty();
-        //Row.RemoveNullOrDisposed();
         Cell.RemoveOrphans();
-        //LoadPicsIntoImageChache();
-        //_filesAfterLoadingLCase.Clear();
-        //_filesAfterLoadingLCase.AddRange(AllConnectedFilesLCase());
-        Works.AddRange(oldPendings);
+        Works?.AddRange(oldPendings);
         oldPendings?.Clear();
         ExecutePending();
         Column.ThrowEvents = true;
         if (IntParse(LoadedVersion.Replace(".", "")) > IntParse(DatabaseVersion.Replace(".", ""))) { SetReadOnly(); }
     }
 
-    public override bool Save(bool mustSave) => _muf.Save(mustSave);
+    public override bool Save(bool mustSave) => _muf?.Save(mustSave) ?? false;
 
-    public void SaveAsAndChangeTo(string fileName) => _muf.SaveAsAndChangeTo(fileName);
+    public void SaveAsAndChangeTo(string fileName) => _muf?.SaveAsAndChangeTo(fileName);
 
     public override void SetReadOnly() {
-        _muf.SetReadOnly();
+        _muf?.SetReadOnly();
         base.SetReadOnly();
-    }
-
-    public override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
-        var r = base.SetValueInternal(type, value, column, row, width, height);
-
-        if (type == DatabaseDataType.ReloadDelaySecond) {
-            _muf.ReloadDelaySecond = ReloadDelaySecond;
-        }
-
-        if (type == DatabaseDataType.UndoInOne) {
-            Works.Clear();
-            var uio = value.SplitAndCutByCr();
-            for (var z = 0; z <= uio.GetUpperBound(0); z++) {
-                WorkItem tmpWork = new(uio[z]) {
-                    State = ItemState.Undo // Beim Erstellen des strings ist noch nicht sicher, ob gespeichter wird. Deswegen die alten "Pendings" zu Undos ändern.
-                };
-                Works.Add(tmpWork);
-            }
-        }
-
-        return r;
     }
 
     public override string UndoText(ColumnItem? column, RowItem? row) {
@@ -485,8 +489,8 @@ public sealed class Database : DatabaseAbstract {
         SaveToByteList(list, contentSize.Height, 2);
     }
 
-    protected override void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, long rowKey, string previousValue, string changedTo, string userName) {
-        Works.Add(new WorkItem(comand, column, rowKey, previousValue, changedTo, UserName));
+    protected override void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName) {
+        Works.Add(new WorkItem(comand, column, row, previousValue, changedTo, UserName));
     }
 
     protected override void Dispose(bool disposing) {
@@ -518,7 +522,32 @@ public sealed class Database : DatabaseAbstract {
 
     protected override void SetUserDidSomething() => _muf.SetUserDidSomething();
 
+    protected override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
+        var r = base.SetValueInternal(type, value, column, row, width, height);
+
+        if (type == DatabaseDataType.ReloadDelaySecond) {
+            _muf.ReloadDelaySecond = ReloadDelaySecond;
+        }
+
+        if (type == DatabaseDataType.UndoInOne) {
+            Works.Clear();
+            var uio = value.SplitAndCutByCr();
+            for (var z = 0; z <= uio.GetUpperBound(0); z++) {
+                WorkItem tmpWork = new(uio[z]) {
+                    State = ItemState.Undo // Beim Erstellen des strings ist noch nicht sicher, ob gespeichter wird. Deswegen die alten "Pendings" zu Undos ändern.
+                };
+                Works.Add(tmpWork);
+            }
+        }
+
+        return r;
+    }
+
     protected override string SpecialErrorReason(ErrorReason mode) => _muf.ErrorReason(mode);
+
+    protected override void StoreValueToHardDisk(DatabaseDataType type, ColumnItem? column, RowItem? row, string value) {
+        // System speichert nicht in Echtzeit. Deswegen ist diese Routine irrelevant.
+    }
 
     private static int NummerCode2(byte[] b, int pointer) => (b[pointer] * 255) + b[pointer + 1];
 

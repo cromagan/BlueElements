@@ -133,8 +133,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public event EventHandler<CellValueChangingByUserEventArgs> CellValueChangingByUser;
 
-    public event EventHandler ColumnArrangementChanged;
-
     public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
 
     public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
@@ -660,7 +658,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             _database.Column.ItemRemoved -= _Database_ViewChanged;
             _database.Column.ItemAdded -= _Database_ViewChanged;
             _database.SavedToDisk -= _Database_SavedToDisk;
-            _database.ColumnArrangements.ItemInternalChanged -= ColumnArrangements_ItemInternalChanged;
             _database.ProgressbarInfo -= _Database_ProgressbarInfo;
             _database.DropMessage -= _Database_DropMessage;
             _database.Disposing -= _Database_Disposing;
@@ -687,8 +684,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             _database.Column.ItemAdded += _Database_ViewChanged;
             _database.Column.ItemRemoving += Column_ItemRemoving;
             _database.Column.ItemRemoved += _Database_ViewChanged;
-            _database.SavedToDisk += _Database_SavedToDisk;
-            _database.ColumnArrangements.ItemInternalChanged += ColumnArrangements_ItemInternalChanged;
+            _database.SavedToDisk += _Database_SavedToDisk; 
             _database.ProgressbarInfo += _Database_ProgressbarInfo;
             _database.DropMessage += _Database_DropMessage;
             _database.Disposing += _Database_Disposing;
@@ -1902,7 +1898,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void _Database_ViewChanged(object sender, System.EventArgs e) {
         InitializeSkin(); // Sicher ist sicher, um die neuen Schrift-Größen zu haben.
-
         Invalidate_HeadSize();
         Invalidate_AllColumnArrangements();
         //Invalidate_RowSort();
@@ -2381,10 +2376,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    private void ColumnArrangements_ItemInternalChanged(object sender, ListEventArgs e) {
-        OnColumnArrangementChanged();
-        Invalidate();
-    }
+
 
     private SizeF ColumnCaptionText_Size(ColumnItem? column) {
         if (column.TmpCaptionTextSize.Width > 0) { return column.TmpCaptionTextSize; }
@@ -3067,8 +3059,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private void OnCellValueChanged(CellEventArgs e) => CellValueChanged?.Invoke(this, e);
 
     private void OnCellValueChangingByUser(CellValueChangingByUserEventArgs ed) => CellValueChangingByUser?.Invoke(this, ed);
-
-    private void OnColumnArrangementChanged() => ColumnArrangementChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void OnDatabaseChanged() => DatabaseChanged?.Invoke(this, System.EventArgs.Empty);
 

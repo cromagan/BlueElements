@@ -27,7 +27,7 @@ using System.Linq;
 
 namespace BlueDatabase;
 
-public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable {
+public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable, ICloneable {
     //NICHT IReadableText, das gibt zu viele Probleme (Dropdownboxen)
 
     #region Fields
@@ -35,6 +35,8 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable {
     private string _name;
 
     #endregion
+
+    public object Clone() => new ColumnViewCollection(Database, ToString());
 
     #region Constructors
 

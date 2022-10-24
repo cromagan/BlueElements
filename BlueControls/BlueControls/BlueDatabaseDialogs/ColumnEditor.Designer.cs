@@ -105,7 +105,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnQI_Vorschau = new BlueControls.Controls.Button();
             this.tabSonstiges = new System.Windows.Forms.TabPage();
             this.butSaveContent = new BlueControls.Controls.Button();
-            this.tbxTags = new BlueControls.Controls.TextBox();
+            this.txbTags = new BlueControls.Controls.TextBox();
             this.Caption8 = new BlueControls.Controls.Caption();
             this.cbxSort = new BlueControls.Controls.ComboBox();
             this.txbRegex = new BlueControls.Controls.TextBox();
@@ -1046,7 +1046,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.tabSonstiges.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabSonstiges.Controls.Add(this.butSaveContent);
-            this.tabSonstiges.Controls.Add(this.tbxTags);
+            this.tabSonstiges.Controls.Add(this.txbTags);
             this.tabSonstiges.Controls.Add(this.Caption8);
             this.tabSonstiges.Location = new System.Drawing.Point(4, 25);
             this.tabSonstiges.Name = "tabSonstiges";
@@ -1064,19 +1064,19 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.butSaveContent.TabIndex = 34;
             this.butSaveContent.Text = "Inhalte der Zellen auf Festplatte speichern und laden";
             // 
-            // tbxTags
+            // txbTags
             // 
-            this.tbxTags.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.txbTags.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbxTags.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.tbxTags.Location = new System.Drawing.Point(4, 31);
-            this.tbxTags.MultiLine = true;
-            this.tbxTags.Name = "tbxTags";
-            this.tbxTags.Regex = null;
-            this.tbxTags.Size = new System.Drawing.Size(980, 361);
-            this.tbxTags.TabIndex = 30;
-            this.tbxTags.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.txbTags.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbTags.Location = new System.Drawing.Point(4, 31);
+            this.txbTags.MultiLine = true;
+            this.txbTags.Name = "txbTags";
+            this.txbTags.Regex = null;
+            this.txbTags.Size = new System.Drawing.Size(980, 361);
+            this.txbTags.TabIndex = 30;
+            this.txbTags.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // Caption8
             // 
@@ -1595,7 +1595,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Button btnOtherValuesToo;
         private ListBox lbxCellEditor;
         private ComboBox cbxFormat;
-        private TextBox tbxTags;
+        private TextBox txbTags;
         private TabControl tabControl;
         private System.Windows.Forms.TabPage tabAnzeige;
         private System.Windows.Forms.TabPage tabBearbeitung;

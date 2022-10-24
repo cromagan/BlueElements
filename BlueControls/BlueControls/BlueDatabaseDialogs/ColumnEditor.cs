@@ -30,6 +30,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Windows.Controls;
 using static BlueBasics.Converter;
 
 namespace BlueControls.BlueDatabaseDialogs;
@@ -78,7 +79,7 @@ internal sealed partial class ColumnEditor {
 
     private static void Database_ShouldICancelDiscOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
 
-    private static void SetKeyTo(TextBox combobox, long columnKey) => combobox.Text = columnKey.ToString();
+    private static void SetKeyTo(BlueControls.Controls.TextBox combobox, long columnKey) => combobox.Text = columnKey.ToString();
 
     private bool AllOk() {
         var feh = "";
@@ -385,9 +386,9 @@ internal sealed partial class ColumnEditor {
         txbReplacer.Text = _column.OpticalReplace.JoinWithCr();
         txbAutoReplace.Text = _column.AfterEditAutoReplace.JoinWithCr();
         txbRegex.Text = _column.Regex;
-        tbxTags.Text = _column.Tags.JoinWithCr();
+        txbTags.Text = _column.Tags.JoinWithCr();
         lbxCellEditor.Item.Clear();
-        lbxCellEditor.Item.AddRange(_column.PermissionGroupsChangeCell.ToArray());
+        lbxCellEditor.Item.AddRange(_column.PermissionGroupsChangeCell);
         tbxAllowedChars.Text = _column.AllowedChars;
         btnOtherValuesToo.Checked = _column.DropdownWerteAndererZellenAnzeigen;
         btnIgnoreLock.Checked = _column.EditAllowedDespiteLock;
@@ -467,36 +468,18 @@ internal sealed partial class ColumnEditor {
         //_Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled) = AutoFilterErw.Checked;
         _column.FilterOptions = tmpf;
         _column.IgnoreAtRowFilter = btnZeilenFilterIgnorieren.Checked;
-        if (lbxCellEditor.Item.ToListOfString().IsDifferentTo(_column.PermissionGroupsChangeCell)) {
-            _column.PermissionGroupsChangeCell.Clear();
-            _column.PermissionGroupsChangeCell.AddRange(lbxCellEditor.Item.ToListOfString());
-        }
-        var newDd = tbxAuswaehlbareWerte.Text.SplitAndCutByCrToList().SortedDistinctList();
-        if (newDd.IsDifferentTo(_column.DropDownItems)) {
-            _column.DropDownItems.Clear();
-            _column.DropDownItems.AddRange(newDd);
-        }
-        var newRep = txbReplacer.Text.SplitAndCutByCrToList();
-        if (newRep.IsDifferentTo(_column.OpticalReplace)) {
-            _column.OpticalReplace.Clear();
-            _column.OpticalReplace.AddRange(newRep);
-        }
-        var newRep2 = txbAutoReplace.Text.SplitAndCutByCrToList();
-        if (newRep2.IsDifferentTo(_column.AfterEditAutoReplace)) {
-            _column.AfterEditAutoReplace.Clear();
-            _column.AfterEditAutoReplace.AddRange(newRep2);
-        }
+        _column.PermissionGroupsChangeCell = lbxCellEditor.Item.ToListOfString();
+        _column.DropDownItems = tbxAuswaehlbareWerte.Text.SplitAndCutByCrToList().SortedDistinctList();
+        _column.OpticalReplace = txbReplacer.Text.SplitAndCutByCrToList();
+        _column.AfterEditAutoReplace =txbAutoReplace.Text.SplitAndCutByCrToList();
+
         _column.AutoFilterJoker = tbxJoker.Text;
         _column.CaptionGroup1 = txbUeberschift1.Text;
         _column.CaptionGroup2 = txbUeberschift2.Text;
         _column.CaptionGroup3 = txbUeberschift3.Text;
         _column.Prefix = txbPrefix.Text;
         _column.CaptionBitmapCode = txbSpaltenbild.Text;
-        var newTags = tbxTags.Text.SplitAndCutByCrToList();
-        if (newTags.IsDifferentTo(_column.Tags)) {
-            _column.Tags.Clear();
-            _column.Tags.AddRange(newTags);
-        }
+        _column.Tags = txbTags.Text.SplitAndCutByCrToList();
         _column.Regex = txbRegex.Text;
         _column.TextBearbeitungErlaubt = btnEditableStandard.Checked;
         _column.DropdownBearbeitungErlaubt = btnEditableDropdown.Checked;
@@ -541,32 +524,47 @@ internal sealed partial class ColumnEditor {
         if (linkdb == null) { return; }
 
         if (tblFilterliste.Database == null) {
-            Database x = new(false, "Filter " + _column.Database.ConnectionID + " " + _column.Name);
-            x.Column.Add("count", "count", VarType.Integer);
-            var vis = x.Column.Add("visible", "visible", VarType.Bit);
-            var sp = x.Column.Add("Spalte", "Spalte", VarType.Text);
+            Database db = new(false, "Filter " + _column.Database.ConnectionID + " " + _column.Name);
+            db.Column.Add("count", "count", VarType.Integer);
+            var vis = db.Column.Add("visible", "visible", VarType.Bit);
+            var sp = db.Column.Add("Spalte", "Spalte", VarType.Text);
             sp.Align = AlignmentHorizontal.Rechts;
-            var b = x.Column.Add("Such", "Suchtext", VarType.Text);
+            var b = db.Column.Add("Such", "Suchtext", VarType.Text);
             b.Quickinfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum suchen<br>Mischen wird nicht unterstützt.";
             b.MultiLine = false;
             b.TextBearbeitungErlaubt = true;
             b.DropdownAllesAbwählenErlaubt = true;
             b.DropdownBearbeitungErlaubt = true;
 
+            var dd = b.DropDownItems.Clone();
+            var or = b.OpticalReplace.Clone();
+
+
             foreach (var thisColumn in _column.Database.Column.Where(thisColumn => thisColumn.Format.CanBeCheckedByRules() && !thisColumn.MultiLine)) {
-                b.DropDownItems.Add("~" + thisColumn.Name.ToLower() + "~");
-                b.OpticalReplace.Add("~" + thisColumn.Name.ToLower() + "~|[Spalte: " + thisColumn.ReadableText() + "]");
+                dd.Add("~" + thisColumn.Name.ToLower() + "~");
+                or.Add("~" + thisColumn.Name.ToLower() + "~|[Spalte: " + thisColumn.ReadableText() + "]");
             }
 
-            x.RepairAfterParse();
-            x.ColumnArrangements[1].ShowAllColumns();
-            x.ColumnArrangements[1].Hide("visible");
-            x.ColumnArrangements[1].HideSystemColumns();
-            x.SortDefinition = new RowSortDefinition(x, "Count", false);
-            tblFilterliste.DatabaseSet(x, string.Empty);
+            b.DropDownItems = dd;
+            b.OpticalReplace = or;
+
+            db.RepairAfterParse();
+            var car = db.ColumnArrangements.CloneWithClones();
+
+            car[1].ShowAllColumns();
+            car[1].Hide("visible");
+            car[1].HideSystemColumns();
+
+            db.ColumnArrangements = car;
+
+            db.SortDefinition = new RowSortDefinition(db, "Count", false);
+            tblFilterliste.DatabaseSet(db, string.Empty);
             tblFilterliste.Arrangement = 1;
 
-            x.Tags.TagSet("Filename", linkdb.ConnectionID);
+
+            var t = db.Tags.Clone();
+            t.TagSet("Filename", linkdb.ConnectionID);
+            db.Tags = t;
 
             tblFilterliste.Filter.Add(vis, FilterType.Istgleich, "+");
         }
@@ -621,12 +619,7 @@ internal sealed partial class ColumnEditor {
             }
         }
 
-        nf = nf.JoinWithCr().SplitAndCutByCrToList();
-
-        if (_column.LinkedCellFilter.IsDifferentTo(nf)) {
-            _column.LinkedCellFilter.Clear();
-            _column.LinkedCellFilter.AddRange(nf);
-        }
+        _column.LinkedCellFilter = nf.JoinWithCr().SplitAndCutByCrToList();
     }
 
     /// <summary>

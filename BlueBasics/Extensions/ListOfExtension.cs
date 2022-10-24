@@ -58,6 +58,14 @@ public static partial class Extensions {
         return true;
     }
 
+
+
+    /// <summary>
+    /// Fügt Items der hinzu, erzeugt keine Clone!
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="list1"></param>
+    /// <param name="list2"></param>
     public static void CloneFrom<T>(this List<T> list1, List<T> list2) where T : IComparable {
         if (!list1.IsDifferentTo(list2)) { return; }
 
@@ -81,9 +89,29 @@ public static partial class Extensions {
         }
     }
 
+
+    public static List<T> Clone<T>(this List<T> l) {
+        var l2 = new List<T>();
+        l2.AddRange(l);
+        return l2;
+    }
+
+    public static List<T> CloneWithClones<T>(this List<T> l) where T : ICloneable {
+        var l2 = new List<T>();
+
+        foreach (var item in l) {
+            var it = item.Clone();
+            if (it!=null) {
+                l2.Add((T)it);
+            }
+        }
+
+        return l2;
+    }
+
     public static bool IsDifferentTo<T>(this List<T>? list1, List<T>? list2) =>
-        // https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.sequenceequal?redirectedfrom=MSDN&view=netcore-3.1#System_Linq_Enumerable_SequenceEqual__1_System_Collections_Generic_IEnumerable___0__System_Collections_Generic_IEnumerable___0__
-        list1 != list2 && (list1 is null || list2 is null || !list1.SequenceEqual(list2));
+            // https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.sequenceequal?redirectedfrom=MSDN&view=netcore-3.1#System_Linq_Enumerable_SequenceEqual__1_System_Collections_Generic_IEnumerable___0__System_Collections_Generic_IEnumerable___0__
+            list1 != list2 && (list1 is null || list2 is null || !list1.SequenceEqual(list2));
 
     public static void Load(this List<string> l, string filename, System.Text.Encoding code) {
         var t = File.ReadAllText(filename, code);
@@ -307,7 +335,7 @@ public static partial class Extensions {
     /// <param name="removeEmpty"></param>
     /// <returns></returns>
     public static string ToString<T>(this List<T> l, bool removeEmpty) where T : IStringable? {
-        // Remove Empty sollte eigentlich selbstverständlich seih. Ist nur als Dummy drinnen, dass der Interpreter zwischen der Internen und Extension unterscheiden kann.
+        // Remove Empty sollte eigentlich selbstverständlich sein. Ist nur als Dummy drinnen, dass der Interpreter zwischen der Internen und Extension unterscheiden kann.
         var tmp = string.Empty;
         foreach (var item in l) {
             var tmp2 = string.Empty;
@@ -320,6 +348,12 @@ public static partial class Extensions {
         return tmp.TrimCr();
     }
 
+    /// <summary>
+    /// Cloned eine Liste mit Clonen drinnen.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="l"></param>
+    /// <returns></returns>
     private static int TagGetPosition(this ICollection<string> col, string tagname) {
         var uTagName = tagname.ToUpper() + ":";
 

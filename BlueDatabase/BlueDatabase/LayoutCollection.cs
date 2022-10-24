@@ -16,6 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Interfaces;
+using System;
 
 namespace BlueDatabase;
 
@@ -24,7 +26,18 @@ namespace BlueDatabase;
 /// Noch dazu ist ItemCollectionPad in BlueConrolls verankert, das nur die Sichtbarmachung einen Sinn macht.
 /// Und diese Sichtbarmachung braucht braucht Controls für die Bearbeitung.
 /// </summary>
-public class LayoutCollection : ListExt<string> {
+public class LayoutCollection : ListExt<string>, ICloneable {
+
+    //public string ToString(
+    //     return this.JoinWithCr();
+    //    )
+
+
+    public object Clone() {
+        var l = new LayoutCollection();
+        l.AddRange(this);
+        return l;
+    }
 
     #region Methods
 

@@ -92,11 +92,11 @@ public sealed partial class DatabaseHeadEditor {
                 }
             }
         }
-        tbxTags.Text = _database.Tags.JoinWithCr();
+        txbTags.Text = _database.Tags.JoinWithCr();
         // Exports ----------------
         lbxExportSets.Item.Clear();
         foreach (var thisSet in _database.Export.Where(thisSet => thisSet != null)) {
-            lbxExportSets.Item.Add(thisSet, string.Empty, string.Empty);
+            lbxExportSets.Item.Add((ExportDefinition)(thisSet.Clone()), string.Empty, string.Empty);
         }
         lbxExportSets.Item.Sort();
         // -----------------------------
@@ -279,9 +279,17 @@ public sealed partial class DatabaseHeadEditor {
         }
 
         x.RepairAfterParse();
-        x.ColumnArrangements[1].ShowAllColumns();
-        x.ColumnArrangements[1].Hide("hidden");
-        x.ColumnArrangements[1].HideSystemColumns();
+
+        var car = x.ColumnArrangements.CloneWithClones();
+        car[1].ShowAllColumns();
+        car[1].Hide("hidden");
+        car[1].HideSystemColumns();
+ 
+
+        x.ColumnArrangements = car;
+
+
+
         x.SortDefinition = new RowSortDefinition(x, "Index", true);
         tblUndo.DatabaseSet(x, string.Empty);
         tblUndo.Arrangement = 1;
@@ -376,20 +384,14 @@ public sealed partial class DatabaseHeadEditor {
         _database.AdditionaFilesPfad = txbAdditionalFiles.Text;
         _database.StandardFormulaFile = txbStandardFormulaFile.Text;
         _database.ZeilenQuickInfo = txbZeilenQuickInfo.Text.Replace("\r", "<br>");
-        if (tbxTags.Text != _database.Tags.JoinWithCr()) {
-            _database.Tags.Clear();
-            _database.Tags.AddRange(tbxTags.Text.SplitAndCutByCr());
-        }
-        if (DatenbankAdmin.Item.ToListOfString().IsDifferentTo(_database.DatenbankAdmin)) {
-            _database.DatenbankAdmin.Clear();
-            _database.DatenbankAdmin.AddRange(DatenbankAdmin.Item.ToListOfString());
-        }
-        if (PermissionGroups_NewRow.Item.ToListOfString().IsDifferentTo(_database.PermissionGroupsNewRow)) {
-            _database.PermissionGroupsNewRow.Clear();
-            _database.PermissionGroupsNewRow.AddRange(PermissionGroups_NewRow.Item.ToListOfString());
-            _database.PermissionGroupsNewRow.Remove("#Administrator");
-        }
-        //_database.VerwaisteDaten = (VerwaisteDaten)IntParse(cbxVerwaisteDaten.Text);
+
+        _database.Tags = txbTags.Text.SplitAndCutByCrToList();
+
+        _database.DatenbankAdmin = DatenbankAdmin.Item.ToListOfString();
+
+        var tmp = PermissionGroups_NewRow.Item.ToListOfString();
+        tmp.Remove("#Administrator");
+        _database.PermissionGroupsNewRow = tmp;
 
         #region Sortierung
 
@@ -399,11 +401,7 @@ public sealed partial class DatabaseHeadEditor {
         #endregion
 
         // Export ------------
-        var newExports = lbxExportSets.Item.Select(thisItem => (ExportDefinition)((TextListItem)thisItem).Tag).ToList();
-        if (newExports.IsDifferentTo(_database.Export)) {
-            _database.Export.Clear();
-            _database.Export.AddRange(newExports);
-        }
+        _database.Export = lbxExportSets.Item.Select(thisItem => (ExportDefinition)((TextListItem)thisItem).Tag).ToList();
     }
 
     #endregion

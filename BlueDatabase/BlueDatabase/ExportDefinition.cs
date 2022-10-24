@@ -32,7 +32,7 @@ using static BlueBasics.IO;
 
 namespace BlueDatabase;
 
-public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, IDisposable {
+public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, IDisposable, ICloneable {
 
     #region Fields
 

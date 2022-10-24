@@ -124,17 +124,18 @@ public abstract class SQLBackAbstract {
         SetStyleData(tablename, DatabaseDataType.ColumnKey, columnName.ToUpper(), columnKey.ToString());
     }
 
-    public bool AddUndo(string tablename, DatabaseDataType comand, ColumnItem? column, long rowKey, string previousValue, string changedTo, string userName) {
+    public bool AddUndo(string tablename, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName) {
         if (!OpenConnection()) { return false; }
 
         var n = (column?.Name) ?? "~Database~";
+        var rk = (row?.Key.ToString()) ?? string.Empty;
 
         var cmdString = "INSERT INTO " + SYS_UNDO +
             " (TABLENAME, COMAND, COLUMNNAME, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, DATETIMEUTC) VALUES (" +
             "'" + tablename.ToUpper() + "'," +
             "'" + comand.ToString() + "'," +
             "'" + n + "'," +
-            "'" + rowKey.ToString() + "'," +
+            "'" + rk + "'," +
             "'" + previousValue + "'," +
             "'" + changedTo + "'," +
             "'" + userName + "'," +
@@ -148,6 +149,7 @@ public abstract class SQLBackAbstract {
 
     public bool CheckIn(string tablename, DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
         if (!OpenConnection()) { return false; }
+
 
         #region Ignorieren
 
@@ -181,7 +183,7 @@ public abstract class SQLBackAbstract {
 
         #region Spalten Eigenschaften
 
-        if (type.IsDatabaseTag()) {
+        if (type.IsColumnTag()) {
             if (type == DatabaseDataType.ColumnName) { RenameColumn(tablename, column.Name.ToUpper(), value.ToUpper()); }
             return SetStyleData(tablename, type, column.Name.ToUpper(), value);
         }
@@ -211,6 +213,10 @@ public abstract class SQLBackAbstract {
                     AddColumnToMain(tablename, column.Name, column.Key);
                     return true;
 
+                case DatabaseDataType.Comand_RemovingColumn:
+                    RemoveColumn(tablename, column.Name);
+                    return true;
+
                 default:
                     Develop.DebugPrint(FehlerArt.Fehler, type.ToString() + " nicht definiert!");
                     return false;
@@ -222,6 +228,7 @@ public abstract class SQLBackAbstract {
         CloseConnection();
         return false;
     }
+
 
     public string ConnectionID(string tablename) {
         return ConnectionString + "|" + tablename.ToUpper();
@@ -296,13 +303,13 @@ public abstract class SQLBackAbstract {
             row.Add(r);
 
             for (var z = 1; z < reader.FieldCount; z++) {
-                row.Database.Cell.Load_310(row.Database.Column[z - 1], r, reader[z].ToString(), -1, -1);
+                row.Database.Cell.SetValueInternal(row.Database.Column[z - 1], r, reader[z].ToString(), -1, -1);
             }
 
             //var n = 0;
             //foreach (var thiss in reader) {
             //    n++;
-            //    row.Database.Cell.Load_310(row.Database.Column[n], r, thiss.ToString(), -1, -1);
+            //    row.Database.Cell.SetValueInternal(row.Database.Column[n], r, thiss.ToString(), -1, -1);
             //    //row.Database.Cell.SetValueBehindLinkedValue(row.Database.Column[n], r, thiss.ToString());
             //    //r.CellSet(row.Database.Column[n], thiss.ToString());
             //}
@@ -451,6 +458,13 @@ public abstract class SQLBackAbstract {
 
         ExecuteCommand("alter table " + tablename.ToUpper() + " add " + column + " " + type + " default ''" + n);
     }
+
+
+    private void RemoveColumn(string tablename, string column) {
+        ExecuteCommand("alter table " + tablename.ToUpper() + " drop column " + column.ToUpper());
+        ExecuteCommand("DELETE FROM " + SYS_STYLE + " WHERE TABLENAME = '" + tablename.ToUpper() + "' AND COLUMNNAME = '" + column.ToUpper() + "'");
+    }
+
 
     private bool ExecuteCommand(DbCommand command) {
         if (!OpenConnection()) { return false; }

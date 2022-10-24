@@ -37,7 +37,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnSortRichtung = new BlueControls.Controls.Button();
             this.btnOk = new BlueControls.Controls.Button();
             this.btnSperreAufheben = new BlueControls.Controls.Button();
-            this.tbxTags = new BlueControls.Controls.TextBox();
+            this.txbTags = new BlueControls.Controls.TextBox();
             this.txbCaption = new BlueControls.Controls.TextBox();
             this.capCaption = new BlueControls.Controls.Caption();
             this.capTags = new BlueControls.Controls.Caption();
@@ -239,18 +239,18 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnSperreAufheben.Text = "Datenbank-Sperre aufheben";
             this.btnSperreAufheben.Click += new System.EventHandler(this.btnSperreAufheben_Click);
             // 
-            // tbxTags
+            // txbTags
             // 
-            this.tbxTags.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.txbTags.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbxTags.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.tbxTags.Location = new System.Drawing.Point(568, 24);
-            this.tbxTags.MultiLine = true;
-            this.tbxTags.Name = "tbxTags";
-            this.tbxTags.Size = new System.Drawing.Size(463, 581);
-            this.tbxTags.TabIndex = 26;
-            this.tbxTags.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.txbTags.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbTags.Location = new System.Drawing.Point(568, 24);
+            this.txbTags.MultiLine = true;
+            this.txbTags.Name = "txbTags";
+            this.txbTags.Size = new System.Drawing.Size(463, 581);
+            this.txbTags.TabIndex = 26;
+            this.txbTags.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // txbCaption
             // 
@@ -322,7 +322,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Allgemein.Controls.Add(this.capZeilenQuickInfo);
             this.Tab_Allgemein.Controls.Add(this.txbGlobalScale);
             this.Tab_Allgemein.Controls.Add(this.caption1);
-            this.Tab_Allgemein.Controls.Add(this.tbxTags);
+            this.Tab_Allgemein.Controls.Add(this.txbTags);
             this.Tab_Allgemein.Controls.Add(this.btnSpaltenuebersicht);
             this.Tab_Allgemein.Controls.Add(this.tbxReloadVerzoegerung);
             this.Tab_Allgemein.Controls.Add(this.capReloadVerzoegerung);
@@ -694,7 +694,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private Caption capTags;
         private Caption capCaption;
         private TextBox txbCaption;
-        private TextBox tbxTags;
+        private TextBox txbTags;
         private ListBox lbxSortierSpalten;
         private Button btnSperreAufheben;
         private Caption Caption22;

@@ -456,7 +456,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposable {
         return l;
     }
 
-    //internal string Load_310(enDatabaseDataType type, string value) {
+    //internal string SetValueInternal(enDatabaseDataType type, string value) {
     //    switch (type) {
     //        case enDatabaseDataType.LastRowKey:
     //            //_LastRowKey = LongParse(value);

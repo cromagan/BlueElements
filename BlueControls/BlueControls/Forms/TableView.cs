@@ -692,7 +692,14 @@ public partial class TableView : Form {
     private void btnSpaltenanordnung_Click(object sender, System.EventArgs e) {
         var x = new ColumnArrangementPadEditor(Table.Database);
         x.ShowDialog();
-        Table.Database.ColumnArrangements[0].ShowAllColumns();
+
+
+        var car = Table.Database.ColumnArrangements.CloneWithClones();
+        car[0].ShowAllColumns();
+        Table.Database.ColumnArrangements = car;
+
+
+
         Table.Invalidate_HeadSize();
         Table.Invalidate_AllColumnArrangements();
     }

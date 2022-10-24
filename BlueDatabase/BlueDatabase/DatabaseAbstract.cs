@@ -51,33 +51,23 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
     public readonly ColumnCollection Column;
 
-    public readonly ListExt<ColumnViewCollection> ColumnArrangements = new();
-
-    public readonly ListExt<string> DatenbankAdmin = new();
-
-    /// <summary>
-    /// Exporte werden nur internal verwaltet. Wegen zu vieler erzeigter Pendings, z.B. bei LayoutExport.
-    /// Der Head-Editor kann und muss (manuelles Löschen) auf die Exporte Zugreifen und kümmert sich auch um die Pendings
-    /// </summary>
-    public readonly ListExt<ExportDefinition?> Export = new();
-
-    public readonly LayoutCollection Layouts = new();
-
-    public readonly ListExt<string> PermissionGroupsNewRow = new();
-
     public readonly RowCollection Row;
-
     public readonly string TableName = string.Empty;
-    public readonly ListExt<string> Tags = new();
-
     public readonly string UserName = Generic.UserName().ToUpper();
+    public readonly List<ColumnViewCollection> _columnArrangements = new();
+
+    public readonly List<string> _datenbankAdmin = new();
 
     public DatabaseAbstract? Mirror;
+
     public string UserGroup;
 
     private readonly BackgroundWorker _backgroundWorker;
+
     private readonly Timer _checker;
+
     private readonly long _startTick = DateTime.UtcNow.Ticks;
+
     private string _additionaFilesPfad;
 
     private string? _additionaFilesPfadtmp;
@@ -87,18 +77,24 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     private string _caption = string.Empty;
 
     private int _checkerTickCount = -5;
+
     private string _createDate = string.Empty;
 
     private string _creator = string.Empty;
 
+    /// <summary>
+    /// Exporte werden nur internal verwaltet. Wegen zu vieler erzeigter Pendings, z.B. bei LayoutExport.
+    /// Der Head-Editor kann und muss (manuelles Löschen) auf die Exporte Zugreifen und kümmert sich auch um die Pendings
+    /// </summary>
+    private List<ExportDefinition?> _export = new();
+
     private double _globalScale;
-
     private string _globalShowPass = string.Empty;
-
     private DateTime _lastUserActionUtc = new(1900, 1, 1);
+    private readonly LayoutCollection _layouts = new();
+    private readonly List<string> _permissionGroupsNewRow = new();
     private int _reloadDelaySecond;
     private string _rulesScript = string.Empty;
-
     private RowSortDefinition? _sortDefinition;
 
     /// <summary>
@@ -106,6 +102,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     /// </summary>
     private string _standardFormulaFile = string.Empty;
 
+    private readonly List<string> _tags = new();
     private int _undoCount;
 
     private string _zeilenQuickInfo = string.Empty;
@@ -120,12 +117,6 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         UserGroup = "#Administrator";
         Cell = new CellCollection(this);
 
-        DatenbankAdmin.Changed += DatabaseAdmin_ListOrItemChanged;
-
-        PermissionGroupsNewRow.Changed += PermissionGroups_NewRow_ListOrItemChanged;
-
-        Tags.Changed += DatabaseTags_ListOrItemChanged;
-
         QuickImage.NeedImage += QuickImage_NeedImage;
 
         Row = new RowCollection(this);
@@ -136,13 +127,6 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         Column.ItemRemoving += Column_ItemRemoving;
         Column.ItemRemoved += Column_ItemRemoved;
         Column.ItemAdded += Column_ItemAdded;
-
-        //_filesAfterLoadingLCase = new List<string>();
-        ColumnArrangements.Changed += ColumnArrangements_ListOrItemChanged;
-        Layouts.Changed += Layouts_ListOrItemChanged;
-        Layouts.ItemSeted += Layouts_ItemSeted;
-
-        Export.Changed += Export_ListOrItemChanged;
 
         _backgroundWorker = new BackgroundWorker {
             WorkerReportsProgress = false,
@@ -199,7 +183,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         set {
             if (_additionaFilesPfad == value) { return; }
             _additionaFilesPfadtmp = null;
-            ChangeData(DatabaseDataType.AdditionaFilesPath, null, -1, _additionaFilesPfad, value, true);
+            ChangeData(DatabaseDataType.AdditionaFilesPath, null, null, _additionaFilesPfad, value);
             Cell.InvalidateAllSizes();
         }
     }
@@ -219,7 +203,16 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         get => _caption;
         set {
             if (_caption == value) { return; }
-            ChangeData(DatabaseDataType.Caption, null, -1, _caption, value, true);
+            ChangeData(DatabaseDataType.Caption, null, null, _caption, value);
+        }
+    }
+
+    public List<ColumnViewCollection> ColumnArrangements {
+        get => _columnArrangements;
+        set {
+            if (_columnArrangements.ToString() ==  value.ToString()) { return; }
+            ChangeData(DatabaseDataType.ColumnArrangement, null, null, _columnArrangements.ToString(), value.ToString());
+            OnViewChanged();
         }
     }
 
@@ -230,7 +223,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         get => _createDate;
         set {
             if (_createDate == value) { return; }
-            ChangeData(DatabaseDataType.CreateDateUTC, null, -1, _createDate, value, true);
+            ChangeData(DatabaseDataType.CreateDateUTC, null, null, _createDate, value);
         }
     }
 
@@ -239,7 +232,23 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         get => _creator.Trim();
         set {
             if (_creator == value) { return; }
-            ChangeData(DatabaseDataType.Creator, null, -1, _creator, value, true);
+            ChangeData(DatabaseDataType.Creator, null, null, _creator, value);
+        }
+    }
+
+    public List<string> DatenbankAdmin {
+        get => _datenbankAdmin;
+        set {
+            if (!_datenbankAdmin.IsDifferentTo(value)) { return; }
+            ChangeData(DatabaseDataType.DatabaseAdminGroups, null, null, _datenbankAdmin.JoinWithCr(), value.JoinWithCr());
+        }
+    }
+
+    public List<ExportDefinition> Export {
+        get => _export;
+        set {
+            if (_export.ToString() == value.ToString()) { return; }
+            ChangeData(DatabaseDataType.AutoExport, null, null, _export.ToString(true), value.ToString(true));
         }
     }
 
@@ -250,7 +259,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         get => _globalScale;
         set {
             if (_globalScale == value) { return; }
-            ChangeData(DatabaseDataType.GlobalScale, null, -1, _globalScale.ToString(CultureInfo.InvariantCulture), value.ToString(CultureInfo.InvariantCulture), true);
+            ChangeData(DatabaseDataType.GlobalScale, null, null, _globalScale.ToString(CultureInfo.InvariantCulture), value.ToString(CultureInfo.InvariantCulture));
             Cell.InvalidateAllSizes();
         }
     }
@@ -259,7 +268,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         get => _globalShowPass;
         set {
             if (_globalShowPass == value) { return; }
-            ChangeData(DatabaseDataType.GlobalShowPass, null, -1, _globalShowPass, value, true);
+            ChangeData(DatabaseDataType.GlobalShowPass, null, null, _globalShowPass, value);
         }
     }
 
@@ -267,7 +276,23 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
     public abstract bool IsLoading { get; protected set; }
 
+    public LayoutCollection Layouts {
+        get => _layouts;
+        set {
+            if (!_layouts.IsDifferentTo(value)) { return; }
+            ChangeData(DatabaseDataType.Layouts, null, null, _layouts.JoinWithCr(), value.JoinWithCr());
+        }
+    }
+
     public string LoadedVersion { get; private set; }
+
+    public List<string>? PermissionGroupsNewRow {
+        get => _permissionGroupsNewRow;
+        set {
+            if (!_permissionGroupsNewRow.IsDifferentTo(value)) { return; }
+            ChangeData(DatabaseDataType.PermissionGroupsNewRow, null, null, _permissionGroupsNewRow.JoinWithCr(), value.JoinWithCr());
+        }
+    }
 
     public DateTime PowerEdit { get; set; }
 
@@ -278,7 +303,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         get => _reloadDelaySecond;
         set {
             if (_reloadDelaySecond == value) { return; }
-            ChangeData(DatabaseDataType.ReloadDelaySecond, null, -1, _reloadDelaySecond.ToString(), value.ToString(), true);
+            ChangeData(DatabaseDataType.ReloadDelaySecond, null, null, _reloadDelaySecond.ToString(), value.ToString());
         }
     }
 
@@ -290,7 +315,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         get => _rulesScript;
         set {
             if (_rulesScript == value) { return; }
-            ChangeData(DatabaseDataType.RulesScript, null, -1, _rulesScript, value, true);
+            ChangeData(DatabaseDataType.RulesScript, null, null, _rulesScript, value);
         }
     }
 
@@ -303,8 +328,8 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
             if (_sortDefinition != null) { alt = _sortDefinition.ToString(); }
             if (value != null) { neu = value.ToString(); }
             if (alt == neu) { return; }
-            ChangeData(DatabaseDataType.SortDefinition, null, -1, alt, neu, false);
-            _sortDefinition = new RowSortDefinition(this, neu);
+            ChangeData(DatabaseDataType.SortDefinition, null, null, alt, neu);
+
             OnSortParameterChanged();
         }
     }
@@ -318,7 +343,15 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         get => _standardFormulaFile;
         set {
             if (_standardFormulaFile == value) { return; }
-            ChangeData(DatabaseDataType.StandardFormulaFile, null, -1, _standardFormulaFile, value, true);
+            ChangeData(DatabaseDataType.StandardFormulaFile, null, null, _standardFormulaFile, value);
+        }
+    }
+
+    public List<string> Tags {
+        get => _tags;
+        set {
+            if (!_tags.IsDifferentTo(value)) { return; }
+            ChangeData(DatabaseDataType.Tags, null, null, _tags.JoinWithCr(), value.JoinWithCr());
         }
     }
 
@@ -327,7 +360,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         get => _undoCount;
         set {
             if (_undoCount == value) { return; }
-            ChangeData(DatabaseDataType.UndoCount, null, -1, _undoCount.ToString(), value.ToString(), true);
+            ChangeData(DatabaseDataType.UndoCount, null, null, _undoCount.ToString(), value.ToString());
         }
     }
 
@@ -336,7 +369,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         get => _zeilenQuickInfo;
         set {
             if (_zeilenQuickInfo == value) { return; }
-            ChangeData(DatabaseDataType.RowQuickInfo, null, -1, _zeilenQuickInfo, value, true);
+            ChangeData(DatabaseDataType.RowQuickInfo, null, null, _zeilenQuickInfo, value);
         }
     }
 
@@ -524,56 +557,42 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
     /// <summary>
     /// Das hier ist die richtige Methode, um einen Wert dauerhaft zu setzen.
+    /// Stößt undo uns die Festsetzung an. Es wird aber nich geprüft, ob Readonly gesetzt ist und spiegelt auch den Wert bei bedarf.
     /// </summary>
     /// <param name="comand"></param>
     /// <param name="columnKey"></param>
     /// <param name="rowKey"></param>
     /// <param name="previousValue"></param>
     /// <param name="changedTo"></param>
-    /// <param name="executeNow"></param>
-    public void ChangeData(DatabaseDataType comand, ColumnItem column, string previousValue, string changedTo, bool executeNow) => ChangeData(comand, column, -1, previousValue, changedTo, executeNow);
+    public virtual void ChangeData(DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo) {
 
-    /// <summary>
-    /// Das hier ist die richtige Methode, um einen Wert dauerhaft zu setzen.
-    /// </summary>
-    /// <param name="comand"></param>
-    /// <param name="columnKey"></param>
-    /// <param name="rowKey"></param>
-    /// <param name="previousValue"></param>
-    /// <param name="changedTo"></param>
-    /// <param name="executeNow"></param>
-    public void ChangeData(DatabaseDataType comand, ColumnItem? column, string listExt, bool executeNow) => ChangeData(comand, column, -1, "", listExt, executeNow);
 
-    /// <summary>
-    /// Das hier ist die richtige Methode, um einen Wert dauerhaft zu setzen.
-    /// </summary>
-    /// <param name="comand"></param>
-    /// <param name="columnKey"></param>
-    /// <param name="rowKey"></param>
-    /// <param name="previousValue"></param>
-    /// <param name="changedTo"></param>
-    /// <param name="executeNow"></param>
-    public void ChangeData(DatabaseDataType comand, ColumnItem? column, long rowKey, string previousValue, string changedTo, bool executeNow) {
-        if (executeNow) {
-            SetValueInternal(comand, changedTo, column, Row.SearchByKey(rowKey), -1, -1);
+        SetValueInternal(comand, changedTo, column, row, -1, -1);
+
+        if (Mirror != null && !Mirror.ReadOnly) {
+            ColumnItem? c = null;
+            if (column!= null) { c= Mirror.Column.SearchByKey(column.Key); }
+            RowItem? r = null;
+            if (row!= null) { r= Mirror.Row.SearchByKey(row.Key); }
+
+            Mirror?.ChangeData(comand, c, r, previousValue, changedTo);
         }
-        Mirror?.ChangeData(comand, column, rowKey, previousValue, changedTo, executeNow);
 
         if (IsLoading) { return; }
+
         if (ReadOnly) {
             if (!string.IsNullOrEmpty(TableName)) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Datei ist Readonly, " + comand + ", " + TableName);
             }
             return;
         }
-        // Keine Doppelten Rausfiltern, ansonstn stimmen die Undo nicht mehr
+
+
+        StoreValueToHardDisk(comand, column, row, changedTo);
+        AddUndo(TableName, comand, column, row, previousValue, changedTo, UserName);
 
         if (comand != DatabaseDataType.AutoExport) { SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
 
-        if (rowKey < -100) { Develop.DebugPrint(FehlerArt.Fehler, "RowKey darf hier nicht <-100 sein!"); }
-        //if (columnKey < -100) { Develop.DebugPrint(FehlerArt.Fehler, "ColKey darf hier nicht <-100 sein!"); }
-
-        AddUndo(TableName, comand, column, rowKey, previousValue, changedTo, UserName);
     }
 
     /// <summary>
@@ -602,12 +621,15 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         UndoCount = sourceDatabase.UndoCount;
         ZeilenQuickInfo = sourceDatabase.ZeilenQuickInfo;
 
-        DatenbankAdmin.CloneFrom(sourceDatabase.DatenbankAdmin);
-        PermissionGroupsNewRow.CloneFrom(sourceDatabase.PermissionGroupsNewRow);
-        ColumnArrangements.Clear();
+        DatenbankAdmin= sourceDatabase.DatenbankAdmin;
+        PermissionGroupsNewRow = sourceDatabase.PermissionGroupsNewRow;
+        //ColumnArrangements.Clear();
+        var tcvc = new List<ColumnViewCollection>();
         foreach (var t in sourceDatabase.ColumnArrangements) {
-            ColumnArrangements.Add(new ColumnViewCollection(this, t.ToString()));
+            tcvc.Add(new ColumnViewCollection(this, t.ToString()));
         }
+
+        ColumnArrangements = tcvc;
     }
 
     /// <summary>
@@ -744,13 +766,13 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
     /// </summary>
     /// <returns></returns>
-    public string Export_CSV(FirstRow firstRow, int arrangementNo, FilterCollection? filter, List<RowItem>? pinned) => Export_CSV(firstRow, ColumnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null));
+    public string Export_CSV(FirstRow firstRow, int arrangementNo, FilterCollection? filter, List<RowItem>? pinned) => Export_CSV(firstRow, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null));
 
     /// <summary>
     /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
     /// </summary>
     /// <returns></returns>
-    public void Export_HTML(string filename, int arrangementNo, FilterCollection? filter, List<RowItem>? pinned) => Export_HTML(filename, ColumnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null), false);
+    public void Export_HTML(string filename, int arrangementNo, FilterCollection? filter, List<RowItem>? pinned) => Export_HTML(filename, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null), false);
 
     /// <summary>
     /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
@@ -964,12 +986,30 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         return Import(importText, true, true, sep, false, false, true, script);
     }
 
+    public void InvalidateExports(string layoutId) {
+        if (ReadOnly) { return; }
+
+        var ex = Export.CloneWithClones();
+
+        foreach (var thisExport in ex) {
+            if (thisExport != null) {
+                if (thisExport.Typ == ExportTyp.EinzelnMitFormular) {
+                    if (thisExport.ExportFormularId == layoutId) {
+                        thisExport.LastExportTimeUtc = new DateTime(1900, 1, 1);
+                    }
+                }
+            }
+        }
+
+        Export = ex;
+    }
+
     public bool IsAdministrator() {
         if (UserGroup.ToUpper() == "#ADMINISTRATOR") { return true; }
-        if (DatenbankAdmin == null || DatenbankAdmin.Count == 0) { return false; }
-        if (DatenbankAdmin.Contains("#EVERYBODY", false)) { return true; }
-        if (!string.IsNullOrEmpty(UserName) && DatenbankAdmin.Contains("#User: " + UserName, false)) { return true; }
-        return !string.IsNullOrEmpty(UserGroup) && DatenbankAdmin.Contains(UserGroup, false);
+        if (_datenbankAdmin == null || _datenbankAdmin.Count == 0) { return false; }
+        if (_datenbankAdmin.Contains("#EVERYBODY", false)) { return true; }
+        if (!string.IsNullOrEmpty(UserName) && _datenbankAdmin.Contains("#User: " + UserName, false)) { return true; }
+        return !string.IsNullOrEmpty(UserGroup) && _datenbankAdmin.Contains(UserGroup, false);
     }
 
     public abstract void Load_Reload();
@@ -995,9 +1035,9 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
                 e.AddRange(thisColumnItem.PermissionGroupsChangeCell);
             }
         }
-        e.AddRange(PermissionGroupsNewRow);
-        e.AddRange(DatenbankAdmin);
-        foreach (var thisArrangement in ColumnArrangements) {
+        e.AddRange(_permissionGroupsNewRow);
+        e.AddRange(_datenbankAdmin);
+        foreach (var thisArrangement in _columnArrangements) {
             e.AddRange(thisArrangement.PermissionGroups_Show);
         }
         //foreach (var thisArrangement in OldFormulaViews) {
@@ -1015,7 +1055,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         return e.SortedDistinctList();
     }
 
-    public bool PermissionCheck(ListExt<string>? allowed, RowItem? row) {
+    public bool PermissionCheck(List<string>? allowed, RowItem? row) {
         try {
             if (IsAdministrator()) { return true; }
             if (PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0) { return true; }
@@ -1032,182 +1072,13 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     public void RepairAfterParse() {
         Column.Repair();
         CheckViewsAndArrangements();
-        Layouts.Check();
+        _layouts.Check();
     }
 
     public abstract bool Save(bool mustDo);
 
     public virtual void SetReadOnly() {
         ReadOnly = true;
-    }
-
-    public virtual string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
-        if (type.IsColumnTag()) {
-            return column.SetValueInternal(type, value);
-        }
-
-        switch (type) {
-            case DatabaseDataType.Formatkennung:
-                break;
-
-            case DatabaseDataType.Version:
-                LoadedVersion = value.Trim();
-                if (LoadedVersion != DatabaseVersion) {
-                    Initialize();
-                    LoadedVersion = value.Trim();
-                } else {
-                    //Cell.RemoveOrphans();
-                    Row.RemoveNullOrEmpty();
-                    Cell.Clear();
-                }
-                break;
-
-            case DatabaseDataType.Werbung:
-                break;
-
-            case DatabaseDataType.CryptionState:
-                break;
-
-            case DatabaseDataType.CryptionTest:
-                break;
-
-            case DatabaseDataType.Creator:
-                _creator = value;
-                break;
-
-            case DatabaseDataType.CreateDateUTC:
-                _createDate = value;
-                break;
-
-            case DatabaseDataType.ReloadDelaySecond:
-                _reloadDelaySecond = IntParse(value);
-                break;
-
-            case DatabaseDataType.DatabaseAdminGroups:
-                DatenbankAdmin.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
-                break;
-
-            case DatabaseDataType.SortDefinition:
-                _sortDefinition = new RowSortDefinition(this, value);
-                break;
-
-            case DatabaseDataType.Caption:
-                _caption = value;
-                break;
-
-            case DatabaseDataType.GlobalScale:
-                _globalScale = DoubleParse(value);
-                break;
-
-            case DatabaseDataType.AdditionaFilesPath:
-                _additionaFilesPfad = value;
-                break;
-
-            case DatabaseDataType.StandardFormulaFile:
-                _standardFormulaFile = value;
-                break;
-
-            case DatabaseDataType.RowQuickInfo:
-                _zeilenQuickInfo = value;
-                break;
-
-            case DatabaseDataType.Tags:
-                Tags.SplitAndCutByCr(value);
-                break;
-
-            //case enDatabaseDataType.BinaryDataInOne:
-            //    break;
-
-            case DatabaseDataType.Layouts:
-                Layouts.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
-                break;
-
-            case DatabaseDataType.AutoExport:
-                Export.Clear();
-                List<string> ae = new(value.SplitAndCutByCr());
-                foreach (var t in ae) {
-                    Export.Add(new ExportDefinition(this, t));
-                }
-                break;
-
-            case DatabaseDataType.ColumnArrangement:
-                ColumnArrangements.Clear();
-                List<string> ca = new(value.SplitAndCutByCr());
-                foreach (var t in ca) {
-                    ColumnArrangements.Add(new ColumnViewCollection(this, t));
-                }
-                break;
-
-            case DatabaseDataType.PermissionGroupsNewRow:
-                PermissionGroupsNewRow.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
-                break;
-
-            case DatabaseDataType.GlobalShowPass:
-                _globalShowPass = value;
-                break;
-
-            case DatabaseDataType.RulesScript:
-                _rulesScript = value;
-                break;
-
-            case DatabaseDataType.ce_Value_withSizeData:
-            case DatabaseDataType.ce_UTF8Value_withSizeData:
-            case DatabaseDataType.ce_Value_withoutSizeData:
-                if (type == DatabaseDataType.ce_UTF8Value_withSizeData) {
-                    //Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-                    var enc1252 = Encoding.GetEncoding(1252);
-                    value = Encoding.UTF8.GetString(enc1252.GetBytes(value));
-                }
-                Cell.Load_310(column, row, value, width, height);
-                break;
-
-            case DatabaseDataType.UndoCount:
-                _undoCount = IntParse(value);
-                break;
-
-            case DatabaseDataType.UndoInOne:
-                // Muss eine übergeordnete Routine bei Befarf abfangen
-                break;
-
-            case DatabaseDataType.dummyComand_AddRow:
-                var addRowKey = LongParse(value);
-                if (Row.SearchByKey(addRowKey) == null) { Row.Add(new RowItem(this, addRowKey)); }
-                break;
-
-            case DatabaseDataType.AddColumnKeyInfo: // TODO: Ummünzen auf AddColumnNameInfo
-                var addColumnKey = LongParse(value);
-                if (Column.SearchByKey(addColumnKey) == null) { Column.AddFromParser(new ColumnItem(this, addColumnKey)); }
-                break;
-
-            case DatabaseDataType.AddColumnNameInfo: // TODO: Ummünzen auf AddColumnNameInfo
-                //var addColumnKey = LongParse(value);
-                //if (Column.SearchByKey(addColumnKey) == null) { Column.AddFromParser(new ColumnItem(this, addColumnKey)); }
-                break;
-
-            case DatabaseDataType.dummyComand_RemoveRow:
-                var removeRowKey = LongParse(value);
-                if (Row.SearchByKey(removeRowKey) != null) { Row.Remove(removeRowKey); }
-                break;
-
-            case DatabaseDataType.dummyComand_RemoveColumn:
-                var removeColumnKey = LongParse(value);
-                if (Column.SearchByKey(removeColumnKey) is ColumnItem col) { Column.Remove(col); }
-                break;
-
-            case DatabaseDataType.EOF:
-                return string.Empty;
-
-            default:
-                if (LoadedVersion == DatabaseVersion) {
-                    SetReadOnly();
-                    if (!ReadOnly) {
-                        Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Datei: " + ConnectionID);
-                    }
-                }
-
-                break;
-        }
-        return string.Empty;
     }
 
     public abstract string UndoText(ColumnItem? column, RowItem? row);
@@ -1245,16 +1116,16 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         //if (view) { t += " - Formular-Ansichten<br>"; }
         var cola = false;
         var first = true;
-        foreach (var thisView in ColumnArrangements) {
+        foreach (var thisView in _columnArrangements) {
             if (!first && thisView[column] != null) { cola = true; }
             first = false;
         }
         if (cola) { t += " - Benutzerdefinierte Spalten-Anordnungen<br>"; }
         if (RulesScript.ToUpper().Contains(column.Name.ToUpper())) { t += " - Regeln-Skript<br>"; }
         if (ZeilenQuickInfo.ToUpper().Contains(column.Name.ToUpper())) { t += " - Zeilen-Quick-Info<br>"; }
-        if (Tags.JoinWithCr().ToUpper().Contains(column.Name.ToUpper())) { t += " - Datenbank-Tags<br>"; }
+        if (_tags.JoinWithCr().ToUpper().Contains(column.Name.ToUpper())) { t += " - Datenbank-Tags<br>"; }
         var layout = false;
-        foreach (var thisLayout in Layouts) {
+        foreach (var thisLayout in _layouts) {
             if (thisLayout.Contains(column.Name.ToUpper())) { layout = true; }
         }
         if (layout) { t += " - Layouts<br>"; }
@@ -1296,7 +1167,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         ViewChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
-    protected abstract void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, long rowKey, string previousValue, string changedTo, string userName);
+    protected abstract void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName);
 
     protected virtual void Dispose(bool disposing) {
         if (IsDisposed) { return; }
@@ -1311,13 +1182,13 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         }
         // TODO: nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer weiter unten überschreiben.
         // TODO: große Felder auf Null setzen.
-        ColumnArrangements.Changed -= ColumnArrangements_ListOrItemChanged;
-        Layouts.Changed -= Layouts_ListOrItemChanged;
-        Layouts.ItemSeted -= Layouts_ItemSeted;
-        PermissionGroupsNewRow.Changed -= PermissionGroups_NewRow_ListOrItemChanged;
-        Tags.Changed -= DatabaseTags_ListOrItemChanged;
-        Export.Changed -= Export_ListOrItemChanged;
-        DatenbankAdmin.Changed -= DatabaseAdmin_ListOrItemChanged;
+        //ColumnArrangements.Changed -= ColumnArrangements_ListOrItemChanged;
+        //Layouts.Changed -= Layouts_ListOrItemChanged;
+        //Layouts.ItemSeted -= Layouts_ItemSeted;
+        //PermissionGroupsNewRow.Changed -= PermissionGroups_NewRow_ListOrItemChanged;
+        //Tags.Changed -= DatabaseTags_ListOrItemChanged;
+        //Export.Changed -= Export_ListOrItemChanged;
+        //DatenbankAdmin.Changed -= DatabaseAdmin_ListOrItemChanged;
 
         Row.RowRemoving -= Row_RowRemoving;
         Row.RowAdded -= Row_RowAdded;
@@ -1329,12 +1200,12 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         Cell.Dispose();
         Row.Dispose();
 
-        ColumnArrangements.Dispose();
-        Tags.Dispose();
-        Export.Dispose();
-        DatenbankAdmin.Dispose();
-        PermissionGroupsNewRow.Dispose();
-        Layouts.Dispose();
+        //_columnArrangements.Dispose();
+        //_cags.Dispose();
+        //_export.Dispose();
+        //_datenbankAdmin.Dispose();
+        //_permissionGroupsNewRow.Dispose();
+        _layouts.Dispose();
     }
 
     protected abstract DatabaseAbstract? GetOtherTable(string tablename, bool readOnly);
@@ -1342,12 +1213,12 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     protected virtual void Initialize() {
         Cell.Initialize();
 
-        ColumnArrangements.Clear();
-        Layouts.Clear();
-        PermissionGroupsNewRow.Clear();
-        Tags.Clear();
-        Export.Clear();
-        DatenbankAdmin.Clear();
+        _columnArrangements.Clear();
+        _layouts.Clear();
+        _permissionGroupsNewRow.Clear();
+        _tags.Clear();
+        _export.Clear();
+        _datenbankAdmin.Clear();
         _globalShowPass = string.Empty;
         _creator = UserName;
         _createDate = DateTime.Now.ToString(Constants.Format_Date5);
@@ -1392,15 +1263,212 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         _lastUserActionUtc = DateTime.UtcNow;
     }
 
+    /// <summary>
+    /// Die richtige Routine, wenn Werte auf den richtigen Speicherplatz geschrieben werden sollen.
+    /// Nur von Laderoutinen aufzurufen, oder von ChangeData, wenn der Wert bereits fest in der Datenbank verankert ist.
+    /// Vorsicht beim überschreiben! Da in Columns und Cells abgesprungen wird, und diese nicht überschrieben werde können.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="value"></param>
+    /// <param name="column"></param>
+    /// <param name="row"></param>
+    /// <param name="width"></param>
+    /// <param name="height"></param>
+    /// <returns></returns>
+    protected virtual string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
+        if (type.IsColumnTag()) {
+            if (column == null) {
+                Develop.DebugPrint(FehlerArt.Warnung, "Spalte ist null! " + type.ToString());
+                return "Wert nicht gesetzt!";
+            }
+            return column.SetValueInternal(type, value);
+        }
+
+        if (type.IsCellValue()) {
+            //        case DatabaseDataType.ce_Value_withSizeData:
+            //case DatabaseDataType.ce_UTF8Value_withSizeData:
+            //case DatabaseDataType.ce_Value_withoutSizeData:
+            if (type == DatabaseDataType.ce_UTF8Value_withSizeData) {
+                //Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+                var enc1252 = Encoding.GetEncoding(1252);
+                value = Encoding.UTF8.GetString(enc1252.GetBytes(value));
+            }
+            return Cell.SetValueInternal(column, row, value, width, height);
+        }
+
+        switch (type) {
+            case DatabaseDataType.Formatkennung:
+                break;
+
+            case DatabaseDataType.Version:
+                LoadedVersion = value.Trim();
+                if (LoadedVersion != DatabaseVersion) {
+                    Initialize();
+                    LoadedVersion = value.Trim();
+                } else {
+                    //Cell.RemoveOrphans();
+                    Row.RemoveNullOrEmpty();
+                    Cell.Clear();
+                }
+                break;
+
+            case DatabaseDataType.Werbung:
+                break;
+
+            case DatabaseDataType.CryptionState:
+                break;
+
+            case DatabaseDataType.CryptionTest:
+                break;
+
+            case DatabaseDataType.Creator:
+                _creator = value;
+                break;
+
+            case DatabaseDataType.CreateDateUTC:
+                _createDate = value;
+                break;
+
+            case DatabaseDataType.ReloadDelaySecond:
+                _reloadDelaySecond = IntParse(value);
+                break;
+
+            case DatabaseDataType.DatabaseAdminGroups:
+                _datenbankAdmin.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
+                break;
+
+            case DatabaseDataType.SortDefinition:
+                _sortDefinition = new RowSortDefinition(this, value);
+                break;
+
+            case DatabaseDataType.Caption:
+                _caption = value;
+                break;
+
+            case DatabaseDataType.GlobalScale:
+                _globalScale = DoubleParse(value);
+                break;
+
+            case DatabaseDataType.AdditionaFilesPath:
+                _additionaFilesPfad = value;
+                break;
+
+            case DatabaseDataType.StandardFormulaFile:
+                _standardFormulaFile = value;
+                break;
+
+            case DatabaseDataType.RowQuickInfo:
+                _zeilenQuickInfo = value;
+                break;
+
+            case DatabaseDataType.Tags:
+                _tags.SplitAndCutByCr(value);
+                break;
+
+            //case enDatabaseDataType.BinaryDataInOne:
+            //    break;
+
+            case DatabaseDataType.Layouts:
+                _layouts.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
+                break;
+
+            case DatabaseDataType.AutoExport:
+                _export.Clear();
+                List<string> ae = new(value.SplitAndCutByCr());
+                foreach (var t in ae) {
+                    _export.Add(new ExportDefinition(this, t));
+                }
+                break;
+
+            case DatabaseDataType.ColumnArrangement:
+                _columnArrangements.Clear();
+                List<string> ca = new(value.SplitAndCutByCr());
+                foreach (var t in ca) {
+                    _columnArrangements.Add(new ColumnViewCollection(this, t));
+                }
+                break;
+
+            case DatabaseDataType.PermissionGroupsNewRow:
+                _permissionGroupsNewRow.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
+                break;
+
+            case DatabaseDataType.GlobalShowPass:
+                _globalShowPass = value;
+                break;
+
+            case DatabaseDataType.RulesScript:
+                _rulesScript = value;
+                break;
+
+            case DatabaseDataType.UndoCount:
+                _undoCount = IntParse(value);
+                break;
+
+            case DatabaseDataType.UndoInOne:
+                // Muss eine übergeordnete Routine bei Befarf abfangen
+                break;
+
+            case DatabaseDataType.dummyComand_AddRow:
+                var addRowKey = LongParse(value);
+                if (Row.SearchByKey(addRowKey) == null) { Row.Add(new RowItem(this, addRowKey)); }
+                break;
+
+            case DatabaseDataType.AddColumnKeyInfo: // TODO: Ummünzen auf AddColumnNameInfo
+                var addColumnKey = LongParse(value);
+                if (Column.SearchByKey(addColumnKey) == null) { Column.AddFromParser(new ColumnItem(this, addColumnKey)); }
+                break;
+
+            case DatabaseDataType.AddColumnNameInfo: // TODO: Ummünzen auf AddColumnNameInfo
+                //var addColumnKey = LongParse(value);
+                //if (Column.SearchByKey(addColumnKey) == null) { Column.AddFromParser(new ColumnItem(this, addColumnKey)); }
+                break;
+
+            case DatabaseDataType.dummyComand_RemoveRow:
+                var removeRowKey = LongParse(value);
+                if (Row.SearchByKey(removeRowKey) != null) { Row.Remove(removeRowKey); }
+                break;
+
+            case DatabaseDataType.Comand_RemovingColumn:
+                //var removeColumnKey = LongParse(value);
+                //if (Column.SearchByKey(removeColumnKey) is ColumnItem col) { Column.Remove(col); }
+                break;
+
+            case DatabaseDataType.EOF:
+                return string.Empty;
+
+            default:
+                if (LoadedVersion == DatabaseVersion) {
+                    SetReadOnly();
+                    if (!ReadOnly) {
+                        Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Datei: " + ConnectionID);
+                    }
+                }
+
+                break;
+        }
+        return string.Empty;
+    }
+
     protected abstract string SpecialErrorReason(ErrorReason mode);
+
+    /// <summary>
+    /// Für Echtzeitbasierte Systeme ist hier der richtige Zeitpunkt, den Wert fest auf Festplatte zu schreiben.
+    /// </summary>
+    /// <param name="comand"></param>
+    /// <param name="column"></param>
+    /// <param name="row"></param>
+    /// <param name="value"></param>
+    protected abstract void StoreValueToHardDisk(DatabaseDataType type, ColumnItem? column, RowItem? row, string value);
 
     private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
         if (ReadOnly) { return; }
 
-        foreach (var thisExport in Export) {
-            if (_backgroundWorker.CancellationPending) { return; }
+        var tmpe = _export.CloneWithClones();
 
-            if (IsLoading) { return; }
+        foreach (var thisExport in tmpe) {
+            if (_backgroundWorker.CancellationPending) { break; }
+
+            if (IsLoading) { break; }
 
             if (thisExport.IsOk()) {
                 //var e2 = new MultiUserFileHasPendingChangesEventArgs();
@@ -1409,15 +1477,17 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
                 //if (!e2.HasPendingChanges) {
                 CancelEventArgs ec = new(false);
                 OnExporting(ec);
-                if (ec.Cancel) { return; }
+                if (ec.Cancel) { break; }
                 //}
 
                 thisExport.DeleteOutdatedBackUps(_backgroundWorker);
-                if (_backgroundWorker.CancellationPending) { return; }
+                if (_backgroundWorker.CancellationPending) { break; }
                 thisExport.DoBackUp(_backgroundWorker);
-                if (_backgroundWorker.CancellationPending) { return; }
+                if (_backgroundWorker.CancellationPending) { break; }
             }
         }
+
+        Export = tmpe;
     }
 
     private bool BlockSaveOperations() {
@@ -1492,10 +1562,14 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
         if (IsLoading) { return; }
 
-        for (var z = 0; z < Math.Max(2, ColumnArrangements.Count); z++) {
-            if (ColumnArrangements.Count < z + 1) { ColumnArrangements.Add(new ColumnViewCollection(this, string.Empty)); }
-            ColumnArrangements[z].Repair(z, true);
+        var x = _columnArrangements.CloneWithClones();
+
+        for (var z = 0; z < Math.Max(2, x.Count); z++) {
+            if (x.Count < z + 1) { x.Add(new ColumnViewCollection(this, string.Empty)); }
+            x[z].Repair(z, true);
         }
+
+        ColumnArrangements = x;
     }
 
     private void Column_ItemAdded(object sender, ListEventArgs e) => CheckViewsAndArrangements();
@@ -1504,46 +1578,14 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         if (IsLoading) { Develop.DebugPrint(FehlerArt.Warnung, "Parsing Falsch!"); }
         CheckViewsAndArrangements();
 
-        Layouts.Check();
+        var lay = (LayoutCollection)Layouts.Clone();
+        lay.Check();
+        Layouts = lay;
     }
 
     private void Column_ItemRemoving(object sender, ListEventArgs e) {
         var c = (ColumnItem)e.Item;
-        ChangeData(DatabaseDataType.dummyComand_RemoveColumn, c, -1, string.Empty, c.Key.ToString(), false);
-    }
-
-    private void ColumnArrangements_ListOrItemChanged(object sender, System.EventArgs e) {
-        if (IsLoading) { return; } // hier schon raus, es muss kein ToString ausgeführt werden. Kann zu Endlosschleifen führen.
-        ChangeData(DatabaseDataType.ColumnArrangement, null, ColumnArrangements.ToString(), false);
-    }
-
-    private void DatabaseAdmin_ListOrItemChanged(object sender, System.EventArgs e) {
-        if (IsLoading) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
-        ChangeData(DatabaseDataType.DatabaseAdminGroups, null, DatenbankAdmin.JoinWithCr(), false);
-    }
-
-    private void DatabaseTags_ListOrItemChanged(object sender, System.EventArgs e) {
-        if (IsLoading) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
-        ChangeData(DatabaseDataType.Tags, null, Tags.JoinWithCr(), false);
-    }
-
-    private void Export_ListOrItemChanged(object sender, System.EventArgs e) {
-        if (IsLoading) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
-        ChangeData(DatabaseDataType.AutoExport, null, Export.ToString(true), false);
-    }
-
-    private void InvalidateExports(string layoutId) {
-        if (ReadOnly) { return; }
-
-        foreach (var thisExport in Export) {
-            if (thisExport != null) {
-                if (thisExport.Typ == ExportTyp.EinzelnMitFormular) {
-                    if (thisExport.ExportFormularId == layoutId) {
-                        thisExport.LastExportTimeUtc = new DateTime(1900, 1, 1);
-                    }
-                }
-            }
-        }
+        ChangeData(DatabaseDataType.Comand_RemovingColumn, c, null, string.Empty, c.Key.ToString());
     }
 
     private bool IsThereBackgroundWorkToDo() {
@@ -1555,7 +1597,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         OnExporting(ec);
         if (ec.Cancel) { return false; }
 
-        foreach (var thisExport in Export) {
+        foreach (var thisExport in _export) {
             if (thisExport != null) {
                 if (thisExport.Typ == ExportTyp.EinzelnMitFormular) { return true; }
                 if (DateTime.UtcNow.Subtract(thisExport.LastExportTimeUtc).TotalDays > thisExport.BackupInterval * 50) { return true; }
@@ -1563,21 +1605,6 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         }
 
         return false;
-    }
-
-    private void Layouts_ItemSeted(object sender, ListEventArgs? e) {
-        if (e != null) {
-            var x = (string)e.Item;
-            if (!x.StartsWith("{ID=#")) { Develop.DebugPrint("ID nicht gefunden: " + x); }
-            var ko = x.IndexOf(", ", StringComparison.Ordinal);
-            var id = x.Substring(4, ko - 4);
-            InvalidateExports(id);
-        }
-    }
-
-    private void Layouts_ListOrItemChanged(object sender, System.EventArgs e) {
-        if (IsLoading) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
-        ChangeData(DatabaseDataType.Layouts, null, Layouts.JoinWithCr(), false);
     }
 
     private void OnDisposing() {
@@ -1606,11 +1633,6 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
             return true;
         }
         return false;
-    }
-
-    private void PermissionGroups_NewRow_ListOrItemChanged(object sender, System.EventArgs e) {
-        if (IsLoading) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
-        ChangeData(DatabaseDataType.PermissionGroupsNewRow, null, PermissionGroupsNewRow.JoinWithCr(), false);
     }
 
     private void QuickImage_NeedImage(object sender, NeedImageEventArgs e) {
@@ -1659,11 +1681,11 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
     private void Row_RowAdded(object sender, RowEventArgs e) {
         if (IsLoading) {
-            ChangeData(DatabaseDataType.dummyComand_AddRow, null, e.Row.Key, "", e.Row.Key.ToString(), false);
+            ChangeData(DatabaseDataType.dummyComand_AddRow, null, e.Row, String.Empty, e.Row.Key.ToString());
         }
     }
 
-    private void Row_RowRemoving(object sender, RowEventArgs e) => ChangeData(DatabaseDataType.dummyComand_RemoveRow, null, e.Row.Key, "", e.Row.Key.ToString(), false);
+    private void Row_RowRemoving(object sender, RowEventArgs e) => ChangeData(DatabaseDataType.dummyComand_RemoveRow, null, e.Row, string.Empty, e.Row.Key.ToString());
 
     private void StartBackgroundWorker() {
         try {

@@ -75,10 +75,7 @@ public sealed class DatabaseSQL : DatabaseAbstract {
 
     public override bool Save(bool mustSave) => _sql.ConnectionOk;
 
-    public override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
-        _sql?.CheckIn(TableName, type, value, column, row, width, height);
-        return base.SetValueInternal(type, value, column, row, width, height);
-    }
+
 
     public override string UndoText(ColumnItem? column, RowItem? row) => string.Empty;
 
@@ -100,8 +97,8 @@ public sealed class DatabaseSQL : DatabaseAbstract {
         Column.Add(x);
     }
 
-    protected override void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, long rowKey, string previousValue, string changedTo, string userName) {
-        _sql.AddUndo(TableName, comand, column, rowKey, previousValue, changedTo, UserName);
+    protected override void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName) {
+        _sql.AddUndo(TableName, comand, column, row, previousValue, changedTo, UserName);
     }
 
     protected override DatabaseAbstract? GetOtherTable(string tablename, bool readOnly) {
@@ -134,7 +131,7 @@ public sealed class DatabaseSQL : DatabaseAbstract {
 
         #region Datenbank Eigenschaften laden
 
-        var l = _sql.GetStylDataAll(TableName, string.Empty);
+        var l = _sql.GetStylDataAll(TableName, "~DATABASE~");
         if (l != null && l.Count > 0) {
             foreach (var thisstyle in l) {
                 Enum.TryParse(thisstyle.Key, out DatabaseDataType t);
@@ -153,6 +150,11 @@ public sealed class DatabaseSQL : DatabaseAbstract {
         IsLoading = false;
 
         //RepairAfterParse(null, null);
+    }
+
+    protected override void StoreValueToHardDisk(DatabaseDataType type, ColumnItem? column, RowItem? row, string value) {
+        _sql?.CheckIn(TableName, type, value, column, row, -1, -1);
+        //return base.SetValueInternal(type, value, column, row, width, height);
     }
 
     #endregion

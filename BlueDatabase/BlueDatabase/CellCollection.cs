@@ -416,10 +416,12 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
         return IsNullOrEmpty(column, row);
     }
 
-    public void Load_310(ColumnItem? column, RowItem? row, string value, int width, int height) {
-        if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Row konnte nicht generiert werden."); }
-        if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Column konnte nicht generiert werden."); }
+    public string SetValueInternal(ColumnItem? column, RowItem? row, string value, int width, int height) {
+        if (row == null) { return "Row konnte nicht generiert werden."; }
+        if (column == null) { return "Column konnte nicht generiert werden."; }
+
         var cellKey = KeyOfCell(column, row);
+
         if (ContainsKey(cellKey)) {
             var c = this[cellKey];
             c.Value = value; // Auf jeden Fall setzen. Auch falls es nachher entfernt wird, so ist es sicher leer
@@ -428,6 +430,8 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
         } else {
             Add(cellKey, new CellItem(value, width, height));
         }
+
+        return string.Empty;
     }
 
     public bool MatchesTo(ColumnItem? column, RowItem? row, FilterItem filter) {
@@ -670,7 +674,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
         if (value == oldValue) { return; }
 
         _database?.WaitEditable();
-        _database?.ChangeData(DatabaseDataType.ce_Value_withoutSizeData, column, row.Key, oldValue, value, true);
+        _database?.ChangeData(DatabaseDataType.ce_Value_withoutSizeData, column, row, oldValue, value);
         column.UcaseNamesSortedByLenght = null;
 
         if (changeSysColumns) {
@@ -698,7 +702,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
             Add(cellKey, new CellItem(string.Empty, 0, 0));
         }
         if (value == @string) { return; }
-        _database.ChangeData(DatabaseDataType.ce_Value_withoutSizeData, column, row.Key, @string, value, true);
+        _database.ChangeData(DatabaseDataType.ce_Value_withoutSizeData, column, row, @string, value);
     }
 
     private static bool CompareValues(string istValue, string filterValue, FilterType typ) {

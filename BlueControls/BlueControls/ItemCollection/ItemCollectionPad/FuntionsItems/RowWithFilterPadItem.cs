@@ -30,6 +30,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Windows;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 
@@ -152,7 +153,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         var FilterTable = new Table();
         FilterTable.DropMessages = false;
         FilterTable.ShowWaitScreen = true;
-        FilterTable.Size = new Size(968, 400);
+        FilterTable.Size = new System.Drawing.Size(968, 400);
 
         FilterTable.DatabaseSet(FilterDefiniton, string.Empty);
 
@@ -314,20 +315,25 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         #region Hauptspalte
 
         var hs = FilterDefiniton.Column["spalte"];
-        hs.OpticalReplace.Clear();
+
+        var or2 = new List<string>();
         if (Database != null) {
             foreach (var thisc in Database.Column) {
-                hs.OpticalReplace.Add(thisc.Key.ToString() + "|" + thisc.ReadableText());
+                or2.Add(thisc.Key.ToString() + "|" + thisc.ReadableText());
             }
         }
+
+        hs.OpticalReplace= or2;
 
         #endregion
 
         #region Spalte Suchtext & SuchSym-Script
 
         var b = FilterDefiniton.Column["suchtxt"];
-        b.DropDownItems.Clear();
-        b.OpticalReplace.Clear();
+
+        var dd = new List<string>();
+        var or = new List<string>();
+
 
         if (Parent != null) {
             foreach (var thisPadItem in Parent) {
@@ -336,8 +342,8 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
                     if (efpi is IAcceptAndSends aas) { rek = aas.IsRecursiveWith(this); }
 
                     if (!rek) {
-                        b.DropDownItems.Add(efpi.Internal);
-                        b.OpticalReplace.Add(efpi.Internal + "|" + efpi.ReadableText());
+                        dd.Add(efpi.Internal);
+                        or.Add(efpi.Internal + "|" + efpi.ReadableText());
                         var s = string.Empty;
                         var tmp = efpi.SymbolForReadableText();
                         if (tmp != null) { s = tmp.ToString(); }
@@ -347,6 +353,8 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
                 }
             }
         }
+        b.DropDownItems = dd;
+        b.OpticalReplace = or;
 
         #endregion
 
@@ -409,11 +417,8 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         fa.TextBearbeitungErlaubt = false;
         fa.DropdownAllesAbwählenErlaubt = true;
         fa.DropdownBearbeitungErlaubt = true;
-        fa.DropDownItems.Add("=");
-        fa.DropDownItems.Add("=!empty");
-        fa.OpticalReplace.Add("=|ist (GK egal)");
-        fa.OpticalReplace.Add("=!empty|wenn nicht leer, ist");
-
+        fa.DropDownItems = new List<string>() { "=", "=!empty" };
+        fa.OpticalReplace = new List<string>() { "=|ist (GK egal)", "=!empty|wenn nicht leer, ist" };
         var b1 = x.Column.Add("suchsym", " ", VarType.Text);
         b1.BehaviorOfImageAndText = BildTextVerhalten.Nur_Bild;
         b1.ScriptType = ScriptType.String;
@@ -428,8 +433,14 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         FilterDatabaseUpdate();
 
         x.RepairAfterParse();
-        x.ColumnArrangements[1].ShowAllColumns();
-        x.ColumnArrangements[1].HideSystemColumns();
+
+        var car = x.ColumnArrangements.CloneWithClones();
+        car[1].ShowAllColumns();
+        car[1].HideSystemColumns();
+        x.ColumnArrangements = car;
+
+
+
         x.SortDefinition = new RowSortDefinition(x, "Spalte", false);
 
         return x;

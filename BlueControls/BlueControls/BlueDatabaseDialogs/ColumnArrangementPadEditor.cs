@@ -91,7 +91,9 @@ public partial class ColumnArrangementPadEditor : PadEditor {
     private void btnAktuelleAnsichtLoeschen_Click(object sender, System.EventArgs e) {
         if (Database == null || Arrangement < 2 || Arrangement >= Database.ColumnArrangements.Count) { return; }
         if (MessageBox.Show("Anordung <b>'" + CurrentArrangement.Name + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-        Database.ColumnArrangements.RemoveAt(Arrangement);
+        var car = Database.ColumnArrangements.CloneWithClones();
+        car.RemoveAt(Arrangement);
+        Database.ColumnArrangements = car;
         Arrangement = 1;
         UpdateCombobox();
         ShowOrder();
@@ -127,19 +129,26 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         if (Arrangement > 0 && CurrentArrangement != null) {
             MitVorlage = Convert.ToBoolean(MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", ImageCode.Frage, "Ja", "Nein") == 0);
         }
-        if (Database.ColumnArrangements.Count < 1) {
-            Database.ColumnArrangements.Add(new ColumnViewCollection(Database, "", ""));
+
+        var car = Database.ColumnArrangements.CloneWithClones();
+        car.RemoveAt(Arrangement);
+
+
+        if (car.Count < 1) {
+            car.Add(new ColumnViewCollection(Database, "", ""));
         }
         string newname;
         if (MitVorlage) {
             newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", "", VarType.Text);
             if (string.IsNullOrEmpty(newname)) { return; }
-            Database.ColumnArrangements.Add(new ColumnViewCollection(Database, CurrentArrangement.ToString(), newname));
+            car.Add(new ColumnViewCollection(Database, CurrentArrangement.ToString(), newname));
         } else {
             newname = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", "", VarType.Text);
             if (string.IsNullOrEmpty(newname)) { return; }
-            Database.ColumnArrangements.Add(new ColumnViewCollection(Database, "", newname));
+            car.Add(new ColumnViewCollection(Database, "", newname));
         }
+
+        Database.ColumnArrangements = car;
         UpdateCombobox();
         ShowOrder();
     }
@@ -231,8 +240,10 @@ public partial class ColumnArrangementPadEditor : PadEditor {
     private void FixColumnArrangement() {
         if (Generating || Sorting) { return; }
 
-        var c = CurrentArrangement;
-        if (c == null) { return; }
+        var car = Database.ColumnArrangements.CloneWithClones();
+        var carone = car[Arrangement];
+
+        if (carone == null) { return; }
         var did = false;
 
         Fixing++;
@@ -246,17 +257,17 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
                 #region Code für Ansichten > 0
 
-                var currentVI = c.IndexOf(c[x.Column]);
+                var currentVI = carone.IndexOf(carone[x.Column]);
 
                 if (currentVI < 0) {
-                    c.Add(x.Column, false);
-                    currentVI = c.IndexOf(c[x.Column]);
+                    carone.Add(x.Column, false);
+                    currentVI = carone.IndexOf(carone[x.Column]);
                     did = true;
                 }
 
                 if (currentVI != done.Count) {
-                    var onPosVI = c.IndexOf(c[done.Count]);
-                    c.Swap(c[onPosVI], c[currentVI]);
+                    var onPosVI = carone.IndexOf(carone[done.Count]);
+                    carone.Swap(carone[onPosVI], carone[currentVI]);
                     did = true;
                 }
 
@@ -274,7 +285,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
                 }
 
                 if (currentC != done.Count) {
-                    var onPosC = Database.Column.IndexOf(c[done.Count].Column);
+                    var onPosC = Database.Column.IndexOf(carone[done.Count].Column);
                     Database.Column.Swap(Database.Column[onPosC], Database.Column[currentC]);
                     did = true;
                 }
@@ -285,12 +296,12 @@ public partial class ColumnArrangementPadEditor : PadEditor {
             done.Add(x);
         } while (true);
 
-        while (c.Count > done.Count) {
+        while (carone.Count > done.Count) {
             if (Arrangement > 0) {
 
                 #region Code für Ansichten > 0
 
-                c.RemoveAt(c.Count - 1);
+                carone.RemoveAt(carone.Count - 1);
                 did = true;
 
                 #endregion
@@ -298,7 +309,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
                 #region Code für Ansicht 0
 
-                var col = Database.Column[c.Count - 1];
+                var col = Database.Column[carone.Count - 1];
                 if (string.IsNullOrEmpty(col.Identifier) && MessageBox.Show("Spalte <b>" + col.ReadableText() + "</b> endgültig löschen?", ImageCode.Warnung, "Ja", "Nein") == 0) {
                     Database.Column.Remove(col);
                 }
@@ -315,6 +326,8 @@ public partial class ColumnArrangementPadEditor : PadEditor {
             Database?.RepairAfterParse();
             ShowOrder();
         }
+
+        Database.ColumnArrangements =car;
     }
 
     private void Item_ItemAdded(object sender, ListEventArgs e) {

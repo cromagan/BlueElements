@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase;
 using BlueScript.Variables;
@@ -90,8 +91,10 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
         }
 
         x.RepairAfterParse();
-        x.ColumnArrangements[1].ShowAllColumns();
-        x.ColumnArrangements[1].HideSystemColumns();
+        var car = x.ColumnArrangements.CloneWithClones();
+        car[1].ShowAllColumns();
+        car[1].HideSystemColumns();
+        x.ColumnArrangements = car;
         x.SortDefinition = new RowSortDefinition(x, "Name", true);
         tableVariablen.DatabaseSet(x, string.Empty);
         tableVariablen.Arrangement = 1;
