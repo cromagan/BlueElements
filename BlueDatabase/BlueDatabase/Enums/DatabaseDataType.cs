@@ -45,7 +45,7 @@ public enum DatabaseDataType : byte {
     CryptionTest = 3,
 
     //InBearbeitung = 3,
-    //CheckOutTime = 4,
+    TimeCode = 4,
     //CheckOutUser = 5,
     // Zugriffanzahl = 6
     // TotalSperrbit = 7

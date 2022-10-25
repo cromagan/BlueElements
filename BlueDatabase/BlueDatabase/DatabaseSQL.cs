@@ -33,6 +33,10 @@ public sealed class DatabaseSQL : DatabaseAbstract {
 
     public readonly SQLBackAbstract _sql;
 
+    private bool _checkedAndReloadNeed;
+
+    private DateTime _lastCheck = DateTime.Now;
+
     #endregion
 
     #region Constructors
@@ -45,6 +49,7 @@ public sealed class DatabaseSQL : DatabaseAbstract {
         Develop.StartService();
 
         Initialize();
+        _checkedAndReloadNeed = true;
 
         if (sql != null) {
             //DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + tablename.FileNameWithoutSuffix()));
@@ -62,8 +67,34 @@ public sealed class DatabaseSQL : DatabaseAbstract {
     public override string Filename => _sql.Filename;
 
     public override bool IsLoading { get; protected set; }
-    public override bool ReloadNeeded { get; }
-    public override bool ReloadNeededSoft { get; }
+
+    public override bool ReloadNeeded {
+        get {
+            if (string.IsNullOrEmpty(Filename)) { return false; }
+            if (_checkedAndReloadNeed) { return true; }
+            _lastCheck = DateTime.Now;
+
+            if (_sql.GetStyleData(TableName, DatabaseDataType.TimeCode.ToString(), string.Empty) != TimeCode) {
+                _checkedAndReloadNeed = true;
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    public override bool ReloadNeededSoft {
+        get {
+            if (string.IsNullOrEmpty(Filename)) { return false; }
+            if (_checkedAndReloadNeed) { return true; }
+
+            if (DateTime.Now.Subtract(_lastCheck).TotalSeconds > 10) {
+                return ReloadNeeded;
+            }
+
+            return false;
+        }
+    }
 
     #endregion
 
@@ -75,8 +106,6 @@ public sealed class DatabaseSQL : DatabaseAbstract {
 
     public override bool Save(bool mustSave) => _sql.ConnectionOk;
 
-
-
     public override string UndoText(ColumnItem? column, RowItem? row) => string.Empty;
 
     public override void UnlockHard() { }
@@ -86,7 +115,7 @@ public sealed class DatabaseSQL : DatabaseAbstract {
     internal void AddColumn(string columnname, SQLBackAbstract sql) {
         var x = new ColumnItem(this, columnname, Column.NextColumnKey());
 
-        var l = sql.GetStylDataAll(TableName.FileNameWithoutSuffix(), columnname);
+        var l = sql.GetStyleDataAll(TableName.FileNameWithoutSuffix(), columnname);
         if (l != null && l.Count > 0) {
             foreach (var thisstyle in l) {
                 Enum.TryParse(thisstyle.Key, out DatabaseDataType t);
@@ -98,7 +127,7 @@ public sealed class DatabaseSQL : DatabaseAbstract {
     }
 
     protected override void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName) {
-        _sql.AddUndo(TableName, comand, column, row, previousValue, changedTo, UserName);
+        _sql.AddUndo(tableName, comand, column, row, previousValue, changedTo, UserName);
     }
 
     protected override DatabaseAbstract? GetOtherTable(string tablename, bool readOnly) {
@@ -112,6 +141,11 @@ public sealed class DatabaseSQL : DatabaseAbstract {
     protected override void SetUserDidSomething() { }
 
     protected override string SpecialErrorReason(ErrorReason mode) => string.Empty;
+
+    protected override void StoreValueToHardDisk(DatabaseDataType type, ColumnItem? column, RowItem? row, string value) {
+        _sql?.CheckIn(TableName, type, value, column, row, -1, -1);
+        //return base.SetValueInternal(type, value, column, row, width, height);
+    }
 
     private void LoadFromSQLBack() {
         IsLoading = true;
@@ -131,7 +165,7 @@ public sealed class DatabaseSQL : DatabaseAbstract {
 
         #region Datenbank Eigenschaften laden
 
-        var l = _sql.GetStylDataAll(TableName, "~DATABASE~");
+        var l = _sql.GetStyleDataAll(TableName, "~DATABASE~");
         if (l != null && l.Count > 0) {
             foreach (var thisstyle in l) {
                 Enum.TryParse(thisstyle.Key, out DatabaseDataType t);
@@ -147,14 +181,10 @@ public sealed class DatabaseSQL : DatabaseAbstract {
 
         #endregion
 
+        _checkedAndReloadNeed = false;
         IsLoading = false;
 
         //RepairAfterParse(null, null);
-    }
-
-    protected override void StoreValueToHardDisk(DatabaseDataType type, ColumnItem? column, RowItem? row, string value) {
-        _sql?.CheckIn(TableName, type, value, column, row, -1, -1);
-        //return base.SetValueInternal(type, value, column, row, width, height);
     }
 
     #endregion

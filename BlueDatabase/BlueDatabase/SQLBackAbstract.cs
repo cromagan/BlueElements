@@ -239,12 +239,48 @@ public abstract class SQLBackAbstract {
     /// <returns></returns>
     public abstract List<string>? GetColumnNames(string tablename);
 
+    public string? GetStyleData(string tablename, string type, string columnName) {
+        if (!OpenConnection()) { return null; }
+
+        using var q = _connection.CreateCommand();
+
+        if (string.IsNullOrEmpty(columnName)) { columnName = "~Database~"; }
+
+        q.CommandText = @"select VALUE, PART from " + SYS_STYLE + " " +
+                        "where TABLENAME = '" + tablename.ToUpper() + "' " +
+                        "and TYPE = '" + type + "' " +
+                        "and COLUMNNAME = '" + columnName.ToUpper() + "' "+
+                        "ORDER BY PART ASC";
+
+        using var reader = q.ExecuteReader();
+        var value = string.Empty;
+        while (reader.Read()) {
+            value += reader[0].ToString();
+        }
+
+        //if (reader.Read()) {
+        //    // you may want to check if value is NULL: reader.IsDBNull(0)
+        //    var value = reader[0].ToString();
+
+        //    //if (reader.Read()) {
+        //    //    // Doppelter Wert?!?Ersten Wert zurückgeben, um unendliche erweiterungen zu erhindern
+        //    //    Develop.DebugPrint(tablename.ToUpper() + " " + type + " " + columnName + " doppelt in Style vorhanden!");
+        //    //}
+
+        //    CloseConnection();
+        //    return value;
+        //}
+
+        CloseConnection();    // Nix vorhanden!
+        return value;
+    }
+
     /// <summary>
     /// Wird kein Spaltenname angegeben, werden die Eigenschaften der Datenbank zurück gegeben.
     /// </summary>
     /// <param name="columnName"></param>
     /// <returns></returns>
-    public Dictionary<string, string> GetStylDataAll(string tablename, string columnName) {
+    public Dictionary<string, string> GetStyleDataAll(string tablename, string columnName) {
         var l = new Dictionary<string, string>();
 
         if (!OpenConnection()) { return l; }
@@ -509,42 +545,6 @@ public abstract class SQLBackAbstract {
 
         CloseConnection();    // Nix vorhanden!
         return null;
-    }
-
-    private string? GetStyleData(string tablename, string type, string columnName) {
-        if (!OpenConnection()) { return null; }
-
-        using var q = _connection.CreateCommand();
-
-        if (string.IsNullOrEmpty(columnName)) { columnName = "~Database~"; }
-
-        q.CommandText = @"select VALUE, PART from " + SYS_STYLE + " " +
-                        "where TABLENAME = '" + tablename.ToUpper() + "' " +
-                        "and TYPE = '" + type + "' " +
-                        "and COLUMNNAME = '" + columnName.ToUpper() + "' "+
-                        "ORDER BY PART ASC";
-
-        using var reader = q.ExecuteReader();
-        var value = string.Empty;
-        while (reader.Read()) {
-            value += reader[0].ToString();
-        }
-
-        //if (reader.Read()) {
-        //    // you may want to check if value is NULL: reader.IsDBNull(0)
-        //    var value = reader[0].ToString();
-
-        //    //if (reader.Read()) {
-        //    //    // Doppelter Wert?!?Ersten Wert zurückgeben, um unendliche erweiterungen zu erhindern
-        //    //    Develop.DebugPrint(tablename.ToUpper() + " " + type + " " + columnName + " doppelt in Style vorhanden!");
-        //    //}
-
-        //    CloseConnection();
-        //    return value;
-        //}
-
-        CloseConnection();    // Nix vorhanden!
-        return value;
     }
 
     private void RemoveColumn(string tablename, string column) {

@@ -52,35 +52,23 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     public readonly CellCollection Cell;
 
     public readonly ColumnCollection Column;
-
     public readonly RowCollection Row;
     public readonly string TableName = string.Empty;
     public readonly string UserName = Generic.UserName().ToUpper();
     public DatabaseAbstract? Mirror;
-
     public string UserGroup;
-
     private readonly BackgroundWorker _backgroundWorker;
-
     private readonly Timer _checker;
-
     private readonly LayoutCollection _layouts = new();
     private readonly List<string> _permissionGroupsNewRow = new();
     private readonly long _startTick = DateTime.UtcNow.Ticks;
-
     private readonly List<string> _tags = new();
     private string _additionaFilesPfad;
-
     private string? _additionaFilesPfadtmp;
-
     private string _cachePfad;
-
     private string _caption = string.Empty;
-
     private int _checkerTickCount = -5;
-
     private string _createDate = string.Empty;
-
     private string _creator = string.Empty;
 
     /// <summary>
@@ -101,6 +89,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     /// </summary>
     private string _standardFormulaFile = string.Empty;
 
+    private string _timeCode = string.Empty;
     private int _undoCount;
 
     private string _zeilenQuickInfo = string.Empty;
@@ -353,6 +342,14 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         }
     }
 
+    public string TimeCode {
+        get => _timeCode;
+        set {
+            if (_timeCode == value) { return; }
+            ChangeData(DatabaseDataType.TimeCode, null, null, _timeCode, value);
+        }
+    }
+
     [Browsable(false)]
     public int UndoCount {
         get => _undoCount;
@@ -584,7 +581,11 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         }
 
         StoreValueToHardDisk(comand, column, row, changedTo);
-        AddUndo(TableName, comand, column, row, previousValue, changedTo, UserName);
+
+        if (comand  != DatabaseDataType.TimeCode) {
+            AddUndo(TableName, comand, column, row, previousValue, changedTo, UserName);
+            ChangeData(DatabaseDataType.TimeCode, null, null, _timeCode, DateTime.UtcNow.ToString(Constants.Format_Date));
+        }
 
         if (comand != DatabaseDataType.AutoExport) { SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
     }
@@ -601,6 +602,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         AdditionaFilesPfad = sourceDatabase.AdditionaFilesPfad;
         CachePfad = sourceDatabase.CachePfad; // Nicht so wichtig ;-)
         Caption = sourceDatabase.Caption;
+        TimeCode = sourceDatabase.TimeCode;
         CreateDate = sourceDatabase.CreateDate;
         Creator = sourceDatabase.Creator;
         //Filename - nope
@@ -1218,6 +1220,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         _createDate = DateTime.Now.ToString(Constants.Format_Date5);
         _undoCount = 300;
         _caption = string.Empty;
+        _timeCode = string.Empty;
         //_verwaisteDaten = VerwaisteDaten.Ignorieren;
         LoadedVersion = DatabaseVersion;
         _rulesScript = string.Empty;
@@ -1337,6 +1340,10 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
             case DatabaseDataType.Caption:
                 _caption = value;
+                break;
+
+            case DatabaseDataType.TimeCode:
+                _timeCode = value;
                 break;
 
             case DatabaseDataType.GlobalScale:
