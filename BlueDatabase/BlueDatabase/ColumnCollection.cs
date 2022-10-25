@@ -124,14 +124,23 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
             Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht erlaubt!");
         }
 
-        var c = SearchByKey(colKey) ?? Exists(internalName);
-        Database.ChangeData(DatabaseDataType.AddColumnNameInfo, c, null, string.Empty, internalName.ToUpper());
-        c = SearchByKey(colKey) ?? Exists(internalName);
-        Database.ChangeData(DatabaseDataType.AddColumnKeyInfo, c, null, string.Empty, colKey.ToString());
+        var c = SearchByKey(colKey);
 
-        // Ruft anschließen AddFromParser Auf, der die Spalte endgültig dazumacht
+        //var addColumnKey = LongParse(value);
+        if (c == null) {
+            c=new ColumnItem(Database, internalName, colKey);
+            base.Add(c);
+            Database.ChangeData(DatabaseDataType.Comand_ColumnAdded, c, null, string.Empty, c.Name);
+        }
 
-        c = SearchByKey(colKey) ?? Exists(internalName);
+        //var c = SearchByKey(colKey) ?? Exists(internalName);
+        //Database.ChangeData(DatabaseDataType.AddColumnNameInfo, c, null, string.Empty, internalName.ToUpper());
+        //c = SearchByKey(colKey) ?? Exists(internalName);
+        //Database.ChangeData(DatabaseDataType.AddColumnKeyInfo, c, null, string.Empty, colKey.ToString());
+
+        //// Ruft anschließen AddFromParser Auf, der die Spalte endgültig dazumacht
+
+        //c = SearchByKey(colKey) ?? Exists(internalName);
 
         c.Name = internalName;
         c.Key = colKey;
@@ -143,16 +152,16 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         return c;
     }
 
-    /// <summary>
-    /// Diese Routine sollte nur bei einem Reload benutzt werden. AddPending wir nicht mehr ausgelöst.
-    /// </summary>
-    /// <param name="column"></param>
-    /// <returns></returns>
-    public void AddFromParser(ColumnItem? column) {
-        if (column.Database != Database) { Develop.DebugPrint(FehlerArt.Fehler, "Parent-Datenbanken unterschiedlich!"); }
-        if (Contains(column)) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte bereits vorhanden!"); }
-        base.Add(column);
-    }
+    ///// <summary>
+    ///// Diese Routine sollte nur bei einem Reload benutzt werden. AddPending wir nicht mehr ausgelöst.
+    ///// </summary>
+    ///// <param name="column"></param>
+    ///// <returns></returns>
+    //public void AddFromParser(ColumnItem? column) {
+    //    if (column.Database != Database) { Develop.DebugPrint(FehlerArt.Fehler, "Parent-Datenbanken unterschiedlich!"); }
+    //    if (Contains(column)) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte bereits vorhanden!"); }
+    //    base.Add(column);
+    //}
 
     public ColumnItem? Exists(string columnName) {
         if (Database == null) {
@@ -357,6 +366,27 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
 
     internal static string ParsableColumnKey(long key) => "ColumnKey=" + key;
 
+    internal void CloneFrom(DatabaseAbstract sourceDatabase) {
+        // Spalten, die zu viel sind, löschen
+        var names = new List<ColumnItem>();
+        foreach (var ThisColumn in this) {
+            var l = sourceDatabase.Column.Exists(ThisColumn.Name);
+            if (l == null) { names.Add(ThisColumn); }
+        }
+        foreach (var thisname in names) {
+            Remove(thisname);
+        }
+
+        // Spalten erzeugen und Format übertragen
+        foreach (var ThisColumn in sourceDatabase.Column) {
+            var l = Exists(ThisColumn.Name);
+            if (l == null) {
+                l = Add(ThisColumn.Key, ThisColumn.Name, ThisColumn.Caption, ThisColumn.Suffix, VarType.Unbekannt, ThisColumn.Quickinfo);
+            }
+            l.CloneFrom(ThisColumn, true);
+        }
+    }
+
     internal long NextColumnKey() {
         var tmp = 0;
         long key;
@@ -407,30 +437,6 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     }
 
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
-    internal void CloneFrom(DatabaseAbstract sourceDatabase) {
-
-        // Spalten, die zu viel sind, löschen
-        var names = new List<ColumnItem>();
-        foreach (var ThisColumn in this) {
-            var l = sourceDatabase.Column.Exists(ThisColumn.Name);
-            if (l == null) { names.Add(ThisColumn); }
-        }
-        foreach(var thisname in names) {
-            Remove(thisname);
-        }
-
-
-        // Spalten erzeugen und Format übertragen
-        foreach (var ThisColumn in sourceDatabase.Column) {
-            var l = Exists(ThisColumn.Name);
-            if (l == null) {
-                l = Add(ThisColumn.Key, ThisColumn.Name, ThisColumn.Caption, ThisColumn.Suffix, VarType.Unbekannt, ThisColumn.Quickinfo);
-            }
-            l.CloneFrom(ThisColumn, true);
-        }
-
-
-    }
 
     #endregion
 }

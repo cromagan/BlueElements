@@ -284,11 +284,8 @@ public sealed partial class DatabaseHeadEditor {
         car[1].ShowAllColumns();
         car[1].Hide("hidden");
         car[1].HideSystemColumns();
- 
 
         x.ColumnArrangements = car;
-
-
 
         x.SortDefinition = new RowSortDefinition(x, "Index", true);
         tblUndo.DatabaseSet(x, string.Empty);
@@ -401,7 +398,9 @@ public sealed partial class DatabaseHeadEditor {
         #endregion
 
         // Export ------------
-        _database.Export = lbxExportSets.Item.Select(thisItem => (ExportDefinition)((TextListItem)thisItem).Tag).ToList();
+        var t = new ListExt<ExportDefinition>();
+        t.AddRange(lbxExportSets.Item.Select(thisItem => (ExportDefinition)((TextListItem)thisItem).Tag));
+        _database.Export = t;
     }
 
     #endregion

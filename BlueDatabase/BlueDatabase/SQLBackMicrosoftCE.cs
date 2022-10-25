@@ -77,10 +77,13 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
 
     #region Properties
 
+    public override int MaxStringLenght => 4000;
+
     //public override string ID => "Microsoft SQL Server";
     public override string Primary => "bigint identity(1,1)";
 
     public override string VarChar255 => "VARCHAR(255)";
+
     public override string VarChar4000 => "VARCHAR(4000)";
 
     #endregion
@@ -129,6 +132,32 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
             }
         }
         return ok;
+    }
+
+    /// <summary>
+    /// Gibt die Spaltenname in Grosschreibung zurück
+    /// </summary>
+    /// <returns></returns>
+    public override List<string>? GetColumnNames(string tablename) {
+        if (!OpenConnection()) { return null; }
+
+        var columns = new List<string>();
+
+        using var com = _connection.CreateCommand();
+
+        com.CommandText = @"SELECT * FROM " + tablename;
+
+        using var reader = com.ExecuteReader(CommandBehavior.SchemaOnly);
+
+        var schemaTable = reader.GetSchemaTable();
+        if (schemaTable == null) { return null; }
+
+        foreach (DataRow colRow in schemaTable.Rows) {
+            columns.Add(colRow.Field<string>("ColumnName").ToUpper());
+        }
+
+        CloseConnection();
+        return columns;
     }
 
     public override SQLBackAbstract OtherTable(string tablename) => new SQLBackMicrosoftCE(this, tablename);

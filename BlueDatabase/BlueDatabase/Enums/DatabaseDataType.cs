@@ -38,7 +38,7 @@ public static class DatabaseDataTypeExtension {
 
 public enum DatabaseDataType : byte {
 
-   //Error = 0,
+    //Error = 0,
     Version = 1,
 
     CryptionState = 2,
@@ -295,8 +295,9 @@ public enum DatabaseDataType : byte {
     //	dummyComand_AddUndo = 222,
     Comand_RemovingColumn = 223,
 
-    AddColumnKeyInfo = 224,
-    AddColumnNameInfo = 225,
+    //AddColumnKeyInfo = 224,
+    //AddColumnNameInfo = 225,
+    Comand_ColumnAdded = 226,
 
     UndoCount = 249,
 

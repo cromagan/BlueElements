@@ -299,7 +299,7 @@ public sealed class Database : DatabaseAbstract {
                     }
                     if (column != null) {
                         // Prima, gefunden! Noch die Collections korrigieren
-                        Column.AddFromParser(column);
+                        Column.Add(column);
                         columnsOld.Remove(column);
                     } else {
                         // Nicht gefunden, als neu machen
@@ -661,10 +661,10 @@ public sealed class Database : DatabaseAbstract {
             if (thisPendingItem.ColKey > -1) {
                 col = Column.SearchByKey(thisPendingItem.ColKey);
                 if (col == null) {
-                    if (thisPendingItem.Comand != DatabaseDataType.AddColumnKeyInfo && thisPendingItem.User != UserName) {
-                        Develop.DebugPrint("Pending verworfen, Spalte gelöscht.<br>" + ConnectionID + "<br>" + thisPendingItem.ToString());
-                        return;
-                    }
+                    //if (thisPendingItem.Comand != DatabaseDataType.AddColumnKeyInfo && thisPendingItem.User != UserName) {
+                    Develop.DebugPrint("Pending verworfen, Spalte gelöscht.<br>" + ConnectionID + "<br>" + thisPendingItem.ToString());
+                    return;
+                    //}
                 }
             }
             SetValueInternal(thisPendingItem.Comand, thisPendingItem.ChangedTo, col, row, 0, 0);

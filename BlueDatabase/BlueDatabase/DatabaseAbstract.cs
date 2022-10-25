@@ -47,6 +47,8 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     public const string DatabaseVersion = "4.00";
 
     public static readonly ListExt<DatabaseAbstract> AllFiles = new();
+    public readonly ListExt<ColumnViewCollection> _columnArrangements = new();
+    public readonly List<string> _datenbankAdmin = new();
     public readonly CellCollection Cell;
 
     public readonly ColumnCollection Column;
@@ -54,10 +56,6 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     public readonly RowCollection Row;
     public readonly string TableName = string.Empty;
     public readonly string UserName = Generic.UserName().ToUpper();
-    public readonly List<ColumnViewCollection> _columnArrangements = new();
-
-    public readonly List<string> _datenbankAdmin = new();
-
     public DatabaseAbstract? Mirror;
 
     public string UserGroup;
@@ -66,8 +64,11 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
     private readonly Timer _checker;
 
+    private readonly LayoutCollection _layouts = new();
+    private readonly List<string> _permissionGroupsNewRow = new();
     private readonly long _startTick = DateTime.UtcNow.Ticks;
 
+    private readonly List<string> _tags = new();
     private string _additionaFilesPfad;
 
     private string? _additionaFilesPfadtmp;
@@ -86,13 +87,11 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     /// Exporte werden nur internal verwaltet. Wegen zu vieler erzeigter Pendings, z.B. bei LayoutExport.
     /// Der Head-Editor kann und muss (manuelles Löschen) auf die Exporte Zugreifen und kümmert sich auch um die Pendings
     /// </summary>
-    private List<ExportDefinition?> _export = new();
+    private ListExt<ExportDefinition?> _export = new();
 
     private double _globalScale;
     private string _globalShowPass = string.Empty;
     private DateTime _lastUserActionUtc = new(1900, 1, 1);
-    private readonly LayoutCollection _layouts = new();
-    private readonly List<string> _permissionGroupsNewRow = new();
     private int _reloadDelaySecond;
     private string _rulesScript = string.Empty;
     private RowSortDefinition? _sortDefinition;
@@ -102,7 +101,6 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     /// </summary>
     private string _standardFormulaFile = string.Empty;
 
-    private readonly List<string> _tags = new();
     private int _undoCount;
 
     private string _zeilenQuickInfo = string.Empty;
@@ -207,7 +205,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         }
     }
 
-    public List<ColumnViewCollection> ColumnArrangements {
+    public ListExt<ColumnViewCollection> ColumnArrangements {
         get => _columnArrangements;
         set {
             if (_columnArrangements.ToString() ==  value.ToString()) { return; }
@@ -244,7 +242,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         }
     }
 
-    public List<ExportDefinition> Export {
+    public ListExt<ExportDefinition> Export {
         get => _export;
         set {
             if (_export.ToString() == value.ToString()) { return; }
@@ -565,8 +563,6 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     /// <param name="previousValue"></param>
     /// <param name="changedTo"></param>
     public virtual void ChangeData(DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo) {
-
-
         SetValueInternal(comand, changedTo, column, row, -1, -1);
 
         if (Mirror != null && !Mirror.ReadOnly) {
@@ -587,12 +583,10 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
             return;
         }
 
-
         StoreValueToHardDisk(comand, column, row, changedTo);
         AddUndo(TableName, comand, column, row, previousValue, changedTo, UserName);
 
         if (comand != DatabaseDataType.AutoExport) { SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
-
     }
 
     /// <summary>
@@ -623,8 +617,8 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
         DatenbankAdmin= sourceDatabase.DatenbankAdmin;
         PermissionGroupsNewRow = sourceDatabase.PermissionGroupsNewRow;
-        //ColumnArrangements.Clear();
-        var tcvc = new List<ColumnViewCollection>();
+
+        var tcvc = new ListExt<ColumnViewCollection>();
         foreach (var t in sourceDatabase.ColumnArrangements) {
             tcvc.Add(new ColumnViewCollection(this, t.ToString()));
         }
@@ -1413,15 +1407,15 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
                 if (Row.SearchByKey(addRowKey) == null) { Row.Add(new RowItem(this, addRowKey)); }
                 break;
 
-            case DatabaseDataType.AddColumnKeyInfo: // TODO: Ummünzen auf AddColumnNameInfo
-                var addColumnKey = LongParse(value);
-                if (Column.SearchByKey(addColumnKey) == null) { Column.AddFromParser(new ColumnItem(this, addColumnKey)); }
-                break;
+            //case DatabaseDataType.AddColumnKeyInfo: // TODO: Ummünzen auf AddColumnNameInfo
+            //    var addColumnKey = LongParse(value);
+            //    if (Column.SearchByKey(addColumnKey) == null) { Column.AddFromParser(new ColumnItem(this, addColumnKey)); }
+            //    break;
 
-            case DatabaseDataType.AddColumnNameInfo: // TODO: Ummünzen auf AddColumnNameInfo
-                //var addColumnKey = LongParse(value);
-                //if (Column.SearchByKey(addColumnKey) == null) { Column.AddFromParser(new ColumnItem(this, addColumnKey)); }
-                break;
+            //case DatabaseDataType.AddColumnNameInfo: // TODO: Ummünzen auf AddColumnNameInfo
+            //    //var addColumnKey = LongParse(value);
+            //    //if (Column.SearchByKey(addColumnKey) == null) { Column.AddFromParser(new ColumnItem(this, addColumnKey)); }
+            //    break;
 
             case DatabaseDataType.dummyComand_RemoveRow:
                 var removeRowKey = LongParse(value);
@@ -1436,7 +1430,17 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
             case DatabaseDataType.EOF:
                 return string.Empty;
 
+            case DatabaseDataType.Comand_ColumnAdded:
+                break;
+
+            case (DatabaseDataType)22:
+            case (DatabaseDataType)62:
+            case (DatabaseDataType)53:
+            case (DatabaseDataType)33:
+                break;
+
             default:
+                // Variable type
                 if (LoadedVersion == DatabaseVersion) {
                     SetReadOnly();
                     if (!ReadOnly) {

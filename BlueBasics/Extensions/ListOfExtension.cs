@@ -58,7 +58,17 @@ public static partial class Extensions {
         return true;
     }
 
+    public static ListExt<T> Clone<T>(this ListExt<T> l) {
+        var l2 = new ListExt<T>();
+        l2.AddRange(l);
+        return l2;
+    }
 
+    public static List<T> Clone<T>(this List<T> l) {
+        var l2 = new List<T>();
+        l2.AddRange(l);
+        return l2;
+    }
 
     /// <summary>
     /// Fügt Items der hinzu, erzeugt keine Clone!
@@ -89,10 +99,16 @@ public static partial class Extensions {
         }
     }
 
+    public static ListExt<T> CloneWithClones<T>(this ListExt<T> l) where T : ICloneable {
+        var l2 = new ListExt<T>();
 
-    public static List<T> Clone<T>(this List<T> l) {
-        var l2 = new List<T>();
-        l2.AddRange(l);
+        foreach (var item in l) {
+            var it = item.Clone();
+            if (it!=null) {
+                l2.Add((T)it);
+            }
+        }
+
         return l2;
     }
 

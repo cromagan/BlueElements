@@ -180,9 +180,15 @@ public class BitmapListItem : BasicListItem {
         scaledImagePosition = scaledImagePosition with { X = scaledImagePosition.Left - trp.X, Y = scaledImagePosition.Top - trp.Y };
         lock (gr) {
             gr.TranslateTransform(trp.X, trp.Y);
-            if (_bitmap != null) { gr.DrawImage(_bitmap, scaledImagePosition, areaOfWholeImage, GraphicsUnit.Pixel); }
-            foreach (var thisQi in Overlays) {
-                gr.DrawImage(thisQi, scaledImagePosition.Left + 8, scaledImagePosition.Top + 8);
+
+            try {
+                if (_bitmap != null) { gr.DrawImage(_bitmap, scaledImagePosition, areaOfWholeImage, GraphicsUnit.Pixel); }
+                foreach (var thisQi in Overlays) {
+                    gr.DrawImage(thisQi, scaledImagePosition.Left + 8, scaledImagePosition.Top + 8);
+                }
+            } catch {
+                //Trotz lock kommt "Das Objekt wird an anderer Stelle verwendent.
+                // Ein Bitmap?
             }
         }
         if (!string.IsNullOrEmpty(_caption)) {
