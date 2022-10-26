@@ -74,7 +74,6 @@ public abstract class SQLBackAbstract {
     #region Properties
 
     public bool ConnectionOk => _connection != null;
-
     public string ConnectionString { get; protected set; }
 
     /// <summary>
@@ -83,10 +82,7 @@ public abstract class SQLBackAbstract {
     public string Filename { get; protected set; } = string.Empty;
 
     public abstract int MaxStringLenght { get; }
-
-    //public abstract string ID { get; }
     public abstract string Primary { get; }
-
     public abstract string VarChar255 { get; }
     public abstract string VarChar4000 { get; }
 
@@ -97,13 +93,9 @@ public abstract class SQLBackAbstract {
     public static bool IsValidTableName(string tablename) {
         var t = tablename.ToUpper();
 
-        if (t.StartsWith("SYS_")) {
-            return false;
-        }
+        if (t.StartsWith("SYS_")) { return false; }
 
-        if (!t.ContainsOnlyChars(Constants.Char_AZ + Constants.Char_Numerals + "_")) {
-            return false;
-        }
+        if (!t.ContainsOnlyChars(Constants.Char_AZ + Constants.Char_Numerals + "_")) { return false; }
 
         return true;
     }
@@ -133,14 +125,14 @@ public abstract class SQLBackAbstract {
 
         var cmdString = "INSERT INTO " + SYS_UNDO +
             " (TABLENAME, COMAND, COLUMNNAME, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, DATETIMEUTC) VALUES (" +
-            "'" + tablename.ToUpper() + "'," +
-            "'" + comand.ToString() + "'," +
-            "'" + n + "'," +
-            "'" + rk + "'," +
-            "'" + previousValue.Substring(0, Math.Min(previousValue.Length, MaxStringLenght)) + "'," +
-            "'" + changedTo.Substring(0, Math.Min(changedTo.Length, MaxStringLenght)) + "'," +
-            "'" + userName + "'," +
-            "'" + DateTime.UtcNow.ToString(Constants.Format_Date) + "')";
+             DBVAL(tablename.ToUpper()) + "," +
+             DBVAL(comand.ToString()) + "," +
+             DBVAL(n) + "," +
+             DBVAL(rk) + "," +
+             DBVAL(previousValue) + "," +
+             DBVAL(changedTo) + "," +
+             DBVAL(userName) + "," +
+             DBVAL(DateTime.UtcNow.ToString(Constants.Format_Date)) + ")";
 
         using var comm = _connection.CreateCommand();
         comm.CommandText = cmdString;
@@ -257,9 +249,9 @@ public abstract class SQLBackAbstract {
         if (string.IsNullOrEmpty(columnName)) { columnName = "~Database~"; }
 
         q.CommandText = @"select VALUE, PART from " + SYS_STYLE + " " +
-                        "where TABLENAME = '" + tablename.ToUpper() + "' " +
-                        "and TYPE = '" + type + "' " +
-                        "and COLUMNNAME = '" + columnName.ToUpper() + "' "+
+                        "where TABLENAME = " + DBVAL(tablename.ToUpper()) + " " +
+                        "and TYPE = " + DBVAL(type) + " " +
+                        "and COLUMNNAME = " + DBVAL(columnName.ToUpper()) + " "+
                         "ORDER BY PART ASC";
 
         using var reader = q.ExecuteReader();
@@ -299,8 +291,8 @@ public abstract class SQLBackAbstract {
         using var q = _connection.CreateCommand();
 
         q.CommandText = @"select TYPE, PART, VALUE from " + SYS_STYLE + " " +
-                        "where TABLENAME = '" + tablename.ToUpper() + "' " +
-                        "and COLUMNNAME = '" + columnName.ToUpper() + "'"+
+                        "where TABLENAME = " + DBVAL(tablename.ToUpper()) + " " +
+                        "and COLUMNNAME = " + DBVAL(columnName.ToUpper()) + " " +
                         "ORDER BY PART ASC";
 
         using var reader = q.ExecuteReader();
@@ -455,7 +447,7 @@ public abstract class SQLBackAbstract {
         if (isVal == null) { return false; }
         if (isVal == newValue) { return true; }
 
-        ExecuteCommand("DELETE FROM " + SYS_STYLE + " WHERE TABLENAME = '" + tablename.ToUpper() + "' AND COLUMNNAME = '" + columnName.ToUpper() + "'  AND TYPE = '" + type + "'");
+        ExecuteCommand("DELETE FROM " + SYS_STYLE + " WHERE TABLENAME = " + DBVAL(tablename.ToUpper()) + " AND COLUMNNAME = " + DBVAL(columnName.ToUpper()) + "  AND TYPE = " + DBVAL(type.ToString()));
 
         do {
             c++;
@@ -532,6 +524,16 @@ public abstract class SQLBackAbstract {
         ExecuteCommand("alter table " + tablename.ToUpper() + " add " + column + " " + type + " default ''" + n);
     }
 
+    private string DBVAL(long original) {
+        return DBVAL(original.ToString());
+    }
+
+    private string DBVAL(string original) {
+        original = original.Substring(0, Math.Min(original.Length, MaxStringLenght));
+        original =  original.Replace("'", "''");
+        return "'" + original  + "'";
+    }
+
     private bool ExecuteCommand(DbCommand command) {
         if (!OpenConnection()) { return false; }
 
@@ -552,10 +554,10 @@ public abstract class SQLBackAbstract {
         using var q = _connection.CreateCommand();
 
         q.CommandText = @"select " + column.Name.ToUpper() + " from " + tablename.ToUpper() + " " +
-                        "where RK = '" + row.Key + "'";
+                        "where RK = " + DBVAL(row.Key);
 
-        ////q.AddParameterWithValue("'"+columnName.ToUpper()+"'", column.Name.ToUpper());
-        //q.AddParameterWithValue("'"+row.Key+"'", row.Key.ToString());
+        ////q.AddParameterWithValue("" + DBVAL(columnName.ToUpper()) , column.Name.ToUpper());
+        //q.AddParameterWithValue("" + DBVAL(row.Key)", row.Key.ToString());
 
         using var reader = q.ExecuteReader();
         if (reader.Read()) {
@@ -577,12 +579,12 @@ public abstract class SQLBackAbstract {
 
     private void RemoveColumn(string tablename, string column) {
         ExecuteCommand("alter table " + tablename.ToUpper() + " drop column " + column.ToUpper());
-        ExecuteCommand("DELETE FROM " + SYS_STYLE + " WHERE TABLENAME = '" + tablename.ToUpper() + "' AND COLUMNNAME = '" + column.ToUpper() + "'");
+        ExecuteCommand("DELETE FROM " + SYS_STYLE + " WHERE TABLENAME = " + DBVAL(tablename.ToUpper()) + " AND COLUMNNAME = " + DBVAL(column.ToUpper()));
     }
 
     private void RemoveRow(string tablename, long key) {
-        ExecuteCommand("DELETE FROM  " + tablename.ToUpper() + " WHERE RK = '" + key.ToString() +"'");
-        //ExecuteCommand("DELETE FROM " + SYS_STYLE + " WHERE TABLENAME = '" + tablename.ToUpper() + "' AND COLUMNNAME = '" + column.ToUpper() + "'");
+        ExecuteCommand("DELETE FROM  " + tablename.ToUpper() + " WHERE RK = " + DBVAL(key.ToString()));
+        //ExecuteCommand("DELETE FROM " + SYS_STYLE + " WHERE TABLENAME = " + DBVAL( tablename.ToUpper() ) + " AND COLUMNNAME = " + DBVAL( column.ToUpper() ));
     }
 
     private void RenameColumn(string tablename, string oldname, string newname) {
@@ -591,9 +593,9 @@ public abstract class SQLBackAbstract {
         ExecuteCommand(cmdString);
 
         //if (isVal is null) {
-        //    cmdString = "INSERT INTO " + SYS_STYLE + " (TABLENAME, TYPE, COLUMNNAME, VALUE)  VALUES ('" + tablename.ToUpper() + "', '" + type + "', '" + columnName.ToUpper() + "', '" + newValue + "')";
+        //    cmdString = "INSERT INTO " + SYS_STYLE + " (TABLENAME, TYPE, COLUMNNAME, VALUE)  VALUES (" + DBVAL( tablename.ToUpper() ) + ", " + DBVAL( type ) + ", " + DBVAL( columnName.ToUpper() ) + ", " + DBVAL( newValue ) + ")";
         //} else if (isVal != newValue) {
-        cmdString = "UPDATE " + SYS_STYLE + " SET COLUMNNAME = '" + newname + "' WHERE TABLENAME = '" + tablename.ToUpper() + "' AND COLUMNNAME = '" + oldname.ToUpper() + "'";
+        cmdString = "UPDATE " + SYS_STYLE + " SET COLUMNNAME = " + DBVAL(newname) + " WHERE TABLENAME = " + DBVAL(tablename.ToUpper()) + " AND COLUMNNAME = " + DBVAL(oldname.ToUpper());
         //} else {
         //    return true;
         //}
@@ -616,9 +618,9 @@ public abstract class SQLBackAbstract {
         string cmdString;
 
         if (isVal is null) {
-            cmdString = "INSERT INTO " + tablename.ToUpper() + " (RK, " + column.Name.ToUpper() + " ) VALUES ('" + row.Key + "', '" + newValue.Substring(0, Math.Min(newValue.Length, MaxStringLenght)) + "' )";
+            cmdString = "INSERT INTO " + tablename.ToUpper() + " (RK, " + column.Name.ToUpper() + " ) VALUES (" + DBVAL(row.Key) + ", " + DBVAL(newValue) + " )";
         } else if (isVal != newValue) {
-            cmdString = "UPDATE " + tablename.ToUpper() + " SET " + column.Name.ToUpper() + " = '" + newValue.Substring(0, Math.Min(newValue.Length, MaxStringLenght)) + "' WHERE RK = '" + row.Key + "'";
+            cmdString = "UPDATE " + tablename.ToUpper() + " SET " + column.Name.ToUpper() + " = " + DBVAL(newValue) + " WHERE RK = " + DBVAL(row.Key);
         } else {
             return true;
         }
@@ -641,9 +643,9 @@ public abstract class SQLBackAbstract {
         string cmdString;
 
         //if (isVal is null) {
-        cmdString = "INSERT INTO " + SYS_STYLE + " (TABLENAME, TYPE, COLUMNNAME, VALUE, PART)  VALUES ('" + tablename.ToUpper() + "', '" + type + "', '" + columnName.ToUpper() + "', '" + newValue + "', '" + part.ToString(Constants.Format_Integer3) + "')";
+        cmdString = "INSERT INTO " + SYS_STYLE + " (TABLENAME, TYPE, COLUMNNAME, VALUE, PART)  VALUES (" + DBVAL(tablename.ToUpper()) + ", " + DBVAL(type) + ", " + DBVAL(columnName.ToUpper()) + ", " + DBVAL(newValue) + ", " + DBVAL(part.ToString(Constants.Format_Integer3)) + ")";
         //} else if (isVal != newValue) {
-        //    cmdString = "UPDATE " + SYS_STYLE + " SET VALUE = '" + newValue + "' WHERE TABLENAME = '" + tablename.ToUpper() + "' AND TYPE = '" + type + "' AND COLUMNNAME = '" + columnName.ToUpper() + "'";
+        //    cmdString = "UPDATE " + SYS_STYLE + " SET VALUE = " + DBVAL( newValue ) + " WHERE TABLENAME = " + DBVAL( tablename.ToUpper() ) + " AND TYPE = " + DBVAL( type ) + " AND COLUMNNAME = " + DBVAL( columnName.ToUpper() );
         //} else {
         //    return true;
         //}
