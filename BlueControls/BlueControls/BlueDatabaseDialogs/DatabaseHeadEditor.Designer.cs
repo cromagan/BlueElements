@@ -55,8 +55,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnSpaltenuebersicht = new BlueControls.Controls.Button();
             this.tbxReloadVerzoegerung = new BlueControls.Controls.TextBox();
             this.capReloadVerzoegerung = new BlueControls.Controls.Caption();
-            this.cbxAnsicht = new BlueControls.Controls.ComboBox();
-            this.capAnsicht = new BlueControls.Controls.Caption();
             this.Tab_Regeln = new System.Windows.Forms.TabPage();
             this.scriptEditor = new BlueControls.ScriptEditorDatabase();
             this.Tab_Rechte = new System.Windows.Forms.TabPage();
@@ -304,6 +302,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.GlobalTab.HotTrack = true;
             this.GlobalTab.Location = new System.Drawing.Point(0, 0);
             this.GlobalTab.Name = "GlobalTab";
+            this.GlobalTab.RowKey = ((long)(-1));
             this.GlobalTab.SelectedIndex = 0;
             this.GlobalTab.Size = new System.Drawing.Size(1047, 645);
             this.GlobalTab.TabDefault = null;
@@ -326,8 +325,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Allgemein.Controls.Add(this.btnSpaltenuebersicht);
             this.Tab_Allgemein.Controls.Add(this.tbxReloadVerzoegerung);
             this.Tab_Allgemein.Controls.Add(this.capReloadVerzoegerung);
-            this.Tab_Allgemein.Controls.Add(this.cbxAnsicht);
-            this.Tab_Allgemein.Controls.Add(this.capAnsicht);
             this.Tab_Allgemein.Controls.Add(this.capInfo);
             this.Tab_Allgemein.Controls.Add(this.capTags);
             this.Tab_Allgemein.Controls.Add(this.txbCaption);
@@ -440,25 +437,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capReloadVerzoegerung.Name = "capReloadVerzoegerung";
             this.capReloadVerzoegerung.Size = new System.Drawing.Size(136, 18);
             this.capReloadVerzoegerung.Text = "Reload-Verzögerung:";
-            // 
-            // cbxAnsicht
-            // 
-            this.cbxAnsicht.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.cbxAnsicht.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxAnsicht.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxAnsicht.Location = new System.Drawing.Point(168, 558);
-            this.cbxAnsicht.Name = "cbxAnsicht";
-            this.cbxAnsicht.Size = new System.Drawing.Size(160, 24);
-            this.cbxAnsicht.TabIndex = 32;
-            // 
-            // capAnsicht
-            // 
-            this.capAnsicht.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.capAnsicht.CausesValidation = false;
-            this.capAnsicht.Location = new System.Drawing.Point(8, 560);
-            this.capAnsicht.Name = "capAnsicht";
-            this.capAnsicht.Size = new System.Drawing.Size(120, 18);
-            this.capAnsicht.Text = "Bevorzugte Ansicht:";
             // 
             // Tab_Regeln
             // 
@@ -704,8 +682,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private  System.Windows.Forms.TabPage Tab_Regeln;
         private  System.Windows.Forms.TabPage Tab_Rechte;
         private  System.Windows.Forms.TabPage Tab_Backup;
-        private ComboBox cbxAnsicht;
-        private Caption capAnsicht;
         private GroupBox grpKennwort;
         private GroupBox grpBenutzergruppen;
         private  System.Windows.Forms.TabPage Tab_Undo;

@@ -38,6 +38,8 @@ public static class DatabaseDataTypeExtension {
 
 public enum DatabaseDataType : byte {
 
+    // Enum.TryParse gibt 0 zurück, wenn der Wert nicht erkannt wird
+
     //Error = 0,
     Version = 1,
 
@@ -288,7 +290,7 @@ public enum DatabaseDataType : byte {
 
     //Dummy_ce_ValueWithoutSizeUncrypted = 204,
 
-    dummyComand_RemoveRow = 220,
+    Comand_RemovingRow = 220,
 
     dummyComand_AddRow = 221,
 

@@ -217,6 +217,10 @@ public abstract class SQLBackAbstract {
                     RemoveColumn(tablename, column.Name);
                     return true;
 
+                case DatabaseDataType.Comand_RemovingRow:
+                    RemoveRow(tablename, row.Key);
+                    return true;
+
                 default:
                     Develop.DebugPrint(FehlerArt.Fehler, type.ToString() + " nicht definiert!");
                     return false;
@@ -227,6 +231,12 @@ public abstract class SQLBackAbstract {
 
         CloseConnection();
         return false;
+    }
+
+    public bool CloseConnection() {
+        if (_connection.State == ConnectionState.Open) { _connection.Close(); }
+
+        return _connection.State == ConnectionState.Closed;
     }
 
     public string ConnectionID(string tablename) {
@@ -277,6 +287,7 @@ public abstract class SQLBackAbstract {
 
     /// <summary>
     /// Wird kein Spaltenname angegeben, werden die Eigenschaften der Datenbank zurück gegeben.
+    /// Achtung, die Connection wird nicht geschlossen!
     /// </summary>
     /// <param name="columnName"></param>
     /// <returns></returns>
@@ -305,16 +316,39 @@ public abstract class SQLBackAbstract {
             }
         }
 
-        CloseConnection();    // Nix vorhanden!
+        //CloseConnection();    // Nix vorhanden!
         return l;
     }
 
     public void LoadAllCells(string tablename, RowCollection row) {
         if (!OpenConnection()) { return; }
 
-        using var q = _connection.CreateCommand();
+        var allcols = GetColumnNames(tablename);
+        allcols.Remove("RK");
 
-        q.CommandText = @"select * from " + tablename.ToUpper();
+        var com = "SELECT RK, ";
+
+        foreach (var thiscolumn in row.Database.Column) {
+            if (!allcols.Contains(thiscolumn.Name.ToUpper())) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht auf dem Server vorhanden: " + thiscolumn.Name);
+            }
+            allcols.Remove(thiscolumn.Name.ToUpper());
+
+            com = com + thiscolumn.Name.ToUpper() + ", ";
+        }
+
+        com = com.TrimEnd(", ");
+
+        com = com + " FROM " + tablename.ToUpper();
+
+        if (allcols.Count>0) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Zusätzliche Spalten dem Server vorhanden: " + allcols.JoinWith(", "));
+        }
+
+        OpenConnection();
+
+        using var q = _connection.CreateCommand();
+        q.CommandText = com; //@"select * from " + tablename.ToUpper();
 
         using var reader = q.ExecuteReader();
 
@@ -468,12 +502,6 @@ public abstract class SQLBackAbstract {
     /// <returns></returns>
     protected abstract List<string> AllTables();
 
-    protected bool CloseConnection() {
-        if (_connection.State == ConnectionState.Open) { _connection.Close(); }
-
-        return _connection.State == ConnectionState.Closed;
-    }
-
     protected abstract bool CreateTable(string tablename);
 
     protected abstract bool CreateTable(string tablename, List<string> keycolumns);
@@ -550,6 +578,11 @@ public abstract class SQLBackAbstract {
     private void RemoveColumn(string tablename, string column) {
         ExecuteCommand("alter table " + tablename.ToUpper() + " drop column " + column.ToUpper());
         ExecuteCommand("DELETE FROM " + SYS_STYLE + " WHERE TABLENAME = '" + tablename.ToUpper() + "' AND COLUMNNAME = '" + column.ToUpper() + "'");
+    }
+
+    private void RemoveRow(string tablename, long key) {
+        ExecuteCommand("DELETE FROM  " + tablename.ToUpper() + " WHERE RK = '" + key.ToString() +"'");
+        //ExecuteCommand("DELETE FROM " + SYS_STYLE + " WHERE TABLENAME = '" + tablename.ToUpper() + "' AND COLUMNNAME = '" + column.ToUpper() + "'");
     }
 
     private void RenameColumn(string tablename, string oldname, string newname) {

@@ -678,12 +678,13 @@ namespace BlueControls.Forms {
             // btnSaveLoad
             // 
             this.btnSaveLoad.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnSaveLoad.ImageCode = "Diskette";
+            this.btnSaveLoad.ImageCode = "Refresh|16";
             this.btnSaveLoad.Location = new System.Drawing.Point(208, 2);
             this.btnSaveLoad.Name = "btnSaveLoad";
+            this.btnSaveLoad.QuickInfo = "Aktualisiert die Datenbank-Daten. (Speichern, neu Laden)";
             this.btnSaveLoad.Size = new System.Drawing.Size(64, 66);
             this.btnSaveLoad.TabIndex = 43;
-            this.btnSaveLoad.Text = "Speichern";
+            this.btnSaveLoad.Text = "Daten aktual.";
             this.btnSaveLoad.Click += new System.EventHandler(this.btnSaveLoad_Click);
             // 
             // btnVorherigeVersion

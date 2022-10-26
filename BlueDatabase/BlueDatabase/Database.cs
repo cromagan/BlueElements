@@ -78,7 +78,7 @@ public sealed class Database : DatabaseAbstract {
         } else if (stream != null) {
             _muf.LoadFromStream(stream);
         }
-        RepairAfterParse();
+        //RepairAfterParse();
     }
 
     #endregion
@@ -243,6 +243,7 @@ public sealed class Database : DatabaseAbstract {
 
     public void Parse(object sender, MultiUserParseEventArgs e) {
         Column.ThrowEvents = false;
+        Row.ThrowEvents = false;
         var pointer = 0;
 
         ColumnItem? column = null;
@@ -342,6 +343,7 @@ public sealed class Database : DatabaseAbstract {
         oldPendings?.Clear();
         ExecutePending();
         Column.ThrowEvents = true;
+        Row.ThrowEvents = true;
         if (IntParse(LoadedVersion.Replace(".", "")) > IntParse(DatabaseVersion.Replace(".", ""))) { SetReadOnly(); }
     }
 

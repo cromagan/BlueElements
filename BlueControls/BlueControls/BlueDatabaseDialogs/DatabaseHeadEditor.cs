@@ -76,8 +76,6 @@ public sealed partial class DatabaseHeadEditor {
 
     protected override void OnLoad(System.EventArgs e) {
         base.OnLoad(e);
-        cbxAnsicht.Item.Clear();
-        cbxAnsicht.Item.AddRange(typeof(Ansicht));
         PermissionGroups_NewRow.Item.Clear();
         PermissionGroups_NewRow.Item.AddRange(_database.PermissionGroupsNewRow);
         DatenbankAdmin.Item.Clear();
@@ -189,7 +187,7 @@ public sealed partial class DatabaseHeadEditor {
                     neu = "";
                     break;
 
-                case DatabaseDataType.dummyComand_RemoveRow:
+                case DatabaseDataType.Comand_RemovingRow:
                     aenderung = "Zeile gelöscht";
                     symb = ImageCode.MinusZeichen;
                     break;
@@ -256,7 +254,7 @@ public sealed partial class DatabaseHeadEditor {
     }
 
     private void GenerateUndoTabelle() {
-        Database x = new(true, "Undo " + _database.ConnectionID);
+        Database x = new(false, "Undo " + _database.ConnectionID);
         x.Column.Add("hidden", "hidden", VarType.Text);
         x.Column.Add("Index", "Index", VarType.Integer);
         x.Column.Add("db", "Herkunft", VarType.Text);
@@ -404,4 +402,6 @@ public sealed partial class DatabaseHeadEditor {
     }
 
     #endregion
+
+ 
 }

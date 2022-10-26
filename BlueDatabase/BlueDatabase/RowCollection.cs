@@ -19,6 +19,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using System;
@@ -30,13 +31,12 @@ using System.Threading.Tasks;
 
 namespace BlueDatabase;
 
-public sealed class RowCollection : IEnumerable<RowItem>, IDisposable {
+public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
     #region Fields
 
     private readonly ConcurrentDictionary<long, RowItem?> _internal = new();
-
-    private bool _disposedValue;
+    private bool _throwEvents = true;
 
     #endregion
 
@@ -78,6 +78,15 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposable {
 
     public int Count => _internal.Count;
     public DatabaseAbstract? Database { get; private set; }
+    public bool IsDisposed { get; private set; }
+
+    public bool ThrowEvents {
+        get => !IsDisposed && _throwEvents;
+        set {
+            if (_throwEvents == value) { Develop.DebugPrint(FehlerArt.Fehler, "Set ThrowEvents-Fehler! " + value.ToPlusMinus()); }
+            _throwEvents = value;
+        }
+    }
 
     public long VisibleRowCount { get; private set; }
 
@@ -383,9 +392,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposable {
     IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();
 
     public bool Remove(long key) {
-        var e = SearchByKey(key);
-        if (e == null) { return false; }
-        OnRowRemoving(new RowEventArgs(e));
+        var row = SearchByKey(key);
+        if (row == null) { return false; }
+
+        OnRowRemoving(new RowEventArgs(row));
         foreach (var thisColumnItem in Database.Column.Where(thisColumnItem => thisColumnItem != null)) {
             Database.Cell.Delete(thisColumnItem, key);
         }
@@ -473,6 +483,24 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposable {
     //    return string.Empty;
     //}
 
+    internal void CloneFrom(DatabaseAbstract sourceDatabase) {
+        // Zeilen, die zu viel sind, löschen
+        foreach (var thisRow in this) {
+            var l = sourceDatabase.Row.SearchByKey(thisRow.Key);
+            if (l == null) { Remove(thisRow); }
+        }
+
+        // Zeilen erzeugen und Format übertragen
+        foreach (var thisRow in sourceDatabase.Row) {
+            var l = SearchByKey(thisRow.Key);
+            if (l == null) {
+                l = new RowItem(Database, thisRow.Key);
+                this.Add(l);
+            }
+            l.CloneFrom(thisRow, true);
+        }
+    }
+
     internal long NextRowKey() {
         var tmp = 0;
         long key;
@@ -484,21 +512,32 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposable {
         return key;
     }
 
-    internal void OnRowAdded(RowEventArgs e) {
-        e.Row.RowChecked += OnRowChecked;
-        e.Row.DoSpecialRules += OnDoSpecialRules;
-        RowAdded?.Invoke(this, e);
-    }
-
-    internal void OnRowRemoved() => RowRemoved?.Invoke(this, System.EventArgs.Empty);
-
     internal void OnRowRemoving(RowEventArgs e) {
+        if (!_throwEvents) { return; }
         e.Row.RowChecked -= OnRowChecked;
         e.Row.DoSpecialRules -= OnDoSpecialRules;
         RowRemoving?.Invoke(this, e);
     }
 
     internal void RemoveNullOrEmpty() => _internal.RemoveNullOrEmpty();
+
+    private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
+
+    //internal void SaveToByteList(List<byte> l) => Database.SaveToByteList(l, enDatabaseDataType.LastRowKey, _LastRowKey.ToString());
+    private void Dispose(bool disposing) {
+        if (!IsDisposed) {
+            if (disposing) {
+                // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+            }
+            Database.Disposing -= Database_Disposing;
+            Database = null;
+            _throwEvents = false;
+            _internal.Clear();
+            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
+            // TODO: Große Felder auf NULL setzen
+            IsDisposed = true;
+        }
+    }
 
     //internal void Repair() {
     //    foreach (var ThisRowItem in _Internal.Values) {
@@ -508,50 +547,29 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposable {
     //        }
     //    }
     //}
-
-    //internal void SaveToByteList(List<byte> l) => Database.SaveToByteList(l, enDatabaseDataType.LastRowKey, _LastRowKey.ToString());
-
-    private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
-
-    private void Dispose(bool disposing) {
-        if (!_disposedValue) {
-            if (disposing) {
-                // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
-            }
-            Database.Disposing -= Database_Disposing;
-            Database = null;
-            _internal.Clear();
-            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
-            // TODO: Große Felder auf NULL setzen
-            _disposedValue = true;
-        }
-    }
-
     private IEnumerator IEnumerable_GetEnumerator() => _internal.Values.GetEnumerator();
 
-    private void OnDoSpecialRules(object sender, DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
+    private void OnDoSpecialRules(object sender, DoRowAutomaticEventArgs e) {
+        if (!_throwEvents) { return; }
+        DoSpecialRules?.Invoke(this, e);
+    }
 
-    private void OnRowChecked(object sender, RowCheckedEventArgs e) => RowChecked?.Invoke(this, e);
-    internal void CloneFrom(DatabaseAbstract sourceDatabase) {
+    private void OnRowAdded(RowEventArgs e) {
+        if (!_throwEvents) { return; }
 
-        // Zeilen, die zu viel sind, löschen
-        foreach (var thisRow in this) {
-            var l = sourceDatabase.Row.SearchByKey(thisRow.Key);
-            if (l == null) { Remove(thisRow); }
-        }
+        e.Row.RowChecked += OnRowChecked;
+        e.Row.DoSpecialRules += OnDoSpecialRules;
+        RowAdded?.Invoke(this, e);
+    }
 
+    private void OnRowChecked(object sender, RowCheckedEventArgs e) {
+        if (!_throwEvents) { return; }
+        RowChecked?.Invoke(this, e);
+    }
 
-        // Zeilen erzeugen und Format übertragen
-        foreach (var thisRow in sourceDatabase.Row) {
-            var l = SearchByKey(thisRow.Key);
-            if (l == null) {
-                l = new RowItem(Database, thisRow.Key);
-                this.Add(l);
-            }
-            l.CloneFrom(thisRow, true);
-        }
-
-
+    private void OnRowRemoved() {
+        if (!_throwEvents) { return; }
+        RowRemoved?.Invoke(this, System.EventArgs.Empty);
     }
 
     #endregion

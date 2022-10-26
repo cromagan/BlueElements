@@ -220,9 +220,11 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
                 #region Sichtbarkeit des Filterelemts bestimmen
 
-                if (thisColumn.AutoFilterSymbolPossible()) {
-                    if (viewItemOrder != null && Filtertypes.HasFlag(FilterTypesToShow.NachDefinierterAnsicht)) { showMe = true; }
-                    if (viewItemCurrent != null && filterItem != null && Filtertypes.HasFlag(FilterTypesToShow.AktuelleAnsicht_AktiveFilter)) { showMe = true; }
+                if (thisColumn != null) {
+                    if (thisColumn.AutoFilterSymbolPossible()) {
+                        if (viewItemOrder != null && Filtertypes.HasFlag(FilterTypesToShow.NachDefinierterAnsicht)) { showMe = true; }
+                        if (viewItemCurrent != null && filterItem != null && Filtertypes.HasFlag(FilterTypesToShow.AktuelleAnsicht_AktiveFilter)) { showMe = true; }
+                    }
                 }
 
                 #endregion Sichtbarkeit des Filterelemts bestimmen

@@ -55,7 +55,6 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     public readonly RowCollection Row;
     public readonly string TableName = string.Empty;
     public readonly string UserName = Generic.UserName().ToUpper();
-    public DatabaseAbstract? Mirror;
     public string UserGroup;
     private readonly BackgroundWorker _backgroundWorker;
     private readonly Timer _checker;
@@ -108,6 +107,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
         Row = new RowCollection(this);
         Row.RowRemoving += Row_RowRemoving;
+        //Row.RowRemoved += Row_RowRemoved;
         Row.RowAdded += Row_RowAdded;
 
         Column = new ColumnCollection(this);
@@ -283,7 +283,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
     public DateTime PowerEdit { get; set; }
 
-    public bool ReadOnly { get; private set; }
+    public bool ReadOnly { get; private set; } = false;
 
     [Browsable(false)]
     public int ReloadDelaySecond {
@@ -562,14 +562,14 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     public virtual void ChangeData(DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo) {
         SetValueInternal(comand, changedTo, column, row, -1, -1);
 
-        if (Mirror != null && !Mirror.ReadOnly) {
-            ColumnItem? c = null;
-            if (column!= null) { c= Mirror.Column.SearchByKey(column.Key); }
-            RowItem? r = null;
-            if (row!= null) { r= Mirror.Row.SearchByKey(row.Key); }
+        //if (Mirror != null && !Mirror.ReadOnly) {
+        //    ColumnItem? c = null;
+        //    if (column!= null) { c= Mirror.Column.SearchByKey(column.Key); }
+        //    RowItem? r = null;
+        //    if (row!= null) { r= Mirror.Row.SearchByKey(row.Key); }
 
-            Mirror?.ChangeData(comand, c, r, previousValue, changedTo);
-        }
+        //    Mirror?.ChangeData(comand, c, r, previousValue, changedTo);
+        //}
 
         if (IsLoading) { return; }
 
@@ -606,6 +606,8 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         CreateDate = sourceDatabase.CreateDate;
         Creator = sourceDatabase.Creator;
         //Filename - nope
+        //Tablename - nope
+        //TimeCode - nope
         GlobalScale = sourceDatabase.GlobalScale;
         GlobalShowPass = sourceDatabase.GlobalShowPass;
         ReloadDelaySecond = sourceDatabase.ReloadDelaySecond;
@@ -616,6 +618,8 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         StandardFormulaFile = sourceDatabase.StandardFormulaFile;
         UndoCount = sourceDatabase.UndoCount;
         ZeilenQuickInfo = sourceDatabase.ZeilenQuickInfo;
+        Tags = sourceDatabase.Tags;
+        Layouts = sourceDatabase.Layouts;
 
         DatenbankAdmin= sourceDatabase.DatenbankAdmin;
         PermissionGroupsNewRow = sourceDatabase.PermissionGroupsNewRow;
@@ -624,6 +628,10 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         foreach (var t in sourceDatabase.ColumnArrangements) {
             tcvc.Add(new ColumnViewCollection(this, t.ToString()));
         }
+
+        Export = sourceDatabase.Export;
+
+        UndoCount = sourceDatabase.UndoCount;
 
         ColumnArrangements = tcvc;
     }
@@ -1187,6 +1195,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         //DatenbankAdmin.Changed -= DatabaseAdmin_ListOrItemChanged;
 
         Row.RowRemoving -= Row_RowRemoving;
+        //Row.RowRemoved -= Row_RowRemoved;
         Row.RowAdded -= Row_RowAdded;
 
         Column.ItemRemoving -= Column_ItemRemoving;
@@ -1235,11 +1244,23 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         Exporting?.Invoke(this, e);
     }
 
+    /// <summary>
+    /// Führt auch die Reparatur aus.
+    /// Loading ist hier bereits false.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     protected void OnLoaded(object sender, LoadedEventArgs e) {
         if (IsDisposed) { return; }
+        RepairAfterParse();
         Loaded?.Invoke(this, e);
     }
 
+    /// <summary>
+    /// Bricht auch die Backgroundworker ab.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     protected void OnLoading(object sender, LoadingEventArgs e) {
         if (IsDisposed) { return; }
         CancelBackGroundWorker();
@@ -1424,9 +1445,9 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
             //    //if (Column.SearchByKey(addColumnKey) == null) { Column.AddFromParser(new ColumnItem(this, addColumnKey)); }
             //    break;
 
-            case DatabaseDataType.dummyComand_RemoveRow:
-                var removeRowKey = LongParse(value);
-                if (Row.SearchByKey(removeRowKey) != null) { Row.Remove(removeRowKey); }
+            case DatabaseDataType.Comand_RemovingRow:
+                //var removeRowKey = LongParse(value);
+                //if (Row.SearchByKey(removeRowKey) != null) { Row.Remove(removeRowKey); }
                 break;
 
             case DatabaseDataType.Comand_RemovingColumn:
@@ -1696,7 +1717,15 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         }
     }
 
-    private void Row_RowRemoving(object sender, RowEventArgs e) => ChangeData(DatabaseDataType.dummyComand_RemoveRow, null, e.Row, string.Empty, e.Row.Key.ToString());
+    private void Row_RowRemoving(object sender, RowEventArgs e) {
+        ChangeData(DatabaseDataType.Comand_RemovingRow, null, e.Row, string.Empty, e.Row.Key.ToString());
+    }
+
+    //private void Row_RowRemoving(object sender, RowEventArgs e) {
+    //    Develop.CheckStackForOverflow();
+    //    ChangeData(DatabaseDataType.dummyComand_RemoveRow, null, e.Row, string.Empty, e.Row.Key.ToString());
+
+    //}
 
     private void StartBackgroundWorker() {
         try {

@@ -21,6 +21,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace BlueDatabase;
@@ -70,7 +71,7 @@ public sealed class DatabaseSQL : DatabaseAbstract {
 
     public override bool ReloadNeeded {
         get {
-            if (string.IsNullOrEmpty(Filename)) { return false; }
+            if (string.IsNullOrEmpty(TableName)) { return false; }
             if (_checkedAndReloadNeed) { return true; }
             _lastCheck = DateTime.Now;
 
@@ -85,10 +86,10 @@ public sealed class DatabaseSQL : DatabaseAbstract {
 
     public override bool ReloadNeededSoft {
         get {
-            if (string.IsNullOrEmpty(Filename)) { return false; }
+            if (string.IsNullOrEmpty(TableName)) { return false; }
             if (_checkedAndReloadNeed) { return true; }
 
-            if (DateTime.Now.Subtract(_lastCheck).TotalSeconds > 10) {
+            if (DateTime.Now.Subtract(_lastCheck).TotalSeconds > 20) {
                 return ReloadNeeded;
             }
 
@@ -102,7 +103,9 @@ public sealed class DatabaseSQL : DatabaseAbstract {
 
     public override void BlockReload(bool crashIsCurrentlyLoading) { }
 
-    public override void Load_Reload() { }
+    public override void Load_Reload() {
+        LoadFromSQLBack();
+    }
 
     public override bool Save(bool mustSave) => _sql.ConnectionOk;
 
@@ -112,18 +115,22 @@ public sealed class DatabaseSQL : DatabaseAbstract {
 
     public override void WaitEditable() { }
 
-    internal void AddColumn(string columnname, SQLBackAbstract sql) {
-        var x = new ColumnItem(this, columnname, Column.NextColumnKey());
-
-        var l = sql.GetStyleDataAll(TableName.FileNameWithoutSuffix(), columnname);
+    /// <summary>
+    /// Liest die Spaltenattribute aus der Style-Datenbank und schreibt sie in die Spalte
+    /// Achtung: Die Connection wird nicht geschlossen!
+    /// </summary>
+    /// <param name="column"></param>
+    /// <param name="sql"></param>
+    internal void GetColumnAttributesColumn(ColumnItem column, SQLBackAbstract sql) {
+        var l = sql.GetStyleDataAll(TableName.FileNameWithoutSuffix(), column.Name);
         if (l != null && l.Count > 0) {
             foreach (var thisstyle in l) {
                 Enum.TryParse(thisstyle.Key, out DatabaseDataType t);
-                x.SetValueInternal(t, thisstyle.Value);
+                if (t != (DatabaseDataType)0) {
+                    column.SetValueInternal(t, thisstyle.Value);
+                }
             }
         }
-
-        Column.Add(x);
     }
 
     protected override void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName) {
@@ -148,18 +155,47 @@ public sealed class DatabaseSQL : DatabaseAbstract {
     }
 
     private void LoadFromSQLBack() {
+        var onlyReload = false;
+
+        OnLoading(this, new BlueBasics.EventArgs.LoadingEventArgs(onlyReload));
         IsLoading = true;
+        Column.ThrowEvents = false;
+        Row.ThrowEvents = false;
+
+        #region Spalten richtig stellen
+
+        var columnsToLoad = _sql.GetColumnNames(TableName.ToUpper());
+        columnsToLoad.Remove("RK");
+
+        #region Nicht mehr vorhandene Spalten löschen
+
+        var columnsToDelete = new List<ColumnItem>();
+        foreach (var thiscol in Column) {
+            if (!columnsToLoad.Contains(thiscol.Name.ToUpper())) {
+                columnsToDelete.Add(thiscol);
+            }
+        }
+
+        foreach (var thiscol in columnsToDelete) {
+            Column.Remove(thiscol);
+        }
+
+        #endregion
 
         #region Spalten erstellen
 
-        var cols = _sql.GetColumnNames(TableName.ToUpper());
-        cols.Remove("RK");
-
-        foreach (var thisCol in cols) {
-            AddColumn(thisCol, _sql);
+        foreach (var thisCol in columnsToLoad) {
+            var colum = Column.Exists(thisCol);
+            if (colum == null) {
+                colum= new ColumnItem(this, thisCol, Column.NextColumnKey());
+                Column.Add(colum);
+            }
+            GetColumnAttributesColumn(colum, _sql);
         }
 
         Column.GetSystems();
+
+        #endregion
 
         #endregion
 
@@ -169,7 +205,9 @@ public sealed class DatabaseSQL : DatabaseAbstract {
         if (l != null && l.Count > 0) {
             foreach (var thisstyle in l) {
                 Enum.TryParse(thisstyle.Key, out DatabaseDataType t);
-                SetValueInternal(t, thisstyle.Value, null, null, -1, -1);
+                if (t != (DatabaseDataType)0) {
+                    SetValueInternal(t, thisstyle.Value, null, null, -1, -1);
+                }
             }
         }
 
@@ -181,10 +219,17 @@ public sealed class DatabaseSQL : DatabaseAbstract {
 
         #endregion
 
-        _checkedAndReloadNeed = false;
-        IsLoading = false;
+        _sql.CloseConnection();
 
-        //RepairAfterParse(null, null);
+        Row.RemoveNullOrEmpty();
+        Cell.RemoveOrphans();
+
+        _checkedAndReloadNeed = false;
+        Column.ThrowEvents = true;
+        Row.ThrowEvents = true;
+        IsLoading = false;
+        OnLoaded(this, new BlueBasics.EventArgs.LoadedEventArgs(onlyReload));
+        //RepairAfterParse();
     }
 
     #endregion

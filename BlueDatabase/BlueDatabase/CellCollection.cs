@@ -17,6 +17,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using System;
@@ -31,12 +32,11 @@ using static BlueBasics.Generic;
 
 namespace BlueDatabase;
 
-public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
+public sealed class CellCollection : Dictionary<string, CellItem>, IDisposableExtended {
 
     #region Fields
 
     private DatabaseAbstract? _database;
-    private bool _disposedValue;
 
     #endregion
 
@@ -64,6 +64,12 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
     #region Events
 
     public event EventHandler<CellEventArgs> CellValueChanged;
+
+    #endregion
+
+    #region Properties
+
+    public bool IsDisposed { get; private set; }
 
     #endregion
 
@@ -416,24 +422,6 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
         return IsNullOrEmpty(column, row);
     }
 
-    public string SetValueInternal(ColumnItem? column, RowItem? row, string value, int width, int height) {
-        if (row == null) { return "Row konnte nicht generiert werden."; }
-        if (column == null) { return "Column konnte nicht generiert werden."; }
-
-        var cellKey = KeyOfCell(column, row);
-
-        if (ContainsKey(cellKey)) {
-            var c = this[cellKey];
-            c.Value = value; // Auf jeden Fall setzen. Auch falls es nachher entfernt wird, so ist es sicher leer
-            c.Size = width > 0 ? new Size(width, height) : Size.Empty;
-            if (string.IsNullOrEmpty(value)) { Remove(cellKey); }
-        } else {
-            Add(cellKey, new CellItem(value, width, height));
-        }
-
-        return string.Empty;
-    }
-
     public bool MatchesTo(ColumnItem? column, RowItem? row, FilterItem filter) {
         //Grundlegendes zu UND und ODER:
         //Ein Filter kann mehrere Werte haben, diese müssen ein Attribut UND oder ODER haben.
@@ -552,10 +540,11 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
 
     public void Set(string columnName, RowItem? row, Point value) => Set(_database?.Column[columnName], row, value);
 
-    public void Set(ColumnItem? column, RowItem? row, Point value) => Set(column, row, value.ToString());      // Main Method// {X=253,Y=194} MUSS ES SEIN, prüfen
+    public void Set(ColumnItem? column, RowItem? row, Point value) => Set(column, row, value.ToString());
 
     public void Set(string columnName, RowItem? row, int value) => Set(_database?.Column[columnName], row, value.ToString());
 
+    // Main Method// {X=253,Y=194} MUSS ES SEIN, prüfen
     public void Set(ColumnItem? column, RowItem? row, int value) => Set(column, row, value.ToString());
 
     public void Set(string columnName, RowItem? row, double value) => Set(_database?.Column[columnName], row, value.ToString(Constants.Format_Float1));
@@ -572,6 +561,24 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
         var cellKey = KeyOfCell(column, row);
         if (!ContainsKey(cellKey)) { return; }
         this[cellKey].Size = contentSize;
+    }
+
+    public string SetValueInternal(ColumnItem? column, RowItem? row, string value, int width, int height) {
+        if (row == null) { return "Row konnte nicht generiert werden."; }
+        if (column == null) { return "Column konnte nicht generiert werden."; }
+
+        var cellKey = KeyOfCell(column, row);
+
+        if (ContainsKey(cellKey)) {
+            var c = this[cellKey];
+            c.Value = value; // Auf jeden Fall setzen. Auch falls es nachher entfernt wird, so ist es sicher leer
+            c.Size = width > 0 ? new Size(width, height) : Size.Empty;
+            if (string.IsNullOrEmpty(value)) { Remove(cellKey); }
+        } else {
+            Add(cellKey, new CellItem(value, width, height));
+        }
+
+        return string.Empty;
     }
 
     public List<string> ValuesReadable(ColumnItem? column, RowItem row, ShortenStyle style) => CellItem.ValuesReadable(column, row, style);
@@ -627,14 +634,18 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
     internal bool RemoveOrphans() {
         try {
             List<string?> removeKeys = new();
+
             foreach (var pair in this.Where(pair => !string.IsNullOrEmpty(pair.Value.Value))) {
                 DataOfCellKey(pair.Key, out var column, out var row);
                 if (column == null || row == null) { removeKeys.Add(pair.Key); }
             }
+
             if (removeKeys.Count == 0) { return false; }
+
             foreach (var thisKey in removeKeys) {
                 Remove(thisKey);
             }
+
             return true;
         } catch {
             Develop.CheckStackForOverflow(); // Um Rauszufinden, ob endlos-Schleifen öfters  vorkommen. Zuletzt 24.11.2020
@@ -894,7 +905,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
     }
 
     private void Dispose(bool disposing) {
-        if (!_disposedValue) {
+        if (!IsDisposed) {
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
@@ -903,7 +914,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
             _database.Disposing -= _database_Disposing;
             _database = null;
             Clear();
-            _disposedValue = true;
+            IsDisposed = true;
         }
     }
 
