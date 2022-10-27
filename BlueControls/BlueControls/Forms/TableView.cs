@@ -209,6 +209,8 @@ public partial class TableView : Form {
     /// </summary>
     /// <param name="uniqueID"></param>
     protected void AddTabPage(ConnectionInfo ci) {
+        if(ci is null) { return; }
+
         var NTabPage = new System.Windows.Forms.TabPage {
             Name = tbcDatabaseSelector.TabCount.ToString(),
             Text = ci.TableName,

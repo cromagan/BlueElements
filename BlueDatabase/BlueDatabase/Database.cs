@@ -125,7 +125,7 @@ public sealed class Database : DatabaseAbstract {
         var nn = System.IO.Directory.GetFiles(Filename.FilePath(), "*.mdb", SearchOption.AllDirectories);
         var gb = new List<ConnectionInfo>();
         foreach (var thisn in nn) {
-            gb.Add(ConnectionDataOfOtherTable(thisn));
+            gb.Add(ConnectionDataOfOtherTable(thisn.FileNameWithoutSuffix()));
         }
         return gb;
     }
