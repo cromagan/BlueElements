@@ -1745,7 +1745,7 @@ public static class Skin {
     private static BlueFont GetBlueFont(DatabaseAbstract styleDb, ColumnItem? column, RowItem? row) {
         var @string = styleDb.Cell.GetString(column, row);
         if (string.IsNullOrEmpty(@string)) {
-            Develop.DebugPrint("Schrift nicht definiert: " + styleDb.ConnectionID + " - " + column.Name + " - " + row.CellFirstString());
+            Develop.DebugPrint("Schrift nicht definiert: " + styleDb.TableName + " - " + column.Name + " - " + row.CellFirstString());
             return BlueFont.Get("Arial", 7, false, false, false, false, false, Color.Black, Color.Transparent, false, false, false);
         }
         return BlueFont.Get(@string);

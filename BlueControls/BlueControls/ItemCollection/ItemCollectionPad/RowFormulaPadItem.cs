@@ -137,7 +137,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
                 return true;
 
             case "database":
-                _database = DatabaseAbstract.GetByID(value.FromNonCritical(), false, false, null, value.FromNonCritical().FileNameWithoutSuffix());
+                _database = DatabaseAbstract.GetByID(new ConnectionInfo(value.FromNonCritical()));
                 _database.Disposing += _Database_Disposing;
                 return true;
 
@@ -174,7 +174,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
         var t = base.ToString();
         t = t.Substring(0, t.Length - 1) + ", ";
         t = t + "LayoutID=" + _layoutId.ToNonCritical() + ", ";
-        if (_database != null) { t = t + "Database=" + _database.ConnectionID.ToNonCritical() + ", "; }
+        if (_database != null) { t = t + "Database=" + _database.ConnectionData.DatabaseID.ToNonCritical() + ", "; }
         if (_rowKey != 0) { t = t + "RowKey=" + _rowKey + ", "; }
         if (Row is RowItem r) { t = t + "FirstValue=" + r.CellFirstString().ToNonCritical() + ", "; }
         return t.Trim(", ") + "}";

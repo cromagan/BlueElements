@@ -528,7 +528,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         } else {
             if (column == null) { return null; }  // Bei Steuerelementen, die manuell hinzugefügt werden
             if (row == null) { return null; }  // Beim initualisieren des Controls und Linked Cell kann das vorkommen
-            Develop.DebugPrint("Column nicht gefunden: " + column.Name + " " + column.Database.ConnectionID);
+            Develop.DebugPrint("Column nicht gefunden: " + column.Name + " " + column.Database.TableName);
         }
 
         return gbColumn;

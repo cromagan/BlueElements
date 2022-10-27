@@ -203,7 +203,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         }
     }
 
-    public abstract string ConnectionID { get; }
+    public abstract ConnectionInfo ConnectionData { get; }
 
     [Browsable(false)]
     public string CreateDate {
@@ -372,61 +372,81 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
     #region Methods
 
+
+
+    public static List<ConnectionInfo> AllAvailableTables() {
+        var gb = new List<ConnectionInfo>();
+
+        var allreadychecked = new List<DatabaseAbstract>();
+
+        foreach (var thisDB in AllFiles) {
+            var nn = thisDB.AllAvailableTables(allreadychecked);
+
+            allreadychecked.Add(thisDB);
+
+            if (nn != null) {
+                gb.AddRange(nn);
+                //foreach (var thisn in nn) {
+                //    gb.Add(new ConnectionInfo(thisn, thisDB, DatabaseID, null));
+                //}
+            }
+        }
+
+        return gb;
+    }
+
     /// <summary>
     /// Sucht die Datenbank im Speicher. Wird sie nicht gefunden, wird sie geladen.
     /// </summary>
-    /// <param name="filename"></param>
-    /// <param name="checkOnlyCaptionToo"></param>
-    /// <param name="readOnly"></param>
-    /// <returns></returns>
-    public static DatabaseAbstract? GetByID(string connectionID, bool checkOnlyCaptionToo, bool readOnly, DatabaseAbstract? vorlage, string tablename) {
-        if (string.IsNullOrEmpty(connectionID)) { return null; }
+    public static DatabaseAbstract? GetByID(ConnectionInfo ci) {
+        if (ci is null) { return null; }
 
         foreach (var thisFile in AllFiles) {
-            if (thisFile is DatabaseAbstract db && string.Equals(thisFile.ConnectionID, connectionID, StringComparison.OrdinalIgnoreCase)) {
+            if (string.Equals(thisFile.ConnectionData.UniqueID, ci.UniqueID, StringComparison.OrdinalIgnoreCase)) {
                 thisFile.BlockReload(false);
-                return db;
+                return thisFile;
             }
         }
 
-        #region wenn captiontoo angewählt wurde, schauen ob eine ConnectionID einem Dateinamen entspricht
 
-        if (checkOnlyCaptionToo) {
-            foreach (var thisFile in AllFiles) {
-                if (thisFile is DatabaseAbstract db && thisFile.TableName.ToLower() == connectionID.ToLower().FileNameWithSuffix()) {
-                    thisFile.BlockReload(false);
-                    return db;
-                }
-            }
+        if (ci.Provider != null) {
+            return ci.Provider.GetOtherTable(ci.TableName);
         }
 
-        #endregion
+        //#region wenn captiontoo angewählt wurde, schauen ob eine ConnectionID einem Dateinamen entspricht
 
-        if (vorlage != null) {
-            return vorlage.GetOtherTable(tablename, readOnly);
-        }
+        //if (checkOnlyCaptionToo) {
+        //    foreach (var thisFile in AllFiles) {
+        //        if (thisFile is DatabaseAbstract db && thisFile.TableName.ToLower() == connectionID.ToLower().FileNameWithSuffix()) {
+        //            thisFile.BlockReload(false);
+        //            return db;
+        //        }
+        //    }
+        //}
+
+        //#endregion
 
         #region Wenn die Connection einem Dateinamen entspricht, versuchen den zu laden
 
-        if (FileExists(connectionID)) {
-            if (connectionID.FileSuffix().ToLower() == "mdb") {
-                return new Database(connectionID, readOnly, false, tablename);
+        if (FileExists(ci.AdditionalData)) {
+            if (ci.AdditionalData.FileSuffix().ToLower() == "mdb") {
+                return new Database(ci.AdditionalData, false, false, ci.TableName);
             }
 
-            if (connectionID.FileSuffix().ToLower() == "mdf") {
-                var x = new SQLBackMicrosoftCE(connectionID, false);
+            //if (connectionID.FileSuffix().ToLower() == "mdf") {
+            //    var x = new SQLBackMicrosoftCE(connectionID, false);
 
-                var tables = x.Tables();
-                var tabn = string.Empty;
-                if (tables.Count >= 1) { tabn = tables[0]; }
+            //    var tables = x.Tables();
+            //    var tabn = string.Empty;
+            //    if (tables.Count >= 1) { tabn = tables[0]; }
 
-                if (string.IsNullOrEmpty(tabn)) {
-                    tabn = "MAIN";
-                    x.RepairAll(tabn);
-                }
+            //    if (string.IsNullOrEmpty(tabn)) {
+            //        tabn = "MAIN";
+            //        x.RepairAll(tabn);
+            //    }
 
-                return new DatabaseSQL(x, false, tabn);
-            }
+            //    return new DatabaseSQL(x, false, tabn);
+            //}
         }
 
         #endregion
@@ -435,8 +455,8 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
         if (SQLBackAbstract.ConnectedSQLBack != null) {
             foreach (var thisSQL in SQLBackAbstract.ConnectedSQLBack) {
-                var h = thisSQL.HandleMe(connectionID);
-                if (h != null) { return new DatabaseSQL(h, readOnly, tablename); }
+                var h = thisSQL.HandleMe(ci);
+                if (h != null) { return new DatabaseSQL(h, false, ci.TableName); }
             }
         }
 
@@ -495,7 +515,9 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
                         break;
                 }
                 if (FileExists(pf)) {
-                    var tmp = GetByID(pf, false, false, null, pf.FileNameWithoutSuffix());
+                    var ci = new ConnectionInfo(pf);
+
+                    var tmp = GetByID(ci);
                     if (tmp != null) { return tmp; }
                     tmp = new Database(pf, false, false, pf.FileNameWithoutSuffix());
                     return tmp;
@@ -533,6 +555,8 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         _additionaFilesPfadtmp = string.Empty;
         return string.Empty;
     }
+
+    public abstract List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked);
 
     public List<RowData?> AllRows() {
         var sortedRows = new List<RowData?>();
@@ -1146,7 +1170,8 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
             t += "\r\nLoading: " + IsLoading;
             t += "\r\nColumn-Count: " + Column.Count;
             t += "\r\nRow-Count: " + Row.Count;
-            t += "\r\nFile: " + ConnectionID;
+            t += "\r\nTable: " + ConnectionData.TableName;
+            t += "\r\nID: " + ConnectionData.DatabaseID;
         } catch { }
         Develop.DebugPrint(FehlerArt.Warnung, t);
     }
@@ -1213,7 +1238,30 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         _layouts.Dispose();
     }
 
-    protected abstract DatabaseAbstract? GetOtherTable(string tablename, bool readOnly);
+    public DatabaseAbstract? GetOtherTable(string tablename) {
+
+        //if (string.IsNullOrEmpty(tablename)) { return null; }
+
+        //var newpf = Filename.FilePath() + tablename.FileNameWithoutSuffix() + ".mdb";
+
+        //return GetByID(new ConnectionInfo(tablename, null, DatabaseID, newpf);
+        //// KEINE Vorage mitgeben, weil sonst eine Endlosschleife aufgerufen wird!
+
+
+        //    public override DatabaseAbstract? GetOtherTable(string tablename) {
+        //if (!SQLBackAbstract.IsValidTableName(tablename)) {
+        //    return null;
+        //}
+
+        var x = ConnectionDataOfOtherTable(tablename);
+
+        x.Provider = null;  // KEINE Vorage mitgeben, weil sonst eine Endlosschleife aufgerufen wird!
+
+        return GetByID(x);// new DatabaseSQL(_sql, readOnly, tablename);
+
+
+
+    }
 
     protected virtual void Initialize() {
         Cell.Initialize();
@@ -1303,10 +1351,10 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         }
 
         if (type.IsCellValue()) {
-            //        case DatabaseDataType.ce_Value_withSizeData:
-            //case DatabaseDataType.ce_UTF8Value_withSizeData:
-            //case DatabaseDataType.ce_Value_withoutSizeData:
-            if (type == DatabaseDataType.ce_UTF8Value_withSizeData) {
+            //        case DatabaseDataType.Value_withSizeData:
+            //case DatabaseDataType.UTF8Value_withSizeData:
+            //case DatabaseDataType.Value_withoutSizeData:
+            if (type == DatabaseDataType.UTF8Value_withSizeData) {
                 //Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
                 var enc1252 = Encoding.GetEncoding(1252);
                 value = Encoding.UTF8.GetString(enc1252.GetBytes(value));
@@ -1472,7 +1520,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
                 if (LoadedVersion == DatabaseVersion) {
                     SetReadOnly();
                     if (!ReadOnly) {
-                        Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Datei: " + ConnectionID);
+                        Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + ConnectionData.ToString);
                     }
                 }
 
@@ -1735,6 +1783,9 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
             StartBackgroundWorker();
         }
     }
+
+    public abstract ConnectionInfo? ConnectionDataOfOtherTable(string tableName);
+
 
     #endregion
 }

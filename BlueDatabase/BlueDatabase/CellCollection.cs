@@ -274,7 +274,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposableEx
     public void DoSpecialFormats(ColumnItem? column, RowItem? row, string previewsValue, bool doAlways) {
         if (_database == null || _database.IsDisposed) { return; }
         if (row == null) { return; }
-        if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.ConnectionID); }
+        if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.ConnectionData.TableName); }
 
         var currentValue = GetString(column, row);
 
@@ -382,8 +382,8 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposableEx
     public string GetString(ColumnItem? column, RowItem? row) // Main Method
     {
         try {
-            if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.ConnectionID); }
-            if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + _database.ConnectionID); }
+            if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.ConnectionData.TableName); }
+            if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + _database.ConnectionData.TableName); }
             if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 var (lcolumn, lrow, _) = LinkedCellData(column, row, false, false);
                 return lcolumn != null && lrow != null ? lrow.CellGetString(lcolumn) : string.Empty;
@@ -516,8 +516,8 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposableEx
     public void Set(ColumnItem? column, RowItem? row, string value) // Main Method
     {
         _database.BlockReload(false);
-        if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.ConnectionID); }
-        if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!!<br>" + _database.ConnectionID); }
+        if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.ConnectionData.TableName); }
+        if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!!<br>" + _database.ConnectionData.TableName); }
         if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             var (lcolumn, lrow, _) = LinkedCellData(column, row, true, !string.IsNullOrEmpty(value));
             lrow?.CellSet(lcolumn, value);
@@ -668,12 +668,12 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposableEx
         _database.BlockReload(false);
         if (column == null || _database.Column.SearchByKey(column.Key) == null) {
             _database?.DevelopWarnung("Spalte ungültig!");
-            Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database?.ConnectionID);
+            Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.ConnectionData.TableName);
             return;
         }
         if (row == null || _database?.Row.SearchByKey(row.Key) == null) {
             _database?.DevelopWarnung("Zeile ungültig!!");
-            Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!!<br>" + _database?.ConnectionID);
+            Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!!<br>" + _database.ConnectionData.TableName);
             return;
         }
 
@@ -685,7 +685,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposableEx
         if (value == oldValue) { return; }
 
         _database?.WaitEditable();
-        _database?.ChangeData(DatabaseDataType.ce_Value_withoutSizeData, column, row, oldValue, value);
+        _database?.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldValue, value);
         column.UcaseNamesSortedByLenght = null;
 
         if (changeSysColumns) {
@@ -701,8 +701,8 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposableEx
     }
 
     internal void SystemSet(ColumnItem? column, RowItem? row, string value) {
-        if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.ConnectionID); }
-        if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + _database.ConnectionID); }
+        if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.ConnectionData.TableName); }
+        if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + _database.ConnectionData.TableName); }
         if (string.IsNullOrEmpty(column.Identifier)) { Develop.DebugPrint(FehlerArt.Fehler, "SystemSet nur bei System-Spalten möglich: " + ToString()); }
         if (!column.SaveContent) { return; }
         var cellKey = KeyOfCell(column, row);
@@ -713,7 +713,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposableEx
             Add(cellKey, new CellItem(string.Empty, 0, 0));
         }
         if (value == @string) { return; }
-        _database.ChangeData(DatabaseDataType.ce_Value_withoutSizeData, column, row, @string, value);
+        _database.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, @string, value);
     }
 
     private static bool CompareValues(string istValue, string filterValue, FilterType typ) {

@@ -39,18 +39,18 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
     #region Fields
 
-    private readonly List<string> _afterEditAutoReplace = new();
-    private readonly List<string> _dropDownItems = new();
-    private readonly List<string?> _linkedCellFilter = new();
-    private readonly List<string> _opticalReplace = new();
-    private readonly List<string> _permissionGroupsChangeCell = new();
-    private readonly List<string> _tags = new();
     public bool? TmpAutoFilterSinnvoll = null;
     public QuickImage? TmpCaptionBitmapCode;
     public SizeF TmpCaptionTextSize = new(-1, -1);
     public int? TmpColumnContentWidth;
     public int? TmpIfFilterRemoved = null;
     internal List<string>? UcaseNamesSortedByLenght;
+    private readonly List<string> _afterEditAutoReplace = new();
+    private readonly List<string> _dropDownItems = new();
+    private readonly List<string?> _linkedCellFilter = new();
+    private readonly List<string> _opticalReplace = new();
+    private readonly List<string> _permissionGroupsChangeCell = new();
+    private readonly List<string> _tags = new();
     private AdditionalCheck _additionalFormatCheck;
     private string _adminInfo;
     private bool _afterEditAutoCorrect;
@@ -242,6 +242,15 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         }
     }
 
+    public List<string> AfterEditAutoReplace {
+        get => _afterEditAutoReplace;
+        set {
+            if (!_afterEditAutoReplace.IsDifferentTo(value)) { return; }
+            Database.ChangeData(DatabaseDataType.AutoReplaceAfterEdit, this, null, _afterEditAutoReplace.JoinWithCr(), value.JoinWithCr());
+            OnChanged();
+        }
+    }
+
     public bool AfterEditDoUCase {
         get => _afterEditDoUCase;
         set {
@@ -422,6 +431,15 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         }
     }
 
+    public List<string> DropDownItems {
+        get => _dropDownItems;
+        set {
+            if (!_dropDownItems.IsDifferentTo(value)) { return; }
+            Database.ChangeData(DatabaseDataType.DropDownItems, this, null, _dropDownItems.JoinWithCr(), value.JoinWithCr());
+            OnChanged();
+        }
+    }
+
     public bool DropdownWerteAndererZellenAnzeigen {
         get => _dropdownWerteAndererZellenAnzeigen;
         set {
@@ -486,62 +504,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             OnChanged();
         }
     }
-
-
-    public List<string> PermissionGroupsChangeCell {
-        get => _permissionGroupsChangeCell;
-        set {
-            if (!_permissionGroupsChangeCell.IsDifferentTo(value)) { return; }
-            Database.ChangeData(DatabaseDataType.PermissionGroupsChangeCell, this, null, _permissionGroupsChangeCell.JoinWithCr(), value.JoinWithCr());
-            OnChanged();
-        }
-    }
-
-    public List<string> Tags {
-        get => _tags;
-        set {
-            if (!_tags.IsDifferentTo(value)) { return; }
-            Database.ChangeData(DatabaseDataType.ColumnTags, this, null, _tags.JoinWithCr(), value.JoinWithCr());
-            OnChanged();
-        }
-    }
-    
-    public List<string> DropDownItems {
-        get => _dropDownItems;
-        set {
-            if (!_dropDownItems.IsDifferentTo(value)) { return; }
-            Database.ChangeData(DatabaseDataType.DropDownItems, this, null, _dropDownItems.JoinWithCr(), value.JoinWithCr());
-            OnChanged();
-        }
-    }
-
-    public List<string> LinkedCellFilter {
-        get => _linkedCellFilter;
-        set {
-            if (!_linkedCellFilter.IsDifferentTo(value)) { return; }
-            Database.ChangeData(DatabaseDataType.LinkedCellFilter, this, null, _linkedCellFilter.JoinWithCr(), value.JoinWithCr());
-            OnChanged();
-        }
-    }
-
-    public List<string> OpticalReplace {
-        get => _opticalReplace;
-        set {
-            if (!_opticalReplace.IsDifferentTo(value)) { return; }
-            Database.ChangeData(DatabaseDataType.OpticalTextReplace, this, null, _opticalReplace.JoinWithCr(), value.JoinWithCr());
-            OnChanged();
-        }
-    }
-
-    public List<string> AfterEditAutoReplace {
-        get => _afterEditAutoReplace;
-        set {
-            if (!_afterEditAutoReplace.IsDifferentTo(value)) { return; }
-            Database.ChangeData(DatabaseDataType.AutoReplaceAfterEdit, this, null, _afterEditAutoReplace.JoinWithCr(), value.JoinWithCr());
-            OnChanged();
-        }
-    }
-
 
     public bool IgnoreAtRowFilter {
         get => !_format.Autofilter_möglich() || _ignoreAtRowFilter;
@@ -610,12 +572,23 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         }
     }
 
+    public List<string> LinkedCellFilter {
+        get => _linkedCellFilter;
+        set {
+            if (!_linkedCellFilter.IsDifferentTo(value)) { return; }
+            Database.ChangeData(DatabaseDataType.LinkedCellFilter, this, null, _linkedCellFilter.JoinWithCr(), value.JoinWithCr());
+            OnChanged();
+        }
+    }
+
     public DatabaseAbstract? LinkedDatabase {
         get {
             if (_tmpLinkedDatabase != null) { return _tmpLinkedDatabase; }
             if (string.IsNullOrEmpty(_linkedDatabaseFile)) { return null; }
 
-            Tmp_LinkedDatabase = DatabaseAbstract.GetByID(_linkedDatabaseFile, true, false, Database, _linkedDatabaseFile.FileNameWithoutSuffix());
+            var ci = Database.ConnectionDataOfOtherTable(_linkedDatabaseFile);//  new ConnectionInfo(_linkedDatabaseFile, this, this.DatabaseID, string.Empty);
+
+            Tmp_LinkedDatabase = DatabaseAbstract.GetByID(ci);
 
             if (_tmpLinkedDatabase != null) { _tmpLinkedDatabase.UserGroup = Database.UserGroup; }
             return _tmpLinkedDatabase;
@@ -653,6 +626,24 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             var old = _name;
             Database?.ChangeData(DatabaseDataType.ColumnName, this, null, old, value);
             Database?.Column_NameChanged(old, this);
+            OnChanged();
+        }
+    }
+
+    public List<string> OpticalReplace {
+        get => _opticalReplace;
+        set {
+            if (!_opticalReplace.IsDifferentTo(value)) { return; }
+            Database.ChangeData(DatabaseDataType.OpticalTextReplace, this, null, _opticalReplace.JoinWithCr(), value.JoinWithCr());
+            OnChanged();
+        }
+    }
+
+    public List<string> PermissionGroupsChangeCell {
+        get => _permissionGroupsChangeCell;
+        set {
+            if (!_permissionGroupsChangeCell.IsDifferentTo(value)) { return; }
+            Database.ChangeData(DatabaseDataType.PermissionGroupsChangeCell, this, null, _permissionGroupsChangeCell.JoinWithCr(), value.JoinWithCr());
             OnChanged();
         }
     }
@@ -717,7 +708,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         get => _showUndo;
         set {
             if (_showUndo == value) { return; }
-            Database?.ChangeData(DatabaseDataType.co_ShowUndo, this, null, _showUndo.ToPlusMinus(), value.ToPlusMinus());
+            Database?.ChangeData(DatabaseDataType.ShowUndo, this, null, _showUndo.ToPlusMinus(), value.ToPlusMinus());
             OnChanged();
         }
     }
@@ -730,8 +721,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             OnChanged();
         }
     }
-
-
 
     public bool SpellCheckingEnabled {
         get => _spellCheckingEnabled;
@@ -751,6 +740,15 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             if (_suffix == value) { return; }
             Database?.ChangeData(DatabaseDataType.Suffix, this, null, _suffix, value);
             Invalidate_ColumAndContent();
+            OnChanged();
+        }
+    }
+
+    public List<string> Tags {
+        get => _tags;
+        set {
+            if (!_tags.IsDifferentTo(value)) { return; }
+            Database.ChangeData(DatabaseDataType.ColumnTags, this, null, _tags.JoinWithCr(), value.JoinWithCr());
             OnChanged();
         }
     }
@@ -1525,7 +1523,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             }
 
             if (ScriptType == ScriptType.undefiniert) {
-                Develop.DebugPrint(FehlerArt.Warnung, "Umsetzung fehlgeschlagen: " + Caption + " " + Database.ConnectionID);
+                Develop.DebugPrint(FehlerArt.Warnung, "Umsetzung fehlgeschlagen: " + Caption + " " + Database.ConnectionData.TableName);
             }
 
             ResetSystemToDefault(false);
@@ -2251,7 +2249,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 _ignoreAtRowFilter = newvalue.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.co_ShowUndo:
+            case DatabaseDataType.ShowUndo:
                 _showUndo = newvalue.FromPlusMinus();
                 break;
 
@@ -2452,8 +2450,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     //    }
     //}
 
-
-
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
     private void Dispose(bool disposing) {
@@ -2487,8 +2483,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             IsDisposed = true;
         }
     }
-
-
 
     private string KleineFehlerCorrect(string txt) {
         if (string.IsNullOrEmpty(txt)) { return string.Empty; }
@@ -2564,8 +2558,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         }
         return txt;
     }
-
-
 
     #endregion
 }

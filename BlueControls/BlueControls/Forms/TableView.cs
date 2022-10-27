@@ -45,8 +45,8 @@ namespace BlueControls.Forms;
 public partial class TableView : Form {
 
     #region Fields
-
     public static SQLBackAbstract? SQL = null;
+
     private Ansicht _ansicht = Ansicht.Tabelle_und_Formular_nebeneinander;
 
     private bool _firstOne = true;
@@ -91,6 +91,7 @@ public partial class TableView : Form {
 
     #endregion
 
+
     #region Methods
 
     public static void CheckDatabase(object? sender, LoadedEventArgs? e) {
@@ -98,7 +99,7 @@ public partial class TableView : Form {
             if (database.IsAdministrator()) {
                 foreach (var thisColumnItem in database.Column) {
                     while (!thisColumnItem.IsOk()) {
-                        DebugPrint(FehlerArt.Info, "Datenbank:" + database.ConnectionID + "\r\nSpalte:" + thisColumnItem.Name + "\r\nSpaltenfehler: " + thisColumnItem.ErrorReason() + "\r\nUser: " + database.UserName + "\r\nGroup: " + database.UserGroup + "\r\nAdmins: " + database.DatenbankAdmin.JoinWith(";"));
+                        DebugPrint(FehlerArt.Info, "Datenbank:" + database.TableName + "\r\nSpalte:" + thisColumnItem.Name + "\r\nSpaltenfehler: " + thisColumnItem.ErrorReason() + "\r\nUser: " + database.UserName + "\r\nGroup: " + database.UserGroup + "\r\nAdmins: " + database.DatenbankAdmin.JoinWith(";"));
                         MessageBox.Show("Die folgende Spalte enthält einen Fehler:<br>" + thisColumnItem.ErrorReason() + "<br><br>Bitte reparieren.", ImageCode.Information, "OK");
                         OpenColumnEditor(thisColumnItem, null);
                     }
@@ -193,13 +194,10 @@ public partial class TableView : Form {
         return l;
     }
 
-    public virtual bool ConnectSQL() {
-        return false;
-    }
 
     public void ResetDatabaseSettings() {
         foreach (var thisT in tbcDatabaseSelector.TabPages) {
-            if (thisT is System.Windows.Forms.TabPage tp && tp.Tag is List<string> s) {
+            if (thisT is System.Windows.Forms.TabPage tp && tp.Tag is List<object> s) {
                 s[1] = string.Empty;
                 tp.Tag = s;
             }
@@ -209,12 +207,12 @@ public partial class TableView : Form {
     /// <summary>
     /// Erstellt einen Reiter mit den nötigen Tags um eine Datenbank laden zu können - lädt die Datenbank aber selbst nicht.
     /// </summary>
-    /// <param name="connectionID"></param>
-    protected void AddTabPage(string connectionID) {
+    /// <param name="uniqueID"></param>
+    protected void AddTabPage(ConnectionInfo ci) {
         var NTabPage = new System.Windows.Forms.TabPage {
             Name = tbcDatabaseSelector.TabCount.ToString(),
-            Text = connectionID.Split('|').Last().FileNameWithoutSuffix(),
-            Tag = new List<string>() { connectionID, string.Empty }
+            Text = ci.TableName,
+            Tag = new List<object>() { ci, string.Empty }
         };
         tbcDatabaseSelector.Controls.Add(NTabPage);
     }
@@ -260,7 +258,7 @@ public partial class TableView : Form {
         Table.Export_HTML();
     }
 
-    protected void ChangeDatabaseInTab(string connectionID, System.Windows.Forms.TabPage? xtab) {
+    protected void ChangeDatabaseInTab(ConnectionInfo connectionID, System.Windows.Forms.TabPage? xtab) {
         if (xtab == null) { return; }
 
         tbcDatabaseSelector.Enabled = false;
@@ -268,7 +266,7 @@ public partial class TableView : Form {
         Table.ShowWaitScreen = true;
         Table.Refresh();
 
-        var s = (List<string>)(xtab.Tag);
+        var s = (List<object>)(xtab.Tag);
         s[0] = connectionID;
         s[1] = string.Empty;
         xtab.Tag = s;
@@ -383,14 +381,14 @@ public partial class TableView : Form {
     /// Sucht den Tab mit der angegebenen Datenbank.
     /// Ist kein Reiter vorhanden, wird ein neuer erzeugt.
     /// </summary>
-    /// <param name="connectionId"></param>
+    /// <param name="connectionInfo"></param>
     /// <returns></returns>
-    protected bool SwitchTabToDatabase(string connectionId) {
-        if (string.IsNullOrEmpty(connectionId)) { return false; }
+    protected bool SwitchTabToDatabase(ConnectionInfo connectionInfo) {
+        if (connectionInfo is null) { return false; }
 
         foreach (var thisT in tbcDatabaseSelector.TabPages) {
-            if (thisT is System.Windows.Forms.TabPage tp && tp.Tag is List<string> s) {
-                if (s[0].Equals(connectionId, StringComparison.OrdinalIgnoreCase)) {
+            if (thisT is System.Windows.Forms.TabPage tp && tp.Tag is List<object> s && s[0] is ConnectionInfo ci) {
+                if (ci.UniqueID.Equals(connectionInfo.UniqueID, StringComparison.OrdinalIgnoreCase)) {
                     tbcDatabaseSelector.SelectedTab = tp;
 
                     if (_firstOne) {
@@ -403,13 +401,13 @@ public partial class TableView : Form {
             }
         }
 
-        AddTabPage(connectionId);
-        return SwitchTabToDatabase(connectionId); // Rekursiver Aufruf, nun sollt der Tab ja gefunden werden.
+        AddTabPage(connectionInfo);
+        return SwitchTabToDatabase(connectionInfo); // Rekursiver Aufruf, nun sollt der Tab ja gefunden werden.
     }
 
     protected bool SwitchTabToDatabase(DatabaseAbstract? database) {
         if (database == null) { return false; }
-        return SwitchTabToDatabase(database.ConnectionID);
+        return SwitchTabToDatabase(database.ConnectionData);
     }
 
     protected virtual void TableView_ContextMenu_Init(object sender, ContextMenuInitEventArgs e) {
@@ -615,7 +613,7 @@ public partial class TableView : Form {
 
     private void btnLetzteDateien_ItemClicked(object sender, BasicListItemEventArgs e) {
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-        SwitchTabToDatabase(e.Item.Internal);
+        SwitchTabToDatabase(new ConnectionInfo(e.Item.Internal));
     }
 
     private void btnLoeschen_Click(object sender, System.EventArgs e) {
@@ -652,7 +650,7 @@ public partial class TableView : Form {
 
         var db = new Database(false, string.Empty);
         db.SaveAsAndChangeTo(SaveTab.FileName);
-        SwitchTabToDatabase(SaveTab.FileName);
+        SwitchTabToDatabase(new ConnectionInfo(SaveTab.FileName));
     }
 
     private void btnNummerierung_CheckedChanged(object sender, System.EventArgs e) => Table.ShowNumber = btnNummerierung.Checked;
@@ -680,7 +678,7 @@ public partial class TableView : Form {
             if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
 
             db.SaveAsAndChangeTo(SaveTab.FileName);
-            SwitchTabToDatabase(SaveTab.FileName);
+            SwitchTabToDatabase(new ConnectionInfo(SaveTab.FileName));
         }
     }
 
@@ -784,36 +782,6 @@ public partial class TableView : Form {
 
     private void btnUnterschiede_CheckedChanged(object sender, System.EventArgs e) => Table.Unterschiede = btnUnterschiede.Checked ? Table.CursorPosRow.Row : null;
 
-    private void btnVorherigeVersion_Click(object sender, System.EventArgs e) {
-        btnVorherigeVersion.Enabled = false;
-
-        if (_originalDb != null && Table.Database != _originalDb) {
-            _originalDb.Disposing -= _originalDB_Disposing;
-            Table.DatabaseSet(_originalDb, string.Empty);
-            _originalDb = null;
-            btnVorherigeVersion.Text = "Vorherige Version";
-            btnVorherigeVersion.Enabled = true;
-            return;
-        }
-        var merker = Table.Database;
-        var l = Vorgängerversionen(Table.Database);
-        if (l.Count == 0) {
-            MessageBox.Show("Kein Backup vorhanden.", ImageCode.Information, "OK");
-            btnVorherigeVersion.Enabled = true;
-            return;
-        }
-        var files = InputBoxListBoxStyle.Show("Stand wählen:", l, AddType.None, true);
-        if (files == null || files.Count != 1) {
-            btnVorherigeVersion.Enabled = true;
-            return;
-        }
-
-        Table.DatabaseSet(Database.GetByID(files[0], false, true, Table.Database, files[0].FileNameWithoutSuffix()), string.Empty);
-        _originalDb = merker;
-        _originalDb.Disposing += _originalDB_Disposing;
-        btnVorherigeVersion.Text = "zurück";
-        btnVorherigeVersion.Enabled = true;
-    }
 
     private void btnVorwärts_Click(object sender, System.EventArgs e) {
         SuchEintragNoSave(Direction.Unten, out var column, out var row);
@@ -842,7 +810,6 @@ public partial class TableView : Form {
             _originalDb.Disposing -= _originalDB_Disposing;
         }
         _originalDb = null;
-        btnVorherigeVersion.Text = "Vorherige Version";
         CheckDatabase(database, null);
         Check_OrderButtons();
     }
@@ -940,7 +907,7 @@ public partial class TableView : Form {
         }
     }
 
-    private void LoadTab_FileOk(object sender, CancelEventArgs e) => SwitchTabToDatabase(LoadTab.FileName);
+    private void LoadTab_FileOk(object sender, CancelEventArgs e) => SwitchTabToDatabase(new ConnectionInfo(LoadTab.FileName));
 
     private string NameRepair(string istName, RowItem? vRow) {
         var newName = istName;
@@ -1036,7 +1003,7 @@ public partial class TableView : Form {
     private void TableView_EnabledChanged(object sender, System.EventArgs e) => Check_OrderButtons();
 
     private void tbcDatabaseSelector_Deselecting(object sender, System.Windows.Forms.TabControlCancelEventArgs e) {
-        var s = (List<string>)(e.TabPage.Tag);
+        var s = (List<object>)(e.TabPage.Tag);
         s[1] = ViewToString();
         e.TabPage.Tag = s;
     }
@@ -1056,22 +1023,23 @@ public partial class TableView : Form {
 
         if (e.TabPage == null) { return; }
 
-        var s = (List<string>)(e.TabPage.Tag);
+        var s = (List<object>)(e.TabPage.Tag);
 
-        var DB = Database.GetByID(s[0], false, false, null, s[0].Split('|').Last().FileNameWithoutSuffix());
+        var DB = Database.GetByID((ConnectionInfo)s[0]);
 
         if (DB != null) {
             if (!string.IsNullOrEmpty(DB.Filename)) {
-                btnLetzteDateien.AddFileName(DB.Filename, string.Empty);
+                btnLetzteDateien.AddFileName(DB.Filename, DB.TableName);
+                LoadTab.FileName = DB.Filename;
             } else {
-                btnLetzteDateien.AddFileName(DB.ConnectionID, string.Empty);
+                btnLetzteDateien.AddFileName(DB.ConnectionData.UniqueID, DB.TableName);
             }
 
-            LoadTab.FileName = DB.ConnectionID;
+
             e.TabPage.Text = DB.TableName;
         }
 
-        DatabaseSet(DB, s[1]);
+        DatabaseSet(DB, (string)s[1]);
     }
 
     private void tbcSidebar_SelectedIndexChanged(object sender, System.EventArgs e) => FillFormula(Table?.CursorPosRow?.Row);

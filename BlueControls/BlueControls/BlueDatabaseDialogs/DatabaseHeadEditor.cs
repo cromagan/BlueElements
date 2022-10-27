@@ -147,8 +147,8 @@ public sealed partial class DatabaseHeadEditor {
             var neu = work.ChangedTo;
             var aenderung = work.Comand.ToString();
             switch (work.Comand) {
-                case DatabaseDataType.ce_UTF8Value_withoutSizeData:
-                case DatabaseDataType.ce_Value_withoutSizeData:
+                case DatabaseDataType.UTF8Value_withoutSizeData:
+                case DatabaseDataType.Value_withoutSizeData:
                     symb = ImageCode.Textfeld;
                     aenderung = "Wert geändert";
                     break;
@@ -248,13 +248,13 @@ public sealed partial class DatabaseHeadEditor {
     }
 
     private void GenerateInfoText() {
-        var t = "<b>Datei:</b><tab>" + _database.ConnectionID + "<br>";
+        var t = "<b>Tabelle:</b><tab>" + _database.ConnectionData.TableName + "<br>";
         t = t + "<b>Zeilen:</b><tab>" + (_database.Row.Count() - 1);
         capInfo.Text = t.TrimEnd("<br>");
     }
 
     private void GenerateUndoTabelle() {
-        Database x = new(false, "Undo " + _database.ConnectionID);
+        Database x = new(false, "Undo " + _database.ConnectionData.TableName);
         x.Column.Add("hidden", "hidden", VarType.Text);
         x.Column.Add("Index", "Index", VarType.Integer);
         x.Column.Add("db", "Herkunft", VarType.Text);

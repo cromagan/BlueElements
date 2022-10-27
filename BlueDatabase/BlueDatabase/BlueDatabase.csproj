@@ -97,6 +97,7 @@
     <Compile Include="AdditionalScriptComands\VariableDatabase.cs" />
     <Compile Include="AdditionalScriptComands\VariableRowItem.cs" />
     <Compile Include="AdditionalScriptComands\VariableFilterItem.cs" />
+    <Compile Include="ConnetionInfo.cs" />
     <Compile Include="DatabaseAbstract.cs" />
     <Compile Include="SQLBackMicrosoftCE.cs" />
     <Compile Include="CellCollection.cs" />

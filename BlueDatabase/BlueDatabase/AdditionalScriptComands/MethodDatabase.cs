@@ -30,10 +30,10 @@ public abstract class MethodDatabase : Method {
 
     protected ColumnItem? Column(Script s, string name) => MyDatabase(s)?.Column.Exists(name);
 
-    protected DatabaseAbstract? DatabaseOf(Script s, string name) {
+    protected DatabaseAbstract? DatabaseOf(Script s, string tableName) {
         if (s.Variables != null) {
-            var db = MyDatabase(s);
-            return DatabaseAbstract.GetByID(name, true, false, db, name.FileNameWithoutSuffix());
+            var db = MyDatabase(s).ConnectionDataOfOtherTable(tableName);
+            return DatabaseAbstract.GetByID(db);
         }
 
         return null;

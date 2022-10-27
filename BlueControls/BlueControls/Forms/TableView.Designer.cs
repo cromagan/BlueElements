@@ -69,7 +69,6 @@ namespace BlueControls.Forms {
             this.btnLayouts = new BlueControls.Controls.Button();
             this.grpAdminAllgemein = new BlueControls.Controls.GroupBox();
             this.btnSaveLoad = new BlueControls.Controls.Button();
-            this.btnVorherigeVersion = new BlueControls.Controls.Button();
             this.btnDatenbankKopf = new BlueControls.Controls.Button();
             this.btnSpaltenUebersicht = new BlueControls.Controls.Button();
             this.tabExport = new System.Windows.Forms.TabPage();
@@ -663,7 +662,6 @@ namespace BlueControls.Forms {
             this.grpAdminAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpAdminAllgemein.CausesValidation = false;
             this.grpAdminAllgemein.Controls.Add(this.btnSaveLoad);
-            this.grpAdminAllgemein.Controls.Add(this.btnVorherigeVersion);
             this.grpAdminAllgemein.Controls.Add(this.btnDatenbankKopf);
             this.grpAdminAllgemein.Controls.Add(this.btnSpaltenUebersicht);
             this.grpAdminAllgemein.Dock = System.Windows.Forms.DockStyle.Left;
@@ -686,17 +684,6 @@ namespace BlueControls.Forms {
             this.btnSaveLoad.TabIndex = 43;
             this.btnSaveLoad.Text = "Daten aktual.";
             this.btnSaveLoad.Click += new System.EventHandler(this.btnSaveLoad_Click);
-            // 
-            // btnVorherigeVersion
-            // 
-            this.btnVorherigeVersion.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnVorherigeVersion.ImageCode = "Uhr";
-            this.btnVorherigeVersion.Location = new System.Drawing.Point(136, 2);
-            this.btnVorherigeVersion.Name = "btnVorherigeVersion";
-            this.btnVorherigeVersion.Size = new System.Drawing.Size(64, 66);
-            this.btnVorherigeVersion.TabIndex = 42;
-            this.btnVorherigeVersion.Text = "Vorherige Version";
-            this.btnVorherigeVersion.Click += new System.EventHandler(this.btnVorherigeVersion_Click);
             // 
             // btnDatenbankKopf
             // 
@@ -1030,7 +1017,6 @@ namespace BlueControls.Forms {
         private Controls.Button btnPowerBearbeitung;
         private Controls.Button btnSpaltenanordnung;
         private Controls.Button btnLayouts;
-        private Controls.Button btnVorherigeVersion;
         private Controls.Button btnDatenbankKopf;
         private Controls.Button btnSpaltenUebersicht;
         private Controls.Button btnClipboardImport;

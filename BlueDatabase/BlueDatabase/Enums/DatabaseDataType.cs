@@ -211,7 +211,7 @@ public enum DatabaseDataType : byte {
     ShowMultiLineInOneLine = 153,
 
     EditAllowedDespiteLock = 154,
-    co_ShowUndo = 155,
+    ShowUndo = 155,
     SpellCheckingEnabled = 156,
 
     //co_TagsInternal_ALT = 157,
@@ -279,14 +279,14 @@ public enum DatabaseDataType : byte {
     DoOpticalTranslation = 198,
     TextFormatingAllowed = 199,
 
-    ce_Value_withoutSizeData = 200,
-    ce_Value_withSizeData = 201,
+    Value_withoutSizeData = 200,
+    Value_withSizeData = 201,
 
     [Obsolete]
-    ce_UTF8Value_withoutSizeData = 202,
+    UTF8Value_withoutSizeData = 202,
 
     [Obsolete]
-    ce_UTF8Value_withSizeData = 203,
+    UTF8Value_withSizeData = 203,
 
     //Dummy_ce_ValueWithoutSizeUncrypted = 204,
 

@@ -85,10 +85,16 @@ public sealed class Database : DatabaseAbstract {
 
     #region Properties
 
-    /// <summary>
-    /// Entspricht dem Dateinamen
-    /// </summary>
-    public override string ConnectionID => _muf != null ? _muf.Filename : string.Empty;
+
+    public override ConnectionInfo ConnectionData {
+        get {
+            return new ConnectionInfo(TableName, this, DatabaseID, Filename);
+        }
+        
+        //_muf != null ? _muf.Filename : string.Empty;
+
+    }
+ 
 
     public override string Filename => _muf != null ? _muf.Filename : string.Empty;
 
@@ -104,6 +110,25 @@ public sealed class Database : DatabaseAbstract {
     #endregion
 
     #region Methods
+
+    public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked) {
+        if (string.IsNullOrWhiteSpace(Filename)) { return null; } // Stream-Datenbank
+
+        if (allreadychecked != null) {
+            foreach (var thisa in allreadychecked) {
+                if (thisa is Database db) {
+                    if (string.Equals(db.Filename.FilePath(), Filename.FilePath())) { return null; }
+                }
+            }
+        }
+
+        var nn = System.IO.Directory.GetFiles(Filename.FilePath(), "*.mdb", SearchOption.AllDirectories);
+        var gb = new List<ConnectionInfo>();
+        foreach (var thisn in nn) {
+            gb.Add(ConnectionDataOfOtherTable(thisn));
+        }
+        return gb;
+    }
 
     public override void BlockReload(bool crashIsCurrentlyLoading) {
         _muf.BlockReload(crashIsCurrentlyLoading);
@@ -403,7 +428,7 @@ public sealed class Database : DatabaseAbstract {
         SaveToByteList(l, DatabaseDataType.EditableWithTextInput, c.TextBearbeitungErlaubt.ToPlusMinus(), key);
         SaveToByteList(l, DatabaseDataType.SpellCheckingEnabled, c.SpellCheckingEnabled.ToPlusMinus(), key);
         SaveToByteList(l, DatabaseDataType.ShowMultiLineInOneLine, c.ShowMultiLineInOneLine.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.co_ShowUndo, c.ShowUndo.ToPlusMinus(), key);
+        SaveToByteList(l, DatabaseDataType.ShowUndo, c.ShowUndo.ToPlusMinus(), key);
         SaveToByteList(l, DatabaseDataType.TextFormatingAllowed, c.FormatierungErlaubt.ToPlusMinus(), key);
         SaveToByteList(l, DatabaseDataType.ForeColor, c.ForeColor.ToArgb().ToString(), key);
         SaveToByteList(l, DatabaseDataType.BackColor, c.BackColor.ToArgb().ToString(), key);
@@ -481,7 +506,7 @@ public sealed class Database : DatabaseAbstract {
         if (!tColumn.SaveContent) { return; }
         var b = cell.Value.Value.UTF8_ToByte();
         list.Add((byte)Routinen.CellFormatUTF8_V400);
-        list.Add((byte)DatabaseDataType.ce_Value_withSizeData);
+        list.Add((byte)DatabaseDataType.Value_withSizeData);
         SaveToByteList(list, b.Length, 3);
         SaveToByteList(list, tColumn.Key, 7);
         SaveToByteList(list, tRow.Key, 7);
@@ -501,14 +526,8 @@ public sealed class Database : DatabaseAbstract {
         base.Dispose(disposing);
     }
 
-    protected override DatabaseAbstract? GetOtherTable(string tablename, bool readOnly) {
-        if (string.IsNullOrEmpty(Filename)) { return null; }
 
-        var newpf = Filename.FilePath() + tablename.FileNameWithoutSuffix() + ".mdb";
 
-        return GetByID(newpf, false, readOnly, null, tablename);
-        // KEINE Vorage mitgeben, weil sonst eine Endlosschleife aufgerufen wird!
-    }
 
     protected override void Initialize() {
         base.Initialize();
@@ -654,7 +673,7 @@ public sealed class Database : DatabaseAbstract {
                 row = Row.SearchByKey(thisPendingItem.RowKey);
                 if (row == null) {
                     if (thisPendingItem.Comand != DatabaseDataType.dummyComand_AddRow && thisPendingItem.User != UserName) {
-                        Develop.DebugPrint("Pending verworfen, Zeile gelöscht.<br>" + ConnectionID + "<br>" + thisPendingItem.ToString());
+                        Develop.DebugPrint("Pending verworfen, Zeile gelöscht.<br>" + ConnectionData.TableName + "<br>" + thisPendingItem.ToString());
                         return;
                     }
                 }
@@ -664,7 +683,7 @@ public sealed class Database : DatabaseAbstract {
                 col = Column.SearchByKey(thisPendingItem.ColKey);
                 if (col == null) {
                     //if (thisPendingItem.Comand != DatabaseDataType.AddColumnKeyInfo && thisPendingItem.User != UserName) {
-                    Develop.DebugPrint("Pending verworfen, Spalte gelöscht.<br>" + ConnectionID + "<br>" + thisPendingItem.ToString());
+                    Develop.DebugPrint("Pending verworfen, Spalte gelöscht.<br>" + ConnectionData.TableName + "<br>" + thisPendingItem.ToString());
                     return;
                     //}
                 }
@@ -729,7 +748,7 @@ public sealed class Database : DatabaseAbstract {
             if (Works != null) {
                 foreach (var thisWorkItem in Works) {
                     if (thisWorkItem != null) {
-                        if (thisWorkItem.Comand != DatabaseDataType.ce_Value_withoutSizeData) {
+                        if (thisWorkItem.Comand != DatabaseDataType.Value_withoutSizeData) {
                             works2.Add(thisWorkItem.ToString());
                         } else {
                             if (thisWorkItem.LogsUndo(this)) {
@@ -749,6 +768,21 @@ public sealed class Database : DatabaseAbstract {
             ToListOfByte(sender, e);
         }
     }
+
+    public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName) {
+
+        if (string.IsNullOrEmpty(Filename)) { return null; }
+
+        var f = Filename.FilePath() + tableName.FileNameWithoutSuffix() + ".mdb";
+
+        return new ConnectionInfo(tableName, this, DatabaseID, f);
+
+
+
+    }
+
+    public static string DatabaseID { get => "BlueDatabase"; }
+
 
     #endregion
 }

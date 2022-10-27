@@ -153,7 +153,6 @@ public abstract class SQLBackAbstract {
                 break;
 
             case DatabaseDataType.SaveContent:
-            case DatabaseDataType.co_ShowUndo:
                 break;
 
             case DatabaseDataType.EOF:
@@ -231,8 +230,14 @@ public abstract class SQLBackAbstract {
         return _connection.State == ConnectionState.Closed;
     }
 
-    public string ConnectionID(string tablename) {
-        return ConnectionString + "|" + tablename.ToUpper();
+
+    /// <summary>
+    /// Provider ist immer NULL!
+    /// </summary>
+    /// <param name="tablename"></param>
+    /// <returns></returns>
+    public ConnectionInfo ConnectionData(string tablename) {
+        return new ConnectionInfo(tablename, null, ConnectionString, string.Empty);
     }
 
     /// <summary>
@@ -447,7 +452,10 @@ public abstract class SQLBackAbstract {
         if (isVal == null) { return false; }
         if (isVal == newValue) { return true; }
 
-        ExecuteCommand("DELETE FROM " + SYS_STYLE + " WHERE TABLENAME = " + DBVAL(tablename.ToUpper()) + " AND COLUMNNAME = " + DBVAL(columnName.ToUpper()) + "  AND TYPE = " + DBVAL(type.ToString()));
+        ExecuteCommand("DELETE FROM " + SYS_STYLE + 
+                       " WHERE TABLENAME = " + DBVAL(tablename.ToUpper()) + 
+                       " AND COLUMNNAME = " + DBVAL(columnName.ToUpper()) + 
+                       " AND TYPE = " + DBVAL(type.ToString()));
 
         do {
             c++;
@@ -473,15 +481,15 @@ public abstract class SQLBackAbstract {
         return l;
     }
 
-    internal SQLBackAbstract? HandleMe(string connectionID) {
-        if (string.IsNullOrEmpty(connectionID)) { return null; }
+    internal SQLBackAbstract? HandleMe(ConnectionInfo ci) {
+        if (ci is null ) { return null; }
 
-        var s = connectionID.SplitBy("|");
-        if (s.Count() != 2) { return null; }
+        //var s = connectionID.SplitBy("|");
+        //if (s.Count() != 2) { return null; }
 
         foreach (var thisK in ConnectedSQLBack) {
-            if (thisK.ConnectionOk && thisK.ConnectionString == s[0]) {
-                return thisK.OtherTable(s[1]);
+            if (thisK.ConnectionOk && thisK.ConnectionString == ci.DatabaseID) {
+                return thisK.OtherTable(ci.TableName);
             }
         }
 

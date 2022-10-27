@@ -406,7 +406,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         var dbColumnCombi = new List<string>();
         foreach (var thisc in Database?.Column) {
             if (thisc.LinkedDatabase != null) {
-                var dbN = thisc.LinkedDatabase.ConnectionID + "|" + thisc.LinkedCellFilter.JoinWithCr();
+                var dbN = thisc.LinkedDatabase.ConnectionData.TableName + "|" + thisc.LinkedCellFilter.JoinWithCr();
                 dbColumnCombi.AddIfNotExists(dbN);
             }
         }
@@ -422,7 +422,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
                 if (thisc.Column.LinkedDatabase != null) {
                     // String als Namen als eindeutige Kennung
-                    var toCheckCombi = thisc.Column.LinkedDatabase.ConnectionID + "|" + thisc.Column.LinkedCellFilter.JoinWithCr();
+                    var toCheckCombi = thisc.Column.LinkedDatabase.ConnectionData.TableName + "|" + thisc.Column.LinkedCellFilter.JoinWithCr();
 
                     if (toCheckCombi == thisCombi) {
 
@@ -430,7 +430,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
                         var databItem = (GenericPadItem)Pad.Item[toCheckCombi];
                         if (databItem == null) {
-                            var nam = thisc.Column.LinkedDatabase.ConnectionID.FileNameWithSuffix();
+                            var nam = thisc.Column.LinkedDatabase.ConnectionData.TableName;
                             databItem = new GenericPadItem(toCheckCombi, nam, new Size((int)(anyitem.UsedArea.Height / 2), (int)anyitem.UsedArea.Height));
                             Pad.Item.Add(databItem);
                             databItem.SetLeftTopPoint(Math.Max(kx, it.UsedArea.Left - databItem.UsedArea.Width), 600);

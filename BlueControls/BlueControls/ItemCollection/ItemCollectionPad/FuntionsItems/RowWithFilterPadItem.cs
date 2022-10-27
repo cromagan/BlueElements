@@ -202,7 +202,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         if (base.ParseThis(tag, value)) { return true; }
         switch (tag) {
             case "database":
-                Database = DatabaseAbstract.GetByID(value.FromNonCritical(), false, false, null, value.FromNonCritical().FileNameWithoutSuffix());
+                Database = DatabaseAbstract.GetByID(new ConnectionInfo(value.FromNonCritical()));
                 return true;
 
             case "id":
@@ -258,7 +258,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         t = t + "ID=" + Id.ToString() + ", ";
 
         if (Database != null) {
-            t = t + "Database=" + Database.ConnectionID.ToNonCritical() + ", ";
+            t = t + "Database=" + Database.ConnectionData.UniqueID.ToNonCritical() + ", ";
         }
 
         if (FilterDefiniton != null) {

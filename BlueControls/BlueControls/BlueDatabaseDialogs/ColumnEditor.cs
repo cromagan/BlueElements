@@ -519,12 +519,15 @@ internal sealed partial class ColumnEditor {
 
         if (linkdb == null || tblFilterliste.Database == null) { tblFilterliste.DatabaseSet(null, string.Empty); }
 
-        if (tblFilterliste.Database != null && tblFilterliste.Database.Tags.TagGet("Filename") != linkdb.ConnectionID) { tblFilterliste.DatabaseSet(null, string.Empty); }
+        if (tblFilterliste.Database != null && 
+            tblFilterliste.Database.Tags.TagGet("Filename") != linkdb.ConnectionData.UniqueID) {
+            tblFilterliste.DatabaseSet(null, string.Empty);
+        }
 
         if (linkdb == null) { return; }
 
         if (tblFilterliste.Database == null) {
-            Database db = new(false, "Filter " + _column.Database.ConnectionID + " " + _column.Name);
+            Database db = new(false, "Filter " + _column.Database.ConnectionData.UniqueID + " " + _column.Name);
             db.Column.Add("count", "count", VarType.Integer);
             var vis = db.Column.Add("visible", "visible", VarType.Bit);
             var sp = db.Column.Add("Spalte", "Spalte", VarType.Text);
@@ -563,7 +566,7 @@ internal sealed partial class ColumnEditor {
 
 
             var t = db.Tags.Clone();
-            t.TagSet("Filename", linkdb.ConnectionID);
+            t.TagSet("Filename", linkdb.ConnectionData.UniqueID);
             db.Tags = t;
 
             tblFilterliste.Filter.Add(vis, FilterType.Istgleich, "+");

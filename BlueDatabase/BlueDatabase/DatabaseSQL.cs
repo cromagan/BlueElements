@@ -63,7 +63,13 @@ public sealed class DatabaseSQL : DatabaseAbstract {
 
     #region Properties
 
-    public override string ConnectionID => _sql.ConnectionID(TableName);
+    public override ConnectionInfo ConnectionData {
+        get {
+            var ConnectionData = _sql.ConnectionData(TableName);
+            ConnectionData.Provider = this;
+            return ConnectionData;
+        }
+    }
 
     public override string Filename => _sql.Filename;
 
@@ -101,7 +107,33 @@ public sealed class DatabaseSQL : DatabaseAbstract {
 
     #region Methods
 
+    public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked) {
+        if (allreadychecked != null) {
+            foreach (var thisa in allreadychecked) {
+                if (thisa is DatabaseSQL db) {
+                    if (db._sql == _sql) { return null; }
+                }
+            }
+        }
+
+        var tb = _sql.Tables();
+
+        var l = new List<ConnectionInfo>();
+
+        foreach (var thistb in tb) {
+            l.Add(ConnectionDataOfOtherTable(thistb));
+        }
+
+        return l;
+    }
+
     public override void BlockReload(bool crashIsCurrentlyLoading) { }
+
+    public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName) {
+        var ConnectionData = _sql.ConnectionData(tableName);
+        ConnectionData.Provider = this;
+        return ConnectionData;
+    }
 
     public override void Load_Reload() {
         LoadFromSQLBack();
@@ -135,14 +167,6 @@ public sealed class DatabaseSQL : DatabaseAbstract {
 
     protected override void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName) {
         _sql.AddUndo(tableName, comand, column, row, previousValue, changedTo, UserName);
-    }
-
-    protected override DatabaseAbstract? GetOtherTable(string tablename, bool readOnly) {
-        if (!SQLBackAbstract.IsValidTableName(tablename)) {
-            return null;
-        }
-
-        return new DatabaseSQL(_sql, readOnly, tablename);
     }
 
     protected override void SetUserDidSomething() { }
