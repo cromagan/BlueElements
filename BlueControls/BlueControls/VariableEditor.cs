@@ -76,7 +76,7 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
     }
 
     private void GenerateVariableTable() {
-        Database x = new(false, "Script-Variablen");
+        Database x = new(false, "Script_Variablen");
         x.Column.Add("Name", "N", VarType.Text, "Variablenname");
         x.Column.Add("Typ", "T", VarType.Text, "Variablentyp");
         x.Column.Add("RO", "R", VarType.Bit, "Readonly, Schreibgeschützt");

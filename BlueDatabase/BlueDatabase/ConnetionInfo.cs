@@ -18,6 +18,8 @@
 #nullable enable
 
 using BlueBasics;
+using System.Collections.Generic;
+using static BlueBasics.Extensions;
 
 namespace BlueDatabase;
 
@@ -26,6 +28,12 @@ namespace BlueDatabase;
 /// </summary>
 public class ConnectionInfo {
 
+    #region Fields
+
+    private string _tablename = string.Empty;
+
+    #endregion
+
     #region Constructors
 
     /// <summary>
@@ -33,10 +41,10 @@ public class ConnectionInfo {
     /// </summary>
     /// <param name="uniqueID"></param>
     public ConnectionInfo(string uniqueID) {
-        if (uniqueID.FileSuffix().ToUpper() == "MDB" && System.IO.File.Exists(uniqueID)) {
-            // Siehe Database.ConnectionDataByFilename
-
-            TableName = uniqueID.FileNameWithoutSuffix().ToUpper();
+        if (uniqueID.FileSuffix().ToUpper() == "MDB" &&
+            uniqueID.Substring(1, 1)==":" &&
+            System.IO.File.Exists(uniqueID)) {
+            TableName = SQLBackAbstract.MakeValidTableName(uniqueID.FileNameWithoutSuffix());
             Provider = null;
             DatabaseID = Database.DatabaseID;
             AdditionalData = uniqueID;
@@ -45,7 +53,12 @@ public class ConnectionInfo {
 
         var x = (uniqueID + "||||").SplitBy("|");
 
-        foreach (var thisDB in DatabaseAbstract.AllFiles) {
+
+        var alf = new List<DatabaseAbstract>();// könnte sich ändern, deswegen Zwischenspeichern
+        alf.AddRange(DatabaseAbstract.AllFiles);
+
+
+        foreach (var thisDB in alf) {
             var d = thisDB.ConnectionData;
 
             if (d.DatabaseID == x[1]) {
@@ -132,7 +145,15 @@ public class ConnectionInfo {
     /// <summary>
     /// Die Tabelle, um die es geht.
     /// </summary>
-    public string TableName { get; set; }
+    public string TableName {
+        get => _tablename; set {
+            if (!SQLBackAbstract.IsValidTableName(value)) {
+                Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Tabellenname ungültig: " + value);
+            }
+
+            _tablename = value;
+        }
+    }
 
     /// <summary>
     /// Eindeutiger Schlüssel, mit dem eine Datenbank von vorhandenen Datenbanken wieder gefunden werden kann.

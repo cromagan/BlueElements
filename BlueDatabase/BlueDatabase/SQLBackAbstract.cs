@@ -25,7 +25,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Linq;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
@@ -98,6 +97,12 @@ public abstract class SQLBackAbstract {
         if (!t.ContainsOnlyChars(Constants.Char_AZ + Constants.Char_Numerals + "_")) { return false; }
 
         return true;
+    }
+
+    public static string MakeValidTableName(string tablename) {
+        var tmp = tablename.FileNameWithoutSuffix().ToLower().Replace(" ", "_").Replace("-", "_");
+        tmp = tmp.StarkeVereinfachung("_").ToUpper().Replace("__", "_");
+        return tmp;
     }
 
     /// <summary>
@@ -229,7 +234,6 @@ public abstract class SQLBackAbstract {
 
         return _connection.State == ConnectionState.Closed;
     }
-
 
     /// <summary>
     /// Provider ist immer NULL!
@@ -452,9 +456,9 @@ public abstract class SQLBackAbstract {
         if (isVal == null) { return false; }
         if (isVal == newValue) { return true; }
 
-        ExecuteCommand("DELETE FROM " + SYS_STYLE + 
-                       " WHERE TABLENAME = " + DBVAL(tablename.ToUpper()) + 
-                       " AND COLUMNNAME = " + DBVAL(columnName.ToUpper()) + 
+        ExecuteCommand("DELETE FROM " + SYS_STYLE +
+                       " WHERE TABLENAME = " + DBVAL(tablename.ToUpper()) +
+                       " AND COLUMNNAME = " + DBVAL(columnName.ToUpper()) +
                        " AND TYPE = " + DBVAL(type.ToString()));
 
         do {
@@ -482,7 +486,7 @@ public abstract class SQLBackAbstract {
     }
 
     internal SQLBackAbstract? HandleMe(ConnectionInfo ci) {
-        if (ci is null ) { return null; }
+        if (ci is null) { return null; }
 
         //var s = connectionID.SplitBy("|");
         //if (s.Count() != 2) { return null; }
@@ -661,6 +665,10 @@ public abstract class SQLBackAbstract {
         if (!OpenConnection()) { return false; }
 
         return ExecuteCommand(cmdString);
+    }
+
+    internal static string MakeValidColumnName(string columnname) {
+       return columnname.ToUpper().Replace(" ", "_").ReduceToChars(Constants.AllowedCharsVariableName);
     }
 
     #endregion

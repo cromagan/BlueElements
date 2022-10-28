@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text.RegularExpressions;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
@@ -800,6 +801,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         if (!name.ContainsOnlyChars(Constants.AllowedCharsVariableName)) { return false; }
 
         if (!Constants.Char_AZ.Contains(name.Substring(0, 1).ToUpper())) { return false; }
+
+        if(name.ToUpper() =="USER") { return false; } // SQL System-Name
 
         return true;
     }

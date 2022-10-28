@@ -103,7 +103,7 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
         // var myConn = new SqlConnection("Server=(local)\\netsdk;uid=sa;pwd=;database=master");
 
         var myConn = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;Integrated security=SSPI;database=master");
-        var dbn = filename.FileNameWithoutSuffix().Replace(" ", "_");
+        var dbn = MakeValidTableName(filename.FileNameWithoutSuffix());
         filename = filename.FilePath() + dbn + ".mdf";
 
         var str = "CREATE DATABASE " + dbn + " ON PRIMARY " +

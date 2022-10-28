@@ -248,8 +248,9 @@ public sealed partial class DatabaseHeadEditor {
     }
 
     private void GenerateInfoText() {
-        var t = "<b>Tabelle:</b><tab>" + _database.ConnectionData.TableName + "<br>";
-        t = t + "<b>Zeilen:</b><tab>" + (_database.Row.Count() - 1);
+        var t = "<b>Tabelle:</b> <tab>" + _database.ConnectionData.TableName + "<br>";
+        t = t + "<b>ID:</b> <tab>" + _database.ConnectionData.UniqueID + "<br>";
+        t = t + "<b>Zeilen:</b> <tab>" + (_database.Row.Count() - 1);
         capInfo.Text = t.TrimEnd("<br>");
     }
 

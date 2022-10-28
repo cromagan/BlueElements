@@ -775,7 +775,7 @@ public sealed class Database : DatabaseAbstract {
 
         var f = Filename.FilePath() + tableName.FileNameWithoutSuffix() + ".mdb";
 
-        return new ConnectionInfo(tableName, this, DatabaseID, f);
+        return new ConnectionInfo(f);
 
 
 

@@ -99,7 +99,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
     protected DatabaseAbstract(string tablename, bool readOnly) {
         ReadOnly = readOnly;
-        TableName = tablename.ToUpper();
+        TableName = SQLBackAbstract.MakeValidTableName(tablename);
         UserGroup = "#Administrator";
         Cell = new CellCollection(this);
 
@@ -273,6 +273,8 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
     public string LoadedVersion { get; private set; }
 
+    public bool LogUndo { get; set; } = true;
+
     public List<string>? PermissionGroupsNewRow {
         get => _permissionGroupsNewRow;
         set {
@@ -372,14 +374,15 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
     #region Methods
 
-
-
     public static List<ConnectionInfo> AllAvailableTables() {
         var gb = new List<ConnectionInfo>();
 
         var allreadychecked = new List<DatabaseAbstract>();
 
-        foreach (var thisDB in AllFiles) {
+        var alf = new List<DatabaseAbstract>();// könnte sich ändern, deswegen Zwischenspeichern
+        alf.AddRange(DatabaseAbstract.AllFiles);
+
+        foreach (var thisDB in alf) {
             var nn = thisDB.AllAvailableTables(allreadychecked);
 
             allreadychecked.Add(thisDB);
@@ -407,7 +410,6 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
                 return thisFile;
             }
         }
-
 
         if (ci.Provider != null) {
             return ci.Provider.GetOtherTable(ci.TableName);
@@ -525,7 +527,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
             } while (pf != string.Empty);
         }
         var d = Generic.GetEmmbedResource(assembly, name);
-        if (d != null) { return new Database(d, name); }
+        if (d != null) { return new Database(d, name.ToUpper().TrimEnd(".MDB")); }
         if (fehlerAusgeben) { Develop.DebugPrint(FehlerArt.Fehler, "Ressource konnte nicht initialisiert werden: " + blueBasicsSubDir + " - " + name); }
         return null;
     }
@@ -606,7 +608,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
         StoreValueToHardDisk(comand, column, row, changedTo);
 
-        if (comand  != DatabaseDataType.TimeCode) {
+        if (comand  != DatabaseDataType.TimeCode && LogUndo) {
             AddUndo(TableName, comand, column, row, previousValue, changedTo, UserName);
             ChangeData(DatabaseDataType.TimeCode, null, null, _timeCode, DateTime.UtcNow.ToString(Constants.Format_Date));
         }
@@ -619,6 +621,8 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     /// </summary>
     /// <param name="sourceDatabase"></param>
     public void CloneFrom(DatabaseAbstract sourceDatabase, bool cellDataToo) {
+        LogUndo = false;
+
         Column.CloneFrom(sourceDatabase);
 
         if (cellDataToo) { Row.CloneFrom(sourceDatabase); }
@@ -658,7 +662,11 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         UndoCount = sourceDatabase.UndoCount;
 
         ColumnArrangements = tcvc;
+
+        LogUndo = true;
     }
+
+    public abstract ConnectionInfo? ConnectionDataOfOtherTable(string tableName);
 
     /// <summary>
     /// AdditionaFiles/Datenbankpfad mit Forms und abschließenden \
@@ -886,6 +894,26 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         return null;
     }
 
+    public DatabaseAbstract? GetOtherTable(string tablename) {
+        //if (string.IsNullOrEmpty(tablename)) { return null; }
+
+        //var newpf = Filename.FilePath() + tablename.FileNameWithoutSuffix() + ".mdb";
+
+        //return GetByID(new ConnectionInfo(tablename, null, DatabaseID, newpf);
+        //// KEINE Vorage mitgeben, weil sonst eine Endlosschleife aufgerufen wird!
+
+        //    public override DatabaseAbstract? GetOtherTable(string tablename) {
+        //if (!SQLBackAbstract.IsValidTableName(tablename)) {
+        //    return null;
+        //}
+
+        var x = ConnectionDataOfOtherTable(tablename);
+
+        x.Provider = null;  // KEINE Vorage mitgeben, weil sonst eine Endlosschleife aufgerufen wird!
+
+        return GetByID(x);// new DatabaseSQL(_sql, readOnly, tablename);
+    }
+
     public string Import(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart, bool dorowautmatic, string script) {
         // Vorbereitung des Textes -----------------------------
         importText = importText.Replace("\r\n", "\r").Trim("\r");
@@ -944,7 +972,8 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
                     OnDropMessage(FehlerArt.Warnung, "Abbruch,<br>leerer Spaltenname.");
                     return "Abbruch,<br>leerer Spaltenname.";
                 }
-                zeil[0][spaltNo] = zeil[0][spaltNo].Replace(" ", "_").ReduceToChars(Constants.AllowedCharsVariableName);
+                zeil[0][spaltNo] = SQLBackAbstract.MakeValidColumnName(zeil[0][spaltNo]);
+
                 var col = Column.Exists(zeil[0][spaltNo]);
                 if (col == null) {
                     col = Column.Add(zeil[0][spaltNo]);
@@ -1236,31 +1265,6 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         //_datenbankAdmin.Dispose();
         //_permissionGroupsNewRow.Dispose();
         _layouts.Dispose();
-    }
-
-    public DatabaseAbstract? GetOtherTable(string tablename) {
-
-        //if (string.IsNullOrEmpty(tablename)) { return null; }
-
-        //var newpf = Filename.FilePath() + tablename.FileNameWithoutSuffix() + ".mdb";
-
-        //return GetByID(new ConnectionInfo(tablename, null, DatabaseID, newpf);
-        //// KEINE Vorage mitgeben, weil sonst eine Endlosschleife aufgerufen wird!
-
-
-        //    public override DatabaseAbstract? GetOtherTable(string tablename) {
-        //if (!SQLBackAbstract.IsValidTableName(tablename)) {
-        //    return null;
-        //}
-
-        var x = ConnectionDataOfOtherTable(tablename);
-
-        x.Provider = null;  // KEINE Vorage mitgeben, weil sonst eine Endlosschleife aufgerufen wird!
-
-        return GetByID(x);// new DatabaseSQL(_sql, readOnly, tablename);
-
-
-
     }
 
     protected virtual void Initialize() {
@@ -1783,9 +1787,6 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
             StartBackgroundWorker();
         }
     }
-
-    public abstract ConnectionInfo? ConnectionDataOfOtherTable(string tableName);
-
 
     #endregion
 }
