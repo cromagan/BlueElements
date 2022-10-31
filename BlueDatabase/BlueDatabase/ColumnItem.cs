@@ -29,7 +29,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text.RegularExpressions;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
@@ -587,7 +586,10 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             if (_tmpLinkedDatabase != null) { return _tmpLinkedDatabase; }
             if (string.IsNullOrEmpty(_linkedDatabaseFile)) { return null; }
 
-            var ci = Database.ConnectionDataOfOtherTable(_linkedDatabaseFile);//  new ConnectionInfo(_linkedDatabaseFile, this, this.DatabaseID, string.Empty);
+            var ci = new ConnectionInfo(_linkedDatabaseFile);
+
+            //q
+            //var ci = Database.ConnectionDataOfOtherTable(_linkedDatabaseFile.FileNameWithoutSuffix());//  new ConnectionInfo(_linkedDatabaseFile, this, this.DatabaseID, string.Empty);
 
             Tmp_LinkedDatabase = DatabaseAbstract.GetByID(ci);
 
@@ -802,7 +804,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
         if (!Constants.Char_AZ.Contains(name.Substring(0, 1).ToUpper())) { return false; }
 
-        if(name.ToUpper() =="USER") { return false; } // SQL System-Name
+        if (name.ToUpper() =="USER") { return false; } // SQL System-Name
 
         return true;
     }

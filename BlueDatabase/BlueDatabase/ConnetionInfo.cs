@@ -70,6 +70,7 @@ public class ConnectionInfo {
             }
 
             if (d.DatabaseID == Database.DatabaseID) {
+                // Dateisystem
                 var dn = d.AdditionalData.FilePath() + x[0] + ".mdb";
                 if (System.IO.File.Exists(dn)) {
                     TableName = x[0].ToUpper();
@@ -79,6 +80,25 @@ public class ConnectionInfo {
                 }
             }
         }
+  
+
+        var tbn = SQLBackAbstract.MakeValidTableName( uniqueID.FileNameWithoutSuffix());
+
+        var alc = DatabaseAbstract.AllAvailableTables();
+
+
+        foreach(var thisc in alc) {
+
+            if(thisc.TableName  == tbn) {
+                TableName = thisc.TableName;
+                Provider = thisc.Provider;
+                DatabaseID = thisc.DatabaseID;
+                AdditionalData = thisc.AdditionalData;
+                return;
+            }
+
+        }
+
 
         //#region Wenn die Connection einem Dateinamen entspricht, versuchen den zu laden
 

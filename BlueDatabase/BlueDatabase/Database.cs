@@ -85,16 +85,15 @@ public sealed class Database : DatabaseAbstract {
 
     #region Properties
 
+    public static string DatabaseID { get => "BlueDatabase"; }
 
     public override ConnectionInfo ConnectionData {
         get {
             return new ConnectionInfo(TableName, this, DatabaseID, Filename);
         }
-        
-        //_muf != null ? _muf.Filename : string.Empty;
 
+        //_muf != null ? _muf.Filename : string.Empty;
     }
- 
 
     public override string Filename => _muf != null ? _muf.Filename : string.Empty;
 
@@ -132,6 +131,14 @@ public sealed class Database : DatabaseAbstract {
 
     public override void BlockReload(bool crashIsCurrentlyLoading) {
         _muf.BlockReload(crashIsCurrentlyLoading);
+    }
+
+    public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName) {
+        if (string.IsNullOrEmpty(Filename)) { return null; }
+
+        var f = Filename.FilePath() + tableName.FileNameWithoutSuffix() + ".mdb";
+
+        return new ConnectionInfo(f);
     }
 
     public void DiscardPendingChanges(object sender, System.EventArgs e) => ChangeWorkItems(ItemState.Pending, ItemState.Undo);
@@ -526,9 +533,6 @@ public sealed class Database : DatabaseAbstract {
         base.Dispose(disposing);
     }
 
-
-
-
     protected override void Initialize() {
         base.Initialize();
         _muf.ReloadDelaySecond = 600;
@@ -768,21 +772,6 @@ public sealed class Database : DatabaseAbstract {
             ToListOfByte(sender, e);
         }
     }
-
-    public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName) {
-
-        if (string.IsNullOrEmpty(Filename)) { return null; }
-
-        var f = Filename.FilePath() + tableName.FileNameWithoutSuffix() + ".mdb";
-
-        return new ConnectionInfo(f);
-
-
-
-    }
-
-    public static string DatabaseID { get => "BlueDatabase"; }
-
 
     #endregion
 }

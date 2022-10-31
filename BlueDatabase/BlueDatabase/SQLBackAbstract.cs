@@ -100,7 +100,8 @@ public abstract class SQLBackAbstract {
     }
 
     public static string MakeValidTableName(string tablename) {
-        var tmp = tablename.FileNameWithoutSuffix().ToLower().Replace(" ", "_").Replace("-", "_");
+        var tmp = tablename.RemoveChars(Constants.Char_PfadSonderZeichen); // sonst stürzt FileNameWithoutSuffix ab
+        tmp = tmp.FileNameWithoutSuffix().ToLower().Replace(" ", "_").Replace("-", "_");
         tmp = tmp.StarkeVereinfachung("_").ToUpper().Replace("__", "_");
         return tmp;
     }
@@ -485,6 +486,10 @@ public abstract class SQLBackAbstract {
         return l;
     }
 
+    internal static string MakeValidColumnName(string columnname) {
+        return columnname.ToUpper().Replace(" ", "_").ReduceToChars(Constants.AllowedCharsVariableName);
+    }
+
     internal SQLBackAbstract? HandleMe(ConnectionInfo ci) {
         if (ci is null) { return null; }
 
@@ -520,6 +525,8 @@ public abstract class SQLBackAbstract {
     }
 
     protected bool OpenConnection() {
+        if (_connection == null) { return false; }
+
         if (_connection.State == ConnectionState.Closed) {
             _connection.Open();
         }
@@ -665,10 +672,6 @@ public abstract class SQLBackAbstract {
         if (!OpenConnection()) { return false; }
 
         return ExecuteCommand(cmdString);
-    }
-
-    internal static string MakeValidColumnName(string columnname) {
-       return columnname.ToUpper().Replace(" ", "_").ReduceToChars(Constants.AllowedCharsVariableName);
     }
 
     #endregion
