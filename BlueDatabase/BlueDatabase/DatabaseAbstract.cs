@@ -375,27 +375,42 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     #region Methods
 
     public static List<ConnectionInfo> AllAvailableTables() {
-        var gb = new List<ConnectionInfo>();
+        var allavailabletables = new List<ConnectionInfo>();
 
+        // Wird benutzt, um z.b. das Dateisystem nicht doppelt und dreifach abzufragen.
+        // Wenn eine Datenbank z.B. im gleichen Verzeichnis liegt,
+        // reicht es, das Verzeichnis einmal zu prüfen
         var allreadychecked = new List<DatabaseAbstract>();
 
         var alf = new List<DatabaseAbstract>();// könnte sich ändern, deswegen Zwischenspeichern
         alf.AddRange(DatabaseAbstract.AllFiles);
 
         foreach (var thisDB in alf) {
-            var nn = thisDB.AllAvailableTables(allreadychecked);
-
+            var possibletables = thisDB.AllAvailableTables(allreadychecked);
             allreadychecked.Add(thisDB);
 
-            if (nn != null) {
-                gb.AddRange(nn);
-                //foreach (var thisn in nn) {
-                //    gb.Add(new ConnectionInfo(thisn, thisDB, DatabaseID, null));
-                //}
+            if (possibletables != null) {
+                var canadd = true;
+
+                foreach (var thistable in possibletables) {
+
+                    #region prüfen, ob schon voranden, z.b. DatabaseAbstract.AllFiles
+
+                    foreach (var checkme in allavailabletables) {
+                        if (string.Equals(checkme.TableName, thistable.TableName, StringComparison.InvariantCultureIgnoreCase)) {
+                            canadd =false;
+                            break;
+                        }
+                    }
+
+                    #endregion
+
+                    if (canadd) { allavailabletables.Add(thistable); }
+                }
             }
         }
 
-        return gb;
+        return allavailabletables;
     }
 
     /// <summary>

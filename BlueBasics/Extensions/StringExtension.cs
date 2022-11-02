@@ -171,6 +171,35 @@ public static partial class Extensions {
         return tXt;
     }
 
+    public static string CutToUTF8Length(this string str, int byteLength) {
+        // https://stackoverflow.com/questions/1225052/best-way-to-shorten-utf8-string-based-on-byte-length
+        var byteArray = Encoding.UTF8.GetBytes(str);
+
+        if (byteArray.Length <= byteLength) { return str; }
+
+        var returnValue = string.Empty;
+
+        var bytePointer = byteLength;
+
+        // Check high bit to see if we're [potentially] in the middle of a multi-byte char
+        if (bytePointer >= 0
+            && (byteArray[bytePointer] & Convert.ToByte("10000000", 2)) > 0) {
+            // If so, keep walking back until we have a byte starting with `11`,
+            // which means the first byte of a multi-byte UTF8 character.
+            while (bytePointer >= 0
+                && Convert.ToByte("11000000", 2) != (byteArray[bytePointer] & Convert.ToByte("11000000", 2))) {
+                bytePointer--;
+            }
+        }
+
+        // See if we had 1s in the high bit all the way back. If so, we're toast. Return empty string.
+        if (0 != bytePointer) {
+            returnValue = Encoding.UTF8.GetString(byteArray, 0, bytePointer); // hat tip to @NealEhardt! Well played. ;^)
+        }
+
+        return returnValue;
+    }
+
     /// <summary>
     /// Entfernt ( und ), { und } und " und leerzeichen am Anfang/Ende
     /// </summary>

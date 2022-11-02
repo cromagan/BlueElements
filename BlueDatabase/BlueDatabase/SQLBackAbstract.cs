@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 
 namespace BlueDatabase;
 
@@ -464,13 +465,14 @@ public abstract class SQLBackAbstract {
 
         do {
             c++;
+            var tmp = utf8.CutToUTF8Length(MaxStringLenght);
 
-            var ok2 = SetStyleData(tablename, ty, columnName, utf8.Substring(0, Math.Min(utf8.Length, MaxStringLenght)), c);
+            var ok2 = SetStyleData(tablename, ty, columnName, tmp, c);
             if (!ok2) { ok = false; }
 
-            utf8 = utf8.Substring(Math.Min(utf8.Length, MaxStringLenght));
+            if (tmp == utf8) { return ok; }
 
-            if (string.IsNullOrEmpty(utf8)) { return ok; }
+            utf8 = utf8.Substring(tmp.Length);
         } while (true);
     }
 
@@ -548,7 +550,7 @@ public abstract class SQLBackAbstract {
     }
 
     private string DBVAL(string original) {
-        original = original.Substring(0, Math.Min(original.Length, MaxStringLenght));
+        original = original.CutToUTF8Length(MaxStringLenght);
         original =  original.Replace("'", "''");
         return "'" + original  + "'";
     }
