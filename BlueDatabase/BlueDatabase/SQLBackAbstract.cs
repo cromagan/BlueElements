@@ -323,7 +323,7 @@ public abstract class SQLBackAbstract {
         return l;
     }
 
-    public void LoadAllCells(string tablename, RowCollection row) {
+    public async void LoadAllCells(string tablename, RowCollection row) {
         if (!OpenConnection()) { return; }
 
         var allcols = GetColumnNames(tablename);
@@ -350,15 +350,17 @@ public abstract class SQLBackAbstract {
 
         OpenConnection();
 
-        using var q = _connection.CreateCommand();
-        q.CommandText = com; //@"select * from " + tablename.ToUpper();
+        using var command = _connection.CreateCommand();
+        command.CommandText = com; //@"select * from " + tablename.ToUpper();
 
-        using var reader = q.ExecuteReader();
+        using var reader = await command.ExecuteReaderAsync();
+
+
 
         row.Clear();
         var ti = DateTime.Now;
 
-        while (reader.Read()) {
+        while (await reader.ReadAsync()) {
             var rk = LongParse(reader[0].ToString());
             var r = new RowItem(row.Database, rk);
             row.Add(r);
@@ -435,7 +437,7 @@ public abstract class SQLBackAbstract {
     /// <returns></returns>
     public bool SetStyleData(string tablename, DatabaseDataType type, string columnName, string newValue) {
         if (type.Nameless()) { return true; }
-        //q
+        //command
         //if (type == DatabaseDataType.AddColumnKeyInfo) { return true; } // enthält zwar den Key, aber Wertlos, wenn der Spaltenname noch nicht bekannt ist...
         //if (type == DatabaseDataType.AutoExport) { return true; }
         if (type == DatabaseDataType.UndoInOne) { return true; }
@@ -570,8 +572,8 @@ public abstract class SQLBackAbstract {
         q.CommandText = @"select " + column.Name.ToUpper() + " from " + tablename.ToUpper() + " " +
                         "where RK = " + DBVAL(row.Key);
 
-        ////q.AddParameterWithValue("" + DBVAL(columnName.ToUpper()) , column.Name.ToUpper());
-        //q.AddParameterWithValue("" + DBVAL(row.Key)", row.Key.ToString());
+        ////command.AddParameterWithValue("" + DBVAL(columnName.ToUpper()) , column.Name.ToUpper());
+        //command.AddParameterWithValue("" + DBVAL(row.Key)", row.Key.ToString());
 
         using var reader = q.ExecuteReader();
         if (reader.Read()) {

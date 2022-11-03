@@ -53,10 +53,8 @@ public class ConnectionInfo {
 
         var x = (uniqueID + "||||").SplitBy("|");
 
-
         var alf = new List<DatabaseAbstract>();// könnte sich ändern, deswegen Zwischenspeichern
         alf.AddRange(DatabaseAbstract.AllFiles);
-
 
         foreach (var thisDB in alf) {
             var d = thisDB.ConnectionData;
@@ -80,59 +78,17 @@ public class ConnectionInfo {
                 }
             }
         }
-  
 
-        var tbn = SQLBackAbstract.MakeValidTableName( uniqueID.FileNameWithoutSuffix());
+        var tbn = SQLBackAbstract.MakeValidTableName(uniqueID.FileNameWithoutSuffix());
 
-        var alc = DatabaseAbstract.AllAvailableTables();
+        var ci = DatabaseAbstract.ProviderOf(tbn);
 
-
-        foreach(var thisc in alc) {
-
-            if(thisc.TableName  == tbn) {
-                TableName = thisc.TableName;
-                Provider = thisc.Provider;
-                DatabaseID = thisc.DatabaseID;
-                AdditionalData = thisc.AdditionalData;
-                return;
-            }
-
+        if (ci!= null) {
+            TableName = ci.TableName;
+            Provider = ci.Provider;
+            DatabaseID = ci.DatabaseID;
+            AdditionalData = ci.AdditionalData;
         }
-
-
-        //#region Wenn die Connection einem Dateinamen entspricht, versuchen den zu laden
-
-        //if (FileExists(ci.AdditionalData)) {
-        //    if (ci.AdditionalData.FileSuffix().ToLower() == "mdb") {
-        //        return new Database(ci.AdditionalData, false, false, ci.TableName);
-        //    }
-
-        //    //if (connectionID.FileSuffix().ToLower() == "mdf") {
-        //    //    var x = new SQLBackMicrosoftCE(connectionID, false);
-
-        //    //    var tables = x.Tables();
-        //    //    var tabn = string.Empty;
-        //    //    if (tables.Count >= 1) { tabn = tables[0]; }
-
-        //    //    if (string.IsNullOrEmpty(tabn)) {
-        //    //        tabn = "MAIN";
-        //    //        x.RepairAll(tabn);
-        //    //    }
-
-        //    //    return new DatabaseSQL(x, false, tabn);
-        //    //}
-        //}
-
-        //#endregion
-
-        ////SQLBackAbstract.GetSQLBacks();
-
-        //if (SQLBackAbstract.ConnectedSQLBack != null) {
-        //    foreach (var thisSQL in SQLBackAbstract.ConnectedSQLBack) {
-        //        var h = thisSQL.HandleMe(ci);
-        //        if (h != null) { return new DatabaseSQL(h, false, ci.TableName); }
-        //    }
-        //}
     }
 
     public ConnectionInfo(string tablename, DatabaseAbstract? provider, string connectionString, string? additionalInfo) {

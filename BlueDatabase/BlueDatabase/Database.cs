@@ -124,7 +124,7 @@ public sealed class Database : DatabaseAbstract {
         var nn = System.IO.Directory.GetFiles(Filename.FilePath(), "*.mdb", SearchOption.AllDirectories);
         var gb = new List<ConnectionInfo>();
         foreach (var thisn in nn) {
-            gb.Add(ConnectionDataOfOtherTable(thisn.FileNameWithoutSuffix()));
+            gb.Add(ConnectionDataOfOtherTable(thisn.FileNameWithoutSuffix(), false));
         }
         return gb;
     }
@@ -133,10 +133,12 @@ public sealed class Database : DatabaseAbstract {
         _muf.BlockReload(crashIsCurrentlyLoading);
     }
 
-    public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName) {
+    public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists) {
         if (string.IsNullOrEmpty(Filename)) { return null; }
 
         var f = Filename.FilePath() + tableName.FileNameWithoutSuffix() + ".mdb";
+
+        if(checkExists && !File.Exists(f)) { return null; }
 
         return new ConnectionInfo(f);
     }

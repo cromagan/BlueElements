@@ -121,7 +121,7 @@ public sealed class DatabaseSQL : DatabaseAbstract {
         var l = new List<ConnectionInfo>();
 
         foreach (var thistb in tb) {
-            l.Add(ConnectionDataOfOtherTable(thistb));
+            l.Add(ConnectionDataOfOtherTable(thistb, false));
         }
 
         return l;
@@ -129,10 +129,25 @@ public sealed class DatabaseSQL : DatabaseAbstract {
 
     public override void BlockReload(bool crashIsCurrentlyLoading) { }
 
-    public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName) {
+    public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists) {
+      
+
+        if(checkExists) {
+            var t = AllAvailableTables();
+       
+            foreach(var thisT in t) {
+                if(string.Equals(tableName, thisT.TableName, StringComparison.InvariantCultureIgnoreCase)) {
+                    return thisT;
+                }
+            }
+            return null;
+        }
+        
+        
         var ConnectionData = _sql.ConnectionData(tableName);
         ConnectionData.Provider = this;
         return ConnectionData;
+
     }
 
     public override void Load_Reload() {

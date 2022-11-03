@@ -547,6 +547,19 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         return null;
     }
 
+    public static ConnectionInfo? ProviderOf(string tablename) {
+        var alf = new List<DatabaseAbstract>();// könnte sich ändern, deswegen Zwischenspeichern
+        alf.AddRange(DatabaseAbstract.AllFiles);
+
+        foreach (var thisDB in alf) {
+            if (thisDB.ConnectionDataOfOtherTable(tablename, true) is ConnectionInfo ci) {
+                return ci;
+            }
+        }
+
+        return null;
+    }
+
     /// <summary>
     /// Der komplette Pfad mit abschließenden \
     /// </summary>
@@ -635,7 +648,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     /// Einstellungen der Quell-Datenbank auf diese hier übertragen
     /// </summary>
     /// <param name="sourceDatabase"></param>
-    public void CloneFrom(DatabaseAbstract sourceDatabase, bool cellDataToo) {
+    public void CloneFrom(DatabaseAbstract sourceDatabase, bool cellDataToo, bool tagsToo) {
         LogUndo = false;
 
         Column.CloneFrom(sourceDatabase);
@@ -661,7 +674,9 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         StandardFormulaFile = sourceDatabase.StandardFormulaFile;
         UndoCount = sourceDatabase.UndoCount;
         ZeilenQuickInfo = sourceDatabase.ZeilenQuickInfo;
-        Tags = sourceDatabase.Tags;
+        if (tagsToo) {
+            Tags = sourceDatabase.Tags;
+        }
         Layouts = sourceDatabase.Layouts;
 
         DatenbankAdmin= sourceDatabase.DatenbankAdmin;
@@ -681,7 +696,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         LogUndo = true;
     }
 
-    public abstract ConnectionInfo? ConnectionDataOfOtherTable(string tableName);
+    public abstract ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists);
 
     /// <summary>
     /// AdditionaFiles/Datenbankpfad mit Forms und abschließenden \
@@ -922,7 +937,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         //    return null;
         //}
 
-        var x = ConnectionDataOfOtherTable(tablename);
+        var x = ConnectionDataOfOtherTable(tablename, true);
 
         x.Provider = null;  // KEINE Vorage mitgeben, weil sonst eine Endlosschleife aufgerufen wird!
 
