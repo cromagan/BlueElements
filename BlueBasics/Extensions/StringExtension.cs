@@ -20,6 +20,7 @@
 using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -795,6 +796,12 @@ public static partial class Extensions {
     }
 
     public static string ToNonCriticalWithQuote(this string txt) => "\"" + txt.ToNonCritical() + "\"";
+
+    public static string ToTitleCase(this string text) {
+        text = text.ToLower().Replace("_", " ");
+        var info = CultureInfo.CurrentCulture.TextInfo;
+        return info.ToTitleCase(text);
+    }
 
     public static string Trim(this string tXt, string was) {
         if (string.IsNullOrEmpty(tXt)) { return string.Empty; }

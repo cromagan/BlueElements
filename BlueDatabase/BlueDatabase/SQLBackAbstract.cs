@@ -356,6 +356,7 @@ public abstract class SQLBackAbstract {
         using var reader = q.ExecuteReader();
 
         row.Clear();
+        var ti = DateTime.Now;
 
         while (reader.Read()) {
             var rk = LongParse(reader[0].ToString());
@@ -365,17 +366,9 @@ public abstract class SQLBackAbstract {
             for (var z = 1; z < reader.FieldCount; z++) {
                 row.Database.Cell.SetValueInternal(row.Database.Column[z - 1], r, reader[z].ToString(), -1, -1);
             }
-
-            //var n = 0;
-            //foreach (var thiss in reader) {
-            //    n++;
-            //    row.Database.Cell.SetValueInternal(row.Database.Column[n], r, thiss.ToString(), -1, -1);
-            //    //row.Database.Cell.SetValueBehindLinkedValue(row.Database.Column[n], r, thiss.ToString());
-            //    //r.CellSet(row.Database.Column[n], thiss.ToString());
-            //}
-
-            ////l.Add(reader[0].ToString(), reader[1].ToString());
         }
+
+        Develop.DebugPrint(FehlerArt.Info, "Datenbank Ladezeit: " + row.Database.TableName + " - " + DateTime.Now.Subtract(ti).TotalSeconds.ToString() + " Sekunden");
 
         CloseConnection();
     }

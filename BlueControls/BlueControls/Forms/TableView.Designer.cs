@@ -553,7 +553,7 @@ namespace BlueControls.Forms {
             this.grpAdminZeilen.Controls.Add(this.btnDatenüberprüfung);
             this.grpAdminZeilen.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAdminZeilen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAdminZeilen.Location = new System.Drawing.Point(544, 0);
+            this.grpAdminZeilen.Location = new System.Drawing.Point(456, 0);
             this.grpAdminZeilen.Name = "grpAdminZeilen";
             this.grpAdminZeilen.Size = new System.Drawing.Size(232, 81);
             this.grpAdminZeilen.TabIndex = 8;
@@ -605,7 +605,7 @@ namespace BlueControls.Forms {
             this.grpAdminBearbeiten.Controls.Add(this.btnLayouts);
             this.grpAdminBearbeiten.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAdminBearbeiten.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAdminBearbeiten.Location = new System.Drawing.Point(280, 0);
+            this.grpAdminBearbeiten.Location = new System.Drawing.Point(192, 0);
             this.grpAdminBearbeiten.Name = "grpAdminBearbeiten";
             this.grpAdminBearbeiten.Size = new System.Drawing.Size(264, 81);
             this.grpAdminBearbeiten.TabIndex = 9;
@@ -668,7 +668,7 @@ namespace BlueControls.Forms {
             this.grpAdminAllgemein.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAdminAllgemein.Location = new System.Drawing.Point(0, 0);
             this.grpAdminAllgemein.Name = "grpAdminAllgemein";
-            this.grpAdminAllgemein.Size = new System.Drawing.Size(280, 81);
+            this.grpAdminAllgemein.Size = new System.Drawing.Size(192, 81);
             this.grpAdminAllgemein.TabIndex = 7;
             this.grpAdminAllgemein.TabStop = false;
             this.grpAdminAllgemein.Text = "Allgemein";
@@ -677,10 +677,10 @@ namespace BlueControls.Forms {
             // 
             this.btnSaveLoad.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnSaveLoad.ImageCode = "Refresh|16";
-            this.btnSaveLoad.Location = new System.Drawing.Point(208, 2);
+            this.btnSaveLoad.Location = new System.Drawing.Point(136, 2);
             this.btnSaveLoad.Name = "btnSaveLoad";
             this.btnSaveLoad.QuickInfo = "Aktualisiert die Datenbank-Daten. (Speichern, neu Laden)";
-            this.btnSaveLoad.Size = new System.Drawing.Size(64, 66);
+            this.btnSaveLoad.Size = new System.Drawing.Size(48, 66);
             this.btnSaveLoad.TabIndex = 43;
             this.btnSaveLoad.Text = "Daten aktual.";
             this.btnSaveLoad.Click += new System.EventHandler(this.btnSaveLoad_Click);

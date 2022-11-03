@@ -45,8 +45,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // SucheExact
             // 
-            this.SucheExact.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
-            this.SucheExact.Location = new System.Drawing.Point(24, 40);
+            this.SucheExact.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
+            this.SucheExact.Location = new System.Drawing.Point(8, 40);
             this.SucheExact.Name = "SucheExact";
             this.SucheExact.QuickInfo = "Trifft zu, wenn der eingegebene Text<br><b>exact dem Zelleninhalt</b>entspricht.";
             this.SucheExact.Size = new System.Drawing.Size(104, 16);
@@ -56,7 +56,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // NurinAktuellerSpalte
             // 
-            this.NurinAktuellerSpalte.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.NurinAktuellerSpalte.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
             this.NurinAktuellerSpalte.Checked = true;
             this.NurinAktuellerSpalte.Location = new System.Drawing.Point(16, 32);
             this.NurinAktuellerSpalte.Name = "NurinAktuellerSpalte";
@@ -67,7 +67,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // ErsetzeMit
             // 
-            this.ErsetzeMit.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
+            this.ErsetzeMit.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
             this.ErsetzeMit.Checked = true;
             this.ErsetzeMit.Location = new System.Drawing.Point(8, 16);
             this.ErsetzeMit.Name = "ErsetzeMit";
@@ -79,7 +79,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // AktuelleFilterung
             // 
-            this.AktuelleFilterung.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.AktuelleFilterung.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
             this.AktuelleFilterung.Checked = true;
             this.AktuelleFilterung.Location = new System.Drawing.Point(16, 16);
             this.AktuelleFilterung.Name = "AktuelleFilterung";
@@ -91,7 +91,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // ers
             // 
             this.ers.Enabled = false;
-            this.ers.Location = new System.Drawing.Point(496, 304);
+            this.ers.Location = new System.Drawing.Point(496, 288);
             this.ers.Name = "ers";
             this.ers.Size = new System.Drawing.Size(80, 32);
             this.ers.TabIndex = 4;
@@ -101,26 +101,26 @@ namespace BlueControls.BlueDatabaseDialogs
             // Neu
             // 
             this.Neu.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.Neu.Location = new System.Drawing.Point(144, 8);
+            this.Neu.Location = new System.Drawing.Point(144, 16);
             this.Neu.Name = "Neu";
-            this.Neu.Size = new System.Drawing.Size(416, 40);
+            this.Neu.Size = new System.Drawing.Size(416, 48);
             this.Neu.TabIndex = 3;
             this.Neu.TextChanged += new System.EventHandler(this.Alt_TextChange);
             // 
             // Alt
             // 
             this.Alt.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.Alt.Location = new System.Drawing.Point(136, 16);
+            this.Alt.Location = new System.Drawing.Point(144, 16);
             this.Alt.Name = "Alt";
-            this.Alt.Size = new System.Drawing.Size(424, 40);
+            this.Alt.Size = new System.Drawing.Size(416, 48);
             this.Alt.TabIndex = 2;
             this.Alt.TextChanged += new System.EventHandler(this.Alt_TextChange);
             // 
             // SucheNach
             // 
-            this.SucheNach.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
+            this.SucheNach.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
             this.SucheNach.Checked = true;
-            this.SucheNach.Location = new System.Drawing.Point(24, 16);
+            this.SucheNach.Location = new System.Drawing.Point(8, 16);
             this.SucheNach.Name = "SucheNach";
             this.SucheNach.QuickInfo = "Trifft zu, wenn die eingegebene<br><b>Textpassage</b>enthalten ist.";
             this.SucheNach.Size = new System.Drawing.Size(96, 16);
@@ -130,6 +130,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Suchen
             // 
+            this.Suchen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.Suchen.CausesValidation = false;
             this.Suchen.Controls.Add(this.InhaltEgal);
             this.Suchen.Controls.Add(this.SucheNach);
@@ -137,13 +138,15 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Suchen.Controls.Add(this.Alt);
             this.Suchen.Location = new System.Drawing.Point(8, 8);
             this.Suchen.Name = "Suchen";
-            this.Suchen.Size = new System.Drawing.Size(568, 96);
+            this.Suchen.Size = new System.Drawing.Size(568, 88);
+            this.Suchen.TabIndex = 3;
+            this.Suchen.TabStop = false;
             this.Suchen.Text = "Suche";
             // 
             // InhaltEgal
             // 
-            this.InhaltEgal.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
-            this.InhaltEgal.Location = new System.Drawing.Point(24, 72);
+            this.InhaltEgal.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
+            this.InhaltEgal.Location = new System.Drawing.Point(8, 64);
             this.InhaltEgal.Name = "InhaltEgal";
             this.InhaltEgal.QuickInfo = "Trifft immer zu";
             this.InhaltEgal.Size = new System.Drawing.Size(96, 16);
@@ -153,20 +156,23 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // BlueFrame1
             // 
+            this.BlueFrame1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.BlueFrame1.CausesValidation = false;
             this.BlueFrame1.Controls.Add(this.FügeHinzu);
             this.BlueFrame1.Controls.Add(this.ErsetzeKomplett);
             this.BlueFrame1.Controls.Add(this.Neu);
             this.BlueFrame1.Controls.Add(this.ErsetzeMit);
-            this.BlueFrame1.Location = new System.Drawing.Point(8, 104);
+            this.BlueFrame1.Location = new System.Drawing.Point(8, 96);
             this.BlueFrame1.Name = "BlueFrame1";
-            this.BlueFrame1.Size = new System.Drawing.Size(568, 112);
+            this.BlueFrame1.Size = new System.Drawing.Size(568, 104);
+            this.BlueFrame1.TabIndex = 2;
+            this.BlueFrame1.TabStop = false;
             this.BlueFrame1.Text = "Ersetzen";
             // 
             // FügeHinzu
             // 
-            this.FügeHinzu.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
-            this.FügeHinzu.Location = new System.Drawing.Point(8, 88);
+            this.FügeHinzu.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
+            this.FügeHinzu.Location = new System.Drawing.Point(8, 80);
             this.FügeHinzu.Name = "FügeHinzu";
             this.FügeHinzu.QuickInfo = "Fügt den Text als neuen Eintrag hinzu.";
             this.FügeHinzu.Size = new System.Drawing.Size(128, 16);
@@ -175,7 +181,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // ErsetzeKomplett
             // 
-            this.ErsetzeKomplett.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
+            this.ErsetzeKomplett.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
             this.ErsetzeKomplett.Location = new System.Drawing.Point(8, 40);
             this.ErsetzeKomplett.Name = "ErsetzeKomplett";
             this.ErsetzeKomplett.QuickInfo = "Ersetzt den <b>kompletten Zelleninhalt</b><br>mit dem eingegebenen Text.";
@@ -186,18 +192,21 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // BlueFrame2
             // 
+            this.BlueFrame2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.BlueFrame2.CausesValidation = false;
             this.BlueFrame2.Controls.Add(this.AbgeschlosseZellen);
             this.BlueFrame2.Controls.Add(this.NurinAktuellerSpalte);
             this.BlueFrame2.Controls.Add(this.AktuelleFilterung);
-            this.BlueFrame2.Location = new System.Drawing.Point(8, 216);
+            this.BlueFrame2.Location = new System.Drawing.Point(8, 200);
             this.BlueFrame2.Name = "BlueFrame2";
             this.BlueFrame2.Size = new System.Drawing.Size(336, 80);
+            this.BlueFrame2.TabIndex = 1;
+            this.BlueFrame2.TabStop = false;
             this.BlueFrame2.Text = "Optionen";
             // 
             // AbgeschlosseZellen
             // 
-            this.AbgeschlosseZellen.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.AbgeschlosseZellen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
             this.AbgeschlosseZellen.Checked = true;
             this.AbgeschlosseZellen.Location = new System.Drawing.Point(16, 48);
             this.AbgeschlosseZellen.Name = "AbgeschlosseZellen";
@@ -208,11 +217,14 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // grpSonderzeichen
             // 
+            this.grpSonderzeichen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.grpSonderzeichen.CausesValidation = false;
             this.grpSonderzeichen.Controls.Add(this.capSonderzeichen);
-            this.grpSonderzeichen.Location = new System.Drawing.Point(344, 216);
+            this.grpSonderzeichen.Location = new System.Drawing.Point(344, 200);
             this.grpSonderzeichen.Name = "grpSonderzeichen";
             this.grpSonderzeichen.Size = new System.Drawing.Size(232, 80);
+            this.grpSonderzeichen.TabIndex = 0;
+            this.grpSonderzeichen.TabStop = false;
             this.grpSonderzeichen.Text = "Sonderzeichen";
             // 
             // capSonderzeichen
@@ -226,7 +238,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // SearchAndReplace
             // 
-            this.ClientSize = new System.Drawing.Size(587, 343);
+            this.ClientSize = new System.Drawing.Size(583, 331);
             this.Controls.Add(this.grpSonderzeichen);
             this.Controls.Add(this.BlueFrame2);
             this.Controls.Add(this.BlueFrame1);
@@ -236,11 +248,13 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Name = "SearchAndReplace";
             this.ShowInTaskbar = false;
             this.Text = "Suchen und Ersetzen";
+            this.TopMost = true;
             this.Suchen.ResumeLayout(false);
             this.BlueFrame1.ResumeLayout(false);
             this.BlueFrame2.ResumeLayout(false);
             this.grpSonderzeichen.ResumeLayout(false);
             this.ResumeLayout(false);
+
 			}
 			private TextBox Alt;
 			private TextBox Neu;

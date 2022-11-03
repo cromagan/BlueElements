@@ -136,6 +136,8 @@ public sealed class DatabaseSQL : DatabaseAbstract {
     }
 
     public override void Load_Reload() {
+       if(!ReloadNeeded) { return; }
+
         LoadFromSQLBack();
     }
 

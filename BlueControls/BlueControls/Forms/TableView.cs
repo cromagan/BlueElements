@@ -213,7 +213,7 @@ public partial class TableView : Form {
 
         var NTabPage = new System.Windows.Forms.TabPage {
             Name = tbcDatabaseSelector.TabCount.ToString(),
-            Text = ci.TableName,
+            Text = ci.TableName.ToTitleCase(),
             Tag = new List<object>() { ci, string.Empty }
         };
         tbcDatabaseSelector.Controls.Add(NTabPage);
@@ -1038,9 +1038,8 @@ public partial class TableView : Form {
             }
 
 
-            e.TabPage.Text = DB.TableName;
-        }
-
+            e.TabPage.Text = DB.Caption;
+        } 
         DatabaseSet(DB, (string)s[1]);
     }
 
