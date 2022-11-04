@@ -326,6 +326,17 @@ public abstract class SQLBackAbstract {
     public async void LoadAllCells(string tablename, RowCollection row) {
         if (!OpenConnection()) { return; }
 
+
+        //DataTable dataTable = new DataTable();
+        //using var cmd = _connection.CreateCommand();
+        //cmd.CommandText =@"select * from " + tablename.ToUpper();
+        //DbDataAdapter da = DbProviderFactories.GetFactory(_connection).CreateDataAdapter();
+        //da.SelectCommand = cmd;
+        //da.Fill(dataTable);
+        //da.Dispose();
+
+
+
         var allcols = GetColumnNames(tablename);
         allcols.Remove("RK");
 
