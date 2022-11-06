@@ -42,7 +42,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     public bool? TmpAutoFilterSinnvoll = null;
     public QuickImage? TmpCaptionBitmapCode;
     public SizeF TmpCaptionTextSize = new(-1, -1);
-    public int? TmpColumnContentWidth;
     public int? TmpIfFilterRemoved = null;
     internal List<string>? UcaseNamesSortedByLenght;
     private readonly List<string> _afterEditAutoReplace = new();
@@ -53,6 +52,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     private readonly List<string> _tags = new();
     private AdditionalCheck _additionalFormatCheck;
     private string _adminInfo;
+    private string _timecode;
     private bool _afterEditAutoCorrect;
     private bool _afterEditDoUCase;
     private bool _afterEditQuickSortRemoveDouble;
@@ -62,7 +62,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     private string _autoFilterJoker;
     private string _autoRemove;
     private Color _backColor;
-
     private BildTextVerhalten _behaviorOfImageAndText;
     private string _caption;
     private string _captionBitmapCode;
@@ -71,7 +70,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     private string _captionGroup3;
     private string _cellInitValue;
     private string _constantHeightOfImageCode;
-
+    private int _contentwidth;
     private TranslationType _doOpticalTranslation;
     private bool _dropdownAllesAbwählenErlaubt;
     private bool _dropdownBearbeitungErlaubt;
@@ -156,6 +155,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         _identifier = string.Empty;
         _allowedChars = string.Empty;
         _adminInfo = string.Empty;
+        _timecode = string.Empty;
+        _contentwidth = -1;
         _captionBitmapCode = string.Empty;
         _filterOptions = FilterOptions.Enabled | FilterOptions.TextFilterEnabled | FilterOptions.ExtendedFilterEnabled;
         //_AutofilterErlaubt = true;
@@ -398,6 +399,25 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             if (_constantHeightOfImageCode == value) { return; }
             Database?.ChangeData(DatabaseDataType.ConstantHeightOfImageCode, this, null, _constantHeightOfImageCode, value);
             Invalidate_ColumAndContent();
+            OnChanged();
+        }
+    }
+
+    public int ContentWidth {
+        get => _contentwidth;
+        set {
+            if (_contentwidth == value) { return; }
+            Database?.ChangeData(DatabaseDataType.ColumnContentWidth, this, null, _contentwidth.ToString(), value.ToString());
+            OnChanged();
+        }
+    }
+
+
+    public string TimeCode {
+        get => _timecode;
+        set {
+            if (_timecode == value) { return; }
+            Database?.ChangeData(DatabaseDataType.ColumnTimeCode, this, null, _timecode, value);
             OnChanged();
         }
     }
@@ -804,7 +824,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
         if (!Constants.Char_AZ.Contains(name.Substring(0, 1).ToUpper())) { return false; }
 
-        if (name.ToUpper() =="USER") { return false; } // SQL System-Name
+        if (name.ToUpper() == "USER") { return false; } // SQL System-Name
 
         return true;
     }
@@ -936,6 +956,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         PermissionGroupsChangeCell = source.PermissionGroupsChangeCell;
         Tags = source.Tags;
         AdminInfo = source.AdminInfo;
+        TimeCode = source.TimeCode;
+        ContentWidth = source.ContentWidth;
         FilterOptions = source.FilterOptions;
         IgnoreAtRowFilter = source.IgnoreAtRowFilter;
         DropdownBearbeitungErlaubt = source.DropdownBearbeitungErlaubt;
@@ -1315,7 +1337,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     /// </summary>
     public void Invalidate_ColumAndContent() {
         TmpCaptionTextSize = new SizeF(-1, -1);
-        Invalidate_TmpColumnContentWidth();
+        Invalidate_ContentWidth();
         Invalidate_TmpVariables();
         foreach (var thisRow in Database.Row) {
             if (thisRow != null) { CellCollection.Invalidate_CellContentSize(this, thisRow); }
@@ -2122,7 +2144,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     /// <summary>
     /// Wenn sich ein Zelleninhalt verändert hat, muss die Spalte neu berechnet werden.
     /// </summary>
-    internal void Invalidate_TmpColumnContentWidth() => TmpColumnContentWidth = null;
+    internal void Invalidate_ContentWidth() => ContentWidth = -1;
 
     internal void Invalidate_TmpVariables() {
         TmpCaptionTextSize = new SizeF(-1, -1);
@@ -2135,7 +2157,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             _tmpLinkedDatabase.Disposing -= _TMP_LinkedDatabase_Disposing;
             _tmpLinkedDatabase = null;
         }
-        TmpColumnContentWidth = null;
+        ContentWidth = -1;
     }
 
     internal string ParsableColumnKey() => ColumnCollection.ParsableColumnKey(this);
@@ -2310,6 +2332,14 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 _adminInfo = newvalue;
                 break;
 
+            case DatabaseDataType.ColumnTimeCode:
+                _timecode = newvalue;
+                break;
+
+            case DatabaseDataType.ColumnContentWidth:
+                _contentwidth = IntParse(newvalue);
+                break;
+
             case DatabaseDataType.CaptionBitmapCode:
                 _captionBitmapCode = newvalue;
                 break;
@@ -2399,7 +2429,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         foreach (var thisRow in Database.Row) {
             if (Database.Cell.GetStringBehindLinkedValue(this, thisRow) == tKey) {
                 CellCollection.Invalidate_CellContentSize(this, thisRow);
-                Invalidate_TmpColumnContentWidth();
+                Invalidate_ContentWidth();
                 Database.Cell.OnCellValueChanged(new CellEventArgs(this, thisRow));
                 thisRow.DoAutomatic(true, false, 5, "value changed");
             }

@@ -21,7 +21,6 @@ using BlueBasics.Enums;
 using BlueControls;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Forms;
-using BlueDatabase;
 using static BlueBasics.Develop;
 
 namespace BeCreative;
@@ -63,7 +62,7 @@ public partial class Start : Form {
 
     private void btnHierachie_Click(object sender, System.EventArgs e) => DoForm(new RelationDiagram(null));
 
-    private void btnLayout_Click(object sender, System.EventArgs e) => DoForm(new LayoutPadEditor(null as Database));
+    private void btnLayout_Click(object sender, System.EventArgs e) => DoForm(new LayoutPadEditor(null));
 
     private void DoForm(Form frm) {
         FormManager.Current.RegisterForm(frm);

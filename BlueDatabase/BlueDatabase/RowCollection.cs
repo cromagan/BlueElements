@@ -255,7 +255,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         List<RowData> pinnedData = new();
         if (pinnedRows != null) {
             Parallel.ForEach(pinnedRows, thisRow => {
-                var rd = reUseMe.Get(thisRow, "Angepinnt") is RowData r ? r : new RowData(thisRow, "Angepinnt");
+                var rd = reUseMe.Get(thisRow, "Angepinnt") as RowData ?? new RowData(thisRow, "Angepinnt");
                 rd.PinStateSortAddition = "1";
                 rd.MarkYellow = true;
                 rd.AdditionalSort = rowSortDefinition == null ? thisRow.CompareKey(null) : thisRow.CompareKey(rowSortDefinition.Columns);
@@ -291,7 +291,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
             if (caps.Count == 0) { caps.Add(string.Empty); }
 
             foreach (var thisCap in caps) {
-                var rd = reUseMe.Get(thisRow, thisCap) is RowData r ? r : new RowData(thisRow, thisCap);
+                var rd = reUseMe.Get(thisRow, thisCap) as RowData ?? new RowData(thisRow, thisCap);
 
                 rd.PinStateSortAddition = "2";
                 rd.MarkYellow = markYellow;

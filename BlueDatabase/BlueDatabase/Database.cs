@@ -138,7 +138,7 @@ public sealed class Database : DatabaseAbstract {
 
         var f = Filename.FilePath() + tableName.FileNameWithoutSuffix() + ".mdb";
 
-        if(checkExists && !File.Exists(f)) { return null; }
+        if (checkExists && !File.Exists(f)) { return null; }
 
         return new ConnectionInfo(f);
     }
@@ -268,7 +268,7 @@ public sealed class Database : DatabaseAbstract {
                     type = (DatabaseDataType)0;
                     value = string.Empty;
                     width = 0;
-                    height= 0;
+                    height = 0;
                     Develop.DebugPrint(FehlerArt.Fehler, "Laderoutine nicht definiert: " + bLoaded[pointer]);
                     break;
                 }
@@ -453,6 +453,7 @@ public sealed class Database : DatabaseAbstract {
         SaveToByteList(l, DatabaseDataType.ShowValuesOfOtherCellsInDropdown, c.DropdownWerteAndererZellenAnzeigen.ToPlusMinus(), key);
         SaveToByteList(l, DatabaseDataType.ColumnQuickInfo, c.Quickinfo, key);
         SaveToByteList(l, DatabaseDataType.ColumnAdminInfo, c.AdminInfo, key);
+        SaveToByteList(l, DatabaseDataType.ColumnContentWidth, c.ContentWidth.ToString(), key);
         SaveToByteList(l, DatabaseDataType.CaptionBitmapCode, c.CaptionBitmapCode, key);
         SaveToByteList(l, DatabaseDataType.AllowedChars, c.AllowedChars, key);
         SaveToByteList(l, DatabaseDataType.PermissionGroupsChangeCell, c.PermissionGroupsChangeCell.JoinWithCr(), key);
@@ -471,6 +472,7 @@ public sealed class Database : DatabaseAbstract {
         SaveToByteList(l, DatabaseDataType.MakeSuggestionFromSameKeyColumn, c.VorschlagsColumn.ToString(), key);
         SaveToByteList(l, DatabaseDataType.ColumnAlign, ((int)c.Align).ToString(), key);
         SaveToByteList(l, DatabaseDataType.SortType, ((int)c.SortType).ToString(), key);
+        SaveToByteList(l, DatabaseDataType.ColumnTimeCode, c.TimeCode, key);
         //Kennung UNBEDINGT zum Schluss, damit die Standard-Werte gesetzt werden können
         SaveToByteList(l, DatabaseDataType.ColumnIdentify, c.Identifier, key);
     }

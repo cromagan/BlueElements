@@ -103,7 +103,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         }
         if (lColumn == null) { lColumn = _column; }
 
-        Width = Math.Max(txbEingabe.Width + (Skin.Padding * 2), Table.TmpColumnContentWidth(null, lColumn, f, 16));
+        Width = Math.Max(txbEingabe.Width + (Skin.Padding * 2), Table.CalculateColumnContentWidth(null, lColumn, f, 16));
         lsbFilterItems.Item.Clear();
         lsbFilterItems.CheckBehavior = CheckBehavior.MultiSelection;
 
@@ -117,7 +117,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
         var prefSize = lsbFilterItems.Item.CalculateColumnAndSize();
         lsbFilterItems.Anchor = System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Top;
-        lsbFilterItems.Width = Math.Min(Table.TmpColumnContentWidth(null, lColumn, f, 16), Width - (Skin.PaddingSmal * 2));
+        lsbFilterItems.Width = Math.Min(Table.CalculateColumnContentWidth(null, lColumn, f, 16), Width - (Skin.PaddingSmal * 2));
         lsbFilterItems.Width = Math.Max(lsbFilterItems.Width, prefSize.Width);
         lsbFilterItems.Height = Math.Max(lsbFilterItems.Height, prefSize.Height);
         lsbFilterItems.Width = Math.Max(lsbFilterItems.Width, Width - (Skin.PaddingSmal * 2));

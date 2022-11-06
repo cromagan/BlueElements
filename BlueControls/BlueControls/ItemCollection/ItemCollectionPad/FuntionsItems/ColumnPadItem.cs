@@ -139,7 +139,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
             return;
         }
 
-        var wi = Table.TmpColumnContentWidth(null, Column, CellFont, 16);
+        var wi = Table.CalculateColumnContentWidth(null, Column, CellFont, 16);
 
         var bmp = new Bitmap(Math.Max((int)(wi * 0.7), 30), 300);
         var gr = Graphics.FromImage(bmp);

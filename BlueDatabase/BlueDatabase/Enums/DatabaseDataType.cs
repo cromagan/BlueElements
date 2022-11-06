@@ -29,7 +29,7 @@ public static class DatabaseDataTypeExtension {
 
     public static bool IsCommand(this DatabaseDataType type) => (int)type is >= 220 and <= 230;
 
-    public static bool IsDatabaseTag(this DatabaseDataType type) => (int)type is < 100 or  >= 249;
+    public static bool IsDatabaseTag(this DatabaseDataType type) => (int)type is < 100 or >= 249;
 
     public static bool Nameless(this DatabaseDataType type) => type.ToString() == ((int)type).ToString();
 
@@ -37,7 +37,6 @@ public static class DatabaseDataTypeExtension {
 }
 
 public enum DatabaseDataType : byte {
-
     // Enum.TryParse gibt 0 zurück, wenn der Wert nicht erkannt wird
 
     //Error = 0,
@@ -48,6 +47,7 @@ public enum DatabaseDataType : byte {
 
     //InBearbeitung = 3,
     TimeCode = 4,
+
     //CheckOutUser = 5,
     // Zugriffanzahl = 6
     // TotalSperrbit = 7
@@ -154,12 +154,12 @@ public enum DatabaseDataType : byte {
 
     LinkedCellFilter = 108, // co_ShowPass = 108
 
-    // co_ChangePass = 109
+    ColumnContentWidth = 109, // co_ChangePass = 109
     LineStyleLeft = 110,
 
     LineStyleRight = 111,
 
-    // co_Ausrichtung = 112
+    ColumnTimeCode=112, // co_Ausrichtung = 112
     ColumnQuickInfo = 113,
 
     // co_FesteBreite = 114

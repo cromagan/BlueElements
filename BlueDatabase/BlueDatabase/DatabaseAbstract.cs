@@ -32,9 +32,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
+using Timer = System.Threading.Timer;
 
 namespace BlueDatabase;
 
@@ -197,7 +197,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     public ListExt<ColumnViewCollection> ColumnArrangements {
         get => _columnArrangements;
         set {
-            if (_columnArrangements.ToString() ==  value.ToString()) { return; }
+            if (_columnArrangements.ToString() == value.ToString()) { return; }
             ChangeData(DatabaseDataType.ColumnArrangement, null, null, _columnArrangements.ToString(), value.ToString());
             OnViewChanged();
         }
@@ -398,7 +398,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
                     foreach (var checkme in allavailabletables) {
                         if (string.Equals(checkme.TableName, thistable.TableName, StringComparison.InvariantCultureIgnoreCase)) {
-                            canadd =false;
+                            canadd = false;
                             break;
                         }
                     }
@@ -588,8 +588,8 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
     public abstract List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked);
 
-    public List<RowData?> AllRows() {
-        var sortedRows = new List<RowData?>();
+    public List<RowData> AllRows() {
+        var sortedRows = new List<RowData>();
         foreach (var thisRowItem in Row) {
             if (thisRowItem != null) {
                 sortedRows.Add(new RowData(thisRowItem));
@@ -609,8 +609,8 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     /// Stößt undo uns die Festsetzung an. Es wird aber nich geprüft, ob Readonly gesetzt ist und spiegelt auch den Wert bei bedarf.
     /// </summary>
     /// <param name="comand"></param>
-    /// <param name="columnKey"></param>
-    /// <param name="rowKey"></param>
+    /// <param name="column"></param>
+    /// <param name="row"></param>
     /// <param name="previousValue"></param>
     /// <param name="changedTo"></param>
     public virtual void ChangeData(DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo) {
@@ -636,9 +636,16 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
 
         StoreValueToHardDisk(comand, column, row, changedTo);
 
-        if (comand  != DatabaseDataType.TimeCode && LogUndo) {
+        if (comand != DatabaseDataType.TimeCode &&
+            comand != DatabaseDataType.ColumnTimeCode &&
+            LogUndo) {
             AddUndo(TableName, comand, column, row, previousValue, changedTo, UserName);
-            ChangeData(DatabaseDataType.TimeCode, null, null, _timeCode, DateTime.UtcNow.ToString(Constants.Format_Date));
+            var tc = DateTime.UtcNow.ToString(Constants.Format_Date);
+            ChangeData(DatabaseDataType.TimeCode, null, null, _timeCode, tc);
+
+            if (column != null) {
+                ChangeData(DatabaseDataType.ColumnTimeCode, column, null, column.TimeCode, tc);
+            }
         }
 
         if (comand != DatabaseDataType.AutoExport) { SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
@@ -648,6 +655,8 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     /// Einstellungen der Quell-Datenbank auf diese hier übertragen
     /// </summary>
     /// <param name="sourceDatabase"></param>
+    /// <param name="cellDataToo"></param>
+    /// <param name="tagsToo"></param>
     public void CloneFrom(DatabaseAbstract sourceDatabase, bool cellDataToo, bool tagsToo) {
         LogUndo = false;
 
@@ -668,8 +677,8 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         GlobalShowPass = sourceDatabase.GlobalShowPass;
         ReloadDelaySecond = sourceDatabase.ReloadDelaySecond;
         RulesScript = sourceDatabase.RulesScript;
-        if (SortDefinition == null || SortDefinition.ToString() != sourceDatabase.SortDefinition.ToString()) {
-            SortDefinition = new RowSortDefinition(this, sourceDatabase.SortDefinition.ToString());
+        if (SortDefinition == null || SortDefinition.ToString() != sourceDatabase.SortDefinition?.ToString()) {
+            SortDefinition = new RowSortDefinition(this, sourceDatabase.SortDefinition?.ToString());
         }
         StandardFormulaFile = sourceDatabase.StandardFormulaFile;
         UndoCount = sourceDatabase.UndoCount;
@@ -679,7 +688,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         }
         Layouts = sourceDatabase.Layouts;
 
-        DatenbankAdmin= sourceDatabase.DatenbankAdmin;
+        DatenbankAdmin = sourceDatabase.DatenbankAdmin;
         PermissionGroupsNewRow = sourceDatabase.PermissionGroupsNewRow;
 
         var tcvc = new ListExt<ColumnViewCollection>();
@@ -749,7 +758,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     /// <param name="column">Die Spalte, die zurückgegeben wird.</param>
     /// <param name="sortedRows">Die Zeilen, die zurückgegeben werden. NULL gibt alle Zeilen zurück.</param>
     /// <returns></returns>
-    public string Export_CSV(FirstRow firstRow, ColumnItem? column, List<RowData>? sortedRows) =>
+    public string Export_CSV(FirstRow firstRow, ColumnItem column, List<RowData>? sortedRows) =>
         //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
         Export_CSV(firstRow, new List<ColumnItem> { column }, sortedRows);
 
@@ -761,11 +770,8 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
     /// <param name="sortedRows">Die Zeilen, die zurückgegeben werden. NULL gibt alle ZEilen zurück.</param>
     /// <returns></returns>
     public string Export_CSV(FirstRow firstRow, List<ColumnItem>? columnList, List<RowData>? sortedRows) {
-        if (columnList == null) {
-            columnList = Column.Where(thisColumnItem => thisColumnItem != null).ToList();
-        }
-
-        if (sortedRows == null) { sortedRows = AllRows(); }
+        columnList ??= Column.Where(thisColumnItem => thisColumnItem != null).ToList();
+        sortedRows ??= AllRows();
 
         StringBuilder sb = new();
         switch (firstRow) {

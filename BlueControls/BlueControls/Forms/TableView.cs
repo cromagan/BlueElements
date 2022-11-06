@@ -45,6 +45,7 @@ namespace BlueControls.Forms;
 public partial class TableView : Form {
 
     #region Fields
+
     public static SQLBackAbstract? SQL = null;
 
     private Ansicht _ansicht = Ansicht.Tabelle_und_Formular_nebeneinander;
@@ -90,7 +91,6 @@ public partial class TableView : Form {
     public SQLBackAbstract? CopyToSQL { get; set; } = null;
 
     #endregion
-
 
     #region Methods
 
@@ -194,7 +194,6 @@ public partial class TableView : Form {
         return l;
     }
 
-
     public void ResetDatabaseSettings() {
         foreach (var thisT in tbcDatabaseSelector.TabPages) {
             if (thisT is System.Windows.Forms.TabPage tp && tp.Tag is List<object> s) {
@@ -209,7 +208,7 @@ public partial class TableView : Form {
     /// </summary>
     /// <param name="uniqueID"></param>
     protected void AddTabPage(ConnectionInfo ci) {
-        if(ci is null) { return; }
+        if (ci is null) { return; }
 
         var NTabPage = new System.Windows.Forms.TabPage {
             Name = tbcDatabaseSelector.TabCount.ToString(),
@@ -364,7 +363,7 @@ public partial class TableView : Form {
     }
 
     protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
-        DatabaseSet(null as Database, string.Empty);
+        DatabaseSet(null, string.Empty);
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(true);
         base.OnFormClosing(e);
     }
@@ -693,12 +692,9 @@ public partial class TableView : Form {
         var x = new ColumnArrangementPadEditor(Table.Database);
         x.ShowDialog();
 
-
         var car = Table.Database.ColumnArrangements.CloneWithClones();
         car[0].ShowAllColumns();
         Table.Database.ColumnArrangements = car;
-
-
 
         Table.Invalidate_HeadSize();
         Table.Invalidate_AllColumnArrangements();
@@ -783,7 +779,6 @@ public partial class TableView : Form {
     }
 
     private void btnUnterschiede_CheckedChanged(object sender, System.EventArgs e) => Table.Unterschiede = btnUnterschiede.Checked ? Table.CursorPosRow.Row : null;
-
 
     private void btnVorwärts_Click(object sender, System.EventArgs e) {
         SuchEintragNoSave(Direction.Unten, out var column, out var row);
@@ -1037,9 +1032,8 @@ public partial class TableView : Form {
                 btnLetzteDateien.AddFileName(DB.ConnectionData.UniqueID, DB.TableName);
             }
 
-
             e.TabPage.Text = DB.Caption;
-        } 
+        }
         DatabaseSet(DB, (string)s[1]);
     }
 

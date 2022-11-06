@@ -299,13 +299,43 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     #region Methods
 
-    public static Size Cell_ContentSize(Table? table, ColumnItem? column, RowItem? row, BlueFont? cellFont, int pix16) {
+    public static int CalculateColumnContentWidth(Table? table, ColumnItem column, BlueFont? cellFont, int pix16) {
+        if (column.ContentWidth > 0) { return column.ContentWidth; }
+
+       var NewContentWidth = 0;
+
+        if (column.Format == DataFormat.Button) {
+            // Beim Button reicht eine Abfrage mit Row null
+            NewContentWidth = Cell_ContentSize(table, column, null, cellFont, pix16).Width;
+        } else {
+            var locker = new object();
+
+            Parallel.ForEach(column.Database.Row, thisRowItem => {
+                if (thisRowItem != null && !thisRowItem.CellIsNullOrEmpty(column)) {
+                    var wx = Cell_ContentSize(table, column, thisRowItem, cellFont, pix16).Width;
+
+                    lock (locker) {
+                        NewContentWidth = Math.Max(NewContentWidth, wx);
+                    }
+                }
+            });
+        }
+
+        column.ContentWidth = NewContentWidth;
+        return NewContentWidth;
+    }
+
+    public static Size Cell_ContentSize(Table? table, ColumnItem column, RowItem? row, BlueFont? cellFont, int pix16) {
+       
         if (column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             var (lcolumn, lrow, _) = CellCollection.LinkedCellData(column, row, false, false);
-            return lcolumn != null && lrow != null ? Cell_ContentSize(table, lcolumn, lrow, cellFont, pix16) : new Size(pix16, pix16);
+            return lcolumn != null && lrow != null ? Cell_ContentSize(table, lcolumn, lrow, cellFont, pix16) 
+                                                   : new Size(pix16, pix16);
         }
+
         var contentSize = column.Database.Cell.GetSizeOfCellContent(column, row);
         if (contentSize.Width > 0 && contentSize.Height > 0) { return contentSize; }
+
         if (column.Format == DataFormat.Button) {
             if (table is null) {
                 contentSize = new Size(pix16, pix16);
@@ -475,38 +505,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 }
             }
         } while (true);
-    }
-
-    public static int TmpColumnContentWidth(Table? table, ColumnItem? column, BlueFont? cellFont, int pix16) {
-        if (column.TmpColumnContentWidth != null) { return (int)column.TmpColumnContentWidth; }
-        column.TmpColumnContentWidth = 0;
-        if (column.Format == DataFormat.Button) {
-            // Beim Button reicht eine Abfrage mit Row null
-            column.TmpColumnContentWidth = Cell_ContentSize(table, column, null, cellFont, pix16).Width;
-        } else {
-            var locker = new object();
-
-            Parallel.ForEach(column.Database.Row, thisRowItem => {
-                if (thisRowItem != null && !thisRowItem.CellIsNullOrEmpty(column)) {
-                    var wx = Cell_ContentSize(table, column, thisRowItem, cellFont, pix16).Width;
-
-                    lock (locker) {
-                        var t = column.TmpColumnContentWidth; // ja, dank Multithreading kann es sein, dass hier das hier null ist
-                        if (t == null) { t = 0; }
-                        column.TmpColumnContentWidth = Math.Max((int)t, wx);
-                    }
-                }
-            });
-
-            //foreach (var ThisRowItem in Column.Database.Row) {
-            //    if (ThisRowItem != null && !ThisRowItem.CellIsNullOrEmpty(Column)) {
-            //        var t = Column.TMP_ColumnContentWidth; // ja, dank Multithreading kann es sein, dass hier das hier null ist
-            //        if (t == null) { t = 0; }
-            //        Column.TMP_ColumnContentWidth = Math.Max((int)t, Cell_ContentSize(table, Column, ThisRowItem, CellFont, Pix16).Width);
-            //    }
-            //}
-        }
-        return column.TmpColumnContentWidth is int w ? w : 0;
     }
 
     public static ItemCollectionList UndoItems(DatabaseAbstract db, string cellkey) {
@@ -684,7 +682,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             _database.Column.ItemAdded += _Database_ViewChanged;
             _database.Column.ItemRemoving += Column_ItemRemoving;
             _database.Column.ItemRemoved += _Database_ViewChanged;
-            _database.SavedToDisk += _Database_SavedToDisk; 
+            _database.SavedToDisk += _Database_SavedToDisk;
             _database.ProgressbarInfo += _Database_ProgressbarInfo;
             _database.DropMessage += _Database_DropMessage;
             _database.Disposing += _Database_Disposing;
@@ -2358,8 +2356,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             viewItem.TmpDrawWidth = 16;
         } else {
             viewItem.TmpDrawWidth = viewItem.ViewType == ViewType.PermanentColumn
-                ? Math.Min(TmpColumnContentWidth(this, viewItem.Column, _cellFont, _pix16), (int)(displayRectangleWoSlider.Width * 0.3))
-                : Math.Min(TmpColumnContentWidth(this, viewItem.Column, _cellFont, _pix16), (int)(displayRectangleWoSlider.Width * 0.75));
+                ? Math.Min(CalculateColumnContentWidth(this, viewItem.Column, _cellFont, _pix16), (int)(displayRectangleWoSlider.Width * 0.3))
+                : Math.Min(CalculateColumnContentWidth(this, viewItem.Column, _cellFont, _pix16), (int)(displayRectangleWoSlider.Width * 0.6));
         }
 
         viewItem.TmpDrawWidth = Math.Max((int)viewItem.TmpDrawWidth, AutoFilterSize); // Mindestens so groß wie der Autofilter;
@@ -2375,8 +2373,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             _mouseOverColumn = null;
         }
     }
-
-
 
     private SizeF ColumnCaptionText_Size(ColumnItem? column) {
         if (column.TmpCaptionTextSize.Width > 0) { return column.TmpCaptionTextSize; }

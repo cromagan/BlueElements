@@ -389,7 +389,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposableEx
                 return lcolumn != null && lrow != null ? lrow.CellGetString(lcolumn) : string.Empty;
             }
             var cellKey = KeyOfCell(column, row);
-            return !ContainsKey(cellKey) ? string.Empty : this[cellKey].Value is string s ? s : string.Empty;
+            return !ContainsKey(cellKey) ? string.Empty : this[cellKey].Value;
         } catch {
             // Manchmal verscwhindwet der vorhandene Key?!?
             return GetString(column, row);
@@ -690,13 +690,14 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposableEx
 
         if (changeSysColumns) {
             DoSpecialFormats(column, row, oldValue, false);
-
+            var tc = DateTime.Now.ToString(Constants.Format_Date);
             SystemSet(_database?.Column.SysRowChanger, row, _database?.UserName);
-            SystemSet(_database.Column.SysRowChangeDate, row, DateTime.Now.ToString(Constants.Format_Date5));
+            SystemSet(_database?.Column.SysRowChangeDate, row, tc);
+            column.TimeCode = tc;
         }
 
         Invalidate_CellContentSize(column, row);
-        column.Invalidate_TmpColumnContentWidth();
+        column.Invalidate_ContentWidth();
         OnCellValueChanged(new CellEventArgs(column, row));
     }
 

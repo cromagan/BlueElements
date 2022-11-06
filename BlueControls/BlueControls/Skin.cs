@@ -1179,18 +1179,28 @@ public static class Skin {
         }
     }
 
-    public static Size FormatedText_NeededSize(string text, QuickImage? image, BlueFont? font, int minSie) {
+    public static Size FormatedText_NeededSize(string text, QuickImage? image, BlueFont font, int minSie) {
         try {
             var pSize = SizeF.Empty;
             var tSize = SizeF.Empty;
             if (font == null) { return new Size(3, 3); }
             if (image != null) { pSize = image.Size; }
             if (!string.IsNullOrEmpty(text)) { tSize = BlueFont.MeasureString(text, font.Font()); }
-            return !string.IsNullOrEmpty(text)
-                ? image == null
-                    ? new Size((int)(tSize.Width + 1), Math.Max((int)tSize.Height, minSie))
-                    : new Size((int)(tSize.Width + 2 + pSize.Width + 1), Math.Max((int)tSize.Height, (int)pSize.Height))
-                : image != null ? new Size((int)pSize.Width, (int)pSize.Height) : new Size(minSie, minSie);
+
+            if (!string.IsNullOrEmpty(text)) {
+                if (image == null) {
+                    return new Size((int)(tSize.Width + 1), Math.Max((int)tSize.Height, minSie));
+                }
+
+                return new Size((int)(tSize.Width + 2 + pSize.Width + 1),
+                    Math.Max((int)tSize.Height, (int)pSize.Height));
+            }
+
+            if (image != null) {
+                return new Size((int)pSize.Width, (int)pSize.Height);
+            }
+
+            return new Size(minSie, minSie);
         } catch {
             // tmpImageCode wird an anderer Stelle verwendet
             return FormatedText_NeededSize(text, image, font, minSie);

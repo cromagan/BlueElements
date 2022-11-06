@@ -374,12 +374,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
                     }
                 }
                 CellCollection.Invalidate_CellContentSize(thisColum, this);
-                thisColum.Invalidate_TmpColumnContentWidth();
+                thisColum.Invalidate_ContentWidth();
                 doFemdZelleInvalidate = false; // Hier ja schon bei jedem gemacht
             }
             if (doFemdZelleInvalidate && thisColum.LinkedDatabase != null) {
                 CellCollection.Invalidate_CellContentSize(thisColum, this);
-                thisColum.Invalidate_TmpColumnContentWidth();
+                thisColum.Invalidate_ContentWidth();
             }
         }
 
