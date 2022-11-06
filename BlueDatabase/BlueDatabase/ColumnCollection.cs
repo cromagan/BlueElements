@@ -354,13 +354,13 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         }
     }
 
-    public new void Swap(ColumnItem? column1, ColumnItem? column2) {
-        if (column1 == null || column2 == null) { return; }
-        base.Swap(column1, column2);
-        column1.Invalidate_ColumAndContent();
-        column2.Invalidate_ColumAndContent();
-        //Database.ColumnArrangements[0].ShowAllColumns(); // Damit die Datenbank mitbekommt, das sich da was geändert hat
-    }
+    //public new void Swap(int index1, int index2) {
+    //    if (column1 == null || column2 == null) { return; }
+    //    base.Swap(index1, column2);
+    //    column1.Invalidate_ColumAndContent();
+    //    column2.Invalidate_ColumAndContent();
+    //    //Database.ColumnArrangements[0].ShowAllColumns(); // Damit die Datenbank mitbekommt, das sich da was geändert hat
+    //}
 
     internal static string ParsableColumnKey(ColumnItem? column) => column == null ? "ColumnKey=?" : ParsableColumnKey(column.Key);
 

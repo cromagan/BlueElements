@@ -133,7 +133,6 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         var car = Database.ColumnArrangements.CloneWithClones();
         car.RemoveAt(Arrangement);
 
-
         if (car.Count < 1) {
             car.Add(new ColumnViewCollection(Database, "", ""));
         }
@@ -240,81 +239,88 @@ public partial class ColumnArrangementPadEditor : PadEditor {
     private void FixColumnArrangement() {
         if (Generating || Sorting) { return; }
 
-        var car = Database.ColumnArrangements.CloneWithClones();
-        var carone = car[Arrangement];
+        var cloneOfColumnArrangements = Database.ColumnArrangements.CloneWithClones();
+        var thisColumnViewCollection = cloneOfColumnArrangements[Arrangement];
 
-        if (carone == null) { return; }
+        if (thisColumnViewCollection == null) { return; }
         var did = false;
 
         Fixing++;
 
-        var done = new List<BasicPadItem>();
+        var itemsdone = new List<BasicPadItem>();
+
         do {
-            var x = LeftestItem(done);
-            if (x == null) { break; }
+            var leftestItem = LeftestItem(itemsdone);
+            if (leftestItem == null) { break; }
 
-            if (Arrangement > 0) {
+            #region Die Ansicht richtig stellen
 
-                #region Code für Ansichten > 0
+            var columnIndexWhoShouldBeThere2 = thisColumnViewCollection.IndexOf(thisColumnViewCollection[leftestItem.Column]);
 
-                var currentVI = carone.IndexOf(carone[x.Column]);
+            if (columnIndexWhoShouldBeThere2 < 0) {
+                // Noch nicht in der View, wurde also hinzugfügt. Auch fest hizufügen
+                thisColumnViewCollection.Add(leftestItem.Column, false);
+                columnIndexWhoShouldBeThere2 = thisColumnViewCollection.IndexOf(thisColumnViewCollection[leftestItem.Column]);
+                did = true;
+            }
 
-                if (currentVI < 0) {
-                    carone.Add(x.Column, false);
-                    currentVI = carone.IndexOf(carone[x.Column]);
-                    did = true;
-                }
+            var columnIndexWhoISonPos2 = thisColumnViewCollection.IndexOf(thisColumnViewCollection[itemsdone.Count]);
+            if (columnIndexWhoShouldBeThere2 != itemsdone.Count) {
+                // Position stimmt nicht, also swapen
+                thisColumnViewCollection.Swap(columnIndexWhoISonPos2, columnIndexWhoShouldBeThere2);
+                did = true;
+            }
 
-                if (currentVI != done.Count) {
-                    var onPosVI = carone.IndexOf(carone[done.Count]);
-                    carone.Swap(carone[onPosVI], carone[currentVI]);
-                    did = true;
-                }
+            #endregion
 
-                #endregion
-            } else {
+            #region Zusätzlich bei Ansicht 0 das auch in echt machen
 
-                #region Code für Ansicht 0
-
-                var currentC = Database.Column.IndexOf(x.Column);
-                if (currentC < 0) {
+            if (Arrangement == 0) {
+                var columnIndexWhoShouldBeThere = Database.Column.IndexOf(leftestItem.Column);
+                if (columnIndexWhoShouldBeThere < 0) {
                     MessageBox.Show("Interner Fehler", ImageCode.Warnung, "OK");
                     ShowOrder();
                     Fixing--;
                     return;
                 }
 
-                if (currentC != done.Count) {
-                    var onPosC = Database.Column.IndexOf(carone[done.Count].Column);
-                    Database.Column.Swap(Database.Column[onPosC], Database.Column[currentC]);
-                    did = true;
+                if (columnIndexWhoShouldBeThere != itemsdone.Count) {
+                    //var columnIndexWhoISonPos = Database.Column.IndexOf(thisColumnViewCollection[itemsdone.Count].Column);
+                    Database.Column.Swap(columnIndexWhoISonPos2, columnIndexWhoShouldBeThere);
                 }
-
-                #endregion
             }
 
-            done.Add(x);
+            #endregion
+
+            itemsdone.Add(leftestItem);
         } while (true);
 
-        while (carone.Count > done.Count) {
+        // Prüfen, ob Items gelöscht wurden.
+        // Diese dann ebenfalls löschen
+        if (thisColumnViewCollection.Count > itemsdone.Count) {
             if (Arrangement > 0) {
 
                 #region Code für Ansichten > 0
 
-                carone.RemoveAt(carone.Count - 1);
-                did = true;
+                while (thisColumnViewCollection.Count > itemsdone.Count) {
+                    // Item, dass nun durch die Swaps an die letzten
+                    // Stellen gewandert und zu viel sind, einfach am Ende weglöschen
+                    thisColumnViewCollection.RemoveAt(thisColumnViewCollection.Count - 1);
+                    did = true;
+                }
 
                 #endregion
             } else {
 
                 #region Code für Ansicht 0
 
-                var col = Database.Column[carone.Count - 1];
-                if (string.IsNullOrEmpty(col.Identifier) && MessageBox.Show("Spalte <b>" + col.ReadableText() + "</b> endgültig löschen?", ImageCode.Warnung, "Ja", "Nein") == 0) {
+                var col = thisColumnViewCollection[thisColumnViewCollection.Count - 1].Column;
+                if (string.IsNullOrEmpty(col.Identifier) &&
+                    MessageBox.Show("Spalte <b>" + col.ReadableText() + "</b> endgültig löschen?", ImageCode.Warnung,
+                        "Ja", "Nein") == 0) {
                     Database.Column.Remove(col);
+                    did = true;
                 }
-                did = true;
-                break;
 
                 #endregion
             }
@@ -322,12 +328,12 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
         Fixing--;
 
-        if (Arrangement == 0 && did) {
+        Database.ColumnArrangements = cloneOfColumnArrangements;
+
+        if (did) {
             Database?.RepairAfterParse();
             ShowOrder();
         }
-
-        Database.ColumnArrangements =car;
     }
 
     private void Item_ItemAdded(object sender, ListEventArgs e) {
@@ -382,7 +388,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         ColumnPadItem? anyitem = null;
 
         var ca = CurrentArrangement;
-        if (ca == null) { return; }
+        if (ca == null) { Generating = false; return; }
 
         #region Erst alle Spalten der eigenen Datenbank erzeugen, um später verweisen zu können
 
@@ -399,7 +405,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
         #endregion
 
-        if (anyitem == null) { return; }
+        if (anyitem == null) { Generating = false; return; }
 
         #region Im zweiten Durchlauf ermitteln, welche Verknüpfungen es gibt
 
