@@ -144,7 +144,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
 
     //public object Clone() => new FilterItem(Database, ToString());
 
-    //public string CompareKey() => ((int)_filterType).ToString(Constants.Format_Integer10);
+    //public string CompareKeyx() => ((int)_filterType).ToString(Constants.Format_Integer10);
 
     // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
     // ~FilterItem()

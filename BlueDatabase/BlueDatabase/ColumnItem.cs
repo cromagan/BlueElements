@@ -52,7 +52,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     private readonly List<string> _tags = new();
     private AdditionalCheck _additionalFormatCheck;
     private string _adminInfo;
-    private string _timecode;
+    public string _timecode;
     private bool _afterEditAutoCorrect;
     private bool _afterEditDoUCase;
     private bool _afterEditQuickSortRemoveDouble;
@@ -1061,6 +1061,11 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     public List<string> Contents(FilterCollection filter, List<RowItem>? pinned) {
         List<string> list = new();
         if (Database == null) { return list; }
+
+
+        Database.RefreshColumnsData(filter);
+
+
 
         foreach (var thisRowItem in Database.Row) {
             if (thisRowItem != null) {

@@ -207,7 +207,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
 
     public object Clone() => new ExportDefinition(Database, ToString());
 
-    //public string CompareKey() => ((int)_typ).ToString(Constants.Format_Integer3) + "|" + _verzeichnis + "|" + _exportFormularId + "|" + _backupInterval + "|" + _autoDelete;
+    //public string CompareKeyx() => ((int)_typ).ToString(Constants.Format_Integer3) + "|" + _verzeichnis + "|" + _exportFormularId + "|" + _backupInterval + "|" + _autoDelete;
 
     //#region IDisposable Support
     //// IDisposable

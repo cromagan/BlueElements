@@ -473,7 +473,12 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         if (SQLBackAbstract.ConnectedSQLBack != null) {
             foreach (var thisSQL in SQLBackAbstract.ConnectedSQLBack) {
                 var h = thisSQL.HandleMe(ci);
-                if (h != null) { return new DatabaseSQL(h, false, ci.TableName); }
+                if (h != null) {
+                    if (ci.UniqueID.Contains("LITE")) {
+                        return new DatabaseSQLLite(h, false, ci.TableName);
+                    }
+                    return new DatabaseSQL(h, false, ci.TableName);
+                }
             }
         }
 
@@ -1821,6 +1826,20 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
             if (!_backgroundWorker.IsBusy) { _backgroundWorker.RunWorkerAsync(); }
         } catch {
             StartBackgroundWorker();
+        }
+    }
+
+    internal abstract void RefreshColumnsData(ListExt<ColumnItem>? columns);
+    internal void RefreshColumnsData(List<FilterItem>? filter) {
+        if (filter != null) {
+            var c = new ListExt<ColumnItem>();
+
+            foreach (var thisF in filter) {
+                if (thisF.Column!= null) {
+                    c.AddIfNotExists(thisF.Column);
+                }
+            }
+            RefreshColumnsData(c);
         }
     }
 

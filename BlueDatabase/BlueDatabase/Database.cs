@@ -777,5 +777,7 @@ public sealed class Database : DatabaseAbstract {
         }
     }
 
+    internal override void RefreshColumnsData(ListExt<ColumnItem>? columns) { }
+
     #endregion
 }

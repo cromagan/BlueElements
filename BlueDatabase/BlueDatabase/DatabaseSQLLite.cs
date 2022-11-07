@@ -28,7 +28,7 @@ namespace BlueDatabase;
 
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public sealed class DatabaseSQL : DatabaseAbstract {
+public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     #region Fields
 
@@ -41,8 +41,8 @@ public sealed class DatabaseSQL : DatabaseAbstract {
     #endregion
 
     #region Constructors
-    internal override void RefreshColumnsData(ListExt<ColumnItem>? columns) { }
-    public DatabaseSQL(SQLBackAbstract sql, bool readOnly, string tablename) : base(tablename, readOnly) {
+
+    public DatabaseSQLLite(SQLBackAbstract sql, bool readOnly, string tablename) : base(tablename, readOnly) {
         AllFiles.Add(this);
 
         _sql = sql;
@@ -65,7 +65,7 @@ public sealed class DatabaseSQL : DatabaseAbstract {
 
     public override ConnectionInfo ConnectionData {
         get {
-            var ConnectionData = _sql.ConnectionData(TableName, false);
+            var ConnectionData = _sql.ConnectionData(TableName, true);
             ConnectionData.Provider = this;
             return ConnectionData;
         }
@@ -130,8 +130,6 @@ public sealed class DatabaseSQL : DatabaseAbstract {
     public override void BlockReload(bool crashIsCurrentlyLoading) { }
 
     public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists) {
-
-
         if (checkExists) {
             var t = AllAvailableTables();
 
@@ -143,11 +141,9 @@ public sealed class DatabaseSQL : DatabaseAbstract {
             return null;
         }
 
-
-        var ConnectionData = _sql.ConnectionData(tableName, false);
+        var ConnectionData = _sql.ConnectionData(tableName, true);
         ConnectionData.Provider = this;
         return ConnectionData;
-
     }
 
     public override void Load_Reload() {
@@ -180,6 +176,23 @@ public sealed class DatabaseSQL : DatabaseAbstract {
                 }
             }
         }
+    }
+
+    internal override void RefreshColumnsData(ListExt<ColumnItem>? columns) {
+        if (columns == null || columns.Count ==0) { return; }
+        //if(!ReloadNeeded) { return; }
+
+        _sql.OpenConnection();
+        var l = new List<ColumnItem>();
+
+        foreach (var thisc in columns) {
+            if (string.IsNullOrEmpty(thisc.TimeCode) || _sql.GetStyleData(TableName, DatabaseDataType.ColumnTimeCode.ToString(), thisc.Name) != thisc.TimeCode) {
+                l.AddIfNotExists(thisc);
+            }
+        }
+
+        _sql.LoadColumns(TableName, columns);
+        _sql.CloseConnection();
     }
 
     protected override void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName) {
@@ -254,9 +267,13 @@ public sealed class DatabaseSQL : DatabaseAbstract {
 
         #endregion
 
-        #region  Alle Zellen laden
+        #region  Alle ZEILEN laden
 
-        _sql.LoadAllCells(TableName, Row);
+        _sql.LoadAllRows(TableName, Row);
+
+        foreach (var thisColumn in Column) {
+            thisColumn._timecode = string.Empty;
+        }
 
         #endregion
 

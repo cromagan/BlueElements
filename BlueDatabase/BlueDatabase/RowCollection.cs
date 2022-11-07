@@ -217,6 +217,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         List<RowItem> tmpVisibleRows = new();
         if (Database == null) { return tmpVisibleRows; }
 
+
+
+
+            Database.RefreshColumnsData(filter);
+
+
+
         try {
             var lockMe = new object();
             Parallel.ForEach(Database.Row, thisRowItem => {
@@ -239,7 +246,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         var lockMe = new object();
         VisibleRowCount = 0;
 
-        #region Ermitteln, ob mindestens eine Überschruft vorhanden ist (capName)
+        #region Ermitteln, ob mindestens eine Überschrift vorhanden ist (capName)
 
         var capName = pinnedRows != null && pinnedRows.Count > 0;
         if (!capName) {
@@ -250,12 +257,17 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
         #endregion
 
+        Database.RefreshColumnsData(rowSortDefinition.Columns);
+
+      
+
+
         #region _Angepinnten Zeilen erstellen (_pinnedData)
 
         List<RowData> pinnedData = new();
         if (pinnedRows != null) {
             Parallel.ForEach(pinnedRows, thisRow => {
-                var rd = reUseMe.Get(thisRow, "Angepinnt") as RowData ?? new RowData(thisRow, "Angepinnt");
+                var rd = reUseMe.Get(thisRow, "Angepinnt") ?? new RowData(thisRow, "Angepinnt");
                 rd.PinStateSortAddition = "1";
                 rd.MarkYellow = true;
                 rd.AdditionalSort = rowSortDefinition == null ? thisRow.CompareKey(null) : thisRow.CompareKey(rowSortDefinition.Columns);
@@ -291,7 +303,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
             if (caps.Count == 0) { caps.Add(string.Empty); }
 
             foreach (var thisCap in caps) {
-                var rd = reUseMe.Get(thisRow, thisCap) as RowData ?? new RowData(thisRow, thisCap);
+                var rd = reUseMe.Get(thisRow, thisCap) ?? new RowData(thisRow, thisCap);
 
                 rd.PinStateSortAddition = "2";
                 rd.MarkYellow = markYellow;

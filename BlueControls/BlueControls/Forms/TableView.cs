@@ -46,7 +46,7 @@ public partial class TableView : Form {
 
     #region Fields
 
-    public static SQLBackAbstract? SQL = null;
+
 
     private Ansicht _ansicht = Ansicht.Tabelle_und_Formular_nebeneinander;
 

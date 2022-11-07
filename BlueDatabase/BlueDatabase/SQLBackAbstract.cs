@@ -30,21 +30,6 @@ using static BlueBasics.Extensions;
 
 namespace BlueDatabase;
 
-//public static class SQLExtension {
-//    #region Methods
-
-//    public static void AddParameterWithValue(this DbCommand? command, string parameterName, object parameterValue) {
-//        // https://stackoverflow.com/questions/21608362/missing-addwithvalue-from-dbcommand-parameters
-
-//        if (command == null) { return; }
-//        var parameter = command.CreateParameter();
-//        parameter.ParameterName = parameterName;
-//        parameter.Value = parameterValue;
-//        command.Parameters.Add(parameter);
-//    }
-
-//    #endregion
-//}
 
 //https://www.c-sharpcorner.com/article/create-a-sql-server-database-dynamically-in-C-Sharp/
 //https://www.ictdemy.com/csharp/databases/introduction-to-databases-in-csharp-net
@@ -103,7 +88,13 @@ public abstract class SQLBackAbstract {
     public static string MakeValidTableName(string tablename) {
         var tmp = tablename.RemoveChars(Constants.Char_PfadSonderZeichen); // sonst stürzt FileNameWithoutSuffix ab
         tmp = tmp.FileNameWithoutSuffix().ToLower().Replace(" ", "_").Replace("-", "_");
-        tmp = tmp.StarkeVereinfachung("_").ToUpper().Replace("__", "_");
+        tmp = tmp.StarkeVereinfachung("_").ToUpper();
+
+        while (tmp.Contains("__")) {
+
+            tmp = tmp.Replace("__", "_");
+        }
+
         return tmp;
     }
 
@@ -242,8 +233,9 @@ public abstract class SQLBackAbstract {
     /// </summary>
     /// <param name="tablename"></param>
     /// <returns></returns>
-    public ConnectionInfo ConnectionData(string tablename) {
-        return new ConnectionInfo(tablename, null, ConnectionString, string.Empty);
+    public ConnectionInfo ConnectionData(string tablename, bool lite) {
+        var z = lite ? " LITE" : string.Empty;
+        return new ConnectionInfo(tablename, null, ConnectionString + z, string.Empty);
     }
 
     /// <summary>
@@ -322,6 +314,62 @@ public abstract class SQLBackAbstract {
         //CloseConnection();    // Nix vorhanden!
         return l;
     }
+
+
+    public async void LoadAllRows(string tablename, RowCollection row) {
+        if (!OpenConnection()) { return; }
+
+
+
+        //var allcols = GetColumnNames(tablename);
+        //allcols.Remove("RK");
+
+        var com = "SELECT RK ";
+
+        //foreach (var thiscolumn in row.Database.Column) {
+        //    if (!allcols.Contains(thiscolumn.Name.ToUpper())) {
+        //        Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht auf dem Server vorhanden: " + thiscolumn.Name);
+        //    }
+        //    allcols.Remove(thiscolumn.Name.ToUpper());
+
+        //    com = com + thiscolumn.Name.ToUpper() + ", ";
+        //}
+
+        //com = com.TrimEnd(", ");
+
+        com = com + " FROM " + tablename.ToUpper();
+
+        //if (allcols.Count>0) {
+        //    Develop.DebugPrint(FehlerArt.Fehler, "Zusätzliche Spalten dem Server vorhanden: " + allcols.JoinWith(", "));
+        //}
+
+        OpenConnection();
+
+        using var command = _connection.CreateCommand();
+        command.CommandText = com; //@"select * from " + tablename.ToUpper();
+
+        using var reader = await command.ExecuteReaderAsync();
+
+
+
+        row.Clear();
+        //var ti = DateTime.Now;
+
+        while (await reader.ReadAsync()) {
+            var rk = LongParse(reader[0].ToString());
+            var r = new RowItem(row.Database, rk);
+            row.Add(r);
+
+            //for (var z = 1; z < reader.FieldCount; z++) {
+            //    row.Database.Cell.SetValueInternal(row.Database.Column[z - 1], r, reader[z].ToString(), -1, -1);
+            //}
+        }
+
+        //Develop.DebugPrint(FehlerArt.Info, "Datenbank Ladezeit: " + row.Database.TableName + " - " + DateTime.Now.Subtract(ti).TotalSeconds.ToString() + " Sekunden");
+
+        CloseConnection();
+    }
+
 
     public async void LoadAllCells(string tablename, RowCollection row) {
         if (!OpenConnection()) { return; }
@@ -508,6 +556,11 @@ public abstract class SQLBackAbstract {
             if (thisK.ConnectionOk && thisK.ConnectionString == ci.DatabaseID) {
                 return thisK.OtherTable(ci.TableName);
             }
+
+            if (thisK.ConnectionOk && thisK.ConnectionString  + " LITE" == ci.DatabaseID) {
+                return thisK.OtherTable(ci.TableName);
+            }
+
         }
 
         return null;
@@ -532,7 +585,7 @@ public abstract class SQLBackAbstract {
         return ExecuteCommand(command);
     }
 
-    protected bool OpenConnection() {
+    public bool OpenConnection() {
         if (_connection == null) { return false; }
 
         if (_connection.State == ConnectionState.Closed) {
@@ -680,6 +733,59 @@ public abstract class SQLBackAbstract {
         if (!OpenConnection()) { return false; }
 
         return ExecuteCommand(cmdString);
+    }
+
+    internal async void  LoadColumns(string tablename, ListExt<ColumnItem> columns) {
+        if (columns == null || columns.Count ==0) { return; }
+        if (!OpenConnection()) { return; }
+
+        var com = "SELECT RK, ";
+
+        foreach (var thiscolumn in columns) {
+            com = com + thiscolumn.Name.ToUpper() + ", ";
+        }
+        com = com.TrimEnd(", ");
+        com = com + " FROM " + tablename.ToUpper();
+
+        OpenConnection();
+
+        using var command = _connection.CreateCommand();
+        command.CommandText = com; 
+
+        using var reader = await command.ExecuteReaderAsync();
+
+
+        while (await reader.ReadAsync()) {
+            var rk = LongParse(reader[0].ToString());
+            var row = columns[0].Database.Row.SearchByKey(rk);
+
+            if(row == null) {
+                row = new RowItem(columns[0].Database, rk);
+                columns[0].Database.Row.Add(row);
+            }
+
+
+
+            for (var z = 1; z < reader.FieldCount; z++) {
+                row.Database.Cell.SetValueInternal(columns[z - 1], row, reader[z].ToString(), -1, -1);
+            }
+        }
+
+        foreach (var thiscolumn in columns) {
+            var val = GetStyleData(tablename, DatabaseDataType.ColumnTimeCode.ToString(), thiscolumn.Name);
+            thiscolumn.TimeCode = val;
+        }
+
+
+
+
+        //Develop.DebugPrint(FehlerArt.Info, "Datenbank Ladezeit: " + row.Database.TableName + " - " + DateTime.Now.Subtract(ti).TotalSeconds.ToString() + " Sekunden");
+
+        CloseConnection();
+
+
+
+
     }
 
     #endregion
