@@ -30,7 +30,6 @@ using static BlueBasics.Extensions;
 
 namespace BlueDatabase;
 
-
 //https://www.c-sharpcorner.com/article/create-a-sql-server-database-dynamically-in-C-Sharp/
 //https://www.ictdemy.com/csharp/databases/introduction-to-databases-in-csharp-net
 //https://docs.microsoft.com/en-us/troubleshoot/developer/visualstudio/csharp/language-compilers/create-sql-server-database-programmatically
@@ -91,7 +90,6 @@ public abstract class SQLBackAbstract {
         tmp = tmp.StarkeVereinfachung("_").ToUpper();
 
         while (tmp.Contains("__")) {
-
             tmp = tmp.Replace("__", "_");
         }
 
@@ -315,65 +313,8 @@ public abstract class SQLBackAbstract {
         return l;
     }
 
-
-    public async void LoadAllRows(string tablename, RowCollection row) {
-        if (!OpenConnection()) { return; }
-
-
-
-        //var allcols = GetColumnNames(tablename);
-        //allcols.Remove("RK");
-
-        var com = "SELECT RK ";
-
-        //foreach (var thiscolumn in row.Database.Column) {
-        //    if (!allcols.Contains(thiscolumn.Name.ToUpper())) {
-        //        Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht auf dem Server vorhanden: " + thiscolumn.Name);
-        //    }
-        //    allcols.Remove(thiscolumn.Name.ToUpper());
-
-        //    com = com + thiscolumn.Name.ToUpper() + ", ";
-        //}
-
-        //com = com.TrimEnd(", ");
-
-        com = com + " FROM " + tablename.ToUpper();
-
-        //if (allcols.Count>0) {
-        //    Develop.DebugPrint(FehlerArt.Fehler, "Zusätzliche Spalten dem Server vorhanden: " + allcols.JoinWith(", "));
-        //}
-
-        OpenConnection();
-
-        using var command = _connection.CreateCommand();
-        command.CommandText = com; //@"select * from " + tablename.ToUpper();
-
-        using var reader = await command.ExecuteReaderAsync();
-
-
-
-        row.Clear();
-        //var ti = DateTime.Now;
-
-        while (await reader.ReadAsync()) {
-            var rk = LongParse(reader[0].ToString());
-            var r = new RowItem(row.Database, rk);
-            row.Add(r);
-
-            //for (var z = 1; z < reader.FieldCount; z++) {
-            //    row.Database.Cell.SetValueInternal(row.Database.Column[z - 1], r, reader[z].ToString(), -1, -1);
-            //}
-        }
-
-        //Develop.DebugPrint(FehlerArt.Info, "Datenbank Ladezeit: " + row.Database.TableName + " - " + DateTime.Now.Subtract(ti).TotalSeconds.ToString() + " Sekunden");
-
-        CloseConnection();
-    }
-
-
     public async void LoadAllCells(string tablename, RowCollection row) {
         if (!OpenConnection()) { return; }
-
 
         //DataTable dataTable = new DataTable();
         //using var cmd = _connection.CreateCommand();
@@ -382,8 +323,6 @@ public abstract class SQLBackAbstract {
         //da.SelectCommand = cmd;
         //da.Fill(dataTable);
         //da.Dispose();
-
-
 
         var allcols = GetColumnNames(tablename);
         allcols.Remove("RK");
@@ -414,8 +353,6 @@ public abstract class SQLBackAbstract {
 
         using var reader = await command.ExecuteReaderAsync();
 
-
-
         row.Clear();
         var ti = DateTime.Now;
 
@@ -432,6 +369,100 @@ public abstract class SQLBackAbstract {
         Develop.DebugPrint(FehlerArt.Info, "Datenbank Ladezeit: " + row.Database.TableName + " - " + DateTime.Now.Subtract(ti).TotalSeconds.ToString() + " Sekunden");
 
         CloseConnection();
+    }
+
+    public async void LoadAllRows(string tablename, RowCollection row) {
+        if (!OpenConnection()) { return; }
+
+        //var allcols = GetColumnNames(tablename);
+        //allcols.Remove("RK");
+
+        var com = "SELECT RK ";
+
+        //foreach (var thiscolumn in row.Database.Column) {
+        //    if (!allcols.Contains(thiscolumn.Name.ToUpper())) {
+        //        Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht auf dem Server vorhanden: " + thiscolumn.Name);
+        //    }
+        //    allcols.Remove(thiscolumn.Name.ToUpper());
+
+        //    com = com + thiscolumn.Name.ToUpper() + ", ";
+        //}
+
+        //com = com.TrimEnd(", ");
+
+        com = com + " FROM " + tablename.ToUpper();
+
+        //if (allcols.Count>0) {
+        //    Develop.DebugPrint(FehlerArt.Fehler, "Zusätzliche Spalten dem Server vorhanden: " + allcols.JoinWith(", "));
+        //}
+
+        OpenConnection();
+
+        using var command = _connection.CreateCommand();
+        command.CommandText = com; //@"select * from " + tablename.ToUpper();
+
+        using var reader = await command.ExecuteReaderAsync();
+
+        row.Clear();
+        //var ti = DateTime.Now;
+
+        while (await reader.ReadAsync()) {
+            var rk = LongParse(reader[0].ToString());
+            var r = new RowItem(row.Database, rk);
+            row.Add(r);
+
+            //for (var z = 1; z < reader.FieldCount; z++) {
+            //    row.Database.Cell.SetValueInternal(row.Database.Column[z - 1], r, reader[z].ToString(), -1, -1);
+            //}
+        }
+
+        //Develop.DebugPrint(FehlerArt.Info, "Datenbank Ladezeit: " + row.Database.TableName + " - " + DateTime.Now.Subtract(ti).TotalSeconds.ToString() + " Sekunden");
+
+        CloseConnection();
+    }
+
+    public void LoadRow(string tablename, RowItem row) {
+        if (!OpenConnection()) { return; }
+
+        var com = "SELECT RK, ";
+
+        foreach (var thiscolumn in row.Database.Column) {
+            com = com + thiscolumn.Name.ToUpper() + ", ";
+        }
+
+        com = com.TrimEnd(", ");
+
+        com = com + " FROM " + tablename.ToUpper();
+
+        OpenConnection();
+
+        using var command = _connection.CreateCommand();
+        command.CommandText = com; //@"select * from " + tablename.ToUpper();
+
+        using var reader = command.ExecuteReader();
+
+        while (reader.Read()) {
+            for (var z = 1; z < reader.FieldCount; z++) {
+                row.Database.Cell.SetValueInternal(row.Database.Column[z - 1], row, reader[z].ToString(), -1, -1);
+            }
+        }
+
+        if (string.IsNullOrEmpty(row.CellGetString(row.Database.Column.SysRowChangeDate))) {
+            Develop.DebugPrint(FehlerArt.Warnung, "Zeile ohne Zeitstempel, repariert! + " + com);
+            row.CellSet(row.Database.Column.SysRowChangeDate, DateTime.UtcNow.ToString(Constants.Format_Date));
+        }
+
+        CloseConnection();
+    }
+
+    public bool OpenConnection() {
+        if (_connection == null) { return false; }
+
+        if (_connection.State == ConnectionState.Closed) {
+            _connection.Open();
+        }
+
+        return _connection.State == ConnectionState.Open;
     }
 
     public abstract SQLBackAbstract OtherTable(string tablename);
@@ -560,10 +591,60 @@ public abstract class SQLBackAbstract {
             if (thisK.ConnectionOk && thisK.ConnectionString  + " LITE" == ci.DatabaseID) {
                 return thisK.OtherTable(ci.TableName);
             }
-
         }
 
         return null;
+    }
+
+    internal async void LoadColumns(string tablename, ListExt<ColumnItem> columns) {
+        if (columns == null || columns.Count ==0) { return; }
+        if (!OpenConnection()) { return; }
+
+        var com = "SELECT RK, ";
+
+        foreach (var thiscolumn in columns) {
+            com = com + thiscolumn.Name.ToUpper() + ", ";
+        }
+        com = com.TrimEnd(", ");
+        com = com + " FROM " + tablename.ToUpper();
+
+        OpenConnection();
+
+        using var command = _connection.CreateCommand();
+        command.CommandText = com;
+
+        using var reader = await command.ExecuteReaderAsync();
+
+        while (await reader.ReadAsync()) {
+            var rk = LongParse(reader[0].ToString());
+            var row = columns[0].Database.Row.SearchByKey(rk);
+
+            if (row == null) {
+                row = new RowItem(columns[0].Database, rk);
+                columns[0].Database.Row.Add(row);
+            }
+
+            for (var z = 1; z < reader.FieldCount; z++) {
+                row.Database.Cell.SetValueInternal(columns[z - 1], row, reader[z].ToString(), -1, -1);
+            }
+        }
+
+        foreach (var thiscolumn in columns) {
+            var val = GetStyleData(tablename, DatabaseDataType.ColumnTimeCode.ToString(), thiscolumn.Name);
+
+            thiscolumn._timecode = val;
+
+            if (string.IsNullOrEmpty(val)) {
+                Develop.DebugPrint(FehlerArt.Warnung, "Spalte ohne Zeitstempel, repariert! + " + com);
+                thiscolumn.TimeCode = DateTime.UtcNow.ToString(Constants.Format_Date);
+                //val =
+                //SetStyleData(tablename, DatabaseDataType.ColumnTimeCode, thiscolumn.Name, val);
+            }
+        }
+
+        //Develop.DebugPrint(FehlerArt.Info, "Datenbank Ladezeit: " + row.Database.TableName + " - " + DateTime.Now.Subtract(ti).TotalSeconds.ToString() + " Sekunden");
+
+        CloseConnection();
     }
 
     /// <summary>
@@ -583,16 +664,6 @@ public abstract class SQLBackAbstract {
         command.CommandText = commandtext;
 
         return ExecuteCommand(command);
-    }
-
-    public bool OpenConnection() {
-        if (_connection == null) { return false; }
-
-        if (_connection.State == ConnectionState.Closed) {
-            _connection.Open();
-        }
-
-        return _connection.State == ConnectionState.Open;
     }
 
     private void AddColumn(string tablename, string column, bool nullable) => AddColumn(tablename, column, VarChar255, nullable);
@@ -733,59 +804,6 @@ public abstract class SQLBackAbstract {
         if (!OpenConnection()) { return false; }
 
         return ExecuteCommand(cmdString);
-    }
-
-    internal async void  LoadColumns(string tablename, ListExt<ColumnItem> columns) {
-        if (columns == null || columns.Count ==0) { return; }
-        if (!OpenConnection()) { return; }
-
-        var com = "SELECT RK, ";
-
-        foreach (var thiscolumn in columns) {
-            com = com + thiscolumn.Name.ToUpper() + ", ";
-        }
-        com = com.TrimEnd(", ");
-        com = com + " FROM " + tablename.ToUpper();
-
-        OpenConnection();
-
-        using var command = _connection.CreateCommand();
-        command.CommandText = com; 
-
-        using var reader = await command.ExecuteReaderAsync();
-
-
-        while (await reader.ReadAsync()) {
-            var rk = LongParse(reader[0].ToString());
-            var row = columns[0].Database.Row.SearchByKey(rk);
-
-            if(row == null) {
-                row = new RowItem(columns[0].Database, rk);
-                columns[0].Database.Row.Add(row);
-            }
-
-
-
-            for (var z = 1; z < reader.FieldCount; z++) {
-                row.Database.Cell.SetValueInternal(columns[z - 1], row, reader[z].ToString(), -1, -1);
-            }
-        }
-
-        foreach (var thiscolumn in columns) {
-            var val = GetStyleData(tablename, DatabaseDataType.ColumnTimeCode.ToString(), thiscolumn.Name);
-            thiscolumn.TimeCode = val;
-        }
-
-
-
-
-        //Develop.DebugPrint(FehlerArt.Info, "Datenbank Ladezeit: " + row.Database.TableName + " - " + DateTime.Now.Subtract(ti).TotalSeconds.ToString() + " Sekunden");
-
-        CloseConnection();
-
-
-
-
     }
 
     #endregion

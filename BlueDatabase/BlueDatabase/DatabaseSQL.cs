@@ -41,7 +41,7 @@ public sealed class DatabaseSQL : DatabaseAbstract {
     #endregion
 
     #region Constructors
-    internal override void RefreshColumnsData(ListExt<ColumnItem>? columns) { }
+
     public DatabaseSQL(SQLBackAbstract sql, bool readOnly, string tablename) : base(tablename, readOnly) {
         AllFiles.Add(this);
 
@@ -130,8 +130,6 @@ public sealed class DatabaseSQL : DatabaseAbstract {
     public override void BlockReload(bool crashIsCurrentlyLoading) { }
 
     public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists) {
-
-
         if (checkExists) {
             var t = AllAvailableTables();
 
@@ -143,11 +141,9 @@ public sealed class DatabaseSQL : DatabaseAbstract {
             return null;
         }
 
-
         var ConnectionData = _sql.ConnectionData(tableName, false);
         ConnectionData.Provider = this;
         return ConnectionData;
-
     }
 
     public override void Load_Reload() {
@@ -181,6 +177,10 @@ public sealed class DatabaseSQL : DatabaseAbstract {
             }
         }
     }
+
+    internal override void RefreshColumnsData(ListExt<ColumnItem>? columns) { }
+
+    internal override void RefreshRowData(RowItem row) { }
 
     protected override void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName) {
         _sql.AddUndo(tableName, comand, column, row, previousValue, changedTo, UserName);

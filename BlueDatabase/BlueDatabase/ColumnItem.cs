@@ -192,8 +192,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         UcaseNamesSortedByLenght = null;
 
         #endregion Standard-Werte
-
-        Invalidate_TmpVariables();
+        Invalidate_Head();
+        Invalidate_LinkedDatabase();
     }
 
     #endregion
@@ -341,7 +341,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             value = value.Replace("<br>", "\r", RegexOptions.IgnoreCase);
             if (_caption == value) { return; }
             Database?.ChangeData(DatabaseDataType.ColumnCaption, this, null, _caption, value);
-            Invalidate_TmpVariables();
+            Invalidate_Head();
             OnChanged();
         }
     }
@@ -352,7 +352,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             if (_captionBitmapCode == value) { return; }
             Database?.ChangeData(DatabaseDataType.CaptionBitmapCode, this, null, _captionBitmapCode, value);
             _captionBitmapCode = value;
-            Invalidate_TmpVariables();
+            Invalidate_Head();
             OnChanged();
         }
     }
@@ -483,7 +483,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         set {
             if (_filterOptions == value) { return; }
             Database?.ChangeData(DatabaseDataType.FilterOptions, this, null, ((int)_filterOptions).ToString(), ((int)value).ToString());
-            Invalidate_TmpVariables();
+            Invalidate_Head();
             OnChanged();
         }
     }
@@ -623,7 +623,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         set {
             if (_linkedDatabaseFile == value) { return; }
             Database?.ChangeData(DatabaseDataType.LinkedDatabase, this, null, _linkedDatabaseFile, value);
-            Invalidate_TmpVariables();
+            Invalidate_LinkedDatabase();
             OnChanged();
         }
     }
@@ -804,7 +804,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     private DatabaseAbstract Tmp_LinkedDatabase {
         set {
             if (value == _tmpLinkedDatabase) { return; }
-            Invalidate_TmpVariables();
             _tmpLinkedDatabase = value;
             if (_tmpLinkedDatabase != null) {
                 _tmpLinkedDatabase.ConnectedControlsStopAllWorking += _TMP_LinkedDatabase_ConnectedControlsStopAllWorking;
@@ -1052,6 +1051,11 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         return list.SortedDistinctList();
     }
 
+    public void RefreshColumnsData() {
+        var x = new ListExt<ColumnItem>() { this };
+        Database.RefreshColumnsData(x);
+    }
+
     /// <summary>
     ///
     /// </summary>
@@ -1063,7 +1067,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         if (Database == null) { return list; }
 
 
-        Database.RefreshColumnsData(filter);
+        RefreshColumnsData();
 
 
 
@@ -1341,9 +1345,9 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     /// Der Invalidate, der am meisten invalidiert: Alle temporären Variablen und auch jede Zell-Größe der Spalte.
     /// </summary>
     public void Invalidate_ColumAndContent() {
-        TmpCaptionTextSize = new SizeF(-1, -1);
+        Invalidate_Head();
         Invalidate_ContentWidth();
-        Invalidate_TmpVariables();
+        Invalidate_LinkedDatabase();
         foreach (var thisRow in Database.Row) {
             if (thisRow != null) { CellCollection.Invalidate_CellContentSize(this, thisRow); }
         }
@@ -2150,10 +2154,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     /// Wenn sich ein Zelleninhalt verändert hat, muss die Spalte neu berechnet werden.
     /// </summary>
     internal void Invalidate_ContentWidth() => ContentWidth = -1;
-
-    internal void Invalidate_TmpVariables() {
-        TmpCaptionTextSize = new SizeF(-1, -1);
-        TmpCaptionBitmapCode = null;
+    internal void Invalidate_LinkedDatabase() {
         if (_tmpLinkedDatabase != null) {
             //_TMP_LinkedDatabase.RowKeyChanged -= _TMP_LinkedDatabase_RowKeyChanged;
             //_TMP_LinkedDatabase.ColumnKeyChanged -= _TMP_LinkedDatabase_ColumnKeyChanged;
@@ -2162,10 +2163,17 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             _tmpLinkedDatabase.Disposing -= _TMP_LinkedDatabase_Disposing;
             _tmpLinkedDatabase = null;
         }
-        ContentWidth = -1;
     }
 
-    internal string ParsableColumnKey() => ColumnCollection.ParsableColumnKey(this);
+
+
+    internal void Invalidate_Head() {
+        TmpCaptionTextSize = new SizeF(-1, -1);
+        TmpCaptionBitmapCode = null;
+    }
+
+
+        internal string ParsableColumnKey() => ColumnCollection.ParsableColumnKey(this);
 
     /// <summary>
     /// Setzt den Wert in die dazugehörige Variable.
@@ -2179,12 +2187,12 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         switch (type) {
             case DatabaseDataType.ColumnKey:
                 _key = LongParse(newvalue);
-                Invalidate_TmpVariables();
+                //Invalidate_TmpVariablesx();
                 break;
 
             case DatabaseDataType.ColumnName:
                 _name = newvalue;
-                Invalidate_TmpVariables();
+                //Invalidate_TmpVariablesx();
                 break;
 
             case DatabaseDataType.ColumnCaption:
@@ -2473,7 +2481,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     //    }
     //}
     private void _TMP_LinkedDatabase_Disposing(object sender, System.EventArgs e) {
-        Invalidate_TmpVariables();
+        Invalidate_LinkedDatabase();
         Database.Dispose();
     }
 
@@ -2498,7 +2506,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
             Database.Disposing -= Database_Disposing;
-            Invalidate_TmpVariables();
+            Invalidate_LinkedDatabase();
             Database = null;
 
             //DropDownItems.Changed -= DropDownItems_ListOrItemChanged;

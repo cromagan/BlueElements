@@ -302,7 +302,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public static int CalculateColumnContentWidth(Table? table, ColumnItem column, BlueFont? cellFont, int pix16) {
         if (column.ContentWidth > 0) { return column.ContentWidth; }
 
-       var NewContentWidth = 0;
+        var NewContentWidth = -1;
 
         if (column.Format == DataFormat.Button) {
             // Beim Button reicht eine Abfrage mit Row null
@@ -326,10 +326,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public static Size Cell_ContentSize(Table? table, ColumnItem column, RowItem? row, BlueFont? cellFont, int pix16) {
-       
         if (column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             var (lcolumn, lrow, _) = CellCollection.LinkedCellData(column, row, false, false);
-            return lcolumn != null && lrow != null ? Cell_ContentSize(table, lcolumn, lrow, cellFont, pix16) 
+            return lcolumn != null && lrow != null ? Cell_ContentSize(table, lcolumn, lrow, cellFont, pix16)
                                                    : new Size(pix16, pix16);
         }
 

@@ -284,13 +284,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
     }
 
     /// <summary>
-    /// Erstellt einen sortierfähigen String eine Zeile mit der Standard sortierung
-    /// </summary>
-    /// <param name="columns">Nur diese Spalten in deser Reihenfolge werden berücksichtigt</param>
-    /// <returns>Den String mit dem abschluß <<>key<>> und dessen Key.</returns>
-    public string CompareKeyx() => CompareKey(Database.SortDefinition?.Columns);
-
-    /// <summary>
     /// Erstellt einen Sortierfähigen String eine Zeile
     /// </summary>
     /// <param name="columns">Nur diese Spalten in deser Reihenfolge werden berücksichtigt</param>
@@ -305,6 +298,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
         r.Append(Constants.SecondSortChar + "<key>" + Key);
         return r.ToString();
     }
+
+    /// <summary>
+    /// Erstellt einen sortierfähigen String eine Zeile mit der Standard sortierung
+    /// </summary>
+    /// <param name="columns">Nur diese Spalten in deser Reihenfolge werden berücksichtigt</param>
+    /// <returns>Den String mit dem abschluß <<>key<>> und dessen Key.</returns>
+    public string CompareKeyx() => CompareKey(Database.SortDefinition?.Columns);
 
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
@@ -448,6 +448,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
             if (!MatchesTo(thisFilter)) { return false; }
         }
         return true;
+    }
+
+    public void RefreshRowData() {
+        Database.RefreshRowData(this);
     }
 
     /// <summary>

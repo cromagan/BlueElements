@@ -141,7 +141,7 @@ public partial class TableView : Form {
     public static void OpenColumnEditor(ColumnItem? column, Table? tableview) {
         using ColumnEditor w = new(column, tableview);
         w.ShowDialog();
-        column?.Invalidate_ColumAndContent();
+        //column?.Invalidate_ColumAndContentx();
     }
 
     /// <summary>

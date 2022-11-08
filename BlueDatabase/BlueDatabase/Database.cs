@@ -487,6 +487,10 @@ public sealed class Database : DatabaseAbstract {
         list.AddRange(b);
     }
 
+    internal override void RefreshColumnsData(ListExt<ColumnItem>? columns) { }
+
+    internal override void RefreshRowData(RowItem row) { }
+
     internal void SaveToByteList(List<byte> list, ColumnCollection c) {
         //Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString());
         foreach (var columnitem in c) {
@@ -776,8 +780,6 @@ public sealed class Database : DatabaseAbstract {
             ToListOfByte(sender, e);
         }
     }
-
-    internal override void RefreshColumnsData(ListExt<ColumnItem>? columns) { }
 
     #endregion
 }

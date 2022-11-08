@@ -389,6 +389,11 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposableEx
                 return lcolumn != null && lrow != null ? lrow.CellGetString(lcolumn) : string.Empty;
             }
             var cellKey = KeyOfCell(column, row);
+
+            if (string.IsNullOrEmpty(column.TimeCode)) {
+                _database.RefreshRowData(row);
+            }
+
             return !ContainsKey(cellKey) ? string.Empty : this[cellKey].Value;
         } catch {
             // Manchmal verscwhindwet der vorhandene Key?!?
@@ -575,7 +580,9 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposableEx
             c.Size = width > 0 ? new Size(width, height) : Size.Empty;
             if (string.IsNullOrEmpty(value)) { Remove(cellKey); }
         } else {
-            Add(cellKey, new CellItem(value, width, height));
+            if (!string.IsNullOrEmpty(value)) {
+                Add(cellKey, new CellItem(value, width, height));
+            }
         }
 
         return string.Empty;

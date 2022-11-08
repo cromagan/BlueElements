@@ -357,8 +357,8 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     //public new void Swap(int index1, int index2) {
     //    if (column1 == null || column2 == null) { return; }
     //    base.Swap(index1, column2);
-    //    column1.Invalidate_ColumAndContent();
-    //    column2.Invalidate_ColumAndContent();
+    //    column1.Invalidate_ColumAndContentx();
+    //    column2.Invalidate_ColumAndContentx();
     //    //Database.ColumnArrangements[0].ShowAllColumns(); // Damit die Datenbank mitbekommt, das sich da was geändert hat
     //}
 

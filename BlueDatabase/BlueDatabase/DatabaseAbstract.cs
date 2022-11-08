@@ -1266,6 +1266,23 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         ViewChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
+    internal abstract void RefreshColumnsData(ListExt<ColumnItem>? columns);
+
+    internal void RefreshColumnsData(List<FilterItem>? filter) {
+        if (filter != null) {
+            var c = new ListExt<ColumnItem>();
+
+            foreach (var thisF in filter) {
+                if (thisF.Column!= null) {
+                    c.AddIfNotExists(thisF.Column);
+                }
+            }
+            RefreshColumnsData(c);
+        }
+    }
+
+    internal abstract void RefreshRowData(RowItem row);
+
     protected abstract void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName);
 
     protected virtual void Dispose(bool disposing) {
@@ -1826,20 +1843,6 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
             if (!_backgroundWorker.IsBusy) { _backgroundWorker.RunWorkerAsync(); }
         } catch {
             StartBackgroundWorker();
-        }
-    }
-
-    internal abstract void RefreshColumnsData(ListExt<ColumnItem>? columns);
-    internal void RefreshColumnsData(List<FilterItem>? filter) {
-        if (filter != null) {
-            var c = new ListExt<ColumnItem>();
-
-            foreach (var thisF in filter) {
-                if (thisF.Column!= null) {
-                    c.AddIfNotExists(thisF.Column);
-                }
-            }
-            RefreshColumnsData(c);
         }
     }
 
