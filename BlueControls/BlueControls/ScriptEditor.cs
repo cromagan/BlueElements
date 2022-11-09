@@ -19,6 +19,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
@@ -34,7 +35,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueControls;
 
-public partial class ScriptEditor : GroupBox, IContextMenu, IDisposable //  System.Windows.Forms.UserControl, IContextMenu//
+public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended //  System.Windows.Forms.UserControl, IContextMenu//
 {
     #region Fields
 

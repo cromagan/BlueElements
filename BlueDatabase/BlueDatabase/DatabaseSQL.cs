@@ -152,6 +152,10 @@ public sealed class DatabaseSQL : DatabaseAbstract {
         LoadFromSQLBack();
     }
 
+    public override void RefreshColumnsData(List<ColumnItem>? columns) { }
+
+    public override void RefreshRowData(List<RowItem> row) { }
+
     public override bool Save(bool mustSave) => _sql.ConnectionOk;
 
     public override string UndoText(ColumnItem? column, RowItem? row) => string.Empty;
@@ -177,10 +181,6 @@ public sealed class DatabaseSQL : DatabaseAbstract {
             }
         }
     }
-
-    internal override void RefreshColumnsData(ListExt<ColumnItem>? columns) { }
-
-    internal override void RefreshRowData(RowItem row) { }
 
     protected override void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName) {
         _sql.AddUndo(tableName, comand, column, row, previousValue, changedTo, UserName);

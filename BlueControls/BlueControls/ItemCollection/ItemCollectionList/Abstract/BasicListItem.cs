@@ -169,7 +169,7 @@ public abstract class BasicListItem : IComparable, ICloneable {
     public void Draw(Graphics gr, int xModifier, int yModifier, Design controldesign, Design itemdesign, States vState, bool drawBorderAndBack, string filterText, bool translate) {
         if (Parent == null) { Develop.DebugPrint(FehlerArt.Fehler, "Parent nicht definiert"); }
         if (itemdesign == Design.Undefiniert) { return; }
-        Rectangle positionModified = Pos with { X = Pos.X - xModifier, Y = Pos.Y - yModifier };
+        var positionModified = Pos with { X = Pos.X - xModifier, Y = Pos.Y - yModifier };
         DrawExplicit(gr, positionModified, itemdesign, vState, drawBorderAndBack, translate);
         if (drawBorderAndBack) {
             if (!string.IsNullOrEmpty(filterText) && !FilterMatch(filterText)) {

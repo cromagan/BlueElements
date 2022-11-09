@@ -27,7 +27,7 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEmpty, IDisposable {
+public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEmpty, IDisposableExtended {
 
     #region Fields
 
@@ -35,7 +35,6 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
 
     private ColumnItem? _column;
 
-    private bool _disposedValue;
     private FilterType _filterType = FilterType.KeinFilter;
 
     #endregion
@@ -126,6 +125,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
         }
     }
 
+    public bool IsDisposed { get; private set; }
     public bool IsParsing { get; private set; }
     public ListExt<string> SearchValue { get; } = new();
 
@@ -181,7 +181,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
 
                 case "database":
                     if (Database != null) { Database.Disposing -= Database_Disposing; }
-                    Database = DatabaseAbstract.GetByID(new ConnectionInfo( pair.Value.FromNonCritical()));
+                    Database = DatabaseAbstract.GetByID(new ConnectionInfo(pair.Value.FromNonCritical()));
                     Database.Disposing += Database_Disposing;
                     break;
 
@@ -297,7 +297,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
     private void Dispose(bool disposing) {
-        if (!_disposedValue) {
+        if (!IsDisposed) {
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
@@ -308,7 +308,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
             }
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen
-            _disposedValue = true;
+            IsDisposed = true;
         }
     }
 

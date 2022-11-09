@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Enums;
 using System;
 
 namespace BluePaint;
@@ -23,12 +24,25 @@ internal static class Program {
 
     #region Methods
 
+    private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e) {
+        try {
+            var ex = (Exception)e.ExceptionObject;
+            BlueBasics.Develop.DebugPrint(FehlerArt.Fehler, ex);
+            BlueBasics.Develop.TraceLogging_End();
+        } finally {
+            BlueBasics.Develop.AbortExe();
+        }
+        BlueBasics.Develop.AbortExe();
+    }
+
     /// <summary>
     /// Der Haupteinstiegspunkt für die Anwendung.
     /// </summary>
     [STAThread]
     private static void Main() {
         BlueBasics.Develop.StartService();
+        var currentDomain = AppDomain.CurrentDomain;
+        currentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
         //CultureInfo culture = new("de-DE");
         //CultureInfo.DefaultThreadCurrentCulture = culture;
         //CultureInfo.DefaultThreadCurrentUICulture = culture;

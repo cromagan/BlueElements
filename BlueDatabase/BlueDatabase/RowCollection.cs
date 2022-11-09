@@ -217,12 +217,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         List<RowItem> tmpVisibleRows = new();
         if (Database == null) { return tmpVisibleRows; }
 
-
-
-
-            Database.RefreshColumnsData(filter);
-
-
+        Database.RefreshColumnsData(filter);
 
         try {
             var lockMe = new object();
@@ -257,10 +252,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
         #endregion
 
-        Database.RefreshColumnsData(rowSortDefinition.Columns);
+        var l = new List<ColumnItem>();
+        l.AddRange(rowSortDefinition.Columns);
+        l.AddIfNotExists(Database.Column.SysChapter);
+        l.Remove(Database.Column.SysRowChangeDate);
 
-      
-
+        Database.RefreshColumnsData(l);
 
         #region _Angepinnten Zeilen erstellen (_pinnedData)
 

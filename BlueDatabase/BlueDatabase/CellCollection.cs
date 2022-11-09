@@ -21,6 +21,7 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -32,7 +33,7 @@ using static BlueBasics.Generic;
 
 namespace BlueDatabase;
 
-public sealed class CellCollection : Dictionary<string, CellItem>, IDisposableExtended {
+public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDisposableExtended {
 
     #region Fields
 
@@ -253,9 +254,11 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposableEx
     public void Delete(ColumnItem column, long rowKey) {
         var cellKey = KeyOfCell(column.Key, rowKey);
         if (!ContainsKey(cellKey)) { return; }
-        //           var Inhalt = _cells[CellKey].Value;
-        Remove(cellKey);
-        //  DoSpecialFormats(Column, RowKey, Inhalt, false, false, true);
+
+        if (!TryRemove(cellKey, out _)) {
+            Develop.CheckStackForOverflow();
+            Delete(column, rowKey);
+        }
     }
 
     public void Dispose() {
@@ -578,10 +581,18 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposableEx
             var c = this[cellKey];
             c.Value = value; // Auf jeden Fall setzen. Auch falls es nachher entfernt wird, so ist es sicher leer
             c.Size = width > 0 ? new Size(width, height) : Size.Empty;
-            if (string.IsNullOrEmpty(value)) { Remove(cellKey); }
+            if (string.IsNullOrEmpty(value)) {
+                if (!TryRemove(cellKey, out _)) {
+                    Develop.CheckStackForOverflow();
+                    return SetValueInternal(column, row, value, width, height);
+                }
+            }
         } else {
             if (!string.IsNullOrEmpty(value)) {
-                Add(cellKey, new CellItem(value, width, height));
+                if (!TryAdd(cellKey, new CellItem(value, width, height))) {
+                    Develop.CheckStackForOverflow();
+                    return SetValueInternal(column, row, value, width, height);
+                }
             }
         }
 
@@ -638,7 +649,7 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposableEx
         CellValueChanged?.Invoke(this, e);
     }
 
-    internal bool RemoveOrphans() {
+    internal void RemoveOrphans() {
         try {
             List<string?> removeKeys = new();
 
@@ -647,16 +658,20 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposableEx
                 if (column == null || row == null) { removeKeys.Add(pair.Key); }
             }
 
-            if (removeKeys.Count == 0) { return false; }
+            if (removeKeys.Count == 0) { return; }
 
             foreach (var thisKey in removeKeys) {
-                Remove(thisKey);
+                if (!TryRemove(thisKey, out _)) {
+                    Develop.CheckStackForOverflow();
+                    RemoveOrphans();
+                    return;
+                }
             }
 
-            return true;
+            return;
         } catch {
             Develop.CheckStackForOverflow(); // Um Rauszufinden, ob endlos-Schleifen öfters  vorkommen. Zuletzt 24.11.2020
-            return RemoveOrphans();
+            return;
         }
     }
 
@@ -718,7 +733,11 @@ public sealed class CellCollection : Dictionary<string, CellItem>, IDisposableEx
         if (ContainsKey(cellKey)) {
             @string = this[cellKey].Value;
         } else {
-            Add(cellKey, new CellItem(string.Empty, 0, 0));
+            if (!TryAdd(cellKey, new CellItem(string.Empty, 0, 0))) {
+                Develop.CheckStackForOverflow();
+                SystemSet(column, row, value);
+                return;
+            }
         }
         if (value == @string) { return; }
         _database.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, @string, value);

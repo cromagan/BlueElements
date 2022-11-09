@@ -155,8 +155,8 @@ public static class Generic {
     }
 
     public static string GetHashString(this string inputString) {
-        StringBuilder sb = new StringBuilder();
-        foreach (byte b in GetHash(inputString))
+        var sb = new StringBuilder();
+        foreach (var b in GetHash(inputString))
             sb.Append(b.ToString("X2"));
 
         return sb.ToString();

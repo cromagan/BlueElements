@@ -32,7 +32,7 @@ using static BlueBasics.IO;
 
 namespace BlueDatabase;
 
-public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, IDisposable, ICloneable {
+public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, IDisposableExtended, ICloneable {
 
     #region Fields
 
@@ -46,7 +46,6 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
     /// </summary>
     private float _backupInterval;
 
-    private bool _disposedValue;
     private string _exportFormularId;
     private int _exportSpaltenAnsicht;
     private FilterCollection? _filter;
@@ -172,6 +171,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
         }
     }
 
+    public bool IsDisposed { get; private set; }
     public bool IsParsing { get; private set; }
 
     public DateTime LastExportTimeUtc {
@@ -207,47 +207,6 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
 
     public object Clone() => new ExportDefinition(Database, ToString());
 
-    //public string CompareKeyx() => ((int)_typ).ToString(Constants.Format_Integer3) + "|" + _verzeichnis + "|" + _exportFormularId + "|" + _backupInterval + "|" + _autoDelete;
-
-    //#region IDisposable Support
-    //// IDisposable
-    //protected virtual void Dispose(bool disposing)
-    //{
-    //    if (!disposedValue)
-    //    {
-    //        if (disposing)
-    //        {
-    //            //disposedValue = False
-    //            _Verzeichnis = null;
-    //            _Typ = 0;
-    //            _Intervall = 0;
-    //            _AutomatischLöschen = 0;
-    //            _ExportFormular = null;
-    //            _ExportSpaltenAnsicht = 0;
-    //            _Filter.Dispose();
-    //            _BereitsExportiert = null;
-    //            _LastExportTime = default(DateTime);
-    //            // TODO: verwalteten Zustand (verwaltete Objekte) entsorgen.
-    //        }
-    //        // TODO: nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalize() weiter unten überschreiben.
-    //        // TODO: große Felder auf Null setzen.
-    //    }
-    //    disposedValue = true;
-    //}
-    //// TODO: Finalize() nur überschreiben, wenn Dispose(disposing As Boolean) weiter oben Code zur Bereinigung nicht verwalteter Ressourcen enthält.
-    ////Protected Overrides Sub Finalize()
-    ////    ' Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(disposing As Boolean) weiter oben ein.
-    ////    Dispose(False)
-    ////    MyBase.Finalize()
-    ////End Sub
-    //// Dieser Code wird von Visual Basic hinzugefügt, um das Dispose-Muster richtig zu implementieren.
-    //public void Dispose()
-    //{
-    //    // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(disposing As Boolean) weiter oben ein.
-    //    Dispose(true);
-    //    // TODO: Auskommentierung der folgenden Zeile aufheben, wenn Finalize() oben überschrieben wird.
-    //    // GC.SuppressFinalize(Me)
-    //}
     public void DeleteAllBackups() {
         for (var n = 0; n < BereitsExportiert.Count; n++) {
             if (!string.IsNullOrEmpty(BereitsExportiert[n])) {
@@ -575,10 +534,8 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
 
         if (!DirectoryExists(savePath)) { Directory.CreateDirectory(savePath); }
 
-
         var singleFileExport = savePath + Database.Filename.FileNameWithoutSuffix().StarkeVereinfachung(" _-+") + "_" + DateTime.Now.ToString(Constants.Format_Date4);
-        
-        
+
         List<string> added = new();
         var tim2 = DateTime.UtcNow;
         var tim = tim2.ToString(Constants.Format_Date5);
@@ -677,7 +634,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
     }
 
     private void Dispose(bool disposing) {
-        if (!_disposedValue) {
+        if (!IsDisposed) {
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
@@ -688,7 +645,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
             BereitsExportiert.Changed -= _BereitsExportiert_ListOrItemChanged;
             BereitsExportiert = new ListExt<string>();
             BereitsExportiert.Dispose();
-            _disposedValue = true;
+            IsDisposed = true;
         }
     }
 

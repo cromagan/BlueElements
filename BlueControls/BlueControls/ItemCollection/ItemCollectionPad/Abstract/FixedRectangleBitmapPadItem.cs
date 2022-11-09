@@ -17,12 +17,13 @@
 
 #nullable enable
 
+using BlueBasics.Interfaces;
 using System;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection;
 
-public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem, IDisposable {
+public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
 
     #region Fields
 
@@ -59,13 +60,6 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem, IDisp
 
     #endregion
 
-    //public void Dispose() {
-    //    // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-    //    Dispose(true);
-    //    GC.SuppressFinalize(this);
-    //    base.Dispose();
-    //}
-
     #region Methods
 
     protected override RectangleF CalculateUsedArea() {
@@ -77,7 +71,7 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem, IDisp
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
 
-        if (!_disposedValue) {
+        if (!IsDisposed) {
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
@@ -151,10 +145,5 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem, IDisp
 
     #endregion
 
-    // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
-    // ~FixedRectangleBitmapPadItem()
-    // {
-    //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-    //     Dispose(disposing: false);
-    // }
+ 
 }

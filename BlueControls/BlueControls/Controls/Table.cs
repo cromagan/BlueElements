@@ -740,7 +740,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 var anz = Autofilter_Text(viewItem.Column);
                 trichterText = anz > -100 ? (anz * -1).ToString() : "∞";
             } else {
-                trichterState = Autofilter_Sinnvoll(viewItem.Column) ? States.Standard : States.Standard_Disabled;
+                trichterState = States.Standard;
             }
         }
         var trichterSize = (AutoFilterSize - 4).ToString();
@@ -749,9 +749,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         } else if (Filter != null && Filter.MayHasRowFilter(viewItem.Column)) {
             trichterIcon = QuickImage.Get("Trichter|" + trichterSize + "|||227722");
         } else if (viewItem.Column.AutoFilterSymbolPossible()) {
-            trichterIcon = Autofilter_Sinnvoll(viewItem.Column)
-                ? QuickImage.Get("Trichter|" + trichterSize)
-                : QuickImage.Get("Trichter|" + trichterSize + "||128");
+            trichterIcon =  QuickImage.Get("Trichter|" + trichterSize);
         }
         if (trichterState != States.Undefiniert) {
             Skin.Draw_Back(gr, Enums.Design.Button_AutoFilter, trichterState, viewItem.TmpAutoFilterLocation, null, false);
@@ -1816,11 +1814,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 Filter.MayHasRowFilter(e.Column) ||
                 e.Column == Database.Column.SysChapter) {
                 Invalidate_FilteredRows();
+                Invalidate_SortedRowData();
             }
         }
         Invalidate_DrawWidth(e.Column);
 
-        Invalidate_SortedRowData();
+
         Invalidate();
         OnCellValueChanged(e);
     }
@@ -1828,7 +1827,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private void _Database_ColumnContentChanged(object sender, ListEventArgs e) {
         Invalidate_AllColumnArrangements();
         Invalidate_HeadSize();
-        Invalidate_SortedRowData();
+
+        // kümmert sich _Database_CellValueChanged darum
+        //   Invalidate_SortedRowData();
     }
 
     private void _Database_DatabaseLoaded(object sender, LoadedEventArgs e) {
@@ -2022,17 +2023,17 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Develop.Debugprint_BackgroundThread();
     }
 
-    private bool Autofilter_Sinnvoll(ColumnItem? column) {
-        if (column.TmpAutoFilterSinnvoll != null) { return (bool)column.TmpAutoFilterSinnvoll; }
-        for (var rowcount = 0; rowcount <= SortedRows().Count - 2; rowcount++) {
-            if (SortedRows()[rowcount]?.Row.CellGetString(column) != SortedRows()[rowcount + 1]?.Row.CellGetString(column)) {
-                column.TmpAutoFilterSinnvoll = true;
-                return true;
-            }
-        }
-        column.TmpAutoFilterSinnvoll = false;
-        return false;
-    }
+    //private bool Autofilter_Sinnvoll(ColumnItem? column) {
+    //    if (column.TmpAutoFilterSinnvoll != null) { return (bool)column.TmpAutoFilterSinnvoll; }
+    //    for (var rowcount = 0; rowcount <= SortedRows().Count - 2; rowcount++) {
+    //        if (SortedRows()[rowcount]?.Row.CellGetString(column) != SortedRows()[rowcount + 1]?.Row.CellGetString(column)) {
+    //            column.TmpAutoFilterSinnvoll = true;
+    //            return true;
+    //        }
+    //    }
+    //    column.TmpAutoFilterSinnvoll = false;
+    //    return false;
+    //}
 
     /// <summary>
     /// Gibt die Anzahl der SICHTBAREN Zeilen zurück, die mehr angezeigt werden würden, wenn dieser Filter deaktiviert wäre.
@@ -2608,6 +2609,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
 
         #endregion
+
+        var rw = new List<RowItem>();
+        for (var zei = firstVisibleRow; zei <= lastVisibleRow; zei++) {
+            rw.AddIfNotExists(sr[zei].Row);
+        }
+        _database.RefreshRowData(rw);
 
         #region Zeilen Zeichnen (Alle Zellen)
 

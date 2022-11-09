@@ -381,6 +381,10 @@ public sealed class Database : DatabaseAbstract {
         if (IntParse(LoadedVersion.Replace(".", "")) > IntParse(DatabaseVersion.Replace(".", ""))) { SetReadOnly(); }
     }
 
+    public override void RefreshColumnsData(List<ColumnItem>? columns) { }
+
+    public override void RefreshRowData(List<RowItem> row) { }
+
     public override bool Save(bool mustSave) => _muf?.Save(mustSave) ?? false;
 
     public void SaveAsAndChangeTo(string fileName) => _muf?.SaveAsAndChangeTo(fileName);
@@ -486,10 +490,6 @@ public sealed class Database : DatabaseAbstract {
         SaveToByteList(list, 0, 7); //Zeile-Unötig
         list.AddRange(b);
     }
-
-    internal override void RefreshColumnsData(ListExt<ColumnItem>? columns) { }
-
-    internal override void RefreshRowData(RowItem row) { }
 
     internal void SaveToByteList(List<byte> list, ColumnCollection c) {
         //Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString());

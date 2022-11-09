@@ -704,7 +704,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private TextBox txbZeilenQuickInfo;
         private Caption capZeilenQuickInfo;
         private Caption capBinInfo;
-        private System.ComponentModel.IContainer components;
         private TextBox txbAdditionalFiles;
         private Caption capAdditional;
         private Button btnSave;

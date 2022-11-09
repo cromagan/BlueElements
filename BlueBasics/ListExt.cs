@@ -26,7 +26,7 @@ using System.Linq;
 
 namespace BlueBasics;
 
-public class ListExt<T> : List<T>, IChangedFeedback, IDisposable, IDisposableExtended {
+public class ListExt<T> : List<T>, IChangedFeedback, IDisposableExtended {
 
     #region Fields
 

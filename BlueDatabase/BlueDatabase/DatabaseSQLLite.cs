@@ -152,6 +152,43 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         LoadFromSQLBack();
     }
 
+    public override void RefreshColumnsData(List<ColumnItem>? columns) {
+        if (columns == null || columns.Count ==0) { return; }
+        //if(!ReloadNeeded) { return; }
+
+        _sql.OpenConnection();
+        var l = new ListExt<ColumnItem>();
+
+        foreach (var thisc in columns) {
+            if (string.IsNullOrEmpty(thisc.TimeCode) || _sql.GetStyleData(TableName, DatabaseDataType.ColumnTimeCode.ToString(), thisc.Name) != thisc.TimeCode) {
+                l.AddIfNotExists(thisc);
+            }
+        }
+
+        _sql.LoadColumns(TableName, l);
+        _sql.CloseConnection();
+    }
+
+    public override void RefreshRowData(List<RowItem> rows) {
+        if (rows == null || rows.Count == 0) { return; }
+
+        var l = new ListExt<RowItem>();
+
+        foreach (var thisr in rows) {
+            var cellKey = CellCollection.KeyOfCell(Column.SysRowChangeDate, thisr);
+
+            if (!Cell.ContainsKey(cellKey)) {
+                l.AddIfNotExists(thisr);
+            }
+        }
+
+        if (l.Count ==0) { return; }
+
+        _sql.OpenConnection();
+        _sql.LoadRow(TableName, l);
+        _sql.CloseConnection();
+    }
+
     public override bool Save(bool mustSave) => _sql.ConnectionOk;
 
     public override string UndoText(ColumnItem? column, RowItem? row) => string.Empty;
@@ -176,44 +213,6 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
                 }
             }
         }
-    }
-
-    internal override void RefreshColumnsData(ListExt<ColumnItem>? columns) {
-        if (columns == null || columns.Count ==0) { return; }
-        //if(!ReloadNeeded) { return; }
-
-        _sql.OpenConnection();
-        var l = new ListExt<ColumnItem>();
-
-        foreach (var thisc in columns) {
-            if (string.IsNullOrEmpty(thisc.TimeCode) || _sql.GetStyleData(TableName, DatabaseDataType.ColumnTimeCode.ToString(), thisc.Name) != thisc.TimeCode) {
-                l.AddIfNotExists(thisc);
-            }
-        }
-
-        _sql.LoadColumns(TableName, l);
-        _sql.CloseConnection();
-    }
-
-    internal override void RefreshRowData(RowItem row) {
-        if (row == null ) { return; }
-
-
-        var cellKey = CellCollection.KeyOfCell(Column.SysRowChangeDate, row);
-
-        //if (string.IsNullOrEmpty(column.TimeCode)) {
-        //    _database.RefreshRowData(row);
-        //}
-
-        if(Cell.ContainsKey(cellKey)) { return; }
-
-        //if ( string.IsNullOrEmpty(row.CellGetString(Column.SysRowChangeDate))) { return; }
-
-
-        _sql.OpenConnection();
-        _sql.LoadRow(TableName, row);
-        _sql.CloseConnection();
-
     }
 
     protected override void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName) {

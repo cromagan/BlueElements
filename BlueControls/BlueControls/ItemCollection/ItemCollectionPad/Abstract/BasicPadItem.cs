@@ -33,7 +33,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
 
-public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, IMoveable, IDisposable, IComparable {
+public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, IMoveable, IDisposableExtended, IComparable {
 
     #region Fields
 
@@ -51,9 +51,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
 
     public List<FlexiControl>? AdditionalStyleOptions = null;
 
-    protected bool _disposedValue;
     private static int _uniqueInternalCount;
-
     private static string _uniqueInternalLastTime = "InitialDummy";
 
     /// <summary>
@@ -65,9 +63,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     private string _page = string.Empty;
     private ItemCollectionPad _parent;
     private PadStyles _style = PadStyles.Style_Standard;
-
     private RectangleF _usedArea;
-
     private int _zoomPadding;
 
     #endregion
@@ -113,7 +109,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     public string Gruppenzugehörigkeit { get; set; } = string.Empty;
 
     public string Internal { get; }
-
+    public bool IsDisposed { get; private set; }
     public bool IsParsing { get; private set; }
 
     [Description("Ist Page befüllt, wird das Item nur angezeigt, wenn die anzuzeigende Seite mit dem String übereinstimmt.")]
@@ -541,7 +537,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     protected abstract string ClassId();
 
     protected virtual void Dispose(bool disposing) {
-        if (!_disposedValue) {
+        if (!IsDisposed) {
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
@@ -559,7 +555,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
 
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen
-            _disposedValue = true;
+            IsDisposed = true;
         }
     }
 

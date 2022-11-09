@@ -39,6 +39,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
     #region Fields
 
+    public string _timecode;
     public bool? TmpAutoFilterSinnvoll = null;
     public QuickImage? TmpCaptionBitmapCode;
     public SizeF TmpCaptionTextSize = new(-1, -1);
@@ -52,7 +53,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     private readonly List<string> _tags = new();
     private AdditionalCheck _additionalFormatCheck;
     private string _adminInfo;
-    public string _timecode;
     private bool _afterEditAutoCorrect;
     private bool _afterEditDoUCase;
     private bool _afterEditQuickSortRemoveDouble;
@@ -192,6 +192,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         UcaseNamesSortedByLenght = null;
 
         #endregion Standard-Werte
+
         Invalidate_Head();
         Invalidate_LinkedDatabase();
     }
@@ -408,16 +409,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         set {
             if (_contentwidth == value) { return; }
             Database?.ChangeData(DatabaseDataType.ColumnContentWidth, this, null, _contentwidth.ToString(), value.ToString());
-            OnChanged();
-        }
-    }
-
-
-    public string TimeCode {
-        get => _timecode;
-        set {
-            if (_timecode == value) { return; }
-            Database?.ChangeData(DatabaseDataType.ColumnTimeCode, this, null, _timecode, value);
             OnChanged();
         }
     }
@@ -785,6 +776,15 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         }
     }
 
+    public string TimeCode {
+        get => _timecode;
+        set {
+            if (_timecode == value) { return; }
+            Database?.ChangeData(DatabaseDataType.ColumnTimeCode, this, null, _timecode, value);
+            OnChanged();
+        }
+    }
+
     public string Ueberschriften {
         get {
             var txt = _captionGroup1 + "/" + _captionGroup2 + "/" + _captionGroup3;
@@ -1051,11 +1051,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         return list.SortedDistinctList();
     }
 
-    public void RefreshColumnsData() {
-        var x = new ListExt<ColumnItem>() { this };
-        Database.RefreshColumnsData(x);
-    }
-
     /// <summary>
     ///
     /// </summary>
@@ -1066,10 +1061,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         List<string> list = new();
         if (Database == null) { return list; }
 
-
         RefreshColumnsData();
-
-
 
         foreach (var thisRowItem in Database.Row) {
             if (thisRowItem != null) {
@@ -1308,6 +1300,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         einzigartig.RemoveString(nichtEinzigartig, false);
     }
 
+    public int Index() => Database.Column.IndexOf(this);
+
     ///// <summary>
     ///// Füllt die Ersetzungen mittels eines übergebenen Enums aus.
     ///// </summary>
@@ -1338,9 +1332,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     //        DropDownItems.AddRange(NewAuswahl);
     //    }
     //}
-
-    public int Index() => Database.Column.IndexOf(this);
-
     /// <summary>
     /// Der Invalidate, der am meisten invalidiert: Alle temporären Variablen und auch jede Zell-Größe der Spalte.
     /// </summary>
@@ -1434,6 +1425,11 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             }
         }
         return ret.Replace("\r", " ").Replace("  ", " ").TrimEnd(":");
+    }
+
+    public void RefreshColumnsData() {
+        var x = new ListExt<ColumnItem>() { this };
+        Database.RefreshColumnsData(x);
     }
 
     public void Repair() {
@@ -2154,6 +2150,12 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     /// Wenn sich ein Zelleninhalt verändert hat, muss die Spalte neu berechnet werden.
     /// </summary>
     internal void Invalidate_ContentWidth() => ContentWidth = -1;
+
+    internal void Invalidate_Head() {
+        TmpCaptionTextSize = new SizeF(-1, -1);
+        TmpCaptionBitmapCode = null;
+    }
+
     internal void Invalidate_LinkedDatabase() {
         if (_tmpLinkedDatabase != null) {
             //_TMP_LinkedDatabase.RowKeyChanged -= _TMP_LinkedDatabase_RowKeyChanged;
@@ -2165,15 +2167,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         }
     }
 
-
-
-    internal void Invalidate_Head() {
-        TmpCaptionTextSize = new SizeF(-1, -1);
-        TmpCaptionBitmapCode = null;
-    }
-
-
-        internal string ParsableColumnKey() => ColumnCollection.ParsableColumnKey(this);
+    internal string ParsableColumnKey() => ColumnCollection.ParsableColumnKey(this);
 
     /// <summary>
     /// Setzt den Wert in die dazugehörige Variable.

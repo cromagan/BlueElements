@@ -163,24 +163,35 @@ public class BitmapListItem : BasicListItem {
         var bFont = Skin.GetBlueFont(itemdesign, state);
         GetImage();
         if (!string.IsNullOrEmpty(_caption) && _captiontmp.Count == 0) { _captiontmp = bFont.SplitByWidth(_caption, drawingCoordinates.Width, _captionlines); }
-        if (_bitmap != null) {
-            try {
-                areaOfWholeImage = new RectangleF(0, 0, _bitmap.Width, _bitmap.Height);
-                var scale = (float)Math.Min((drawingCoordinates.Width - (Padding * 2)) / (double)_bitmap.Width,
-                    (drawingCoordinates.Height - (Padding * 2) - (_captionlines * ConstMy)) / (double)_bitmap.Height);
-                scaledImagePosition = new RectangleF(((drawingCoordinates.Width - (_bitmap.Width * scale)) / 2) + drawingCoordinates.Left,
-                    ((drawingCoordinates.Height - (_bitmap.Height * scale)) / 2) + drawingCoordinates.Top - (_captionlines * ConstMy / 2),
-                    _bitmap.Width * scale,
-                    _bitmap.Height * scale);
-            } catch {
-                return;
+
+        //Point trp;
+
+        var ok = true;
+        do {
+            ok = true;
+            if (_bitmap != null) {
+                try {
+                    areaOfWholeImage = new RectangleF(0, 0, _bitmap.Width, _bitmap.Height);
+                    var scale = (float)Math.Min((drawingCoordinates.Width - (Padding * 2)) / (double)_bitmap.Width,
+                        (drawingCoordinates.Height - (Padding * 2) - (_captionlines * ConstMy)) / (double)_bitmap.Height);
+                    scaledImagePosition = new RectangleF(((drawingCoordinates.Width - (_bitmap.Width * scale)) / 2) + drawingCoordinates.Left,
+                        ((drawingCoordinates.Height - (_bitmap.Height * scale)) / 2) + drawingCoordinates.Top - (_captionlines * ConstMy / 2),
+                        _bitmap.Width * scale,
+                        _bitmap.Height * scale);
+                } catch {
+                    ok = false;
+                }
             }
-        }
+        } while (!ok);
+
         var trp = drawingCoordinates.PointOf(Alignment.Horizontal_Vertical_Center);
         scaledImagePosition = scaledImagePosition with { X = scaledImagePosition.Left - trp.X, Y = scaledImagePosition.Top - trp.Y };
-        lock (gr) {
-            gr.TranslateTransform(trp.X, trp.Y);
 
+        gr.TranslateTransform(trp.X, trp.Y);
+
+        var ok2 = true;
+        do {
+            ok2 = true;
             try {
                 if (_bitmap != null) { gr.DrawImage(_bitmap, scaledImagePosition, areaOfWholeImage, GraphicsUnit.Pixel); }
                 foreach (var thisQi in Overlays) {
@@ -189,8 +200,10 @@ public class BitmapListItem : BasicListItem {
             } catch {
                 //Trotz lock kommt "Das Objekt wird an anderer Stelle verwendent.
                 // Ein Bitmap?
+                ok2 = false;
             }
-        }
+        } while (!ok2);
+
         if (!string.IsNullOrEmpty(_caption)) {
             var c = _captiontmp.Count;
             var ausgl = (c - _captionlines) * ConstMy / 2;

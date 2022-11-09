@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Runtime.InteropServices.ComTypes;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 
@@ -43,6 +44,9 @@ public abstract class SQLBackAbstract {
 
     //public static List<SQLBackAbstract>? PossibleSQLBacks;
     protected DbConnection? _connection;
+
+    private object getRow = new object();
+    private object openclose = new object();
 
     #endregion
 
@@ -221,9 +225,11 @@ public abstract class SQLBackAbstract {
     }
 
     public bool CloseConnection() {
-        if (_connection.State == ConnectionState.Open) { _connection.Close(); }
+        lock (openclose) {
+            if (_connection.State == ConnectionState.Open) { _connection.Close(); }
 
-        return _connection.State == ConnectionState.Closed;
+            return _connection.State == ConnectionState.Closed;
+        }
     }
 
     /// <summary>
@@ -421,48 +427,62 @@ public abstract class SQLBackAbstract {
         CloseConnection();
     }
 
-    public void LoadRow(string tablename, RowItem row) {
-        if (!OpenConnection()) { return; }
+    public void LoadRow(string tablename, List<RowItem> row) {
+        lock (getRow) {
+            if (!OpenConnection()) { return; }
 
-        var com = "SELECT RK, ";
+            var com = "SELECT RK, ";
 
-        foreach (var thiscolumn in row.Database.Column) {
-            com = com + thiscolumn.Name.ToUpper() + ", ";
-        }
-
-        com = com.TrimEnd(", ");
-
-        com = com + " FROM " + tablename.ToUpper();
-
-        OpenConnection();
-
-        using var command = _connection.CreateCommand();
-        command.CommandText = com; //@"select * from " + tablename.ToUpper();
-
-        using var reader = command.ExecuteReader();
-
-        while (reader.Read()) {
-            for (var z = 1; z < reader.FieldCount; z++) {
-                row.Database.Cell.SetValueInternal(row.Database.Column[z - 1], row, reader[z].ToString(), -1, -1);
+            foreach (var thiscolumn in row[0].Database.Column) {
+                com = com + thiscolumn.Name.ToUpper() + ", ";
             }
-        }
 
-        if (string.IsNullOrEmpty(row.CellGetString(row.Database.Column.SysRowChangeDate))) {
-            Develop.DebugPrint(FehlerArt.Warnung, "Zeile ohne Zeitstempel, repariert! + " + com);
-            row.CellSet(row.Database.Column.SysRowChangeDate, DateTime.UtcNow.ToString(Constants.Format_Date));
-        }
+            com = com.TrimEnd(", ");
 
-        CloseConnection();
+            com = com + " FROM " + tablename.ToUpper() + " WHERE ";
+
+            foreach (var thisr in row) {
+                com = com + "RK = " + DBVAL(thisr.Key) + " OR ";
+            }
+
+            com =            com.TrimEnd(" OR ");
+
+            OpenConnection();
+
+            using var command = _connection.CreateCommand();
+            command.CommandText = com;
+
+            using var reader = command.ExecuteReader();
+
+            while (reader.Read()) {
+                var rk = LongParse(reader[0].ToString());
+                var r = row[0].Database.Row.SearchByKey(rk);
+                //var r = new RowItem(row.Database, rk);
+                //row.Add(r);
+
+                for (var z = 1; z < reader.FieldCount; z++) {
+                    r.Database.Cell.SetValueInternal(r.Database.Column[z - 1], r, reader[z].ToString(), -1, -1);
+                }
+
+                if (string.IsNullOrEmpty(r.CellGetString(r.Database.Column.SysRowChangeDate))) {
+                    Develop.DebugPrint(FehlerArt.Warnung, "Zeile ohne Zeitstempel, repariert! + " + com);
+                    r.CellSet(r.Database.Column.SysRowChangeDate, DateTime.UtcNow.ToString(Constants.Format_Date));
+                }
+            }
+            CloseConnection();
+        }
     }
 
     public bool OpenConnection() {
-        if (_connection == null) { return false; }
+        lock (openclose) {
+            if (_connection == null) { return false; }
 
-        if (_connection.State == ConnectionState.Closed) {
-            _connection.Open();
+            if (_connection.State == ConnectionState.Closed) {
+                _connection.Open();
+            }
+
+            return _connection.State == ConnectionState.Open;
         }
-
-        return _connection.State == ConnectionState.Open;
     }
 
     public abstract SQLBackAbstract OtherTable(string tablename);

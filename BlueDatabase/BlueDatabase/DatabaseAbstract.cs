@@ -40,7 +40,7 @@ namespace BlueDatabase;
 
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
+public abstract class DatabaseAbstract : IDisposableExtended {
 
     #region Fields
 
@@ -1126,6 +1126,11 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         ShouldICancelSaveOperations?.Invoke(this, e);
     }
 
+    public void OnViewChanged() {
+        if (IsDisposed) { return; }
+        ViewChanged?.Invoke(this, System.EventArgs.Empty);
+    }
+
     public List<string> Permission_AllUsed(bool cellLevel) {
         List<string> e = new();
         foreach (var thisColumnItem in Column) {
@@ -1165,6 +1170,27 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
             Develop.DebugPrint(FehlerArt.Warnung, ex);
         }
         return false;
+    }
+
+    public abstract void RefreshColumnsData(List<ColumnItem>? columns);
+
+    public void RefreshColumnsData(List<FilterItem>? filter) {
+        if (filter != null) {
+            var c = new ListExt<ColumnItem>();
+
+            foreach (var thisF in filter) {
+                if (thisF.Column!= null) {
+                    c.AddIfNotExists(thisF.Column);
+                }
+            }
+            RefreshColumnsData(c);
+        }
+    }
+
+    public abstract void RefreshRowData(List<RowItem> row);
+
+    public void RefreshRowData(RowItem row) {
+        RefreshRowData(new List<RowItem>() { row });
     }
 
     public void RepairAfterParse() {
@@ -1261,28 +1287,6 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         ProgressbarInfo?.Invoke(this, e);
     }
 
-    internal void OnViewChanged() {
-        if (IsDisposed) { return; }
-        ViewChanged?.Invoke(this, System.EventArgs.Empty);
-    }
-
-    internal abstract void RefreshColumnsData(ListExt<ColumnItem>? columns);
-
-    internal void RefreshColumnsData(List<FilterItem>? filter) {
-        if (filter != null) {
-            var c = new ListExt<ColumnItem>();
-
-            foreach (var thisF in filter) {
-                if (thisF.Column!= null) {
-                    c.AddIfNotExists(thisF.Column);
-                }
-            }
-            RefreshColumnsData(c);
-        }
-    }
-
-    internal abstract void RefreshRowData(RowItem row);
-
     protected abstract void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName);
 
     protected virtual void Dispose(bool disposing) {
@@ -1314,7 +1318,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
         Column.ItemRemoved -= Column_ItemRemoved;
         Column.ItemAdded -= Column_ItemAdded;
         Column.Dispose();
-        Cell.Dispose();
+        //Cell.Dispose();
         Row.Dispose();
 
         //_columnArrangements.Dispose();
@@ -1793,7 +1797,7 @@ public abstract class DatabaseAbstract : IDisposable, IDisposableExtended {
             if (!string.IsNullOrWhiteSpace(CachePfad)) {
                 if (FileExists(fullhashname)) {
                     FileInfo f = new(fullhashname);
-                    if (DateTime.Now.Subtract(f.CreationTime).TotalDays < 20) {
+                    if (DateTime.Now.Subtract(f.CreationTime).TotalDays < 5) {
                         if (f.Length < 5) { return; }
                         e.Bmp = new BitmapExt(fullhashname);
                         return;

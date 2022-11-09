@@ -647,11 +647,6 @@ public sealed class MultiUserFile : IDisposableExtended {
         return true;
     }
 
-    private void OnLoaded(LoadedEventArgs e) {
-        if (IsDisposed) { return; }
-        Loaded?.Invoke(this, e);
-    }
-
     private static byte[] ZipIt(byte[] data) {
         // https://stackoverflow.com/questions/17217077/create-zip-file-from-byte
         using MemoryStream compressedFileStream = new();
@@ -842,6 +837,11 @@ public sealed class MultiUserFile : IDisposableExtended {
         var x = new MultiUserFileHasPendingChangesEventArgs();
         HasPendingChanges?.Invoke(this, x);
         return x.HasPendingChanges;
+    }
+
+    private void OnLoaded(LoadedEventArgs e) {
+        if (IsDisposed) { return; }
+        Loaded?.Invoke(this, e);
     }
 
     private void OnLoading(LoadingEventArgs e) {

@@ -277,9 +277,9 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         var (biggestItemX, _, heightAdded, senkrechtAllowed) = Item.ItemData();
         Item.ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height - paintModYx), SliderY, biggestItemX, heightAdded, senkrechtAllowed);
         if (SliderY.Visible) { paintModXx = SliderY.Width; }
-        Rectangle borderCoords = new(DisplayRectangle.Left, DisplayRectangle.Top,
-            DisplayRectangle.Width - paintModXx, DisplayRectangle.Height - paintModYx);
-        Rectangle visArea = borderCoords with { Y = (int)(borderCoords.Y + SliderY.Value) };
+        var borderCoords = new Rectangle(DisplayRectangle.Left, DisplayRectangle.Top,
+           DisplayRectangle.Width - paintModXx, DisplayRectangle.Height - paintModYx);
+        var visArea = borderCoords with { Y = (int)(borderCoords.Y + SliderY.Value) };
         if (borderCoords.Height > 0) {
             //// Kann sein, wenn PaintModY größer als die Höhe ist
             //if (_Appearance == BlueListBoxAppearance.Listbox)
