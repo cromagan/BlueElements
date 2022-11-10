@@ -113,17 +113,18 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (!column.SaveContent) { return LanguageTool.DoTranslate("Der Spalteninhalt wird nicht gespeichert."); }
 
         if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-            var (lcolumn, lrow, info) = LinkedCellData(column, row, true, false);
+            var (lcolumn, lrow, info) = LinkedCellData(column, row, true, mode == BlueBasics.Enums.ErrorReason.EditAcut);
+
+            if (!string.IsNullOrEmpty(info)) { return LanguageTool.DoTranslate(info); }
+
             if (lcolumn != null && lrow != null) {
                 lcolumn.Database.PowerEdit = column.Database.PowerEdit;
                 var tmp = ErrorReason(lcolumn, lrow, mode);
-                return !string.IsNullOrEmpty(tmp)
-                    ? LanguageTool.DoTranslate("Die verlinkte Zelle kann nicht bearbeitet werden: ") + tmp
-                    : string.Empty;
+                return string.IsNullOrEmpty(tmp)
+                    ? string.Empty
+                    : LanguageTool.DoTranslate("Die verlinkte Zelle kann nicht bearbeitet werden: ") + tmp;
             }
-            if (lcolumn == null) { return LanguageTool.DoTranslate("Die Spalte ist in der Quell-Datenbank nicht vorhanden.") + " " + info; }
-            // if (LinkedData.Item2 == null) { return LanguageTool.DoTranslate("Die Zeile ist in der Quell-Datenbank nicht vorhanden."); }
-            return LanguageTool.DoTranslate("Die Zeile ist in der Quell-Datenbank nicht vorhanden.") + " " + info;
+            return LanguageTool.DoTranslate("Allgemeiner Fehler.");
         }
 
         if (row != null) {

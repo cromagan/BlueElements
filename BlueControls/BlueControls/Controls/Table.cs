@@ -1429,7 +1429,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                                 _isinKeyDown = false;
                                 return;
                             }
-                            var l2 = CellCollection.ErrorReason(_cursorPosColumn, _cursorPosRow?.Row, ErrorReason.EditGeneral);
+                            var l2 = CellCollection.ErrorReason(_cursorPosColumn, _cursorPosRow?.Row, ErrorReason.EditAcut);
                             if (string.IsNullOrEmpty(l2)) {
                                 UserEdited(this, ntxt, _cursorPosColumn, _cursorPosRow?.Row, _cursorPosRow?.Chapter, true);
                             } else {
