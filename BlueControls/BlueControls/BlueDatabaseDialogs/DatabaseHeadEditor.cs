@@ -270,7 +270,7 @@ public sealed partial class DatabaseHeadEditor {
         x.Column.Add("Aenderung", "Änderung", VarType.Text);
         x.Column.Add("WertAlt", "Wert alt", VarType.Text);
         x.Column.Add("WertNeu", "Wert neu", VarType.Text);
-        foreach (var thisColumn in x.Column.Where(thisColumn => string.IsNullOrEmpty(thisColumn.Identifier))) {
+        foreach (var thisColumn in x.Column.Where(thisColumn => !thisColumn.IsSystemColumn())) {
             thisColumn.MultiLine = true;
             thisColumn.TextBearbeitungErlaubt = false;
             thisColumn.DropdownBearbeitungErlaubt = false;
@@ -403,6 +403,4 @@ public sealed partial class DatabaseHeadEditor {
     }
 
     #endregion
-
- 
 }

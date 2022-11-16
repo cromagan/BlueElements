@@ -161,7 +161,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         }
 
         var mitDaten = false;
-        if (vorlage != null && !string.IsNullOrEmpty(vorlage.Identifier)) { vorlage = null; }
+        if (vorlage != null && !vorlage.IsSystemColumn()) { vorlage = null; }
         if (vorlage != null) {
             switch (MessageBox.Show("Spalte '" + vorlage.ReadableText() + "' als<br>Vorlage verwenden?", ImageCode.Frage, "Ja", "Ja, mit allen Daten", "Nein", "Abbrechen")) {
                 case 0:
@@ -315,7 +315,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
                 #region Code für Ansicht 0
 
                 var col = thisColumnViewCollection[thisColumnViewCollection.Count - 1].Column;
-                if (string.IsNullOrEmpty(col.Identifier) &&
+                if (!col.IsSystemColumn() &&
                     MessageBox.Show("Spalte <b>" + col.ReadableText() + "</b> endgültig löschen?", ImageCode.Warnung,
                         "Ja", "Nein") == 0) {
                     Database.Column.Remove(col);

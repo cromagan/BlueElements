@@ -36,8 +36,6 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable, 
 
     #endregion
 
-    public object Clone() => new ColumnViewCollection(Database, ToString());
-
     #region Constructors
 
     public ColumnViewCollection(DatabaseAbstract database, string code) {
@@ -58,6 +56,7 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable, 
     #region Properties
 
     public DatabaseAbstract? Database { get; private set; }
+
     public bool IsParsing { get; private set; }
 
     public string Name {
@@ -95,6 +94,8 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable, 
         }
     }
 
+    public object Clone() => new ColumnViewCollection(Database, ToString());
+
     public void Hide(string columnName) {
         foreach (var thisViewItem in this.Where(thisViewItem => thisViewItem != null && (thisViewItem.Column == null || string.Equals(thisViewItem.Column.Name, columnName, StringComparison.OrdinalIgnoreCase)))) {
             Remove(thisViewItem);
@@ -104,7 +105,7 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable, 
     }
 
     public void HideSystemColumns() {
-        foreach (var thisViewItem in this.Where(thisViewItem => thisViewItem != null && (thisViewItem.Column == null || !string.IsNullOrEmpty(thisViewItem.Column.Identifier)))) {
+        foreach (var thisViewItem in this.Where(thisViewItem => thisViewItem != null && (thisViewItem.Column == null || thisViewItem.Column.IsSystemColumn()))) {
             Remove(thisViewItem);
             HideSystemColumns();
             return;

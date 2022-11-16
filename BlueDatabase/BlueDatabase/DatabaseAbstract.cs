@@ -710,6 +710,43 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         LogUndo = true;
     }
 
+    public string Column_UsedIn(ColumnItem? column) {
+        if (column == null) { return string.Empty; }
+
+        var t = "<b><u>Verwendung von " + column.ReadableText() + "</b></u><br>";
+        if (column.IsSystemColumn()) {
+            t += " - Systemspalte<br>";
+        }
+
+        if (SortDefinition.Columns.Contains(column)) { t += " - Sortierung<br>"; }
+        //var view = false;
+        //foreach (var thisView in OldFormulaViews) {
+        //    if (thisView[column] != null) { view = true; }
+        //}
+        //if (view) { t += " - Formular-Ansichten<br>"; }
+        var cola = false;
+        var first = true;
+        foreach (var thisView in _columnArrangements) {
+            if (!first && thisView[column] != null) { cola = true; }
+            first = false;
+        }
+        if (cola) { t += " - Benutzerdefinierte Spalten-Anordnungen<br>"; }
+        if (RulesScript.ToUpper().Contains(column.Name.ToUpper())) { t += " - Regeln-Skript<br>"; }
+        if (ZeilenQuickInfo.ToUpper().Contains(column.Name.ToUpper())) { t += " - Zeilen-Quick-Info<br>"; }
+        if (_tags.JoinWithCr().ToUpper().Contains(column.Name.ToUpper())) { t += " - Datenbank-Tags<br>"; }
+        var layout = false;
+        foreach (var thisLayout in _layouts) {
+            if (thisLayout.Contains(column.Name.ToUpper())) { layout = true; }
+        }
+        if (layout) { t += " - Layouts<br>"; }
+        var l = column.Contents();
+        if (l.Count > 0) {
+            t += "<br><br><b>Zusatz-Info:</b><br>";
+            t = t + " - Befüllt mit " + l.Count + " verschiedenen Werten";
+        }
+        return t;
+    }
+
     public abstract ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists);
 
     /// <summary>
@@ -1024,7 +1061,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                 columns.Add(col);
             }
         } else {
-            columns.AddRange(Column.Where(thisColumn => thisColumn != null && string.IsNullOrEmpty(thisColumn.Identifier)));
+            columns.AddRange(Column.Where(thisColumn => thisColumn != null && !thisColumn.IsSystemColumn()));
             while (columns.Count < zeil[0].GetUpperBound(0) + 1) {
                 var newc = Column.Add();
                 newc.Caption = newc.Name;
@@ -1228,37 +1265,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         // Zeilen-Quick-Info -----------------------------------------
         //ZeilenQuickInfo = ZeilenQuickInfo.Replace("~" + oldName + ";", "~" + newName.Name + ";", RegexOptions.IgnoreCase);
         //ZeilenQuickInfo = ZeilenQuickInfo.Replace("~" + oldName + "(", "~" + newName.Name + "(", RegexOptions.IgnoreCase);
-    }
-
-    internal string Column_UsedIn(ColumnItem? column) {
-        var t = string.Empty;
-        if (SortDefinition.Columns.Contains(column)) { t += " - Sortierung<br>"; }
-        //var view = false;
-        //foreach (var thisView in OldFormulaViews) {
-        //    if (thisView[column] != null) { view = true; }
-        //}
-        //if (view) { t += " - Formular-Ansichten<br>"; }
-        var cola = false;
-        var first = true;
-        foreach (var thisView in _columnArrangements) {
-            if (!first && thisView[column] != null) { cola = true; }
-            first = false;
-        }
-        if (cola) { t += " - Benutzerdefinierte Spalten-Anordnungen<br>"; }
-        if (RulesScript.ToUpper().Contains(column.Name.ToUpper())) { t += " - Regeln-Skript<br>"; }
-        if (ZeilenQuickInfo.ToUpper().Contains(column.Name.ToUpper())) { t += " - Zeilen-Quick-Info<br>"; }
-        if (_tags.JoinWithCr().ToUpper().Contains(column.Name.ToUpper())) { t += " - Datenbank-Tags<br>"; }
-        var layout = false;
-        foreach (var thisLayout in _layouts) {
-            if (thisLayout.Contains(column.Name.ToUpper())) { layout = true; }
-        }
-        if (layout) { t += " - Layouts<br>"; }
-        var l = column.Contents();
-        if (l.Count > 0) {
-            t += "<br><br><b>Zusatz-Info:</b><br>";
-            t = t + " - Befüllt mit " + l.Count + " verschiedenen Werten";
-        }
-        return t;
     }
 
     internal void DevelopWarnung(string t) {

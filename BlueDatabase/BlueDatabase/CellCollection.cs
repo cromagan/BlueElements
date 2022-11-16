@@ -727,7 +727,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     internal void SystemSet(ColumnItem? column, RowItem? row, string value) {
         if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.ConnectionData.TableName); }
         if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + _database.ConnectionData.TableName); }
-        if (string.IsNullOrEmpty(column.Identifier)) { Develop.DebugPrint(FehlerArt.Fehler, "SystemSet nur bei System-Spalten möglich: " + ToString()); }
+        if (!column.IsSystemColumn()) { Develop.DebugPrint(FehlerArt.Fehler, "SystemSet nur bei System-Spalten möglich: " + ToString()); }
         if (!column.SaveContent) { return; }
         var cellKey = KeyOfCell(column, row);
         var @string = string.Empty;

@@ -1105,14 +1105,14 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         if (Key < 0) { return "Interner Fehler: ID nicht definiert"; }
         if (string.IsNullOrEmpty(_name)) { return "Der Spaltenname ist nicht definiert."; }
 
-        if (!IsValidColumnName(Name)) { return "Der Spaltenname ist ungültig."; }
+        if (!IsValidColumnName(_name)) { return "Der Spaltenname ist ungültig."; }
 
         if (Database.Column.Any(thisColumn => thisColumn != this && thisColumn != null && string.Equals(_name, thisColumn.Name, StringComparison.OrdinalIgnoreCase))) {
             return "Spalten-Name bereits vorhanden.";
         }
 
         if (string.IsNullOrEmpty(_caption)) { return "Spalten Beschriftung fehlt."; }
-        if (!_saveContent && string.IsNullOrEmpty(_identifier)) { return "Inhalt der Spalte muss gespeichert werden."; }
+        if (!_saveContent && !IsSystemColumn()) { return "Inhalt der Spalte muss gespeichert werden."; }
         if (!_saveContent && _showUndo) { return "Wenn der Inhalt der Spalte nicht gespeichert wird, darf auch kein Undo geloggt werden."; }
         if (((int)_format).ToString() == _format.ToString()) { return "Format fehlerhaft."; }
         if (_format.NeedTargetDatabase()) {
@@ -1349,6 +1349,16 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
     public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
 
+    public bool IsSystemColumn() {
+        return _name.ToUpper() is "SYS_CORRECT" or
+                             "SYS_CHANGER"or
+                             "SYS_CREATOR"or
+                             "SYS_CHAPTER"or
+                             "SYS_DATECREATED"or
+                             "SYS_DATECHANGED"or
+                             "SYS_LOCKED";
+    }
+
     public ColumnItem? Next() {
         var columnCount = Index();
         do {
@@ -1565,7 +1575,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     }
 
     public void ResetSystemToDefault(bool setAll) {
-        if (string.IsNullOrEmpty(_identifier)) { return; }
+        if (!IsSystemColumn()) { return; }
         //if (SetAll && !IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Ausserhalb des parsens!"); }
         // ACHTUNG: Die SetAll Befehle OHNE _, die müssen geloggt werden.
         if (setAll) {
@@ -1574,9 +1584,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             ForeColor = Color.FromArgb(0, 0, 0);
             //CaptionBitmapCode = null;
         }
-        switch (_identifier) {
-            case "System: Creator":
-                _name = "SYS_Creator";
+        switch (Name.ToUpper()) {
+            case "SYS_CREATOR":
                 _format = DataFormat.Text;
                 if (setAll) {
                     Caption = "Ersteller";
@@ -1588,8 +1597,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 }
                 break;
 
-            case "System: Changer":
-                _name = "SYS_Changer";
+            case "SYS_CHANGER":
                 _format = DataFormat.Text;
                 _spellCheckingEnabled = false;
                 _textBearbeitungErlaubt = false;
@@ -1604,8 +1612,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 }
                 break;
 
-            case "System: Chapter":
-                _name = "SYS_Chapter";
+            case "SYS_CHAPTER":
                 _format = DataFormat.Text;
                 _afterEditAutoCorrect = true; // Verhindert \r am Ende und somit anzeigefehler
                 if (setAll) {
@@ -1617,8 +1624,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 }
                 break;
 
-            case "System: Date Created":
-                _name = "SYS_DateCreated";
+            case "SYS_DATECREATED":
                 _spellCheckingEnabled = false;
 
                 if (setAll) {
@@ -1630,8 +1636,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 }
                 break;
 
-            case "System: Date Changed":
-                _name = "SYS_DateChanged";
+            case "SYS_DATECHANGED":
                 _spellCheckingEnabled = false;
                 _showUndo = false;
                 // SetFormatForDateTime(); --Sriptt Type Chaos
@@ -1650,8 +1655,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 }
                 break;
 
-            case "System: Correct":
-                _name = "SYS_Correct";
+            case "SYS_CORRECT":
                 _caption = "Fehlerfrei";
                 _spellCheckingEnabled = false;
                 _format = DataFormat.Text;
@@ -1676,8 +1680,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 }
                 break;
 
-            case "System: Locked":
-                _name = "SYS_Locked";
+            case "SYS_LOCKED":
                 _spellCheckingEnabled = false;
                 _format = DataFormat.Text;
                 _scriptType = ScriptType.Bool;
@@ -1705,26 +1708,26 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 }
                 break;
 
-            case "System: State":
-                _name = "SYS_RowState";
-                _caption = "veraltet und kann gelöscht werden: Zeilenstand";
-                _identifier = "";
-                break;
+            //case "System: State":
+            //    _name = "SYS_RowState";
+            //    _caption = "veraltet und kann gelöscht werden: Zeilenstand";
+            //    _identifierx = "";
+            //    break;
 
-            case "System: ID":
-                _name = "SYS_ID";
-                _caption = "veraltet und kann gelöscht werden: Zeilen-ID";
-                _identifier = "";
-                break;
+            //case "System: ID":
+            //    _name = "SYS_ID";
+            //    _caption = "veraltet und kann gelöscht werden: Zeilen-ID";
+            //    _identifierx = "";
+            //    break;
 
-            case "System: Last Used Layout":
-                _name = "SYS_Layout";
-                _caption = "veraltet und kann gelöscht werden:  Letztes Layout";
-                _identifier = "";
-                break;
+            //case "System: Last Used Layout":
+            //    _name = "SYS_Layout";
+            //    _caption = "veraltet und kann gelöscht werden:  Letztes Layout";
+            //    _identifierx = "";
+            //    break;
 
             default:
-                Develop.DebugPrint("Unbekannte Kennung: " + _identifier);
+                Develop.DebugPrint("Unbekannte Kennung: " + _name);
                 break;
         }
     }
@@ -2105,14 +2108,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 Develop.DebugPrint(_format);
                 return false;
         }
-    }
-
-    public string Verwendung() {
-        var t = "<b><u>Verwendung von " + ReadableText() + "</b></u><br>";
-        if (!string.IsNullOrEmpty(_identifier)) {
-            t += " - Systemspalte<br>";
-        }
-        return t + Database.Column_UsedIn(this);
     }
 
     internal EditTypeFormula CheckFormulaEditType(EditTypeFormula toCheck) {

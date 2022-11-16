@@ -197,7 +197,7 @@ internal sealed partial class ColumnEditor {
         btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToString();
     }
 
-    private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(_column.Verwendung());
+    private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(_column.Database.Column_UsedIn(_column));
 
     private void btnVor_Click(object sender, System.EventArgs e) {
         if (!AllOk()) { return; }
@@ -337,12 +337,12 @@ internal sealed partial class ColumnEditor {
             butAktuellVor.Enabled = false;
             butAktuellZurueck.Enabled = false;
         }
-        if (string.IsNullOrEmpty(_column.Identifier)) {
+        if (!_column.IsSystemColumn()) {
             btnStandard.Enabled = false;
             capInfo.Text = "<Imagecode=" + _column.SymbolForReadableText() + "> Normale Spalte (Key: " + _column.Key + ")";
         } else {
             btnStandard.Enabled = true;
-            capInfo.Text = "<Imagecode=" + _column.SymbolForReadableText() + "> " + _column.Identifier + " (Key: " + _column.Key + ")";
+            capInfo.Text = "<Imagecode=" + _column.SymbolForReadableText() + "> System Spalte (Key: " + _column.Key + ")";
         }
         tbxName.Text = _column.Name;
         tbxName.AllowedChars = Constants.AllowedCharsVariableName;
@@ -519,7 +519,7 @@ internal sealed partial class ColumnEditor {
 
         if (linkdb == null || tblFilterliste.Database == null) { tblFilterliste.DatabaseSet(null, string.Empty); }
 
-        if (tblFilterliste.Database != null && 
+        if (tblFilterliste.Database != null &&
             tblFilterliste.Database.Tags.TagGet("Filename") != linkdb.ConnectionData.UniqueID) {
             tblFilterliste.DatabaseSet(null, string.Empty);
         }
@@ -542,7 +542,6 @@ internal sealed partial class ColumnEditor {
             var dd = b.DropDownItems.Clone();
             var or = b.OpticalReplace.Clone();
 
-
             foreach (var thisColumn in _column.Database.Column.Where(thisColumn => thisColumn.Format.CanBeCheckedByRules() && !thisColumn.MultiLine)) {
                 dd.Add("~" + thisColumn.Name.ToLower() + "~");
                 or.Add("~" + thisColumn.Name.ToLower() + "~|[Spalte: " + thisColumn.ReadableText() + "]");
@@ -563,7 +562,6 @@ internal sealed partial class ColumnEditor {
             db.SortDefinition = new RowSortDefinition(db, "Count", false);
             tblFilterliste.DatabaseSet(db, string.Empty);
             tblFilterliste.Arrangement = 1;
-
 
             var t = db.Tags.Clone();
             t.TagSet("Filename", linkdb.ConnectionData.UniqueID);
@@ -588,7 +586,7 @@ internal sealed partial class ColumnEditor {
 
             r.CellSet("Spalte", col.ReadableText() + " = ");
 
-            if (col.Format.Autofilter_möglich() && !col.MultiLine && col != spalteauDb && !col.Format.NeedTargetDatabase() && string.IsNullOrEmpty(col.Identifier)) {
+            if (col.Format.Autofilter_möglich() && !col.MultiLine && col != spalteauDb && !col.Format.NeedTargetDatabase() && !col.IsSystemColumn()) {
                 r.CellSet("visible", true);
             } else {
                 r.CellSet("visible", false);

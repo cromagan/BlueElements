@@ -84,7 +84,7 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
         x.Column.Add("Inhalt", "I", VarType.Text, "Inhalt (gekürzte Ansicht)");
         x.Column.Add("Kommentar", "K", VarType.Text, "Komentar");
 
-        foreach (var thisColumn in x.Column.Where(thisColumn => string.IsNullOrEmpty(thisColumn.Identifier))) {
+        foreach (var thisColumn in x.Column.Where(thisColumn => !thisColumn.IsSystemColumn())) {
             thisColumn.MultiLine = true;
             thisColumn.TextBearbeitungErlaubt = false;
             thisColumn.DropdownBearbeitungErlaubt = false;

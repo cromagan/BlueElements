@@ -232,7 +232,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     }
 
     /// <summary>
-    /// Setzt die fest vermerkten Spalten zurück und durchsucht die Spalten nach dem Identifier.
+    /// Setzt die fest vermerkten Spalten zurück und durchsucht die Spalten nach dem Identifierx.
     /// Es werden nur die gefunden Spalten gemerkt - keine neuen erstellt!
     /// </summary>
     public void GetSystems() {
@@ -244,41 +244,39 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         SysRowChangeDate = null;
         SysChapter = null;
 
-        foreach (var thisColumnItem in this.Where(thisColumnItem => thisColumnItem != null)) {
-            switch (thisColumnItem.Identifier) {
-                case "":
-                    break;
-
-                case "System: Locked":
+        foreach (var thisColumnItem in this.Where(thisColumnItem => thisColumnItem != null && thisColumnItem.IsSystemColumn())) {
+            switch (thisColumnItem.Name.ToUpper()) {
+                case "SYS_LOCKED":
                     SysLocked = thisColumnItem;
                     break;
 
-                case "System: Creator":
+                case "SYS_CREATOR":
                     SysRowCreator = thisColumnItem;
                     break;
 
-                case "System: Changer":
+                case "SYS_CHANGER":
                     SysRowChanger = thisColumnItem;
                     break;
 
-                case "System: Date Created":
+                case "SYS_DATECREATED":
                     SysRowCreateDate = thisColumnItem;
                     break;
 
-                case "System: Correct":
+                case "SYS_CORRECT":
                     SysCorrect = thisColumnItem;
                     break;
 
-                case "System: Date Changed":
+                case "SYS_DATECHANGED":
                     SysRowChangeDate = thisColumnItem;
                     break;
 
-                case "System: Chapter":
+                case "SYS_CHAPTER":
                     SysChapter = thisColumnItem;
                     break;
 
                 default:
-                    Develop.DebugPrint(FehlerArt.Fehler, "Unbekannte Kennung: " + thisColumnItem.Identifier);
+
+                    Develop.DebugPrint(FehlerArt.Fehler, "Unbekannte Kennung: " + thisColumnItem.Name);
                     break;
             }
         }
@@ -287,13 +285,13 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     public void Repair() {
         List<string> w = new()
         {
-            "System: Chapter",
-            "System: Date Changed",
-            "System: Changer",
-            "System: Date Created",
-            "System: Creator",
-            "System: Correct",
-            "System: Locked"
+            "SYS_CHAPTER",
+            "SYS_DATECHANGED",
+            "SYS_CHANGER",
+            "SYS_DATECREATED",
+            "SYS_CREATOR",
+            "SYS_CORRECT",
+            "SYS_LOCKED"
         };
 
         foreach (var thisstring in w) {
@@ -308,10 +306,10 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
                         if (string.Equals(base[s1].Name, base[s2].Name, StringComparison.OrdinalIgnoreCase)) {
                             base[s2].Name = base[s2].Name + "0";
                         }
-                        // Evtl. Doppelte Identifier eleminieren
-                        if (!string.IsNullOrEmpty(base[s1].Identifier) && string.Equals(base[s1].Identifier, base[s2].Identifier, StringComparison.OrdinalIgnoreCase)) {
-                            base[s2].Identifier = string.Empty;
-                        }
+                        //// Evtl. Doppelte Identifierx eleminieren
+                        //if (!string.IsNullOrEmpty(base[s1].Identifierx) && string.Equals(base[s1].Identifierx, base[s2].Identifierx, StringComparison.OrdinalIgnoreCase)) {
+                        //    base[s2].Identifierx = string.Empty;
+                        //}
                     }
                 }
             }
@@ -327,11 +325,11 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
                 colN = -1;
             } else if (this[colN + 1] == null) {
                 // Dummy, um nachfoldgnd nicht abfragen zu müssen
-            } else if (!string.IsNullOrEmpty(this[colN].Identifier) && string.IsNullOrEmpty(this[colN + 1].Identifier)) {
+            } else if (this[colN].IsSystemColumn() && !this[colN + 1].IsSystemColumn()) {
                 Swap(colN, colN + 1);
                 colN = -1;
-            } else if (!string.IsNullOrEmpty(this[colN].Identifier) && !string.IsNullOrEmpty(this[colN + 1].Identifier)) {
-                if (w.IndexOf(this[colN].Identifier) > w.IndexOf(this[colN + 1].Identifier)) {
+            } else if (this[colN].IsSystemColumn() && this[colN + 1].IsSystemColumn()) {
+                if (w.IndexOf(this[colN].Name) > w.IndexOf(this[colN + 1].Name)) {
                     Swap(colN, colN + 1);
                     colN = -1;
                 }
@@ -421,18 +419,19 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         base.Dispose(disposing);
     }
 
-    private void AddSystem(string identifier) {
-        if (this.Any(thisColumn => thisColumn != null && string.Equals(thisColumn.Identifier, identifier, StringComparison.OrdinalIgnoreCase))) {
+    private void AddSystem(string sysname) {
+        var c = Exists(sysname);
+
+        if (sysname == "SYS_DATECHANGED" && c == null) { c = Exists("SYS_CHANGEDATE"); }
+        if (sysname == "SYS_DATECREATED" && c == null) { c = Exists("SYS_CREATEDATE"); }
+
+        if (c != null) {
+            c.Name = sysname; // Wegen der Namensverbiegung oben...
+            c.ResetSystemToDefault(false);
             return;
         }
 
-        var nam = identifier.ToUpper();
-        nam = nam.Replace("SYSTEM: ", "SYS_");
-        nam = nam.Replace(" ", "");
-
-        var c = Add(nam);
-        c.Identifier = identifier;
-        //c.SetValueInternal(DatabaseDataType.ColumnIdentify, identifier);
+        c = Add(sysname.ToUpper());
         c.ResetSystemToDefault(true);
     }
 
