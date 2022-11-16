@@ -161,7 +161,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         }
 
         var mitDaten = false;
-        if (vorlage != null && !vorlage.IsSystemColumn()) { vorlage = null; }
+        if (vorlage != null && vorlage.IsSystemColumn()) { vorlage = null; }
         if (vorlage != null) {
             switch (MessageBox.Show("Spalte '" + vorlage.ReadableText() + "' als<br>Vorlage verwenden?", ImageCode.Frage, "Ja", "Ja, mit allen Daten", "Nein", "Abbrechen")) {
                 case 0:
