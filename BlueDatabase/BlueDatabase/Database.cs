@@ -477,8 +477,6 @@ public sealed class Database : DatabaseAbstract {
         SaveToByteList(l, DatabaseDataType.ColumnAlign, ((int)c.Align).ToString(), key);
         SaveToByteList(l, DatabaseDataType.SortType, ((int)c.SortType).ToString(), key);
         SaveToByteList(l, DatabaseDataType.ColumnTimeCode, c.TimeCode, key);
-        //Kennung UNBEDINGT zum Schluss, damit die Standard-Werte gesetzt werden können
-        SaveToByteList(l, DatabaseDataType.ColumnIdentify, c.Identifier, key);
     }
 
     internal static void SaveToByteList(List<byte> list, DatabaseDataType databaseDataType, string content, long columnKey) {

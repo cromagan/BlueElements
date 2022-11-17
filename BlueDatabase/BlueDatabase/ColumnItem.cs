@@ -81,7 +81,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     private Color _foreColor;
     private DataFormat _format;
     private bool _formatierungErlaubt;
-    private string _identifier;
     private bool _ignoreAtRowFilter;
 
     private long _key = -1;
@@ -152,7 +151,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         _vorschlagsColumn = -1;
         _align = AlignmentHorizontal.Links;
         _keyColumnKey = -1;
-        _identifier = string.Empty;
         _allowedChars = string.Empty;
         _adminInfo = string.Empty;
         _timecode = string.Empty;
@@ -503,15 +501,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         set {
             if (_formatierungErlaubt == value) { return; }
             Database?.ChangeData(DatabaseDataType.TextFormatingAllowed, this, null, _formatierungErlaubt.ToPlusMinus(), value.ToPlusMinus());
-            OnChanged();
-        }
-    }
-
-    public string Identifier {
-        get => _identifier;
-        set {
-            if (_identifier == value) { return; }
-            Database?.ChangeData(DatabaseDataType.ColumnIdentify, this, null, _identifier, value);
             OnChanged();
         }
     }
@@ -951,7 +940,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         ForeColor = source.ForeColor;
         BackColor = source.BackColor;
         EditAllowedDespiteLock = source.EditAllowedDespiteLock;
-        Identifier = source.Identifier;
         PermissionGroupsChangeCell = source.PermissionGroupsChangeCell;
         Tags = source.Tags;
         AdminInfo = source.AdminInfo;
@@ -2222,12 +2210,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
             case DatabaseDataType.CaptionGroup3:
                 _captionGroup3 = newvalue;
-                break;
-
-            case DatabaseDataType.ColumnIdentify:
-                _identifier = newvalue;
-                ResetSystemToDefault(false);
-                Database.Column.GetSystems();
                 break;
 
             case DatabaseDataType.MultiLine:

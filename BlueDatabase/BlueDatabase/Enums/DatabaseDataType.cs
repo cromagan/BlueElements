@@ -159,7 +159,7 @@ public enum DatabaseDataType : byte {
 
     LineStyleRight = 111,
 
-    ColumnTimeCode=112, // co_Ausrichtung = 112
+    ColumnTimeCode = 112, // co_Ausrichtung = 112
     ColumnQuickInfo = 113,
 
     // co_FesteBreite = 114
@@ -205,7 +205,7 @@ public enum DatabaseDataType : byte {
     // co_SpaltenGröße = 148
     // co_ÜberschriftAnordnung = 149
     // co_ÜberschriftErsatz = 150
-    ColumnIdentify = 151,
+    //ColumnIdentify = 151,
 
     //co_CompactView_alt = 152,
     ShowMultiLineInOneLine = 153,
