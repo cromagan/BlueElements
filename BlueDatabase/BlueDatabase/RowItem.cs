@@ -373,8 +373,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
                         Database.Cell.DoSpecialFormats(thisColum, this, CellGetString(thisColum), true);
                     }
                 }
-                CellCollection.Invalidate_CellContentSize(thisColum, this);
-                thisColum.Invalidate_ContentWidth();
+                //CellCollection.Invalidate_CellContentSize(thisColum, this);
+                //thisColum.Invalidate_ContentWidth();
                 doFemdZelleInvalidate = false; // Hier ja schon bei jedem gemacht
             }
             if (doFemdZelleInvalidate && thisColum.LinkedDatabase != null) {

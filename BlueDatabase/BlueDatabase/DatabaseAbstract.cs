@@ -632,6 +632,10 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
         if (IsLoading) { return; }
 
+        //if (comand == DatabaseDataType.ColumnContentWidth && changedTo =="-1") {
+        //    var t = 10;
+        //}
+
         if (ReadOnly) {
             if (!string.IsNullOrEmpty(TableName)) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Datei ist Readonly, " + comand + ", " + TableName);
@@ -1803,7 +1807,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             if (!string.IsNullOrWhiteSpace(CachePfad)) {
                 if (FileExists(fullhashname)) {
                     FileInfo f = new(fullhashname);
-                    if (DateTime.Now.Subtract(f.CreationTime).TotalDays < 5) {
+                    if (DateTime.Now.Subtract(f.CreationTime).TotalDays < 20) {
                         if (f.Length < 5) { return; }
                         e.Bmp = new BitmapExt(fullhashname);
                         return;

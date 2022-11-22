@@ -522,9 +522,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     }
 
     internal void OnRowRemoving(RowEventArgs e) {
-        if (!_throwEvents) { return; }
         e.Row.RowChecked -= OnRowChecked;
         e.Row.DoSpecialRules -= OnDoSpecialRules;
+
+        if (!_throwEvents) { return; }
         RowRemoving?.Invoke(this, e);
     }
 
@@ -564,10 +565,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     }
 
     private void OnRowAdded(RowEventArgs e) {
-        if (!_throwEvents) { return; }
-
         e.Row.RowChecked += OnRowChecked;
         e.Row.DoSpecialRules += OnDoSpecialRules;
+
+        if (!_throwEvents) { return; }
         RowAdded?.Invoke(this, e);
     }
 

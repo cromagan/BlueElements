@@ -1814,9 +1814,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 Filter.MayHasRowFilter(e.Column) ||
                 e.Column == Database.Column.SysChapter) {
                 Invalidate_FilteredRows();
-                Invalidate_SortedRowData();
+
             }
         }
+        Invalidate_SortedRowData(); // Zeichenhöhe kann sich ändern... 
+
         Invalidate_DrawWidth(e.Column);
 
 
