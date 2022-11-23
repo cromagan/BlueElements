@@ -450,10 +450,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
         return true;
     }
 
-    public void RefreshRowData() {
-        Database.RefreshRowData(this);
-    }
-
     /// <summary>
     /// Ersetzt Spaltennamen mit dem dementsprechenden Wert der Zelle. Format: &Spaltenname; oder &Spaltenname(L,8);
     /// </summary>

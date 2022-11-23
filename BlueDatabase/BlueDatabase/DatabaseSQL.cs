@@ -154,7 +154,7 @@ public sealed class DatabaseSQL : DatabaseAbstract {
 
     public override void RefreshColumnsData(List<ColumnItem>? columns) { }
 
-    public override void RefreshRowData(List<RowItem> row) { }
+    public override bool RefreshRowData(List<RowItem> row) => false;
 
     public override bool Save(bool mustSave) => _sql.ConnectionOk;
 
@@ -228,7 +228,7 @@ public sealed class DatabaseSQL : DatabaseAbstract {
         foreach (var thisCol in columnsToLoad) {
             var colum = Column.Exists(thisCol);
             if (colum == null) {
-                colum= new ColumnItem(this, thisCol, Column.NextColumnKey());
+                colum = new ColumnItem(this, thisCol, Column.NextColumnKey());
                 Column.Add(colum);
             }
             GetColumnAttributesColumn(colum, _sql);

@@ -1220,7 +1220,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             var c = new ListExt<ColumnItem>();
 
             foreach (var thisF in filter) {
-                if (thisF.Column!= null) {
+                if (thisF.Column != null) {
                     c.AddIfNotExists(thisF.Column);
                 }
             }
@@ -1228,10 +1228,10 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         }
     }
 
-    public abstract void RefreshRowData(List<RowItem> row);
+    public abstract bool RefreshRowData(List<RowItem> row);
 
-    public void RefreshRowData(RowItem row) {
-        RefreshRowData(new List<RowItem>() { row });
+    public bool RefreshRowData(RowItem row) {
+        return RefreshRowData(new List<RowItem>() { row });
     }
 
     public void RepairAfterParse() {

@@ -258,7 +258,7 @@ public abstract class SQLBackAbstract {
         q.CommandText = @"select VALUE, PART from " + SYS_STYLE + " " +
                         "where TABLENAME = " + DBVAL(tablename.ToUpper()) + " " +
                         "and TYPE = " + DBVAL(type) + " " +
-                        "and COLUMNNAME = " + DBVAL(columnName.ToUpper()) + " "+
+                        "and COLUMNNAME = " + DBVAL(columnName.ToUpper()) + " " +
                         "ORDER BY PART ASC";
 
         using var reader = q.ExecuteReader();
@@ -309,7 +309,7 @@ public abstract class SQLBackAbstract {
             var value = reader[2].ToString();
 
             if (reader[1].ToString() != "001") {
-                l[key] =  l[key]+value;
+                l[key] = l[key] + value;
             } else {
                 l.Add(key, value);
             }
@@ -348,7 +348,7 @@ public abstract class SQLBackAbstract {
 
         com = com + " FROM " + tablename.ToUpper();
 
-        if (allcols.Count>0) {
+        if (allcols.Count > 0) {
             Develop.DebugPrint(FehlerArt.Fehler, "Zusätzliche Spalten dem Server vorhanden: " + allcols.JoinWith(", "));
         }
 
@@ -445,7 +445,7 @@ public abstract class SQLBackAbstract {
                 com = com + "RK = " + DBVAL(thisr.Key) + " OR ";
             }
 
-            com =            com.TrimEnd(" OR ");
+            com = com.TrimEnd(" OR ");
 
             OpenConnection();
 
@@ -608,7 +608,7 @@ public abstract class SQLBackAbstract {
                 return thisK.OtherTable(ci.TableName);
             }
 
-            if (thisK.ConnectionOk && thisK.ConnectionString  + " LITE" == ci.DatabaseID) {
+            if (thisK.ConnectionOk && thisK.ConnectionString + " LITE" == ci.DatabaseID) {
                 return thisK.OtherTable(ci.TableName);
             }
         }
@@ -617,7 +617,7 @@ public abstract class SQLBackAbstract {
     }
 
     internal async void LoadColumns(string tablename, ListExt<ColumnItem> columns) {
-        if (columns == null || columns.Count ==0) { return; }
+        if (columns == null || columns.Count == 0) { return; }
         if (!OpenConnection()) { return; }
 
         var com = "SELECT RK, ";
@@ -701,8 +701,8 @@ public abstract class SQLBackAbstract {
 
     private string DBVAL(string original) {
         original = original.CutToUTF8Length(MaxStringLenght);
-        original =  original.Replace("'", "''");
-        return "'" + original  + "'";
+        original = original.Replace("'", "''");
+        return "'" + original + "'";
     }
 
     private bool ExecuteCommand(DbCommand command) {

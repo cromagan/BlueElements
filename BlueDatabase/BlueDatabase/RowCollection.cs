@@ -235,10 +235,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         return tmpVisibleRows;
     }
 
-    public List<RowData?> CalculateSortedRows(List<FilterItem>? filter, RowSortDefinition rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) => CalculateSortedRows(CalculateFilteredRows(filter), rowSortDefinition, pinnedRows, reUseMe);
+    public List<RowData> CalculateSortedRows(List<FilterItem>? filter, RowSortDefinition rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) => CalculateSortedRows(CalculateFilteredRows(filter), rowSortDefinition, pinnedRows, reUseMe);
 
-    public List<RowData?> CalculateSortedRows(List<RowItem?> filteredRows, RowSortDefinition? rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) {
-        var lockMe = new object();
+    public List<RowData> CalculateSortedRows(List<RowItem> filteredRows, RowSortDefinition? rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) {
+        if (Database == null) { return new List<RowData>(); }
+
         VisibleRowCount = 0;
 
         #region Ermitteln, ob mindestens eine Überschrift vorhanden ist (capName)
@@ -262,6 +263,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         #region _Angepinnten Zeilen erstellen (_pinnedData)
 
         List<RowData> pinnedData = new();
+        var lockMe = new object();
         if (pinnedRows != null) {
             Parallel.ForEach(pinnedRows, thisRow => {
                 var rd = reUseMe.Get(thisRow, "Angepinnt") ?? new RowData(thisRow, "Angepinnt");

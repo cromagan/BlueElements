@@ -153,7 +153,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     }
 
     public override void RefreshColumnsData(List<ColumnItem>? columns) {
-        if (columns == null || columns.Count ==0) { return; }
+        if (columns == null || columns.Count == 0) { return; }
         //if(!ReloadNeeded) { return; }
 
         _sql.OpenConnection();
@@ -169,8 +169,8 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         _sql.CloseConnection();
     }
 
-    public override void RefreshRowData(List<RowItem> rows) {
-        if (rows == null || rows.Count == 0) { return; }
+    public override bool RefreshRowData(List<RowItem> rows) {
+        if (rows == null || rows.Count == 0) { return false; }
 
         var l = new ListExt<RowItem>();
 
@@ -182,11 +182,12 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
             }
         }
 
-        if (l.Count ==0) { return; }
+        if (l.Count == 0) { return false; }
 
         _sql.OpenConnection();
         _sql.LoadRow(TableName, l);
         _sql.CloseConnection();
+        return true;
     }
 
     public override bool Save(bool mustSave) => _sql.ConnectionOk;
@@ -261,7 +262,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         foreach (var thisCol in columnsToLoad) {
             var colum = Column.Exists(thisCol);
             if (colum == null) {
-                colum= new ColumnItem(this, thisCol, Column.NextColumnKey());
+                colum = new ColumnItem(this, thisCol, Column.NextColumnKey());
                 Column.Add(colum);
             }
             GetColumnAttributesColumn(colum, _sql);

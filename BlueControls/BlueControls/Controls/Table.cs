@@ -749,7 +749,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         } else if (Filter != null && Filter.MayHasRowFilter(viewItem.Column)) {
             trichterIcon = QuickImage.Get("Trichter|" + trichterSize + "|||227722");
         } else if (viewItem.Column.AutoFilterSymbolPossible()) {
-            trichterIcon =  QuickImage.Get("Trichter|" + trichterSize);
+            trichterIcon = QuickImage.Get("Trichter|" + trichterSize);
         }
         if (trichterState != States.Undefiniert) {
             Skin.Draw_Back(gr, Enums.Design.Button_AutoFilter, trichterState, viewItem.TmpAutoFilterLocation, null, false);
@@ -1200,23 +1200,36 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 DrawWaitScreen(gr);
                 return;
             }
-            var sr = SortedRows();
 
-            if (sr == null) {
-                // Multitasking...
-                DrawWaitScreen(gr);
-                return;
-            }
+            var rw = new List<RowItem>();
+            List<RowData> sr;
+            int firstVisibleRow;
+            int lastVisibleRow;
+            do {
+                sr = SortedRows();
 
-            var firstVisibleRow = sr.Count;
-            var lastVisibleRow = -1;
-            foreach (var thisRow in sr) {
-                if (IsOnScreen(thisRow, displayRectangleWoSlider)) {
-                    var T = sr.IndexOf(thisRow);
-                    firstVisibleRow = Math.Min(T, firstVisibleRow);
-                    lastVisibleRow = Math.Max(T, lastVisibleRow);
+                if (sr == null) {
+                    // Multitasking...
+                    DrawWaitScreen(gr);
+                    return;
                 }
-            }
+
+                firstVisibleRow = sr.Count;
+                lastVisibleRow = -1;
+                rw.Clear();
+                foreach (var thisRow in sr) {
+                    if (IsOnScreen(thisRow, displayRectangleWoSlider)) {
+                        if (thisRow?.Row != null) { rw.AddIfNotExists(thisRow.Row); }
+                        var T = sr.IndexOf(thisRow);
+                        firstVisibleRow = Math.Min(T, firstVisibleRow);
+                        lastVisibleRow = Math.Max(T, lastVisibleRow);
+                    }
+                }
+
+                if (!_database.RefreshRowData(rw)) { break; }
+                Invalidate_SortedRowData();
+            } while (true);
+
             switch (_design) {
                 case BlueTableAppearance.Standard:
                     Draw_Table_Std(gr, sr, state, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow);
@@ -1814,13 +1827,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 Filter.MayHasRowFilter(e.Column) ||
                 e.Column == Database.Column.SysChapter) {
                 Invalidate_FilteredRows();
-
             }
         }
-        Invalidate_SortedRowData(); // Zeichenhöhe kann sich ändern... 
+        Invalidate_SortedRowData(); // Zeichenhöhe kann sich ändern...
 
         Invalidate_DrawWidth(e.Column);
-
 
         Invalidate();
         OnCellValueChanged(e);
@@ -2612,12 +2623,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         #endregion
 
-        var rw = new List<RowItem>();
-        for (var zei = firstVisibleRow; zei <= lastVisibleRow; zei++) {
-            rw.AddIfNotExists(sr[zei].Row);
-        }
-        _database.RefreshRowData(rw);
-
         #region Zeilen Zeichnen (Alle Zellen)
 
         for (var zei = firstVisibleRow; zei <= lastVisibleRow; zei++) {
@@ -2790,7 +2795,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Skin.Draw_Border(gr, Enums.Design.ListBox, state, displayRectangleWoSlider);
     }
 
-    private void Draw_Table_Std(Graphics gr, List<RowData?> sr, States state, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow) {
+    private void Draw_Table_Std(Graphics gr, List<RowData>? sr, States state, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow) {
         try {
             if (_database.ColumnArrangements == null || _arrangementNr >= _database.ColumnArrangements.Count) { return; }   // Kommt vor, dass spontan doch geparsed wird...
             Skin.Draw_Back(gr, Enums.Design.Table_And_Pad, state, base.DisplayRectangle, this, true);
@@ -2886,6 +2891,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Skin.Draw_Border(gr, Enums.Design.Table_And_Pad, States.Standard_Disabled, base.DisplayRectangle);
     }
 
+    /// <summary>
+    /// Berechent die Y-Position auf dem aktuellen Controll
+    /// </summary>
+    /// <param name="r"></param>
+    /// <returns></returns>
     private int DrawY(RowData? r) => r == null ? 0 : r.Y + HeadSize() - (int)SliderY.Value;
 
     private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {

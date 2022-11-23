@@ -25,8 +25,8 @@ internal class Method_String : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableFloat.ShortName_Plain } };
-    public override string Description => "Wandelt die Zahl in einen Text um.";
+    public override List<List<string>> Args => new() { new() { VariableFloat.ShortName_Plain, VariableString.ShortName_Plain } };
+    public override string Description => "Wandelt die Zahl in einen Text um. Kulanterweise werden Strings einfach als String weitergegeben.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
