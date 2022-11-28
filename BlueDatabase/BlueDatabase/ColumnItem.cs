@@ -119,6 +119,10 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     public ColumnItem(DatabaseAbstract database, long columnkey) : this(database, database.Column.Freename(string.Empty), columnkey) { }
 
     public ColumnItem(DatabaseAbstract database, string columnname, long columnkey) {
+        if (!IsValidColumnName(columnname)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht erlaubt!");
+        }
+
         Database = database;
         Database.Disposing += Database_Disposing;
         if (columnkey < 0) { Develop.DebugPrint(FehlerArt.Fehler, "ColumnKey <0"); }
@@ -128,7 +132,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
         #region Standard-Werte
 
-        _name = columnname;
+        _name = columnname.ToUpper();
         _caption = string.Empty;
         //_CaptionBitmapCode = null;
         _format = DataFormat.Text;
@@ -624,8 +628,17 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         set {
             value = value.ToUpper();
             if (value == _name.ToUpper()) { return; }
-            if (Database?.Column.Exists(value) != null) { return; }
-            if (string.IsNullOrEmpty(value)) { return; }
+
+            if (Database?.Column.Exists(value) != null) {
+                Develop.DebugPrint(FehlerArt.Warnung, "Name existiert bereits!");
+                return;
+            }
+
+            if (!IsValidColumnName(value)) {
+                Develop.DebugPrint(FehlerArt.Warnung, "Spaltenname nicht erlaubt!");
+                return;
+            }
+
             var old = _name;
             Database?.ChangeData(DatabaseDataType.ColumnName, this, null, old, value);
             Database?.Column_NameChanged(old, this);
@@ -1339,11 +1352,11 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
     public bool IsSystemColumn() {
         return _name.ToUpper() is "SYS_CORRECT" or
-                             "SYS_CHANGER"or
-                             "SYS_CREATOR"or
-                             "SYS_CHAPTER"or
-                             "SYS_DATECREATED"or
-                             "SYS_DATECHANGED"or
+                             "SYS_CHANGER" or
+                             "SYS_CREATOR" or
+                             "SYS_CHAPTER" or
+                             "SYS_DATECREATED" or
+                             "SYS_DATECHANGED" or
                              "SYS_LOCKED";
     }
 
@@ -2168,7 +2181,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 break;
 
             case DatabaseDataType.ColumnName:
-                _name = newvalue;
+                _name = newvalue.ToUpper();
                 //Invalidate_TmpVariablesx();
                 break;
 

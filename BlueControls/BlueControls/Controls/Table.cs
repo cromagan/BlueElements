@@ -1571,12 +1571,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
         base.OnMouseUp(e);
+
         if (_database == null) { return; }
+
         lock (_lockUserAction) {
             if (_isinMouseUp) { return; }
             _isinMouseUp = true;
-            var screenX = System.Windows.Forms.Cursor.Position.X - e.X;
-            var screenY = System.Windows.Forms.Cursor.Position.Y - e.Y;
+
             if (_database == null) {
                 Forms.QuickInfo.Close();
                 _isinMouseUp = false;
@@ -1587,46 +1588,50 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             // TXTBox_Close() NICHT! Weil sonst nach dem öffnen sofort wieder gschlossen wird
             // AutoFilter_Close() NICHT! Weil sonst nach dem öffnen sofort wieder geschlossen wird
             FloatingForm.Close(this, Enums.Design.Form_KontextMenu);
-            //EnsureVisible(_MouseOver) <-Nur MouseDown, siehe Da
-            //CursorPos_Set(_MouseOver) <-Nur MouseDown, siehe Da
-            ColumnViewItem viewItem = null;
-            if (_mouseOverColumn != null) {
-                viewItem = CurrentArrangement[_mouseOverColumn];
-            }
+
+            var viewItem = CurrentArrangement?[_mouseOverColumn];
+
             if (e.Button == System.Windows.Forms.MouseButtons.Left) {
                 if (_mouseOverColumn != null) {
                     if (Mouse_IsInAutofilter(viewItem, e)) {
+                        var screenX = System.Windows.Forms.Cursor.Position.X - e.X;
+                        var screenY = System.Windows.Forms.Cursor.Position.Y - e.Y;
                         AutoFilter_Show(viewItem, screenX, screenY);
                         _isinMouseUp = false;
                         return;
                     }
-                    if (Mouse_IsInRedcueButton(viewItem, e)) {
+
+                    if (viewItem != null && Mouse_IsInRedcueButton(viewItem, e)) {
                         viewItem.TmpReduced = !viewItem.TmpReduced;
                         viewItem.TmpDrawWidth = null;
                         Invalidate();
                         _isinMouseUp = false;
                         return;
                     }
+
                     if (_mouseOverRow != null && _mouseOverColumn.Format == DataFormat.Button) {
                         OnButtonCellClicked(new CellEventArgs(_mouseOverColumn, _mouseOverRow?.Row));
                         Invalidate();
                     }
                 }
             }
+
             if (e.Button == System.Windows.Forms.MouseButtons.Right) {
                 FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
             }
+
             _isinMouseUp = false;
         }
-        //   End SyncLock
     }
 
     protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
         base.OnMouseWheel(e);
         if (_database == null) { return; }
+
         lock (_lockUserAction) {
             if (_isinMouseWheel) { return; }
             _isinMouseWheel = true;
+
             Database?.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
             if (!SliderY.Visible) {
                 _isinMouseWheel = false;
@@ -1650,24 +1655,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Invalidate_SortedRowData(); // Zellen können ihre Größe ändern. z.B. die Zeilenhöhe
     }
 
-    //protected override void OnResize(System.EventArgs e) {
-    //    base.OnResize(e);
-    //    if (_Database == null) { return; }
-    //    lock (Lock_UserAction) {
-    //        if (ISIN_Resize) { return; }
-    //        ISIN_Resize = true;
-    //        Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
-    //        Invalidate_AllDraw(false);
-    //        ISIN_Resize = false;
-    //    }
-    //}
     protected override void OnVisibleChanged(System.EventArgs e) {
         base.OnVisibleChanged(e);
         if (_database == null) { return; }
         lock (_lockUserAction) {
             if (_isinVisibleChanged) { return; }
             _isinVisibleChanged = true;
-            Database.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
+            Database?.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
             _isinVisibleChanged = false;
         }
     }
@@ -1691,15 +1685,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private static void DB_GenerateLayoutInternal(object sender, GenerateLayoutInternalEventargs e) {
         if (e.Handled) { return; }
         e.Handled = true;
-        ItemCollectionPad pad = new(e.LayoutId, e.Row.Database, e.Row.Key);
+        if (e?.Row?.Database == null) { return; }
+
+        var pad = new ItemCollectionPad(e.LayoutId, e.Row.Database, e.Row.Key);
         pad.SaveAsBitmap(e.Filename);
     }
 
-    //    if (e.WrittenToLogifile) { return; }
-    //    e.WrittenToLogifile = true;
-    //    Develop.DebugPrint(e.Type, e.Message);
-    //}
-    private static void Draw_CellTransparentDirect(Graphics gr, string? toDraw, Rectangle drawarea, BlueFont? font, ColumnItem? contentHolderCellColumn, int pix16, ShortenStyle style, BildTextVerhalten bildTextverhalten, States state) {
+    private static void Draw_CellTransparentDirect(Graphics gr, string? toDraw, Rectangle drawarea, BlueFont? font, ColumnItem contentHolderCellColumn, int pix16, ShortenStyle style, BildTextVerhalten bildTextverhalten, States state) {
         if (toDraw == null) { toDraw = string.Empty; }
 
         if (!contentHolderCellColumn.MultiLine || !toDraw.Contains("\r")) {
@@ -1719,7 +1711,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     //    if (e.Type is enFehlerArt.DevelopInfo or enFehlerArt.Info) { return; }
-    private static void Draw_CellTransparentDirect_OneLine(Graphics gr, string drawString, ColumnItem? contentHolderColumnStyle, Rectangle drawarea, int txtYPix, bool changeToDot, BlueFont? font, int pix16, ShortenStyle style, BildTextVerhalten bildTextverhalten, States state) {
+    private static void Draw_CellTransparentDirect_OneLine(Graphics gr, string drawString, ColumnItem contentHolderColumnStyle, Rectangle drawarea, int txtYPix, bool changeToDot, BlueFont? font, int pix16, ShortenStyle style, BildTextVerhalten bildTextverhalten, States state) {
         Rectangle r = new(drawarea.Left, drawarea.Top + txtYPix, drawarea.Width, pix16);
 
         if (r.Bottom + pix16 > drawarea.Bottom) {
@@ -1734,11 +1726,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Skin.Draw_FormatedText(gr, tmpData.Item1, tmpImageCode, (Alignment)contentHolderColumnStyle.Align, r, null, false, font, false);
     }
 
-    //private static void Database_DropConstructorMessage(object sender, MessageEventArgs e) {
-    //    if (!e.Shown) {
-    //        e.Shown = true;
-    //        Notification.Show(e.Message, ImageCode.Datenbank);
-    //    }
     private static int GetPix(int pix, BlueFont? f, double scale) => Skin.FormatedText_NeededSize("@|", null, f, (int)((pix * scale) + 0.5)).Height;
 
     private static bool Mouse_IsInAutofilter(ColumnViewItem? viewItem, System.Windows.Forms.MouseEventArgs e) => viewItem != null && viewItem.TmpAutoFilterLocation.Width != 0 && viewItem.Column.AutoFilterSymbolPossible() && viewItem.TmpAutoFilterLocation.Contains(e.X, e.Y);
@@ -1776,7 +1763,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (string.IsNullOrEmpty(newValue)) { return; }
         }
 
-        CellValueChangingByUserEventArgs ed = new(column, row, newValue, string.Empty);
+        var ed = new CellValueChangingByUserEventArgs(column, row, newValue, string.Empty);
         table.OnCellValueChangingByUser(ed);
         var cancelReason = ed.CancelReason;
         if (string.IsNullOrEmpty(cancelReason) && formatWarnung && !string.IsNullOrEmpty(newValue)) {
@@ -1794,7 +1781,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 row = column.Database.Row.Add(newValue);
                 if (table.Database == column.Database) {
                     var l = table.FilteredRows();
-                    if (!l.Contains(row)) {
+                    if (row != null && !l.Contains(row)) {
                         if (MessageBox.Show("Die neue Zeile ist ausgeblendet.<br>Soll sie <b>angepinnt</b> werden?", ImageCode.Pinnadel, "anpinnen", "abbrechen") == 0) {
                             table.PinAdd(row);
                         }
@@ -1821,11 +1808,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void _Database_CellValueChanged(object sender, CellEventArgs e) {
         if (_filteredRows != null) {
-            if (Filter[e.Column] != null ||
-                SortUsed() == null ||
-                SortUsed().UsedForRowSort(e.Column) ||
-                Filter.MayHasRowFilter(e.Column) ||
-                e.Column == Database.Column.SysChapter) {
+            var f = Filter;
+            var rsd = SortUsed();
+
+            if ((f != null && f[e.Column] != null) ||
+                rsd == null ||
+               rsd.UsedForRowSort(e.Column) ||
+              (f != null && f.MayHasRowFilter(e.Column)) ||
+                e.Column == Database?.Column.SysChapter) {
                 Invalidate_FilteredRows();
             }
         }

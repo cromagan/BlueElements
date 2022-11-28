@@ -83,7 +83,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         if (Skin.StyleDb != null) { _sheetStyle = Skin.StyleDb.Row.First(); }
     }
 
-    public ItemCollectionPad(string layoutId, DatabaseAbstract? database, long rowkey) : this(database.Layouts[database.Layouts.LayoutIdToIndex(layoutId)], string.Empty) {
+    public ItemCollectionPad(string layoutId, DatabaseAbstract database, long rowkey) : this(database.Layouts[database.Layouts.LayoutIdToIndex(layoutId)], string.Empty) {
         // Wenn nur die Row ankommt und diese null ist, kann gar nix generiert werden
         ResetVariables();
         ParseVariable(database.Row.SearchByKey(rowkey));

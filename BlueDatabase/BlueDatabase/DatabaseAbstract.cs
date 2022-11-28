@@ -1589,6 +1589,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             case (DatabaseDataType)62:
             case (DatabaseDataType)53:
             case (DatabaseDataType)33:
+            case (DatabaseDataType)65:
                 break;
 
             default:

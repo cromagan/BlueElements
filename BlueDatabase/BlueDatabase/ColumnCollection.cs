@@ -128,7 +128,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
 
         //var addColumnKey = LongParse(value);
         if (c == null) {
-            c=new ColumnItem(Database, internalName, colKey);
+            c = new ColumnItem(Database, internalName, colKey);
             base.Add(c);
             Database.ChangeData(DatabaseDataType.Comand_ColumnAdded, c, null, string.Empty, c.Name);
         }
@@ -182,15 +182,17 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     /// <returns></returns>
     public ColumnItem? First() => this[0];
 
-    public string Freename(string wunschname) {
+    public string Freename(string preferedName) {
+        preferedName = preferedName.ReduceToChars(Constants.AllowedCharsVariableName);
+        if (string.IsNullOrEmpty(preferedName)) { preferedName = "NewColumn"; }
+
+        if (Exists(preferedName) == null) { return preferedName; }
+
+        string testName;
         var nr = 0;
-        wunschname = wunschname.ReduceToChars(Constants.AllowedCharsVariableName);
-        if (string.IsNullOrEmpty(wunschname)) { wunschname = "NewColumn"; }
-        if (Exists(wunschname) == null) { return wunschname; }
-        string? testName;
         do {
             nr++;
-            testName = wunschname + "_" + nr;
+            testName = preferedName + "_" + nr;
         } while (Exists(testName) != null);
         return testName;
     }

@@ -23,7 +23,7 @@ public class RowEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public RowEventArgs(RowItem? row) {
+    public RowEventArgs(RowItem row) {
         Row = row;
     }
 
@@ -31,7 +31,7 @@ public class RowEventArgs : System.EventArgs {
 
     #region Properties
 
-    public RowItem? Row { get; }
+    public RowItem Row { get; }
 
     #endregion
 }

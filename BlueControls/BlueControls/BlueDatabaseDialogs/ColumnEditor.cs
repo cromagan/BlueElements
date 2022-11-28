@@ -414,10 +414,12 @@ internal sealed partial class ColumnEditor {
         // Einige Dropdown-Menüs sind abhängig von der LinkedDatabase und werden in dessen TextChanged-Event befüllt
         // siehe Ende dieser Routine
         foreach (var thisColumn in _column.Database.Column) {
-            if ((thisColumn.Format == DataFormat.RelationText || !thisColumn.MultiLine) && thisColumn.Format.CanBeCheckedByRules()) { cbxSchlüsselspalte.Item.Add(thisColumn); }
-            if (thisColumn.Format.CanBeCheckedByRules() && !thisColumn.MultiLine && !thisColumn.Format.NeedTargetDatabase()) {
-                //cbxDropDownKey.Item.Add(thisColumn);
-                cbxVorschlagSpalte.Item.Add(thisColumn);
+            if (thisColumn.IsOk() && thisColumn.Format.CanBeCheckedByRules()) {
+                if (thisColumn.Format == DataFormat.RelationText || !thisColumn.MultiLine) { cbxSchlüsselspalte.Item.Add(thisColumn); }
+                if (!thisColumn.MultiLine && !thisColumn.Format.NeedTargetDatabase()) {
+                    //cbxDropDownKey.Item.Add(thisColumn);
+                    cbxVorschlagSpalte.Item.Add(thisColumn);
+                }
             }
         }
         cbxSchlüsselspalte.Item.Sort();
@@ -471,7 +473,7 @@ internal sealed partial class ColumnEditor {
         _column.PermissionGroupsChangeCell = lbxCellEditor.Item.ToListOfString();
         _column.DropDownItems = tbxAuswaehlbareWerte.Text.SplitAndCutByCrToList().SortedDistinctList();
         _column.OpticalReplace = txbReplacer.Text.SplitAndCutByCrToList();
-        _column.AfterEditAutoReplace =txbAutoReplace.Text.SplitAndCutByCrToList();
+        _column.AfterEditAutoReplace = txbAutoReplace.Text.SplitAndCutByCrToList();
 
         _column.AutoFilterJoker = tbxJoker.Text;
         _column.CaptionGroup1 = txbUeberschift1.Text;
