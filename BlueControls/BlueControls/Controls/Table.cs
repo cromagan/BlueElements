@@ -1226,7 +1226,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     }
                 }
 
-                if (!_database.RefreshRowData(rw)) { break; }
+                if (!_database.RefreshRowData(rw, false)) { break; }
                 Invalidate_SortedRowData();
             } while (true);
 

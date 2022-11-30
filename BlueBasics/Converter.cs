@@ -143,7 +143,8 @@ public static class Converter {
                || DateTime.TryParseExact(s, "d.M.yy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
                || DateTime.TryParseExact(s, Constants.Format_Date5, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
                || DateTime.TryParseExact(s, Constants.Format_Date7, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, Constants.Format_Date, CultureInfo.InvariantCulture, DateTimeStyles.None, out result);
+               || DateTime.TryParseExact(s, Constants.Format_Date, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+               || DateTime.TryParseExact(s, Constants.Format_Date9, CultureInfo.InvariantCulture, DateTimeStyles.None, out result);
     }
 
     /// <summary>
@@ -353,7 +354,6 @@ public static class Converter {
     public static float MmToPixel(float mM, int dPi) => mM * dPi / 25.4f;
 
     public static float PixelToMm(float pixel, int dPi) => pixel / dPi * 25.4f;
-
 
     public static string StringtoUtf8(this string s) => Encoding.Default.GetString(Encoding.UTF8.GetBytes(s));
 

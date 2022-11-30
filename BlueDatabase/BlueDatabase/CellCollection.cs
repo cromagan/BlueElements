@@ -395,7 +395,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             var cellKey = KeyOfCell(column, row);
 
             if (string.IsNullOrEmpty(column.TimeCode)) {
-                _database.RefreshRowData(row);
+                _database.RefreshRowData(row, false);
             }
 
             return !ContainsKey(cellKey) ? string.Empty : this[cellKey].Value;

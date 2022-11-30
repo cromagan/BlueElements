@@ -23,6 +23,9 @@ using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.SqlTypes;
+using System.Threading;
+using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
@@ -32,7 +35,22 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     #region Fields
 
+    /// <summary>
+    /// Nicht static, weil verschiedene Datenbankverbindngen möglich sind.
+    /// </summary>
     public readonly SQLBackAbstract _sql;
+
+    private static bool _isInTimer = false;
+
+    /// <summary>
+    /// Der Globale Timer, der die Sys_Undo Datenbank abfrägt
+    /// </summary>
+    private static System.Threading.Timer? _timer = null;
+
+    /// <summary>
+    /// Der Zeitstempel der letzten Abfrage des _timer
+    /// </summary>
+    private static DateTime _timerTimeStamp = DateTime.UtcNow.AddMinutes(-5);
 
     private bool _checkedAndReloadNeed;
 
@@ -57,6 +75,8 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
             LoadFromSQLBack();
         }
         RepairAfterParse();
+
+        GenerateTimer();
     }
 
     #endregion
@@ -169,7 +189,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         _sql.CloseConnection();
     }
 
-    public override bool RefreshRowData(List<RowItem> rows) {
+    public override bool RefreshRowData(List<RowItem> rows, bool refreshAlways) {
         if (rows == null || rows.Count == 0) { return false; }
 
         var l = new ListExt<RowItem>();
@@ -177,7 +197,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         foreach (var thisr in rows) {
             var cellKey = CellCollection.KeyOfCell(Column.SysRowChangeDate, thisr);
 
-            if (!Cell.ContainsKey(cellKey)) {
+            if (refreshAlways || !Cell.ContainsKey(cellKey)) {
                 l.AddIfNotExists(thisr);
             }
         }
@@ -227,6 +247,55 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     protected override void StoreValueToHardDisk(DatabaseDataType type, ColumnItem? column, RowItem? row, string value) {
         _sql?.CheckIn(TableName, type, value, column, row, -1, -1);
         //return base.SetValueInternal(type, value, column, row, width, height);
+    }
+
+    private static void CheckSysUndo(object state) {
+        if (DateTime.UtcNow.Subtract(_timerTimeStamp).TotalSeconds < 30) { return; }
+
+        if (_isInTimer) { return; }
+        _isInTimer = true;
+
+        var fd = DateTime.UtcNow;
+
+        var done = new List<DatabaseAbstract>();
+
+        foreach (var thisDB in AllFiles) {
+            if (!done.Contains(thisDB)) {
+                if (thisDB is DatabaseSQLLite thisDBSqlLite) {
+                    var db = LoadedDatabasesWithThisSQL(thisDBSqlLite._sql);
+                    done.AddRange(db);
+
+                    var erg = thisDBSqlLite._sql.GetRowData(db, _timerTimeStamp.AddSeconds(-2), fd);
+
+                    foreach (var thisdb in db) {
+                        thisdb.RefreshRows(erg);
+                    }
+                }
+            }
+        }
+
+        _timerTimeStamp = fd;
+        _isInTimer = false;
+    }
+
+    private static List<DatabaseSQLLite> LoadedDatabasesWithThisSQL(SQLBackAbstract sql) {
+        var oo = new List<DatabaseSQLLite>();
+        foreach (var thisDb in AllFiles) {
+            if (thisDb is DatabaseSQLLite thidDBSQLLIte) {
+                if (thidDBSQLLIte._sql == sql) {
+                    oo.Add(thidDBSQLLIte);
+                }
+            }
+        }
+
+        return oo;
+    }
+
+    private void GenerateTimer() {
+        if (_timer != null) { return; }
+        _timerTimeStamp = DateTime.UtcNow.AddMinutes(-5);
+        _timer = new System.Threading.Timer(CheckSysUndo);
+        _timer.Change(5000, 5000);
     }
 
     private void LoadFromSQLBack() {
@@ -309,6 +378,27 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         IsLoading = false;
         OnLoaded(this, new BlueBasics.EventArgs.LoadedEventArgs(onlyReload));
         //RepairAfterParse();
+    }
+
+    private void RefreshRows(List<(string tablename, string comand, string columnname, string rowid)>? data) {
+        if (data == null) { return; }
+
+        var rk = new List<long>();
+
+        foreach (var thisData in data) {
+            if (TableName == thisData.tablename) {
+                if (!string.IsNullOrEmpty(thisData.rowid)) {
+                    rk.AddIfNotExists(LongParse(thisData.rowid));
+                }
+
+                //Enum.TryParse(thisData.comand, out DatabaseDataType t);
+                //if (t != (DatabaseDataType)0) {
+                //    column.SetValueInternal(t, thisstyle.Value);
+                //}
+            }
+        }
+
+        RefreshRowData(rk, true);
     }
 
     #endregion

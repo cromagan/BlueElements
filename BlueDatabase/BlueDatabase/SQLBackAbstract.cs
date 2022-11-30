@@ -64,6 +64,8 @@ public abstract class SQLBackAbstract {
     public bool ConnectionOk => _connection != null;
     public string ConnectionString { get; protected set; }
 
+    public string Date { get; } = "DATE";
+
     /// <summary>
     /// Falls die Datenbank von einer lokalen Datei geladen wurde, ist hier der Dateiname enthalten.
     /// </summary>
@@ -123,8 +125,10 @@ public abstract class SQLBackAbstract {
         var n = (column?.Name) ?? "~Database~";
         var rk = (row?.Key.ToString()) ?? string.Empty;
 
+        var dt = DateTime.UtcNow;
+
         var cmdString = "INSERT INTO " + SYS_UNDO +
-            " (TABLENAME, COMAND, COLUMNNAME, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, DATETIMEUTC) VALUES (" +
+            " (TABLENAME, COMAND, COLUMNNAME, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, DATETIMEUTC, TIMECODEUTC) VALUES (" +
              DBVAL(tablename.ToUpper()) + "," +
              DBVAL(comand.ToString()) + "," +
              DBVAL(n) + "," +
@@ -132,7 +136,8 @@ public abstract class SQLBackAbstract {
              DBVAL(previousValue) + "," +
              DBVAL(changedTo) + "," +
              DBVAL(userName) + "," +
-             DBVAL(DateTime.UtcNow.ToString(Constants.Format_Date)) + ")";
+             DBVAL(dt.ToString(Constants.Format_Date)) + "," +
+             DBVAL(dt) + ")";
 
         using var comm = _connection.CreateCommand();
         comm.CommandText = cmdString;
@@ -266,19 +271,6 @@ public abstract class SQLBackAbstract {
         while (reader.Read()) {
             value += reader[0].ToString();
         }
-
-        //if (reader.Read()) {
-        //    // you may want to check if value is NULL: reader.IsDBNull(0)
-        //    var value = reader[0].ToString();
-
-        //    //if (reader.Read()) {
-        //    //    // Doppelter Wert?!?Ersten Wert zurückgeben, um unendliche erweiterungen zu erhindern
-        //    //    Develop.DebugPrint(tablename.ToUpper() + " " + type + " " + columnName + " doppelt in Style vorhanden!");
-        //    //}
-
-        //    CloseConnection();
-        //    return value;
-        //}
 
         CloseConnection();    // Nix vorhanden!
         return value;
@@ -530,6 +522,7 @@ public abstract class SQLBackAbstract {
         if (!colUndo.Contains("CHANGEDTO")) { AddColumn(SYS_UNDO, "CHANGEDTO", VarChar4000, true); }
         if (!colUndo.Contains("USERNAME")) { AddColumn(SYS_UNDO, "USERNAME", false); }
         if (!colUndo.Contains("DATETIMEUTC")) { AddColumn(SYS_UNDO, "DATETIMEUTC", false); }
+        if (!colUndo.Contains("TIMECODEUTC")) { AddColumn(SYS_UNDO, "TIMECODEUTC", Date, false); }
 
         #endregion
 
@@ -595,6 +588,39 @@ public abstract class SQLBackAbstract {
 
     internal static string MakeValidColumnName(string columnname) {
         return columnname.ToUpper().Replace(" ", "_").ReduceToChars(Constants.AllowedCharsVariableName);
+    }
+
+    internal List<(string tablename, string comand, string columnname, string rowid)>? GetRowData(List<DatabaseSQLLite> db, DateTime fromDate, DateTime toDate) {
+        if (!OpenConnection()) { return null; }
+
+        using var q = _connection.CreateCommand();
+
+        q.CommandText = @"select TABLENAME, COMAND, COLUMNNAME, ROWKEY from " + SYS_UNDO + " ";
+
+        // nur bestimmte Tabellen
+        q.CommandText += "WHERE (";
+        foreach (var thisdb in db) {
+            q.CommandText += "TABLENAME=" + DBVAL(thisdb.TableName.ToUpper()) + " OR ";
+        }
+        q.CommandText = q.CommandText.TrimEnd(" OR ") + ") AND ";
+
+        // Zeit einbeziehen
+        q.CommandText += "(TIMECODEUTC BETWEEN " + DBVAL(fromDate)
+                         + " AND " + DBVAL(toDate) + ")";
+
+        // Sortierung nach Tabellen
+        q.CommandText += " ORDER BY TABLENAME ASC";
+
+        var fb = new List<(string tablename, string comand, string columnname, string rowid)>();
+
+        using var reader = q.ExecuteReader();
+        var value = string.Empty;
+        while (reader.Read()) {
+            fb.Add((reader[0].ToString(), reader[1].ToString(), reader[2].ToString(), reader[3].ToString()));
+        }
+
+        CloseConnection();
+        return fb;
     }
 
     internal SQLBackAbstract? HandleMe(ConnectionInfo ci) {
@@ -697,6 +723,13 @@ public abstract class SQLBackAbstract {
 
     private string DBVAL(long original) {
         return DBVAL(original.ToString());
+    }
+
+    private string DBVAL(DateTime date) {
+        return "to_timestamp(" +
+               DBVAL(date.ToString(Constants.Format_Date9)) + ", " +
+               DBVAL(Constants.Format_Date9.ToUpper().Replace(":MM:", ":MI:").Replace("HH:", "HH24:").Replace(".FFF", ".FF3")) +
+                    ")";
     }
 
     private string DBVAL(string original) {

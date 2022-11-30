@@ -1228,10 +1228,21 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         }
     }
 
-    public abstract bool RefreshRowData(List<RowItem> row);
+    public abstract bool RefreshRowData(List<RowItem> row, bool refreshAlways);
 
-    public bool RefreshRowData(RowItem row) {
-        return RefreshRowData(new List<RowItem>() { row });
+    public bool RefreshRowData(List<long> keys, bool refreshAlways) {
+        if (keys.Count == 0) { return false; }
+
+        var r = new List<RowItem>();
+        foreach (var thisK in keys) {
+            var ro = Row.SearchByKey(thisK);
+            if (ro != null) { r.AddIfNotExists(ro); }
+        }
+        return RefreshRowData(r, refreshAlways);
+    }
+
+    public bool RefreshRowData(RowItem row, bool refreshAlways) {
+        return RefreshRowData(new List<RowItem>() { row }, refreshAlways);
     }
 
     public void RepairAfterParse() {

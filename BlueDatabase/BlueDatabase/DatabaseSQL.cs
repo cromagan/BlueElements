@@ -154,7 +154,7 @@ public sealed class DatabaseSQL : DatabaseAbstract {
 
     public override void RefreshColumnsData(List<ColumnItem>? columns) { }
 
-    public override bool RefreshRowData(List<RowItem> row) => false;
+    public override bool RefreshRowData(List<RowItem> row, bool refreshAlways) => false;
 
     public override bool Save(bool mustSave) => _sql.ConnectionOk;
 
