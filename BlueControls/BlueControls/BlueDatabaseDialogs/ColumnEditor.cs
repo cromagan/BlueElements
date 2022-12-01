@@ -390,6 +390,7 @@ internal sealed partial class ColumnEditor {
         lbxCellEditor.Item.Clear();
         lbxCellEditor.Item.AddRange(_column.PermissionGroupsChangeCell);
         tbxAllowedChars.Text = _column.AllowedChars;
+        tbxMaxTextLenght.Text = _column.MaxTextLenght.ToString();
         btnOtherValuesToo.Checked = _column.DropdownWerteAndererZellenAnzeigen;
         btnIgnoreLock.Checked = _column.EditAllowedDespiteLock;
         tbxAdminInfo.Text = _column.AdminInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
@@ -489,6 +490,7 @@ internal sealed partial class ColumnEditor {
         _column.DropdownWerteAndererZellenAnzeigen = btnOtherValuesToo.Checked;
         _column.EditAllowedDespiteLock = btnIgnoreLock.Checked;
         _column.AllowedChars = tbxAllowedChars.Text;
+        _column.MaxTextLenght = IntParse(tbxMaxTextLenght.Text);
 
         _column.ConstantHeightOfImageCode = txbBildCodeConstHeight.Text;
         IntTryParse(cbxBildTextVerhalten.Text, out var imNf);
@@ -530,7 +532,7 @@ internal sealed partial class ColumnEditor {
 
         if (tblFilterliste.Database == null) {
             Database db = new(false, "Filter " + _column.Database.ConnectionData.UniqueID + " " + _column.Name);
-            db.Column.Add("count", "count", VarType.Integer);
+            db.Column.Add("count", "count", VarType.IntegerPositive);
             var vis = db.Column.Add("visible", "visible", VarType.Bit);
             var sp = db.Column.Add("Spalte", "Spalte", VarType.Text);
             sp.Align = AlignmentHorizontal.Rechts;

@@ -241,6 +241,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
             Suffix = column1.Suffix;
             Regex = column1.Regex;
             AllowedChars = column1.AllowedChars;
+            MaxTextLenght = column1.MaxTextLenght;
         }
 
         switch (e.Control) {
@@ -537,14 +538,12 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     private void GetTmpVariables() {
         try {
             if (_database != null && !_database.IsDisposed) {
-
                 if (string.IsNullOrEmpty(_columnName)) {
                     _tmpColumn = _database.Column.SearchByKey(_colKey);
                 } else {
                     _tmpColumn = _database.Column[_columnName];
                 }
                 _tmpRow = _database.Row.SearchByKey(_rowKey);
-
             } else {
                 _tmpColumn = null;
                 _tmpRow = null;

@@ -20,6 +20,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueDatabase.AdditionalScriptComands;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
@@ -125,10 +126,8 @@ public abstract class SQLBackAbstract {
         var n = (column?.Name) ?? "~Database~";
         var rk = (row?.Key.ToString()) ?? string.Empty;
 
-        var dt = DateTime.UtcNow;
-
         var cmdString = "INSERT INTO " + SYS_UNDO +
-            " (TABLENAME, COMAND, COLUMNNAME, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, DATETIMEUTC, TIMECODEUTC) VALUES (" +
+            " (TABLENAME, COMAND, COLUMNNAME, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, TIMECODEUTC) VALUES (" +
              DBVAL(tablename.ToUpper()) + "," +
              DBVAL(comand.ToString()) + "," +
              DBVAL(n) + "," +
@@ -136,8 +135,8 @@ public abstract class SQLBackAbstract {
              DBVAL(previousValue) + "," +
              DBVAL(changedTo) + "," +
              DBVAL(userName) + "," +
-             DBVAL(dt.ToString(Constants.Format_Date)) + "," +
-             DBVAL(dt) + ")";
+             //DBVAL(dt.ToString(Constants.Format_Date)) + "," +
+             DBVAL(DateTime.UtcNow) + ")";
 
         using var comm = _connection.CreateCommand();
         comm.CommandText = cmdString;
@@ -215,6 +214,10 @@ public abstract class SQLBackAbstract {
 
                 case DatabaseDataType.Comand_RemovingRow:
                     RemoveRow(tablename, row.Key);
+                    return true;
+
+                case DatabaseDataType.Comand_RowAdded:
+                    AddRow(tablename, row.Key);
                     return true;
 
                 default:
@@ -311,6 +314,7 @@ public abstract class SQLBackAbstract {
         return l;
     }
 
+    [Obsolete]
     public async void LoadAllCells(string tablename, RowCollection row) {
         if (!OpenConnection()) { return; }
 
@@ -369,6 +373,7 @@ public abstract class SQLBackAbstract {
         CloseConnection();
     }
 
+    [Obsolete]
     public async void LoadAllRows(string tablename, RowCollection row) {
         if (!OpenConnection()) { return; }
 
@@ -420,6 +425,11 @@ public abstract class SQLBackAbstract {
     }
 
     public void LoadRow(string tablename, List<RowItem> row) {
+        if (row == null || row.Count == 0 || row[0] is null || row[0].Database is null) { return; }
+        if (!OpenConnection()) { return; }
+
+        if (!row[0].Database.IsLoading) { Develop.DebugPrint("Loading falsch"); }
+
         lock (getRow) {
             if (!OpenConnection()) { return; }
 
@@ -521,7 +531,7 @@ public abstract class SQLBackAbstract {
         if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn(SYS_UNDO, "PREVIOUSVALUE", VarChar4000, true); }
         if (!colUndo.Contains("CHANGEDTO")) { AddColumn(SYS_UNDO, "CHANGEDTO", VarChar4000, true); }
         if (!colUndo.Contains("USERNAME")) { AddColumn(SYS_UNDO, "USERNAME", false); }
-        if (!colUndo.Contains("DATETIMEUTC")) { AddColumn(SYS_UNDO, "DATETIMEUTC", false); }
+        //if (!colUndo.Contains("DATETIMEUTC")) { AddColumn(SYS_UNDO, "DATETIMEUTC", false); }
         if (!colUndo.Contains("TIMECODEUTC")) { AddColumn(SYS_UNDO, "TIMECODEUTC", Date, false); }
 
         #endregion
@@ -590,7 +600,7 @@ public abstract class SQLBackAbstract {
         return columnname.ToUpper().Replace(" ", "_").ReduceToChars(Constants.AllowedCharsVariableName);
     }
 
-    internal List<(string tablename, string comand, string columnname, string rowid)>? GetRowData(List<DatabaseSQLLite> db, DateTime fromDate, DateTime toDate) {
+    internal List<(string tablename, string comand, string columnname, string rowid)>? GetLastChanges(List<DatabaseSQLLite> db, DateTime fromDate, DateTime toDate) {
         if (!OpenConnection()) { return null; }
 
         using var q = _connection.CreateCommand();
@@ -609,7 +619,7 @@ public abstract class SQLBackAbstract {
                          + " AND " + DBVAL(toDate) + ")";
 
         // Sortierung nach Tabellen
-        q.CommandText += " ORDER BY TABLENAME ASC";
+        q.CommandText += " ORDER BY TIMECODEUTC ASC";
 
         var fb = new List<(string tablename, string comand, string columnname, string rowid)>();
 
@@ -643,8 +653,10 @@ public abstract class SQLBackAbstract {
     }
 
     internal async void LoadColumns(string tablename, ListExt<ColumnItem> columns) {
-        if (columns == null || columns.Count == 0) { return; }
+        if (columns == null || columns.Count == 0 || columns[0] is null || columns[0].Database is null) { return; }
         if (!OpenConnection()) { return; }
+
+        if (!columns[0].Database.IsLoading) { Develop.DebugPrint("Loading falsch"); }
 
         var com = "SELECT RK, ";
 
@@ -676,16 +688,16 @@ public abstract class SQLBackAbstract {
         }
 
         foreach (var thiscolumn in columns) {
-            var val = GetStyleData(tablename, DatabaseDataType.ColumnTimeCode.ToString(), thiscolumn.Name);
+            //var val = GetStyleData(tablename, DatabaseDataType.ColumnTimeCode.ToString(), thiscolumn.Name);
 
-            thiscolumn._timecode = val;
+            thiscolumn.Loaded = true;
 
-            if (string.IsNullOrEmpty(val)) {
-                Develop.DebugPrint(FehlerArt.Warnung, "Spalte ohne Zeitstempel, repariert! + " + com);
-                thiscolumn.TimeCode = DateTime.UtcNow.ToString(Constants.Format_Date);
-                //val =
-                //SetStyleData(tablename, DatabaseDataType.ColumnTimeCode, thiscolumn.Name, val);
-            }
+            //if (string.IsNullOrEmpty(val)) {
+            //    Develop.DebugPrint(FehlerArt.Warnung, "Spalte ohne Zeitstempel, repariert! + " + com);
+            //    thiscolumn.TimeCode = DateTime.UtcNow.ToString(Constants.Format_Date);
+            //    //val =
+            //    //SetStyleData(tablename, DatabaseDataType.ColumnTimeCode, thiscolumn.Name, val);
+            //}
         }
 
         //Develop.DebugPrint(FehlerArt.Info, "Datenbank Ladezeit: " + row.Database.TableName + " - " + DateTime.Now.Subtract(ti).TotalSeconds.ToString() + " Sekunden");
@@ -719,6 +731,12 @@ public abstract class SQLBackAbstract {
         if (nullable) { n = string.Empty; }
 
         ExecuteCommand("alter table " + tablename.ToUpper() + " add " + column + " " + type + " default ''" + n);
+    }
+
+    private void AddRow(string tablename, long key) {
+        ExecuteCommand("INSERT INTO " + tablename.ToUpper() + " (RK) VALUES (" + DBVAL(key) + ")");
+        //ExecuteCommand("DELETE FROM  " + tablename.ToUpper() + " WHERE RK = " + DBVAL(key.ToString()));
+        //ExecuteCommand("DELETE FROM " + SYS_STYLE + " WHERE TABLENAME = " + DBVAL( tablename.ToUpper() ) + " AND COLUMNNAME = " + DBVAL( column.ToUpper() ));
     }
 
     private string DBVAL(long original) {

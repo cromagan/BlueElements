@@ -460,6 +460,7 @@ public sealed class Database : DatabaseAbstract {
         SaveToByteList(l, DatabaseDataType.ColumnContentWidth, c.ContentWidth.ToString(), key);
         SaveToByteList(l, DatabaseDataType.CaptionBitmapCode, c.CaptionBitmapCode, key);
         SaveToByteList(l, DatabaseDataType.AllowedChars, c.AllowedChars, key);
+        SaveToByteList(l, DatabaseDataType.MaxTextLenght, c.MaxTextLenght.ToString(), key);
         SaveToByteList(l, DatabaseDataType.PermissionGroupsChangeCell, c.PermissionGroupsChangeCell.JoinWithCr(), key);
         SaveToByteList(l, DatabaseDataType.ColumnTags, c.Tags.JoinWithCr(), key);
         SaveToByteList(l, DatabaseDataType.EditAllowedDespiteLock, c.EditAllowedDespiteLock.ToPlusMinus(), key);
@@ -476,7 +477,7 @@ public sealed class Database : DatabaseAbstract {
         SaveToByteList(l, DatabaseDataType.MakeSuggestionFromSameKeyColumn, c.VorschlagsColumn.ToString(), key);
         SaveToByteList(l, DatabaseDataType.ColumnAlign, ((int)c.Align).ToString(), key);
         SaveToByteList(l, DatabaseDataType.SortType, ((int)c.SortType).ToString(), key);
-        SaveToByteList(l, DatabaseDataType.ColumnTimeCode, c.TimeCode, key);
+        //SaveToByteList(l, DatabaseDataType.ColumnTimeCode, c.TimeCode, key);
     }
 
     internal static void SaveToByteList(List<byte> list, DatabaseDataType databaseDataType, string content, long columnKey) {
@@ -682,7 +683,7 @@ public sealed class Database : DatabaseAbstract {
             if (thisPendingItem.RowKey > -1) {
                 row = Row.SearchByKey(thisPendingItem.RowKey);
                 if (row == null) {
-                    if (thisPendingItem.Comand != DatabaseDataType.dummyComand_AddRow && thisPendingItem.User != UserName) {
+                    if (thisPendingItem.Comand != DatabaseDataType.Comand_RowAdded && thisPendingItem.User != UserName) {
                         Develop.DebugPrint("Pending verworfen, Zeile gelöscht.<br>" + ConnectionData.TableName + "<br>" + thisPendingItem.ToString());
                         return;
                     }

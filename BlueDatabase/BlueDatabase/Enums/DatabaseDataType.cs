@@ -46,7 +46,7 @@ public enum DatabaseDataType : byte {
     CryptionTest = 3,
 
     //InBearbeitung = 3,
-    TimeCode = 4,
+    //TimeCode = 4,
 
     //CheckOutUser = 5,
     // Zugriffanzahl = 6
@@ -159,10 +159,11 @@ public enum DatabaseDataType : byte {
 
     LineStyleRight = 111,
 
-    ColumnTimeCode = 112, // co_Ausrichtung = 112
+    //ColumnTimeCode = 112, // co_Ausrichtung = 112
     ColumnQuickInfo = 113,
 
-    // co_FesteBreite = 114
+    MaxTextLenght = 114, // co_FesteBreite = 114
+
     // co_Bitlänge = 115
     // co_FilterOption = 116
     DropDownItems = 117,
@@ -290,15 +291,29 @@ public enum DatabaseDataType : byte {
 
     //Dummy_ce_ValueWithoutSizeUncrypted = 204,
 
+    /// <summary>
+    /// Wenn im Arbeitsspeicher eine Zeile gelöscht werden soll, und echtzeitsysteme Nachziehen müssen
+    /// </summary>
     Comand_RemovingRow = 220,
 
-    dummyComand_AddRow = 221,
+    /// <summary>
+    /// Wenn im Arbeitsspeicher eine Zeile erstellt wurde, und echtzeitsysteme Nachziehen müssen
+    /// </summary>
+    Comand_RowAdded = 221,
 
     //	dummyComand_AddUndo = 222,
+
+    /// <summary>
+    /// Wenn im Arbeitsspeicher eine Spalte gelöscht werden soll, und echtzeitsysteme Nachziehen müssen
+    /// </summary>
     Comand_RemovingColumn = 223,
 
     //AddColumnKeyInfo = 224,
     //AddColumnNameInfo = 225,
+
+    /// <summary>
+    /// Wenn im Arbeitsspeicher eine Spalte erstellt wurde, und echtzeitsysteme Nachziehen müssen
+    /// </summary>
     Comand_ColumnAdded = 226,
 
     UndoCount = 249,

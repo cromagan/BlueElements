@@ -88,7 +88,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// </summary>
     private string _standardFormulaFile = string.Empty;
 
-    private string _timeCode = string.Empty;
+    //private string _timeCode = string.Empty;
     private int _undoCount;
 
     private string _zeilenQuickInfo = string.Empty;
@@ -344,13 +344,13 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         }
     }
 
-    public string TimeCode {
-        get => _timeCode;
-        set {
-            if (_timeCode == value) { return; }
-            ChangeData(DatabaseDataType.TimeCode, null, null, _timeCode, value);
-        }
-    }
+    //public string TimeCode {
+    //    get => _timeCode;
+    //    set {
+    //        if (_timeCode == value) { return; }
+    //        ChangeData(DatabaseDataType.TimeCode, null, null, _timeCode, value);
+    //    }
+    //}
 
     [Browsable(false)]
     public int UndoCount {
@@ -645,17 +645,17 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
         StoreValueToHardDisk(comand, column, row, changedTo);
 
-        if (comand != DatabaseDataType.TimeCode &&
-            comand != DatabaseDataType.ColumnTimeCode &&
-            LogUndo) {
-            AddUndo(TableName, comand, column, row, previousValue, changedTo, UserName);
-            var tc = DateTime.UtcNow.ToString(Constants.Format_Date);
-            ChangeData(DatabaseDataType.TimeCode, null, null, _timeCode, tc);
+        //if (comand != DatabaseDataType.TimeCode &&
+        //    comand != DatabaseDataType.ColumnTimeCode &&
+        //    LogUndo) {
+        AddUndo(TableName, comand, column, row, previousValue, changedTo, UserName);
+        //var tc = DateTime.UtcNow.ToString(Constants.Format_Date);
+        //ChangeData(DatabaseDataType.TimeCode, null, null, _timeCode, tc);
 
-            if (column != null) {
-                ChangeData(DatabaseDataType.ColumnTimeCode, column, null, column.TimeCode, tc);
-            }
-        }
+        //if (column != null) {
+        //    ChangeData(DatabaseDataType.ColumnTimeCode, column, null, column.TimeCode, tc);
+        //}
+        //}
 
         if (comand != DatabaseDataType.AutoExport) { SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
     }
@@ -676,7 +676,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         AdditionaFilesPfad = sourceDatabase.AdditionaFilesPfad;
         CachePfad = sourceDatabase.CachePfad; // Nicht so wichtig ;-)
         Caption = sourceDatabase.Caption;
-        TimeCode = sourceDatabase.TimeCode;
+        //TimeCode = sourceDatabase.TimeCode;
         CreateDate = sourceDatabase.CreateDate;
         Creator = sourceDatabase.Creator;
         //Filename - nope
@@ -1364,7 +1364,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         _createDate = DateTime.Now.ToString(Constants.Format_Date5);
         _undoCount = 300;
         _caption = string.Empty;
-        _timeCode = string.Empty;
+        //_timeCode = string.Empty;
         //_verwaisteDaten = VerwaisteDaten.Ignorieren;
         LoadedVersion = DatabaseVersion;
         _rulesScript = string.Empty;
@@ -1419,7 +1419,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// <summary>
     /// Die richtige Routine, wenn Werte auf den richtigen Speicherplatz geschrieben werden sollen.
     /// Nur von Laderoutinen aufzurufen, oder von ChangeData, wenn der Wert bereits fest in der Datenbank verankert ist.
-    /// Vorsicht beim überschreiben! Da in Columns und Cells abgesprungen wird, und diese nicht überschrieben werde können.
+    /// Vorsicht beim überschreiben! Da in Columns und Cells abgesprungen wird, und diese nicht überschrieben werden können.
     /// </summary>
     /// <param name="type"></param>
     /// <param name="value"></param>
@@ -1498,9 +1498,9 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                 _caption = value;
                 break;
 
-            case DatabaseDataType.TimeCode:
-                _timeCode = value;
-                break;
+            //case DatabaseDataType.TimeCode:
+            //    _timeCode = value;
+            //    break;
 
             case DatabaseDataType.GlobalScale:
                 _globalScale = DoubleParse(value);
@@ -1565,10 +1565,10 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                 // Muss eine übergeordnete Routine bei Befarf abfangen
                 break;
 
-            case DatabaseDataType.dummyComand_AddRow:
-                var addRowKey = LongParse(value);
-                if (Row.SearchByKey(addRowKey) == null) { Row.Add(new RowItem(this, addRowKey)); }
-                break;
+            //case DatabaseDataType.Comand_RowAdded:
+            //    var addRowKey = LongParse(value);
+            //    if (Row.SearchByKey(addRowKey) == null) { Row.Add(new RowItem(this, addRowKey)); }
+            //    break;
 
             //case DatabaseDataType.AddColumnKeyInfo: // TODO: Ummünzen auf AddColumnNameInfo
             //    var addColumnKey = LongParse(value);
@@ -1580,21 +1580,21 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             //    //if (Column.SearchByKey(addColumnKey) == null) { Column.AddFromParser(new ColumnItem(this, addColumnKey)); }
             //    break;
 
-            case DatabaseDataType.Comand_RemovingRow:
-                //var removeRowKey = LongParse(value);
-                //if (Row.SearchByKey(removeRowKey) != null) { Row.Remove(removeRowKey); }
-                break;
+            //case DatabaseDataType.Comand_RemovingRow:
+            //    //var removeRowKey = LongParse(value);
+            //    //if (Row.SearchByKey(removeRowKey) != null) { Row.Remove(removeRowKey); }
+            //    break;
 
-            case DatabaseDataType.Comand_RemovingColumn:
-                //var removeColumnKey = LongParse(value);
-                //if (Column.SearchByKey(removeColumnKey) is ColumnItem col) { Column.Remove(col); }
-                break;
+            //case DatabaseDataType.Comand_RemovingColumn:
+            //    //var removeColumnKey = LongParse(value);
+            //    //if (Column.SearchByKey(removeColumnKey) is ColumnItem col) { Column.Remove(col); }
+            //    break;
 
             case DatabaseDataType.EOF:
                 return string.Empty;
 
-            case DatabaseDataType.Comand_ColumnAdded:
-                break;
+            //case DatabaseDataType.Comand_ColumnAdded:
+            //    break;
 
             case (DatabaseDataType)22:
             case (DatabaseDataType)62:
@@ -1620,7 +1620,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     protected abstract string SpecialErrorReason(ErrorReason mode);
 
     /// <summary>
-    /// Für Echtzeitbasierte Systeme ist hier der richtige Zeitpunkt, den Wert fest auf Festplatte zu schreiben.
+    /// Für echtzeitbasierte Systeme ist hier der richtige Zeitpunkt, den Wert fest auf Festplatte zu schreiben.
     /// </summary>
     /// <param name="comand"></param>
     /// <param name="column"></param>
@@ -1848,9 +1848,9 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     }
 
     private void Row_RowAdded(object sender, RowEventArgs e) {
-        if (IsLoading) {
-            ChangeData(DatabaseDataType.dummyComand_AddRow, null, e.Row, String.Empty, e.Row.Key.ToString());
-        }
+        //if (IsLoading) {
+        ChangeData(DatabaseDataType.Comand_RowAdded, null, e.Row, String.Empty, e.Row.Key.ToString());
+        //}
     }
 
     private void Row_RowRemoving(object sender, RowEventArgs e) {

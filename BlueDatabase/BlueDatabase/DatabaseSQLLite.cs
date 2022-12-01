@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.SqlTypes;
 using System.Threading;
+using System.Windows.Input;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
@@ -52,11 +53,11 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     /// </summary>
     private static DateTime _timerTimeStamp = DateTime.UtcNow.AddMinutes(-5);
 
-    private bool _checkedAndReloadNeed;
-
-    private DateTime _lastCheck = DateTime.Now;
-
     #endregion
+
+    //private bool _checkedAndReloadNeed;
+
+    //private DateTime _lastCheck = DateTime.Now;
 
     #region Constructors
 
@@ -68,7 +69,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         Develop.StartService();
 
         Initialize();
-        _checkedAndReloadNeed = true;
+        //_checkedAndReloadNeed = true;
 
         if (sql != null) {
             //DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + tablename.FileNameWithoutSuffix()));
@@ -95,35 +96,39 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     public override bool IsLoading { get; protected set; }
 
-    public override bool ReloadNeeded {
-        get {
-            if (string.IsNullOrEmpty(TableName)) { return false; }
-            if (_checkedAndReloadNeed) { return true; }
-            _lastCheck = DateTime.Now;
+    public override bool ReloadNeeded => false;
 
-            if (_sql.GetStyleData(TableName, DatabaseDataType.TimeCode.ToString(), string.Empty) != TimeCode) {
-                _checkedAndReloadNeed = true;
-                return true;
-            }
-
-            return false;
-        }
-    }
-
-    public override bool ReloadNeededSoft {
-        get {
-            if (string.IsNullOrEmpty(TableName)) { return false; }
-            if (_checkedAndReloadNeed) { return true; }
-
-            if (DateTime.Now.Subtract(_lastCheck).TotalSeconds > 20) {
-                return ReloadNeeded;
-            }
-
-            return false;
-        }
-    }
+    public override bool ReloadNeededSoft => false;
 
     #endregion
+
+    //public override bool ReloadNeeded {
+    //    get {
+    //        if (string.IsNullOrEmpty(TableName)) { return false; }
+    //        if (_checkedAndReloadNeed) { return true; }
+    //        _lastCheck = DateTime.Now;
+
+    //        if (_sql.GetStyleData(TableName, DatabaseDataType.TimeCode.ToString(), string.Empty) != TimeCode) {
+    //            _checkedAndReloadNeed = true;
+    //            return true;
+    //        }
+
+    //        return false;
+    //    }
+    //}
+
+    //public override bool ReloadNeededSoft {
+    //    get {
+    //        if (string.IsNullOrEmpty(TableName)) { return false; }
+    //        if (_checkedAndReloadNeed) { return true; }
+
+    //        if (DateTime.Now.Subtract(_lastCheck).TotalSeconds > 20) {
+    //            return ReloadNeeded;
+    //        }
+
+    //        return false;
+    //    }
+    //}
 
     #region Methods
 
@@ -174,19 +179,22 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     public override void RefreshColumnsData(List<ColumnItem>? columns) {
         if (columns == null || columns.Count == 0) { return; }
-        //if(!ReloadNeeded) { return; }
+        if (IsLoading) { Develop.DebugPrint("Loading bereits True!"); }
+        IsLoading = true;
 
         _sql.OpenConnection();
         var l = new ListExt<ColumnItem>();
 
         foreach (var thisc in columns) {
-            if (string.IsNullOrEmpty(thisc.TimeCode) || _sql.GetStyleData(TableName, DatabaseDataType.ColumnTimeCode.ToString(), thisc.Name) != thisc.TimeCode) {
+            if (!thisc.Loaded) {
                 l.AddIfNotExists(thisc);
             }
         }
 
         _sql.LoadColumns(TableName, l);
         _sql.CloseConnection();
+
+        IsLoading = false;
     }
 
     public override bool RefreshRowData(List<RowItem> rows, bool refreshAlways) {
@@ -204,9 +212,12 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
         if (l.Count == 0) { return false; }
 
+        if (IsLoading) { Develop.DebugPrint("Loading bereits True!"); }
+        IsLoading = true;
         _sql.OpenConnection();
         _sql.LoadRow(TableName, l);
         _sql.CloseConnection();
+        IsLoading = false;
         return true;
     }
 
@@ -265,10 +276,10 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
                     var db = LoadedDatabasesWithThisSQL(thisDBSqlLite._sql);
                     done.AddRange(db);
 
-                    var erg = thisDBSqlLite._sql.GetRowData(db, _timerTimeStamp.AddSeconds(-2), fd);
+                    var erg = thisDBSqlLite._sql.GetLastChanges(db, _timerTimeStamp.AddSeconds(-2), fd);
 
                     foreach (var thisdb in db) {
-                        thisdb.RefreshRows(erg);
+                        thisdb.DoLastChanges(erg);
                     }
                 }
             }
@@ -291,6 +302,33 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         return oo;
     }
 
+    private void DoLastChanges(List<(string tablename, string comand, string columnname, string rowid)>? data) {
+        if (data == null) { return; }
+
+        var rk = new List<long>();
+
+        foreach (var thisData in data) {
+            if (TableName == thisData.tablename) {
+                Enum.TryParse(thisData.comand, out DatabaseDataType t);
+                if (t != (DatabaseDataType)0) {
+                    if (t.IsCommand()) {
+                    } else if (!string.IsNullOrEmpty(thisData.rowid)) {
+                        rk.AddIfNotExists(LongParse(thisData.rowid));
+                    } else if (t.IsDatabaseTag()) {
+                        var v = _sql.GetStyleData(thisData.tablename, thisData.comand, "~DATABASE~");
+                        SetValueInternal(t, v, null, null, -1, -1);
+                    } else if (t.IsColumnTag()) {
+                        var v = _sql.GetStyleData(thisData.tablename, thisData.comand, thisData.columnname);
+                        var c = Column[thisData.columnname];
+                        SetValueInternal(t, v, c, null, -1, -1);
+                    }
+                }
+            }
+        }
+
+        RefreshRowData(rk, true);
+    }
+
     private void GenerateTimer() {
         if (_timer != null) { return; }
         _timerTimeStamp = DateTime.UtcNow.AddMinutes(-5);
@@ -302,6 +340,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         var onlyReload = false;
 
         OnLoading(this, new BlueBasics.EventArgs.LoadingEventArgs(onlyReload));
+        if (IsLoading) { Develop.DebugPrint("Loading bereits True!"); }
         IsLoading = true;
         Column.ThrowEvents = false;
         Row.ThrowEvents = false;
@@ -362,7 +401,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         _sql.LoadAllRows(TableName, Row);
 
         foreach (var thisColumn in Column) {
-            thisColumn._timecode = string.Empty;
+            thisColumn.Loaded = false;// string.Empty;
         }
 
         #endregion
@@ -372,33 +411,12 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         Row.RemoveNullOrEmpty();
         Cell.RemoveOrphans();
 
-        _checkedAndReloadNeed = false;
+        //_checkedAndReloadNeed = false;
         Column.ThrowEvents = true;
         Row.ThrowEvents = true;
         IsLoading = false;
         OnLoaded(this, new BlueBasics.EventArgs.LoadedEventArgs(onlyReload));
         //RepairAfterParse();
-    }
-
-    private void RefreshRows(List<(string tablename, string comand, string columnname, string rowid)>? data) {
-        if (data == null) { return; }
-
-        var rk = new List<long>();
-
-        foreach (var thisData in data) {
-            if (TableName == thisData.tablename) {
-                if (!string.IsNullOrEmpty(thisData.rowid)) {
-                    rk.AddIfNotExists(LongParse(thisData.rowid));
-                }
-
-                //Enum.TryParse(thisData.comand, out DatabaseDataType t);
-                //if (t != (DatabaseDataType)0) {
-                //    column.SetValueInternal(t, thisstyle.Value);
-                //}
-            }
-        }
-
-        RefreshRowData(rk, true);
     }
 
     #endregion

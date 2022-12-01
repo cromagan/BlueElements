@@ -167,7 +167,7 @@ public sealed partial class DatabaseHeadEditor {
                     symb = ImageCode.Layout;
                     break;
 
-                case DatabaseDataType.dummyComand_AddRow:
+                case DatabaseDataType.Comand_RowAdded:
                     aenderung = "Neue Zeile";
                     symb = ImageCode.PlusZeichen;
                     break;
@@ -257,12 +257,12 @@ public sealed partial class DatabaseHeadEditor {
     private void GenerateUndoTabelle() {
         Database x = new(false, "Undo " + _database.ConnectionData.TableName);
         x.Column.Add("hidden", "hidden", VarType.Text);
-        x.Column.Add("Index", "Index", VarType.Integer);
+        x.Column.Add("Index", "Index", VarType.IntegerPositive);
         x.Column.Add("db", "Herkunft", VarType.Text);
-        x.Column.Add("ColumnKey", "Spalten-<br>Schlüssel", VarType.Integer);
+        x.Column.Add("ColumnKey", "Spalten-<br>Schlüssel", VarType.IntegerPositive);
         x.Column.Add("ColumnName", "Spalten-<br>Name", VarType.Text);
         x.Column.Add("ColumnCaption", "Spalten-<br>Beschriftung", VarType.Text);
-        x.Column.Add("RowKey", "Zeilen-<br>Schlüssel", VarType.Integer);
+        x.Column.Add("RowKey", "Zeilen-<br>Schlüssel", VarType.IntegerPositive);
         x.Column.Add("RowFirst", "Zeile, Wert der<br>1. Spalte", VarType.Text);
         x.Column.Add("Aenderzeit", "Änder-<br>Zeit", VarType.Text);
         x.Column.Add("Aenderer", "Änderer", VarType.Text);

@@ -394,7 +394,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
             var cellKey = KeyOfCell(column, row);
 
-            if (string.IsNullOrEmpty(column.TimeCode)) {
+            if (!column.Loaded) {
                 _database.RefreshRowData(row, false);
             }
 
@@ -716,7 +716,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             var tc = DateTime.Now.ToString(Constants.Format_Date);
             SystemSet(_database?.Column.SysRowChanger, row, _database?.UserName);
             SystemSet(_database?.Column.SysRowChangeDate, row, tc);
-            column.TimeCode = tc;
+            //column.TimeCode = tc;
         }
 
         Invalidate_CellContentSize(column, row);

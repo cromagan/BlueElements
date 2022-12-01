@@ -45,19 +45,14 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     private readonly ExtText _eTxt;
     private string _allowedChars = string.Empty;
-
     private int _cursorCharPos = -1;
-
     private bool _cursorVisible;
     private bool _formatierungErlaubt;
     private string _lastCheckedText = string.Empty;
-
     private DateTime _lastUserActionForSpellChecking = DateTime.Now;
-
     private int _markEnd = -1;
-
     private int _markStart = -1;
-
+    private int _maxTextLenght = 4000;
     private int _mouseValue;
 
     private bool _multiline;
@@ -129,6 +124,16 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         set {
             if (value == FormatierungErlaubt) { return; }
             _formatierungErlaubt = value;
+            GenerateEtxt(false);
+        }
+    }
+
+    [DefaultValue(4000)]
+    public int MaxTextLenght {
+        get => _maxTextLenght;
+        set {
+            if (value == _maxTextLenght) { return; }
+            _maxTextLenght = value;
             GenerateEtxt(false);
         }
     }

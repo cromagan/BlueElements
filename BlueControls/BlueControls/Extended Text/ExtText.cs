@@ -73,6 +73,7 @@ public sealed class ExtText : ListExt<ExtChar> {
     /// </summary>
     public Point DrawingPos;
 
+    public int MaxTextLenght;
     public bool Multiline;
     private readonly RowItem? _row;
     private Design _design;
@@ -94,6 +95,7 @@ public sealed class ExtText : ListExt<ExtChar> {
         _row = null;
         DrawingPos = new Point(0, 0);
         Ausrichtung = Alignment.Top_Left;
+        MaxTextLenght = 4000;
         Multiline = true;
         AllowedChars = string.Empty;
         DrawingArea = new Rectangle(0, 0, -1, -1);

@@ -39,8 +39,11 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
     #region Fields
 
-    public string _timecode;
+    public bool Loaded = false;
+
+    //public string _timecode;
     public bool? TmpAutoFilterSinnvoll = null;
+
     public QuickImage? TmpCaptionBitmapCode;
     public SizeF TmpCaptionTextSize = new(-1, -1);
     public int? TmpIfFilterRemoved = null;
@@ -74,7 +77,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     private TranslationType _doOpticalTranslation;
     private bool _dropdownAllesAbwählenErlaubt;
     private bool _dropdownBearbeitungErlaubt;
-
     private bool _dropdownWerteAndererZellenAnzeigen;
     private bool _editAllowedDespiteLock;
     private FilterOptions _filterOptions;
@@ -82,10 +84,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     private DataFormat _format;
     private bool _formatierungErlaubt;
     private bool _ignoreAtRowFilter;
-
     private long _key = -1;
     private long _keyColumnKey;
-
     private ColumnLineStyle _lineLeft;
     private ColumnLineStyle _lineRight;
 
@@ -95,7 +95,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     private long _linkedCell_ColumnKeyOfLinkedDatabase;
 
     private string _linkedDatabaseFile;
-
+    private int _maxTextLenght;
     private bool _multiLine;
     private string _name;
     private string _prefix;
@@ -157,7 +157,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         _keyColumnKey = -1;
         _allowedChars = string.Empty;
         _adminInfo = string.Empty;
-        _timecode = string.Empty;
+        _maxTextLenght = 4000;
         _contentwidth = -1;
         _captionBitmapCode = string.Empty;
         _filterOptions = FilterOptions.Enabled | FilterOptions.TextFilterEnabled | FilterOptions.ExtendedFilterEnabled;
@@ -612,6 +612,15 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         }
     }
 
+    public int MaxTextLenght {
+        get => _maxTextLenght;
+        set {
+            if (_maxTextLenght == value) { return; }
+            Database?.ChangeData(DatabaseDataType.MaxTextLenght, this, null, _maxTextLenght.ToString(), value.ToString());
+            OnChanged();
+        }
+    }
+
     public bool MultiLine {
         get => _multiLine;
         set {
@@ -774,15 +783,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         set {
             if (_textBearbeitungErlaubt == value) { return; }
             Database?.ChangeData(DatabaseDataType.EditableWithTextInput, this, null, _textBearbeitungErlaubt.ToPlusMinus(), value.ToPlusMinus());
-            OnChanged();
-        }
-    }
-
-    public string TimeCode {
-        get => _timecode;
-        set {
-            if (_timecode == value) { return; }
-            Database?.ChangeData(DatabaseDataType.ColumnTimeCode, this, null, _timecode, value);
             OnChanged();
         }
     }
@@ -956,7 +956,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         PermissionGroupsChangeCell = source.PermissionGroupsChangeCell;
         Tags = source.Tags;
         AdminInfo = source.AdminInfo;
-        TimeCode = source.TimeCode;
+        //TimeCode = source.TimeCode;
         ContentWidth = source.ContentWidth;
         FilterOptions = source.FilterOptions;
         IgnoreAtRowFilter = source.IgnoreAtRowFilter;
@@ -2265,6 +2265,10 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 _allowedChars = newvalue;
                 break;
 
+            case DatabaseDataType.MaxTextLenght:
+                _maxTextLenght = IntParse(newvalue);
+                break;
+
             case DatabaseDataType.FilterOptions:
                 _filterOptions = (FilterOptions)IntParse(newvalue);
                 break;
@@ -2329,9 +2333,9 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 _adminInfo = newvalue;
                 break;
 
-            case DatabaseDataType.ColumnTimeCode:
-                _timecode = newvalue;
-                break;
+            //case DatabaseDataType.ColumnTimeCode:
+            //    _timecode = newvalue;
+            //    break;
 
             case DatabaseDataType.ColumnContentWidth:
                 _contentwidth = IntParse(newvalue);

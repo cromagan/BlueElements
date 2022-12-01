@@ -71,6 +71,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private bool _formatierungErlaubt;
     private Caption? _infoCaption;
     private string _infoText = string.Empty;
+    private int _maxTextLenght = 4000;
     private bool _multiLine;
     private bool _pauseValueChanged;
     private string _regex = string.Empty;
@@ -112,7 +113,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     public event EventHandler NeedRefresh;
 
     [Obsolete("Value Changed benutzen", true)]
-    // ReSharper disable once UnusedMember.Global
     public new event EventHandler TextChanged;
 
     public event EventHandler ValueChanged;
@@ -237,6 +237,16 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (_infoText == value) { return; }
             _infoText = value;
             Invalidate();
+        }
+    }
+
+    [DefaultValue(4000)]
+    public int MaxTextLenght {
+        get => _maxTextLenght;
+        set {
+            if (_maxTextLenght == value) { return; }
+            _maxTextLenght = value;
+            UpdateControls();
         }
     }
 

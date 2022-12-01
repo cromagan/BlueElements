@@ -75,35 +75,36 @@ public sealed class DatabaseSQL : DatabaseAbstract {
 
     public override bool IsLoading { get; protected set; }
 
-    public override bool ReloadNeeded {
-        get {
-            if (string.IsNullOrEmpty(TableName)) { return false; }
-            if (_checkedAndReloadNeed) { return true; }
-            _lastCheck = DateTime.Now;
+    public override bool ReloadNeeded => false;
+    //get {
+    //    if (string.IsNullOrEmpty(TableName)) { return false; }
+    //    if (_checkedAndReloadNeed) { return true; }
+    //    _lastCheck = DateTime.Now;
 
-            if (_sql.GetStyleData(TableName, DatabaseDataType.TimeCode.ToString(), string.Empty) != TimeCode) {
-                _checkedAndReloadNeed = true;
-                return true;
-            }
+    //    if (_sql.GetStyleData(TableName, DatabaseDataType.TimeCode.ToString(), string.Empty) != TimeCode) {
+    //        _checkedAndReloadNeed = true;
+    //        return true;
+    //    }
 
-            return false;
-        }
-    }
+    //    return false;
+    //}
+    //}
 
-    public override bool ReloadNeededSoft {
-        get {
-            if (string.IsNullOrEmpty(TableName)) { return false; }
-            if (_checkedAndReloadNeed) { return true; }
-
-            if (DateTime.Now.Subtract(_lastCheck).TotalSeconds > 20) {
-                return ReloadNeeded;
-            }
-
-            return false;
-        }
-    }
+    public override bool ReloadNeededSoft => false;
 
     #endregion
+
+    //    get {
+    //        if (string.IsNullOrEmpty(TableName)) { return false; }
+    //        if (_checkedAndReloadNeed) { return true; }
+
+    //        if (DateTime.Now.Subtract(_lastCheck).TotalSeconds > 20) {
+    //            return ReloadNeeded;
+    //        }
+
+    //        return false;
+    //    }
+    //}
 
     #region Methods
 
@@ -199,6 +200,9 @@ public sealed class DatabaseSQL : DatabaseAbstract {
         var onlyReload = false;
 
         OnLoading(this, new BlueBasics.EventArgs.LoadingEventArgs(onlyReload));
+
+        if (IsLoading) { Develop.DebugPrint("Loading bereits True!"); }
+
         IsLoading = true;
         Column.ThrowEvents = false;
         Row.ThrowEvents = false;

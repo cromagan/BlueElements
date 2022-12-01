@@ -38,6 +38,7 @@ public interface IInputFormat {
     //public BildTextVerhalten BildTextVerhalten { get; set; }
     public bool FormatierungErlaubt { get; set; }
 
+    public int MaxTextLenght { get; set; }
     public bool MultiLine { get; set; }
     public string Prefix { get; set; }
     public string Regex { get; set; }
@@ -57,7 +58,7 @@ public static class IInputFormatExtensions {
     #region Methods
 
     /// <summary>
-    /// Setzt: AllowedChars, Regex, Präfix, Suffix, FormatierungErlaubt, AdditionlCheck, SpellChecking und Multiline
+    /// Setzt: AllowedChars, Regex, Präfix, Suffix, FormatierungErlaubt, AdditionlCheck, SpellChecking, MaxTextLenght und Multiline
     /// </summary>
     /// <param name="t"></param>
     /// <param name="source"></param>
@@ -68,11 +69,12 @@ public static class IInputFormatExtensions {
         t.Regex = source.Regex;
         t.Suffix = source.Suffix;
         t.MultiLine = source.MultiLine;
+        t.MaxTextLenght = source.MaxTextLenght;
         t.SpellCheckingEnabled = source.SpellCheckingEnabled;
         t.FormatierungErlaubt = source.FormatierungErlaubt;
     }
 
-    public static bool IsFormat(this string txt, IInputFormat? formatToCheck) {
+    public static bool IsFormat(this string txt, IInputFormat formatToCheck) {
         var l = new List<string>();
 
         if (formatToCheck.MultiLine) {
@@ -80,6 +82,8 @@ public static class IInputFormatExtensions {
         } else {
             l.Add(txt);
         }
+
+        if (txt.Length > formatToCheck.MaxTextLenght) { return false; }
 
         foreach (var thisString in l.Where(thisString => !string.IsNullOrEmpty(thisString))) {
             if (!string.IsNullOrEmpty(formatToCheck.AllowedChars) && !thisString.ContainsOnlyChars(formatToCheck.AllowedChars)) { return false; }
@@ -117,10 +121,11 @@ public static class IInputFormatExtensions {
         t.Suffix == source.Suffix &&
         t.MultiLine == source.MultiLine &&
         t.SpellCheckingEnabled == source.SpellCheckingEnabled &&
-        t.FormatierungErlaubt == source.FormatierungErlaubt;
+        t.FormatierungErlaubt == source.FormatierungErlaubt &&
+        t.MaxTextLenght == source.MaxTextLenght;
 
     /// <summary>
-    /// Setzt: AllowedChars, Regex, Präfix, Suffix, FormatierungErlaubt, AdditionlCheck, SpellChecking und Multiline
+    /// Setzt: AllowedChars, Regex, Präfix, Suffix, FormatierungErlaubt, AdditionlCheck, SpellChecking, MaxTextLenght und Multiline
     /// </summary>
     /// <param name="t"></param>
     /// <param name="type"></param>
@@ -135,6 +140,7 @@ public static class IInputFormatExtensions {
                 t.AdditionalFormatCheck = AdditionalCheck.None;
                 t.SpellCheckingEnabled = true;
                 t.MultiLine = false;
+                t.MaxTextLenght = 4000;
                 return;
 
             case VarType.Bit:
@@ -146,6 +152,7 @@ public static class IInputFormatExtensions {
                 t.AdditionalFormatCheck = AdditionalCheck.None;
                 t.SpellCheckingEnabled = false;
                 t.MultiLine = false;
+                t.MaxTextLenght = 1;
                 return;
 
             case VarType.TextMitFormatierung:
@@ -157,6 +164,7 @@ public static class IInputFormatExtensions {
                 t.AdditionalFormatCheck = AdditionalCheck.None;
                 t.SpellCheckingEnabled = true;
                 t.MultiLine = true;
+                t.MaxTextLenght = 4000;
                 return;
 
             case VarType.Date:
@@ -168,6 +176,7 @@ public static class IInputFormatExtensions {
                 t.AdditionalFormatCheck = AdditionalCheck.DateTime;
                 t.SpellCheckingEnabled = false;
                 t.MultiLine = false;
+                t.MaxTextLenght = 10;
                 return;
 
             case VarType.Url:
@@ -180,6 +189,7 @@ public static class IInputFormatExtensions {
                 t.AdditionalFormatCheck = AdditionalCheck.None;
                 t.SpellCheckingEnabled = false;
                 t.MultiLine = false;
+                t.MaxTextLenght = 4000;
                 return;
 
             case VarType.Email:
@@ -192,29 +202,57 @@ public static class IInputFormatExtensions {
                 t.AdditionalFormatCheck = AdditionalCheck.None;
                 t.SpellCheckingEnabled = false;
                 t.MultiLine = false;
+                t.MaxTextLenght = 4000;
                 return;
 
             case VarType.Float:
                 //https://regex101.com/r/onr0NZ/1
                 t.Regex = @"(^-?([1-9]\d*)|^0)([.|,]\d*[1-9])?$";
-                t.AllowedChars = Constants.Char_Numerals + ",";
+                t.AllowedChars = Constants.Char_Numerals + ",-";
                 t.Suffix = string.Empty;
                 t.Prefix = string.Empty;
                 t.FormatierungErlaubt = false;
                 t.AdditionalFormatCheck = AdditionalCheck.Float;
                 t.SpellCheckingEnabled = false;
                 t.MultiLine = false;
+                t.MaxTextLenght = 255;
+                return;
+
+            case VarType.FloatPositive:
+                //https://regex101.com/r/onr0NZ/1
+                t.Regex = @"(^([1-9]\d*)|^0)([.|,]\d*[1-9])?$";
+                t.AllowedChars = Constants.Char_Numerals + ",-";
+                t.Suffix = string.Empty;
+                t.Prefix = string.Empty;
+                t.FormatierungErlaubt = false;
+                t.AdditionalFormatCheck = AdditionalCheck.Float;
+                t.SpellCheckingEnabled = false;
+                t.MultiLine = false;
+                t.MaxTextLenght = 255;
                 return;
 
             case VarType.Integer:
                 t.Regex = @"^((-?[1-9]\d*)|0)$";
-                t.AllowedChars = Constants.Char_Numerals;
+                t.AllowedChars = Constants.Char_Numerals + "-";
                 t.Suffix = string.Empty;
                 t.Prefix = string.Empty;
                 t.FormatierungErlaubt = false;
                 t.AdditionalFormatCheck = AdditionalCheck.Integer;
                 t.SpellCheckingEnabled = false;
                 t.MultiLine = false;
+                t.MaxTextLenght = 255;
+                return;
+
+            case VarType.IntegerPositive:
+                t.Regex = @"^(([1-9]\d*)|0)$";
+                t.AllowedChars = Constants.Char_Numerals + "-";
+                t.Suffix = string.Empty;
+                t.Prefix = string.Empty;
+                t.FormatierungErlaubt = false;
+                t.AdditionalFormatCheck = AdditionalCheck.Integer;
+                t.SpellCheckingEnabled = false;
+                t.MultiLine = false;
+                t.MaxTextLenght = 255;
                 return;
 
             case VarType.PhoneNumber:
@@ -227,6 +265,7 @@ public static class IInputFormatExtensions {
                 t.AdditionalFormatCheck = AdditionalCheck.None;
                 t.SpellCheckingEnabled = false;
                 t.MultiLine = false;
+                t.MaxTextLenght = 255;
                 return;
 
             case VarType.DateTime:
@@ -238,6 +277,7 @@ public static class IInputFormatExtensions {
                 t.AdditionalFormatCheck = AdditionalCheck.DateTime;
                 t.SpellCheckingEnabled = false;
                 t.MultiLine = false;
+                t.MaxTextLenght = 20;
                 return;
 
             default:
