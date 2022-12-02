@@ -238,7 +238,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         e.UserMenu.Add(ContextMenuComands.Umbenennen, FileExists(it.Internal));
         e.UserMenu.Add(ContextMenuComands.Löschen, FileExists(it.Internal));
         e.UserMenu.AddSeparator();
-        //e.UserMenu.Add("Screenshot als Vorschau", "Screenshot", QuickImage.Get(ImageCode.Bild), FileExists(it.Internal));
+        //e.UserMenu.GenerateAndAdd("Screenshot als Vorschau", "Screenshot", QuickImage.Get(ImageCode.Bild), FileExists(it.Internal));
         //e.UserMenu.AddSeparator();
 
         e.UserMenu.Add("Im Explorer öffnen", "Explorer", QuickImage.Get(ImageCode.Ordner));
@@ -254,7 +254,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
                 var I = new FileInfo(it.Internal);
                 //var attribute = I.Attributes;
 
-                var silent = !I.Attributes.HasFlag( FileAttributes.ReadOnly);
+                var silent = !I.Attributes.HasFlag(FileAttributes.ReadOnly);
 
                 if (FileDialogs.DeleteFile(I.FullName, !silent)) {
                     //FileDialogs.DeleteFile(ThumbFile(I.FullName), false);
@@ -512,16 +512,16 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
 
                 //            if (thumbnail != null) {
                 //                thumbnail.Save(th, ImageFormat.Png);
-                //                feedBack.Add(thumbnail);
+                //                feedBack.GenerateAndAdd(thumbnail);
                 //            }
                 //        } else {
-                //            feedBack.Add(Image_FromFile(th));
+                //            feedBack.GenerateAndAdd(Image_FromFile(th));
                 //        }
                 //    }
 
                 //    if (feedBack.Count == 1) {
                 //        // Verschlüsselte Dateinamen....schwierig ein echtes Bild zu kriegen...
-                //        feedBack.Add(QuickImage.Get(rEadable.FileType(), 64));
+                //        feedBack.GenerateAndAdd(QuickImage.Get(rEadable.FileType(), 64));
                 //    }
                 //}
 

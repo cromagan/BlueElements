@@ -748,9 +748,9 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
             //    foreach (var file in tmp) {
             //        var tmpF = _tmpColumn.BestFile(file, false);
             //        if (FileExists(tmpF)) {
-            //            tmp2.Add(tmpF);
+            //            tmp2.GenerateAndAdd(tmpF);
             //        } else {
-            //            tmp2.Add(file);
+            //            tmp2.GenerateAndAdd(file);
             //        }
             //    }
             //    ValueSet(tmp2.JoinWithCr(), true, true);

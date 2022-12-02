@@ -56,7 +56,7 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
         foreach (var thisv in variables) {
             var ro = RowOfVariable(thisv);
             if (ro == null) {
-                ro = tableVariablen.Database.Row.Add(thisv.Name);
+                ro = tableVariablen.Database.Row.GenerateAndAdd(thisv.Name);
             }
 
             ro.CellSet("typ", thisv.ShortName);
@@ -77,12 +77,12 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
 
     private void GenerateVariableTable() {
         Database x = new(false, "Script_Variablen");
-        x.Column.Add("Name", "N", VarType.Text, "Variablenname");
-        x.Column.Add("Typ", "T", VarType.Text, "Variablentyp");
-        x.Column.Add("RO", "R", VarType.Bit, "Readonly, Schreibgeschützt");
-        x.Column.Add("System", "S", VarType.Bit, "Systemspalte\r\nIm Script nicht verfügbar");
-        x.Column.Add("Inhalt", "I", VarType.Text, "Inhalt (gekürzte Ansicht)");
-        x.Column.Add("Kommentar", "K", VarType.Text, "Komentar");
+        x.Column.GenerateAndAdd("Name", "N", VarType.Text, "Variablenname");
+        x.Column.GenerateAndAdd("Typ", "T", VarType.Text, "Variablentyp");
+        x.Column.GenerateAndAdd("RO", "R", VarType.Bit, "Readonly, Schreibgeschützt");
+        x.Column.GenerateAndAdd("System", "S", VarType.Bit, "Systemspalte\r\nIm Script nicht verfügbar");
+        x.Column.GenerateAndAdd("Inhalt", "I", VarType.Text, "Inhalt (gekürzte Ansicht)");
+        x.Column.GenerateAndAdd("Kommentar", "K", VarType.Text, "Komentar");
 
         foreach (var thisColumn in x.Column.Where(thisColumn => !thisColumn.IsSystemColumn())) {
             thisColumn.MultiLine = true;

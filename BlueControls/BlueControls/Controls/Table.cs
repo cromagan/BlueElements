@@ -434,8 +434,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         x.Dispose();
     }
 
-    //        newFiles.Add(neu);
-    //        delList.Add(thisf);
+    //        newFiles.GenerateAndAdd(neu);
+    //        delList.GenerateAndAdd(thisf);
     //    }
     public static void SearchNextText(string searchTxt, Table tableView, ColumnItem? column, RowData? row, out ColumnItem? foundColumn, out RowData? foundRow, bool vereinfachteSuche) {
         searchTxt = searchTxt.Trim();
@@ -1778,7 +1778,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (row == null) {
                 var f = CellCollection.ErrorReason(column.Database.Column[0], null, ErrorReason.EditGeneral);
                 if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
-                row = column.Database.Row.Add(newValue);
+                row = column.Database.Row.GenerateAndAdd(newValue);
                 if (table.Database == column.Database) {
                     var l = table.FilteredRows();
                     if (row != null && !l.Contains(row)) {

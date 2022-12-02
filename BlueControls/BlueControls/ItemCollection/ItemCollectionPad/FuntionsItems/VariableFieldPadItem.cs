@@ -116,7 +116,7 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
         l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
         //var b = new ItemCollection.ItemCollectionList.ItemCollectionList();
         //b.AddRange(typeof(EditTypeFormula));
-        //l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
+        //l.GenerateAndAdd(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
         l.Add(new FlexiControl());
 
         return l;

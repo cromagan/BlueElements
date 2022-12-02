@@ -126,7 +126,7 @@ public sealed partial class DatabaseHeadEditor {
 
             var cd = work.CellKey.SplitAndCutBy("|");
             _database.Cell.DataOfCellKey(work.CellKey, out var col, out var row);
-            var r = tblUndo.Database.Row.Add(work.ToString());
+            var r = tblUndo.Database.Row.GenerateAndAdd(work.ToString());
             r.CellSet("ColumnKey", cd[0]);
             r.CellSet("RowKey", cd[1]);
             r.CellSet("index", index);
@@ -167,7 +167,7 @@ public sealed partial class DatabaseHeadEditor {
                     symb = ImageCode.Layout;
                     break;
 
-                case DatabaseDataType.Comand_RowAdded:
+                case DatabaseDataType.Comand_AddRow:
                     aenderung = "Neue Zeile";
                     symb = ImageCode.PlusZeichen;
                     break;
@@ -187,7 +187,7 @@ public sealed partial class DatabaseHeadEditor {
                     neu = "";
                     break;
 
-                case DatabaseDataType.Comand_RemovingRow:
+                case DatabaseDataType.Comand_RemoveRow:
                     aenderung = "Zeile gelöscht";
                     symb = ImageCode.MinusZeichen;
                     break;
@@ -256,20 +256,20 @@ public sealed partial class DatabaseHeadEditor {
 
     private void GenerateUndoTabelle() {
         Database x = new(false, "Undo " + _database.ConnectionData.TableName);
-        x.Column.Add("hidden", "hidden", VarType.Text);
-        x.Column.Add("Index", "Index", VarType.IntegerPositive);
-        x.Column.Add("db", "Herkunft", VarType.Text);
-        x.Column.Add("ColumnKey", "Spalten-<br>Schlüssel", VarType.IntegerPositive);
-        x.Column.Add("ColumnName", "Spalten-<br>Name", VarType.Text);
-        x.Column.Add("ColumnCaption", "Spalten-<br>Beschriftung", VarType.Text);
-        x.Column.Add("RowKey", "Zeilen-<br>Schlüssel", VarType.IntegerPositive);
-        x.Column.Add("RowFirst", "Zeile, Wert der<br>1. Spalte", VarType.Text);
-        x.Column.Add("Aenderzeit", "Änder-<br>Zeit", VarType.Text);
-        x.Column.Add("Aenderer", "Änderer", VarType.Text);
-        x.Column.Add("Symbol", "Symbol", VarType.Text);
-        x.Column.Add("Aenderung", "Änderung", VarType.Text);
-        x.Column.Add("WertAlt", "Wert alt", VarType.Text);
-        x.Column.Add("WertNeu", "Wert neu", VarType.Text);
+        x.Column.GenerateAndAdd("hidden", "hidden", VarType.Text);
+        x.Column.GenerateAndAdd("Index", "Index", VarType.IntegerPositive);
+        x.Column.GenerateAndAdd("db", "Herkunft", VarType.Text);
+        x.Column.GenerateAndAdd("ColumnKey", "Spalten-<br>Schlüssel", VarType.IntegerPositive);
+        x.Column.GenerateAndAdd("ColumnName", "Spalten-<br>Name", VarType.Text);
+        x.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", VarType.Text);
+        x.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", VarType.IntegerPositive);
+        x.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", VarType.Text);
+        x.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", VarType.Text);
+        x.Column.GenerateAndAdd("Aenderer", "Änderer", VarType.Text);
+        x.Column.GenerateAndAdd("Symbol", "Symbol", VarType.Text);
+        x.Column.GenerateAndAdd("Aenderung", "Änderung", VarType.Text);
+        x.Column.GenerateAndAdd("WertAlt", "Wert alt", VarType.Text);
+        x.Column.GenerateAndAdd("WertNeu", "Wert neu", VarType.Text);
         foreach (var thisColumn in x.Column.Where(thisColumn => !thisColumn.IsSystemColumn())) {
             thisColumn.MultiLine = true;
             thisColumn.TextBearbeitungErlaubt = false;

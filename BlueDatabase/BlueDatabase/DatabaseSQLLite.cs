@@ -53,11 +53,13 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     /// </summary>
     private static DateTime _timerTimeStamp = DateTime.UtcNow.AddMinutes(-5);
 
-    #endregion
-
     //private bool _checkedAndReloadNeed;
 
     //private DateTime _lastCheck = DateTime.Now;
+
+    private int _loadingCount = 0;
+
+    #endregion
 
     #region Constructors
 
@@ -93,8 +95,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     }
 
     public override string Filename => _sql.Filename;
-
-    public override bool IsLoading { get; protected set; }
+    public override bool IsLoading { get => _loadingCount > 0; }
 
     public override bool ReloadNeeded => false;
 
@@ -179,8 +180,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     public override void RefreshColumnsData(List<ColumnItem>? columns) {
         if (columns == null || columns.Count == 0) { return; }
-        if (IsLoading) { Develop.DebugPrint("Loading bereits True!"); }
-        IsLoading = true;
+        _loadingCount++;
 
         _sql.OpenConnection();
         var l = new ListExt<ColumnItem>();
@@ -194,7 +194,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         _sql.LoadColumns(TableName, l);
         _sql.CloseConnection();
 
-        IsLoading = false;
+        _loadingCount--;
     }
 
     public override bool RefreshRowData(List<RowItem> rows, bool refreshAlways) {
@@ -203,21 +203,20 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         var l = new ListExt<RowItem>();
 
         foreach (var thisr in rows) {
-            var cellKey = CellCollection.KeyOfCell(Column.SysRowChangeDate, thisr);
-
-            if (refreshAlways || !Cell.ContainsKey(cellKey)) {
+            if (refreshAlways || !thisr.RowInChache()) {
                 l.AddIfNotExists(thisr);
             }
         }
 
         if (l.Count == 0) { return false; }
 
-        if (IsLoading) { Develop.DebugPrint("Loading bereits True!"); }
-        IsLoading = true;
+        //if (l.Count == 1) { Develop.DebugPrint(FehlerArt.Fehler, "Test"); return false; }
+
+        _loadingCount++;
         _sql.OpenConnection();
         _sql.LoadRow(TableName, l);
         _sql.CloseConnection();
-        IsLoading = false;
+        _loadingCount--;
         return true;
     }
 
@@ -253,12 +252,19 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     protected override void SetUserDidSomething() { }
 
-    protected override string SpecialErrorReason(ErrorReason mode) => string.Empty;
+    protected override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
+        var w = base.SetValueInternal(type, value, column, row, width, height);
 
-    protected override void StoreValueToHardDisk(DatabaseDataType type, ColumnItem? column, RowItem? row, string value) {
-        _sql?.CheckIn(TableName, type, value, column, row, -1, -1);
-        //return base.SetValueInternal(type, value, column, row, width, height);
+        if (!string.IsNullOrEmpty(w)) { return w; }
+        if (IsLoading) { return w; }
+
+        if (ReadOnly) { return "Schreibgeschützt!"; }
+
+        _sql?.SetValueInternal(TableName, type, value, column, row, -1, -1);
+        return w;
     }
+
+    protected override string SpecialErrorReason(ErrorReason mode) => string.Empty;
 
     private static void CheckSysUndo(object state) {
         if (DateTime.UtcNow.Subtract(_timerTimeStamp).TotalSeconds < 30) { return; }
@@ -277,6 +283,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
                     done.AddRange(db);
 
                     var erg = thisDBSqlLite._sql.GetLastChanges(db, _timerTimeStamp.AddSeconds(-2), fd);
+                    if (erg == null) { _isInTimer = false; return; } // Später ein neuer Versuch
 
                     foreach (var thisdb in db) {
                         thisdb.DoLastChanges(erg);
@@ -340,8 +347,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         var onlyReload = false;
 
         OnLoading(this, new BlueBasics.EventArgs.LoadingEventArgs(onlyReload));
-        if (IsLoading) { Develop.DebugPrint("Loading bereits True!"); }
-        IsLoading = true;
+        _loadingCount++;
         Column.ThrowEvents = false;
         Row.ThrowEvents = false;
 
@@ -368,12 +374,12 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         #region Spalten erstellen
 
         foreach (var thisCol in columnsToLoad) {
-            var colum = Column.Exists(thisCol);
-            if (colum == null) {
-                colum = new ColumnItem(this, thisCol, Column.NextColumnKey());
-                Column.Add(colum);
+            var column = Column.Exists(thisCol);
+            if (column == null) {
+                column = Column.GenerateAndAdd(Column.NextColumnKey(), thisCol);
             }
-            GetColumnAttributesColumn(colum, _sql);
+            if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht gefunden"); return; }
+            GetColumnAttributesColumn(column, _sql);
         }
 
         Column.GetSystems();
@@ -414,7 +420,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         //_checkedAndReloadNeed = false;
         Column.ThrowEvents = true;
         Row.ThrowEvents = true;
-        IsLoading = false;
+        _loadingCount--;
         OnLoaded(this, new BlueBasics.EventArgs.LoadedEventArgs(onlyReload));
         //RepairAfterParse();
     }

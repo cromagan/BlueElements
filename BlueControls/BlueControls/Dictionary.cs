@@ -133,7 +133,7 @@ internal static class Dictionary {
 
     public static void WordAdd(string wort) {
         if (_dictWords.Row[wort] != null) { _dictWords.Row.Remove(_dictWords.Row[wort]); }
-        _dictWords.Row.Add(wort);
+        _dictWords.Row.GenerateAndAdd(wort);
     }
 
     private static void Init() => _dictWords = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.MDB", "Dictionary", true, false, null);

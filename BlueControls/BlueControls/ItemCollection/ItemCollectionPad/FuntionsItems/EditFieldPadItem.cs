@@ -318,7 +318,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
     //    ConnectsTo.Clear();
 
     //    if (GetRowFrom != null) {
-    //        ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, (BasicPadItem)GetRowFrom, ConnectionType.Bottom, false, false));
+    //        ConnectsTo.GenerateAndAdd(new ItemConnection(ConnectionType.Top, true, (BasicPadItem)GetRowFrom, ConnectionType.Bottom, false, false));
     //    }
     //}
 

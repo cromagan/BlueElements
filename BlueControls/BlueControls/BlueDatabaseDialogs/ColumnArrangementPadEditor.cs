@@ -179,7 +179,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
                     return;
             }
         }
-        var newc = Database.Column.Add();
+        var newc = Database.Column.GenerateAndAdd();
         if (vorlage != null) {
             newc.CloneFrom(vorlage, false);
             if (mitDaten) {
@@ -457,7 +457,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
                                     rkcolit?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false, databItem, ConnectionType.Top, true, false));
                                 }
                             }// else if (!string.IsNullOrEmpty(column.LinkedCellFilter[z]) && column.LinkedCellFilter[z].StartsWith("@")) {
-                            //    fi.Add(new FilterItem(linkedDatabase.Column[z], enFilterType.Istgleich, column.LinkedCellFilter[z].Substring(1)));
+                            //    fi.GenerateAndAdd(new FilterItem(linkedDatabase.Column[z], enFilterType.Istgleich, column.LinkedCellFilter[z].Substring(1)));
                             //}
                         }
 

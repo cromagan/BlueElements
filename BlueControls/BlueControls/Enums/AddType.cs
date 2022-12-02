@@ -20,27 +20,27 @@ namespace BlueControls.Enums;
 public enum AddType {
 
     /// <summary>
-    /// Add-Button wird nicht angezeigt, und auch niemals das Add-Ereignis ausgelöst.
+    /// GenerateAndAdd-Button wird nicht angezeigt, und auch niemals das GenerateAndAdd-Ereignis ausgelöst.
     /// </summary>
     None = 0,
 
     /// <summary>
-    /// Add-Button wird angezeigt, und auf einen Klick dessen wird das Add-Ereignis ausgelöst und dann ein Item mittels einer Input-Box erstellt.
+    /// GenerateAndAdd-Button wird angezeigt, und auf einen Klick dessen wird das GenerateAndAdd-Ereignis ausgelöst und dann ein Item mittels einer Input-Box erstellt.
     /// </summary>
     Text = 1,
 
     /// <summary>
-    /// Add-Button wird angezeigt, und auf einen Klick dessen wird das Add-Ereignis ausgelös und dann ein Item mittels einer File-Selcet-Box erstellt. Die Original-Dateien werden nicht verändert.
+    /// GenerateAndAdd-Button wird angezeigt, und auf einen Klick dessen wird das GenerateAndAdd-Ereignis ausgelös und dann ein Item mittels einer File-Selcet-Box erstellt. Die Original-Dateien werden nicht verändert.
     /// </summary>
     BinarysFromFileSystem = 2,
 
     /// <summary>
-    /// Add-Button wird angezeigt, und auf einen Klick dessen wird das Add-Ereignis ausgelöst und dann ein Item mittels einer List-Box erstellt.
+    /// GenerateAndAdd-Button wird angezeigt, und auf einen Klick dessen wird das GenerateAndAdd-Ereignis ausgelöst und dann ein Item mittels einer List-Box erstellt.
     /// </summary>
     OnlySuggests = 3,
 
     /// <summary>
-    /// Add-Button wird angezeigt, und auf einen Klick dessen wird das Add-Ereignis ausgelöst und sonst nichts gemacht.
+    /// GenerateAndAdd-Button wird angezeigt, und auf einen Klick dessen wird das GenerateAndAdd-Ereignis ausgelöst und sonst nichts gemacht.
     /// </summary>
     UserDef = 4
 }

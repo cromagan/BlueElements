@@ -40,7 +40,7 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
 
     protected AbstractTabControl() : base() {
         //This call is required by the Windows Form Designer.
-        //Add any initialization after the InitializeComponent() call
+        //GenerateAndAdd any initialization after the InitializeComponent() call
         //   Me.SetStyle(System.Windows.Forms.ControlStyles.AllPaintingInWmPaint Or System.Windows.Forms.ControlStyles.OptimizedDoubleBuffer Or System.Windows.Forms.ControlStyles.ResizeRedraw Or System.Windows.Forms.ControlStyles.UserPaint, True)
         //SetStyle(System.Windows.Forms.ControlStyles.ResizeRedraw, false);
         SetStyle(ControlStyles.SupportsTransparentBackColor, false);

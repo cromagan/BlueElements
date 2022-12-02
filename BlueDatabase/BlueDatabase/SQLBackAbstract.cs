@@ -144,94 +144,6 @@ public abstract class SQLBackAbstract {
         return ExecuteCommand(comm);
     }
 
-    public bool CheckIn(string tablename, DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
-        if (!OpenConnection()) { return false; }
-
-        #region Ignorieren
-
-        switch (type) {
-            case DatabaseDataType.Formatkennung:
-            case DatabaseDataType.Werbung:
-            case DatabaseDataType.CryptionState:
-            case DatabaseDataType.CryptionTest:
-                break;
-
-            case DatabaseDataType.SaveContent:
-                break;
-
-            case DatabaseDataType.EOF:
-                break;
-
-            default:
-                break;
-        }
-
-        #endregion
-
-        #region Datenbank Eigenschaften
-
-        if (type.IsDatabaseTag()) {
-            return SetStyleData(tablename, type, string.Empty, value);
-        }
-
-        #endregion
-
-        #region Spalten Eigenschaften
-
-        if (type.IsColumnTag()) {
-            if (type == DatabaseDataType.ColumnName) { RenameColumn(tablename, column.Name.ToUpper(), value.ToUpper()); }
-            return SetStyleData(tablename, type, column.Name.ToUpper(), value);
-        }
-
-        #endregion
-
-        #region Zellen-Wert
-
-        if (type.IsCellValue()) {
-            SetCellValue(tablename, column, row, value);
-
-            CloseConnection();
-            return true;
-        }
-
-        #endregion
-
-        #region Befehle
-
-        if (type.IsCommand()) {
-            switch (type) {
-                //case DatabaseDataType.AddColumnKeyInfo:
-                //    // Ignoreieren, macht AddColumnNameInfo
-                //    return true;
-
-                case DatabaseDataType.Comand_ColumnAdded:
-                    AddColumnToMain(tablename, column.Name, column.Key);
-                    return true;
-
-                case DatabaseDataType.Comand_RemovingColumn:
-                    RemoveColumn(tablename, column.Name);
-                    return true;
-
-                case DatabaseDataType.Comand_RemovingRow:
-                    RemoveRow(tablename, row.Key);
-                    return true;
-
-                case DatabaseDataType.Comand_RowAdded:
-                    AddRow(tablename, row.Key);
-                    return true;
-
-                default:
-                    Develop.DebugPrint(FehlerArt.Fehler, type.ToString() + " nicht definiert!");
-                    return false;
-            }
-        }
-
-        #endregion
-
-        CloseConnection();
-        return false;
-    }
-
     public bool CloseConnection() {
         lock (openclose) {
             if (_connection.State == ConnectionState.Open) { _connection.Close(); }
@@ -360,8 +272,7 @@ public abstract class SQLBackAbstract {
 
         while (await reader.ReadAsync()) {
             var rk = LongParse(reader[0].ToString());
-            var r = new RowItem(row.Database, rk);
-            row.Add(r);
+            var r = row.GenerateAndAdd(rk, string.Empty, false, false);
 
             for (var z = 1; z < reader.FieldCount; z++) {
                 row.Database.Cell.SetValueInternal(row.Database.Column[z - 1], r, reader[z].ToString(), -1, -1);
@@ -411,8 +322,8 @@ public abstract class SQLBackAbstract {
 
         while (await reader.ReadAsync()) {
             var rk = LongParse(reader[0].ToString());
-            var r = new RowItem(row.Database, rk);
-            row.Add(r);
+            var r = row.GenerateAndAdd(rk, string.Empty, false, false);
+            //row.Addx(r);
 
             //for (var z = 1; z < reader.FieldCount; z++) {
             //    row.Database.Cell.SetValueInternal(row.Database.Column[z - 1], r, reader[z].ToString(), -1, -1);
@@ -425,53 +336,58 @@ public abstract class SQLBackAbstract {
     }
 
     public void LoadRow(string tablename, List<RowItem> row) {
-        if (row == null || row.Count == 0 || row[0] is null || row[0].Database is null) { return; }
-        if (!OpenConnection()) { return; }
-
-        if (!row[0].Database.IsLoading) { Develop.DebugPrint("Loading falsch"); }
-
-        lock (getRow) {
+        try {
+            CloseConnection(); // Um ORA-01000: MAXIMALE ANZAHL OFFENER CURSOR ÜBERSCHRITTEN zu vermeiden
+            if (row == null || row.Count == 0 || row[0] is null || row[0].Database is null) { return; }
             if (!OpenConnection()) { return; }
 
-            var com = "SELECT RK, ";
+            if (!row[0].Database.IsLoading) { Develop.DebugPrint("Loading falsch"); }
 
-            foreach (var thiscolumn in row[0].Database.Column) {
-                com = com + thiscolumn.Name.ToUpper() + ", ";
-            }
+            lock (getRow) {
+                if (!OpenConnection()) { return; }
 
-            com = com.TrimEnd(", ");
+                var com = "SELECT RK, ";
 
-            com = com + " FROM " + tablename.ToUpper() + " WHERE ";
-
-            foreach (var thisr in row) {
-                com = com + "RK = " + DBVAL(thisr.Key) + " OR ";
-            }
-
-            com = com.TrimEnd(" OR ");
-
-            OpenConnection();
-
-            using var command = _connection.CreateCommand();
-            command.CommandText = com;
-
-            using var reader = command.ExecuteReader();
-
-            while (reader.Read()) {
-                var rk = LongParse(reader[0].ToString());
-                var r = row[0].Database.Row.SearchByKey(rk);
-                //var r = new RowItem(row.Database, rk);
-                //row.Add(r);
-
-                for (var z = 1; z < reader.FieldCount; z++) {
-                    r.Database.Cell.SetValueInternal(r.Database.Column[z - 1], r, reader[z].ToString(), -1, -1);
+                foreach (var thiscolumn in row[0].Database.Column) {
+                    com = com + thiscolumn.Name.ToUpper() + ", ";
                 }
 
-                if (string.IsNullOrEmpty(r.CellGetString(r.Database.Column.SysRowChangeDate))) {
-                    Develop.DebugPrint(FehlerArt.Warnung, "Zeile ohne Zeitstempel, repariert! + " + com);
-                    r.CellSet(r.Database.Column.SysRowChangeDate, DateTime.UtcNow.ToString(Constants.Format_Date));
+                com = com.TrimEnd(", ");
+
+                com = com + " FROM " + tablename.ToUpper() + " WHERE ";
+
+                foreach (var thisr in row) {
+                    com = com + "RK = " + DBVAL(thisr.Key) + " OR ";
                 }
+
+                com = com.TrimEnd(" OR ");
+
+                OpenConnection();
+
+                using var command = _connection.CreateCommand();
+                command.CommandText = com;
+
+                using var reader = command.ExecuteReader();
+
+                while (reader.Read()) {
+                    var rk = LongParse(reader[0].ToString());
+                    var r = row[0].Database.Row.SearchByKey(rk);
+                    if (r == null) { r = row[0].Database.Row.GenerateAndAdd(rk, string.Empty, false, false); }
+
+                    for (var z = 1; z < reader.FieldCount; z++) {
+                        r.Database.Cell.SetValueInternal(r.Database.Column[z - 1], r, reader[z].ToString(), -1, -1);
+                    }
+
+                    if (!r.RowInChache()) {
+                        Develop.DebugPrint(FehlerArt.Warnung, "Zeile ohne Zeitstempel, repariert! + " + com);
+                        r.CellSet(r.Database.Column.SysRowChangeDate, DateTime.UtcNow.ToString(Constants.Format_Date5));
+                    }
+                }
+                CloseConnection();
             }
+        } catch {
             CloseConnection();
+            LoadRow(tablename, row);
         }
     }
 
@@ -585,6 +501,105 @@ public abstract class SQLBackAbstract {
     }
 
     /// <summary>
+    /// Führt eine eine Änderung im BackEnd aus
+    /// </summary>
+    /// <param name="tablename"></param>
+    /// <param name="type"></param>
+    /// <param name="value"></param>
+    /// <param name="column"></param>
+    /// <param name="row"></param>
+    /// <param name="width"></param>
+    /// <param name="height"></param>
+    /// <returns></returns>
+    public bool SetValueInternal(string tablename, DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
+        if (!OpenConnection()) { return false; }
+
+        #region Ignorieren
+
+        switch (type) {
+            case DatabaseDataType.Formatkennung:
+            case DatabaseDataType.Werbung:
+            case DatabaseDataType.CryptionState:
+            case DatabaseDataType.CryptionTest:
+                break;
+
+            case DatabaseDataType.SaveContent:
+                break;
+
+            case DatabaseDataType.EOF:
+                break;
+
+            default:
+                break;
+        }
+
+        #endregion
+
+        #region Datenbank Eigenschaften
+
+        if (type.IsDatabaseTag()) {
+            return SetStyleData(tablename, type, string.Empty, value);
+        }
+
+        #endregion
+
+        #region Spalten Eigenschaften
+
+        if (type.IsColumnTag()) {
+            if (type == DatabaseDataType.ColumnName) { RenameColumn(tablename, column.Name.ToUpper(), value.ToUpper()); }
+            return SetStyleData(tablename, type, column.Name.ToUpper(), value);
+        }
+
+        #endregion
+
+        #region Zellen-Wert
+
+        if (type.IsCellValue()) {
+            SetCellValue(tablename, column, row, value);
+
+            CloseConnection();
+            return true;
+        }
+
+        #endregion
+
+        #region Befehle
+
+        if (type.IsCommand()) {
+            switch (type) {
+                //case DatabaseDataType.AddColumnKeyInfo:
+                //    // Ignoreieren, macht AddColumnNameInfo
+                //    return true;
+
+                case DatabaseDataType.Comand_AddColumn:
+                    AddColumnToMain(tablename, column.Name, column.Key);
+                    return true;
+
+                case DatabaseDataType.Comand_RemoveColumn:
+                    RemoveColumn(tablename, column.Name);
+                    return true;
+
+                case DatabaseDataType.Comand_RemoveRow:
+                    RemoveRow(tablename, row.Key);
+                    return true;
+
+                case DatabaseDataType.Comand_AddRow:
+                    AddRow(tablename, LongParse(value));
+                    return true;
+
+                default:
+                    Develop.DebugPrint(FehlerArt.Fehler, type.ToString() + " nicht definiert!");
+                    return false;
+            }
+        }
+
+        #endregion
+
+        CloseConnection();
+        return false;
+    }
+
+    /// <summary>
     /// Gibt alle verfügbaren Tabellen - außer die Systemtabellen - zurück
     /// </summary>
     /// <returns></returns>
@@ -623,6 +638,7 @@ public abstract class SQLBackAbstract {
 
         var fb = new List<(string tablename, string comand, string columnname, string rowid)>();
 
+        if (!OpenConnection()) { return null; }
         using var reader = q.ExecuteReader();
         var value = string.Empty;
         while (reader.Read()) {
@@ -652,57 +668,61 @@ public abstract class SQLBackAbstract {
         return null;
     }
 
-    internal async void LoadColumns(string tablename, ListExt<ColumnItem> columns) {
-        if (columns == null || columns.Count == 0 || columns[0] is null || columns[0].Database is null) { return; }
-        if (!OpenConnection()) { return; }
+    internal void LoadColumns(string tablename, ListExt<ColumnItem> columns) {
+        try {
+            if (columns == null || columns.Count == 0 || columns[0] is null || columns[0].Database is null) { return; }
+            if (!OpenConnection()) { return; }
 
-        if (!columns[0].Database.IsLoading) { Develop.DebugPrint("Loading falsch"); }
+            if (!columns[0].Database.IsLoading) { Develop.DebugPrint("Loading falsch"); }
 
-        var com = "SELECT RK, ";
+            var com = "SELECT RK, ";
 
-        foreach (var thiscolumn in columns) {
-            com = com + thiscolumn.Name.ToUpper() + ", ";
-        }
-        com = com.TrimEnd(", ");
-        com = com + " FROM " + tablename.ToUpper();
+            foreach (var thiscolumn in columns) {
+                com = com + thiscolumn.Name.ToUpper() + ", ";
+            }
+            com = com.TrimEnd(", ");
+            com = com + " FROM " + tablename.ToUpper();
 
-        OpenConnection();
+            OpenConnection();
 
-        using var command = _connection.CreateCommand();
-        command.CommandText = com;
+            using var command = _connection.CreateCommand();
+            command.CommandText = com;
 
-        using var reader = await command.ExecuteReaderAsync();
+            using var reader = command.ExecuteReader();
 
-        while (await reader.ReadAsync()) {
-            var rk = LongParse(reader[0].ToString());
-            var row = columns[0].Database.Row.SearchByKey(rk);
+            while (reader.Read()) {
+                var rk = LongParse(reader[0].ToString());
+                var row = columns[0].Database.Row.SearchByKey(rk);
 
-            if (row == null) {
-                row = new RowItem(columns[0].Database, rk);
-                columns[0].Database.Row.Add(row);
+                if (row == null) {
+                    row = columns[0].Database.Row.GenerateAndAdd(rk, string.Empty, false, false);
+                }
+
+                for (var z = 1; z < reader.FieldCount; z++) {
+                    row.Database.Cell.SetValueInternal(columns[z - 1], row, reader[z].ToString(), -1, -1);
+                }
             }
 
-            for (var z = 1; z < reader.FieldCount; z++) {
-                row.Database.Cell.SetValueInternal(columns[z - 1], row, reader[z].ToString(), -1, -1);
+            foreach (var thiscolumn in columns) {
+                //var val = GetStyleData(tablename, DatabaseDataType.ColumnTimeCode.ToString(), thiscolumn.Name);
+
+                thiscolumn.Loaded = true;
+
+                //if (string.IsNullOrEmpty(val)) {
+                //    Develop.DebugPrint(FehlerArt.Warnung, "Spalte ohne Zeitstempel, repariert! + " + com);
+                //    thiscolumn.TimeCode = DateTime.UtcNow.ToString(Constants.Format_Date);
+                //    //val =
+                //    //SetStyleData(tablename, DatabaseDataType.ColumnTimeCode, thiscolumn.Name, val);
+                //}
             }
+
+            //Develop.DebugPrint(FehlerArt.Info, "Datenbank Ladezeit: " + row.Database.TableName + " - " + DateTime.Now.Subtract(ti).TotalSeconds.ToString() + " Sekunden");
+
+            CloseConnection();
+        } catch {
+            CloseConnection();
+            LoadColumns(tablename, columns);
         }
-
-        foreach (var thiscolumn in columns) {
-            //var val = GetStyleData(tablename, DatabaseDataType.ColumnTimeCode.ToString(), thiscolumn.Name);
-
-            thiscolumn.Loaded = true;
-
-            //if (string.IsNullOrEmpty(val)) {
-            //    Develop.DebugPrint(FehlerArt.Warnung, "Spalte ohne Zeitstempel, repariert! + " + com);
-            //    thiscolumn.TimeCode = DateTime.UtcNow.ToString(Constants.Format_Date);
-            //    //val =
-            //    //SetStyleData(tablename, DatabaseDataType.ColumnTimeCode, thiscolumn.Name, val);
-            //}
-        }
-
-        //Develop.DebugPrint(FehlerArt.Info, "Datenbank Ladezeit: " + row.Database.TableName + " - " + DateTime.Now.Subtract(ti).TotalSeconds.ToString() + " Sekunden");
-
-        CloseConnection();
     }
 
     /// <summary>

@@ -132,8 +132,8 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
 
         //if (Parent is Filterleiste f) {
         //    if (f.pic.Visible) {
-        //        Items.Add("Filter verschieben", "#FilterVerschieben", QuickImage.Get(ImageCode.Trichter));
-        //        Items.Add("Bild-Pfad öffnen", "#BildPfad", QuickImage.Get(ImageCode.Ordner));
+        //        Items.GenerateAndAdd("Filter verschieben", "#FilterVerschieben", QuickImage.Get(ImageCode.Trichter));
+        //        Items.GenerateAndAdd("Bild-Pfad öffnen", "#BildPfad", QuickImage.Get(ImageCode.Ordner));
         //    }
         //}
     }
@@ -167,7 +167,7 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
             //var c = Filter.Column.Contents(null);
             //foreach (var thiss in c)
             //{
-            //    Item2.Add("|" + thiss, thiss));
+            //    Item2.GenerateAndAdd("|" + thiss, thiss));
             //}
             StyleComboBox(cbx, item2, System.Windows.Forms.ComboBoxStyle.DropDown, false);
             cbx.DropDownShowing += Cbx_DropDownShowing;

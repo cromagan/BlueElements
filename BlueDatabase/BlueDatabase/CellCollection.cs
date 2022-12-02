@@ -713,9 +713,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (changeSysColumns) {
             DoSpecialFormats(column, row, oldValue, false);
-            var tc = DateTime.Now.ToString(Constants.Format_Date);
             SystemSet(_database?.Column.SysRowChanger, row, _database?.UserName);
-            SystemSet(_database?.Column.SysRowChangeDate, row, tc);
+            SystemSet(_database?.Column.SysRowChangeDate, row, DateTime.UtcNow.ToString(Constants.Format_Date5));
             //column.TimeCode = tc;
         }
 
@@ -830,7 +829,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         //    targetRow = linkedDatabase.Row[row.CellGetString(linkedCellRowIsInColumn)];
         //    if (targetRow == null && addRowIfNotExists) {
-        //        targetRow = linkedDatabase.Row.Add(row.CellGetString(linkedCellRowIsInColumn));
+        //        targetRow = linkedDatabase.Row.GenerateAndAdd(row.CellGetString(linkedCellRowIsInColumn));
         //    }
         //} else {
         var (filter, info) = GetFilterFromLinkedCellData(linkedDatabase, column, row);
@@ -843,7 +842,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             targetRow = r[0];
         } else {
             if (addRowIfNotExists) {
-                targetRow = linkedDatabase.Row.Add(filter);
+                targetRow = linkedDatabase.Row.GenerateAndAdd(filter);
             }
         }
         //   }

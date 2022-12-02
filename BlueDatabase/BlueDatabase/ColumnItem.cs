@@ -116,12 +116,10 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
     #region Constructors
 
-    public ColumnItem(DatabaseAbstract database, long columnkey) : this(database, database.Column.Freename(string.Empty), columnkey) { }
-
-    public ColumnItem(DatabaseAbstract database, string columnname, long columnkey) {
-        if (!IsValidColumnName(columnname)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht erlaubt!");
-        }
+    public ColumnItem(DatabaseAbstract database, long columnkey) {
+        //if (!IsValidColumnName(columnname)) {
+        //    Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht erlaubt!");
+        //}
 
         Database = database;
         Database.Disposing += Database_Disposing;
@@ -132,7 +130,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
         #region Standard-Werte
 
-        _name = columnname.ToUpper();
+        _name = string.Empty;
         _caption = string.Empty;
         //_CaptionBitmapCode = null;
         _format = DataFormat.Text;
@@ -200,6 +198,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     }
 
     #endregion
+
+    //internal ColumnItem(DatabaseAbstract database, long columnkey) : this(database, database.Column.Freename(string.Empty), columnkey) { }
 
     #region Destructors
 
@@ -1317,9 +1317,9 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     //        var te = Enum.GetName(t, thisItem);
     //        var th = (int)thisItem;
     //        if (!string.IsNullOrEmpty(te)) {
-    //            NewReplacer.Add(th.ToString() + "|" + te);
+    //            NewReplacer.GenerateAndAdd(th.ToString() + "|" + te);
     //            if (th >= ZumDropdownHinzuAb && th < ZumDropdownHinzuBis) {
-    //                NewAuswahl.Add(th.ToString());
+    //                NewAuswahl.GenerateAndAdd(th.ToString());
     //            }
     //        }
     //    }
@@ -1531,7 +1531,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                     //if (LinkedCell_RowKeyIsInColumn != -9999) {
                     _format = DataFormat.Verknüpfung_zu_anderer_Datenbank;
                     _linkedCellFilter.Clear();
-                    //LinkedCellFilter.Add(LinkedCell_RowKeyIsInColumn.ToString());
+                    //LinkedCellFilter.GenerateAndAdd(LinkedCell_RowKeyIsInColumn.ToString());
                     //LinkedCell_RowKeyIsInColumn = -1;
                     //}
                     break;

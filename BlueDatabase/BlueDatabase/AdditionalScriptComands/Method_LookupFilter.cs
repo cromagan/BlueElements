@@ -83,7 +83,7 @@ public class Method_LookupFilter : MethodDatabase {
             return new DoItFeedback("Spaltentyp nicht unterstützt.");
         }
 
-        //  l.Add(((VariableString)attvar.Attributes[2]).ValueString);
+        //  l.GenerateAndAdd(((VariableString)attvar.Attributes[2]).ValueString);
 
         return new DoItFeedback(l);
     }

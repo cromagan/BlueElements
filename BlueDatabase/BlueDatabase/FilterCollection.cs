@@ -180,7 +180,7 @@ public sealed class FilterCollection : ListExt<FilterItem>, IParseable {
 
     //private void AddIfNotExists(FilterItem filterItem) {
     //    if (Exists(filterItem)) { return; }
-    //    Add(filterItem);
+    //    GenerateAndAdd(filterItem);
     //}
 
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();

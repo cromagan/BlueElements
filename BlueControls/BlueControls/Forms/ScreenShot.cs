@@ -227,7 +227,7 @@ public sealed partial class ScreenShot {
     //    AllS = new List<clsScreenData>();
     //    DrawText = "Bitte ziehen sie einen Rahmen um den gewünschten Bereich.\r\nDieser wird anschließend nach jedem Mauszug abfotografiert.\r\nBeendet wird der Modus mit der rechten Maustaste.";
     //    DrawSize = 10;
-    //    AllS.Add(GrabAreaInternal(null, -1, -1));
+    //    AllS.GenerateAndAdd(GrabAreaInternal(null, -1, -1));
     //    Rahm = new Overlay();
     //    Hook = new SystemInputHook();
     //    Hook.InstallHook();
@@ -247,7 +247,7 @@ public sealed partial class ScreenShot {
     //                    HookP1 = HookStartPoint,
     //                    HookP2 = HookEndPoint
     //                };
-    //                AllS.Add(l);
+    //                AllS.GenerateAndAdd(l);
     //            }
     //            HookStartPoint = new Point(int.MinValue, int.MinValue);
     //            HookEndPoint = new Point(int.MinValue, int.MinValue);

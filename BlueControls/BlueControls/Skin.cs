@@ -32,7 +32,7 @@ using System.Reflection;
 using System.Windows.Forms;
 using static BlueBasics.Polygons;
 
-//  = A3 & ".Design.Add(enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
+//  = A3 & ".Design.GenerateAndAdd(enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
 
 //	Control	Status	Kontur	X1	X2	Y1	Y2	Draw Back	Verlauf Mitte	Color Back 1	Color Back 2	Color Back 3	Border Style	Color Border 1	Color Border 2	Color Border 3	Schrift	StandardPic
 //	Button	Standard	Rechteck					Solide		EAEAEA			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}
@@ -1222,7 +1222,7 @@ public static class Skin {
     public static ItemCollectionList GetFonts(RowItem? sheetStyle) {
         ItemCollectionList rahms = new()
         {
-            //   Rahms.Add(New ItemCollection.TextListItem(CInt(PadStyles.Undefiniert).ToString, "Ohne Rahmen", ImageCode.Kreuz))
+            //   Rahms.GenerateAndAdd(New ItemCollection.TextListItem(CInt(PadStyles.Undefiniert).ToString, "Ohne Rahmen", ImageCode.Kreuz))
             { "Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Haupt).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Haupt, sheetStyle).SymbolForReadableText() },
             { "Untertitel für Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Untertitel).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Untertitel, sheetStyle).SymbolForReadableText() },
             { "Überschrift für Kapitel", ((int)PadStyles.Style_Überschrift_Kapitel).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Kapitel, sheetStyle).SymbolForReadableText() },
@@ -1294,7 +1294,7 @@ public static class Skin {
     public static void LoadSkin() {
         //_SkinString = "Windows10";
         //SkinDB = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), _SkinString + ".skn", "Skin", true, Convert.ToBoolean(Develop.AppName() == "SkinDesigner"));
-        //="Design.Add(enDesign."& A3 & ",enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
+        //="Design.GenerateAndAdd(enDesign."& A3 & ",enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
         Design.Add(Enums.Design.Button, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, 0, "EAEAEA", "", "", RahmenArt.Solide_1px, "B6B6B6", "", "", "{Name=Calibri, Size=10[K]15}", "");
         Design.Add(Enums.Design.Button, States.Standard_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, 0, "EAEAEA", "", "", RahmenArt.Solide_1px, "3399FF", "", "", "{Name=Calibri, Size=10[K]15}", "");
         Design.Add(Enums.Design.Button, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, 0, "EAEAEA", "", "", RahmenArt.Solide_3px, "3399FF", "", "", "{Name=Calibri, Size=10[K]15}", "");
@@ -1500,7 +1500,7 @@ public static class Skin {
         Design.Add(Enums.Design.Form_Standard, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, 0, "F0F0F0", "", "", RahmenArt.Ohne, "", "", "", "", "");
         Design.Add(Enums.Design.Form_MsgBox, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, 0, "F0F0F0", "", "", RahmenArt.Ohne, "", "", "", "{Name=Calibri, Size=10[K]15}", "");
         Design.Add(Enums.Design.Form_QuickInfo, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, 0, "BFDFFF", "", "", RahmenArt.Solide_1px, "4DA1B5", "", "", "{Name=Calibri, Size=10[K]15}", "");
-        // Design.Add(enDesign.Form_DesktopBenachrichtigung, enStates.Standard, enKontur.Rechteck, 0, 0, 0, 0, enHintergrundArt.Solide, 0, "1F1F1F", "", "", enRahmenArt.Solide_3px, "484848", "", "", "{Name=Calibri, Size=12[K]5,Color=ffffff}", "");
+        // Design.GenerateAndAdd(enDesign.Form_DesktopBenachrichtigung, enStates.Standard, enKontur.Rechteck, 0, 0, 0, 0, enHintergrundArt.Solide, 0, "1F1F1F", "", "", enRahmenArt.Solide_3px, "484848", "", "", "{Name=Calibri, Size=12[K]5,Color=ffffff}", "");
         Design.Add(Enums.Design.Form_DesktopBenachrichtigung, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, 0, "F0F0F0", "", "", RahmenArt.Solide_3px, "5D5D5D", "", "", "{Name=Calibri, Size=11[K]9}", "");
         Design.Add(Enums.Design.Form_BitteWarten, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, 0, "BFDFFF", "", "", RahmenArt.Solide_1px, "4DA1B5", "", "", "{Name=Calibri, Size=10[K]15}", "");
         Design.Add(Enums.Design.Form_AutoFilter, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, 0, "FFFFFF", "", "", RahmenArt.Solide_1px, "000000", "", "", "{Name=Calibri, Size=10[K]15}", "");

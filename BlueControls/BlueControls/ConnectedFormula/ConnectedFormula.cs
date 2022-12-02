@@ -352,7 +352,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
         t.Add("Version=" + Version);
         t.Add("CreateDate=" + _createDate.ToNonCritical());
         t.Add("CreateName=" + _creator.ToNonCritical());
-        //t.Add("FilePath=" + FilePath.ToNonCritical());
+        //t.GenerateAndAdd("FilePath=" + FilePath.ToNonCritical());
         t.Add("LastUsedID=" + _id.ToString());
         t.Add("DatabaseFiles=" + DatabaseFiles.JoinWithCr().ToNonCritical());
         t.Add("NotAllowedChilds=" + NotAllowedChilds.JoinWithCr().ToNonCritical());

@@ -441,7 +441,7 @@ public partial class TableView : Form {
             e.UserMenu.Add("Spalte", true);
             e.UserMenu.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten, column != null && tbl.Database.IsAdministrator());
             e.UserMenu.Add("Statistik", "Statistik", QuickImage.Get(ImageCode.Balken, 16), column != null && tbl.Database.IsAdministrator());
-            //e.UserMenu.Add("Inhalte aller angezeigten Zellen dieser Spalte löschen", "ColumnContentDelete", ImageCode.Radiergummi, column != null && column.Format.CanBeChangedByRules() && tbl.Database.IsAdministrator());
+            //e.UserMenu.GenerateAndAdd("Inhalte aller angezeigten Zellen dieser Spalte löschen", "ColumnContentDelete", ImageCode.Radiergummi, column != null && column.Format.CanBeChangedByRules() && tbl.Database.IsAdministrator());
             e.UserMenu.Add("Summe", "Summe", ImageCode.Summe, column != null && tbl.Database.IsAdministrator());
             e.UserMenu.AddSeparator();
         }
@@ -635,8 +635,8 @@ public partial class TableView : Form {
 
     private void btnNeu_Click(object sender, System.EventArgs e) {
         var r = Table.Database.Column.First().SortType == SortierTyp.Datum_Uhrzeit
-    ? Table.Database.Row.Add(NameRepair(DateTime.Now.ToString(Constants.Format_Date5), null))
-    : Table.Database.Row.Add(NameRepair("Neuer Eintrag", null));
+    ? Table.Database.Row.GenerateAndAdd(NameRepair(DateTime.Now.ToString(Constants.Format_Date5), null))
+    : Table.Database.Row.GenerateAndAdd(NameRepair("Neuer Eintrag", null));
         Table.CursorPos_Set(Table.Database.Column.First(), Table.SortedRows().Get(r), true);
     }
 

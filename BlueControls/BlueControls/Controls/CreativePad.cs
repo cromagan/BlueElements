@@ -267,7 +267,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         selectedHotItem = HotItem;
         if (selectedHotItem != null) {
             items.Add("Allgemeine Element-Aktionen", true);
-            //items.Add("Objekt bearbeiten", "#Erweitert", ImageCode.Stift);
+            //items.GenerateAndAdd("Objekt bearbeiten", "#Erweitert", ImageCode.Stift);
             //items.AddSeparator();
             items.Add("Objekt duplizieren", "#Duplicate", ImageCode.Kopieren, selectedHotItem is ICloneable);
             items.AddSeparator();

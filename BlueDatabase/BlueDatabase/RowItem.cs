@@ -131,7 +131,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
         //    //case DataFormat.Verknüpfung_zu_anderer_Datenbank:
         //    //    //if (column.LinkedCell_RowKeyIsInColumn == -9999) {
         //    //    wert = string.Empty; // Beim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss.
-        //    //    //vars.Add(new Variable(column.Name + "_link", string.Empty, VariableDataType.String, true, true, "Dieser Wert kann nur mit SetLink verändert werden.\r\nBeim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss."));
+        //    //    //vars.GenerateAndAdd(new Variable(column.Name + "_link", string.Empty, VariableDataType.String, true, true, "Dieser Wert kann nur mit SetLink verändert werden.\r\nBeim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss."));
         //    //    //} else {
         //    //    //    qi = "Spalte: " + column.ReadableText() + "\r\nDer Inhalt wird zur Startzeit des Skripts festgelegt.";
         //    //    //    ro = true;
@@ -142,7 +142,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
         //    //    qi = "Spalte: " + column.ReadableText() + "\r\nFalls die Datei auf der Festplatte existiert, wird eine weitere\r\nVariable erzeugt: " + column.Name + "_FileName";
         //    //    var f = column.Database.Cell.BestFile(column, row);
         //    //    if (f.FileType() == FileFormat.Image && IO.FileExists(f)) {
-        //    //        vars.Add(new VariableString(column.Name + "_FileName", f, true, false, "Spalte: " + column.ReadableText() + "\r\nEnthält den vollen Dateinamen der Datei der zugehörigen Zelle.\r\nDie Existenz der Datei wurde geprüft und die Datei existert.\r\nAuf die Datei kann evtl. mit LoadImage zugegriffen werden."));
+        //    //        vars.GenerateAndAdd(new VariableString(column.Name + "_FileName", f, true, false, "Spalte: " + column.ReadableText() + "\r\nEnthält den vollen Dateinamen der Datei der zugehörigen Zelle.\r\nDie Existenz der Datei wurde geprüft und die Datei existert.\r\nAuf die Datei kann evtl. mit LoadImage zugegriffen werden."));
         //    //    }
         //    //    break;
 
@@ -490,6 +490,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
         return erg;
     }
 
+    public bool RowInChache() {
+        if (Database == null) { return false; }
+        var cellKey = CellCollection.KeyOfCell(Database.Column.SysRowChangeDate, this);
+        return Database.Cell.ContainsKey(cellKey);
+    }
+
     internal void OnDoSpecialRules(DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
 
     internal void OnRowChecked(RowCheckedEventArgs e) => RowChecked?.Invoke(this, e);
@@ -544,7 +550,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
             if (!string.IsNullOrEmpty(Database.AdditionaFilesPfadWhole())) {
                 vars.Add(new VariableString("AdditionaFilesPfad", Database.AdditionaFilesPfadWhole(), true, false, "Der Dateipfad der Datenbank, in dem zusäzliche Daten gespeichert werden."));
             }
-            //vars.Add(new VariableString("DatabasePath", Database.Filename2.FilePath(), true, false, "Der Dateipfad der Datenbank."));
+            //vars.GenerateAndAdd(new VariableString("DatabasePath", Database.Filename2.FilePath(), true, false, "Der Dateipfad der Datenbank."));
 
             #endregion Variablen für Skript erstellen
 

@@ -87,7 +87,7 @@ public class ListExt<T> : List<T>, IChangedFeedback, IDisposableExtended {
     public new T this[int index] {
         get {
             Develop.DebugPrint_Disposed(IsDisposed);
-            if (index >= Count || index < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Index falsch: " + index +", Maximum: " + (Count-1)); }
+            if (index >= Count || index < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Index falsch: " + index + ", Maximum: " + (Count - 1)); }
             return base[index];
         }
         set {

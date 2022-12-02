@@ -291,30 +291,17 @@ public enum DatabaseDataType : byte {
 
     //Dummy_ce_ValueWithoutSizeUncrypted = 204,
 
-    /// <summary>
-    /// Wenn im Arbeitsspeicher eine Zeile gelöscht werden soll, und echtzeitsysteme Nachziehen müssen
-    /// </summary>
-    Comand_RemovingRow = 220,
-
-    /// <summary>
-    /// Wenn im Arbeitsspeicher eine Zeile erstellt wurde, und echtzeitsysteme Nachziehen müssen
-    /// </summary>
-    Comand_RowAdded = 221,
+    Comand_RemoveRow = 220,
+    Comand_AddRow = 221,
 
     //	dummyComand_AddUndo = 222,
 
-    /// <summary>
-    /// Wenn im Arbeitsspeicher eine Spalte gelöscht werden soll, und echtzeitsysteme Nachziehen müssen
-    /// </summary>
-    Comand_RemovingColumn = 223,
+    Comand_RemoveColumn = 223,
 
     //AddColumnKeyInfo = 224,
     //AddColumnNameInfo = 225,
 
-    /// <summary>
-    /// Wenn im Arbeitsspeicher eine Spalte erstellt wurde, und echtzeitsysteme Nachziehen müssen
-    /// </summary>
-    Comand_ColumnAdded = 226,
+    Comand_AddColumn = 226,
 
     UndoCount = 249,
 

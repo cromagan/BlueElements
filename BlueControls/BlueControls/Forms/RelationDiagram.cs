@@ -405,7 +405,7 @@ public partial class RelationDiagram : PadEditor {
     //    'Dim l As New List(Of String)
     //    'For z As Integer = 0 To Pad.Item.Lastx
     //    '    If Pad.Item(z) IsNot Nothing AndAlso TypeOf Pad.Item(z).Object Is clsExtTxt Then
-    //    '        l.Add(Pad.Item(z).Internal & "|" & Pad.Item(z).UsedArea.Left & "|" & Pad.Item(z).UsedArea.Top)
+    //    '        l.GenerateAndAdd(Pad.Item(z).Internal & "|" & Pad.Item(z).UsedArea.Left & "|" & Pad.Item(z).UsedArea.Top)
     //    '    End If
     //    'Next
     //    'SaveToDiskx(SaveFileDialog1.FileName, l.JoinWithCr(), False)

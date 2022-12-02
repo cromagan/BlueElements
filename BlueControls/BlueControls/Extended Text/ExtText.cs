@@ -581,15 +581,15 @@ public sealed class ExtText : ListExt<ExtChar> {
             //
             case "HR":
             //    Position++;
-            //    this.Add(new ExtChar(13, _Design, _State, PF, Stufe, MarkState));
+            //    this.GenerateAndAdd(new ExtChar(13, _Design, _State, PF, Stufe, MarkState));
             //    Position++;
-            //    this.Add(new ExtChar((int)enEtxtCodes.HorizontalLine, _Design, _State, PF, Stufe, MarkState));
+            //    this.GenerateAndAdd(new ExtChar((int)enEtxtCodes.HorizontalLine, _Design, _State, PF, Stufe, MarkState));
             //    break;
 
             case "TAB":
                 position++;
                 Add(new ExtCharTabCode(_design, _state, font, stufe));
-                //this.Add(new ExtChar((char)9, _Design, _State, font, Stufe, enMarkState.None));
+                //this.GenerateAndAdd(new ExtChar((char)9, _Design, _State, font, Stufe, enMarkState.None));
                 break;
 
             case "ZBX_STORE":

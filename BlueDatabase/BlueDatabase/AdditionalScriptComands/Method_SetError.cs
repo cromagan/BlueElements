@@ -60,7 +60,7 @@ public class Method_SetError : MethodDatabase {
             //var ve = s.Variablen.GetSystem(n);
             //if (ve == null) {
             //    ve = new Variable(n, string.Empty, enVariableDataType.List, false, true, string.Empty);
-            //    s.Variablen.Add(ve);
+            //    s.Variablen.GenerateAndAdd(ve);
             //}
             //ve.Readonly = false;
             //var l = ve.ValueListString;

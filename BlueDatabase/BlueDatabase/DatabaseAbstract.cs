@@ -31,6 +31,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
@@ -106,12 +107,12 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         QuickImage.NeedImage += QuickImage_NeedImage;
 
         Row = new RowCollection(this);
-        Row.RowRemoving += Row_RowRemoving;
+        //Row.RowRemoving += Row_RowRemoving;
         //Row.RowRemoved += Row_RowRemoved;
-        Row.RowAdded += Row_RowAdded;
+        //Row.RowAdded += Row_RowAdded;
 
         Column = new ColumnCollection(this);
-        Column.ItemRemoving += Column_ItemRemoving;
+        //Column.ItemRemoving += Column_ItemRemoving;
         Column.ItemRemoved += Column_ItemRemoved;
         Column.ItemAdded += Column_ItemAdded;
 
@@ -261,7 +262,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     public bool IsDisposed { get; private set; }
 
-    public abstract bool IsLoading { get; protected set; }
+    public abstract bool IsLoading { get; }
 
     public LayoutCollection Layouts {
         get => _layouts;
@@ -610,54 +611,33 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     }
 
     /// <summary>
-    /// Das hier ist die richtige Methode, um einen Wert dauerhaft zu setzen.
-    /// Stößt undo uns die Festsetzung an. Es wird aber nich geprüft, ob Readonly gesetzt ist und spiegelt auch den Wert bei bedarf.
+    /// Diese Methode setzt einen Wert dauerhaft und kümmert sich um alles, was dahingehend zu tun ist (z.B. Undo).
+    /// Der Wert wird intern fest verankert - bei ReadOnly werden aber weitere Schritte ignoriert.
     /// </summary>
     /// <param name="comand"></param>
     /// <param name="column"></param>
     /// <param name="row"></param>
     /// <param name="previousValue"></param>
     /// <param name="changedTo"></param>
-    public virtual void ChangeData(DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo) {
-        SetValueInternal(comand, changedTo, column, row, -1, -1);
+    public string ChangeData(DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo) {
+        var f = SetValueInternal(comand, changedTo, column, row, -1, -1);
 
-        //if (Mirror != null && !Mirror.ReadOnly) {
-        //    ColumnItem? c = null;
-        //    if (column!= null) { c= Mirror.Column.SearchByKey(column.Key); }
-        //    RowItem? r = null;
-        //    if (row!= null) { r= Mirror.Row.SearchByKey(row.Key); }
+        if (!string.IsNullOrEmpty(f)) { return f; }
 
-        //    Mirror?.ChangeData(comand, c, r, previousValue, changedTo);
-        //}
-
-        if (IsLoading) { return; }
-
-        //if (comand == DatabaseDataType.ColumnContentWidth && changedTo =="-1") {
-        //    var t = 10;
-        //}
+        if (IsLoading) { return f; }
 
         if (ReadOnly) {
             if (!string.IsNullOrEmpty(TableName)) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Datei ist Readonly, " + comand + ", " + TableName);
             }
-            return;
+            return "Schreibschutz aktiv";
         }
 
-        StoreValueToHardDisk(comand, column, row, changedTo);
-
-        //if (comand != DatabaseDataType.TimeCode &&
-        //    comand != DatabaseDataType.ColumnTimeCode &&
-        //    LogUndo) {
         AddUndo(TableName, comand, column, row, previousValue, changedTo, UserName);
-        //var tc = DateTime.UtcNow.ToString(Constants.Format_Date);
-        //ChangeData(DatabaseDataType.TimeCode, null, null, _timeCode, tc);
-
-        //if (column != null) {
-        //    ChangeData(DatabaseDataType.ColumnTimeCode, column, null, column.TimeCode, tc);
-        //}
-        //}
 
         if (comand != DatabaseDataType.AutoExport) { SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
+
+        return string.Empty;
     }
 
     /// <summary>
@@ -914,7 +894,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         foreach (var thisColumn in columnList) {
             if (thisColumn != null) {
                 da.CellAdd(thisColumn.ReadableText().Replace(";", "<br>"), thisColumn.BackColor);
-                //da.Add("        <th bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\"><b>" + ThisColumn.ReadableText().Replace(";", "<br>") + "</b></th>");
+                //da.GenerateAndAdd("        <th bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\"><b>" + ThisColumn.ReadableText().Replace(";", "<br>") + "</b></th>");
             }
         }
         da.RowEnd();
@@ -945,10 +925,10 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                 var s = thisColumn.Summe(sortedRows);
                 if (s == null) {
                     da.CellAdd("-", thisColumn.BackColor);
-                    //da.Add("        <th BORDERCOLOR=\"#aaaaaa\" align=\"left\" valign=\"middle\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\">-</th>");
+                    //da.GenerateAndAdd("        <th BORDERCOLOR=\"#aaaaaa\" align=\"left\" valign=\"middle\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\">-</th>");
                 } else {
                     da.CellAdd("~sum~ " + s, thisColumn.BackColor);
-                    //da.Add("        <th BORDERCOLOR=\"#aaaaaa\" align=\"left\" valign=\"middle\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\">&sum; " + s + "</th>");
+                    //da.GenerateAndAdd("        <th BORDERCOLOR=\"#aaaaaa\" align=\"left\" valign=\"middle\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\">&sum; " + s + "</th>");
                 }
             }
         }
@@ -1058,7 +1038,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
                 var col = Column.Exists(zeil[0][spaltNo]);
                 if (col == null) {
-                    col = Column.Add(zeil[0][spaltNo]);
+                    col = Column.GenerateAndAdd(zeil[0][spaltNo]);
                     col.Caption = zeil[0][spaltNo];
                     col.Format = DataFormat.Text;
                 }
@@ -1067,7 +1047,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         } else {
             columns.AddRange(Column.Where(thisColumn => thisColumn != null && !thisColumn.IsSystemColumn()));
             while (columns.Count < zeil[0].GetUpperBound(0) + 1) {
-                var newc = Column.Add();
+                var newc = Column.GenerateAndAdd();
                 newc.Caption = newc.Name;
                 newc.Format = DataFormat.Text;
                 newc.MultiLine = true;
@@ -1089,7 +1069,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                     row = null;
                     if (zeileZuordnen && !string.IsNullOrEmpty(zeil[zeilNo][spaltNo])) { row = Row[zeil[zeilNo][spaltNo]]; }
                     if (row == null && !string.IsNullOrEmpty(zeil[zeilNo][spaltNo])) {
-                        row = Row.Add(zeil[zeilNo][spaltNo]);
+                        row = Row.GenerateAndAdd(zeil[zeilNo][spaltNo]);
                         neuZ++;
                     }
                 } else {
@@ -1331,11 +1311,11 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         //Export.Changed -= Export_ListOrItemChanged;
         //DatenbankAdmin.Changed -= DatabaseAdmin_ListOrItemChanged;
 
-        Row.RowRemoving -= Row_RowRemoving;
-        //Row.RowRemoved -= Row_RowRemoved;
-        Row.RowAdded -= Row_RowAdded;
+        //Row.RowRemoving -= Row_RowRemoving;
+        ////Row.RowRemoved -= Row_RowRemoved;
+        //Row.RowAdded -= Row_RowAdded;
 
-        Column.ItemRemoving -= Column_ItemRemoving;
+        //Column.ItemRemoving -= Column_ItemRemoving;
         Column.ItemRemoved -= Column_ItemRemoved;
         Column.ItemAdded -= Column_ItemAdded;
         Column.Dispose();
@@ -1417,9 +1397,12 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     }
 
     /// <summary>
-    /// Die richtige Routine, wenn Werte auf den richtigen Speicherplatz geschrieben werden sollen.
+    /// Diese Routine setzt Werte auf den richtigen Speicherplatz und führt Comands aus.
+    /// Echtzeitbasierte Syteme sollten diese Routine verwenden, um den Wert ebenfalls fest zu verankern (sofern !IsLoading && !Readonly)
     /// Nur von Laderoutinen aufzurufen, oder von ChangeData, wenn der Wert bereits fest in der Datenbank verankert ist.
-    /// Vorsicht beim überschreiben! Da in Columns und Cells abgesprungen wird, und diese nicht überschrieben werden können.
+    /// Vorsicht beim Überschreiben:
+    /// Da in Columns und Cells abgesprungen wird, und diese nicht überschrieben werden können,
+    ///
     /// </summary>
     /// <param name="type"></param>
     /// <param name="value"></param>
@@ -1427,7 +1410,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// <param name="row"></param>
     /// <param name="width"></param>
     /// <param name="height"></param>
-    /// <returns></returns>
+    /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
     protected virtual string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
         if (type.IsColumnTag()) {
             if (column == null) {
@@ -1447,6 +1430,27 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                 value = Encoding.UTF8.GetString(enc1252.GetBytes(value));
             }
             return Cell.SetValueInternal(column, row, value, width, height);
+        }
+
+        if (type.IsCommand()) {
+            switch (type) {
+                case DatabaseDataType.Comand_RemoveColumn:
+                case DatabaseDataType.Comand_AddColumn:
+                    return Column.SetValueInternal(type, value);
+
+                case DatabaseDataType.Comand_AddRow:
+                case DatabaseDataType.Comand_RemoveRow:
+                    return Row.SetValueInternal(type, value);
+
+                default:
+                    if (LoadedVersion == DatabaseVersion) {
+                        SetReadOnly();
+                        if (!ReadOnly) {
+                            Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + ConnectionData.ToString);
+                        }
+                    }
+                    return "Befehl unbekannt.";
+            }
         }
 
         switch (type) {
@@ -1565,36 +1569,8 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                 // Muss eine übergeordnete Routine bei Befarf abfangen
                 break;
 
-            //case DatabaseDataType.Comand_RowAdded:
-            //    var addRowKey = LongParse(value);
-            //    if (Row.SearchByKey(addRowKey) == null) { Row.Add(new RowItem(this, addRowKey)); }
-            //    break;
-
-            //case DatabaseDataType.AddColumnKeyInfo: // TODO: Ummünzen auf AddColumnNameInfo
-            //    var addColumnKey = LongParse(value);
-            //    if (Column.SearchByKey(addColumnKey) == null) { Column.AddFromParser(new ColumnItem(this, addColumnKey)); }
-            //    break;
-
-            //case DatabaseDataType.AddColumnNameInfo: // TODO: Ummünzen auf AddColumnNameInfo
-            //    //var addColumnKey = LongParse(value);
-            //    //if (Column.SearchByKey(addColumnKey) == null) { Column.AddFromParser(new ColumnItem(this, addColumnKey)); }
-            //    break;
-
-            //case DatabaseDataType.Comand_RemovingRow:
-            //    //var removeRowKey = LongParse(value);
-            //    //if (Row.SearchByKey(removeRowKey) != null) { Row.Remove(removeRowKey); }
-            //    break;
-
-            //case DatabaseDataType.Comand_RemovingColumn:
-            //    //var removeColumnKey = LongParse(value);
-            //    //if (Column.SearchByKey(removeColumnKey) is ColumnItem col) { Column.Remove(col); }
-            //    break;
-
             case DatabaseDataType.EOF:
                 return string.Empty;
-
-            //case DatabaseDataType.Comand_ColumnAdded:
-            //    break;
 
             case (DatabaseDataType)22:
             case (DatabaseDataType)62:
@@ -1612,21 +1588,12 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                     }
                 }
 
-                break;
+                return "Datentyp unbekannt.";
         }
         return string.Empty;
     }
 
     protected abstract string SpecialErrorReason(ErrorReason mode);
-
-    /// <summary>
-    /// Für echtzeitbasierte Systeme ist hier der richtige Zeitpunkt, den Wert fest auf Festplatte zu schreiben.
-    /// </summary>
-    /// <param name="comand"></param>
-    /// <param name="column"></param>
-    /// <param name="row"></param>
-    /// <param name="value"></param>
-    protected abstract void StoreValueToHardDisk(DatabaseDataType type, ColumnItem? column, RowItem? row, string value);
 
     private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
         if (ReadOnly) { return; }
@@ -1740,7 +1707,10 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         ColumnArrangements = x;
     }
 
-    private void Column_ItemAdded(object sender, ListEventArgs e) => CheckViewsAndArrangements();
+    private void Column_ItemAdded(object sender, ListEventArgs e) {
+        if (IsLoading) { return; }
+        CheckViewsAndArrangements();
+    }
 
     private void Column_ItemRemoved(object sender, System.EventArgs e) {
         if (IsLoading) { Develop.DebugPrint(FehlerArt.Warnung, "Parsing Falsch!"); }
@@ -1749,11 +1719,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         var lay = (LayoutCollection)Layouts.Clone();
         lay.Check();
         Layouts = lay;
-    }
-
-    private void Column_ItemRemoving(object sender, ListEventArgs e) {
-        var c = (ColumnItem)e.Item;
-        ChangeData(DatabaseDataType.Comand_RemovingColumn, c, null, string.Empty, c.Key.ToString());
     }
 
     private bool IsThereBackgroundWorkToDo() {
@@ -1847,15 +1812,15 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         } catch { }
     }
 
-    private void Row_RowAdded(object sender, RowEventArgs e) {
-        //if (IsLoading) {
-        ChangeData(DatabaseDataType.Comand_RowAdded, null, e.Row, String.Empty, e.Row.Key.ToString());
-        //}
-    }
+    //private void Row_RowAdded(object sender, RowEventArgs e) {
+    //    //if (IsLoading) {
+    //    ChangeData(DatabaseDataType.Comand_RowAdded, null, e.Row, String.Empty, e.Row.Key.ToString());
+    //    //}
+    //}
 
-    private void Row_RowRemoving(object sender, RowEventArgs e) {
-        ChangeData(DatabaseDataType.Comand_RemovingRow, null, e.Row, string.Empty, e.Row.Key.ToString());
-    }
+    //private void Row_RowRemoving(object sender, RowEventArgs e) {
+    //    ChangeData(DatabaseDataType.Comand_RemovingRow, null, e.Row, string.Empty, e.Row.Key.ToString());
+    //}
 
     //private void Row_RowRemoving(object sender, RowEventArgs e) {
     //    Develop.CheckStackForOverflow();

@@ -62,7 +62,7 @@ public sealed class TextBoxActionList : DesignerActionList {
             new DesignerActionPropertyItem("TextFormat", "TextFormat", "Allgemein", "Wert kann nicht geändert werden. Bei Anklicken werden die entsprechenden Felder gesetzt.")
         };
         //if ((int)ReverenceControl.ButtonStyle % 1000 is ((int)ButtonStyle.Checkbox) or ((int)ButtonStyle.Yes_or_No) or ((int)ButtonStyle.Pic1_or_Pic2) or ((int)ButtonStyle.Optionbox)) {
-        //    items.Add(new DesignerActionPropertyItem("Checked", "Checked", "Allgemein", "Der Checked-Status."));
+        //    items.GenerateAndAdd(new DesignerActionPropertyItem("Checked", "Checked", "Allgemein", "Der Checked-Status."));
         //}
         return items;
     }

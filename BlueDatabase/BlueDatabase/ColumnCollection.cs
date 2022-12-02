@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using static BlueBasics.IO;
+using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
@@ -41,6 +42,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     #region Properties
 
     public DatabaseAbstract? Database { get; private set; }
+
     public ColumnItem? SysChapter { get; private set; }
 
     public ColumnItem? SysCorrect { get; private set; }
@@ -104,64 +106,8 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         return originalString;
     }
 
-    //[Obsolete("Direkter Aufruf nicht erlaubt!", true)]
-    //public new ColumnItem? Add(ColumnItem column) => null;
-
-    public ColumnItem Add(string internalName) => Add(NextColumnKey(), internalName, internalName, string.Empty, VarType.Text, string.Empty);
-
-    public ColumnItem Add(long colKey) => Add(colKey, Freename(string.Empty), string.Empty, string.Empty, VarType.Unbekannt, string.Empty);
-
-    public ColumnItem Add() => Add(NextColumnKey(), Freename(string.Empty), string.Empty, string.Empty, VarType.Text, string.Empty);
-
-    public ColumnItem Add(string internalName, string caption, VarType format) => Add(NextColumnKey(), internalName, caption, string.Empty, format, string.Empty);
-
-    public ColumnItem Add(string internalName, string caption, VarType format, string quickinfo) => Add(NextColumnKey(), internalName, caption, string.Empty, format, quickinfo);
-
-    public ColumnItem Add(string internalName, string caption, string suffix, VarType format) => Add(NextColumnKey(), internalName, caption, suffix, format, string.Empty);
-
-    public ColumnItem Add(long colKey, string internalName, string caption, string suffix, VarType format, string quickinfo) {
-        if (!ColumnItem.IsValidColumnName(internalName)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht erlaubt!");
-        }
-
-        var c = SearchByKey(colKey);
-
-        //var addColumnKey = LongParse(value);
-        if (c == null) {
-            c = new ColumnItem(Database, internalName, colKey);
-            base.Add(c);
-            Database.ChangeData(DatabaseDataType.Comand_ColumnAdded, c, null, string.Empty, c.Name);
-        }
-
-        //var c = SearchByKey(colKey) ?? Exists(internalName);
-        //Database.ChangeData(DatabaseDataType.AddColumnNameInfo, c, null, string.Empty, internalName.ToUpper());
-        //c = SearchByKey(colKey) ?? Exists(internalName);
-        //Database.ChangeData(DatabaseDataType.AddColumnKeyInfo, c, null, string.Empty, colKey.ToString());
-
-        //// Ruft anschließen AddFromParser Auf, der die Spalte endgültig dazumacht
-
-        //c = SearchByKey(colKey) ?? Exists(internalName);
-
-        c.Name = internalName;
-        c.Key = colKey;
-        c.Caption = caption;
-
-        if (format != VarType.Unbekannt) { c.SetFormat(format); }
-        c.Suffix = suffix;
-        c.Quickinfo = quickinfo;
-        return c;
-    }
-
-    ///// <summary>
-    ///// Diese Routine sollte nur bei einem Reload benutzt werden. AddPending wir nicht mehr ausgelöst.
-    ///// </summary>
-    ///// <param name="column"></param>
-    ///// <returns></returns>
-    //public void AddFromParser(ColumnItem? column) {
-    //    if (column.Database != Database) { Develop.DebugPrint(FehlerArt.Fehler, "Parent-Datenbanken unterschiedlich!"); }
-    //    if (Contains(column)) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte bereits vorhanden!"); }
-    //    base.Add(column);
-    //}
+    [Obsolete("GenerateAndAdd benutzen, oder mittels SetValueInternal, falls Daten nachgezogen werden müssen")]
+    public new void Add() { }
 
     public ColumnItem? Exists(string columnName) {
         if (Database == null) {
@@ -176,6 +122,16 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         return this.FirstOrDefault(thisColumn => thisColumn != null && thisColumn.Name == columnName);
     }
 
+    ///// <summary>
+    ///// Diese Routine sollte nur bei einem Reload benutzt werden. AddPending wir nicht mehr ausgelöst.
+    ///// </summary>
+    ///// <param name="column"></param>
+    ///// <returns></returns>
+    //public void AddFromParser(ColumnItem? column) {
+    //    if (column.Database != Database) { Develop.DebugPrint(FehlerArt.Fehler, "Parent-Datenbanken unterschiedlich!"); }
+    //    if (Contains(column)) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte bereits vorhanden!"); }
+    //    base.GenerateAndAdd(column);
+    //}
     /// <summary>
     /// Gib Spalte 0 zurück
     /// </summary>
@@ -195,6 +151,50 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
             testName = preferedName + "_" + nr;
         } while (Exists(testName) != null);
         return testName;
+    }
+
+    public ColumnItem GenerateAndAdd(string internalName, string caption, string suffix, VarType format) => GenerateAndAdd(NextColumnKey(), internalName, caption, suffix, format, string.Empty);
+
+    public ColumnItem GenerateAndAdd(string internalName, string caption, VarType format, string quickinfo) => GenerateAndAdd(NextColumnKey(), internalName, caption, string.Empty, format, quickinfo);
+
+    public ColumnItem GenerateAndAdd(string internalName, string caption, VarType format) => GenerateAndAdd(NextColumnKey(), internalName, caption, string.Empty, format, string.Empty);
+
+    public ColumnItem GenerateAndAdd(long colKey) => GenerateAndAdd(colKey, Freename(string.Empty), string.Empty, string.Empty, VarType.Unbekannt, string.Empty);
+
+    public ColumnItem GenerateAndAdd(long colKey, string internalName) => GenerateAndAdd(colKey, internalName, string.Empty, string.Empty, VarType.Unbekannt, string.Empty);
+
+    public ColumnItem GenerateAndAdd() => GenerateAndAdd(NextColumnKey(), Freename(string.Empty), string.Empty, string.Empty, VarType.Text, string.Empty);
+
+    public ColumnItem GenerateAndAdd(string internalName) => GenerateAndAdd(NextColumnKey(), internalName, internalName, string.Empty, VarType.Text, string.Empty);
+
+    public ColumnItem GenerateAndAdd(long key, string internalName, string caption, string suffix, VarType format, string quickinfo) {
+        if (!ColumnItem.IsValidColumnName(internalName)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht erlaubt!");
+        }
+
+        var item = SearchByKey(key);
+        if (item != null) { Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!"); }
+        Database.ChangeData(DatabaseDataType.Comand_AddColumn, null, null, string.Empty, key.ToString());
+        item = SearchByKey(key);
+        if (item == null) { Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen."); }
+
+        //var c = SearchByKey(colKey) ?? Exists(internalName);
+        //Database.ChangeData(DatabaseDataType.AddColumnNameInfo, c, null, string.Empty, internalName.ToUpper());
+        //c = SearchByKey(colKey) ?? Exists(internalName);
+        //Database.ChangeData(DatabaseDataType.AddColumnKeyInfo, c, null, string.Empty, colKey.ToString());
+
+        //// Ruft anschließen AddFromParser Auf, der die Spalte endgültig dazumacht
+
+        //c = SearchByKey(colKey) ?? Exists(internalName);
+
+        item.Name = internalName;
+        item.Key = key;
+        item.Caption = caption;
+
+        if (format != VarType.Unbekannt) { item.SetFormat(format); }
+        item.Suffix = suffix;
+        item.Quickinfo = quickinfo;
+        return item;
     }
 
     public void GenerateOverView() {
@@ -284,6 +284,10 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         }
     }
 
+    public new void Remove(ColumnItem item) {
+        Database.ChangeData(DatabaseDataType.Comand_RemoveColumn, item, null, string.Empty, item.Key.ToString());
+    }
+
     public void Repair() {
         List<string> w = new()
         {
@@ -297,7 +301,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         };
 
         foreach (var thisstring in w) {
-            AddSystem(thisstring);
+            GenerateAndAddSystem(thisstring);
         }
         GetSystems();
         for (var s1 = 0; s1 < Count; s1++) {
@@ -381,7 +385,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         foreach (var ThisColumn in sourceDatabase.Column) {
             var l = Exists(ThisColumn.Name);
             if (l == null) {
-                l = Add(ThisColumn.Key, ThisColumn.Name, ThisColumn.Caption, ThisColumn.Suffix, VarType.Unbekannt, ThisColumn.Quickinfo);
+                l = GenerateAndAdd(ThisColumn.Key, ThisColumn.Name, ThisColumn.Caption, ThisColumn.Suffix, VarType.Unbekannt, ThisColumn.Quickinfo);
             }
             l.CloneFrom(ThisColumn, true);
         }
@@ -414,6 +418,22 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     //    }
     //    return string.Empty;
     //}
+    internal string SetValueInternal(DatabaseDataType type, string value) {
+        if (type == DatabaseDataType.Comand_AddColumn) {
+            var c = new ColumnItem(Database, LongParse(value));
+            base.Add(c);
+            return string.Empty;
+        }
+
+        if (type == DatabaseDataType.Comand_RemoveColumn) {
+            var key = LongParse(value);
+            var c = SearchByKey(key);
+            base.Remove(c);
+            return string.Empty;
+        }
+
+        return "Befehl unbekannt";
+    }
 
     protected override void Dispose(bool disposing) {
         Database.Disposing -= Database_Disposing;
@@ -421,7 +441,9 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         base.Dispose(disposing);
     }
 
-    private void AddSystem(string sysname) {
+    private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
+
+    private void GenerateAndAddSystem(string sysname) {
         var c = Exists(sysname);
 
         if (sysname == "SYS_DATECHANGED" && c == null) { c = Exists("SYS_CHANGEDATE"); }
@@ -433,11 +455,9 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
             return;
         }
 
-        c = Add(sysname.ToUpper());
+        c = GenerateAndAdd(sysname.ToUpper());
         c.ResetSystemToDefault(true);
     }
-
-    private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
     #endregion
 }

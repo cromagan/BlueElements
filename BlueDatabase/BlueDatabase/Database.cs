@@ -99,7 +99,6 @@ public sealed class Database : DatabaseAbstract {
 
     public override bool IsLoading {
         get => _muf.IsLoading;
-        protected set => Develop.DebugPrint_NichtImplementiert();
     }
 
     public override bool ReloadNeeded => _muf != null && _muf.ReloadNeeded;
@@ -313,8 +312,7 @@ public sealed class Database : DatabaseAbstract {
             if (rowKey > -1) {
                 row = Row.SearchByKey(rowKey);
                 if (row == null) {
-                    row = new RowItem(this, rowKey);
-                    Row.Add(row);
+                    row = Row.GenerateAndAdd(rowKey, string.Empty, false, false);
                 }
             }
 
@@ -338,7 +336,7 @@ public sealed class Database : DatabaseAbstract {
                         columnsOld.Remove(column);
                     } else {
                         // Nicht gefunden, als neu machen
-                        column = Column.Add(colKey);
+                        column = Column.GenerateAndAdd(colKey);
                     }
                 }
             }
@@ -577,10 +575,6 @@ public sealed class Database : DatabaseAbstract {
 
     protected override string SpecialErrorReason(ErrorReason mode) => _muf.ErrorReason(mode);
 
-    protected override void StoreValueToHardDisk(DatabaseDataType type, ColumnItem? column, RowItem? row, string value) {
-        // System speichert nicht in Echtzeit. Deswegen ist diese Routine irrelevant.
-    }
-
     private static int NummerCode2(byte[] b, int pointer) => (b[pointer] * 255) + b[pointer + 1];
 
     private static int NummerCode3(byte[] b, int pointer) => (b[pointer] * 65025) + (b[pointer + 1] * 255) + b[pointer + 2];
@@ -683,7 +677,7 @@ public sealed class Database : DatabaseAbstract {
             if (thisPendingItem.RowKey > -1) {
                 row = Row.SearchByKey(thisPendingItem.RowKey);
                 if (row == null) {
-                    if (thisPendingItem.Comand != DatabaseDataType.Comand_RowAdded && thisPendingItem.User != UserName) {
+                    if (thisPendingItem.Comand != DatabaseDataType.Comand_AddRow && thisPendingItem.User != UserName) {
                         Develop.DebugPrint("Pending verworfen, Zeile gelöscht.<br>" + ConnectionData.TableName + "<br>" + thisPendingItem.ToString());
                         return;
                     }

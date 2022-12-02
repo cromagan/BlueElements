@@ -165,7 +165,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
             //    if (db != null && !string.IsNullOrEmpty(column.LinkedKeyKennung)) {
             //        foreach (var thisColumn in db.Column) {
             //            if (thisColumn.Name.ToLower().StartsWith(column.LinkedKeyKennung.ToLower())) {
-            //                l.Add(thisColumn.Key.ToString());
+            //                l.GenerateAndAdd(thisColumn.Key.ToString());
             //            }
             //        }
             //    }
@@ -441,7 +441,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
     public BasicListItem? Add(string value, ColumnItem? columnStyle, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
         if (this[value] == null) {
             //if (columnStyle.Format == DataFormat.Link_To_Filesystem && value.FileType() == FileFormat.Image) {
-            //    return Add(columnStyle.BestFile(value, false), value, value, columnStyle.Database.FileEncryptionKey);
+            //    return GenerateAndAdd(columnStyle.BestFile(value, false), value, value, columnStyle.Database.FileEncryptionKey);
             //}
 
             CellLikeListItem i = new(value, columnStyle, style, true, bildTextverhalten);
@@ -487,7 +487,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
             return;
         }
         foreach (var thisstring in values) {
-            Add(thisstring, columnStyle, style, bildTextverhalten); // If Item(thisstring) Is Nothing Then Add(New CellLikeItem(thisstring, ColumnStyle))
+            Add(thisstring, columnStyle, style, bildTextverhalten); // If Item(thisstring) Is Nothing Then GenerateAndAdd(New CellLikeItem(thisstring, ColumnStyle))
         }
     }
 
@@ -587,7 +587,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
             var te = Enum.GetName(t, thisItem);
             var th = (int)thisItem;
             if (!string.IsNullOrEmpty(te)) {
-                //NewReplacer.Add(th.ToString() + "|" + te);
+                //NewReplacer.GenerateAndAdd(th.ToString() + "|" + te);
                 if (th >= zumDropdownHinzuAb && th < zumDropdownHinzuBis) {
                     Add(te, th.ToString());
                 }
@@ -605,10 +605,10 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
     //    foreach (var thisItem in this) {
     //        switch (thisItem) {
     //            case BitmapListItem BI:
-    //                l.Add(new clsNamedBinary(BI.Caption, BI.Bitmap));
+    //                l.GenerateAndAdd(new clsNamedBinary(BI.Caption, BI.Bitmap));
     //                break;
     //            case TextListItem TI:
-    //                l.Add(new clsNamedBinary(TI.Text, TI.Internal));
+    //                l.GenerateAndAdd(new clsNamedBinary(TI.Text, TI.Internal));
     //                break;
     //        }
     //    }

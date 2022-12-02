@@ -800,7 +800,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             //        if (bmp.Picture != null) {
             //            if (!string.IsNullOrEmpty(bmp.Name)) {
             //                var crc = "DB_" + bmp.Name;
-            //                i.Add(bmp.Name, crc, QuickImage.Get(crc, 20));
+            //                i.GenerateAndAdd(bmp.Name, crc, QuickImage.Get(crc, 20));
             //            }
             //        }
             //    }

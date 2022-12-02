@@ -532,11 +532,11 @@ internal sealed partial class ColumnEditor {
 
         if (tblFilterliste.Database == null) {
             Database db = new(false, "Filter " + _column.Database.ConnectionData.UniqueID + " " + _column.Name);
-            db.Column.Add("count", "count", VarType.IntegerPositive);
-            var vis = db.Column.Add("visible", "visible", VarType.Bit);
-            var sp = db.Column.Add("Spalte", "Spalte", VarType.Text);
+            db.Column.GenerateAndAdd("count", "count", VarType.IntegerPositive);
+            var vis = db.Column.GenerateAndAdd("visible", "visible", VarType.Bit);
+            var sp = db.Column.GenerateAndAdd("Spalte", "Spalte", VarType.Text);
             sp.Align = AlignmentHorizontal.Rechts;
-            var b = db.Column.Add("Such", "Suchtext", VarType.Text);
+            var b = db.Column.GenerateAndAdd("Such", "Suchtext", VarType.Text);
             b.Quickinfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum suchen<br>Mischen wird nicht unterstützt.";
             b.MultiLine = false;
             b.TextBearbeitungErlaubt = true;
@@ -585,7 +585,7 @@ internal sealed partial class ColumnEditor {
 
             var r = tblFilterliste.Database.Row[z.ToString()];
             if (r == null) {
-                r = tblFilterliste.Database.Row.Add(z.ToString());
+                r = tblFilterliste.Database.Row.GenerateAndAdd(z.ToString());
             }
 
             r.CellSet("Spalte", col.ReadableText() + " = ");

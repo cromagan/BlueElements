@@ -210,7 +210,7 @@ public abstract class AbstractPhysicPadItem : BasicPadItem {
     //   http://csharphelper.com/blog/2014/07/find-the-centroid-of-a-polygon-in-c/
     // Find the polygon's centroid.
     public PointM FindCentroid() {
-        // Add the first point at the end of the array.
+        // GenerateAndAdd the first point at the end of the array.
         var numPoints = MovablePoint.Count - 1;
         var pts = new PointM?[numPoints + 1];
         MovablePoint.CopyTo(pts, 0);
@@ -319,7 +319,7 @@ public abstract class AbstractPhysicPadItem : BasicPadItem {
                 curIndex = nextIndex;
                 // If we've returned to the starting point, we're done.
                 if (curPoint == startPoint) { break; }
-                // Add the current point to the union.
+                // GenerateAndAdd the current point to the union.
                 union.Add(curPoint);
             }
         }
@@ -336,7 +336,7 @@ public abstract class AbstractPhysicPadItem : BasicPadItem {
         // first and last vertices.
         var maxPoint = MovablePoint.Count - 2;
         var totalAngle = GetAngle(MovablePoint[maxPoint].X, MovablePoint[maxPoint].Y, x, y, MovablePoint[0].X, MovablePoint[0].Y);
-        // Add the angles from the point
+        // GenerateAndAdd the angles from the point
         // to each other pair of vertices.
         for (var i = 0; i < maxPoint; i++) {
             totalAngle += GetAngle(
@@ -480,7 +480,7 @@ public abstract class AbstractPhysicPadItem : BasicPadItem {
     }
 
     private static float SignedPolygonArea(IList<PointF> points) {
-        // Add the first point to the end.
+        // GenerateAndAdd the first point to the end.
         var numPoints = points.Count;
         var pts = new PointF[numPoints + 1];
         points.CopyTo(pts, 0);
@@ -501,7 +501,7 @@ public abstract class AbstractPhysicPadItem : BasicPadItem {
     // The value will be negative if the polygon is
     // oriented clockwise.
     private float SignedPolygonArea() {
-        // Add the first point to the end.
+        // GenerateAndAdd the first point to the end.
         var numPoints = MovablePoint.Count - 1;
         var pts = new PointM?[numPoints + 1];
         MovablePoint.CopyTo(pts, 0);

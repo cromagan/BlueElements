@@ -28,6 +28,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
@@ -139,72 +140,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
             if (ok) { return unique; }
         } while (true);
-    }
-
-    public void Add(RowItem? row) {
-        if (!_internal.TryAdd(row.Key, row)) { Develop.DebugPrint(FehlerArt.Fehler, "Add Failed"); }
-        OnRowAdded(new RowEventArgs(row));
-    }
-
-    public RowItem? Add(string valueOfCellInFirstColumn) => Add(valueOfCellInFirstColumn, true);
-
-    /// <summary>
-    /// Erstellt eine neue Spalte mit den aus den Filterkriterien. nur Fiter IstGleich wird unterstützt.
-    /// Schägt irgendetwas fehl, wird NULL zurückgegeben.
-    /// Ist ein Filter mehrfach vorhanden, erhält die Zelle den LETZTEN Wert.
-    /// Am Schluß wird noch das Skript ausgeführt.
-    /// </summary>
-    /// <param name="fi"></param>
-    /// <returns></returns>
-    public RowItem? Add(List<FilterItem>? fi) {
-        List<string> first = null;
-
-        foreach (var thisfi in fi) {
-            if (Database.Column.First() == thisfi.Column) {
-                if (first != null) { return null; }
-                first = thisfi.SearchValue;
-            }
-            if (thisfi.FilterType != FilterType.Istgleich) { return null; }
-            if (thisfi.Column == null) { return null; }
-            if (thisfi.Column.Database != Database) { return null; }
-        }
-
-        if (first == null) { return null; }
-
-        var row = Add(first.JoinWithCr(), false);
-
-        if (row == null) { return null; }
-
-        foreach (var thisfi in fi) {
-            row.CellSet(thisfi.Column, thisfi.SearchValue);
-        }
-
-        row.DoAutomatic(false, false, 1, "new row");
-
-        return row;
-    }
-
-    public RowItem? Add(string valueOfCellInFirstColumn, bool runScriptOfNewRow) {
-        Develop.DebugPrint_Disposed(Database);
-
-        if (string.IsNullOrEmpty(valueOfCellInFirstColumn)) {
-            Develop.DebugPrint("Value = 0");
-            return null;
-        }
-
-        RowItem row = new(Database!);
-        Add(row);
-        row.CellSet(Database!.Column[0], valueOfCellInFirstColumn);
-        Database.Cell.SystemSet(Database.Column.SysRowCreator, row, Database.UserName);
-        Database.Cell.SystemSet(Database.Column.SysRowCreateDate, row, DateTime.Now.ToString(Constants.Format_Date5));
-        // Dann die Inital-Werte reinschreiben
-        foreach (var thisColum in Database.Column.Where(thisColum => thisColum != null && !string.IsNullOrEmpty(thisColum.CellInitValue))) {
-            row.CellSet(thisColum, thisColum.CellInitValue);
-        }
-
-        if (runScriptOfNewRow) { row.DoAutomatic(false, false, 1, "new row"); }
-
-        return row;
     }
 
     /// <summary>
@@ -349,7 +284,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         //foreach (var thisRowItem in Database.Row) {
         //    if (thisRowItem != null) {
         //        if (thisRowItem.MatchesTo(filter) || pinnedRows.Contains(thisRowItem)) {
-        //            _tmpVisibleRows.Add(thisRowItem);
+        //            _tmpVisibleRows.GenerateAndAdd(thisRowItem);
         //        }
         //    }
         //}
@@ -397,37 +332,103 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
     public RowItem? First() => _internal.Values.FirstOrDefault(thisRowItem => thisRowItem != null);
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="valueOfCellInFirstColumn"></param>
+    /// <param name="runScriptOfNewRow"></param>
+    /// <param name="fullprocessing">Sollen der Zeilenersteller, das Datum und die Initalwerte geschrieben werden?</param>
+    /// <returns></returns>
+    public RowItem? GenerateAndAdd(long key, string valueOfCellInFirstColumn, bool runScriptOfNewRow, bool fullprocessing) {
+        Develop.DebugPrint_Disposed(Database);
+
+        var item = SearchByKey(key);
+        if (item != null) { Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!"); }
+        Database.ChangeData(DatabaseDataType.Comand_AddRow, null, null, string.Empty, key.ToString());
+        item = SearchByKey(key);
+        if (item == null) { Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen."); }
+
+        if (fullprocessing) {
+            Database.Cell.SystemSet(Database.Column.SysRowCreator, item, Database.UserName);
+            Database.Cell.SystemSet(Database.Column.SysRowCreateDate, item, DateTime.UtcNow.ToString(Constants.Format_Date5));
+
+            // Dann die Inital-Werte reinschreiben
+            foreach (var thisColum in Database.Column.Where(thisColum => thisColum != null && !string.IsNullOrEmpty(thisColum.CellInitValue))) {
+                item.CellSet(thisColum, thisColum.CellInitValue);
+            }
+        }
+
+        if (!string.IsNullOrEmpty(valueOfCellInFirstColumn)) {
+            item.CellSet(Database!.Column[0], valueOfCellInFirstColumn);
+        }
+
+        if (runScriptOfNewRow) {
+            item.DoAutomatic(false, false, 1, "new row");
+        }
+
+        return item;
+    }
+
+    /// <summary>
+    /// Erstellt eine neue Spalte mit den aus den Filterkriterien. nur Fiter IstGleich wird unterstützt.
+    /// Schägt irgendetwas fehl, wird NULL zurückgegeben.
+    /// Ist ein Filter mehrfach vorhanden, erhält die Zelle den LETZTEN Wert.
+    /// Am Schluß wird noch das Skript ausgeführt.
+    /// </summary>
+    /// <param name="fi"></param>
+    /// <returns></returns>
+    public RowItem? GenerateAndAdd(List<FilterItem>? fi) {
+        List<string> first = null;
+
+        foreach (var thisfi in fi) {
+            if (Database.Column.First() == thisfi.Column) {
+                if (first != null) { return null; }
+                first = thisfi.SearchValue;
+            }
+            if (thisfi.FilterType != FilterType.Istgleich) { return null; }
+            if (thisfi.Column == null) { return null; }
+            if (thisfi.Column.Database != Database) { return null; }
+        }
+
+        if (first == null) { return null; }
+
+        var row = GenerateAndAdd(NextRowKey(), first.JoinWithCr(), false, true);
+
+        if (row == null) { return null; }
+
+        foreach (var thisfi in fi) {
+            row.CellSet(thisfi.Column, thisfi.SearchValue);
+        }
+
+        row.DoAutomatic(false, false, 1, "new row");
+
+        return row;
+    }
+
+    public RowItem? GenerateAndAdd(string valueOfCellInFirstColumn) => GenerateAndAdd(NextRowKey(), valueOfCellInFirstColumn, true, true);
+
     public IEnumerator<RowItem> GetEnumerator() => _internal.Values.GetEnumerator();
 
     //foreach (var ThisRowItem in _Internal.Values)//{//    if (ThisRowItem != null) { return ThisRowItem; }//}//return null;
     IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();
 
     public bool Remove(long key) {
-        var row = SearchByKey(key);
-        if (row == null) { return false; }
-
-        OnRowRemoving(new RowEventArgs(row));
-        foreach (var thisColumnItem in Database.Column.Where(thisColumnItem => thisColumnItem != null)) {
-            Database.Cell.Delete(thisColumnItem, key);
-        }
-        if (!_internal.TryRemove(key, out _)) { Develop.DebugPrint(FehlerArt.Fehler, "Remove Failed"); }
-        OnRowRemoved();
-        return true;
+        return string.IsNullOrEmpty(Database.ChangeData(DatabaseDataType.Comand_RemoveRow, null, null, string.Empty, key.ToString()));
     }
 
     public bool Remove(FilterItem filter, List<RowItem?> pinned) {
-        FilterCollection nf = new(Database)
-        {
-            filter
-        };
+        FilterCollection nf = new(Database) { filter };
         return Remove(nf, pinned);
     }
 
-    public bool Remove(FilterCollection? filter, List<RowItem>? pinned) {
+    public bool Remove(FilterCollection? filter, List<RowItem?>? pinned) {
         var keys = (from thisrowitem in _internal.Values where thisrowitem != null && thisrowitem.MatchesTo(filter) select thisrowitem.Key).Select(dummy => dummy).ToList();
         var did = keys.Count(thisKey => Remove(thisKey)) > 0;
 
-        did = pinned?.Count(thisRow => Remove(thisRow)) > 0 || did;
+        if (pinned != null && pinned.Count > 0) {
+            did = pinned?.Count(thisRow => Remove(thisRow)) > 0 || did;
+        }
 
         return did;
     }
@@ -441,7 +442,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         //    if (thisrowitem != null)
         //    {
         //        var D = thisrowitem.CellGetDateTime(Database.Column.SysRowCreateDate());
-        //        if (DateTime.Now.Subtract(D).TotalHours > InHours) { x.Add(thisrowitem.Key); }
+        //        if (DateTime.Now.Subtract(D).TotalHours > InHours) { x.GenerateAndAdd(thisrowitem.Key); }
         //    }
         //}
         if (x.Count == 0) { return false; }
@@ -477,23 +478,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         return l;
     }
 
-    //internal string SetValueInternal(enDatabaseDataType type, string value) {
-    //    switch (type) {
-    //        case enDatabaseDataType.LastRowKey:
-    //            //_LastRowKey = LongParse(value);
-    //            break;
-
-    //        default:
-    //            if (type.ToString() == ((int)type).ToString()) {
-    //                Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + type + "' nicht definiert.<br>Wert: " + value + "<br>Datei: " + Database.Filename);
-    //            } else {
-    //                return "Interner Fehler: Für den Datentyp  '" + type + "'  wurde keine Laderegel definiert.";
-    //            }
-    //            break;
-    //    }
-    //    return string.Empty;
-    //}
-
     internal void CloneFrom(DatabaseAbstract sourceDatabase) {
         // Zeilen, die zu viel sind, löschen
         foreach (var thisRow in this) {
@@ -505,13 +489,22 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         foreach (var thisRow in sourceDatabase.Row) {
             var l = SearchByKey(thisRow.Key);
             if (l == null) {
-                l = new RowItem(Database, thisRow.Key);
-                this.Add(l);
+                l = GenerateAndAdd(thisRow.Key, string.Empty, false, false);
             }
             l.CloneFrom(thisRow, true);
         }
     }
 
+    //        default:
+    //            if (type.ToString() == ((int)type).ToString()) {
+    //                Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + type + "' nicht definiert.<br>Wert: " + value + "<br>Datei: " + Database.Filename);
+    //            } else {
+    //                return "Interner Fehler: Für den Datentyp  '" + type + "'  wurde keine Laderegel definiert.";
+    //            }
+    //            break;
+    //    }
+    //    return string.Empty;
+    //}
     internal long NextRowKey() {
         var tmp = 0;
         long key;
@@ -523,6 +516,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         return key;
     }
 
+    //internal string SetValueInternal(enDatabaseDataType type, string value) {
+    //    switch (type) {
+    //        case enDatabaseDataType.LastRowKey:
+    //            //_LastRowKey = LongParse(value);
+    //            break;
     internal void OnRowRemoving(RowEventArgs e) {
         e.Row.RowChecked -= OnRowChecked;
         e.Row.DoSpecialRules -= OnDoSpecialRules;
@@ -532,6 +530,41 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     }
 
     internal void RemoveNullOrEmpty() => _internal.RemoveNullOrEmpty();
+
+    internal string SetValueInternal(DatabaseDataType type, string value) {
+        if (type == DatabaseDataType.Comand_AddRow) {
+            var c = new RowItem(Database, LongParse(value));
+
+            return Add(c);
+        }
+
+        if (type == DatabaseDataType.Comand_RemoveRow) {
+            var key = LongParse(value);
+            var row = SearchByKey(key);
+            if (row == null) { return "Zeile nicht vorhanden"; }
+
+            OnRowRemoving(new RowEventArgs(row));
+            foreach (var thisColumnItem in Database.Column.Where(thisColumnItem => thisColumnItem != null)) {
+                Database.Cell.Delete(thisColumnItem, key);
+            }
+            if (!_internal.TryRemove(key, out _)) { return "Löschen nicht erfolgreich"; }
+            OnRowRemoved();
+            return string.Empty;
+        }
+
+        return "Befehl unbekannt";
+    }
+
+    /// <summary>
+    /// Fügt eine Zeile hinzu, die im System fest verankert ist.
+    /// </summary>
+    /// <param name="row"></param>
+    /// <returns></returns>
+    private string Add(RowItem row) {
+        if (!_internal.TryAdd(row.Key, row)) { return "Hinzufügen fehlgeschlagen."; }
+        OnRowAdded(new RowEventArgs(row));
+        return string.Empty;
+    }
 
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
