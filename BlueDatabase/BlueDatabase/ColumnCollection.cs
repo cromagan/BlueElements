@@ -24,7 +24,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using static BlueBasics.IO;
-using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
@@ -174,18 +173,9 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
 
         var item = SearchByKey(key);
         if (item != null) { Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!"); }
-        Database.ChangeData(DatabaseDataType.Comand_AddColumn, null, null, string.Empty, key.ToString());
+        Database.ChangeData(DatabaseDataType.Comand_AddColumn, key, null, string.Empty, key.ToString());
         item = SearchByKey(key);
         if (item == null) { Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen."); }
-
-        //var c = SearchByKey(colKey) ?? Exists(internalName);
-        //Database.ChangeData(DatabaseDataType.AddColumnNameInfo, c, null, string.Empty, internalName.ToUpper());
-        //c = SearchByKey(colKey) ?? Exists(internalName);
-        //Database.ChangeData(DatabaseDataType.AddColumnKeyInfo, c, null, string.Empty, colKey.ToString());
-
-        //// Ruft anschließen AddFromParser Auf, der die Spalte endgültig dazumacht
-
-        //c = SearchByKey(colKey) ?? Exists(internalName);
 
         item.Name = internalName;
         item.Key = key;
@@ -285,7 +275,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     }
 
     public new void Remove(ColumnItem item) {
-        Database.ChangeData(DatabaseDataType.Comand_RemoveColumn, item, null, string.Empty, item.Key.ToString());
+        Database.ChangeData(DatabaseDataType.Comand_RemoveColumn, item.Key, null, string.Empty, item.Key.ToString());
     }
 
     public void Repair() {
@@ -347,10 +337,10 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         }
     }
 
-    public ColumnItem? SearchByKey(long key) {
+    public ColumnItem? SearchByKey(long? key) {
         try {
             if (Database == null) { return null; }
-            if (key < 0) { return null; } // Evtl. Gelöschte Spalte in irgendeiner Order
+            if (key == null || key < 0) { return null; } // Evtl. Gelöschte Spalte in irgendeiner Order
             Database.BlockReload(false);
             return this.FirstOrDefault(thisColumn => thisColumn != null && thisColumn.Key == key);
         } catch {
@@ -418,15 +408,19 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     //    }
     //    return string.Empty;
     //}
-    internal string SetValueInternal(DatabaseDataType type, string value) {
+    internal string SetValueInternal(DatabaseDataType type, long? key) {
+        if (key is null or < 0) { return "Schlüsselfehler"; }
+
         if (type == DatabaseDataType.Comand_AddColumn) {
-            var c = new ColumnItem(Database, LongParse(value));
+            var c = SearchByKey(key);
+            if (c != null) { return "Bereits vorhanden!"; }
+
+            c = new ColumnItem(Database, (long)key);
             base.Add(c);
             return string.Empty;
         }
 
         if (type == DatabaseDataType.Comand_RemoveColumn) {
-            var key = LongParse(value);
             var c = SearchByKey(key);
             base.Remove(c);
             return string.Empty;

@@ -40,16 +40,18 @@ public class WorkItem : IParseable {
 
     #region Constructors
 
-    public WorkItem(DatabaseDataType comand, ColumnItem column, RowItem row, string previousValue, string changedTo, string user) {
+    public WorkItem(DatabaseDataType comand, long? columnKey, long? rowkey, string previousValue, string changedTo, string user) {
         _state = ItemState.Pending;
         Comand = comand;
-        _colKey = column?.Key ?? -1;
-        _rowKey = row?.Key ?? -1;
+        _colKey = columnKey ?? -1;
+        _rowKey = rowkey ?? -1;
         PreviousValue = previousValue;
         _changedTo = changedTo;
         User = user;
         Date = DateTime.UtcNow;
     }
+
+    //public WorkItem(DatabaseDataType comand, ColumnItem column, RowItem row, string previousValue, string changedTo, string user) : this(comand, column?.Key ?? -1, row?.Key ?? -1, previousValue, changedTo, user) { }
 
     public WorkItem(string s) {
         Parse(s);

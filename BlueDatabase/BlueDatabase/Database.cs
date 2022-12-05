@@ -360,7 +360,7 @@ public sealed class Database : DatabaseAbstract {
 
             #endregion
 
-            var fehler = SetValueInternal(art, inhalt, column, row, x, y);
+            var fehler = SetValueInternal(art, inhalt, column?.Key, row?.Key, x, y);
 
             if (art == DatabaseDataType.EOF) { break; }
             if (!string.IsNullOrEmpty(fehler)) {
@@ -528,8 +528,8 @@ public sealed class Database : DatabaseAbstract {
         SaveToByteList(list, contentSize.Height, 2);
     }
 
-    protected override void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName) {
-        Works.Add(new WorkItem(comand, column, row, previousValue, changedTo, UserName));
+    protected override void AddUndo(string tableName, DatabaseDataType comand, long? columnKey, long? rowKey, string previousValue, string changedTo, string userName) {
+        Works.Add(new WorkItem(comand, columnKey, rowKey, previousValue, changedTo, userName));
     }
 
     protected override void Dispose(bool disposing) {
@@ -552,8 +552,8 @@ public sealed class Database : DatabaseAbstract {
 
     protected override void SetUserDidSomething() => _muf.SetUserDidSomething();
 
-    protected override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
-        var r = base.SetValueInternal(type, value, column, row, width, height);
+    protected override string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height) {
+        var r = base.SetValueInternal(type, value, columnkey, rowkey, width, height);
 
         if (type == DatabaseDataType.ReloadDelaySecond) {
             _muf.ReloadDelaySecond = ReloadDelaySecond;
@@ -673,27 +673,27 @@ public sealed class Database : DatabaseAbstract {
 
     private void ExecutePending(WorkItem thisPendingItem) {
         if (thisPendingItem.State == ItemState.Pending) {
-            RowItem? row = null;
-            if (thisPendingItem.RowKey > -1) {
-                row = Row.SearchByKey(thisPendingItem.RowKey);
-                if (row == null) {
-                    if (thisPendingItem.Comand != DatabaseDataType.Comand_AddRow && thisPendingItem.User != UserName) {
-                        Develop.DebugPrint("Pending verworfen, Zeile gelöscht.<br>" + ConnectionData.TableName + "<br>" + thisPendingItem.ToString());
-                        return;
-                    }
-                }
-            }
-            ColumnItem? col = null;
-            if (thisPendingItem.ColKey > -1) {
-                col = Column.SearchByKey(thisPendingItem.ColKey);
-                if (col == null) {
-                    //if (thisPendingItem.Comand != DatabaseDataType.AddColumnKeyInfo && thisPendingItem.User != UserName) {
-                    Develop.DebugPrint("Pending verworfen, Spalte gelöscht.<br>" + ConnectionData.TableName + "<br>" + thisPendingItem.ToString());
-                    return;
-                    //}
-                }
-            }
-            SetValueInternal(thisPendingItem.Comand, thisPendingItem.ChangedTo, col, row, 0, 0);
+            //RowItem? row = null;
+            //if (thisPendingItem.RowKey > -1) {
+            //    row = Row.SearchByKey(thisPendingItem.RowKey);
+            //    if (row == null) {
+            //        if (thisPendingItem.Comand != DatabaseDataType.Comand_AddRow && thisPendingItem.User != UserName) {
+            //            Develop.DebugPrint("Pending verworfen, Zeile gelöscht.<br>" + ConnectionData.TableName + "<br>" + thisPendingItem.ToString());
+            //            return;
+            //        }
+            //    }
+            //}
+            //ColumnItem? col = null;
+            //if (thisPendingItem.ColKey > -1) {
+            //    col = Column.SearchByKey(thisPendingItem.ColKey);
+            //    if (col == null) {
+            //        //if (thisPendingItem.Comand != DatabaseDataType.AddColumnKeyInfo && thisPendingItem.User != UserName) {
+            //        Develop.DebugPrint("Pending verworfen, Spalte gelöscht.<br>" + ConnectionData.TableName + "<br>" + thisPendingItem.ToString());
+            //        return;
+            //        //}
+            //    }
+            //}
+            SetValueInternal(thisPendingItem.Comand, thisPendingItem.ChangedTo, thisPendingItem.ColKey, thisPendingItem.RowKey, 0, 0);
         }
     }
 

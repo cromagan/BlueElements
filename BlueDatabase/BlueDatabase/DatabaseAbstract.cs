@@ -475,10 +475,10 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             foreach (var thisSQL in SQLBackAbstract.ConnectedSQLBack) {
                 var h = thisSQL.HandleMe(ci);
                 if (h != null) {
-                    if (ci.UniqueID.Contains("LITE")) {
-                        return new DatabaseSQLLite(h, false, ci.TableName);
-                    }
-                    return new DatabaseSQL(h, false, ci.TableName);
+                    //if (ci.UniqueID.Contains("LITE")) {
+                    return new DatabaseSQLLite(h, false, ci.TableName);
+                    //}
+                    //return new DatabaseSQL(h, false, ci.TableName);
                 }
             }
         }
@@ -619,8 +619,8 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// <param name="row"></param>
     /// <param name="previousValue"></param>
     /// <param name="changedTo"></param>
-    public string ChangeData(DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo) {
-        var f = SetValueInternal(comand, changedTo, column, row, -1, -1);
+    public string ChangeData(DatabaseDataType comand, long? columnkey, long? rowkey, string previousValue, string changedTo) {
+        var f = SetValueInternal(comand, changedTo, columnkey, rowkey, -1, -1);
 
         if (!string.IsNullOrEmpty(f)) { return f; }
 
@@ -633,7 +633,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             return "Schreibschutz aktiv";
         }
 
-        AddUndo(TableName, comand, column, row, previousValue, changedTo, UserName);
+        AddUndo(TableName, comand, columnkey, rowkey, previousValue, changedTo, UserName);
 
         if (comand != DatabaseDataType.AutoExport) { SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
 
@@ -1288,7 +1288,9 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         ProgressbarInfo?.Invoke(this, e);
     }
 
-    protected abstract void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName);
+    protected abstract void AddUndo(string tableName, DatabaseDataType comand, long? columnKey, long? rowKey, string previousValue, string changedTo, string userName);
+
+    protected void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName) => AddUndo(tableName, comand, column?.Key ?? -1, row?.Key ?? -1, previousValue, changedTo, userName);
 
     protected virtual void Dispose(bool disposing) {
         if (IsDisposed) { return; }
@@ -1411,13 +1413,14 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// <param name="width"></param>
     /// <param name="height"></param>
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
-    protected virtual string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
+    protected virtual string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height) {
         if (type.IsColumnTag()) {
-            if (column == null) {
+            var c = Column.SearchByKey(columnkey);
+            if (c == null) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Spalte ist null! " + type.ToString());
                 return "Wert nicht gesetzt!";
             }
-            return column.SetValueInternal(type, value);
+            return c.SetValueInternal(type, value);
         }
 
         if (type.IsCellValue()) {
@@ -1429,18 +1432,18 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                 var enc1252 = Encoding.GetEncoding(1252);
                 value = Encoding.UTF8.GetString(enc1252.GetBytes(value));
             }
-            return Cell.SetValueInternal(column, row, value, width, height);
+            return Cell.SetValueInternal((long)columnkey, (long)rowkey, value, width, height);
         }
 
         if (type.IsCommand()) {
             switch (type) {
                 case DatabaseDataType.Comand_RemoveColumn:
                 case DatabaseDataType.Comand_AddColumn:
-                    return Column.SetValueInternal(type, value);
+                    return Column.SetValueInternal(type, columnkey);
 
                 case DatabaseDataType.Comand_AddRow:
                 case DatabaseDataType.Comand_RemoveRow:
-                    return Row.SetValueInternal(type, value);
+                    return Row.SetValueInternal(type, rowkey);
 
                 default:
                     if (LoadedVersion == DatabaseVersion) {

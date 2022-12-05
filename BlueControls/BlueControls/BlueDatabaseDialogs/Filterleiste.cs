@@ -83,10 +83,6 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     [DefaultValue(FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter)]
     public FilterTypesToShow Filtertypes { get; set; } = FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter;
 
-    [DefaultValue(BlueBasics.Enums.Orientation.Waagerecht)]
-    [Obsolete("Wird zukünftig entfernt werden", false)]
-    public BlueBasics.Enums.Orientation Orientation { get; set; } = BlueBasics.Enums.Orientation.Waagerecht;
-
     [DefaultValue((Table)null)]
     public Table? Table {
         get => _tableView;
@@ -153,24 +149,15 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
         #region Variablen für Waagerecht / Senkrecht bestimmen
 
-        if (Orientation == BlueBasics.Enums.Orientation.Waagerecht) {
-            toppos = btnAlleFilterAus.Top;
-            var beginnx = btnPinZurück.Right + (Skin.Padding * 3);
-            leftpos = beginnx;
-            constwi = (int)(txbZeilenFilter.Width * 1.5);
-            right = constwi + Skin.PaddingSmal;
-            anchor = AnchorStyles.Top | AnchorStyles.Left;
-            down = 0;
-            //breakafter = btnAdmin.Left;
-            //afterBreakAddY = txbZeilenFilter.Height + Skin.Padding;
-        } else {
-            toppos = btnAlleFilterAus.Bottom + Skin.Padding;
-            leftpos = txbZeilenFilter.Left;
-            constwi = Width - (txbZeilenFilter.Left * 3);
-            right = 0;
-            anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            down = txbZeilenFilter.Height + Skin.Padding;
-        }
+        toppos = btnAlleFilterAus.Top;
+        var beginnx = btnPinZurück.Right + (Skin.Padding * 3);
+        leftpos = beginnx;
+        constwi = (int)(txbZeilenFilter.Width * 1.5);
+        right = constwi + Skin.PaddingSmal;
+        anchor = AnchorStyles.Top | AnchorStyles.Left;
+        down = 0;
+        //breakafter = btnAdmin.Left;
+        //afterBreakAddY = txbZeilenFilter.Height + Skin.Padding;
 
         #endregion Variablen für Waagerecht / Senkrecht bestimmen
 
@@ -379,7 +366,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     }
 
     private void Filter_ZeilenFilterSetzen() {
-        if (_tableView?.Database == null) {
+        if (_tableView == null || _tableView.Database == null || _tableView.Filter == null) {
             DoÄhnlich();
             return;
         }
@@ -395,9 +382,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         DoÄhnlich();
     }
 
-    private void Filterleiste_SizeChanged(object sender, System.EventArgs e) {
-        if (Orientation == BlueBasics.Enums.Orientation.Waagerecht) { FillFilters(); }
-    }
+    private void Filterleiste_SizeChanged(object sender, System.EventArgs e) => FillFilters();
 
     private FlexiControlForFilter? FlexiItemOf(FilterItem filter) {
         foreach (var thisControl in Controls) {

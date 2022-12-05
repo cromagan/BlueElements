@@ -241,8 +241,7 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
             } else {
                 var showDelFilterButton = true;
                 if (Filter.FilterType == FilterType.Instr_GroßKleinEgal && Filter.SearchValue != null && Filter.SearchValue.Count == 1) {
-                    CaptionPosition = myParent == null || myParent.Orientation == Orientation.Waagerecht ? ÜberschriftAnordnung.Links_neben_Dem_Feld
-                        : ÜberschriftAnordnung.Über_dem_Feld;
+                    CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
                     showDelFilterButton = false;
                     Caption = Filter.Column.ReadableText() + ":";
                     EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;

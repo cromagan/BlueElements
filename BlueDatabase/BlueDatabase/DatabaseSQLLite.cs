@@ -136,7 +136,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked) {
         if (allreadychecked != null) {
             foreach (var thisa in allreadychecked) {
-                if (thisa is DatabaseSQL db) {
+                if (thisa is DatabaseSQLLite db) {
                     if (db._sql == _sql) { return null; }
                 }
             }
@@ -180,19 +180,25 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     public override void RefreshColumnsData(List<ColumnItem>? columns) {
         if (columns == null || columns.Count == 0) { return; }
+        if (columns.Count == 1 && columns[0].Loaded) { return; }
+
         _loadingCount++;
 
-        _sql.OpenConnection();
-        var l = new ListExt<ColumnItem>();
+        try {
+            _sql.OpenConnection();
+            var l = new ListExt<ColumnItem>();
 
-        foreach (var thisc in columns) {
-            if (!thisc.Loaded) {
-                l.AddIfNotExists(thisc);
+            foreach (var thisc in columns) {
+                if (!thisc.Loaded) {
+                    l.AddIfNotExists(thisc);
+                }
             }
-        }
 
-        _sql.LoadColumns(TableName, l);
-        _sql.CloseConnection();
+            _sql.LoadColumns(TableName, l);
+            _sql.CloseConnection();
+        } catch {
+            RefreshColumnsData(columns);
+        }
 
         _loadingCount--;
     }
@@ -203,19 +209,25 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         var l = new ListExt<RowItem>();
 
         foreach (var thisr in rows) {
-            if (refreshAlways || !thisr.RowInChache()) {
+            if (refreshAlways || !thisr.RowInCache) {
                 l.AddIfNotExists(thisr);
             }
         }
 
         if (l.Count == 0) { return false; }
 
-        //if (l.Count == 1) { Develop.DebugPrint(FehlerArt.Fehler, "Test"); return false; }
+        //if (l.Count == 1) { Develop.DebugPrint(FehlerArt.Warnung, "Test"); }
 
         _loadingCount++;
-        _sql.OpenConnection();
-        _sql.LoadRow(TableName, l);
-        _sql.CloseConnection();
+
+        try {
+            _sql.OpenConnection();
+            _sql.LoadRow(TableName, l);
+            _sql.CloseConnection();
+        } catch {
+            RefreshRowData(rows, refreshAlways);
+        }
+
         _loadingCount--;
         return true;
     }
@@ -246,22 +258,22 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         }
     }
 
-    protected override void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName) {
-        _sql.AddUndo(tableName, comand, column, row, previousValue, changedTo, UserName);
+    protected override void AddUndo(string tableName, DatabaseDataType comand, long? columnKey, long? rowKey, string previousValue, string changedTo, string userName) {
+        _sql.AddUndo(tableName, comand, columnKey, rowKey, previousValue, changedTo, UserName);
     }
 
     protected override void SetUserDidSomething() { }
 
-    protected override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, int width, int height) {
-        var w = base.SetValueInternal(type, value, column, row, width, height);
+    protected override string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height) {
+        if (!IsLoading && !ReadOnly) {
+            var c = Column.SearchByKey(columnkey);
+            if (type == DatabaseDataType.ColumnName) {
+                _sql?.RenameColumn(TableName, c?.Name.ToUpper(), value.ToUpper());
+            }
+            _sql?.SetValueInternal(TableName, type, value, c?.Name, columnkey, rowkey, -1, -1);
+        }
 
-        if (!string.IsNullOrEmpty(w)) { return w; }
-        if (IsLoading) { return w; }
-
-        if (ReadOnly) { return "Schreibgeschützt!"; }
-
-        _sql?.SetValueInternal(TableName, type, value, column, row, -1, -1);
-        return w;
+        return base.SetValueInternal(type, value, columnkey, rowkey, width, height);
     }
 
     protected override string SpecialErrorReason(ErrorReason mode) => string.Empty;
@@ -269,27 +281,36 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     private static void CheckSysUndo(object state) {
         if (DateTime.UtcNow.Subtract(_timerTimeStamp).TotalSeconds < 30) { return; }
 
+        foreach (var thisDB in AllFiles) {
+            if (thisDB.IsLoading) { return; }
+        }
+
         if (_isInTimer) { return; }
         _isInTimer = true;
 
         var fd = DateTime.UtcNow;
 
-        var done = new List<DatabaseAbstract>();
+        try {
+            var done = new List<DatabaseAbstract>();
 
-        foreach (var thisDB in AllFiles) {
-            if (!done.Contains(thisDB)) {
-                if (thisDB is DatabaseSQLLite thisDBSqlLite) {
-                    var db = LoadedDatabasesWithThisSQL(thisDBSqlLite._sql);
-                    done.AddRange(db);
+            foreach (var thisDB in AllFiles) {
+                if (!done.Contains(thisDB)) {
+                    if (thisDB is DatabaseSQLLite thisDBSqlLite) {
+                        var db = LoadedDatabasesWithThisSQL(thisDBSqlLite._sql);
+                        done.AddRange(db);
 
-                    var erg = thisDBSqlLite._sql.GetLastChanges(db, _timerTimeStamp.AddSeconds(-2), fd);
-                    if (erg == null) { _isInTimer = false; return; } // Später ein neuer Versuch
+                        var erg = thisDBSqlLite._sql.GetLastChanges(db, _timerTimeStamp.AddSeconds(-0.01), fd);
+                        if (erg == null) { _isInTimer = false; return; } // Später ein neuer Versuch
 
-                    foreach (var thisdb in db) {
-                        thisdb.DoLastChanges(erg);
+                        foreach (var thisdb in db) {
+                            thisdb.DoLastChanges(erg);
+                        }
                     }
                 }
             }
+        } catch {
+            _isInTimer = false;
+            return;
         }
 
         _timerTimeStamp = fd;
@@ -309,7 +330,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         return oo;
     }
 
-    private void DoLastChanges(List<(string tablename, string comand, string columnname, string rowid)>? data) {
+    private void DoLastChanges(List<(string tablename, string comand, string columnkey, string rowkey)>? data) {
         if (data == null) { return; }
 
         var rk = new List<long>();
@@ -317,17 +338,45 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         foreach (var thisData in data) {
             if (TableName == thisData.tablename) {
                 Enum.TryParse(thisData.comand, out DatabaseDataType t);
+
                 if (t != (DatabaseDataType)0) {
-                    if (t.IsCommand()) {
-                    } else if (!string.IsNullOrEmpty(thisData.rowid)) {
-                        rk.AddIfNotExists(LongParse(thisData.rowid));
-                    } else if (t.IsDatabaseTag()) {
-                        var v = _sql.GetStyleData(thisData.tablename, thisData.comand, "~DATABASE~");
-                        SetValueInternal(t, v, null, null, -1, -1);
-                    } else if (t.IsColumnTag()) {
-                        var v = _sql.GetStyleData(thisData.tablename, thisData.comand, thisData.columnname);
-                        var c = Column[thisData.columnname];
-                        SetValueInternal(t, v, c, null, -1, -1);
+                    // Nix tun
+                } else if (t == DatabaseDataType.ColumnName) {
+                    // Sonderbehandlung!
+                    var c = Column.SearchByKey(LongParse(thisData.columnkey));
+
+                    if (c != null) {
+                        var newn = _sql.GetLastColumnName(thisData.tablename, c.Key);
+                        if (c.Name != newn) {
+                            _sql.RenameColumn(thisData.tablename, c.Name, newn);
+                        }
+                    }
+                } else if (t.IsCommand()) {
+                    switch (t) {
+                        case DatabaseDataType.Comand_RemoveColumn:
+                        case DatabaseDataType.Comand_AddColumn:
+                            Column.SetValueInternal(t, LongParse(thisData.columnkey));
+                            break;
+
+                        case DatabaseDataType.Comand_AddRow:
+                        case DatabaseDataType.Comand_RemoveRow:
+                            Row.SetValueInternal(t, LongParse(thisData.rowkey));
+                            break;
+
+                        default:
+                            Develop.DebugPrint(t);
+                            break;
+                    }
+                } else if (!string.IsNullOrEmpty(thisData.rowkey)) {
+                    rk.AddIfNotExists(LongParse(thisData.rowkey));
+                } else if (t.IsDatabaseTag()) {
+                    var v = _sql.GetStyleData(thisData.tablename, thisData.comand, "~DATABASE~");
+                    if (v != null) { SetValueInternal(t, v, null, null, -1, -1); }
+                } else if (t.IsColumnTag()) {
+                    var c = Column.SearchByKey(LongParse(thisData.columnkey));
+                    if (c != null) {
+                        var v = _sql.GetStyleData(thisData.tablename, thisData.comand, c.Name);
+                        if (v != null) { SetValueInternal(t, v, c.Key, null, -1, -1); }
                     }
                 }
             }
@@ -340,7 +389,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         if (_timer != null) { return; }
         _timerTimeStamp = DateTime.UtcNow.AddMinutes(-5);
         _timer = new System.Threading.Timer(CheckSysUndo);
-        _timer.Change(5000, 5000);
+        _timer.Change(10000, 10000);
     }
 
     private void LoadFromSQLBack() {
@@ -404,7 +453,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
         #region  Alle ZEILEN laden
 
-        _sql.LoadAllRows(TableName, Row);
+        _sql.LoadAllRowKeys(TableName, Row);
 
         foreach (var thisColumn in Column) {
             thisColumn.Loaded = false;// string.Empty;

@@ -572,11 +572,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         this[cellKey].Size = contentSize;
     }
 
-    public string SetValueInternal(ColumnItem? column, RowItem? row, string value, int width, int height) {
-        if (row == null) { return "Row konnte nicht generiert werden."; }
-        if (column == null) { return "Column konnte nicht generiert werden."; }
+    public string SetValueInternal(long columnkey, long rowkey, string value, int width, int height) {
+        if (rowkey < 0) { return "Row konnte nicht generiert werden."; }
+        if (columnkey < 0) { return "Column konnte nicht generiert werden."; }
 
-        var cellKey = KeyOfCell(column, row);
+        var cellKey = KeyOfCell(columnkey, rowkey);
 
         if (ContainsKey(cellKey)) {
             var c = this[cellKey];
@@ -585,14 +585,14 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (string.IsNullOrEmpty(value)) {
                 if (!TryRemove(cellKey, out _)) {
                     Develop.CheckStackForOverflow();
-                    return SetValueInternal(column, row, value, width, height);
+                    return SetValueInternal(columnkey, rowkey, value, width, height);
                 }
             }
         } else {
             if (!string.IsNullOrEmpty(value)) {
                 if (!TryAdd(cellKey, new CellItem(value, width, height))) {
                     Develop.CheckStackForOverflow();
-                    return SetValueInternal(column, row, value, width, height);
+                    return SetValueInternal(columnkey, rowkey, value, width, height);
                 }
             }
         }
@@ -685,16 +685,16 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <param name="row"></param>
     /// <param name="value"></param>
     /// <param name="changeSysColumns"></param>
-    internal void SetValueBehindLinkedValue(ColumnItem? column, RowItem? row, string value, bool changeSysColumns) {
+    internal void SetValueBehindLinkedValue(ColumnItem column, RowItem row, string value, bool changeSysColumns) {
         if (_database == null) { return; }
 
         _database.BlockReload(false);
-        if (column == null || _database.Column.SearchByKey(column.Key) == null) {
+        if (column == null) {
             _database?.DevelopWarnung("Spalte ungültig!");
             Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.ConnectionData.TableName);
             return;
         }
-        if (row == null || _database?.Row.SearchByKey(row.Key) == null) {
+        if (row == null) {
             _database?.DevelopWarnung("Zeile ungültig!!");
             Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!!<br>" + _database.ConnectionData.TableName);
             return;
@@ -708,7 +708,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (value == oldValue) { return; }
 
         _database?.WaitEditable();
-        _database?.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldValue, value);
+        _database?.ChangeData(DatabaseDataType.Value_withoutSizeData, column.Key, row.Key, oldValue, value);
         column.UcaseNamesSortedByLenght = null;
 
         if (changeSysColumns) {
@@ -740,7 +740,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
         }
         if (value == @string) { return; }
-        _database.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, @string, value);
+        _database.ChangeData(DatabaseDataType.Value_withoutSizeData, column.Key, row.Key, @string, value);
     }
 
     private static bool CompareValues(string istValue, string filterValue, FilterType typ) {

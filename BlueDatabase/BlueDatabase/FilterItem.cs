@@ -23,11 +23,12 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
+using System.Security.AccessControl;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEmpty, IDisposableExtended {
+public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEmpty, IDisposableExtended, IErrorCheckable {
 
     #region Fields
 
@@ -41,9 +42,9 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
 
     #region Constructors
 
-    public FilterItem(DatabaseAbstract? database, FilterType filterType, string searchValue) : this(database, filterType, new List<string> { searchValue }) { }
+    public FilterItem(DatabaseAbstract database, FilterType filterType, string searchValue) : this(database, filterType, new List<string> { searchValue }) { }
 
-    public FilterItem(DatabaseAbstract? database, FilterType filterType, IReadOnlyCollection<string>? searchValue) {
+    public FilterItem(DatabaseAbstract database, FilterType filterType, IReadOnlyCollection<string> searchValue) {
         Database = database;
         if (Database != null) {
             Database.Disposing += Database_Disposing;
@@ -51,6 +52,12 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
 
         _filterType = filterType;
         if (searchValue != null && searchValue.Count > 0) { SearchValue.AddRange(searchValue); }
+
+        //if (!IsOk()) {
+        //    Develop.DebugPrint(FehlerArt.Fehler, "Filter fehlerhaft: " + ErrorReason());
+        //    return;
+        //}
+        _column?.RefreshColumnsData();
         SearchValue.Changed += SearchValue_ListOrItemChanged;
     }
 
@@ -61,6 +68,12 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
         }
 
         Parse(filterCode);
+
+        //if (!IsOk()) {
+        //    Develop.DebugPrint(FehlerArt.Fehler, "Filter fehlerhaft: " + ErrorReason());
+        //    return;
+        //}
+        _column?.RefreshColumnsData();
         SearchValue.Changed += SearchValue_ListOrItemChanged;
     }
 
@@ -70,16 +83,22 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
     /// <param name="filterCode"></param>
     public FilterItem(string filterCode) {
         Parse(filterCode);
+
+        //if (!IsOk()) {
+        //    Develop.DebugPrint(FehlerArt.Fehler, "Filter fehlerhaft: " + ErrorReason());
+        //    return;
+        //}
+        _column?.RefreshColumnsData();
         SearchValue.Changed += SearchValue_ListOrItemChanged;
     }
 
-    public FilterItem(ColumnItem? column, FilterType filterType, string searchValue) : this(column, filterType, new List<string> { searchValue }, string.Empty) { }
+    public FilterItem(ColumnItem column, FilterType filterType, string searchValue) : this(column, filterType, new List<string> { searchValue }, string.Empty) { }
 
-    public FilterItem(ColumnItem? column, FilterType filterType, string searchValue, string tag) : this(column, filterType, new List<string> { searchValue }, tag) { }
+    public FilterItem(ColumnItem column, FilterType filterType, string searchValue, string tag) : this(column, filterType, new List<string> { searchValue }, tag) { }
 
-    public FilterItem(ColumnItem? column, FilterType filterType, List<string> searchValue) : this(column, filterType, searchValue, string.Empty) { }
+    public FilterItem(ColumnItem column, FilterType filterType, List<string> searchValue) : this(column, filterType, searchValue, string.Empty) { }
 
-    public FilterItem(ColumnItem? column, FilterType filterType, IReadOnlyCollection<string>? searchValue, string herkunft) {
+    public FilterItem(ColumnItem column, FilterType filterType, IReadOnlyCollection<string> searchValue, string herkunft) {
         if (column == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht vorhanden.");
             return;
@@ -88,11 +107,23 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
         _column = column;
         _filterType = filterType;
         Herkunft = herkunft;
+
+        _column?.RefreshColumnsData();
+
+
         if (searchValue != null && searchValue.Count > 0) { SearchValue.AddRange(searchValue); }
+
+
+
+        //if (!IsOk()) {
+        //    Develop.DebugPrint(FehlerArt.Fehler, "Filter fehlerhaft: " + ErrorReason());
+        //    return;
+        //}
+
         SearchValue.Changed += SearchValue_ListOrItemChanged;
     }
 
-    public FilterItem(ColumnItem? column, RowItem rowWithValue) : this(column, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, rowWithValue.CellGetString(column)) { }
+    public FilterItem(ColumnItem column, RowItem rowWithValue) : this(column, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, rowWithValue.CellGetString(column)) { }
 
     #endregion
 
@@ -107,6 +138,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
     public ColumnItem? Column {
         get => _column;
         set {
+            if (value == _column) { return; }
             _column = value;
             OnChanged();
         }
@@ -120,6 +152,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
     public FilterType FilterType {
         get => _filterType;
         set {
+            if (value == _filterType) { return; }
             _filterType = value;
             OnChanged();
         }
@@ -158,7 +191,24 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
         GC.SuppressFinalize(this);
     }
 
-    public string ErrorReason() => _filterType == FilterType.KeinFilter ? "'Kein Filter' angegeben" : string.Empty;
+    public string ErrorReason() {
+        if (_filterType == FilterType.KeinFilter) { return "'Kein Filter' angegeben"; }
+
+        if (_filterType.HasFlag(FilterType.Instr)) {
+            if (SearchValue == null || SearchValue.Count == 0) { return "Instr-Filter ohne Suchtext"; }
+            foreach (var thisV in SearchValue) {
+                if (string.IsNullOrEmpty(thisV)) { return "Instr-Filter ohne Suchtext"; }
+            }
+        }
+
+        if (_column == null && Database == null) { return "Weder Spalte noch Datenbank angegeben"; }
+
+        if (Database != null && Database.IsDisposed) { return "Datenbank verworfen"; }
+
+        if (Column == null && !_filterType.HasFlag(FilterType.Instr)) { return "Fehlerhafter Zeilenfilter"; }
+
+        return string.Empty;
+    }
 
     public bool IsNullOrEmpty() => _filterType == FilterType.KeinFilter;
 

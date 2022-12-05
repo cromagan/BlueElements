@@ -95,6 +95,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
         }
     }
 
+    public bool RowInCache { get; set; }
+
     #endregion
 
     #region Methods
@@ -421,8 +423,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
 
     public bool IsNullOrEmpty(string columnName) => Database.Cell.IsNullOrEmpty(Database.Column[columnName], this);
 
-    public bool MatchesTo(FilterItem? filter) {
+    public bool MatchesTo(FilterItem filter) {
         if (Database == null) { return false; }
+
+        filter.Column?.RefreshColumnsData();
 
         if (filter != null) {
             if (filter.FilterType is FilterType.KeinFilter or FilterType.GroﬂKleinEgal) { return true; } // Filter ohne Funktion
@@ -442,6 +446,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
     public bool MatchesTo(List<FilterItem>? filter) {
         if (Database == null) { return false; }
         if (filter == null || filter.Count == 0) { return true; }
+
+        Database.RefreshColumnsData(filter);
+
         foreach (var thisFilter in filter) {
             if (thisFilter.Database != filter[0].Database) { Develop.DebugPrint_NichtImplementiert(); }
 
@@ -488,12 +495,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
             }
         }
         return erg;
-    }
-
-    public bool RowInChache() {
-        if (Database == null) { return false; }
-        var cellKey = CellCollection.KeyOfCell(Database.Column.SysRowChangeDate, this);
-        return Database.Cell.ContainsKey(cellKey);
     }
 
     internal void OnDoSpecialRules(DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);

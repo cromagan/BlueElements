@@ -191,7 +191,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         var l = new List<ColumnItem>();
         l.AddRange(rowSortDefinition.Columns);
         l.AddIfNotExists(Database.Column.SysChapter);
-        l.Remove(Database.Column.SysRowChangeDate);
+        //l.Remove(Database.Column.SysRowChangeDate);
 
         Database.RefreshColumnsData(l);
 
@@ -345,7 +345,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
         var item = SearchByKey(key);
         if (item != null) { Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!"); }
-        Database.ChangeData(DatabaseDataType.Comand_AddRow, null, null, string.Empty, key.ToString());
+        Database.ChangeData(DatabaseDataType.Comand_AddRow, null, key, string.Empty, key.ToString());
         item = SearchByKey(key);
         if (item == null) { Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen."); }
 
@@ -414,7 +414,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();
 
     public bool Remove(long key) {
-        return string.IsNullOrEmpty(Database.ChangeData(DatabaseDataType.Comand_RemoveRow, null, null, string.Empty, key.ToString()));
+        return string.IsNullOrEmpty(Database.ChangeData(DatabaseDataType.Comand_RemoveRow, null, key, string.Empty, key.ToString()));
     }
 
     public bool Remove(FilterItem filter, List<RowItem?> pinned) {
@@ -452,9 +452,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         return true;
     }
 
-    public RowItem? SearchByKey(long key) {
+    public RowItem? SearchByKey(long? key) {
         try {
-            return key < 0 ? null : !_internal.ContainsKey(key) ? null : _internal[key];
+            return key != null && key > -1 && _internal.ContainsKey((long)key) ? _internal[(long)key] : null;
         } catch {
             return SearchByKey(key);
         }
@@ -531,23 +531,24 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
     internal void RemoveNullOrEmpty() => _internal.RemoveNullOrEmpty();
 
-    internal string SetValueInternal(DatabaseDataType type, string value) {
+    internal string SetValueInternal(DatabaseDataType type, long? key) {
+        if (key is null or < 0) { return "Schlüsselfehler"; }
+
         if (type == DatabaseDataType.Comand_AddRow) {
-            var c = new RowItem(Database, LongParse(value));
+            var c = new RowItem(Database, (long)key);
 
             return Add(c);
         }
 
         if (type == DatabaseDataType.Comand_RemoveRow) {
-            var key = LongParse(value);
             var row = SearchByKey(key);
             if (row == null) { return "Zeile nicht vorhanden"; }
 
             OnRowRemoving(new RowEventArgs(row));
             foreach (var thisColumnItem in Database.Column.Where(thisColumnItem => thisColumnItem != null)) {
-                Database.Cell.Delete(thisColumnItem, key);
+                Database.Cell.Delete(thisColumnItem, (long)key);
             }
-            if (!_internal.TryRemove(key, out _)) { return "Löschen nicht erfolgreich"; }
+            if (!_internal.TryRemove((long)key, out _)) { return "Löschen nicht erfolgreich"; }
             OnRowRemoved();
             return string.Empty;
         }
