@@ -26,6 +26,7 @@ using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
@@ -40,6 +41,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     #region Fields
 
     public static readonly string TmpNewDummy = "TMPNEWDUMMY";
+    public int _unsavedContentWidth = -1;
     public bool Loaded = false;
 
     //public string _timecode;
@@ -158,6 +160,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         _adminInfo = string.Empty;
         _maxTextLenght = 4000;
         _contentwidth = -1;
+        _unsavedContentWidth = -1;
         _captionBitmapCode = string.Empty;
         _filterOptions = FilterOptions.Enabled | FilterOptions.TextFilterEnabled | FilterOptions.ExtendedFilterEnabled;
         //_AutofilterErlaubt = true;
@@ -410,7 +413,11 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     public int ContentWidth {
         get => _contentwidth;
         set {
+            _unsavedContentWidth = value;
             if (_contentwidth == value) { return; }
+            if (value < 10) {
+                Develop.DebugPrint("Width < 10!");
+            }
             Database?.ChangeData(DatabaseDataType.ColumnContentWidth, Key, null, _contentwidth.ToString(), value.ToString());
             OnChanged();
         }
@@ -649,9 +656,9 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 return;
             }
 
-            var old = _name;
-            Database?.ChangeData(DatabaseDataType.ColumnName, Key, null, old, value);
-            Database?.Column_NameChanged(old, this);
+            Database?.ChangeData(DatabaseDataType.ColumnName, Key, null, _name, value);
+            Database?.RepairColumnArrangements();
+            Database?.RepairViews();
             OnChanged();
         }
     }
@@ -960,6 +967,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         Tags = source.Tags;
         AdminInfo = source.AdminInfo;
         //TimeCode = source.TimeCode;
+        _unsavedContentWidth = source._unsavedContentWidth;
         ContentWidth = source.ContentWidth;
         FilterOptions = source.FilterOptions;
         IgnoreAtRowFilter = source.IgnoreAtRowFilter;
@@ -1442,8 +1450,12 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     }
 
     public void RefreshColumnsData() {
+        if (Loaded) { return; }
+        if (Database == null || Database.IsDisposed) { return; }
+        if (Name == TmpNewDummy) { Develop.DebugPrint("TMPNEWDUMMY kann nicht geladen werden"); return; }
+
         var x = new ListExt<ColumnItem>() { this };
-        Database.RefreshColumnsData(x);
+        Database?.RefreshColumnsData(x);
     }
 
     public void Repair() {
@@ -1572,6 +1584,10 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 Develop.DebugPrint(FehlerArt.Warnung, "Umsetzung fehlgeschlagen: " + Caption + " " + Database.ConnectionData.TableName);
             }
 
+            if (_scriptType is ScriptType.Bool or ScriptType.Numeral or ScriptType.DateTime) {
+                _ignoreAtRowFilter = true;
+            }
+
             ResetSystemToDefault(false);
         } catch (Exception ex) {
             Develop.DebugPrint(ex);
@@ -1603,6 +1619,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
             case "SYS_CHANGER":
                 _format = DataFormat.Text;
+                _ignoreAtRowFilter = true;
                 _spellCheckingEnabled = false;
                 _textBearbeitungErlaubt = false;
                 _dropdownBearbeitungErlaubt = false;
@@ -1630,7 +1647,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
             case "SYS_DATECREATED":
                 _spellCheckingEnabled = false;
-
+                _ignoreAtRowFilter = true;
                 if (setAll) {
                     SetFormatForDateTime();
                     Caption = "Erstell-Datum";
@@ -1638,10 +1655,12 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                     BackColor = Color.FromArgb(185, 185, 255);
                     LineLeft = ColumnLineStyle.Dick;
                 }
+
                 break;
 
             case "SYS_DATECHANGED":
                 _spellCheckingEnabled = false;
+                _ignoreAtRowFilter = true;
                 _showUndo = false;
                 // SetFormatForDateTime(); --Sriptt Type Chaos
                 _textBearbeitungErlaubt = false;
@@ -1758,8 +1777,16 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 SetFormatForFloat();
                 break;
 
+            case VarType.FloatPositive:
+                SetFormatForFloatPositive();
+                break;
+
             case VarType.Integer:
                 SetFormatForInteger();
+                break;
+
+            case VarType.IntegerPositive:
+                SetFormatForIntegerPositive();
                 break;
 
             case VarType.PhoneNumber:
@@ -1866,8 +1893,32 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         ScriptType = ScriptType.Numeral;
     }
 
+    public void SetFormatForFloatPositive() {
+        ((IInputFormat)this).SetFormat(VarType.FloatPositive);
+
+        Format = DataFormat.Text;
+        Align = AlignmentHorizontal.Rechts;
+        DoOpticalTranslation = TranslationType.Zahl;
+        SortType = SortierTyp.ZahlenwertFloat;
+        AfterEditQuickSortRemoveDouble = false;
+        BehaviorOfImageAndText = BildTextVerhalten.Nur_Text;
+        ScriptType = ScriptType.Numeral;
+    }
+
     public void SetFormatForInteger() {
         ((IInputFormat)this).SetFormat(VarType.Integer);
+
+        Format = DataFormat.Text;
+        Align = AlignmentHorizontal.Rechts;
+        SortType = SortierTyp.ZahlenwertInt;
+        DoOpticalTranslation = TranslationType.Original_Anzeigen;
+        AfterEditQuickSortRemoveDouble = false;
+        BehaviorOfImageAndText = BildTextVerhalten.Nur_Text;
+        ScriptType = ScriptType.Numeral;
+    }
+
+    public void SetFormatForIntegerPositive() {
+        ((IInputFormat)this).SetFormat(VarType.IntegerPositive);
 
         Format = DataFormat.Text;
         Align = AlignmentHorizontal.Rechts;
@@ -2055,7 +2106,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 if (editTypeToCheck == EditTypeFormula.None) { return true; }
                 //if (EditType_To_Check != enEditTypeFormula.Textfeld &&
                 //    EditType_To_Check != enEditTypeFormula.nur_als_Text_anzeigen) { return false; }
-                if (Database.IsLoading) { return true; }
+                //if (Database.IsLoading) { return true; }
 
                 //var skriptgesteuert = LinkedCell_RowKeyIsInColumn == -9999;
                 //if (skriptgesteuert) {
@@ -2148,7 +2199,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     /// <summary>
     /// Wenn sich ein Zelleninhalt verändert hat, muss die Spalte neu berechnet werden.
     /// </summary>
-    internal void Invalidate_ContentWidth() => ContentWidth = -1;
+    internal void Invalidate_ContentWidth() => _unsavedContentWidth = -1;
 
     internal void Invalidate_Head() {
         TmpCaptionTextSize = new SizeF(-1, -1);
@@ -2174,7 +2225,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     /// <param name="type"></param>
     /// <param name="newvalue"></param>
     /// <returns></returns>
-    internal string SetValueInternal(DatabaseDataType type, string newvalue) {
+    internal string SetValueInternal(DatabaseDataType type, string newvalue, bool isLoading) {
         //Develop.CheckStackForOverflow();
 
         switch (type) {
@@ -2342,6 +2393,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
             case DatabaseDataType.ColumnContentWidth:
                 _contentwidth = IntParse(newvalue);
+                _unsavedContentWidth = _contentwidth;
                 break;
 
             case DatabaseDataType.CaptionBitmapCode:

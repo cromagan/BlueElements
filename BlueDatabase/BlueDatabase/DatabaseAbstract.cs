@@ -113,8 +113,8 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
         Column = new ColumnCollection(this);
         //Column.ItemRemoving += Column_ItemRemoving;
-        Column.ItemRemoved += Column_ItemRemoved;
-        Column.ItemAdded += Column_ItemAdded;
+        //Column.ItemRemoved += Column_ItemRemoved;
+        //Column.ItemAdded += Column_ItemAdded;
 
         _backgroundWorker = new BackgroundWorker {
             WorkerReportsProgress = false,
@@ -620,11 +620,11 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// <param name="previousValue"></param>
     /// <param name="changedTo"></param>
     public string ChangeData(DatabaseDataType comand, long? columnkey, long? rowkey, string previousValue, string changedTo) {
-        var f = SetValueInternal(comand, changedTo, columnkey, rowkey, -1, -1);
+        var f = SetValueInternal(comand, changedTo, columnkey, rowkey, -1, -1, false);
 
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        if (IsLoading) { return f; }
+        //if (isLoading) { return f; }
 
         if (ReadOnly) {
             if (!string.IsNullOrEmpty(TableName)) {
@@ -1193,6 +1193,11 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         return false;
     }
 
+    public void RefreshColumnsData(ColumnItem column) {
+        if (column.Loaded) { return; }
+        RefreshColumnsData(new List<ColumnItem>() { column });
+    }
+
     public abstract void RefreshColumnsData(List<ColumnItem>? columns);
 
     public void RefreshColumnsData(List<FilterItem>? filter) {
@@ -1200,7 +1205,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             var c = new ListExt<ColumnItem>();
 
             foreach (var thisF in filter) {
-                if (thisF.Column != null) {
+                if (thisF.Column != null && !thisF.Column.Loaded) {
                     c.AddIfNotExists(thisF.Column);
                 }
             }
@@ -1227,7 +1232,8 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     public void RepairAfterParse() {
         Column.Repair();
-        CheckViewsAndArrangements();
+        RepairColumnArrangements();
+        RepairViews();
         _layouts.Check();
     }
 
@@ -1242,25 +1248,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     public abstract void UnlockHard();
 
     public abstract void WaitEditable();
-
-    internal void Column_NameChanged(string oldName, ColumnItem newName) {
-        if (string.IsNullOrEmpty(oldName)) { return; }
-        // Cells ----------------------------------------------
-        //   Cell.ChangeCaptionName(OldName, cColumnItem.Name, cColumnItem)
-        //  Undo -----------------------------------------
-        // Nicht nötig, da die Spalten als Verweiß gespeichert sind
-        // Layouts -----------------------------------------
-        // Werden über das Skript gesteuert
-        // Sortierung -----------------------------------------
-        // Nicht nötig, da die Spalten als Verweiß gespeichert sind
-        // _ColumnArrangements-----------------------------------------
-        // Nicht nötig, da die Spalten als Verweiß gespeichert sind
-        // _Views-----------------------------------------
-        // Nicht nötig, da die Spalten als Verweiß gespeichert sind
-        // Zeilen-Quick-Info -----------------------------------------
-        //ZeilenQuickInfo = ZeilenQuickInfo.Replace("~" + oldName + ";", "~" + newName.Name + ";", RegexOptions.IgnoreCase);
-        //ZeilenQuickInfo = ZeilenQuickInfo.Replace("~" + oldName + "(", "~" + newName.Name + "(", RegexOptions.IgnoreCase);
-    }
 
     internal void DevelopWarnung(string t) {
         try {
@@ -1286,6 +1273,25 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     internal void OnProgressbarInfo(ProgressbarEventArgs e) {
         if (IsDisposed) { return; }
         ProgressbarInfo?.Invoke(this, e);
+    }
+
+    internal void RepairColumnArrangements() {
+        //if (ReadOnly) { return; }  // Gibt fehler bei Datenbanken, die nur Temporär erzeugt werden!
+
+        var x = _columnArrangements.CloneWithClones();
+
+        for (var z = 0; z < Math.Max(2, x.Count); z++) {
+            if (x.Count < z + 1) { x.Add(new ColumnViewCollection(this, string.Empty)); }
+            x[z].Repair(z);
+        }
+
+        ColumnArrangements = x;
+    }
+
+    internal void RepairViews() {
+        var lay = (LayoutCollection)Layouts.Clone();
+        lay.Check();
+        Layouts = lay;
     }
 
     protected abstract void AddUndo(string tableName, DatabaseDataType comand, long? columnKey, long? rowKey, string previousValue, string changedTo, string userName);
@@ -1318,8 +1324,8 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         //Row.RowAdded -= Row_RowAdded;
 
         //Column.ItemRemoving -= Column_ItemRemoving;
-        Column.ItemRemoved -= Column_ItemRemoved;
-        Column.ItemAdded -= Column_ItemAdded;
+        //Column.ItemRemoved -= Column_ItemRemoved;
+        //Column.ItemAdded -= Column_ItemAdded;
         Column.Dispose();
         //Cell.Dispose();
         Row.Dispose();
@@ -1413,14 +1419,14 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// <param name="width"></param>
     /// <param name="height"></param>
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
-    protected virtual string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height) {
+    protected virtual string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height, bool isLoading) {
         if (type.IsColumnTag()) {
             var c = Column.SearchByKey(columnkey);
             if (c == null) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Spalte ist null! " + type.ToString());
                 return "Wert nicht gesetzt!";
             }
-            return c.SetValueInternal(type, value);
+            return c.SetValueInternal(type, value, isLoading);
         }
 
         if (type.IsCellValue()) {
@@ -1432,18 +1438,18 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                 var enc1252 = Encoding.GetEncoding(1252);
                 value = Encoding.UTF8.GetString(enc1252.GetBytes(value));
             }
-            return Cell.SetValueInternal((long)columnkey, (long)rowkey, value, width, height);
+            return Cell.SetValueInternal((long)columnkey, (long)rowkey, value, width, height, isLoading);
         }
 
         if (type.IsCommand()) {
             switch (type) {
                 case DatabaseDataType.Comand_RemoveColumn:
                 case DatabaseDataType.Comand_AddColumn:
-                    return Column.SetValueInternal(type, columnkey);
+                    return Column.SetValueInternal(type, columnkey, isLoading);
 
                 case DatabaseDataType.Comand_AddRow:
                 case DatabaseDataType.Comand_RemoveRow:
-                    return Row.SetValueInternal(type, rowkey);
+                    return Row.SetValueInternal(type, rowkey, isLoading);
 
                 default:
                     if (LoadedVersion == DatabaseVersion) {
@@ -1695,34 +1701,19 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         //}
     }
 
-    private void CheckViewsAndArrangements() {
-        //if (ReadOnly) { return; }  // Gibt fehler bei Datenbanken, die nur Temporär erzeugt werden!
+    //private void Column_ItemAdded(object sender, ListEventArgs e) {
+    //    if (IsLoadingx) { return; }
+    //    CheckViewsAndArrangements();
+    //}
 
-        if (IsLoading) { return; }
+    //private void Column_ItemRemoved(object sender, System.EventArgs e) {
+    //    //if (IsLoadingx) { Develop.DebugPrint(FehlerArt.Warnung, "Loading Falsch!"); }
+    //    CheckViewsAndArrangements();
 
-        var x = _columnArrangements.CloneWithClones();
-
-        for (var z = 0; z < Math.Max(2, x.Count); z++) {
-            if (x.Count < z + 1) { x.Add(new ColumnViewCollection(this, string.Empty)); }
-            x[z].Repair(z, true);
-        }
-
-        ColumnArrangements = x;
-    }
-
-    private void Column_ItemAdded(object sender, ListEventArgs e) {
-        if (IsLoading) { return; }
-        CheckViewsAndArrangements();
-    }
-
-    private void Column_ItemRemoved(object sender, System.EventArgs e) {
-        if (IsLoading) { Develop.DebugPrint(FehlerArt.Warnung, "Parsing Falsch!"); }
-        CheckViewsAndArrangements();
-
-        var lay = (LayoutCollection)Layouts.Clone();
-        lay.Check();
-        Layouts = lay;
-    }
+    //    var lay = (LayoutCollection)Layouts.Clone();
+    //    lay.Check();
+    //    Layouts = lay;
+    //}
 
     private bool IsThereBackgroundWorkToDo() {
         //var e2 = new MultiUserFileHasPendingChangesEventArgs();

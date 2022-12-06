@@ -392,7 +392,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         return key;
     }
 
-    //internal string SetValueInternal(enDatabaseDataType type, string value) {
+    //internal string SetValueInternal(enDatabaseDataType type, string value, bool isLoading) {
     //    switch (type) {
     //        case enDatabaseDataType.LastColumnKey:
     //            _LastColumnKey = LongParse(value);
@@ -408,7 +408,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     //    }
     //    return string.Empty;
     //}
-    internal string SetValueInternal(DatabaseDataType type, long? key) {
+    internal string SetValueInternal(DatabaseDataType type, long? key, bool isLoading) {
         if (key is null or < 0) { return "Schlüsselfehler"; }
 
         if (type == DatabaseDataType.Comand_AddColumn) {
@@ -417,12 +417,24 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
 
             c = new ColumnItem(Database, (long)key);
             base.Add(c);
+
+            if (!isLoading) {
+                Database.RepairColumnArrangements();
+                Database.RepairViews();
+            }
+
             return string.Empty;
         }
 
         if (type == DatabaseDataType.Comand_RemoveColumn) {
             var c = SearchByKey(key);
             base.Remove(c);
+
+            if (!isLoading) {
+                Database.RepairColumnArrangements();
+                Database.RepairViews();
+            }
+
             return string.Empty;
         }
 

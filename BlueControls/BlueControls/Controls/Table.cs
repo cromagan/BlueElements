@@ -300,7 +300,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     #region Methods
 
     public static int CalculateColumnContentWidth(Table? table, ColumnItem column, BlueFont? cellFont, int pix16) {
-        if (column.ContentWidth > 0) { return column.ContentWidth; }
+        if (column._unsavedContentWidth > 0) { return column._unsavedContentWidth; }
+
+        column.RefreshColumnsData();
 
         var NewContentWidth = -1;
 
@@ -1575,7 +1577,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (_database == null) { return; }
 
         lock (_lockUserAction) {
-            if (_isinMouseUp) { return; }
+            //if (_isinMouseUp) { return; }
             _isinMouseUp = true;
 
             if (_database == null) {
@@ -2420,6 +2422,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private bool ComputeAllColumnPositions() {
         //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
         if (Database.IsLoading) { return false; }
+
         try {
             // Kommt vor, dass spontan doch geparsed wird...
             if (_database.ColumnArrangements == null || _arrangementNr >= _database.ColumnArrangements.Count) { return false; }

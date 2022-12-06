@@ -46,8 +46,6 @@ public partial class TableView : Form {
 
     #region Fields
 
-
-
     private Ansicht _ansicht = Ansicht.Tabelle_und_Formular_nebeneinander;
 
     private bool _firstOne = true;

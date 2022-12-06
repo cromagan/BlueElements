@@ -178,13 +178,17 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
         return tables;
     }
 
-    protected override bool CreateTable(string tablename) {
-        if (!ExecuteCommand("DROP TABLE IF EXISTS " + tablename)) { return false; }
+    protected override string CreateTable(string tablename) {
+        var b = ExecuteCommand("DROP TABLE IF EXISTS " + tablename);
+        if (!string.IsNullOrEmpty(b)) { return b; }
+
         return ExecuteCommand(@"CREATE TABLE " + tablename + "(RK " + Primary + " NOT NULL PRIMARY KEY)");
     }
 
-    protected override bool CreateTable(string tablename, List<string> keycolumns) {
-        if (!ExecuteCommand("DROP TABLE IF EXISTS " + tablename)) { return false; }
+    protected override string CreateTable(string tablename, List<string> keycolumns) {
+        var b = ExecuteCommand("DROP TABLE IF EXISTS " + tablename);
+        if (!string.IsNullOrEmpty(b)) { return b; }
+
         // http://www.sql-server-helper.com/error-messages/msg-8110.aspx
 
         var t = @"CREATE TABLE " + tablename + "(";
@@ -195,7 +199,9 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
         t = t.TrimEnd(", ");
         t += ")";
 
-        if (!ExecuteCommand(t)) { return false; }
+        b = ExecuteCommand(t);
+
+        if (!string.IsNullOrEmpty(b)) { return b; }
         //if (!ExecuteCommand("SET IDENTITY_INSERT " + name + " ON")) { return false; }
 
         t = "ALTER TABLE " + tablename + " ADD CONSTRAINT PK_" + tablename.ToUpper() + " PRIMARY KEY CLUSTERED(" + keycolumns.JoinWith(", ").ToUpper() + ")";

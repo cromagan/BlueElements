@@ -572,7 +572,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         this[cellKey].Size = contentSize;
     }
 
-    public string SetValueInternal(long columnkey, long rowkey, string value, int width, int height) {
+    public string SetValueInternal(long columnkey, long rowkey, string value, int width, int height, bool isLoading) {
         if (rowkey < 0) { return "Row konnte nicht generiert werden."; }
         if (columnkey < 0) { return "Column konnte nicht generiert werden."; }
 
@@ -585,14 +585,14 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (string.IsNullOrEmpty(value)) {
                 if (!TryRemove(cellKey, out _)) {
                     Develop.CheckStackForOverflow();
-                    return SetValueInternal(columnkey, rowkey, value, width, height);
+                    return SetValueInternal(columnkey, rowkey, value, width, height, isLoading);
                 }
             }
         } else {
             if (!string.IsNullOrEmpty(value)) {
                 if (!TryAdd(cellKey, new CellItem(value, width, height))) {
                     Develop.CheckStackForOverflow();
-                    return SetValueInternal(columnkey, rowkey, value, width, height);
+                    return SetValueInternal(columnkey, rowkey, value, width, height, isLoading);
                 }
             }
         }

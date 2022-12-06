@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.SqlTypes;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Windows.Input;
 using static BlueBasics.Converter;
@@ -57,7 +58,9 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     //private DateTime _lastCheck = DateTime.Now;
 
-    private int _loadingCount = 0;
+    //private int _loadingCount = 0;
+
+    private bool _isLoading = false;
 
     #endregion
 
@@ -95,7 +98,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     }
 
     public override string Filename => _sql.Filename;
-    public override bool IsLoading { get => _loadingCount > 0; }
+    public override bool IsLoading { get => _isLoading; }
 
     public override bool ReloadNeeded => false;
 
@@ -178,29 +181,15 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         LoadFromSQLBack();
     }
 
-    public override void RefreshColumnsData(List<ColumnItem>? columns) {
+    public override void RefreshColumnsData(List<ColumnItem> columns) {
         if (columns == null || columns.Count == 0) { return; }
         if (columns.Count == 1 && columns[0].Loaded) { return; }
 
-        _loadingCount++;
-
         try {
-            _sql.OpenConnection();
-            var l = new ListExt<ColumnItem>();
-
-            foreach (var thisc in columns) {
-                if (!thisc.Loaded) {
-                    l.AddIfNotExists(thisc);
-                }
-            }
-
-            _sql.LoadColumns(TableName, l);
-            _sql.CloseConnection();
+            _sql.LoadColumns(TableName, columns);
         } catch {
             RefreshColumnsData(columns);
         }
-
-        _loadingCount--;
     }
 
     public override bool RefreshRowData(List<RowItem> rows, bool refreshAlways) {
@@ -216,19 +205,12 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
         if (l.Count == 0) { return false; }
 
-        //if (l.Count == 1) { Develop.DebugPrint(FehlerArt.Warnung, "Test"); }
-
-        _loadingCount++;
-
         try {
-            _sql.OpenConnection();
             _sql.LoadRow(TableName, l);
-            _sql.CloseConnection();
         } catch {
-            RefreshRowData(rows, refreshAlways);
+            return RefreshRowData(rows, refreshAlways);
         }
 
-        _loadingCount--;
         return true;
     }
 
@@ -252,7 +234,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
             foreach (var thisstyle in l) {
                 Enum.TryParse(thisstyle.Key, out DatabaseDataType t);
                 if (t != (DatabaseDataType)0) {
-                    column.SetValueInternal(t, thisstyle.Value);
+                    column.SetValueInternal(t, thisstyle.Value, true);
                 }
             }
         }
@@ -264,26 +246,26 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     protected override void SetUserDidSomething() { }
 
-    protected override string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height) {
-        if (!IsLoading && !ReadOnly) {
+    protected override string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height, bool isLoading) {
+        if (!isLoading && !ReadOnly) {
             var c = Column.SearchByKey(columnkey);
             if (type == DatabaseDataType.ColumnName) {
                 _sql?.RenameColumn(TableName, c?.Name.ToUpper(), value.ToUpper());
             }
-            _sql?.SetValueInternal(TableName, type, value, c?.Name, columnkey, rowkey, -1, -1);
+            _sql?.SetValueInternal(TableName, type, value, c?.Name, columnkey, rowkey, -1, -1, isLoading);
         }
 
-        return base.SetValueInternal(type, value, columnkey, rowkey, width, height);
+        return base.SetValueInternal(type, value, columnkey, rowkey, width, height, isLoading);
     }
 
     protected override string SpecialErrorReason(ErrorReason mode) => string.Empty;
 
     private static void CheckSysUndo(object state) {
-        if (DateTime.UtcNow.Subtract(_timerTimeStamp).TotalSeconds < 30) { return; }
+        if (DateTime.UtcNow.Subtract(_timerTimeStamp).TotalSeconds < 120) { return; }
 
-        foreach (var thisDB in AllFiles) {
-            if (thisDB.IsLoading) { return; }
-        }
+        //foreach (var thisDB in AllFiles) {
+        //    if (thisDB.IsLoadingx) { return; }
+        //}
 
         if (_isInTimer) { return; }
         _isInTimer = true;
@@ -333,56 +315,104 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     private void DoLastChanges(List<(string tablename, string comand, string columnkey, string rowkey)>? data) {
         if (data == null) { return; }
 
-        var rk = new List<long>();
+        //_loadingCount++;
 
-        foreach (var thisData in data) {
-            if (TableName == thisData.tablename) {
-                Enum.TryParse(thisData.comand, out DatabaseDataType t);
+        try {
+            var rk = new List<long>();
 
-                if (t != (DatabaseDataType)0) {
-                    // Nix tun
-                } else if (t == DatabaseDataType.ColumnName) {
-                    // Sonderbehandlung!
-                    var c = Column.SearchByKey(LongParse(thisData.columnkey));
+            foreach (var thisData in data) {
+                if (TableName == thisData.tablename) {
+                    Enum.TryParse(thisData.comand, out DatabaseDataType t);
 
-                    if (c != null) {
-                        var newn = _sql.GetLastColumnName(thisData.tablename, c.Key);
-                        if (c.Name != newn) {
-                            _sql.RenameColumn(thisData.tablename, c.Name, newn);
+                    if (t == (DatabaseDataType)0) {
+                        // Nix tun
+                    } else if (t == DatabaseDataType.ColumnName) {
+
+                        #region Sonderbehandlung: ColumnName
+
+                        // Sonderbehandlung!
+                        var c = Column.SearchByKey(LongParse(thisData.columnkey));
+
+                        if (c != null) {
+                            var newn = _sql.GetLastColumnName(thisData.tablename, c.Key);
+                            if (c.Name != newn) {
+                                _sql.RenameColumn(thisData.tablename, c.Name, newn);
+                            }
                         }
-                    }
-                } else if (t.IsCommand()) {
-                    switch (t) {
-                        case DatabaseDataType.Comand_RemoveColumn:
-                        case DatabaseDataType.Comand_AddColumn:
-                            Column.SetValueInternal(t, LongParse(thisData.columnkey));
-                            break;
 
-                        case DatabaseDataType.Comand_AddRow:
-                        case DatabaseDataType.Comand_RemoveRow:
-                            Row.SetValueInternal(t, LongParse(thisData.rowkey));
-                            break;
+                        #endregion
+                    } else if (t.IsCommand()) {
 
-                        default:
-                            Develop.DebugPrint(t);
-                            break;
-                    }
-                } else if (!string.IsNullOrEmpty(thisData.rowkey)) {
-                    rk.AddIfNotExists(LongParse(thisData.rowkey));
-                } else if (t.IsDatabaseTag()) {
-                    var v = _sql.GetStyleData(thisData.tablename, thisData.comand, "~DATABASE~");
-                    if (v != null) { SetValueInternal(t, v, null, null, -1, -1); }
-                } else if (t.IsColumnTag()) {
-                    var c = Column.SearchByKey(LongParse(thisData.columnkey));
-                    if (c != null) {
-                        var v = _sql.GetStyleData(thisData.tablename, thisData.comand, c.Name);
-                        if (v != null) { SetValueInternal(t, v, c.Key, null, -1, -1); }
+                        #region Befehle
+
+                        switch (t) {
+                            case DatabaseDataType.Comand_RemoveColumn:
+                                Column.SetValueInternal(t, LongParse(thisData.columnkey), true);
+                                break;
+
+                            case DatabaseDataType.Comand_AddColumn:
+                                Column.SetValueInternal(t, LongParse(thisData.columnkey), true);
+                                var c = Column.SearchByKey(LongParse(thisData.columnkey));
+                                var name = _sql.GetLastColumnName(TableName, c.Key);
+                                SetValueInternal(DatabaseDataType.ColumnName, name, c.Key, null, -1, -1, true);
+                                c.RefreshColumnsData(); // muss sein, alternativ alle geladenen Zeilen neu laden
+                                break;
+
+                            case DatabaseDataType.Comand_AddRow:
+                                Row.SetValueInternal(t, LongParse(thisData.rowkey), true);
+                                rk.AddIfNotExists(LongParse(thisData.rowkey)); // Nachher auch laden
+                                break;
+
+                            case DatabaseDataType.Comand_RemoveRow:
+                                Row.SetValueInternal(t, LongParse(thisData.rowkey), true);
+                                break;
+
+                            default:
+                                Develop.DebugPrint(t);
+                                break;
+                        }
+
+                        #endregion
+                    } else if (!string.IsNullOrEmpty(thisData.rowkey)) {
+
+                        #region Zeilen zum neu Einlesen merken uns Spaltenbreite invalidierne
+
+                        rk.AddIfNotExists(LongParse(thisData.rowkey));
+
+                        var c = Column.SearchByKey(LongParse(thisData.columnkey));
+                        c.Invalidate_ContentWidth();
+
+                        #endregion
+                    } else if (t.IsDatabaseTag()) {
+
+                        #region Datenbank-Styles
+
+                        var v = _sql.GetStyleData(thisData.tablename, thisData.comand, "~DATABASE~");
+                        if (v != null) { SetValueInternal(t, v, null, null, -1, -1, true); }
+
+                        #endregion
+                    } else if (t.IsColumnTag()) {
+
+                        #region Spalten-Styles
+
+                        var c = Column.SearchByKey(LongParse(thisData.columnkey));
+                        if (c != null) {
+                            var v = _sql.GetStyleData(thisData.tablename, thisData.comand, c.Name);
+                            if (v != null) { SetValueInternal(t, v, c.Key, null, -1, -1, true); }
+                        }
+
+                        #endregion
                     }
                 }
             }
+
+            RefreshRowData(rk, true);
+        } catch {
+            DoLastChanges(data);
         }
 
-        RefreshRowData(rk, true);
+        //if (_loadingCount < 1) { Develop.DebugPrint("Loading <0!"); }
+        //_loadingCount--;
     }
 
     private void GenerateTimer() {
@@ -396,82 +426,97 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         var onlyReload = false;
 
         OnLoading(this, new BlueBasics.EventArgs.LoadingEventArgs(onlyReload));
-        _loadingCount++;
-        Column.ThrowEvents = false;
-        Row.ThrowEvents = false;
+        Develop.DebugPrint(FehlerArt.DevelopInfo, "Loading++");
+        _isLoading = true;
 
-        #region Spalten richtig stellen
+        try {
+            Column.ThrowEvents = false;
+            Row.ThrowEvents = false;
 
-        var columnsToLoad = _sql.GetColumnNames(TableName.ToUpper());
-        columnsToLoad.Remove("RK");
+            #region Spalten richtig stellen
 
-        #region Nicht mehr vorhandene Spalten löschen
+            var columnsToLoad = _sql.GetColumnNames(TableName.ToUpper());
+            columnsToLoad.Remove("RK");
 
-        var columnsToDelete = new List<ColumnItem>();
-        foreach (var thiscol in Column) {
-            if (!columnsToLoad.Contains(thiscol.Name.ToUpper())) {
-                columnsToDelete.Add(thiscol);
-            }
-        }
+            #region Nicht mehr vorhandene Spalten löschen
 
-        foreach (var thiscol in columnsToDelete) {
-            Column.Remove(thiscol);
-        }
-
-        #endregion
-
-        #region Spalten erstellen
-
-        foreach (var thisCol in columnsToLoad) {
-            var column = Column.Exists(thisCol);
-            if (column == null) {
-                column = Column.GenerateAndAdd(Column.NextColumnKey(), thisCol);
-            }
-            if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht gefunden"); return; }
-            GetColumnAttributesColumn(column, _sql);
-        }
-
-        Column.GetSystems();
-
-        #endregion
-
-        #endregion
-
-        #region Datenbank Eigenschaften laden
-
-        var l = _sql.GetStyleDataAll(TableName, "~DATABASE~");
-        if (l != null && l.Count > 0) {
-            foreach (var thisstyle in l) {
-                Enum.TryParse(thisstyle.Key, out DatabaseDataType t);
-                if (t != (DatabaseDataType)0) {
-                    SetValueInternal(t, thisstyle.Value, null, null, -1, -1);
+            var columnsToDelete = new List<ColumnItem>();
+            foreach (var thiscol in Column) {
+                if (!columnsToLoad.Contains(thiscol.Name.ToUpper())) {
+                    columnsToDelete.Add(thiscol);
                 }
             }
+
+            foreach (var thiscol in columnsToDelete) {
+                Column.Remove(thiscol);
+            }
+
+            #endregion
+
+            #region Spalten erstellen
+
+            foreach (var thisCol in columnsToLoad) {
+                var column = Column.Exists(thisCol);
+                if (column == null) {
+                    var ck = Column.NextColumnKey();
+                    Column.SetValueInternal(DatabaseDataType.Comand_AddColumn, ck, true);
+                    SetValueInternal(DatabaseDataType.ColumnName, thisCol, ck, null, -1, -1, true);
+                    column = Column.SearchByKey(ck);
+                    //column = new ColumnItem(this, thisCol, Column.NextColumnKey()); // Column.GenerateAndAdd(Column.NextColumnKey(), thisCol);
+                }
+                if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht gefunden"); return; }
+                GetColumnAttributesColumn(column, _sql);
+            }
+
+            Column.GetSystems();
+
+            #endregion
+
+            #endregion
+
+            #region Datenbank Eigenschaften laden
+
+            var l = _sql.GetStyleDataAll(TableName, "~DATABASE~");
+            if (l != null && l.Count > 0) {
+                foreach (var thisstyle in l) {
+                    Enum.TryParse(thisstyle.Key, out DatabaseDataType t);
+                    if (t != (DatabaseDataType)0) {
+                        SetValueInternal(t, thisstyle.Value, null, null, -1, -1, true);
+                    }
+                }
+            }
+
+            #endregion
+
+            #region  Alle ZEILEN laden
+
+            _sql.LoadAllRowKeys(TableName, Row);
+
+            foreach (var thisColumn in Column) {
+                thisColumn.Loaded = false;// string.Empty;
+            }
+
+            #endregion
+
+            _sql.CloseConnection();
+
+            Row.RemoveNullOrEmpty();
+            Cell.RemoveOrphans();
+
+            //_checkedAndReloadNeed = false;
+            Column.ThrowEvents = true;
+            Row.ThrowEvents = true;
+        } catch {
+            //if (_loadingCount < 1) { Develop.DebugPrint("Loading <0!"); }
+            //_loadingCount--;
+            LoadFromSQLBack();
+            return;
         }
 
-        #endregion
-
-        #region  Alle ZEILEN laden
-
-        _sql.LoadAllRowKeys(TableName, Row);
-
-        foreach (var thisColumn in Column) {
-            thisColumn.Loaded = false;// string.Empty;
-        }
-
-        #endregion
-
-        _sql.CloseConnection();
-
-        Row.RemoveNullOrEmpty();
-        Cell.RemoveOrphans();
-
-        //_checkedAndReloadNeed = false;
-        Column.ThrowEvents = true;
-        Row.ThrowEvents = true;
-        _loadingCount--;
+        //if (_loadingCount < 1) { Develop.DebugPrint("Loading <0!"); }
+        //_loadingCount--;
+        _isLoading = false;
         OnLoaded(this, new BlueBasics.EventArgs.LoadedEventArgs(onlyReload));
-        //RepairAfterParse();
     }
 
     #endregion

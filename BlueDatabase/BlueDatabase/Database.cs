@@ -312,7 +312,9 @@ public sealed class Database : DatabaseAbstract {
             if (rowKey > -1) {
                 row = Row.SearchByKey(rowKey);
                 if (row == null) {
-                    row = Row.GenerateAndAdd(rowKey, string.Empty, false, false);
+                    //row = Row.GenerateAndAdd(rowKey, string.Empty, false, false);
+                    Row.SetValueInternal(DatabaseDataType.Comand_AddRow, rowKey, true);
+                    row = Row.SearchByKey(rowKey);
                 }
             }
 
@@ -336,7 +338,9 @@ public sealed class Database : DatabaseAbstract {
                         columnsOld.Remove(column);
                     } else {
                         // Nicht gefunden, als neu machen
-                        column = Column.GenerateAndAdd(colKey);
+                        Column.SetValueInternal(DatabaseDataType.Comand_AddColumn, colKey, true);
+                        column = Column.SearchByKey(colKey);
+                        //column = Column.GenerateAndAdd(colKey);
                     }
                 }
             }
@@ -360,7 +364,7 @@ public sealed class Database : DatabaseAbstract {
 
             #endregion
 
-            var fehler = SetValueInternal(art, inhalt, column?.Key, row?.Key, x, y);
+            var fehler = SetValueInternal(art, inhalt, column?.Key, row?.Key, x, y, true);
 
             if (art == DatabaseDataType.EOF) { break; }
             if (!string.IsNullOrEmpty(fehler)) {
@@ -552,8 +556,8 @@ public sealed class Database : DatabaseAbstract {
 
     protected override void SetUserDidSomething() => _muf.SetUserDidSomething();
 
-    protected override string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height) {
-        var r = base.SetValueInternal(type, value, columnkey, rowkey, width, height);
+    protected override string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height, bool isLoading) {
+        var r = base.SetValueInternal(type, value, columnkey, rowkey, width, height, isLoading);
 
         if (type == DatabaseDataType.ReloadDelaySecond) {
             _muf.ReloadDelaySecond = ReloadDelaySecond;
@@ -693,7 +697,7 @@ public sealed class Database : DatabaseAbstract {
             //        //}
             //    }
             //}
-            SetValueInternal(thisPendingItem.Comand, thisPendingItem.ChangedTo, thisPendingItem.ColKey, thisPendingItem.RowKey, 0, 0);
+            SetValueInternal(thisPendingItem.Comand, thisPendingItem.ChangedTo, thisPendingItem.ColKey, thisPendingItem.RowKey, 0, 0, true);
         }
     }
 

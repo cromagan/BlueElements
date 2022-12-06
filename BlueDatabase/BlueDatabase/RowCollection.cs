@@ -531,7 +531,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
     internal void RemoveNullOrEmpty() => _internal.RemoveNullOrEmpty();
 
-    internal string SetValueInternal(DatabaseDataType type, long? key) {
+    internal string SetValueInternal(DatabaseDataType type, long? key, bool isLoading) {
         if (key is null or < 0) { return "Schlüsselfehler"; }
 
         if (type == DatabaseDataType.Comand_AddRow) {
