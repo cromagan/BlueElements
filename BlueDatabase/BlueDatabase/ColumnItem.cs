@@ -42,7 +42,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
     public static readonly string TmpNewDummy = "TMPNEWDUMMY";
     public int _unsavedContentWidth = -1;
-    public bool Loaded = false;
+    public bool IsInCache = false;
 
     //public string _timecode;
     public bool? TmpAutoFilterSinnvoll = null;
@@ -1450,7 +1450,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     }
 
     public void RefreshColumnsData() {
-        if (Loaded) { return; }
+        if (IsInCache) { return; }
         if (Database == null || Database.IsDisposed) { return; }
         if (Name == TmpNewDummy) { Develop.DebugPrint("TMPNEWDUMMY kann nicht geladen werden"); return; }
 

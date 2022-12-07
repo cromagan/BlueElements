@@ -315,6 +315,7 @@ public sealed class Database : DatabaseAbstract {
                     //row = Row.GenerateAndAdd(rowKey, string.Empty, false, false);
                     Row.SetValueInternal(DatabaseDataType.Comand_AddRow, rowKey, true);
                     row = Row.SearchByKey(rowKey);
+                    row.IsInCache = true;
                 }
             }
 
@@ -340,6 +341,7 @@ public sealed class Database : DatabaseAbstract {
                         // Nicht gefunden, als neu machen
                         Column.SetValueInternal(DatabaseDataType.Comand_AddColumn, colKey, true);
                         column = Column.SearchByKey(colKey);
+                        column.IsInCache = true;
                         //column = Column.GenerateAndAdd(colKey);
                     }
                 }

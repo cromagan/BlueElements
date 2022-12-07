@@ -1194,7 +1194,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     }
 
     public void RefreshColumnsData(ColumnItem column) {
-        if (column.Loaded) { return; }
+        if (column.IsInCache) { return; }
         RefreshColumnsData(new List<ColumnItem>() { column });
     }
 
@@ -1205,7 +1205,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             var c = new ListExt<ColumnItem>();
 
             foreach (var thisF in filter) {
-                if (thisF.Column != null && !thisF.Column.Loaded) {
+                if (thisF.Column != null && !thisF.Column.IsInCache) {
                     c.AddIfNotExists(thisF.Column);
                 }
             }

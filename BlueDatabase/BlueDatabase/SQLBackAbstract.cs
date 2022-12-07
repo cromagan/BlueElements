@@ -362,7 +362,7 @@ public abstract class SQLBackAbstract {
                         r.Database.Cell.SetValueInternal(r.Database.Column[z - 1].Key, r.Key, reader[z].ToString(), -1, -1, true);
                     }
 
-                    r.RowInCache = true;
+                    r.IsInCache = true;
                     //if (!r.RowInChache()) {
                     //    Develop.DebugPrint(FehlerArt.Warnung, "Zeile ohne Zeitstempel, repariert! + " + com);
                     //    r.CellSet(r.Database.Column.SysRowChangeDate, DateTime.UtcNow.ToString(Constants.Format_Date5));
@@ -686,7 +686,7 @@ public abstract class SQLBackAbstract {
             var columnsToLoad = new List<ColumnItem>();
 
             foreach (var thisc in columns) {
-                if (thisc != null && !thisc.Loaded) {
+                if (thisc != null && !thisc.IsInCache) {
                     columnsToLoad.AddIfNotExists(thisc);
                 }
             }
@@ -740,7 +740,7 @@ public abstract class SQLBackAbstract {
             foreach (var thiscolumn in columnsToLoad) {
                 //var val = GetStyleData(tablename, DatabaseDataType.ColumnTimeCode.ToString(), thiscolumn.Name);
 
-                thiscolumn.Loaded = true;
+                thiscolumn.IsInCache = true;
 
                 //if (string.IsNullOrEmpty(val)) {
                 //    Develop.DebugPrint(FehlerArt.Warnung, "Spalte ohne Zeitstempel, repariert! + " + com);

@@ -151,7 +151,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     public List<RowItem> CalculateFilteredRows(List<FilterItem>? filter) {
         List<RowItem> tmpVisibleRows = new();
         if (Database == null) { return tmpVisibleRows; }
-
+      
         Database.RefreshColumnsData(filter);
 
         try {

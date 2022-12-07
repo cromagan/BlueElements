@@ -85,6 +85,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
 
     public DatabaseAbstract? Database { get; private set; }
     public bool IsDisposed { get; private set; }
+    public bool IsInCache { get; set; }
     public long Key { get; private set; }
 
     public string QuickInfo {
@@ -94,8 +95,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
             return _tmpQuickInfo!;
         }
     }
-
-    public bool RowInCache { get; set; }
 
     #endregion
 

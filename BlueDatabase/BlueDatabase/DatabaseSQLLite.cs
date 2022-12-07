@@ -183,7 +183,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     public override void RefreshColumnsData(List<ColumnItem> columns) {
         if (columns == null || columns.Count == 0) { return; }
-        if (columns.Count == 1 && columns[0].Loaded) { return; }
+        if (columns.Count == 1 && columns[0].IsInCache) { return; }
 
         try {
             _sql.LoadColumns(TableName, columns);
@@ -198,7 +198,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         var l = new ListExt<RowItem>();
 
         foreach (var thisr in rows) {
-            if (refreshAlways || !thisr.RowInCache) {
+            if (refreshAlways || !thisr.IsInCache) {
                 l.AddIfNotExists(thisr);
             }
         }
@@ -493,7 +493,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
             _sql.LoadAllRowKeys(TableName, Row);
 
             foreach (var thisColumn in Column) {
-                thisColumn.Loaded = false;// string.Empty;
+                thisColumn.IsInCache = false;// string.Empty;
             }
 
             #endregion

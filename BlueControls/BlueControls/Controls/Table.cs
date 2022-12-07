@@ -877,6 +877,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     /// <returns></returns>
     public List<RowItem> FilteredRows() {
         if (_filteredRows != null) { return _filteredRows; }
+        if(Database == null || Database.IsDisposed) {  return new List<RowItem>(); }
         _filteredRows = Database.Row.CalculateFilteredRows(Filter);
         return _filteredRows;
     }
@@ -2990,7 +2991,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void Invalidate_FilteredRows() {
         _filteredRows = null;
-        //CursorPos_Reset(); // Gibt Probleme bei Formularen, wenn die Key-Spalte geändert wird. Mal abgesehen davon macht es einen Sinn, den Cursor proforma zu löschen, dass soll der RowSorter übernehmen.
+        ////CursorPos_Reset(); // Gibt Probleme bei Formularen, wenn die Key-Spalte geändert wird. Mal abgesehen davon macht es einen Sinn, den Cursor proforma zu löschen, dass soll der RowSorter übernehmen.
         Invalidate_Filterinfo();
         Invalidate_SortedRowData();
     }
