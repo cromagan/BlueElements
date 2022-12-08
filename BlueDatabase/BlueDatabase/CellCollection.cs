@@ -604,7 +604,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     internal static List<RowItem?> ConnectedRowsOfRelations(string completeRelationText, RowItem? row) {
         List<RowItem?> allRows = new();
-        var names = row.Database.Column[0].GetUcaseNamesSortedByLenght();
+        var names = row.Database.Column.First.GetUcaseNamesSortedByLenght();
         var relationTextLine = completeRelationText.ToUpper().SplitAndCutByCr();
         foreach (var thisTextLine in relationTextLine) {
             var tmp = thisTextLine;
@@ -877,7 +877,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     }
 
     private string ChangeTextToRowId(string completeRelationText, string oldValue, string newValue, long keyOfCHangedRow) {
-        var names = _database.Column[0].GetUcaseNamesSortedByLenght();
+        var names = _database.Column.First.GetUcaseNamesSortedByLenght();
         var didOld = false;
         var didNew = false;
         for (var z = names.Count - 1; z > -1; z--) {

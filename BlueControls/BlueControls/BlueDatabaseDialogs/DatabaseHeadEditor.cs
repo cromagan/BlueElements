@@ -99,6 +99,7 @@ public sealed partial class DatabaseHeadEditor {
         lbxExportSets.Item.Sort();
         // -----------------------------
         txbCaption.Text = _database.Caption;
+        txbFirstColumn.Text = _database.FirstColumn;
         tbxReloadVerzoegerung.Text = _database.ReloadDelaySecond.ToString();
         txbGlobalScale.Text = _database.GlobalScale.ToString(Constants.Format_Float1);
         txbAdditionalFiles.Text = _database.AdditionaFilesPfad;
@@ -369,6 +370,7 @@ public sealed partial class DatabaseHeadEditor {
         scriptEditor.WriteScriptBack();
         _database.GlobalShowPass = txbKennwort.Text;
         _database.Caption = txbCaption.Text;
+        _database.FirstColumn = txbFirstColumn.Text;
         _database.UndoCount = tbxUndoAnzahl.Text.IsLong() ? Math.Max(IntParse(tbxUndoAnzahl.Text), 5) : 5;
         _database.ReloadDelaySecond = tbxReloadVerzoegerung.Text.IsLong() ? Math.Max(IntParse(tbxReloadVerzoegerung.Text), 5) : 5;
         if (txbGlobalScale.Text.IsDouble()) {

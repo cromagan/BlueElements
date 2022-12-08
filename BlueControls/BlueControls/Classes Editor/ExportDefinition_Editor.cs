@@ -125,7 +125,7 @@ internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<Expo
     //private void ExportFilter_AddClicked(object sender, System.EventArgs e)
     //{
     //    Develop.DebugPrint_NichtImplementiert();
-    //    var DummyFilter = new FilterItem(tmp.Database.Column[0], enFilterType.KeinFilter, "");
+    //    var DummyFilter = new FilterItem(tmp.Database.Column.First, enFilterType.KeinFilter, "");
     //    var NewFilter = FilterItem_Editor();// DialogBox.eEditClass(DummyFilter, false);
     //    if (NewFilter == DummyFilter) { return; }
     //    var NewFilter2 = (FilterItem)NewFilter;

@@ -98,7 +98,7 @@ public partial class RelationDiagram : PadEditor {
         if (string.IsNullOrEmpty(t)) { return; }
         // Alle möglichen Namen holen
         List<string> names = new();
-        names.AddRange(_database.Column[0].GetUcaseNamesSortedByLenght());
+        names.AddRange(_database.Column.First.GetUcaseNamesSortedByLenght());
         // Namen ermitteln, die relevant sind
         List<string> bez = new();
         foreach (var thisN in names.Where(thisN => t.Contains(thisN))) {
@@ -306,7 +306,7 @@ public partial class RelationDiagram : PadEditor {
 
     private void Hinzu_Click(object sender, System.EventArgs e) {
         ItemCollectionList il = new();
-        il.AddRange(_database.Column[0].Contents());
+        il.AddRange(_database.Column.First.Contents());
         il.Sort();
         il.CheckBehavior = CheckBehavior.SingleSelection;
         var i = InputBoxListBoxStyle.Show("Objekt hinzufügen:", il, AddType.None, true);

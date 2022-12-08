@@ -100,7 +100,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     /// </summary>
     /// <param name="primärSchlüssel">Der Primärschlüssel, nach dem gesucht werden soll. Groß/Kleinschreibung wird ignoriert.</param>
     /// <returns>Die Zeile, dessen erste Spalte den Primärschlüssel enthält oder - falls nicht gefunden - NULL.</returns>
-    public RowItem this[string primärSchlüssel] => this[new FilterItem(Database.Column[0], FilterType.Istgleich_GroßKleinEgal | FilterType.MultiRowIgnorieren, primärSchlüssel)];
+    public RowItem this[string primärSchlüssel] => this[new FilterItem(Database.Column.First, FilterType.Istgleich_GroßKleinEgal | FilterType.MultiRowIgnorieren, primärSchlüssel)];
 
     public RowItem? this[params FilterItem[]? filter] {
         get {
@@ -151,7 +151,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     public List<RowItem> CalculateFilteredRows(List<FilterItem>? filter) {
         List<RowItem> tmpVisibleRows = new();
         if (Database == null) { return tmpVisibleRows; }
-      
+
         Database.RefreshColumnsData(filter);
 
         try {
@@ -360,7 +360,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         }
 
         if (!string.IsNullOrEmpty(valueOfCellInFirstColumn)) {
-            item.CellSet(Database!.Column[0], valueOfCellInFirstColumn);
+            item.CellSet(Database!.Column.First, valueOfCellInFirstColumn);
         }
 
         if (runScriptOfNewRow) {

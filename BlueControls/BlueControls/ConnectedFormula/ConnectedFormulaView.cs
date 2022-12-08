@@ -315,7 +315,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
                     ColumnItem? co;
 
                     if (ripi.Spaltenname.Equals("#first", StringComparison.OrdinalIgnoreCase)) {
-                        co = Database?.Column.First();
+                        co = Database?.Column.First;
                     } else {
                         co = Database?.Column.Exists(ripi.Spaltenname);
                     }

@@ -382,12 +382,31 @@ public sealed class Database : DatabaseAbstract {
         ExecutePending();
         Column.ThrowEvents = true;
         Row.ThrowEvents = true;
+
+        FirstColumn = Column[0].Name;
+
         if (IntParse(LoadedVersion.Replace(".", "")) > IntParse(DatabaseVersion.Replace(".", ""))) { SetReadOnly(); }
     }
 
-    public override void RefreshColumnsData(List<ColumnItem>? columns) { }
+    public override void RefreshColumnsData(List<ColumnItem>? columns) {
+        if (columns == null || columns.Count == 0) { return; }
 
-    public override bool RefreshRowData(List<RowItem> row, bool refreshAlways) => false;
+        foreach (var thisrow in columns) {
+            thisrow.IsInCache = true;
+        }
+
+        return;
+    }
+
+    public override bool RefreshRowData(List<RowItem> row, bool refreshAlways) {
+        if (row == null || row.Count == 0) { return false; }
+
+        foreach (var thisrow in row) {
+            thisrow.IsInCache = true;
+        }
+
+        return false;
+    }
 
     public override bool Save(bool mustSave) => _muf?.Save(mustSave) ?? false;
 
@@ -737,6 +756,7 @@ public sealed class Database : DatabaseAbstract {
             //SaveToByteList(l, enDatabaseDataType.BinaryDataInOne, Bins.ToString(true));
             //SaveToByteList(l, enDatabaseDataType.FilterImagePfad, _filterImagePfad);
             SaveToByteList(l, DatabaseDataType.AdditionaFilesPath, AdditionaFilesPfad);
+            SaveToByteList(l, DatabaseDataType.FirstColumn, FirstColumn);
             SaveToByteList(l, DatabaseDataType.RowQuickInfo, ZeilenQuickInfo);
             SaveToByteList(l, DatabaseDataType.StandardFormulaFile, StandardFormulaFile);
             SaveToByteList(l, Column);

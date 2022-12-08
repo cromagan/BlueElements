@@ -42,6 +42,22 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
 
     public DatabaseAbstract? Database { get; private set; }
 
+    ///// <summary>
+    ///// Diese Routine sollte nur bei einem Reload benutzt werden. AddPending wir nicht mehr ausgelöst.
+    ///// </summary>
+    ///// <param name="column"></param>
+    ///// <returns></returns>
+    //public void AddFromParser(ColumnItem? column) {
+    //    if (column.Database != Database) { Develop.DebugPrint(FehlerArt.Fehler, "Parent-Datenbanken unterschiedlich!"); }
+    //    if (Contains(column)) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte bereits vorhanden!"); }
+    //    base.GenerateAndAdd(column);
+    //}
+    /// <summary>
+    /// Gib ColumnFirst oder Spalte 0 zurück
+    /// </summary>
+    /// <returns></returns>
+    public ColumnItem? First { get => Exists(Database?.FirstColumn) ?? this[0]; }
+
     public ColumnItem? SysChapter { get; private set; }
 
     public ColumnItem? SysCorrect { get; private set; }
@@ -108,34 +124,18 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     [Obsolete("GenerateAndAdd benutzen, oder mittels SetValueInternal, falls Daten nachgezogen werden müssen")]
     public new void Add() { }
 
-    public ColumnItem? Exists(string columnName) {
+    public ColumnItem? Exists(string? columnName) {
         if (Database == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Database ist null bei " + columnName);
             return null;
         }
-        if (string.IsNullOrEmpty(columnName)) {
+        if (columnName == null || string.IsNullOrEmpty(columnName)) {
             //             Develop.DebugPrint(enFehlerArt.Warnung, "Leerer Spaltenname"); Neue Spalten haben noch keinen Namen
             return null;
         }
         columnName = columnName.ToUpper();
         return this.FirstOrDefault(thisColumn => thisColumn != null && thisColumn.Name == columnName);
     }
-
-    ///// <summary>
-    ///// Diese Routine sollte nur bei einem Reload benutzt werden. AddPending wir nicht mehr ausgelöst.
-    ///// </summary>
-    ///// <param name="column"></param>
-    ///// <returns></returns>
-    //public void AddFromParser(ColumnItem? column) {
-    //    if (column.Database != Database) { Develop.DebugPrint(FehlerArt.Fehler, "Parent-Datenbanken unterschiedlich!"); }
-    //    if (Contains(column)) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte bereits vorhanden!"); }
-    //    base.GenerateAndAdd(column);
-    //}
-    /// <summary>
-    /// Gib Spalte 0 zurück
-    /// </summary>
-    /// <returns></returns>
-    public ColumnItem? First() => this[0];
 
     public string Freename(string preferedName) {
         preferedName = preferedName.ReduceToChars(Constants.AllowedCharsVariableName);
@@ -291,8 +291,11 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         };
 
         foreach (var thisstring in w) {
-            GenerateAndAddSystem(thisstring);
+            if (Exists(thisstring) == null) {
+                GenerateAndAddSystem(thisstring);
+            }
         }
+
         GetSystems();
         for (var s1 = 0; s1 < Count; s1++) {
             if (base[s1] != null) {
@@ -378,6 +381,14 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
                 l = GenerateAndAdd(ThisColumn.Key, ThisColumn.Name, ThisColumn.Caption, ThisColumn.Suffix, VarType.Unbekannt, ThisColumn.Quickinfo);
             }
             l.CloneFrom(ThisColumn, true);
+
+            if (l.Name != ThisColumn.Name) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Name nicht korrekt!");
+            }
+
+            if (l.Key != ThisColumn.Key) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Key nicht korrekt!");
+            }
         }
     }
 

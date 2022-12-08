@@ -655,7 +655,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         List<string> names = new();
         if (_database == null) { return; }
 
-        var col = _database.Column[0];
+        var col = _database.Column.First;
         if (col == null) { return; }
         names.AddRange(col.GetUcaseNamesSortedByLenght());
         if (Marker.CancellationPending) { return; }

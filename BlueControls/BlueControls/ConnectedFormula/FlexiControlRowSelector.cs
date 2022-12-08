@@ -64,7 +64,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         }
         _showformat = showFormat;
 
-        if (string.IsNullOrEmpty(_showformat) && database != null && database.Column.Count > 0 && database.Column[0] is ColumnItem fc) {
+        if (string.IsNullOrEmpty(_showformat) && database != null && database.Column.Count > 0 && database.Column.First is ColumnItem fc) {
             _showformat = "~" + fc.Name + "~";
         }
 

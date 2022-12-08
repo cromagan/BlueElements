@@ -261,7 +261,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     protected override string SpecialErrorReason(ErrorReason mode) => string.Empty;
 
     private static void CheckSysUndo(object state) {
-        if (DateTime.UtcNow.Subtract(_timerTimeStamp).TotalSeconds < 120) { return; }
+        if (DateTime.UtcNow.Subtract(_timerTimeStamp).TotalSeconds < 180) { return; }
 
         //foreach (var thisDB in AllFiles) {
         //    if (thisDB.IsLoadingx) { return; }
@@ -461,7 +461,10 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
                     var ck = Column.NextColumnKey();
                     Column.SetValueInternal(DatabaseDataType.Comand_AddColumn, ck, true);
                     SetValueInternal(DatabaseDataType.ColumnName, thisCol, ck, null, -1, -1, true);
+                    column = Column.Exists(thisCol);
+                    if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht gefunden"); return; }
                     column = Column.SearchByKey(ck);
+
                     //column = new ColumnItem(this, thisCol, Column.NextColumnKey()); // Column.GenerateAndAdd(Column.NextColumnKey(), thisCol);
                 }
                 if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht gefunden"); return; }

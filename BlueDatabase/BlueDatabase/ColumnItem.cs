@@ -1357,7 +1357,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         Database.OnViewChanged();
     }
 
-    public bool IsFirst() => Database?.Column[0] == this;
+    public bool IsFirst() => Database?.Column.First == this;
 
     public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
 

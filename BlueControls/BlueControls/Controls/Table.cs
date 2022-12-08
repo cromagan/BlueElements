@@ -877,7 +877,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     /// <returns></returns>
     public List<RowItem> FilteredRows() {
         if (_filteredRows != null) { return _filteredRows; }
-        if(Database == null || Database.IsDisposed) {  return new List<RowItem>(); }
+        if (Database == null || Database.IsDisposed) { return new List<RowItem>(); }
         _filteredRows = Database.Row.CalculateFilteredRows(Filter);
         return _filteredRows;
     }
@@ -1754,7 +1754,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             return;
         }
 
-        if (row == null && column != column.Database.Column[0]) {
+        if (row == null && column != column.Database.Column.First) {
             NotEditableInfo("Neue Zeilen müssen mit der ersten Spalte beginnen");
             return;
         }
@@ -1779,7 +1779,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         if (string.IsNullOrEmpty(cancelReason)) {
             if (row == null) {
-                var f = CellCollection.ErrorReason(column.Database.Column[0], null, ErrorReason.EditGeneral);
+                var f = CellCollection.ErrorReason(column.Database.Column.First, null, ErrorReason.EditGeneral);
                 if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
                 row = column.Database.Row.GenerateAndAdd(newValue);
                 if (table.Database == column.Database) {
@@ -1792,7 +1792,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
                     var sr = table.SortedRows();
                     var rd = sr.Get(row);
-                    table.CursorPos_Set(table.Database.Column[0], rd, true);
+                    table.CursorPos_Set(table.Database.Column.First, rd, true);
                 }
             } else {
                 var f = CellCollection.ErrorReason(column, row, ErrorReason.EditGeneral);
@@ -1973,7 +1973,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         if (thisR.CellGetString(e.Column) != thisR.CellGetString(c)) { d.Add(thisR.CellFirstString()); }
                     }
                     if (d.Count > 0) {
-                        Filter.Add(new FilterItem(e.Column.Database.Column[0], FilterType.Istgleich_ODER_GroßKleinEgal, d));
+                        Filter.Add(new FilterItem(e.Column.Database.Column.First, FilterType.Istgleich_ODER_GroßKleinEgal, d));
                         Notification.Show("Die aktuell <b>unterschiedlichen</b> Einträge wurden berechnet<br>und als <b>ODER-Filter</b> in der <b>ersten Spalte</b> gespeichert.", ImageCode.Trichter);
                     } else {
                         Notification.Show("Keine Filter verändert,<br>da <b>alle Einträge</b> identisch sind.", ImageCode.Trichter);
@@ -2611,7 +2611,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         #region Neue Zeile
 
-        if (UserEdit_NewRowAllowed() && viewItem == CurrentArrangement[Database.Column[0]]) {
+        if (UserEdit_NewRowAllowed() && viewItem == CurrentArrangement[Database.Column.First]) {
             Skin.Draw_FormatedText(gr, "[Neue Zeile]", QuickImage.Get(ImageCode.PlusZeichen, _pix16), Alignment.Left, new Rectangle((int)viewItem.OrderTmpSpalteX1 + 1, (int)(-SliderY.Value + HeadSize() + 1), (int)viewItem.TmpDrawWidth - 2, 16 - 2), this, false, _newRowFont, Translate);
         }
 
@@ -2760,7 +2760,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private void Draw_Table_ListboxStyle(Graphics gr, List<RowData?> sr, States state, Rectangle displayRectangleWoSlider, int vFirstVisibleRow, int vLastVisibleRow) {
         var itStat = state;
         Skin.Draw_Back(gr, Enums.Design.ListBox, state, base.DisplayRectangle, this, true);
-        var col = Database.Column[0];
+        var col = Database.Column.First;
         // Zeilen Zeichnen (Alle Zellen)
         for (var zeiv = vFirstVisibleRow; zeiv <= vLastVisibleRow; zeiv++) {
             var currentRow = sr[zeiv];
@@ -3034,7 +3034,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         newRow = row;
         if (_design == BlueTableAppearance.OnlyMainColumnWithoutHead) {
             if (direction is not Direction.Oben and not Direction.Unten) {
-                newColumn = _database.Column[0];
+                newColumn = _database.Column.First;
                 return;
             }
         }
@@ -3156,7 +3156,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private int Row_DrawHeight(RowItem? vrow, Rectangle displayRectangleWoSlider) {
-        if (_design == BlueTableAppearance.OnlyMainColumnWithoutHead) { return Cell_ContentSize(this, _database.Column[0], vrow, _cellFont, _pix16).Height; }
+        if (_design == BlueTableAppearance.OnlyMainColumnWithoutHead) { return Cell_ContentSize(this, _database.Column.First, vrow, _cellFont, _pix16).Height; }
         var tmp = _pix18;
         if (CurrentArrangement == null) { return tmp; }
 
@@ -3247,15 +3247,15 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private bool UserEdit_NewRowAllowed() {
-        if (_database == null || _database.Column.Count == 0 || _database.Column[0] == null) { return false; }
+        if (_database == null || _database.Column.Count == 0 || _database.Column.First == null) { return false; }
         if (_design == BlueTableAppearance.OnlyMainColumnWithoutHead) { return false; }
         if (_database.ColumnArrangements.Count == 0) { return false; }
-        if (CurrentArrangement?[_database.Column[0]] == null) { return false; }
+        if (CurrentArrangement?[_database.Column.First] == null) { return false; }
         if (!_database.PermissionCheck(_database.PermissionGroupsNewRow, null)) { return false; }
 
         if (_database.PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0) { return true; }
 
-        return CellCollection.UserEditPossible(_database.Column[0], null, ErrorReason.EditNormaly);
+        return CellCollection.UserEditPossible(_database.Column.First, null, ErrorReason.EditNormaly);
     }
 
     #endregion

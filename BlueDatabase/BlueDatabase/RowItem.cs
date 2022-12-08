@@ -195,7 +195,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
         return vars;
     }
 
-    public string CellFirstString() => Database.Cell.GetString(Database.Column[0], this);
+    public string CellFirstString() => Database.Cell.GetString(Database.Column.First, this);
 
     public bool CellGetBoolean(string columnName) => Database.Cell.GetBoolean(Database.Column[columnName], this);
 
@@ -384,7 +384,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
             }
         }
 
-        var infoTxt = "<b><u>" + CellGetString(Database.Column[0]) + "</b></u><br><br>";
+        var infoTxt = "<b><u>" + CellGetString(Database.Column.First) + "</b></u><br><br>";
 
         if (script != null) {
             List<string> cols = new();

@@ -56,7 +56,7 @@ internal static class Dictionary {
         if (word != word.ToLower() && word != word.ToUpper() && word != word.Substring(0, 1).ToUpper() + word.Substring(1).ToLower()) { return false; }
         if (word == word.ToLower()) {
             // Wenn ein Wort klein geschrieben ist, mu0ß auch das kleingeschriebene in der Datenbank sein!
-            return _dictWords.Row[new FilterItem(_dictWords.Column[0], FilterType.Istgleich, word)] != null;
+            return _dictWords.Row[new FilterItem(_dictWords.Column.First, FilterType.Istgleich, word)] != null;
         }
         return _dictWords.Row[word] != null;
     }

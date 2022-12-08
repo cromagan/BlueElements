@@ -68,10 +68,10 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tbxUndoAnzahl = new BlueControls.Controls.TextBox();
             this.capUndoAnzahl = new BlueControls.Controls.Caption();
             this.tblUndo = new BlueControls.Controls.Table();
-            this.Tab_Expermimentell = new System.Windows.Forms.TabPage();
-            this.capExperimentellWarnung = new BlueControls.Controls.Caption();
             this.capBinInfo = new BlueControls.Controls.Caption();
             this.btnSave = new BlueControls.Controls.Button();
+            this.capFirstColumn = new BlueControls.Controls.Caption();
+            this.txbFirstColumn = new BlueControls.Controls.TextBox();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
             this.GlobalTab.SuspendLayout();
@@ -82,7 +82,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Backup.SuspendLayout();
             this.grpExport.SuspendLayout();
             this.Tab_Undo.SuspendLayout();
-            this.Tab_Expermimentell.SuspendLayout();
             this.SuspendLayout();
             // 
             // grpBenutzergruppen
@@ -207,7 +206,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnSortRichtung
             // 
-            this.btnSortRichtung.ButtonStyle = BlueControls.Enums.ButtonStyle.Yes_or_No;
+            this.btnSortRichtung.ButtonStyle = Enums.ButtonStyle.Pic1_or_Pic2;
             this.btnSortRichtung.ImageCode = "AZ|16|8";
             this.btnSortRichtung.ImageCode_Checked = "ZA|16|8";
             this.btnSortRichtung.Location = new System.Drawing.Point(288, 32);
@@ -298,7 +297,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.GlobalTab.Controls.Add(this.Tab_Sortierung);
             this.GlobalTab.Controls.Add(this.Tab_Backup);
             this.GlobalTab.Controls.Add(this.Tab_Undo);
-            this.GlobalTab.Controls.Add(this.Tab_Expermimentell);
             this.GlobalTab.HotTrack = true;
             this.GlobalTab.Location = new System.Drawing.Point(0, 0);
             this.GlobalTab.Name = "GlobalTab";
@@ -463,6 +461,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // Tab_Rechte
             // 
             this.Tab_Rechte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.Tab_Rechte.Controls.Add(this.txbFirstColumn);
+            this.Tab_Rechte.Controls.Add(this.capFirstColumn);
             this.Tab_Rechte.Controls.Add(this.grpKennwort);
             this.Tab_Rechte.Controls.Add(this.grpBenutzergruppen);
             this.Tab_Rechte.Location = new System.Drawing.Point(4, 25);
@@ -598,24 +598,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tblUndo.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.tblUndo_ContextMenuInit);
             this.tblUndo.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.tblUndo_ContextMenuItemClicked);
             // 
-            // Tab_Expermimentell
-            // 
-            this.Tab_Expermimentell.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.Tab_Expermimentell.Controls.Add(this.capExperimentellWarnung);
-            this.Tab_Expermimentell.Location = new System.Drawing.Point(4, 25);
-            this.Tab_Expermimentell.Name = "Tab_Expermimentell";
-            this.Tab_Expermimentell.Size = new System.Drawing.Size(1039, 616);
-            this.Tab_Expermimentell.TabIndex = 8;
-            this.Tab_Expermimentell.Text = "Experimentell";
-            // 
-            // capExperimentellWarnung
-            // 
-            this.capExperimentellWarnung.CausesValidation = false;
-            this.capExperimentellWarnung.Location = new System.Drawing.Point(16, 16);
-            this.capExperimentellWarnung.Name = "capExperimentellWarnung";
-            this.capExperimentellWarnung.Size = new System.Drawing.Size(488, 80);
-            this.capExperimentellWarnung.Text = resources.GetString("capExperimentellWarnung.Text");
-            // 
             // capBinInfo
             // 
             this.capBinInfo.CausesValidation = false;
@@ -636,6 +618,23 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnSave.TabIndex = 22;
             this.btnSave.Text = "Speichern";
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            // 
+            // capFirstColumn
+            // 
+            this.capFirstColumn.CausesValidation = false;
+            this.capFirstColumn.Location = new System.Drawing.Point(400, 128);
+            this.capFirstColumn.Name = "capFirstColumn";
+            this.capFirstColumn.Size = new System.Drawing.Size(200, 16);
+            this.capFirstColumn.Text = "Die Hauptspalte (erste Spalte) ist:";
+            this.capFirstColumn.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
+            // txbFirstColumn
+            // 
+            this.txbFirstColumn.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbFirstColumn.Location = new System.Drawing.Point(400, 144);
+            this.txbFirstColumn.Name = "txbFirstColumn";
+            this.txbFirstColumn.Size = new System.Drawing.Size(304, 22);
+            this.txbFirstColumn.TabIndex = 36;
             // 
             // DatabaseHeadEditor
             // 
@@ -658,7 +657,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Backup.ResumeLayout(false);
             this.grpExport.ResumeLayout(false);
             this.Tab_Undo.ResumeLayout(false);
-            this.Tab_Expermimentell.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -692,8 +690,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private GroupBox grpExport;
         private ExportDefinition_Editor ExportEditor;
         private Button btnSpaltenuebersicht;
-        private  System.Windows.Forms.TabPage Tab_Expermimentell;
-        private Caption capExperimentellWarnung;
         private Table tblUndo;
         private Caption capNeueZeilenInfo;
         private Caption capUndoAnzahl;
@@ -711,5 +707,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private Button btnClipboard;
         private TextBox txbStandardFormulaFile;
         private Caption capStandardFormulaFile;
+        private TextBox txbFirstColumn;
+        private Caption capFirstColumn;
     }
 }

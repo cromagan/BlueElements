@@ -77,6 +77,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// </summary>
     private ListExt<ExportDefinition?> _export = new();
 
+    private string _firstColumn;
     private double _globalScale;
     private string _globalShowPass = string.Empty;
     private DateTime _lastUserActionUtc = new(1900, 1, 1);
@@ -241,6 +242,16 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     }
 
     public abstract string Filename { get; }
+
+    [Browsable(false)]
+    [Description("Welche Spalte bei Columnfirst zurückgegeben wird")]
+    public string FirstColumn {
+        get => _firstColumn;
+        set {
+            if (_firstColumn == value) { return; }
+            ChangeData(DatabaseDataType.FirstColumn, null, null, _firstColumn, value);
+        }
+    }
 
     [Browsable(false)]
     public double GlobalScale {
@@ -653,6 +664,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
         if (cellDataToo) { Row.CloneFrom(sourceDatabase); }
 
+        FirstColumn = sourceDatabase.FirstColumn;
         AdditionaFilesPfad = sourceDatabase.AdditionaFilesPfad;
         CachePfad = sourceDatabase.CachePfad; // Nicht so wichtig ;-)
         Caption = sourceDatabase.Caption;
@@ -1358,6 +1370,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         _rulesScript = string.Empty;
         _globalScale = 1f;
         _additionaFilesPfad = "AdditionalFiles";
+        _firstColumn = string.Empty;
         _zeilenQuickInfo = string.Empty;
         _sortDefinition = null;
     }
@@ -1521,6 +1534,10 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
             case DatabaseDataType.AdditionaFilesPath:
                 _additionaFilesPfad = value;
+                break;
+
+            case DatabaseDataType.FirstColumn:
+                _firstColumn = value;
                 break;
 
             case DatabaseDataType.StandardFormulaFile:

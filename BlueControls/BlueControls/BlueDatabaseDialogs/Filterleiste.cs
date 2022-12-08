@@ -295,7 +295,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     //}
 
     private void btnÄhnliche_Click(object sender, System.EventArgs e) {
-        List<FilterItem> fl = new() { new FilterItem(_tableView.Database.Column[0], FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
+        List<FilterItem> fl = new() { new FilterItem(_tableView.Database.Column.First, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
 
         var r = _tableView.Database.Row.CalculateFilteredRows(fl);
         if (r == null || r.Count != 1 || _ähnliche == null || _ähnliche.Count == 0) {
@@ -343,7 +343,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     private void DoÄhnlich() {
         //_TableView.Database.Column.Count == 0 Ist eine nigelnagelneue Datenbank
         if (_tableView?.Database == null || _tableView.Database.Column.Count == 0) { return; }
-        List<FilterItem> fl = new() { new FilterItem(_tableView.Database.Column[0], FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
+        List<FilterItem> fl = new() { new FilterItem(_tableView.Database.Column.First, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
 
         var r = _tableView.Database.Row.CalculateFilteredRows(fl);
         if (_ähnliche != null) {

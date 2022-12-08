@@ -127,6 +127,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnOk = new BlueControls.Controls.Button();
             this.tabControl = new BlueControls.Controls.TabControl();
             this.tabDatenFormat = new System.Windows.Forms.TabPage();
+            this.tbxMaxTextLenght = new BlueControls.Controls.TextBox();
+            this.capMaxTextLenght = new BlueControls.Controls.Caption();
             this.grpSchnellformat = new BlueControls.Controls.GroupBox();
             this.btnSchnellText = new BlueControls.Controls.Button();
             this.btnSchnellBit = new BlueControls.Controls.Button();
@@ -147,8 +149,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.caption5 = new BlueControls.Controls.Caption();
             this.butAktuellVor = new BlueControls.Controls.Button();
             this.butAktuellZurueck = new BlueControls.Controls.Button();
-            this.capMaxTextLenght = new BlueControls.Controls.Caption();
-            this.tbxMaxTextLenght = new BlueControls.Controls.TextBox();
             this.tabAnzeige.SuspendLayout();
             this.tabBearbeitung.SuspendLayout();
             this.grpAuswahlmenuOptionen.SuspendLayout();
@@ -224,7 +224,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxTranslate.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxTranslate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxTranslate.Location = new System.Drawing.Point(528, 176);
-            this.cbxTranslate.MaxTextLenght = 4000;
             this.cbxTranslate.Name = "cbxTranslate";
             this.cbxTranslate.Regex = null;
             this.cbxTranslate.Size = new System.Drawing.Size(368, 24);
@@ -235,7 +234,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbBildCodeConstHeight.AllowedChars = "0123456789|";
             this.txbBildCodeConstHeight.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbBildCodeConstHeight.Location = new System.Drawing.Point(176, 200);
-            this.txbBildCodeConstHeight.MaxTextLenght = 4000;
             this.txbBildCodeConstHeight.Name = "txbBildCodeConstHeight";
             this.txbBildCodeConstHeight.QuickInfo = "Beispieleingabe: 24|16";
             this.txbBildCodeConstHeight.Size = new System.Drawing.Size(96, 24);
@@ -265,7 +263,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txbSpaltenbild.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbSpaltenbild.Location = new System.Drawing.Point(528, 104);
-            this.txbSpaltenbild.MaxTextLenght = 4000;
             this.txbSpaltenbild.Name = "txbSpaltenbild";
             this.txbSpaltenbild.Regex = null;
             this.txbSpaltenbild.Size = new System.Drawing.Size(465, 24);
@@ -276,7 +273,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxBildTextVerhalten.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxBildTextVerhalten.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxBildTextVerhalten.Location = new System.Drawing.Point(176, 176);
-            this.cbxBildTextVerhalten.MaxTextLenght = 4000;
             this.cbxBildTextVerhalten.Name = "cbxBildTextVerhalten";
             this.cbxBildTextVerhalten.Regex = null;
             this.cbxBildTextVerhalten.Size = new System.Drawing.Size(336, 24);
@@ -287,7 +283,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxAlign.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxAlign.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxAlign.Location = new System.Drawing.Point(384, 136);
-            this.cbxAlign.MaxTextLenght = 4000;
             this.cbxAlign.Name = "cbxAlign";
             this.cbxAlign.Regex = null;
             this.cbxAlign.Size = new System.Drawing.Size(128, 24);
@@ -300,7 +295,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txbReplacer.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbReplacer.Location = new System.Drawing.Point(8, 264);
-            this.txbReplacer.MaxTextLenght = 4000;
             this.txbReplacer.MultiLine = true;
             this.txbReplacer.Name = "txbReplacer";
             this.txbReplacer.QuickInfo = "Texte in der Spalte werden mit diesen Angaben <b>optisch</b> ersetzt.<br><i><u>Be" +
@@ -339,7 +333,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.txbPrefix.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbPrefix.Location = new System.Drawing.Point(56, 48);
-            this.txbPrefix.MaxTextLenght = 4000;
             this.txbPrefix.Name = "txbPrefix";
             this.txbPrefix.Regex = null;
             this.txbPrefix.Size = new System.Drawing.Size(168, 24);
@@ -384,7 +377,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.txbUeberschift3.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbUeberschift3.Location = new System.Drawing.Point(624, 56);
-            this.txbUeberschift3.MaxTextLenght = 4000;
             this.txbUeberschift3.Name = "txbUeberschift3";
             this.txbUeberschift3.Regex = null;
             this.txbUeberschift3.Size = new System.Drawing.Size(288, 24);
@@ -394,7 +386,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.txbUeberschift2.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbUeberschift2.Location = new System.Drawing.Point(624, 32);
-            this.txbUeberschift2.MaxTextLenght = 4000;
             this.txbUeberschift2.Name = "txbUeberschift2";
             this.txbUeberschift2.Regex = null;
             this.txbUeberschift2.Size = new System.Drawing.Size(288, 24);
@@ -404,7 +395,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.txbUeberschift1.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbUeberschift1.Location = new System.Drawing.Point(624, 8);
-            this.txbUeberschift1.MaxTextLenght = 4000;
             this.txbUeberschift1.Name = "txbUeberschift1";
             this.txbUeberschift1.Regex = null;
             this.txbUeberschift1.Size = new System.Drawing.Size(288, 24);
@@ -439,7 +429,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.cbxEinheit.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxEinheit.Location = new System.Drawing.Point(56, 8);
-            this.cbxEinheit.MaxTextLenght = 4000;
             this.cbxEinheit.Name = "cbxEinheit";
             this.cbxEinheit.Regex = null;
             this.cbxEinheit.Size = new System.Drawing.Size(168, 24);
@@ -468,7 +457,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxRandRechts.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxRandRechts.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxRandRechts.Location = new System.Drawing.Point(384, 88);
-            this.cbxRandRechts.MaxTextLenght = 4000;
             this.cbxRandRechts.Name = "cbxRandRechts";
             this.cbxRandRechts.Regex = null;
             this.cbxRandRechts.Size = new System.Drawing.Size(128, 24);
@@ -488,7 +476,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxRandLinks.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxRandLinks.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxRandLinks.Location = new System.Drawing.Point(248, 88);
-            this.cbxRandLinks.MaxTextLenght = 4000;
             this.cbxRandLinks.Name = "cbxRandLinks";
             this.cbxRandLinks.Regex = null;
             this.cbxRandLinks.Size = new System.Drawing.Size(128, 24);
@@ -517,7 +504,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxScriptType.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxScriptType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxScriptType.Location = new System.Drawing.Point(232, 272);
-            this.cbxScriptType.MaxTextLenght = 4000;
             this.cbxScriptType.Name = "cbxScriptType";
             this.cbxScriptType.Regex = null;
             this.cbxScriptType.Size = new System.Drawing.Size(304, 24);
@@ -545,7 +531,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxAdditionalCheck.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxAdditionalCheck.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxAdditionalCheck.Location = new System.Drawing.Point(232, 232);
-            this.cbxAdditionalCheck.MaxTextLenght = 4000;
             this.cbxAdditionalCheck.Name = "cbxAdditionalCheck";
             this.cbxAdditionalCheck.Regex = null;
             this.cbxAdditionalCheck.Size = new System.Drawing.Size(304, 24);
@@ -565,7 +550,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxFormat.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxFormat.Location = new System.Drawing.Point(8, 32);
-            this.cbxFormat.MaxTextLenght = 4000;
             this.cbxFormat.Name = "cbxFormat";
             this.cbxFormat.Regex = null;
             this.cbxFormat.Size = new System.Drawing.Size(312, 24);
@@ -641,7 +625,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbxAuswaehlbareWerte.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbxAuswaehlbareWerte.Location = new System.Drawing.Point(8, 64);
-            this.tbxAuswaehlbareWerte.MaxTextLenght = 4000;
             this.tbxAuswaehlbareWerte.MultiLine = true;
             this.tbxAuswaehlbareWerte.Name = "tbxAuswaehlbareWerte";
             this.tbxAuswaehlbareWerte.Regex = null;
@@ -755,7 +738,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txbAutoReplace.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbAutoReplace.Location = new System.Drawing.Point(8, 288);
-            this.txbAutoReplace.MaxTextLenght = 4000;
             this.txbAutoReplace.MultiLine = true;
             this.txbAutoReplace.Name = "txbAutoReplace";
             this.txbAutoReplace.QuickInfo = resources.GetString("txbAutoReplace.QuickInfo");
@@ -778,7 +760,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txbAutoRemove.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbAutoRemove.Location = new System.Drawing.Point(8, 240);
-            this.txbAutoRemove.MaxTextLenght = 4000;
             this.txbAutoRemove.Name = "txbAutoRemove";
             this.txbAutoRemove.Regex = null;
             this.txbAutoRemove.Size = new System.Drawing.Size(977, 24);
@@ -799,7 +780,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxSchlüsselspalte.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxSchlüsselspalte.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxSchlüsselspalte.Location = new System.Drawing.Point(408, 176);
-            this.cbxSchlüsselspalte.MaxTextLenght = 4000;
             this.cbxSchlüsselspalte.Name = "cbxSchlüsselspalte";
             this.cbxSchlüsselspalte.Regex = null;
             this.cbxSchlüsselspalte.Size = new System.Drawing.Size(577, 24);
@@ -811,7 +791,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbxInitValue.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbxInitValue.Location = new System.Drawing.Point(8, 32);
-            this.tbxInitValue.MaxTextLenght = 4000;
             this.tbxInitValue.Name = "tbxInitValue";
             this.tbxInitValue.Regex = null;
             this.tbxInitValue.Size = new System.Drawing.Size(977, 24);
@@ -857,7 +836,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.tbxRunden.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbxRunden.Location = new System.Drawing.Point(224, 96);
-            this.tbxRunden.MaxTextLenght = 4000;
             this.tbxRunden.Name = "tbxRunden";
             this.tbxRunden.Regex = null;
             this.tbxRunden.Size = new System.Drawing.Size(88, 24);
@@ -870,7 +848,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxVorschlagSpalte.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxVorschlagSpalte.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxVorschlagSpalte.Location = new System.Drawing.Point(416, 128);
-            this.cbxVorschlagSpalte.MaxTextLenght = 4000;
             this.cbxVorschlagSpalte.Name = "cbxVorschlagSpalte";
             this.cbxVorschlagSpalte.Regex = null;
             this.cbxVorschlagSpalte.Size = new System.Drawing.Size(577, 24);
@@ -953,7 +930,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.tbxJoker.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbxJoker.Location = new System.Drawing.Point(4, 233);
-            this.tbxJoker.MaxTextLenght = 4000;
             this.tbxJoker.Name = "tbxJoker";
             this.tbxJoker.Regex = null;
             this.tbxJoker.Size = new System.Drawing.Size(312, 24);
@@ -1016,7 +992,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbxAdminInfo.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbxAdminInfo.Location = new System.Drawing.Point(512, 24);
-            this.tbxAdminInfo.MaxTextLenght = 4000;
             this.tbxAdminInfo.MultiLine = true;
             this.tbxAdminInfo.Name = "tbxAdminInfo";
             this.tbxAdminInfo.Regex = null;
@@ -1032,7 +1007,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbxQuickinfo.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbxQuickinfo.Location = new System.Drawing.Point(8, 24);
-            this.tbxQuickinfo.MaxTextLenght = 4000;
             this.tbxQuickinfo.MultiLine = true;
             this.tbxQuickinfo.Name = "tbxQuickinfo";
             this.tbxQuickinfo.Regex = null;
@@ -1099,7 +1073,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txbTags.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbTags.Location = new System.Drawing.Point(4, 31);
-            this.txbTags.MaxTextLenght = 4000;
             this.txbTags.MultiLine = true;
             this.txbTags.Name = "txbTags";
             this.txbTags.Regex = null;
@@ -1121,7 +1094,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxSort.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxSort.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxSort.Location = new System.Drawing.Point(232, 312);
-            this.cbxSort.MaxTextLenght = 4000;
             this.cbxSort.Name = "cbxSort";
             this.cbxSort.Regex = null;
             this.cbxSort.Size = new System.Drawing.Size(304, 24);
@@ -1133,7 +1105,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txbRegex.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbRegex.Location = new System.Drawing.Point(8, 168);
-            this.txbRegex.MaxTextLenght = 4000;
             this.txbRegex.Name = "txbRegex";
             this.txbRegex.Size = new System.Drawing.Size(976, 48);
             this.txbRegex.TabIndex = 9;
@@ -1161,7 +1132,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbxAllowedChars.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbxAllowedChars.Location = new System.Drawing.Point(8, 88);
-            this.tbxAllowedChars.MaxTextLenght = 4000;
             this.tbxAllowedChars.Name = "tbxAllowedChars";
             this.tbxAllowedChars.Regex = null;
             this.tbxAllowedChars.Size = new System.Drawing.Size(976, 56);
@@ -1183,7 +1153,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxLinkedDatabase.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxLinkedDatabase.Location = new System.Drawing.Point(224, 16);
-            this.cbxLinkedDatabase.MaxTextLenght = 4000;
             this.cbxLinkedDatabase.Name = "cbxLinkedDatabase";
             this.cbxLinkedDatabase.Regex = null;
             this.cbxLinkedDatabase.Size = new System.Drawing.Size(752, 24);
@@ -1249,7 +1218,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tbxName.AllowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.[]()";
             this.tbxName.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbxName.Location = new System.Drawing.Point(8, 56);
-            this.tbxName.MaxTextLenght = 4000;
             this.tbxName.Name = "tbxName";
             this.tbxName.Regex = null;
             this.tbxName.Size = new System.Drawing.Size(296, 24);
@@ -1270,7 +1238,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbxCaption.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbxCaption.Location = new System.Drawing.Point(312, 32);
-            this.tbxCaption.MaxTextLenght = 4000;
             this.tbxCaption.MultiLine = true;
             this.tbxCaption.Name = "tbxCaption";
             this.tbxCaption.Regex = null;
@@ -1356,6 +1323,29 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabDatenFormat.Size = new System.Drawing.Size(993, 487);
             this.tabDatenFormat.TabIndex = 12;
             this.tabDatenFormat.Text = "Daten-Format";
+            // 
+            // tbxMaxTextLenght
+            // 
+            this.tbxMaxTextLenght.AdditionalFormatCheck = BlueDatabase.Enums.AdditionalCheck.Integer;
+            this.tbxMaxTextLenght.AllowedChars = "0123456789";
+            this.tbxMaxTextLenght.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.tbxMaxTextLenght.Location = new System.Drawing.Point(680, 232);
+            this.tbxMaxTextLenght.MaxTextLenght = 255;
+            this.tbxMaxTextLenght.Name = "tbxMaxTextLenght";
+            this.tbxMaxTextLenght.Regex = "^((-?[1-9]\\d*)|0)$";
+            this.tbxMaxTextLenght.Size = new System.Drawing.Size(96, 24);
+            this.tbxMaxTextLenght.TabIndex = 45;
+            // 
+            // capMaxTextLenght
+            // 
+            this.capMaxTextLenght.CausesValidation = false;
+            this.capMaxTextLenght.Location = new System.Drawing.Point(544, 232);
+            this.capMaxTextLenght.Name = "capMaxTextLenght";
+            this.capMaxTextLenght.QuickInfo = "Falls mehrere Zeilen erlaubt sind, pro Zeile.\r\nAber es sind niemals mehr als 4000" +
+    " Zeichen erlaubt.\r\nDa im UTF8-Format gespeichert wird, evtl. auch weniger.";
+            this.capMaxTextLenght.Size = new System.Drawing.Size(128, 24);
+            this.capMaxTextLenght.Text = "Maximale Text Länge:";
+            this.capMaxTextLenght.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // grpSchnellformat
             // 
@@ -1510,7 +1500,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxTargetColumn.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxTargetColumn.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxTargetColumn.Location = new System.Drawing.Point(224, 48);
-            this.cbxTargetColumn.MaxTextLenght = 4000;
             this.cbxTargetColumn.Name = "cbxTargetColumn";
             this.cbxTargetColumn.Regex = null;
             this.cbxTargetColumn.Size = new System.Drawing.Size(752, 24);
@@ -1563,29 +1552,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.butAktuellZurueck.Size = new System.Drawing.Size(72, 24);
             this.butAktuellZurueck.TabIndex = 18;
             this.butAktuellZurueck.Click += new System.EventHandler(this.butAktuellZurueck_Click);
-            // 
-            // capMaxTextLenght
-            // 
-            this.capMaxTextLenght.CausesValidation = false;
-            this.capMaxTextLenght.Location = new System.Drawing.Point(544, 232);
-            this.capMaxTextLenght.Name = "capMaxTextLenght";
-            this.capMaxTextLenght.QuickInfo = "Falls mehrere Zeilen erlaubt sind, pro Zeile.\r\nAber es sind niemals mehr als 4000" +
-    " Zeichen erlaubt.\r\nDa im UTF8-Format gespeichert wird, evtl. auch weniger.";
-            this.capMaxTextLenght.Size = new System.Drawing.Size(128, 24);
-            this.capMaxTextLenght.Text = "Maximale Text Länge:";
-            this.capMaxTextLenght.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            // 
-            // tbxMaxTextLenght
-            // 
-            this.tbxMaxTextLenght.AdditionalFormatCheck = BlueDatabase.Enums.AdditionalCheck.Integer;
-            this.tbxMaxTextLenght.AllowedChars = "0123456789";
-            this.tbxMaxTextLenght.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.tbxMaxTextLenght.Location = new System.Drawing.Point(680, 232);
-            this.tbxMaxTextLenght.MaxTextLenght = 255;
-            this.tbxMaxTextLenght.Name = "tbxMaxTextLenght";
-            this.tbxMaxTextLenght.Regex = "^((-?[1-9]\\d*)|0)$";
-            this.tbxMaxTextLenght.Size = new System.Drawing.Size(96, 24);
-            this.tbxMaxTextLenght.TabIndex = 45;
             // 
             // ColumnEditor
             // 

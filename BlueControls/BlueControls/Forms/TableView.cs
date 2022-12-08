@@ -333,7 +333,7 @@ public partial class TableView : Form {
         if (!did) {
             Table.DatabaseSet(database, string.Empty);
             if (Table.View_RowFirst() != null && database != null) {
-                Table.CursorPos_Set(database.Column[0], Table.View_RowFirst(), false);
+                Table.CursorPos_Set(database.Column.First, Table.View_RowFirst(), false);
             }
         }
 
@@ -771,7 +771,7 @@ public partial class TableView : Form {
             if (gefRow?.Row == Formula.ShowingRow) {
                 MessageBox.Show("Text nur im <b>aktuellen Eintrag</b> gefunden,<br>aber sonst keine weiteren Einträge!", ImageCode.Information, "OK");
             } else {
-                Table.CursorPos_Set(Table.Database.Column[0], gefRow, true);
+                Table.CursorPos_Set(Table.Database.Column.First, gefRow, true);
             }
         }
     }
@@ -891,7 +891,7 @@ public partial class TableView : Form {
         if (Table.Visible) {
             if (Table.Database != null) {
                 if (Table.CursorPosRow == null && Table.View_RowFirst() != null) {
-                    Table.CursorPos_Set(Table.Database.Column[0], Table.View_RowFirst(), false);
+                    Table.CursorPos_Set(Table.Database.Column.First, Table.View_RowFirst(), false);
                 }
                 if (Table.CursorPosRow != null) {
                     FillFormula(Table.CursorPosRow.Row);
@@ -930,7 +930,7 @@ public partial class TableView : Form {
     }
 
     private void SuchEintragNoSave(Direction richtung, out ColumnItem? column, out RowData? row) {
-        column = Table.Database.Column[0];
+        column = Table.Database.Column.First;
         row = null;
         if (Table.Database.Row.Count < 1) { return; }
         // Temporär berechnen, um geflacker zu vermeiden (Endabled - > Disabled bei Nothing)
