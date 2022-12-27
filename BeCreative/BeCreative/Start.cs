@@ -52,7 +52,7 @@ public partial class Start : Form {
         TraceLogging_End();
     }
 
-    internal static System.Windows.Forms.Form? NewForm() => new Start();
+    internal static System.Windows.Forms.Form NewForm() => new Start();
 
     private void btnBildEditor_Click(object sender, System.EventArgs e) => DoForm(new BluePaint.MainWindow(true));
 

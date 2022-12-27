@@ -27,10 +27,8 @@ using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Windows.Controls;
 using static BlueBasics.Converter;
 
 namespace BlueControls.BlueDatabaseDialogs;
@@ -71,7 +69,7 @@ internal sealed partial class ColumnEditor {
         return c;
     }
 
-    private static void SetKeyTo(BlueControls.Controls.TextBox combobox, long columnKey) => combobox.Text = columnKey.ToString();
+    private static void SetKeyTo(Controls.TextBox combobox, long columnKey) => combobox.Text = columnKey.ToString();
 
     private bool AllOk() {
         var feh = "";
@@ -578,10 +576,7 @@ internal sealed partial class ColumnEditor {
         for (var z = 0; z < linkdb.Column.Count; z++) {
             var col = linkdb.Column[z];
 
-            var r = tblFilterliste.Database.Row[z.ToString()];
-            if (r == null) {
-                r = tblFilterliste.Database.Row.GenerateAndAdd(z.ToString());
-            }
+            var r = tblFilterliste.Database.Row[z.ToString()] ?? tblFilterliste.Database.Row.GenerateAndAdd(z.ToString());
 
             r.CellSet("Spalte", col.ReadableText() + " = ");
 

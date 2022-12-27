@@ -42,11 +42,9 @@ public class ConstantTextPadItem : CustomizableShowPadItem, IReadableText, ICont
 
     public ConstantTextPadItem() : this(UniqueInternal(), string.Empty) { }
 
-    public ConstantTextPadItem(string intern, string text) : base(intern) {
-        _text = text;
-        //Size = new Size(150, 24);
-    }
+    public ConstantTextPadItem(string intern, string text) : base(intern) => _text = text;
 
+    //Size = new Size(150, 24);
     public ConstantTextPadItem(string intern) : this(intern, string.Empty) { }
 
     #endregion
@@ -69,7 +67,7 @@ public class ConstantTextPadItem : CustomizableShowPadItem, IReadableText, ICont
 
     #region Methods
 
-    public override Control? CreateControl(ConnectedFormulaView parent) {
+    public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new FlexiControl();
         con.Width = 100;
         con.Height = 16;
@@ -119,7 +117,7 @@ public class ConstantTextPadItem : CustomizableShowPadItem, IReadableText, ICont
         var t = string.Empty;
         t = t + _text;
 
-        Skin.Draw_FormatedText(gr, t, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
+        Skin.Draw_FormatedText(gr, t, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont.Scale(zoom), false);
 
         gr.FillRectangle(new SolidBrush(Color.FromArgb(128, 255, 255, 255)), positionModified);
 

@@ -23,7 +23,6 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
-using System.Security.AccessControl;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
@@ -110,10 +109,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
 
         _column?.RefreshColumnsData();
 
-
         if (searchValue != null && searchValue.Count > 0) { SearchValue.AddRange(searchValue); }
-
-
 
         //if (!IsOk()) {
         //    Develop.DebugPrint(FehlerArt.Fehler, "Filter fehlerhaft: " + ErrorReason());

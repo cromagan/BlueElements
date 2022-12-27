@@ -65,7 +65,7 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
 
     #region Methods
 
-    public override Control? CreateControl(ConnectedFormulaView parent) {
+    public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new Controls.TabControl();
         con.Name = DefaultItemToControlName();
 
@@ -210,7 +210,7 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
 
             gr.FillRectangle(new SolidBrush(Color.FromArgb(255, 200, 200, 200)), it);
 
-            Skin.Draw_FormatedText(gr, thisC.FileNameWithoutSuffix(), null, Alignment.Horizontal_Vertical_Center, it.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
+            Skin.Draw_FormatedText(gr, thisC.FileNameWithoutSuffix(), null, Alignment.Horizontal_Vertical_Center, it.ToRect(), ColumnFont.Scale(zoom), false);
             gr.DrawRectangle(new Pen(Color.Black, zoom), it);
         }
 
@@ -218,7 +218,7 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
         gr.DrawRectangle(new Pen(Color.Black, zoom), body);
 
         //Skin.Draw_FormatedText(gr, _text, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
-        Skin.Draw_FormatedText(gr, "Register-\r\nkarten", null, Alignment.Horizontal_Vertical_Center, body.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
+        Skin.Draw_FormatedText(gr, "Register-\r\nkarten", null, Alignment.Horizontal_Vertical_Center, body.ToRect(), ColumnFont.Scale(zoom), false);
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
@@ -254,11 +254,7 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
         }
 
         foreach (var thisf in _childs) {
-            if (System.IO.File.Exists(thisf)) {
-                childs.Item.Add(thisf, ImageCode.Diskette);
-            } else {
-                childs.Item.Add(thisf, ImageCode.Formel);
-            }
+            childs.Item.Add(thisf, System.IO.File.Exists(thisf) ? ImageCode.Diskette : ImageCode.Formel);
         }
 
         childs.ListOrItemChanged += Childs_ListOrItemChanged;

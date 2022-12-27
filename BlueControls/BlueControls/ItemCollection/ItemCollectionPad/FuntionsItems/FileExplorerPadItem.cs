@@ -63,7 +63,7 @@ public class FileExplorerPadItem : CustomizableShowPadItem, IItemToControl {
 
     #region Methods
 
-    public override System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
+    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var con = new FileBrowser();
         con.OriginalText = Pfad;
         con.Name = DefaultItemToControlName();

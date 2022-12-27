@@ -80,7 +80,7 @@ public class clsDesign {
     public Color BackColor1;
     public Color BackColor2;
     public Color BackColor3;
-    public BlueFont? bFont;
+    public BlueFont bFont;
     public Color BorderColor1;
     public Color BorderColor2;
     public Color BorderColor3;

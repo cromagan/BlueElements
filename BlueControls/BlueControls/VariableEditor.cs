@@ -54,10 +54,7 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
         if (variables == null) { return; }
 
         foreach (var thisv in variables) {
-            var ro = RowOfVariable(thisv);
-            if (ro == null) {
-                ro = tableVariablen.Database.Row.GenerateAndAdd(thisv.Name);
-            }
+            var ro = RowOfVariable(thisv) ?? tableVariablen.Database.Row.GenerateAndAdd(thisv.Name);
 
             ro.CellSet("typ", thisv.ShortName);
             ro.CellSet("RO", thisv.Readonly);

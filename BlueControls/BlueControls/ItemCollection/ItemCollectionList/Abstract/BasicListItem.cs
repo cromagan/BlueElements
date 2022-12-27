@@ -130,7 +130,7 @@ public abstract class BasicListItem : IComparable, ICloneable {
 
     #region Methods
 
-    public abstract object Clone();
+    public abstract object? Clone();
 
     ///// <summary>
     ///// Klont das aktuelle Objekt (es wird ein neues Objekt des gleichen Typs erstellt) und fügt es in die angegebene ItemCollection hinzu

@@ -53,9 +53,7 @@ public sealed partial class ScreenShot {
         _feedBack = new ScreenData();
     }
 
-    private ScreenShot(string text) : this() {
-        _drawText = text;
-    }
+    private ScreenShot(string text) : this() => _drawText = text;
 
     #endregion
 

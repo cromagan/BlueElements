@@ -155,7 +155,7 @@ public class RowFormulaListItem : BasicListItem {
         var internalZoom = Math.Min(500 / mb.Width, 500 / mb.Height);
         internalZoom = Math.Min(1, internalZoom);
 
-        if (_tmpBmp == null) { _tmpBmp = new Bitmap((int)(mb.Width * internalZoom), (int)(mb.Height * internalZoom)); }
+        _tmpBmp ??= new Bitmap((int)(mb.Width * internalZoom), (int)(mb.Height * internalZoom));
         var zoomv = ItemCollectionPad.ZoomFitValue(mb, _tmpBmp.Size);
         var centerpos = ItemCollectionPad.CenterPos(mb, _tmpBmp.Size, zoomv);
         var slidervalues = ItemCollectionPad.SliderValues(mb, zoomv, centerpos);

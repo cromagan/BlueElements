@@ -45,7 +45,7 @@ public static partial class Extensions {
 
     public static bool AddIfNotExists<T>(this List<T> l, List<T>? values) {
         if (values == null || values.Count == 0) { return false; }
-        var ok1 = values.Count(thivalue => l.AddIfNotExists(thivalue)) > 0;
+        var ok1 = values.Count(l.AddIfNotExists) > 0;
         return ok1;
     }
 
@@ -104,7 +104,7 @@ public static partial class Extensions {
 
         foreach (var item in l) {
             var it = item.Clone();
-            if (it!=null) {
+            if (it != null) {
                 l2.Add((T)it);
             }
         }
@@ -117,7 +117,7 @@ public static partial class Extensions {
 
         foreach (var item in l) {
             var it = item.Clone();
-            if (it!=null) {
+            if (it != null) {
                 l2.Add((T)it);
             }
         }

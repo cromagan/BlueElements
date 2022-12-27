@@ -69,7 +69,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
     #region Constructors
 
     public ItemCollectionPad() : base() {
-        if (PadItemTypes == null) { PadItemTypes = GetEnumerableOfType<BasicPadItem>("NAME"); }
+        PadItemTypes ??= GetEnumerableOfType<BasicPadItem>("NAME");
 
         if (Skin.StyleDb == null) { Skin.InitStyles(); }
         SheetSizeInMm = Size.Empty;

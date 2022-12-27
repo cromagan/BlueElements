@@ -8,7 +8,7 @@ public class Html {
     #region Constructors
 
     // https://www.w3schools.com/html/html_tables.asp
-    public Html(string title) {
+    public Html(string title) =>
         Code = new List<string> {
             "<!DOctypex HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"",
             "\"http://www.w3.org/TR/html4/strict.dtd\">",
@@ -43,7 +43,6 @@ public class Html {
             "  </head>",
             "<body>"
         };
-    }
 
     #endregion
 

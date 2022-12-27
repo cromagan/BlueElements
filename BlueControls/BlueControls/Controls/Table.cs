@@ -464,8 +464,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     return;
                 }
                 rowsChecked++;
-                row = tableView.View_NextRow(row);
-                if (row == null) { row = tableView.View_RowFirst(); }
+                row = tableView.View_NextRow(row) ?? tableView.View_RowFirst();
             }
             var contentHolderCellColumn = column;
             var contenHolderCellRow = row?.Row;
@@ -950,7 +949,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public void Pin(List<RowItem>? rows) {
         // Arbeitet mit Rows, weil nur eine Anpinngug möglich ist
 
-        if (rows == null) { rows = new List<RowItem>(); }
+        rows ??= new List<RowItem>();
 
         rows = rows.Distinct().ToList();
         if (!rows.IsDifferentTo(PinnedRows)) { return; }
@@ -1689,7 +1688,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private static void Draw_CellTransparentDirect(Graphics gr, string? toDraw, Rectangle drawarea, BlueFont? font, ColumnItem contentHolderCellColumn, int pix16, ShortenStyle style, BildTextVerhalten bildTextverhalten, States state) {
-        if (toDraw == null) { toDraw = string.Empty; }
+        toDraw ??= string.Empty;
 
         if (!contentHolderCellColumn.MultiLine || !toDraw.Contains("\r")) {
             Draw_CellTransparentDirect_OneLine(gr, toDraw, contentHolderCellColumn, drawarea, 0, false, font, pix16, style, bildTextverhalten, state);

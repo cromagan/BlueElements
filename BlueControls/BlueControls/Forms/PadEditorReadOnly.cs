@@ -54,7 +54,7 @@ public partial class PadEditorReadOnly : Form {
 
     private void DoPages() {
         if (InvokeRequired) {
-            Invoke(new Action(() => DoPages()));
+            Invoke(new Action(DoPages));
             return;
         }
 

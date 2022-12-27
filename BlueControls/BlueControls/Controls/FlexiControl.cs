@@ -145,7 +145,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     public string Caption {
         get => _caption;
         set {
-            if (value == null) { value = string.Empty; }
+            value ??= string.Empty;
             if (_caption == value) { return; }
             RemoveAll(); // Controls and Events entfernen!
             _caption = value;

@@ -111,7 +111,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     public new string Text {
         get => _text;
         set {
-            if (value is null) { value = string.Empty; }
+            value ??= string.Empty;
             if (_text == value) { return; }
             _text = value;
             ResetETextAndInvalidate();

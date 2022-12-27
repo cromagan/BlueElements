@@ -56,11 +56,7 @@ internal class Method_SortNum : Method {
 
         var nums = new List<double>();
         foreach (var txt in ((VariableListString)attvar.Attributes[0]).ValueList) {
-            if (txt.IsNumeral()) {
-                nums.Add(DoubleParse(txt));
-            } else {
-                nums.Add(((VariableFloat)attvar.Attributes[1]).ValueNum);
-            }
+            nums.Add(txt.IsNumeral() ? DoubleParse(txt) : ((VariableFloat)attvar.Attributes[1]).ValueNum);
         }
 
         nums.Sort();

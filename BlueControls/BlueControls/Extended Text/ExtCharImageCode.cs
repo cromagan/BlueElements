@@ -34,13 +34,9 @@ internal class ExtCharImageCode : ExtChar {
 
     #region Constructors
 
-    public ExtCharImageCode(QuickImage? qi, Design design, States state, BlueFont? font, int stufe) : base(design, state, font, stufe) {
-        _qi = qi;
-    }
+    public ExtCharImageCode(QuickImage? qi, Design design, States state, BlueFont? font, int stufe) : base(design, state, font, stufe) => _qi = qi;
 
-    public ExtCharImageCode(string imagecode, Design design, States state, BlueFont? font, int stufe) : base(design, state, font, stufe) {
-        _qi = QuickImage.Get(imagecode);
-    }
+    public ExtCharImageCode(string imagecode, Design design, States state, BlueFont? font, int stufe) : base(design, state, font, stufe) => _qi = QuickImage.Get(imagecode);
 
     #endregion
 

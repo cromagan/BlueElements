@@ -21,9 +21,7 @@ public class MultiUserFileHasPendingChangesEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public MultiUserFileHasPendingChangesEventArgs() {
-        HasPendingChanges = false;
-    }
+    public MultiUserFileHasPendingChangesEventArgs() => HasPendingChanges = false;
 
     #endregion
 

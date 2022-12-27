@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using System.Collections.Generic;
-using static BlueBasics.Extensions;
 
 namespace BlueDatabase;
 
@@ -42,7 +41,7 @@ public class ConnectionInfo {
     /// <param name="uniqueID"></param>
     public ConnectionInfo(string uniqueID) {
         if (uniqueID.FileSuffix().ToUpper() == "MDB" &&
-            uniqueID.Substring(1, 1)==":" &&
+            uniqueID.Substring(1, 1) == ":" &&
             System.IO.File.Exists(uniqueID)) {
             TableName = SQLBackAbstract.MakeValidTableName(uniqueID.FileNameWithoutSuffix());
             Provider = null;
@@ -83,7 +82,7 @@ public class ConnectionInfo {
 
         var ci = DatabaseAbstract.ProviderOf(tbn);
 
-        if (ci!= null) {
+        if (ci != null) {
             TableName = ci.TableName;
             Provider = ci.Provider;
             DatabaseID = ci.DatabaseID;
@@ -111,7 +110,7 @@ public class ConnectionInfo {
     /// <summary>
     /// Eine Kennung, die von von DatabaseAbstract abgeleiten Klassen erkannt werden kann.
     /// </summary>
-    public string DatabaseID { get; private set; }
+    public string DatabaseID { get; }
 
     /// <summary>
     /// Welche bereits vorhandene Datenbank den in dieser Klasse aufgezeigten Tabellenamen erzeugen kann
@@ -134,7 +133,7 @@ public class ConnectionInfo {
     /// <summary>
     /// Eindeutiger Schlüssel, mit dem eine Datenbank von vorhandenen Datenbanken wieder gefunden werden kann.
     /// </summary>
-    public string UniqueID { get => TableName +"|"+ DatabaseID + "|" + AdditionalData; }
+    public string UniqueID => TableName + "|" + DatabaseID + "|" + AdditionalData;
 
     #endregion
 }

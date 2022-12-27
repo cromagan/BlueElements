@@ -130,7 +130,7 @@ public static class Generic {
     public static Stream? GetEmmbedResource(Assembly assembly, string name) {
         return assembly.GetManifestResourceNames()
             .Where(thisString => thisString.EndsWith("." + name))
-            .Select(thisString => assembly.GetManifestResourceStream(thisString)).FirstOrDefault();
+            .Select(assembly.GetManifestResourceStream).FirstOrDefault();
     }
 
     public static List<T> GetEnumerableOfType<T>(params object[] constructorArgs) where T : class {
@@ -142,7 +142,7 @@ public static class Generic {
                         l.Add((T)Activator.CreateInstance(thist, constructorArgs));
                     }
                 }
-            } catch (Exception ex) {
+            } catch (Exception) {
                 //Develop.DebugPrint(FehlerArt.Info, ex);
             }
         }

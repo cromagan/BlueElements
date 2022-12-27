@@ -32,9 +32,7 @@ public class VariableBitmap : Variable {
 
     #region Constructors
 
-    public VariableBitmap(string name, Bitmap? value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) {
-        _bmp = value;
-    }
+    public VariableBitmap(string name, Bitmap? value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _bmp = value;
 
     /// <summary>
     /// Wichtig für: GetEnumerableOfType<Variable>("NAME");

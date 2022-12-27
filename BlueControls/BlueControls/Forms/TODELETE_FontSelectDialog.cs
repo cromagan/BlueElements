@@ -95,7 +95,7 @@ public partial class FontSelectDialog {
         get => BlueFont.Get(FName.Item.Checked()[0].Internal, FloatParse(FSize.Item.Checked()[0].Internal), fFett.Checked, fKursiv.Checked, fUnterstrichen.Checked, fDurchge.Checked, fOutline.Checked, QuickImage.Get(cFarbe.ImageCode).ChangeGreenTo, QuickImage.Get(cRandF.ImageCode).ChangeGreenTo, fKap.Checked, OnlyUpper.Checked, OnlyLow.Checked);
         set {
             _adding = true;
-            if (value == null) { value = BlueFont.Get(Skin.DummyStandardFont); }
+            value ??= BlueFont.Get(Skin.DummyStandardFont);
             if (FName.Item[value.FontName] == null) { FName.Item.Add(value.FontName, value.FontName, QuickImage.Get(ImageCode.Warnung, 20)); }
             FName.Item.UncheckAll();
             FName.Item[value.FontName].Checked = true;

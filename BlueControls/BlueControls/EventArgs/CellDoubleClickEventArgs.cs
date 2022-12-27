@@ -23,9 +23,7 @@ public class CellDoubleClickEventArgs : BlueDatabase.EventArgs.CellEventArgs {
 
     #region Constructors
 
-    public CellDoubleClickEventArgs(ColumnItem? column, RowItem? row, bool startEdit) : base(column, row) {
-        StartEdit = startEdit;
-    }
+    public CellDoubleClickEventArgs(ColumnItem? column, RowItem? row, bool startEdit) : base(column, row) => StartEdit = startEdit;
 
     #endregion
 

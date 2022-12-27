@@ -80,8 +80,6 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
     #region Methods
 
-    private static void TmpDatabase_ShouldICancelDiscOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
-
     private void btnAktuelleAnsichtLoeschen_Click(object sender, System.EventArgs e) {
         if (Database == null || Arrangement < 2 || Arrangement >= Database.ColumnArrangements.Count) { return; }
         if (MessageBox.Show("Anordung <b>'" + CurrentArrangement.Name + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }

@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.EventArgs;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
 using BlueControls.Enums;
@@ -942,14 +941,12 @@ public partial class TableView : Form {
         if (Table.Database.Row.Count < 1) { return; }
         // Temporär berechnen, um geflacker zu vermeiden (Endabled - > Disabled bei Nothing)
         if (Convert.ToBoolean(richtung & Direction.Unten)) {
-            row = Table.View_NextRow(Table.CursorPosRow);
-            if (row == null) { row = Table.View_RowFirst(); }
+            row = Table.View_NextRow(Table.CursorPosRow) ?? Table.View_RowFirst();
         }
         if (Convert.ToBoolean(richtung & Direction.Oben)) {
-            row = Table.View_PreviousRow(Table.CursorPosRow);
-            if (row == null) { row = Table.View_RowLast(); }
+            row = Table.View_PreviousRow(Table.CursorPosRow) ?? Table.View_RowLast();
         }
-        if (row == null) { row = Table.View_RowFirst(); }
+        row ??= Table.View_RowFirst();
     }
 
     private void Table_EditBeforeBeginEdit(object sender, CellCancelEventArgs e) {
@@ -1029,7 +1026,7 @@ public partial class TableView : Form {
 
         var s = (List<object>)(e.TabPage.Tag);
 
-        var DB = Database.GetByID((ConnectionInfo)s[0]);
+        var DB = DatabaseAbstract.GetByID((ConnectionInfo)s[0]);
 
         if (DB is Database BDB) {
             if (!string.IsNullOrEmpty(BDB.Filename)) {

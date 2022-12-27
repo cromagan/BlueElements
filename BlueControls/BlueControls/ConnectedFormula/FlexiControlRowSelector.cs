@@ -57,11 +57,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
         EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
 
-        if (string.IsNullOrEmpty(caption)) {
-            Caption = "Wählen:";
-        } else {
-            Caption = caption;
-        }
+        Caption = string.IsNullOrEmpty(caption) ? "Wählen:" : caption;
         _showformat = showFormat;
 
         if (string.IsNullOrEmpty(_showformat) && database != null && database.Column.Count > 0 && database.Column.First is ColumnItem fc) {
@@ -164,11 +160,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
     protected override void OnValueChanged() {
         base.OnValueChanged();
 
-        if (string.IsNullOrEmpty(Value)) {
-            Row = null;
-        } else {
-            Row = Database?.Row.SearchByKey(LongParse(Value));
-        }
+        Row = string.IsNullOrEmpty(Value) ? null : Database?.Row.SearchByKey(LongParse(Value));
     }
 
     private static void DoChilds_OneRowKey(IAcceptRowKey fcfc, RowItem? row, DatabaseAbstract? database) {

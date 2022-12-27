@@ -354,10 +354,10 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     /// <summary>
     /// Wird für den Editor benötigt, um bei hinzufügen es für den Benutzer mittig zu Plazieren
     /// </summary>
-    /// <param name="v1"></param>
-    /// <param name="v2"></param>
-    /// <param name="wid"></param>
-    /// <param name="he"></param>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="width"></param>
+    /// <param name="height"></param>
     public abstract void InitialPosition(int x, int y, int width, int height);
 
     public bool IsVisibleOnPage(string page) {

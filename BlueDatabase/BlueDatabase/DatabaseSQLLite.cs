@@ -23,10 +23,7 @@ using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data.SqlTypes;
-using System.Linq.Expressions;
 using System.Threading;
-using System.Windows.Input;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
@@ -47,7 +44,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     /// <summary>
     /// Der Globale Timer, der die Sys_Undo Datenbank abfrägt
     /// </summary>
-    private static System.Threading.Timer? _timer = null;
+    private static Timer? _timer = null;
 
     /// <summary>
     /// Der Zeitstempel der letzten Abfrage des _timer
@@ -88,9 +85,9 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     public override ConnectionInfo ConnectionData {
         get {
-            var ConnectionData = _sql.ConnectionData(TableName, true);
-            ConnectionData.Provider = this;
-            return ConnectionData;
+            var connectionData = _sql.ConnectionData(TableName, true);
+            connectionData.Provider = this;
+            return connectionData;
         }
     }
 
@@ -165,9 +162,9 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
             return null;
         }
 
-        var ConnectionData = _sql.ConnectionData(tableName, true);
-        ConnectionData.Provider = this;
-        return ConnectionData;
+        var connectionData = _sql.ConnectionData(tableName, true);
+        connectionData.Provider = this;
+        return connectionData;
     }
 
     //public override void Load_Reload() {
@@ -176,7 +173,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     //    LoadFromSQLBack();
     //}
 
-    public override void RefreshColumnsData(List<ColumnItem> columns) {
+    public override void RefreshColumnsData(List<ColumnItem>? columns) {
         if (columns == null || columns.Count == 0) { return; }
         if (columns.Count == 1 && columns[0].IsInCache) { return; }
 
@@ -413,7 +410,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     private void GenerateTimer() {
         if (_timer != null) { return; }
         _timerTimeStamp = DateTime.UtcNow.AddMinutes(-5);
-        _timer = new System.Threading.Timer(CheckSysUndo);
+        _timer = new Timer(CheckSysUndo);
         _timer.Change(10000, 10000);
     }
 

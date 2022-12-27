@@ -20,17 +20,12 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueDatabase.AdditionalScriptComands;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Runtime.InteropServices.ComTypes;
-using System.Security.Cryptography.X509Certificates;
-using System.Windows.Forms;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 
 namespace BlueDatabase;
 
@@ -355,8 +350,7 @@ public abstract class SQLBackAbstract {
 
                 while (reader.Read()) {
                     var rk = LongParse(reader[0].ToString());
-                    var r = row[0].Database.Row.SearchByKey(rk);
-                    if (r == null) { r = row[0].Database.Row.GenerateAndAdd(rk, string.Empty, false, false); }
+                    var r = row[0].Database.Row.SearchByKey(rk) ?? row[0].Database.Row.GenerateAndAdd(rk, string.Empty, false, false);
 
                     for (var z = 1; z < reader.FieldCount; z++) {
                         r.Database.Cell.SetValueInternal(r.Database.Column[z - 1].Key, r.Key, reader[z].ToString(), -1, -1, true);
@@ -595,9 +589,7 @@ public abstract class SQLBackAbstract {
         return l;
     }
 
-    internal static string MakeValidColumnName(string columnname) {
-        return columnname.ToUpper().Replace(" ", "_").ReduceToChars(Constants.AllowedCharsVariableName);
-    }
+    internal static string MakeValidColumnName(string columnname) => columnname.ToUpper().Replace(" ", "_").ReduceToChars(Constants.AllowedCharsVariableName);
 
     internal List<(string tablename, string comand, string columnkey, string rowkey)>? GetLastChanges(List<DatabaseSQLLite> db, DateTime fromDate, DateTime toDate) {
         if (!OpenConnection()) { return null; }
@@ -625,7 +617,6 @@ public abstract class SQLBackAbstract {
 
             if (!OpenConnection()) { return null; }
             using var reader = q.ExecuteReader();
-            var value = string.Empty;
             while (reader.Read()) {
                 fb.Add((reader[0].ToString(), reader[1].ToString(), reader[2].ToString(), reader[3].ToString()));
             }
@@ -792,22 +783,17 @@ public abstract class SQLBackAbstract {
         ExecuteCommand("alter table " + tablename.ToUpper() + " add " + column + " " + type + " default ''" + n);
     }
 
-    private string AddRow(string tablename, long key) {
-        return ExecuteCommand("INSERT INTO " + tablename.ToUpper() + " (RK) VALUES (" + DBVAL(key) + ")");
-        //ExecuteCommand("DELETE FROM  " + tablename.ToUpper() + " WHERE RK = " + DBVAL(key.ToString()));
-        //ExecuteCommand("DELETE FROM " + SYS_STYLE + " WHERE TABLENAME = " + DBVAL( tablename.ToUpper() ) + " AND COLUMNNAME = " + DBVAL( column.ToUpper() ));
-    }
+    private string AddRow(string tablename, long key) => ExecuteCommand("INSERT INTO " + tablename.ToUpper() + " (RK) VALUES (" + DBVAL(key) + ")");
 
-    private string DBVAL(long original) {
-        return DBVAL(original.ToString());
-    }
+    //ExecuteCommand("DELETE FROM  " + tablename.ToUpper() + " WHERE RK = " + DBVAL(key.ToString()));
+    //ExecuteCommand("DELETE FROM " + SYS_STYLE + " WHERE TABLENAME = " + DBVAL( tablename.ToUpper() ) + " AND COLUMNNAME = " + DBVAL( column.ToUpper() ));
+    private string DBVAL(long original) => DBVAL(original.ToString());
 
-    private string DBVAL(DateTime date) {
-        return "to_timestamp(" +
-               DBVAL(date.ToString(Constants.Format_Date9)) + ", " +
-               DBVAL(Constants.Format_Date9.ToUpper().Replace(":MM:", ":MI:").Replace("HH:", "HH24:").Replace(".FFF", ".FF3")) +
-                    ")";
-    }
+    private string DBVAL(DateTime date) =>
+        "to_timestamp(" +
+        DBVAL(date.ToString(Constants.Format_Date9)) + ", " +
+        DBVAL(Constants.Format_Date9.ToUpper().Replace(":MM:", ":MI:").Replace("HH:", "HH24:").Replace(".FFF", ".FF3")) +
+        ")";
 
     private string DBVAL(string original) {
         original = original.CutToUTF8Length(MaxStringLenght);
@@ -847,7 +833,7 @@ public abstract class SQLBackAbstract {
 
             if (reader.Read()) {
                 // Doppelter Wert?!?Ersten Wert zurückgeben, um unendliche erweiterungen zu erhindern
-                Develop.DebugPrint(columnname.ToString() + " doppelt in " + tablename.ToUpper() + " vorhanden!");
+                Develop.DebugPrint(columnname + " doppelt in " + tablename.ToUpper() + " vorhanden!");
             }
 
             CloseConnection();
@@ -909,10 +895,8 @@ public abstract class SQLBackAbstract {
     /// <param name="newValue"></param>
     /// <returns></returns>
     private string SetStyleData(string tablename, string type, string columnName, string newValue, int part) {
-        string cmdString;
-
         //if (isVal is null) {
-        cmdString = "INSERT INTO " + SYS_STYLE + " (TABLENAME, TYPE, COLUMNNAME, VALUE, PART)  VALUES (" + DBVAL(tablename.ToUpper()) + ", " + DBVAL(type) + ", " + DBVAL(columnName.ToUpper()) + ", " + DBVAL(newValue) + ", " + DBVAL(part.ToString(Constants.Format_Integer3)) + ")";
+        var cmdString = "INSERT INTO " + SYS_STYLE + " (TABLENAME, TYPE, COLUMNNAME, VALUE, PART)  VALUES (" + DBVAL(tablename.ToUpper()) + ", " + DBVAL(type) + ", " + DBVAL(columnName.ToUpper()) + ", " + DBVAL(newValue) + ", " + DBVAL(part.ToString(Constants.Format_Integer3)) + ")";
         //} else if (isVal != newValue) {
         //    cmdString = "UPDATE " + SYS_STYLE + " SET VALUE = " + DBVAL( newValue ) + " WHERE TABLENAME = " + DBVAL( tablename.ToUpper() ) + " AND TYPE = " + DBVAL( type ) + " AND COLUMNNAME = " + DBVAL( columnName.ToUpper() );
         //} else {

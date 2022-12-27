@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using BlueBasics;
 using BlueScript;
 using BlueScript.Methods;
 using BlueScript.Variables;

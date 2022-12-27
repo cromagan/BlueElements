@@ -52,7 +52,6 @@ public sealed class MultiUserFile : IDisposableExtended {
     private string _filename;
     private string _inhaltBlockdatei = string.Empty;
     private bool _initialLoadDone;
-    private DateTime _lastCheck = DateTime.Now;
     private DateTime _lastMessageUtc = DateTime.UtcNow.AddMinutes(-10);
     private string _lastSaveCode;
     private DateTime _lastUserActionUtc = new(1900, 1, 1);
@@ -147,7 +146,6 @@ public sealed class MultiUserFile : IDisposableExtended {
         get {
             if (string.IsNullOrEmpty(Filename)) { return false; }
             if (_checkedAndReloadNeed) { return true; }
-            _lastCheck = DateTime.Now;
             if (GetFileInfo(Filename, false) != _lastSaveCode) {
                 _checkedAndReloadNeed = true;
                 return true;
@@ -397,7 +395,6 @@ public sealed class MultiUserFile : IDisposableExtended {
 
             _lastSaveCode = tmpLastSaveCode; // initialize setzt zurück
 
-            var onlyReload = _initialLoadDone;
             _initialLoadDone = true;
             _checkedAndReloadNeed = false;
 

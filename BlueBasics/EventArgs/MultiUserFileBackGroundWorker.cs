@@ -23,9 +23,7 @@ public class MultiUserFileBackgroundWorkerEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public MultiUserFileBackgroundWorkerEventArgs(BackgroundWorker bgw) {
-        BackgroundWorker = bgw;
-    }
+    public MultiUserFileBackgroundWorkerEventArgs(BackgroundWorker bgw) => BackgroundWorker = bgw;
 
     #endregion
 

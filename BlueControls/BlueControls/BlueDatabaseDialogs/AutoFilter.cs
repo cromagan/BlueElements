@@ -101,7 +101,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         if (_column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             (lColumn, _, _) = CellCollection.LinkedCellData(_column, null, false, false);
         }
-        if (lColumn == null) { lColumn = _column; }
+        lColumn ??= _column;
 
         Width = Math.Max(txbEingabe.Width + (Skin.Padding * 2), Table.CalculateColumnContentWidth(null, lColumn, f, 16));
         lsbFilterItems.Item.Clear();

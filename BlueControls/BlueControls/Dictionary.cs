@@ -27,7 +27,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
-using System.Windows.Media.TextFormatting;
 
 namespace BlueControls;
 
@@ -138,7 +137,7 @@ internal static class Dictionary {
     }
 
     private static void Init() {
-        var tmp = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.MDB", "Dictionary", true, false, null);
+        var tmp = DatabaseAbstract.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.MDB", "Dictionary", true, false, null);
         if (tmp is Database DBD) { _dictWords = DBD; }
     }
 

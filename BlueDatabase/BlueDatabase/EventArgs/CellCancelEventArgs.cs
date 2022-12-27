@@ -21,9 +21,7 @@ public class CellCancelEventArgs : CellEventArgs {
 
     #region Constructors
 
-    public CellCancelEventArgs(ColumnItem? column, RowItem? row, string cancelReason) : base(column, row) {
-        CancelReason = cancelReason;
-    }
+    public CellCancelEventArgs(ColumnItem? column, RowItem? row, string cancelReason) : base(column, row) => CancelReason = cancelReason;
 
     #endregion
 

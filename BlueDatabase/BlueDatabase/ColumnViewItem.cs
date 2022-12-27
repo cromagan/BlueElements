@@ -136,11 +136,7 @@ public sealed class ColumnViewItem {
 
             if (value == Permanent) { return; }
 
-            if (value) {
-                _viewType = ViewType.PermanentColumn;
-            } else {
-                _viewType = ViewType.Column;
-            }
+            _viewType = value ? ViewType.PermanentColumn : ViewType.Column;
 
             OnChanged();
         }

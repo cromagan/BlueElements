@@ -164,7 +164,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         return l;
     }
 
-    public override System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
+    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
             var ff = parent.SearchOrGenerate(rfw2);
 
@@ -204,7 +204,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         u.AddRange(typeof(ÜberschriftAnordnung));
         l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
         var b = new ItemCollection.ItemCollectionList.ItemCollectionList();
-        b.AddRange(EditFieldPadItem.GetAllowedEditTypes(Column));
+        b.AddRange(GetAllowedEditTypes(Column));
         l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
         l.Add(new FlexiControl());
         l.Add(new FlexiControlForProperty<string>(() => Spalten_QuickInfo, 5));

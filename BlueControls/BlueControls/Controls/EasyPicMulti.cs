@@ -54,7 +54,7 @@ public partial class EasyPicMulti : GenericControl, IBackgroundNone // System.Wi
             _pic.Clear();
             _files = value;
             _nr = 0;
-            if (_files == null) { _files = new List<string>(); }
+            _files ??= new List<string>();
             while (_pic.Count < _files.Count) { _pic.Add(null); }
             SetPic();
         }
@@ -107,9 +107,7 @@ public partial class EasyPicMulti : GenericControl, IBackgroundNone // System.Wi
     private void SetPic() {
         Bitmap? bitmap = null;
         if (_pic.Count > 0) {
-            if (_pic[_nr] == null) {
-                _pic[_nr] = new BitmapExt(_files[_nr], true);
-            }
+            _pic[_nr] ??= new BitmapExt(_files[_nr], true);
             bitmap = _pic[_nr];
         }
         zoompic.Bmp = bitmap;

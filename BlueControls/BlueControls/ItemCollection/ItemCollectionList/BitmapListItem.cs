@@ -166,7 +166,7 @@ public class BitmapListItem : BasicListItem {
 
         //Point trp;
 
-        var ok = true;
+        bool ok;
         do {
             ok = true;
             if (_bitmap != null) {
@@ -189,7 +189,7 @@ public class BitmapListItem : BasicListItem {
 
         gr.TranslateTransform(trp.X, trp.Y);
 
-        var ok2 = true;
+        bool ok2;
         do {
             ok2 = true;
             try {

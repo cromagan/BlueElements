@@ -139,23 +139,17 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
         #endregion ZeilenFilter befüllen
 
-        int toppos;
-        int leftpos;
-        int constwi;
         var consthe = btnAlleFilterAus.Height;
-        int down;
-        int right;
-        AnchorStyles anchor;
 
         #region Variablen für Waagerecht / Senkrecht bestimmen
 
-        toppos = btnAlleFilterAus.Top;
+        var toppos = btnAlleFilterAus.Top;
         var beginnx = btnPinZurück.Right + (Skin.Padding * 3);
-        leftpos = beginnx;
-        constwi = (int)(txbZeilenFilter.Width * 1.5);
-        right = constwi + Skin.PaddingSmal;
-        anchor = AnchorStyles.Top | AnchorStyles.Left;
-        down = 0;
+        var leftpos = beginnx;
+        var constwi = (int)(txbZeilenFilter.Width * 1.5);
+        var right = constwi + Skin.PaddingSmal;
+        var anchor = AnchorStyles.Top | AnchorStyles.Left;
+        var down = 0;
         //breakafter = btnAdmin.Left;
         //afterBreakAddY = txbZeilenFilter.Height + Skin.Padding;
 

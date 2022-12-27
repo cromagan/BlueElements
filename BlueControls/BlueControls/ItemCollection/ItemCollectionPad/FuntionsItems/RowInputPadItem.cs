@@ -43,11 +43,9 @@ public class RowInputPadItem : RectanglePadItemWithVersion, IReadableText, ICont
 
     public RowInputPadItem() : this(UniqueInternal(), string.Empty) { }
 
-    public RowInputPadItem(string intern, string spaltenname) : base(intern) {
-        _spaltenname = spaltenname;
-        //Size = new Size(200, 40);
-    }
+    public RowInputPadItem(string intern, string spaltenname) : base(intern) => _spaltenname = spaltenname;
 
+    //Size = new Size(200, 40);
     public RowInputPadItem(string intern) : this(intern, string.Empty) { }
 
     #endregion
@@ -70,7 +68,7 @@ public class RowInputPadItem : RectanglePadItemWithVersion, IReadableText, ICont
 
     #region Methods
 
-    public Control? CreateControl(ConnectedFormulaView parent) {
+    public Control CreateControl(ConnectedFormulaView parent) {
         var con = new FlexiControlForCell();
         con.Width = 200;
         con.Height = 32;
@@ -115,7 +113,7 @@ public class RowInputPadItem : RectanglePadItemWithVersion, IReadableText, ICont
             gr.DrawRectangle(new Pen(Color.Black, zoom), positionModified);
             var t = "Eingangs-Zeilen-Spalte\r\n" + _spaltenname;
 
-            Skin.Draw_FormatedText(gr, t, SymbolForReadableText(), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
+            Skin.Draw_FormatedText(gr, t, SymbolForReadableText(), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont.Scale(zoom), false);
         } else {
             CustomizableShowPadItem.DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Links_neben_Dem_Feld, _spaltenname + ":");
         }

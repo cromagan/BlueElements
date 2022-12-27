@@ -74,17 +74,17 @@ public class ExtCharAscii : ExtChar {
 
     public override string HtmlText() => Convert.ToChar(_char).ToString().CreateHtmlCodes(false);
 
-    public override bool IsLineBreak() => (int)_char switch {
-        11 or 13 => true,
-        _ => false
-    };
+    public override bool IsLineBreak() {
+        if ((int)_char is 11 or 13) { return true; }
+        return false;
+    }
 
     public override bool IsPossibleLineBreak() => _char.IsPossibleLineBreak();
 
-    public override bool IsSpace() => (int)_char switch {
-        32 or 0 or 9 => true,
-        _ => false
-    };
+    public override bool IsSpace() {
+        if ((int)_char is 32 or 0 or 9) { return true; }
+        return false;
+    }
 
     public override bool IsWordSeperator() => _char.IsWordSeperator();
 

@@ -118,8 +118,6 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
         base.OnFormClosing(e);
     }
 
-    private static void Database_ShouldICancelDiscOperations(object sender, CancelEventArgs e) => e.Cancel = true;
-
     private void BefülleLayoutDropdown() {
         if (Database != null) {
             cbxLayout.Item.Clear();

@@ -34,9 +34,7 @@ public class VariableFloat : Variable {
 
     #region Constructors
 
-    public VariableFloat(string name, double value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) {
-        _double = value;
-    }
+    public VariableFloat(string name, double value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _double = value;
 
     public VariableFloat(double value) : this(DummyName(), value, true, false, string.Empty) { }
 

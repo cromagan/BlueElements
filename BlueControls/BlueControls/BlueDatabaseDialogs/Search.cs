@@ -76,11 +76,10 @@ public sealed partial class Search : Form {
         if (string.IsNullOrEmpty(searchT)) { return; }
         var found = _col;
         var ca = _blueTable?.CurrentArrangement;
-        if (found == null) { found = _blueTable.Database.Column.SysLocked; }
+        found ??= _blueTable.Database.Column.SysLocked;
         var columnStarted = _col;
         do {
-            found = ca.NextVisible(found);
-            if (found == null) { found = ca[0].Column; }
+            found = ca.NextVisible(found) ?? ca[0].Column;
             var ist1 = found.ReadableText().ToLower();
             if (!string.IsNullOrEmpty(ist1)) {
                 // Allgemeine Prüfung

@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using BlueBasics.Interfaces;
-using System;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection;
@@ -50,11 +48,7 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
         }
         protected set {
             _generatedBitmap = value;
-            if (_generatedBitmap == null) {
-                Size = Size.Empty;
-            } else {
-                Size = _generatedBitmap.Size;
-            }
+            Size = _generatedBitmap?.Size ?? Size.Empty;
         }
     }
 
@@ -144,6 +138,4 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
     }
 
     #endregion
-
- 
 }

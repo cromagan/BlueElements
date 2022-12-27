@@ -19,31 +19,13 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.EventArgs;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using static BlueBasics.Converter;
-
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
-
-using BlueBasics.Interfaces;
-
-using System;
-using System.ComponentModel;
-using System.IO;
-
-using System.IO.Compression;
-
-using System.Linq;
-
-using System.Threading;
-using System.Windows.Forms;
 using BlueBasics.MultiUserFile;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
@@ -98,16 +80,11 @@ public sealed class Database : DatabaseAbstract {
 
     #region Properties
 
-    public static string DatabaseID { get => "BlueDatabase"; }
+    public static string DatabaseID => "BlueDatabase";
 
-    public override ConnectionInfo ConnectionData {
-        get {
-            return new ConnectionInfo(TableName, this, DatabaseID, Filename);
-        }
+    public override ConnectionInfo ConnectionData => new ConnectionInfo(TableName, this, DatabaseID, Filename);
 
-        //_muf != null ? _muf.Filename : string.Empty;
-    }
-
+    //_muf != null ? _muf.Filename : string.Empty;
     public string Filename { get; set; }
 
     #endregion
@@ -140,7 +117,7 @@ public sealed class Database : DatabaseAbstract {
             }
         }
 
-        var nn = System.IO.Directory.GetFiles(Filename.FilePath(), "*.mdb", SearchOption.AllDirectories);
+        var nn = Directory.GetFiles(Filename.FilePath(), "*.mdb", SearchOption.AllDirectories);
         var gb = new List<ConnectionInfo>();
         foreach (var thisn in nn) {
             gb.Add(ConnectionDataOfOtherTable(thisn.FileNameWithoutSuffix(), false));
@@ -200,7 +177,7 @@ public sealed class Database : DatabaseAbstract {
         //LoadingEventArgs ec = new(_initialLoadDone);
         OnLoading();
 
-        var (bLoaded, tmpLastSaveCode) = LoadBytesFromDisk(BlueBasics.Enums.ErrorReason.Load);
+        var (bLoaded, _) = LoadBytesFromDisk(BlueBasics.Enums.ErrorReason.Load);
         if (bLoaded == null) {
             return;
         }
@@ -515,11 +492,10 @@ public sealed class Database : DatabaseAbstract {
         Filename = newFileName;
 
         var l = ToListOfByte();
-        using (FileStream x = new(newFileName, FileMode.Create, FileAccess.Write, FileShare.None)) {
-            x.Write(l.ToArray(), 0, l.ToArray().Length);
-            x.Flush();
-            x.Close();
-        }
+        using FileStream x = new(newFileName, FileMode.Create, FileAccess.Write, FileShare.None);
+        x.Write(l.ToArray(), 0, l.ToArray().Length);
+        x.Flush();
+        x.Close();
     }
 
     public override string UndoText(ColumnItem? column, RowItem? row) {

@@ -56,7 +56,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     /// Gib ColumnFirst oder Spalte 0 zurück
     /// </summary>
     /// <returns></returns>
-    public ColumnItem? First { get => Exists(Database?.FirstColumn) ?? this[0]; }
+    public ColumnItem? First => Exists(Database?.FirstColumn) ?? this[0];
 
     public ColumnItem? SysChapter { get; private set; }
 
@@ -119,9 +119,6 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         }
         return originalString;
     }
-
-    [Obsolete("GenerateAndAdd benutzen, oder mittels SetValueInternal, falls Daten nachgezogen werden müssen")]
-    public new void Add() { }
 
     public ColumnItem? Exists(string? columnName) {
         if (Database == null) {
@@ -375,10 +372,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
 
         // Spalten erzeugen und Format übertragen
         foreach (var ThisColumn in sourceDatabase.Column) {
-            var l = Exists(ThisColumn.Name);
-            if (l == null) {
-                l = GenerateAndAdd(ThisColumn.Key, ThisColumn.Name, ThisColumn.Caption, ThisColumn.Suffix, VarType.Unbekannt, ThisColumn.Quickinfo);
-            }
+            var l = Exists(ThisColumn.Name) ?? GenerateAndAdd(ThisColumn.Key, ThisColumn.Name, ThisColumn.Caption, ThisColumn.Suffix, VarType.Unbekannt, ThisColumn.Quickinfo);
             l.CloneFrom(ThisColumn, true);
 
             if (l.Name != ThisColumn.Name) {
@@ -426,7 +420,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
             if (c != null) { return "Bereits vorhanden!"; }
 
             c = new ColumnItem(Database, (long)key);
-            base.Add(c);
+            Add(c);
 
             if (!isLoading) {
                 Database.RepairColumnArrangements();

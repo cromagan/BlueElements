@@ -27,9 +27,7 @@ public class LineListItem : BasicListItem {
 
     #region Constructors
 
-    public LineListItem(string internalname, string userDefCompareKey) : base(internalname, true) {
-        UserDefCompareKey = userDefCompareKey;
-    }
+    public LineListItem(string internalname, string userDefCompareKey) : base(internalname, true) => UserDefCompareKey = userDefCompareKey;
 
     #endregion
 

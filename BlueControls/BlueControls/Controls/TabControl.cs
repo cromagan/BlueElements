@@ -37,9 +37,7 @@ public class TabControl : AbstractTabControl, IAcceptRowKey {
 
     #region Constructors
 
-    public TabControl() : base() {
-        BackColor = Skin.Color_Back(Design.TabStrip_Body, States.Standard);
-    }
+    public TabControl() : base() => BackColor = Skin.Color_Back(Design.TabStrip_Body, States.Standard);
 
     #endregion
 

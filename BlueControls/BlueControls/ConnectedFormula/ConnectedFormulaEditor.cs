@@ -201,7 +201,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         _cf.DatabaseFiles.AddIfNotExists(LoadTabDatabase.FileName);
 
-        var db = DatabaseAbstract.GetByID(new ConnectionInfo( LoadTabDatabase.FileName));
+        var db = DatabaseAbstract.GetByID(new ConnectionInfo(LoadTabDatabase.FileName));
         if (db == null) { return; }
 
         it.Database = db;
@@ -230,14 +230,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
             _cf.NotAllowedChilds.AddRange(notAllowedchilds);
         }
 
-        if (_cf == null) {
-            Pad.Item = null;
-        } else {
-            Pad.Item = _cf.PadData;
-            //Pad.Item.SheetSizeInMm = new SizeF(PixelToMm(500, 300), PixelToMm(850, 300));
-            //Pad.Item.GridShow = 0.5f;
-            //Pad.Item.GridSnap = 0.5f;
-        }
+        Pad.Item = _cf?.PadData;
     }
 
     private void grpFileExplorer_Click(object sender, System.EventArgs e) {

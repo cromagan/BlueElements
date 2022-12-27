@@ -42,7 +42,7 @@ internal static class Program {
     private static void Main() {
         BlueBasics.Develop.StartService();
         var currentDomain = AppDomain.CurrentDomain;
-        currentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+        currentDomain.UnhandledException += CurrentDomain_UnhandledException;
         //CultureInfo culture = new("de-DE");
         //CultureInfo.DefaultThreadCurrentCulture = culture;
         //CultureInfo.DefaultThreadCurrentUICulture = culture;

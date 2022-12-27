@@ -72,7 +72,7 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
 
     #region Methods
 
-    public Control? CreateControl(ConnectedFormulaView parent) {
+    public Control CreateControl(ConnectedFormulaView parent) {
         var con = new FlexiControlRowSelector(Database, Parent, null, "Datenbank", string.Empty);
         con.EditType = EditTypeFormula.None;
         con.CaptionPosition = ÜberschriftAnordnung.ohne;
@@ -141,9 +141,9 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
             if (Database != null) {
                 var txt = "Datenbank " + Database.Caption;
 
-                Skin.Draw_FormatedText(gr, txt, QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
+                Skin.Draw_FormatedText(gr, txt, QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont.Scale(zoom), false);
             } else {
-                Skin.Draw_FormatedText(gr, "Bezug fehlt", QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
+                Skin.Draw_FormatedText(gr, "Bezug fehlt", QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont.Scale(zoom), false);
             }
         }
 

@@ -206,7 +206,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     public static (ColumnItem? column, RowItem? row, string info) LinkedCellData(ColumnItem? column, RowItem? row, bool repairLinkedValue, bool addRowIfNotExists) {
         if (column == null) { return (null, null, "Interner Spaltenfehler."); }
 
-        if (column.Format is not DataFormat.Verknüpfung_zu_anderer_Datenbank) { return ((ColumnItem?)null, (RowItem?)null, "Format ist nicht LinkedCell."); }
+        if (column.Format is not DataFormat.Verknüpfung_zu_anderer_Datenbank) { return (null, null, "Format ist nicht LinkedCell."); }
 
         var linkedDatabase = column.LinkedDatabase;
         if (linkedDatabase == null) { return (null, null, "Verlinkte Datenbank nicht gefunden."); }

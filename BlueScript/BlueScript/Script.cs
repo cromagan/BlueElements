@@ -91,7 +91,7 @@ public class Script {
     //    return objects;
     //}
     public Script(List<Variable>? variablen, string additionalFilesPath, bool onlyTesting) {
-        if (Comands == null) { Comands = GetEnumerableOfType<Method>(); }
+        Comands ??= GetEnumerableOfType<Method>();
         if (VarTypes == null) {
             VarTypes = GetEnumerableOfType<Variable>("NAME");
             VarTypes.Sort();

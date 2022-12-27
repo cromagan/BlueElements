@@ -21,9 +21,7 @@ public class ListEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public ListEventArgs(object item) {
-        Item = item;
-    }
+    public ListEventArgs(object item) => Item = item;
 
     #endregion
 

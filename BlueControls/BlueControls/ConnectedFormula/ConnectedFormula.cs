@@ -25,7 +25,6 @@ using BlueControls.ItemCollection;
 using BlueDatabase;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using static BlueBasics.Converter;
 using static BlueBasics.Develop;
@@ -186,6 +185,8 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
     /// Zeilenselectionen werden dabei ignoriert.
     /// </summary>
     /// <param name="page">Wird dieser Wert leer gelassen, wird das komplette Formular geprüft</param>
+    /// <param name="myGroup"></param>
+    /// <param name="myName"></param>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
     internal bool HasVisibleItemsForMe(string page, string? myGroup, string? myName) {

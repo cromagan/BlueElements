@@ -63,7 +63,7 @@ public class EasyPicPadItem : CustomizableShowPadItem, IItemToControl {
 
     #region Methods
 
-    public override System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent) {
+    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var con = new EasyPic();
         con.OriginalText = Bild_Dateiname;
         con.Name = DefaultItemToControlName();

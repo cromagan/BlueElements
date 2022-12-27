@@ -21,7 +21,7 @@ public class MultiUserToListEventArgs : System.EventArgs {
 
     #region Properties
 
-    public byte[] Data { get; set; }
+    public byte[]? Data { get; set; }
 
     #endregion
 }

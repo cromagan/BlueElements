@@ -33,9 +33,7 @@ public class VariableFilterItem : Variable {
 
     #region Constructors
 
-    public VariableFilterItem(string name, FilterItem value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) {
-        _filter = value;
-    }
+    public VariableFilterItem(string name, FilterItem value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _filter = value;
 
     public VariableFilterItem(string name) : this(name, null!, true, false, string.Empty) { }
 

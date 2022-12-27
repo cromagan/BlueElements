@@ -93,7 +93,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
     public static string FilenameTxt(string pathOfPicture) => pathOfPicture.FilePath() + pathOfPicture.FileNameWithoutSuffix() + ".txt";
 
-    public static BitmapListItem? GenerateBitmapListItem(string pathOfPicture) {
+    public static BitmapListItem GenerateBitmapListItem(string pathOfPicture) {
         var (bitmap, list) = LoadFromDisk(pathOfPicture);
         return GenerateBitmapListItem(bitmap, list);
     }
@@ -137,7 +137,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
         return new Tuple<Bitmap?, List<string>>(pic2, tags2);
     }
 
-    public BitmapListItem? GenerateBitmapListItem() {
+    public BitmapListItem GenerateBitmapListItem() {
         WritePointsInTags();
         return GenerateBitmapListItem(Bmp, Tags);
     }

@@ -30,7 +30,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Windows;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 
@@ -141,7 +140,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
     #region Methods
 
-    public Control? CreateControl(ConnectedFormulaView parent) {
+    public Control CreateControl(ConnectedFormulaView parent) {
         var con = new FlexiControlRowSelector(Database, Parent, FilterDefiniton, _überschrift, _anzeige);
         con.EditType = _bearbeitung;
         con.CaptionPosition = CaptionPosition;
@@ -285,9 +284,9 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
             if (Database != null) {
                 var txt = "eine Zeile aus " + Database.Caption;
 
-                Skin.Draw_FormatedText(gr, txt, QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
+                Skin.Draw_FormatedText(gr, txt, QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont.Scale(zoom), false);
             } else {
-                Skin.Draw_FormatedText(gr, "Bezug fehlt", QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
+                Skin.Draw_FormatedText(gr, "Bezug fehlt", QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont.Scale(zoom), false);
             }
         } else {
             CustomizableShowPadItem.DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
@@ -323,7 +322,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
             }
         }
 
-        hs.OpticalReplace= or2;
+        hs.OpticalReplace = or2;
 
         #endregion
 
@@ -333,7 +332,6 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
         var dd = new List<string>();
         var or = new List<string>();
-
 
         if (Parent != null) {
             foreach (var thisPadItem in Parent) {
@@ -438,8 +436,6 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         car[1].ShowAllColumns();
         car[1].HideSystemColumns();
         x.ColumnArrangements = car;
-
-
 
         x.SortDefinition = new RowSortDefinition(x, "Spalte", false);
 

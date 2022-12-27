@@ -25,9 +25,7 @@ public class BitmapEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public BitmapEventArgs(Bitmap? bmp) {
-        Bmp = bmp;
-    }
+    public BitmapEventArgs(Bitmap? bmp) => Bmp = bmp;
 
     #endregion
 

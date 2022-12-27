@@ -31,7 +31,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Security.Cryptography;
 using System.Text;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
@@ -347,7 +346,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         var allreadychecked = new List<DatabaseAbstract>();
 
         var alf = new List<DatabaseAbstract>();// könnte sich ändern, deswegen Zwischenspeichern
-        alf.AddRange(DatabaseAbstract.AllFiles);
+        alf.AddRange(AllFiles);
 
         foreach (var thisDB in alf) {
             var possibletables = thisDB.AllAvailableTables(allreadychecked);
@@ -516,7 +515,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     public static ConnectionInfo? ProviderOf(string tablename) {
         var alf = new List<DatabaseAbstract>();// könnte sich ändern, deswegen Zwischenspeichern
-        alf.AddRange(DatabaseAbstract.AllFiles);
+        alf.AddRange(AllFiles);
 
         foreach (var thisDB in alf) {
             if (thisDB.ConnectionDataOfOtherTable(tablename, true) is ConnectionInfo ci) {
@@ -716,9 +715,9 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         //if (!string.IsNullOrEmpty(f)) { return f; }
         if (mode == BlueBasics.Enums.ErrorReason.OnlyRead) { return string.Empty; }
 
-        if (mode.HasFlag(BlueBasics.Enums.ErrorReason.Load)) {
-            if (_backgroundWorker.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell das Neuladen."; }
-        }
+        //if (mode.HasFlag(BlueBasics.Enums.ErrorReason.Load)) {
+        //    if (_backgroundWorker.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell das Neuladen."; }
+        //}
         if (mode.HasFlag(BlueBasics.Enums.ErrorReason.EditGeneral) || mode.HasFlag(BlueBasics.Enums.ErrorReason.Save)) {
             if (_backgroundWorker.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
         }
@@ -1168,9 +1167,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         return RefreshRowData(r, refreshAlways);
     }
 
-    public bool RefreshRowData(RowItem row, bool refreshAlways) {
-        return RefreshRowData(new List<RowItem>() { row }, refreshAlways);
-    }
+    public bool RefreshRowData(RowItem row, bool refreshAlways) => RefreshRowData(new List<RowItem>() { row }, refreshAlways);
 
     public void RepairAfterParse() {
         Column.Repair();
@@ -1324,7 +1321,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     protected void OnLoading() {
         if (IsDisposed) { return; }
-        CancelBackGroundWorker();
         Loading?.Invoke(this, System.EventArgs.Empty);
     }
 
@@ -1710,7 +1706,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             if (FileExists(fullname)) {
                 e.Bmp = new BitmapExt(fullname);
                 if (!string.IsNullOrWhiteSpace(CachePfad)) {
-                    BlueBasics.IO.CopyFile(fullname, fullhashname, false);
+                    CopyFile(fullname, fullhashname, false);
                     try {
                         //File.SetLastWriteTime(fullhashname, DateTime.Now);
                         File.SetCreationTime(fullhashname, DateTime.Now);

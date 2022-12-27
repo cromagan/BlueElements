@@ -30,12 +30,12 @@ public class FormManager : ApplicationContext {
 
     #region Fields
 
-    public static dExecuteAtEnd ExecuteAtEnd = null;
+    public static dExecuteAtEnd? ExecuteAtEnd = null;
     public static bool First = true;
     public static bool FirstWindowShown = false;
     public static List<Form> Forms = new();
 
-    public static dNewModeSelectionForm NewModeSelectionForm = null;
+    public static dNewModeSelectionForm? NewModeSelectionForm = null;
     public static Form? StartForm;
 
     //I'm using Lazy here, because an exception is thrown if any Forms have been
@@ -99,11 +99,7 @@ public class FormManager : ApplicationContext {
         Forms.Remove((Form)sender);
         if (FirstWindowShown && !Forms.Any()) {
             if (sender != _lastStartForm) {
-                if (NewModeSelectionForm != null) {
-                    _lastStartForm = NewModeSelectionForm();
-                } else {
-                    _lastStartForm = null;
-                }
+                _lastStartForm = NewModeSelectionForm();
 
                 if (_lastStartForm != null) {
                     Current.RegisterForm(_lastStartForm);

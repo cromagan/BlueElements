@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
-using BlueBasics.EventArgs;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;

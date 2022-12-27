@@ -28,7 +28,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
@@ -102,7 +101,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     /// </summary>
     /// <param name="primärSchlüssel">Der Primärschlüssel, nach dem gesucht werden soll. Groß/Kleinschreibung wird ignoriert.</param>
     /// <returns>Die Zeile, dessen erste Spalte den Primärschlüssel enthält oder - falls nicht gefunden - NULL.</returns>
-    public RowItem this[string primärSchlüssel] => this[new FilterItem(Database.Column.First, FilterType.Istgleich_GroßKleinEgal | FilterType.MultiRowIgnorieren, primärSchlüssel)];
+    public RowItem? this[string primärSchlüssel] => this[new FilterItem(Database.Column.First, FilterType.Istgleich_GroßKleinEgal | FilterType.MultiRowIgnorieren, primärSchlüssel)];
 
     public RowItem? this[params FilterItem[]? filter] {
         get {
@@ -158,7 +157,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     /// Gibt die mit dieser Kombination sichtbaren Zeilen zurück. Ohne Sortierung. Jede Zeile kann maximal einmal vorkommen.
     /// </summary>
     /// <param name="filter"></param>
-    /// <param name="pinnedRows"></param>
     /// <returns></returns>
     public List<RowItem> CalculateFilteredRows(List<FilterItem>? filter) {
         List<RowItem> tmpVisibleRows = new();
@@ -425,9 +423,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     //foreach (var ThisRowItem in _Internal.Values)//{//    if (ThisRowItem != null) { return ThisRowItem; }//}//return null;
     IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();
 
-    public bool Remove(long key) {
-        return string.IsNullOrEmpty(Database.ChangeData(DatabaseDataType.Comand_RemoveRow, null, key, string.Empty, key.ToString()));
-    }
+    public bool Remove(long key) => string.IsNullOrEmpty(Database.ChangeData(DatabaseDataType.Comand_RemoveRow, null, key, string.Empty, key.ToString()));
 
     public bool Remove(FilterItem filter, List<RowItem?> pinned) {
         FilterCollection nf = new(Database) { filter };
@@ -436,10 +432,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
     public bool Remove(FilterCollection? filter, List<RowItem?>? pinned) {
         var keys = (from thisrowitem in _internal.Values where thisrowitem != null && thisrowitem.MatchesTo(filter) select thisrowitem.Key).Select(dummy => dummy).ToList();
-        var did = keys.Count(thisKey => Remove(thisKey)) > 0;
+        var did = keys.Count(Remove) > 0;
 
         if (pinned != null && pinned.Count > 0) {
-            did = pinned?.Count(thisRow => Remove(thisRow)) > 0 || did;
+            did = pinned?.Count(Remove) > 0 || did;
         }
 
         return did;
@@ -499,10 +495,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
         // Zeilen erzeugen und Format übertragen
         foreach (var thisRow in sourceDatabase.Row) {
-            var l = SearchByKey(thisRow.Key);
-            if (l == null) {
-                l = GenerateAndAdd(thisRow.Key, string.Empty, false, false);
-            }
+            var l = SearchByKey(thisRow.Key) ?? GenerateAndAdd(thisRow.Key, string.Empty, false, false);
             l.CloneFrom(thisRow, true);
         }
     }

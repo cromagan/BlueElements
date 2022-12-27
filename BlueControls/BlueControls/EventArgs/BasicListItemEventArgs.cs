@@ -25,9 +25,7 @@ public class BasicListItemEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public BasicListItemEventArgs(BasicListItem item) {
-        Item = item;
-    }
+    public BasicListItemEventArgs(BasicListItem item) => Item = item;
 
     #endregion
 

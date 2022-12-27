@@ -434,7 +434,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
                 if (filter.FilterType is not FilterType.Instr_GroßKleinEgal and not FilterType.Instr_UND_GroßKleinEgal) { Develop.DebugPrint(FehlerArt.Fehler, "Zeilenfilter nur mit Instr möglich!"); }
                 if (filter.SearchValue.Count < 1) { Develop.DebugPrint(FehlerArt.Fehler, "Zeilenfilter nur mit mindestens einem Wert möglich"); }
 
-                return filter.SearchValue.All(t => RowFilterMatch(t));
+                return filter.SearchValue.All(RowFilterMatch);
             }
 
             if (!Database.Cell.MatchesTo(filter.Column, this, filter)) { return false; }
