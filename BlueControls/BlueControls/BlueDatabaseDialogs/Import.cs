@@ -48,7 +48,6 @@ public sealed partial class Import {
         }
 
         Database.Disposing += Database_Disposing;
-        Database.ShouldICancelSaveOperations += Database_ShouldICancelDiscOperations;
     }
 
     #endregion
@@ -63,11 +62,8 @@ public sealed partial class Import {
 
     protected override void OnClosing(CancelEventArgs e) {
         Database.Disposing -= Database_Disposing;
-        Database.ShouldICancelSaveOperations -= Database_ShouldICancelDiscOperations;
         base.OnClosing(e);
     }
-
-    private static void Database_ShouldICancelDiscOperations(object sender, CancelEventArgs e) => e.Cancel = true;
 
     private void Cancel_Click(object sender, System.EventArgs e) => Close();
 

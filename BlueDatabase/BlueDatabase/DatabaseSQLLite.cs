@@ -54,15 +54,15 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     /// </summary>
     private static DateTime _timerTimeStamp = DateTime.UtcNow.AddMinutes(-5);
 
+    #endregion
+
     //private bool _checkedAndReloadNeed;
 
     //private DateTime _lastCheck = DateTime.Now;
 
     //private int _loadingCount = 0;
 
-    private bool _isLoading = false;
-
-    #endregion
+    //private bool _isLoading = false;
 
     #region Constructors
 
@@ -80,9 +80,6 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
             //DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + tablename.FileNameWithoutSuffix()));
             LoadFromSQLBack();
         }
-        RepairAfterParse();
-
-        GenerateTimer();
     }
 
     #endregion
@@ -97,14 +94,14 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         }
     }
 
-    public override string Filename => _sql.Filename;
-    public override bool IsLoading { get => _isLoading; }
-
-    public override bool ReloadNeeded => false;
-
-    public override bool ReloadNeededSoft => false;
-
     #endregion
+
+    //public override string Filename => _sql.Filename;
+    //public override bool IsLoading { get => _isLoading; }
+
+    //public override bool ReloadNeeded => false;
+
+    //public override bool ReloadNeededSoft => false;
 
     //public override bool ReloadNeeded {
     //    get {
@@ -156,8 +153,6 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         return l;
     }
 
-    public override void BlockReload(bool crashIsCurrentlyLoading) { }
-
     public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists) {
         if (checkExists) {
             var t = AllAvailableTables();
@@ -175,11 +170,11 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         return ConnectionData;
     }
 
-    public override void Load_Reload() {
-        if (!ReloadNeeded) { return; }
+    //public override void Load_Reload() {
+    //    if (!ReloadNeeded) { return; }
 
-        LoadFromSQLBack();
-    }
+    //    LoadFromSQLBack();
+    //}
 
     public override void RefreshColumnsData(List<ColumnItem> columns) {
         if (columns == null || columns.Count == 0) { return; }
@@ -214,13 +209,13 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         return true;
     }
 
-    public override bool Save(bool mustSave) => _sql.ConnectionOk;
+    public override bool Save() => _sql.ConnectionOk;
 
     public override string UndoText(ColumnItem? column, RowItem? row) => string.Empty;
 
-    public override void UnlockHard() { }
+    //public override void UnlockHard() { }
 
-    public override void WaitEditable() { }
+    //public override void WaitEditable() { }
 
     /// <summary>
     /// Liest die Spaltenattribute aus der Style-Datenbank und schreibt sie in die Spalte
@@ -258,7 +253,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         return base.SetValueInternal(type, value, columnkey, rowkey, width, height, isLoading);
     }
 
-    protected override string SpecialErrorReason(ErrorReason mode) => string.Empty;
+    //protected override string SpecialErrorReason(ErrorReason mode) => string.Empty;
 
     private static void CheckSysUndo(object state) {
         if (DateTime.UtcNow.Subtract(_timerTimeStamp).TotalSeconds < 180) { return; }
@@ -423,11 +418,8 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     }
 
     private void LoadFromSQLBack() {
-        var onlyReload = false;
-
-        OnLoading(this, new BlueBasics.EventArgs.LoadingEventArgs(onlyReload));
-        Develop.DebugPrint(FehlerArt.DevelopInfo, "Loading++");
-        _isLoading = true;
+        OnLoading();
+        //Develop.DebugPrint(FehlerArt.DevelopInfo, "Loading++");
 
         try {
             Column.ThrowEvents = false;
@@ -516,10 +508,10 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
             return;
         }
 
-        //if (_loadingCount < 1) { Develop.DebugPrint("Loading <0!"); }
-        //_loadingCount--;
-        _isLoading = false;
-        OnLoaded(this, new BlueBasics.EventArgs.LoadedEventArgs(onlyReload));
+        RepairAfterParse();
+        OnLoaded();
+        CreateWatcher();
+        GenerateTimer();
     }
 
     #endregion

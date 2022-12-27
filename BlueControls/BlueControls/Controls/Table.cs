@@ -523,7 +523,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             var lasNr = -1;
             var co = 0;
             for (var z = database.Works.Count - 1; z >= 0; z--) {
-                if (database.Works[z].CellKey == cellkey && database.Works[z].HistorischRelevant) {
+                if (database.Works[z].CellKey == cellkey) {
                     co++;
                     lasNr = z;
                     las = isfirst
@@ -643,7 +643,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (_database != null) {
             // auch Disposed Datenbanken die Bezüge entfernen!
             _database.Cell.CellValueChanged -= _Database_CellValueChanged;
-            _database.ConnectedControlsStopAllWorking -= _Database_StopAllWorking;
             _database.Loaded -= _Database_DatabaseLoaded;
             _database.Loading -= _Database_StoreView;
             _database.ViewChanged -= _Database_ViewChanged;
@@ -656,10 +655,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             _database.Row.RowAdded -= _Database_Row_RowAdded;
             _database.Column.ItemRemoved -= _Database_ViewChanged;
             _database.Column.ItemAdded -= _Database_ViewChanged;
-            _database.SavedToDisk -= _Database_SavedToDisk;
             _database.ProgressbarInfo -= _Database_ProgressbarInfo;
             _database.DropMessage -= _Database_DropMessage;
             _database.Disposing -= _Database_Disposing;
+            DatabaseAbstract.ForceSaveAll();
             BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
             //_database.Save(false);         // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
         }
@@ -669,7 +668,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         InitializeSkin(); // Neue Schriftgrößen
         if (_database != null) {
             _database.Cell.CellValueChanged += _Database_CellValueChanged;
-            _database.ConnectedControlsStopAllWorking += _Database_StopAllWorking;
             _database.Loaded += _Database_DatabaseLoaded;
             _database.Loading += _Database_StoreView;
             _database.ViewChanged += _Database_ViewChanged;
@@ -683,7 +681,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             _database.Column.ItemAdded += _Database_ViewChanged;
             _database.Column.ItemRemoving += Column_ItemRemoving;
             _database.Column.ItemRemoved += _Database_ViewChanged;
-            _database.SavedToDisk += _Database_SavedToDisk;
             _database.ProgressbarInfo += _Database_ProgressbarInfo;
             _database.DropMessage += _Database_DropMessage;
             _database.Disposing += _Database_Disposing;
@@ -891,10 +888,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
         hotItem = null;
-        if (_database.IsLoading) {
-            cancel = true;
-            return;
-        }
+        DatabaseAbstract.ForceSaveAll();
         BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
 
         //Database?.Load_Reload();
@@ -1281,7 +1275,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         lock (_lockUserAction) {
             if (_isinClick) { return; }
             _isinClick = true;
-            Database.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
+            //Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
             CellOnCoordinate(MousePos().X, MousePos().Y, out _mouseOverColumn, out _mouseOverRow);
             _isinClick = false;
         }
@@ -1296,11 +1290,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             CellOnCoordinate(MousePos().X, MousePos().Y, out _mouseOverColumn, out _mouseOverRow);
             CellDoubleClickEventArgs ea = new(_mouseOverColumn, _mouseOverRow?.Row, true);
             if (Mouse_IsInHead()) {
-                Database.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
+                //Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
                 DoubleClick?.Invoke(this, ea);
             } else {
                 if (_mouseOverRow == null && MousePos().Y > HeadSize() + _pix18) {
-                    Database.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
+                    //Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
                     DoubleClick?.Invoke(this, ea);
                 } else {
                     DoubleClick?.Invoke(this, ea);
@@ -1321,7 +1315,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (_isinKeyDown) { return; }
             _isinKeyDown = true;
 
-            _database.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
+            //_database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
             switch (e.KeyCode) {
                 case System.Windows.Forms.Keys.Oemcomma: // normales ,
@@ -1465,7 +1459,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         lock (_lockUserAction) {
             if (_isinMouseDown) { return; }
             _isinMouseDown = true;
-            _database.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
+            //_database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
             CellOnCoordinate(e.X, e.Y, out _mouseOverColumn, out _mouseOverRow);
             // Die beiden Befehle nur in Mouse Down!
             // Wenn der Cursor bei Click/Up/Down geändert wird, wird ein Ereignis ausgelöst.
@@ -1524,7 +1518,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             _mouseOverText = string.Empty;
             CellOnCoordinate(e.X, e.Y, out _mouseOverColumn, out _mouseOverRow);
             if (e.Button != System.Windows.Forms.MouseButtons.None) {
-                _database?.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
+                //_database?.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
             } else {
                 if (_mouseOverColumn != null && e.Y < HeadSize()) {
                     _mouseOverText = _mouseOverColumn.QuickInfoText(string.Empty);
@@ -1635,7 +1629,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (_isinMouseWheel) { return; }
             _isinMouseWheel = true;
 
-            Database?.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
+            //Database?.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
             if (!SliderY.Visible) {
                 _isinMouseWheel = false;
                 return;
@@ -1651,7 +1645,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         lock (_lockUserAction) {
             if (_isinSizeChanged) { return; }
             _isinSizeChanged = true;
-            Database?.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
+            //Database?.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
             CurrentArrangement?.Invalidate_DrawWithOfAllItems();
             _isinSizeChanged = false;
         }
@@ -1664,7 +1658,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         lock (_lockUserAction) {
             if (_isinVisibleChanged) { return; }
             _isinVisibleChanged = true;
-            Database?.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
+            //Database?.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
             _isinVisibleChanged = false;
         }
     }
@@ -1838,7 +1832,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         //   Invalidate_SortedRowData();
     }
 
-    private void _Database_DatabaseLoaded(object sender, LoadedEventArgs e) {
+    private void _Database_DatabaseLoaded(object sender, System.EventArgs e) {
         // Wird auch bei einem Reload ausgeführt.
         // Es kann aber sein, dass eine Ansicht zurückgeholt wurde, und die Werte stimmen.
         // Deswegen prüfen, ob wirklich alles gelöscht werden muss, oder weiter behalten werden kann.
@@ -1885,16 +1879,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void _Database_RowRemoved(object sender, System.EventArgs e) => Invalidate_FilteredRows();
 
-    //private void _Database_RowKeyChanged(object sender, KeyChangedEventArgs e) {
-    //    // Ist aktuell nur möglich, wenn Pending Changes eine neue Zeile machen
-    //    if (string.IsNullOrEmpty(_StoredView)) { return; }
-    //    _StoredView = _StoredView.Replace("RowKey=" + e.KeyOld + "}", "RowKey=" + e.KeyNew + "}");
-    //}
-    private void _Database_SavedToDisk(object sender, System.EventArgs e) => Invalidate();
-
     private void _Database_SortParameterChanged(object sender, System.EventArgs e) => Invalidate_SortedRowData();
-
-    private void _Database_StopAllWorking(object sender, MultiUserFileStopWorkingEventArgs e) => CloseAllComponents();
 
     private void _Database_StoreView(object sender, System.EventArgs e) =>
             //if (!string.IsNullOrEmpty(_StoredView)) { Develop.DebugPrint("Stored View nicht Empty!"); }
@@ -2020,7 +2005,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             MessageBox.Show("Dieser Filter wurde<br>automatisch gesetzt.", ImageCode.Information, "OK");
             return;
         }
-        Database.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
+        //Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
         //OnBeforeAutoFilterShow(new ColumnEventArgs(columnviewitem.Column));
         _autoFilter = new AutoFilter(columnviewitem.Column, Filter, PinnedRows);
         _autoFilter.Position_LocateToPosition(new Point(screenx + (int)columnviewitem.OrderTmpSpalteX1, screeny + HeadSize()));
@@ -2080,11 +2065,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private void BTB_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e) => e.File = Database;
 
     private void Cell_Edit(ColumnItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, bool withDropDown) {
-        Database.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
+        //Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
         ColumnItem? contentHolderCellColumn;
         RowItem? contentHolderCellRow;
 
-        if (Database.ReloadNeeded) { Database.Load_Reload(); }
+        //if (Database.ReloadNeeded) { Database.Load_Reload(); }
 
         var f = Database.ErrorReason(ErrorReason.EditGeneral);
         if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
@@ -2421,9 +2406,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private bool ComputeAllColumnPositions() {
-        //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
-        if (Database.IsLoading) { return false; }
-
         try {
             // Kommt vor, dass spontan doch geparsed wird...
             if (_database.ColumnArrangements == null || _arrangementNr >= _database.ColumnArrangements.Count) { return false; }
@@ -2825,15 +2807,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             //return;
 
-            if (Database.ReloadNeededSoft) {
-                gr.DrawImage(QuickImage.Get(ImageCode.Uhr, 16), 8, 8);
-            }
-
             if (Database is Database db) {
-                var e2 = new MultiUserFileHasPendingChangesEventArgs();
-                db.HasPendingChanges(null, e2);
-
-                if (e2.HasPendingChanges) {
+                if (db.HasPendingChanges) {
                     gr.DrawImage(QuickImage.Get(ImageCode.Stift, 16), 16, 8);
                 }
             }
@@ -3211,19 +3186,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private void SliderX_ValueChanged(object sender, System.EventArgs e) {
-        if (_database == null) { return; }
-        lock (_lockUserAction) {
-            Database.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
-            Invalidate();
-        }
+        Invalidate();
     }
 
     private void SliderY_ValueChanged(object sender, System.EventArgs e) {
-        if (_database == null) { return; }
-        lock (_lockUserAction) {
-            Database.OnConnectedControlsStopAllWorking(this, new MultiUserFileStopWorkingEventArgs());
-            Invalidate();
-        }
+        Invalidate();
     }
 
     private RowSortDefinition? SortUsed() => _sortDefinitionTemporary?.Columns != null

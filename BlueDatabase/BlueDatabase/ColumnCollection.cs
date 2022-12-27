@@ -79,7 +79,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     public new ColumnItem? this[int index] {
         get {
             if (Database == null) { return null; }
-            Database.BlockReload(false);
+
             if (index >= 0 && index < Count) {
                 return base[index];
             }
@@ -91,7 +91,6 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
 
     public ColumnItem? this[string columnName] {
         get {
-            Database?.BlockReload(false);
             var colum = Exists(columnName);
             if (colum is null) { Database?.DevelopWarnung("Spalte nicht gefunden: " + columnName); }
             return colum;
@@ -344,7 +343,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         try {
             if (Database == null) { return null; }
             if (key == null || key < 0) { return null; } // Evtl. Gelöschte Spalte in irgendeiner Order
-            Database.BlockReload(false);
+
             return this.FirstOrDefault(thisColumn => thisColumn != null && thisColumn.Key == key);
         } catch {
             return SearchByKey(key); // Sammlung wurde verändert

@@ -177,7 +177,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
         InvalidateView();
     }
 
-    private void _cf_Loaded(object sender, LoadedEventArgs e) {
+    private void _cf_Loaded(object sender, System.EventArgs e) {
         InvalidateView();
     }
 

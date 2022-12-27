@@ -129,7 +129,6 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
                 _database.Cell.CellValueChanged -= Database_CellValueChanged;
                 _database.Row.RowRemoving -= Row_RowRemoving;
                 _database.Column.ItemInternalChanged -= Column_ItemInternalChanged;
-                _database.ConnectedControlsStopAllWorking -= Database_ConnectedControlsStopAllWorking;
                 _database.Row.RowChecked -= Database_RowChecked;
                 //_Database.RowKeyChanged -= _Database_RowKeyChanged;
                 //_Database.ColumnKeyChanged -= _Database_ColumnKeyChanged;
@@ -144,7 +143,6 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
                 //_Database.Row.RowRemoved += Database_RowRemoved;
                 _database.Row.RowRemoving += Row_RowRemoving;
                 _database.Column.ItemInternalChanged += Column_ItemInternalChanged;
-                _database.ConnectedControlsStopAllWorking += Database_ConnectedControlsStopAllWorking;
                 _database.Row.RowChecked += Database_RowChecked;
                 //_Database.RowKeyChanged += _Database_RowKeyChanged;
                 _database.Loaded += _Database_Loaded;
@@ -376,7 +374,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
 
     private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
 
-    private void _Database_Loaded(object sender, LoadedEventArgs e) {
+    private void _Database_Loaded(object sender, System.EventArgs e) {
         if (Disposing || IsDisposed) { return; }
 
         if (InvokeRequired) {
@@ -416,8 +414,6 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
 
         if (e.Column == _tmpColumn || e.Column == e.Column.Database.Column.SysLocked) { CheckEnabledState(); }
     }
-
-    private void Database_ConnectedControlsStopAllWorking(object sender, System.EventArgs e) => FillCellNow();
 
     private void Database_RowChecked(object sender, RowCheckedEventArgs e) {
         if (e.Row != _tmpRow) { return; }
@@ -493,7 +489,6 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         var tmpR2 = _tmpRow; // Manchmal wird die Sortierung verändert, was zur Folge hat, dass der Cursor verschwindet, wass die _tmpRow verwirft....
         var tmpC2 = _tmpColumn;
 
-        tmpR2.Database.WaitEditable();
         tmpR2.CellSet(tmpC2, newValue);
         if (oldVal != tmpR2.CellGetString(tmpC2)) { tmpR2.DoAutomatic(false, false, 1, "value changed"); }
     }

@@ -34,14 +34,13 @@ public class WorkItem : IParseable {
 
     private long _rowKey;
 
-    private ItemState _state;
+    //private ItemState _state;
 
     #endregion
 
     #region Constructors
 
     public WorkItem(DatabaseDataType comand, long? columnKey, long? rowkey, string previousValue, string changedTo, string user) {
-        _state = ItemState.Pending;
         Comand = comand;
         _colKey = columnKey ?? -1;
         _rowKey = rowkey ?? -1;
@@ -89,7 +88,7 @@ public class WorkItem : IParseable {
 
     public DatabaseDataType Comand { get; private set; }
     public DateTime Date { get; private set; }
-    public bool HistorischRelevant => State is ItemState.Pending or ItemState.Undo;
+    //public bool HistorischRelevant => State is ItemState.Pending or ItemState.Undo;
     public bool IsParsing { get; private set; }
 
     public string PreviousValue { get; private set; }
@@ -105,14 +104,14 @@ public class WorkItem : IParseable {
 
     public string User { get; private set; }
 
-    internal ItemState State {
-        get => _state;
-        set {
-            if (value == _state) { return; }
-            _state = value;
-            OnChanged();
-        }
-    }
+    //internal ItemState State {
+    //    get => _state;
+    //    set {
+    //        if (value == _state) { return; }
+    //        _state = value;
+    //        OnChanged();
+    //    }
+    //}
 
     #endregion
 
@@ -133,7 +132,7 @@ public class WorkItem : IParseable {
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key) {
                 case "st":
-                    _state = (ItemState)IntParse(pair.Value);
+                    //_state = (ItemState)IntParse(pair.Value);
                     break;
 
                 case "co":
@@ -215,8 +214,7 @@ public class WorkItem : IParseable {
         IsParsing = false;
     }
 
-    public new string ToString() => "{ST=" + (int)_state +
-                                    ", CO=" + (int)Comand +
+    public new string ToString() => "{CO=" + (int)Comand +
                                     ", CK=" + _colKey +
                                     ", RK=" + _rowKey +
                                     ", D=" + Date +

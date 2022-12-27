@@ -816,7 +816,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             if (value == _tmpLinkedDatabase) { return; }
             _tmpLinkedDatabase = value;
             if (_tmpLinkedDatabase != null) {
-                _tmpLinkedDatabase.ConnectedControlsStopAllWorking += _TMP_LinkedDatabase_ConnectedControlsStopAllWorking;
                 _tmpLinkedDatabase.Cell.CellValueChanged += _TMP_LinkedDatabase_Cell_CellValueChanged;
                 _tmpLinkedDatabase.Disposing += _TMP_LinkedDatabase_Disposing;
             }
@@ -2210,7 +2209,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         if (_tmpLinkedDatabase != null) {
             //_TMP_LinkedDatabase.RowKeyChanged -= _TMP_LinkedDatabase_RowKeyChanged;
             //_TMP_LinkedDatabase.ColumnKeyChanged -= _TMP_LinkedDatabase_ColumnKeyChanged;
-            _tmpLinkedDatabase.ConnectedControlsStopAllWorking -= _TMP_LinkedDatabase_ConnectedControlsStopAllWorking;
             _tmpLinkedDatabase.Cell.CellValueChanged -= _TMP_LinkedDatabase_Cell_CellValueChanged;
             _tmpLinkedDatabase.Disposing -= _TMP_LinkedDatabase_Disposing;
             _tmpLinkedDatabase = null;
@@ -2493,7 +2491,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     }
 
     //private void _TMP_LinkedDatabase_ColumnKeyChanged(object sender, KeyChangedEventArgs e) {
-    //    Database.BlockReload(false);
     //    if (_Format != DataFormat.Columns_für_LinkedCellDropdown) {
     //        var os = e.KeyOld.ToString();
     //        var ns = e.KeyNew.ToString();
@@ -2514,8 +2511,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     //        }
     //    }
     //}
-
-    private void _TMP_LinkedDatabase_ConnectedControlsStopAllWorking(object sender, MultiUserFileStopWorkingEventArgs e) => Database.OnConnectedControlsStopAllWorking(this, e);
 
     //public bool IsParsing {
     //    get {

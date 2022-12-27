@@ -119,9 +119,6 @@
     <Compile Include="Enums\SW.cs" />
     <Compile Include="Enums\DataFormat.cs" />
     <Compile Include="Enums\FehlerArt.cs" />
-    <Compile Include="EventArgs\MultiUserFileStopWorkingEventArgs.cs" />
-    <Compile Include="EventArgs\LoadedEventArgs.cs" />
-    <Compile Include="EventArgs\LoadingEventArgs.cs" />
     <Compile Include="Extensions\GraphicsExtensions.cs" />
     <Compile Include="ListExt.cs" />
     <Compile Include="Polygons.cs" />

@@ -51,10 +51,6 @@ internal sealed partial class ColumnEditor {
         InitializeComponent();
         _table = table;
         Column_DatenAuslesen(column);
-
-        if (_column != null) {
-            _column.Database.ShouldICancelSaveOperations += Database_ShouldICancelDiscOperations;
-        }
     }
 
     #endregion
@@ -65,8 +61,6 @@ internal sealed partial class ColumnEditor {
         base.OnFormClosing(e);
         if (!AllOk()) {
             e.Cancel = true;
-        } else {
-            _column.Database.ShouldICancelSaveOperations -= Database_ShouldICancelDiscOperations;
         }
     }
 
@@ -76,8 +70,6 @@ internal sealed partial class ColumnEditor {
         IntTryParse(columnKey, out var c);
         return c;
     }
-
-    private static void Database_ShouldICancelDiscOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
 
     private static void SetKeyTo(BlueControls.Controls.TextBox combobox, long columnKey) => combobox.Text = columnKey.ToString();
 
@@ -301,12 +293,15 @@ internal sealed partial class ColumnEditor {
         cbxTranslate.Item.AddRange(typeof(TranslationType));
         cbxSort.Item.AddRange(typeof(SortierTyp));
         cbxLinkedDatabase.Item.Clear();
-        if (!string.IsNullOrEmpty(_column.Database.Filename)) {
-            var all = Directory.GetFiles(_column.Database.Filename.FilePath(), "*.mdb", SearchOption.TopDirectoryOnly);
-            foreach (var thisString in all) {
-                if (!string.Equals(thisString, _column.Database.Filename, StringComparison.OrdinalIgnoreCase)) { cbxLinkedDatabase.Item.Add(thisString.FileNameWithSuffix()); }
-            }
+
+        var l = DatabaseAbstract.AllAvailableTables();
+
+        //if (!string.IsNullOrEmpty(_column.Database.Filename)) {
+        //var all = Directory.GetFiles(_column.Database.Filename.FilePath(), "*.mdb", SearchOption.TopDirectoryOnly);
+        foreach (var thisString in l) {
+            if (!string.Equals(thisString.UniqueID, _column.Database.ConnectionData.UniqueID, StringComparison.OrdinalIgnoreCase)) { cbxLinkedDatabase.Item.Add(thisString.TableName, thisString.UniqueID); }
         }
+        //}
         cbxLinkedDatabase.Item.Sort();
         if (cbxEinheit.Item.Count < 1) {
             cbxEinheit.Item.Add("µm", ImageCode.Lineal);

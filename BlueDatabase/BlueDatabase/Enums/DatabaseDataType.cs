@@ -115,7 +115,7 @@ public enum DatabaseDataType : byte {
     AutoExport = 56,
 
     //BinaryCount = 57,
-    ReloadDelaySecond = 58,
+    //ReloadDelaySecond = 58,
 
     //[Obsolete]
     //LastColumnKey = 59,

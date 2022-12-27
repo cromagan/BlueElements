@@ -78,7 +78,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     #region Properties
 
     public int Count => _internal.Count;
+
     public DatabaseAbstract? Database { get; private set; }
+
     public bool IsDisposed { get; private set; }
 
     public bool ThrowEvents {
@@ -140,6 +142,16 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
             if (ok) { return unique; }
         } while (true);
+    }
+
+    public List<RowData> AllRows() {
+        var sortedRows = new List<RowData>();
+        foreach (var thisRowItem in this) {
+            if (thisRowItem != null) {
+                sortedRows.Add(new RowData(thisRowItem));
+            }
+        }
+        return sortedRows;
     }
 
     /// <summary>

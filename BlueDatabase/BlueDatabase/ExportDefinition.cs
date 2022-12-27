@@ -227,7 +227,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
     }
 
     public string ErrorReason() {
-        if (string.IsNullOrEmpty(Database.Filename) && _typ != ExportTyp.EinzelnMitFormular) {
+        if (string.IsNullOrEmpty(Database.DefaultBackupPath()) && _typ != ExportTyp.EinzelnMitFormular) {
             return "Nur von Datenbanken, die auch auf der Festplatte gespeichert sind, kann ein Export stattfinden.";
         }
 
@@ -526,15 +526,15 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
             savePath = _verzeichnis.CheckPath();
         } else if (!string.IsNullOrEmpty(Database.AdditionaFilesPfad)) {
             savePath = Database.AdditionaFilesPfad + "Backup\\";
-        } else if (!string.IsNullOrEmpty(Database.Filename)) {
-            savePath = Database.Filename.FilePath() + "Backup\\";
+        } else if (!string.IsNullOrEmpty(Database.DefaultBackupPath())) {
+            savePath = Database.DefaultBackupPath();
         } else {
             savePath = (System.Windows.Forms.Application.StartupPath + "\\Backup\\").CheckPath();
         }
 
         if (!DirectoryExists(savePath)) { Directory.CreateDirectory(savePath); }
 
-        var singleFileExport = savePath + Database.Filename.FileNameWithoutSuffix().StarkeVereinfachung(" _-+") + "_" + DateTime.Now.ToString(Constants.Format_Date4);
+        var singleFileExport = savePath + Database.TableName.FileNameWithoutSuffix().StarkeVereinfachung(" _-+") + "_" + DateTime.Now.ToString(Constants.Format_Date4);
 
         List<string> added = new();
         var tim2 = DateTime.UtcNow;
@@ -542,10 +542,16 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
         try {
             switch (_typ) {
                 case ExportTyp.DatenbankOriginalFormat:
-                    if (_backupInterval > (float)DateTime.UtcNow.Subtract(_lastExportTimeUtc).TotalDays) { return false; }
-                    singleFileExport = TempFile(singleFileExport + ".MDB");
-                    if (!FileExists(singleFileExport)) { File.Copy(Database.Filename, singleFileExport); }
-                    added.Add(singleFileExport + "|" + tim);
+
+                    if (Database is Database DBD) {
+                        if (_backupInterval > (float)DateTime.UtcNow.Subtract(_lastExportTimeUtc).TotalDays) { return false; }
+
+                        singleFileExport = TempFile(singleFileExport + ".MDB");
+                        if (!FileExists(singleFileExport)) { File.Copy(DBD.Filename, singleFileExport); }
+
+                        added.Add(singleFileExport + "|" + tim);
+                    }
+
                     break;
 
                 case ExportTyp.DatenbankCSVFormat:

@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
+using System.Windows.Media.TextFormatting;
 
 namespace BlueControls;
 
@@ -36,7 +37,7 @@ internal static class Dictionary {
 
     public static bool IsSpellChecking;
     internal static readonly object LockSpellChecking = new();
-    private static DatabaseAbstract? _dictWords;
+    private static Database? _dictWords;
 
     #endregion
 
@@ -136,7 +137,10 @@ internal static class Dictionary {
         _dictWords.Row.GenerateAndAdd(wort);
     }
 
-    private static void Init() => _dictWords = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.MDB", "Dictionary", true, false, null);
+    private static void Init() {
+        var tmp = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.MDB", "Dictionary", true, false, null);
+        if (tmp is Database DBD) { _dictWords = DBD; }
+    }
 
     #endregion
 }

@@ -41,9 +41,7 @@ public sealed class MultiUserFile : IDisposableExtended {
     private readonly Timer _checker;
     private readonly object _lockload = new();
     private readonly BackgroundWorker _pureBinSaver;
-    private readonly long _startTick = DateTime.UtcNow.Ticks;
-    private readonly bool _zipped;
-    private DateTime _blockReload = new(1900, 1, 1);
+
     private string _canWriteError = string.Empty;
     private DateTime _canWriteNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
     private bool _checkedAndReloadNeed;
@@ -65,8 +63,7 @@ public sealed class MultiUserFile : IDisposableExtended {
 
     #region Constructors
 
-    public MultiUserFile(bool readOnly, bool zipped) {
-        _zipped = zipped;
+    public MultiUserFile() {
         _all_Files.Add(this);
         //OnMultiUserFileCreated(this); // Ruft ein statisches Event auf, deswegen geht das.
         _pureBinSaver = new BackgroundWorker {
@@ -79,10 +76,8 @@ public sealed class MultiUserFile : IDisposableExtended {
         ReCreateWatcher();
         _checkedAndReloadNeed = true;
         _lastSaveCode = string.Empty;
-        //_data_On_Disk = Array.Empty<byte>();
-        ReadOnly = readOnly;
         AutoDeleteBak = false;
-        BlockReload(false);
+
         _checker.Change(2000, 2000);
     }
 
@@ -100,26 +95,19 @@ public sealed class MultiUserFile : IDisposableExtended {
 
     #region Events
 
-    public event EventHandler<MultiUserFileStopWorkingEventArgs> ConnectedControlsStopAllWorking;
-
     public event EventHandler DiscardPendingChanges;
 
     public event EventHandler<MultiUserFileHasPendingChangesEventArgs> HasPendingChanges;
 
-    public event EventHandler<LoadedEventArgs> Loaded;
+    public event EventHandler Loaded;
 
-    public event EventHandler<LoadingEventArgs> Loading;
+    public event EventHandler Loading;
 
     public event EventHandler<MultiUserParseEventArgs> ParseExternal;
 
     public event EventHandler SavedToDisk;
 
     public event EventHandler Saving;
-
-    /// <summary>
-    /// Dient dazu, offene Dialoge abzufragen
-    /// </summary>
-    public event EventHandler<CancelEventArgs> ShouldICancelSaveOperations;
 
     public event EventHandler<MultiUserToListEventArgs> ToListOfByte;
 
@@ -155,8 +143,6 @@ public sealed class MultiUserFile : IDisposableExtended {
 
     public bool IsSaving { get; private set; }
 
-    public bool ReadOnly { get; private set; }
-
     public bool ReloadNeeded {
         get {
             if (string.IsNullOrEmpty(Filename)) { return false; }
@@ -166,19 +152,6 @@ public sealed class MultiUserFile : IDisposableExtended {
                 _checkedAndReloadNeed = true;
                 return true;
             }
-            return false;
-        }
-    }
-
-    public bool ReloadNeededSoft {
-        get {
-            if (string.IsNullOrEmpty(Filename)) { return false; }
-            if (_checkedAndReloadNeed) { return true; }
-
-            if (DateTime.Now.Subtract(_lastCheck).TotalSeconds > 10) {
-                return ReloadNeeded;
-            }
-
             return false;
         }
     }
@@ -244,30 +217,6 @@ public sealed class MultiUserFile : IDisposableExtended {
         return null;
     }
 
-    public void BlockReload(bool crashisiscurrentlyloading) {
-        WaitLoaded(crashisiscurrentlyloading);
-        if (IsInSaveingLoop) { return; } // Ausnahme, bearbeitung sollte eh blockiert sein...
-        if (IsSaving) { return; }
-        _blockReload = DateTime.UtcNow;
-    }
-
-    /// <summary>
-    /// Alle Abfragen, die nicht durch standard Abfragen gehandelt werden können.
-    /// Z.B. Offen Dialoge, Prozesse die nur die die abgeleitete Klasse kennt
-    /// </summary>
-    /// <returns></returns>
-    public bool BlockSaveOperations() {
-        var e = new CancelEventArgs {
-            Cancel = false
-        };
-        OnShouldICancelSaveOperations(e);
-        return e.Cancel;
-    }
-
-    //public void CancelBackGroundWorker() {
-    //    if (_backgroundWorker.IsBusy && !_backgroundWorker.CancellationPending) { _backgroundWorker.CancelAsync(); }
-    //}
-
     // Dieser Code wird hinzugefügt, um das Dispose-Muster richtig zu implementieren.
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(bool disposing) weiter oben ein.
@@ -286,7 +235,6 @@ public sealed class MultiUserFile : IDisposableExtended {
             // TODO: große Felder auf Null setzen.
             Save(false);
             while (_pureBinSaver.IsBusy) { Pause(0.5, true); }
-            SetReadOnly(); // Ja nix mehr speichern!!!
             // https://stackoverflow.com/questions/2542326/proper-way-to-dispose-of-a-backgroundworker
             _pureBinSaver.Dispose();
             _checker.Dispose();
@@ -296,6 +244,8 @@ public sealed class MultiUserFile : IDisposableExtended {
     }
 
     public string ErrorReason(ErrorReason mode) {
+        if (IsDisposed) { return "Daten verworfen."; }
+
         if (mode == Enums.ErrorReason.OnlyRead) { return string.Empty; }
 
         //----------Load, vereinfachte Prüfung ------------------------------------------------------------------------
@@ -306,20 +256,14 @@ public sealed class MultiUserFile : IDisposableExtended {
         }
 
         if (mode == Enums.ErrorReason.Load) {
-            var x = DateTime.UtcNow.Subtract(_blockReload).TotalSeconds;
-            if (x < 5 && _initialLoadDone) { return "Laden noch " + (5 - x) + " Sekunden blockiert."; }
-
             if (DateTime.UtcNow.Subtract(_lastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; }  // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
             if (_pureBinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
-            //if (IsLoading) { return "Es werden bereits Daten geladen."; }
-            //if (BlockDiskOperations()) { return "Reload unmöglich, vererbte Klasse gab Fehler zurück"; }
             return string.Empty;
         }
 
         //----------Alle Edits und Save ------------------------------------------------------------------------
         //  Generelle Prüfung, die eigentlich immer benötigt wird. Mehr allgemeine Fehler, wo sich nicht so schnell ändern
         //  und eine Prüfung, die nicht auf die Sekunde genau wichtig ist.
-        if (ReadOnly) { return "Die Datei wurde schreibgeschützt geöffnet."; }
         if (CheckForLastError(ref _editNormalyNextCheckUtc, ref _editNormalyError)) { return _editNormalyError; }
         if (!string.IsNullOrEmpty(Filename)) {
             if (!CanWriteInDirectory(Filename.FilePath())) {
@@ -350,7 +294,6 @@ public sealed class MultiUserFile : IDisposableExtended {
         if (mode.HasFlag(Enums.ErrorReason.Save)) {
             if (IsLoading) { return "Speichern aktuell nicht möglich, da gerade Daten geladen werden."; }
             if (DateTime.UtcNow.Subtract(_lastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
-            if (BlockSaveOperations()) { return "Speichern unmöglich, vererbte Klasse blockiert Speichervorgänge"; }
             if (string.IsNullOrEmpty(Filename)) { return string.Empty; } // EXIT -------------------
             if (!FileExists(Filename)) { return string.Empty; } // EXIT -------------------
             if (CheckForLastError(ref _canWriteNextCheckUtc, ref _canWriteError) && !string.IsNullOrEmpty(_canWriteError)) {
@@ -405,18 +348,13 @@ public sealed class MultiUserFile : IDisposableExtended {
         if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(FehlerArt.Fehler, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
         if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(FehlerArt.Fehler, "Dateiname nicht angegeben!"); }
         //fileNameToLoad = modConverter.SerialNr2Path(fileNameToLoad);
-        if (!createWhenNotExisting && !CanWriteInDirectory(fileNameToLoad.FilePath())) { SetReadOnly(); }
+
         if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
         if (!FileExists(fileNameToLoad)) {
             if (createWhenNotExisting) {
-                if (ReadOnly) {
-                    Develop.DebugPrint(FehlerArt.Fehler, "Readonly kann keine Datei erzeugen<br>" + fileNameToLoad);
-                    return;
-                }
                 SaveAsAndChangeTo(fileNameToLoad);
             } else {
                 Develop.DebugPrint(FehlerArt.Warnung, "Datei existiert nicht: " + fileNameToLoad);  // Readonly deutet auf Backup hin, in einem anderne Verzeichnis (Linked)
-                SetReadOnly();
                 return;
             }
         }
@@ -447,13 +385,7 @@ public sealed class MultiUserFile : IDisposableExtended {
                 return;
             } // Wird in der Schleife auch geprüft
 
-            LoadingEventArgs ec = new(_initialLoadDone);
-            OnLoading(ec);
-
-            if (_initialLoadDone && ReadOnly && ec.TryCancel) {
-                IsLoading = false;
-                return;
-            }
+            OnLoading(System.EventArgs.Empty);
 
             var (bLoaded, tmpLastSaveCode) = LoadBytesFromDisk(Enums.ErrorReason.Load);
             if (bLoaded == null) {
@@ -474,8 +406,7 @@ public sealed class MultiUserFile : IDisposableExtended {
 
             IsLoading = false;
 
-            OnLoaded(new LoadedEventArgs(onlyReload));
-            BlockReload(false);
+            OnLoaded();
         }
     }
 
@@ -483,7 +414,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         lock (_lockload) {
             IsLoading = true;
 
-            OnLoading(new LoadingEventArgs(false));
+            OnLoading(System.EventArgs.Empty);
             byte[] bLoaded;
             using (BinaryReader r = new(stream)) {
                 bLoaded = r.ReadBytes((int)stream.Length);
@@ -499,23 +430,9 @@ public sealed class MultiUserFile : IDisposableExtended {
 
             IsLoading = false;
 
-            OnLoaded(new LoadedEventArgs(false));
-            BlockReload(false);
+            OnLoaded();
         }
     }
-
-    public void OnConnectedControlsStopAllWorking(MultiUserFileStopWorkingEventArgs e) {
-        if (IsDisposed) { return; }
-        if (e.AllreadyStopped.Contains(Filename.ToLower())) { return; }
-        e.AllreadyStopped.Add(Filename.ToLower());
-        ConnectedControlsStopAllWorking?.Invoke(this, e);
-    }
-
-    //public void RemoveFilename() {
-    //    Filename = string.Empty;
-    //    ReCreateWatcher();
-    //    SetReadOnly();
-    //}
 
     public void RepairOldBlockFiles() {
         if (DateTime.UtcNow.Subtract(_lastMessageUtc).TotalMinutes < 1) { return; }
@@ -548,7 +465,6 @@ public sealed class MultiUserFile : IDisposableExtended {
     /// </summary>
     /// <param name="mustSave"></param>
     public bool Save(bool mustSave) {
-        if (ReadOnly) { return false; }
         if (IsInSaveingLoop) { return false; }
         //if (isSomethingDiscOperatingsBlocking()) {
         //    if (!mustSave) { RepairOldBlockFiles(); return false; }
@@ -558,7 +474,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         if (string.IsNullOrEmpty(Filename)) { return false; }
 
         OnSaving();
-        OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs()); // Sonst meint der Benutzer evtl. noch, er könne Weiterarbeiten... Und Controlls haben die Möglichkeit, ihre Änderungen einzuchecken
+        //OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs()); // Sonst meint der Benutzer evtl. noch, er könne Weiterarbeiten... Und Controlls haben die Möglichkeit, ihre Änderungen einzuchecken
         var d = DateTime.UtcNow; // Manchmal ist eine Block-Datei vorhanden, die just in dem Moment gelöscht wird. Also ein ganz kurze "Löschzeit" eingestehen.
         if (!mustSave && AgeOfBlockDatei >= 0) { RepairOldBlockFiles(); return false; }
         while (OnHasPendingChanges()) {
@@ -606,11 +522,6 @@ public sealed class MultiUserFile : IDisposableExtended {
         CreateWatcher();
     }
 
-    public void SetReadOnly() {
-        Develop.DebugPrint(FehlerArt.Info, "ReadOnly gesetzt<br>" + Filename);
-        ReadOnly = true;
-    }
-
     public void SetUserDidSomething() => _lastUserActionUtc = DateTime.UtcNow;
 
     public void UnlockHard() {
@@ -647,28 +558,27 @@ public sealed class MultiUserFile : IDisposableExtended {
         return true;
     }
 
-    private static byte[] ZipIt(byte[] data) {
-        // https://stackoverflow.com/questions/17217077/create-zip-file-from-byte
-        using MemoryStream compressedFileStream = new();
-        // Create an archive and store the stream in memory.
-        using (ZipArchive zipArchive = new(compressedFileStream, ZipArchiveMode.Create, false)) {
-            // Create a zip entry for each attachment
-            var zipEntry = zipArchive.CreateEntry("Main.bin");
-            // Get the stream of the attachment
-            using MemoryStream originalFileStream = new(data);
-            using var zipEntryStream = zipEntry.Open();
-            // Copy the attachment stream to the zip entry stream
-            originalFileStream.CopyTo(zipEntryStream);
-        }
-        return compressedFileStream.ToArray();
-    }
+    //private static byte[] ZipIt(byte[] data) {
+    //    // https://stackoverflow.com/questions/17217077/create-zip-file-from-byte
+    //    using MemoryStream compressedFileStream = new();
+    //    // Create an archive and store the stream in memory.
+    //    using (ZipArchive zipArchive = new(compressedFileStream, ZipArchiveMode.Create, false)) {
+    //        // Create a zip entry for each attachment
+    //        var zipEntry = zipArchive.CreateEntry("Main.bin");
+    //        // Get the stream of the attachment
+    //        using MemoryStream originalFileStream = new(data);
+    //        using var zipEntryStream = zipEntry.Open();
+    //        // Copy the attachment stream to the zip entry stream
+    //        originalFileStream.CopyTo(zipEntryStream);
+    //    }
+    //    return compressedFileStream.ToArray();
+    //}
 
     private string Backupdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
 
     private string Blockdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".blk";
 
     private void Checker_Tick(object state) {
-        if (DateTime.UtcNow.Subtract(_blockReload).TotalSeconds < 5) { return; }
         if (IsLoading) { return; }
         if (_pureBinSaver.IsBusy || IsSaving) { return; }
         if (string.IsNullOrEmpty(Filename)) { return; }
@@ -689,8 +599,6 @@ public sealed class MultiUserFile : IDisposableExtended {
         ReloadDelaySecond = Math.Max(ReloadDelaySecond, 10);
         var countBackUp = Math.Min((ReloadDelaySecond / 10f) + 1, 10); // Soviele Sekunden können vergehen, bevor Backups gemacht werden. Der Wert muss kleiner sein, als Count_Save
         var countSave = (countBackUp * 2) + 1; // Soviele Sekunden können vergehen, bevor gespeichert werden muss. Muss größer sein, als Backup. Weil ansonsten der Backup-BackgroundWorker beendet wird
-
-        //if (DateTime.UtcNow.Subtract(_lastUserActionUtc).TotalSeconds < countUserWork || BlockSaveOperations()) { CancelBackGroundWorker(); return; } // Benutzer arbeiten lassen
 
         //if (_checkerTickCount > countSave && mustSave) { CancelBackGroundWorker(); }
 
@@ -839,12 +747,12 @@ public sealed class MultiUserFile : IDisposableExtended {
         return x.HasPendingChanges;
     }
 
-    private void OnLoaded(LoadedEventArgs e) {
+    private void OnLoaded() {
         if (IsDisposed) { return; }
-        Loaded?.Invoke(this, e);
+        Loaded?.Invoke(this, System.EventArgs.Empty);
     }
 
-    private void OnLoading(LoadingEventArgs e) {
+    private void OnLoading(System.EventArgs e) {
         if (IsDisposed) { return; }
         Loading?.Invoke(this, e);
     }
@@ -862,8 +770,6 @@ public sealed class MultiUserFile : IDisposableExtended {
         if (IsDisposed) { return; }
         Saving?.Invoke(this, System.EventArgs.Empty);
     }
-
-    private void OnShouldICancelSaveOperations(CancelEventArgs e) => ShouldICancelSaveOperations?.Invoke(this, e);
 
     private byte[] OnToListOfByte() {
         var x = new MultiUserToListEventArgs();
@@ -915,7 +821,6 @@ public sealed class MultiUserFile : IDisposableExtended {
     /// <param name="savedDataUncompressed"></param>
     /// <returns></returns>
     private string SaveRoutine(bool fromParallelProzess, string? tmpFileName, string? fileInfoBeforeSaving, byte[]? savedDataUncompressed) {
-        if (ReadOnly) { return Feedback("Datei ist Readonly"); }
         if (tmpFileName == null || string.IsNullOrEmpty(tmpFileName) ||
             fileInfoBeforeSaving == null || string.IsNullOrEmpty(fileInfoBeforeSaving) ||
             savedDataUncompressed == null || savedDataUncompressed.Length == 0) { return Feedback("Keine Daten angekommen."); }
@@ -1064,11 +969,10 @@ public sealed class MultiUserFile : IDisposableExtended {
             if (!string.IsNullOrEmpty(f)) { _doingTempFile = false; return (string.Empty, string.Empty, null); }
             fileInfoBeforeSaving = GetFileInfo(Filename, true);
             dataUncompressed = OnToListOfByte();
-            var writerBinaryData = _zipped ? ZipIt(dataUncompressed) : dataUncompressed;
             tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName().ToUpper());
             try {
                 using FileStream x = new(tmpFileName, FileMode.Create, FileAccess.Write, FileShare.None);
-                x.Write(writerBinaryData, 0, writerBinaryData.Length);
+                x.Write(dataUncompressed, 0, dataUncompressed.Length);
                 x.Flush();
                 x.Close();
                 break;

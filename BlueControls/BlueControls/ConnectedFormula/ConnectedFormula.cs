@@ -63,13 +63,12 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
 
     private ConnectedFormula(string filename) {
         AllFiles.Add(this);
-        _muf = new BlueBasics.MultiUserFile.MultiUserFile(false, true);
+        _muf = new BlueBasics.MultiUserFile.MultiUserFile();
 
-        _muf.ConnectedControlsStopAllWorking += OnConnectedControlsStopAllWorking;
+        //_muf.ConnectedControlsStopAllWorking += OnConnectedControlsStopAllWorking;
         _muf.Loaded += OnLoaded;
         _muf.Loading += OnLoading;
         _muf.SavedToDisk += OnSavedToDisk;
-        _muf.ShouldICancelSaveOperations += OnShouldICancelSaveOperations;
         _muf.DiscardPendingChanges += DiscardPendingChanges;
         _muf.HasPendingChanges += HasPendingChanges;
         _muf.ParseExternal += ParseExternal;
@@ -101,18 +100,13 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
 
     public event EventHandler Changed;
 
-    public event EventHandler<MultiUserFileStopWorkingEventArgs> ConnectedControlsStopAllWorking;
+    //public event EventHandler<MultiUserFileStopWorkingEventArgs> ConnectedControlsStopAllWorking;
 
-    public event EventHandler<LoadedEventArgs> Loaded;
+    public event EventHandler Loaded;
 
-    public event EventHandler<LoadingEventArgs> Loading;
+    public event EventHandler Loading;
 
     public event EventHandler SavedToDisk;
-
-    /// <summary>
-    /// Dient dazu, offene Dialoge abzufragen
-    /// </summary>
-    public event EventHandler<CancelEventArgs> ShouldICancelSaveOperations;
 
     #endregion
 
@@ -292,9 +286,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
         _saved = false;
     }
 
-    private void OnConnectedControlsStopAllWorking(object sender, MultiUserFileStopWorkingEventArgs e) => ConnectedControlsStopAllWorking?.Invoke(this, e);
-
-    private void OnLoaded(object sender, LoadedEventArgs e) {
+    private void OnLoaded(object sender, System.EventArgs e) {
         foreach (var thisIt in PadData) {
             if (string.IsNullOrEmpty(thisIt.Page)) {
                 thisIt.Page = "Head";
@@ -308,14 +300,12 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
         Loaded?.Invoke(this, e);
     }
 
-    private void OnLoading(object sender, LoadingEventArgs e) => Loading?.Invoke(this, e);
+    private void OnLoading(object sender, System.EventArgs e) => Loading?.Invoke(this, e);
 
     private void OnSavedToDisk(object sender, System.EventArgs e) {
         _saved = true;
         SavedToDisk?.Invoke(this, e);
     }
-
-    private void OnShouldICancelSaveOperations(object sender, CancelEventArgs e) => ShouldICancelSaveOperations?.Invoke(this, e);
 
     private void PadData_Changed(object sender, System.EventArgs e) {
         if (_saving || _muf.IsLoading) { return; }
@@ -336,8 +326,8 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
 
         foreach (var thisit in PadData) {
             if (thisit is RowWithFilterPadItem rwf) {
-                if (rwf.Database != null) {
-                    DatabaseFiles.AddIfNotExists(rwf.Database.Filename);
+                if (rwf.Database is Database BDB) {
+                    DatabaseFiles.AddIfNotExists(BDB.Filename);
                     _id = Math.Max(_id, rwf.Id);
                 }
             }

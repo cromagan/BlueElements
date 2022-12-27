@@ -59,7 +59,6 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         }
 
         Database = database;
-        Database.ShouldICancelSaveOperations += TmpDatabase_ShouldICancelDiscOperations;
         Arrangement = 1;
         UpdateCombobox();
         ShowOrder();
@@ -80,11 +79,6 @@ public partial class ColumnArrangementPadEditor : PadEditor {
     #endregion
 
     #region Methods
-
-    protected override void OnFormClosed(System.Windows.Forms.FormClosedEventArgs e) {
-        Database.ShouldICancelSaveOperations -= TmpDatabase_ShouldICancelDiscOperations;
-        base.OnFormClosed(e);
-    }
 
     private static void TmpDatabase_ShouldICancelDiscOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
 

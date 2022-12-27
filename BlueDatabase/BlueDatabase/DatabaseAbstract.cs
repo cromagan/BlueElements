@@ -57,16 +57,16 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     public readonly string TableName = string.Empty;
     public readonly string UserName = Generic.UserName().ToUpper();
     public string UserGroup;
-    private readonly BackgroundWorker _backgroundWorker;
-    private readonly Timer _checker;
+    protected string? _additionaFilesPfadtmp;
     private readonly LayoutCollection _layouts = new();
     private readonly List<string> _permissionGroupsNewRow = new();
     private readonly long _startTick = DateTime.UtcNow.Ticks;
     private readonly List<string> _tags = new();
     private string _additionaFilesPfad;
-    private string? _additionaFilesPfadtmp;
+    private BackgroundWorker _backgroundWorker;
     private string _cachePfad;
     private string _caption = string.Empty;
+    private Timer _checker;
     private int _checkerTickCount = -5;
     private string _createDate = string.Empty;
     private string _creator = string.Empty;
@@ -81,7 +81,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     private double _globalScale;
     private string _globalShowPass = string.Empty;
     private DateTime _lastUserActionUtc = new(1900, 1, 1);
-    private int _reloadDelaySecond;
+    private bool _loaded = false;
     private string _rulesScript = string.Empty;
     private RowSortDefinition? _sortDefinition;
 
@@ -108,29 +108,12 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         QuickImage.NeedImage += QuickImage_NeedImage;
 
         Row = new RowCollection(this);
-        //Row.RowRemoving += Row_RowRemoving;
-        //Row.RowRemoved += Row_RowRemoved;
-        //Row.RowAdded += Row_RowAdded;
-
         Column = new ColumnCollection(this);
-        //Column.ItemRemoving += Column_ItemRemoving;
-        //Column.ItemRemoved += Column_ItemRemoved;
-        //Column.ItemAdded += Column_ItemAdded;
-
-        _backgroundWorker = new BackgroundWorker {
-            WorkerReportsProgress = false,
-            WorkerSupportsCancellation = true
-        };
-        _backgroundWorker.DoWork += BackgroundWorker_DoWork;
-        _checker = new Timer(Checker_Tick);
-        _checker.Change(2000, 2000);
     }
 
     #endregion
 
     #region Events
-
-    public event EventHandler<MultiUserFileStopWorkingEventArgs> ConnectedControlsStopAllWorking;
 
     public event EventHandler Disposing;
 
@@ -140,22 +123,15 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     public event EventHandler<GenerateLayoutInternalEventargs> GenerateLayoutInternal;
 
-    public event EventHandler<LoadedEventArgs> Loaded;
+    public event EventHandler Loaded;
 
-    public event EventHandler<LoadingEventArgs> Loading;
+    public event EventHandler Loading;
 
     public event EventHandler<PasswordEventArgs> NeedPassword;
 
     public event EventHandler<ProgressbarEventArgs> ProgressbarInfo;
 
-    public event EventHandler SavedToDisk;
-
     public event EventHandler<RowCancelEventArgs> ScriptError;
-
-    /// <summary>
-    /// Dient dazu, offene Dialoge abzufragen
-    /// </summary>
-    public event EventHandler<CancelEventArgs> ShouldICancelSaveOperations;
 
     public event EventHandler SortParameterChanged;
 
@@ -241,8 +217,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         }
     }
 
-    public abstract string Filename { get; }
-
     [Browsable(false)]
     [Description("Welche Spalte bei Columnfirst zur¸ckgegeben wird")]
     public string FirstColumn {
@@ -271,9 +245,8 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         }
     }
 
+    public bool HasPendingChanges { get; protected set; } = false;
     public bool IsDisposed { get; private set; }
-
-    public abstract bool IsLoading { get; }
 
     public LayoutCollection Layouts {
         get => _layouts;
@@ -298,19 +271,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     public DateTime PowerEdit { get; set; }
 
     public bool ReadOnly { get; private set; } = false;
-
-    [Browsable(false)]
-    public int ReloadDelaySecond {
-        get => _reloadDelaySecond;
-        set {
-            if (_reloadDelaySecond == value) { return; }
-            ChangeData(DatabaseDataType.ReloadDelaySecond, null, null, _reloadDelaySecond.ToString(), value.ToString());
-        }
-    }
-
-    public abstract bool ReloadNeeded { get; }
-
-    public abstract bool ReloadNeededSoft { get; }
 
     public string RulesScript {
         get => _rulesScript;
@@ -355,14 +315,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             ChangeData(DatabaseDataType.Tags, null, null, _tags.JoinWithCr(), value.JoinWithCr());
         }
     }
-
-    //public string TimeCode {
-    //    get => _timeCode;
-    //    set {
-    //        if (_timeCode == value) { return; }
-    //        ChangeData(DatabaseDataType.TimeCode, null, null, _timeCode, value);
-    //    }
-    //}
 
     [Browsable(false)]
     public int UndoCount {
@@ -425,6 +377,18 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         return allavailabletables;
     }
 
+    public static void ForceSaveAll() {
+        var x = AllFiles.Count;
+        foreach (var thisFile in AllFiles) {
+            thisFile?.Save();
+            if (x != AllFiles.Count) {
+                // Die Auflistung wurde ver‰ndert! Selten, aber kann passieren!
+                ForceSaveAll();
+                return;
+            }
+        }
+    }
+
     /// <summary>
     /// Sucht die Datenbank im Speicher. Wird sie nicht gefunden, wird sie geladen.
     /// </summary>
@@ -433,7 +397,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
         foreach (var thisFile in AllFiles) {
             if (string.Equals(thisFile.ConnectionData.UniqueID, ci.UniqueID, StringComparison.OrdinalIgnoreCase)) {
-                thisFile.BlockReload(false);
                 return thisFile;
             }
         }
@@ -441,19 +404,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         if (ci.Provider != null) {
             return ci.Provider.GetOtherTable(ci.TableName);
         }
-
-        //#region wenn captiontoo angew‰hlt wurde, schauen ob eine ConnectionID einem Dateinamen entspricht
-
-        //if (checkOnlyCaptionToo) {
-        //    foreach (var thisFile in AllFiles) {
-        //        if (thisFile is DatabaseAbstract db && thisFile.TableName.ToLower() == connectionID.ToLower().FileNameWithSuffix()) {
-        //            thisFile.BlockReload(false);
-        //            return db;
-        //        }
-        //    }
-        //}
-
-        //#endregion
 
         #region Wenn die Connection einem Dateinamen entspricht, versuchen den zu laden
 
@@ -581,7 +531,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// Der komplette Pfad mit abschlieﬂenden \
     /// </summary>
     /// <returns></returns>
-    public string AdditionaFilesPfadWhole() {
+    public virtual string AdditionaFilesPfadWhole() {
         if (_additionaFilesPfadtmp != null) { return _additionaFilesPfadtmp; }
 
         if (!string.IsNullOrEmpty(_additionaFilesPfad)) {
@@ -592,30 +542,11 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             }
         }
 
-        if (!string.IsNullOrEmpty(Filename)) {
-            var t = (Filename.FilePath() + _additionaFilesPfad.Trim("\\") + "\\").CheckPath();
-            if (DirectoryExists(t)) {
-                _additionaFilesPfadtmp = t;
-                return t;
-            }
-        }
         _additionaFilesPfadtmp = string.Empty;
         return string.Empty;
     }
 
     public abstract List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked);
-
-    public List<RowData> AllRows() {
-        var sortedRows = new List<RowData>();
-        foreach (var thisRowItem in Row) {
-            if (thisRowItem != null) {
-                sortedRows.Add(new RowData(thisRowItem));
-            }
-        }
-        return sortedRows;
-    }
-
-    public abstract void BlockReload(bool crashIsCurrentlyLoading);
 
     public void CancelBackGroundWorker() {
         if (_backgroundWorker.IsBusy && !_backgroundWorker.CancellationPending) { _backgroundWorker.CancelAsync(); }
@@ -676,7 +607,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         //TimeCode - nope
         GlobalScale = sourceDatabase.GlobalScale;
         GlobalShowPass = sourceDatabase.GlobalShowPass;
-        ReloadDelaySecond = sourceDatabase.ReloadDelaySecond;
         RulesScript = sourceDatabase.RulesScript;
         if (SortDefinition == null || SortDefinition.ToString() != sourceDatabase.SortDefinition?.ToString()) {
             SortDefinition = new RowSortDefinition(this, sourceDatabase.SortDefinition?.ToString());
@@ -746,12 +676,22 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     public abstract ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists);
 
     /// <summary>
+    /// AdditionaFiles/Datenbankpfad mit Backup und abschlieﬂenden \
+    /// </summary>
+    /// <returns></returns>
+    public string DefaultBackupPath() {
+        if (!string.IsNullOrEmpty(AdditionaFilesPfadWhole())) { return AdditionaFilesPfadWhole() + "Backup\\"; }
+        //if (!string.IsNullOrEmpty(Filename)) { return Filename.FilePath() + "Forms\\"; }
+        return string.Empty;
+    }
+
+    /// <summary>
     /// AdditionaFiles/Datenbankpfad mit Forms und abschlieﬂenden \
     /// </summary>
     /// <returns></returns>
     public string DefaultFormulaPath() {
         if (!string.IsNullOrEmpty(AdditionaFilesPfadWhole())) { return AdditionaFilesPfadWhole() + "Forms\\"; }
-        if (!string.IsNullOrEmpty(Filename)) { return Filename.FilePath() + "Forms\\"; }
+        //if (!string.IsNullOrEmpty(Filename)) { return Filename.FilePath() + "Forms\\"; }
         return string.Empty;
     }
 
@@ -760,7 +700,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// </summary>
     public string DefaultLayoutPath() {
         if (!string.IsNullOrEmpty(AdditionaFilesPfadWhole())) { return AdditionaFilesPfadWhole() + "Layouts\\"; }
-        if (!string.IsNullOrEmpty(Filename)) { return Filename.FilePath() + "Layouts\\"; }
+        //if (!string.IsNullOrEmpty(Filename)) { return Filename.FilePath() + "Layouts\\"; }
         return string.Empty;
     }
 
@@ -771,9 +711,9 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     }
 
     public string ErrorReason(ErrorReason mode) {
-        var f = SpecialErrorReason(mode);
+        //var f = SpecialErrorReason(mode);
 
-        if (!string.IsNullOrEmpty(f)) { return f; }
+        //if (!string.IsNullOrEmpty(f)) { return f; }
         if (mode == BlueBasics.Enums.ErrorReason.OnlyRead) { return string.Empty; }
 
         if (mode.HasFlag(BlueBasics.Enums.ErrorReason.Load)) {
@@ -781,7 +721,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         }
         if (mode.HasFlag(BlueBasics.Enums.ErrorReason.EditGeneral) || mode.HasFlag(BlueBasics.Enums.ErrorReason.Save)) {
             if (_backgroundWorker.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
-            if (ReloadNeeded) { return "Die Datei muss neu eingelesen werden."; }
         }
 
         return IntParse(LoadedVersion.Replace(".", "")) > IntParse(DatabaseVersion.Replace(".", ""))
@@ -809,7 +748,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// <returns></returns>
     public string Export_CSV(FirstRow firstRow, List<ColumnItem>? columnList, List<RowData>? sortedRows) {
         columnList ??= Column.Where(thisColumnItem => thisColumnItem != null).ToList();
-        sortedRows ??= AllRows();
+        sortedRows ??= Row.AllRows();
 
         StringBuilder sb = new();
         switch (firstRow) {
@@ -893,7 +832,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             columnList = Column.Where(thisColumnItem => thisColumnItem != null).ToList();
         }
 
-        if (sortedRows == null) { sortedRows = AllRows(); }
+        if (sortedRows == null) { sortedRows = Row.AllRows(); }
 
         if (string.IsNullOrEmpty(filename)) {
             filename = TempFile(string.Empty, "Export", "html");
@@ -1143,20 +1082,11 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         return !string.IsNullOrEmpty(UserGroup) && _datenbankAdmin.Contains(UserGroup, false);
     }
 
-    public abstract void Load_Reload();
-
-    public void OnConnectedControlsStopAllWorking(object? sender, MultiUserFileStopWorkingEventArgs e) {
-        ConnectedControlsStopAllWorking?.Invoke(this, e);
-    }
+    //public abstract void Load_Reload();
 
     public void OnScriptError(RowCancelEventArgs e) {
         if (IsDisposed) { return; }
         ScriptError?.Invoke(this, e);
-    }
-
-    public void OnShouldICancelSaveOperations(object sender, CancelEventArgs e) {
-        if (IsDisposed) { return; }
-        ShouldICancelSaveOperations?.Invoke(this, e);
     }
 
     public void OnViewChanged() {
@@ -1249,21 +1179,16 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         _layouts.Check();
     }
 
-    public abstract bool Save(bool mustDo);
+    public abstract bool Save();
 
-    public virtual void SetReadOnly() {
+    public void SetReadOnly() {
         ReadOnly = true;
     }
 
     public abstract string UndoText(ColumnItem? column, RowItem? row);
 
-    public abstract void UnlockHard();
-
-    public abstract void WaitEditable();
-
     internal void DevelopWarnung(string t) {
         try {
-            t += "\r\nLoading: " + IsLoading;
             t += "\r\nColumn-Count: " + Column.Count;
             t += "\r\nRow-Count: " + Row.Count;
             t += "\r\nTable: " + ConnectionData.TableName;
@@ -1272,11 +1197,13 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         Develop.DebugPrint(FehlerArt.Warnung, t);
     }
 
+    //public abstract void WaitEditable();
     internal void OnDropMessage(FehlerArt type, string message) {
         if (IsDisposed) { return; }
         DropMessage?.Invoke(this, new MessageEventArgs(type, message));
     }
 
+    //public abstract void UnlockHard();
     internal void OnGenerateLayoutInternal(GenerateLayoutInternalEventargs e) {
         if (IsDisposed) { return; }
         GenerateLayoutInternal?.Invoke(this, e);
@@ -1309,6 +1236,16 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     protected abstract void AddUndo(string tableName, DatabaseDataType comand, long? columnKey, long? rowKey, string previousValue, string changedTo, string userName);
 
     protected void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName) => AddUndo(tableName, comand, column?.Key ?? -1, row?.Key ?? -1, previousValue, changedTo, userName);
+
+    protected void CreateWatcher() {
+        _backgroundWorker = new BackgroundWorker {
+            WorkerReportsProgress = false,
+            WorkerSupportsCancellation = true
+        };
+        _backgroundWorker.DoWork += BackgroundWorker_DoWork;
+        _checker = new Timer(Checker_Tick);
+        _checker.Change(2000, 2000);
+    }
 
     protected virtual void Dispose(bool disposing) {
         if (IsDisposed) { return; }
@@ -1380,37 +1317,20 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         Exporting?.Invoke(this, e);
     }
 
-    /// <summary>
-    /// F¸hrt auch die Reparatur aus.
-    /// Loading ist hier bereits false.
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    protected void OnLoaded(object sender, LoadedEventArgs e) {
+    protected void OnLoaded() {
         if (IsDisposed) { return; }
-        RepairAfterParse();
-        Loaded?.Invoke(this, e);
+        Loaded?.Invoke(this, System.EventArgs.Empty);
     }
 
-    /// <summary>
-    /// Bricht auch die Backgroundworker ab.
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    protected void OnLoading(object sender, LoadingEventArgs e) {
+    protected void OnLoading() {
         if (IsDisposed) { return; }
         CancelBackGroundWorker();
-        Loading?.Invoke(this, e);
+        Loading?.Invoke(this, System.EventArgs.Empty);
     }
 
     protected void OnNeedPassword(PasswordEventArgs e) {
         if (IsDisposed) { return; }
         NeedPassword?.Invoke(this, e);
-    }
-
-    protected virtual void OnSavedToDisk(object sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-        SavedToDisk?.Invoke(this, e);
     }
 
     protected virtual void SetUserDidSomething() {
@@ -1508,10 +1428,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                 _createDate = value;
                 break;
 
-            case DatabaseDataType.ReloadDelaySecond:
-                _reloadDelaySecond = IntParse(value);
-                break;
-
             case DatabaseDataType.DatabaseAdminGroups:
                 _datenbankAdmin.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
                 break;
@@ -1603,6 +1519,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             case (DatabaseDataType)53:
             case (DatabaseDataType)33:
             case (DatabaseDataType)65:
+            case (DatabaseDataType)58:
                 break;
 
             default:
@@ -1619,7 +1536,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         return string.Empty;
     }
 
-    protected abstract string SpecialErrorReason(ErrorReason mode);
+    //protected abstract string SpecialErrorReason(ErrorReason mode);
 
     private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
         if (ReadOnly) { return; }
@@ -1628,8 +1545,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
         foreach (var thisExport in tmpe) {
             if (_backgroundWorker.CancellationPending) { break; }
-
-            if (IsLoading) { break; }
 
             if (thisExport.IsOk()) {
                 //var e2 = new MultiUserFileHasPendingChangesEventArgs();
@@ -1651,20 +1566,11 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         Export = tmpe;
     }
 
-    private bool BlockSaveOperations() {
-        var e = new CancelEventArgs();
-
-        OnShouldICancelSaveOperations(this, e);
-        return e.Cancel;
-    }
-
     private void Checker_Tick(object state) {
-        if (IsLoading) { return; }
-
         _checkerTickCount++;
         if (_checkerTickCount < 0) { return; }
 
-        if (DateTime.UtcNow.Subtract(_lastUserActionUtc).TotalSeconds < 10 || BlockSaveOperations()) { CancelBackGroundWorker(); return; } // Benutzer arbeiten lassen
+        if (DateTime.UtcNow.Subtract(_lastUserActionUtc).TotalSeconds < 10) { CancelBackGroundWorker(); return; } // Benutzer arbeiten lassen
 
         var mustBackup = IsThereBackgroundWorkToDo();
 
@@ -1674,10 +1580,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         }
 
         // Zeiten berechnen
-        ReloadDelaySecond = Math.Max(ReloadDelaySecond, 10);
-        var countBackUp = Math.Min((ReloadDelaySecond / 10f) + 1, 10); // Soviele Sekunden kˆnnen vergehen, bevor Backups gemacht werden. Der Wert muss kleiner sein, als Count_Save
-
-        //if (DateTime.UtcNow.Subtract(_lastUserActionUtc).TotalSeconds < countUserWork || BlockSaveOperations()) { CancelBackGroundWorker(); return; } // Benutzer arbeiten lassen
 
         ////if (_checkerTickCount > countSave && mustSave) { CancelBackGroundWorker(); }
 
@@ -1695,14 +1597,15 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         //    return;
         //}
 
-        //if (mustSave && _checkerTickCount > countSave) {
-        //    if (!string.IsNullOrEmpty(ErrorReason(BlueBasics.Enums.ErrorReason.Save))) { return; }
-        //    if (!_pureBinSaver.IsBusy) { _pureBinSaver.RunWorkerAsync(); } // Eigentlich sollte diese Abfrage ¸berfl¸ssig sein. Ist sie aber nicht
-        //    _checkerTickCount = 0;
-        //    return;
-        //}
+        if (HasPendingChanges && _checkerTickCount > 20) {
+            if (!string.IsNullOrEmpty(ErrorReason(BlueBasics.Enums.ErrorReason.Save))) { return; }
 
-        if (mustBackup && _checkerTickCount >= countBackUp && string.IsNullOrEmpty(ErrorReason(BlueBasics.Enums.ErrorReason.EditAcut))) {
+            Save();
+            _checkerTickCount = 0;
+            return;
+        }
+
+        if (mustBackup && _checkerTickCount >= 30 && string.IsNullOrEmpty(ErrorReason(BlueBasics.Enums.ErrorReason.EditAcut))) {
             var nowsek = (DateTime.UtcNow.Ticks - _startTick) / 30000000;
             if (nowsek % 20 != 0) { return; } // Lasten startabh‰ngig verteilen. Bei Pending changes ist es eh immer true;
 

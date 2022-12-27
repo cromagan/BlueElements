@@ -46,7 +46,6 @@ public sealed partial class DatabaseHeadEditor {
         InitializeComponent();
         _database = database;
         _database.Disposing += Database_Disposing;
-        _database.ShouldICancelSaveOperations += Database_ShouldICancelSaveOperations;
     }
 
     #endregion
@@ -100,7 +99,6 @@ public sealed partial class DatabaseHeadEditor {
         // -----------------------------
         txbCaption.Text = _database.Caption;
         txbFirstColumn.Text = _database.FirstColumn;
-        tbxReloadVerzoegerung.Text = _database.ReloadDelaySecond.ToString();
         txbGlobalScale.Text = _database.GlobalScale.ToString(Constants.Format_Float1);
         txbAdditionalFiles.Text = _database.AdditionaFilesPfad;
         txbStandardFormulaFile.Text = _database.StandardFormulaFile;
@@ -119,85 +117,81 @@ public sealed partial class DatabaseHeadEditor {
         GenerateInfoText();
     }
 
-    private static void Database_ShouldICancelSaveOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
-
     private void AddUndoToTable(WorkItem work, int index, string db, bool checkNeeded) {
-        if (work.HistorischRelevant) {
-            if (checkNeeded && tblUndo.Database.Row[work.ToString()] != null) { return; }
+        if (checkNeeded && tblUndo.Database.Row[work.ToString()] != null) { return; }
 
-            var cd = work.CellKey.SplitAndCutBy("|");
-            _database.Cell.DataOfCellKey(work.CellKey, out var col, out var row);
-            var r = tblUndo.Database.Row.GenerateAndAdd(work.ToString());
-            r.CellSet("ColumnKey", cd[0]);
-            r.CellSet("RowKey", cd[1]);
-            r.CellSet("index", index);
-            r.CellSet("db", db);
-            if (col != null) {
-                r.CellSet("ColumnName", col.Name);
-                r.CellSet("columnCaption", col.Caption);
-            }
-            if (row != null) {
-                r.CellSet("RowFirst", row.CellFirstString());
-            } else if (cd[1] != "-1") {
-                r.CellSet("RowFirst", "[gelöscht]");
-            }
-            r.CellSet("Aenderer", work.User);
-            r.CellSet("AenderZeit", work.CompareKey());
-            var symb = ImageCode.Fragezeichen;
-            var alt = work.PreviousValue;
-            var neu = work.ChangedTo;
-            var aenderung = work.Comand.ToString();
-            switch (work.Comand) {
-                case DatabaseDataType.UTF8Value_withoutSizeData:
-                case DatabaseDataType.Value_withoutSizeData:
-                    symb = ImageCode.Textfeld;
-                    aenderung = "Wert geändert";
-                    break;
-
-                case DatabaseDataType.AutoExport:
-                    aenderung = "Export ausgeführt oder geändert";
-                    alt = "";
-                    neu = "";
-                    symb = ImageCode.Karton;
-                    break;
-
-                case DatabaseDataType.Layouts:
-                    aenderung = "Layouts verändert";
-                    alt = "";
-                    neu = "";
-                    symb = ImageCode.Layout;
-                    break;
-
-                case DatabaseDataType.Comand_AddRow:
-                    aenderung = "Neue Zeile";
-                    symb = ImageCode.PlusZeichen;
-                    break;
-
-                case DatabaseDataType.RulesScript:
-                    //case enDatabaseDataType.Rules_ALT:
-                    aenderung = "Regeln verändert";
-                    symb = ImageCode.Formel;
-                    alt = "";
-                    neu = "";
-                    break;
-
-                case DatabaseDataType.ColumnArrangement:
-                    aenderung = "Spalten-Anordnungen verändert";
-                    symb = ImageCode.Spalte;
-                    alt = "";
-                    neu = "";
-                    break;
-
-                case DatabaseDataType.Comand_RemoveRow:
-                    aenderung = "Zeile gelöscht";
-                    symb = ImageCode.MinusZeichen;
-                    break;
-            }
-            r.CellSet("Aenderung", aenderung);
-            r.CellSet("symbol", symb + "|24");
-            r.CellSet("Wertalt", alt);
-            r.CellSet("Wertneu", neu);
+        var cd = work.CellKey.SplitAndCutBy("|");
+        _database.Cell.DataOfCellKey(work.CellKey, out var col, out var row);
+        var r = tblUndo.Database.Row.GenerateAndAdd(work.ToString());
+        r.CellSet("ColumnKey", cd[0]);
+        r.CellSet("RowKey", cd[1]);
+        r.CellSet("index", index);
+        r.CellSet("db", db);
+        if (col != null) {
+            r.CellSet("ColumnName", col.Name);
+            r.CellSet("columnCaption", col.Caption);
         }
+        if (row != null) {
+            r.CellSet("RowFirst", row.CellFirstString());
+        } else if (cd[1] != "-1") {
+            r.CellSet("RowFirst", "[gelöscht]");
+        }
+        r.CellSet("Aenderer", work.User);
+        r.CellSet("AenderZeit", work.CompareKey());
+        var symb = ImageCode.Fragezeichen;
+        var alt = work.PreviousValue;
+        var neu = work.ChangedTo;
+        var aenderung = work.Comand.ToString();
+        switch (work.Comand) {
+            case DatabaseDataType.UTF8Value_withoutSizeData:
+            case DatabaseDataType.Value_withoutSizeData:
+                symb = ImageCode.Textfeld;
+                aenderung = "Wert geändert";
+                break;
+
+            case DatabaseDataType.AutoExport:
+                aenderung = "Export ausgeführt oder geändert";
+                alt = "";
+                neu = "";
+                symb = ImageCode.Karton;
+                break;
+
+            case DatabaseDataType.Layouts:
+                aenderung = "Layouts verändert";
+                alt = "";
+                neu = "";
+                symb = ImageCode.Layout;
+                break;
+
+            case DatabaseDataType.Comand_AddRow:
+                aenderung = "Neue Zeile";
+                symb = ImageCode.PlusZeichen;
+                break;
+
+            case DatabaseDataType.RulesScript:
+                //case enDatabaseDataType.Rules_ALT:
+                aenderung = "Regeln verändert";
+                symb = ImageCode.Formel;
+                alt = "";
+                neu = "";
+                break;
+
+            case DatabaseDataType.ColumnArrangement:
+                aenderung = "Spalten-Anordnungen verändert";
+                symb = ImageCode.Spalte;
+                alt = "";
+                neu = "";
+                break;
+
+            case DatabaseDataType.Comand_RemoveRow:
+                aenderung = "Zeile gelöscht";
+                symb = ImageCode.MinusZeichen;
+                break;
+        }
+        r.CellSet("Aenderung", aenderung);
+        r.CellSet("symbol", symb + "|24");
+        r.CellSet("Wertalt", alt);
+        r.CellSet("Wertneu", neu);
     }
 
     private void btnClipboard_Click(object sender, System.EventArgs e) => Generic.CopytoClipboard(tblUndo.Export_CSV(FirstRow.ColumnCaption));
@@ -209,7 +203,7 @@ public sealed partial class DatabaseHeadEditor {
         var ok = false;
         if (_database != null) {
             WriteInfosBack();
-            ok = _database.Save(false);
+            ok = _database.Save();
         }
         if (ok) {
             scriptEditor.Message("Speichern erfolgreich.");
@@ -221,11 +215,6 @@ public sealed partial class DatabaseHeadEditor {
     }
 
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => _database.Column.GenerateOverView();
-
-    private void btnSperreAufheben_Click(object sender, System.EventArgs e) {
-        _database.UnlockHard();
-        MessageBox.Show("Erledigt.", ImageCode.Information, "OK");
-    }
 
     private void Database_Disposing(object sender, System.EventArgs e) {
         RemoveDatabase();
@@ -334,7 +323,6 @@ public sealed partial class DatabaseHeadEditor {
     private void RemoveDatabase() {
         if (_database == null) { return; }
         _database.Disposing -= Database_Disposing;
-        _database.ShouldICancelSaveOperations -= Database_ShouldICancelSaveOperations;
         _database = null;
     }
 
@@ -372,12 +360,9 @@ public sealed partial class DatabaseHeadEditor {
         _database.Caption = txbCaption.Text;
         _database.FirstColumn = txbFirstColumn.Text;
         _database.UndoCount = tbxUndoAnzahl.Text.IsLong() ? Math.Max(IntParse(tbxUndoAnzahl.Text), 5) : 5;
-        _database.ReloadDelaySecond = tbxReloadVerzoegerung.Text.IsLong() ? Math.Max(IntParse(tbxReloadVerzoegerung.Text), 5) : 5;
         if (txbGlobalScale.Text.IsDouble()) {
             _database.GlobalScale = Math.Min(DoubleParse(txbGlobalScale.Text), 5);
             _database.GlobalScale = Math.Max(0.5, _database.GlobalScale);
-        } else {
-            _database.ReloadDelaySecond = 1;
         }
         _database.AdditionaFilesPfad = txbAdditionalFiles.Text;
         _database.StandardFormulaFile = txbStandardFormulaFile.Text;

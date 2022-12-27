@@ -64,13 +64,11 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
 
             if (_database != null) {
                 _database.Disposing -= Database_Disposing;
-                _database.ShouldICancelSaveOperations -= Database_ShouldICancelDiscOperations;
             }
             _database = value;
 
             if (_database != null) {
                 _database.Disposing += Database_Disposing;
-                _database.ShouldICancelSaveOperations += Database_ShouldICancelDiscOperations;
             }
         }
     }
@@ -113,7 +111,6 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
     protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
         if (Database != null) {
             Database.Disposing -= Database_Disposing;
-            Database.ShouldICancelSaveOperations -= Database_ShouldICancelDiscOperations;
         }
         SaveCurrentLayout();
         scriptEditor.Database = null;

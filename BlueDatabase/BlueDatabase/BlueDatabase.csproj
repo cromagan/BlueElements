@@ -121,7 +121,6 @@
     <Compile Include="ColumnViewItem.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="Enums\FilterOptions.cs" />
-    <Compile Include="Enums\ItemState.cs" />
     <Compile Include="Enums\FilterType.cs" />
     <Compile Include="Enums\ShortenStyle.cs" />
     <Compile Include="Enums\ColumnLineStyle.cs" />

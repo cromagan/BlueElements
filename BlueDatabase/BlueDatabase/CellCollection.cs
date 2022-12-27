@@ -524,7 +524,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     public void Set(ColumnItem? column, RowItem? row, string value) // Main Method
     {
-        _database.BlockReload(false);
         if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.ConnectionData.TableName); }
         if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!!<br>" + _database.ConnectionData.TableName); }
         if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
@@ -688,7 +687,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     internal void SetValueBehindLinkedValue(ColumnItem column, RowItem row, string value, bool changeSysColumns) {
         if (_database == null) { return; }
 
-        _database.BlockReload(false);
         if (column == null) {
             _database?.DevelopWarnung("Spalte ungültig!");
             Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.ConnectionData.TableName);
@@ -707,7 +705,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (ContainsKey(cellKey)) { oldValue = this[cellKey].Value; }
         if (value == oldValue) { return; }
 
-        _database?.WaitEditable();
         _database?.ChangeData(DatabaseDataType.Value_withoutSizeData, column.Key, row.Key, oldValue, value);
         column.UcaseNamesSortedByLenght = null;
 
@@ -852,7 +849,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         #region Subroutine Ergebnis
 
         (ColumnItem? column, RowItem? row, string info) Ergebnis(string fehler) {
-            column.Database?.BlockReload(false);
             if (targetColumn != null && targetRow != null && string.IsNullOrEmpty(fehler)) {
                 column.Database?.Cell.SetValueBehindLinkedValue(column, row, KeyOfCell(targetColumn.Key, targetRow.Key), true);
                 return (targetColumn, targetRow, fehler);

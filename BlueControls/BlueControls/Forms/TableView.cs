@@ -92,7 +92,7 @@ public partial class TableView : Form {
 
     #region Methods
 
-    public static void CheckDatabase(object? sender, LoadedEventArgs? e) {
+    public static void CheckDatabase(object? sender, System.EventArgs e) {
         if (sender is DatabaseAbstract database && !database.ReadOnly) {
             if (database.IsAdministrator()) {
                 foreach (var thisColumnItem in database.Column) {
@@ -147,11 +147,8 @@ public partial class TableView : Form {
     /// </summary>
     /// <param name="db"></param>
     public static void OpenDatabaseHeadEditor(DatabaseAbstract db) {
-        db.OnConnectedControlsStopAllWorking(null, new MultiUserFileStopWorkingEventArgs());
-        if (!db.IsLoading) { db.Load_Reload(); } // Die Routine wird evtl. in der Laderoutine aufgerufen. z.B. bei Fehlerhaften Regeln
         using DatabaseHeadEditor w = new(db);
         w.ShowDialog();
-        // DB.OnLoaded(new LoadedEventArgs(true));
     }
 
     public static void OpenLayoutEditor(DatabaseAbstract db, string layoutToOpen) {
@@ -166,7 +163,7 @@ public partial class TableView : Form {
         w.ShowDialog();
     }
 
-    public static ItemCollectionList Vorgängerversionen(DatabaseAbstract db) {
+    public static ItemCollectionList Vorgängerversionen(Database db) {
         List<string> zusatz = new();
         ItemCollectionList l = new();
         foreach (var thisExport in db.Export) {
@@ -273,7 +270,7 @@ public partial class TableView : Form {
     }
 
     protected virtual void CheckButtons() {
-        var datenbankDa = Convert.ToBoolean(Table.Database != null);
+        var datenbankDa = Table.Database != null;
         btnNeuDB.Enabled = true;
         btnOeffnen.Enabled = true;
         btnNeu.Enabled = datenbankDa && Table.Database.PermissionCheck(Table.Database.PermissionGroupsNewRow, null);
@@ -282,7 +279,13 @@ public partial class TableView : Form {
         chkAnsichtNurTabelle.Enabled = datenbankDa;
         chkAnsichtFormular.Enabled = datenbankDa;
         chkAnsichtTableFormular.Enabled = datenbankDa;
-        btnDatenbankenSpeicherort.Enabled = datenbankDa && !string.IsNullOrEmpty(Table.Database.Filename);
+
+        if (Table.Database is Database BDB) {
+            btnDatenbankenSpeicherort.Enabled = !string.IsNullOrEmpty(BDB.Filename);
+        } else {
+            btnDatenbankenSpeicherort.Enabled = false;
+        }
+
         //SuchenUndErsetzen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
         //AngezeigteZeilenLöschen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
         //Datenüberprüfung.Enabled = datenbankDa;
@@ -580,8 +583,12 @@ public partial class TableView : Form {
     }
 
     private void btnDatenbankenSpeicherort_Click(object sender, System.EventArgs e) {
+        DatabaseAbstract.ForceSaveAll();
         BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
-        ExecuteFile(Table.Database.Filename.FilePath());
+
+        if (Table.Database is Database BDB) {
+            ExecuteFile(BDB.Filename.FilePath());
+        }
     }
 
     private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => OpenDatabaseHeadEditor(Table.Database);
@@ -682,7 +689,6 @@ public partial class TableView : Form {
     }
 
     private void btnSaveLoad_Click(object sender, System.EventArgs e) {
-        Table?.Database?.Load_Reload();
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(true);
     }
 
@@ -708,6 +714,7 @@ public partial class TableView : Form {
     }
 
     private void btnTemporärenSpeicherortÖffnen_Click(object sender, System.EventArgs e) {
+        DatabaseAbstract.ForceSaveAll();
         BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
         ExecuteFile(Path.GetTempPath());
     }
@@ -1014,6 +1021,8 @@ public partial class TableView : Form {
         Table.Enabled = false;
         Table.Refresh();
 
+        DatabaseAbstract.ForceSaveAll();
+
         BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
 
         if (e.TabPage == null) { return; }
@@ -1022,10 +1031,10 @@ public partial class TableView : Form {
 
         var DB = Database.GetByID((ConnectionInfo)s[0]);
 
-        if (DB != null) {
-            if (!string.IsNullOrEmpty(DB.Filename)) {
-                btnLetzteDateien.AddFileName(DB.Filename, DB.TableName);
-                LoadTab.FileName = DB.Filename;
+        if (DB is Database BDB) {
+            if (!string.IsNullOrEmpty(BDB.Filename)) {
+                btnLetzteDateien.AddFileName(BDB.Filename, DB.TableName);
+                LoadTab.FileName = BDB.Filename;
             } else {
                 btnLetzteDateien.AddFileName(DB.ConnectionData.UniqueID, DB.TableName);
             }

@@ -36,7 +36,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capSortierspalten = new BlueControls.Controls.Caption();
             this.btnSortRichtung = new BlueControls.Controls.Button();
             this.btnOk = new BlueControls.Controls.Button();
-            this.btnSperreAufheben = new BlueControls.Controls.Button();
             this.txbTags = new BlueControls.Controls.TextBox();
             this.txbCaption = new BlueControls.Controls.TextBox();
             this.capCaption = new BlueControls.Controls.Caption();
@@ -53,8 +52,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txbGlobalScale = new BlueControls.Controls.TextBox();
             this.caption1 = new BlueControls.Controls.Caption();
             this.btnSpaltenuebersicht = new BlueControls.Controls.Button();
-            this.tbxReloadVerzoegerung = new BlueControls.Controls.TextBox();
-            this.capReloadVerzoegerung = new BlueControls.Controls.Caption();
             this.Tab_Regeln = new System.Windows.Forms.TabPage();
             this.scriptEditor = new BlueControls.ScriptEditorDatabase();
             this.Tab_Rechte = new System.Windows.Forms.TabPage();
@@ -225,17 +222,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnOk.Text = "OK";
             this.btnOk.Click += new System.EventHandler(this.OkBut_Click);
             // 
-            // btnSperreAufheben
-            // 
-            this.btnSperreAufheben.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSperreAufheben.ImageCode = "Häkchen|16";
-            this.btnSperreAufheben.Location = new System.Drawing.Point(360, 498);
-            this.btnSperreAufheben.Name = "btnSperreAufheben";
-            this.btnSperreAufheben.Size = new System.Drawing.Size(200, 32);
-            this.btnSperreAufheben.TabIndex = 28;
-            this.btnSperreAufheben.Text = "Datenbank-Sperre aufheben";
-            this.btnSperreAufheben.Click += new System.EventHandler(this.btnSperreAufheben_Click);
-            // 
             // txbTags
             // 
             this.txbTags.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -321,12 +307,9 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Allgemein.Controls.Add(this.caption1);
             this.Tab_Allgemein.Controls.Add(this.txbTags);
             this.Tab_Allgemein.Controls.Add(this.btnSpaltenuebersicht);
-            this.Tab_Allgemein.Controls.Add(this.tbxReloadVerzoegerung);
-            this.Tab_Allgemein.Controls.Add(this.capReloadVerzoegerung);
             this.Tab_Allgemein.Controls.Add(this.capInfo);
             this.Tab_Allgemein.Controls.Add(this.capTags);
             this.Tab_Allgemein.Controls.Add(this.txbCaption);
-            this.Tab_Allgemein.Controls.Add(this.btnSperreAufheben);
             this.Tab_Allgemein.Controls.Add(this.capCaption);
             this.Tab_Allgemein.Location = new System.Drawing.Point(4, 25);
             this.Tab_Allgemein.Name = "Tab_Allgemein";
@@ -417,24 +400,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnSpaltenuebersicht.TabIndex = 35;
             this.btnSpaltenuebersicht.Text = "Spaltenübersicht";
             this.btnSpaltenuebersicht.Click += new System.EventHandler(this.btnSpaltenuebersicht_Click);
-            // 
-            // tbxReloadVerzoegerung
-            // 
-            this.tbxReloadVerzoegerung.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.tbxReloadVerzoegerung.Location = new System.Drawing.Point(168, 488);
-            this.tbxReloadVerzoegerung.Name = "tbxReloadVerzoegerung";
-            this.tbxReloadVerzoegerung.Size = new System.Drawing.Size(160, 24);
-            this.tbxReloadVerzoegerung.Suffix = "Sek.";
-            this.tbxReloadVerzoegerung.TabIndex = 34;
-            // 
-            // capReloadVerzoegerung
-            // 
-            this.capReloadVerzoegerung.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.capReloadVerzoegerung.CausesValidation = false;
-            this.capReloadVerzoegerung.Location = new System.Drawing.Point(8, 490);
-            this.capReloadVerzoegerung.Name = "capReloadVerzoegerung";
-            this.capReloadVerzoegerung.Size = new System.Drawing.Size(136, 18);
-            this.capReloadVerzoegerung.Text = "Reload-Verzögerung:";
             // 
             // Tab_Regeln
             // 
@@ -672,7 +637,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private TextBox txbCaption;
         private TextBox txbTags;
         private ListBox lbxSortierSpalten;
-        private Button btnSperreAufheben;
         private Caption Caption22;
         private ListBox DatenbankAdmin;
         private  System.Windows.Forms.TabPage Tab_Allgemein;
@@ -685,8 +649,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private  System.Windows.Forms.TabPage Tab_Undo;
         private ListBox lbxExportSets;
         private Caption capKennwort;
-        private TextBox tbxReloadVerzoegerung;
-        private Caption capReloadVerzoegerung;
         private GroupBox grpExport;
         private ExportDefinition_Editor ExportEditor;
         private Button btnSpaltenuebersicht;
