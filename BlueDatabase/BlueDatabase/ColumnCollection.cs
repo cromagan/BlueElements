@@ -148,30 +148,39 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         return testName;
     }
 
-    public ColumnItem GenerateAndAdd(string internalName, string caption, string suffix, VarType format) => GenerateAndAdd(NextColumnKey(), internalName, caption, suffix, format, string.Empty);
+    public ColumnItem? GenerateAndAdd(string internalName, string caption, string suffix, VarType format) => GenerateAndAdd(NextColumnKey(), internalName, caption, suffix, format, string.Empty);
 
-    public ColumnItem GenerateAndAdd(string internalName, string caption, VarType format, string quickinfo) => GenerateAndAdd(NextColumnKey(), internalName, caption, string.Empty, format, quickinfo);
+    public ColumnItem? GenerateAndAdd(string internalName, string caption, VarType format, string quickinfo) => GenerateAndAdd(NextColumnKey(), internalName, caption, string.Empty, format, quickinfo);
 
-    public ColumnItem GenerateAndAdd(string internalName, string caption, VarType format) => GenerateAndAdd(NextColumnKey(), internalName, caption, string.Empty, format, string.Empty);
+    public ColumnItem? GenerateAndAdd(string internalName, string caption, VarType format) => GenerateAndAdd(NextColumnKey(), internalName, caption, string.Empty, format, string.Empty);
 
-    public ColumnItem GenerateAndAdd(long colKey) => GenerateAndAdd(colKey, Freename(string.Empty), string.Empty, string.Empty, VarType.Unbekannt, string.Empty);
+    public ColumnItem? GenerateAndAdd(long colKey) => GenerateAndAdd(colKey, Freename(string.Empty), string.Empty, string.Empty, VarType.Unbekannt, string.Empty);
 
-    public ColumnItem GenerateAndAdd(long colKey, string internalName) => GenerateAndAdd(colKey, internalName, string.Empty, string.Empty, VarType.Unbekannt, string.Empty);
+    public ColumnItem? GenerateAndAdd(long colKey, string internalName) => GenerateAndAdd(colKey, internalName, string.Empty, string.Empty, VarType.Unbekannt, string.Empty);
 
-    public ColumnItem GenerateAndAdd() => GenerateAndAdd(NextColumnKey(), Freename(string.Empty), string.Empty, string.Empty, VarType.Text, string.Empty);
+    public ColumnItem? GenerateAndAdd() => GenerateAndAdd(NextColumnKey(), Freename(string.Empty), string.Empty, string.Empty, VarType.Text, string.Empty);
 
-    public ColumnItem GenerateAndAdd(string internalName) => GenerateAndAdd(NextColumnKey(), internalName, internalName, string.Empty, VarType.Text, string.Empty);
+    public ColumnItem? GenerateAndAdd(string internalName) => GenerateAndAdd(NextColumnKey(), internalName, internalName, string.Empty, VarType.Text, string.Empty);
 
-    public ColumnItem GenerateAndAdd(long key, string internalName, string caption, string suffix, VarType format, string quickinfo) {
+    public ColumnItem? GenerateAndAdd(long key, string internalName, string caption, string suffix, VarType format, string quickinfo) {
         if (!ColumnItem.IsValidColumnName(internalName)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht erlaubt!");
+            return null;
         }
 
+        if (Database == null || Database.IsDisposed) { return null; }
+
         var item = SearchByKey(key);
-        if (item != null) { Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!"); }
+        if (item != null) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!");
+            return null;
+        }
         Database.ChangeData(DatabaseDataType.Comand_AddColumn, key, null, string.Empty, key.ToString());
         item = SearchByKey(key);
-        if (item == null) { Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen."); }
+        if (item == null) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen.");
+            return null;
+        }
 
         item.Name = internalName;
         item.Key = key;
@@ -184,6 +193,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     }
 
     public void GenerateOverView() {
+        if (Database == null || Database.IsDisposed) { return; }
         Html da = new(Database.TableName);
         da.AddCaption("Spaltenliste von: " + Database.Caption);
         da.Add("  <Font face=\"Arial\" Size=\"4\">" + Database.TableName + "</h1><br>");
@@ -271,6 +281,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     }
 
     public new void Remove(ColumnItem item) {
+        if (Database == null || Database.IsDisposed) { return; }
         Database.ChangeData(DatabaseDataType.Comand_RemoveColumn, item.Key, null, string.Empty, item.Key.ToString());
     }
 
@@ -315,18 +326,24 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         do {
             colN++;
             if (colN + 2 > Count) { break; }
-            if (this[colN] == null) {
+
+            var thisc = this[colN];
+
+            if (thisc == null) {
                 Swap(colN, colN + 1);
                 colN = -1;
-            } else if (this[colN + 1] == null) {
-                // Dummy, um nachfoldgnd nicht abfragen zu müssen
-            } else if (this[colN].IsSystemColumn() && !this[colN + 1].IsSystemColumn()) {
-                Swap(colN, colN + 1);
-                colN = -1;
-            } else if (this[colN].IsSystemColumn() && this[colN + 1].IsSystemColumn()) {
-                if (w.IndexOf(this[colN].Name) > w.IndexOf(this[colN + 1].Name)) {
+            } else {
+                var thisc1 = this[colN + 1];
+                if (thisc1 == null) {
+                    // Dummy, um nachfoldgnd nicht abfragen zu müssen
+                } else if (thisc.IsSystemColumn() && !thisc1.IsSystemColumn()) {
                     Swap(colN, colN + 1);
                     colN = -1;
+                } else if (thisc.IsSystemColumn() && thisc1.IsSystemColumn()) {
+                    if (w.IndexOf(thisc.Name) > w.IndexOf(thisc1.Name)) {
+                        Swap(colN, colN + 1);
+                        colN = -1;
+                    }
                 }
             }
         } while (true);
@@ -362,25 +379,30 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     internal void CloneFrom(DatabaseAbstract sourceDatabase) {
         // Spalten, die zu viel sind, löschen
         var names = new List<ColumnItem>();
-        foreach (var ThisColumn in this) {
-            var l = sourceDatabase.Column.Exists(ThisColumn.Name);
-            if (l == null) { names.Add(ThisColumn); }
+        foreach (var thisColumn in this) {
+            var l = sourceDatabase.Column.Exists(thisColumn.Name);
+            if (l == null) { names.Add(thisColumn); }
         }
         foreach (var thisname in names) {
             Remove(thisname);
         }
 
         // Spalten erzeugen und Format übertragen
-        foreach (var ThisColumn in sourceDatabase.Column) {
-            var l = Exists(ThisColumn.Name) ?? GenerateAndAdd(ThisColumn.Key, ThisColumn.Name, ThisColumn.Caption, ThisColumn.Suffix, VarType.Unbekannt, ThisColumn.Quickinfo);
-            l.CloneFrom(ThisColumn, true);
+        foreach (var thisColumn in sourceDatabase.Column) {
+            var l = Exists(thisColumn.Name) ?? GenerateAndAdd(thisColumn.Key, thisColumn.Name, thisColumn.Caption, thisColumn.Suffix, VarType.Unbekannt, thisColumn.Quickinfo);
 
-            if (l.Name != ThisColumn.Name) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Name nicht korrekt!");
-            }
+            if (l != null) {
+                l.CloneFrom(thisColumn, true);
 
-            if (l.Key != ThisColumn.Key) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Key nicht korrekt!");
+                if (l.Name != thisColumn.Name) {
+                    Develop.DebugPrint(FehlerArt.Fehler, "Name nicht korrekt!");
+                }
+
+                if (l.Key != thisColumn.Key) {
+                    Develop.DebugPrint(FehlerArt.Fehler, "Key nicht korrekt!");
+                }
+            } else {
+                Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht erzeugt!");
             }
         }
     }
@@ -413,6 +435,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     //    return string.Empty;
     //}
     internal string SetValueInternal(DatabaseDataType type, long? key, bool isLoading) {
+        if (Database == null || Database.IsDisposed) { return "Datenbank verworfen!"; }
         if (key is null or < 0) { return "Schlüsselfehler"; }
 
         if (type == DatabaseDataType.Comand_AddColumn) {
@@ -432,6 +455,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
 
         if (type == DatabaseDataType.Comand_RemoveColumn) {
             var c = SearchByKey(key);
+            if (c == null) { return "Spalte nicht gefunden!"; }
             base.Remove(c);
 
             if (!isLoading) {
@@ -446,7 +470,8 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     }
 
     protected override void Dispose(bool disposing) {
-        Database.Disposing -= Database_Disposing;
+        if (Database != null) { Database.Disposing -= Database_Disposing; }
+
         Database = null;
         base.Dispose(disposing);
     }
@@ -466,7 +491,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         }
 
         c = GenerateAndAdd(sysname.ToUpper());
-        c.ResetSystemToDefault(true);
+        c?.ResetSystemToDefault(true);
     }
 
     #endregion

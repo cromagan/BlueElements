@@ -27,7 +27,7 @@ internal class Method_EndsWith : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableBool.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableBool.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain } };
     public override string Description => "Prüft, ob der String mit einem der angegeben Strings endet.";
     public override bool EndlessArgs => true;
     public override string EndSequence => ")";

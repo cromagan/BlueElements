@@ -190,12 +190,9 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
                     Skin.Draw_FormatedText(gr, _text, _design, state, null, Alignment.Top_Left, new Rectangle(), null, false, Translate);
                     return;
                 }
-                if (_eText == null) {
-                    _eText = new ExtText(_design, state) {
-                        HtmlText = BlueDatabase.LanguageTool.DoTranslate(_text, Translate)
-                    };
-                    //eText.Zeilenabstand = _Zeilenabstand;
-                }
+                _eText ??= new ExtText(_design, state) {
+                    HtmlText = BlueDatabase.LanguageTool.DoTranslate(_text, Translate)
+                };
                 _eText.State = state;
                 _eText.Multiline = true;
                 switch (_textAnzeigeverhalten) {

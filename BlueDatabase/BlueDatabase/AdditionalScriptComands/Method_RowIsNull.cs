@@ -26,7 +26,7 @@ public class Method_RowIsNull : MethodDatabase {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableRowItem.ShortName_Variable } };
+    public override List<List<string>> Args => new() { new List<string> { VariableRowItem.ShortName_Variable } };
     public override string Description => "Prüft, ob die übergebene Zeile NULL ist.";
 
     public override bool EndlessArgs => false;

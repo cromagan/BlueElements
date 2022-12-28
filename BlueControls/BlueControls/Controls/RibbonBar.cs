@@ -20,7 +20,7 @@ using System.Windows.Forms;
 
 namespace BlueControls.Controls;
 
-public class RibbonBar : AbstractTabControl {
+public sealed class RibbonBar : AbstractTabControl {
 
     #region Constructors
 

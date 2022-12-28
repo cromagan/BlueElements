@@ -203,15 +203,15 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     #endregion
 
+    //public BasicListItem? Add_FromFileSystem() {
+    //    var f = IO.GetFilesWithFileSelector(string.Empty, false);
+    //    if (f is null) { return null; }
+
+    //    var picture = BitmapExt.Image_FromFile(f[0]);
+    //    return picture != null ? Item.Add((Bitmap)picture, f[0]) : Item.Add(Converter.FileToByte(f[0]), f[0]);
+    //}
+
     #region Methods
-
-    public BasicListItem? Add_FromFileSystem() {
-        var f = IO.GetFilesWithFileSelector(string.Empty, false);
-        if (f is null) { return null; }
-
-        var picture = BitmapExt.Image_FromFile(f[0]);
-        return picture != null ? Item.Add((Bitmap)picture, f[0]) : Item.Add(Converter.FileToByte(f[0]), f[0]);
-    }
 
     public TextListItem? Add_Text(string? val) {
         if (val == null || string.IsNullOrEmpty(val)) { return null; }
@@ -508,9 +508,9 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
             case AddType.None:
                 break;
 
-            case AddType.BinarysFromFileSystem:
-                Add_FromFileSystem();
-                break;
+            //case AddType.BinarysFromFileSystem:
+            //    Add_FromFileSystem();
+            //    break;
 
             default:
                 Develop.DebugPrint(_addAlloweds);

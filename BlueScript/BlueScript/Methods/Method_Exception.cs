@@ -25,7 +25,7 @@ internal class Method_Exception : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain } };
     public override string Description => "Unterbricht das Skript mit einer Fehlermeldung.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";

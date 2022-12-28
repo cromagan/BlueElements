@@ -28,7 +28,7 @@ public class Method_Row : MethodDatabase {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableFilterItem.ShortName_Variable } };
+    public override List<List<string>> Args => new() { new List<string> { VariableFilterItem.ShortName_Variable } };
     public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.";
 
     public override bool EndlessArgs => true;

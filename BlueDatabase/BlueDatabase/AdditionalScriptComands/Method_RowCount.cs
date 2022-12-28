@@ -28,7 +28,7 @@ public class Method_RowCount : MethodDatabase {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableFilterItem.ShortName_Variable } };
+    public override List<List<string>> Args => new() { new List<string> { VariableFilterItem.ShortName_Variable } };
     public override string Description => "Zählt die Zeilen, die mit dem gegebenen Filter gefunden werden.";
 
     public override bool EndlessArgs => true;

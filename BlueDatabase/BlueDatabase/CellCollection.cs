@@ -386,8 +386,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     public string GetString(ColumnItem? column, RowItem? row) // Main Method
     {
         try {
-            if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.ConnectionData.TableName); }
-            if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + _database.ConnectionData.TableName); }
+            if (_database == null || _database.IsDisposed) { _database?.DevelopWarnung("Datenbank ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Datenbank ungültig!"); return string.Empty; }
+            if (column == null || column.IsDisposed) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.ConnectionData.TableName); return string.Empty; }
+            if (row == null || row.IsDisposed) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + _database.ConnectionData.TableName); return string.Empty; }
             if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 var (lcolumn, lrow, _) = LinkedCellData(column, row, false, false);
                 return lcolumn != null && lrow != null ? lrow.CellGetString(lcolumn) : string.Empty;
@@ -424,7 +425,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return !ContainsKey(cellKey) || string.IsNullOrEmpty(this[cellKey].Value);
     }
 
-    public bool IsNullOrEmpty(string columnName, RowItem? row) => IsNullOrEmpty(_database.Column[columnName], row);
+    public bool IsNullOrEmpty(string columnName, RowItem? row) => IsNullOrEmpty(_database?.Column[columnName], row);
 
     public bool IsNullOrEmpty(string cellKey) {
         DataOfCellKey(cellKey, out var column, out var row);
@@ -456,20 +457,20 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
             //if (Und && Oder) { Develop.DebugPrint(enFehlerArt.Fehler, "Filter-Anweisung erwartet ein 'Und' oder 'Oder': " + ToString()); }
             // Tatsächlichen String ermitteln --------------------------------------------
-            var @string = string.Empty;
+            var txt = string.Empty;
             var fColumn = column;
             if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 var (columnItem, rowItem, _) = LinkedCellData(column, row, false, false);
                 if (columnItem != null && rowItem != null) {
-                    @string = rowItem.CellGetString(columnItem);
+                    txt = rowItem.CellGetString(columnItem);
                     fColumn = columnItem;
                 }
             } else {
                 var cellKey = KeyOfCell(column, row);
-                @string = ContainsKey(cellKey) ? this[cellKey].Value : string.Empty;
+                txt = ContainsKey(cellKey) ? this[cellKey].Value : string.Empty;
             }
-            if (@string is null) { @string = string.Empty; }
-            if (typ.HasFlag(FilterType.Instr)) { @string = LanguageTool.ColumnReplace(@string, fColumn, ShortenStyle.Both); }
+
+            if (typ.HasFlag(FilterType.Instr)) { txt = LanguageTool.ColumnReplace(txt, fColumn, ShortenStyle.Both); }
             // Multiline-Typ ermitteln  --------------------------------------------
             var tmpMultiLine = false;
             if (column != null) { tmpMultiLine = column.MultiLine; }
@@ -477,7 +478,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 tmpMultiLine = false;
                 typ ^= FilterType.MultiRowIgnorieren;
             }
-            if (tmpMultiLine && !@string.Contains("\r")) { tmpMultiLine = false; } // Zeilen mit nur einem Eintrag können ohne Multiline behandel werden.
+            if (tmpMultiLine && !txt.Contains("\r")) { tmpMultiLine = false; } // Zeilen mit nur einem Eintrag können ohne Multiline behandel werden.
             //if (Typ == enFilterType.KeinFilter)
             //{
             //    Develop.DebugPrint(enFehlerArt.Fehler, "'Kein Filter' wurde übergeben: " + ToString());
@@ -485,13 +486,13 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (!tmpMultiLine) {
                 var bedingungErfüllt = false;
                 foreach (var t in filter.SearchValue) {
-                    bedingungErfüllt = CompareValues(@string, t, typ);
+                    bedingungErfüllt = CompareValues(txt, t, typ);
                     if (oder && bedingungErfüllt) { return true; }
                     if (und && bedingungErfüllt == false) { return false; } // Bei diesem UND hier müssen allezutreffen, deshalb kann getrost bei einem False dieses zurückgegeben werden.
                 }
                 return bedingungErfüllt;
             }
-            List<string> vorhandenWerte = new(@string.SplitAndCutByCr());
+            List<string> vorhandenWerte = new(txt.SplitAndCutByCr());
             if (vorhandenWerte.Count == 0) // Um den Filter, der nach 'Leere' Sucht, zu befriediegen
             {
                 vorhandenWerte.Add("");
@@ -524,8 +525,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     public void Set(ColumnItem? column, RowItem? row, string value) // Main Method
     {
-        if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.ConnectionData.TableName); }
-        if (row == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!!<br>" + _database.ConnectionData.TableName); }
+        if (_database == null || _database.IsDisposed) { _database?.DevelopWarnung("Datenbank ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Datenbank ungültig!"); return; }
+        if (column == null || column.IsDisposed) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.ConnectionData.TableName); }
+        if (row == null || row.IsDisposed) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!!<br>" + _database.ConnectionData.TableName); }
         if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             var (lcolumn, lrow, _) = LinkedCellData(column, row, true, !string.IsNullOrEmpty(value));
             lrow?.CellSet(lcolumn, value);

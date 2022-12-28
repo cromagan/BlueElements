@@ -20,6 +20,8 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using System.ComponentModel;
 using System.Drawing;
+using BlueBasics.MultiUserFile;
+using BlueDatabase;
 
 namespace BlueControls.Forms;
 
@@ -71,6 +73,11 @@ public partial class Form : System.Windows.Forms.Form {
         set => base.AutoSize = false;
     }
 
+    public override sealed Color BackColor {
+        get => base.BackColor;
+        set => base.BackColor = value;
+    }
+
     [DefaultValue(true)]
     public bool CloseButtonEnabled { get; set; } = true;
 
@@ -120,6 +127,10 @@ public partial class Form : System.Windows.Forms.Form {
     protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
         //https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.form.closed?view=netframework-4.8
         if (IsClosed) { return; }
+
+        DatabaseAbstract.ForceSaveAll();
+        MultiUserFile.ForceLoadSaveAll();
+
         base.OnFormClosing(e);
         if (!e.Cancel) {
             IsClosed = true;

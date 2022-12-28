@@ -445,8 +445,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (tableView.Design == BlueTableAppearance.OnlyMainColumnWithoutHead) {
             ca = tableView.Database.ColumnArrangements[0];
         }
-        if (row == null) { row = tableView.View_RowLast(); }
-        if (column == null) { column = tableView.Database.Column.SysLocked; }
+        row ??= tableView.View_RowLast();
+        column ??= tableView.Database.Column.SysLocked;
         var rowsChecked = 0;
         if (string.IsNullOrEmpty(searchTxt)) {
             MessageBox.Show("Bitte Text zum Suchen eingeben.", ImageCode.Information, "OK");

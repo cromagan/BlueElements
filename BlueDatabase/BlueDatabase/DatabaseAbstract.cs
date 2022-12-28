@@ -831,7 +831,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             columnList = Column.Where(thisColumnItem => thisColumnItem != null).ToList();
         }
 
-        if (sortedRows == null) { sortedRows = Row.AllRows(); }
+        sortedRows ??= Row.AllRows();
 
         if (string.IsNullOrEmpty(filename)) {
             filename = TempFile(string.Empty, "Export", "html");
@@ -1410,11 +1410,11 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             case DatabaseDataType.Werbung:
                 break;
 
-            case DatabaseDataType.CryptionState:
-                break;
+            //case DatabaseDataType.CryptionState:
+            //    break;
 
-            case DatabaseDataType.CryptionTest:
-                break;
+            //case DatabaseDataType.CryptionTest:
+            //    break;
 
             case DatabaseDataType.Creator:
                 _creator = value;
@@ -1510,6 +1510,8 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             case DatabaseDataType.EOF:
                 return string.Empty;
 
+            case (DatabaseDataType)2:
+            case (DatabaseDataType)3:
             case (DatabaseDataType)22:
             case (DatabaseDataType)62:
             case (DatabaseDataType)53:

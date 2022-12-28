@@ -87,11 +87,9 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable, 
     #region Methods
 
     public void Add(ColumnItem? column, bool permanent) {
-        if (permanent) {
-            Add(new ColumnViewItem(column, ViewType.PermanentColumn, this));
-        } else {
-            Add(new ColumnViewItem(column, ViewType.Column, this));
-        }
+        Add(permanent
+            ? new ColumnViewItem(column, ViewType.PermanentColumn, this)
+            : new ColumnViewItem(column, ViewType.Column, this));
     }
 
     public object Clone() => new ColumnViewCollection(Database, ToString());

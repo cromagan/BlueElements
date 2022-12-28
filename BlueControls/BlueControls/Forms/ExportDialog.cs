@@ -253,6 +253,7 @@ public sealed partial class ExportDialog {
     private void Exported_ItemClicked(object sender, BasicListItemEventArgs e) => ExecuteFile(e.Item.Internal);
 
     private string Fehler() {
+        if (Database == null || Database.IsDisposed) { return "Datenbank verworfen"; }
         if (_rowsForExport == null || _rowsForExport.Count == 0) { return "Es sind keine Einträge für den Export gewählt."; }
         if (string.IsNullOrEmpty(cbxLayoutWahl.Text)) { return "Es sind keine Layout für den Export gewählt."; }
         if (Database.Layouts.LayoutIdToIndex(cbxLayoutWahl.Text) > -1) {

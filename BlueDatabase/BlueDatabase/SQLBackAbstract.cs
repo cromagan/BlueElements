@@ -43,8 +43,8 @@ public abstract class SQLBackAbstract {
     //public static List<SQLBackAbstract>? PossibleSQLBacks;
     protected DbConnection? _connection;
 
-    private object getRow = new object();
-    private object openclose = new object();
+    private object getRow = new();
+    private object openclose = new();
 
     #endregion
 
@@ -514,8 +514,8 @@ public abstract class SQLBackAbstract {
         switch (type) {
             case DatabaseDataType.Formatkennung:
             case DatabaseDataType.Werbung:
-            case DatabaseDataType.CryptionState:
-            case DatabaseDataType.CryptionTest:
+            //case DatabaseDataType.CryptionState:
+            //case DatabaseDataType.CryptionTest:
             case DatabaseDataType.SaveContent:
             case DatabaseDataType.EOF:
                 return string.Empty;

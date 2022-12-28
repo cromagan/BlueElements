@@ -21,6 +21,7 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using System.ComponentModel;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace BlueControls.Controls;
@@ -42,6 +43,11 @@ public class TabControl : AbstractTabControl, IAcceptRowKey {
     #endregion
 
     #region Properties
+
+    public override sealed Color BackColor {
+        get => base.BackColor;
+        set => base.BackColor = value;
+    }
 
     [DefaultValue(null)]
     [Browsable(false)]

@@ -27,7 +27,7 @@ internal class Method_AddSuffix : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable }, new() { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { new List<string> { VariableListString.ShortName_Variable }, new List<string> { VariableString.ShortName_Plain } };
     public override string Description => "Fügt am Ende jedes Listenobjekts einen Text hinzu.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";

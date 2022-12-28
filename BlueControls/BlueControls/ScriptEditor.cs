@@ -241,7 +241,6 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended 
 
                 e.ToolTipTitle = ro + "(" + r.CellGetString("Typ") + ") " + hoveredWordnew + " = " + inh;
                 e.ToolTipText = r.CellGetString("Kommentar") + " ";
-                return;
             }
         } catch (Exception ex) {
             Develop.DebugPrint(ex);

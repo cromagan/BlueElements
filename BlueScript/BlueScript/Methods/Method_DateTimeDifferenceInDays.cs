@@ -25,7 +25,7 @@ internal class Method_DateTimeDifferenceInDays : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableDateTime.ShortName_Variable }, new() { VariableDateTime.ShortName_Variable } };
+    public override List<List<string>> Args => new() { new List<string> { VariableDateTime.ShortName_Variable }, new List<string> { VariableDateTime.ShortName_Variable } };
     public override string Description => "Gibt die Differnz in Tagen der beiden Datums als Gleitkommazahl zurück.\rErgebnis = DateTimeString1 - DateTimeString2";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";

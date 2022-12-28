@@ -85,7 +85,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     private DataFormat _format;
     private bool _formatierungErlaubt;
     private bool _ignoreAtRowFilter;
-    private long _key = -1;
+    private long _key;
     private long _keyColumnKey;
     private ColumnLineStyle _lineLeft;
     private ColumnLineStyle _lineRight;
@@ -198,6 +198,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         _constantHeightOfImageCode = string.Empty;
         _prefix = string.Empty;
         UcaseNamesSortedByLenght = null;
+        Am_A_Key_For_Other_Column = string.Empty;
 
         #endregion Standard-Werte
 

@@ -25,7 +25,7 @@ internal class Method_Count : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable } };
+    public override List<List<string>> Args => new() { new List<string> { VariableListString.ShortName_Variable } };
 
     public override string Description => "Gibt die Anzahl der Elemente der Liste zurück.";
     public override bool EndlessArgs => false;

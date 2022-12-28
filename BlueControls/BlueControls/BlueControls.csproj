@@ -119,12 +119,6 @@
     <Compile Include="ConnectedFormula\FlexiControlRowSelector.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\EasyPicMulti.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\EasyPicMulti.Designer.cs">
-      <DependentUpon>EasyPicMulti.cs</DependentUpon>
-    </Compile>
     <Compile Include="Controls\FileBrowser.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -329,7 +323,6 @@
     <Compile Include="ItemCollection\ItemConnection.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Temporär\PhysicPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Abstract\AbstractPhysicPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionList\DataListItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\GenericPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\ColumnPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Abstract\FixedRectangleBitmapPadItem.cs" />
@@ -627,10 +620,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Classes Editor\FilterItem_Editor.resx">
       <DependentUpon>FilterItem_Editor.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\EasyPicMulti.resx">
-      <DependentUpon>EasyPicMulti.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\ComboBox.resx">

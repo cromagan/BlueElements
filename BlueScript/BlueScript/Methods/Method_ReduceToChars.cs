@@ -26,7 +26,7 @@ internal class Method_ReduceToChars : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain } };
     public override string Description => "Entfernt aus dem Text alle Zeichen die nicht erlaubt sind";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";

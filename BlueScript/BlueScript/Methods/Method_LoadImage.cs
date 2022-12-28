@@ -28,7 +28,7 @@ internal class Method_LoadImage : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain } };
     public override string Description => "Lädt das angegebene Bild aus dem Dateisystem.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";

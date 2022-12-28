@@ -42,8 +42,8 @@ public enum DatabaseDataType : byte {
     //Error = 0,
     Version = 1,
 
-    CryptionState = 2,
-    CryptionTest = 3,
+    //CryptionState = 2,
+    //CryptionTest = 3,
 
     //InBearbeitung = 3,
     //TimeCode = 4,

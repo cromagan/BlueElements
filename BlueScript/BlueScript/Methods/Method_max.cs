@@ -26,7 +26,7 @@ internal class Method_Max : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableFloat.ShortName_Plain } };
+    public override List<List<string>> Args => new() { new List<string> { VariableFloat.ShortName_Plain } };
     public override string Description => "Gibt den den angegeben Werten den, mit dem höchsten Wert zurück.";
     public override bool EndlessArgs => true;
     public override string EndSequence => ")";

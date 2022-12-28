@@ -29,10 +29,10 @@ public enum AddType {
     /// </summary>
     Text = 1,
 
-    /// <summary>
-    /// GenerateAndAdd-Button wird angezeigt, und auf einen Klick dessen wird das GenerateAndAdd-Ereignis ausgelös und dann ein Item mittels einer File-Selcet-Box erstellt. Die Original-Dateien werden nicht verändert.
-    /// </summary>
-    BinarysFromFileSystem = 2,
+    ///// <summary>
+    ///// GenerateAndAdd-Button wird angezeigt, und auf einen Klick dessen wird das GenerateAndAdd-Ereignis ausgelös und dann ein Item mittels einer File-Selcet-Box erstellt. Die Original-Dateien werden nicht verändert.
+    ///// </summary>
+    //BinarysFromFileSystem = 2,
 
     /// <summary>
     /// GenerateAndAdd-Button wird angezeigt, und auf einen Klick dessen wird das GenerateAndAdd-Ereignis ausgelöst und dann ein Item mittels einer List-Box erstellt.

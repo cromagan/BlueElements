@@ -286,9 +286,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
                     }
                 }
                 if (positionModified.Width < 1 || positionModified.Height < 1 || positionModified.Width > 20000 || positionModified.Height > 20000) { return; }
-                if (_tmpBmp == null) {
-                    _tmpBmp = new Bitmap((int)Math.Abs(positionModified.Width), (int)Math.Abs(positionModified.Height));
-                }
+                _tmpBmp ??= new Bitmap((int)Math.Abs(positionModified.Width), (int)Math.Abs(positionModified.Height));
                 var mb = PadInternal.Item.MaxBounds(ZoomItems);
                 var zoomv = ItemCollectionPad.ZoomFitValue(mb, _tmpBmp.Size);
                 var centerpos = ItemCollectionPad.CenterPos(mb, _tmpBmp.Size, zoomv);

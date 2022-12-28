@@ -26,7 +26,7 @@ internal class Method_BerechneVariable : Method {
 
     #region Fields
 
-    private static readonly List<List<string>> _args = new() { new() { Variable.Any_Plain } };
+    private static readonly List<List<string>> _args = new() { new List<string> { Variable.Any_Plain } };
 
     #endregion
 

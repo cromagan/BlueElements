@@ -82,7 +82,7 @@ public sealed class Database : DatabaseAbstract {
 
     public static string DatabaseID => "BlueDatabase";
 
-    public override ConnectionInfo ConnectionData => new ConnectionInfo(TableName, this, DatabaseID, Filename);
+    public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseID, Filename);
 
     //_muf != null ? _muf.Filename : string.Empty;
     public string Filename { get; set; }
@@ -177,10 +177,8 @@ public sealed class Database : DatabaseAbstract {
         //LoadingEventArgs ec = new(_initialLoadDone);
         OnLoading();
 
-        var (bLoaded, _) = LoadBytesFromDisk(BlueBasics.Enums.ErrorReason.Load);
-        if (bLoaded == null) {
-            return;
-        }
+        var bLoaded = LoadBytesFromDisk(BlueBasics.Enums.ErrorReason.Load);
+        if (bLoaded == null) { return; }
 
         Parse(bLoaded);
 
@@ -404,16 +402,14 @@ public sealed class Database : DatabaseAbstract {
 
             #region Bei verschlüsselten Datenbanken das Passwort abfragen
 
-            if (art == DatabaseDataType.CryptionState) {
-                if (inhalt.FromPlusMinus()) {
-                    PasswordEventArgs e2 = new();
-                    OnNeedPassword(e2);
-                    b = Cryptography.SimpleCrypt(b, e2.Password, -1, pointer, b.Length - 1);
-                    if (b[pointer + 1] != 3 || b[pointer + 2] != 0 || b[pointer + 3] != 0 || b[pointer + 4] != 2 || b[pointer + 5] != 79 || b[pointer + 6] != 75) {
-                        SetReadOnly();
-                        //MessageBox.Show("Zugriff verweigrt, Passwort falsch!", ImageCode.Kritisch, "OK");
-                        break;
-                    }
+            if (art == DatabaseDataType.GlobalShowPass && !string.IsNullOrEmpty(inhalt)) {
+                PasswordEventArgs e2 = new();
+                OnNeedPassword(e2);
+                //b = Cryptography.SimpleCrypt(b, e2.Password, -1, pointer, b.Length - 1);
+                if (e2.Password != inhalt) {
+                    SetReadOnly();
+                    //MessageBox.Show("Zugriff verweigrt, Passwort falsch!", ImageCode.Kritisch, "OK");
+                    break;
                 }
             }
 
@@ -705,19 +701,19 @@ public sealed class Database : DatabaseAbstract {
     /// </summary>
     /// <param name="checkmode"></param>
     /// <returns></returns>
-    private (byte[]? data, string fileinfo) LoadBytesFromDisk(ErrorReason checkmode) {
-        string tmpLastSaveCode2;
+    private byte[]? LoadBytesFromDisk(ErrorReason checkmode) {
         var startTime = DateTime.UtcNow;
         byte[] bLoaded;
         while (true) {
             try {
                 var f = ErrorReason(checkmode);
                 if (string.IsNullOrEmpty(f)) {
-                    var tmpLastSaveCode1 = GetFileInfo(Filename, true);
+                    //var tmpLastSaveCode1 = GetFileInfo(Filename, true);
                     bLoaded = File.ReadAllBytes(Filename);
-                    tmpLastSaveCode2 = GetFileInfo(Filename, true);
-                    if (tmpLastSaveCode1 == tmpLastSaveCode2) { break; }
-                    f = "Datei wurde während des Ladens verändert.";
+                    //tmpLastSaveCode2 = GetFileInfo(Filename, true);
+                    //if (tmpLastSaveCode1 == tmpLastSaveCode2) { break; }
+                    //f = "Datei wurde während des Ladens verändert.";
+                    break;
                 }
 
                 if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 20) {
@@ -729,7 +725,7 @@ public sealed class Database : DatabaseAbstract {
                 // Home Office kann lange blokieren....
                 if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 300) {
                     Develop.DebugPrint(FehlerArt.Fehler, "Die Datei<br>" + Filename + "<br>konnte trotz mehrerer Versuche nicht geladen werden.<br><br>Die Fehlermeldung lautet:<br>" + ex.Message);
-                    return (null, string.Empty);
+                    return null;
                 }
             }
         }
@@ -738,7 +734,7 @@ public sealed class Database : DatabaseAbstract {
             // Gezipte Daten-Kennung gefunden
             bLoaded = MultiUserFile.UnzipIt(bLoaded);
         }
-        return (bLoaded, tmpLastSaveCode2);
+        return bLoaded;
     }
 
     private List<byte> ToListOfByte() {
@@ -749,12 +745,12 @@ public sealed class Database : DatabaseAbstract {
             SaveToByteList(l, DatabaseDataType.Version, DatabaseVersion);
             SaveToByteList(l, DatabaseDataType.Werbung, "                                                                    BlueDataBase - (c) by Christian Peter                                                                                        "); // Die Werbung dient als Dummy-Platzhalter, falls doch mal was vergessen wurde...
             // Passwörter ziemlich am Anfang speicher, dass ja keinen Weiteren Daten geladen werden können
-            if (string.IsNullOrEmpty(GlobalShowPass)) {
-                SaveToByteList(l, DatabaseDataType.CryptionState, false.ToPlusMinus());
-            } else {
-                SaveToByteList(l, DatabaseDataType.CryptionState, true.ToPlusMinus());
-                SaveToByteList(l, DatabaseDataType.CryptionTest, "OK");
-            }
+            //if (string.IsNullOrEmpty(GlobalShowPass)) {
+            //    SaveToByteList(l, DatabaseDataType.CryptionState, false.ToPlusMinus());
+            //} else {
+            //    SaveToByteList(l, DatabaseDataType.CryptionState, true.ToPlusMinus());
+            //    SaveToByteList(l, DatabaseDataType.CryptionTest, "OK");
+            //}
             SaveToByteList(l, DatabaseDataType.GlobalShowPass, GlobalShowPass);
             //SaveToByteList(l, DatabaseDataType.FileEncryptionKey, _fileEncryptionKey);
             SaveToByteList(l, DatabaseDataType.Creator, Creator);

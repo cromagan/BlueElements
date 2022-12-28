@@ -25,7 +25,7 @@ internal class Method_Exists : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { Variable.Any_Variable } };
+    public override List<List<string>> Args => new() { new List<string> { Variable.Any_Variable } };
     public override string Description => "Gibt TRUE zurück, wenn die Variable existiert.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";

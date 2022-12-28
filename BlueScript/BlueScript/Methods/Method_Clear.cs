@@ -27,7 +27,7 @@ internal class Method_Clear : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable } };
+    public override List<List<string>> Args => new() { new List<string> { VariableListString.ShortName_Variable } };
     public override string Description => "Entfernt alle Einträge einer Liste";
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";

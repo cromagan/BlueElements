@@ -207,7 +207,7 @@ public class VariableBool : Variable {
             }
 
             if (!string.IsNullOrEmpty(replacer)) {
-                succesVar = new VariableBool((bool)Method_if.GetBool((string)replacer));
+                succesVar = new VariableBool((bool)Method_if.GetBool(replacer));
                 return true;
             }
         }

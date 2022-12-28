@@ -26,7 +26,7 @@ internal class Method_RandomInt : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableFloat.ShortName_Plain } };
+    public override List<List<string>> Args => new() { new List<string> { VariableFloat.ShortName_Plain } };
     public override string Description => "Gibt eine nicht negative Zufalls-Ganzzahl zurück,\rdie kleiner als das angegebene Maximum ist.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";

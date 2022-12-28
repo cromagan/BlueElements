@@ -25,7 +25,7 @@ internal class Method_Sub : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableSub.ShortName_Plain } };
+    public override List<List<string>> Args => new() { new List<string> { VariableSub.ShortName_Plain } };
     public override string Description => "Bezeichnet den Start einer Subroutine.";
     public override bool EndlessArgs => false;
     public override string EndSequence => "()";

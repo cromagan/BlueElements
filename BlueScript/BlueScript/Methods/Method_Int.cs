@@ -25,7 +25,7 @@ internal class Method_Int : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableFloat.ShortName_Plain } };
+    public override List<List<string>> Args => new() { new List<string> { VariableFloat.ShortName_Plain } };
     public override string Description => "Schneidet Nachkommastellen ab. Um einen Text in einen Zahlenwert zu verwandeln, ist der Befehl Number() zu benutzen.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";

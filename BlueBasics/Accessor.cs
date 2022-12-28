@@ -21,6 +21,8 @@ using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
 
+#nullable enable
+
 namespace BlueBasics;
 // https://stackoverflow.com/questions/32901771/multiple-enum-descriptions
 // https://stackoverflow.com/questions/1402803/passing-properties-by-reference-in-c-sharp
@@ -48,7 +50,7 @@ public class Accessor<T> {
         var instanceExpression = memberExpression.Expression;
         var parameter = Expression.Parameter(typeof(T));
 
-        IEnumerable<Attribute> ca = null;
+        IEnumerable<Attribute>? ca = null;
 
         if (memberExpression.Member is PropertyInfo propertyInfo) {
             var setm = propertyInfo.GetSetMethod();

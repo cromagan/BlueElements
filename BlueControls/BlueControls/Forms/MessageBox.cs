@@ -69,6 +69,15 @@ public partial class MessageBox : Form {
 
     #endregion
 
+    #region Properties
+
+    public override sealed string Text {
+        get => base.Text;
+        set => base.Text = value;
+    }
+
+    #endregion
+
     #region Methods
 
     public static void Show(string txt) => Show(txt, ImageCode.None, true, "OK");

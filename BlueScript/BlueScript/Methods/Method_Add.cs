@@ -27,7 +27,7 @@ internal class Method_Add : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable }, new() { VariableString.ShortName_Plain, VariableListString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { new List<string> { VariableListString.ShortName_Variable }, new List<string> { VariableString.ShortName_Plain, VariableListString.ShortName_Plain } };
     public override string Description => "Fügt einer Liste einen oder mehrere Werte hinzu.";
     public override bool EndlessArgs => true;
     public override string EndSequence => ");";

@@ -25,7 +25,7 @@ internal class Method_ToLower : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain } };
     public override string Description => "Gibt den Text in Kleinbuchstaben zurück";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";

@@ -30,7 +30,7 @@ internal class Method_ReplaceList : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableListString.ShortName_Variable }, new() { VariableBool.ShortName_Plain }, new() { VariableBool.ShortName_Plain }, new() { VariableString.ShortName_Plain }, new() { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { new List<string> { VariableListString.ShortName_Variable }, new List<string> { VariableBool.ShortName_Plain }, new List<string> { VariableBool.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain } };
     public override string Description => "Ersetzt alle Werte in der Liste. Bei Partial=True werden alle Teiltrings in den einzelnen Elementen ausgetauscht.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";

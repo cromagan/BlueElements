@@ -280,11 +280,11 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         return x;
     }
 
-    public DataListItem Add(byte[] b, string caption) {
-        DataListItem i = new(b, string.Empty, caption);
-        Add(i);
-        return i;
-    }
+    //public DataListItem Add(byte[] b, string caption) {
+    //    DataListItem i = new(b, string.Empty, caption);
+    //    Add(i);
+    //    return i;
+    //}
 
     public BitmapListItem Add(Bitmap? bmp, string caption) {
         BitmapListItem i = new(bmp, string.Empty, caption);
@@ -917,7 +917,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
                 foreach (var thisItem in this) {
                     if (thisItem != null) {
                         if (thisMustBeChecked == null) {
-                            if (f == null) { f = thisItem; }
+                            f ??= thisItem;
                             if (thisItem.Checked) {
                                 if (!done) {
                                     done = true;

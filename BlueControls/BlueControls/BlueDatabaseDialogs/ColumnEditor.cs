@@ -69,7 +69,7 @@ internal sealed partial class ColumnEditor {
         return c;
     }
 
-    private static void SetKeyTo(Controls.TextBox combobox, long columnKey) => combobox.Text = columnKey.ToString();
+    private static void SetKeyTo(TextBox combobox, long columnKey) => combobox.Text = columnKey.ToString();
 
     private bool AllOk() {
         var feh = "";

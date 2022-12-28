@@ -173,7 +173,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
             foreach (var thisArr in _tableView.Database.ColumnArrangements.Where(thisArr => string.Equals(thisArr.Name, AnsichtName, StringComparison.OrdinalIgnoreCase))) {
                 orderArrangement = thisArr;
             }
-            if (orderArrangement is null) { orderArrangement = _tableView?.CurrentArrangement; }
+            orderArrangement ??= _tableView?.CurrentArrangement;
 
             #region Reihenfolge der Spalten bestimmen
 

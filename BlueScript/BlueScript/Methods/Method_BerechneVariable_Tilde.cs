@@ -28,7 +28,7 @@ internal class Method_BerechneVariable_Tilde : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { Variable.Any_Plain } };
+    public override List<List<string>> Args => new() { new List<string> { Variable.Any_Plain } };
     public override string Description => "Berechnet eine Variable. Der Typ der Variable und des Ergebnisses müssen übereinstimmen.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ";";

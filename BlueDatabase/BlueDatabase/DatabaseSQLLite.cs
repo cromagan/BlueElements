@@ -312,9 +312,9 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         try {
             var rk = new List<long>();
 
-            foreach (var thisData in data) {
-                if (TableName == thisData.tablename) {
-                    Enum.TryParse(thisData.comand, out DatabaseDataType t);
+            foreach (var (tablename, comand, columnkey, rowkey) in data) {
+                if (TableName == tablename) {
+                    Enum.TryParse(comand, out DatabaseDataType t);
 
                     if (t == (DatabaseDataType)0) {
                         // Nix tun
@@ -323,12 +323,12 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
                         #region Sonderbehandlung: ColumnName
 
                         // Sonderbehandlung!
-                        var c = Column.SearchByKey(LongParse(thisData.columnkey));
+                        var c = Column.SearchByKey(LongParse(columnkey));
 
                         if (c != null) {
-                            var newn = _sql.GetLastColumnName(thisData.tablename, c.Key);
+                            var newn = _sql.GetLastColumnName(tablename, c.Key);
                             if (c.Name != newn) {
-                                _sql.RenameColumn(thisData.tablename, c.Name, newn);
+                                _sql.RenameColumn(tablename, c.Name, newn);
                             }
                         }
 
@@ -339,24 +339,24 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
                         switch (t) {
                             case DatabaseDataType.Comand_RemoveColumn:
-                                Column.SetValueInternal(t, LongParse(thisData.columnkey), true);
+                                Column.SetValueInternal(t, LongParse(columnkey), true);
                                 break;
 
                             case DatabaseDataType.Comand_AddColumn:
-                                Column.SetValueInternal(t, LongParse(thisData.columnkey), true);
-                                var c = Column.SearchByKey(LongParse(thisData.columnkey));
+                                Column.SetValueInternal(t, LongParse(columnkey), true);
+                                var c = Column.SearchByKey(LongParse(columnkey));
                                 var name = _sql.GetLastColumnName(TableName, c.Key);
                                 SetValueInternal(DatabaseDataType.ColumnName, name, c.Key, null, -1, -1, true);
                                 c.RefreshColumnsData(); // muss sein, alternativ alle geladenen Zeilen neu laden
                                 break;
 
                             case DatabaseDataType.Comand_AddRow:
-                                Row.SetValueInternal(t, LongParse(thisData.rowkey), true);
-                                rk.AddIfNotExists(LongParse(thisData.rowkey)); // Nachher auch laden
+                                Row.SetValueInternal(t, LongParse(rowkey), true);
+                                rk.AddIfNotExists(LongParse(rowkey)); // Nachher auch laden
                                 break;
 
                             case DatabaseDataType.Comand_RemoveRow:
-                                Row.SetValueInternal(t, LongParse(thisData.rowkey), true);
+                                Row.SetValueInternal(t, LongParse(rowkey), true);
                                 break;
 
                             default:
@@ -365,13 +365,13 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
                         }
 
                         #endregion
-                    } else if (!string.IsNullOrEmpty(thisData.rowkey)) {
+                    } else if (!string.IsNullOrEmpty(rowkey)) {
 
                         #region Zeilen zum neu Einlesen merken uns Spaltenbreite invalidierne
 
-                        rk.AddIfNotExists(LongParse(thisData.rowkey));
+                        rk.AddIfNotExists(LongParse(rowkey));
 
-                        var c = Column.SearchByKey(LongParse(thisData.columnkey));
+                        var c = Column.SearchByKey(LongParse(columnkey));
                         c.Invalidate_ContentWidth();
 
                         #endregion
@@ -379,7 +379,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
                         #region Datenbank-Styles
 
-                        var v = _sql.GetStyleData(thisData.tablename, thisData.comand, "~DATABASE~");
+                        var v = _sql.GetStyleData(tablename, comand, "~DATABASE~");
                         if (v != null) { SetValueInternal(t, v, null, null, -1, -1, true); }
 
                         #endregion
@@ -387,9 +387,9 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
                         #region Spalten-Styles
 
-                        var c = Column.SearchByKey(LongParse(thisData.columnkey));
+                        var c = Column.SearchByKey(LongParse(columnkey));
                         if (c != null) {
-                            var v = _sql.GetStyleData(thisData.tablename, thisData.comand, c.Name);
+                            var v = _sql.GetStyleData(tablename, comand, c.Name);
                             if (v != null) { SetValueInternal(t, v, c.Key, null, -1, -1, true); }
                         }
 

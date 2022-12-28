@@ -26,7 +26,7 @@ internal class Method_IsNumeral : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableString.ShortName_Plain, VariableFloat.ShortName_Plain } };
+    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain, VariableFloat.ShortName_Plain } };
     public override string Description => "Prüft, ob der Inhalt der Variable eine gültige Zahl ist. ";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";

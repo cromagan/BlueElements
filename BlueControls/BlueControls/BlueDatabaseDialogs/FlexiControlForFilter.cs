@@ -234,8 +234,11 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
         } else {
             DisabledReason = !string.IsNullOrEmpty(Filter.Herkunft) ? "Dieser Filter ist automatisch<br>gesetzt worden." : string.Empty;
             var qi = Filter.Column.QuickInfoText(string.Empty);
-            QuickInfo = string.IsNullOrEmpty(qi) ? "<b>Filter:</b><br>" + Filter.ReadableText().CreateHtmlCodes(false)
-                : "<b>Filter:</b><br>" + Filter.ReadableText().CreateHtmlCodes(false) + "<br><br><b>Info:</b><br>" + qi.CreateHtmlCodes(false);
+            if (string.IsNullOrEmpty(qi))
+                QuickInfo = "<b>Filter:</b><br>" + Filter.ReadableText().CreateHtmlCodes(false);
+            else
+                QuickInfo = "<b>Filter:</b><br>" + Filter.ReadableText().CreateHtmlCodes(false) +
+                            "<br><br><b>Info:</b><br>" + qi.CreateHtmlCodes(false);
             if (!Filter.Column.AutoFilterSymbolPossible()) {
                 EditType = EditTypeFormula.None;
             } else {

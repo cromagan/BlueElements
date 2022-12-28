@@ -152,7 +152,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         var FilterTable = new Table();
         FilterTable.DropMessages = false;
         FilterTable.ShowWaitScreen = true;
-        FilterTable.Size = new System.Drawing.Size(968, 400);
+        FilterTable.Size = new Size(968, 400);
 
         FilterTable.DatabaseSet(FilterDefiniton, string.Empty);
 

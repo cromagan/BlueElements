@@ -166,9 +166,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         if (_drawStyle != ComboboxStyle.TextBox) {
             if (string.IsNullOrEmpty(_initialtext) && !string.IsNullOrEmpty(Text)) { _initialtext = Text; }
 
-            if (_eTxt2 == null) {
-                _eTxt2 = new ExtText((Design)_drawStyle, state);
-            }
+            _eTxt2 ??= new ExtText((Design)_drawStyle, state);
 
             Button.DrawButton(this, gr, (Design)_drawStyle, state, QuickImage.Get(_imageCode), Alignment.Horizontal_Vertical_Center, true, _eTxt2, _initialtext, DisplayRectangle, Translate);
             btnDropDown.Invalidate();

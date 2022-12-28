@@ -27,7 +27,7 @@ public class Method_CheckRow : MethodDatabase {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableRowItem.ShortName_Variable } };
+    public override List<List<string>> Args => new() { new List<string> { VariableRowItem.ShortName_Variable } };
     public override string Description => "Prüft die angegebene Zeile mit der Startroutine 'script'. Wenn die Zeile Null ist, wird kein Fehler ausgegeben.";
 
     public override bool EndlessArgs => false;

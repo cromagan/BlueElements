@@ -32,7 +32,7 @@ public class RowFormulaListItem : BasicListItem {
 
     private string _layoutId;
 
-    private RowItem _row;
+    private RowItem? _row;
 
     private Bitmap? _tmpBmp;
 

@@ -338,7 +338,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
                 var oo = c[cpi.Column];
 
                 if (oo != null) {
-                    cpi.AdditionalStyleOptions = new();
+                    cpi.AdditionalStyleOptions = new List<FlexiControl>();
                     cpi.AdditionalStyleOptions.Add(new FlexiControlForProperty<bool>(() => oo.Permanent));
                 }
             }

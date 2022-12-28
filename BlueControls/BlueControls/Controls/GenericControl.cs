@@ -460,7 +460,7 @@ public class GenericControl : System.Windows.Forms.Control {
             if (Width < 1 || Height < 1) { return; }
             try {
                 if (_useBackBitmap) {
-                    if (_bitmapOfControl == null) { _bitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb); }
+                    _bitmapOfControl ??= new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb);
                     var tmpgr = Graphics.FromImage(_bitmapOfControl);
                     DrawControl(tmpgr, IsStatus());
                     if (_bitmapOfControl != null) {
