@@ -385,7 +385,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     public void ValueSet(string? newvalue, bool updateControls, bool alwaysValueChanged) {
         if (IsDisposed) { return; }
         newvalue ??= string.Empty;
-        if (string.IsNullOrEmpty(newvalue)) { return; }
+        //if (string.IsNullOrEmpty(newvalue)) { return; }
         if (Value == newvalue) { return; }
 
         LastTextChange = DateTime.UtcNow;
