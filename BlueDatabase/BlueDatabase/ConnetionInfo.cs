@@ -45,7 +45,7 @@ public class ConnectionInfo {
             System.IO.File.Exists(uniqueID)) {
             TableName = SQLBackAbstract.MakeValidTableName(uniqueID.FileNameWithoutSuffix());
             Provider = null;
-            DatabaseID = Database.DatabaseID;
+            DatabaseID = DatabaseMultiUser.DatabaseID;
             AdditionalData = uniqueID;
             return;
         }
@@ -73,6 +73,17 @@ public class ConnectionInfo {
                     TableName = x[0].ToUpper();
                     Provider = thisDB;
                     DatabaseID = Database.DatabaseID;
+                    AdditionalData = dn;
+                }
+            }
+
+            if (d.DatabaseID == DatabaseMultiUser.DatabaseID) {
+                // Dateisystem
+                var dn = d.AdditionalData.FilePath() + x[0] + ".mdb";
+                if (System.IO.File.Exists(dn)) {
+                    TableName = x[0].ToUpper();
+                    Provider = thisDB;
+                    DatabaseID = DatabaseMultiUser.DatabaseID;
                     AdditionalData = dn;
                 }
             }

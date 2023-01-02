@@ -279,8 +279,10 @@ public partial class TableView : Form {
         chkAnsichtFormular.Enabled = datenbankDa;
         chkAnsichtTableFormular.Enabled = datenbankDa;
 
-        if (Table.Database is Database BDB) {
+        if (Table.Database is DatabaseMultiUser BDB) {
             btnDatenbankenSpeicherort.Enabled = !string.IsNullOrEmpty(BDB.Filename);
+        } else if (Table.Database is Database BD) {
+            btnDatenbankenSpeicherort.Enabled = !string.IsNullOrEmpty(BD.Filename);
         } else {
             btnDatenbankenSpeicherort.Enabled = false;
         }
@@ -585,7 +587,7 @@ public partial class TableView : Form {
         DatabaseAbstract.ForceSaveAll();
         BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
 
-        if (Table.Database is Database BDB) {
+        if (Table.Database is DatabaseMultiUser BDB) {
             ExecuteFile(BDB.Filename.FilePath());
         }
     }

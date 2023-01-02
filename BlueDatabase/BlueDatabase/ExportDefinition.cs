@@ -542,13 +542,17 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
         try {
             switch (_typ) {
                 case ExportTyp.DatenbankOriginalFormat:
+                    if (_backupInterval > (float)DateTime.UtcNow.Subtract(_lastExportTimeUtc).TotalDays) { return false; }
 
                     if (Database is Database DBD) {
-                        if (_backupInterval > (float)DateTime.UtcNow.Subtract(_lastExportTimeUtc).TotalDays) { return false; }
-
                         singleFileExport = TempFile(singleFileExport + ".MDB");
                         if (!FileExists(singleFileExport)) { File.Copy(DBD.Filename, singleFileExport); }
+                        added.Add(singleFileExport + "|" + tim);
+                    }
 
+                    if (Database is DatabaseMultiUser DBDM) {
+                        singleFileExport = TempFile(singleFileExport + ".MDB");
+                        if (!FileExists(singleFileExport)) { File.Copy(DBDM.Filename, singleFileExport); }
                         added.Add(singleFileExport + "|" + tim);
                     }
 

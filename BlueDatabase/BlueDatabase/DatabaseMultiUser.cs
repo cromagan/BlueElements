@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2022 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -19,46 +19,51 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.EventArgs;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using static BlueBasics.Converter;
-using BlueBasics.MultiUserFile;
-using static BlueBasics.Generic;
-using static BlueBasics.IO;
 
 namespace BlueDatabase;
 
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public sealed class Database : DatabaseAbstract {
+public sealed class DatabaseMultiUser : DatabaseAbstract {
+
     #region Fields
 
     public ListExt<WorkItem>? Works;
+
+    private readonly BlueBasics.MultiUserFile.MultiUserFile? _muf;
 
     #endregion
 
     #region Constructors
 
-    public Database(Stream stream, string tablename) : this(stream, string.Empty, true, false, tablename) { }
+    public DatabaseMultiUser(Stream stream, string tablename) : this(stream, string.Empty, true, false, tablename) { }
 
-    public Database(bool readOnly, string tablename) : this(null, string.Empty, readOnly, true, tablename) { }
+    public DatabaseMultiUser(bool readOnly, string tablename) : this(null, string.Empty, readOnly, true, tablename) { }
 
-    public Database(string filename, bool readOnly, bool create, string tablename) : this(null, filename, readOnly, create, tablename) { }
+    public DatabaseMultiUser(string filename, bool readOnly, bool create, string tablename) : this(null, filename, readOnly, create, tablename) { }
 
-    private Database(Stream? stream, string filename, bool readOnly, bool create, string tablename) : base(tablename, readOnly) {
+    private DatabaseMultiUser(Stream? stream, string filename, bool readOnly, bool create, string tablename) : base(tablename, readOnly) {
         AllFiles.Add(this);
 
-        //_muf.Loaded += OnLoaded;
-        //_muf.Loading += OnLoading;
-        //_muf.SavedToDisk += OnSavedToDisk;
-        //_muf.DiscardPendingChanges += DiscardPendingChanges;
-        //_muf.HasPendingChanges += HasPendingChanges;
-        //_muf.ParseExternal += Parse;
-        //_muf.ToListOfByte += ToListOfByte;
+        _muf = new BlueBasics.MultiUserFile.MultiUserFile();
+
+        _muf.Loaded += _muf_Loaded;
+        _muf.Loading += _muf_Loading;
+        _muf.SavedToDisk += _muf_SavedToDisk;
+        _muf.DiscardPendingChanges += DiscardPendingChanges;
+        _muf.HasPendingChanges += _muf_HasPendingChanges;
+        _muf.ParseExternal += Parse;
+        _muf.ToListOfByte += ToListOfByte;
+        _muf.ReloadDelaySecond = 180;
 
         Develop.StartService();
 
@@ -68,9 +73,9 @@ public sealed class Database : DatabaseAbstract {
 
         if (!string.IsNullOrEmpty(filename)) {
             //DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + filename.FileNameWithoutSuffix()));
-            LoadFromFile(filename, create);
+            _muf.Load(filename, create);
         } else if (stream != null) {
-            LoadFromStream(stream);
+            _muf.LoadFromStream(stream);
         }
         //RepairAfterParse();
     }
@@ -79,47 +84,40 @@ public sealed class Database : DatabaseAbstract {
 
     #region Properties
 
-    public static string DatabaseID => "BlueDatabase";
+    public static string DatabaseID { get => "BlueDatabaseMultiUser"; }
 
-    public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseID, Filename);
+    public override ConnectionInfo ConnectionData {
+        get {
+            return new ConnectionInfo(TableName, this, DatabaseID, Filename);
+        }
 
-    //_muf != null ? _muf.Filename : string.Empty;
-    public string Filename { get; set; }
+        //_muf != null ? _muf.Filename : string.Empty;
+    }
+
+    public string Filename => _muf != null ? _muf.Filename : string.Empty;
+
+    public bool IsLoading {
+        get => _muf.IsLoading;
+    }
+
+    public bool ReloadNeeded => _muf != null && _muf.ReloadNeeded;
 
     #endregion
 
     #region Methods
-
-    public override string AdditionaFilesPfadWhole() {
-        var x = base.AdditionaFilesPfadWhole();
-        if (!string.IsNullOrEmpty(x)) { return x; }
-
-        if (!string.IsNullOrEmpty(Filename)) {
-            var t = (Filename.FilePath() + "AdditionaFiles\\").CheckPath();
-            if (DirectoryExists(t)) {
-                _additionaFilesPfadtmp = t;
-                return t;
-            }
-        }
-        _additionaFilesPfadtmp = string.Empty;
-        return string.Empty;
-    }
 
     public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked) {
         if (string.IsNullOrWhiteSpace(Filename)) { return null; } // Stream-Datenbank
 
         if (allreadychecked != null) {
             foreach (var thisa in allreadychecked) {
-                if (thisa is Database db) {
+                if (thisa is DatabaseMultiUser db) {
                     if (string.Equals(db.Filename.FilePath(), Filename.FilePath())) { return null; }
-                }
-                if (thisa is DatabaseMultiUser dbm) {
-                    if (string.Equals(dbm.Filename.FilePath(), Filename.FilePath())) { return null; }
                 }
             }
         }
 
-        var nn = Directory.GetFiles(Filename.FilePath(), "*.mdb", SearchOption.AllDirectories);
+        var nn = System.IO.Directory.GetFiles(Filename.FilePath(), "*.mdb", SearchOption.AllDirectories);
         var gb = new List<ConnectionInfo>();
         foreach (var thisn in nn) {
             gb.Add(ConnectionDataOfOtherTable(thisn.FileNameWithoutSuffix(), false));
@@ -137,86 +135,15 @@ public sealed class Database : DatabaseAbstract {
         return new ConnectionInfo(f);
     }
 
-    public bool IsFileAllowedToLoad(string fileName) {
-        foreach (var thisFile in AllFiles) {
-            if (thisFile is Database db) {
-                if (string.Equals(db.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
-                    thisFile.Save();
-                    Develop.DebugPrint(FehlerArt.Warnung, "Doppletes Laden von " + fileName);
-                    return false;
-                }
-            }
+    public void DiscardPendingChanges(object sender, System.EventArgs e) => ChangeWorkItems();
 
-            if (thisFile is DatabaseMultiUser dbm) {
-                if (string.Equals(dbm.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
-                    thisFile.Save();
-                    Develop.DebugPrint(FehlerArt.Warnung, "Doppletes Laden von " + fileName);
-                    return false;
-                }
-            }
-        }
+    public void Load_Reload() => _muf?.Load_Reload();
 
-        return true;
-    }
-
-    public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting) {
-        if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
-        if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(FehlerArt.Fehler, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
-        if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(FehlerArt.Fehler, "Dateiname nicht angegeben!"); }
-        //fileNameToLoad = modConverter.SerialNr2Path(fileNameToLoad);
-        if (!createWhenNotExisting && !CanWriteInDirectory(fileNameToLoad.FilePath())) { SetReadOnly(); }
-        if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
-        if (!FileExists(fileNameToLoad)) {
-            if (createWhenNotExisting) {
-                if (ReadOnly) {
-                    Develop.DebugPrint(FehlerArt.Fehler, "Readonly kann keine Datei erzeugen<br>" + fileNameToLoad);
-                    return;
-                }
-                SaveAsAndChangeTo(fileNameToLoad);
-            } else {
-                Develop.DebugPrint(FehlerArt.Warnung, "Datei existiert nicht: " + fileNameToLoad);  // Readonly deutet auf Backup hin, in einem anderne Verzeichnis (Linked)
-                SetReadOnly();
-                return;
-            }
-        }
-        Filename = fileNameToLoad;
-        //ReCreateWatcher();
-        // Wenn ein Dateiname auf Nix gesezt wird, z.B: bei Bitmap import
-        if (string.IsNullOrEmpty(Filename)) { return; }
-
-        //LoadingEventArgs ec = new(_initialLoadDone);
-        OnLoading();
-
-        var bLoaded = LoadBytesFromDisk(BlueBasics.Enums.ErrorReason.Load);
-        if (bLoaded == null) { return; }
-
-        Parse(bLoaded);
-
-        RepairAfterParse();
-        OnLoaded();
-        CreateWatcher();
-    }
-
-    public void LoadFromStream(Stream stream) {
-        OnLoading();
-        byte[] bLoaded;
-        using (BinaryReader r = new(stream)) {
-            bLoaded = r.ReadBytes((int)stream.Length);
-            r.Close();
-        }
-
-        if (bLoaded.Length > 4 && BitConverter.ToInt32(bLoaded, 0) == 67324752) {
-            // Gezipte Daten-Kennung gefunden
-            bLoaded = MultiUserFile.UnzipIt(bLoaded);
-        }
-
-        Parse(bLoaded);
-
-        RepairAfterParse();
-        OnLoaded();
-        CreateWatcher();
-    }
-
+    //        return Works.Any(thisWork => thisWork.State == ItemState.Pending);
+    //    } catch {
+    //        return HasPendingChanges();
+    //    }
+    //}
     public void Parse(byte[] bLoaded, ref int pointer, out DatabaseDataType type, ref long colKey, ref long rowKey, out string value, out int width, out int height) {
         int les;
         switch ((Routinen)bLoaded[pointer]) {
@@ -335,7 +262,10 @@ public sealed class Database : DatabaseAbstract {
         }
     }
 
-    public void Parse(byte[] data) {
+    //public bool HasPendingChanges() {
+    //    try {
+    //        if (ReadOnly) { return false; }
+    public void Parse(object sender, MultiUserParseEventArgs e) {
         Column.ThrowEvents = false;
         Row.ThrowEvents = false;
         var pointer = 0;
@@ -356,12 +286,12 @@ public sealed class Database : DatabaseAbstract {
 
         #region Pendings merken und Variable leeren
 
-        //var oldPendings = Works?.Where(thisWork => thisWork.State == ItemState.Pending).ToList();
+        var oldPendings = Works?.Where(thisWork => thisWork.IsPending).ToList();
         Works?.Clear();
 
         #endregion
 
-        var b = data;
+        var b = e.Data;
 
         do {
             if (pointer >= b.Length) { break; }
@@ -436,9 +366,9 @@ public sealed class Database : DatabaseAbstract {
 
         Row.RemoveNullOrEmpty();
         Cell.RemoveOrphans();
-        //Works?.AddRange(oldPendings);
-        //oldPendings?.Clear();
-        //ExecutePending();
+        Works?.AddRange(oldPendings);
+        oldPendings?.Clear();
+        ExecutePending();
         Column.ThrowEvents = true;
         Row.ThrowEvents = true;
 
@@ -453,6 +383,8 @@ public sealed class Database : DatabaseAbstract {
         foreach (var thisrow in columns) {
             thisrow.IsInCache = true;
         }
+
+        return;
     }
 
     public override bool RefreshRowData(List<RowItem> row, bool refreshAlways) {
@@ -465,44 +397,7 @@ public sealed class Database : DatabaseAbstract {
         return false;
     }
 
-    public override bool Save() {
-        if (ReadOnly) { return false; }
-        if (string.IsNullOrEmpty(Filename)) { return false; }
-
-        if (!HasPendingChanges) { return false; }
-
-        var tmpFileName = WriteTempFileToDisk();
-
-        if (string.IsNullOrEmpty(tmpFileName)) { return false; }
-
-        if (FileExists(Backupdateiname())) {
-            if (!DeleteFile(Backupdateiname(), false)) { return false; }
-        }
-
-        // Haupt-Datei wird zum Backup umbenannt
-        if (!MoveFile(Filename, Backupdateiname(), false)) { return false; }
-
-        // --- TmpFile wird zum Haupt ---
-        MoveFile(tmpFileName, Filename, true);
-
-        HasPendingChanges = false;
-        return true;
-    }
-
-    public void SaveAsAndChangeTo(string newFileName) {
-        if (string.Equals(newFileName, Filename, StringComparison.OrdinalIgnoreCase)) { Develop.DebugPrint(FehlerArt.Fehler, "Dateiname unterscheiden sich nicht!"); }
-        Save(); // Original-Datei speichern, die ist ja dann weg.
-        // Jetzt kann es aber immer noch sein, das PendingChanges da sind.
-        // Wenn kein Dateiname angegeben ist oder bei Readonly wird die Datei nicht gespeichert und die Pendings bleiben erhalten!
-
-        Filename = newFileName;
-
-        var l = ToListOfByte();
-        using FileStream x = new(newFileName, FileMode.Create, FileAccess.Write, FileShare.None);
-        x.Write(l.ToArray(), 0, l.ToArray().Length);
-        x.Flush();
-        x.Close();
-    }
+    public override bool Save() => _muf?.Save(true) ?? false;
 
     public override string UndoText(ColumnItem? column, RowItem? row) {
         if (Works == null || Works.Count == 0) { return string.Empty; }
@@ -518,6 +413,10 @@ public sealed class Database : DatabaseAbstract {
         t = t.Trim("<br>");
         t = t.Trim("<hr>");
         return t;
+    }
+
+    public void UnlockHard() {
+        _muf.UnlockHard();
     }
 
     internal static void SaveToByteList(ColumnItem c, ref List<byte> l) {
@@ -582,7 +481,6 @@ public sealed class Database : DatabaseAbstract {
         //SaveToByteList(l, DatabaseDataType.ColumnTimeCode, c.TimeCode, key);
     }
 
-    //public override void WaitEditable() => _muf.WaitEditable();
     internal static void SaveToByteList(List<byte> list, DatabaseDataType databaseDataType, string content, long columnKey) {
         var b = content.UTF8_ToByte();
         list.Add((byte)Routinen.ColumnUTF8_V400);
@@ -638,15 +536,18 @@ public sealed class Database : DatabaseAbstract {
     }
 
     protected override void Dispose(bool disposing) {
-        //_muf.Dispose();
+        _muf.Dispose();
         Works.Dispose();
         base.Dispose(disposing);
     }
 
     protected override void Initialize() {
         base.Initialize();
+        _muf.ReloadDelaySecond = 600;
         Works.Clear();
     }
+
+    protected override void SetUserDidSomething() => _muf.SetUserDidSomething();
 
     protected override string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height, bool isLoading) {
         var r = base.SetValueInternal(type, value, columnkey, rowkey, width, height, isLoading);
@@ -655,7 +556,9 @@ public sealed class Database : DatabaseAbstract {
             Works.Clear();
             var uio = value.SplitAndCutByCr();
             for (var z = 0; z <= uio.GetUpperBound(0); z++) {
-                WorkItem tmpWork = new(uio[z]);
+                WorkItem tmpWork = new(uio[z]) {
+                    IsPending = false // Beim Erstellen des strings ist noch nicht sicher, ob gespeichter wird. Deswegen die alten "Pendings" zu Undos ändern.
+                };
                 Works.Add(tmpWork);
             }
         }
@@ -669,7 +572,7 @@ public sealed class Database : DatabaseAbstract {
 
     private static int NummerCode2(byte[] b, int pointer) => (b[pointer] * 255) + b[pointer + 1];
 
-    //protected override string SpecialErrorReason(ErrorReason mode) => _muf.ErrorReason(mode);
+    //protected string SpecialErrorReason(ErrorReason mode) => _muf.ErrorReason(mode);
     private static int NummerCode3(byte[] b, int pointer) => (b[pointer] * 65025) + (b[pointer + 1] * 255) + b[pointer + 2];
 
     private static long NummerCode7(byte[] b, int pointer) {
@@ -702,63 +605,123 @@ public sealed class Database : DatabaseAbstract {
         //}
     }
 
-    private string Backupdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
-
-    /// <summary>
-    /// Diese Routine lädt die Datei von der Festplatte. Zur Not wartet sie bis zu 5 Minuten.
-    /// Hier wird auch nochmal geprüft, ob ein Laden überhaupt möglich ist.
-    /// Es kann auch NULL zurück gegeben werden, wenn es ein Reload ist und die Daten inzwischen aktuell sind.
-    /// </summary>
-    /// <param name="checkmode"></param>
-    /// <returns></returns>
-    private byte[]? LoadBytesFromDisk(ErrorReason checkmode) {
-        var startTime = DateTime.UtcNow;
-        byte[] bLoaded;
-        while (true) {
-            try {
-                var f = ErrorReason(checkmode);
-                if (string.IsNullOrEmpty(f)) {
-                    //var tmpLastSaveCode1 = GetFileInfo(Filename, true);
-                    bLoaded = File.ReadAllBytes(Filename);
-                    //tmpLastSaveCode2 = GetFileInfo(Filename, true);
-                    //if (tmpLastSaveCode1 == tmpLastSaveCode2) { break; }
-                    //f = "Datei wurde während des Ladens verändert.";
-                    break;
-                }
-
-                if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 20) {
-                    Develop.DebugPrint(FehlerArt.Info, f + "\r\n" + Filename);
-                }
-
-                Pause(0.5, false);
-            } catch (Exception ex) {
-                // Home Office kann lange blokieren....
-                if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 300) {
-                    Develop.DebugPrint(FehlerArt.Fehler, "Die Datei<br>" + Filename + "<br>konnte trotz mehrerer Versuche nicht geladen werden.<br><br>Die Fehlermeldung lautet:<br>" + ex.Message);
-                    return null;
-                }
-            }
-        }
-
-        if (bLoaded.Length > 4 && BitConverter.ToInt32(bLoaded, 0) == 67324752) {
-            // Gezipte Daten-Kennung gefunden
-            bLoaded = MultiUserFile.UnzipIt(bLoaded);
-        }
-        return bLoaded;
+    private void _muf_HasPendingChanges(object sender, MultiUserFileHasPendingChangesEventArgs e) {
+        e.HasPendingChanges = HasPendingChanges;
     }
 
-    private List<byte> ToListOfByte() {
+    private void _muf_Loaded(object sender, System.EventArgs e) {
+        OnLoaded();
+    }
+
+    private void _muf_Loading(object sender, System.EventArgs e) {
+        OnLoading();
+    }
+
+    private void _muf_SavedToDisk(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
+        HasPendingChanges = false;
+        ChangeWorkItems();
+    }
+
+    private void ChangeWorkItems() {
+        foreach (var thisWork in Works) {
+            if (thisWork != null) {
+                thisWork.IsPending = false;
+            }
+        }
+    }
+
+    private void ExecutePending() {
+        if (!_muf.IsLoading) { Develop.DebugPrint(FehlerArt.Fehler, "Nur während des Parsens möglich"); }
+
+        if (!HasPendingChanges) { return; }
+        // Erst die Neuen Zeilen / Spalten alle neutralisieren
+        //var dummy = -1000;
+        //foreach (var ThisPending in Works) {
+        //    if (ThisPending.State == enItemState.Pending) {
+        //        //if (ThisPending.Comand == enDatabaseDataType.dummyComand_AddRow) {
+        //        //    dummy--;
+        //        //    ChangeRowKeyInPending(ThisPending.RowKey, dummy);
+        //        //}
+        //        //if (ThisPending.Comand == enDatabaseDataType.AddColumnKeyInfo) {
+        //        //    dummy--;
+        //        //    ChangeColumnKeyInPending(ThisPending.ColKey, dummy);
+        //        //}
+        //    }
+        //}
+        //// Dann den neuen Zeilen / Spalten Tatsächlich eine neue ID zuweisen
+        //foreach (var ThisPending in Works) {
+        //    if (ThisPending.State == enItemState.Pending) {
+        //        switch (ThisPending.Comand) {
+        //            //case enDatabaseDataType.dummyComand_AddRow when _JoinTyp == enJoinTyp.Intelligent_zusammenfassen: {
+        //            //        var Value = SearchKeyValueInPendingsOf(ThisPending.RowKey);
+        //            //        var fRow = Row[Value];
+        //            //        if (!string.IsNullOrEmpty(Value) && fRow != null) {
+        //            //            ChangeRowKeyInPending(ThisPending.RowKey, fRow.Key);
+        //            //        } else {
+        //            //            ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
+        //            //        }
+        //            //        break;
+        //            //    }
+        //            //case enDatabaseDataType.dummyComand_AddRow:
+        //            //    ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
+        //            //    break;
+
+        //            //case enDatabaseDataType.AddColumnKeyInfo:
+        //            //    ChangeColumnKeyInPending(ThisPending.ColKey, Column.NextColumnKey);
+        //            //    break;
+        //        }
+        //    }
+        //}
+        // Und nun alles ausführen!
+        foreach (var thisPending in Works.Where(thisPending => thisPending.IsPending)) {
+            if (thisPending.Comand == DatabaseDataType.ColumnName) {
+                thisPending.ChangedTo = Column.Freename(thisPending.ChangedTo);
+            }
+            ExecutePending(thisPending);
+        }
+    }
+
+    private void ExecutePending(WorkItem thisPendingItem) {
+        if (thisPendingItem.IsPending) {
+            //RowItem? row = null;
+            //if (thisPendingItem.RowKey > -1) {
+            //    row = Row.SearchByKey(thisPendingItem.RowKey);
+            //    if (row == null) {
+            //        if (thisPendingItem.Comand != DatabaseDataType.Comand_AddRow && thisPendingItem.User != UserName) {
+            //            Develop.DebugPrint("Pending verworfen, Zeile gelöscht.<br>" + ConnectionData.TableName + "<br>" + thisPendingItem.ToString());
+            //            return;
+            //        }
+            //    }
+            //}
+            //ColumnItem? col = null;
+            //if (thisPendingItem.ColKey > -1) {
+            //    col = Column.SearchByKey(thisPendingItem.ColKey);
+            //    if (col == null) {
+            //        //if (thisPendingItem.Comand != DatabaseDataType.AddColumnKeyInfo && thisPendingItem.User != UserName) {
+            //        Develop.DebugPrint("Pending verworfen, Spalte gelöscht.<br>" + ConnectionData.TableName + "<br>" + thisPendingItem.ToString());
+            //        return;
+            //        //}
+            //    }
+            //}
+            SetValueInternal(thisPendingItem.Comand, thisPendingItem.ChangedTo, thisPendingItem.ColKey, thisPendingItem.RowKey, 0, 0, true);
+        }
+    }
+
+    private void ToListOfByte(object sender, MultiUserToListEventArgs e) {
         try {
+            //var cryptPos = -1;
             List<byte> l = new();
             // Wichtig, Reihenfolge und Länge NIE verändern!
             SaveToByteList(l, DatabaseDataType.Formatkennung, "BlueDatabase");
             SaveToByteList(l, DatabaseDataType.Version, DatabaseVersion);
             SaveToByteList(l, DatabaseDataType.Werbung, "                                                                    BlueDataBase - (c) by Christian Peter                                                                                        "); // Die Werbung dient als Dummy-Platzhalter, falls doch mal was vergessen wurde...
-            // Passwörter ziemlich am Anfang speicher, dass ja keinen Weiteren Daten geladen werden können
+            //// Passwörter ziemlich am Anfang speicher, dass ja keinen Weiteren Daten geladen werden können
             //if (string.IsNullOrEmpty(GlobalShowPass)) {
             //    SaveToByteList(l, DatabaseDataType.CryptionState, false.ToPlusMinus());
             //} else {
             //    SaveToByteList(l, DatabaseDataType.CryptionState, true.ToPlusMinus());
+            //    cryptPos = l.Count;
             //    SaveToByteList(l, DatabaseDataType.CryptionTest, "OK");
             //}
             SaveToByteList(l, DatabaseDataType.GlobalShowPass, GlobalShowPass);
@@ -817,114 +780,11 @@ public sealed class Database : DatabaseAbstract {
             if (works2.Count > UndoCount) { works2.RemoveRange(0, works2.Count - UndoCount); }
             SaveToByteList(l, DatabaseDataType.UndoInOne, works2.JoinWithCr((int)(16581375 * 0.9)));
             SaveToByteList(l, DatabaseDataType.EOF, "END");
-            return l;
+            e.Data = l.ToArray();
         } catch {
-            return ToListOfByte();
+            ToListOfByte(sender, e);
         }
     }
 
-    private string WriteTempFileToDisk() {
-        var f = ErrorReason(BlueBasics.Enums.ErrorReason.Save);
-        if (!string.IsNullOrEmpty(f)) { return string.Empty; }
-
-        var dataUncompressed = ToListOfByte().ToArray();
-        var tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName().ToUpper());
-
-        using FileStream x = new(tmpFileName, FileMode.Create, FileAccess.Write, FileShare.None);
-        x.Write(dataUncompressed, 0, dataUncompressed.Length);
-        x.Flush();
-        x.Close();
-
-        return tmpFileName;
-    }
-
     #endregion
-
-    //private void ChangeWorkItems(ItemState oldState, ItemState newState) {
-    //    foreach (var thisWork in Works) {
-    //        if (thisWork != null) {
-    //            if (thisWork.State == oldState) { thisWork.State = newState; }
-    //        }
-    //    }
-    //}
-
-    //private void ExecutePending() {
-    //    if (!_muf.IsLoading) { Develop.DebugPrint(FehlerArt.Fehler, "Nur während des Parsens möglich"); }
-
-    //    var e2 = new MultiUserFileHasPendingChangesEventArgs();
-    //    HasPendingChanges(null, e2);
-
-    //    if (!e2.HasPendingChanges) { return; }
-    //    // Erst die Neuen Zeilen / Spalten alle neutralisieren
-    //    //var dummy = -1000;
-    //    //foreach (var ThisPending in Works) {
-    //    //    if (ThisPending.State == enItemState.Pending) {
-    //    //        //if (ThisPending.Comand == enDatabaseDataType.dummyComand_AddRow) {
-    //    //        //    dummy--;
-    //    //        //    ChangeRowKeyInPending(ThisPending.RowKey, dummy);
-    //    //        //}
-    //    //        //if (ThisPending.Comand == enDatabaseDataType.AddColumnKeyInfo) {
-    //    //        //    dummy--;
-    //    //        //    ChangeColumnKeyInPending(ThisPending.ColKey, dummy);
-    //    //        //}
-    //    //    }
-    //    //}
-    //    //// Dann den neuen Zeilen / Spalten Tatsächlich eine neue ID zuweisen
-    //    //foreach (var ThisPending in Works) {
-    //    //    if (ThisPending.State == enItemState.Pending) {
-    //    //        switch (ThisPending.Comand) {
-    //    //            //case enDatabaseDataType.dummyComand_AddRow when _JoinTyp == enJoinTyp.Intelligent_zusammenfassen: {
-    //    //            //        var Value = SearchKeyValueInPendingsOf(ThisPending.RowKey);
-    //    //            //        var fRow = Row[Value];
-    //    //            //        if (!string.IsNullOrEmpty(Value) && fRow != null) {
-    //    //            //            ChangeRowKeyInPending(ThisPending.RowKey, fRow.Key);
-    //    //            //        } else {
-    //    //            //            ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
-    //    //            //        }
-    //    //            //        break;
-    //    //            //    }
-    //    //            //case enDatabaseDataType.dummyComand_AddRow:
-    //    //            //    ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
-    //    //            //    break;
-
-    //    //            //case enDatabaseDataType.AddColumnKeyInfo:
-    //    //            //    ChangeColumnKeyInPending(ThisPending.ColKey, Column.NextColumnKey);
-    //    //            //    break;
-    //    //        }
-    //    //    }
-    //    //}
-    //    // Und nun alles ausführen!
-    //    foreach (var thisPending in Works.Where(thisPending => thisPending.State == ItemState.Pending)) {
-    //        if (thisPending.Comand == DatabaseDataType.ColumnName) {
-    //            thisPending.ChangedTo = Column.Freename(thisPending.ChangedTo);
-    //        }
-    //        ExecutePending(thisPending);
-    //    }
-    //}
-
-    //private void ExecutePending(WorkItem thisPendingItem) {
-    //    if (thisPendingItem.State == ItemState.Pending) {
-    //        //RowItem? row = null;
-    //        //if (thisPendingItem.RowKey > -1) {
-    //        //    row = Row.SearchByKey(thisPendingItem.RowKey);
-    //        //    if (row == null) {
-    //        //        if (thisPendingItem.Comand != DatabaseDataType.Comand_AddRow && thisPendingItem.User != UserName) {
-    //        //            Develop.DebugPrint("Pending verworfen, Zeile gelöscht.<br>" + ConnectionData.TableName + "<br>" + thisPendingItem.ToString());
-    //        //            return;
-    //        //        }
-    //        //    }
-    //        //}
-    //        //ColumnItem? col = null;
-    //        //if (thisPendingItem.ColKey > -1) {
-    //        //    col = Column.SearchByKey(thisPendingItem.ColKey);
-    //        //    if (col == null) {
-    //        //        //if (thisPendingItem.Comand != DatabaseDataType.AddColumnKeyInfo && thisPendingItem.User != UserName) {
-    //        //        Develop.DebugPrint("Pending verworfen, Spalte gelöscht.<br>" + ConnectionData.TableName + "<br>" + thisPendingItem.ToString());
-    //        //        return;
-    //        //        //}
-    //        //    }
-    //        //}
-    //        SetValueInternal(thisPendingItem.Comand, thisPendingItem.ChangedTo, thisPendingItem.ColKey, thisPendingItem.RowKey, 0, 0, true);
-    //    }
-    //}
 }

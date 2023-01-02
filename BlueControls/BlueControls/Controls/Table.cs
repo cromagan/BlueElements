@@ -2806,13 +2806,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             //return;
 
-            if (Database is Database db) {
-                if (db.HasPendingChanges) {
-                    gr.DrawImage(QuickImage.Get(ImageCode.Stift, 16), 16, 8);
-                }
-            }
-
-            if (Database.ReadOnly) { gr.DrawImage(QuickImage.Get(ImageCode.Schloss, 32), 16, 8); }
+            if (Database?.HasPendingChanges ?? false) { gr.DrawImage(QuickImage.Get(ImageCode.Stift, 16), 16, 8); }
+            if (Database?.ReadOnly ?? false) { gr.DrawImage(QuickImage.Get(ImageCode.Schloss, 32), 16, 8); }
         } catch {
             Invalidate();
             //Develop.DebugPrint(ex);

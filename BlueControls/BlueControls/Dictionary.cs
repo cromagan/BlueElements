@@ -36,7 +36,7 @@ internal static class Dictionary {
 
     public static bool IsSpellChecking;
     internal static readonly object LockSpellChecking = new();
-    private static Database? _dictWords;
+    private static DatabaseAbstract? _dictWords;
 
     #endregion
 
@@ -61,7 +61,7 @@ internal static class Dictionary {
         return _dictWords.Row[word] != null;
     }
 
-    public static bool IsWriteable() => _dictWords != null && !string.IsNullOrEmpty(_dictWords.Filename);
+    public static bool IsWriteable() => _dictWords is Database db && !string.IsNullOrEmpty(db.Filename);
 
     public static List<string>? SimilarTo(string word) {
         if (IsWordOk(word)) { return null; }
@@ -138,7 +138,7 @@ internal static class Dictionary {
 
     private static void Init() {
         var tmp = DatabaseAbstract.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.MDB", "Dictionary", true, false, null);
-        if (tmp is Database DBD) { _dictWords = DBD; }
+        if (tmp is DatabaseAbstract DBD) { _dictWords = DBD; }
     }
 
     #endregion

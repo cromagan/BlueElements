@@ -37,9 +37,9 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
 
     #region Constructors
 
-    public DatabaseSourcePadItem(Database? db, int id) : this(string.Empty, db, id) { }
+    public DatabaseSourcePadItem(DatabaseAbstract? db, int id) : this(string.Empty, db, id) { }
 
-    public DatabaseSourcePadItem(string intern, Database? db, int id) : base(intern) {
+    public DatabaseSourcePadItem(string intern, DatabaseAbstract? db, int id) : base(intern) {
         Database = db;
 
         Id = id;

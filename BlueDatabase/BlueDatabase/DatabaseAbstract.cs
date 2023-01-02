@@ -408,7 +408,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
         if (FileExists(ci.AdditionalData)) {
             if (ci.AdditionalData.FileSuffix().ToLower() == "mdb") {
-                return new Database(ci.AdditionalData, false, false, ci.TableName);
+                return new DatabaseMultiUser(ci.AdditionalData, false, false, ci.TableName);
             }
 
             //if (connectionID.FileSuffix().ToLower() == "mdf") {
@@ -502,7 +502,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
                     var tmp = GetByID(ci);
                     if (tmp != null) { return tmp; }
-                    tmp = new Database(pf, false, false, pf.FileNameWithoutSuffix());
+                    tmp = new DatabaseMultiUser(pf, false, false, pf.FileNameWithoutSuffix());
                     return tmp;
                 }
             } while (pf != string.Empty);

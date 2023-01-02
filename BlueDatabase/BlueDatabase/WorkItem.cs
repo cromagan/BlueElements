@@ -32,11 +32,12 @@ public class WorkItem : IParseable {
 
     private long _colKey;
 
+    private bool _isPending;
     private long _rowKey;
 
-    //private ItemState _state;
-
     #endregion
+
+    //private ItemState _state;
 
     #region Constructors
 
@@ -88,6 +89,7 @@ public class WorkItem : IParseable {
 
     public DatabaseDataType Comand { get; private set; }
     public DateTime Date { get; private set; }
+
     //public bool HistorischRelevant => State is ItemState.Pending or ItemState.Undo;
     public bool IsParsing { get; private set; }
 
@@ -104,14 +106,14 @@ public class WorkItem : IParseable {
 
     public string User { get; private set; }
 
-    //internal ItemState State {
-    //    get => _state;
-    //    set {
-    //        if (value == _state) { return; }
-    //        _state = value;
-    //        OnChanged();
-    //    }
-    //}
+    internal bool IsPending {
+        get => _isPending;
+        set {
+            if (value == _isPending) { return; }
+            _isPending = value;
+            OnChanged();
+        }
+    }
 
     #endregion
 

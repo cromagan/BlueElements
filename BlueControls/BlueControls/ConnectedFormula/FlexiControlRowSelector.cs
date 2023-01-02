@@ -35,7 +35,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
     #region Fields
 
-    public readonly Database? FilterDefiniton;
+    public readonly DatabaseAbstract? FilterDefiniton;
 
     public ItemCollectionPad? ParentCol;
 
@@ -53,7 +53,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
     #region Constructors
 
-    public FlexiControlRowSelector(DatabaseAbstract? database, ItemCollectionPad parent, Database? filterdef, string caption, string showFormat) : base() {
+    public FlexiControlRowSelector(DatabaseAbstract? database, ItemCollectionPad parent, DatabaseAbstract? filterdef, string caption, string showFormat) : base() {
         CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
         EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
 

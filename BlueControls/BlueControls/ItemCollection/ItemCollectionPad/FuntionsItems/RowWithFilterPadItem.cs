@@ -39,7 +39,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
     #region Fields
 
-    public readonly Database FilterDefiniton;
+    public readonly DatabaseAbstract FilterDefiniton;
 
     private string _anzeige = string.Empty;
 
@@ -53,9 +53,9 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
     #region Constructors
 
-    public RowWithFilterPadItem(Database? db, int id) : this(string.Empty, db, id) { }
+    public RowWithFilterPadItem(DatabaseAbstract? db, int id) : this(string.Empty, db, id) { }
 
-    public RowWithFilterPadItem(string intern, Database? db, int id) : base(intern) {
+    public RowWithFilterPadItem(string intern, DatabaseAbstract? db, int id) : base(intern) {
         Database = db;
 
         Id = id;
@@ -405,7 +405,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         }
     }
 
-    private Database GenerateFilterDatabase() {
+    private DatabaseAbstract GenerateFilterDatabase() {
         Database x = new(false, "Filterdatabase_" + Internal);
         var sp = x.Column.GenerateAndAdd("Spalte", "Spalte", VarType.Text);
         sp.Align = AlignmentHorizontal.Rechts;

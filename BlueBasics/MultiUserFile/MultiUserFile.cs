@@ -506,7 +506,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         // Wenn kein Dateiname angegeben ist oder bei Readonly wird die Datei nicht gespeichert und die Pendings bleiben erhalten!
         RemoveWatcher();
         Filename = newFileName;
-        OnDiscardPendingChanges(); // Oben beschrieben. Sonst passiert bei Reload, dass diese wiederholt werden.
+        //OnDiscardPendingChanges(); // Oben beschrieben. Sonst passiert bei Reload, dass diese wiederholt werden.
         var l = OnToListOfByte();
         using (FileStream x = new(newFileName, FileMode.Create, FileAccess.Write, FileShare.None)) {
             x.Write(l.ToArray(), 0, l.ToArray().Length);
@@ -732,10 +732,6 @@ public sealed class MultiUserFile : IDisposableExtended {
             bLoaded = UnzipIt(bLoaded);
         }
         return (bLoaded, tmpLastSaveCode2);
-    }
-
-    private void OnDiscardPendingChanges() {
-        DiscardPendingChanges?.Invoke(this, System.EventArgs.Empty);
     }
 
     private bool OnHasPendingChanges() {
