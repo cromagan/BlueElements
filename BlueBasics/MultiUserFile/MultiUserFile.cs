@@ -407,30 +407,6 @@ public sealed class MultiUserFile : IDisposableExtended {
         }
     }
 
-    public void LoadFromStream(Stream stream) {
-        lock (_lockload) {
-            IsLoading = true;
-
-            OnLoading(System.EventArgs.Empty);
-            byte[] bLoaded;
-            using (BinaryReader r = new(stream)) {
-                bLoaded = r.ReadBytes((int)stream.Length);
-                r.Close();
-            }
-
-            if (bLoaded.Length > 4 && BitConverter.ToInt32(bLoaded, 0) == 67324752) {
-                // Gezipte Daten-Kennung gefunden
-                bLoaded = UnzipIt(bLoaded);
-            }
-
-            OnParseExternal(bLoaded);
-
-            IsLoading = false;
-
-            OnLoaded();
-        }
-    }
-
     public void RepairOldBlockFiles() {
         if (DateTime.UtcNow.Subtract(_lastMessageUtc).TotalMinutes < 1) { return; }
         _lastMessageUtc = DateTime.UtcNow;

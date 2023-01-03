@@ -1297,6 +1297,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabControl.TabDefault = this.tabDatenFormat;
             this.tabControl.TabDefaultOrder = null;
             this.tabControl.TabIndex = 15;
+            this.tabControl.SelectedIndexChanged += new System.EventHandler(this.tabControl_SelectedIndexChanged);
             // 
             // tabDatenFormat
             // 

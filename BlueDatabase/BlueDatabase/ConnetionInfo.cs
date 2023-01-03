@@ -18,6 +18,8 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using System.Collections.Generic;
 
 namespace BlueDatabase;
@@ -25,7 +27,7 @@ namespace BlueDatabase;
 /// <summary>
 /// Informationen über eine Datenbank oder wie diese erzeugt werden kann.
 /// </summary>
-public class ConnectionInfo {
+public class ConnectionInfo : IReadableText {
 
     #region Fields
 
@@ -40,8 +42,7 @@ public class ConnectionInfo {
     /// </summary>
     /// <param name="uniqueID"></param>
     public ConnectionInfo(string uniqueID) {
-        if (uniqueID.FileSuffix().ToUpper() == "MDB" &&
-            uniqueID.Substring(1, 1) == ":" &&
+        if ( uniqueID.Substring(1, 1) == ":" && uniqueID.FileSuffix().ToUpper() == "MDB" &&
             System.IO.File.Exists(uniqueID)) {
             TableName = SQLBackAbstract.MakeValidTableName(uniqueID.FileNameWithoutSuffix());
             Provider = null;
@@ -145,6 +146,17 @@ public class ConnectionInfo {
     /// Eindeutiger Schlüssel, mit dem eine Datenbank von vorhandenen Datenbanken wieder gefunden werden kann.
     /// </summary>
     public string UniqueID => TableName + "|" + DatabaseID + "|" + AdditionalData;
+
+    #endregion
+
+    #region Methods
+
+    public string ReadableText() => TableName;
+
+    public QuickImage? SymbolForReadableText() {
+        if (AdditionalData.ToLower().Contains(".mdb")) { return QuickImage.Get(ImageCode.Diskette, 16); }
+        return QuickImage.Get(ImageCode.Datenbank, 16);
+    }
 
     #endregion
 }

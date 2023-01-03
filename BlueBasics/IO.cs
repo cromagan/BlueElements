@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq.Expressions;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -255,10 +256,17 @@ public static class IO {
     }
 
     public static string FileSuffix(this string name) {
-        if (string.IsNullOrEmpty(name)) { return string.Empty; }
-        if (!name.Contains(".")) { return string.Empty; }
-        var l = Path.GetExtension(name);
-        return string.IsNullOrEmpty(l) ? string.Empty : l.Substring(1);
+        try {
+            if (string.IsNullOrEmpty(name)) { return string.Empty; }
+            if (!name.Contains(".")) { return string.Empty; }
+            var l = Path.GetExtension(name);
+            return string.IsNullOrEmpty(l) ? string.Empty : l.Substring(1);
+        } catch        {
+            // Illegales Zeichen im Pfad?
+            return string.Empty;
+        }
+
+
     }
 
     public static FileFormat FileType(this string filename) => string.IsNullOrEmpty(filename)

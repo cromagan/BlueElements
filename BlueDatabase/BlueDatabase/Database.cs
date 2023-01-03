@@ -35,6 +35,7 @@ namespace BlueDatabase;
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
 public sealed class Database : DatabaseAbstract {
+
     #region Fields
 
     public ListExt<WorkItem>? Works;
@@ -84,140 +85,13 @@ public sealed class Database : DatabaseAbstract {
     public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseID, Filename);
 
     //_muf != null ? _muf.Filename : string.Empty;
-    public string Filename { get; set; }
+    public string Filename { get; set; } = string.Empty;
 
     #endregion
 
     #region Methods
 
-    public override string AdditionaFilesPfadWhole() {
-        var x = base.AdditionaFilesPfadWhole();
-        if (!string.IsNullOrEmpty(x)) { return x; }
-
-        if (!string.IsNullOrEmpty(Filename)) {
-            var t = (Filename.FilePath() + "AdditionaFiles\\").CheckPath();
-            if (DirectoryExists(t)) {
-                _additionaFilesPfadtmp = t;
-                return t;
-            }
-        }
-        _additionaFilesPfadtmp = string.Empty;
-        return string.Empty;
-    }
-
-    public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked) {
-        if (string.IsNullOrWhiteSpace(Filename)) { return null; } // Stream-Datenbank
-
-        if (allreadychecked != null) {
-            foreach (var thisa in allreadychecked) {
-                if (thisa is Database db) {
-                    if (string.Equals(db.Filename.FilePath(), Filename.FilePath())) { return null; }
-                }
-                if (thisa is DatabaseMultiUser dbm) {
-                    if (string.Equals(dbm.Filename.FilePath(), Filename.FilePath())) { return null; }
-                }
-            }
-        }
-
-        var nn = Directory.GetFiles(Filename.FilePath(), "*.mdb", SearchOption.AllDirectories);
-        var gb = new List<ConnectionInfo>();
-        foreach (var thisn in nn) {
-            gb.Add(ConnectionDataOfOtherTable(thisn.FileNameWithoutSuffix(), false));
-        }
-        return gb;
-    }
-
-    public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists) {
-        if (string.IsNullOrEmpty(Filename)) { return null; }
-
-        var f = Filename.FilePath() + tableName.FileNameWithoutSuffix() + ".mdb";
-
-        if (checkExists && !File.Exists(f)) { return null; }
-
-        return new ConnectionInfo(f);
-    }
-
-    public bool IsFileAllowedToLoad(string fileName) {
-        foreach (var thisFile in AllFiles) {
-            if (thisFile is Database db) {
-                if (string.Equals(db.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
-                    thisFile.Save();
-                    Develop.DebugPrint(FehlerArt.Warnung, "Doppletes Laden von " + fileName);
-                    return false;
-                }
-            }
-
-            if (thisFile is DatabaseMultiUser dbm) {
-                if (string.Equals(dbm.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
-                    thisFile.Save();
-                    Develop.DebugPrint(FehlerArt.Warnung, "Doppletes Laden von " + fileName);
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting) {
-        if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
-        if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(FehlerArt.Fehler, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
-        if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(FehlerArt.Fehler, "Dateiname nicht angegeben!"); }
-        //fileNameToLoad = modConverter.SerialNr2Path(fileNameToLoad);
-        if (!createWhenNotExisting && !CanWriteInDirectory(fileNameToLoad.FilePath())) { SetReadOnly(); }
-        if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
-        if (!FileExists(fileNameToLoad)) {
-            if (createWhenNotExisting) {
-                if (ReadOnly) {
-                    Develop.DebugPrint(FehlerArt.Fehler, "Readonly kann keine Datei erzeugen<br>" + fileNameToLoad);
-                    return;
-                }
-                SaveAsAndChangeTo(fileNameToLoad);
-            } else {
-                Develop.DebugPrint(FehlerArt.Warnung, "Datei existiert nicht: " + fileNameToLoad);  // Readonly deutet auf Backup hin, in einem anderne Verzeichnis (Linked)
-                SetReadOnly();
-                return;
-            }
-        }
-        Filename = fileNameToLoad;
-        //ReCreateWatcher();
-        // Wenn ein Dateiname auf Nix gesezt wird, z.B: bei Bitmap import
-        if (string.IsNullOrEmpty(Filename)) { return; }
-
-        //LoadingEventArgs ec = new(_initialLoadDone);
-        OnLoading();
-
-        var bLoaded = LoadBytesFromDisk(BlueBasics.Enums.ErrorReason.Load);
-        if (bLoaded == null) { return; }
-
-        Parse(bLoaded);
-
-        RepairAfterParse();
-        OnLoaded();
-        CreateWatcher();
-    }
-
-    public void LoadFromStream(Stream stream) {
-        OnLoading();
-        byte[] bLoaded;
-        using (BinaryReader r = new(stream)) {
-            bLoaded = r.ReadBytes((int)stream.Length);
-            r.Close();
-        }
-
-        if (bLoaded.Length > 4 && BitConverter.ToInt32(bLoaded, 0) == 67324752) {
-            // Gezipte Daten-Kennung gefunden
-            bLoaded = MultiUserFile.UnzipIt(bLoaded);
-        }
-
-        Parse(bLoaded);
-
-        RepairAfterParse();
-        OnLoaded();
-        CreateWatcher();
-    }
-
-    public void Parse(byte[] bLoaded, ref int pointer, out DatabaseDataType type, ref long colKey, ref long rowKey, out string value, out int width, out int height) {
+    public static void Parse(byte[] bLoaded, ref int pointer, out DatabaseDataType type, ref long colKey, ref long rowKey, out string value, out int width, out int height) {
         int les;
         switch ((Routinen)bLoaded[pointer]) {
             case Routinen.CellFormat: {
@@ -333,6 +207,139 @@ public sealed class Database : DatabaseAbstract {
                     break;
                 }
         }
+    }
+
+    public override string AdditionaFilesPfadWhole() {
+        var x = base.AdditionaFilesPfadWhole();
+        if (!string.IsNullOrEmpty(x)) { return x; }
+
+        if (!string.IsNullOrEmpty(Filename)) {
+            var t = (Filename.FilePath() + "AdditionaFiles\\").CheckPath();
+            if (DirectoryExists(t)) {
+                _additionaFilesPfadtmp = t;
+                return t;
+            }
+        }
+        _additionaFilesPfadtmp = string.Empty;
+        return string.Empty;
+    }
+
+    public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked, List<string>? ignorePath) {
+        if (string.IsNullOrWhiteSpace(Filename)) { return null; } // Stream-Datenbank
+
+        if (allreadychecked != null) {
+            foreach (var thisa in allreadychecked) {
+                if (thisa is Database db) {
+                    if (string.Equals(db.Filename.FilePath(), Filename.FilePath())) { return null; }
+                }
+                if (thisa is DatabaseMultiUser dbm) {
+                    if (string.Equals(dbm.Filename.FilePath(), Filename.FilePath())) { return null; }
+                }
+            }
+        }
+
+        if (ignorePath != null) {
+            foreach (var thisPF in ignorePath) {
+                if (Filename.FilePath().StartsWith(thisPF, StringComparison.OrdinalIgnoreCase)) { return null; }
+            }
+        }
+
+        var nn = Directory.GetFiles(Filename.FilePath(), "*.mdb", SearchOption.AllDirectories);
+        var gb = new List<ConnectionInfo>();
+        foreach (var thisn in nn) {
+            gb.Add(ConnectionDataOfOtherTable(thisn.FileNameWithoutSuffix(), false));
+        }
+        return gb;
+    }
+
+    public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists) {
+        if (string.IsNullOrEmpty(Filename)) { return null; }
+
+        var f = Filename.FilePath() + tableName.FileNameWithoutSuffix() + ".mdb";
+
+        if (checkExists && !File.Exists(f)) { return null; }
+
+        return new ConnectionInfo(f);
+    }
+
+    public bool IsFileAllowedToLoad(string fileName) {
+        foreach (var thisFile in AllFiles) {
+            if (thisFile is Database db) {
+                if (string.Equals(db.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
+                    thisFile.Save();
+                    Develop.DebugPrint(FehlerArt.Warnung, "Doppletes Laden von " + fileName);
+                    return false;
+                }
+            }
+
+            if (thisFile is DatabaseMultiUser dbm) {
+                if (string.Equals(dbm.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
+                    thisFile.Save();
+                    Develop.DebugPrint(FehlerArt.Warnung, "Doppletes Laden von " + fileName);
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting) {
+        if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
+        if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(FehlerArt.Fehler, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
+        if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(FehlerArt.Fehler, "Dateiname nicht angegeben!"); }
+        //fileNameToLoad = modConverter.SerialNr2Path(fileNameToLoad);
+        if (!createWhenNotExisting && !CanWriteInDirectory(fileNameToLoad.FilePath())) { SetReadOnly(); }
+        if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
+        if (!FileExists(fileNameToLoad)) {
+            if (createWhenNotExisting) {
+                if (ReadOnly) {
+                    Develop.DebugPrint(FehlerArt.Fehler, "Readonly kann keine Datei erzeugen<br>" + fileNameToLoad);
+                    return;
+                }
+                SaveAsAndChangeTo(fileNameToLoad);
+            } else {
+                Develop.DebugPrint(FehlerArt.Warnung, "Datei existiert nicht: " + fileNameToLoad);  // Readonly deutet auf Backup hin, in einem anderne Verzeichnis (Linked)
+                SetReadOnly();
+                return;
+            }
+        }
+        Filename = fileNameToLoad;
+        //ReCreateWatcher();
+        // Wenn ein Dateiname auf Nix gesezt wird, z.B: bei Bitmap import
+        if (string.IsNullOrEmpty(Filename)) { return; }
+
+        //LoadingEventArgs ec = new(_initialLoadDone);
+        OnLoading();
+
+        var bLoaded = LoadBytesFromDisk(BlueBasics.Enums.ErrorReason.Load);
+        if (bLoaded == null) { return; }
+
+        Parse(bLoaded);
+
+        RepairAfterParse();
+        OnLoaded();
+        CreateWatcher();
+    }
+
+    public void LoadFromStream(Stream stream) {
+        OnLoading();
+        byte[] bLoaded;
+        using (BinaryReader r = new(stream)) {
+            bLoaded = r.ReadBytes((int)stream.Length);
+            r.Close();
+        }
+
+        if (bLoaded.Length > 4 && BitConverter.ToInt32(bLoaded, 0) == 67324752) {
+            // Gezipte Daten-Kennung gefunden
+            bLoaded = MultiUserFile.UnzipIt(bLoaded);
+        }
+
+        Parse(bLoaded);
+
+        RepairAfterParse();
+        OnLoaded();
+        CreateWatcher();
     }
 
     public void Parse(byte[] data) {

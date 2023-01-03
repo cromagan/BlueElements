@@ -292,15 +292,6 @@ internal sealed partial class ColumnEditor {
         cbxSort.Item.AddRange(typeof(SortierTyp));
         cbxLinkedDatabase.Item.Clear();
 
-        var l = DatabaseAbstract.AllAvailableTables();
-
-        //if (!string.IsNullOrEmpty(_column.Database.Filename)) {
-        //var all = Directory.GetFiles(_column.Database.Filename.FilePath(), "*.mdb", SearchOption.TopDirectoryOnly);
-        foreach (var thisString in l) {
-            if (!string.Equals(thisString.UniqueID, _column.Database.ConnectionData.UniqueID, StringComparison.OrdinalIgnoreCase)) { cbxLinkedDatabase.Item.Add(thisString.TableName, thisString.UniqueID); }
-        }
-        //}
-        cbxLinkedDatabase.Item.Sort();
         if (cbxEinheit.Item.Count < 1) {
             cbxEinheit.Item.Add("µm", ImageCode.Lineal);
             cbxEinheit.Item.Add("mm", ImageCode.Lineal);
@@ -638,6 +629,20 @@ internal sealed partial class ColumnEditor {
             } else {
                 thisr.CellSet("Such", string.Empty);
             }
+        }
+    }
+
+    private void tabControl_SelectedIndexChanged(object sender, System.EventArgs e) {
+        if (tabControl.SelectedTab == tabSpaltenVerlinkung && cbxLinkedDatabase.Item.Count == 0) {
+            var l = DatabaseAbstract.AllAvailableTables(null);
+
+            //if (!string.IsNullOrEmpty(_column.Database.Filename)) {
+            //var all = Directory.GetFiles(_column.Database.Filename.FilePath(), "*.mdb", SearchOption.TopDirectoryOnly);
+            foreach (var thisString in l) {
+                if (!string.Equals(thisString.UniqueID, _column.Database.ConnectionData.UniqueID, StringComparison.OrdinalIgnoreCase)) { cbxLinkedDatabase.Item.Add(thisString.TableName, thisString.UniqueID); }
+            }
+            //}
+            cbxLinkedDatabase.Item.Sort();
         }
     }
 

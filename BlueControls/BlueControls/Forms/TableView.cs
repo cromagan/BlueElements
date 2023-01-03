@@ -587,7 +587,10 @@ public partial class TableView : Form {
         DatabaseAbstract.ForceSaveAll();
         BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
 
-        if (Table.Database is DatabaseMultiUser BDB) {
+        if (Table.Database is DatabaseMultiUser BDBM) {
+            ExecuteFile(BDBM.Filename.FilePath());
+        }
+        if (Table.Database is Database BDB) {
             ExecuteFile(BDB.Filename.FilePath());
         }
     }

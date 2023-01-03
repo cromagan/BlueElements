@@ -337,7 +337,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     #region Methods
 
-    public static List<ConnectionInfo> AllAvailableTables() {
+    public static List<ConnectionInfo> AllAvailableTables(List<string>? ignorePath) {
         var allavailabletables = new List<ConnectionInfo>();
 
         // Wird benutzt, um z.b. das Dateisystem nicht doppelt und dreifach abzufragen.
@@ -349,7 +349,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         alf.AddRange(AllFiles);
 
         foreach (var thisDB in alf) {
-            var possibletables = thisDB.AllAvailableTables(allreadychecked);
+            var possibletables = thisDB.AllAvailableTables(allreadychecked, ignorePath);
             allreadychecked.Add(thisDB);
 
             if (possibletables != null) {
@@ -545,7 +545,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         return string.Empty;
     }
 
-    public abstract List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked);
+    public abstract List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked, List<string>? ignorePath);
 
     public void CancelBackGroundWorker() {
         if (_backgroundWorker.IsBusy && !_backgroundWorker.CancellationPending) { _backgroundWorker.CancelAsync(); }
@@ -1235,6 +1235,8 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     protected void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName) => AddUndo(tableName, comand, column?.Key ?? -1, row?.Key ?? -1, previousValue, changedTo, userName);
 
     protected void CreateWatcher() {
+        if (_backgroundWorker != null) { return; }
+
         _backgroundWorker = new BackgroundWorker {
             WorkerReportsProgress = false,
             WorkerSupportsCancellation = true
@@ -1349,6 +1351,8 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// <param name="height"></param>
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
     protected virtual string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height, bool isLoading) {
+        if (type.IsObsolete()) { return string.Empty; }
+
         if (type.IsColumnTag()) {
             var c = Column.SearchByKey(columnkey);
             if (c == null) {
@@ -1509,16 +1513,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
             case DatabaseDataType.EOF:
                 return string.Empty;
-
-            case (DatabaseDataType)2:
-            case (DatabaseDataType)3:
-            case (DatabaseDataType)22:
-            case (DatabaseDataType)62:
-            case (DatabaseDataType)53:
-            case (DatabaseDataType)33:
-            case (DatabaseDataType)65:
-            case (DatabaseDataType)58:
-                break;
 
             default:
                 // Variable type

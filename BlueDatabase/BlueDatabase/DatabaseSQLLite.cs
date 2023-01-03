@@ -130,7 +130,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     #region Methods
 
-    public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked) {
+    public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked, List<string>? ignorePath) {
         if (allreadychecked != null) {
             foreach (var thisa in allreadychecked) {
                 if (thisa is DatabaseSQLLite db) {
@@ -152,7 +152,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists) {
         if (checkExists) {
-            var t = AllAvailableTables();
+            var t = AllAvailableTables(null);
 
             foreach (var thisT in t) {
                 if (string.Equals(tableName, thisT.TableName, StringComparison.InvariantCultureIgnoreCase)) {
@@ -225,7 +225,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         if (l != null && l.Count > 0) {
             foreach (var thisstyle in l) {
                 Enum.TryParse(thisstyle.Key, out DatabaseDataType t);
-                if (t != (DatabaseDataType)0) {
+                if (!t.IsObsolete()) {
                     column.SetValueInternal(t, thisstyle.Value, true);
                 }
             }
@@ -239,6 +239,8 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     protected override void SetUserDidSomething() { }
 
     protected override string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height, bool isLoading) {
+        if (type.IsObsolete()) { return string.Empty; }
+
         if (!isLoading && !ReadOnly) {
             var c = Column.SearchByKey(columnkey);
             if (type == DatabaseDataType.ColumnName) {
@@ -316,7 +318,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
                 if (TableName == tablename) {
                     Enum.TryParse(comand, out DatabaseDataType t);
 
-                    if (t == (DatabaseDataType)0) {
+                    if (t.IsObsolete()) {
                         // Nix tun
                     } else if (t == DatabaseDataType.ColumnName) {
 
@@ -472,7 +474,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
             if (l != null && l.Count > 0) {
                 foreach (var thisstyle in l) {
                     Enum.TryParse(thisstyle.Key, out DatabaseDataType t);
-                    if (t != (DatabaseDataType)0) {
+                    if (!t.IsObsolete()) {
                         SetValueInternal(t, thisstyle.Value, null, null, -1, -1, true);
                     }
                 }

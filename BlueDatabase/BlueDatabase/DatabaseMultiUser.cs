@@ -45,13 +45,9 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
     #region Constructors
 
-    public DatabaseMultiUser(Stream stream, string tablename) : this(stream, string.Empty, true, false, tablename) { }
+    public DatabaseMultiUser(bool readOnly, string tablename) : this(string.Empty, readOnly, true, tablename) { }
 
-    public DatabaseMultiUser(bool readOnly, string tablename) : this(null, string.Empty, readOnly, true, tablename) { }
-
-    public DatabaseMultiUser(string filename, bool readOnly, bool create, string tablename) : this(null, filename, readOnly, create, tablename) { }
-
-    private DatabaseMultiUser(Stream? stream, string filename, bool readOnly, bool create, string tablename) : base(tablename, readOnly) {
+    public DatabaseMultiUser(string filename, bool readOnly, bool create, string tablename) : base(tablename, readOnly) {
         AllFiles.Add(this);
 
         _muf = new BlueBasics.MultiUserFile.MultiUserFile();
@@ -74,8 +70,6 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         if (!string.IsNullOrEmpty(filename)) {
             //DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + filename.FileNameWithoutSuffix()));
             _muf.Load(filename, create);
-        } else if (stream != null) {
-            _muf.LoadFromStream(stream);
         }
         //RepairAfterParse();
     }
@@ -94,30 +88,39 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         //_muf != null ? _muf.Filename : string.Empty;
     }
 
-    public string Filename => _muf != null ? _muf.Filename : string.Empty;
+    public string Filename => _muf?.Filename ?? string.Empty;
 
     public bool IsLoading {
-        get => _muf.IsLoading;
+        get => _muf?.IsLoading ?? false;
     }
 
-    public bool ReloadNeeded => _muf != null && _muf.ReloadNeeded;
+    public bool ReloadNeeded => _muf?.ReloadNeeded ?? false;
 
     #endregion
 
     #region Methods
 
-    public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked) {
+    public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked, List<string>? ignorePath) {
         if (string.IsNullOrWhiteSpace(Filename)) { return null; } // Stream-Datenbank
 
         if (allreadychecked != null) {
             foreach (var thisa in allreadychecked) {
-                if (thisa is DatabaseMultiUser db) {
+                if (thisa is Database db) {
                     if (string.Equals(db.Filename.FilePath(), Filename.FilePath())) { return null; }
+                }
+                if (thisa is DatabaseMultiUser dbm) {
+                    if (string.Equals(dbm.Filename.FilePath(), Filename.FilePath())) { return null; }
                 }
             }
         }
 
-        var nn = System.IO.Directory.GetFiles(Filename.FilePath(), "*.mdb", SearchOption.AllDirectories);
+        if (ignorePath != null) {
+            foreach (var thisPF in ignorePath) {
+                if (Filename.FilePath().StartsWith(thisPF, StringComparison.OrdinalIgnoreCase)) { return null; }
+            }
+        }
+
+        var nn = Directory.GetFiles(Filename.FilePath(), "*.mdb", SearchOption.AllDirectories);
         var gb = new List<ConnectionInfo>();
         foreach (var thisn in nn) {
             gb.Add(ConnectionDataOfOtherTable(thisn.FileNameWithoutSuffix(), false));
@@ -144,123 +147,6 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
     //        return HasPendingChanges();
     //    }
     //}
-    public void Parse(byte[] bLoaded, ref int pointer, out DatabaseDataType type, ref long colKey, ref long rowKey, out string value, out int width, out int height) {
-        int les;
-        switch ((Routinen)bLoaded[pointer]) {
-            case Routinen.CellFormat: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    les = NummerCode3(bLoaded, pointer + 2);
-                    colKey = NummerCode3(bLoaded, pointer + 5);
-                    rowKey = NummerCode3(bLoaded, pointer + 8);
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
-                    value = b.ToStringWin1252();
-                    width = NummerCode2(bLoaded, pointer + 11 + les);
-                    height = NummerCode2(bLoaded, pointer + 11 + les + 2);
-                    pointer += 11 + les + 4;
-                    break;
-                }
-            case Routinen.CellFormatUTF8: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    les = NummerCode3(bLoaded, pointer + 2);
-                    colKey = NummerCode3(bLoaded, pointer + 5);
-                    rowKey = NummerCode3(bLoaded, pointer + 8);
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
-                    value = b.ToStringUtf8();
-                    width = NummerCode2(bLoaded, pointer + 11 + les);
-                    height = NummerCode2(bLoaded, pointer + 11 + les + 2);
-                    pointer += 11 + les + 4;
-                    break;
-                }
-            case Routinen.CellFormatUTF8_V400: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    les = NummerCode3(bLoaded, pointer + 2);
-                    colKey = NummerCode7(bLoaded, pointer + 5);
-                    rowKey = NummerCode7(bLoaded, pointer + 12);
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 19, b, 0, les);
-                    value = b.ToStringUtf8();
-                    width = NummerCode2(bLoaded, pointer + 19 + les);
-                    height = NummerCode2(bLoaded, pointer + 19 + les + 2);
-                    pointer += 19 + les + 4;
-                    break;
-                }
-            case Routinen.DatenAllgemein: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    les = NummerCode3(bLoaded, pointer + 2);
-                    colKey = -1;
-                    rowKey = -1;
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 5, b, 0, les);
-                    value = b.ToStringWin1252();
-                    width = 0;
-                    height = 0;
-                    pointer += 5 + les;
-                    break;
-                }
-            case Routinen.DatenAllgemeinUTF8: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    les = NummerCode3(bLoaded, pointer + 2);
-                    colKey = -1;
-                    rowKey = -1;
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 5, b, 0, les);
-                    value = b.ToStringUtf8();
-                    width = 0;
-                    height = 0;
-                    pointer += 5 + les;
-                    break;
-                }
-            case Routinen.Column: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    les = NummerCode3(bLoaded, pointer + 2);
-                    colKey = NummerCode3(bLoaded, pointer + 5);
-                    rowKey = NummerCode3(bLoaded, pointer + 8);
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
-                    value = b.ToStringWin1252();
-                    width = 0;
-                    height = 0;
-                    pointer += 11 + les;
-                    break;
-                }
-            case Routinen.ColumnUTF8: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    les = NummerCode3(bLoaded, pointer + 2);
-                    colKey = NummerCode3(bLoaded, pointer + 5);
-                    rowKey = NummerCode3(bLoaded, pointer + 8);
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
-                    value = b.ToStringUtf8();
-                    width = 0;
-                    height = 0;
-                    pointer += 11 + les;
-                    break;
-                }
-            case Routinen.ColumnUTF8_V400: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    les = NummerCode3(bLoaded, pointer + 2);
-                    colKey = NummerCode7(bLoaded, pointer + 5);
-                    rowKey = NummerCode7(bLoaded, pointer + 12);
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 19, b, 0, les);
-                    value = b.ToStringUtf8();
-                    width = 0;
-                    height = 0;
-                    pointer += 19 + les;
-                    break;
-                }
-            default: {
-                    type = (DatabaseDataType)0;
-                    value = string.Empty;
-                    width = 0;
-                    height = 0;
-                    Develop.DebugPrint(FehlerArt.Fehler, "Laderoutine nicht definiert: " + bLoaded[pointer]);
-                    break;
-                }
-        }
-    }
 
     //public bool HasPendingChanges() {
     //    try {
@@ -296,7 +182,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         do {
             if (pointer >= b.Length) { break; }
 
-            Parse(b, ref pointer, out var art, ref colKey, ref rowKey, out var inhalt, out var x, out var y);
+            Database.Parse(b, ref pointer, out var art, ref colKey, ref rowKey, out var inhalt, out var x, out var y);
 
             #region Zeile suchen oder erstellen
 
@@ -611,6 +497,9 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
     private void _muf_Loaded(object sender, System.EventArgs e) {
         OnLoaded();
+
+        RepairAfterParse();
+        CreateWatcher();
     }
 
     private void _muf_Loading(object sender, System.EventArgs e) {

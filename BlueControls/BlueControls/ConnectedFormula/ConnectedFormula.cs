@@ -327,8 +327,8 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
 
         foreach (var thisit in PadData) {
             if (thisit is RowWithFilterPadItem rwf) {
-                if (rwf.Database is Database BDB) {
-                    DatabaseFiles.AddIfNotExists(BDB.Filename);
+                if (rwf.Database != null) {
+                    DatabaseFiles.AddIfNotExists(rwf.Database.ConnectionData.UniqueID);
                     _id = Math.Max(_id, rwf.Id);
                 }
             }

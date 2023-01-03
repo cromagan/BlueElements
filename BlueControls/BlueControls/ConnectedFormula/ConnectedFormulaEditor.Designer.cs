@@ -50,7 +50,6 @@ namespace BlueControls.Forms {
             this.btnNeuDB = new BlueControls.Controls.Button();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
-            this.LoadTabDatabase = new System.Windows.Forms.OpenFileDialog();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabEditorNewRow = new System.Windows.Forms.TabPage();
             this.grpDesign.SuspendLayout();
@@ -427,11 +426,6 @@ namespace BlueControls.Forms {
             this.SaveTab.Filter = "*.CFO Formulare|*.CFO|*.* Alle Dateien|*";
             this.SaveTab.Title = "Bitte neuen Dateinamen des Formulars wählen.";
             // 
-            // LoadTabDatabase
-            // 
-            this.LoadTabDatabase.Filter = "*.MDB Datenbanken|*.MDB|*.* Alle Dateien|*";
-            this.LoadTabDatabase.Title = "Bitte Datenbank wählen:";
-            // 
             // tabPage1
             // 
             this.tabPage1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
@@ -494,7 +488,6 @@ namespace BlueControls.Forms {
         private Controls.Button btnNeuDB;
         private System.Windows.Forms.OpenFileDialog LoadTab;
         private System.Windows.Forms.SaveFileDialog SaveTab;
-        private System.Windows.Forms.OpenFileDialog LoadTabDatabase;
         private Controls.Button btnFileExplorer;
         private Controls.GroupBox groupBox1;
         private Controls.GroupBox grpOptik;

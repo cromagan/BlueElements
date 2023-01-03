@@ -2482,7 +2482,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     /// <param name="newvalue"></param>
     /// <returns></returns>
     internal string SetValueInternal(DatabaseDataType type, string newvalue, bool isLoading) {
-        //Develop.CheckStackForOverflow();
+        if (type.IsObsolete()) { return string.Empty; }
 
         switch (type) {
             case DatabaseDataType.ColumnKey:

@@ -184,24 +184,35 @@ public partial class ConnectedFormulaEditor : PadEditor {
         ChooseDatabaseAndId(it);
     }
 
-    private void CheckButtons() {
-    }
+    private void CheckButtons() { }
 
     private void ChooseDatabaseAndId(ICalculateRowsItemLevel? it) {
         if (_cf == null || it == null) { return; }
 
-        if (string.IsNullOrEmpty(LoadTabDatabase.InitialDirectory)) {
-            LoadTabDatabase.InitialDirectory = _cf.Filename.FilePath();
+        var l = DatabaseAbstract.AllAvailableTables(null);
+
+        var l2 = new ItemCollection.ItemCollectionList.ItemCollectionList();
+
+        foreach (var thisd in l) {
+            l2.Add(thisd, thisd.UniqueID);
         }
 
-        LoadTabDatabase.ShowDialog();
+        var x = BlueControls.Forms.InputBoxListBoxStyle.Show("Datenbank wählen:", l2, Enums.AddType.None, true);
 
-        if (!FileExists(LoadTabDatabase.FileName)) { return; }
-        LoadTabDatabase.InitialDirectory = LoadTabDatabase.FileName.FilePath();
+        if (x == null || x.Count != 1) { return; }
 
-        _cf.DatabaseFiles.AddIfNotExists(LoadTabDatabase.FileName);
+        //if (string.IsNullOrEmpty(LoadTabDatabase.InitialDirectory)) {
+        //    LoadTabDatabase.InitialDirectory = _cf.Filename.FilePath();
+        //}
 
-        var db = DatabaseAbstract.GetByID(new ConnectionInfo(LoadTabDatabase.FileName));
+        //LoadTabDatabase.ShowDialog();
+
+        //if (!FileExists(LoadTabDatabase.FileName)) { return; }
+        //LoadTabDatabase.InitialDirectory = LoadTabDatabase.FileName.FilePath();
+
+        //_cf.DatabaseFiles.AddIfNotExists(LoadTabDatabase.FileName);
+
+        var db = DatabaseAbstract.GetByID(new ConnectionInfo(x[0]));
         if (db == null) { return; }
 
         it.Database = db;
