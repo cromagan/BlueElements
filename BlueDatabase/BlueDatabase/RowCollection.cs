@@ -574,7 +574,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
-    //internal void SaveToByteList(List<byte> l) => Database.SaveToByteList(l, enDatabaseDataType.LastRowKey, _LastRowKey.ToString());
     private void Dispose(bool disposing) {
         if (!IsDisposed) {
             if (disposing) {

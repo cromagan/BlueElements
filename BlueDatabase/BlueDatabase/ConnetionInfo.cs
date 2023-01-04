@@ -60,7 +60,7 @@ public class ConnectionInfo : IReadableText {
             var d = thisDB.ConnectionData;
 
             if (d.DatabaseID == x[1]) {
-                TableName = d.TableName;
+                TableName = x[0].ToUpper();
                 Provider = thisDB;
                 DatabaseID = d.DatabaseID;
                 AdditionalData = d.AdditionalData;

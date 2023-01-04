@@ -91,6 +91,22 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
     public DatabaseAbstract? Database { get; set; }
 
+    public string Datenbank_wählen {
+        get => string.Empty;
+        set {
+            var db = BlueControls.Forms.CommonDialogs.ChooseKnownDatabase();
+
+            if (db == null) { return; }
+
+            if (db == Database) { return; }
+            Database = db;
+
+            FilterDatabaseUpdate();
+
+            RepairConnections();
+        }
+    }
+
     public string Datenbankkopf {
         get => string.Empty;
         set {
@@ -166,6 +182,9 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
+
+        l.Add(new FlexiControlForProperty<string>(() => Datenbank_wählen, ImageCode.Datenbank));
+        l.Add(new FlexiControl());
         if (Database == null) { return l; }
         l.Add(new FlexiControlForProperty<string>(() => Überschrift));
         l.Add(new FlexiControlForProperty<string>(() => Anzeige));

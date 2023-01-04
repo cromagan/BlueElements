@@ -227,6 +227,14 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
     }
 
     public string ErrorReason() {
+        if (Database?.IsDisposed ?? true) { return "Datenbank verworfen"; }
+
+        if (_typ == ExportTyp.DatenbankOriginalFormat) {
+            if (Database is not (BlueDatabase.Database or DatabaseMultiUser)) {
+                return "Nur von dateibasierten Datenbanken können nur Exporte im Originalformat stattfinden.";
+            }
+        }
+
         if (string.IsNullOrEmpty(Database.DefaultBackupPath()) && _typ != ExportTyp.EinzelnMitFormular) {
             return "Nur von Datenbanken, die auch auf der Festplatte gespeichert sind, kann ein Export stattfinden.";
         }
@@ -462,6 +470,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
         if (_typ is ExportTyp.DatenbankCSVFormat or ExportTyp.DatenbankHTMLFormat or ExportTyp.DatenbankOriginalFormat) {
             for (var n = 0; n < BereitsExportiert.Count; n++) {
                 if (worker != null && worker.CancellationPending) { break; }
+                if (Database.IsDisposed) { return false; }
                 if (!string.IsNullOrEmpty(BereitsExportiert[n])) {
                     var x = BereitsExportiert[n].SplitAndCutBy("|");
                     if ((float)DateTime.Now.Subtract(DateTimeParse(x[1])).TotalDays > _autoDelete) {
@@ -478,6 +487,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
             // Dabei ist der Filter egall
             foreach (var thisrow in Database.Row) {
                 if (worker != null && worker.CancellationPending) { break; }
+                if (Database.IsDisposed) { return false; }
                 if (thisrow != null) {
                     if (_filter != null && _filter.Count > 0 && !thisrow.MatchesTo(_filter)) {
                         var tmp = DeleteId(thisrow.Key, worker);
@@ -488,6 +498,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
             // Einträge, die noch vorhanden sind aber der Filter NICHT mehr zutrifft, löschen
             foreach (var thisrow in Database.Row) {
                 if (worker != null && worker.CancellationPending) { break; }
+                if (Database.IsDisposed) { return false; }
                 if (thisrow != null) {
                     if (Database.Cell.GetDateTime(Database.Column.SysRowChangeDate, thisrow).Subtract(_lastExportTimeUtc).TotalSeconds > 0) {
                         var tmp = DeleteId(thisrow.Key, worker);
@@ -590,6 +601,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
                                 }
                             }
                         }
+                        if (Database?.IsDisposed ?? true) { return false; }
                         if (worker != null && worker.CancellationPending) { break; }
                     }
                     break;
@@ -626,6 +638,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
         var did = false;
         for (var f = 0; f < BereitsExportiert.Count; f++) {
             if (worker.CancellationPending) { break; }
+            if (Database?.IsDisposed ?? true) { return false; }
             if (!string.IsNullOrEmpty(BereitsExportiert[f])) {
                 if (BereitsExportiert[f].EndsWith("|" + id)) {
                     var x = BereitsExportiert[f].SplitAndCutBy("|");

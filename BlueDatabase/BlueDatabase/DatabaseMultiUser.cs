@@ -48,8 +48,6 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
     public DatabaseMultiUser(bool readOnly, string tablename) : this(string.Empty, readOnly, true, tablename) { }
 
     public DatabaseMultiUser(string filename, bool readOnly, bool create, string tablename) : base(tablename, readOnly) {
-        AllFiles.Add(this);
-
         _muf = new BlueBasics.MultiUserFile.MultiUserFile();
 
         _muf.Loaded += _muf_Loaded;
@@ -71,7 +69,8 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
             //DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + filename.FileNameWithoutSuffix()));
             _muf.Load(filename, create);
         }
-        //RepairAfterParse();
+
+        AllFiles.Add(this);
     }
 
     #endregion
@@ -80,19 +79,11 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
     public static string DatabaseID { get => "BlueDatabaseMultiUser"; }
 
-    public override ConnectionInfo ConnectionData {
-        get {
-            return new ConnectionInfo(TableName, this, DatabaseID, Filename);
-        }
-
-        //_muf != null ? _muf.Filename : string.Empty;
-    }
+    public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseID, Filename);
 
     public string Filename => _muf?.Filename ?? string.Empty;
 
-    public bool IsLoading {
-        get => _muf?.IsLoading ?? false;
-    }
+    public bool IsLoading => _muf?.IsLoading ?? false;
 
     public bool ReloadNeeded => _muf?.ReloadNeeded ?? false;
 
@@ -142,125 +133,9 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
     public void Load_Reload() => _muf?.Load_Reload();
 
-    //        return Works.Any(thisWork => thisWork.State == ItemState.Pending);
-    //    } catch {
-    //        return HasPendingChanges();
-    //    }
-    //}
-
-    //public bool HasPendingChanges() {
-    //    try {
-    //        if (ReadOnly) { return false; }
     public void Parse(object sender, MultiUserParseEventArgs e) {
-        Column.ThrowEvents = false;
-        Row.ThrowEvents = false;
-        var pointer = 0;
-
-        ColumnItem? column = null;
-        RowItem? row = null;
-
-        long colKey = 0;
-        long rowKey = 0;
-
-        #region Spalten merken und Variable leeren
-
-        List<ColumnItem?> columnsOld = new();
-        columnsOld.AddRange(Column);
-        Column.Clear();
-
-        #endregion
-
-        #region Pendings merken und Variable leeren
-
-        var oldPendings = Works?.Where(thisWork => thisWork.IsPending).ToList();
-        Works?.Clear();
-
-        #endregion
-
-        var b = e.Data;
-
-        do {
-            if (pointer >= b.Length) { break; }
-
-            Database.Parse(b, ref pointer, out var art, ref colKey, ref rowKey, out var inhalt, out var x, out var y);
-
-            #region Zeile suchen oder erstellen
-
-            if (rowKey > -1) {
-                row = Row.SearchByKey(rowKey);
-                if (row == null) {
-                    //row = Row.GenerateAndAdd(rowKey, string.Empty, false, false);
-                    Row.SetValueInternal(DatabaseDataType.Comand_AddRow, rowKey, true);
-                    row = Row.SearchByKey(rowKey);
-                    row.IsInCache = true;
-                }
-            }
-
-            #endregion
-
-            #region Spalte suchen oder erstellen
-
-            if (colKey > -1) {
-                // Zuerst schauen, ob die Column schon (wieder) in der richtigen Collection ist
-                column = Column.SearchByKey(colKey);
-                if (column == null) {
-                    // Column noch nicht gefunden. Schauen, ob sie vor dem Reload vorhanden war und gg. hinzufügen
-                    foreach (var thisColumn in columnsOld) {
-                        if (thisColumn != null && thisColumn.Key == colKey) {
-                            column = thisColumn;
-                        }
-                    }
-                    if (column != null) {
-                        // Prima, gefunden! Noch die Collections korrigieren
-                        Column.Add(column);
-                        columnsOld.Remove(column);
-                    } else {
-                        // Nicht gefunden, als neu machen
-                        Column.SetValueInternal(DatabaseDataType.Comand_AddColumn, colKey, true);
-                        column = Column.SearchByKey(colKey);
-                        column.IsInCache = true;
-                        //column = Column.GenerateAndAdd(colKey);
-                    }
-                }
-            }
-
-            #endregion
-
-            #region Bei verschlüsselten Datenbanken das Passwort abfragen
-
-            if (art == DatabaseDataType.GlobalShowPass && !string.IsNullOrEmpty(inhalt)) {
-                PasswordEventArgs e2 = new();
-                OnNeedPassword(e2);
-                //b = Cryptography.SimpleCrypt(b, e2.Password, -1, pointer, b.Length - 1);
-                if (e2.Password != inhalt) {
-                    SetReadOnly();
-                    //MessageBox.Show("Zugriff verweigrt, Passwort falsch!", ImageCode.Kritisch, "OK");
-                    break;
-                }
-            }
-
-            #endregion
-
-            var fehler = SetValueInternal(art, inhalt, column?.Key, row?.Key, x, y, true);
-
-            if (art == DatabaseDataType.EOF) { break; }
-            if (!string.IsNullOrEmpty(fehler)) {
-                SetReadOnly();
-                Develop.DebugPrint("Schwerer Datenbankfehler:<br>Version: " + DatabaseVersion + "<br>Datei: " + Filename + "<br>Meldung: " + fehler);
-            }
-        } while (true);
-
-        Row.RemoveNullOrEmpty();
-        Cell.RemoveOrphans();
-        Works?.AddRange(oldPendings);
-        oldPendings?.Clear();
+        Database.Parse(e.Data, this, Works);
         ExecutePending();
-        Column.ThrowEvents = true;
-        Row.ThrowEvents = true;
-
-        FirstColumn = Column[0].Name;
-
-        if (IntParse(LoadedVersion.Replace(".", "")) > IntParse(DatabaseVersion.Replace(".", ""))) { SetReadOnly(); }
     }
 
     public override void RefreshColumnsData(List<ColumnItem>? columns) {
@@ -269,8 +144,6 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         foreach (var thisrow in columns) {
             thisrow.IsInCache = true;
         }
-
-        return;
     }
 
     public override bool RefreshRowData(List<RowItem> row, bool refreshAlways) {
@@ -285,157 +158,11 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
     public override bool Save() => _muf?.Save(true) ?? false;
 
-    public override string UndoText(ColumnItem? column, RowItem? row) {
-        if (Works == null || Works.Count == 0) { return string.Empty; }
-        var cellKey = CellCollection.KeyOfCell(column, row);
-        var t = "";
-        for (var z = Works.Count - 1; z >= 0; z--) {
-            if (Works[z] != null && Works[z].CellKey == cellKey) {
-                t = t + Works[z].UndoTextTableMouseOver() + "<br>";
-            }
-        }
-        t = t.Trim("<br>");
-        t = t.Trim("<hr>");
-        t = t.Trim("<br>");
-        t = t.Trim("<hr>");
-        return t;
-    }
+    public override string UndoText(ColumnItem? column, RowItem? row) => Database.UndoText(column, row, Works);
 
-    public void UnlockHard() {
-        _muf.UnlockHard();
-    }
+    public void UnlockHard() => _muf.UnlockHard();
 
-    internal static void SaveToByteList(ColumnItem c, ref List<byte> l) {
-        var key = c.Key;
-
-        SaveToByteList(l, DatabaseDataType.ColumnName, c.Name, key);
-        SaveToByteList(l, DatabaseDataType.ColumnCaption, c.Caption, key);
-        SaveToByteList(l, DatabaseDataType.ColumnFormat, ((int)c.Format).ToString(), key);
-        SaveToByteList(l, DatabaseDataType.CaptionGroup1, c.CaptionGroup1, key);
-        SaveToByteList(l, DatabaseDataType.CaptionGroup2, c.CaptionGroup2, key);
-        SaveToByteList(l, DatabaseDataType.CaptionGroup3, c.CaptionGroup3, key);
-        SaveToByteList(l, DatabaseDataType.MultiLine, c.MultiLine.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.CellInitValue, c.CellInitValue, key);
-        SaveToByteList(l, DatabaseDataType.SortAndRemoveDoubleAfterEdit, c.AfterEditQuickSortRemoveDouble.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.DoUcaseAfterEdit, c.AfterEditDoUCase.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.AutoCorrectAfterEdit, c.AfterEditAutoCorrect.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.RoundAfterEdit, c.AfterEditRunden.ToString(), key);
-        SaveToByteList(l, DatabaseDataType.AutoRemoveCharAfterEdit, c.AutoRemove, key);
-        SaveToByteList(l, DatabaseDataType.SaveContent, c.SaveContent.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.FilterOptions, ((int)c.FilterOptions).ToString(), key);
-        SaveToByteList(l, DatabaseDataType.AutoFilterJoker, c.AutoFilterJoker, key);
-        SaveToByteList(l, DatabaseDataType.IgnoreAtRowFilter, c.IgnoreAtRowFilter.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.EditableWithTextInput, c.TextBearbeitungErlaubt.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.SpellCheckingEnabled, c.SpellCheckingEnabled.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.ShowMultiLineInOneLine, c.ShowMultiLineInOneLine.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.ShowUndo, c.ShowUndo.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.TextFormatingAllowed, c.FormatierungErlaubt.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.ForeColor, c.ForeColor.ToArgb().ToString(), key);
-        SaveToByteList(l, DatabaseDataType.BackColor, c.BackColor.ToArgb().ToString(), key);
-        SaveToByteList(l, DatabaseDataType.LineStyleLeft, ((int)c.LineLeft).ToString(), key);
-        SaveToByteList(l, DatabaseDataType.LineStyleRight, ((int)c.LineRight).ToString(), key);
-        SaveToByteList(l, DatabaseDataType.EditableWithDropdown, c.DropdownBearbeitungErlaubt.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.DropDownItems, c.DropDownItems.JoinWithCr(), key);
-        SaveToByteList(l, DatabaseDataType.LinkedCellFilter, c.LinkedCellFilter.JoinWithCr(), key);
-        SaveToByteList(l, DatabaseDataType.OpticalTextReplace, c.OpticalReplace.JoinWithCr(), key);
-        SaveToByteList(l, DatabaseDataType.AutoReplaceAfterEdit, c.AfterEditAutoReplace.JoinWithCr(), key);
-        SaveToByteList(l, DatabaseDataType.RegexCheck, c.Regex, key);
-        SaveToByteList(l, DatabaseDataType.DropdownDeselectAllAllowed, c.DropdownAllesAbwählenErlaubt.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.ShowValuesOfOtherCellsInDropdown, c.DropdownWerteAndererZellenAnzeigen.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.ColumnQuickInfo, c.Quickinfo, key);
-        SaveToByteList(l, DatabaseDataType.ColumnAdminInfo, c.AdminInfo, key);
-        SaveToByteList(l, DatabaseDataType.ColumnContentWidth, c.ContentWidth.ToString(), key);
-        SaveToByteList(l, DatabaseDataType.CaptionBitmapCode, c.CaptionBitmapCode, key);
-        SaveToByteList(l, DatabaseDataType.AllowedChars, c.AllowedChars, key);
-        SaveToByteList(l, DatabaseDataType.MaxTextLenght, c.MaxTextLenght.ToString(), key);
-        SaveToByteList(l, DatabaseDataType.PermissionGroupsChangeCell, c.PermissionGroupsChangeCell.JoinWithCr(), key);
-        SaveToByteList(l, DatabaseDataType.ColumnTags, c.Tags.JoinWithCr(), key);
-        SaveToByteList(l, DatabaseDataType.EditAllowedDespiteLock, c.EditAllowedDespiteLock.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.Suffix, c.Suffix, key);
-        SaveToByteList(l, DatabaseDataType.LinkedDatabase, c.LinkedDatabaseFile, key);
-        SaveToByteList(l, DatabaseDataType.ConstantHeightOfImageCode, c.ConstantHeightOfImageCode, key);
-        SaveToByteList(l, DatabaseDataType.BehaviorOfImageAndText, ((int)c.BehaviorOfImageAndText).ToString(), key);
-        SaveToByteList(l, DatabaseDataType.DoOpticalTranslation, ((int)c.DoOpticalTranslation).ToString(), key);
-        SaveToByteList(l, DatabaseDataType.AdditionalFormatCheck, ((int)c.AdditionalFormatCheck).ToString(), key);
-        SaveToByteList(l, DatabaseDataType.ScriptType, ((int)c.ScriptType).ToString(), key);
-        SaveToByteList(l, DatabaseDataType.Prefix, c.Prefix, key);
-        SaveToByteList(l, DatabaseDataType.KeyColumnKey, c.KeyColumnKey.ToString(), key);
-        SaveToByteList(l, DatabaseDataType.ColumnKeyOfLinkedDatabase, c.LinkedCell_ColumnKeyOfLinkedDatabase.ToString(), key);
-        SaveToByteList(l, DatabaseDataType.MakeSuggestionFromSameKeyColumn, c.VorschlagsColumn.ToString(), key);
-        SaveToByteList(l, DatabaseDataType.ColumnAlign, ((int)c.Align).ToString(), key);
-        SaveToByteList(l, DatabaseDataType.SortType, ((int)c.SortType).ToString(), key);
-        //SaveToByteList(l, DatabaseDataType.ColumnTimeCode, c.TimeCode, key);
-    }
-
-    internal static void SaveToByteList(List<byte> list, DatabaseDataType databaseDataType, string content, long columnKey) {
-        var b = content.UTF8_ToByte();
-        list.Add((byte)Routinen.ColumnUTF8_V400);
-        list.Add((byte)databaseDataType);
-        SaveToByteList(list, b.Length, 3);
-        SaveToByteList(list, columnKey, 7);
-        SaveToByteList(list, 0, 7); //Zeile-Unötig
-        list.AddRange(b);
-    }
-
-    internal void SaveToByteList(List<byte> list, ColumnCollection c) {
-        //Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString());
-        foreach (var columnitem in c) {
-            if (columnitem != null && !string.IsNullOrEmpty(columnitem.Name)) {
-                SaveToByteList(columnitem, ref list);
-            }
-        }
-    }
-
-    internal void SaveToByteList(List<byte> l, CellCollection c) {
-        c.RemoveOrphans();
-        foreach (var thisString in c) {
-            SaveToByteList(l, thisString);
-        }
-    }
-
-    internal void SaveToByteList(List<byte> list, DatabaseDataType databaseDataType, string content) {
-        var b = content.UTF8_ToByte();
-        list.Add((byte)Routinen.DatenAllgemeinUTF8);
-        list.Add((byte)databaseDataType);
-        SaveToByteList(list, b.Length, 3);
-        list.AddRange(b);
-    }
-
-    internal void SaveToByteList(List<byte> list, KeyValuePair<string, CellItem> cell) {
-        if (string.IsNullOrEmpty(cell.Value.Value)) { return; }
-        Cell.DataOfCellKey(cell.Key, out var tColumn, out var tRow);
-        if (!tColumn.SaveContent) { return; }
-        var b = cell.Value.Value.UTF8_ToByte();
-        list.Add((byte)Routinen.CellFormatUTF8_V400);
-        list.Add((byte)DatabaseDataType.Value_withSizeData);
-        SaveToByteList(list, b.Length, 3);
-        SaveToByteList(list, tColumn.Key, 7);
-        SaveToByteList(list, tRow.Key, 7);
-        list.AddRange(b);
-        var contentSize = Cell.ContentSizeToSave(cell, tColumn);
-        SaveToByteList(list, contentSize.Width, 2);
-        SaveToByteList(list, contentSize.Height, 2);
-    }
-
-    protected override void AddUndo(string tableName, DatabaseDataType comand, long? columnKey, long? rowKey, string previousValue, string changedTo, string userName) {
-        Works.Add(new WorkItem(comand, columnKey, rowKey, previousValue, changedTo, userName));
-    }
-
-    protected override void Dispose(bool disposing) {
-        _muf.Dispose();
-        Works.Dispose();
-        base.Dispose(disposing);
-    }
-
-    protected override void Initialize() {
-        base.Initialize();
-        _muf.ReloadDelaySecond = 600;
-        Works.Clear();
-    }
-
-    protected override void SetUserDidSomething() => _muf.SetUserDidSomething();
-
-    protected override string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height, bool isLoading) {
+    internal override string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height, bool isLoading) {
         var r = base.SetValueInternal(type, value, columnkey, rowkey, width, height, isLoading);
 
         if (type == DatabaseDataType.UndoInOne) {
@@ -456,40 +183,25 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         return r;
     }
 
-    private static int NummerCode2(byte[] b, int pointer) => (b[pointer] * 255) + b[pointer + 1];
+    protected override void AddUndo(string tableName, DatabaseDataType comand, long? columnKey, long? rowKey, string previousValue, string changedTo, string userName) {
+        Works.Add(new WorkItem(comand, columnKey, rowKey, previousValue, changedTo, userName));
+    }
+
+    protected override void Dispose(bool disposing) {
+        _muf.Dispose();
+        Works.Dispose();
+        base.Dispose(disposing);
+    }
+
+    protected override void Initialize() {
+        base.Initialize();
+        _muf.ReloadDelaySecond = 600;
+        Works.Clear();
+    }
+
+    protected override void SetUserDidSomething() => _muf.SetUserDidSomething();
 
     //protected string SpecialErrorReason(ErrorReason mode) => _muf.ErrorReason(mode);
-    private static int NummerCode3(byte[] b, int pointer) => (b[pointer] * 65025) + (b[pointer + 1] * 255) + b[pointer + 2];
-
-    private static long NummerCode7(byte[] b, int pointer) {
-        long nu = 0;
-        for (var n = 0; n < 7; n++) {
-            nu += b[pointer + n] * (long)Math.Pow(255, 6 - n);
-        }
-        return nu;
-    }
-
-    private static void SaveToByteList(List<byte> list, long numberToAdd, int byteCount) {
-        //var tmp = numberToAdd;
-        //var nn = byteCount;
-
-        do {
-            byteCount--;
-            var te = (long)Math.Pow(255, byteCount);
-            var mu = (byte)Math.Truncate((decimal)(numberToAdd / te));
-
-            list.Add(mu);
-            numberToAdd %= te;
-        } while (byteCount > 0);
-
-        //if (nn == 3) {
-        //    if (NummerCode3(list.ToArray(), list.Count - nn) != tmp) { Debugger.Break(); }
-        //}
-
-        //if (nn == 7) {
-        //    if (NummerCode7(list.ToArray(), list.Count - nn) != tmp) { Debugger.Break(); }
-        //}
-    }
 
     private void _muf_HasPendingChanges(object sender, MultiUserFileHasPendingChangesEventArgs e) {
         e.HasPendingChanges = HasPendingChanges;
@@ -598,81 +310,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
     }
 
     private void ToListOfByte(object sender, MultiUserToListEventArgs e) {
-        try {
-            //var cryptPos = -1;
-            List<byte> l = new();
-            // Wichtig, Reihenfolge und Länge NIE verändern!
-            SaveToByteList(l, DatabaseDataType.Formatkennung, "BlueDatabase");
-            SaveToByteList(l, DatabaseDataType.Version, DatabaseVersion);
-            SaveToByteList(l, DatabaseDataType.Werbung, "                                                                    BlueDataBase - (c) by Christian Peter                                                                                        "); // Die Werbung dient als Dummy-Platzhalter, falls doch mal was vergessen wurde...
-            //// Passwörter ziemlich am Anfang speicher, dass ja keinen Weiteren Daten geladen werden können
-            //if (string.IsNullOrEmpty(GlobalShowPass)) {
-            //    SaveToByteList(l, DatabaseDataType.CryptionState, false.ToPlusMinus());
-            //} else {
-            //    SaveToByteList(l, DatabaseDataType.CryptionState, true.ToPlusMinus());
-            //    cryptPos = l.Count;
-            //    SaveToByteList(l, DatabaseDataType.CryptionTest, "OK");
-            //}
-            SaveToByteList(l, DatabaseDataType.GlobalShowPass, GlobalShowPass);
-            //SaveToByteList(l, DatabaseDataType.FileEncryptionKey, _fileEncryptionKey);
-            SaveToByteList(l, DatabaseDataType.Creator, Creator);
-            SaveToByteList(l, DatabaseDataType.CreateDateUTC, CreateDate);
-            SaveToByteList(l, DatabaseDataType.Caption, Caption);
-            //SaveToByteList(l, enDatabaseDataType.JoinTyp, ((int)_JoinTyp).ToString());
-            //SaveToByteList(l, DatabaseDataType.VerwaisteDaten, ((int)_verwaisteDaten).ToString());
-            SaveToByteList(l, DatabaseDataType.Tags, Tags.JoinWithCr());
-            SaveToByteList(l, DatabaseDataType.PermissionGroupsNewRow, PermissionGroupsNewRow.JoinWithCr());
-            SaveToByteList(l, DatabaseDataType.DatabaseAdminGroups, DatenbankAdmin.JoinWithCr());
-            SaveToByteList(l, DatabaseDataType.GlobalScale, GlobalScale.ToString(Constants.Format_Float1));
-            //SaveToByteList(l, DatabaseDataType.Ansicht, ((int)_ansicht).ToString());
-            //SaveToByteList(l, DatabaseDataType.ReloadDelaySecond, ReloadDelaySecond.ToString());
-            //SaveToByteList(l, enDatabaseDataType.ImportScript, _ImportScript);
-            SaveToByteList(l, DatabaseDataType.RulesScript, RulesScript);
-            //SaveToByteList(l, enDatabaseDataType.BinaryDataInOne, Bins.ToString(true));
-            //SaveToByteList(l, enDatabaseDataType.FilterImagePfad, _filterImagePfad);
-            SaveToByteList(l, DatabaseDataType.AdditionaFilesPath, AdditionaFilesPfad);
-            SaveToByteList(l, DatabaseDataType.FirstColumn, FirstColumn);
-            SaveToByteList(l, DatabaseDataType.RowQuickInfo, ZeilenQuickInfo);
-            SaveToByteList(l, DatabaseDataType.StandardFormulaFile, StandardFormulaFile);
-            SaveToByteList(l, Column);
-            //Row.SaveToByteList(l);
-            SaveToByteList(l, Cell);
-            if (SortDefinition == null) {
-                // Ganz neue Datenbank
-                SaveToByteList(l, DatabaseDataType.SortDefinition, string.Empty);
-            } else {
-                SaveToByteList(l, DatabaseDataType.SortDefinition, SortDefinition.ToString());
-            }
-            //SaveToByteList(l, enDatabaseDataType.Rules_ALT, Rules.ToString(true));
-            SaveToByteList(l, DatabaseDataType.ColumnArrangement, ColumnArrangements.ToString());
-            SaveToByteList(l, DatabaseDataType.Layouts, Layouts.JoinWithCr());
-            SaveToByteList(l, DatabaseDataType.AutoExport, Export.ToString(true));
-            // Beim Erstellen des Undo-Speichers die Works nicht verändern, da auch bei einem nicht
-            // erfolgreichen Speichervorgang der Datenbank-String erstellt wird.
-            // Status des Work-Items ist egal, da es beim LADEN automatisch auf 'Undo' gesetzt wird.
-            List<string> works2 = new();
-            if (Works != null) {
-                foreach (var thisWorkItem in Works) {
-                    if (thisWorkItem != null) {
-                        if (thisWorkItem.Comand != DatabaseDataType.Value_withoutSizeData) {
-                            works2.Add(thisWorkItem.ToString());
-                        } else {
-                            if (thisWorkItem.LogsUndo(this)) {
-                                works2.Add(thisWorkItem.ToString());
-                            }
-                        }
-                    }
-                }
-            }
-
-            SaveToByteList(l, DatabaseDataType.UndoCount, UndoCount.ToString());
-            if (works2.Count > UndoCount) { works2.RemoveRange(0, works2.Count - UndoCount); }
-            SaveToByteList(l, DatabaseDataType.UndoInOne, works2.JoinWithCr((int)(16581375 * 0.9)));
-            SaveToByteList(l, DatabaseDataType.EOF, "END");
-            e.Data = l.ToArray();
-        } catch {
-            ToListOfByte(sender, e);
-        }
+        e.Data = Database.ToListOfByte(this, Works).ToArray();
     }
 
     #endregion

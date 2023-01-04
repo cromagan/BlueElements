@@ -154,9 +154,8 @@ public abstract class SQLBackAbstract {
     /// </summary>
     /// <param name="tablename"></param>
     /// <returns></returns>
-    public ConnectionInfo ConnectionData(string tablename, bool lite) {
-        var z = lite ? " LITE" : string.Empty;
-        return new ConnectionInfo(tablename, null, ConnectionString + z, string.Empty);
+    public ConnectionInfo ConnectionData(string tablename) {
+        return new ConnectionInfo(tablename, null, ConnectionString, string.Empty);
     }
 
     /// <summary>
@@ -623,7 +622,13 @@ public abstract class SQLBackAbstract {
 
             CloseConnection();
             return fb;
-        } catch { return null; }
+        } catch {
+            if (_connection != null && _connection.State != ConnectionState.Open) {
+                return GetLastChanges(db, fromDate, toDate);
+            }
+
+            return null;
+        }
     }
 
     internal string? GetLastColumnName(string tablename, long key) {
@@ -659,10 +664,6 @@ public abstract class SQLBackAbstract {
 
         foreach (var thisK in ConnectedSQLBack) {
             if (thisK.ConnectionOk && thisK.ConnectionString == ci.DatabaseID) {
-                return thisK.OtherTable(ci.TableName);
-            }
-
-            if (thisK.ConnectionOk && thisK.ConnectionString + " LITE" == ci.DatabaseID) {
                 return thisK.OtherTable(ci.TableName);
             }
         }

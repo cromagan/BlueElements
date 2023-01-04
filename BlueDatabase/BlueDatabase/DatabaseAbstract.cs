@@ -80,8 +80,8 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     private double _globalScale;
     private string _globalShowPass = string.Empty;
     private DateTime _lastUserActionUtc = new(1900, 1, 1);
-    private bool _loaded = false;
     private string _rulesScript = string.Empty;
+
     private RowSortDefinition? _sortDefinition;
 
     /// <summary>
@@ -435,10 +435,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             foreach (var thisSQL in SQLBackAbstract.ConnectedSQLBack) {
                 var h = thisSQL.HandleMe(ci);
                 if (h != null) {
-                    //if (ci.UniqueID.Contains("LITE")) {
                     return new DatabaseSQLLite(h, false, ci.TableName);
-                    //}
-                    //return new DatabaseSQL(h, false, ci.TableName);
                 }
             }
         }
@@ -548,7 +545,9 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     public abstract List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked, List<string>? ignorePath);
 
     public void CancelBackGroundWorker() {
-        if (_backgroundWorker.IsBusy && !_backgroundWorker.CancellationPending) { _backgroundWorker.CancelAsync(); }
+        if (_backgroundWorker != null && _backgroundWorker.IsBusy && !_backgroundWorker.CancellationPending) {
+            _backgroundWorker?.CancelAsync();
+        }
     }
 
     /// <summary>
@@ -574,7 +573,9 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             return "Schreibschutz aktiv";
         }
 
-        AddUndo(TableName, comand, columnkey, rowkey, previousValue, changedTo, UserName);
+        if (LogUndo) {
+            AddUndo(TableName, comand, columnkey, rowkey, previousValue, changedTo, UserName);
+        }
 
         if (comand != DatabaseDataType.AutoExport) { SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
 
@@ -588,7 +589,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// <param name="cellDataToo"></param>
     /// <param name="tagsToo"></param>
     public void CloneFrom(DatabaseAbstract sourceDatabase, bool cellDataToo, bool tagsToo) {
-        LogUndo = false;
+        sourceDatabase.SetReadOnly();
 
         Column.CloneFrom(sourceDatabase);
 
@@ -631,8 +632,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         UndoCount = sourceDatabase.UndoCount;
 
         ColumnArrangements = tcvc;
-
-        LogUndo = true;
     }
 
     public string Column_UsedIn(ColumnItem? column) {
@@ -1180,6 +1179,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     public void SetReadOnly() {
         ReadOnly = true;
+        DisposeBackgroundWorker();
     }
 
     public abstract string UndoText(ColumnItem? column, RowItem? row);
@@ -1206,6 +1206,11 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         GenerateLayoutInternal?.Invoke(this, e);
     }
 
+    internal void OnNeedPassword(PasswordEventArgs e) {
+        if (IsDisposed) { return; }
+        NeedPassword?.Invoke(this, e);
+    }
+
     internal void OnProgressbarInfo(ProgressbarEventArgs e) {
         if (IsDisposed) { return; }
         ProgressbarInfo?.Invoke(this, e);
@@ -1230,111 +1235,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         Layouts = lay;
     }
 
-    protected abstract void AddUndo(string tableName, DatabaseDataType comand, long? columnKey, long? rowKey, string previousValue, string changedTo, string userName);
-
-    protected void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName) => AddUndo(tableName, comand, column?.Key ?? -1, row?.Key ?? -1, previousValue, changedTo, userName);
-
-    protected void CreateWatcher() {
-        if (_backgroundWorker != null) { return; }
-
-        _backgroundWorker = new BackgroundWorker {
-            WorkerReportsProgress = false,
-            WorkerSupportsCancellation = true
-        };
-        _backgroundWorker.DoWork += BackgroundWorker_DoWork;
-        _checker = new Timer(Checker_Tick);
-        _checker.Change(2000, 2000);
-    }
-
-    protected virtual void Dispose(bool disposing) {
-        if (IsDisposed) { return; }
-        IsDisposed = true;
-
-        OnDisposing();
-        AllFiles.Remove(this);
-
-        //base.Dispose(disposing); // speichert und löscht die ganzen Worker. setzt auch disposedValue und ReadOnly auf true
-        if (disposing) {
-            // TODO: verwalteten Zustand (verwaltete Objekte) entsorgen.
-        }
-        // TODO: nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer weiter unten überschreiben.
-        // TODO: große Felder auf Null setzen.
-        //ColumnArrangements.Changed -= ColumnArrangements_ListOrItemChanged;
-        //Layouts.Changed -= Layouts_ListOrItemChanged;
-        //Layouts.ItemSeted -= Layouts_ItemSeted;
-        //PermissionGroupsNewRow.Changed -= PermissionGroups_NewRow_ListOrItemChanged;
-        //Tags.Changed -= DatabaseTags_ListOrItemChanged;
-        //Export.Changed -= Export_ListOrItemChanged;
-        //DatenbankAdmin.Changed -= DatabaseAdmin_ListOrItemChanged;
-
-        //Row.RowRemoving -= Row_RowRemoving;
-        ////Row.RowRemoved -= Row_RowRemoved;
-        //Row.RowAdded -= Row_RowAdded;
-
-        //Column.ItemRemoving -= Column_ItemRemoving;
-        //Column.ItemRemoved -= Column_ItemRemoved;
-        //Column.ItemAdded -= Column_ItemAdded;
-        Column.Dispose();
-        //Cell.Dispose();
-        Row.Dispose();
-
-        //_columnArrangements.Dispose();
-        //_cags.Dispose();
-        //_export.Dispose();
-        //_datenbankAdmin.Dispose();
-        //_permissionGroupsNewRow.Dispose();
-        _layouts.Dispose();
-    }
-
-    protected virtual void Initialize() {
-        Cell.Initialize();
-
-        _columnArrangements.Clear();
-        _layouts.Clear();
-        _permissionGroupsNewRow.Clear();
-        _tags.Clear();
-        _export.Clear();
-        _datenbankAdmin.Clear();
-        _globalShowPass = string.Empty;
-        _creator = UserName;
-        _createDate = DateTime.Now.ToString(Constants.Format_Date5);
-        _undoCount = 300;
-        _caption = string.Empty;
-        //_timeCode = string.Empty;
-        //_verwaisteDaten = VerwaisteDaten.Ignorieren;
-        LoadedVersion = DatabaseVersion;
-        _rulesScript = string.Empty;
-        _globalScale = 1f;
-        _additionaFilesPfad = "AdditionalFiles";
-        _firstColumn = string.Empty;
-        _zeilenQuickInfo = string.Empty;
-        _sortDefinition = null;
-    }
-
-    protected void OnExporting(CancelEventArgs e) {
-        if (IsDisposed) { return; }
-        Exporting?.Invoke(this, e);
-    }
-
-    protected void OnLoaded() {
-        if (IsDisposed) { return; }
-        Loaded?.Invoke(this, System.EventArgs.Empty);
-    }
-
-    protected void OnLoading() {
-        if (IsDisposed) { return; }
-        Loading?.Invoke(this, System.EventArgs.Empty);
-    }
-
-    protected void OnNeedPassword(PasswordEventArgs e) {
-        if (IsDisposed) { return; }
-        NeedPassword?.Invoke(this, e);
-    }
-
-    protected virtual void SetUserDidSomething() {
-        _lastUserActionUtc = DateTime.UtcNow;
-    }
-
     /// <summary>
     /// Diese Routine setzt Werte auf den richtigen Speicherplatz und führt Comands aus.
     /// Echtzeitbasierte Syteme sollten diese Routine verwenden, um den Wert ebenfalls fest zu verankern (sofern !IsLoading && !Readonly)
@@ -1350,7 +1250,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// <param name="width"></param>
     /// <param name="height"></param>
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
-    protected virtual string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height, bool isLoading) {
+    internal virtual string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height, bool isLoading) {
         if (type.IsObsolete()) { return string.Empty; }
 
         if (type.IsColumnTag()) {
@@ -1528,15 +1428,124 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         return string.Empty;
     }
 
-    //protected abstract string SpecialErrorReason(ErrorReason mode);
+    protected abstract void AddUndo(string tableName, DatabaseDataType comand, long? columnKey, long? rowKey, string previousValue, string changedTo, string userName);
+
+    protected void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName) => AddUndo(tableName, comand, column?.Key ?? -1, row?.Key ?? -1, previousValue, changedTo, userName);
+
+    protected void CreateWatcher() {
+        if (!ReadOnly) {
+            if (_backgroundWorker != null) { return; }
+
+            _backgroundWorker = new BackgroundWorker {
+                WorkerReportsProgress = false,
+                WorkerSupportsCancellation = true
+            };
+            _backgroundWorker.DoWork += BackgroundWorker_DoWork;
+            _checker = new Timer(Checker_Tick);
+            _checker.Change(2000, 2000);
+        }
+    }
+
+    protected virtual void Dispose(bool disposing) {
+        if (IsDisposed) { return; }
+        IsDisposed = true;
+
+        OnDisposing();
+        AllFiles.Remove(this);
+
+        //base.Dispose(disposing); // speichert und löscht die ganzen Worker. setzt auch disposedValue und ReadOnly auf true
+        if (disposing) {
+            // TODO: verwalteten Zustand (verwaltete Objekte) entsorgen.
+        }
+        DisposeBackgroundWorker();
+
+        if (_checker != null) {
+            _checker.Dispose();
+            _checker = null;
+        }
+
+        // TODO: nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer weiter unten überschreiben.
+        // TODO: große Felder auf Null setzen.
+        //ColumnArrangements.Changed -= ColumnArrangements_ListOrItemChanged;
+        //Layouts.Changed -= Layouts_ListOrItemChanged;
+        //Layouts.ItemSeted -= Layouts_ItemSeted;
+        //PermissionGroupsNewRow.Changed -= PermissionGroups_NewRow_ListOrItemChanged;
+        //Tags.Changed -= DatabaseTags_ListOrItemChanged;
+        //Export.Changed -= Export_ListOrItemChanged;
+        //DatenbankAdmin.Changed -= DatabaseAdmin_ListOrItemChanged;
+
+        //Row.RowRemoving -= Row_RowRemoving;
+        ////Row.RowRemoved -= Row_RowRemoved;
+        //Row.RowAdded -= Row_RowAdded;
+
+        //Column.ItemRemoving -= Column_ItemRemoving;
+        //Column.ItemRemoved -= Column_ItemRemoved;
+        //Column.ItemAdded -= Column_ItemAdded;
+        Column.Dispose();
+        //Cell.Dispose();
+        Row.Dispose();
+
+        //_columnArrangements.Dispose();
+        //_cags.Dispose();
+        //_export.Dispose();
+        //_datenbankAdmin.Dispose();
+        //_permissionGroupsNewRow.Dispose();
+        _layouts.Dispose();
+    }
+
+    protected virtual void Initialize() {
+        Cell.Initialize();
+
+        _columnArrangements.Clear();
+        _layouts.Clear();
+        _permissionGroupsNewRow.Clear();
+        _tags.Clear();
+        _export.Clear();
+        _datenbankAdmin.Clear();
+        _globalShowPass = string.Empty;
+        _creator = UserName;
+        _createDate = DateTime.Now.ToString(Constants.Format_Date5);
+        _undoCount = 300;
+        _caption = string.Empty;
+        //_timeCode = string.Empty;
+        //_verwaisteDaten = VerwaisteDaten.Ignorieren;
+        LoadedVersion = DatabaseVersion;
+        _rulesScript = string.Empty;
+        _globalScale = 1f;
+        _additionaFilesPfad = "AdditionalFiles";
+        _firstColumn = string.Empty;
+        _zeilenQuickInfo = string.Empty;
+        _sortDefinition = null;
+    }
+
+    protected void OnExporting(CancelEventArgs e) {
+        if (IsDisposed) { return; }
+        Exporting?.Invoke(this, e);
+    }
+
+    protected void OnLoaded() {
+        if (IsDisposed) { return; }
+        Loaded?.Invoke(this, System.EventArgs.Empty);
+    }
+
+    protected void OnLoading() {
+        if (IsDisposed) { return; }
+        Loading?.Invoke(this, System.EventArgs.Empty);
+    }
+
+    protected virtual void SetUserDidSomething() {
+        _lastUserActionUtc = DateTime.UtcNow;
+    }
 
     private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
+        if (IsDisposed) { return; }
         if (ReadOnly) { return; }
+        if (!LogUndo) { return; }
 
         var tmpe = _export.CloneWithClones();
 
         foreach (var thisExport in tmpe) {
-            if (_backgroundWorker.CancellationPending) { break; }
+            if (_backgroundWorker.CancellationPending || IsDisposed) { break; }
 
             if (thisExport.IsOk()) {
                 //var e2 = new MultiUserFileHasPendingChangesEventArgs();
@@ -1549,16 +1558,21 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                 //}
 
                 thisExport.DeleteOutdatedBackUps(_backgroundWorker);
-                if (_backgroundWorker.CancellationPending) { break; }
+                if (_backgroundWorker.CancellationPending || IsDisposed) { break; }
                 thisExport.DoBackUp(_backgroundWorker);
-                if (_backgroundWorker.CancellationPending) { break; }
+                if (_backgroundWorker.CancellationPending || IsDisposed) { break; }
             }
         }
 
         Export = tmpe;
     }
 
+    //protected abstract string SpecialErrorReason(ErrorReason mode);
     private void Checker_Tick(object state) {
+        if (IsDisposed) { return; }
+        if (ReadOnly) { return; }
+        if (!LogUndo) { return; }
+
         _checkerTickCount++;
         if (_checkerTickCount < 0) { return; }
 
@@ -1613,6 +1627,15 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         //}
     }
 
+    private void DisposeBackgroundWorker() {
+        CancelBackGroundWorker();
+
+        if (_backgroundWorker != null) {
+            _backgroundWorker.Dispose();
+            _backgroundWorker.DoWork -= BackgroundWorker_DoWork;
+        }
+    }
+
     //private void Column_ItemAdded(object sender, ListEventArgs e) {
     //    if (IsLoadingx) { return; }
     //    CheckViewsAndArrangements();
@@ -1628,10 +1651,8 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     //}
 
     private bool IsThereBackgroundWorkToDo() {
-        //var e2 = new MultiUserFileHasPendingChangesEventArgs();
-        //HasPendingChanges(null, e2);
+        if (IsDisposed || ReadOnly || !LogUndo) { return false; }
 
-        //if (e2.HasPendingChanges) { e.BackGroundWork = true; return; }
         CancelEventArgs ec = new(false);
         OnExporting(ec);
         if (ec.Cancel) { return false; }
@@ -1735,6 +1756,8 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     //}
 
     private void StartBackgroundWorker() {
+        if (IsDisposed) { return; }
+
         try {
             if (!string.IsNullOrEmpty(ErrorReason(BlueBasics.Enums.ErrorReason.EditNormaly))) { return; }
             if (!_backgroundWorker.IsBusy) { _backgroundWorker.RunWorkerAsync(); }

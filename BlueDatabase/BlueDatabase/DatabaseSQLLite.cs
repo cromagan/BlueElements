@@ -23,6 +23,7 @@ using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq.Expressions;
 using System.Threading;
 using static BlueBasics.Converter;
 
@@ -64,7 +65,9 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     #region Constructors
 
     public DatabaseSQLLite(SQLBackAbstract sql, bool readOnly, string tablename) : base(tablename, readOnly) {
-        AllFiles.Add(this);
+        if (sql == null) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Keine SQL_Verbindung übergeben.");
+        }
 
         _sql = sql;
 
@@ -77,6 +80,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
             //DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + tablename.FileNameWithoutSuffix()));
             LoadFromSQLBack();
         }
+        AllFiles.Add(this);
     }
 
     #endregion
@@ -85,7 +89,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     public override ConnectionInfo ConnectionData {
         get {
-            var connectionData = _sql.ConnectionData(TableName, true);
+            var connectionData = _sql.ConnectionData(TableName);
             connectionData.Provider = this;
             return connectionData;
         }
@@ -162,7 +166,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
             return null;
         }
 
-        var connectionData = _sql.ConnectionData(tableName, true);
+        var connectionData = _sql.ConnectionData(tableName);
         connectionData.Provider = this;
         return connectionData;
     }
@@ -232,13 +236,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         }
     }
 
-    protected override void AddUndo(string tableName, DatabaseDataType comand, long? columnKey, long? rowKey, string previousValue, string changedTo, string userName) {
-        _sql.AddUndo(tableName, comand, columnKey, rowKey, previousValue, changedTo, UserName);
-    }
-
-    protected override void SetUserDidSomething() { }
-
-    protected override string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height, bool isLoading) {
+    internal override string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height, bool isLoading) {
         if (type.IsObsolete()) { return string.Empty; }
 
         if (!isLoading && !ReadOnly) {
@@ -251,6 +249,12 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
         return base.SetValueInternal(type, value, columnkey, rowkey, width, height, isLoading);
     }
+
+    protected override void AddUndo(string tableName, DatabaseDataType comand, long? columnKey, long? rowKey, string previousValue, string changedTo, string userName) {
+        _sql.AddUndo(tableName, comand, columnKey, rowKey, previousValue, changedTo, UserName);
+    }
+
+    protected override void SetUserDidSomething() { }
 
     //protected override string SpecialErrorReason(ErrorReason mode) => string.Empty;
 
@@ -503,6 +507,8 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         } catch {
             //if (_loadingCount < 1) { Develop.DebugPrint("Loading <0!"); }
             //_loadingCount--;
+            Column.ThrowEvents = true;
+            Row.ThrowEvents = true;
             LoadFromSQLBack();
             return;
         }

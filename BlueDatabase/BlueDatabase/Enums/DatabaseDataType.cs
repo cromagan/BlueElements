@@ -31,7 +31,7 @@ public static class DatabaseDataTypeExtension {
 
     public static bool IsDatabaseTag(this DatabaseDataType type) => (int)type is < 100 or >= 249;
 
-    public static bool IsObsolete(this DatabaseDataType type) => (int)type is 0 or 2 or 3 or 22 or 33 or 34 or 35 or 52 or 53 or 58 or 59 or 60 or 61 or 62 or 63 or 65;
+    public static bool IsObsolete(this DatabaseDataType type) => (int)type is 0 or 2 or 3 or 22 or 33 or 34 or 35 or 52 or 53 or 58 or 59 or 60 or 61 or 62 or 63 or 65 or 151;
 
     public static bool Nameless(this DatabaseDataType type) => type.ToString() == ((int)type).ToString();
 

@@ -107,6 +107,7 @@
       <DependentUpon>Filterleiste.cs</DependentUpon>
     </Compile>
     <Compile Include="BlueFont.cs" />
+    <Compile Include="CommonDialogs.cs" />
     <Compile Include="FormManager.cs" />
     <Compile Include="Interfaces\IHasDatabase.cs" />
     <Compile Include="ConnectedFormula\ConnectedFormula.cs" />

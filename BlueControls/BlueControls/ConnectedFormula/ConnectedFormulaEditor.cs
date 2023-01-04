@@ -189,30 +189,8 @@ public partial class ConnectedFormulaEditor : PadEditor {
     private void ChooseDatabaseAndId(ICalculateRowsItemLevel? it) {
         if (_cf == null || it == null) { return; }
 
-        var l = DatabaseAbstract.AllAvailableTables(null);
+        var db = BlueControls.Forms.CommonDialogs.ChooseKnownDatabase();
 
-        var l2 = new ItemCollection.ItemCollectionList.ItemCollectionList();
-
-        foreach (var thisd in l) {
-            l2.Add(thisd, thisd.UniqueID);
-        }
-
-        var x = BlueControls.Forms.InputBoxListBoxStyle.Show("Datenbank wählen:", l2, Enums.AddType.None, true);
-
-        if (x == null || x.Count != 1) { return; }
-
-        //if (string.IsNullOrEmpty(LoadTabDatabase.InitialDirectory)) {
-        //    LoadTabDatabase.InitialDirectory = _cf.Filename.FilePath();
-        //}
-
-        //LoadTabDatabase.ShowDialog();
-
-        //if (!FileExists(LoadTabDatabase.FileName)) { return; }
-        //LoadTabDatabase.InitialDirectory = LoadTabDatabase.FileName.FilePath();
-
-        //_cf.DatabaseFiles.AddIfNotExists(LoadTabDatabase.FileName);
-
-        var db = DatabaseAbstract.GetByID(new ConnectionInfo(x[0]));
         if (db == null) { return; }
 
         it.Database = db;

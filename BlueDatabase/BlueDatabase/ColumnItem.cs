@@ -208,8 +208,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
     #endregion
 
-    //internal ColumnItem(DatabaseAbstract database, long columnkey) : this(database, database.Column.Freename(string.Empty), columnkey) { }
-
     #region Destructors
 
     // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
@@ -222,6 +220,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
     #region Events
 
+    //internal ColumnItem(DatabaseAbstract database, long columnkey) : this(database, database.Column.Freename(string.Empty), columnkey) { }
     public event EventHandler Changed;
 
     #endregion
@@ -2248,19 +2247,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         ScriptType = ScriptType.String;
     }
 
-    //public string SimplyFile(string fullFileName) {
-    //    if (_format != DataFormat.Link_To_Filesystem) {
-    //        Develop.DebugPrint(FehlerArt.Fehler, "Nur bei Link_To_Filesystem erlaubt!");
-    //    }
-    //    var tmpfile = fullFileName.FileNameWithoutSuffix();
-    //    if (string.Equals(tmpfile, fullFileName, StringComparison.OrdinalIgnoreCase)) { return tmpfile; }
-    //    if (string.Equals(BestFile(tmpfile, false), fullFileName, StringComparison.OrdinalIgnoreCase)) { return tmpfile; }
-    //    tmpfile = fullFileName.FileNameWithSuffix();
-    //    return string.Equals(tmpfile, fullFileName, StringComparison.OrdinalIgnoreCase)
-    //        ? tmpfile
-    //        : string.Equals(BestFile(tmpfile, false), fullFileName, StringComparison.OrdinalIgnoreCase) ? tmpfile : fullFileName;
-    //}
-
     public void Statisik(List<FilterItem>? filter, List<RowItem?>? pinnedRows) {
         if (Database == null) { return; }
         var r = Database.Row.CalculateVisibleRows(filter, pinnedRows);
@@ -2307,6 +2293,18 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         l.Save(TempFile(string.Empty, string.Empty, "txt"), System.Text.Encoding.UTF8, true);
     }
 
+    //public string SimplyFile(string fullFileName) {
+    //    if (_format != DataFormat.Link_To_Filesystem) {
+    //        Develop.DebugPrint(FehlerArt.Fehler, "Nur bei Link_To_Filesystem erlaubt!");
+    //    }
+    //    var tmpfile = fullFileName.FileNameWithoutSuffix();
+    //    if (string.Equals(tmpfile, fullFileName, StringComparison.OrdinalIgnoreCase)) { return tmpfile; }
+    //    if (string.Equals(BestFile(tmpfile, false), fullFileName, StringComparison.OrdinalIgnoreCase)) { return tmpfile; }
+    //    tmpfile = fullFileName.FileNameWithSuffix();
+    //    return string.Equals(tmpfile, fullFileName, StringComparison.OrdinalIgnoreCase)
+    //        ? tmpfile
+    //        : string.Equals(BestFile(tmpfile, false), fullFileName, StringComparison.OrdinalIgnoreCase) ? tmpfile : fullFileName;
+    //}
     public double? Summe(FilterCollection? filter) {
         double summ = 0;
         foreach (var thisrow in Database.Row) {
@@ -2344,6 +2342,13 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                     ? _multiLine ? QuickImage.Get(ImageCode.Textfeld, 16, Color.Red, Color.Transparent) : QuickImage.Get(ImageCode.Textfeld)
                     : QuickImage.Get("Pfeil_Unten_Scrollbar|14|||||0")
             };
+
+    public override string ToString() {
+        if (this == null) { return "NULL"; }
+        if (IsDisposed) { return "Disposed"; }
+
+        return Name + " -> " + Caption + " (" + Key.ToString() + ")";
+    }
 
     public bool UserEditDialogTypeInFormula(EditTypeFormula editTypeToCheck) {
         switch (_format) {

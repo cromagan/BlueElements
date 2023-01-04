@@ -51,8 +51,6 @@ public sealed class Database : DatabaseAbstract {
     public Database(string filename, bool readOnly, bool create, string tablename) : this(null, filename, readOnly, create, tablename) { }
 
     private Database(Stream? stream, string filename, bool readOnly, bool create, string tablename) : base(tablename, readOnly) {
-        AllFiles.Add(this);
-
         //_muf.Loaded += OnLoaded;
         //_muf.Loading += OnLoading;
         //_muf.SavedToDisk += OnSavedToDisk;
@@ -73,6 +71,8 @@ public sealed class Database : DatabaseAbstract {
         } else if (stream != null) {
             LoadFromStream(stream);
         }
+
+        AllFiles.Add(this);
         //RepairAfterParse();
     }
 
@@ -83,8 +83,6 @@ public sealed class Database : DatabaseAbstract {
     public static string DatabaseID => "BlueDatabase";
 
     public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseID, Filename);
-
-    //_muf != null ? _muf.Filename : string.Empty;
     public string Filename { get; set; } = string.Empty;
 
     #endregion
@@ -209,6 +207,217 @@ public sealed class Database : DatabaseAbstract {
         }
     }
 
+    public static void Parse(byte[] data, DatabaseAbstract db, ListExt<WorkItem>? Works) {
+        db.Column.ThrowEvents = false;
+        db.Row.ThrowEvents = false;
+        var pointer = 0;
+
+        ColumnItem? column = null;
+        RowItem? row = null;
+
+        long colKey = 0;
+        long rowKey = 0;
+
+        #region Spalten merken und Variable leeren
+
+        List<ColumnItem?> columnsOld = new();
+        columnsOld.AddRange(db.Column);
+        db.Column.Clear();
+
+        #endregion
+
+        #region Pendings merken und Variable leeren
+
+        //var oldPendings = Works?.Where(thisWork => thisWork.State == ItemState.Pending).ToList();
+        Works?.Clear();
+
+        #endregion
+
+        var b = data;
+
+        do {
+            if (pointer >= b.Length) { break; }
+
+            Database.Parse(b, ref pointer, out var art, ref colKey, ref rowKey, out var inhalt, out var x, out var y);
+
+            if (!art.IsObsolete()) {
+
+                #region Zeile suchen oder erstellen
+
+                if (rowKey > -1) {
+                    row = db.Row.SearchByKey(rowKey);
+                    if (row == null) {
+                        //row = Row.GenerateAndAdd(rowKey, string.Empty, false, false);
+                        db.Row.SetValueInternal(DatabaseDataType.Comand_AddRow, rowKey, true);
+                        row = db.Row.SearchByKey(rowKey);
+                        row.IsInCache = true;
+                    }
+                }
+
+                #endregion
+
+                #region Spalte suchen oder erstellen
+
+                if (colKey > -1) {
+                    // Zuerst schauen, ob die Column schon (wieder) in der richtigen Collection ist
+                    column = db.Column.SearchByKey(colKey);
+                    if (column == null) {
+                        // Column noch nicht gefunden. Schauen, ob sie vor dem Reload vorhanden war und gg. hinzufügen
+                        foreach (var thisColumn in columnsOld) {
+                            if (thisColumn != null && thisColumn.Key == colKey) {
+                                column = thisColumn;
+                            }
+                        }
+                        if (column != null) {
+                            // Prima, gefunden! Noch die Collections korrigieren
+                            db.Column.Add(column);
+                            columnsOld.Remove(column);
+                        } else {
+                            // Nicht gefunden, als neu machen
+                            if (art != DatabaseDataType.ColumnName) {
+                                Develop.DebugPrint(art + " an erster Stelle!");
+                            }
+                            db.Column.SetValueInternal(DatabaseDataType.Comand_AddColumn, colKey, true);
+                            column = db.Column.SearchByKey(colKey);
+                            column.IsInCache = true;
+                            //column = Column.GenerateAndAdd(colKey);
+                        }
+                    }
+                }
+
+                #endregion
+
+                #region Bei verschlüsselten Datenbanken das Passwort abfragen
+
+                if (art == DatabaseDataType.GlobalShowPass && !string.IsNullOrEmpty(inhalt)) {
+                    PasswordEventArgs e2 = new();
+                    db.OnNeedPassword(e2);
+                    //b = Cryptography.SimpleCrypt(b, e2.Password, -1, pointer, b.Length - 1);
+                    if (e2.Password != inhalt) {
+                        db.SetReadOnly();
+                        //MessageBox.Show("Zugriff verweigrt, Passwort falsch!", ImageCode.Kritisch, "OK");
+                        break;
+                    }
+                }
+
+                #endregion
+
+                var fehler = db.SetValueInternal(art, inhalt, column?.Key, row?.Key, x, y, true);
+
+                if (art == DatabaseDataType.EOF) { break; }
+
+                if (!string.IsNullOrEmpty(fehler)) {
+                    db.SetReadOnly();
+                    Develop.DebugPrint("Schwerer Datenbankfehler:<br>Version: " + DatabaseVersion + "<br>Datei: " + db.TableName + "<br>Meldung: " + fehler);
+                }
+            }
+        } while (true);
+
+        db.Row.RemoveNullOrEmpty();
+        db.Cell.RemoveOrphans();
+        //Works?.AddRange(oldPendings);
+        //oldPendings?.Clear();
+        //ExecutePending();
+        db.Column.ThrowEvents = true;
+        db.Row.ThrowEvents = true;
+
+        db.FirstColumn = db.Column[0].Name;
+
+        if (IntParse(db.LoadedVersion.Replace(".", "")) > IntParse(DatabaseVersion.Replace(".", ""))) { db.SetReadOnly(); }
+    }
+
+    public static List<byte> ToListOfByte(DatabaseAbstract db, ListExt<WorkItem>? Works) {
+        try {
+            List<byte> l = new();
+            // Wichtig, Reihenfolge und Länge NIE verändern!
+            SaveToByteList(l, DatabaseDataType.Formatkennung, "BlueDatabase");
+            SaveToByteList(l, DatabaseDataType.Version, DatabaseVersion);
+            SaveToByteList(l, DatabaseDataType.Werbung, "                                                                    BlueDataBase - (c) by Christian Peter                                                                                        "); // Die Werbung dient als Dummy-Platzhalter, falls doch mal was vergessen wurde...
+            // Passwörter ziemlich am Anfang speicher, dass ja keinen Weiteren Daten geladen werden können
+            //if (string.IsNullOrEmpty(GlobalShowPass)) {
+            //    SaveToByteList(l, DatabaseDataType.CryptionState, false.ToPlusMinus());
+            //} else {
+            //    SaveToByteList(l, DatabaseDataType.CryptionState, true.ToPlusMinus());
+            //    SaveToByteList(l, DatabaseDataType.CryptionTest, "OK");
+            //}
+            SaveToByteList(l, DatabaseDataType.GlobalShowPass, db.GlobalShowPass);
+            //SaveToByteList(l, DatabaseDataType.FileEncryptionKey, _fileEncryptionKey);
+            SaveToByteList(l, DatabaseDataType.Creator, db.Creator);
+            SaveToByteList(l, DatabaseDataType.CreateDateUTC, db.CreateDate);
+            SaveToByteList(l, DatabaseDataType.Caption, db.Caption);
+            //SaveToByteList(l, enDatabaseDataType.JoinTyp, ((int)_JoinTyp).ToString());
+            //SaveToByteList(l, DatabaseDataType.VerwaisteDaten, ((int)_verwaisteDaten).ToString());
+            SaveToByteList(l, DatabaseDataType.Tags, db.Tags.JoinWithCr());
+            SaveToByteList(l, DatabaseDataType.PermissionGroupsNewRow, db.PermissionGroupsNewRow.JoinWithCr());
+            SaveToByteList(l, DatabaseDataType.DatabaseAdminGroups, db.DatenbankAdmin.JoinWithCr());
+            SaveToByteList(l, DatabaseDataType.GlobalScale, db.GlobalScale.ToString(Constants.Format_Float1));
+            //SaveToByteList(l, DatabaseDataType.Ansicht, ((int)_ansicht).ToString());
+            //SaveToByteList(l, DatabaseDataType.ReloadDelaySecond, ReloadDelaySecond.ToString());
+            //SaveToByteList(l, enDatabaseDataType.ImportScript, _ImportScript);
+            SaveToByteList(l, DatabaseDataType.RulesScript, db.RulesScript);
+            //SaveToByteList(l, enDatabaseDataType.BinaryDataInOne, Bins.ToString(true));
+            //SaveToByteList(l, enDatabaseDataType.FilterImagePfad, _filterImagePfad);
+            SaveToByteList(l, DatabaseDataType.AdditionaFilesPath, db.AdditionaFilesPfad);
+            SaveToByteList(l, DatabaseDataType.FirstColumn, db.FirstColumn);
+            SaveToByteList(l, DatabaseDataType.RowQuickInfo, db.ZeilenQuickInfo);
+            SaveToByteList(l, DatabaseDataType.StandardFormulaFile, db.StandardFormulaFile);
+            SaveToByteList(l, db.Column);
+            //Row.SaveToByteList(l);
+            SaveToByteList(l, db.Cell, db);
+            if (db.SortDefinition == null) {
+                // Ganz neue Datenbank
+                SaveToByteList(l, DatabaseDataType.SortDefinition, string.Empty);
+            } else {
+                SaveToByteList(l, DatabaseDataType.SortDefinition, db.SortDefinition.ToString());
+            }
+            //SaveToByteList(l, enDatabaseDataType.Rules_ALT, Rules.ToString(true));
+            SaveToByteList(l, DatabaseDataType.ColumnArrangement, db.ColumnArrangements.ToString());
+            SaveToByteList(l, DatabaseDataType.Layouts, db.Layouts.JoinWithCr());
+            SaveToByteList(l, DatabaseDataType.AutoExport, db.Export.ToString(true));
+            // Beim Erstellen des Undo-Speichers die Works nicht verändern, da auch bei einem nicht
+            // erfolgreichen Speichervorgang der Datenbank-String erstellt wird.
+            // Status des Work-Items ist egal, da es beim LADEN automatisch auf 'Undo' gesetzt wird.
+            List<string> works2 = new();
+            if (Works != null) {
+                foreach (var thisWorkItem in Works) {
+                    if (thisWorkItem != null) {
+                        if (thisWorkItem.Comand != DatabaseDataType.Value_withoutSizeData) {
+                            works2.Add(thisWorkItem.ToString());
+                        } else {
+                            if (thisWorkItem.LogsUndo(db)) {
+                                works2.Add(thisWorkItem.ToString());
+                            }
+                        }
+                    }
+                }
+            }
+
+            SaveToByteList(l, DatabaseDataType.UndoCount, db.UndoCount.ToString());
+            if (works2.Count > db.UndoCount) { works2.RemoveRange(0, works2.Count - db.UndoCount); }
+            SaveToByteList(l, DatabaseDataType.UndoInOne, works2.JoinWithCr((int)(16581375 * 0.9)));
+            SaveToByteList(l, DatabaseDataType.EOF, "END");
+            return l;
+        } catch {
+            return ToListOfByte(db, Works);
+        }
+    }
+
+    public static string UndoText(ColumnItem? column, RowItem? row, ListExt<WorkItem>? Works) {
+        if (Works == null || Works.Count == 0) { return string.Empty; }
+        var cellKey = CellCollection.KeyOfCell(column, row);
+        var t = "";
+        for (var z = Works.Count - 1; z >= 0; z--) {
+            if (Works[z] != null && Works[z].CellKey == cellKey) {
+                t = t + Works[z].UndoTextTableMouseOver() + "<br>";
+            }
+        }
+        t = t.Trim("<br>");
+        t = t.Trim("<hr>");
+        t = t.Trim("<br>");
+        t = t.Trim("<hr>");
+        return t;
+    }
+
     public override string AdditionaFilesPfadWhole() {
         var x = base.AdditionaFilesPfadWhole();
         if (!string.IsNullOrEmpty(x)) { return x; }
@@ -315,7 +524,7 @@ public sealed class Database : DatabaseAbstract {
         var bLoaded = LoadBytesFromDisk(BlueBasics.Enums.ErrorReason.Load);
         if (bLoaded == null) { return; }
 
-        Parse(bLoaded);
+        Database.Parse(bLoaded, this, Works);
 
         RepairAfterParse();
         OnLoaded();
@@ -335,123 +544,11 @@ public sealed class Database : DatabaseAbstract {
             bLoaded = MultiUserFile.UnzipIt(bLoaded);
         }
 
-        Parse(bLoaded);
+        Database.Parse(bLoaded, this, Works);
 
         RepairAfterParse();
         OnLoaded();
         CreateWatcher();
-    }
-
-    public void Parse(byte[] data) {
-        Column.ThrowEvents = false;
-        Row.ThrowEvents = false;
-        var pointer = 0;
-
-        ColumnItem? column = null;
-        RowItem? row = null;
-
-        long colKey = 0;
-        long rowKey = 0;
-
-        #region Spalten merken und Variable leeren
-
-        List<ColumnItem?> columnsOld = new();
-        columnsOld.AddRange(Column);
-        Column.Clear();
-
-        #endregion
-
-        #region Pendings merken und Variable leeren
-
-        //var oldPendings = Works?.Where(thisWork => thisWork.State == ItemState.Pending).ToList();
-        Works?.Clear();
-
-        #endregion
-
-        var b = data;
-
-        do {
-            if (pointer >= b.Length) { break; }
-
-            Parse(b, ref pointer, out var art, ref colKey, ref rowKey, out var inhalt, out var x, out var y);
-
-            #region Zeile suchen oder erstellen
-
-            if (rowKey > -1) {
-                row = Row.SearchByKey(rowKey);
-                if (row == null) {
-                    //row = Row.GenerateAndAdd(rowKey, string.Empty, false, false);
-                    Row.SetValueInternal(DatabaseDataType.Comand_AddRow, rowKey, true);
-                    row = Row.SearchByKey(rowKey);
-                    row.IsInCache = true;
-                }
-            }
-
-            #endregion
-
-            #region Spalte suchen oder erstellen
-
-            if (colKey > -1) {
-                // Zuerst schauen, ob die Column schon (wieder) in der richtigen Collection ist
-                column = Column.SearchByKey(colKey);
-                if (column == null) {
-                    // Column noch nicht gefunden. Schauen, ob sie vor dem Reload vorhanden war und gg. hinzufügen
-                    foreach (var thisColumn in columnsOld) {
-                        if (thisColumn != null && thisColumn.Key == colKey) {
-                            column = thisColumn;
-                        }
-                    }
-                    if (column != null) {
-                        // Prima, gefunden! Noch die Collections korrigieren
-                        Column.Add(column);
-                        columnsOld.Remove(column);
-                    } else {
-                        // Nicht gefunden, als neu machen
-                        Column.SetValueInternal(DatabaseDataType.Comand_AddColumn, colKey, true);
-                        column = Column.SearchByKey(colKey);
-                        column.IsInCache = true;
-                        //column = Column.GenerateAndAdd(colKey);
-                    }
-                }
-            }
-
-            #endregion
-
-            #region Bei verschlüsselten Datenbanken das Passwort abfragen
-
-            if (art == DatabaseDataType.GlobalShowPass && !string.IsNullOrEmpty(inhalt)) {
-                PasswordEventArgs e2 = new();
-                OnNeedPassword(e2);
-                //b = Cryptography.SimpleCrypt(b, e2.Password, -1, pointer, b.Length - 1);
-                if (e2.Password != inhalt) {
-                    SetReadOnly();
-                    //MessageBox.Show("Zugriff verweigrt, Passwort falsch!", ImageCode.Kritisch, "OK");
-                    break;
-                }
-            }
-
-            #endregion
-
-            var fehler = SetValueInternal(art, inhalt, column?.Key, row?.Key, x, y, true);
-
-            if (art == DatabaseDataType.EOF) { break; }
-            if (!string.IsNullOrEmpty(fehler)) {
-                SetReadOnly();
-                Develop.DebugPrint("Schwerer Datenbankfehler:<br>Version: " + DatabaseVersion + "<br>Datei: " + Filename + "<br>Meldung: " + fehler);
-            }
-        } while (true);
-
-        Row.RemoveNullOrEmpty();
-        Cell.RemoveOrphans();
-        //Works?.AddRange(oldPendings);
-        //oldPendings?.Clear();
-        //ExecutePending();
-        Column.ThrowEvents = true;
-        Row.ThrowEvents = true;
-
-        FirstColumn = Column[0].Name;
-
-        if (IntParse(LoadedVersion.Replace(".", "")) > IntParse(DatabaseVersion.Replace(".", ""))) { SetReadOnly(); }
     }
 
     public override void RefreshColumnsData(List<ColumnItem>? columns) {
@@ -504,28 +601,14 @@ public sealed class Database : DatabaseAbstract {
 
         Filename = newFileName;
 
-        var l = ToListOfByte();
+        var l = ToListOfByte(this, Works);
         using FileStream x = new(newFileName, FileMode.Create, FileAccess.Write, FileShare.None);
         x.Write(l.ToArray(), 0, l.ToArray().Length);
         x.Flush();
         x.Close();
     }
 
-    public override string UndoText(ColumnItem? column, RowItem? row) {
-        if (Works == null || Works.Count == 0) { return string.Empty; }
-        var cellKey = CellCollection.KeyOfCell(column, row);
-        var t = "";
-        for (var z = Works.Count - 1; z >= 0; z--) {
-            if (Works[z] != null && Works[z].CellKey == cellKey) {
-                t = t + Works[z].UndoTextTableMouseOver() + "<br>";
-            }
-        }
-        t = t.Trim("<br>");
-        t = t.Trim("<hr>");
-        t = t.Trim("<br>");
-        t = t.Trim("<hr>");
-        return t;
-    }
+    public override string UndoText(ColumnItem? column, RowItem? row) => UndoText(column, row, Works);
 
     internal static void SaveToByteList(ColumnItem c, ref List<byte> l) {
         var key = c.Key;
@@ -600,7 +683,7 @@ public sealed class Database : DatabaseAbstract {
         list.AddRange(b);
     }
 
-    internal void SaveToByteList(List<byte> list, ColumnCollection c) {
+    internal static void SaveToByteList(List<byte> list, ColumnCollection c) {
         //Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString());
         foreach (var columnitem in c) {
             if (columnitem != null && !string.IsNullOrEmpty(columnitem.Name)) {
@@ -609,14 +692,14 @@ public sealed class Database : DatabaseAbstract {
         }
     }
 
-    internal void SaveToByteList(List<byte> l, CellCollection c) {
+    internal static void SaveToByteList(List<byte> l, CellCollection c, DatabaseAbstract db) {
         c.RemoveOrphans();
         foreach (var thisString in c) {
-            SaveToByteList(l, thisString);
+            SaveToByteList(l, thisString, db);
         }
     }
 
-    internal void SaveToByteList(List<byte> list, DatabaseDataType databaseDataType, string content) {
+    internal static void SaveToByteList(List<byte> list, DatabaseDataType databaseDataType, string content) {
         var b = content.UTF8_ToByte();
         list.Add((byte)Routinen.DatenAllgemeinUTF8);
         list.Add((byte)databaseDataType);
@@ -624,9 +707,9 @@ public sealed class Database : DatabaseAbstract {
         list.AddRange(b);
     }
 
-    internal void SaveToByteList(List<byte> list, KeyValuePair<string, CellItem> cell) {
+    internal static void SaveToByteList(List<byte> list, KeyValuePair<string, CellItem> cell, DatabaseAbstract db) {
         if (string.IsNullOrEmpty(cell.Value.Value)) { return; }
-        Cell.DataOfCellKey(cell.Key, out var tColumn, out var tRow);
+        db.Cell.DataOfCellKey(cell.Key, out var tColumn, out var tRow);
         if (!tColumn.SaveContent) { return; }
         var b = cell.Value.Value.UTF8_ToByte();
         list.Add((byte)Routinen.CellFormatUTF8_V400);
@@ -635,27 +718,12 @@ public sealed class Database : DatabaseAbstract {
         SaveToByteList(list, tColumn.Key, 7);
         SaveToByteList(list, tRow.Key, 7);
         list.AddRange(b);
-        var contentSize = Cell.ContentSizeToSave(cell, tColumn);
+        var contentSize = db.Cell.ContentSizeToSave(cell, tColumn);
         SaveToByteList(list, contentSize.Width, 2);
         SaveToByteList(list, contentSize.Height, 2);
     }
 
-    protected override void AddUndo(string tableName, DatabaseDataType comand, long? columnKey, long? rowKey, string previousValue, string changedTo, string userName) {
-        Works.Add(new WorkItem(comand, columnKey, rowKey, previousValue, changedTo, userName));
-    }
-
-    protected override void Dispose(bool disposing) {
-        //_muf.Dispose();
-        Works.Dispose();
-        base.Dispose(disposing);
-    }
-
-    protected override void Initialize() {
-        base.Initialize();
-        Works.Clear();
-    }
-
-    protected override string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height, bool isLoading) {
+    internal override string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height, bool isLoading) {
         var r = base.SetValueInternal(type, value, columnkey, rowkey, width, height, isLoading);
 
         if (type == DatabaseDataType.UndoInOne) {
@@ -672,6 +740,21 @@ public sealed class Database : DatabaseAbstract {
         }
 
         return r;
+    }
+
+    protected override void AddUndo(string tableName, DatabaseDataType comand, long? columnKey, long? rowKey, string previousValue, string changedTo, string userName) {
+        Works.Add(new WorkItem(comand, columnKey, rowKey, previousValue, changedTo, userName));
+    }
+
+    protected override void Dispose(bool disposing) {
+        //_muf.Dispose();
+        Works.Dispose();
+        base.Dispose(disposing);
+    }
+
+    protected override void Initialize() {
+        base.Initialize();
+        Works.Clear();
     }
 
     private static int NummerCode2(byte[] b, int pointer) => (b[pointer] * 255) + b[pointer + 1];
@@ -754,87 +837,11 @@ public sealed class Database : DatabaseAbstract {
         return bLoaded;
     }
 
-    private List<byte> ToListOfByte() {
-        try {
-            List<byte> l = new();
-            // Wichtig, Reihenfolge und Länge NIE verändern!
-            SaveToByteList(l, DatabaseDataType.Formatkennung, "BlueDatabase");
-            SaveToByteList(l, DatabaseDataType.Version, DatabaseVersion);
-            SaveToByteList(l, DatabaseDataType.Werbung, "                                                                    BlueDataBase - (c) by Christian Peter                                                                                        "); // Die Werbung dient als Dummy-Platzhalter, falls doch mal was vergessen wurde...
-            // Passwörter ziemlich am Anfang speicher, dass ja keinen Weiteren Daten geladen werden können
-            //if (string.IsNullOrEmpty(GlobalShowPass)) {
-            //    SaveToByteList(l, DatabaseDataType.CryptionState, false.ToPlusMinus());
-            //} else {
-            //    SaveToByteList(l, DatabaseDataType.CryptionState, true.ToPlusMinus());
-            //    SaveToByteList(l, DatabaseDataType.CryptionTest, "OK");
-            //}
-            SaveToByteList(l, DatabaseDataType.GlobalShowPass, GlobalShowPass);
-            //SaveToByteList(l, DatabaseDataType.FileEncryptionKey, _fileEncryptionKey);
-            SaveToByteList(l, DatabaseDataType.Creator, Creator);
-            SaveToByteList(l, DatabaseDataType.CreateDateUTC, CreateDate);
-            SaveToByteList(l, DatabaseDataType.Caption, Caption);
-            //SaveToByteList(l, enDatabaseDataType.JoinTyp, ((int)_JoinTyp).ToString());
-            //SaveToByteList(l, DatabaseDataType.VerwaisteDaten, ((int)_verwaisteDaten).ToString());
-            SaveToByteList(l, DatabaseDataType.Tags, Tags.JoinWithCr());
-            SaveToByteList(l, DatabaseDataType.PermissionGroupsNewRow, PermissionGroupsNewRow.JoinWithCr());
-            SaveToByteList(l, DatabaseDataType.DatabaseAdminGroups, DatenbankAdmin.JoinWithCr());
-            SaveToByteList(l, DatabaseDataType.GlobalScale, GlobalScale.ToString(Constants.Format_Float1));
-            //SaveToByteList(l, DatabaseDataType.Ansicht, ((int)_ansicht).ToString());
-            //SaveToByteList(l, DatabaseDataType.ReloadDelaySecond, ReloadDelaySecond.ToString());
-            //SaveToByteList(l, enDatabaseDataType.ImportScript, _ImportScript);
-            SaveToByteList(l, DatabaseDataType.RulesScript, RulesScript);
-            //SaveToByteList(l, enDatabaseDataType.BinaryDataInOne, Bins.ToString(true));
-            //SaveToByteList(l, enDatabaseDataType.FilterImagePfad, _filterImagePfad);
-            SaveToByteList(l, DatabaseDataType.AdditionaFilesPath, AdditionaFilesPfad);
-            SaveToByteList(l, DatabaseDataType.FirstColumn, FirstColumn);
-            SaveToByteList(l, DatabaseDataType.RowQuickInfo, ZeilenQuickInfo);
-            SaveToByteList(l, DatabaseDataType.StandardFormulaFile, StandardFormulaFile);
-            SaveToByteList(l, Column);
-            //Row.SaveToByteList(l);
-            SaveToByteList(l, Cell);
-            if (SortDefinition == null) {
-                // Ganz neue Datenbank
-                SaveToByteList(l, DatabaseDataType.SortDefinition, string.Empty);
-            } else {
-                SaveToByteList(l, DatabaseDataType.SortDefinition, SortDefinition.ToString());
-            }
-            //SaveToByteList(l, enDatabaseDataType.Rules_ALT, Rules.ToString(true));
-            SaveToByteList(l, DatabaseDataType.ColumnArrangement, ColumnArrangements.ToString());
-            SaveToByteList(l, DatabaseDataType.Layouts, Layouts.JoinWithCr());
-            SaveToByteList(l, DatabaseDataType.AutoExport, Export.ToString(true));
-            // Beim Erstellen des Undo-Speichers die Works nicht verändern, da auch bei einem nicht
-            // erfolgreichen Speichervorgang der Datenbank-String erstellt wird.
-            // Status des Work-Items ist egal, da es beim LADEN automatisch auf 'Undo' gesetzt wird.
-            List<string> works2 = new();
-            if (Works != null) {
-                foreach (var thisWorkItem in Works) {
-                    if (thisWorkItem != null) {
-                        if (thisWorkItem.Comand != DatabaseDataType.Value_withoutSizeData) {
-                            works2.Add(thisWorkItem.ToString());
-                        } else {
-                            if (thisWorkItem.LogsUndo(this)) {
-                                works2.Add(thisWorkItem.ToString());
-                            }
-                        }
-                    }
-                }
-            }
-
-            SaveToByteList(l, DatabaseDataType.UndoCount, UndoCount.ToString());
-            if (works2.Count > UndoCount) { works2.RemoveRange(0, works2.Count - UndoCount); }
-            SaveToByteList(l, DatabaseDataType.UndoInOne, works2.JoinWithCr((int)(16581375 * 0.9)));
-            SaveToByteList(l, DatabaseDataType.EOF, "END");
-            return l;
-        } catch {
-            return ToListOfByte();
-        }
-    }
-
     private string WriteTempFileToDisk() {
         var f = ErrorReason(BlueBasics.Enums.ErrorReason.Save);
         if (!string.IsNullOrEmpty(f)) { return string.Empty; }
 
-        var dataUncompressed = ToListOfByte().ToArray();
+        var dataUncompressed = ToListOfByte(this, Works).ToArray();
         var tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName().ToUpper());
 
         using FileStream x = new(tmpFileName, FileMode.Create, FileAccess.Write, FileShare.None);
