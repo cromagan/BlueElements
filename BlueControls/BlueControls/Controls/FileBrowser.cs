@@ -60,7 +60,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
 
     #region Events
 
-    public event EventHandler FolderChanged;
+    public event EventHandler? FolderChanged;
 
     #endregion
 

@@ -74,7 +74,7 @@ public partial class Slider : IBackgroundNone {
 
     #region Events
 
-    public event EventHandler ValueChanged;
+    public event EventHandler? ValueChanged;
 
     #endregion
 

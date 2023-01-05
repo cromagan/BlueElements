@@ -66,9 +66,9 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
     #region Events
 
-    public event EventHandler Cancel;
+    public event EventHandler? Cancel;
 
-    public event EventHandler<ContextMenuItemClickedEventArgs> ItemClicked;
+    public event EventHandler<ContextMenuItemClickedEventArgs>? ItemClicked;
 
     #endregion
 

@@ -277,7 +277,7 @@ public static class IInputFormatExtensions {
                 t.AdditionalFormatCheck = AdditionalCheck.DateTime;
                 t.SpellCheckingEnabled = false;
                 t.MultiLine = false;
-                t.MaxTextLenght = 20;
+                t.MaxTextLenght = 19;
                 return;
 
             default:

@@ -127,7 +127,10 @@ public static class Generic {
         return img;
     }
 
-    public static Stream? GetEmmbedResource(Assembly assembly, string name) {
+    public static Stream? GetEmmbedResource(Assembly? assembly, string name) {
+        if (assembly == null) { return null; }
+        if (string.IsNullOrEmpty(name)) { return null; }
+
         return assembly.GetManifestResourceNames()
             .Where(thisString => thisString.EndsWith("." + name))
             .Select(assembly.GetManifestResourceStream).FirstOrDefault();

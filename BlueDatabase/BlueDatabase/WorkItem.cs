@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -61,7 +63,7 @@ public class WorkItem : IParseable {
 
     #region Events
 
-    public event EventHandler Changed;
+    public event EventHandler? Changed;
 
     #endregion
 

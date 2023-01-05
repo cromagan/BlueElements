@@ -73,7 +73,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
     #region Events
 
-    public event EventHandler<FilterComandEventArgs> FilterComand;
+    public event EventHandler<FilterComandEventArgs>? FilterComand;
 
     #endregion
 

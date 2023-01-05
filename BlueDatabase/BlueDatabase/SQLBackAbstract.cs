@@ -71,8 +71,10 @@ public abstract class SQLBackAbstract {
 
     public abstract int MaxStringLenght { get; }
     public abstract string Primary { get; }
-    public abstract string VarChar255 { get; }
-    public abstract string VarChar4000 { get; }
+
+    public string VarChar15 { get => VarChar(15); }
+    public string VarChar255 { get => VarChar(255); }
+    public string VarChar4000 { get => VarChar(4000); }
 
     #endregion
 
@@ -139,6 +141,12 @@ public abstract class SQLBackAbstract {
         comm.CommandText = cmdString;
 
         return ExecuteCommand(comm);
+    }
+
+    public void ChangeDataType(string tablename, string column, int charlenght) {
+        //https://stackoverflow.com/questions/10321775/changing-the-data-type-of-a-column-in-oracle
+        var cmdString = @"ALTER TABLE " + tablename + " MODIFY (" + column + " " + VarChar(charlenght) + ")";
+        ExecuteCommand(cmdString);
     }
 
     public bool CloseConnection() {
@@ -227,64 +235,6 @@ public abstract class SQLBackAbstract {
         return l;
     }
 
-    //[Obsolete]
-    //public async void LoadAllCells(string tablename, RowCollection row) {
-    //    if (!OpenConnection()) { return; }
-
-    //    //DataTable dataTable = new DataTable();
-    //    //using var cmd = _connection.CreateCommand();
-    //    //cmd.CommandText =@"select * from " + tablename.ToUpper();
-    //    //DbDataAdapter da = DbProviderFactories.GetFactory(_connection).CreateDataAdapter();
-    //    //da.SelectCommand = cmd;
-    //    //da.Fill(dataTable);
-    //    //da.Dispose();
-
-    //    var allcols = GetColumnNames(tablename);
-    //    allcols.Remove("RK");
-
-    //    var com = "SELECT RK, ";
-
-    //    foreach (var thiscolumn in row.Database.Column) {
-    //        if (!allcols.Contains(thiscolumn.Name.ToUpper())) {
-    //            Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht auf dem Server vorhanden: " + thiscolumn.Name);
-    //        }
-    //        allcols.Remove(thiscolumn.Name.ToUpper());
-
-    //        com = com + thiscolumn.Name.ToUpper() + ", ";
-    //    }
-
-    //    com = com.TrimEnd(", ");
-
-    //    com = com + " FROM " + tablename.ToUpper();
-
-    //    if (allcols.Count > 0) {
-    //        Develop.DebugPrint(FehlerArt.Fehler, "Zusätzliche Spalten dem Server vorhanden: " + allcols.JoinWith(", "));
-    //    }
-
-    //    OpenConnection();
-
-    //    using var command = _connection.CreateCommand();
-    //    command.CommandText = com; //@"select * from " + tablename.ToUpper();
-
-    //    using var reader = await command.ExecuteReaderAsync();
-
-    //    row.Clear();
-    //    var ti = DateTime.Now;
-
-    //    while (await reader.ReadAsync()) {
-    //        var rk = LongParse(reader[0].ToString());
-    //        var r = row.GenerateAndAdd(rk, string.Empty, false, false);
-
-    //        for (var z = 1; z < reader.FieldCount; z++) {
-    //            row.Database.Cell.SetValueInternal(row.Database.Column[z - 1].Key, r, reader[z].ToString(), -1, -1);
-    //        }
-    //    }
-
-    //    Develop.DebugPrint(FehlerArt.Info, "Datenbank Ladezeit: " + row.Database.TableName + " - " + DateTime.Now.Subtract(ti).TotalSeconds.ToString() + " Sekunden");
-
-    //    CloseConnection();
-    //}
-
     public async void LoadAllRowKeys(string tablename, RowCollection row) {
         try {
             if (!OpenConnection()) { return; }
@@ -313,6 +263,8 @@ public abstract class SQLBackAbstract {
         }
     }
 
+    //    CloseConnection();
+    //}
     public void LoadRow(string tablename, List<RowItem> row) {
         try {
             //CloseConnection(); // Um ORA-01000: MAXIMALE ANZAHL OFFENER CURSOR ÜBERSCHRITTEN zu vermeiden
@@ -369,6 +321,7 @@ public abstract class SQLBackAbstract {
         }
     }
 
+    //    Develop.DebugPrint(FehlerArt.Info, "Datenbank Ladezeit: " + row.Database.TableName + " - " + DateTime.Now.Subtract(ti).TotalSeconds.ToString() + " Sekunden");
     public bool OpenConnection() {
         lock (openclose) {
             if (_connection == null) { return false; }
@@ -381,8 +334,15 @@ public abstract class SQLBackAbstract {
         }
     }
 
+    //        for (var z = 1; z < reader.FieldCount; z++) {
+    //            row.Database.Cell.SetValueInternal(row.Database.Column[z - 1].Key, r, reader[z].ToString(), -1, -1);
+    //        }
+    //    }
     public abstract SQLBackAbstract OtherTable(string tablename);
 
+    //    while (await reader.ReadAsync()) {
+    //        var rk = LongParse(reader[0].ToString());
+    //        var r = row.GenerateAndAdd(rk, string.Empty, false, false);
     public void RenameColumn(string tablename, string oldname, string newname) {
         //https://www.1keydata.com/sql/alter-table-rename-column.html
         var cmdString = @"ALTER TABLE " + tablename + " RENAME COLUMN " + oldname + " TO " + newname;
@@ -399,6 +359,8 @@ public abstract class SQLBackAbstract {
         ExecuteCommand(cmdString);
     }
 
+    //    row.Clear();
+    //    var ti = DateTime.Now;
     public void RepairAll(string tablename) {
         Develop.StartService();
 
@@ -434,11 +396,11 @@ public abstract class SQLBackAbstract {
 
         var colUndo = GetColumnNames(SYS_UNDO);
         if (colUndo == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
-        if (!colUndo.Contains("TABLENAME")) { AddColumn(SYS_UNDO, "TABLENAME", false); }
+        if (!colUndo.Contains("TABLENAME")) { AddColumn(SYS_UNDO, "TABLENAME", VarChar255, false); }
         if (!colUndo.Contains("COMAND")) { AddColumn(SYS_UNDO, "COMAND", false); }
         //if (!colUndo.Contains("COLUMNNAME")) { AddColumn(SYS_UNDO, "COLUMNNAME", false); }
-        if (!colUndo.Contains("COLUMNKEY")) { AddColumn(SYS_UNDO, "COLUMNKEY", true); }
-        if (!colUndo.Contains("ROWKEY")) { AddColumn(SYS_UNDO, "ROWKEY", true); }
+        if (!colUndo.Contains("COLUMNKEY")) { AddColumn(SYS_UNDO, "COLUMNKEY", VarChar15, true); }
+        if (!colUndo.Contains("ROWKEY")) { AddColumn(SYS_UNDO, "ROWKEY", VarChar15, true); }
         if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn(SYS_UNDO, "PREVIOUSVALUE", VarChar4000, true); }
         if (!colUndo.Contains("CHANGEDTO")) { AddColumn(SYS_UNDO, "CHANGEDTO", VarChar4000, true); }
         if (!colUndo.Contains("USERNAME")) { AddColumn(SYS_UNDO, "USERNAME", false); }
@@ -450,6 +412,7 @@ public abstract class SQLBackAbstract {
         CloseConnection();
     }
 
+    //    using var reader = await command.ExecuteReaderAsync();
     /// <summary>
     /// Gibt TRUE zurück, wenn alles ok ist.
     /// Entweder der Wert gesetzt wurde, der Wert aktuell ist oder der Wert unwichtig ist.
@@ -495,6 +458,8 @@ public abstract class SQLBackAbstract {
         } while (true);
     }
 
+    //    using var command = _connection.CreateCommand();
+    //    command.CommandText = com; //@"select * from " + tablename.ToUpper();
     /// <summary>
     /// Führt eine eine Änderung im BackEnd aus
     /// </summary>
@@ -519,6 +484,8 @@ public abstract class SQLBackAbstract {
             case DatabaseDataType.EOF:
                 return string.Empty;
         }
+
+        if (type.IsObsolete()) { return string.Empty; }
 
         #endregion
 
@@ -576,6 +543,7 @@ public abstract class SQLBackAbstract {
         return string.Empty;
     }
 
+    //    OpenConnection();
     /// <summary>
     /// Gibt alle verfügbaren Tabellen - außer die Systemtabellen - zurück
     /// </summary>
@@ -588,6 +556,41 @@ public abstract class SQLBackAbstract {
         return l;
     }
 
+    public abstract string VarChar(int lenght);
+
+    //[Obsolete]
+    //public async void LoadAllCells(string tablename, RowCollection row) {
+    //    if (!OpenConnection()) { return; }
+
+    //    //DataTable dataTable = new DataTable();
+    //    //using var cmd = _connection.CreateCommand();
+    //    //cmd.CommandText =@"select * from " + tablename.ToUpper();
+    //    //DbDataAdapter da = DbProviderFactories.GetFactory(_connection).CreateDataAdapter();
+    //    //da.SelectCommand = cmd;
+    //    //da.Fill(dataTable);
+    //    //da.Dispose();
+
+    //    var allcols = GetColumnNames(tablename);
+    //    allcols.Remove("RK");
+
+    //    var com = "SELECT RK, ";
+
+    //    foreach (var thiscolumn in row.Database.Column) {
+    //        if (!allcols.Contains(thiscolumn.Name.ToUpper())) {
+    //            Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht auf dem Server vorhanden: " + thiscolumn.Name);
+    //        }
+    //        allcols.Remove(thiscolumn.Name.ToUpper());
+
+    //        com = com + thiscolumn.Name.ToUpper() + ", ";
+    //    }
+
+    //    com = com.TrimEnd(", ");
+
+    //    com = com + " FROM " + tablename.ToUpper();
+
+    //    if (allcols.Count > 0) {
+    //        Develop.DebugPrint(FehlerArt.Fehler, "Zusätzliche Spalten dem Server vorhanden: " + allcols.JoinWith(", "));
+    //    }
     internal static string MakeValidColumnName(string columnname) => columnname.ToUpper().Replace(" ", "_").ReduceToChars(Constants.AllowedCharsVariableName);
 
     internal List<(string tablename, string comand, string columnkey, string rowkey)>? GetLastChanges(List<DatabaseSQLLite> db, DateTime fromDate, DateTime toDate) {

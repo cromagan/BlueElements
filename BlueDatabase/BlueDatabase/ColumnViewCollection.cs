@@ -41,6 +41,7 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable, 
     public ColumnViewCollection(DatabaseAbstract database, string code) {
         Database = database;
         Database.Disposing += Database_Disposing;
+        _name = string.Empty;
         Parse(code);
     }
 

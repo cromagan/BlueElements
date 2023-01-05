@@ -47,7 +47,7 @@ internal partial class AbstractClassEditor<T> : Controls.GroupBox where T : IPar
 
     #region Events
 
-    public event EventHandler Changed;
+    public event EventHandler? Changed;
 
     #endregion
 

@@ -44,19 +44,19 @@ public abstract partial class GenericTool : GroupBox // System.Windows.Forms.Use
 
     #region Events
 
-    public event System.EventHandler DoInvalidate;
+    public event System.EventHandler? DoInvalidate;
 
-    public event System.EventHandler ForceUndoSaving;
+    public event System.EventHandler? ForceUndoSaving;
 
-    public event System.EventHandler HideMainWindow;
+    public event System.EventHandler? HideMainWindow;
 
-    public event System.EventHandler<BitmapEventArgs> NeedCurrentPic;
+    public event System.EventHandler<BitmapEventArgs>? NeedCurrentPic;
 
-    public event System.EventHandler<BitmapEventArgs> OverridePic;
+    public event System.EventHandler<BitmapEventArgs>? OverridePic;
 
-    public event System.EventHandler ShowMainWindow;
+    public event System.EventHandler? ShowMainWindow;
 
-    public event System.EventHandler ZoomFit;
+    public event System.EventHandler? ZoomFit;
 
     #endregion
 

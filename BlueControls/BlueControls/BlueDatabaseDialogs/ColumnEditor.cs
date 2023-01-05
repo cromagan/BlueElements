@@ -102,6 +102,12 @@ internal sealed partial class ColumnEditor {
         btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToString();
     }
 
+    private void btnCalculateMaxTextLenght_Click(object sender, System.EventArgs e) {
+        if (_column == null) { return; }
+
+        tbxMaxTextLenght.Text = _column.CalculatePreveredMaxTextLenght().ToString();
+    }
+
     private void btnOk_Click(object sender, System.EventArgs e) {
         if (!AllOk()) { return; }
         Close();
@@ -135,7 +141,7 @@ internal sealed partial class ColumnEditor {
 
     private void btnSchnellDatumUhrzeit_Click(object sender, System.EventArgs e) {
         Column_DatenZurückschreiben();
-        _column.SetFormatForDateTime();
+        _column.SetFormatForDateTime(true);
         Column_DatenAuslesen(_column);
     }
 

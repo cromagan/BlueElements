@@ -74,29 +74,29 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
 
     #region Events
 
-    public event PrintEventHandler BeginnPrint;
+    public event PrintEventHandler? BeginnPrint;
 
-    public event EventHandler Changed;
+    public event EventHandler? Changed;
 
-    public event EventHandler ClickedItemChanged;
+    public event EventHandler? ClickedItemChanged;
 
-    public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
+    public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
-    public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
+    public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
 
-    public event EventHandler DrawModeChanged;
+    public event EventHandler? DrawModeChanged;
 
-    public event PrintEventHandler EndPrint;
+    public event PrintEventHandler? EndPrint;
 
-    public event EventHandler GotNewItemCollection;
+    public event EventHandler? GotNewItemCollection;
 
-    public event EventHandler<ListEventArgs> ItemAdded;
+    public event EventHandler<ListEventArgs>? ItemAdded;
 
-    public event EventHandler<System.EventArgs> ItemRemoved;
+    public event EventHandler<System.EventArgs>? ItemRemoved;
 
-    public event EventHandler<ListEventArgs> ItemRemoving;
+    public event EventHandler<ListEventArgs>? ItemRemoving;
 
-    public event PrintPageEventHandler PrintPage;
+    public event PrintPageEventHandler? PrintPage;
 
     #endregion
 

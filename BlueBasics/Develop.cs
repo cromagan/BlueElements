@@ -53,9 +53,9 @@ public static class Develop {
     [DefaultValue(false)]
     public static bool Exited { get; private set; }
 
-    public static string OrigingLanguage { get; private set; }
+    public static string OrigingLanguage { get; private set; } = "DE";
 
-    public static string OrigingNumberDecimalSeparator { get; private set; }
+    public static string OrigingNumberDecimalSeparator { get; private set; } = ",";
 
     [DefaultValue(false)]
     public static bool ServiceStarted { get; private set; }

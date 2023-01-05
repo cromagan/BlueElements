@@ -79,12 +79,7 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
 
     public override int MaxStringLenght => 4000;
 
-    //public override string ID => "Microsoft SQL Server";
     public override string Primary => "bigint identity(1,1)";
-
-    public override string VarChar255 => "VARCHAR(255)";
-
-    public override string VarChar4000 => "VARCHAR(4000)";
 
     #endregion
 
@@ -161,6 +156,8 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
     }
 
     public override SQLBackAbstract OtherTable(string tablename) => new SQLBackMicrosoftCE(this, tablename);
+
+    public override string VarChar(int lenght) => "VARCHAR(" + lenght.ToString() + ")";
 
     protected override List<string> AllTables() {
         List<string> tables = new();

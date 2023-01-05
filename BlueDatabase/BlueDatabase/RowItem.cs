@@ -70,9 +70,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
 
     #region Events
 
-    public event EventHandler<DoRowAutomaticEventArgs> DoSpecialRules;
+    public event EventHandler<DoRowAutomaticEventArgs>? DoSpecialRules;
 
-    public event EventHandler<RowCheckedEventArgs> RowChecked;
+    public event EventHandler<RowCheckedEventArgs>? RowChecked;
 
     #endregion
 

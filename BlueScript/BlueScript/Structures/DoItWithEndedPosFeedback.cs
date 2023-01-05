@@ -35,7 +35,7 @@ public struct DoItWithEndedPosFeedback {
 
     #region Constructors
 
-    public DoItWithEndedPosFeedback(string errormessage, Variable variable, int endpos) {
+    public DoItWithEndedPosFeedback(string errormessage, Variable? variable, int endpos) {
         ErrorMessage = errormessage;
         Variable = variable;
         Position = endpos;

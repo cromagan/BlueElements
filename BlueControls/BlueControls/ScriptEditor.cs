@@ -57,9 +57,9 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended 
 
     #region Events
 
-    public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
+    public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
-    public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
+    public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
 
     #endregion
 

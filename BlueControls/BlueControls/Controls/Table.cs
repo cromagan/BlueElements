@@ -125,39 +125,39 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     #region Events
 
-    public event EventHandler<FilterEventArgs> AutoFilterClicked;
+    public event EventHandler<FilterEventArgs>? AutoFilterClicked;
 
-    public event EventHandler<CellEventArgs> ButtonCellClicked;
+    public event EventHandler<CellEventArgs>? ButtonCellClicked;
 
-    public event EventHandler<CellEventArgs> CellValueChanged;
+    public event EventHandler<CellEventArgs>? CellValueChanged;
 
-    public event EventHandler<CellValueChangingByUserEventArgs> CellValueChangingByUser;
+    public event EventHandler<CellValueChangingByUserEventArgs>? CellValueChangingByUser;
 
-    public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
+    public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
-    public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
+    public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
 
-    public event EventHandler DatabaseChanged;
+    public event EventHandler? DatabaseChanged;
 
-    public new event EventHandler<CellDoubleClickEventArgs> DoubleClick;
+    public new event EventHandler<CellDoubleClickEventArgs>? DoubleClick;
 
-    public event EventHandler<CellCancelEventArgs> EditBeforeBeginEdit;
+    public event EventHandler<CellCancelEventArgs>? EditBeforeBeginEdit;
 
-    public event EventHandler FilterChanged;
+    public event EventHandler? FilterChanged;
 
-    public event EventHandler<ButtonCellEventArgs> NeedButtonArgs;
+    public event EventHandler<ButtonCellEventArgs>? NeedButtonArgs;
 
-    public event EventHandler PinnedChanged;
+    public event EventHandler? PinnedChanged;
 
-    public event EventHandler<RowEventArgs> RowAdded;
+    public event EventHandler<RowEventArgs>? RowAdded;
 
-    public event EventHandler<CellExtEventArgs> SelectedCellChanged;
+    public event EventHandler<CellExtEventArgs>? SelectedCellChanged;
 
-    public event EventHandler<RowEventArgs> SelectedRowChanged;
+    public event EventHandler<RowEventArgs>? SelectedRowChanged;
 
-    public event EventHandler ViewChanged;
+    public event EventHandler? ViewChanged;
 
-    public event EventHandler VisibleRowsChanged;
+    public event EventHandler? VisibleRowsChanged;
 
     #endregion
 
@@ -1678,7 +1678,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    private static void DB_GenerateLayoutInternal(object sender, GenerateLayoutInternalEventargs e) {
+    private static void DB_GenerateLayoutInternal(object sender, GenerateLayoutInternalEventArgs e) {
         if (e.Handled) { return; }
         e.Handled = true;
         if (e?.Row?.Database == null) { return; }

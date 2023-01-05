@@ -108,14 +108,14 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     #region Events
 
-    public event EventHandler ButtonClicked;
+    public event EventHandler? ButtonClicked;
 
-    public event EventHandler NeedRefresh;
+    public event EventHandler? NeedRefresh;
 
     [Obsolete("Value Changed benutzen", true)]
-    public new event EventHandler TextChanged;
+    public new event EventHandler? TextChanged;
 
-    public event EventHandler ValueChanged;
+    public event EventHandler? ValueChanged;
 
     #endregion
 

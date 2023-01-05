@@ -64,7 +64,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     #region Events
 
-    public event EventHandler<CellEventArgs> CellValueChanged;
+    public event EventHandler<CellEventArgs>? CellValueChanged;
 
     #endregion
 

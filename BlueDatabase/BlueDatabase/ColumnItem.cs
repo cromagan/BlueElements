@@ -221,7 +221,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     #region Events
 
     //internal ColumnItem(DatabaseAbstract database, long columnkey) : this(database, database.Column.Freename(string.Empty), columnkey) { }
-    public event EventHandler Changed;
+    public event EventHandler? Changed;
 
     #endregion
 
@@ -1169,6 +1169,24 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
     public bool AutoFilterSymbolPossible() => FilterOptions.HasFlag(FilterOptions.Enabled) && Format.Autofilter_möglich();
 
+    public int CalculatePreveredMaxTextLenght() {
+        if (Database == null) { return 0; }
+        var m = 0;
+
+        foreach (var thisRow in Database.Row) {
+            var t = thisRow.CellGetString(this);
+            m = Math.Max(m, t.StringtoUtf8().Length);
+        }
+
+        if (m <= 0) {
+            return 255;
+        } else if (m == 1)
+            return 1;
+        else {
+            return Math.Min((int)(m * 1.2) + 1, 4000);
+        }
+    }
+
     /// <summary>
     ///
     /// </summary>
@@ -1770,7 +1788,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
                 case 15:// Date_GermanFormat = 15
                 case 16://Datum_und_Uhrzeit = 16,
-                    SetFormatForDateTime();
+                    SetFormatForDateTime(true);
                     break;
 
                 case 2:   //Bit = 3,
@@ -1850,11 +1868,11 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         }
     }
 
-    public void ResetSystemToDefault(bool setAll) {
+    public void ResetSystemToDefault(bool setOpticalToo) {
         if (!IsSystemColumn()) { return; }
         //if (SetAll && !IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Ausserhalb des parsens!"); }
-        // ACHTUNG: Die SetAll Befehle OHNE _, die müssen geloggt werden.
-        if (setAll) {
+        // ACHTUNG: Die setOpticalToo Befehle OHNE _, die müssen geloggt werden.
+        if (setOpticalToo) {
             LineLeft = ColumnLineStyle.Dünn;
             LineRight = ColumnLineStyle.Ohne;
             ForeColor = Color.FromArgb(0, 0, 0);
@@ -1863,7 +1881,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         switch (Name.ToUpper()) {
             case "SYS_CREATOR":
                 _format = DataFormat.Text;
-                if (setAll) {
+                _maxTextLenght = 20;
+                if (setOpticalToo) {
                     Caption = "Ersteller";
                     DropdownBearbeitungErlaubt = true;
                     DropdownWerteAndererZellenAnzeigen = true;
@@ -1882,7 +1901,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 _showUndo = false;
                 _scriptType = ScriptType.String_Readonly;
                 _permissionGroupsChangeCell.Clear();
-                if (setAll) {
+                _maxTextLenght = 20;
+                if (setOpticalToo) {
                     Caption = "Änderer";
                     ForeColor = Color.FromArgb(0, 128, 0);
                     BackColor = Color.FromArgb(185, 255, 185);
@@ -1892,20 +1912,21 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             case "SYS_CHAPTER":
                 _format = DataFormat.Text;
                 _afterEditAutoCorrect = true; // Verhindert \r am Ende und somit anzeigefehler
-                if (setAll) {
+                _multiLine = true;
+                if (setOpticalToo) {
                     Caption = "Kapitel";
                     ForeColor = Color.FromArgb(0, 0, 0);
                     BackColor = Color.FromArgb(255, 255, 150);
                     LineLeft = ColumnLineStyle.Dick;
-                    if (_multiLine) { _showMultiLineInOneLine = true; }
+                    ShowMultiLineInOneLine = true;
                 }
                 break;
 
             case "SYS_DATECREATED":
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
-                if (setAll) {
-                    SetFormatForDateTime();
+                SetFormatForDateTime(false);
+                if (setOpticalToo) {
                     Caption = "Erstell-Datum";
                     ForeColor = Color.FromArgb(0, 0, 128);
                     BackColor = Color.FromArgb(185, 185, 255);
@@ -1918,15 +1939,14 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
                 _showUndo = false;
-                // SetFormatForDateTime(); --Sriptt Type Chaos
+                SetFormatForDateTime(false);
                 _textBearbeitungErlaubt = false;
                 _spellCheckingEnabled = false;
                 _dropdownBearbeitungErlaubt = false;
                 _scriptType = ScriptType.String_Readonly;
                 _permissionGroupsChangeCell.Clear();
 
-                if (setAll) {
-                    SetFormatForDateTime();
+                if (setOpticalToo) {
                     Caption = "Änder-Datum";
                     ForeColor = Color.FromArgb(0, 128, 0);
                     BackColor = Color.FromArgb(185, 255, 185);
@@ -1951,8 +1971,9 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 _textBearbeitungErlaubt = false;
                 _dropdownBearbeitungErlaubt = false;
                 _behaviorOfImageAndText = BildTextVerhalten.Interpretiere_Bool;
+                _maxTextLenght = 1;
 
-                if (setAll) {
+                if (setOpticalToo) {
                     ForeColor = Color.FromArgb(128, 0, 0);
                     BackColor = Color.FromArgb(255, 185, 185);
                     LineLeft = ColumnLineStyle.Dick;
@@ -1968,6 +1989,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 _ignoreAtRowFilter = true;
                 _behaviorOfImageAndText = BildTextVerhalten.Interpretiere_Bool;
                 _align = AlignmentHorizontal.Zentriert;
+                _maxTextLenght = 1;
 
                 if (_textBearbeitungErlaubt || _dropdownBearbeitungErlaubt) {
                     _quickInfo = "Eine abgeschlossene Zeile kann<br>nicht mehr bearbeitet werden.";
@@ -1980,7 +2002,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                     _dropDownItems.Clear();
                 }
 
-                if (setAll) {
+                if (setOpticalToo) {
                     Caption = "Abgeschlossen";
                     ForeColor = Color.FromArgb(128, 0, 0);
                     BackColor = Color.FromArgb(255, 185, 185);
@@ -2022,7 +2044,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 break;
 
             case VarType.DateTime:
-                SetFormatForDateTime();
+                SetFormatForDateTime(true);
                 break;
 
             case VarType.Email:
@@ -2113,16 +2135,15 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         ScriptType = ScriptType.DateTime;
     }
 
-    public void SetFormatForDateTime() {
+    public void SetFormatForDateTime(bool changeScriptType) {
         ((IInputFormat)this).SetFormat(VarType.DateTime);
-
         Format = DataFormat.Text;
         Align = AlignmentHorizontal.Links;
         SortType = SortierTyp.Datum_Uhrzeit;
         DoOpticalTranslation = TranslationType.Datum;
         AfterEditQuickSortRemoveDouble = false;
         BehaviorOfImageAndText = BildTextVerhalten.Nur_Text;
-        ScriptType = ScriptType.DateTime;
+        if (changeScriptType) { ScriptType = ScriptType.DateTime; }
     }
 
     public void SetFormatForEmail() {

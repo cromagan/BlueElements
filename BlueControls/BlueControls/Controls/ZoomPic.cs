@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -49,15 +51,15 @@ public partial class ZoomPic : ZoomPad {
 
     #region Events
 
-    public event EventHandler<AdditionalDrawing> DoAdditionalDrawing;
+    public event EventHandler<AdditionalDrawing>? DoAdditionalDrawing;
 
-    public event EventHandler<MouseEventArgs1_1> ImageMouseDown;
+    public event EventHandler<MouseEventArgs1_1>? ImageMouseDown;
 
-    public event EventHandler<MouseEventArgs1_1DownAndCurrent> ImageMouseMove;
+    public event EventHandler<MouseEventArgs1_1DownAndCurrent>? ImageMouseMove;
 
-    public event EventHandler<MouseEventArgs1_1DownAndCurrent> ImageMouseUp;
+    public event EventHandler<MouseEventArgs1_1DownAndCurrent>? ImageMouseUp;
 
-    public event EventHandler<PositionEventArgs> OverwriteMouseImageData;
+    public event EventHandler<PositionEventArgs>? OverwriteMouseImageData;
 
     #endregion
 

@@ -86,7 +86,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
 
     #region Events
 
-    public event EventHandler Changed;
+    public event EventHandler? Changed;
 
     #endregion
 

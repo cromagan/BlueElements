@@ -72,7 +72,7 @@ public sealed class Button : GenericControl, IBackgroundNone, ITranslateable {
 
     #region Events
 
-    public event EventHandler CheckedChanged;
+    public event EventHandler? CheckedChanged;
 
     #endregion
 

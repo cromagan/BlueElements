@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -50,10 +52,12 @@ public class Method_DisableCellChanges : MethodDatabase {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-        var ve = (VariableBool)s.Variables.GetSystem("CellChangesEnabled");
-        ve.Readonly = false;
-        ve.ValueBool = false;
-        ve.Readonly = true;
+        var ve = s.Variables.GetSystem("CellChangesEnabled");
+        if (ve is VariableBool veb) {
+            veb.Readonly = false;
+            veb.ValueBool = false;
+            veb.Readonly = true;
+        }
 
         return DoItFeedback.Null();
     }

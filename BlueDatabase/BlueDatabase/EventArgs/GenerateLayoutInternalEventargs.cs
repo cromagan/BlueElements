@@ -17,11 +17,11 @@
 
 namespace BlueDatabase.EventArgs;
 
-public class GenerateLayoutInternalEventargs : RowEventArgs {
+public class GenerateLayoutInternalEventArgs : RowEventArgs {
 
     #region Constructors
 
-    public GenerateLayoutInternalEventargs(RowItem row, string layoutId, string saveTo) : base(row) {
+    public GenerateLayoutInternalEventArgs(RowItem row, string layoutId, string saveTo) : base(row) {
         LayoutId = layoutId;
         Filename = saveTo;
         Handled = false;

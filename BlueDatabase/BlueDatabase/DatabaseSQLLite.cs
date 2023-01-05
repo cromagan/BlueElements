@@ -244,6 +244,10 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
             if (type == DatabaseDataType.ColumnName) {
                 _sql?.RenameColumn(TableName, c?.Name.ToUpper(), value.ToUpper());
             }
+            if (type == DatabaseDataType.MaxTextLenght) {
+                _sql?.ChangeDataType(TableName, c?.Name.ToUpper(), IntParse(value));
+            }
+
             _sql?.SetValueInternal(TableName, type, value, c?.Name, columnkey, rowkey, -1, -1, isLoading);
         }
 

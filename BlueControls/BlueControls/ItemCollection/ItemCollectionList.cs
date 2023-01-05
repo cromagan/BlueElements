@@ -64,7 +64,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
 
     #region Events
 
-    public event EventHandler ItemCheckedChanged;
+    public event EventHandler? ItemCheckedChanged;
 
     #endregion
 

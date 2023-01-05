@@ -108,7 +108,7 @@ public sealed class QuickImage : BitmapExt, IReadableText {
 
     #region Events
 
-    public static event EventHandler<NeedImageEventArgs> NeedImage;
+    public static event EventHandler<NeedImageEventArgs>? NeedImage;
 
     #endregion
 

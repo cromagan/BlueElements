@@ -33,9 +33,9 @@ public interface IContextMenu {
 
     #region Events
 
-    event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
+    event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
-    event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
+    event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
 
     #endregion
 

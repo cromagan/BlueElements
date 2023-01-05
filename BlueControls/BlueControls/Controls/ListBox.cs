@@ -75,38 +75,38 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     #region Events
 
-    public event EventHandler AddClicked;
+    public event EventHandler? AddClicked;
 
-    public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
+    public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
-    public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
+    public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
 
-    public event EventHandler<ListEventArgs> ItemAdded;
+    public event EventHandler<ListEventArgs>? ItemAdded;
 
-    public event EventHandler ItemCheckedChanged;
+    public event EventHandler? ItemCheckedChanged;
 
-    public event EventHandler<BasicListItemEventArgs> ItemClicked;
+    public event EventHandler<BasicListItemEventArgs>? ItemClicked;
 
-    public event EventHandler<BasicListItemEventArgs> ItemDoubleClick;
+    public event EventHandler<BasicListItemEventArgs>? ItemDoubleClick;
 
     /// <summary>
     /// Wird nach jedem entfernen eines Items ausgelöst. Auch beim Initialisiern oder bei einem Clear.
     /// Soll eine Benutzerinteraktion abgefragt werden, ist RemoveClicked besser.
     /// </summary>
-    public event EventHandler ItemRemoved;
+    public event EventHandler? ItemRemoved;
 
     /// <summary>
     /// Wird vor jedem entfernen eines Items ausgelöst. Auch beim Initialisiern oder bei einem Clear.
     /// Soll eine Benutzerinteraktion abgefragt werden, ist RemoveClicked besser.
     /// </summary>
-    public event EventHandler<ListEventArgs> ItemRemoving;
+    public event EventHandler<ListEventArgs>? ItemRemoving;
 
-    public event EventHandler ListOrItemChanged;
+    public event EventHandler? ListOrItemChanged;
 
     /// <summary>
     /// Wird nur ausgelöst, wenn explicit der Button gedrückt wird.
     /// </summary>
-    public event EventHandler<ListOfBasicListItemEventArgs> RemoveClicked;
+    public event EventHandler<ListOfBasicListItemEventArgs>? RemoveClicked;
 
     #endregion
 

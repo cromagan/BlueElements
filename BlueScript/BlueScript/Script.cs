@@ -42,7 +42,7 @@ public class Script {
     public readonly string AdditionalFilesPath;
 
     public readonly bool OnlyTesting;
-    public readonly List<Variable>? Variables;
+    public readonly List<Variable> Variables;
     public bool EndScript;
 
     /// <summary>
@@ -98,7 +98,7 @@ public class Script {
         }
 
         OnlyTesting = onlyTesting;
-        Variables = variablen;
+        Variables = variablen ?? new();
 
         AdditionalFilesPath = (additionalFilesPath.Trim("\\") + "\\").CheckPath();
 

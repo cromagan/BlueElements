@@ -42,7 +42,7 @@ public class ConnectionInfo : IReadableText {
     /// </summary>
     /// <param name="uniqueID"></param>
     public ConnectionInfo(string uniqueID) {
-        if ( uniqueID.Substring(1, 1) == ":" && uniqueID.FileSuffix().ToUpper() == "MDB" &&
+        if (uniqueID.Substring(1, 1) == ":" && uniqueID.FileSuffix().ToUpper() == "MDB" &&
             System.IO.File.Exists(uniqueID)) {
             TableName = SQLBackAbstract.MakeValidTableName(uniqueID.FileNameWithoutSuffix());
             Provider = null;
@@ -117,12 +117,12 @@ public class ConnectionInfo : IReadableText {
     /// z.B. wenn ein Dateiname oder sowas mitgegeben werden soll.
     /// Ist nur wichtig für von DatabaseAbstract abgeleiten Klassen und nur diese können damit umgehen.
     /// </summary>
-    public string? AdditionalData { get; set; }
+    public string AdditionalData { get; set; } = string.Empty;
 
     /// <summary>
     /// Eine Kennung, die von von DatabaseAbstract abgeleiten Klassen erkannt werden kann.
     /// </summary>
-    public string DatabaseID { get; }
+    public string DatabaseID { get; } = string.Empty;
 
     /// <summary>
     /// Welche bereits vorhandene Datenbank den in dieser Klasse aufgezeigten Tabellenamen erzeugen kann

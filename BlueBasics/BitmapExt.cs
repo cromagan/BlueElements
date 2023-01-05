@@ -401,6 +401,7 @@ public class BitmapExt : IDisposableExtended {
         if (name.Contains("[")) { return null; }
         using var d = Generic.GetEmmbedResource(assembly, name);
         if (d == null) { return null; }
+
         switch (name.FileType()) {
             case FileFormat.Image:
                 return new BitmapExt(new Bitmap(d));
@@ -409,7 +410,7 @@ public class BitmapExt : IDisposableExtended {
                 return new BitmapExt(new Icon(d));
 
             default:
-                Develop.DebugPrint(Generic.GetEmmbedResource(assembly, name));
+                Develop.DebugPrint(name.FileType());
                 return null;
         }
     }

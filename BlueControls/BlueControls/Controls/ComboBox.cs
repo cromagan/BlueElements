@@ -78,9 +78,9 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     #region Events
 
-    public event EventHandler DropDownShowing;
+    public event EventHandler? DropDownShowing;
 
-    public event EventHandler<BasicListItemEventArgs> ItemClicked;
+    public event EventHandler<BasicListItemEventArgs>? ItemClicked;
 
     #endregion
 

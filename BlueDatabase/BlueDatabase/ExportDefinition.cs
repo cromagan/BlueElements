@@ -105,7 +105,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
 
     #region Events
 
-    public event EventHandler Changed;
+    public event EventHandler? Changed;
 
     #endregion
 

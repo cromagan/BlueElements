@@ -149,6 +149,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.caption5 = new BlueControls.Controls.Caption();
             this.butAktuellVor = new BlueControls.Controls.Button();
             this.butAktuellZurueck = new BlueControls.Controls.Button();
+            this.btnCalculateMaxTextLenght = new BlueControls.Controls.Button();
             this.tabAnzeige.SuspendLayout();
             this.tabBearbeitung.SuspendLayout();
             this.grpAuswahlmenuOptionen.SuspendLayout();
@@ -1302,6 +1303,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // tabDatenFormat
             // 
             this.tabDatenFormat.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabDatenFormat.Controls.Add(this.btnCalculateMaxTextLenght);
             this.tabDatenFormat.Controls.Add(this.tbxMaxTextLenght);
             this.tabDatenFormat.Controls.Add(this.capMaxTextLenght);
             this.tabDatenFormat.Controls.Add(this.tbxAllowedChars);
@@ -1554,6 +1556,16 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.butAktuellZurueck.TabIndex = 18;
             this.butAktuellZurueck.Click += new System.EventHandler(this.butAktuellZurueck_Click);
             // 
+            // btnCalculateMaxTextLenght
+            // 
+            this.btnCalculateMaxTextLenght.ImageCode = "Taschenrechner|16";
+            this.btnCalculateMaxTextLenght.Location = new System.Drawing.Point(776, 232);
+            this.btnCalculateMaxTextLenght.Name = "btnCalculateMaxTextLenght";
+            this.btnCalculateMaxTextLenght.QuickInfo = "Prüft alle Zellen und berechnet die ideale\r\nmaximale Text Länge";
+            this.btnCalculateMaxTextLenght.Size = new System.Drawing.Size(40, 24);
+            this.btnCalculateMaxTextLenght.TabIndex = 46;
+            this.btnCalculateMaxTextLenght.Click += new System.EventHandler(this.btnCalculateMaxTextLenght_Click);
+            // 
             // ColumnEditor
             // 
             this.ClientSize = new System.Drawing.Size(1007, 671);
@@ -1714,5 +1726,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Table tblFilterliste;
         private TextBox tbxMaxTextLenght;
         private Caption capMaxTextLenght;
+        private Button btnCalculateMaxTextLenght;
     }
 }

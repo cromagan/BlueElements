@@ -54,17 +54,17 @@ public class ListExt<T> : List<T>, IChangedFeedback, IDisposableExtended {
 
     #region Events
 
-    public event EventHandler Changed;
+    public event EventHandler? Changed;
 
-    public event EventHandler<ListEventArgs> ItemAdded;
+    public event EventHandler<ListEventArgs>? ItemAdded;
 
-    public event EventHandler<ListEventArgs> ItemInternalChanged;
+    public event EventHandler<ListEventArgs>? ItemInternalChanged;
 
-    public event EventHandler<System.EventArgs> ItemRemoved;
+    public event EventHandler? ItemRemoved;
 
-    public event EventHandler<ListEventArgs> ItemRemoving;
+    public event EventHandler<ListEventArgs>? ItemRemoving;
 
-    public event EventHandler<ListEventArgs> ItemSeted;
+    public event EventHandler<ListEventArgs>? ItemSeted;
 
     #endregion
 

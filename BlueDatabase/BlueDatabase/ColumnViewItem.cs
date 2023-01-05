@@ -117,7 +117,7 @@ public sealed class ColumnViewItem {
 
     #region Events
 
-    public event EventHandler Changed;
+    public event EventHandler? Changed;
 
     #endregion
 

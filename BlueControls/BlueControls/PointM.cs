@@ -90,9 +90,9 @@ public sealed class PointM : IMoveable {
 
     #region Events
 
-    public event EventHandler<MoveEventArgs> Moved;
+    public event EventHandler<MoveEventArgs>? Moved;
 
-    public event EventHandler<MoveEventArgs> Moving;
+    public event EventHandler<MoveEventArgs>? Moving;
 
     #endregion
 

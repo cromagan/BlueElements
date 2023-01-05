@@ -62,15 +62,15 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
     #region Events
 
-    public event EventHandler<DoRowAutomaticEventArgs> DoSpecialRules;
+    public event EventHandler<DoRowAutomaticEventArgs>? DoSpecialRules;
 
-    public event EventHandler<RowEventArgs> RowAdded;
+    public event EventHandler<RowEventArgs>? RowAdded;
 
-    public event EventHandler<RowCheckedEventArgs> RowChecked;
+    public event EventHandler<RowCheckedEventArgs>? RowChecked;
 
-    public event EventHandler RowRemoved;
+    public event EventHandler? RowRemoved;
 
-    public event EventHandler<RowEventArgs> RowRemoving;
+    public event EventHandler<RowEventArgs>? RowRemoving;
 
     #endregion
 

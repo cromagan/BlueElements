@@ -125,7 +125,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
 
     #region Events
 
-    public event EventHandler Changed;
+    public event EventHandler? Changed;
 
     #endregion
 

@@ -495,13 +495,13 @@ public static class Export {
         List<string> l = new();
         foreach (var thisRow in row) {
             var fn = TempFile(path, thisRow.CellFirstString(), "PNG");
-            thisRow.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(thisRow, layoutId, fn));
+            thisRow.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventArgs(thisRow, layoutId, fn));
             l.Add(fn);
         }
         return (l, string.Empty);
     }
 
-    public static void SaveAsBitmap(RowItem row, string layoutId, string filename) => row.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(row, layoutId, filename));
+    public static void SaveAsBitmap(RowItem row, string layoutId, string filename) => row.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventArgs(row, layoutId, filename));
 
     private static string InternalCreateLayout(List<RowItem?>? rows, string fileLoaded, string saveFileName) {
         var head = string.Empty;

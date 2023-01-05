@@ -85,19 +85,19 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     #region Events
 
-    public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
+    public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
-    public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
+    public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
 
-    public new event EventHandler Enter;
+    public new event EventHandler? Enter;
 
-    public event EventHandler Esc;
+    public event EventHandler? Esc;
 
-    public event EventHandler<MultiUserFileGiveBackEventArgs> NeedDatabaseOfAdditinalSpecialChars;
+    public event EventHandler<MultiUserFileGiveBackEventArgs>? NeedDatabaseOfAdditinalSpecialChars;
 
-    public event EventHandler Tab;
+    public event EventHandler? Tab;
 
-    public new event EventHandler TextChanged;
+    public new event EventHandler? TextChanged;
 
     #endregion
 

@@ -63,7 +63,7 @@ public sealed class RowSortDefinition : IParseable {
 
     #region Events
 
-    public event EventHandler Changed;
+    public event EventHandler? Changed;
 
     #endregion
 

@@ -53,15 +53,15 @@ public sealed class SystemInputHook {
 
     #region Events
 
-    public event System.EventHandler<KeyEventArgs> KeyDown;
+    public event System.EventHandler<KeyEventArgs>? KeyDown;
 
-    public event System.EventHandler<KeyEventArgs> KeyUp;
+    public event System.EventHandler<KeyEventArgs>? KeyUp;
 
-    public event System.EventHandler<MouseEventArgs> MouseDown;
+    public event System.EventHandler<MouseEventArgs>? MouseDown;
 
-    public event System.EventHandler<MouseEventArgs> MouseMove;
+    public event System.EventHandler<MouseEventArgs>? MouseMove;
 
-    public event System.EventHandler<MouseEventArgs> MouseUp;
+    public event System.EventHandler<MouseEventArgs>? MouseUp;
 
     #endregion
 

@@ -97,15 +97,15 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
 
     #region Events
 
-    public event EventHandler Changed;
+    public event EventHandler? Changed;
 
-    //public event EventHandler<MultiUserFileStopWorkingEventArgs> ConnectedControlsStopAllWorking;
+    //public event EventHandler<MultiUserFileStopWorkingEventArgs>? ConnectedControlsStopAllWorking;
 
-    public event EventHandler Loaded;
+    public event EventHandler? Loaded;
 
-    public event EventHandler Loading;
+    public event EventHandler? Loading;
 
-    public event EventHandler SavedToDisk;
+    public event EventHandler? SavedToDisk;
 
     #endregion
 

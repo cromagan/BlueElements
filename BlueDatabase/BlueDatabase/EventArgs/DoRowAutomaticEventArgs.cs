@@ -15,13 +15,15 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 namespace BlueDatabase.EventArgs;
 
 public class DoRowAutomaticEventArgs : RowEventArgs {
 
     #region Constructors
 
-    public DoRowAutomaticEventArgs(RowItem? row) : base(row) { }
+    public DoRowAutomaticEventArgs(RowItem row) : base(row) { }
 
     #endregion
 

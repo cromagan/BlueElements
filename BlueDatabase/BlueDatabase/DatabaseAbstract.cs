@@ -114,27 +114,27 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     #region Events
 
-    public event EventHandler Disposing;
+    public event EventHandler? Disposing;
 
-    public event EventHandler<MessageEventArgs> DropMessage;
+    public event EventHandler<MessageEventArgs>? DropMessage;
 
-    public event CancelEventHandler Exporting;
+    public event CancelEventHandler? Exporting;
 
-    public event EventHandler<GenerateLayoutInternalEventargs> GenerateLayoutInternal;
+    public event EventHandler<GenerateLayoutInternalEventArgs>? GenerateLayoutInternal;
 
-    public event EventHandler Loaded;
+    public event EventHandler? Loaded;
 
-    public event EventHandler Loading;
+    public event EventHandler? Loading;
 
-    public event EventHandler<PasswordEventArgs> NeedPassword;
+    public event EventHandler<PasswordEventArgs>? NeedPassword;
 
-    public event EventHandler<ProgressbarEventArgs> ProgressbarInfo;
+    public event EventHandler<ProgressbarEventArgs>? ProgressbarInfo;
 
-    public event EventHandler<RowCancelEventArgs> ScriptError;
+    public event EventHandler<RowCancelEventArgs>? ScriptError;
 
-    public event EventHandler SortParameterChanged;
+    public event EventHandler? SortParameterChanged;
 
-    public event EventHandler ViewChanged;
+    public event EventHandler? ViewChanged;
 
     #endregion
 
@@ -208,7 +208,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         }
     }
 
-    public ListExt<ExportDefinition> Export {
+    public ListExt<ExportDefinition?> Export {
         get => _export;
         set {
             if (_export.ToString() == value.ToString()) { return; }
@@ -391,7 +391,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// <summary>
     /// Sucht die Datenbank im Speicher. Wird sie nicht gefunden, wird sie geladen.
     /// </summary>
-    public static DatabaseAbstract? GetByID(ConnectionInfo ci) {
+    public static DatabaseAbstract? GetByID(ConnectionInfo? ci) {
         if (ci is null) { return null; }
 
         foreach (var thisFile in AllFiles) {
@@ -1201,7 +1201,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     }
 
     //public abstract void UnlockHard();
-    internal void OnGenerateLayoutInternal(GenerateLayoutInternalEventargs e) {
+    internal void OnGenerateLayoutInternal(GenerateLayoutInternalEventArgs e) {
         if (IsDisposed) { return; }
         GenerateLayoutInternal?.Invoke(this, e);
     }

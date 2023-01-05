@@ -50,6 +50,8 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
         SetStyle(ControlStyles.DoubleBuffer, true);
         SetStyle(ControlStyles.AllPaintingInWmPaint, true);
         SetStyle(ControlStyles.UserPaint, true);
+
+        TabDefaultOrder = new string[0];
     }
 
     #endregion
@@ -65,7 +67,7 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
     public TabPage? HotTab { get; private set; }
 
     [Category("Verhalten")]
-    public TabPage TabDefault { get; set; }
+    public TabPage? TabDefault { get; set; }
 
     [Category("Verhalten")]
     public string[] TabDefaultOrder { get; set; }

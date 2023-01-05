@@ -72,9 +72,9 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
 
     #region Events
 
-    public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
+    public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
-    public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
+    public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
 
     #endregion
 
@@ -234,11 +234,13 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
         } else {
             DisabledReason = !string.IsNullOrEmpty(Filter.Herkunft) ? "Dieser Filter ist automatisch<br>gesetzt worden." : string.Empty;
             var qi = Filter.Column.QuickInfoText(string.Empty);
-            if (string.IsNullOrEmpty(qi))
+            if (string.IsNullOrEmpty(qi)) {
                 QuickInfo = "<b>Filter:</b><br>" + Filter.ReadableText().CreateHtmlCodes(false);
-            else
+            } else {
                 QuickInfo = "<b>Filter:</b><br>" + Filter.ReadableText().CreateHtmlCodes(false) +
                             "<br><br><b>Info:</b><br>" + qi.CreateHtmlCodes(false);
+            }
+
             if (!Filter.Column.AutoFilterSymbolPossible()) {
                 EditType = EditTypeFormula.None;
             } else {

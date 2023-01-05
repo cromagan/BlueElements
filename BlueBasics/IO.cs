@@ -261,7 +261,7 @@ public static class IO {
             if (!name.Contains(".")) { return string.Empty; }
             var l = Path.GetExtension(name);
             return string.IsNullOrEmpty(l) ? string.Empty : l.Substring(1);
-        } catch        {
+        } catch {
             // Illegales Zeichen im Pfad?
             return string.Empty;
         }

@@ -44,7 +44,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
 
     #endregion
 
- 
+
 
     #region Constructors
 
@@ -312,5 +312,5 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
 
     #endregion
 
-   
+
 }
