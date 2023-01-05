@@ -43,7 +43,7 @@ public static class LanguageTool {
     /// <param name="column"></param>
     /// <param name="style"></param>
     /// <returns></returns>
-    public static string ColumnReplace(string txt, ColumnItem? column, ShortenStyle style) {
+    public static string ColumnReplace(string txt, ColumnItem column, ShortenStyle style) {
         if (column == null) { return txt; }
 
         if (!string.IsNullOrEmpty(txt)) {
@@ -103,6 +103,7 @@ public static class LanguageTool {
                 if (Translation.ReadOnly) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(_english, args); }
                 if (!mustTranslate) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(_english, args); }
                 r = Translation.Row.GenerateAndAdd(txt);
+                if (r == null) { return args.GetUpperBound(0) < 0 ? txt : string.Format(txt, args); }
             }
             var t = r.CellGetString("Translation");
             if (string.IsNullOrEmpty(t)) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(_english, args); }
@@ -113,7 +114,7 @@ public static class LanguageTool {
         }
     }
 
-    private static string ColumnReplaceTranslated(string newTxt, ColumnItem? column) => column.DoOpticalTranslation == TranslationType.Übersetzen ? DoTranslate(newTxt, false) : newTxt;
+    private static string ColumnReplaceTranslated(string newTxt, ColumnItem column) => column.DoOpticalTranslation == TranslationType.Übersetzen ? DoTranslate(newTxt, false) : newTxt;
 
     #endregion
 }

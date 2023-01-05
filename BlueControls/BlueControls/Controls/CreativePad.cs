@@ -364,7 +364,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         wid = Math.Min(wid, 200);
         he = Math.Min(he, 200);
 
-        it.InitialPosition(pos.X - wid / 2, pos.Y - he / 2, wid, he);
+        it.InitialPosition(pos.X - (wid / 2), pos.Y - (he / 2), wid, he);
 
         Item.Add(it);
     }

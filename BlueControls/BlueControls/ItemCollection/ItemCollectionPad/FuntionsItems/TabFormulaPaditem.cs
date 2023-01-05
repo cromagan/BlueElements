@@ -206,7 +206,7 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
         var c = -1;
         foreach (var thisC in _childs) {
             c++;
-            var it = new RectangleF(positionModified.X + c * headb, positionModified.Y, headb, headh);
+            var it = new RectangleF(positionModified.X + (c * headb), positionModified.Y, headb, headh);
 
             gr.FillRectangle(new SolidBrush(Color.FromArgb(255, 200, 200, 200)), it);
 

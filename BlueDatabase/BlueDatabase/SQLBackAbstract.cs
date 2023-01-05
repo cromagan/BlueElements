@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using static BlueBasics.Converter;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace BlueDatabase;
 
@@ -122,8 +123,8 @@ public abstract class SQLBackAbstract {
     public string AddUndo(string tablename, DatabaseDataType comand, long? columnKey, long? rowKey, string previousValue, string changedTo, string userName) {
         if (!OpenConnection()) { return "Verbindung fehlgeschlagen"; }
 
-        var ck = columnKey != null && columnKey > -1 ? columnKey.ToString() : string.Empty;
-        var rk = rowKey != null && rowKey > -1 ? rowKey.ToString() : string.Empty;
+        var ck = columnKey is not null and > (-1) ? columnKey.ToString() : string.Empty;
+        var rk = rowKey is not null and > (-1) ? rowKey.ToString() : string.Empty;
 
         var cmdString = "INSERT INTO " + SYS_UNDO +
             " (TABLENAME, COMAND, COLUMNKEY, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, TIMECODEUTC) VALUES (" +
@@ -348,15 +349,14 @@ public abstract class SQLBackAbstract {
         var cmdString = @"ALTER TABLE " + tablename + " RENAME COLUMN " + oldname + " TO " + newname;
         ExecuteCommand(cmdString);
 
-        //if (isVal is null) {
-        //    cmdString = "INSERT INTO " + SYS_STYLE + " (TABLENAME, TYPE, COLUMNNAME, VALUE)  VALUES (" + DBVAL( tablename.ToUpper() ) + ", " + DBVAL( type ) + ", " + DBVAL( columnName.ToUpper() ) + ", " + DBVAL( newValue ) + ")";
-        //} else if (isVal != newValue) {
         cmdString = "UPDATE " + SYS_STYLE + " SET COLUMNNAME = " + DBVAL(newname) + " WHERE TABLENAME = " + DBVAL(tablename.ToUpper()) + " AND COLUMNNAME = " + DBVAL(oldname.ToUpper());
-        //} else {
-        //    return true;
-        //}
-
         ExecuteCommand(cmdString);
+
+        var test = GetStyleData(tablename, DatabaseDataType.ColumnName.ToString(), newname);
+
+        if (test != newname) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Fataler Umbenennungs-Fehler!");
+        }
     }
 
     //    row.Clear();
@@ -452,10 +452,22 @@ public abstract class SQLBackAbstract {
             var ok2 = SetStyleData(tablename, ty, columnName, tmp, c);
             if (!string.IsNullOrEmpty(ok2)) { ok = ok2; }
 
-            if (tmp == utf8) { return ok; }
+            if (tmp == utf8) { break; }
 
             utf8 = utf8.Substring(tmp.Length);
         } while (true);
+
+        if (type == DatabaseDataType.ColumnName) {
+            if (columnName != newValue && columnName != ColumnItem.TmpNewDummy) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Fataler Namensfehler 1!");
+            }
+            var test = GetStyleData(tablename, DatabaseDataType.ColumnName.ToString(), columnName);
+            if (columnName != test && columnName != ColumnItem.TmpNewDummy) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Fataler Namensfehler 2!");
+            }
+        }
+
+        return ok;
     }
 
     //    using var command = _connection.CreateCommand();
@@ -593,6 +605,13 @@ public abstract class SQLBackAbstract {
     //    }
     internal static string MakeValidColumnName(string columnname) => columnname.ToUpper().Replace(" ", "_").ReduceToChars(Constants.AllowedCharsVariableName);
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="db"></param>
+    /// <param name="fromDate"></param>
+    /// <param name="toDate"></param>
+    /// <returns>Gibt NULL zurück, wenn die Daten nicht geladen werden konnten</returns>
     internal List<(string tablename, string comand, string columnkey, string rowkey)>? GetLastChanges(List<DatabaseSQLLite> db, DateTime fromDate, DateTime toDate) {
         if (!OpenConnection()) { return null; }
 
@@ -627,6 +646,8 @@ public abstract class SQLBackAbstract {
             return fb;
         } catch {
             if (_connection != null && _connection.State != ConnectionState.Open) {
+                CloseConnection();
+                Develop.CheckStackForOverflow();
                 return GetLastChanges(db, fromDate, toDate);
             }
 
@@ -656,7 +677,11 @@ public abstract class SQLBackAbstract {
 
             CloseConnection();
             return value;
-        } catch { return GetLastColumnName(tablename, key); }
+        } catch {
+            CloseConnection();
+            Develop.CheckStackForOverflow();
+            return GetLastColumnName(tablename, key);
+        }
     }
 
     internal SQLBackAbstract? HandleMe(ConnectionInfo ci) {
@@ -913,14 +938,4 @@ public abstract class SQLBackAbstract {
     }
 
     #endregion
-
-    /// <summary>
-    /// Gibt TRUE zurück, wenn alles ok ist.
-    /// Entweder der Wert gesetzt wurde, der Wert aktuell ist oder der Wert unwichtig ist.
-    /// </summary>
-    /// <param name="tablename"></param>
-    /// <param name="type"></param>
-    /// <param name="columnName"></param>
-    /// <param name="newValue"></param>
-    /// <returns></returns>
 }

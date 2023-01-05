@@ -137,7 +137,7 @@ internal static class Dictionary {
     }
 
     private static void Init() {
-        var tmp = DatabaseAbstract.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.MDB", "Dictionary", true, false, null);
+        var tmp = DatabaseAbstract.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.MDB", "Dictionary", true, false);
         if (tmp is DatabaseAbstract DBD) { _dictWords = DBD; }
     }
 

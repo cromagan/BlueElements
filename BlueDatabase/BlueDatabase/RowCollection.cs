@@ -199,9 +199,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         #endregion
 
         var l = new List<ColumnItem>();
-        l.AddRange(rowSortDefinition.Columns);
-        l.AddIfNotExists(Database.Column.SysChapter);
-        //l.Remove(Database.Column.SysRowChangeDate);
+        if (rowSortDefinition != null) { l.AddRange(rowSortDefinition.Columns); }
+        if (Database.Column.SysChapter != null) { l.AddIfNotExists(Database.Column.SysChapter); }
 
         Database.RefreshColumnsData(l);
 

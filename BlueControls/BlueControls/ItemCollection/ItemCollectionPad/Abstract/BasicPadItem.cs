@@ -251,7 +251,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     public virtual bool Contains(PointF value, float zoomfactor) {
         var tmp = UsedArea; // Umwandlung, um den Bezug zur Klasse zu zerstören
 
-        var ne = 6 / zoomfactor + 1;
+        var ne = (6 / zoomfactor) + 1;
         tmp.Inflate(ne, ne);
         return tmp.Contains(value);
     }

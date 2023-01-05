@@ -115,7 +115,7 @@ public class WindowsThumbnailProvider {
             for (var y = 0; y <= srcData.Height - 1; y++) {
                 for (var x = 0; x <= srcData.Width - 1; x++) {
                     var pixelColor = Color.FromArgb(
-                        Marshal.ReadInt32(srcData.Scan0, srcData.Stride * y + 4 * x));
+                        Marshal.ReadInt32(srcData.Scan0, (srcData.Stride * y) + (4 * x)));
 
                     if ((pixelColor.A > 0) & (pixelColor.A < 255)) {
                         isAlplaBitmap = true;

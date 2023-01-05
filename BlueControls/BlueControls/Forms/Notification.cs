@@ -143,7 +143,7 @@ public partial class Notification : FloatingForm {
 
                     var mSo = DateTime.Now.Subtract(_outime).TotalMilliseconds;
 
-                    Opacity = 1 - mSo / SpeedOut;
+                    Opacity = 1 - (mSo / SpeedOut);
                     //Top = (int)(lowestY + pixelfromLower * (MSo / SpeedOut)) + 1;
                     //Left = x.Left + (int)Math.Max(diff / 17, 1);
                 } else {

@@ -286,7 +286,7 @@ public class BitmapExt : IDisposableExtended {
     /// <param name="bottom">Negativer Wert schneidet diese Anzahl von Pixel vom unteren Rand weg.</param>
     /// <returns></returns>
     public static Bitmap? Crop(Bitmap? bmp, int left, int right, int top, int bottom) {
-        if (bmp == null || left == 0 && right == 0 && top == 0 && bottom == 0) { return bmp; }
+        if (bmp == null || (left == 0 && right == 0 && top == 0 && bottom == 0)) { return bmp; }
 
         Generic.CollectGarbage();
         var w = Math.Max(bmp.Width - left + right, 1);

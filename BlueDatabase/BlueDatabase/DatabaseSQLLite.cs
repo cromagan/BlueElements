@@ -241,14 +241,16 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
         if (!isLoading && !ReadOnly) {
             var c = Column.SearchByKey(columnkey);
+
+            _sql?.SetValueInternal(TableName, type, value, c?.Name, columnkey, rowkey, -1, -1, isLoading);
+
             if (type == DatabaseDataType.ColumnName) {
+                // Wichtig, erst den Wert seetzen, dann umbenennen! Somit wird der Wert richtig mit umbenannt
                 _sql?.RenameColumn(TableName, c?.Name.ToUpper(), value.ToUpper());
             }
             if (type == DatabaseDataType.MaxTextLenght) {
                 _sql?.ChangeDataType(TableName, c?.Name.ToUpper(), IntParse(value));
             }
-
-            _sql?.SetValueInternal(TableName, type, value, c?.Name, columnkey, rowkey, -1, -1, isLoading);
         }
 
         return base.SetValueInternal(type, value, columnkey, rowkey, width, height, isLoading);
@@ -265,9 +267,9 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     private static void CheckSysUndo(object state) {
         if (DateTime.UtcNow.Subtract(_timerTimeStamp).TotalSeconds < 180) { return; }
 
-        //foreach (var thisDB in AllFiles) {
-        //    if (thisDB.IsLoadingx) { return; }
-        //}
+        foreach (var thisDB in AllFiles) {
+            if (!thisDB.LogUndo) { return; } // Irgend ein heikler Prozess
+        }
 
         if (_isInTimer) { return; }
         _isInTimer = true;

@@ -170,7 +170,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
             var he = MmToPixel(ConnectedFormula.ConnectedFormula.StandardHöhe, 300);
             var he1 = MmToPixel(1, 300);
             x.Height = (int)(x.Height / he) * he;
-            x.Height = (int)(x.Height / he1 + 0.99) * he1;
+            x.Height = (int)((x.Height / he1) + 0.99) * he1;
 
             if (x.Height < he) { x.Height = he; }
             RaiseVersion();
@@ -214,7 +214,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
         }
 
         if (cap.X >= 0) {
-            var e = new RectangleF(positionModified.Left + cap.X * zoom, positionModified.Top + cap.Y * zoom, positionModified.Width, 16 * zoom);
+            var e = new RectangleF(positionModified.Left + (cap.X * zoom), positionModified.Top + (cap.Y * zoom), positionModified.Width, 16 * zoom);
             Skin.Draw_FormatedText(gr, captiontxt, null, Alignment.Top_Left, e.ToRect(), CaptionFnt.Scale(zoom), true);
         }
 
@@ -261,7 +261,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
     public void SetXPosition(int anzahlSpaltenImFormular, int aufXPosition, int breiteInspalten) {
         var x = UsedArea;
         x.Width = (Parent.SheetSizeInPix.Width - (MmToPixel(0.5f, 300) * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
-        x.X = x.Width * (aufXPosition - 1) + MmToPixel(0.5f, 300) * (aufXPosition - 1);
+        x.X = (x.Width * (aufXPosition - 1)) + (MmToPixel(0.5f, 300) * (aufXPosition - 1));
         SetCoordinates(x, true);
     }
 

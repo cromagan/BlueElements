@@ -225,13 +225,13 @@ public sealed class QuickImage : BitmapExt, IReadableText {
         return c.ToString().TrimEnd('|');
     }
 
-    public static QuickImage? Get(QuickImage? imageCode, ImageCodeEffect additionalState) => additionalState == ImageCodeEffect.Ohne ? imageCode
+    public static QuickImage? Get(QuickImage imageCode, ImageCodeEffect additionalState) => additionalState == ImageCodeEffect.Ohne ? imageCode
         : Get(GenerateCode(imageCode.Name, imageCode.Width, imageCode.Height, imageCode.Effekt | additionalState, imageCode.Färbung, imageCode.ChangeGreenTo, imageCode.Sättigung, imageCode.Helligkeit, imageCode.DrehWinkel, imageCode.Transparenz, imageCode.Zweitsymbol));
 
-    public static QuickImage? Get(string imageCode) {
-        if (string.IsNullOrEmpty(imageCode)) { return null; }
+    public static QuickImage? Get(string? imageCode) {
+        if (imageCode == null || string.IsNullOrWhiteSpace(imageCode)) { return null; }
 
-        QuickImage? x;
+        QuickImage x;
         lock (Locker) {
             if (Pics.TryGetValue(imageCode, out var p)) { return p; }
             x = new QuickImage(imageCode, false);
@@ -405,7 +405,7 @@ public sealed class QuickImage : BitmapExt, IReadableText {
                 if (Effekt.HasFlag(ImageCodeEffect.WindowsMEDisabled)) {
                     var c1 = Color.FromArgb(0, 0, 0, 0);
                     if (!c.IsMagentaOrTransparent()) {
-                        var randPixel = x > 0 && bmpOri.GetPixel(x - 1, y).IsMagentaOrTransparent() || y > 0 && bmpOri.GetPixel(x, y - 1).IsMagentaOrTransparent();
+                        var randPixel = (x > 0 && bmpOri.GetPixel(x - 1, y).IsMagentaOrTransparent()) || (y > 0 && bmpOri.GetPixel(x, y - 1).IsMagentaOrTransparent());
                         if (x < bmpOri.Width - 1 && bmpOri.GetPixel(x + 1, y).IsMagentaOrTransparent()) { randPixel = true; }
                         if (y < bmpOri.Height - 1 && bmpOri.GetPixel(x, y + 1).IsMagentaOrTransparent()) { randPixel = true; }
                         if (c.B < 128 || randPixel) {

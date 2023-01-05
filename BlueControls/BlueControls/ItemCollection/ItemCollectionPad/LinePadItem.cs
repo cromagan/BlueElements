@@ -112,8 +112,8 @@ public class LinePadItem : BasicPadItem {
     }
 
     public override void InitialPosition(int x, int y, int width, int height) {
-        _point1.SetTo(x, y + height / 2);
-        _point2.SetTo(x + width, y + height / 2);
+        _point1.SetTo(x, y + (height / 2));
+        _point2.SetTo(x + width, y + (height / 2));
     }
 
     public override bool ParseThis(string tag, string value) {

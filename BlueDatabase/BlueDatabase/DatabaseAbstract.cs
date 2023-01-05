@@ -61,9 +61,9 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     private readonly List<string> _permissionGroupsNewRow = new();
     private readonly long _startTick = DateTime.UtcNow.Ticks;
     private readonly List<string> _tags = new();
-    private string _additionaFilesPfad;
+    private string _additionaFilesPfad = string.Empty;
     private BackgroundWorker _backgroundWorker;
-    private string _cachePfad;
+    private string _cachePfad = string.Empty;
     private string _caption = string.Empty;
     private Timer _checker;
     private int _checkerTickCount = -5;
@@ -443,7 +443,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         return null;
     }
 
-    public static DatabaseAbstract? LoadResource(Assembly assembly, string name, string blueBasicsSubDir, bool fehlerAusgeben, bool mustBeStream, SQLBackAbstract? sql) {
+    public static DatabaseAbstract? LoadResource(Assembly assembly, string name, string blueBasicsSubDir, bool fehlerAusgeben, bool mustBeStream) {
         if (Develop.IsHostRunning() && !mustBeStream) {
             var x = -1;
             string? pf;

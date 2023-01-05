@@ -356,7 +356,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
     public ColumnItem? SearchByKey(long? key) {
         try {
             if (Database == null) { return null; }
-            if (key == null || key < 0) { return null; } // Evtl. Gelöschte Spalte in irgendeiner Order
+            if (key is null or < 0) { return null; } // Evtl. Gelöschte Spalte in irgendeiner Order
 
             return this.FirstOrDefault(thisColumn => thisColumn != null && thisColumn.Key == key);
         } catch {

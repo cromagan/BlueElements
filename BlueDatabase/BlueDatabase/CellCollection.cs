@@ -707,7 +707,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (ContainsKey(cellKey)) { oldValue = this[cellKey].Value; }
         if (value == oldValue) { return; }
 
-        _database?.ChangeData(DatabaseDataType.Value_withoutSizeData, column.Key, row.Key, oldValue, value);
+        _database?.ChangeData(DatabaseDataType.Value_withoutSizeData, column.Key, row.Key, oldValue, value.CutToUTF8Length(column.MaxTextLenght));
         column.UcaseNamesSortedByLenght = null;
 
         if (changeSysColumns) {

@@ -185,7 +185,7 @@ public class DimensionPadItem : BasicPadItem {
     public override void InitialPosition(int x, int y, int width, int height) {
         _point1.SetTo(x, y + height);
         _point2.SetTo(x + width, y + height);
-        _textPoint.SetTo(x + width / 2, y);
+        _textPoint.SetTo(x + (width / 2), y);
     }
 
     public override bool ParseThis(string tag, string value) {
