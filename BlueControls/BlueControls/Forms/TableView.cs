@@ -85,7 +85,6 @@ public partial class TableView : Form {
 
     #region Properties
 
-    public SQLBackAbstract? CopyToSQL { get; set; } = null;
 
     #endregion
 

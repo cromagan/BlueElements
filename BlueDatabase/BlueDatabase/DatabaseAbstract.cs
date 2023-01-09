@@ -57,6 +57,10 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     public readonly string UserName = Generic.UserName().ToUpper();
     public string UserGroup;
     protected string? _additionaFilesPfadtmp;
+
+    private static List<ConnectionInfo> _allavailabletables = new List<ConnectionInfo>();
+    private static DateTime _lastTableCheck = new DateTime(1900, 1, 1);
+    private static List<ConnectionInfo> possibletables = new List<ConnectionInfo>();
     private readonly LayoutCollection _layouts = new();
     private readonly List<string> _permissionGroupsNewRow = new();
     private readonly long _startTick = DateTime.UtcNow.Ticks;
@@ -338,7 +342,9 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     #region Methods
 
     public static List<ConnectionInfo> AllAvailableTables(List<string>? ignorePath) {
-        var allavailabletables = new List<ConnectionInfo>();
+        if (DateTime.Now.Subtract(_lastTableCheck).TotalMinutes < 1) {
+            return _allavailabletables;
+        }
 
         // Wird benutzt, um z.b. das Dateisystem nicht doppelt und dreifach abzufragen.
         // Wenn eine Datenbank z.B. im gleichen Verzeichnis liegt,
@@ -350,6 +356,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
         foreach (var thisDB in alf) {
             var possibletables = thisDB.AllAvailableTables(allreadychecked, ignorePath);
+
             allreadychecked.Add(thisDB);
 
             if (possibletables != null) {
@@ -359,7 +366,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
                     #region prüfen, ob schon voranden, z.b. DatabaseAbstract.AllFiles
 
-                    foreach (var checkme in allavailabletables) {
+                    foreach (var checkme in _allavailabletables) {
                         if (string.Equals(checkme.TableName, thistable.TableName, StringComparison.InvariantCultureIgnoreCase)) {
                             canadd = false;
                             break;
@@ -368,12 +375,13 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
                     #endregion
 
-                    if (canadd) { allavailabletables.Add(thistable); }
+                    if (canadd) { _allavailabletables.Add(thistable); }
                 }
             }
         }
 
-        return allavailabletables;
+        _lastTableCheck = DateTime.Now;
+        return _allavailabletables;
     }
 
     public static void ForceSaveAll() {
@@ -567,6 +575,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         //if (isLoading) { return f; }
 
         if (ReadOnly) {
+            if (comand == DatabaseDataType.ColumnContentWidth) { return string.Empty; }
             if (!string.IsNullOrEmpty(TableName)) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Datei ist Readonly, " + comand + ", " + TableName);
             }

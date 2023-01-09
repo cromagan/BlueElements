@@ -69,7 +69,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
             Develop.DebugPrint(FehlerArt.Fehler, "Keine SQL_Verbindung übergeben.");
         }
 
-        _sql = sql;
+        _sql = sql.OtherTable(tablename);
 
         Develop.StartService();
 
@@ -138,7 +138,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         if (allreadychecked != null) {
             foreach (var thisa in allreadychecked) {
                 if (thisa is DatabaseSQLLite db) {
-                    if (db._sql == _sql) { return null; }
+                    if (db._sql.ConnectionString == _sql.ConnectionString) { return null; }
                 }
             }
         }

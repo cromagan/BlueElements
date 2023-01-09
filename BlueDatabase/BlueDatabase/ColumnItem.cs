@@ -1013,6 +1013,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         if (!name.ContainsOnlyChars(Constants.AllowedCharsVariableName)) { return false; }
 
         if (!Constants.Char_AZ.Contains(name.Substring(0, 1).ToUpper())) { return false; }
+        if (name.Length > 128) { return false; }
 
         if (name.ToUpper() == "USER") { return false; } // SQL System-Name
 
