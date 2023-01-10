@@ -700,15 +700,22 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return;
         }
 
-        if (column?.Format is not DataFormat.Verknüpfung_zu_anderer_Datenbank) { value = column?.AutoCorrect(value); }
+        value = column.AutoCorrect(value, true);
 
         var cellKey = KeyOfCell(column, row);
         var oldValue = string.Empty;
         if (ContainsKey(cellKey)) { oldValue = this[cellKey].Value; }
         if (value == oldValue) { return; }
 
-        _database?.ChangeData(DatabaseDataType.Value_withoutSizeData, column.Key, row.Key, oldValue, value.CutToUTF8Length(column.MaxTextLenght));
+        _database?.ChangeData(DatabaseDataType.Value_withoutSizeData, column.Key, row.Key, oldValue, value);
         column.UcaseNamesSortedByLenght = null;
+
+        var checkValue = string.Empty;
+        if (ContainsKey(cellKey)) { checkValue = this[cellKey].Value; }
+        if (checkValue != value) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Wert nicht gesetzt!");
+            return;
+        }
 
         if (changeSysColumns) {
             DoSpecialFormats(column, row, oldValue, false);

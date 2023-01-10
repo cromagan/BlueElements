@@ -105,7 +105,7 @@ internal sealed partial class ColumnEditor {
     private void btnCalculateMaxTextLenght_Click(object sender, System.EventArgs e) {
         if (_column == null) { return; }
 
-        tbxMaxTextLenght.Text = _column.CalculatePreveredMaxTextLenght().ToString();
+        tbxMaxTextLenght.Text = _column.CalculatePreveredMaxTextLenght(1.2f).ToString();
     }
 
     private void btnOk_Click(object sender, System.EventArgs e) {

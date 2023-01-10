@@ -1067,12 +1067,17 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         return UserEditDialogTypeInTable(column.Format, doDropDown, column.TextBearbeitungErlaubt, column.MultiLine);
     }
 
-    public string AutoCorrect(string value) {
+    public string AutoCorrect(string value, bool exitifLinkedFormat) {
         //if (Format == DataFormat.Link_To_Filesystem) {
         //    List<string> l = new(value.SplitAndCutByCr());
         //    var l2 = l.Select(thisFile => SimplyFile(thisFile)).ToList();
         //    value = l2.SortedDistinctList().JoinWithCr();
         //}
+        if (exitifLinkedFormat) {
+            if (_format is DataFormat.Verknüpfung_zu_anderer_Datenbank or
+                DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return value; }
+        }
+
         if (_afterEditDoUCase) { value = value.ToUpper(); }
         if (!string.IsNullOrEmpty(_autoRemove)) { value = value.RemoveChars(_autoRemove); }
         if (_afterEditAutoReplace.Count > 0) {
@@ -1105,13 +1110,19 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             var l = new List<string>(value.SplitAndCutByCr()).SortedDistinctList();
             value = l.JoinWithCr();
         }
+
+        value = value.CutToUTF8Length(_maxTextLenght);
+
         return value;
     }
 
     public bool AutoFilterSymbolPossible() => FilterOptions.HasFlag(FilterOptions.Enabled) && Format.Autofilter_möglich();
 
-    public int CalculatePreveredMaxTextLenght() {
+    public int CalculatePreveredMaxTextLenght(double prozentZuschlag) {
         if (Database == null) { return 0; }
+
+        //if (Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) { return 35; }
+        //if (Format == DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return 15; }
         var m = 0;
 
         foreach (var thisRow in Database.Row) {
@@ -1120,11 +1131,11 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         }
 
         if (m <= 0) {
-            return 255;
+            return 8;
         } else if (m == 1)
             return 1;
         else {
-            return Math.Min((int)(m * 1.2) + 1, 4000);
+            return Math.Min((int)(m * prozentZuschlag) + 1, 4000);
         }
     }
 
@@ -1335,6 +1346,9 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
         if (!IsValidColumnName(_name)) { return "Der Spaltenname ist ungültig."; }
 
+        if (MaxTextLenght < 1) { return "Maximallänge zu klein!"; }
+        if (MaxTextLenght > 4000) { return "Maximallänge zu groß!"; }
+
         if (Database.Column.Any(thisColumn => thisColumn != this && thisColumn != null && string.Equals(_name, thisColumn.Name, StringComparison.OrdinalIgnoreCase))) {
             return "Spalten-Name bereits vorhanden.";
         }
@@ -1365,6 +1379,10 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 if (_vorschlagsColumn > 0) { return "Diese Format kann keine Vorschlags-Spalte haben."; }
                 break;
 
+            //case DataFormat.Verknüpfung_zu_anderer_Datenbank:
+            //    if (MaxTextLenght < 35) { return "Maximallänge bei diesem Format mindestens 35!"; }
+            //    break;
+
             //case DataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
             //    //case DataFormat.Verknüpfung_zu_anderer_Datenbank:
             //    if (!string.IsNullOrEmpty(_cellInitValue)) { return "Dieses Format kann keinen Initial-Text haben."; }
@@ -1389,6 +1407,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 if (!string.IsNullOrEmpty(_cellInitValue)) { return "Dieses Format kann keinen Initial-Text haben."; }
                 if (KeyColumnKey > -1) { return "Dieses Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
                 if (_vorschlagsColumn > 0) { return "Dieses Format kann keine Vorschlags-Spalte haben."; }
+                //if (MaxTextLenght < 15) { return "Maximallänge bei diesem Format mindestens 15!"; }
+
                 break;
 
                 //case DataFormat.Link_To_Filesystem:
@@ -1802,6 +1822,11 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             if (_scriptType is ScriptType.Bool or ScriptType.Numeral or ScriptType.DateTime) {
                 _ignoreAtRowFilter = true;
             }
+
+            // Nicht möglich, weil die ganze Spalte geladen sein muss
+            //if (!Name.StartsWith("SYS_") &&  CalculatePreveredMaxTextLenght(1f) > MaxTextLenght) {
+            //    MaxTextLenght = CalculatePreveredMaxTextLenght(1f);
+            //}
 
             ResetSystemToDefault(false);
         } catch (Exception ex) {

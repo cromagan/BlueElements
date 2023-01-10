@@ -366,7 +366,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
         foreach (var thisColum in Database.Column.Where(thisColum => thisColum != null)) {
             if (fullCheck) {
                 var x = CellGetString(thisColum);
-                var x2 = thisColum.AutoCorrect(x);
+                var x2 = thisColum.AutoCorrect(x, true);
                 if (thisColum.Format is not DataFormat.Verknüpfung_zu_anderer_Datenbank && x != x2) {
                     Database.Cell.Set(thisColum, this, x2);
                 } else {

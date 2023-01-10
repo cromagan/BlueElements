@@ -88,6 +88,8 @@ public abstract class SQLBackAbstract {
 
         if (!t.ContainsOnlyChars(Constants.Char_AZ + Constants.Char_Numerals + "_")) { return false; }
 
+        if (t.Length > 128) { return false; }
+
         return true;
     }
 
@@ -146,6 +148,12 @@ public abstract class SQLBackAbstract {
 
     public void ChangeDataType(string tablename, string column, int charlenght) {
         //https://stackoverflow.com/questions/10321775/changing-the-data-type-of-a-column-in-oracle
+
+        var s = (DataFormat)IntParse(GetStyleData(tablename, DatabaseDataType.ColumnFormat.ToString(), column));
+
+        if (s == DataFormat.Verknüpfung_zu_anderer_Datenbank) { charlenght = Math.Max(charlenght, 35); }
+        if (s == DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { charlenght = Math.Max(charlenght, 15); }
+
         var cmdString = @"ALTER TABLE " + tablename + " MODIFY (" + column + " " + VarChar(charlenght) + ")";
         ExecuteCommand(cmdString);
     }
@@ -208,32 +216,38 @@ public abstract class SQLBackAbstract {
     /// <param name="columnName"></param>
     /// <returns></returns>
     public Dictionary<string, string> GetStyleDataAll(string tablename, string columnName) {
-        var l = new Dictionary<string, string>();
+        try {
+            var l = new Dictionary<string, string>();
 
-        if (!OpenConnection()) { return l; }
+            if (!OpenConnection()) { return l; }
 
-        using var q = _connection.CreateCommand();
+            using var q = _connection.CreateCommand();
 
-        q.CommandText = @"select TYPE, PART, VALUE from " + SYS_STYLE + " " +
-                        "where TABLENAME = " + DBVAL(tablename.ToUpper()) + " " +
-                        "and COLUMNNAME = " + DBVAL(columnName.ToUpper()) + " " +
-                        "ORDER BY PART ASC";
+            q.CommandText = @"select TYPE, PART, VALUE from " + SYS_STYLE + " " +
+                            "where TABLENAME = " + DBVAL(tablename.ToUpper()) + " " +
+                            "and COLUMNNAME = " + DBVAL(columnName.ToUpper()) + " " +
+                            "ORDER BY PART ASC";
 
-        using var reader = q.ExecuteReader();
+            using var reader = q.ExecuteReader();
 
-        while (reader.Read()) {
-            var key = reader[0].ToString();
-            var value = reader[2].ToString();
+            while (reader.Read()) {
+                var key = reader[0].ToString();
+                var value = reader[2].ToString();
 
-            if (reader[1].ToString() != "001") {
-                l[key] = l[key] + value;
-            } else {
-                l.Add(key, value);
+                if (reader[1].ToString() != "001") {
+                    l[key] = l[key] + value;
+                } else {
+                    l.Add(key, value);
+                }
             }
-        }
 
-        //CloseConnection();    // Nix vorhanden!
-        return l;
+            //CloseConnection();    // Nix vorhanden!
+            return l;
+        } catch {
+            Develop.CheckStackForOverflow();
+            CloseConnection();
+            return GetStyleDataAll(tablename, columnName);
+        }
     }
 
     public async void LoadAllRowKeys(string tablename, RowCollection row) {
@@ -260,6 +274,8 @@ public abstract class SQLBackAbstract {
 
             CloseConnection();
         } catch {
+            CloseConnection();
+            Develop.CheckStackForOverflow();
             LoadAllRowKeys(tablename, row);
         }
     }
@@ -318,6 +334,7 @@ public abstract class SQLBackAbstract {
             }
         } catch {
             CloseConnection();
+            Develop.CheckStackForOverflow();
             LoadRow(tablename, row);
         }
     }
@@ -326,7 +343,6 @@ public abstract class SQLBackAbstract {
     public bool OpenConnection() {
         lock (openclose) {
             if (_connection == null) { return false; }
-
             if (_connection.State == ConnectionState.Closed) {
                 _connection.Open();
             }
@@ -374,14 +390,22 @@ public abstract class SQLBackAbstract {
         #region Main
 
         if (!string.IsNullOrEmpty(tablename)) {
-            if (!x.Contains(tablename.ToUpper())) { CreateTable(tablename.ToUpper(), new List<string>() { "RK" }); }
+            if (!x.Contains(tablename.ToUpper())) {
+                CreateTable(tablename.ToUpper(), new List<string>() { "RK" });
+                ChangeDataType(tablename.ToUpper(), "RK", 15);
+            }
         }
 
         #endregion
 
         #region Style
 
-        if (!x.Contains(SYS_STYLE)) { CreateTable(SYS_STYLE, new List<string>() { "TABLENAME", "COLUMNNAME", "TYPE", "PART" }); }
+        if (!x.Contains(SYS_STYLE)) {
+            CreateTable(SYS_STYLE, new List<string>() { "TABLENAME", "COLUMNNAME", "TYPE", "PART" });
+            ChangeDataType(tablename.ToUpper(), "COLUMNNAME", 128);
+            ChangeDataType(tablename.ToUpper(), "TABLENAME", 128);
+            ChangeDataType(tablename.ToUpper(), "PART", 3);
+        }
 
         var colStyle = GetColumnNames(SYS_STYLE);
         if (colStyle == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
@@ -845,32 +869,39 @@ public abstract class SQLBackAbstract {
     }
 
     private string? GetCellValue(string tablename, string columnname, long rowkey) {
-        if (!OpenConnection()) { return null; }
+        try {
+            if (_connection == null) { return null; }
 
-        using var q = _connection.CreateCommand();
+            if (!OpenConnection()) { return null; }
 
-        q.CommandText = @"select " + columnname.ToUpper() + " from " + tablename.ToUpper() + " " +
-                        "where RK = " + DBVAL(rowkey);
+            using var q = _connection.CreateCommand();
 
-        ////command.AddParameterWithValue("" + DBVAL(columnName.ToUpper()) , column.Name.ToUpper());
-        //command.AddParameterWithValue("" + DBVAL(row.Key)", row.Key.ToString());
+            q.CommandText = @"select " + columnname.ToUpper() + " from " + tablename.ToUpper() + " " +
+                            "where RK = " + DBVAL(rowkey);
 
-        using var reader = q.ExecuteReader();
-        if (reader.Read()) {
-            // you may want to check if value is NULL: reader.IsDBNull(0)
-            var value = reader[0].ToString();
+            ////command.AddParameterWithValue("" + DBVAL(columnName.ToUpper()) , column.Name.ToUpper());
+            //command.AddParameterWithValue("" + DBVAL(row.Key)", row.Key.ToString());
 
+            using var reader = q.ExecuteReader();
             if (reader.Read()) {
-                // Doppelter Wert?!?Ersten Wert zurückgeben, um unendliche erweiterungen zu erhindern
-                Develop.DebugPrint(columnname + " doppelt in " + tablename.ToUpper() + " vorhanden!");
+                // you may want to check if value is NULL: reader.IsDBNull(0)
+                var value = reader[0].ToString();
+
+                if (reader.Read()) {
+                    // Doppelter Wert?!?Ersten Wert zurückgeben, um unendliche erweiterungen zu erhindern
+                    Develop.DebugPrint(columnname + " doppelt in " + tablename.ToUpper() + " vorhanden!");
+                }
+
+                CloseConnection();
+                return value;
             }
 
-            CloseConnection();
-            return value;
+            CloseConnection();    // Nix vorhanden!
+            return null;
+        } catch {
+            Develop.CheckStackForOverflow();
+            return GetCellValue(tablename, columnname, rowkey);
         }
-
-        CloseConnection();    // Nix vorhanden!
-        return null;
     }
 
     private string RemoveColumn(string tablename, string column) {

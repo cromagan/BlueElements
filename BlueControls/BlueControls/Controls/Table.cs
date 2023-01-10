@@ -1752,7 +1752,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             return;
         }
 
-        newValue = column.AutoCorrect(newValue);
+        newValue = column.AutoCorrect(newValue, false);
         if (row != null) {
             if (newValue == row.CellGetString(column)) { return; }
         } else {

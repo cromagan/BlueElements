@@ -928,6 +928,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         //}
 
         var x = ConnectionDataOfOtherTable(tablename, true);
+        if (x == null) { return null; }
 
         x.Provider = null;  // KEINE Vorage mitgeben, weil sonst eine Endlosschleife aufgerufen wird!
 
@@ -1177,7 +1178,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     public bool RefreshRowData(RowItem row, bool refreshAlways) => RefreshRowData(new List<RowItem>() { row }, refreshAlways);
 
-    public void RepairAfterParse() {
+    public virtual void RepairAfterParse() {
         Column.Repair();
         RepairColumnArrangements();
         RepairViews();

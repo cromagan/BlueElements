@@ -54,14 +54,6 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     #endregion
 
-    //private bool _checkedAndReloadNeed;
-
-    //private DateTime _lastCheck = DateTime.Now;
-
-    //private int _loadingCount = 0;
-
-    //private bool _isLoading = false;
-
     #region Constructors
 
     public DatabaseSQLLite(SQLBackAbstract sql, bool readOnly, string tablename) : base(tablename, readOnly) {
@@ -87,6 +79,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     #region Properties
 
+    //private bool _isLoading = false;
     public override ConnectionInfo ConnectionData {
         get {
             var connectionData = _sql.ConnectionData(TableName);
@@ -97,6 +90,97 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     #endregion
 
+    #region Methods
+
+    public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked, List<string>? ignorePath) {
+        if (allreadychecked != null) {
+            foreach (var thisa in allreadychecked) {
+                if (thisa is DatabaseSQLLite db) {
+                    if (db._sql.ConnectionString == _sql.ConnectionString) { return null; }
+                }
+            }
+        }
+
+        var tb = _sql.Tables();
+
+        var l = new List<ConnectionInfo>();
+
+        foreach (var thistb in tb) {
+            l.Add(ConnectionDataOfOtherTable(thistb, false));
+        }
+
+        return l;
+    }
+
+    //        return false;
+    //    }
+    //}
+    public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists) {
+        if (checkExists) {
+            var t = AllAvailableTables(null);
+
+            foreach (var thisT in t) {
+                if (string.Equals(tableName, thisT.TableName, StringComparison.InvariantCultureIgnoreCase)) {
+                    return thisT;
+                }
+            }
+            return null;
+        }
+
+        var connectionData = _sql.ConnectionData(tableName);
+        connectionData.Provider = this;
+        return connectionData;
+    }
+
+    public override void RefreshColumnsData(List<ColumnItem>? columns) {
+        if (columns == null || columns.Count == 0) { return; }
+        if (columns.Count == 1 && columns[0].IsInCache) { return; }
+
+        try {
+            _sql.LoadColumns(TableName, columns);
+        } catch {
+            RefreshColumnsData(columns);
+        }
+    }
+
+    //    LoadFromSQLBack();
+    //}
+    public override bool RefreshRowData(List<RowItem> rows, bool refreshAlways) {
+        if (rows == null || rows.Count == 0) { return false; }
+
+        var l = new ListExt<RowItem>();
+
+        foreach (var thisr in rows) {
+            if (refreshAlways || !thisr.IsInCache) {
+                l.AddIfNotExists(thisr);
+            }
+        }
+
+        if (l.Count == 0) { return false; }
+
+        try {
+            _sql.LoadRow(TableName, l);
+        } catch {
+            return RefreshRowData(rows, refreshAlways);
+        }
+
+        return true;
+    }
+
+    public override void RepairAfterParse() {
+        base.RepairAfterParse();
+        foreach (var thisC in Column) {
+            if (IsAdministrator() && thisC.Name.StartsWith("SYS_")) {
+                _sql.ChangeDataType(TableName, thisC.Name, thisC.MaxTextLenght);
+            }
+        }
+    }
+
+    //private bool _checkedAndReloadNeed;
+
+    //private DateTime _lastCheck = DateTime.Now;
+
+    //private int _loadingCount = 0;
     //public override string Filename => _sql.Filename;
     //public override bool IsLoading { get => _isLoading; }
 
@@ -127,89 +211,8 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     //        if (DateTime.Now.Subtract(_lastCheck).TotalSeconds > 20) {
     //            return ReloadNeeded;
     //        }
-
-    //        return false;
-    //    }
-    //}
-
-    #region Methods
-
-    public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked, List<string>? ignorePath) {
-        if (allreadychecked != null) {
-            foreach (var thisa in allreadychecked) {
-                if (thisa is DatabaseSQLLite db) {
-                    if (db._sql.ConnectionString == _sql.ConnectionString) { return null; }
-                }
-            }
-        }
-
-        var tb = _sql.Tables();
-
-        var l = new List<ConnectionInfo>();
-
-        foreach (var thistb in tb) {
-            l.Add(ConnectionDataOfOtherTable(thistb, false));
-        }
-
-        return l;
-    }
-
-    public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists) {
-        if (checkExists) {
-            var t = AllAvailableTables(null);
-
-            foreach (var thisT in t) {
-                if (string.Equals(tableName, thisT.TableName, StringComparison.InvariantCultureIgnoreCase)) {
-                    return thisT;
-                }
-            }
-            return null;
-        }
-
-        var connectionData = _sql.ConnectionData(tableName);
-        connectionData.Provider = this;
-        return connectionData;
-    }
-
     //public override void Load_Reload() {
     //    if (!ReloadNeeded) { return; }
-
-    //    LoadFromSQLBack();
-    //}
-
-    public override void RefreshColumnsData(List<ColumnItem>? columns) {
-        if (columns == null || columns.Count == 0) { return; }
-        if (columns.Count == 1 && columns[0].IsInCache) { return; }
-
-        try {
-            _sql.LoadColumns(TableName, columns);
-        } catch {
-            RefreshColumnsData(columns);
-        }
-    }
-
-    public override bool RefreshRowData(List<RowItem> rows, bool refreshAlways) {
-        if (rows == null || rows.Count == 0) { return false; }
-
-        var l = new ListExt<RowItem>();
-
-        foreach (var thisr in rows) {
-            if (refreshAlways || !thisr.IsInCache) {
-                l.AddIfNotExists(thisr);
-            }
-        }
-
-        if (l.Count == 0) { return false; }
-
-        try {
-            _sql.LoadRow(TableName, l);
-        } catch {
-            return RefreshRowData(rows, refreshAlways);
-        }
-
-        return true;
-    }
-
     public override bool Save() => _sql.ConnectionOk;
 
     public override string UndoText(ColumnItem? column, RowItem? row) => string.Empty;
