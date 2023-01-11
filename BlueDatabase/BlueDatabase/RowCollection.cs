@@ -28,6 +28,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace BlueDatabase;
 
@@ -301,7 +302,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         return tmpVisibleRows;
     }
 
-    public bool Clear() => Remove(new FilterCollection(Database), null);
+    public bool Clear(string comment) => Remove(new FilterCollection(Database), null, comment);
 
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
@@ -349,12 +350,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     /// <param name="runScriptOfNewRow"></param>
     /// <param name="fullprocessing">Sollen der Zeilenersteller, das Datum und die Initalwerte geschrieben werden?</param>
     /// <returns></returns>
-    public RowItem? GenerateAndAdd(long key, string valueOfCellInFirstColumn, bool runScriptOfNewRow, bool fullprocessing) {
+    public RowItem? GenerateAndAdd(long key, string valueOfCellInFirstColumn, bool runScriptOfNewRow, bool fullprocessing, string comment) {
         Develop.DebugPrint_Disposed(Database);
 
         var item = SearchByKey(key);
         if (item != null) { Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!"); }
-        Database.ChangeData(DatabaseDataType.Comand_AddRow, null, key, string.Empty, key.ToString());
+        Database.ChangeData(DatabaseDataType.Comand_AddRow, null, key, string.Empty, key.ToString(), comment);
         item = SearchByKey(key);
         if (item == null) { Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen."); }
 
@@ -387,7 +388,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     /// </summary>
     /// <param name="fi"></param>
     /// <returns></returns>
-    public RowItem? GenerateAndAdd(List<FilterItem>? fi) {
+    public RowItem? GenerateAndAdd(List<FilterItem>? fi, string comment) {
         List<string> first = null;
 
         foreach (var thisfi in fi) {
@@ -402,7 +403,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
         if (first == null) { return null; }
 
-        var row = GenerateAndAdd(NextRowKey(), first.JoinWithCr(), false, true);
+        var row = GenerateAndAdd(NextRowKey(), first.JoinWithCr(), false, true, comment);
 
         if (row == null) { return null; }
 
@@ -415,34 +416,40 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         return row;
     }
 
-    public RowItem? GenerateAndAdd(string valueOfCellInFirstColumn) => GenerateAndAdd(NextRowKey(), valueOfCellInFirstColumn, true, true);
+    public RowItem? GenerateAndAdd(string valueOfCellInFirstColumn, string comment) => GenerateAndAdd(NextRowKey(), valueOfCellInFirstColumn, true, true, comment);
 
     public IEnumerator<RowItem> GetEnumerator() => _internal.Values.GetEnumerator();
 
     //foreach (var ThisRowItem in _Internal.Values)//{//    if (ThisRowItem != null) { return ThisRowItem; }//}//return null;
     IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();
 
-    public bool Remove(long key) => string.IsNullOrEmpty(Database.ChangeData(DatabaseDataType.Comand_RemoveRow, null, key, string.Empty, key.ToString()));
+    public bool Remove(long key, string comment) => string.IsNullOrEmpty(Database.ChangeData(DatabaseDataType.Comand_RemoveRow, null, key, string.Empty, key.ToString(), comment));
 
-    public bool Remove(FilterItem filter, List<RowItem?> pinned) {
+    public bool Remove(FilterItem filter, List<RowItem?> pinned, string comment) {
         FilterCollection nf = new(Database) { filter };
-        return Remove(nf, pinned);
+        return Remove(nf, pinned, comment);
     }
 
-    public bool Remove(FilterCollection? filter, List<RowItem?>? pinned) {
+    public bool Remove(FilterCollection? filter, List<RowItem?>? pinned, string comment) {
         var keys = (from thisrowitem in _internal.Values where thisrowitem != null && thisrowitem.MatchesTo(filter) select thisrowitem.Key).Select(dummy => dummy).ToList();
-        var did = keys.Count(Remove) > 0;
+        var did = false;
+
+        foreach (var thisKey in keys) {
+            if (Remove(thisKey, comment)) { did = true; }
+        }
 
         if (pinned != null && pinned.Count > 0) {
-            did = pinned?.Count(Remove) > 0 || did;
+            foreach (var thisr in pinned) {
+                if (Remove(thisr.Key, comment)) { did = true; }
+            }
         }
 
         return did;
     }
 
-    public bool Remove(RowItem? row) => row != null && Remove(row.Key);
+    public bool Remove(RowItem? row, string comment) => row != null && Remove(row.Key, comment);
 
-    public bool RemoveOlderThan(float inHours) {
+    public bool RemoveOlderThan(float inHours, string comment) {
         var x = (from thisrowitem in _internal.Values where thisrowitem != null let d = thisrowitem.CellGetDateTime(Database.Column.SysRowCreateDate) where DateTime.Now.Subtract(d).TotalHours > inHours select thisrowitem.Key).Select(dummy => dummy).ToList();
         //foreach (var thisrowitem in _Internal.Values)
         //{
@@ -454,7 +461,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         //}
         if (x.Count == 0) { return false; }
         foreach (var thisKey in x) {
-            Remove(thisKey);
+            Remove(thisKey, comment);
         }
         return true;
     }
@@ -489,12 +496,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         // Zeilen, die zu viel sind, löschen
         foreach (var thisRow in this) {
             var l = sourceDatabase.Row.SearchByKey(thisRow.Key);
-            if (l == null) { Remove(thisRow); }
+            if (l == null) { Remove(thisRow, "Clone - Zeile zuviel"); }
         }
 
         // Zeilen erzeugen und Format übertragen
         foreach (var thisRow in sourceDatabase.Row) {
-            var l = SearchByKey(thisRow.Key) ?? GenerateAndAdd(thisRow.Key, string.Empty, false, false);
+            var l = SearchByKey(thisRow.Key) ?? GenerateAndAdd(thisRow.Key, string.Empty, false, false, "Clone - Zeile fehlt");
             l.CloneFrom(thisRow, true);
         }
     }

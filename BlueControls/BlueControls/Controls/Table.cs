@@ -1774,7 +1774,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (row == null) {
                 var f = CellCollection.ErrorReason(column.Database.Column.First, null, ErrorReason.EditGeneral);
                 if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
-                row = column.Database.Row.GenerateAndAdd(newValue);
+                row = column.Database.Row.GenerateAndAdd(newValue, "Neue Zeile über Tabellen-Ansicht");
                 if (table.Database == column.Database) {
                     var l = table.FilteredRows();
                     if (row != null && !l.Contains(row)) {

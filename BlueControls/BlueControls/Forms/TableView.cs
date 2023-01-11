@@ -83,11 +83,6 @@ public partial class TableView : Form {
 
     #endregion
 
-    #region Properties
-
-
-    #endregion
-
     #region Methods
 
     public static void CheckDatabase(object? sender, System.EventArgs e) {
@@ -487,7 +482,7 @@ public partial class TableView : Form {
                 if (!tbl.Database.IsAdministrator()) { return; }
                 if (row == null) { return; }
                 if (MessageBox.Show("Zeile wirklich löschen? (<b>" + ValueCol0 + "</b>)", ImageCode.Frage, "Ja", "Nein") == 0) {
-                    tbl.Database.Row.Remove(row);
+                    tbl.Database.Row.Remove(row, "Benutzer: löschen Befehl");
                 }
 
                 break;
@@ -635,16 +630,16 @@ public partial class TableView : Form {
             if (MessageBox.Show("Soll der Eintrag<br><b>" + tmpr.CellFirstString() + "</b><br>wirklich <b>gelöscht</b> werden?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             SuchEintragNoSave(Direction.Unten, out var column, out var row);
             Table.CursorPos_Set(column, row, false);
-            Table.Database.Row.Remove(tmpr);
+            Table.Database.Row.Remove(tmpr, "Benutzer: Eintrag löschen");
         } else {
-            Table.Database.Row.Remove(Table.Filter, Table.PinnedRows);
+            Table.Database.Row.Remove(Table.Filter, Table.PinnedRows, "Benutzer: Zeilen löschen");
         }
     }
 
     private void btnNeu_Click(object sender, System.EventArgs e) {
         var r = Table.Database.Column.First().SortType == SortierTyp.Datum_Uhrzeit
-    ? Table.Database.Row.GenerateAndAdd(NameRepair(DateTime.Now.ToString(Constants.Format_Date5), null))
-    : Table.Database.Row.GenerateAndAdd(NameRepair("Neuer Eintrag", null));
+    ? Table.Database.Row.GenerateAndAdd(NameRepair(DateTime.Now.ToString(Constants.Format_Date5), null), "Benutzer: +")
+    : Table.Database.Row.GenerateAndAdd(NameRepair("Neuer Eintrag", null), "Benutzer: +");
         Table.CursorPos_Set(Table.Database.Column.First(), Table.SortedRows().Get(r), true);
     }
 
@@ -797,7 +792,7 @@ public partial class TableView : Form {
         if (!Table.Database.IsAdministrator()) { return; }
         var m = MessageBox.Show("Angezeigte Zeilen löschen?", ImageCode.Warnung, "Ja", "Nein");
         if (m != 0) { return; }
-        Table.Database.Row.Remove(Table.Filter, Table.PinnedRows);
+        Table.Database.Row.Remove(Table.Filter, Table.PinnedRows, "Benutzer: Zeile löschen");
     }
 
     private void btnZurück_Click(object sender, System.EventArgs e) {

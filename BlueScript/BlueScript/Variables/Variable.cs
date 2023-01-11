@@ -32,7 +32,7 @@ public static class VariableExtensions {
 
     #region Methods
 
-    public static void AddComent(this List<Variable> vars, string additionalComent) {
+    public static void AddComment(this List<Variable> vars, string additionalComent) {
         foreach (var thisvar in vars) {
             if (!string.IsNullOrEmpty(thisvar.Coment)) {
                 thisvar.Coment += "\r";
@@ -168,7 +168,7 @@ public static class VariableExtensions {
     public static Variable? GetSystem(this List<Variable> vars, string name) => vars.FirstOrDefault(thisv =>
         thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper());
 
-    public static void RemoveWithComent(this List<Variable> vars, string coment) {
+    public static void RemoveWithComment(this List<Variable> vars, string coment) {
         var z = 0;
         do {
             if (vars[z].Coment.Contains(coment)) {

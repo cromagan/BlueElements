@@ -75,7 +75,7 @@ public class Method_AddRow : MethodDatabase {
 
         if (s.OnlyTesting) { return new DoItFeedback("Zeile anlegen im Testmodus deaktiviert."); }
 
-        var r = db.Row.GenerateAndAdd(db.Row.NextRowKey(), ((VariableString)attvar.Attributes[1]).ValueString, ((VariableBool)attvar.Attributes[2]).ValueBool, true);
+        var r = db.Row.GenerateAndAdd(db.Row.NextRowKey(), ((VariableString)attvar.Attributes[1]).ValueString, ((VariableBool)attvar.Attributes[2]).ValueBool, true, "Script Command: Add Row");
 
         return Method_Row.RowToObjectFeedback(r);
     }

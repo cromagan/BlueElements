@@ -573,7 +573,7 @@ internal sealed partial class ColumnEditor {
         for (var z = 0; z < linkdb.Column.Count; z++) {
             var col = linkdb.Column[z];
 
-            var r = tblFilterliste.Database.Row[z.ToString()] ?? tblFilterliste.Database.Row.GenerateAndAdd(z.ToString());
+            var r = tblFilterliste.Database.Row[z.ToString()] ?? tblFilterliste.Database.Row.GenerateAndAdd(z.ToString(), "Neue Spalte");
 
             r.CellSet("Spalte", col.ReadableText() + " = ");
 

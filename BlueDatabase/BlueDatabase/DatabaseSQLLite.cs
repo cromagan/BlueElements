@@ -50,7 +50,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     /// <summary>
     /// Der Zeitstempel der letzten Abfrage des _timer
     /// </summary>
-    private static DateTime _timerTimeStamp = DateTime.UtcNow.AddMinutes(-5);
+    private static DateTime _timerTimeStamp = DateTime.UtcNow.AddSeconds(-0.5);
 
     #endregion
 
@@ -259,8 +259,8 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         return base.SetValueInternal(type, value, columnkey, rowkey, width, height, isLoading);
     }
 
-    protected override void AddUndo(string tableName, DatabaseDataType comand, long? columnKey, long? rowKey, string previousValue, string changedTo, string userName) {
-        _sql.AddUndo(tableName, comand, columnKey, rowKey, previousValue, changedTo, UserName);
+    protected override void AddUndo(string tableName, DatabaseDataType comand, long? columnKey, long? rowKey, string previousValue, string changedTo, string userName, string comment) {
+        _sql.AddUndo(tableName, comand, columnKey, rowKey, previousValue, changedTo, UserName, comment);
     }
 
     protected override void SetUserDidSomething() { }
@@ -321,6 +321,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     private void DoLastChanges(List<(string tablename, string comand, string columnkey, string rowkey)>? data) {
         if (data == null) { return; }
+        return;
 
         //_loadingCount++;
 

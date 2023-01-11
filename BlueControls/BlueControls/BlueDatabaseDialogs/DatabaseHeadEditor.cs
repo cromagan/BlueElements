@@ -124,7 +124,7 @@ public sealed partial class DatabaseHeadEditor {
 
         var cd = work.CellKey.SplitAndCutBy("|");
         _database.Cell.DataOfCellKey(work.CellKey, out var col, out var row);
-        var r = tblUndo.Database.Row.GenerateAndAdd(work.ToString());
+        var r = tblUndo.Database.Row.GenerateAndAdd(work.ToString(), "New Undo Item");
         r.CellSet("ColumnKey", cd[0]);
         r.CellSet("RowKey", cd[1]);
         r.CellSet("index", index);

@@ -52,7 +52,7 @@ internal class Method_ExtractTags : Method {
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
         const string coment = "Mit dem Befehl 'ExtractTags' erstellt";
-        s.Variables.RemoveWithComent(coment);
+        s.Variables.RemoveWithComment(coment);
 
         var tags = new List<string>();
         if (attvar.Attributes[0] is VariableString vs) { tags.Add(vs.ValueString); }

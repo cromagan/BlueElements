@@ -102,7 +102,7 @@ public static class LanguageTool {
             if (r == null) {
                 if (Translation.ReadOnly) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(_english, args); }
                 if (!mustTranslate) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(_english, args); }
-                r = Translation.Row.GenerateAndAdd(txt);
+                r = Translation.Row.GenerateAndAdd(txt, "Missing translation");
                 if (r == null) { return args.GetUpperBound(0) < 0 ? txt : string.Format(txt, args); }
             }
             var t = r.CellGetString("Translation");

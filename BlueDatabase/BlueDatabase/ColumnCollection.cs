@@ -175,7 +175,7 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
             Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!");
             return null;
         }
-        Database.ChangeData(DatabaseDataType.Comand_AddColumn, key, null, string.Empty, key.ToString());
+        Database.ChangeData(DatabaseDataType.Comand_AddColumn, key, null, string.Empty, key.ToString(), string.Empty);
         item = SearchByKey(key);
         if (item == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen.");
@@ -280,9 +280,9 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
         }
     }
 
-    public new void Remove(ColumnItem item) {
+    public new void Remove(ColumnItem item, string comment) {
         if (Database == null || Database.IsDisposed) { return; }
-        Database.ChangeData(DatabaseDataType.Comand_RemoveColumn, item.Key, null, string.Empty, item.Key.ToString());
+        Database.ChangeData(DatabaseDataType.Comand_RemoveColumn, item.Key, null, string.Empty, item.Key.ToString(), comment);
     }
 
     public void Repair() {

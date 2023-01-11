@@ -707,7 +707,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (ContainsKey(cellKey)) { oldValue = this[cellKey].Value; }
         if (value == oldValue) { return; }
 
-        _database?.ChangeData(DatabaseDataType.Value_withoutSizeData, column.Key, row.Key, oldValue, value);
+        _database?.ChangeData(DatabaseDataType.Value_withoutSizeData, column.Key, row.Key, oldValue, value, string.Empty);
         column.UcaseNamesSortedByLenght = null;
 
         var checkValue = string.Empty;
@@ -746,7 +746,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
         }
         if (value == @string) { return; }
-        _database.ChangeData(DatabaseDataType.Value_withoutSizeData, column.Key, row.Key, @string, value);
+        _database.ChangeData(DatabaseDataType.Value_withoutSizeData, column.Key, row.Key, @string, value, "SystemSet");
     }
 
     private static bool CompareValues(string istValue, string filterValue, FilterType typ) {
@@ -848,7 +848,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             targetRow = r[0];
         } else {
             if (addRowIfNotExists) {
-                targetRow = linkedDatabase.Row.GenerateAndAdd(filter);
+                targetRow = linkedDatabase.Row.GenerateAndAdd(filter, "LinkedCell aus " + column.Database.TableName);
             }
         }
         //   }

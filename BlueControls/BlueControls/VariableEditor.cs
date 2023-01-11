@@ -54,7 +54,7 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
         if (variables == null) { return; }
 
         foreach (var thisv in variables) {
-            var ro = RowOfVariable(thisv) ?? tableVariablen.Database.Row.GenerateAndAdd(thisv.Name);
+            var ro = RowOfVariable(thisv) ?? tableVariablen.Database.Row.GenerateAndAdd(thisv.Name, "Neue Variable");
 
             ro.CellSet("typ", thisv.ShortName);
             ro.CellSet("RO", thisv.Readonly);
@@ -69,7 +69,7 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
     }
 
     internal void Clear() {
-        tableVariablen.Database?.Row.Clear();
+        tableVariablen.Database?.Row.Clear("Variablen gelöscht");
     }
 
     private void GenerateVariableTable() {

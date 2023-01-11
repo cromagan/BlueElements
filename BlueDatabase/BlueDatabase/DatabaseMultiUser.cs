@@ -183,7 +183,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         return r;
     }
 
-    protected override void AddUndo(string tableName, DatabaseDataType comand, long? columnKey, long? rowKey, string previousValue, string changedTo, string userName) {
+    protected override void AddUndo(string tableName, DatabaseDataType comand, long? columnKey, long? rowKey, string previousValue, string changedTo, string userName, string comment) {
         Works.Add(new WorkItem(comand, columnKey, rowKey, previousValue, changedTo, userName));
     }
 

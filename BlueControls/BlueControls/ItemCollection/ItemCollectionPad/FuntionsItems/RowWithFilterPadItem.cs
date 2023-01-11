@@ -131,7 +131,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
             if (t == null || t.Count != 1) { return; }
 
-            var r = FilterDefiniton.Row.GenerateAndAdd(t[0]);
+            var r = FilterDefiniton.Row.GenerateAndAdd(t[0], "Neuer Filter");
             r.CellSet("FilterArt", "=");
         }
     }
@@ -228,7 +228,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
                 return true;
 
             case "filterdb":
-                FilterDefiniton.Row.Clear();
+                FilterDefiniton.Row.Clear("Neue Filter-Datenbank per Parse");
                 FilterDatabaseUpdate();
                 FilterDefiniton.Import(value.FromNonCritical(), true, false, ";", false, false, false, string.Empty);
                 return true;
@@ -407,7 +407,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
         switch (e.ClickedComand.ToLower()) {
             case "löschen":
-                row.Database?.Row.Remove(row);
+                row.Database?.Row.Remove(row, "Benutzer: Filter (und somit Zeile) gelöscht");
                 break;
 
             default:
