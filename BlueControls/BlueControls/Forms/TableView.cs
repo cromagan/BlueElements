@@ -1025,7 +1025,7 @@ public partial class TableView : Form {
 
         var s = (List<object>)(e.TabPage.Tag);
 
-        var DB = DatabaseAbstract.GetByID((ConnectionInfo)s[0]);
+        var DB = DatabaseAbstract.GetByID((ConnectionInfo)s[0], Table.Database_NeedPassword);
 
         if (DB is Database BDB) {
             if (!string.IsNullOrEmpty(BDB.Filename)) {

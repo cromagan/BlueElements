@@ -736,7 +736,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             //q
             //var ci = Database.ConnectionDataOfOtherTable(_linkedDatabaseFile.FileNameWithoutSuffix());//  new ConnectionInfo(_linkedDatabaseFile, this, this.DatabaseID, string.Empty);
 
-            Tmp_LinkedDatabase = DatabaseAbstract.GetByID(ci);
+            Tmp_LinkedDatabase = DatabaseAbstract.GetByID(ci, null);
 
             if (_tmpLinkedDatabase != null) {
                 _tmpLinkedDatabase.UserGroup = Database.UserGroup;

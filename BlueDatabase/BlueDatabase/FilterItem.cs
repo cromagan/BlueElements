@@ -227,7 +227,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
 
                 case "database":
                     if (Database != null) { Database.Disposing -= Database_Disposing; }
-                    Database = DatabaseAbstract.GetByID(new ConnectionInfo(pair.Value.FromNonCritical()));
+                    Database = DatabaseAbstract.GetByID(new ConnectionInfo(pair.Value.FromNonCritical()), null);
                     Database.Disposing += Database_Disposing;
                     break;
 

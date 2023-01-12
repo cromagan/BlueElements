@@ -102,7 +102,7 @@ public sealed partial class DatabaseHeadEditor {
         txbCaption.Text = _database.Caption;
         txbFirstColumn.Text = _database.FirstColumn;
         txbGlobalScale.Text = _database.GlobalScale.ToString(Constants.Format_Float1);
-        txbAdditionalFiles.Text = _database.AdditionaFilesPfad;
+        txbAdditionalFiles.Text = _database.AdditionalFilesPfad;
         txbStandardFormulaFile.Text = _database.StandardFormulaFile;
         txbZeilenQuickInfo.Text = _database.ZeilenQuickInfo.Replace("<br>", "\r");
         tbxUndoAnzahl.Text = _database.UndoCount.ToString();
@@ -366,7 +366,7 @@ public sealed partial class DatabaseHeadEditor {
             _database.GlobalScale = Math.Min(DoubleParse(txbGlobalScale.Text), 5);
             _database.GlobalScale = Math.Max(0.5, _database.GlobalScale);
         }
-        _database.AdditionaFilesPfad = txbAdditionalFiles.Text;
+        _database.AdditionalFilesPfad = txbAdditionalFiles.Text;
         _database.StandardFormulaFile = txbStandardFormulaFile.Text;
         _database.ZeilenQuickInfo = txbZeilenQuickInfo.Text.Replace("\r", "<br>");
 

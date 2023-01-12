@@ -92,7 +92,7 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
         if (base.ParseThis(tag, value)) { return true; }
         switch (tag) {
             case "database":
-                Database = DatabaseAbstract.GetByID(new ConnectionInfo(value.FromNonCritical()));
+                Database = DatabaseAbstract.GetByID(new ConnectionInfo(value.FromNonCritical()), null);
                 return true;
 
             case "id":

@@ -535,8 +535,8 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
 
         if (!string.IsNullOrEmpty(_verzeichnis)) {
             savePath = _verzeichnis.CheckPath();
-        } else if (!string.IsNullOrEmpty(Database.AdditionaFilesPfad)) {
-            savePath = Database.AdditionaFilesPfad + "Backup\\";
+        } else if (!string.IsNullOrEmpty(Database.AdditionalFilesPfad)) {
+            savePath = Database.AdditionalFilesPfad + "Backup\\";
         } else if (!string.IsNullOrEmpty(Database.DefaultBackupPath())) {
             savePath = Database.DefaultBackupPath();
         } else {

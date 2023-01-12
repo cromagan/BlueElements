@@ -99,7 +99,7 @@ public sealed partial class ExportDialog {
         if (!addDiskLayouts) { return; }
         List<string> path = new();
         if (database != null) { path.Add(database.DefaultLayoutPath()); }
-        if (!string.IsNullOrEmpty(database.AdditionaFilesPfadWhole())) { path.Add(database.AdditionaFilesPfadWhole()); }
+        if (!string.IsNullOrEmpty(database.AdditionalFilesPfadWhole())) { path.Add(database.AdditionalFilesPfadWhole()); }
         foreach (var thisP in path) {
             if (DirectoryExists(thisP)) {
                 var e = Directory.GetFiles(thisP);

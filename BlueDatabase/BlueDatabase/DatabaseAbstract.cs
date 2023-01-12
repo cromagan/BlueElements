@@ -56,7 +56,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     public readonly string TableName = string.Empty;
     public readonly string UserName = Generic.UserName().ToUpper();
     public string UserGroup;
-    protected string? _additionaFilesPfadtmp;
+    protected string? _additionalFilesPfadtmp;
 
     private static List<ConnectionInfo> _allavailabletables = new List<ConnectionInfo>();
     private static DateTime _lastTableCheck = new DateTime(1900, 1, 1);
@@ -65,7 +65,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     private readonly List<string> _permissionGroupsNewRow = new();
     private readonly long _startTick = DateTime.UtcNow.Ticks;
     private readonly List<string> _tags = new();
-    private string _additionaFilesPfad = string.Empty;
+    private string _additionalFilesPfad = string.Empty;
     private BackgroundWorker _backgroundWorker;
     private string _cachePfad = string.Empty;
     private string _caption = string.Empty;
@@ -120,6 +120,12 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     #endregion
 
+    #region Delegates
+
+    public delegate string NeedPassword();
+
+    #endregion
+
     #region Events
 
     public event EventHandler? Disposing;
@@ -133,8 +139,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     public event EventHandler? Loaded;
 
     public event EventHandler? Loading;
-
-    public event EventHandler<PasswordEventArgs>? NeedPassword;
 
     public event EventHandler<ProgressbarEventArgs>? ProgressbarInfo;
 
@@ -150,12 +154,12 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     [Browsable(false)]
     [Description("In diesem Pfad suchen verschiedene Routinen (Spalten Bilder, Layouts, etc.) nach zus‰tzlichen Dateien.")]
-    public string AdditionaFilesPfad {
-        get => _additionaFilesPfad;
+    public string AdditionalFilesPfad {
+        get => _additionalFilesPfad;
         set {
-            if (_additionaFilesPfad == value) { return; }
-            _additionaFilesPfadtmp = null;
-            ChangeData(DatabaseDataType.AdditionaFilesPath, null, null, _additionaFilesPfad, value, string.Empty);
+            if (_additionalFilesPfad == value) { return; }
+            _additionalFilesPfadtmp = null;
+            ChangeData(DatabaseDataType.AdditionalFilesPath, null, null, _additionalFilesPfad, value, string.Empty);
             Cell.InvalidateAllSizes();
         }
     }
@@ -409,12 +413,20 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// <summary>
     /// Sucht die Datenbank im Speicher. Wird sie nicht gefunden, wird sie geladen.
     /// </summary>
-    public static DatabaseAbstract? GetByID(ConnectionInfo? ci) {
+    public static DatabaseAbstract? GetByID(ConnectionInfo? ci, DatabaseAbstract.NeedPassword? needPassword) {
         if (ci is null) { return null; }
 
         foreach (var thisFile in AllFiles) {
-            if (string.Equals(thisFile.ConnectionData.UniqueID, ci.UniqueID, StringComparison.OrdinalIgnoreCase)) {
+            var d = thisFile.ConnectionData;
+
+            if (string.Equals(d.UniqueID, ci.UniqueID, StringComparison.OrdinalIgnoreCase)) {
                 return thisFile;
+            }
+
+            if (d.AdditionalData.ToLower().EndsWith(".mdb")) {
+                if (d.AdditionalData.Equals(ci.AdditionalData, StringComparison.OrdinalIgnoreCase)) {
+                    return thisFile; // Multiuser - nicht multiuser konflikt
+                }
             }
         }
 
@@ -426,7 +438,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
         if (FileExists(ci.AdditionalData)) {
             if (ci.AdditionalData.FileSuffix().ToLower() == "mdb") {
-                return new DatabaseMultiUser(ci.AdditionalData, false, false, ci.TableName);
+                return new Database(ci.AdditionalData, false, false, ci.TableName, needPassword);
             }
 
             //if (connectionID.FileSuffix().ToLower() == "mdf") {
@@ -515,7 +527,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                 if (FileExists(pf)) {
                     var ci = new ConnectionInfo(pf);
 
-                    var tmp = GetByID(ci);
+                    var tmp = GetByID(ci, null);
                     if (tmp != null) { return tmp; }
                     tmp = new DatabaseMultiUser(pf, false, false, pf.FileNameWithoutSuffix());
                     return tmp;
@@ -545,18 +557,18 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// Der komplette Pfad mit abschlieﬂenden \
     /// </summary>
     /// <returns></returns>
-    public virtual string AdditionaFilesPfadWhole() {
-        if (_additionaFilesPfadtmp != null) { return _additionaFilesPfadtmp; }
+    public virtual string AdditionalFilesPfadWhole() {
+        if (_additionalFilesPfadtmp != null) { return _additionalFilesPfadtmp; }
 
-        if (!string.IsNullOrEmpty(_additionaFilesPfad)) {
-            var t = _additionaFilesPfad.CheckPath();
+        if (!string.IsNullOrEmpty(_additionalFilesPfad)) {
+            var t = _additionalFilesPfad.CheckPath();
             if (DirectoryExists(t)) {
-                _additionaFilesPfadtmp = t;
+                _additionalFilesPfadtmp = t;
                 return t;
             }
         }
 
-        _additionaFilesPfadtmp = string.Empty;
+        _additionalFilesPfadtmp = string.Empty;
         return string.Empty;
     }
 
@@ -616,7 +628,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         if (cellDataToo) { Row.CloneFrom(sourceDatabase); }
 
         FirstColumn = sourceDatabase.FirstColumn;
-        AdditionaFilesPfad = sourceDatabase.AdditionaFilesPfad;
+        AdditionalFilesPfad = sourceDatabase.AdditionalFilesPfad;
         CachePfad = sourceDatabase.CachePfad; // Nicht so wichtig ;-)
         Caption = sourceDatabase.Caption;
         //TimeCode = sourceDatabase.TimeCode;
@@ -693,30 +705,30 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     public abstract ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists);
 
     /// <summary>
-    /// AdditionaFiles/Datenbankpfad mit Backup und abschlieﬂenden \
+    /// AdditionalFiles/Datenbankpfad mit Backup und abschlieﬂenden \
     /// </summary>
     /// <returns></returns>
     public string DefaultBackupPath() {
-        if (!string.IsNullOrEmpty(AdditionaFilesPfadWhole())) { return AdditionaFilesPfadWhole() + "Backup\\"; }
+        if (!string.IsNullOrEmpty(AdditionalFilesPfadWhole())) { return AdditionalFilesPfadWhole() + "Backup\\"; }
         //if (!string.IsNullOrEmpty(Filename)) { return Filename.FilePath() + "Forms\\"; }
         return string.Empty;
     }
 
     /// <summary>
-    /// AdditionaFiles/Datenbankpfad mit Forms und abschlieﬂenden \
+    /// AdditionalFiles/Datenbankpfad mit Forms und abschlieﬂenden \
     /// </summary>
     /// <returns></returns>
     public string DefaultFormulaPath() {
-        if (!string.IsNullOrEmpty(AdditionaFilesPfadWhole())) { return AdditionaFilesPfadWhole() + "Forms\\"; }
+        if (!string.IsNullOrEmpty(AdditionalFilesPfadWhole())) { return AdditionalFilesPfadWhole() + "Forms\\"; }
         //if (!string.IsNullOrEmpty(Filename)) { return Filename.FilePath() + "Forms\\"; }
         return string.Empty;
     }
 
     /// <summary>
-    /// AdditionaFiles/Datenbankpfad mit Layouts und abschlieﬂenden \
+    /// AdditionalFiles/Datenbankpfad mit Layouts und abschlieﬂenden \
     /// </summary>
     public string DefaultLayoutPath() {
-        if (!string.IsNullOrEmpty(AdditionaFilesPfadWhole())) { return AdditionaFilesPfadWhole() + "Layouts\\"; }
+        if (!string.IsNullOrEmpty(AdditionalFilesPfadWhole())) { return AdditionalFilesPfadWhole() + "Layouts\\"; }
         //if (!string.IsNullOrEmpty(Filename)) { return Filename.FilePath() + "Layouts\\"; }
         return string.Empty;
     }
@@ -922,7 +934,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// <returns></returns>
     public string? FormulaFileName() {
         if (FileExists(_standardFormulaFile)) { return _standardFormulaFile; }
-        if (FileExists(AdditionaFilesPfadWhole() + _standardFormulaFile)) { return AdditionaFilesPfadWhole() + _standardFormulaFile; }
+        if (FileExists(AdditionalFilesPfadWhole() + _standardFormulaFile)) { return AdditionalFilesPfadWhole() + _standardFormulaFile; }
         if (FileExists(DefaultFormulaPath() + _standardFormulaFile)) { return DefaultFormulaPath() + _standardFormulaFile; }
         return null;
     }
@@ -945,7 +957,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
         x.Provider = null;  // KEINE Vorage mitgeben, weil sonst eine Endlosschleife aufgerufen wird!
 
-        return GetByID(x);// new DatabaseSQL(_sql, readOnly, tablename);
+        return GetByID(x, null);// new DatabaseSQL(_sql, readOnly, tablename);
     }
 
     public string Import(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart, bool dorowautmatic, string script) {
@@ -1231,11 +1243,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         GenerateLayoutInternal?.Invoke(this, e);
     }
 
-    internal void OnNeedPassword(PasswordEventArgs e) {
-        if (IsDisposed) { return; }
-        NeedPassword?.Invoke(this, e);
-    }
-
     internal void OnProgressbarInfo(ProgressbarEventArgs e) {
         if (IsDisposed) { return; }
         ProgressbarInfo?.Invoke(this, e);
@@ -1373,8 +1380,8 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                 _globalScale = DoubleParse(value);
                 break;
 
-            case DatabaseDataType.AdditionaFilesPath:
-                _additionaFilesPfad = value;
+            case DatabaseDataType.AdditionalFilesPath:
+                _additionalFilesPfad = value;
                 break;
 
             case DatabaseDataType.FirstColumn:
@@ -1537,7 +1544,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         LoadedVersion = DatabaseVersion;
         _rulesScript = string.Empty;
         _globalScale = 1f;
-        _additionaFilesPfad = "AdditionalFiles";
+        _additionalFilesPfad = "AdditionalFiles";
         _firstColumn = string.Empty;
         _zeilenQuickInfo = string.Empty;
         _sortDefinition = null;
@@ -1726,12 +1733,12 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             if (e.Done) { return; }
             e.Done = true;
 
-            if (string.IsNullOrWhiteSpace(AdditionaFilesPfadWhole())) { return; }
+            if (string.IsNullOrWhiteSpace(AdditionalFilesPfadWhole())) { return; }
 
             var name = e.Name.RemoveChars(Constants.Char_DateiSonderZeichen);
             var hashname = name.GetHashString();
 
-            var fullname = AdditionaFilesPfadWhole() + name + ".png";
+            var fullname = AdditionalFilesPfadWhole() + name + ".png";
             var fullhashname = CachePfad.TrimEnd("\\") + "\\" + hashname;
 
             if (!string.IsNullOrWhiteSpace(CachePfad)) {

@@ -42,19 +42,33 @@ public class ConnectionInfo : IReadableText {
     /// </summary>
     /// <param name="uniqueID"></param>
     public ConnectionInfo(string uniqueID) {
-        if (uniqueID.Substring(1, 1) == ":" && uniqueID.FileSuffix().ToUpper() == "MDB" &&
+        var alf = new List<DatabaseAbstract>();// könnte sich ändern, deswegen Zwischenspeichern
+        alf.AddRange(DatabaseAbstract.AllFiles);
+
+        if (uniqueID.Substring(1, 1) == ":" &&
+            uniqueID.FileSuffix().ToUpper() == "MDB" &&
             System.IO.File.Exists(uniqueID)) {
+            foreach (var thisDB in alf) {
+                var d = thisDB.ConnectionData;
+
+                if (d.UniqueID.ToUpper().EndsWith(uniqueID.ToUpper())) {
+                    TableName = d.TableName;
+                    Provider = d.Provider;
+                    DatabaseID = d.DatabaseID;
+                    AdditionalData = d.AdditionalData;
+                    return;
+                }
+            }
+
             TableName = SQLBackAbstract.MakeValidTableName(uniqueID.FileNameWithoutSuffix());
             Provider = null;
-            DatabaseID = DatabaseMultiUser.DatabaseID;
+            DatabaseID = DatabaseMultiUser.DatabaseId;
             AdditionalData = uniqueID;
+
             return;
         }
 
         var x = (uniqueID + "||||").SplitBy("|");
-
-        var alf = new List<DatabaseAbstract>();// könnte sich ändern, deswegen Zwischenspeichern
-        alf.AddRange(DatabaseAbstract.AllFiles);
 
         foreach (var thisDB in alf) {
             var d = thisDB.ConnectionData;
@@ -67,24 +81,24 @@ public class ConnectionInfo : IReadableText {
                 return;
             }
 
-            if (d.DatabaseID == Database.DatabaseID) {
+            if (d.DatabaseID == Database.DatabaseId) {
                 // Dateisystem
                 var dn = d.AdditionalData.FilePath() + x[0] + ".mdb";
                 if (System.IO.File.Exists(dn)) {
                     TableName = x[0].ToUpper();
                     Provider = thisDB;
-                    DatabaseID = Database.DatabaseID;
+                    DatabaseID = Database.DatabaseId;
                     AdditionalData = dn;
                 }
             }
 
-            if (d.DatabaseID == DatabaseMultiUser.DatabaseID) {
+            if (d.DatabaseID == DatabaseMultiUser.DatabaseId) {
                 // Dateisystem
                 var dn = d.AdditionalData.FilePath() + x[0] + ".mdb";
                 if (System.IO.File.Exists(dn)) {
                     TableName = x[0].ToUpper();
                     Provider = thisDB;
-                    DatabaseID = DatabaseMultiUser.DatabaseID;
+                    DatabaseID = DatabaseMultiUser.DatabaseId;
                     AdditionalData = dn;
                 }
             }
@@ -106,7 +120,7 @@ public class ConnectionInfo : IReadableText {
         TableName = tablename.ToUpper();
         Provider = provider;
         DatabaseID = connectionString;
-        AdditionalData = additionalInfo;
+        AdditionalData = additionalInfo ?? string.Empty;
     }
 
     #endregion

@@ -136,7 +136,6 @@
     <Compile Include="EventArgs\CellExtEventArgs.cs" />
     <Compile Include="EventArgs\MessageEventArgs.cs" />
     <Compile Include="EventArgs\GenerateLayoutInternalEventArgs.cs" />
-    <Compile Include="EventArgs\PasswordEventArgs.cs" />
     <Compile Include="EventArgs\CellEventArgs.cs" />
     <Compile Include="EventArgs\DoRowAutomaticEventArgs.cs" />
     <Compile Include="EventArgs\FilterEventArgs.cs" />

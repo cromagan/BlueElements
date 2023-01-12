@@ -382,11 +382,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    public static void Database_NeedPassword(object sender, PasswordEventArgs e) {
-        if (e.Handled) { return; }
-        e.Handled = true;
-        e.Password = InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Datenbank<br>zu erhalten:", string.Empty, VarType.Text);
-    }
+    public static string Database_NeedPassword() => InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Datenbank<br>zu erhalten:", string.Empty, VarType.Text);
 
     public static void DoUndo(ColumnItem? column, RowItem? row) {
         if (column == null) { return; }
@@ -1664,7 +1660,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private static void AllFiles_ItemAdded(object sender, ListEventArgs e) {
         if (e.Item is DatabaseAbstract db) {
-            db.NeedPassword += Database_NeedPassword;
             db.GenerateLayoutInternal += DB_GenerateLayoutInternal;
             db.Loaded += TableView.CheckDatabase;
         }
@@ -1672,7 +1667,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private static void AllFiles_ItemRemoving(object sender, ListEventArgs e) {
         if (e.Item is DatabaseAbstract db) {
-            db.NeedPassword -= Database_NeedPassword;
             db.GenerateLayoutInternal -= DB_GenerateLayoutInternal;
             db.Loaded -= TableView.CheckDatabase;
         }

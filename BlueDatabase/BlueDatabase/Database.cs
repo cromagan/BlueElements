@@ -29,6 +29,7 @@ using static BlueBasics.Converter;
 using BlueBasics.MultiUserFile;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
+using static BlueDatabase.DatabaseAbstract;
 
 namespace BlueDatabase;
 
@@ -44,45 +45,38 @@ public sealed class Database : DatabaseAbstract {
 
     #region Constructors
 
-    public Database(Stream stream, string tablename) : this(stream, string.Empty, true, false, tablename) { }
+    public Database(Stream stream, string tablename) : this(stream, string.Empty, true, false, tablename, null) { }
 
-    public Database(bool readOnly, string tablename) : this(null, string.Empty, readOnly, true, tablename) { }
+    public Database(bool readOnly, string tablename) : this(null, string.Empty, readOnly, true, tablename, null) { }
 
-    public Database(string filename, bool readOnly, bool create, string tablename) : this(null, filename, readOnly, create, tablename) { }
+    public Database(string filename, bool readOnly, bool create, string tablename, NeedPassword? needPassword) : this(null, filename, readOnly, create, tablename, needPassword) { }
 
-    private Database(Stream? stream, string filename, bool readOnly, bool create, string tablename) : base(tablename, readOnly) {
-        //_muf.Loaded += OnLoaded;
-        //_muf.Loading += OnLoading;
-        //_muf.SavedToDisk += OnSavedToDisk;
-        //_muf.DiscardPendingChanges += DiscardPendingChanges;
-        //_muf.HasPendingChanges += HasPendingChanges;
-        //_muf.ParseExternal += Parse;
-        //_muf.ToListOfByte += ToListOfByte;
-
+    private Database(Stream? stream, string filename, bool readOnly, bool create, string tablename, NeedPassword? needPassword) : base(tablename, readOnly) {
         Develop.StartService();
 
         Works = new ListExt<WorkItem>();
 
         Initialize();
 
+        // Muss vor dem Laden zu Allfiles hinzugfügt werde, weil das bei OnAdded
+        // Die Events registriert werden, um z.B: das Passwort abzufragen
+        AllFiles.Add(this);
+
         if (!string.IsNullOrEmpty(filename)) {
             //DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + filename.FileNameWithoutSuffix()));
-            LoadFromFile(filename, create);
+            LoadFromFile(filename, create, needPassword);
         } else if (stream != null) {
             LoadFromStream(stream);
         }
-
-        AllFiles.Add(this);
-        //RepairAfterParse();
     }
 
     #endregion
 
     #region Properties
 
-    public static string DatabaseID => "BlueDatabase";
+    public static string DatabaseId => "BlueDatabase";
 
-    public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseID, Filename);
+    public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename);
     public string Filename { get; set; } = string.Empty;
 
     #endregion
@@ -207,7 +201,7 @@ public sealed class Database : DatabaseAbstract {
         }
     }
 
-    public static void Parse(byte[] data, DatabaseAbstract db, ListExt<WorkItem>? Works) {
+    public static void Parse(byte[] data, DatabaseAbstract db, ListExt<WorkItem>? works, NeedPassword? needPassword) {
         db.Column.ThrowEvents = false;
         db.Row.ThrowEvents = false;
         var pointer = 0;
@@ -229,7 +223,7 @@ public sealed class Database : DatabaseAbstract {
         #region Pendings merken und Variable leeren
 
         //var oldPendings = Works?.Where(thisWork => thisWork.State == ItemState.Pending).ToList();
-        Works?.Clear();
+        works?.Clear();
 
         #endregion
 
@@ -290,10 +284,14 @@ public sealed class Database : DatabaseAbstract {
                 #region Bei verschlüsselten Datenbanken das Passwort abfragen
 
                 if (art == DatabaseDataType.GlobalShowPass && !string.IsNullOrEmpty(inhalt)) {
-                    PasswordEventArgs e2 = new();
-                    db.OnNeedPassword(e2);
+                    var pwd = string.Empty;
+
+                    if (needPassword != null) { pwd = needPassword(); }
+
+                    //PasswordEventArgs e2 = new();
+                    //db.OnNeedPassword(e2);
                     //b = Cryptography.SimpleCrypt(b, e2.Password, -1, pointer, b.Length - 1);
-                    if (e2.Password != inhalt) {
+                    if (pwd != inhalt) {
                         db.SetReadOnly();
                         //MessageBox.Show("Zugriff verweigrt, Passwort falsch!", ImageCode.Kritisch, "OK");
                         break;
@@ -321,12 +319,14 @@ public sealed class Database : DatabaseAbstract {
         db.Column.ThrowEvents = true;
         db.Row.ThrowEvents = true;
 
-        db.FirstColumn = db.Column[0].Name;
+        if (db != null && db.Column.Count > 0) {
+            db.FirstColumn = db.Column[0].Name;
+        }
 
         if (IntParse(db.LoadedVersion.Replace(".", "")) > IntParse(DatabaseVersion.Replace(".", ""))) { db.SetReadOnly(); }
     }
 
-    public static List<byte> ToListOfByte(DatabaseAbstract db, ListExt<WorkItem>? Works) {
+    public static List<byte> ToListOfByte(DatabaseAbstract db, ListExt<WorkItem>? works) {
         try {
             List<byte> l = new();
             // Wichtig, Reihenfolge und Länge NIE verändern!
@@ -357,7 +357,7 @@ public sealed class Database : DatabaseAbstract {
             SaveToByteList(l, DatabaseDataType.RulesScript, db.RulesScript);
             //SaveToByteList(l, enDatabaseDataType.BinaryDataInOne, Bins.ToString(true));
             //SaveToByteList(l, enDatabaseDataType.FilterImagePfad, _filterImagePfad);
-            SaveToByteList(l, DatabaseDataType.AdditionaFilesPath, db.AdditionaFilesPfad);
+            SaveToByteList(l, DatabaseDataType.AdditionalFilesPath, db.AdditionalFilesPfad);
             SaveToByteList(l, DatabaseDataType.FirstColumn, db.FirstColumn);
             SaveToByteList(l, DatabaseDataType.RowQuickInfo, db.ZeilenQuickInfo);
             SaveToByteList(l, DatabaseDataType.StandardFormulaFile, db.StandardFormulaFile);
@@ -378,8 +378,8 @@ public sealed class Database : DatabaseAbstract {
             // erfolgreichen Speichervorgang der Datenbank-String erstellt wird.
             // Status des Work-Items ist egal, da es beim LADEN automatisch auf 'Undo' gesetzt wird.
             List<string> works2 = new();
-            if (Works != null) {
-                foreach (var thisWorkItem in Works) {
+            if (works != null) {
+                foreach (var thisWorkItem in works) {
                     if (thisWorkItem != null) {
                         if (thisWorkItem.Comand != DatabaseDataType.Value_withoutSizeData) {
                             works2.Add(thisWorkItem.ToString());
@@ -398,17 +398,17 @@ public sealed class Database : DatabaseAbstract {
             SaveToByteList(l, DatabaseDataType.EOF, "END");
             return l;
         } catch {
-            return ToListOfByte(db, Works);
+            return ToListOfByte(db, works);
         }
     }
 
-    public static string UndoText(ColumnItem? column, RowItem? row, ListExt<WorkItem>? Works) {
-        if (Works == null || Works.Count == 0) { return string.Empty; }
+    public static string UndoText(ColumnItem? column, RowItem? row, ListExt<WorkItem>? works) {
+        if (works == null || works.Count == 0) { return string.Empty; }
         var cellKey = CellCollection.KeyOfCell(column, row);
         var t = "";
-        for (var z = Works.Count - 1; z >= 0; z--) {
-            if (Works[z] != null && Works[z].CellKey == cellKey) {
-                t = t + Works[z].UndoTextTableMouseOver() + "<br>";
+        for (var z = works.Count - 1; z >= 0; z--) {
+            if (works[z] != null && works[z].CellKey == cellKey) {
+                t = t + works[z].UndoTextTableMouseOver() + "<br>";
             }
         }
         t = t.Trim("<br>");
@@ -418,18 +418,18 @@ public sealed class Database : DatabaseAbstract {
         return t;
     }
 
-    public override string AdditionaFilesPfadWhole() {
-        var x = base.AdditionaFilesPfadWhole();
+    public override string AdditionalFilesPfadWhole() {
+        var x = base.AdditionalFilesPfadWhole();
         if (!string.IsNullOrEmpty(x)) { return x; }
 
         if (!string.IsNullOrEmpty(Filename)) {
-            var t = (Filename.FilePath() + "AdditionaFiles\\").CheckPath();
+            var t = (Filename.FilePath() + "AdditionalFiles\\").CheckPath();
             if (DirectoryExists(t)) {
-                _additionaFilesPfadtmp = t;
+                _additionalFilesPfadtmp = t;
                 return t;
             }
         }
-        _additionaFilesPfadtmp = string.Empty;
+        _additionalFilesPfadtmp = string.Empty;
         return string.Empty;
     }
 
@@ -448,8 +448,8 @@ public sealed class Database : DatabaseAbstract {
         }
 
         if (ignorePath != null) {
-            foreach (var thisPF in ignorePath) {
-                if (Filename.FilePath().StartsWith(thisPF, StringComparison.OrdinalIgnoreCase)) { return null; }
+            foreach (var thisPf in ignorePath) {
+                if (Filename.FilePath().StartsWith(thisPf, StringComparison.OrdinalIgnoreCase)) { return null; }
             }
         }
 
@@ -493,7 +493,7 @@ public sealed class Database : DatabaseAbstract {
         return true;
     }
 
-    public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting) {
+    public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword) {
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(FehlerArt.Fehler, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
         if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(FehlerArt.Fehler, "Dateiname nicht angegeben!"); }
@@ -524,7 +524,7 @@ public sealed class Database : DatabaseAbstract {
         var bLoaded = LoadBytesFromDisk(BlueBasics.Enums.ErrorReason.Load);
         if (bLoaded == null) { return; }
 
-        Database.Parse(bLoaded, this, Works);
+        Database.Parse(bLoaded, this, Works, needPassword);
 
         RepairAfterParse();
         OnLoaded();
@@ -544,7 +544,7 @@ public sealed class Database : DatabaseAbstract {
             bLoaded = MultiUserFile.UnzipIt(bLoaded);
         }
 
-        Database.Parse(bLoaded, this, Works);
+        Database.Parse(bLoaded, this, Works, null);
 
         RepairAfterParse();
         OnLoaded();

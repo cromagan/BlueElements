@@ -28,6 +28,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using static BlueBasics.Converter;
+using static BlueBasics.IO;
 
 namespace BlueDatabase;
 
@@ -77,9 +78,9 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
     #region Properties
 
-    public static string DatabaseID { get => "BlueDatabaseMultiUser"; }
+    public static string DatabaseId => "BlueDatabaseMultiUser";
 
-    public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseID, Filename);
+    public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename);
 
     public string Filename => _muf?.Filename ?? string.Empty;
 
@@ -90,6 +91,21 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
     #endregion
 
     #region Methods
+
+    public override string AdditionalFilesPfadWhole() {
+        var x = base.AdditionalFilesPfadWhole();
+        if (!string.IsNullOrEmpty(x)) { return x; }
+
+        if (!string.IsNullOrEmpty(Filename)) {
+            var t = (Filename.FilePath() + "AdditionalFiles\\").CheckPath();
+            if (DirectoryExists(t)) {
+                _additionalFilesPfadtmp = t;
+                return t;
+            }
+        }
+        _additionalFilesPfadtmp = string.Empty;
+        return string.Empty;
+    }
 
     public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked, List<string>? ignorePath) {
         if (string.IsNullOrWhiteSpace(Filename)) { return null; } // Stream-Datenbank
@@ -106,8 +122,8 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         }
 
         if (ignorePath != null) {
-            foreach (var thisPF in ignorePath) {
-                if (Filename.FilePath().StartsWith(thisPF, StringComparison.OrdinalIgnoreCase)) { return null; }
+            foreach (var thisPf in ignorePath) {
+                if (Filename.FilePath().StartsWith(thisPf, StringComparison.OrdinalIgnoreCase)) { return null; }
             }
         }
 
@@ -134,7 +150,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
     public void Load_Reload() => _muf?.Load_Reload();
 
     public void Parse(object sender, MultiUserParseEventArgs e) {
-        Database.Parse(e.Data, this, Works);
+        Database.Parse(e.Data, this, Works, null);
         ExecutePending();
     }
 

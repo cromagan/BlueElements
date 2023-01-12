@@ -76,9 +76,9 @@ public abstract class SQLBackAbstract {
     public abstract int MaxStringLenght { get; }
     public abstract string Primary { get; }
 
-    public string VarChar15 { get => VarChar(15); }
-    public string VarChar255 { get => VarChar(255); }
-    public string VarChar4000 { get => VarChar(4000); }
+    public string VarChar15 => VarChar(15);
+    public string VarChar255 => VarChar(255);
+    public string VarChar4000 => VarChar(4000);
 
     #endregion
 
@@ -175,9 +175,7 @@ public abstract class SQLBackAbstract {
     /// </summary>
     /// <param name="tablename"></param>
     /// <returns></returns>
-    public ConnectionInfo ConnectionData(string tablename) {
-        return new ConnectionInfo(tablename, null, ConnectionString, string.Empty);
-    }
+    public ConnectionInfo ConnectionData(string tablename) => new ConnectionInfo(tablename, null, ConnectionString, string.Empty);
 
     /// <summary>
     /// Datentabelle befüllen

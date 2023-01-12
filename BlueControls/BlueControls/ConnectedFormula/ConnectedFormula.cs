@@ -276,7 +276,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
         if (_saving || _muf.IsLoading) { return; }
 
         foreach (var thisfile in DatabaseFiles) {
-            DatabaseAbstract.GetByID(new ConnectionInfo(thisfile));
+            DatabaseAbstract.GetByID(new ConnectionInfo(thisfile), null);
         }
 
         _saved = false;

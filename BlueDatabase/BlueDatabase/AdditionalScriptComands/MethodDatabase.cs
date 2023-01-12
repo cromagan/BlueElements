@@ -32,7 +32,7 @@ public abstract class MethodDatabase : Method {
     protected DatabaseAbstract? DatabaseOf(Script s, string tableName) {
         if (s.Variables != null) {
             var db = MyDatabase(s)?.ConnectionDataOfOtherTable(tableName, false);
-            return DatabaseAbstract.GetByID(db);
+            return DatabaseAbstract.GetByID(db, null);
         }
 
         return null;

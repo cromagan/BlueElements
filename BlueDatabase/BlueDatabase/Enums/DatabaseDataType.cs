@@ -137,7 +137,7 @@ public enum DatabaseDataType : byte {
 
     RowQuickInfo = 66,
     RulesScript = 67,
-    AdditionaFilesPath = 68,
+    AdditionalFilesPath = 68,
     StandardFormulaFile = 69,
     FirstColumn = 70,
 

@@ -186,8 +186,8 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
 
     private void btnLayoutVerzeichnis_Click(object sender, System.EventArgs e) {
         if (Database == null) { return; }
-        if (!string.IsNullOrEmpty(Database.AdditionaFilesPfadWhole())) {
-            ExecuteFile(Database.AdditionaFilesPfadWhole());
+        if (!string.IsNullOrEmpty(Database.AdditionalFilesPfadWhole())) {
+            ExecuteFile(Database.AdditionalFilesPfadWhole());
         }
         ExecuteFile(Database.DefaultLayoutPath());
     }

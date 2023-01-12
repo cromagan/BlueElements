@@ -547,8 +547,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
             vars.Add(new VariableBool("Administrator", Database.IsAdministrator(), true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
             vars.Add(new VariableDatabase("Database", Database, true, true, string.Empty));
 
-            if (!string.IsNullOrEmpty(Database.AdditionaFilesPfadWhole())) {
-                vars.Add(new VariableString("AdditionaFilesPfad", Database.AdditionaFilesPfadWhole(), true, false, "Der Dateipfad der Datenbank, in dem zusäzliche Daten gespeichert werden."));
+            if (!string.IsNullOrEmpty(Database.AdditionalFilesPfadWhole())) {
+                vars.Add(new VariableString("AdditionalFilesPfad", Database.AdditionalFilesPfadWhole(), true, false, "Der Dateipfad der Datenbank, in dem zusäzliche Daten gespeichert werden."));
             }
             //vars.GenerateAndAdd(new VariableString("DatabasePath", Database.Filename2.FilePath(), true, false, "Der Dateipfad der Datenbank."));
 
@@ -556,7 +556,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
 
             #region Script ausführen
 
-            Script sc = new(vars, Database.AdditionaFilesPfadWhole(), startRoutine.Equals("script testing", StringComparison.OrdinalIgnoreCase)) {
+            Script sc = new(vars, Database.AdditionalFilesPfadWhole(), startRoutine.Equals("script testing", StringComparison.OrdinalIgnoreCase)) {
                 ScriptText = Database.RulesScript
             };
             sc.Parse();
