@@ -395,7 +395,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
             var cellKey = KeyOfCell(column, row);
 
-            if (!column.IsInCache) {
+            if (column.IsInCache == null) {
                 _database.RefreshRowData(row, false);
             }
 

@@ -504,6 +504,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
             var l = SearchByKey(thisRow.Key) ?? GenerateAndAdd(thisRow.Key, string.Empty, false, false, "Clone - Zeile fehlt");
             l.CloneFrom(thisRow, true);
         }
+
+        if (sourceDatabase.Row.Count != Count) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Clone Fehlgeschlagen");
+        }
     }
 
     //        default:

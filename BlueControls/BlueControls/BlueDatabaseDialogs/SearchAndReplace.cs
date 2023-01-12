@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -60,7 +62,7 @@ internal sealed partial class SearchAndReplace : Form {
 
     private void Checkbuttons() {
         var canDo = true;
-        if (_blueTable == null) { return; }
+        if (_blueTable?.Database == null) { return; }
         if (!_blueTable.Database.IsAdministrator()) { canDo = false; }
         if (SucheNach.Checked) {
             if (string.IsNullOrEmpty(Alt.Text)) { canDo = false; }

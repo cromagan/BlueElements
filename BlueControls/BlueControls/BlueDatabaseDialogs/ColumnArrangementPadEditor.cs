@@ -123,7 +123,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         }
 
         var car = Database.ColumnArrangements.CloneWithClones();
-        car.RemoveAt(Arrangement);
+        //car.RemoveAt(Arrangement);
 
         if (car.Count < 1) {
             car.Add(new ColumnViewCollection(Database, "", ""));
@@ -140,8 +140,14 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         }
 
         Database.ColumnArrangements = car;
+        Arrangement = car.Count - 1;
         UpdateCombobox();
+
+
+
         ShowOrder();
+
+
     }
 
     private void btnNeueSpalte_Click(object sender, System.EventArgs e) {

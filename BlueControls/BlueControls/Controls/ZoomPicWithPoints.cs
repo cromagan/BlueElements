@@ -41,18 +41,11 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
     public string Feedback = string.Empty;
 
-    public List<string>? Tags = new();
-
     private static readonly Brush BrushRotTransp = new SolidBrush(Color.FromArgb(200, 255, 0, 0));
-
     private static readonly Pen PenRotTransp = new(Color.FromArgb(200, 255, 0, 0));
-
     private readonly List<PointM?> _points = new();
-
     private Helpers _helper = Helpers.Ohne;
-
     private BlueBasics.Enums.Orientation _mittelLinie = BlueBasics.Enums.Orientation.Ohne;
-
     private bool _pointAdding;
 
     #endregion
@@ -86,6 +79,8 @@ public partial class ZoomPicWithPoints : ZoomPic {
             Invalidate();
         }
     }
+
+    public List<string> Tags { get; } = new();
 
     #endregion
 
@@ -155,7 +150,8 @@ public partial class ZoomPicWithPoints : ZoomPic {
     public void LoadData(string pathOfPicture) {
         var (bitmap, list) = LoadFromDisk(pathOfPicture);
         Bmp = bitmap;
-        Tags = list;
+        Tags.Clear();
+        Tags.AddRange(list);
         GeneratePointsFromTags();
         Invalidate();
     }

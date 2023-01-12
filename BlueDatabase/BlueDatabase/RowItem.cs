@@ -38,6 +38,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
 
     #region Fields
 
+    public DateTime? IsInCache = null;
     private string? _tmpQuickInfo;
 
     #endregion
@@ -85,7 +86,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
 
     public DatabaseAbstract? Database { get; private set; }
     public bool IsDisposed { get; private set; }
-    public bool IsInCache { get; set; }
     public long Key { get; private set; }
 
     public string QuickInfo {

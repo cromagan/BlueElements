@@ -250,7 +250,7 @@ public sealed class Database : DatabaseAbstract {
                         //row = Row.GenerateAndAdd(rowKey, string.Empty, false, false);
                         db.Row.SetValueInternal(DatabaseDataType.Comand_AddRow, rowKey, true);
                         row = db.Row.SearchByKey(rowKey);
-                        row.IsInCache = true;
+                        row.IsInCache = DateTime.UtcNow;
                     }
                 }
 
@@ -279,7 +279,7 @@ public sealed class Database : DatabaseAbstract {
                             }
                             db.Column.SetValueInternal(DatabaseDataType.Comand_AddColumn, colKey, true);
                             column = db.Column.SearchByKey(colKey);
-                            column.IsInCache = true;
+                            column.IsInCache = DateTime.UtcNow;
                             //column = Column.GenerateAndAdd(colKey);
                         }
                     }
@@ -555,7 +555,7 @@ public sealed class Database : DatabaseAbstract {
         if (columns == null || columns.Count == 0) { return; }
 
         foreach (var thisrow in columns) {
-            thisrow.IsInCache = true;
+            thisrow.IsInCache = DateTime.UtcNow;
         }
     }
 
@@ -563,7 +563,7 @@ public sealed class Database : DatabaseAbstract {
         if (row == null || row.Count == 0) { return false; }
 
         foreach (var thisrow in row) {
-            thisrow.IsInCache = true;
+            thisrow.IsInCache = DateTime.UtcNow;
         }
 
         return false;

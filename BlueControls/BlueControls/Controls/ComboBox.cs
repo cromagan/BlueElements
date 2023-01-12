@@ -65,7 +65,6 @@ public partial class ComboBox : TextBox, ITranslateable {
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         MouseHighlight = true;
         SetStyle(System.Windows.Forms.ControlStyles.ContainerControl, true);
-        Item = new ItemCollectionList(BlueListBoxAppearance.DropdownSelectbox);
         Item.ItemAdded += _Item_ItemAdded;
         Item.ItemCheckedChanged += _Item_ItemCheckedChanged;
         Item.ItemRemoved += _Item_ItemRemoved;
@@ -124,7 +123,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
     }
 
-    public ItemCollectionList? Item { get; }
+    public ItemCollectionList Item { get; } = new ItemCollectionList(BlueListBoxAppearance.DropdownSelectbox);
 
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;

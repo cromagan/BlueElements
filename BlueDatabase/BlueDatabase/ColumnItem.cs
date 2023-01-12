@@ -40,7 +40,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
     public static readonly string TmpNewDummy = "TMPNEWDUMMY";
     public int _unsavedContentWidth = -1;
-    public bool IsInCache = false;
+    public DateTime? IsInCache = null;
 
     //public string _timecode;
     public bool? TmpAutoFilterSinnvoll = null;
@@ -785,15 +785,20 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             value = value.ToUpper();
             if (value == _name.ToUpper()) { return; }
 
-            if (Database?.Column.Exists(value) != null) {
-                Develop.DebugPrint(FehlerArt.Warnung, "Name existiert bereits!");
+            if (!ColumNameAllowed(value)) {
+                Develop.DebugPrint(FehlerArt.Warnung, "Spaltenname nicht erlaubt: " + _name);
                 return;
             }
 
-            if (!IsValidColumnName(value)) {
-                Develop.DebugPrint(FehlerArt.Warnung, "Spaltenname nicht erlaubt!");
-                return;
-            }
+            //if (Database?.Column.Exists(value) != null) {
+            //    Develop.DebugPrint(FehlerArt.Warnung, "Name existiert bereits!");
+            //    return;
+            //}
+
+            //if (!IsValidColumnName(value)) {
+            //    Develop.DebugPrint(FehlerArt.Warnung, "Spaltenname nicht erlaubt!");
+            //    return;
+            //}
 
             Database?.ChangeData(DatabaseDataType.ColumnName, Key, null, _name, value, string.Empty);
             Database?.RepairColumnArrangements();
@@ -1204,6 +1209,15 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         ConstantHeightOfImageCode = source.ConstantHeightOfImageCode;
         //BestFile_StandardSuffix = source.BestFile_StandardSuffix;
         //BestFile_StandardFolder = source.BestFile_StandardFolder;
+    }
+
+    public bool ColumNameAllowed(string nameToTest) {
+        if (!IsValidColumnName(nameToTest)) { return false; }
+
+        if (nameToTest == _name.ToUpper()) { return true; }
+        if (Database?.Column.Exists(nameToTest) != null) { return false; }
+
+        return true;
     }
 
     public string CompareKey() {
@@ -1660,7 +1674,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     }
 
     public void RefreshColumnsData() {
-        if (IsInCache) { return; }
+        if (IsInCache != null) { return; }
         if (Database == null || Database.IsDisposed) { return; }
         if (Name == TmpNewDummy) { Develop.DebugPrint("TMPNEWDUMMY kann nicht geladen werden"); return; }
 

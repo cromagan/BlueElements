@@ -81,9 +81,13 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     private ListExt<ExportDefinition?> _export = new();
 
     private string _firstColumn;
+
     private double _globalScale;
+
     private string _globalShowPass = string.Empty;
+
     private DateTime _lastUserActionUtc = new(1900, 1, 1);
+
     private string _rulesScript = string.Empty;
 
     private RowSortDefinition? _sortDefinition;
@@ -249,7 +253,13 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     }
 
     public bool HasPendingChanges { get; protected set; } = false;
+
     public bool IsDisposed { get; private set; }
+
+    /// <summary>
+    /// Letzter Lade-Stand der Daten. Wird in OnLoaded gesetzt
+    /// </summary>
+    public DateTime? IsInCache { get; private set; } = null;
 
     public LayoutCollection Layouts {
         get => _layouts;
@@ -636,12 +646,11 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         foreach (var t in sourceDatabase.ColumnArrangements) {
             tcvc.Add(new ColumnViewCollection(this, t.ToString()));
         }
+        ColumnArrangements = tcvc;
 
         Export = sourceDatabase.Export;
 
         UndoCount = sourceDatabase.UndoCount;
-
-        ColumnArrangements = tcvc;
     }
 
     public string Column_UsedIn(ColumnItem? column) {
@@ -727,6 +736,9 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         //if (mode.HasFlag(BlueBasics.Enums.ErrorReason.Load)) {
         //    if (_backgroundWorker.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell das Neuladen."; }
         //}
+
+        if (ReadOnly) { return "Datenbank schreibgeschützt!"; }
+
         if (mode.HasFlag(BlueBasics.Enums.ErrorReason.EditGeneral) || mode.HasFlag(BlueBasics.Enums.ErrorReason.Save)) {
             if (_backgroundWorker.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
         }
@@ -1145,7 +1157,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     }
 
     public void RefreshColumnsData(ColumnItem column) {
-        if (column.IsInCache) { return; }
+        if (column.IsInCache != null) { return; }
         RefreshColumnsData(new List<ColumnItem>() { column });
     }
 
@@ -1156,7 +1168,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             var c = new ListExt<ColumnItem>();
 
             foreach (var thisF in filter) {
-                if (thisF.Column != null && !thisF.Column.IsInCache) {
+                if (thisF.Column != null && thisF.Column.IsInCache == null) {
                     c.AddIfNotExists(thisF.Column);
                 }
             }
@@ -1184,6 +1196,8 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         RepairColumnArrangements();
         RepairViews();
         _layouts.Check();
+
+        IsInCache = DateTime.UtcNow;
     }
 
     public abstract bool Save();
@@ -1536,6 +1550,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     protected void OnLoaded() {
         if (IsDisposed) { return; }
+        IsInCache = DateTime.UtcNow;
         Loaded?.Invoke(this, System.EventArgs.Empty);
     }
 

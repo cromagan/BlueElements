@@ -364,7 +364,7 @@ public abstract class SQLBackAbstract {
                         r.Database.Cell.SetValueInternal(r.Database.Column[z - 1].Key, r.Key, reader[z].ToString(), -1, -1, true);
                     }
 
-                    r.IsInCache = true;
+                    r.IsInCache = DateTime.UtcNow;
                     //if (!r.RowInChache()) {
                     //    Develop.DebugPrint(FehlerArt.Warnung, "Zeile ohne Zeitstempel, repariert! + " + com);
                     //    r.CellSet(r.Database.Column.SysRowChangeDate, DateTime.UtcNow.ToString(Constants.Format_Date5));
@@ -677,14 +677,14 @@ public abstract class SQLBackAbstract {
     /// <param name="fromDate"></param>
     /// <param name="toDate"></param>
     /// <returns>Gibt NULL zurück, wenn die Daten nicht geladen werden konnten</returns>
-    internal List<(string tablename, string comand, string columnkey, string rowkey)>? GetLastChanges(List<DatabaseSQLLite> db, DateTime fromDate, DateTime toDate) {
+    internal List<(string tablename, string comand, string columnkey, string rowkey, DateTime timecode)>? GetLastChanges(List<DatabaseSQLLite> db, DateTime fromDate, DateTime toDate) {
         if (!OpenConnection()) { return null; }
 
         try {
             lock (getChanges) {
                 //using var q = _connection.CreateCommand();
 
-                var CommandText = @"select TABLENAME, COMAND, COLUMNKEY, ROWKEY from " + SYS_UNDO + " ";
+                var CommandText = @"select TABLENAME, COMAND, COLUMNKEY, ROWKEY, TIMECODEUTC from " + SYS_UNDO + " ";
 
                 // nur bestimmte Tabellen
                 CommandText += "WHERE (";
@@ -700,7 +700,7 @@ public abstract class SQLBackAbstract {
                 // Sortierung nach Tabellen
                 CommandText += " ORDER BY TIMECODEUTC ASC";
 
-                var fb = new List<(string tablename, string comand, string columnname, string rowid)>();
+                var fb = new List<(string tablename, string comand, string columnname, string rowid, DateTime timecode)>();
 
                 var dt = Fill_Table(CommandText);
 
@@ -712,7 +712,7 @@ public abstract class SQLBackAbstract {
 
                 foreach (var thisRow in dt.Rows) {
                     var reader = (DataRow)thisRow;
-                    fb.Add((reader[0].ToString(), reader[1].ToString(), reader[2].ToString(), reader[3].ToString()));
+                    fb.Add((reader[0].ToString(), reader[1].ToString(), reader[2].ToString(), reader[3].ToString(), DateTimeParse(reader[4].ToString())));
                 }
 
                 //CloseConnection();
@@ -780,7 +780,7 @@ public abstract class SQLBackAbstract {
             var columnsToLoad = new List<ColumnItem>();
 
             foreach (var thisc in columns) {
-                if (thisc != null && !thisc.IsInCache) {
+                if (thisc != null && thisc.IsInCache == null) {
                     columnsToLoad.AddIfNotExists(thisc);
                 }
             }
@@ -836,7 +836,7 @@ public abstract class SQLBackAbstract {
             foreach (var thiscolumn in columnsToLoad) {
                 //var val = GetStyleData(tablename, DatabaseDataType.ColumnTimeCode.ToString(), thiscolumn.Name);
 
-                thiscolumn.IsInCache = true;
+                thiscolumn.IsInCache = DateTime.UtcNow;
 
                 //if (string.IsNullOrEmpty(val)) {
                 //    Develop.DebugPrint(FehlerArt.Warnung, "Spalte ohne Zeitstempel, repariert! + " + com);
@@ -925,30 +925,39 @@ public abstract class SQLBackAbstract {
 
             if (!OpenConnection()) { return null; }
 
-            using var q = _connection.CreateCommand();
+            //using var q = _connection.CreateCommand();
 
-            q.CommandText = @"select " + columnname.ToUpper() + " from " + tablename.ToUpper() + " " +
-                            "where RK = " + DBVAL(rowkey);
+            var comm = @"select " + columnname.ToUpper() + " from " + tablename.ToUpper() + " " +
+                                   "where RK = " + DBVAL(rowkey);
 
             ////command.AddParameterWithValue("" + DBVAL(columnName.ToUpper()) , column.Name.ToUpper());
             //command.AddParameterWithValue("" + DBVAL(row.Key)", row.Key.ToString());
 
-            using var reader = q.ExecuteReader();
-            if (reader.Read()) {
-                // you may want to check if value is NULL: reader.IsDBNull(0)
-                var value = reader[0].ToString();
+            var dt = Fill_Table(comm);
 
-                if (reader.Read()) {
-                    // Doppelter Wert?!?Ersten Wert zurückgeben, um unendliche erweiterungen zu erhindern
-                    Develop.DebugPrint(columnname + " doppelt in " + tablename.ToUpper() + " vorhanden!");
-                }
-
-                CloseConnection();
-                return value;
+            if (dt.Rows.Count == 0) { return string.Empty; }
+            if (dt.Rows.Count > 1) {
+                // Doppelter Wert?!?Ersten Wert zurückgeben, um unendliche erweiterungen zu erhindern
+                Develop.DebugPrint(columnname + " doppelt in " + tablename.ToUpper() + " vorhanden!");
             }
 
-            CloseConnection();    // Nix vorhanden!
-            return null;
+            return dt.Rows[0][0].ToString();
+            //using var reader = q.ExecuteReader();
+            //if (reader.Read()) {
+            //    // you may want to check if value is NULL: reader.IsDBNull(0)
+            //    var value = reader[0].ToString();
+
+            //    if (reader.Read()) {
+            //        // Doppelter Wert?!?Ersten Wert zurückgeben, um unendliche erweiterungen zu erhindern
+            //        Develop.DebugPrint(columnname + " doppelt in " + tablename.ToUpper() + " vorhanden!");
+            //    }
+
+            //    CloseConnection();
+            //return value;
+            //}
+
+            //CloseConnection();    // Nix vorhanden!
+            //return null;
         } catch {
             CloseConnection();
             Develop.CheckStackForOverflow();

@@ -72,27 +72,28 @@ internal sealed partial class ColumnEditor {
     private static void SetKeyTo(TextBox combobox, long columnKey) => combobox.Text = columnKey.ToString();
 
     private bool AllOk() {
-        var feh = "";
-        // Diese Fehler sind so schwer und darf auf keinen Fall in die Umwelt gelassen werden
-        if (string.IsNullOrEmpty(feh)) {
-            if (string.IsNullOrEmpty(tbxName.Text)) { feh = "Spaltenname nicht definiert."; }
-        }
-        // Diese Fehler sind so schwer und darf auf keinen Fall in die Umwelt gelassen werden
-        if (string.IsNullOrEmpty(feh)) {
-            foreach (var _ in _column.Database.Column.Where(thisColumn => thisColumn != _column && thisColumn != null && string.Equals(tbxName.Text, thisColumn.Name, StringComparison.OrdinalIgnoreCase))) {
-                feh = "Spalten-Name bereits vorhanden.";
+        var feh = string.Empty;
+
+        //// Diese Fehler sind so schwer und darf auf keinen Fall in die Umwelt gelassen werden
+        if (_column == null || _column.IsDisposed) {
+            feh = "Spalte verworfen!";
+        } else {
+            if (!tbxName.Text.StartsWith("SYS_")) {
+                if (!_column.ColumNameAllowed(tbxName.Text)) { feh = "Spaltenname nicht erlaubt!"; }
             }
         }
+
         if (string.IsNullOrEmpty(feh)) {
             Column_DatenZurückschreiben();
-            if (string.IsNullOrEmpty(feh)) { feh = _column.ErrorReason(); }
+            if (string.IsNullOrEmpty(feh)) { feh = _column!.ErrorReason(); }
         }
+
         if (!string.IsNullOrEmpty(feh)) {
             MessageBox.Show("<b><u>Bitte korrigieren sie zuerst folgenden Fehler:</u></b><br>" + feh, ImageCode.Warnung, "Ok");
             return false;
         }
 
-        _column.Repair();
+        _column?.Repair();
         return true;
     }
 
@@ -116,67 +117,67 @@ internal sealed partial class ColumnEditor {
     private void btnQI_Vorschau_Click(object sender, System.EventArgs e) => Notification.Show(tbxQuickinfo.Text.Replace("\r", "<BR>") + "<br><br><br>" + tbxAdminInfo.Text.Replace("\r", "<BR>"));
 
     private void btnSchnellAuswahloptionen_Click(object sender, System.EventArgs e) {
-        Column_DatenZurückschreiben();
+        if (!AllOk()) { return; }
         _column.SetFormatForTextOptions();
         Column_DatenAuslesen(_column);
     }
 
     private void btnSchnellBildCode_Click(object sender, System.EventArgs e) {
-        Column_DatenZurückschreiben();
+        if (!AllOk()) { return; }
         _column.SetFormatForBildCode();
         Column_DatenAuslesen(_column);
     }
 
     private void btnSchnellBit_Click(object sender, System.EventArgs e) {
-        Column_DatenZurückschreiben();
+        if (!AllOk()) { return; }
         _column.SetFormatForBit();
         Column_DatenAuslesen(_column);
     }
 
     private void btnSchnellDatum_Click(object sender, System.EventArgs e) {
-        Column_DatenZurückschreiben();
+        if (!AllOk()) { return; }
         _column.SetFormatForDate();
         Column_DatenAuslesen(_column);
     }
 
     private void btnSchnellDatumUhrzeit_Click(object sender, System.EventArgs e) {
-        Column_DatenZurückschreiben();
+        if (!AllOk()) { return; }
         _column.SetFormatForDateTime(true);
         Column_DatenAuslesen(_column);
     }
 
     private void btnSchnellEmail_Click(object sender, System.EventArgs e) {
-        Column_DatenZurückschreiben();
+        if (!AllOk()) { return; }
         _column.SetFormatForEmail();
         Column_DatenAuslesen(_column);
     }
 
     private void btnSchnellGanzzahl_Click(object sender, System.EventArgs e) {
-        Column_DatenZurückschreiben();
+        if (!AllOk()) { return; }
         _column.SetFormatForInteger();
         Column_DatenAuslesen(_column);
     }
 
     private void btnSchnellGleitkommazahl_Click(object sender, System.EventArgs e) {
-        Column_DatenZurückschreiben();
+        if (!AllOk()) { return; }
         _column.SetFormatForFloat();
         Column_DatenAuslesen(_column);
     }
 
     private void btnSchnellIInternetAdresse_Click(object sender, System.EventArgs e) {
-        Column_DatenZurückschreiben();
+        if (!AllOk()) { return; }
         _column.SetFormatForUrl();
         Column_DatenAuslesen(_column);
     }
 
     private void btnSchnellTelefonNummer_Click(object sender, System.EventArgs e) {
-        Column_DatenZurückschreiben();
+        if (!AllOk()) { return; }
         _column.SetFormatForPhoneNumber();
         Column_DatenAuslesen(_column);
     }
 
     private void btnSchnellText_Click(object sender, System.EventArgs e) {
-        Column_DatenZurückschreiben();
+        if (!AllOk()) { return; }
         _column.SetFormatForText();
         Column_DatenAuslesen(_column);
     }
@@ -335,6 +336,8 @@ internal sealed partial class ColumnEditor {
             capInfo.Text = "<Imagecode=" + _column.SymbolForReadableText() + "> System Spalte (Key: " + _column.Key + ")";
         }
         tbxName.Text = _column.Name;
+        tbxName.Enabled = !_column.Name.StartsWith("SYS_");
+
         tbxName.AllowedChars = Constants.AllowedCharsVariableName;
         tbxCaption.Text = _column.Caption;
         btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, _column.BackColor).ToString();
@@ -423,9 +426,18 @@ internal sealed partial class ColumnEditor {
         cbxLinkedDatabase_TextChanged(null, System.EventArgs.Empty);
     }
 
+    /// <summary>
+    /// Schreibt die Werte hart zurück.
+    /// Diese Routine sollte nicht benutzt werden, sondern AllOk
+    /// </summary>
     private void Column_DatenZurückschreiben() {
-        if (_column.Database.ReadOnly) { return; }
-        _column.Name = tbxName.Text;
+        if (_column?.Database?.ReadOnly ?? true) { return; }
+        if (_column.IsDisposed) { return; }
+
+        if (_column.ColumNameAllowed(tbxName.Text)) {
+            _column.Name = tbxName.Text;
+        }
+
         _column.Caption = tbxCaption.Text.Replace("\r\n", "\r").Trim().Trim("\r").Trim();
         _column.Format = (DataFormat)IntParse(cbxFormat.Text);
         _column.Quickinfo = tbxQuickinfo.Text.Replace("\r", "<BR>");
@@ -501,7 +513,6 @@ internal sealed partial class ColumnEditor {
         GetLinkedCellFilter();
 
         _column.Repair();
-        //_Column.Database.Rules.Sort();
     }
 
     private void GeneratFilterListe() {

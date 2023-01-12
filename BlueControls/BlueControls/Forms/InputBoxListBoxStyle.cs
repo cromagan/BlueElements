@@ -35,9 +35,9 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
 
     #region Constructors
 
-    private InputBoxListBoxStyle() : this(string.Empty, null, AddType.None, true) { }
+    private InputBoxListBoxStyle() : this(string.Empty, new ItemCollectionList(), AddType.None, true) { }
 
-    private InputBoxListBoxStyle(string txt, ItemCollectionList? itemsOriginal, AddType addNewAllowed, bool cancelErl) : base(cancelErl, true) {
+    private InputBoxListBoxStyle(string txt, ItemCollectionList itemsOriginal, AddType addNewAllowed, bool cancelErl) : base(cancelErl, true) {
         InitializeComponent();
         if (itemsOriginal.Appearance != BlueListBoxAppearance.Listbox) {
             Develop.DebugPrint("Design nicht Listbox");

@@ -134,7 +134,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     public override void RefreshColumnsData(List<ColumnItem>? columns) {
         if (columns == null || columns.Count == 0) { return; }
-        if (columns.Count == 1 && columns[0].IsInCache) { return; }
+        if (columns.Count == 1 && columns[0].IsInCache != null) { return; }
 
         try {
             _sql.LoadColumns(TableName, columns);
@@ -151,7 +151,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         var l = new ListExt<RowItem>();
 
         foreach (var thisr in rows) {
-            if (refreshAlways || !thisr.IsInCache) {
+            if (refreshAlways || thisr.IsInCache == null) {
                 l.AddIfNotExists(thisr);
             }
         }
@@ -271,7 +271,10 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         if (DateTime.UtcNow.Subtract(_timerTimeStamp).TotalSeconds < 180) { return; }
 
         foreach (var thisDB in AllFiles) {
-            if (!thisDB.LogUndo) { return; } // Irgend ein heikler Prozess
+            if (!thisDB.IsDisposed) {
+                if (!thisDB.LogUndo) { return; } // Irgend ein heikler Prozess
+                if (thisDB.IsInCache == null) { return; } // Irgend eineDatenbank wird aktuell geladen
+            }
         }
 
         if (_isInTimer) { return; }
@@ -319,17 +322,20 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         return oo;
     }
 
-    private void DoLastChanges(List<(string tablename, string comand, string columnkey, string rowkey)>? data) {
+    private void DoLastChanges(List<(string tablename, string comand, string columnkey, string rowkey, DateTime timecode)>? data) {
         if (data == null) { return; }
-        return;
+        if (IsDisposed) { return; }
 
-        //_loadingCount++;
+        if (IsInCache == null) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Datenbank noch nicht korrekt geladen!");
+            return;
+        }
 
         try {
             var rk = new List<long>();
 
-            foreach (var (tablename, comand, columnkey, rowkey) in data) {
-                if (TableName == tablename) {
+            foreach (var (tablename, comand, columnkey, rowkey, timecode) in data) {
+                if (TableName == tablename && timecode > IsInCache) {
                     Enum.TryParse(comand, out DatabaseDataType t);
 
                     if (t.IsObsolete()) {
@@ -343,9 +349,13 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
                         if (c != null) {
                             var newn = _sql.GetLastColumnName(tablename, c.Key);
-                            if (c.Name != newn) {
-                                _sql.RenameColumn(tablename, c.Name, newn);
-                            }
+                            c.Name = newn;
+                            //if (c.Name != newn) {
+                            //    //Develop.DebugPrint(FehlerArt.Fehler, "Spalte muss umbenannt werden???");
+                            //    //q
+                            //    //_sql.RenameColumn(tablename, c.Name, newn);
+
+                            //}
                         }
 
                         #endregion
@@ -385,10 +395,18 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
                         #region Zeilen zum neu Einlesen merken uns Spaltenbreite invalidierne
 
-                        rk.AddIfNotExists(LongParse(rowkey));
-
                         var c = Column.SearchByKey(LongParse(columnkey));
-                        c.Invalidate_ContentWidth();
+                        var r = Row.SearchByKey(LongParse(rowkey));
+                        //if (r == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile nicht gefunden"); }
+                        //if (c == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht gefunden"); }
+                        if (r != null && c != null) {
+                            // Kann sein, dass der Bentzer hier ja schon eine Zeile oder so geklscht hat
+                            // hier geklscht, aber anderer PC mat bei der noch vorhanden Zeile eine Änderung
+                            if (timecode > r.IsInCache || timecode > c.IsInCache) {
+                                rk.AddIfNotExists(r.Key);
+                                c?.Invalidate_ContentWidth();
+                            }
+                        }
 
                         #endregion
                     } else if (t.IsDatabaseTag()) {
@@ -501,14 +519,14 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
             _sql.LoadAllRowKeys(TableName, Row);
 
             foreach (var thisColumn in Column) {
-                thisColumn.IsInCache = false;// string.Empty;
+                thisColumn.IsInCache = null;
             }
 
             #endregion
 
             _sql.CloseConnection();
 
-            Row.RemoveNullOrEmpty();
+            //Row.RemoveNullOrEmpty();
             Cell.RemoveOrphans();
 
             //_checkedAndReloadNeed = false;

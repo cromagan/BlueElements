@@ -142,7 +142,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         if (columns == null || columns.Count == 0) { return; }
 
         foreach (var thisrow in columns) {
-            thisrow.IsInCache = true;
+            thisrow.IsInCache = DateTime.UtcNow;
         }
     }
 
@@ -150,7 +150,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         if (row == null || row.Count == 0) { return false; }
 
         foreach (var thisrow in row) {
-            thisrow.IsInCache = true;
+            thisrow.IsInCache = DateTime.UtcNow;
         }
 
         return false;

@@ -389,7 +389,8 @@ public sealed class ColumnCollection : ListExt<ColumnItem> {
 
         // Spalten erzeugen und Format übertragen
         foreach (var thisColumn in sourceDatabase.Column) {
-            var l = Exists(thisColumn.Name) ?? GenerateAndAdd(thisColumn.Key, thisColumn.Name, thisColumn.Caption, thisColumn.Suffix, VarType.Unbekannt, thisColumn.Quickinfo);
+            var l = Exists(thisColumn.Name) ??
+                GenerateAndAdd(thisColumn.Key, thisColumn.Name, thisColumn.Caption, thisColumn.Suffix, VarType.Unbekannt, thisColumn.Quickinfo);
 
             if (l != null) {
                 l.CloneFrom(thisColumn, true);
