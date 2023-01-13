@@ -45,6 +45,8 @@ public sealed class Database : DatabaseAbstract {
 
     #region Constructors
 
+    public Database(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) : this(ci.AdditionalData, readOnly, false, ci.TableName, needPassword) { }
+
     public Database(Stream stream, string tablename) : this(stream, string.Empty, true, false, tablename, null) { }
 
     public Database(bool readOnly, string tablename) : this(null, string.Empty, readOnly, true, tablename, null) { }
@@ -52,7 +54,7 @@ public sealed class Database : DatabaseAbstract {
     public Database(string filename, bool readOnly, bool create, string tablename, NeedPassword? needPassword) : this(null, filename, readOnly, create, tablename, needPassword) { }
 
     private Database(Stream? stream, string filename, bool readOnly, bool create, string tablename, NeedPassword? needPassword) : base(tablename, readOnly) {
-        Develop.StartService();
+        //Develop.StartService();
 
         Works = new ListExt<WorkItem>();
 
@@ -74,7 +76,7 @@ public sealed class Database : DatabaseAbstract {
 
     #region Properties
 
-    public static string DatabaseId => "BlueDatabase";
+    public static string DatabaseId => typeof(Database).Name;
 
     public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename);
     public string Filename { get; set; } = string.Empty;
@@ -551,11 +553,11 @@ public sealed class Database : DatabaseAbstract {
         CreateWatcher();
     }
 
-    public override void RefreshColumnsData(List<ColumnItem>? columns) {
+    public override void RefreshColumnsData(List<ColumnItem?>? columns) {
         if (columns == null || columns.Count == 0) { return; }
 
-        foreach (var thisrow in columns) {
-            thisrow.IsInCache = DateTime.UtcNow;
+        foreach (var thiscol in columns) {
+            if (thiscol != null) { thiscol.IsInCache = DateTime.UtcNow; }
         }
     }
 

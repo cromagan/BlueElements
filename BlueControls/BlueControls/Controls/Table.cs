@@ -304,7 +304,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         column.RefreshColumnsData();
 
-        var NewContentWidth = -1;
+        var NewContentWidth = 16; // Wert muss gesetzt werden, dass er am ende auch gespeichert wird
 
         if (column.Format == DataFormat.Button) {
             // Beim Button reicht eine Abfrage mit Row null

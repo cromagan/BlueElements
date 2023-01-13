@@ -136,13 +136,13 @@ public static class Generic {
             .Select(assembly.GetManifestResourceStream).FirstOrDefault();
     }
 
-    public static List<T> GetEnumerableOfType<T>(params object[] constructorArgs) where T : class {
-        List<T> l = new();
+    public static List<Type> GetEnumerableOfType<T>() where T : class {
+        List<Type> l = new();
         foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
             try {
                 foreach (var thist in thisas.GetTypes()) {
                     if (thist.IsClass && !thist.IsAbstract && thist.IsSubclassOf(typeof(T))) {
-                        l.Add((T)Activator.CreateInstance(thist, constructorArgs));
+                        l.Add(thist);
                     }
                 }
             } catch (Exception) {
@@ -163,6 +163,22 @@ public static class Generic {
             sb.Append(b.ToString("X2"));
 
         return sb.ToString();
+    }
+
+    public static List<T> GetInstaceOfType<T>(params object[] constructorArgs) where T : class {
+        List<T> l = new();
+        foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
+            try {
+                foreach (var thist in thisas.GetTypes()) {
+                    if (thist.IsClass && !thist.IsAbstract && thist.IsSubclassOf(typeof(T))) {
+                        l.Add((T)Activator.CreateInstance(thist, constructorArgs));
+                    }
+                }
+            } catch (Exception) {
+                //Develop.DebugPrint(FehlerArt.Info, ex);
+            }
+        }
+        return l;
     }
 
     public static long GetUniqueKey(int tmp, string type) {

@@ -131,6 +131,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (row.Database != column.Database) { return LanguageTool.DoTranslate("Interner Fehler: Bezug der Datenbank zur Zeile ist fehlerhaft."); }
 
             if (column.Database.PowerEdit.Subtract(DateTime.Now).TotalSeconds < 0) {
+                column.Database.RefreshColumnsData(column.Database.Column.SysLocked);
                 if (column != column.Database.Column.SysLocked && row.CellGetBoolean(column.Database.Column.SysLocked) && !column.EditAllowedDespiteLock) { return LanguageTool.DoTranslate("Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden."); }
             }
         } else {

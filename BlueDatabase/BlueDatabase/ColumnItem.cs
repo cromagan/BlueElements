@@ -487,13 +487,11 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         get => _contentwidth;
         set {
             _unsavedContentWidth = value;
-            if (_contentwidth == value) {
-                return;
-            }
+            if (_contentwidth == value) { return; }
 
-            if (value < 10) {
-                Develop.DebugPrint("Width < 10!");
-            }
+            //if (value < 10) {
+            //    Develop.DebugPrint("Width < 10!");
+            //}
 
             Database?.ChangeData(DatabaseDataType.ColumnContentWidth, Key, null, _contentwidth.ToString(), value.ToString(), string.Empty);
             OnChanged();
@@ -1214,7 +1212,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     public bool ColumNameAllowed(string nameToTest) {
         if (!IsValidColumnName(nameToTest)) { return false; }
 
-        if (nameToTest == _name.ToUpper()) { return true; }
+        if (nameToTest.Equals(_name, StringComparison.OrdinalIgnoreCase)) { return true; }
         if (Database?.Column.Exists(nameToTest) != null) { return false; }
 
         return true;

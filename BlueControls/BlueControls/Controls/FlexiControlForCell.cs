@@ -417,6 +417,10 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
 
     private void Database_RowChecked(object sender, RowCheckedEventArgs e) {
         if (e.Row != _tmpRow) { return; }
+        if(e.ColumnsWithErrors == null ) {
+            InfoText = string.Empty; return;    
+        }
+
         var newT = string.Empty;
         foreach (var thisString in e.ColumnsWithErrors) {
             var x = thisString.SplitAndCutBy("|");

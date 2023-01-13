@@ -192,6 +192,9 @@ public abstract class SQLBackAbstract {
                 OpenConnection();
                 TBL.Load(command.ExecuteReader());
                 CloseConnection();
+                //if (TBL.Rows.Count == 1) {
+                //    Develop.DebugPrint("Müssig");
+                //}
                 return TBL;
             }
         } catch {
@@ -771,7 +774,7 @@ public abstract class SQLBackAbstract {
         return null;
     }
 
-    internal void LoadColumns(string tablename, List<ColumnItem>? columns) {
+    internal void LoadColumns(string tablename, List<ColumnItem?>? columns) {
         try {
             if (columns == null || columns.Count == 0) { return; }
 

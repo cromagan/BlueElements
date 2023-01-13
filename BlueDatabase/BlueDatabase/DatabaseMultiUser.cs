@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 
@@ -39,12 +40,13 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
     #region Fields
 
     public ListExt<WorkItem>? Works;
-
     private readonly BlueBasics.MultiUserFile.MultiUserFile? _muf;
 
     #endregion
 
     #region Constructors
+
+    public DatabaseMultiUser(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) : this(ci.AdditionalData, readOnly, false, ci.TableName) { }
 
     public DatabaseMultiUser(bool readOnly, string tablename) : this(string.Empty, readOnly, true, tablename) { }
 
@@ -60,7 +62,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         _muf.ToListOfByte += ToListOfByte;
         _muf.ReloadDelaySecond = 180;
 
-        Develop.StartService();
+        //Develop.StartService();
 
         Works = new ListExt<WorkItem>();
 
@@ -78,8 +80,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
     #region Properties
 
-    public static string DatabaseId => "BlueDatabaseMultiUser";
-
+    public static string DatabaseId => typeof(DatabaseMultiUser).Name;
     public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename);
 
     public string Filename => _muf?.Filename ?? string.Empty;
@@ -154,11 +155,11 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         ExecutePending();
     }
 
-    public override void RefreshColumnsData(List<ColumnItem>? columns) {
+    public override void RefreshColumnsData(List<ColumnItem?>? columns) {
         if (columns == null || columns.Count == 0) { return; }
 
-        foreach (var thisrow in columns) {
-            thisrow.IsInCache = DateTime.UtcNow;
+        foreach (var thiscol in columns) {
+            if (thiscol != null) { thiscol.IsInCache = DateTime.UtcNow; }
         }
     }
 

@@ -56,6 +56,8 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     #region Constructors
 
+    public DatabaseSQLLite(ConnectionInfo ci) : this(((DatabaseSQLLite)ci.Provider)._sql, false, ci.TableName) { }
+
     public DatabaseSQLLite(SQLBackAbstract sql, bool readOnly, string tablename) : base(tablename, readOnly) {
         if (sql == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Keine SQL_Verbindung übergeben.");
@@ -63,7 +65,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
         _sql = sql.OtherTable(tablename);
 
-        Develop.StartService();
+        //Develop.StartService();
 
         Initialize();
         //_checkedAndReloadNeed = true;
@@ -78,6 +80,8 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     #endregion
 
     #region Properties
+
+    public static string DatabaseId => typeof(DatabaseSQLLite).Name;
 
     //private bool _isLoading = false;
     public override ConnectionInfo ConnectionData {
@@ -132,9 +136,9 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         return connectionData;
     }
 
-    public override void RefreshColumnsData(List<ColumnItem>? columns) {
+    public override void RefreshColumnsData(List<ColumnItem?>? columns) {
         if (columns == null || columns.Count == 0) { return; }
-        if (columns.Count == 1 && columns[0].IsInCache != null) { return; }
+        //if (columns.Count == 1 && columns[0].IsInCache != null) { return; }
 
         try {
             _sql.LoadColumns(TableName, columns);
@@ -167,14 +171,14 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         return true;
     }
 
-    public override void RepairAfterParse() {
-        base.RepairAfterParse();
-        foreach (var thisC in Column) {
-            if (IsAdministrator() && thisC.Name.StartsWith("SYS_")) {
-                _sql.ChangeDataType(TableName, thisC.Name, thisC.MaxTextLenght);
-            }
-        }
-    }
+    //public override void RepairAfterParse() {
+    //    base.RepairAfterParse();
+    //    foreach (var thisC in Column) {
+    //        if (IsAdministrator() && thisC.Name.StartsWith("SYS_")) {
+    //            _sql.ChangeDataType(TableName, thisC.Name, thisC.MaxTextLenght);
+    //        }
+    //    }
+    //}
 
     //private bool _checkedAndReloadNeed;
 

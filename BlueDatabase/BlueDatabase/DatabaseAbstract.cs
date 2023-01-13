@@ -23,6 +23,7 @@ using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
+using BlueScript.Methods;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Text;
 using static BlueBasics.Converter;
@@ -47,6 +49,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     public const string DatabaseVersion = "4.00";
 
     public static readonly ListExt<DatabaseAbstract> AllFiles = new();
+    public static List<Type>? DatabaseTypes;
     public readonly ListExt<ColumnViewCollection> _columnArrangements = new();
     public readonly List<string> _datenbankAdmin = new();
     public readonly CellCollection Cell;
@@ -81,15 +84,10 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     private ListExt<ExportDefinition?> _export = new();
 
     private string _firstColumn;
-
     private double _globalScale;
-
     private string _globalShowPass = string.Empty;
-
     private DateTime _lastUserActionUtc = new(1900, 1, 1);
-
     private string _rulesScript = string.Empty;
-
     private RowSortDefinition? _sortDefinition;
 
     /// <summary>
@@ -106,7 +104,11 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     #region Constructors
 
+    public DatabaseAbstract(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) : this(ci.TableName, readOnly) { }
+
     protected DatabaseAbstract(string tablename, bool readOnly) {
+        Develop.StartService();
+
         ReadOnly = readOnly;
         TableName = SQLBackAbstract.MakeValidTableName(tablename);
         UserGroup = "#Administrator";
@@ -416,6 +418,8 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     public static DatabaseAbstract? GetByID(ConnectionInfo? ci, DatabaseAbstract.NeedPassword? needPassword) {
         if (ci is null) { return null; }
 
+        #region Schauen, ob die Datenbank bereits geladen ist
+
         foreach (var thisFile in AllFiles) {
             var d = thisFile.ConnectionData;
 
@@ -430,9 +434,30 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             }
         }
 
+        #endregion
+
+        #region Schauen, ob der Provider sie herstellen kann
+
         if (ci.Provider != null) {
             return ci.Provider.GetOtherTable(ci.TableName);
         }
+
+        #endregion
+
+        DatabaseTypes ??= Generic.GetEnumerableOfType<DatabaseAbstract>();
+
+        #region Schauen, ob sie über den Typ definiert werden kann
+
+        foreach (var thist in DatabaseTypes) {
+            if (thist.Name.Equals(ci.DatabaseID, StringComparison.OrdinalIgnoreCase)) {
+                return (DatabaseAbstract)Activator.CreateInstance(thist, ci, false, needPassword);
+            }
+
+            //MethodInfo parseMethod = thist.GetMethod("DatabaseId");
+            //object value = parseMethod.Invoke(null, new object[] { });
+        }
+
+        #endregion
 
         #region Wenn die Connection einem Dateinamen entspricht, versuchen den zu laden
 
@@ -440,26 +465,9 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             if (ci.AdditionalData.FileSuffix().ToLower() == "mdb") {
                 return new Database(ci.AdditionalData, false, false, ci.TableName, needPassword);
             }
-
-            //if (connectionID.FileSuffix().ToLower() == "mdf") {
-            //    var x = new SQLBackMicrosoftCE(connectionID, false);
-
-            //    var tables = x.Tables();
-            //    var tabn = string.Empty;
-            //    if (tables.Count >= 1) { tabn = tables[0]; }
-
-            //    if (string.IsNullOrEmpty(tabn)) {
-            //        tabn = "MAIN";
-            //        x.RepairAll(tabn);
-            //    }
-
-            //    return new DatabaseSQL(x, false, tabn);
-            //}
         }
 
         #endregion
-
-        //SQLBackAbstract.GetSQLBacks();
 
         if (SQLBackAbstract.ConnectedSQLBack != null) {
             foreach (var thisSQL in SQLBackAbstract.ConnectedSQLBack) {
@@ -1168,12 +1176,12 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         return false;
     }
 
-    public void RefreshColumnsData(ColumnItem column) {
-        if (column.IsInCache != null) { return; }
-        RefreshColumnsData(new List<ColumnItem>() { column });
+    public void RefreshColumnsData(ColumnItem? column) {
+        if (column == null || column.IsInCache != null) { return; }
+        RefreshColumnsData(new List<ColumnItem?>() { column });
     }
 
-    public abstract void RefreshColumnsData(List<ColumnItem>? columns);
+    public abstract void RefreshColumnsData(List<ColumnItem?>? columns);
 
     public void RefreshColumnsData(List<FilterItem>? filter) {
         if (filter != null) {
