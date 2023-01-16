@@ -81,7 +81,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
             if (!FileExists(_filename)) {
                 _bitmap = null;
             } else {
-                _bitmap = (Bitmap)Image_FromFile(_filename);
+                _bitmap = (Bitmap?)Image_FromFile(_filename);
             }
             ZoomFitInvalidateAndCheckButtons();
         }
@@ -284,7 +284,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
 
     private void OpenDia_FileOk(object sender, CancelEventArgs e) {
         if (!HasFileName()) { return; }
-        _bitmap = (Bitmap)Image_FromFile(OpenDia.FileName);
+        _bitmap = Image_FromFile(OpenDia.FileName) as Bitmap;
         SaveNewPicToDisc();
         ZoomFitInvalidateAndCheckButtons();
     }

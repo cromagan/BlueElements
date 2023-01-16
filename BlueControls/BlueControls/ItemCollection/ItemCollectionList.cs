@@ -569,7 +569,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
             CheckBehavior = _checkBehavior
         };
         foreach (var thisItem in this) {
-            x.Add((BasicListItem)thisItem.Clone());   /* ThisItem.CloneToNewCollection(x);*/
+            x.Add(thisItem.Clone() as BasicListItem);   /* ThisItem.CloneToNewCollection(x);*/
         }
         return x;
     }
@@ -673,7 +673,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
             var maxX = int.MinValue;
             var maxy = int.MinValue;
             var itenc = -1;
-            BasicListItem previtem = null;
+            BasicListItem? previtem = null;
             foreach (var thisItem in this) {
                 // PaintmodX kann immer abgezogen werden, da es eh nur bei einspaltigen Listboxen verändert wird!
                 if (thisItem != null) {

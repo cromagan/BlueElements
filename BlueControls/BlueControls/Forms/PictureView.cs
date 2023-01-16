@@ -97,7 +97,7 @@ public partial class PictureView : Form, IDisposableExtended {
         _nr = nr;
         if (FileList != null && nr < FileList.Count && nr > -1) {
             try {
-                Pad.Bmp = (Bitmap)BitmapExt.Image_FromFile(FileList[nr]);
+                Pad.Bmp = BitmapExt.Image_FromFile(FileList[nr]) as Bitmap;
             } catch (Exception ex) {
                 Pad.Bmp = null;
                 Develop.DebugPrint(ex);

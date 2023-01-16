@@ -306,10 +306,12 @@ public class FlexiControlForProperty<T> : FlexiControl {
             CaptionPosition = ÜberschriftAnordnung.ohne;
             var s0 = BlueFont.MeasureStringOfCaption(Caption.TrimEnd(":"));
             Size = new Size((int)s0.Width + 50 + 22, 30);
-            var c0 = (Button)CreateSubControls();
-            c0.Text = Caption.TrimEnd(":");
-            if (image != ImageCode.None) {
-                c0.ImageCode = QuickImage.Get(image, 22).ToString();
+            var c0 = CreateSubControls() as Button;
+            if (c0 != null) {
+                c0.Text = Caption.TrimEnd(":");
+                if (image != ImageCode.None) {
+                    c0.ImageCode = QuickImage.Get(image, 22).ToString();
+                }
             }
         } else {
             switch (_accessor) {
@@ -329,7 +331,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                             var x2 = Math.Max((int)(biggestItemX + 20 + s2.Width), 200);
                             var y2 = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
                             Size = new Size(x2, y2);
-                            StyleComboBox((ComboBox)CreateSubControls(), list, ComboBoxStyle.DropDownList, true);
+                            StyleComboBox(CreateSubControls() as ComboBox, list, ComboBoxStyle.DropDownList, true);
                         } else {
                             EditType = EditTypeFormula.Textfeld;
                             if (textLines >= 2) {
@@ -368,7 +370,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                                 }
                             }
 
-                            StyleTextBox((TextBox)CreateSubControls());
+                            StyleTextBox(CreateSubControls() as TextBox);
                         }
                         break;
                     }

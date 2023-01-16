@@ -359,8 +359,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
                 Database.OnScriptError(new RowCancelEventArgs(this, "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode));
                 return (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
             }
-
-            if (script.Variables == null || !((VariableBool)script.Variables.GetSystem("CellChangesEnabled")).ValueBool) { return (true, string.Empty, script); }
+            var doch = script?.Variables?.GetSystem("CellChangesEnabled") as VariableBool;
+            if (doch == null || !doch.ValueBool) { return (true, string.Empty, script); }
         }
         // Dann die Abschließenden Korrekturen vornehmen
         foreach (var thisColum in Database.Column.Where(thisColum => thisColum != null)) {
@@ -563,7 +563,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
 
             #endregion
 
-            if (startRoutine != "script testing" && ((VariableBool)vars.GetSystem("CellChangesEnabled")).ValueBool) {
+            var doch = vars.GetSystem("CellChangesEnabled") as VariableBool;
+            if (startRoutine != "script testing" && doch != null && doch.ValueBool) {
 
                 #region Variablen zurückschreiben und Special Rules ausführen
 

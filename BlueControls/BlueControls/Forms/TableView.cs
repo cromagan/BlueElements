@@ -23,6 +23,7 @@ using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
@@ -34,6 +35,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Forms.Design;
 using static BlueBasics.Converter;
 using static BlueBasics.Develop;
 using static BlueBasics.Generic;
@@ -41,14 +43,12 @@ using static BlueBasics.IO;
 
 namespace BlueControls.Forms;
 
-public partial class TableView : Form {
+public partial class TableView : Form, IHasStatusbar {
 
     #region Fields
 
     private Ansicht _ansicht = Ansicht.Tabelle_und_Formular_nebeneinander;
-
     private bool _firstOne = true;
-
     private DatabaseAbstract? _originalDb;
 
     #endregion
@@ -80,6 +80,12 @@ public partial class TableView : Form {
 
         SwitchTabToDatabase(database);
     }
+
+    #endregion
+
+    #region Properties
+
+    public bool DropMessages { get; set; }
 
     #endregion
 
@@ -191,6 +197,10 @@ public partial class TableView : Form {
         }
     }
 
+    public bool UpdateStatus(FehlerArt type, string message, bool didAlreadyMessagebox) {
+        return base.UpdateStatus(type, message, didAlreadyMessagebox, capStatusbar, DropMessages);
+    }
+
     /// <summary>
     /// Erstellt einen Reiter mit den nötigen Tags um eine Datenbank laden zu können - lädt die Datenbank aber selbst nicht.
     /// </summary>
@@ -297,6 +307,10 @@ public partial class TableView : Form {
     }
 
     protected virtual void DatabaseSet(DatabaseAbstract? database, string toParse) {
+        if (database != null) {
+            DropMessages = database.IsAdministrator();
+        }
+
         if (Table.Database != database) {
             Formula.ConnectedFormula = null;
         }
@@ -637,10 +651,10 @@ public partial class TableView : Form {
     }
 
     private void btnNeu_Click(object sender, System.EventArgs e) {
-        var r = Table.Database.Column.First().SortType == SortierTyp.Datum_Uhrzeit
+        var r = Table?.Database?.Column.First().SortType == SortierTyp.Datum_Uhrzeit
     ? Table.Database.Row.GenerateAndAdd(NameRepair(DateTime.Now.ToString(Constants.Format_Date5), null), "Benutzer: +")
     : Table.Database.Row.GenerateAndAdd(NameRepair("Neuer Eintrag", null), "Benutzer: +");
-        Table.CursorPos_Set(Table.Database.Column.First(), Table.SortedRows().Get(r), true);
+        Table.CursorPos_Set(Table?.Database?.Column.First(), Table.SortedRows().Get(r), true);
     }
 
     private void btnNeuDB_Click(object sender, System.EventArgs e) {
@@ -694,7 +708,7 @@ public partial class TableView : Form {
         var x = new ColumnArrangementPadEditor(Table.Database);
         x.ShowDialog();
 
-        var car = Table.Database.ColumnArrangements.CloneWithClones();
+        var car = Table?.Database?.ColumnArrangements.CloneWithClones();
         car[0].ShowAllColumns();
         Table.Database.ColumnArrangements = car;
 
@@ -702,7 +716,7 @@ public partial class TableView : Form {
         Table.Invalidate_AllColumnArrangements();
     }
 
-    private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => Table.Database.Column.GenerateOverView();
+    private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => Table?.Database?.Column.GenerateOverView();
 
     private void btnSuchenUndErsetzen_Click(object sender, System.EventArgs e) => Table.OpenSearchAndReplace();
 
@@ -776,7 +790,7 @@ public partial class TableView : Form {
             if (gefRow?.Row == Formula.ShowingRow) {
                 MessageBox.Show("Text nur im <b>aktuellen Eintrag</b> gefunden,<br>aber sonst keine weiteren Einträge!", ImageCode.Information, "OK");
             } else {
-                Table.CursorPos_Set(Table.Database.Column.First, gefRow, true);
+                Table.CursorPos_Set(Table?.Database?.Column.First, gefRow, true);
             }
         }
     }
@@ -810,7 +824,7 @@ public partial class TableView : Form {
             _originalDb.Disposing -= _originalDB_Disposing;
         }
         _originalDb = null;
-        CheckDatabase(database, null);
+        CheckDatabase(database, System.EventArgs.Empty);
         Check_OrderButtons();
     }
 
@@ -896,7 +910,7 @@ public partial class TableView : Form {
         if (Table.Visible) {
             if (Table.Database != null) {
                 if (Table.CursorPosRow == null && Table.View_RowFirst() != null) {
-                    Table.CursorPos_Set(Table.Database.Column.First, Table.View_RowFirst(), false);
+                    Table.CursorPos_Set(Table?.Database?.Column.First, Table.View_RowFirst(), false);
                 }
                 if (Table.CursorPosRow != null) {
                     FillFormula(Table.CursorPosRow.Row);
@@ -935,7 +949,7 @@ public partial class TableView : Form {
     }
 
     private void SuchEintragNoSave(Direction richtung, out ColumnItem? column, out RowData? row) {
-        column = Table.Database.Column.First;
+        column = Table?.Database?.Column.First;
         row = null;
         if (Table.Database.Row.Count < 1) { return; }
         // Temporär berechnen, um geflacker zu vermeiden (Endabled - > Disabled bei Nothing)
@@ -1034,9 +1048,9 @@ public partial class TableView : Form {
             } else {
                 btnLetzteDateien.AddFileName(DB.ConnectionData.UniqueID, DB.TableName);
             }
-
-            e.TabPage.Text = DB.Caption;
         }
+
+        e.TabPage.Text = DB.TableName.ToTitleCase();
         DatabaseSet(DB, (string)s[1]);
     }
 

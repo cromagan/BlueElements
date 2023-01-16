@@ -236,7 +236,7 @@ public class BitmapListItem : BasicListItem {
         if (_bitmap != null) { return; }
         try {
             if (FileExists(_imageFilename)) {
-                _bitmap = (Bitmap)BitmapExt.Image_FromFile(_imageFilename);
+                _bitmap = BitmapExt.Image_FromFile(_imageFilename) as Bitmap;
             }
         } catch (Exception ex) {
             Develop.DebugPrint(ex);

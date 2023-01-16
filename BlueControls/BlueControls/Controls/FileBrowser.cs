@@ -229,8 +229,8 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
     private void lsbFiles_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         if (e.HotItem == null) { return; }
 
-        var it = ((BitmapListItem)e.HotItem);
-        var tags = (List<string>)(it.Tag);
+        var it = ((BitmapListItem)e.HotItem) ;
+        var tags = (List<string>)(it.Tag) ?? new List<string>(); ;
 
         e.UserMenu.Add(ContextMenuComands.Ausschneiden, !tags.TagGet("Folder").FromPlusMinus());
         e.UserMenu.Add(ContextMenuComands.Einfügen, tags.TagGet("Folder").FromPlusMinus() && !string.IsNullOrEmpty(_ausschneiden));
@@ -321,7 +321,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
 
     private void lsbFiles_ItemClicked(object sender, BasicListItemEventArgs e) {
         if (File.Exists(e.Item.Internal)) {
-            var tags = (List<string>)e.Item.Tag;
+            var tags = (List<string>)e.Item.Tag ?? new List<string>(); ;
 
             switch (e.Item.Internal.FileType()) {
                 case FileFormat.Link:

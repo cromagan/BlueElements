@@ -109,6 +109,7 @@
     <Compile Include="BlueFont.cs" />
     <Compile Include="CommonDialogs.cs" />
     <Compile Include="FormManager.cs" />
+    <Compile Include="Interfaces\IHasStatusBar.cs" />
     <Compile Include="Interfaces\IHasDatabase.cs" />
     <Compile Include="ConnectedFormula\ConnectedFormula.cs" />
     <Compile Include="ConnectedFormula\ConnectedFormulaView.cs">

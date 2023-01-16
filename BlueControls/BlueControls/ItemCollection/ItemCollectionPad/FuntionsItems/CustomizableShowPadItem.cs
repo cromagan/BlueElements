@@ -246,7 +246,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
                 return true;
 
             case "getvaluefrom":
-                GetRowFrom = (ICalculateRowsItemLevel)Parent[value.FromNonCritical()];
+                GetRowFrom = Parent[value.FromNonCritical()] as ICalculateRowsItemLevel;
                 return true;
 
             case "visiblefor":

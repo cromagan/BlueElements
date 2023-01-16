@@ -1494,7 +1494,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
     public List<string> GetUcaseNamesSortedByLenght() {
         if (UcaseNamesSortedByLenght != null) { return UcaseNamesSortedByLenght; }
-        var tmp = Contents((FilterCollection)null, null);
+        var tmp = Contents(null as FilterCollection, null);
         for (var z = 0; z < tmp.Count; z++) {
             tmp[z] = tmp[z].Length.ToString(Constants.Format_Integer10) + tmp[z].ToUpper();
         }

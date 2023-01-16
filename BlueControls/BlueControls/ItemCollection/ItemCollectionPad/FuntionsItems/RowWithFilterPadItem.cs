@@ -280,7 +280,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         }
 
         if (FilterDefiniton != null) {
-            t = t + "FilterDB=" + FilterDefiniton.Export_CSV(FirstRow.ColumnInternalName, (List<ColumnItem>)null, null).ToNonCritical() + ", ";
+            t = t + "FilterDB=" + FilterDefiniton.Export_CSV(FirstRow.ColumnInternalName, null as List<ColumnItem>, null).ToNonCritical() + ", ";
         }
 
         return t.Trim(", ") + "}";

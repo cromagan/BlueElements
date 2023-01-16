@@ -103,7 +103,7 @@ public class VariableBool : Variable {
             #region Ersten Wert als s1 ermitteln
 
             var s1 = txt.Substring(0, i);
-            Variable v1 = null;
+            Variable? v1 = null;
             if (!string.IsNullOrEmpty(s1)) {
                 var tmp1 = GetVariableByParsing(s1, s);
                 if (!string.IsNullOrEmpty(tmp1.ErrorMessage)) { return false; }//new DoItFeedback("Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage);

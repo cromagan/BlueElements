@@ -148,7 +148,14 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
     public void DiscardPendingChanges(object sender, System.EventArgs e) => ChangeWorkItems();
 
-    public void Load_Reload() => _muf?.Load_Reload();
+    public void Load_Reload() {
+        if (!ReloadNeeded || IsDisposed) { return; }
+
+        OnDropMessage(FehlerArt.Info, "Lade Änderungen der Datenbank: " + TableName);
+        _muf?.Load_Reload();
+
+        OnDropMessage(FehlerArt.Info, string.Empty);
+    }
 
     public void Parse(object sender, MultiUserParseEventArgs e) {
         Database.Parse(e.Data, this, Works, null);
@@ -173,7 +180,21 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         return false;
     }
 
-    public override bool Save() => _muf?.Save(true) ?? false;
+    public override bool Save() {
+        if (_muf == null || IsDisposed || ReadOnly || !HasPendingChanges) { return false; }
+
+        OnDropMessage(FehlerArt.Info, "Speichere Datenbank: " + TableName);
+
+        var x = _muf?.Save(true) ?? false;
+
+        if (x) {
+            OnDropMessage(FehlerArt.Info, "Datenbank " + TableName + " erfolgreich gespeichert.");
+        } else {
+            OnDropMessage(FehlerArt.Info, "Datenbank " + TableName + " Speichervorgang nicht erfolgreich, neuer Versuch startet demnächst.");
+        }
+
+        return x;
+    }
 
     public override string UndoText(ColumnItem? column, RowItem? row) => Database.UndoText(column, row, Works);
 

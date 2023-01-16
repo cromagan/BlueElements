@@ -44,13 +44,9 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
 
     #endregion
 
-
-
     #region Constructors
 
     public BitmapPadItem(string internalname) : this(internalname, null, Size.Empty) { }
-
-    public BitmapPadItem(string internalname, string fileToLoad) : this(internalname, (Bitmap)BitmapExt.Image_FromFile(fileToLoad), Size.Empty) { }
 
     public BitmapPadItem(string internalname, Bitmap? bmp) : this(internalname, bmp, Size.Empty) { }
 
@@ -101,20 +97,18 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
             e.ShowDialog();
 
             if (!FileExists(e.FileName)) { return; }
-            Bitmap = (Bitmap)BitmapExt.Image_FromFile(e.FileName);
+            Bitmap = (Bitmap?)BitmapExt.Image_FromFile(e.FileName);
         }
     }
 
     public bool Hintergrund_Weiß_Füllen { get; set; }
 
     [Description("Hier kann ein Variablenname als Platzhalter eingegeben werden. Beispiel: ~Bild~")]
-    public string Platzhalter_Für_Layout { get; set; }
+    public string Platzhalter_Für_Layout { get; set; } = string.Empty;
 
     protected override int SaveOrder => 999;
 
     #endregion
-
-
 
     #region Methods
 
@@ -311,6 +305,4 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
     }
 
     #endregion
-
-
 }

@@ -137,7 +137,7 @@ public sealed class FilterCollection : ListExt<FilterItem>, IParseable {
         Remove(tmp);
     }
 
-    public void Remove_RowFilter() => Remove((ColumnItem)null);
+    public void Remove_RowFilter() => Remove((ColumnItem?)null);
 
     public void RemoveOtherAndAddIfNotExists(ColumnItem? column, FilterType filterType, string filterBy, string herkunft) => RemoveOtherAndAddIfNotExists(new FilterItem(column, filterType, filterBy, herkunft));
 

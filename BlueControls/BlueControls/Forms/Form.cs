@@ -22,6 +22,8 @@ using System.ComponentModel;
 using System.Drawing;
 using BlueBasics.MultiUserFile;
 using BlueDatabase;
+using BlueBasics.Enums;
+using System;
 
 namespace BlueControls.Forms;
 
@@ -115,12 +117,40 @@ public partial class Form : System.Windows.Forms.Form {
         // NIX TUN!!!!
     }
 
+    public bool UpdateStatus(FehlerArt type, string message, bool didAlreadyMessagebox, Caption capStatusbar, bool dropMessages) {
+        var imagecode = ImageCode.Information;
+
+        if(string.IsNullOrEmpty(message)) {
+            capStatusbar.Text = string.Empty;
+            capStatusbar.Refresh();
+            return false;
+        }
+
+
+        if (type == FehlerArt.Warnung) { imagecode = ImageCode.Warnung; }
+        if (type == FehlerArt.Fehler) { imagecode = ImageCode.Kritisch; }
+
+        if (type == FehlerArt.Info || type == FehlerArt.DevelopInfo || !dropMessages || didAlreadyMessagebox) {
+            capStatusbar.Text = "<imagecode=" + QuickImage.Get(imagecode, 16).ToString() + "> " + message;
+            capStatusbar.Refresh();
+            return false;
+        }
+
+        if (dropMessages) {
+            Develop.DebugPrint(type, message);
+            MessageBox.Show(message, imagecode, "Ok");
+            return true;
+        }
+
+        return false;
+    }
+
     //MyBase.ScaleChildren
     protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) => bounds;
 
     protected override void OnCreateControl() {
         Develop.StartService();
-        Table.StartDatabaseService();
+        Allgemein.StartDatabaseService();
         base.OnCreateControl();
     }
 

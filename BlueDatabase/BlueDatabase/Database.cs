@@ -541,10 +541,10 @@ public sealed class Database : DatabaseAbstract {
             r.Close();
         }
 
-        if (bLoaded.Length > 4 && BitConverter.ToInt32(bLoaded, 0) == 67324752) {
-            // Gezipte Daten-Kennung gefunden
-            bLoaded = MultiUserFile.UnzipIt(bLoaded);
-        }
+        //if (bLoaded.Length > 4 && BitConverter.ToInt32(bLoaded, 0) == 67324752) {
+        //    // Gezipte Daten-Kennung gefunden
+        //    bLoaded = MultiUserFile.UnzipIt(bLoaded);
+        //}
 
         Database.Parse(bLoaded, this, Works, null);
 

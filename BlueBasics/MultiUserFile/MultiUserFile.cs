@@ -201,7 +201,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         }
     }
 
-    public static byte[]? UnzipIt(byte[] data) {
+    public static byte[] UnzipIt(byte[] data) {
         using MemoryStream originalFileStream = new(data);
         using ZipArchive zipArchive = new(originalFileStream);
         var entry = zipArchive.GetEntry("Main.bin");
@@ -212,7 +212,7 @@ public sealed class MultiUserFile : IDisposableExtended {
             return ms.ToArray();
         }
 
-        return null;
+        return new byte[0];
     }
 
     // Dieser Code wird hinzugefügt, um das Dispose-Muster richtig zu implementieren.
@@ -705,7 +705,9 @@ public sealed class MultiUserFile : IDisposableExtended {
 
         if (bLoaded.Length > 4 && BitConverter.ToInt32(bLoaded, 0) == 67324752) {
             // Gezipte Daten-Kennung gefunden
-            bLoaded = UnzipIt(bLoaded);
+            var tmp = UnzipIt(bLoaded);
+
+            if (tmp is byte[] bok) { bLoaded = bok; }
         }
         return (bLoaded, tmpLastSaveCode2);
     }
@@ -745,7 +747,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         Saving?.Invoke(this, System.EventArgs.Empty);
     }
 
-    private byte[] OnToListOfByte() {
+    private byte[]? OnToListOfByte() {
         var x = new MultiUserToListEventArgs();
 
         ToListOfByte?.Invoke(this, x);

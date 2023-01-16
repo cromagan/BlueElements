@@ -265,8 +265,6 @@ public static class IO {
             // Illegales Zeichen im Pfad?
             return string.Empty;
         }
-
-
     }
 
     public static FileFormat FileType(this string filename) => string.IsNullOrEmpty(filename)

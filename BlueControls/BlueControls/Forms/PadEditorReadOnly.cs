@@ -18,13 +18,16 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 using System.Windows.Forms;
 
 namespace BlueControls.Forms;
 
-public partial class PadEditorReadOnly : Form {
+public partial class PadEditorReadOnly : Form, IHasStatusbar {
 
     #region Constructors
 
@@ -36,7 +39,17 @@ public partial class PadEditorReadOnly : Form {
 
     #endregion
 
+    #region Properties
+
+    public bool DropMessages { get; set; }
+
+    #endregion
+
     #region Methods
+
+    public bool UpdateStatus(FehlerArt type, string message, bool didAlreadyMessagebox) {
+        return base.UpdateStatus(type, message, didAlreadyMessagebox, capStatusBar, DropMessages);
+    }
 
     private void btnAlsBildSpeichern_Click(object sender, System.EventArgs e) => Pad.OpenSaveDialog(string.Empty);
 

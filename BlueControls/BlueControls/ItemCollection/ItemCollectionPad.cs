@@ -669,8 +669,8 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
     private void CreateConnection(string toparse) {
         var x = toparse.GetAllTags();
 
-        BasicPadItem item1 = null;
-        BasicPadItem item2 = null;
+        BasicPadItem? item1 = null;
+        BasicPadItem? item2 = null;
         var arrow1 = false;
         var arrow2 = false;
         var con1 = ConnectionType.Auto;

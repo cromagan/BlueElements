@@ -17,15 +17,30 @@
 
 #nullable enable
 
+using BlueBasics.Enums;
+using BlueBasics.EventArgs;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Forms;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollection;
 using BlueControls.ItemCollection.ItemCollectionList;
+using BlueDatabase;
+using BlueDatabase.EventArgs;
+using System;
+using System.CodeDom;
 using System.Collections.Generic;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace BlueControls;
 
 public static class Allgemein {
+
+    #region Fields
+
+    private static bool _serviceStarted;
+
+    #endregion
 
     #region Methods
 
@@ -69,6 +84,65 @@ public static class Allgemein {
             return par;
         }
         return null;
+    }
+
+    public static void StartDatabaseService() {
+        if (_serviceStarted) { return; }
+        _serviceStarted = true;
+        DatabaseAbstract.AllFiles.ItemAdded += AllFiles_ItemAdded;
+        DatabaseAbstract.AllFiles.ItemRemoving += AllFiles_ItemRemoving;
+        //Database.DropConstructorMessage += Database_DropConstructorMessage;
+    }
+
+    public static void UpdateStatusBar(string jobname, string text) {
+        if (string.IsNullOrEmpty(jobname) && string.IsNullOrEmpty(text)) {
+            UpdateStatusBar(FehlerArt.Info, string.Empty, false);
+        } else {
+            UpdateStatusBar(FehlerArt.Info, "[" + jobname + " " + DateTime.Now.ToString("HH:mm:ss") + "] " + text, false);
+        }
+    }
+
+    public static void UpdateStatusBar(FehlerArt type, string text, bool addtime) {
+        if (addtime && !string.IsNullOrEmpty(text)) {
+            text = DateTime.Now.ToString("HH:mm:ss") + " " + text;
+        }
+
+        var did = false;
+        foreach (var thisf in FormManager.Forms) {
+            if (thisf is IHasStatusbar fd) {
+                var x = fd.UpdateStatus(type, text, did);
+                if (x) { did = true; }
+            }
+        }
+    }
+
+    private static void AllFiles_ItemAdded(object sender, ListEventArgs e) {
+        if (e.Item is DatabaseAbstract db) {
+            db.GenerateLayoutInternal += DB_GenerateLayoutInternal;
+            db.Loaded += TableView.CheckDatabase;
+            db.DropMessage += Db_DropMessage;
+        }
+    }
+
+    private static void AllFiles_ItemRemoving(object sender, ListEventArgs e) {
+        if (e.Item is DatabaseAbstract db) {
+            db.GenerateLayoutInternal -= DB_GenerateLayoutInternal;
+            db.Loaded -= TableView.CheckDatabase;
+            db.DropMessage -= Db_DropMessage;
+        }
+    }
+
+    private static void Db_DropMessage(object sender, MessageEventArgs e) {
+        UpdateStatusBar(e.Type, e.Message, true);
+    }
+
+    private static void DB_GenerateLayoutInternal(object sender, GenerateLayoutInternalEventArgs e) {
+        if (e.Handled) { return; }
+        e.Handled = true;
+        if (e?.Row?.Database == null) { return; }
+
+        var pad = new ItemCollectionPad(e.LayoutId, e.Row.Database, e.Row.Key);
+        pad.SaveAsBitmap(e.Filename);
     }
 
     #endregion

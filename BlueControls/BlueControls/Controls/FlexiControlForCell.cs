@@ -417,8 +417,8 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
 
     private void Database_RowChecked(object sender, RowCheckedEventArgs e) {
         if (e.Row != _tmpRow) { return; }
-        if(e.ColumnsWithErrors == null ) {
-            InfoText = string.Empty; return;    
+        if (e.ColumnsWithErrors == null) {
+            InfoText = string.Empty; return;
         }
 
         var newT = string.Empty;
@@ -568,7 +568,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     private void ListBox_AddClicked(object sender, System.EventArgs e) {
         var dia = ColumnItem.UserEditDialogTypeInTable(_tmpColumn, false);
 
-        ListBox lbx = null;
+        ListBox? lbx = null;
 
         if (sender is ListBox lbx2) { lbx = lbx2; }
         if (sender is SwapListBox lbx3) { lbx = lbx3.Main; }

@@ -143,11 +143,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         Arrangement = car.Count - 1;
         UpdateCombobox();
 
-
-
         ShowOrder();
-
-
     }
 
     private void btnNeueSpalte_Click(object sender, System.EventArgs e) {
@@ -421,8 +417,8 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
         var kx = 0f;
         foreach (var thisCombi in dbColumnCombi) {
-            foreach (var thisc in CurrentArrangement) {
-                var it = (ColumnPadItem)Pad.Item[thisc.Column.Name];
+            foreach (var thisc in ca) {
+                var it = Pad.Item[thisc?.Column?.Name] as ColumnPadItem;
 
                 if (thisc.Column.LinkedDatabase != null) {
                     // String als Namen als eindeutige Kennung
@@ -432,7 +428,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
                         #region Database-Item 'databItem' erzeugen
 
-                        var databItem = (GenericPadItem)Pad.Item[toCheckCombi];
+                        var databItem = Pad.Item[toCheckCombi] as GenericPadItem;
                         if (databItem == null) {
                             var nam = thisc.Column.LinkedDatabase.ConnectionData.TableName;
                             databItem = new GenericPadItem(toCheckCombi, nam, new Size((int)(anyitem.UsedArea.Height / 2), (int)anyitem.UsedArea.Height));
@@ -449,9 +445,9 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
                         for (var z = 0; z < Math.Min(thisc.Column.LinkedCellFilter.Count, thisc.Column.LinkedDatabase.Column.Count); z++) {
                             if (IntTryParse(thisc.Column.LinkedCellFilter[z], out var key)) {
-                                var c = thisc.Column.Database.Column.SearchByKey(key);
+                                var c = thisc?.Column?.Database?.Column.SearchByKey(key);
                                 if (c != null) {
-                                    var rkcolit = (ColumnPadItem)Pad.Item[c.Name];
+                                    var rkcolit = (ColumnPadItem?)Pad.Item[c.Name];
                                     rkcolit?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false, databItem, ConnectionType.Top, true, false));
                                 }
                             }// else if (!string.IsNullOrEmpty(column.LinkedCellFilter[z]) && column.LinkedCellFilter[z].StartsWith("@")) {

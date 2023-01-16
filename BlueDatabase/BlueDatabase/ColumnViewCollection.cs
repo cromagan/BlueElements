@@ -27,7 +27,7 @@ using System.Linq;
 
 namespace BlueDatabase;
 
-public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable, ICloneable {
+public sealed class ColumnViewCollection : ListExt<ColumnViewItem?>, IParseable, ICloneable {
     //NICHT IReadableText, das gibt zu viele Probleme (Dropdownboxen)
 
     #region Fields
@@ -264,11 +264,12 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable, 
     }
 
     internal void Repair(int number) {
+        if (Database == null || Database.IsDisposed) { return; }
 
         #region Ungültige Spalten entfernen
 
         for (var z = 0; z < Count; z++) {
-            if (this[z].Column == null || !Database.Column.Contains(this[z].Column)) {
+            if (this[z].Column == null || !Database.Column.Contains(this[z]?.Column)) {
                 this[z] = null;
             }
         }

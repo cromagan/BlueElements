@@ -1501,7 +1501,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
         if (_checker != null) {
             _checker.Dispose();
-            _checker = null;
+            //_checker = null;
         }
 
         // TODO: nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer weiter unten überschreiben.

@@ -272,8 +272,8 @@ public sealed class QuickImage : BitmapExt, IReadableText {
             if (DateTime.Now.Subtract(tim).TotalSeconds > 5) { return null; }
 
             try { // .... wir an anderer Stelle verwendet....
-                bmp = (BitmapExt)p;
-                if (bmp == null || bmp.Width < p.Width) { bmp = null; }
+                bmp = (BitmapExt?)p;
+                if (bmp == null || p == null || bmp.Width < p.Width) { bmp = null; }
             } catch { bmp = null; }
         } while (bmp == null);
 
@@ -298,6 +298,10 @@ public sealed class QuickImage : BitmapExt, IReadableText {
 
     public QuickImage SymbolForReadableText() => this;
 
+    /// <summary>
+    /// Gibt den ImageCode zurück
+    /// </summary>
+    /// <returns></returns>
     public override string ToString() => Code;
 
     private void CorrectSize(int width, int height, Image? bmp) {
@@ -432,7 +436,7 @@ public sealed class QuickImage : BitmapExt, IReadableText {
         if (vbmp != null) { return vbmp; }
 
         if (Pics.TryGetValue(tmpname, out var p) && p != this) {
-            return p.IsError ? null : (Bitmap)p;
+            return p.IsError ? null : (Bitmap?)p;
         }
 
         NeedImageEventArgs e = new(tmpname);
@@ -440,7 +444,7 @@ public sealed class QuickImage : BitmapExt, IReadableText {
 
         // Evtl. hat die "OnNeedImage" das Bild auch in den Stack hochgeladen
         // Falls nicht, hier noch erledigen
-        return Exists(tmpname) && Get(tmpname) != this ? Get(tmpname) : (Bitmap)e.Bmp;
+        return Exists(tmpname) && Get(tmpname) != this ? Get(tmpname) : (Bitmap?)e.Bmp;
     }
 
     #endregion

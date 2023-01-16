@@ -74,7 +74,7 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
         if (item == null) { return; }
         foreach (var thisi in item.Where(thisi => Main.Item[thisi.Internal] == null && Suggest.Item[thisi.Internal] == null)) {
             thisi.Checked = false;
-            Suggest.Item.Add((BasicListItem)thisi.Clone());
+            Suggest.Item.Add(thisi.Clone() as BasicListItem);
         }
     }
 
@@ -85,7 +85,7 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
         var sourceItem = source.Item[@internal];
         var targetItem = target.Item[@internal];
         if (sourceItem != null && targetItem == null) {
-            target.Item.Add((BasicListItem)sourceItem.Clone());
+            target.Item.Add(sourceItem.Clone() as BasicListItem);
         } else if (sourceItem == null && targetItem == null) {
             targetItem = new TextListItem(@internal, @internal, null, false, true, string.Empty);
             target.Item.Add(targetItem);

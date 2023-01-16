@@ -238,8 +238,10 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
         if (rück == null || rück.Count == 0) { return; }
 
-        Item.Add((BasicListItem)Suggestions[rück[0]].Clone());
-        //.CloneToNewCollection(Item);
+        var sg = Suggestions[rück[0]];
+        if (sg == null) { return; }
+
+        Item.Add(sg.Clone() as BasicListItem);
     }
 
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
@@ -530,7 +532,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     //    CheckButtons();
     //}
     private void Up_Click(object sender, System.EventArgs e) {
-        BasicListItem ln = null;
+        BasicListItem? ln = null;
         foreach (var thisItem in Item) {
             if (thisItem != null) {
                 if (thisItem.Checked) {

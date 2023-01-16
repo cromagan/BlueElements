@@ -106,7 +106,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
         Bitmap? bmp = null;
         List<string> tags = new();
         if (FileExists(pathOfPicture)) {
-            bmp = (Bitmap)BitmapExt.Image_FromFile(pathOfPicture);
+            bmp = (Bitmap?)BitmapExt.Image_FromFile(pathOfPicture);
         }
         var ftxt = FilenameTxt(pathOfPicture);
         if (FileExists(ftxt)) {

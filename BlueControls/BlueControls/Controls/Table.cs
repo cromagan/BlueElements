@@ -59,7 +59,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private const int AutoFilterSize = 22;
     private const int ColumnCaptionSizeY = 22;
     private const int RowCaptionSizeY = 50;
-    private static bool _serviceStarted;
+
     private readonly List<string> _collapsed = new();
     private readonly object _lockUserAction = new();
     private int _arrangementNr = 1;
@@ -651,7 +651,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             _database.Column.ItemRemoved -= _Database_ViewChanged;
             _database.Column.ItemAdded -= _Database_ViewChanged;
             _database.ProgressbarInfo -= _Database_ProgressbarInfo;
-            _database.DropMessage -= _Database_DropMessage;
             _database.Disposing -= _Database_Disposing;
             DatabaseAbstract.ForceSaveAll();
             BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
@@ -677,7 +676,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             _database.Column.ItemRemoving += Column_ItemRemoving;
             _database.Column.ItemRemoved += _Database_ViewChanged;
             _database.ProgressbarInfo += _Database_ProgressbarInfo;
-            _database.DropMessage += _Database_DropMessage;
             _database.Disposing += _Database_Disposing;
         }
 
@@ -1082,13 +1080,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public RowData? View_NextRow(RowData? row) {
         if (_database == null) { return null; }
-        var rowNr = SortedRows().IndexOf(row);
+        var rowNr = SortedRows()?.IndexOf(row) ?? -1;
         return rowNr < 0 || rowNr >= SortedRows().Count - 1 ? null : SortedRows()[rowNr + 1];
     }
 
     public RowData? View_PreviousRow(RowData? row) {
         if (_database == null) { return null; }
-        var rowNr = SortedRows().IndexOf(row);
+        var rowNr = SortedRows()?.IndexOf(row) ?? -1;
         return rowNr < 1 ? null : SortedRows()[rowNr - 1];
     }
 
@@ -1156,14 +1154,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         //return Database.Row.CalculateVisibleRows(Filter, PinnedRows);
     }
 
-    internal static void StartDatabaseService() {
-        if (_serviceStarted) { return; }
-        _serviceStarted = true;
-        DatabaseAbstract.AllFiles.ItemAdded += AllFiles_ItemAdded;
-        DatabaseAbstract.AllFiles.ItemRemoving += AllFiles_ItemRemoving;
-        //Database.DropConstructorMessage += Database_DropConstructorMessage;
-    }
-
     protected override void DrawControl(Graphics gr, States state) {
         if (InvokeRequired) {
             Invoke(new Action(() => DrawControl(gr, state)));
@@ -1173,7 +1163,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         _tmpCursorRect = Rectangle.Empty;
 
         // Listboxen bekommen keinen Focus, also Tabellen auch nicht. Basta.
-        if (Convert.ToBoolean(state & States.Standard_HasFocus)) {
+        if (state.HasFlag(States.Standard_HasFocus)) {
             state ^= States.Standard_HasFocus;
         }
 
@@ -1184,7 +1174,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         lock (_lockUserAction) {
             //if (_InvalidExternal) { FillExternalControls(); }
-            if (Convert.ToBoolean(state & States.Standard_Disabled)) { CursorPos_Reset(); }
+            if (state.HasFlag(States.Standard_Disabled)) { CursorPos_Reset(); }
             var displayRectangleWoSlider = DisplayRectangleWithoutSlider();
             // Haupt-Aufbau-Routine ------------------------------------
             //gr.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
@@ -1194,7 +1184,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             }
 
             var rw = new List<RowItem>();
-            List<RowData> sr;
+            List<RowData>? sr;
             int firstVisibleRow;
             int lastVisibleRow;
             do {
@@ -1211,10 +1201,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 rw.Clear();
                 foreach (var thisRow in sr) {
                     if (IsOnScreen(thisRow, displayRectangleWoSlider)) {
-                        if (thisRow?.Row != null) { rw.AddIfNotExists(thisRow.Row); }
-                        var T = sr.IndexOf(thisRow);
-                        firstVisibleRow = Math.Min(T, firstVisibleRow);
-                        lastVisibleRow = Math.Max(T, lastVisibleRow);
+                        if (thisRow?.Row != null) {
+                            rw.AddIfNotExists(thisRow.Row);
+                            var T = sr.IndexOf(thisRow);
+                            firstVisibleRow = Math.Min(T, firstVisibleRow);
+                            lastVisibleRow = Math.Max(T, lastVisibleRow);
+                        }
                     }
                 }
 
@@ -1658,29 +1650,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    private static void AllFiles_ItemAdded(object sender, ListEventArgs e) {
-        if (e.Item is DatabaseAbstract db) {
-            db.GenerateLayoutInternal += DB_GenerateLayoutInternal;
-            db.Loaded += TableView.CheckDatabase;
-        }
-    }
-
-    private static void AllFiles_ItemRemoving(object sender, ListEventArgs e) {
-        if (e.Item is DatabaseAbstract db) {
-            db.GenerateLayoutInternal -= DB_GenerateLayoutInternal;
-            db.Loaded -= TableView.CheckDatabase;
-        }
-    }
-
-    private static void DB_GenerateLayoutInternal(object sender, GenerateLayoutInternalEventArgs e) {
-        if (e.Handled) { return; }
-        e.Handled = true;
-        if (e?.Row?.Database == null) { return; }
-
-        var pad = new ItemCollectionPad(e.LayoutId, e.Row.Database, e.Row.Key);
-        pad.SaveAsBitmap(e.Filename);
-    }
-
     private static void Draw_CellTransparentDirect(Graphics gr, string? toDraw, Rectangle drawarea, BlueFont? font, ColumnItem contentHolderCellColumn, int pix16, ShortenStyle style, BildTextVerhalten bildTextverhalten, States state) {
         toDraw ??= string.Empty;
 
@@ -1779,7 +1748,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
                     var sr = table.SortedRows();
                     var rd = sr.Get(row);
-                    table.CursorPos_Set(table.Database.Column.First, rd, true);
+                    table.CursorPos_Set(table.Database?.Column.First, rd, true);
                 }
             } else {
                 var f = CellCollection.ErrorReason(column, row, ErrorReason.EditGeneral);
@@ -1846,12 +1815,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     //    _StoredView = ColumnCollection.ChangeKeysInString(_StoredView, e.KeyOld, e.KeyNew);
     //}
     private void _Database_Disposing(object sender, System.EventArgs e) => DatabaseSet(null, string.Empty);
-
-    private void _Database_DropMessage(object sender, MessageEventArgs e) {
-        if (_database.IsAdministrator() && DropMessages) {
-            MessageBox.Show(e.Message);
-        }
-    }
 
     private void _Database_ProgressbarInfo(object sender, ProgressbarEventArgs e) {
         if (e.Ends) {
@@ -2126,7 +2089,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             OnEditBeforeBeginEdit(ed);
             cancel = ed.CancelReason;
         } else {
-            RowCancelEventArgs ed = new(null, cancel);
+            var ed = new RowCancelEventArgs(null, cancel);
             //OnEditBeforeNewRow(ed);
             cancel = ed.CancelReason;
         }
@@ -2368,7 +2331,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private SizeF ColumnHead_Size(ColumnItem? column) {
         float wi;
         float he;
-        Bitmap CaptionBitmapCode = null; // TODO: Caption Bitmap neu erstellen
+        Bitmap? CaptionBitmapCode = null; // TODO: Caption Bitmap neu erstellen
         if (CaptionBitmapCode != null && CaptionBitmapCode.Width > 10) {
             wi = Math.Max(50, ColumnCaptionText_Size(column).Width + 4);
             he = 50 + ColumnCaptionText_Size(column).Height + 3;
@@ -2376,7 +2339,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             wi = ColumnCaptionText_Size(column).Height + 4;
             he = ColumnCaptionText_Size(column).Width + 3;
         }
-        if (!string.IsNullOrEmpty(column.CaptionGroup3)) {
+        if (!string.IsNullOrEmpty(column?.CaptionGroup3)) {
             he += ColumnCaptionSizeY * 3;
         } else if (!string.IsNullOrEmpty(column.CaptionGroup2)) {
             he += ColumnCaptionSizeY * 2;
@@ -2388,7 +2351,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private ColumnItem? ColumnOnCoordinate(int xpos) {
         if (_database == null || _database.ColumnArrangements.Count - 1 < _arrangementNr) { return null; }
-        foreach (var thisViewItem in CurrentArrangement) {
+        var cua = CurrentArrangement;
+        if (cua == null) { return null; }
+
+        foreach (var thisViewItem in cua) {
             if (thisViewItem?.Column != null) {
                 if (xpos >= thisViewItem.OrderTmpSpalteX1 && xpos <= thisViewItem.OrderTmpSpalteX1 + Column_DrawWidth(thisViewItem, DisplayRectangleWithoutSlider())) {
                     return thisViewItem.Column;
@@ -2402,7 +2368,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         try {
             // Kommt vor, dass spontan doch geparsed wird...
             if (_database.ColumnArrangements == null || _arrangementNr >= _database.ColumnArrangements.Count) { return false; }
-            foreach (var thisViewItem in CurrentArrangement) {
+
+            var cua = CurrentArrangement;
+            if (cua == null) { return false; }
+            foreach (var thisViewItem in cua) {
                 if (thisViewItem != null) {
                     thisViewItem.OrderTmpSpalteX1 = null;
                 }
@@ -2416,7 +2385,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             var maxX = 0;
             var displayR = DisplayRectangleWithoutSlider();
             // Spalten berechnen
-            foreach (var thisViewItem in CurrentArrangement) {
+            foreach (var thisViewItem in cua) {
                 if (thisViewItem?.Column != null) {
                     if (thisViewItem.ViewType != ViewType.PermanentColumn) { wdh = false; }
                     if (wdh) {
@@ -2679,12 +2648,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private void Draw_Column_Head_Captions(Graphics gr) {
         var bvi = new ColumnViewItem[3];
         var lcbvi = new ColumnViewItem[3];
-        ColumnViewItem lastViewItem = null;
+        ColumnViewItem? lastViewItem = null;
         var permaX = 0;
         var ca = CurrentArrangement;
+        if (ca == null) { return; }
+
         for (var x = 0; x < ca.Count + 1; x++) {
             var viewItem = x < ca.Count ? ca[x] : null;
-            if (viewItem?.ViewType == ViewType.PermanentColumn) {
+            if (viewItem != null && viewItem.ViewType == ViewType.PermanentColumn) {
                 permaX = Math.Max(permaX, (int)viewItem.OrderTmpSpalteX1 + (int)viewItem.TmpDrawWidth);
             }
             if (viewItem == null ||
@@ -2815,8 +2786,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         foreach (var viewItem in CurrentArrangement.Where(viewItem => viewItem?.Column != null)) {
             lfdno++;
-            if (IsOnScreen(viewItem, displayRectangleWoSlider)) {
-                if ((col == TableDrawColumn.NonPermament && viewItem.ViewType != ViewType.PermanentColumn && (int)viewItem.OrderTmpSpalteX1 + (int)viewItem.TmpDrawWidth > permaX) ||
+            if (viewItem != null && IsOnScreen(viewItem, displayRectangleWoSlider)) {
+                if ((col == TableDrawColumn.NonPermament && viewItem.ViewType != ViewType.PermanentColumn && (viewItem.OrderTmpSpalteX1 ?? 0) + (viewItem.TmpDrawWidth ?? 0) > permaX) ||
                     (col == TableDrawColumn.Permament && viewItem.ViewType == ViewType.PermanentColumn)) {
                     switch (type) {
                         case TableDrawType.ColumnBackBody:
@@ -2859,8 +2830,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         FloatingForm.Close(this);
         if (string.IsNullOrEmpty(e.ClickedComand)) { return; }
 
-        CellExtEventArgs ck = null;
+        CellExtEventArgs? ck = null;
         if (e.HotItem is CellExtEventArgs tmp) { ck = tmp; }
+
+        if (ck?.Column == null) { return; }
 
         var toAdd = e.ClickedComand;
         var toRemove = string.Empty;
@@ -2873,6 +2846,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             UserEdited(this, toAdd, ck.Column, null, string.Empty, false);
             return;
         }
+
+        if (ck?.RowData.Row == null) { return; }
 
         if (ck.Column.MultiLine) {
             var li = ck.RowData.Row.CellGetList(ck.Column);

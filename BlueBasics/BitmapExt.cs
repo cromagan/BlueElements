@@ -843,7 +843,7 @@ public class BitmapExt : IDisposableExtended {
             try {
                 l.Clear();
                 Generic.CollectGarbage();
-                var x = (Bitmap)Image_FromFile(fileName);
+                var x = (Bitmap?)Image_FromFile(fileName);
                 l.Add(Resize(x, maxSize, maxSize, SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
                 if (frames > 1) {
                     Bitmap x2 = new(200, 200);
@@ -916,7 +916,7 @@ public class BitmapExt : IDisposableExtended {
     }
 
     public void FromFile(string dateiName, bool setDummyPicIfFails) {
-        var x = (Bitmap)Image_FromFile(dateiName);
+        var x = (Bitmap?)Image_FromFile(dateiName);
         if (x == null && setDummyPicIfFails) {
             x = QuickImage.Get(ImageCode.Warnung);
         }

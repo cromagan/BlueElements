@@ -860,9 +860,9 @@ public static class Skin {
 
     public static ImageCodeEffect AdditionalState(States vState) => vState.HasFlag(States.Standard_Disabled) ? St[0] : ImageCodeEffect.Ohne;
 
-    public static List<string> AllStyles() {
+    public static List<string>? AllStyles() {
         if (StyleDb == null) { InitStyles(); }
-        return StyleDb?.Column.First.Contents();
+        return StyleDb?.Column?.First?.Contents();
     }
 
     public static void ChangeDesign(Design ds, States status, Kontur enKontur, int x1, int y1, int x2, int y2, HintergrundArt hint, float verlauf, string bc1, string bc2, string bc3, RahmenArt rahm, string boc1, string boc2, string boc3, string f, string pic) {

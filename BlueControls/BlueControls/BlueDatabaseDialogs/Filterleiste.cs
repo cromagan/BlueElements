@@ -83,7 +83,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     [DefaultValue(FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter)]
     public FilterTypesToShow Filtertypes { get; set; } = FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter;
 
-    [DefaultValue((Table)null)]
+    [DefaultValue((Table?)null)]
     public Table? Table {
         get => _tableView;
         set {

@@ -33,6 +33,7 @@ namespace BlueControls.Forms {
             this.btnAlsBildSpeichern = new BlueControls.Controls.Button();
             this.btnDruckerDialog = new BlueControls.Controls.Button();
             this.tabSeiten = new BlueControls.Controls.TabControl();
+            this.capStatusBar = new BlueControls.Controls.Caption();
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.grpAssistent.SuspendLayout();
@@ -81,7 +82,7 @@ namespace BlueControls.Forms {
             this.Pad.Name = "Pad";
             this.Pad.ShiftX = -1F;
             this.Pad.ShiftY = -1F;
-            this.Pad.Size = new System.Drawing.Size(884, 225);
+            this.Pad.Size = new System.Drawing.Size(884, 200);
             this.Pad.TabIndex = 0;
             this.Pad.Zoom = 1F;
             this.Pad.Changed += new System.EventHandler(this.Pad_Changed);
@@ -255,7 +256,6 @@ namespace BlueControls.Forms {
             // 
             // tabSeiten
             // 
-            this.tabSeiten.Database = null;
             this.tabSeiten.Dock = System.Windows.Forms.DockStyle.Top;
             this.tabSeiten.HotTrack = true;
             this.tabSeiten.Location = new System.Drawing.Point(0, 110);
@@ -268,12 +268,21 @@ namespace BlueControls.Forms {
             this.tabSeiten.TabIndex = 3;
             this.tabSeiten.Selected += new System.Windows.Forms.TabControlEventHandler(this.tabSeiten_Selected);
             // 
+            // capStatusBar
+            // 
+            this.capStatusBar.CausesValidation = false;
+            this.capStatusBar.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.capStatusBar.Location = new System.Drawing.Point(0, 336);
+            this.capStatusBar.Name = "capStatusBar";
+            this.capStatusBar.Size = new System.Drawing.Size(884, 25);
+            // 
             // PadEditorReadOnly
             // 
             this.ClientSize = new System.Drawing.Size(884, 361);
             this.Controls.Add(this.Pad);
             this.Controls.Add(this.tabSeiten);
             this.Controls.Add(this.Ribbon);
+            this.Controls.Add(this.capStatusBar);
             this.Name = "PadEditorReadOnly";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "(c) Christian Peter";
@@ -304,5 +313,6 @@ namespace BlueControls.Forms {
         private Button btnPageSetup;
         protected Button btnVorschauModus;
         protected TabControl tabSeiten;
+        private Caption capStatusBar;
     }
 }

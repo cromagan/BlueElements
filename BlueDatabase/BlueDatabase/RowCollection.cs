@@ -388,8 +388,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     /// </summary>
     /// <param name="fi"></param>
     /// <returns></returns>
-    public RowItem? GenerateAndAdd(List<FilterItem>? fi, string comment) {
-        List<string> first = null;
+    public RowItem? GenerateAndAdd(List<FilterItem> fi, string comment) {
+        if (Database == null || Database.IsDisposed) { return null; }
+
+        List<string>? first = null;
 
         foreach (var thisfi in fi) {
             if (Database.Column.First() == thisfi.Column) {
@@ -425,7 +427,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
     public bool Remove(long key, string comment) => string.IsNullOrEmpty(Database.ChangeData(DatabaseDataType.Comand_RemoveRow, null, key, string.Empty, key.ToString(), comment));
 
-    public bool Remove(FilterItem filter, List<RowItem?> pinned, string comment) {
+    public bool Remove(FilterItem filter, List<RowItem?>? pinned, string comment) {
         FilterCollection nf = new(Database) { filter };
         return Remove(nf, pinned, comment);
     }

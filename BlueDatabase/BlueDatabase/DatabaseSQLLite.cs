@@ -38,7 +38,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     /// <summary>
     /// Nicht static, weil verschiedene Datenbankverbindngen möglich sind.
     /// </summary>
-    public readonly SQLBackAbstract _sql;
+    public readonly SQLBackAbstract? _sql;
 
     private static bool _isInTimer = false;
 
@@ -56,22 +56,19 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     #region Constructors
 
-    public DatabaseSQLLite(ConnectionInfo ci) : this(((DatabaseSQLLite)ci.Provider)._sql, false, ci.TableName) { }
+    public DatabaseSQLLite(ConnectionInfo ci) : this(((DatabaseSQLLite?)ci.Provider)?._sql, false, ci.TableName) { }
 
-    public DatabaseSQLLite(SQLBackAbstract sql, bool readOnly, string tablename) : base(tablename, readOnly) {
+    public DatabaseSQLLite(SQLBackAbstract? sql, bool readOnly, string tablename) : base(tablename, readOnly) {
         if (sql == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Keine SQL_Verbindung übergeben.");
+            return;
         }
 
         _sql = sql.OtherTable(tablename);
 
-        //Develop.StartService();
-
         Initialize();
-        //_checkedAndReloadNeed = true;
 
         if (sql != null) {
-            //DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + tablename.FileNameWithoutSuffix()));
             LoadFromSQLBack();
         }
         AllFiles.Add(this);
@@ -140,11 +137,15 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         if (columns == null || columns.Count == 0) { return; }
         //if (columns.Count == 1 && columns[0].IsInCache != null) { return; }
 
+        OnDropMessage(FehlerArt.Info, "Lade " + columns.Count.ToString() + " Spalte(n) nach.");
+
         try {
             _sql.LoadColumns(TableName, columns);
         } catch {
             RefreshColumnsData(columns);
         }
+
+        OnDropMessage(FehlerArt.Info, string.Empty);
     }
 
     //    LoadFromSQLBack();

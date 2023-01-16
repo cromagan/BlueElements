@@ -115,12 +115,12 @@ internal sealed partial class SearchAndReplace : Form {
         if (NurinAktuellerSpalte.Checked) {
             sp.Add(_blueTable.CursorPosColumn);
         } else {
-            sp.AddRange(_blueTable.Database.Column.Where(thisColumn => thisColumn != null && thisColumn.Format.CanBeChangedByRules()));
+            sp.AddRange(_blueTable?.Database?.Column.Where(thisColumn => thisColumn != null && thisColumn.Format.CanBeChangedByRules()));
         }
         foreach (var thisRow in _blueTable.Database.Row) {
             if (thisRow != null) {
                 if (!AktuelleFilterung.Checked || thisRow.MatchesTo(_blueTable.Filter)) {
-                    if (!AbgeschlosseZellen.Checked || !thisRow.CellGetBoolean(_blueTable.Database.Column.SysLocked)) { ro.Add(thisRow); }
+                    if (!AbgeschlosseZellen.Checked || !thisRow.CellGetBoolean(_blueTable?.Database?.Column.SysLocked)) { ro.Add(thisRow); }
                 }
             }
         }

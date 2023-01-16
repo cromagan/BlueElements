@@ -370,7 +370,10 @@ public static partial class Extensions {
     /// <typeparam name="T"></typeparam>
     /// <param name="l"></param>
     /// <returns></returns>
-    private static int TagGetPosition(this ICollection<string> col, string tagname) {
+    private static int TagGetPosition(this ICollection<string>? col, string tagname) {
+        if(col == null) { return -1; }
+
+
         var uTagName = tagname.ToUpper() + ":";
 
         for (var z = 0; z < col.Count; z++) {
