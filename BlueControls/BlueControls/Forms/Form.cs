@@ -126,6 +126,12 @@ public partial class Form : System.Windows.Forms.Form {
             return false;
         }
 
+        message = message.Replace("\r\n", "; ");
+        message = message.Replace("\r", "; ");
+        message = message.Replace("\n", "; ");
+        message = message.Replace("<BR>", "; ", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        message = message.Replace("; ; ", "; ");
+        message = message.TrimEnd("; ");
 
         if (type == FehlerArt.Warnung) { imagecode = ImageCode.Warnung; }
         if (type == FehlerArt.Fehler) { imagecode = ImageCode.Kritisch; }

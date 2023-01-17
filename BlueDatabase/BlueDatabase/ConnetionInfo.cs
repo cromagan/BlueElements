@@ -45,6 +45,8 @@ public class ConnectionInfo : IReadableText {
         var alf = new List<DatabaseAbstract>();// könnte sich ändern, deswegen Zwischenspeichern
         alf.AddRange(DatabaseAbstract.AllFiles);
 
+
+        #region Ist es NUR ein Dateiname? Dann im Single und Multiuser suchen und zur Not eine MultiUser zurück geben
         if (uniqueID.Substring(1, 1) == ":" &&
             uniqueID.FileSuffix().ToUpper() == "MDB" &&
             System.IO.File.Exists(uniqueID)) {
@@ -67,19 +69,29 @@ public class ConnectionInfo : IReadableText {
 
             return;
         }
+        #endregion
 
         var x = (uniqueID + "||||").SplitBy("|");
 
         foreach (var thisDB in alf) {
             var d = thisDB.ConnectionData;
 
-            if (d.DatabaseID == x[1]) {
-                TableName = x[0].ToUpper();
-                Provider = thisDB;
-                DatabaseID = d.DatabaseID;
-                AdditionalData = d.AdditionalData;
+
+            if (thisDB.ConnectionDataOfOtherTable(x[0], true) is ConnectionInfo nci)
+                    {
+                TableName = nci.TableName;
+                Provider = nci.Provider;
+                DatabaseID = nci.DatabaseID;
+                AdditionalData = nci.AdditionalData;
                 return;
             }
+            //if (d.DatabaseID == x[1]) {
+            //    TableName = x[0].ToUpper();
+            //    Provider = thisDB;
+            //    DatabaseID = d.DatabaseID;
+            //    AdditionalData = dn;
+            //    return;
+            //}
 
             if (d.DatabaseID == Database.DatabaseId) {
                 // Dateisystem
@@ -105,6 +117,8 @@ public class ConnectionInfo : IReadableText {
         }
 
         var tbn = SQLBackAbstract.MakeValidTableName(uniqueID.FileNameWithoutSuffix());
+
+
 
         var ci = DatabaseAbstract.ProviderOf(tbn);
 

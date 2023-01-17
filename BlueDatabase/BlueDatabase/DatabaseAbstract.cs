@@ -357,9 +357,14 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     #region Methods
 
+    /// <summary>
+    /// Gibt einen neue Liste zurück
+    /// </summary>
+    /// <param name="ignorePath"></param>
+    /// <returns></returns>
     public static List<ConnectionInfo> AllAvailableTables(List<string>? ignorePath) {
         if (DateTime.Now.Subtract(_lastTableCheck).TotalMinutes < 1) {
-            return _allavailabletables;
+            return _allavailabletables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
         }
 
         // Wird benutzt, um z.b. das Dateisystem nicht doppelt und dreifach abzufragen.
@@ -397,7 +402,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         }
 
         _lastTableCheck = DateTime.Now;
-        return _allavailabletables;
+        return _allavailabletables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
     }
 
     public static void ForceSaveAll() {

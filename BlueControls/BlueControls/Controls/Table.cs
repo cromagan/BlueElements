@@ -327,7 +327,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         return NewContentWidth;
     }
 
-    public static Size Cell_ContentSize(Table? table, ColumnItem column, RowItem? row, BlueFont? cellFont, int pix16) {
+    public static Size Cell_ContentSize(Table? table, ColumnItem? column, RowItem? row, BlueFont? cellFont, int pix16) {
+        if (table?.Database == null || column?.Database == null || row == null || table.Database.IsDisposed) { return new Size(pix16, pix16); }
+
         if (column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             var (lcolumn, lrow, _) = CellCollection.LinkedCellData(column, row, false, false);
             return lcolumn != null && lrow != null ? Cell_ContentSize(table, lcolumn, lrow, cellFont, pix16)
@@ -368,14 +370,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public static void CopyToClipboard(ColumnItem? column, RowItem? row, bool meldung) {
         try {
-            if (row != null && column.Format.CanBeCheckedByRules()) {
+            if (row != null && column != null && column.Format.CanBeCheckedByRules()) {
                 var c = row.CellGetString(column);
                 c = c.Replace("\r\n", "\r");
                 c = c.Replace("\r", "\r\n");
                 Generic.CopytoClipboard(c);
                 if (meldung) { Notification.Show(LanguageTool.DoTranslate("<b>{0}</b><br>ist nun in der Zwischenablage.", true, c), ImageCode.Kopieren); }
             } else {
-                if (meldung) { Notification.Show(LanguageTool.DoTranslate("Bei dieser Spalte nicht möglich."), ImageCode.Warnung); }
+                if (meldung) { Notification.Show(LanguageTool.DoTranslate("Bei dieser Zelle nicht möglich."), ImageCode.Warnung); }
             }
         } catch {
             if (meldung) { Notification.Show(LanguageTool.DoTranslate("Unerwarteter Fehler beim Kopieren."), ImageCode.Warnung); }
@@ -1216,7 +1218,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             switch (_design) {
                 case BlueTableAppearance.Standard:
-                    Draw_Table_Std(gr, sr, state, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow);
+                    Draw_Table_Std(gr, sr, state, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, CurrentArrangement);
                     break;
 
                 case BlueTableAppearance.OnlyMainColumnWithoutHead:
@@ -2551,7 +2553,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Draw_Border(gr, cellInThisDatabaseColumn, displayRectangleWoSlider, false);
     }
 
-    private void Draw_Column_Cells(Graphics gr, List<RowData?> sr, ColumnViewItem viewItem, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, States state, bool firstOnScreen) {
+    private void Draw_Column_Cells(Graphics gr, List<RowData?>? sr, ColumnViewItem viewItem, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, States state, bool firstOnScreen) {
 
         #region Neue Zeile
 
@@ -2703,7 +2705,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    private void Draw_Table_ListboxStyle(Graphics gr, List<RowData?> sr, States state, Rectangle displayRectangleWoSlider, int vFirstVisibleRow, int vLastVisibleRow) {
+    private void Draw_Table_ListboxStyle(Graphics gr, List<RowData?>? sr, States state, Rectangle displayRectangleWoSlider, int vFirstVisibleRow, int vLastVisibleRow) {
         var itStat = state;
         Skin.Draw_Back(gr, Enums.Design.ListBox, state, base.DisplayRectangle, this, true);
         var col = Database.Column.First;
@@ -2735,14 +2737,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Skin.Draw_Border(gr, Enums.Design.ListBox, state, displayRectangleWoSlider);
     }
 
-    private void Draw_Table_Std(Graphics gr, List<RowData>? sr, States state, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow) {
+    private void Draw_Table_Std(Graphics gr, List<RowData>? sr, States state, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, ColumnViewCollection? ca) {
         try {
-            if (_database.ColumnArrangements == null || _arrangementNr >= _database.ColumnArrangements.Count) { return; }   // Kommt vor, dass spontan doch geparsed wird...
+            if (Database == null || Database.IsDisposed || ca == null) { return; }   // Kommt vor, dass spontan doch geparsed wird...
             Skin.Draw_Back(gr, Enums.Design.Table_And_Pad, state, base.DisplayRectangle, this, true);
 
             /// Maximale Rechten Pixel der Permanenten Columns ermitteln
             var permaX = 0;
-            foreach (var viewItem in CurrentArrangement) {
+            foreach (var viewItem in ca) {
                 if (viewItem?.Column != null && viewItem.ViewType == ViewType.PermanentColumn) {
                     if (viewItem.TmpDrawWidth == null) {
                         // Veränderte Werte!
@@ -2753,14 +2755,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 }
             }
 
-            Draw_Table_What(gr, sr, TableDrawColumn.NonPermament, TableDrawType.ColumnBackBody, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state);
-            Draw_Table_What(gr, sr, TableDrawColumn.NonPermament, TableDrawType.Cells, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state);
-            Draw_Table_What(gr, sr, TableDrawColumn.Permament, TableDrawType.ColumnBackBody, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state);
-            Draw_Table_What(gr, sr, TableDrawColumn.Permament, TableDrawType.Cells, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state);
+            Draw_Table_What(gr, sr, TableDrawColumn.NonPermament, TableDrawType.ColumnBackBody, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state, ca);
+            Draw_Table_What(gr, sr, TableDrawColumn.NonPermament, TableDrawType.Cells, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state, ca);
+            Draw_Table_What(gr, sr, TableDrawColumn.Permament, TableDrawType.ColumnBackBody, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state, ca);
+            Draw_Table_What(gr, sr, TableDrawColumn.Permament, TableDrawType.Cells, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state, ca);
             // Den CursorLines zeichnen
             Draw_Cursor(gr, displayRectangleWoSlider, true);
-            Draw_Table_What(gr, sr, TableDrawColumn.NonPermament, TableDrawType.ColumnHead, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state);
-            Draw_Table_What(gr, sr, TableDrawColumn.Permament, TableDrawType.ColumnHead, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state);
+            Draw_Table_What(gr, sr, TableDrawColumn.NonPermament, TableDrawType.ColumnHead, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state, ca);
+            Draw_Table_What(gr, sr, TableDrawColumn.Permament, TableDrawType.ColumnHead, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state, ca);
 
             /// Überschriften 1-3 Zeichnen
             Draw_Column_Head_Captions(gr);
@@ -2779,31 +2781,33 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    private void Draw_Table_What(Graphics gr, List<RowData?> sr, TableDrawColumn col, TableDrawType type, int permaX, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, States state) {
+    private void Draw_Table_What(Graphics gr, List<RowData?>? sr, TableDrawColumn col, TableDrawType type, int permaX, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, States state, ColumnViewCollection ca) {
         var lfdno = 0;
 
         var firstOnScreen = true;
 
-        foreach (var viewItem in CurrentArrangement.Where(viewItem => viewItem?.Column != null)) {
-            lfdno++;
-            if (viewItem != null && IsOnScreen(viewItem, displayRectangleWoSlider)) {
-                if ((col == TableDrawColumn.NonPermament && viewItem.ViewType != ViewType.PermanentColumn && (viewItem.OrderTmpSpalteX1 ?? 0) + (viewItem.TmpDrawWidth ?? 0) > permaX) ||
-                    (col == TableDrawColumn.Permament && viewItem.ViewType == ViewType.PermanentColumn)) {
-                    switch (type) {
-                        case TableDrawType.ColumnBackBody:
-                            Draw_Column_Body(gr, viewItem, displayRectangleWoSlider);
-                            break;
+        foreach (var viewItem in ca) {
+            if (viewItem?.Column != null) {
+                lfdno++;
+                if (viewItem != null && IsOnScreen(viewItem, displayRectangleWoSlider)) {
+                    if ((col == TableDrawColumn.NonPermament && viewItem.ViewType != ViewType.PermanentColumn && (viewItem.OrderTmpSpalteX1 ?? 0) + (viewItem.TmpDrawWidth ?? 0) > permaX) ||
+                        (col == TableDrawColumn.Permament && viewItem.ViewType == ViewType.PermanentColumn)) {
+                        switch (type) {
+                            case TableDrawType.ColumnBackBody:
+                                Draw_Column_Body(gr, viewItem, displayRectangleWoSlider);
+                                break;
 
-                        case TableDrawType.Cells:
-                            Draw_Column_Cells(gr, sr, viewItem, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state, firstOnScreen);
-                            break;
+                            case TableDrawType.Cells:
+                                Draw_Column_Cells(gr, sr, viewItem, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state, firstOnScreen);
+                                break;
 
-                        case TableDrawType.ColumnHead:
-                            Draw_Column_Head(gr, viewItem, displayRectangleWoSlider, lfdno);
-                            break;
+                            case TableDrawType.ColumnHead:
+                                Draw_Column_Head(gr, viewItem, displayRectangleWoSlider, lfdno);
+                                break;
+                        }
                     }
+                    firstOnScreen = false;
                 }
-                firstOnScreen = false;
             }
         }
     }
@@ -3094,7 +3098,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private int Row_DrawHeight(RowItem? vrow, Rectangle displayRectangleWoSlider) {
-        if (_design == BlueTableAppearance.OnlyMainColumnWithoutHead) { return Cell_ContentSize(this, _database.Column.First, vrow, _cellFont, _pix16).Height; }
+        if (Database == null || Database.IsDisposed || vrow == null) { return _pix18; }
+
+        if (_design == BlueTableAppearance.OnlyMainColumnWithoutHead) { return Cell_ContentSize(this, Database?.Column?.First, vrow, _cellFont, _pix16).Height; }
         var tmp = _pix18;
         if (CurrentArrangement == null) { return tmp; }
 
