@@ -98,6 +98,7 @@ public sealed class ColumnViewItem {
                     break;
             }
         }
+        if (Column == null) { Develop.DebugPrint(FehlerArt.Warnung, "Ungültige Spalte"); }
         if (Column != null && _viewType == ViewType.None) { _viewType = ViewType.Column; }
         //if (Column != null && _viewType != ViewType.None) { Column.CheckFormulaEditType(); }
     }

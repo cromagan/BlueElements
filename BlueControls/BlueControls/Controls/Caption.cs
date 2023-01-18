@@ -113,6 +113,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     public new string Text {
         get => _text;
         set {
+            Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
             value ??= string.Empty;
             if (_text == value) { return; }
             _text = value;
@@ -157,6 +158,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     public void ResetETextAndInvalidate() {
+        Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
         _eText = null;
         if (!QuickModePossible()) { SetDoubleBuffering(); }
         Invalidate();
@@ -185,6 +187,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
                 Develop.DebugPrint(state);
                 return;
             }
+
             if (!string.IsNullOrEmpty(_text)) {
                 if (QuickModePossible()) {
                     if (gr == null) { return; }
@@ -192,11 +195,13 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
                     Skin.Draw_FormatedText(gr, _text, _design, state, null, Alignment.Top_Left, new Rectangle(), null, false, Translate);
                     return;
                 }
+
                 _eText ??= new ExtText(_design, state) {
-                    HtmlText = BlueDatabase.LanguageTool.DoTranslate(_text, Translate)
+                    HtmlText = BlueDatabase.LanguageTool.DoTranslate(_text, Translate),
+                    State = state,
+                    Multiline = true
                 };
-                _eText.State = state;
-                _eText.Multiline = true;
+
                 switch (_textAnzeigeverhalten) {
                     case SteuerelementVerhalten.Steuerelement_Anpassen:
                         _eText.TextDimensions = Size.Empty;
@@ -219,7 +224,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
             }
             if (gr == null) { return; }// Wenn vorab die Größe abgefragt wird
             Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
-            if (!string.IsNullOrEmpty(_text)) { _eText.Draw(gr, 1); }
+            if (!string.IsNullOrEmpty(_text)) { _eText?.Draw(gr, 1); }
         } catch { }
     }
 

@@ -340,7 +340,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         return string.Empty;
     }
 
-    public RowItem? First() => _internal.Values.FirstOrDefault(thisRowItem => thisRowItem != null);
+    public RowItem? First() => _internal.Values.FirstOrDefault(thisRowItem => thisRowItem != null && !thisRowItem.IsDisposed);
 
     /// <summary>
     ///
@@ -469,6 +469,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     }
 
     public RowItem? SearchByKey(long? key) {
+        if (Database == null || Database.IsDisposed) { return null; }
         try {
             return key != null && key > -1 && _internal.ContainsKey((long)key) ? _internal[(long)key] : null;
         } catch {

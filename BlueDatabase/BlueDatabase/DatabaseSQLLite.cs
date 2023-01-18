@@ -251,14 +251,6 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
             var c = Column.SearchByKey(columnkey);
 
             _sql?.SetValueInternal(TableName, type, value, c?.Name, columnkey, rowkey, -1, -1, isLoading);
-
-            if (type == DatabaseDataType.ColumnName) {
-                // Wichtig, erst den Wert seetzen, dann umbenennen! Somit wird der Wert richtig mit umbenannt
-                _sql?.RenameColumn(TableName, c?.Name.ToUpper(), value.ToUpper());
-            }
-            if (type == DatabaseDataType.MaxTextLenght) {
-                _sql?.ChangeDataType(TableName, c?.Name.ToUpper(), IntParse(value));
-            }
         }
 
         return base.SetValueInternal(type, value, columnkey, rowkey, width, height, isLoading);
@@ -476,7 +468,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
             }
 
             foreach (var thiscol in columnsToDelete) {
-                Column.Remove(thiscol);
+                Column.Remove(thiscol, "Reload, Spalten zu viel");
             }
 
             #endregion

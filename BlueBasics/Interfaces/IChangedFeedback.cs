@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System;
 
 namespace BlueBasics.Interfaces;
@@ -27,7 +29,7 @@ public interface IChangedFeedback {
     /// Wird ausgelöst, wenn sich ein Objekt verändert.
     /// Wird nicht bei der Neuerstellung des Objektes oder beim Parsen ausgelöst.
     /// </summary>
-    event EventHandler Changed;
+    event EventHandler? Changed;
 
     #endregion
 

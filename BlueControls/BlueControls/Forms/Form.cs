@@ -118,9 +118,13 @@ public partial class Form : System.Windows.Forms.Form {
     }
 
     public bool UpdateStatus(FehlerArt type, string message, bool didAlreadyMessagebox, Caption capStatusbar, bool dropMessages) {
+        if (InvokeRequired) {
+            return (bool)Invoke(new Func<bool>(() => UpdateStatus(type, message, didAlreadyMessagebox, capStatusbar, dropMessages)));
+        }
+
         var imagecode = ImageCode.Information;
 
-        if(string.IsNullOrEmpty(message)) {
+        if (string.IsNullOrEmpty(message)) {
             capStatusbar.Text = string.Empty;
             capStatusbar.Refresh();
             return false;
@@ -164,8 +168,10 @@ public partial class Form : System.Windows.Forms.Form {
         //https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.form.closed?view=netframework-4.8
         if (IsClosed) { return; }
 
-        DatabaseAbstract.ForceSaveAll();
-        MultiUserFile.ForceLoadSaveAll();
+        if (this is not FloatingForm) {
+            DatabaseAbstract.ForceSaveAll();
+            MultiUserFile.ForceLoadSaveAll();
+        }
 
         base.OnFormClosing(e);
         if (!e.Cancel) {

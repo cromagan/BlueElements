@@ -524,11 +524,24 @@ public abstract class SQLBackAbstract {
         } while (true);
 
         if (type == DatabaseDataType.ColumnName) {
-            if (columnName != newValue && columnName != ColumnItem.TmpNewDummy) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Fataler Namensfehler 1: " + columnName + " -> " + newValue);
-            }
+            // Wichtig, erst den Wert seetzen, dann umbenennen! Somit wird der Wert richtig mit umbenannt
+            RenameColumn(tablename, columnName.ToUpper(), newValue.ToUpper());
+        }
+        if (type == DatabaseDataType.MaxTextLenght) {
+            ChangeDataType(tablename, columnName.ToUpper(), IntParse(newValue));
+        }
+
+        if (type == DatabaseDataType.ColumnName) {
             var test = GetStyleData(tablename, DatabaseDataType.ColumnName.ToString(), columnName);
-            if (columnName != test && columnName != ColumnItem.TmpNewDummy) {
+            if (!string.IsNullOrEmpty(test)) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Fataler Namensfehler 1!");
+            }
+
+            //if (columnName != newValue && columnName != ColumnItem.TmpNewDummy) {
+            //    Develop.DebugPrint(FehlerArt.Fehler, "Fataler Namensfehler 1: " + columnName + " -> " + newValue);
+            //}
+            test = GetStyleData(tablename, DatabaseDataType.ColumnName.ToString(), newValue);
+            if (newValue != test) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Fataler Namensfehler 2!");
             }
         }

@@ -220,7 +220,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
     #region Events
 
-    //internal ColumnItem(DatabaseAbstract database, long columnkey) : this(database, database.Column.Freename(string.Empty), columnkey) { }
     public event EventHandler? Changed;
 
     #endregion
@@ -1602,7 +1601,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         } while (true);
     }
 
-    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+    public void OnChanged() => Changed?.Invoke(this, new ColumnEventArgs(this));
 
     public ColumnItem? Previous() {
         var columnCount = Index();
@@ -2323,7 +2322,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         if (this == null) { return "NULL"; }
         if (IsDisposed) { return "Disposed"; }
 
-        return Name + " -> " + Caption + " (" + Key.ToString() + ")";
+        return Name + " -> " + Caption + " (Key: " + Key.ToString() + ")";
     }
 
     public bool UserEditDialogTypeInFormula(EditTypeFormula editTypeToCheck) {
@@ -2467,7 +2466,16 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
         switch (type) {
             case DatabaseDataType.ColumnKey:
-                _key = LongParse(newvalue);
+                var nkey = LongParse(newvalue);
+
+                if (nkey == 0 && newvalue.Contains(",")) {
+                    // Wiederverwendeter wert:  co_DauerFilterPos = 194 {x=0, y=0}
+                    return string.Empty;
+                }
+
+                Database.Column.ChangeKey(_key, nkey);
+
+                _key = nkey;
                 //Invalidate_TmpVariablesx();
                 break;
 

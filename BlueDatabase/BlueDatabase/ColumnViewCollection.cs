@@ -88,6 +88,8 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem?>, IParseable,
     #region Methods
 
     public void Add(ColumnItem? column, bool permanent) {
+        if (column == null) { return; }
+
         Add(permanent
             ? new ColumnViewItem(column, ViewType.PermanentColumn, this)
             : new ColumnViewItem(column, ViewType.Column, this));
@@ -111,7 +113,10 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem?>, IParseable,
         }
     }
 
-    public void Insert(int index, ColumnItem? column) => Insert(index, new ColumnViewItem(column, ViewType.Column, this));
+    //public void Insert(int index, ColumnItem? column) {
+    //    if (column == null) { return; }
+    //    Insert(index, new ColumnViewItem(column, ViewType.Column, this));
+    //}
 
     public void Invalidate_DrawWithOfAllItems() {
         foreach (var thisViewItem in this) {

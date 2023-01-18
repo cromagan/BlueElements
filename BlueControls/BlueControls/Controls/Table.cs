@@ -645,13 +645,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             _database.ViewChanged -= _Database_ViewChanged;
             //_Database.RowKeyChanged -= _Database_RowKeyChanged;
             //_Database.ColumnKeyChanged -= _Database_ColumnKeyChanged;
-            _database.Column.ItemInternalChanged -= _Database_ColumnContentChanged;
+            _database.Column.ColumnInternalChanged -= _Database_ColumnContentChanged;
             _database.SortParameterChanged -= _Database_SortParameterChanged;
             _database.Row.RowRemoving -= Row_RowRemoving;
             _database.Row.RowRemoved -= _Database_RowRemoved;
             _database.Row.RowAdded -= _Database_Row_RowAdded;
-            _database.Column.ItemRemoved -= _Database_ViewChanged;
-            _database.Column.ItemAdded -= _Database_ViewChanged;
+            _database.Column.ColumnRemoving -= Column_ItemRemoving;
+            _database.Column.ColumnRemoved -= _Database_ViewChanged;
+            _database.Column.ColumnAdded -= _Database_ViewChanged;
             _database.ProgressbarInfo -= _Database_ProgressbarInfo;
             _database.Disposing -= _Database_Disposing;
             DatabaseAbstract.ForceSaveAll();
@@ -669,14 +670,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             _database.ViewChanged += _Database_ViewChanged;
             //_Database.RowKeyChanged += _Database_RowKeyChanged;
             //_Database.ColumnKeyChanged += _Database_ColumnKeyChanged;
-            _database.Column.ItemInternalChanged += _Database_ColumnContentChanged;
+            _database.Column.ColumnInternalChanged += _Database_ColumnContentChanged;
             _database.SortParameterChanged += _Database_SortParameterChanged;
             _database.Row.RowRemoving += Row_RowRemoving;
             _database.Row.RowRemoved += _Database_RowRemoved;
             _database.Row.RowAdded += _Database_Row_RowAdded;
-            _database.Column.ItemAdded += _Database_ViewChanged;
-            _database.Column.ItemRemoving += Column_ItemRemoving;
-            _database.Column.ItemRemoved += _Database_ViewChanged;
+            _database.Column.ColumnAdded += _Database_ViewChanged;
+            _database.Column.ColumnRemoving += Column_ItemRemoving;
+            _database.Column.ColumnRemoved += _Database_ViewChanged;
             _database.ProgressbarInfo += _Database_ProgressbarInfo;
             _database.Disposing += _Database_Disposing;
         }
@@ -1525,7 +1526,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
                                 //case DataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
                                 case DataFormat.Verknüpfung_zu_anderer_Datenbank:
-                                case DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
+
                                     var (lcolumn, _, info) = CellCollection.LinkedCellData(_mouseOverColumn, _mouseOverRow.Row, true, false);
                                     if (lcolumn != null) { _mouseOverText = lcolumn.QuickInfoText(_mouseOverColumn.ReadableText() + " bei " + lcolumn.ReadableText() + ":"); }
 
@@ -1534,6 +1535,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                                         _mouseOverText = "Verlinkungs-Status: " + info;
                                     }
 
+                                    break;
+
+                                case DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
                                     break;
 
                                 default:
@@ -1788,7 +1792,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         OnCellValueChanged(e);
     }
 
-    private void _Database_ColumnContentChanged(object sender, ListEventArgs e) {
+    private void _Database_ColumnContentChanged(object sender, ColumnEventArgs e) {
         Invalidate_AllColumnArrangements();
         Invalidate_HeadSize();
 
@@ -2314,11 +2318,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         return (int)viewItem.TmpDrawWidth;
     }
 
-    private void Column_ItemRemoving(object sender, ListEventArgs e) {
-        if (e.Item == _cursorPosColumn) {
+    private void Column_ItemRemoving(object sender, ColumnEventArgs e) {
+        if (e.Column == _cursorPosColumn) {
             CursorPos_Reset();
         }
-        if (e.Item == _mouseOverColumn) {
+        if (e.Column == _mouseOverColumn) {
             _mouseOverColumn = null;
         }
     }

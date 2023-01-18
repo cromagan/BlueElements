@@ -218,7 +218,7 @@ public sealed class Database : DatabaseAbstract {
 
         List<ColumnItem?> columnsOld = new();
         columnsOld.AddRange(db.Column);
-        db.Column.Clear();
+        db.Column.Clear("Parse Start");
 
         #endregion
 
@@ -321,7 +321,7 @@ public sealed class Database : DatabaseAbstract {
         db.Column.ThrowEvents = true;
         db.Row.ThrowEvents = true;
 
-        if (db != null && db.Column.Count > 0) {
+        if (db != null && db.Column.Count > 0 && string.IsNullOrEmpty(db.FirstColumn)) {
             db.FirstColumn = db.Column[0].Name;
         }
 

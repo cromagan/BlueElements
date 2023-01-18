@@ -86,7 +86,7 @@ public sealed partial class DatabaseHeadEditor {
         if (_database.SortDefinition != null) {
             btnSortRichtung.Checked = _database.SortDefinition.Reverse;
             if (_database.SortDefinition.Columns != null) {
-                foreach (var thisColumn in _database.SortDefinition.Columns.Where(thisColumn => thisColumn != null)) {
+                foreach (var thisColumn in _database.SortDefinition.Columns.Where(thisColumn => thisColumn != null && !thisColumn.IsDisposed)) {
                     lbxSortierSpalten.Item.Add(thisColumn);
                 }
             }

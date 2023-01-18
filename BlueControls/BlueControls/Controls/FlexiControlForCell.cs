@@ -128,7 +128,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
             if (_database != null) {
                 _database.Cell.CellValueChanged -= Database_CellValueChanged;
                 _database.Row.RowRemoving -= Row_RowRemoving;
-                _database.Column.ItemInternalChanged -= Column_ItemInternalChanged;
+                _database.Column.ColumnInternalChanged -= Column_ItemInternalChanged;
                 _database.Row.RowChecked -= Database_RowChecked;
                 //_Database.RowKeyChanged -= _Database_RowKeyChanged;
                 //_Database.ColumnKeyChanged -= _Database_ColumnKeyChanged;
@@ -142,7 +142,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
                 _database.Cell.CellValueChanged += Database_CellValueChanged;
                 //_Database.Row.RowRemoved += Database_RowRemoved;
                 _database.Row.RowRemoving += Row_RowRemoving;
-                _database.Column.ItemInternalChanged += Column_ItemInternalChanged;
+                _database.Column.ColumnInternalChanged += Column_ItemInternalChanged;
                 _database.Row.RowChecked += Database_RowChecked;
                 //_Database.RowKeyChanged += _Database_RowKeyChanged;
                 _database.Loaded += _Database_Loaded;
@@ -399,8 +399,8 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     //    SetValueFromCell();
     //}
 
-    private void Column_ItemInternalChanged(object sender, ListEventArgs e) {
-        if ((ColumnItem)e.Item == _tmpColumn) {
+    private void Column_ItemInternalChanged(object sender, ColumnEventArgs e) {
+        if (e.Column == _tmpColumn) {
             UpdateColumnData();
             CheckEnabledState();
             OnNeedRefresh();

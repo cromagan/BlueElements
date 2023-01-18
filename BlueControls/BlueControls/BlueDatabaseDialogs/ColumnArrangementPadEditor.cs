@@ -267,24 +267,24 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
             #endregion
 
-            #region Zusätzlich bei Ansicht 0 das auch in echt machen
+            //#region Zusätzlich bei Ansicht 0 das auch in echt machen
 
-            if (Arrangement == 0) {
-                var columnIndexWhoShouldBeThere = Database.Column.IndexOf(leftestItem.Column);
-                if (columnIndexWhoShouldBeThere < 0) {
-                    MessageBox.Show("Interner Fehler", ImageCode.Warnung, "OK");
-                    ShowOrder();
-                    Fixing--;
-                    return;
-                }
+            //if (Arrangement == 0) {
+            //    var columnIndexWhoShouldBeThere = Database.Column.IndexOf(leftestItem.Column);
+            //    if (columnIndexWhoShouldBeThere < 0) {
+            //        MessageBox.Show("Interner Fehler", ImageCode.Warnung, "OK");
+            //        ShowOrder();
+            //        Fixing--;
+            //        return;
+            //    }
 
-                if (columnIndexWhoShouldBeThere != itemsdone.Count) {
-                    //var columnIndexWhoISonPos = Database.Column.IndexOf(thisColumnViewCollection[itemsdone.Count].Column);
-                    Database.Column.Swap(columnIndexWhoISonPos2, columnIndexWhoShouldBeThere);
-                }
-            }
+            //    if (columnIndexWhoShouldBeThere != itemsdone.Count) {
+            //        //var columnIndexWhoISonPos = Database.Column.IndexOf(thisColumnViewCollection[itemsdone.Count].Column);
+            //        Database.Column.Swap(columnIndexWhoISonPos2, columnIndexWhoShouldBeThere);
+            //    }
+            //}
 
-            #endregion
+            //#endregion
 
             itemsdone.Add(leftestItem);
         } while (true);
@@ -312,7 +312,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
                 if (!col.IsSystemColumn() &&
                     MessageBox.Show("Spalte <b>" + col.ReadableText() + "</b> endgültig löschen?", ImageCode.Warnung,
                         "Ja", "Nein") == 0) {
-                    Database.Column.Remove(col);
+                    Database.Column.Remove(col, "Benutzer löscht im ColArrangement Editor");
                     did = true;
                 }
 
