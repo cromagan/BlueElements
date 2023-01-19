@@ -85,7 +85,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     /// Gib ColumnFirst oder Spalte 0 zurück
     /// </summary>
     /// <returns></returns>
-    public ColumnItem? First => Exists(Database?.FirstColumn) ?? _internal.Values.FirstOrDefault(thisColumnItem => thisColumnItem != null && !thisColumnItem.IsDisposed);
+    public ColumnItem? First => Database?.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column != null)?.Column;
 
     public bool IsDisposed { get; private set; }
 
@@ -113,32 +113,27 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     #endregion
 
+    //public ColumnItem? this[int index] {
+    //    get {
+    //        if (Database == null || Database.IsDisposed) { return null; }
+
+    //        //var L = new List<string>();
+
+    //        //foreach (var thiscol in this) {
+    //        //    L.Add(thiscol.Name);
+    //        //}
+    //        //L.Sort();
+
+    //        if (index >= 0 && index < _internal.Count) {
+    //            return _internal.ElementAt(index).Value;
+    //        }
+
+    //        Database.DevelopWarnung("Spalten-Index nicht gefunden: " + index);
+    //        return null;
+    //    }
+    //}
+
     #region Indexers
-
-    /// <summary>
-    /// Alphabetisch sortierter Index!
-    /// </summary>
-    /// <param name="index"></param>
-    /// <returns></returns>
-    public ColumnItem? this[int index] {
-        get {
-            if (Database == null || Database.IsDisposed) { return null; }
-
-            //var L = new List<string>();
-
-            //foreach (var thiscol in this) {
-            //    L.Add(thiscol.Name);
-            //}
-            //L.Sort();
-
-            if (index >= 0 && index < _internal.Count) {
-                return _internal.ElementAt(index).Value;
-            }
-
-            Database.DevelopWarnung("Spalten-Index nicht gefunden: " + index);
-            return null;
-        }
-    }
 
     public ColumnItem? this[string columnName] {
         get {
@@ -171,11 +166,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         return originalString;
     }
 
-    /// <summary>
-    /// Fügt eine Spalte hinzu, die im System fest verankert ist.
-    /// </summary>
-    /// <param name="row"></param>
-    /// <returns></returns>
     public string Add(ColumnItem column) {
         foreach (var thisc in this) {
             if (thisc.Name.Equals(column.Name, StringComparison.OrdinalIgnoreCase)) { return "Hinzufügen fehlgeschlagen."; }
@@ -371,6 +361,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             if (column == _internal.ElementAt(index).Value) { return index; }
         }
 
+        Database.DevelopWarnung("Spalten-Index nicht gefunden: " + column.Caption);
         return -1;
     }
 
@@ -399,22 +390,22 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         }
 
         GetSystems();
-        for (var s1 = 0; s1 < Count; s1++) {
-            if (this[s1] != null) {
-                for (var s2 = s1 + 1; s2 < Count; s2++) {
-                    if (this[s2] != null) {
-                        // Evtl. Doppelte Namen einzigartig machen
-                        if (string.Equals(this[s1].Name, this[s2].Name, StringComparison.OrdinalIgnoreCase)) {
-                            this[s2].Name = this[s2].Name + "0";
-                        }
-                        //// Evtl. Doppelte Identifierx eleminieren
-                        //if (!string.IsNullOrEmpty(base[s1].Identifierx) && string.Equals(base[s1].Identifierx, base[s2].Identifierx, StringComparison.OrdinalIgnoreCase)) {
-                        //    base[s2].Identifierx = string.Empty;
-                        //}
-                    }
-                }
-            }
-        }
+        //for (var s1 = 0; s1 < Count; s1++) {
+        //    if (this[s1] != null) {
+        //        for (var s2 = s1 + 1; s2 < Count; s2++) {
+        //            if (this[s2] != null) {
+        //                // Evtl. Doppelte Namen einzigartig machen
+        //                if (string.Equals(this[s1].Name, this[s2].Name, StringComparison.OrdinalIgnoreCase)) {
+        //                    this[s2].Name = this[s2].Name + "0";
+        //                }
+        //                //// Evtl. Doppelte Identifierx eleminieren
+        //                //if (!string.IsNullOrEmpty(base[s1].Identifierx) && string.Equals(base[s1].Identifierx, base[s2].Identifierx, StringComparison.OrdinalIgnoreCase)) {
+        //                //    base[s2].Identifierx = string.Empty;
+        //                //}
+        //            }
+        //        }
+        //    }
+        //}
 
         //// Reihengolge reparieren
         //var colN = -1;
@@ -449,9 +440,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     public ColumnItem? SearchByKey(long? key) {
-        if (Database == null || Database.IsDisposed) { return null; }
+        if (Database == null || Database.IsDisposed || key == null || key < 0) { return null; }
         try {
-            return key != null && key > -1 && _internal.ContainsKey((long)key) ? _internal[(long)key] : null;
+            return _internal.ContainsKey((long)key) ? _internal[(long)key] : null;
         } catch {
             return SearchByKey(key);
         }

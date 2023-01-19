@@ -100,7 +100,6 @@ public sealed partial class DatabaseHeadEditor {
         lbxExportSets.Item.Sort();
         // -----------------------------
         txbCaption.Text = _database.Caption;
-        txbFirstColumn.Text = _database.FirstColumn;
         txbGlobalScale.Text = _database.GlobalScale.ToString(Constants.Format_Float1);
         txbAdditionalFiles.Text = _database.AdditionalFilesPfad;
         txbStandardFormulaFile.Text = _database.StandardFormulaFile;
@@ -360,7 +359,6 @@ public sealed partial class DatabaseHeadEditor {
         scriptEditor.WriteScriptBack();
         _database.GlobalShowPass = txbKennwort.Text;
         _database.Caption = txbCaption.Text;
-        _database.FirstColumn = txbFirstColumn.Text;
         _database.UndoCount = tbxUndoAnzahl.Text.IsLong() ? Math.Max(IntParse(tbxUndoAnzahl.Text), 5) : 5;
         if (txbGlobalScale.Text.IsDouble()) {
             _database.GlobalScale = Math.Min(DoubleParse(txbGlobalScale.Text), 5);

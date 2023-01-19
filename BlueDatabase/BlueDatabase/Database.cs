@@ -30,6 +30,7 @@ using BlueBasics.MultiUserFile;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 using static BlueDatabase.DatabaseAbstract;
+using System.Configuration;
 
 namespace BlueDatabase;
 
@@ -214,28 +215,15 @@ public sealed class Database : DatabaseAbstract {
         long colKey = 0;
         long rowKey = 0;
 
-        #region Spalten merken und Variable leeren
+        var columnUsed = new List<ColumnItem>();
 
-        List<ColumnItem?> columnsOld = new();
-        columnsOld.AddRange(db.Column);
-        db.Column.Clear("Parse Start");
-
-        #endregion
-
-        #region Pendings merken und Variable leeren
-
-        //var oldPendings = Works?.Where(thisWork => thisWork.State == ItemState.Pending).ToList();
         works?.Clear();
 
-        #endregion
-
-        var b = data;
-
         do {
-            if (pointer >= b.Length) { break; }
+            if (pointer >= data.Length) { break; }
 
-            Database.Parse(b, ref pointer, out var art, ref colKey, ref rowKey, out var inhalt, out var x, out var y);
-
+            Parse(data, ref pointer, out var art, ref colKey, ref rowKey, out var inhalt, out var x, out var y);
+            //Console.WriteLine(art);
             if (!art.IsObsolete()) {
 
                 #region Zeile suchen oder erstellen
@@ -243,11 +231,15 @@ public sealed class Database : DatabaseAbstract {
                 if (rowKey > -1) {
                     row = db.Row.SearchByKey(rowKey);
                     if (row == null) {
-                        //row = Row.GenerateAndAdd(rowKey, string.Empty, false, false);
                         db.Row.SetValueInternal(DatabaseDataType.Comand_AddRow, rowKey, true);
                         row = db.Row.SearchByKey(rowKey);
-                        row.IsInCache = DateTime.UtcNow;
                     }
+                    if (row == null) {
+                        Develop.DebugPrint(FehlerArt.Fehler, "Zeile hinzufügen Fehler");
+                        db.SetReadOnly();
+                        return;
+                    }
+                    row.IsInCache = DateTime.UtcNow;
                 }
 
                 #endregion
@@ -255,30 +247,19 @@ public sealed class Database : DatabaseAbstract {
                 #region Spalte suchen oder erstellen
 
                 if (colKey > -1) {
-                    // Zuerst schauen, ob die Column schon (wieder) in der richtigen Collection ist
                     column = db.Column.SearchByKey(colKey);
                     if (column == null) {
-                        // Column noch nicht gefunden. Schauen, ob sie vor dem Reload vorhanden war und gg. hinzufügen
-                        foreach (var thisColumn in columnsOld) {
-                            if (thisColumn != null && thisColumn.Key == colKey) {
-                                column = thisColumn;
-                            }
-                        }
-                        if (column != null) {
-                            // Prima, gefunden! Noch die Collections korrigieren
-                            db.Column.Add(column);
-                            columnsOld.Remove(column);
-                        } else {
-                            // Nicht gefunden, als neu machen
-                            if (art != DatabaseDataType.ColumnName) {
-                                Develop.DebugPrint(art + " an erster Stelle!");
-                            }
-                            db.Column.SetValueInternal(DatabaseDataType.Comand_AddColumn, colKey, true);
-                            column = db.Column.SearchByKey(colKey);
-                            column.IsInCache = DateTime.UtcNow;
-                            //column = Column.GenerateAndAdd(colKey);
-                        }
+                        if (art != DatabaseDataType.ColumnName) { Develop.DebugPrint(art + " an erster Stelle!"); }
+                        db.Column.SetValueInternal(DatabaseDataType.Comand_AddColumn, colKey, true);
+                        column = db.Column.SearchByKey(colKey);
                     }
+                    if (column == null) {
+                        Develop.DebugPrint(FehlerArt.Fehler, "Spalte hinzufügen Fehler");
+                        db.SetReadOnly();
+                        return;
+                    }
+                    column.IsInCache = DateTime.UtcNow;
+                    columnUsed.Add(column);
                 }
 
                 #endregion
@@ -289,13 +270,8 @@ public sealed class Database : DatabaseAbstract {
                     var pwd = string.Empty;
 
                     if (needPassword != null) { pwd = needPassword(); }
-
-                    //PasswordEventArgs e2 = new();
-                    //db.OnNeedPassword(e2);
-                    //b = Cryptography.SimpleCrypt(b, e2.Password, -1, pointer, b.Length - 1);
                     if (pwd != inhalt) {
                         db.SetReadOnly();
-                        //MessageBox.Show("Zugriff verweigrt, Passwort falsch!", ImageCode.Kritisch, "OK");
                         break;
                     }
                 }
@@ -313,6 +289,21 @@ public sealed class Database : DatabaseAbstract {
             }
         } while (true);
 
+        #region unbenutzte (gelöschte) Spalten entfernen
+
+        var l = new List<ColumnItem>();
+        foreach (var thisColumn in db.Column) {
+            l.Add(thisColumn);
+        }
+
+        foreach (var thisColumn in l) {
+            if (!columnUsed.Contains(thisColumn)) {
+                db.SetValueInternal(DatabaseDataType.Comand_RemoveColumn, thisColumn.Key.ToString(), thisColumn.Key, null, -1, -1, true);
+            }
+        }
+
+        #endregion
+
         db.Row.RemoveNullOrEmpty();
         db.Cell.RemoveOrphans();
         //Works?.AddRange(oldPendings);
@@ -321,9 +312,9 @@ public sealed class Database : DatabaseAbstract {
         db.Column.ThrowEvents = true;
         db.Row.ThrowEvents = true;
 
-        if (db != null && db.Column.Count > 0 && string.IsNullOrEmpty(db.FirstColumn)) {
-            db.FirstColumn = db.Column[0].Name;
-        }
+        //if (db != null && db.Column.Count > 0 && string.IsNullOrEmpty(db.FirstColumn)) {
+        //    db.FirstColumn = Col
+        //}
 
         if (IntParse(db.LoadedVersion.Replace(".", "")) > IntParse(DatabaseVersion.Replace(".", ""))) { db.SetReadOnly(); }
     }
@@ -360,7 +351,7 @@ public sealed class Database : DatabaseAbstract {
             //SaveToByteList(l, enDatabaseDataType.BinaryDataInOne, Bins.ToString(true));
             //SaveToByteList(l, enDatabaseDataType.FilterImagePfad, _filterImagePfad);
             SaveToByteList(l, DatabaseDataType.AdditionalFilesPath, db.AdditionalFilesPfad);
-            SaveToByteList(l, DatabaseDataType.FirstColumn, db.FirstColumn);
+            //SaveToByteList(l, DatabaseDataType.FirstColumn, db.FirstColumn);
             SaveToByteList(l, DatabaseDataType.RowQuickInfo, db.ZeilenQuickInfo);
             SaveToByteList(l, DatabaseDataType.StandardFormulaFile, db.StandardFormulaFile);
             SaveToByteList(l, db.Column);
@@ -470,7 +461,7 @@ public sealed class Database : DatabaseAbstract {
 
         if (checkExists && !File.Exists(f)) { return null; }
 
-        return new ConnectionInfo(f);
+        return new ConnectionInfo(SQLBackAbstract.MakeValidTableName(tableName.FileNameWithoutSuffix()), null, DatabaseId, f);
     }
 
     public bool IsFileAllowedToLoad(string fileName) {

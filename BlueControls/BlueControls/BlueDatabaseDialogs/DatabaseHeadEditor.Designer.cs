@@ -67,8 +67,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tblUndo = new BlueControls.Controls.Table();
             this.capBinInfo = new BlueControls.Controls.Caption();
             this.btnSave = new BlueControls.Controls.Button();
-            this.capFirstColumn = new BlueControls.Controls.Caption();
-            this.txbFirstColumn = new BlueControls.Controls.TextBox();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
             this.GlobalTab.SuspendLayout();
@@ -426,8 +424,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // Tab_Rechte
             // 
             this.Tab_Rechte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.Tab_Rechte.Controls.Add(this.txbFirstColumn);
-            this.Tab_Rechte.Controls.Add(this.capFirstColumn);
             this.Tab_Rechte.Controls.Add(this.grpKennwort);
             this.Tab_Rechte.Controls.Add(this.grpBenutzergruppen);
             this.Tab_Rechte.Location = new System.Drawing.Point(4, 25);
@@ -584,23 +580,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnSave.Text = "Speichern";
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
-            // capFirstColumn
-            // 
-            this.capFirstColumn.CausesValidation = false;
-            this.capFirstColumn.Location = new System.Drawing.Point(400, 128);
-            this.capFirstColumn.Name = "capFirstColumn";
-            this.capFirstColumn.Size = new System.Drawing.Size(200, 16);
-            this.capFirstColumn.Text = "Die Hauptspalte (erste Spalte) ist:";
-            this.capFirstColumn.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            // 
-            // txbFirstColumn
-            // 
-            this.txbFirstColumn.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbFirstColumn.Location = new System.Drawing.Point(400, 144);
-            this.txbFirstColumn.Name = "txbFirstColumn";
-            this.txbFirstColumn.Size = new System.Drawing.Size(304, 22);
-            this.txbFirstColumn.TabIndex = 36;
-            // 
             // DatabaseHeadEditor
             // 
             this.ClientSize = new System.Drawing.Size(1050, 677);
@@ -669,7 +648,5 @@ namespace BlueControls.BlueDatabaseDialogs
         private Button btnClipboard;
         private TextBox txbStandardFormulaFile;
         private Caption capStandardFormulaFile;
-        private TextBox txbFirstColumn;
-        private Caption capFirstColumn;
     }
 }

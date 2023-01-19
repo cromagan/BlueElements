@@ -143,7 +143,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
         if (checkExists && !File.Exists(f)) { return null; }
 
-        return new ConnectionInfo(f);
+        return new ConnectionInfo(SQLBackAbstract.MakeValidTableName( tableName.FileNameWithoutSuffix()), null, DatabaseId, f);
     }
 
     public void DiscardPendingChanges(object sender, System.EventArgs e) => ChangeWorkItems();
@@ -152,9 +152,12 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         if (!ReloadNeeded || IsDisposed) { return; }
 
         OnDropMessage(FehlerArt.Info, "Lade Änderungen der Datenbank: " + TableName);
-        _muf?.Load_Reload();
 
-        OnDropMessage(FehlerArt.Info, string.Empty);
+        if (_muf?.Load_Reload() ?? false) {
+            OnDropMessage(FehlerArt.Info, "Laden der Datenbank fehlgeschlagen: " + TableName);
+        } else {
+            OnDropMessage(FehlerArt.Info, string.Empty);
+        }
     }
 
     public void Parse(object sender, MultiUserParseEventArgs e) {

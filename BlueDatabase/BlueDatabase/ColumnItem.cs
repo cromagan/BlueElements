@@ -125,7 +125,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         Database = database;
         Database.Disposing += Database_Disposing;
         if (columnkey < 0) {
-            Develop.DebugPrint(FehlerArt.Fehler, "ColumnKey <0");
+            Develop.DebugPrint(FehlerArt.Fehler, "ColumnKey < 0");
         }
 
         var ex = Database.Column.SearchByKey(columnkey);
@@ -727,6 +727,10 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             if (string.IsNullOrEmpty(_linkedDatabaseFile)) {
                 return null;
             }
+
+            //if (_linkedDatabaseFile == "AutoVue.mdb") {
+            //    _linkedDatabaseFile = _linkedDatabaseFile;
+            //}
 
             var ci = new ConnectionInfo(_linkedDatabaseFile);
 
@@ -1505,16 +1509,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         return UcaseNamesSortedByLenght;
     }
 
-    //public void Parse(string ToParse) {
-    //    Develop.DebugPrint(enFehlerArt.Fehler, "Kann nur über die Datenbank geparsed werden.");
-    //}
-    //public object Clone()
-    //{
-    //    if (!IsOk())
-    //    {
-    //        Develop.DebugPrint(enFehlerArt.Fehler, "Quell-Spalte fehlerhaft:\r\nQuelle: " + Name + "\r\nFehler: " + ErrorReason());
-    //    }
-    //    return new ColumnItem(this, false);
     //}
     public void GetUniques(List<RowItem?> rows, out List<string> einzigartig, out List<string> nichtEinzigartig) {
         einzigartig = new List<string>();
@@ -1533,8 +1527,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         }
         einzigartig.RemoveString(nichtEinzigartig, false);
     }
-
-    public int Index() => Database.Column.IndexOf(this);
 
     ///// <summary>
     ///// Füllt die Ersetzungen mittels eines übergebenen Enums aus.
@@ -1592,39 +1584,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             "SYS_DATECHANGED" or
             "SYS_LOCKED";
 
-    public ColumnItem? Next() {
-        var columnCount = Index();
-        do {
-            columnCount++;
-            if (columnCount >= Database.Column.Count) { return null; }
-            if (Database.Column[columnCount] != null) { return Database.Column[columnCount]; }
-        } while (true);
-    }
-
     public void OnChanged() => Changed?.Invoke(this, new ColumnEventArgs(this));
 
-    public ColumnItem? Previous() {
-        var columnCount = Index();
-        do {
-            columnCount--;
-            if (columnCount < 0) { return null; }
-            if (Database?.Column[columnCount] != null) { return Database.Column[columnCount]; }
-        } while (true);
-    }
-
-    //public bool ZellenZusammenfassen
-    //{
-    //    get
-    //    {
-    //        return _ZellenZusammenfassen;
-    //    }
-    //    set
-    //    {
-    //        if (_ZellenZusammenfassen == value) { return; }
-    //        Database.AddPending(enDatabaseDataType.co_ZellenZusammenfassen, this, _ZellenZusammenfassen.ToPlusMinus(), value.ToPlusMinus(), true);
-    //        OnChanged();
-    //    }
-    //}
     public string QuickInfoText(string additionalText) {
         var T = string.Empty;
         if (!string.IsNullOrEmpty(_quickInfo)) { T += _quickInfo; }

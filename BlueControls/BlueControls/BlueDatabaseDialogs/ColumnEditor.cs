@@ -196,16 +196,6 @@ internal sealed partial class ColumnEditor {
 
     private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(_column.Database.Column_UsedIn(_column));
 
-    private void btnVor_Click(object sender, System.EventArgs e) {
-        if (!AllOk()) { return; }
-        Column_DatenAuslesen(_column.Next());
-    }
-
-    private void btnZurueck_Click(object sender, System.EventArgs e) {
-        if (!AllOk()) { return; }
-        Column_DatenAuslesen(_column.Previous());
-    }
-
     private void butAktuellVor_Click(object sender, System.EventArgs e) {
         if (!AllOk()) { return; }
         Column_DatenAuslesen(_table.CurrentArrangement[_column].NextVisible().Column);
@@ -319,8 +309,6 @@ internal sealed partial class ColumnEditor {
         }
         lbxCellEditor.Suggestions.Clear();
         lbxCellEditor.Suggestions.AddRange(_column.Database.Permission_AllUsed(true));
-        btnZurueck.Enabled = _column.Previous() != null;
-        btnVor.Enabled = _column.Next() != null;
         if (_table?.CurrentArrangement != null) {
             butAktuellZurueck.Enabled = _table.CurrentArrangement[_column]?.PreviewsVisible() != null;
             butAktuellVor.Enabled = _table.CurrentArrangement[_column]?.NextVisible() != null;
@@ -582,7 +570,7 @@ internal sealed partial class ColumnEditor {
         if (ok) { spalteauDb = linkdb.Column.SearchByKey(key); }
 
         for (var z = 0; z < linkdb.Column.Count; z++) {
-            var col = linkdb.Column[z];
+            var col = linkdb.ColumnArrangements[0][z].Column;
 
             var r = tblFilterliste.Database.Row[z.ToString()] ?? tblFilterliste.Database.Row.GenerateAndAdd(z.ToString(), "Neue Spalte");
 

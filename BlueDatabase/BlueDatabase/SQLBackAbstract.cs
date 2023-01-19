@@ -322,7 +322,6 @@ public abstract class SQLBackAbstract {
     //}
     public void LoadRow(string tablename, List<RowItem> row) {
         try {
-            //CloseConnection(); // Um ORA-01000: MAXIMALE ANZAHL OFFENER CURSOR ÜBERSCHRITTEN zu vermeiden
             if (row == null || row.Count == 0 || row[0] is null || row[0].Database is null) { return; }
             if (!OpenConnection()) { return; }
 
@@ -333,8 +332,8 @@ public abstract class SQLBackAbstract {
 
                 var com = "SELECT RK, ";
 
-                foreach (var thiscolumn in row[0].Database.Column) {
-                    com = com + thiscolumn.Name.ToUpper() + ", ";
+                foreach (var thiscolumn in row[0].Database.ColumnArrangements[0]) {
+                    com = com + thiscolumn.Column.Name.ToUpper() + ", ";
                 }
 
                 com = com.TrimEnd(", ");
@@ -362,7 +361,7 @@ public abstract class SQLBackAbstract {
                     var r = row[0].Database.Row.SearchByKey(rk) ?? row[0].Database.Row.GenerateAndAdd(rk, string.Empty, false, false, "Load row");
 
                     for (var z = 1; z < dt.Columns.Count; z++) {
-                        r.Database.Cell.SetValueInternal(r.Database.Column[z - 1].Key, r.Key, reader[z].ToString(), -1, -1, true);
+                        r.Database.Cell.SetValueInternal(r.Database.ColumnArrangements[0][z - 1].Column.Key, r.Key, reader[z].ToString(), -1, -1, true);
                     }
 
                     r.IsInCache = DateTime.UtcNow;

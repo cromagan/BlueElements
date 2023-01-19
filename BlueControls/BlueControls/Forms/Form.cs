@@ -147,7 +147,7 @@ public partial class Form : System.Windows.Forms.Form {
         }
 
         if (dropMessages) {
-            Develop.DebugPrint(type, message);
+            Develop.DebugPrint(FehlerArt.Warnung, message);
             MessageBox.Show(message, imagecode, "Ok");
             return true;
         }

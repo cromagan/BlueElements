@@ -1050,7 +1050,7 @@ public partial class TableView : Form, IHasStatusbar {
             }
         }
 
-        e.TabPage.Text = DB.TableName.ToTitleCase();
+        e.TabPage.Text = DB?.TableName.ToTitleCase() ?? "FEHLER";
         DatabaseSet(DB, (string)s[1]);
     }
 

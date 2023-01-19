@@ -83,8 +83,9 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// </summary>
     private ListExt<ExportDefinition?> _export = new();
 
-    private string _firstColumn;
+    //private string _firstColumn;
     private double _globalScale;
+
     private string _globalShowPass = string.Empty;
     private DateTime _lastUserActionUtc = new(1900, 1, 1);
     private string _rulesScript = string.Empty;
@@ -230,15 +231,15 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         }
     }
 
-    [Browsable(false)]
-    [Description("Welche Spalte bei Columnfirst zurückgegeben wird")]
-    public string FirstColumn {
-        get => _firstColumn;
-        set {
-            if (_firstColumn == value) { return; }
-            ChangeData(DatabaseDataType.FirstColumn, null, null, _firstColumn, value, string.Empty);
-        }
-    }
+    //[Browsable(false)]
+    //[Description("Welche Spalte bei Columnfirst zurückgegeben wird")]
+    //public string FirstColumn {
+    //    get => _firstColumn;
+    //    set {
+    //        if (_firstColumn == value) { return; }
+    //        ChangeData(DatabaseDataType.FirstColumn, null, null, _firstColumn, value, string.Empty);
+    //    }
+    //}
 
     [Browsable(false)]
     public double GlobalScale {
@@ -611,7 +612,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
         if (ReadOnly) {
             if (comand == DatabaseDataType.ColumnContentWidth) { return string.Empty; }
-            if (comand == DatabaseDataType.FirstColumn) { return string.Empty; }
+            //if (comand == DatabaseDataType.FirstColumn) { return string.Empty; }
             if (!string.IsNullOrEmpty(TableName)) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Datei ist Readonly, " + comand + ", " + TableName);
             }
@@ -640,7 +641,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
         if (cellDataToo) { Row.CloneFrom(sourceDatabase); }
 
-        FirstColumn = sourceDatabase.FirstColumn;
+        //FirstColumn = sourceDatabase.FirstColumn;
         AdditionalFilesPfad = sourceDatabase.AdditionalFilesPfad;
         CachePfad = sourceDatabase.CachePfad; // Nicht so wichtig ;-)
         Caption = sourceDatabase.Caption;
@@ -1397,9 +1398,9 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                 _additionalFilesPfad = value;
                 break;
 
-            case DatabaseDataType.FirstColumn:
-                _firstColumn = value;
-                break;
+            //case DatabaseDataType.FirstColumn:
+            //    _firstColumn = value;
+            //    break;
 
             case DatabaseDataType.StandardFormulaFile:
                 _standardFormulaFile = value;
@@ -1558,7 +1559,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         _rulesScript = string.Empty;
         _globalScale = 1f;
         _additionalFilesPfad = "AdditionalFiles";
-        _firstColumn = string.Empty;
         _zeilenQuickInfo = string.Empty;
         _sortDefinition = null;
     }

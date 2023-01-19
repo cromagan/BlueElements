@@ -39,23 +39,40 @@ public sealed class MultiUserFile : IDisposableExtended {
     private static readonly ListExt<MultiUserFile> _all_Files = new();
 
     private readonly Timer _checker;
-    private readonly object _lockload = new();
+
     private readonly BackgroundWorker _pureBinSaver;
 
     private string _canWriteError = string.Empty;
+
     private DateTime _canWriteNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
+
     private bool _checkedAndReloadNeed;
+
     private int _checkerTickCount = -5;
+
     private bool _doingTempFile;
+
     private string _editNormalyError = string.Empty;
+
     private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
-    private string _filename;
+
+    private string _filename = string.Empty;
+
     private string _inhaltBlockdatei = string.Empty;
+
     private bool _initialLoadDone;
+
     private DateTime _lastMessageUtc = DateTime.UtcNow.AddMinutes(-10);
+
     private string _lastSaveCode;
+
     private DateTime _lastUserActionUtc = new(1900, 1, 1);
+
     private int _loadingThreadId = -1;
+
+    //private static string _lockLastastfile = string.Empty;
+    private int _lockload = 0;
+
     private FileSystemWatcher? _watcher;
 
     #endregion
@@ -139,7 +156,6 @@ public sealed class MultiUserFile : IDisposableExtended {
     public bool IsInSaveingLoop { get; private set; }
 
     public bool IsLoading { get; private set; }
-
     public bool IsSaving { get; private set; }
 
     public bool ReloadNeeded {
@@ -359,7 +375,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         Filename = fileNameToLoad;
         ReCreateWatcher();
         // Wenn ein Dateiname auf Nix gesezt wird, z.B: bei Bitmap import
-        Load_Reload();
+        while (!Load_Reload()) { };
     }
 
     /// <summary>
@@ -367,44 +383,49 @@ public sealed class MultiUserFile : IDisposableExtended {
     /// Der Prozess wartet solange, bis der Reload erfolgreich war.
     /// Ein bereits eventuell bestehender Ladevorgang wird abgewartet.
     /// </summary>
-    public void Load_Reload() {
-        if (string.IsNullOrEmpty(Filename)) { return; }
+    /// <returns>Gibt TRUE zurück, wenn die am Ende der Routine die Datei auf dem aktuellesten Stand ist</returns>
+    public bool Load_Reload() {
+        if (string.IsNullOrEmpty(Filename)) { return true; }
         WaitLoaded(true);
 
-        lock (_lockload) {
-            IsLoading = true;
-            _loadingThreadId = Thread.CurrentThread.ManagedThreadId;
+        if (Interlocked.CompareExchange(ref _lockload, 1, 0) == 0) {
+            try {
+                IsLoading = true;
+                //_lockLastastfile = Filename;
 
-            //// Wichtig, das _LastSaveCode geprüft wird, das ReloadNeeded im EasyMode immer false zurück gibt.
-            //if (!string.IsNullOrEmpty(_LastSaveCode) && !ReloadNeeded) { IsLoading = false; return; }
-            //var OnlyReload = !string.IsNullOrEmpty(_LastSaveCode);
-            if (_initialLoadDone && !ReloadNeeded) {
+                //if (_lockLastastfile.Contains("GEBINDETRANSPORT_BAUGRUPPEN")) {
+                //    _lockLastastfile = Filename;
+                //}
+
+                _loadingThreadId = Thread.CurrentThread.ManagedThreadId;
+
+                if (_initialLoadDone && !ReloadNeeded) { return true; }
+
+                OnLoading(System.EventArgs.Empty);
+
+                var (bLoaded, tmpLastSaveCode) = LoadBytesFromDisk(Enums.ErrorReason.Load);
+                if (bLoaded == null) { return false; }
+
+                OnParseExternal(bLoaded);
+
+                _lastSaveCode = tmpLastSaveCode; // initialize setzt zurück
+
+                _initialLoadDone = true;
+                _checkedAndReloadNeed = false;
+
+                RepairOldBlockFiles();
+
+                OnLoaded();
+
+                return ReloadNeeded;
+            } catch {
+                return false;
+            } finally {
                 IsLoading = false;
-                return;
-            } // Wird in der Schleife auch geprüft
-
-            OnLoading(System.EventArgs.Empty);
-
-            var (bLoaded, tmpLastSaveCode) = LoadBytesFromDisk(Enums.ErrorReason.Load);
-            if (bLoaded == null) {
-                IsLoading = false;
-                return;
+                Interlocked.Decrement(ref _lockload);
             }
-
-            OnParseExternal(bLoaded);
-
-            _lastSaveCode = tmpLastSaveCode; // initialize setzt zurück
-
-            _initialLoadDone = true;
-            _checkedAndReloadNeed = false;
-
-            //CheckDataAfterReload();
-            RepairOldBlockFiles();
-
-            IsLoading = false;
-
-            OnLoaded();
         }
+        return false;
     }
 
     public void RepairOldBlockFiles() {
@@ -439,11 +460,6 @@ public sealed class MultiUserFile : IDisposableExtended {
     /// <param name="mustSave"></param>
     public bool Save(bool mustSave) {
         if (IsInSaveingLoop) { return false; }
-        //if (isSomethingDiscOperatingsBlocking()) {
-        //    if (!mustSave) { RepairOldBlockFiles(); return false; }
-        //    Develop.DebugPrint(enFehlerArt.Warnung, "Release unmöglich, Dateistatus geblockt");
-        //    return false;
-        //}
         if (string.IsNullOrEmpty(Filename)) { return false; }
 
         OnSaving();
@@ -452,10 +468,15 @@ public sealed class MultiUserFile : IDisposableExtended {
         if (!mustSave && AgeOfBlockDatei >= 0) { RepairOldBlockFiles(); return false; }
         while (OnHasPendingChanges()) {
             IsInSaveingLoop = true;
-            //CancelBackGroundWorker();
-            Load_Reload();
-            var (tmpFileName, fileInfoBeforeSaving, dataUncompressed) = WriteTempFileToDisk(false); // Dateiname, Stand der Originaldatei, was gespeichert wurde
-            var f = SaveRoutine(false, tmpFileName, fileInfoBeforeSaving, dataUncompressed);
+
+            var f = string.Empty;
+            if (!Load_Reload()) { f = "Reload fehlgeschlagen"; }
+
+            if (!string.IsNullOrEmpty(f)) {
+                var (tmpFileName, fileInfoBeforeSaving, dataUncompressed) = WriteTempFileToDisk(false); // Dateiname, Stand der Originaldatei, was gespeichert wurde
+                f = SaveRoutine(false, tmpFileName, fileInfoBeforeSaving, dataUncompressed);
+            }
+
             if (!string.IsNullOrEmpty(f)) {
                 if (DateTime.UtcNow.Subtract(d).TotalSeconds > 40) {
                     // Da liegt ein größerer Fehler vor...
@@ -876,16 +897,15 @@ public sealed class MultiUserFile : IDisposableExtended {
     /// </summary>
     /// <param name="hardmode"></param>
     private void WaitLoaded(bool hardmode) {
-        if (_loadingThreadId == Thread.CurrentThread.ManagedThreadId) { return; }
+        //if (_loadingThreadId == Thread.CurrentThread.ManagedThreadId) { return; }
         var x = DateTime.Now;
-        while (IsLoading) {
+        while (_lockload > 0) {
             Develop.DoEvents();
             if (!hardmode) { return; }
             if (DateTime.Now.Subtract(x).TotalMinutes > 1) {
                 if (hardmode) {
                     Develop.DebugPrint(FehlerArt.Warnung, "WaitLoaded hängt: " + Filename);
                 }
-                //Develop.DebugPrint(enFehlerArt.Warnung, "WaitLoaded hängt: " + Filename);
                 return;
             }
         }

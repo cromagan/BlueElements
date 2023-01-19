@@ -122,8 +122,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tbxName = new BlueControls.Controls.TextBox();
             this.Caption2 = new BlueControls.Controls.Caption();
             this.tbxCaption = new BlueControls.Controls.TextBox();
-            this.btnVor = new BlueControls.Controls.Button();
-            this.btnZurueck = new BlueControls.Controls.Button();
             this.btnOk = new BlueControls.Controls.Button();
             this.tabControl = new BlueControls.Controls.TabControl();
             this.tabDatenFormat = new System.Windows.Forms.TabPage();
@@ -1245,26 +1243,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tbxCaption.Size = new System.Drawing.Size(681, 64);
             this.tbxCaption.TabIndex = 2;
             // 
-            // btnVor
-            // 
-            this.btnVor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnVor.ImageCode = "Pfeil_Rechts|16|||FF0000";
-            this.btnVor.Location = new System.Drawing.Point(385, 640);
-            this.btnVor.Name = "btnVor";
-            this.btnVor.Size = new System.Drawing.Size(72, 24);
-            this.btnVor.TabIndex = 5;
-            this.btnVor.Click += new System.EventHandler(this.btnVor_Click);
-            // 
-            // btnZurueck
-            // 
-            this.btnZurueck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnZurueck.ImageCode = "Pfeil_Links|16|||FF0000";
-            this.btnZurueck.Location = new System.Drawing.Point(305, 640);
-            this.btnZurueck.Name = "btnZurueck";
-            this.btnZurueck.Size = new System.Drawing.Size(72, 24);
-            this.btnZurueck.TabIndex = 4;
-            this.btnZurueck.Click += new System.EventHandler(this.btnZurueck_Click);
-            // 
             // btnOk
             // 
             this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -1575,8 +1553,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.Controls.Add(this.capIntern);
             this.Controls.Add(this.tabControl);
             this.Controls.Add(this.BlueFrame1);
-            this.Controls.Add(this.btnVor);
-            this.Controls.Add(this.btnZurueck);
             this.Controls.Add(this.btnOk);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "ColumnEditor";
@@ -1607,8 +1583,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Button btnAutoFilterTXTErlaubt;
         private Button btnAutoFilterMoeglich;
         private Caption capInfo;
-        private Button btnZurueck;
-        private Button btnVor;
         private Button btnMultiline;
         private Caption capRechterRand;
         private Caption capLinkerRand;

@@ -453,7 +453,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             return;
         }
         do {
-            column = tableView.Design == BlueTableAppearance.OnlyMainColumnWithoutHead ? column.Next() : ca.NextVisible(column);
+            column = tableView.Design == BlueTableAppearance.OnlyMainColumnWithoutHead ? tableView.Database.ColumnArrangements[0].NextVisible(column) : ca.NextVisible(column);
             if (column == null) {
                 column = ca[0].Column;
                 if (rowsChecked > tableView.Database.Row.Count() + 1) {

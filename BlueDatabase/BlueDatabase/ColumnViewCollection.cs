@@ -213,35 +213,13 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem?>, IParseable,
     }
 
     public void ShowAllColumns() {
+        if (Database == null || Database.IsDisposed) { return; }
 
-        #region Schnelle Prüfung, ob alles ok ist
-
-        var ok = true;
-        for (var z = 0; z < Database.Column.Count; z++) {
-            if (z >= Count) {
-                ok = false;
-                break;
-            }
-            if (this[z].Column != Database.Column[z]) {
-                ok = false;
-                break;
+        foreach (var thisColumn in Database.Column) {
+            if (this[thisColumn] == null) {
+                Add(new ColumnViewItem(thisColumn, ViewType.Column, this));
             }
         }
-        if (Count > 0 && this[0].ViewType != ViewType.PermanentColumn) { ok = false; }
-
-        #endregion
-
-        if (ok) { return; }
-
-        #region Komplett neu erstellen
-
-        Clear();
-        foreach (var thisColumnItem in Database.Column.Where(thisColumnItem => thisColumnItem != null)) {
-            Add(new ColumnViewItem(thisColumnItem, ViewType.Column, this));
-        }
-        if (Count > 0) { this[0].ViewType = ViewType.PermanentColumn; }
-
-        #endregion
     }
 
     public new void Swap(ColumnViewItem? viewItem1, ColumnViewItem? viewItem2) {

@@ -158,15 +158,15 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     public static (List<FilterItem> filter, string info) GetFilterFromLinkedCellData(DatabaseAbstract linkedDatabase, ColumnItem column, RowItem? row) {
         var fi = new List<FilterItem>();
 
-        for (var z = 0; z < Math.Min(column.LinkedCellFilter.Count, linkedDatabase.Column.Count); z++) {
+        for (var z = 0; z < Math.Min(column.LinkedCellFilter.Count, linkedDatabase.ColumnArrangements[0].Count); z++) {
             if (IntTryParse(column.LinkedCellFilter[z], out var key)) {
                 var c = column.Database.Column.SearchByKey(key);
                 if (c == null) { return (fi, "Eine Spalte, aus der der Zeilenschlüssel kommen soll, existiert nicht."); }
                 var value = row.CellGetString(c);
                 if (string.IsNullOrEmpty(value)) { return (fi, "Leere Suchwerte werden nicht unterstützt."); }
-                fi.Add(new FilterItem(linkedDatabase.Column[z], FilterType.Istgleich, value));
+                fi.Add(new FilterItem(linkedDatabase.ColumnArrangements[0][z].Column, FilterType.Istgleich, value));
             } else if (!string.IsNullOrEmpty(column.LinkedCellFilter[z]) && column.LinkedCellFilter[z].StartsWith("@")) {
-                fi.Add(new FilterItem(linkedDatabase.Column[z], FilterType.Istgleich, column.LinkedCellFilter[z].Substring(1)));
+                fi.Add(new FilterItem(linkedDatabase.ColumnArrangements[0][z].Column, FilterType.Istgleich, column.LinkedCellFilter[z].Substring(1)));
             }
         }
 
