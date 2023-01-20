@@ -21,13 +21,14 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
+using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEmpty, IDisposableExtended, IErrorCheckable {
+public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEmpty, IDisposableExtended, IErrorCheckable, IHasDatabase {
 
     #region Fields
 

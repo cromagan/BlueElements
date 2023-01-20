@@ -21,13 +21,14 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
+using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace BlueDatabase;
 
-public sealed class FilterCollection : ListExt<FilterItem>, IParseable {
+public sealed class FilterCollection : ListExt<FilterItem>, IParseable, IHasDatabase {
 
     #region Constructors
 

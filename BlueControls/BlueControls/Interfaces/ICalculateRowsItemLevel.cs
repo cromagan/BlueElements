@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics.Interfaces;
+using BlueDatabase.Interfaces;
 
 namespace BlueControls.Interfaces;
 
@@ -25,7 +26,7 @@ namespace BlueControls.Interfaces;
 /// Wird verwendet, wenn das PadItem Zeilen berechnen kann und dann das
 /// erzeugte Control es an Childs weiter geben kann.
 /// </summary>
-public interface ICalculateRowsItemLevel : IHasDatabase, IReadableText, IItemToControl {
+public interface ICalculateRowsItemLevel : IHasChangeabelDatabase, IReadableText, IItemToControl {
 
     #region Properties
 

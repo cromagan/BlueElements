@@ -102,6 +102,8 @@
     <Compile Include="DatabaseMultiUser.cs" />
     <Compile Include="DatabaseSQLLite.cs" />
     <Compile Include="EventArgs\ColumnEventArgs.cs" />
+    <Compile Include="Interfaces\IHasChangeabelDatabase.cs" />
+    <Compile Include="Interfaces\IHasDatabase.cs" />
     <Compile Include="SQLBackMicrosoftCE.cs" />
     <Compile Include="CellCollection.cs" />
     <Compile Include="CellItem.cs" />

@@ -51,7 +51,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     internal List<string>? UcaseNamesSortedByLenght;
     private readonly List<string> _afterEditAutoReplace = new();
     private readonly List<string> _dropDownItems = new();
-    private readonly List<string> _linkedCellFilterx = new();
+    private readonly List<string> _linkedCellFilter = new();
     private readonly List<string> _opticalReplace = new();
     private readonly List<string> _permissionGroupsChangeCell = new();
     private readonly List<string> _tags = new();
@@ -706,14 +706,30 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         }
     }
 
-    public List<string> LinkedCellFilterx {
-        get => _linkedCellFilterx;
+    public List<string> LinkedCellFilter {
+        get => _linkedCellFilter;
         set {
-            if (!_linkedCellFilterx.IsDifferentTo(value)) {
-                return;
+
+            #region Altes Format konvertieren
+
+            var newVal = new List<string>();
+
+            foreach (var item in value) {
+                if (!string.IsNullOrEmpty(item)) {
+                    if (item.Contains("|")) {
+                        newVal.Add(item);
+                    } else {
+                        Develop.DebugPrint("Altes Format!");
+                        newVal.Add(item);
+                    }
+                }
             }
 
-            Database.ChangeData(DatabaseDataType.LinkedCellFilter, Key, null, _linkedCellFilterx.JoinWithCr(), value.JoinWithCr(), string.Empty);
+            #endregion
+
+            if (!_linkedCellFilter.IsDifferentTo(newVal)) { return; }
+
+            Database.ChangeData(DatabaseDataType.LinkedCellFilter, Key, null, _linkedCellFilter.JoinWithCr(), newVal.JoinWithCr(), string.Empty);
             OnChanged();
         }
     }

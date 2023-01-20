@@ -21,12 +21,12 @@ using BlueDatabase;
 
 namespace BlueDatabase.Interfaces;
 
-public interface IHasDatabase {
+public interface IHasChangeabelDatabase {
     //protected DatabaseAbstract? _database;
 
     #region Properties
 
-    public DatabaseAbstract? Database { get; }
+    public DatabaseAbstract? Database { get; set; }
 
     #endregion
 
