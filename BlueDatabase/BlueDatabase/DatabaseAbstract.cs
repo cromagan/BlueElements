@@ -135,8 +135,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     public event EventHandler<MessageEventArgs>? DropMessage;
 
-    public event CancelEventHandler? Exporting;
-
     public event EventHandler<GenerateLayoutInternalEventArgs>? GenerateLayoutInternal;
 
     public event EventHandler? Loaded;
@@ -766,7 +764,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         if (ReadOnly) { return "Datenbank schreibgeschützt!"; }
 
         if (mode.HasFlag(BlueBasics.Enums.ErrorReason.EditGeneral) || mode.HasFlag(BlueBasics.Enums.ErrorReason.Save)) {
-            if (_backgroundWorker.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
+            if (_backgroundWorker?.IsBusy ?? false) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
         }
 
         return IntParse(LoadedVersion.Replace(".", "")) > IntParse(DatabaseVersion.Replace(".", ""))
@@ -1563,11 +1561,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         _sortDefinition = null;
     }
 
-    protected void OnExporting(CancelEventArgs e) {
-        if (IsDisposed) { return; }
-        Exporting?.Invoke(this, e);
-    }
-
     protected void OnLoaded() {
         if (IsDisposed) { return; }
         IsInCache = DateTime.UtcNow;
@@ -1598,9 +1591,9 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                 //HasPendingChanges(null, e2);
 
                 //if (!e2.HasPendingChanges) {
-                CancelEventArgs ec = new(false);
-                OnExporting(ec);
-                if (ec.Cancel) { break; }
+                //CancelEventArgs ec = new(false);
+                //OnExporting(ec);
+                //if (ec.Cancel) { break; }
                 //}
 
                 thisExport.DeleteOutdatedBackUps(_backgroundWorker);
@@ -1699,9 +1692,9 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     private bool IsThereBackgroundWorkToDo() {
         if (IsDisposed || ReadOnly || !LogUndo) { return false; }
 
-        CancelEventArgs ec = new(false);
-        OnExporting(ec);
-        if (ec.Cancel) { return false; }
+        //CancelEventArgs ec = new(false);
+        //OnExporting(ec);
+        //if (ec.Cancel) { return false; }
 
         foreach (var thisExport in _export) {
             if (thisExport != null) {

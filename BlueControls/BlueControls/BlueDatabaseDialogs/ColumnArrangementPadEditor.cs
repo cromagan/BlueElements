@@ -406,7 +406,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         var dbColumnCombi = new List<string>();
         foreach (var thisc in Database?.Column) {
             if (thisc.LinkedDatabase != null) {
-                var dbN = thisc.LinkedDatabase.ConnectionData.TableName + "|" + thisc.LinkedCellFilter.JoinWithCr();
+                var dbN = thisc.LinkedDatabase.ConnectionData.TableName + "|" + thisc.LinkedCellFilterx.JoinWithCr();
                 dbColumnCombi.AddIfNotExists(dbN);
             }
         }
@@ -422,7 +422,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
                 if (thisc.Column.LinkedDatabase != null) {
                     // String als Namen als eindeutige Kennung
-                    var toCheckCombi = thisc.Column.LinkedDatabase.ConnectionData.TableName + "|" + thisc.Column.LinkedCellFilter.JoinWithCr();
+                    var toCheckCombi = thisc.Column.LinkedDatabase.ConnectionData.TableName + "|" + thisc.Column.LinkedCellFilterx.JoinWithCr();
 
                     if (toCheckCombi == thisCombi) {
 
@@ -443,8 +443,8 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
                         #region ANDERE Spalten (die Filterung der Einträge) aus eigener Datenbank zur Verknüpften Datenbank zeigen lassen
 
-                        for (var z = 0; z < Math.Min(thisc.Column.LinkedCellFilter.Count, thisc.Column.LinkedDatabase.Column.Count); z++) {
-                            if (IntTryParse(thisc.Column.LinkedCellFilter[z], out var key)) {
+                        for (var z = 0; z < Math.Min(thisc.Column.LinkedCellFilterx.Count, thisc.Column.LinkedDatabase.Column.Count); z++) {
+                            if (IntTryParse(thisc.Column.LinkedCellFilterx[z], out var key)) {
                                 var c = thisc?.Column?.Database?.Column.SearchByKey(key);
                                 if (c != null) {
                                     var rkcolit = (ColumnPadItem?)Pad.Item[c.Name];

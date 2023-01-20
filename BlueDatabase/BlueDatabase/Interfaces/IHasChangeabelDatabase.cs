@@ -19,7 +19,7 @@
 
 using BlueDatabase;
 
-namespace BlueControls.Interfaces;
+namespace BlueDatabase.Interfaces;
 
 public interface IHasDatabase {
     //protected DatabaseAbstract? _database;

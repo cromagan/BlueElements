@@ -472,7 +472,7 @@ public sealed class MultiUserFile : IDisposableExtended {
             var f = string.Empty;
             if (!Load_Reload()) { f = "Reload fehlgeschlagen"; }
 
-            if (!string.IsNullOrEmpty(f)) {
+            if (string.IsNullOrEmpty(f)) {
                 var (tmpFileName, fileInfoBeforeSaving, dataUncompressed) = WriteTempFileToDisk(false); // Dateiname, Stand der Originaldatei, was gespeichert wurde
                 f = SaveRoutine(false, tmpFileName, fileInfoBeforeSaving, dataUncompressed);
             }

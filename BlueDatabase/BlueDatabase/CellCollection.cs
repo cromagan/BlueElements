@@ -158,15 +158,15 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     public static (List<FilterItem> filter, string info) GetFilterFromLinkedCellData(DatabaseAbstract linkedDatabase, ColumnItem column, RowItem? row) {
         var fi = new List<FilterItem>();
 
-        for (var z = 0; z < Math.Min(column.LinkedCellFilter.Count, linkedDatabase.ColumnArrangements[0].Count); z++) {
-            if (IntTryParse(column.LinkedCellFilter[z], out var key)) {
+        for (var z = 0; z < Math.Min(column.LinkedCellFilterx.Count, linkedDatabase.ColumnArrangements[0].Count); z++) {
+            if (IntTryParse(column.LinkedCellFilterx[z], out var key)) {
                 var c = column.Database.Column.SearchByKey(key);
                 if (c == null) { return (fi, "Eine Spalte, aus der der Zeilenschlüssel kommen soll, existiert nicht."); }
                 var value = row.CellGetString(c);
                 if (string.IsNullOrEmpty(value)) { return (fi, "Leere Suchwerte werden nicht unterstützt."); }
                 fi.Add(new FilterItem(linkedDatabase.ColumnArrangements[0][z].Column, FilterType.Istgleich, value));
-            } else if (!string.IsNullOrEmpty(column.LinkedCellFilter[z]) && column.LinkedCellFilter[z].StartsWith("@")) {
-                fi.Add(new FilterItem(linkedDatabase.ColumnArrangements[0][z].Column, FilterType.Istgleich, column.LinkedCellFilter[z].Substring(1)));
+            } else if (!string.IsNullOrEmpty(column.LinkedCellFilterx[z]) && column.LinkedCellFilterx[z].StartsWith("@")) {
+                fi.Add(new FilterItem(linkedDatabase.ColumnArrangements[0][z].Column, FilterType.Istgleich, column.LinkedCellFilterx[z].Substring(1)));
             }
         }
 
@@ -1024,7 +1024,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             //}
 
             if (thisColumn.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-                foreach (var thisV in thisColumn.LinkedCellFilter) {
+                foreach (var thisV in thisColumn.LinkedCellFilterx) {
                     if (IntTryParse(thisV, out var key)) {
                         if (key == column.Key) { LinkedCellData(thisColumn, ownRow, true, false); break; }
                     }

@@ -525,6 +525,8 @@ internal sealed partial class ColumnEditor {
             var vis = db.Column.GenerateAndAdd("visible", "visible", VarType.Bit);
             var sp = db.Column.GenerateAndAdd("Spalte", "Spalte", VarType.Text);
             sp.Align = AlignmentHorizontal.Rechts;
+            db.Column.GenerateAndAdd("SpalteName", "Spalte-Name", VarType.Text);
+
             var b = db.Column.GenerateAndAdd("Such", "Suchtext", VarType.Text);
             b.Quickinfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum suchen<br>Mischen wird nicht unterstützt.";
             b.MultiLine = false;
@@ -546,9 +548,12 @@ internal sealed partial class ColumnEditor {
             db.RepairAfterParse();
             var car = db.ColumnArrangements.CloneWithClones();
 
-            car[1].ShowAllColumns();
-            car[1].Hide("visible");
-            car[1].HideSystemColumns();
+            car[1].Add(sp, false);
+            car[1].Add(b, false);
+
+            //car[1].ShowAllColumns();
+            //car[1].Hide("visible");
+            //car[1].HideSystemColumns();
 
             db.ColumnArrangements = car;
 
@@ -575,6 +580,7 @@ internal sealed partial class ColumnEditor {
             var r = tblFilterliste.Database.Row[z.ToString()] ?? tblFilterliste.Database.Row.GenerateAndAdd(z.ToString(), "Neue Spalte");
 
             r.CellSet("Spalte", col.ReadableText() + " = ");
+            r.CellSet("SpalteName", col.Name);
 
             if (col.Format.Autofilter_möglich() && !col.MultiLine && col != spalteauDb && !col.Format.NeedTargetDatabase() && !col.IsSystemColumn()) {
                 r.CellSet("visible", true);
@@ -597,7 +603,7 @@ internal sealed partial class ColumnEditor {
         foreach (var thisr in tblFilterliste.Database.Row) {
             var x = thisr.CellGetInteger("Count");
 
-            while (nf.Count <= x) { nf.Add(string.Empty); }
+            //while (nf.Count <= x) { nf.Add(string.Empty); }
             if (thisr.CellGetBoolean("visible")) {
                 var tmp = "@" + thisr.CellGetString("Such");
 
@@ -606,11 +612,13 @@ internal sealed partial class ColumnEditor {
                 }
                 if (tmp == "@") { tmp = string.Empty; }
 
-                nf[x] = tmp;
+                if (!string.IsNullOrEmpty(tmp)) {
+                    nf.Add(thisr.CellGetString("spaltename") + "|=|" + tmp);
+                }
             }
         }
 
-        _column.LinkedCellFilter = nf.JoinWithCr().SplitAndCutByCrToList();
+        _column.LinkedCellFilterx = nf.JoinWithCr().SplitAndCutByCrToList();
     }
 
     /// <summary>
@@ -619,21 +627,19 @@ internal sealed partial class ColumnEditor {
     /// </summary>
     private void SetLinkedCellFilter() {
         foreach (var thisr in tblFilterliste.Database.Row) {
-            var x = thisr.CellGetInteger("Count");
+            thisr.CellSet("Such", string.Empty);
+        }
 
-            if (x < _column.LinkedCellFilter.Count) {
-                var tmp = _column.LinkedCellFilter[x];
+        foreach (var thisFi in _column.LinkedCellFilterx) {
+            var tmp = _column.LinkedCellFilterx[x];
 
-                if (IntTryParse(tmp, out var key)) {
-                    var col = _column.Database.Column.SearchByKey(key);
-                    tmp = col != null ? "~" + col.Name.ToLower() + "~" : string.Empty;
-                } else {
-                    tmp = tmp.StartsWith("@") ? tmp.Substring(1) : string.Empty;
-                }
-                thisr.CellSet("Such", tmp);
+            if (IntTryParse(tmp, out var key)) {
+                var col = _column.Database.Column.SearchByKey(key);
+                tmp = col != null ? "~" + col.Name.ToLower() + "~" : string.Empty;
             } else {
-                thisr.CellSet("Such", string.Empty);
+                tmp = tmp.StartsWith("@") ? tmp.Substring(1) : string.Empty;
             }
+            thisr.CellSet("Such", tmp);
         }
     }
 

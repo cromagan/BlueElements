@@ -168,7 +168,7 @@ public partial class Form : System.Windows.Forms.Form {
         //https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.form.closed?view=netframework-4.8
         if (IsClosed) { return; }
 
-        if (this is not FloatingForm) {
+        if (this is not FloatingForm && this is not MessageBox) {
             DatabaseAbstract.ForceSaveAll();
             MultiUserFile.ForceLoadSaveAll();
         }

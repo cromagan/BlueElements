@@ -34,7 +34,7 @@ using static BlueBasics.IO;
 
 namespace BlueDatabase;
 
-public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended, IInputFormat, IErrorCheckable {
+public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended, IInputFormat, IErrorCheckable, IHasDatabase {
 
     #region Fields
 
@@ -51,7 +51,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     internal List<string>? UcaseNamesSortedByLenght;
     private readonly List<string> _afterEditAutoReplace = new();
     private readonly List<string> _dropDownItems = new();
-    private readonly List<string?> _linkedCellFilter = new();
+    private readonly List<string> _linkedCellFilterx = new();
     private readonly List<string> _opticalReplace = new();
     private readonly List<string> _permissionGroupsChangeCell = new();
     private readonly List<string> _tags = new();
@@ -706,14 +706,14 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         }
     }
 
-    public List<string> LinkedCellFilter {
-        get => _linkedCellFilter;
+    public List<string> LinkedCellFilterx {
+        get => _linkedCellFilterx;
         set {
-            if (!_linkedCellFilter.IsDifferentTo(value)) {
+            if (!_linkedCellFilterx.IsDifferentTo(value)) {
                 return;
             }
 
-            Database.ChangeData(DatabaseDataType.LinkedCellFilter, Key, null, _linkedCellFilter.JoinWithCr(), value.JoinWithCr(), string.Empty);
+            Database.ChangeData(DatabaseDataType.LinkedCellFilter, Key, null, _linkedCellFilterx.JoinWithCr(), value.JoinWithCr(), string.Empty);
             OnChanged();
         }
     }
@@ -1194,7 +1194,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         Align = source.Align;
         SortType = source.SortType;
         DropDownItems = source.DropDownItems;
-        LinkedCellFilter = source.LinkedCellFilter;
+        LinkedCellFilterx = source.LinkedCellFilterx;
         OpticalReplace = source.OpticalReplace;
         AfterEditAutoReplace = source.AfterEditAutoReplace;
         this.GetStyleFrom(source); // regex, Allowed Chars, etc.
@@ -1727,7 +1727,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
                     //if (LinkedCell_RowKeyIsInColumn != -9999) {
                     _format = DataFormat.Verknüpfung_zu_anderer_Datenbank;
-                    _linkedCellFilter.Clear();
+                    _linkedCellFilterx.Clear();
                     //LinkedCellFilter.GenerateAndAdd(LinkedCell_RowKeyIsInColumn.ToString());
                     //LinkedCell_RowKeyIsInColumn = -1;
                     //}
@@ -1881,7 +1881,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 _scriptType = ScriptType.Nicht_vorhanden;
                 _align = AlignmentHorizontal.Zentriert;
                 _dropDownItems.Clear();
-                _linkedCellFilter.Clear();
+                _linkedCellFilterx.Clear();
                 _permissionGroupsChangeCell.Clear();
                 _textBearbeitungErlaubt = false;
                 _dropdownBearbeitungErlaubt = false;
@@ -2384,7 +2384,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                                                                                                                                                       //if (ThisColumn.LinkedCell_ColumnValueFoundIn == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
 
             if (thisColumn.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-                foreach (var thisV in thisColumn._linkedCellFilter) {
+                foreach (var thisV in thisColumn._linkedCellFilterx) {
                     if (IntTryParse(thisV, out var key)) {
                         if (key == Key) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; }
                     }
@@ -2494,7 +2494,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 break;
 
             case DatabaseDataType.LinkedCellFilter:
-                _linkedCellFilter.SplitAndCutByCr(newvalue);
+                _linkedCellFilterx.SplitAndCutByCr(newvalue);
                 break;
 
             case DatabaseDataType.OpticalTextReplace:
@@ -2686,6 +2686,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         return string.Empty;
     }
 
+    protected void Database_Disposing(object sender, System.EventArgs e) => Dispose();
+
     private void _TMP_LinkedDatabase_Cell_CellValueChanged(object sender, CellEventArgs e) {
         var tKey = CellCollection.KeyOfCell(e.Column, e.Row);
         foreach (var thisRow in Database.Row) {
@@ -2743,9 +2745,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     //        }
     //    }
     //}
-
-    private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
-
     private void Dispose(bool disposing) {
         if (!IsDisposed) {
             if (disposing) {
