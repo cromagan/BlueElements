@@ -108,7 +108,7 @@ namespace BeCreative {
             this.Controls.Add(this.btnLayout);
             this.Controls.Add(this.btnFormular);
             this.Controls.Add(this.btnDatenbank);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "Start";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "BeCreative! - (c) Christian Peter";

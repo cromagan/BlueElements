@@ -68,12 +68,16 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
         Initialize();
 
+        // Muss vor dem Laden zu Allfiles hinzugfügt werde, weil das bei OnAdded
+        // Die Events registriert werden, um z.B: das Passwort abzufragen
+        // Zusätzlic werden z.B: Filter für den Export erstellt - auch der muss die Datenbank finden können
+
+        AllFiles.Add(this);
+
         if (!string.IsNullOrEmpty(filename)) {
             //DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + filename.FileNameWithoutSuffix()));
             _muf.Load(filename, create);
         }
-
-        AllFiles.Add(this);
     }
 
     #endregion

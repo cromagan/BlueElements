@@ -194,7 +194,7 @@ public sealed class ExtText : ListExt<ExtChar> {
     public float Zeilenabstand {
         get => _zeilenabstand;
         set {
-            if (value == _zeilenabstand) { return; }
+            if (Math.Abs(value - _zeilenabstand) < 0.01) { return; }
             _zeilenabstand = value;
             ResetPosition(false);
             OnChanged();
@@ -323,6 +323,7 @@ public sealed class ExtText : ListExt<ExtChar> {
     public int Height() {
         while (_width == null) { ReBreak(); }
 
+        if (_height == null) { return -1; }
         return (int)_height;
     }
 
@@ -344,7 +345,7 @@ public sealed class ExtText : ListExt<ExtChar> {
 
     public Size LastSize() {
         while (_width == null) { ReBreak(); }
-        return _width < 5 || _height < 5 ? new Size(32, 16) : new Size((int)_width, (int)_height);
+        return _width < 5 || _height < 5 || _height == null ? new Size(32, 16) : new Size((int)_width, (int)_height);
     }
 
     public void StufeÄndern(int first, int last, int stufe) {
@@ -424,18 +425,17 @@ public sealed class ExtText : ListExt<ExtChar> {
     }
 
     private string ConvertCharToHtmlText(int first, int last) {
+        if (Count == 0) { return string.Empty; }
+
         var t = new StringBuilder();
 
         last = Math.Min(last, Count - 1);
         var lastStufe = 4;
 
         for (var z = first; z <= last; z++) {
-            if (z <= first) { lastStufe = this[first].Stufe; }
-            if (z == first && lastStufe != 4) { t.Append("<H" + this[first].Stufe + ">"); }
-
-            if (lastStufe != this[first].Stufe) {
-                t.Append("<H" + this[first].Stufe + ">");
-                lastStufe = this[first].Stufe;
+            if (lastStufe != this[z].Stufe) {
+                t.Append("<H" + this[z].Stufe + ">");
+                lastStufe = this[z].Stufe;
             }
 
             t.Append(this[z].HtmlText());
@@ -603,7 +603,7 @@ public sealed class ExtText : ListExt<ExtChar> {
                 break;
 
             case "IMAGECODE":
-                var x = !attribut.Contains("|") && font != null ? QuickImage.Get(attribut, (int)font.Oberlänge(1)) : QuickImage.Get(attribut);
+                var x = !attribut.Contains("|") ? QuickImage.Get(attribut, (int)font.Oberlänge(1)) : QuickImage.Get(attribut);
                 position++;
                 Add(new ExtCharImageCode(x, _design, _state, font, stufe));
                 break;

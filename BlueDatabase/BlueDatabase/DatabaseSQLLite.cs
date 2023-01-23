@@ -69,10 +69,15 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
         Initialize();
 
+        // Muss vor dem Laden zu Allfiles hinzugfügt werde, weil das bei OnAdded
+        // Die Events registriert werden, um z.B: das Passwort abzufragen
+        // Zusätzlic werden z.B: Filter für den Export erstellt - auch der muss die Datenbank finden können
+
+        AllFiles.Add(this);
+
         if (sql != null) {
             LoadFromSQLBack();
         }
-        AllFiles.Add(this);
     }
 
     #endregion

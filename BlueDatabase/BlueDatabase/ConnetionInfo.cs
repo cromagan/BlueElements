@@ -73,58 +73,62 @@ public class ConnectionInfo : IReadableText {
         #endregion
 
         var x = (uniqueID + "||||").SplitBy("|");
+        TableName = x[0];
+        Provider = null;
+        DatabaseID = x[1];
+        AdditionalData = x[2];
 
-        foreach (var thisDB in alf) {
-            var d = thisDB.ConnectionData;
+        //#region  Prüfen, ob eine vorhandene Datenbank den Provider machen kann
+        //foreach (var thisDB in alf) {
+        //    var d = thisDB.ConnectionData;
 
-            if (thisDB.ConnectionDataOfOtherTable(x[0], true) is ConnectionInfo nci) {
-                TableName = nci.TableName;
-                Provider = nci.Provider;
-                DatabaseID = nci.DatabaseID;
-                AdditionalData = nci.AdditionalData;
-                return;
-            }
-            //if (d.DatabaseID == x[1]) {
-            //    TableName = x[0].ToUpper();
-            //    Provider = thisDB;
-            //    DatabaseID = d.DatabaseID;
-            //    AdditionalData = dn;
-            //    return;
-            //}
+        //    if (thisDB.ConnectionDataOfOtherTable(x[0], true) is ConnectionInfo nci) {
+        //        TableName = nci.TableName;
+        //        Provider = nci.Provider;
+        //        DatabaseID = nci.DatabaseID;
+        //        AdditionalData = nci.AdditionalData;
+        //        return;
+        //    }
 
-            if (d.DatabaseID == Database.DatabaseId) {
-                // Dateisystem
-                var dn = d.AdditionalData.FilePath() + x[0] + ".mdb";
-                if (System.IO.File.Exists(dn)) {
-                    TableName = x[0].ToUpper();
-                    Provider = thisDB;
-                    DatabaseID = Database.DatabaseId;
-                    AdditionalData = dn;
-                }
-            }
+        //}
 
-            if (d.DatabaseID == DatabaseMultiUser.DatabaseId) {
-                // Dateisystem
-                var dn = d.AdditionalData.FilePath() + x[0] + ".mdb";
-                if (System.IO.File.Exists(dn)) {
-                    TableName = x[0].ToUpper();
-                    Provider = thisDB;
-                    DatabaseID = DatabaseMultiUser.DatabaseId;
-                    AdditionalData = dn;
-                }
-            }
-        }
+        //#endregion
 
-        var tbn = SQLBackAbstract.MakeValidTableName(uniqueID.FileNameWithoutSuffix());
+        //if (d.DatabaseID == Database.DatabaseId) {
+        //    // Dateisystem
+        //    var dn = d.AdditionalData.FilePath() + x[0] + ".mdb";
+        //    if (System.IO.File.Exists(dn)) {
+        //        TableName = x[0].ToUpper();
+        //        Provider = thisDB;
+        //        DatabaseID = Database.DatabaseId;
+        //        AdditionalData = dn;
+        //    }
+        //}
 
-        var ci = DatabaseAbstract.ProviderOf(tbn);
+        //if (d.DatabaseID == DatabaseMultiUser.DatabaseId) {
+        //    // Dateisystem
+        //    var dn = d.AdditionalData.FilePath() + x[0] + ".mdb";
+        //    if (System.IO.File.Exists(dn)) {
+        //        TableName = x[0].ToUpper();
+        //        Provider = thisDB;
+        //        DatabaseID = DatabaseMultiUser.DatabaseId;
+        //        AdditionalData = dn;
+        //    }
+        //}
+        //var tbn = SQLBackAbstract.MakeValidTableName(uniqueID.FileNameWithoutSuffix());
 
-        if (ci != null) {
-            TableName = ci.TableName;
-            Provider = ci.Provider;
-            DatabaseID = ci.DatabaseID;
-            AdditionalData = ci.AdditionalData;
-        }
+        //if (!SQLBackAbstract.IsValidTableName(x[0])) {
+        //    var ci = DatabaseAbstract.ProviderOf(x[0]);
+
+        //    if (ci != null) {
+        //        TableName = ci.TableName;
+        //        Provider = ci.Provider;
+        //        DatabaseID = ci.DatabaseID;
+        //        AdditionalData = ci.AdditionalData;
+        //    }
+        //}
+
+        //Develop.DebugPrint(FehlerArt.Fehler, "Datenbank konnte nicht gefunden werden: " + uniqueID);
     }
 
     public ConnectionInfo(string tablename, DatabaseAbstract? provider, string connectionString, string? additionalInfo) {
