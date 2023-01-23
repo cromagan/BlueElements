@@ -31,7 +31,6 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Text;
 using static BlueBasics.Converter;
@@ -63,7 +62,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     private static List<ConnectionInfo> _allavailabletables = new List<ConnectionInfo>();
     private static DateTime _lastTableCheck = new DateTime(1900, 1, 1);
-    private static List<ConnectionInfo> possibletables = new List<ConnectionInfo>();
     private readonly LayoutCollection _layouts = new();
     private readonly List<string> _permissionGroupsNewRow = new();
     private readonly long _startTick = DateTime.UtcNow.Ticks;
@@ -278,7 +276,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     public bool LogUndo { get; set; } = true;
 
-    public List<string>? PermissionGroupsNewRow {
+    public List<string> PermissionGroupsNewRow {
         get => _permissionGroupsNewRow;
         set {
             if (!_permissionGroupsNewRow.IsDifferentTo(value)) { return; }
@@ -602,6 +600,8 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// <param name="previousValue"></param>
     /// <param name="changedTo"></param>
     public string ChangeData(DatabaseDataType comand, long? columnkey, long? rowkey, string previousValue, string changedTo, string comment) {
+        if (IsDisposed) { return "Datenbank verworfen!"; }
+
         var f = SetValueInternal(comand, changedTo, columnkey, rowkey, -1, -1, false);
 
         if (!string.IsNullOrEmpty(f)) { return f; }
@@ -659,12 +659,12 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         UndoCount = sourceDatabase.UndoCount;
         ZeilenQuickInfo = sourceDatabase.ZeilenQuickInfo;
         if (tagsToo) {
-            Tags = sourceDatabase.Tags;
+            Tags = sourceDatabase.Tags.Clone();
         }
         Layouts = sourceDatabase.Layouts;
 
-        DatenbankAdmin = sourceDatabase.DatenbankAdmin;
-        PermissionGroupsNewRow = sourceDatabase.PermissionGroupsNewRow;
+        DatenbankAdmin = sourceDatabase.DatenbankAdmin.Clone();
+        PermissionGroupsNewRow = sourceDatabase.PermissionGroupsNewRow.Clone();
 
         var tcvc = new ListExt<ColumnViewCollection>();
         foreach (var t in sourceDatabase.ColumnArrangements) {
@@ -1295,6 +1295,8 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// <param name="height"></param>
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
     internal virtual string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height, bool isLoading) {
+        if (IsDisposed) { return "Datenbank verworfen!"; }
+
         if (type.IsObsolete()) { return string.Empty; }
 
         if (type.IsColumnTag()) {

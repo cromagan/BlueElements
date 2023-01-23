@@ -31,7 +31,7 @@ public static class DatabaseDataTypeExtension {
 
     public static bool IsDatabaseTag(this DatabaseDataType type) => (int)type is < 100 or >= 249;
 
-    public static bool IsObsolete(this DatabaseDataType type) => (int)type is 0 or 2 or 3 or 22 or 33 or 34 or 35 or 52 or 53 or 58 or 59 or 60 or 61 or 62 or 63 or 65 or 70 or 151;
+    public static bool IsObsolete(this DatabaseDataType type) => (int)type is 0 or 2 or 3 or 22 or 33 or 34 or 35 or 52 or 53 or 58 or 59 or 60 or 61 or 62 or 63 or 65 or 70 or 123 or 151 or 178 or 185;
 
     public static bool Nameless(this DatabaseDataType type) => type.ToString() == ((int)type).ToString();
 
@@ -249,11 +249,11 @@ public enum DatabaseDataType : byte {
     CaptionGroup2 = 175,
     CaptionGroup3 = 176,
     Prefix = 177,
-    KeyColumnKey = 178,
+    //KeyColumnKey = 178,
 
     //co_LinkedCell_RowKeyIsInColumn = 179,
 
-    ColumnKeyOfLinkedDatabase = 180,
+    ColumnNameOfLinkedDatabase = 180,
 
     //co_LinkedCell_ColumnValueFoundIn = 181,
 
@@ -262,8 +262,9 @@ public enum DatabaseDataType : byte {
     //co_LinkedCell_Behaviour = 183,
     //co_DropDownKey = 184,
 
-    MakeSuggestionFromSameKeyColumn = 185,
+    //MakeSuggestionFromSameKeyColumn = 185,
     ColumnAlign = 186,
+
     RegexCheck = 187,
     SortType = 188,
 

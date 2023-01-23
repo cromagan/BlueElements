@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static System.Net.Mime.MediaTypeNames;
@@ -322,7 +323,7 @@ public abstract class SQLBackAbstract {
     //}
     public void LoadRow(string tablename, List<RowItem> row) {
         try {
-            if (row == null || row.Count == 0 || row[0] is null || row[0].Database is null) { return; }
+            if (row == null || row.Count == 0 || row[0] is null || row[0]?.Database is null) { return; }
             if (!OpenConnection()) { return; }
 
             //if (isLoading) { Develop.DebugPrint("Loading falsch"); }
@@ -332,8 +333,13 @@ public abstract class SQLBackAbstract {
 
                 var com = "SELECT RK, ";
 
-                foreach (var thiscolumn in row[0].Database.ColumnArrangements[0]) {
-                    com = com + thiscolumn.Column.Name.ToUpper() + ", ";
+                //var c = new List<ColumnItem>();
+
+                foreach (var thiscolumn in row[0].Database.Column) {
+                    if (thiscolumn.IsInCache == null) {
+                        //c.Add(thiscolumn);
+                        com = com + thiscolumn.Name.ToUpper() + ", ";
+                    }
                 }
 
                 com = com.TrimEnd(", ");
@@ -361,7 +367,8 @@ public abstract class SQLBackAbstract {
                     var r = row[0].Database.Row.SearchByKey(rk) ?? row[0].Database.Row.GenerateAndAdd(rk, string.Empty, false, false, "Load row");
 
                     for (var z = 1; z < dt.Columns.Count; z++) {
-                        r.Database.Cell.SetValueInternal(r.Database.ColumnArrangements[0][z - 1].Column.Key, r.Key, reader[z].ToString(), -1, -1, true);
+                        var cx = r.Database.Column.Exists(dt.Columns[z].ColumnName);
+                        r.Database.Cell.SetValueInternal(cx.Key, r.Key, reader[z].ToString(), -1, -1, true);
                     }
 
                     r.IsInCache = DateTime.UtcNow;

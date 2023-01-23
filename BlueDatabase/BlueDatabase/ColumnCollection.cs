@@ -145,26 +145,26 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     #endregion
 
-    #region Methods
+    //public static string ChangeKeysInString(string originalString, int oldKey, int newKey) {
+    //    var o = ParsableColumnKey(oldKey);
+    //    if (!originalString.Contains(o)) { return originalString; }
+    //    var n = ParsableColumnKey(newKey);
+    //    if (oldKey == newKey) {
+    //        Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel gleich:  " + oldKey);
+    //        return originalString;
+    //    }
+    //    originalString = originalString.Replace(o + "}", n + "}");
+    //    originalString = originalString.Replace(o + ",", n + ",");
+    //    originalString = originalString.Replace(o + " ", n + " ");
+    //    if (originalString.EndsWith(o)) { originalString = originalString.TrimEnd(o) + n; }
+    //    if (originalString.Contains(o)) {
+    //        Develop.DebugPrint(FehlerArt.Fehler, "String nicht ersetzt: " + originalString);
+    //        return originalString;
+    //    }
+    //    return originalString;
+    //}
 
-    public static string ChangeKeysInString(string originalString, int oldKey, int newKey) {
-        var o = ParsableColumnKey(oldKey);
-        if (!originalString.Contains(o)) { return originalString; }
-        var n = ParsableColumnKey(newKey);
-        if (oldKey == newKey) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel gleich:  " + oldKey);
-            return originalString;
-        }
-        originalString = originalString.Replace(o + "}", n + "}");
-        originalString = originalString.Replace(o + ",", n + ",");
-        originalString = originalString.Replace(o + " ", n + " ");
-        if (originalString.EndsWith(o)) { originalString = originalString.TrimEnd(o) + n; }
-        if (originalString.Contains(o)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "String nicht ersetzt: " + originalString);
-            return originalString;
-        }
-        return originalString;
-    }
+    #region Methods
 
     public string Add(ColumnItem column) {
         foreach (var thisc in this) {
@@ -304,7 +304,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     public IEnumerator<ColumnItem> GetEnumerator() => _internal.Values.GetEnumerator();
 
     /// <summary>
-    /// Setzt die fest vermerkten Spalten zurück und durchsucht die Spalten nach dem Identifierx.
+    /// Setzt die fest vermerkten Spalten zurück und durchsucht die Spalten nach dem Identifier.
     /// Es werden nur die gefunden Spalten gemerkt - keine neuen erstellt!
     /// </summary>
     public void GetSystems() {
@@ -354,16 +354,16 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         }
     }
 
-    public int IndexOf(ColumnItem? column) {
-        if (column == null || column.IsDisposed || Database?.Column == null || Database.IsDisposed) { return -1; }
+    //public int IndexOf(ColumnItem? column) {
+    //    if (column == null || column.IsDisposed || Database?.Column == null || Database.IsDisposed) { return -1; }
 
-        for (var index = 0; index < _internal.Count; index++) {
-            if (column == _internal.ElementAt(index).Value) { return index; }
-        }
+    //    for (var index = 0; index < _internal.Count; index++) {
+    //        if (column == _internal.ElementAt(index).Value) { return index; }
+    //    }
 
-        Database.DevelopWarnung("Spalten-Index nicht gefunden: " + column.Caption);
-        return -1;
-    }
+    //    Database.DevelopWarnung("Spalten-Index nicht gefunden: " + column.Caption);
+    //    return -1;
+    //}
 
     public void Remove(ColumnItem item, string comment) {
         Remove(item.Key, comment);
@@ -448,9 +448,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         }
     }
 
-    internal static string ParsableColumnKey(ColumnItem? column) => column == null ? "ColumnKey=?" : ParsableColumnKey(column.Key);
-
-    internal static string ParsableColumnKey(long key) => "ColumnKey=" + key;
+    //internal static string ParsableColumnName(ColumnItem? column) => column == null ? "ColumnName=?" : "ColumnName=" + column.Name;
 
     internal void ChangeKey(long oldKey, long newKey) {
         if (oldKey == newKey) { return; }

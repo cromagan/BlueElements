@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Threading;
+using System.Windows.Forms;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
@@ -45,7 +46,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     /// <summary>
     /// Der Globale Timer, der die Sys_Undo Datenbank abfrägt
     /// </summary>
-    private static Timer? _timer = null;
+    private static System.Threading.Timer? _timer = null;
 
     /// <summary>
     /// Der Zeitstempel der letzten Abfrage des _timer
@@ -135,7 +136,14 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     public override void RefreshColumnsData(List<ColumnItem?>? columns) {
         if (columns == null || columns.Count == 0) { return; }
-        //if (columns.Count == 1 && columns[0].IsInCache != null) { return; }
+        var need = false;
+        foreach (var thisColumn in columns) {
+            if (thisColumn != null && thisColumn.IsInCache == null) {
+                need = true;
+            }
+        }
+
+        if (!need) { return; }
 
         OnDropMessage(FehlerArt.Info, "Lade " + columns.Count.ToString() + " Spalte(n) nach.");
 
@@ -245,6 +253,8 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     }
 
     internal override string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height, bool isLoading) {
+        if (IsDisposed) { return "Datenbank verworfen!"; }
+
         if (type.IsObsolete()) { return string.Empty; }
 
         if (!isLoading && !ReadOnly) {
@@ -441,7 +451,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     private void GenerateTimer() {
         if (_timer != null) { return; }
         _timerTimeStamp = DateTime.UtcNow.AddMinutes(-5);
-        _timer = new Timer(CheckSysUndo);
+        _timer = new System.Threading.Timer(CheckSysUndo);
         _timer.Change(10000, 10000);
     }
 

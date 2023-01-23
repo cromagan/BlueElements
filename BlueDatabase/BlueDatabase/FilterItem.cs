@@ -236,6 +236,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
                     _filterType = (FilterType)IntParse(pair.Value);
                     break;
 
+                case "columnname":
                 case "column":
                     _column = Database.Column[pair.Value];
                     break;
@@ -321,25 +322,27 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
 
     public QuickImage? SymbolForReadableText() => null;
 
-    public string ToString(bool withdatabaseTag) {
+    public override string ToString() {
+        Develop.DebugPrint_Disposed(IsDisposed);
         try {
             if (!IsOk()) { return string.Empty; }
             var result = "{Type=" + (int)_filterType;
 
-            if (Database != null && withdatabaseTag) { result = result + ", Database=" + Database.ConnectionData.DatabaseID; }
+            if (Database != null) { result = result + ", Database=" + Database.ConnectionData.UniqueID; }
 
-            if (_column != null) { result = result + ", " + _column.ParsableColumnKey(); }
+            if (_column != null) {
+                result = result + ", ColumnName=" + _column.Name;
+            }
+
             foreach (var t in SearchValue) {
                 result = result + ", Value=" + t.ToNonCritical();
             }
             if (!string.IsNullOrEmpty(Herkunft)) { result = result + ", Herkunft=" + Herkunft.ToNonCritical(); }
             return result + "}";
         } catch {
-            return ToString(withdatabaseTag);
+            return ToString();
         }
     }
-
-    public override string ToString() => ToString(false);
 
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 

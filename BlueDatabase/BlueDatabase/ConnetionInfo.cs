@@ -45,8 +45,8 @@ public class ConnectionInfo : IReadableText {
         var alf = new List<DatabaseAbstract>();// könnte sich ändern, deswegen Zwischenspeichern
         alf.AddRange(DatabaseAbstract.AllFiles);
 
-
         #region Ist es NUR ein Dateiname? Dann im Single und Multiuser suchen und zur Not eine MultiUser zurück geben
+
         if (uniqueID.Substring(1, 1) == ":" &&
             uniqueID.FileSuffix().ToUpper() == "MDB" &&
             System.IO.File.Exists(uniqueID)) {
@@ -69,6 +69,7 @@ public class ConnectionInfo : IReadableText {
 
             return;
         }
+
         #endregion
 
         var x = (uniqueID + "||||").SplitBy("|");
@@ -76,9 +77,7 @@ public class ConnectionInfo : IReadableText {
         foreach (var thisDB in alf) {
             var d = thisDB.ConnectionData;
 
-
-            if (thisDB.ConnectionDataOfOtherTable(x[0], true) is ConnectionInfo nci)
-                    {
+            if (thisDB.ConnectionDataOfOtherTable(x[0], true) is ConnectionInfo nci) {
                 TableName = nci.TableName;
                 Provider = nci.Provider;
                 DatabaseID = nci.DatabaseID;
@@ -118,8 +117,6 @@ public class ConnectionInfo : IReadableText {
 
         var tbn = SQLBackAbstract.MakeValidTableName(uniqueID.FileNameWithoutSuffix());
 
-
-
         var ci = DatabaseAbstract.ProviderOf(tbn);
 
         if (ci != null) {
@@ -149,6 +146,8 @@ public class ConnectionInfo : IReadableText {
 
     /// <summary>
     /// Eine Kennung, die von von DatabaseAbstract abgeleiten Klassen erkannt werden kann.
+    /// Enthänt nur eine Wert wie z.B. DatabaseSQL.
+    /// Um eine Datenbank wieder zu finden, muss uniqueID verwendet werden.
     /// </summary>
     public string DatabaseID { get; } = string.Empty;
 

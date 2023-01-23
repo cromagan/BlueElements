@@ -86,14 +86,13 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     private bool _formatierungErlaubt;
     private bool _ignoreAtRowFilter;
     private long _key;
-    private long _keyColumnKey;
     private ColumnLineStyle _lineLeft;
     private ColumnLineStyle _lineRight;
 
     /// <summary>
     /// Die Quell-Spalte (aus der verlinkten Datenbank) ist immer
     /// </summary>
-    private long _linkedCell_ColumnKeyOfLinkedDatabase;
+    private string _linkedCell_ColumnNameOfLinkedDatabase;
 
     private string _linkedDatabaseFile;
     private int _maxTextLenght;
@@ -111,9 +110,10 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     private string _suffix;
     private bool _textBearbeitungErlaubt;
     private DatabaseAbstract? _tmpLinkedDatabase;
-    private long _vorschlagsColumn;
 
     #endregion
+
+    //private string _vorschlagsColumn;
 
     #region Constructors
 
@@ -153,13 +153,13 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         _backColor = Color.White;
         _cellInitValue = string.Empty;
         //_linkedCellRowKeyIsInColumn = -1;
-        _linkedCell_ColumnKeyOfLinkedDatabase = -1;
+        _linkedCell_ColumnNameOfLinkedDatabase = string.Empty;
         _sortType = SortierTyp.Original_String;
         //_ZellenZusammenfassen = false;
         //_dropDownKey = -1;
-        _vorschlagsColumn = -1;
+        //_vorschlagsColumn = -1;
         _align = AlignmentHorizontal.Links;
-        _keyColumnKey = -1;
+        //_keyColumnKey = -1;
         _allowedChars = string.Empty;
         _adminInfo = string.Empty;
         _maxTextLenght = 4000;
@@ -271,7 +271,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 return;
             }
 
-            Database.ChangeData(DatabaseDataType.AutoReplaceAfterEdit, Key, null, _afterEditAutoReplace.JoinWithCr(),
+            Database?.ChangeData(DatabaseDataType.AutoReplaceAfterEdit, Key, null, _afterEditAutoReplace.JoinWithCr(),
                 value.JoinWithCr(), string.Empty);
             OnChanged();
         }
@@ -647,24 +647,24 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         }
     }
 
-    /// <summary>
-    /// Hält Werte, dieser Spalte gleich, bezugnehmend der KeyColumn(key)
-    /// </summary>
-    public long KeyColumnKey {
-        get => _keyColumnKey;
-        set {
-            if (_keyColumnKey == value) {
-                return;
-            }
+    ///// <summary>
+    ///// Hält Werte, dieser Spalte gleich, bezugnehmend der KeyColumn(key)
+    ///// </summary>
+    //public long KeyColumnKey {
+    //    get => _keyColumnKey;
+    //    set {
+    //        if (_keyColumnKey == value) {
+    //            return;
+    //        }
 
-            var c = Database?.Column.SearchByKey(_keyColumnKey);
-            c?.CheckIfIAmAKeyColumn();
-            Database?.ChangeData(DatabaseDataType.KeyColumnKey, Key, null, _keyColumnKey.ToString(), value.ToString(), string.Empty);
-            c = Database?.Column.SearchByKey(_keyColumnKey);
-            c?.CheckIfIAmAKeyColumn();
-            OnChanged();
-        }
-    }
+    //        var c = Database?.Column.SearchByKey(_keyColumnKey);
+    //        c?.CheckIfIAmAKeyColumn();
+    //        Database?.ChangeData(DatabaseDataType.KeyColumnKey, Key, null, _keyColumnKey.ToString(), value.ToString(), string.Empty);
+    //        c = Database?.Column.SearchByKey(_keyColumnKey);
+    //        c?.CheckIfIAmAKeyColumn();
+    //        OnChanged();
+    //    }
+    //}
 
     public ColumnLineStyle LineLeft {
         get => _lineLeft;
@@ -693,14 +693,16 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     /// <summary>
     /// Die Quell-Spalte (aus der verlinkten Datenbank) ist immer
     /// </summary>
-    public long LinkedCell_ColumnKeyOfLinkedDatabase {
-        get => _linkedCell_ColumnKeyOfLinkedDatabase;
+    public string LinkedCell_ColumnNameOfLinkedDatabase {
+        get => _linkedCell_ColumnNameOfLinkedDatabase;
         set {
-            if (_linkedCell_ColumnKeyOfLinkedDatabase == value) {
+            if (value == "-1") { value = string.Empty; }
+
+            if (_linkedCell_ColumnNameOfLinkedDatabase == value) {
                 return;
             }
 
-            Database?.ChangeData(DatabaseDataType.ColumnKeyOfLinkedDatabase, Key, null, _linkedCell_ColumnKeyOfLinkedDatabase.ToString(), value.ToString(), string.Empty);
+            Database?.ChangeData(DatabaseDataType.ColumnNameOfLinkedDatabase, Key, null, _linkedCell_ColumnNameOfLinkedDatabase.ToString(), value.ToString(), string.Empty);
             Invalidate_ColumAndContent();
             OnChanged();
         }
@@ -709,27 +711,27 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     public List<string> LinkedCellFilter {
         get => _linkedCellFilter;
         set {
+            //#region Altes Format konvertieren
 
-            #region Altes Format konvertieren
+            //var newVal = new List<string>();
 
-            var newVal = new List<string>();
+            //foreach (var item in value) {
+            //    if (!string.IsNullOrEmpty(item)) {
+            //        if (item.Contains("|")) {
+            //            newVal.Add(item);
+            //        } else {
+            //            Develop.DebugPrint("Altes Format!");
+            //            newVal.Add(item);
+            //        }
+            //    }
+            //}
 
-            foreach (var item in value) {
-                if (!string.IsNullOrEmpty(item)) {
-                    if (item.Contains("|")) {
-                        newVal.Add(item);
-                    } else {
-                        Develop.DebugPrint("Altes Format!");
-                        newVal.Add(item);
-                    }
-                }
-            }
+            //#endregion
+            value = value.SortedDistinctList();
 
-            #endregion
+            if (!_linkedCellFilter.IsDifferentTo(value)) { return; }
 
-            if (!_linkedCellFilter.IsDifferentTo(newVal)) { return; }
-
-            Database.ChangeData(DatabaseDataType.LinkedCellFilter, Key, null, _linkedCellFilter.JoinWithCr(), newVal.JoinWithCr(), string.Empty);
+            Database?.ChangeData(DatabaseDataType.LinkedCellFilter, Key, null, _linkedCellFilter.JoinWithCr(), value.JoinWithCr(), string.Empty);
             OnChanged();
         }
     }
@@ -977,15 +979,15 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         }
     }
 
-    public long VorschlagsColumn {
-        get => _vorschlagsColumn;
-        set {
-            if (_vorschlagsColumn == value) { return; }
+    //public string VorschlagsColumn {
+    //    get => _vorschlagsColumn;
+    //    set {
+    //        if (_vorschlagsColumn == value) { return; }
 
-            Database?.ChangeData(DatabaseDataType.MakeSuggestionFromSameKeyColumn, Key, null, _vorschlagsColumn.ToString(), value.ToString(), string.Empty);
-            OnChanged();
-        }
-    }
+    //        Database?.ChangeData(DatabaseDataType.MakeSuggestionFromSameKeyColumn, Key, null, _vorschlagsColumn.ToString(), value.ToString(), string.Empty);
+    //        OnChanged();
+    //    }
+    //}
 
     private DatabaseAbstract Tmp_LinkedDatabase {
         set {
@@ -1202,15 +1204,15 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         SaveContent = source.SaveContent;
         CellInitValue = source.CellInitValue;
         AutoFilterJoker = source.AutoFilterJoker;
-        KeyColumnKey = source.KeyColumnKey;
+        //KeyColumnKey = source.KeyColumnKey;
         //LinkedCell_RowKeyIsInColumn = source.LinkedCell_RowKeyIsInColumn;
-        LinkedCell_ColumnKeyOfLinkedDatabase = source.LinkedCell_ColumnKeyOfLinkedDatabase;
+        LinkedCell_ColumnNameOfLinkedDatabase = source.LinkedCell_ColumnNameOfLinkedDatabase;
         //DropdownKey = source.DropdownKey;
-        VorschlagsColumn = source.VorschlagsColumn;
+        //VorschlagsColumn = source.VorschlagsColumn;
         Align = source.Align;
         SortType = source.SortType;
         DropDownItems = source.DropDownItems;
-        LinkedCellFilterx = source.LinkedCellFilterx;
+        LinkedCellFilter = source.LinkedCellFilter;
         OpticalReplace = source.OpticalReplace;
         AfterEditAutoReplace = source.AfterEditAutoReplace;
         this.GetStyleFrom(source); // regex, Allowed Chars, etc.
@@ -1379,10 +1381,10 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         switch (_format) {
             case DataFormat.RelationText:
                 if (!_multiLine) { return "Bei diesem Format muss mehrzeilig ausgewählt werden."; }
-                if (_keyColumnKey > -1) { return "Diese Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
+                //if (_keyColumnKey > -1) { return "Diese Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
                 if (IsFirst()) { return "Diese Format ist bei der ersten (intern) erste Spalte nicht erlaubt."; }
                 if (!string.IsNullOrEmpty(_cellInitValue)) { return "Diese Format kann keinen Initial-Text haben."; }
-                if (_vorschlagsColumn > 0) { return "Diese Format kann keine Vorschlags-Spalte haben."; }
+                //if (!string.IsNullOrEmpty(_vorschlagsColumn)) { return "Diese Format kann keine Vorschlags-Spalte haben."; }
                 break;
 
             //case DataFormat.Verknüpfung_zu_anderer_Datenbank:
@@ -1411,8 +1413,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             case DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
                 //Develop.DebugPrint("Values_für_LinkedCellDropdown Verwendung bei:" + Database.Filename); //TODO: 29.07.2021 Values_für_LinkedCellDropdown Format entfernen
                 if (!string.IsNullOrEmpty(_cellInitValue)) { return "Dieses Format kann keinen Initial-Text haben."; }
-                if (KeyColumnKey > -1) { return "Dieses Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
-                if (_vorschlagsColumn > 0) { return "Dieses Format kann keine Vorschlags-Spalte haben."; }
+                //if (KeyColumnKey > -1) { return "Dieses Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
+                //if (_vorschlagsColumn > 0) { return "Dieses Format kann keine Vorschlags-Spalte haben."; }
                 //if (MaxTextLenght < 15) { return "Maximallänge bei diesem Format mindestens 15!"; }
 
                 break;
@@ -1443,7 +1445,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             if (tmpEditDialog == EditTypeTable.Dropdown_Single) { return "Format unterstützt nur Dropdown-Menü."; }
             if (tmpEditDialog == EditTypeTable.None) { return "Format unterstützt keine Standard-Bearbeitung."; }
         } else {
-            if (_vorschlagsColumn > -1) { return "'Vorschlags-Text-Spalte' nur bei Texteingabe möglich."; }
+            //if (_vorschlagsColumn > -1) { return "'Vorschlags-Text-Spalte' nur bei Texteingabe möglich."; }
             //if (!string.IsNullOrEmpty(_AllowedChars)) { return "'Erlaubte Zeichen' nur bei Texteingabe nötig."; }
         }
         if (_dropdownBearbeitungErlaubt) {
@@ -1455,7 +1457,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         }
         if (!string.IsNullOrEmpty(_cellInitValue)) {
             if (IsFirst()) { return "Die erste Spalte darf keinen InitialWert haben."; }
-            if (_vorschlagsColumn > -1) { return "InitialWert und Vorschlagspalten-Initial-Text gemeinsam nicht möglich"; }
+            //if (_vorschlagsColumn > -1) { return "InitialWert und Vorschlagspalten-Initial-Text gemeinsam nicht möglich"; }
         }
         foreach (var thisS in _permissionGroupsChangeCell) {
             if (thisS.Contains("|")) { return "Unerlaubtes Zeichen bei den Gruppen, die eine Zelle bearbeiten dürfen."; }
@@ -1494,17 +1496,17 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             if (_filterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled)) { return "Entweder 'Ersetzungen' oder 'erweiternden Autofilter'"; }
             if (!string.IsNullOrEmpty(_autoFilterJoker)) { return "Entweder 'Ersetzungen' oder 'Autofilter Joker'"; }
         }
-        if (_keyColumnKey > -1) {
-            if (!string.IsNullOrEmpty(Am_A_Key_For_Other_Column)) { return "Eine Schlüsselspalte darf selbst keine Verknüpfung zu einer anderen Spalte haben: " + Am_A_Key_For_Other_Column; }
-            var c = Database.Column.SearchByKey(_keyColumnKey);
-            if (c == null) { return "Die verknüpfte Schlüsselspalte existiert nicht."; }
-        }
-        if (IsFirst()) {
-            if (_keyColumnKey > -1) { return "Die (intern) erste Spalte darf keine Verknüpfung zu einer andern Schlüsselspalte haben."; }
-        }
+        //if (_keyColumnKey > -1) {
+        //    if (!string.IsNullOrEmpty(Am_A_Key_For_Other_Column)) { return "Eine Schlüsselspalte darf selbst keine Verknüpfung zu einer anderen Spalte haben: " + Am_A_Key_For_Other_Column; }
+        //    var c = Database.Column.SearchByKey(_keyColumnKey);
+        //    if (c == null) { return "Die verknüpfte Schlüsselspalte existiert nicht."; }
+        //}
+        //if (IsFirst()) {
+        //    if (_keyColumnKey > -1) { return "Die (intern) erste Spalte darf keine Verknüpfung zu einer andern Schlüsselspalte haben."; }
+        //}
         if (_format is not DataFormat.Verknüpfung_zu_anderer_Datenbank and not DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) {
             //if (_LinkedCell_RowKeyIsInColumn > -1) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
-            if (_linkedCell_ColumnKeyOfLinkedDatabase > -1) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
+            if (!string.IsNullOrEmpty(_linkedCell_ColumnNameOfLinkedDatabase)) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
         }
         return string.Empty;
     }
@@ -1743,7 +1745,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
                     //if (LinkedCell_RowKeyIsInColumn != -9999) {
                     _format = DataFormat.Verknüpfung_zu_anderer_Datenbank;
-                    _linkedCellFilterx.Clear();
+                    _linkedCellFilter.Clear();
                     //LinkedCellFilter.GenerateAndAdd(LinkedCell_RowKeyIsInColumn.ToString());
                     //LinkedCell_RowKeyIsInColumn = -1;
                     //}
@@ -1769,7 +1771,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             }
 
             if (_format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-                var c = LinkedDatabase?.Column.SearchByKey(_linkedCell_ColumnKeyOfLinkedDatabase);
+                var c = LinkedDatabase?.Column.Exists(_linkedCell_ColumnNameOfLinkedDatabase);
                 if (c != null) {
                     this.GetStyleFrom(c);
                     BehaviorOfImageAndText = c.BehaviorOfImageAndText;
@@ -1897,7 +1899,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 _scriptType = ScriptType.Nicht_vorhanden;
                 _align = AlignmentHorizontal.Zentriert;
                 _dropDownItems.Clear();
-                _linkedCellFilterx.Clear();
+                _linkedCellFilter.Clear();
                 _permissionGroupsChangeCell.Clear();
                 _textBearbeitungErlaubt = false;
                 _dropdownBearbeitungErlaubt = false;
@@ -2327,9 +2329,9 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 //    return editTypeToCheck is enEditTypeFormula.Textfeld or enEditTypeFormula.nur_als_Text_anzeigen;
                 //}
 
-                if (LinkedDatabase == null) { return false; }
-                if (_linkedCell_ColumnKeyOfLinkedDatabase < 0) { return false; }
-                var col = LinkedDatabase.Column.SearchByKey(_linkedCell_ColumnKeyOfLinkedDatabase);
+                //if (LinkedDatabase == null) { return false; }
+                //if (string.IsNullOrEmpty_linkedCell_ColumnKeyOfLinkedDatabase < 0) { return false; }
+                var col = LinkedDatabase?.Column.Exists(_linkedCell_ColumnNameOfLinkedDatabase);
                 if (col == null) { return false; }
                 return col.UserEditDialogTypeInFormula(editTypeToCheck);
 
@@ -2395,12 +2397,12 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     internal void CheckIfIAmAKeyColumn() {
         Am_A_Key_For_Other_Column = string.Empty;
         foreach (var thisColumn in Database.Column) {
-            if (thisColumn.KeyColumnKey == Key) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // Werte Gleichhalten
-                                                                                                                                                      //if (thisColumn.LinkedCell_RowKeyIsInColumn == Key) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
-                                                                                                                                                      //if (ThisColumn.LinkedCell_ColumnValueFoundIn == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
+            //if (thisColumn.KeyColumnKey == Key) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // Werte Gleichhalten
+            //if (thisColumn.LinkedCell_RowKeyIsInColumn == Key) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
+            //if (ThisColumn.LinkedCell_ColumnValueFoundIn == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
 
             if (thisColumn.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-                foreach (var thisV in thisColumn._linkedCellFilterx) {
+                foreach (var thisV in thisColumn._linkedCellFilter) {
                     if (IntTryParse(thisV, out var key)) {
                         if (key == Key) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; }
                     }
@@ -2429,8 +2431,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             _tmpLinkedDatabase = null;
         }
     }
-
-    internal string ParsableColumnKey() => ColumnCollection.ParsableColumnKey(this);
 
     /// <summary>
     /// Setzt den Wert in die dazugehörige Variable.
@@ -2510,7 +2510,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 break;
 
             case DatabaseDataType.LinkedCellFilter:
-                _linkedCellFilterx.SplitAndCutByCr(newvalue);
+                _linkedCellFilter.SplitAndCutByCr(newvalue);
                 break;
 
             case DatabaseDataType.OpticalTextReplace:
@@ -2667,12 +2667,20 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 _cellInitValue = newvalue;
                 break;
 
-            case DatabaseDataType.KeyColumnKey:
-                _keyColumnKey = LongParse(newvalue);
-                break;
+            //case DatabaseDataType.KeyColumnKey:
+            //    _keyColumnKey = LongParse(newvalue);
+            //    break;
 
-            case DatabaseDataType.ColumnKeyOfLinkedDatabase:
-                _linkedCell_ColumnKeyOfLinkedDatabase = LongParse(newvalue);
+            case DatabaseDataType.ColumnNameOfLinkedDatabase:
+                var l = LongParse(newvalue);
+                if (l < 0) {
+                    _linkedCell_ColumnNameOfLinkedDatabase = string.Empty;
+                } else
+                if (l > 0) {
+                    _linkedCell_ColumnNameOfLinkedDatabase = Database?.Column.SearchByKey(l)?.Name ?? string.Empty;
+                } else {
+                    _linkedCell_ColumnNameOfLinkedDatabase = newvalue;
+                }
                 break;
 
             case DatabaseDataType.SortType:
@@ -2683,9 +2691,9 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 }
                 break;
 
-            case DatabaseDataType.MakeSuggestionFromSameKeyColumn:
-                _vorschlagsColumn = LongParse(newvalue);
-                break;
+            //case DatabaseDataType.MakeSuggestionFromSameKeyColumn:
+            //    _vorschlagsColumn = LongParse(newvalue);
+            //    break;
 
             case DatabaseDataType.ColumnAlign:
                 var tmpalign = (AlignmentHorizontal)IntParse(newvalue);

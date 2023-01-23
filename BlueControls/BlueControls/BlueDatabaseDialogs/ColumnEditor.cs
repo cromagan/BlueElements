@@ -62,14 +62,14 @@ internal sealed partial class ColumnEditor {
         }
     }
 
-    private static int ColumKeyFrom(DatabaseAbstract? database, string columnKey) {
-        if (database == null || string.IsNullOrEmpty(columnKey)) { return -1; }
+    //private static int ColumKeyFrom(DatabaseAbstract? database, string columnKey) {
+    //    if (database == null || string.IsNullOrEmpty(columnKey)) { return -1; }
 
-        IntTryParse(columnKey, out var c);
-        return c;
-    }
+    //    IntTryParse(columnKey, out var c);
+    //    return c;
+    //}
 
-    private static void SetKeyTo(TextBox combobox, long columnKey) => combobox.Text = columnKey.ToString();
+    //private static void SetKeyTo(TextBox combobox, long columnKey) => combobox.Text = columnKey.ToString();
 
     private bool AllOk() {
         var feh = string.Empty;
@@ -264,7 +264,8 @@ internal sealed partial class ColumnEditor {
             }
         }
         cbxTargetColumn.Item.Sort();
-        SetKeyTo(cbxTargetColumn, _column.LinkedCell_ColumnKeyOfLinkedDatabase);
+        cbxTargetColumn.Text = _column.LinkedCell_ColumnNameOfLinkedDatabase;
+        //SetKeyTo(cbxTargetColumn, _column.LinkedCell_ColumnKeyOfLinkedDatabase);
         cbxTargetColumn.Enabled = cbxTargetColumn.Item.Count > 0;
         capTargetColumn.Enabled = cbxTargetColumn.Enabled;
         if (!cbxTargetColumn.Enabled) {
@@ -387,30 +388,30 @@ internal sealed partial class ColumnEditor {
         txbAutoRemove.Text = _column.AutoRemove;
         butSaveContent.Checked = _column.SaveContent;
 
-        cbxSchlüsselspalte.Item.Clear();
-        cbxSchlüsselspalte.Item.Add("#Ohne", "-1");
+        //cbxSchlüsselspalte.Item.Clear();
+        //cbxSchlüsselspalte.Item.Add("#Ohne", "-1");
         //cbxDropDownKey.Item.Clear();
         //cbxDropDownKey.Item.Add("#Ohne", "-1");
-        cbxVorschlagSpalte.Item.Clear();
-        cbxVorschlagSpalte.Item.Add("#Ohne", "-1");
+        //cbxVorschlagSpalte.Item.Clear();
+        //cbxVorschlagSpalte.Item.Add("#Ohne", "-1");
         // Einige Dropdown-Menüs sind abhängig von der LinkedDatabase und werden in dessen TextChanged-Event befüllt
         // siehe Ende dieser Routine
-        foreach (var thisColumn in _column.Database.Column) {
-            if (thisColumn.IsOk() && thisColumn.Format.CanBeCheckedByRules()) {
-                if (thisColumn.Format == DataFormat.RelationText || !thisColumn.MultiLine) { cbxSchlüsselspalte.Item.Add(thisColumn); }
-                if (!thisColumn.MultiLine && !thisColumn.Format.NeedTargetDatabase()) {
-                    //cbxDropDownKey.Item.Add(thisColumn);
-                    cbxVorschlagSpalte.Item.Add(thisColumn);
-                }
-            }
-        }
-        cbxSchlüsselspalte.Item.Sort();
-        cbxVorschlagSpalte.Item.Sort();
+        //foreach (var thisColumn in _column.Database.Column) {
+        //    if (thisColumn.IsOk() && thisColumn.Format.CanBeCheckedByRules()) {
+        //        //if (thisColumn.Format == DataFormat.RelationText || !thisColumn.MultiLine) { cbxSchlüsselspalte.Item.Add(thisColumn); }
+        //        if (!thisColumn.MultiLine && !thisColumn.Format.NeedTargetDatabase()) {
+        //            //cbxDropDownKey.Item.Add(thisColumn);
+        //            //cbxVorschlagSpalte.Item.Add(thisColumn);
+        //        }
+        //    }
+        //}
+        //cbxSchlüsselspalte.Item.Sort();
+        //cbxVorschlagSpalte.Item.Sort();
         //cbxDropDownKey.Item.Sort();
 
-        SetKeyTo(cbxSchlüsselspalte, _column.KeyColumnKey);
+        //SetKeyTo(cbxSchlüsselspalte, _column.KeyColumnKey);
         //SetKeyTo(cbxDropDownKey, _column.DropdownKey);
-        SetKeyTo(cbxVorschlagSpalte, _column.VorschlagsColumn);
+        //SetKeyTo(cbxVorschlagSpalte, _column.VorschlagsColumn);
         cbxLinkedDatabase_TextChanged(null, System.EventArgs.Empty);
     }
 
@@ -488,9 +489,9 @@ internal sealed partial class ColumnEditor {
         //_column.BestFile_StandardFolder = txbBestFileStandardFolder.Text;
         //_column.BestFile_StandardSuffix = txbBestFileStandardSuffix.Text;
         _column.LinkedDatabaseFile = cbxLinkedDatabase.Text; // Muss vor LinkedCell_RowKey zurückgeschrieben werden
-        _column.KeyColumnKey = ColumKeyFrom(_column.Database, cbxSchlüsselspalte.Text);
-        _column.LinkedCell_ColumnKeyOfLinkedDatabase = ColumKeyFrom(_column.LinkedDatabase, cbxTargetColumn.Text); // LINKED DATABASE
-        _column.VorschlagsColumn = ColumKeyFrom(_column.Database, cbxVorschlagSpalte.Text);
+        //_column.KeyColumnKey = ColumKeyFrom(_column.Database, cbxSchlüsselspalte.Text);
+        _column.LinkedCell_ColumnNameOfLinkedDatabase = cbxTargetColumn.Text; // LINKED DATABASE
+        //_column.VorschlagsColumn = ColumKeyFrom(_column.Database, cbxVorschlagSpalte.Text);
         _column.Align = (AlignmentHorizontal)IntParse(cbxAlign.Text);
         _column.AdditionalFormatCheck = (AdditionalCheck)IntParse(cbxAdditionalCheck.Text);
         _column.ScriptType = (ScriptType)IntParse(cbxScriptType.Text);
@@ -504,7 +505,7 @@ internal sealed partial class ColumnEditor {
     }
 
     private void GeneratFilterListe() {
-        GetLinkedCellFilter();
+        //GetLinkedCellFilter();
 
         _column.LinkedDatabaseFile = cbxLinkedDatabase.Text;
 
@@ -521,11 +522,12 @@ internal sealed partial class ColumnEditor {
 
         if (tblFilterliste.Database == null) {
             Database db = new(false, "Filter " + _column.Database.ConnectionData.UniqueID + " " + _column.Name);
-            db.Column.GenerateAndAdd("count", "count", VarType.IntegerPositive);
+            //db.Column.GenerateAndAdd("count", "count", VarType.IntegerPositive);
+            db.Column.GenerateAndAdd("SpalteName", "Spalte-Name", VarType.Text);
+
             var vis = db.Column.GenerateAndAdd("visible", "visible", VarType.Bit);
             var sp = db.Column.GenerateAndAdd("Spalte", "Spalte", VarType.Text);
             sp.Align = AlignmentHorizontal.Rechts;
-            db.Column.GenerateAndAdd("SpalteName", "Spalte-Name", VarType.Text);
 
             var b = db.Column.GenerateAndAdd("Such", "Suchtext", VarType.Text);
             b.Quickinfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum suchen<br>Mischen wird nicht unterstützt.";
@@ -557,7 +559,7 @@ internal sealed partial class ColumnEditor {
 
             db.ColumnArrangements = car;
 
-            db.SortDefinition = new RowSortDefinition(db, "Count", false);
+            db.SortDefinition = new RowSortDefinition(db, "Spalte", false);
             tblFilterliste.DatabaseSet(db, string.Empty);
             tblFilterliste.Arrangement = 1;
 
@@ -570,14 +572,14 @@ internal sealed partial class ColumnEditor {
 
         linkdb.RepairAfterParse(); // Dass ja die 0 Ansicht stimmt
 
-        var ok = IntTryParse(cbxTargetColumn.Text, out var key);
-        ColumnItem? spalteauDb = null;
-        if (ok) { spalteauDb = linkdb.Column.SearchByKey(key); }
+        //var ok = IntTryParse(cbxTargetColumn.Text, out var key);
+        ColumnItem? spalteauDb = linkdb.Column.Exists(cbxTargetColumn.Text);
+        //if (ok) { spalteauDb = linkdb.Column.SearchByKey(key); }
 
-        for (var z = 0; z < linkdb.Column.Count; z++) {
-            var col = linkdb.ColumnArrangements[0][z].Column;
+        foreach (var col in linkdb.Column) {
+            //var col = linkdb.ColumnArrangements[0][z].Column;
 
-            var r = tblFilterliste.Database.Row[z.ToString()] ?? tblFilterliste.Database.Row.GenerateAndAdd(z.ToString(), "Neue Spalte");
+            var r = tblFilterliste.Database.Row[col.Name] ?? tblFilterliste.Database.Row.GenerateAndAdd(col.Name, "Neue Spalte");
 
             r.CellSet("Spalte", col.ReadableText() + " = ");
             r.CellSet("SpalteName", col.Name);
@@ -587,9 +589,9 @@ internal sealed partial class ColumnEditor {
             } else {
                 r.CellSet("visible", false);
             }
-
-            SetLinkedCellFilter();
         }
+
+        SetLinkedCellFilter();
     }
 
     /// <summary>
@@ -599,26 +601,14 @@ internal sealed partial class ColumnEditor {
     private void GetLinkedCellFilter() {
         if (tblFilterliste.Database == null) { return; }
 
-        var nf = new List<string?>();
+        var nf = new List<string>();
         foreach (var thisr in tblFilterliste.Database.Row) {
-            var x = thisr.CellGetInteger("Count");
-
-            //while (nf.Count <= x) { nf.Add(string.Empty); }
-            if (thisr.CellGetBoolean("visible")) {
-                var tmp = "@" + thisr.CellGetString("Such");
-
-                foreach (var thisColumn in _column.Database.Column.Where(thisColumn => "@~" + thisColumn.Name.ToLower() + "~" == tmp)) {
-                    tmp = thisColumn.Key.ToString();
-                }
-                if (tmp == "@") { tmp = string.Empty; }
-
-                if (!string.IsNullOrEmpty(tmp)) {
-                    nf.Add(thisr.CellGetString("spaltename") + "|=|" + tmp);
-                }
+            if (thisr.CellGetBoolean("visible") && !string.IsNullOrEmpty(thisr.CellGetString("such"))) {
+                nf.Add(thisr.CellGetString("spaltename") + "|=|" + thisr.CellGetString("Such").ToNonCritical());
             }
         }
 
-        _column.LinkedCellFilterx = nf.JoinWithCr().SplitAndCutByCrToList();
+        _column.LinkedCellFilter = nf;
     }
 
     /// <summary>
@@ -630,16 +620,16 @@ internal sealed partial class ColumnEditor {
             thisr.CellSet("Such", string.Empty);
         }
 
-        foreach (var thisFi in _column.LinkedCellFilterx) {
-            var tmp = _column.LinkedCellFilterx[x];
+        foreach (var thisFi in _column.LinkedCellFilter) {
+            var x = thisFi.SplitBy("|");
 
-            if (IntTryParse(tmp, out var key)) {
-                var col = _column.Database.Column.SearchByKey(key);
-                tmp = col != null ? "~" + col.Name.ToLower() + "~" : string.Empty;
-            } else {
-                tmp = tmp.StartsWith("@") ? tmp.Substring(1) : string.Empty;
+            if (x != null && x.Count() == 3) {
+                var r = tblFilterliste.Database.Row[new FilterItem(tblFilterliste.Database.Column["SpalteName"], FilterType.Istgleich_GroßKleinEgal, x[0])];
+
+                if (r != null && r.CellGetBoolean("Visible")) {
+                    r.CellSet("Such", x[2].FromNonCritical());
+                }
             }
-            thisr.CellSet("Such", tmp);
         }
     }
 

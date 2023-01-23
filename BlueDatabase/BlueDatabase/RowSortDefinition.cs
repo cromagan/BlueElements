@@ -92,13 +92,12 @@ public sealed class RowSortDefinition : IParseable {
                     break;
 
                 case "direction":
-                    Reverse = Convert.ToBoolean(pair.Value == "Z-A");
+                    Reverse = pair.Value == "Z-A";
                     break;
 
                 case "column":
-
                 case "columnname": // ColumnName wichtig wegen CopyLayout
-                    if (Database.Column[pair.Value] is ColumnItem c) { Columns.Add(c); }
+                    if (Database.Column.Exists(pair.Value) is ColumnItem c) { Columns.Add(c); }
 
                     break;
 
@@ -124,7 +123,7 @@ public sealed class RowSortDefinition : IParseable {
 
         foreach (var thisColumn in Columns) {
             if (thisColumn != null) {
-                result = result + ", " + thisColumn.ParsableColumnKey();
+                result = result + ", ColumnName=" + thisColumn.Name;
             }
         }
 

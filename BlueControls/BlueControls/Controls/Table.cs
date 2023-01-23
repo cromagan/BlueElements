@@ -1913,7 +1913,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     var r = InputBoxListBoxStyle.Show("Mit welcher Spalte vergleichen?", ic, AddType.None, true);
                     if (r == null || r.Count == 0) { return; }
 
-                    var c = e.Column.Database.Column.SearchByKey(LongParse(r[0]));
+                    var c = e.Column.Database.Column.Exists(r[0]);
 
                     List<string> d = new();
                     foreach (var thisR in ro) {
@@ -2261,9 +2261,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             }
         }
 
-        if (string.IsNullOrEmpty(Box.Text)) {
-            Box.Text = CellCollection.AutomaticInitalValue(contentHolderCellColumn, contentHolderCellRow);
-        }
+        //if (string.IsNullOrEmpty(Box.Text)) {
+        //    Box.Text = CellCollection.AutomaticInitalValue(contentHolderCellColumn, contentHolderCellRow);
+        //}
 
         Box.Visible = true;
         Box.BringToFront();

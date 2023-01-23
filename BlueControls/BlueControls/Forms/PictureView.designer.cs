@@ -11,8 +11,8 @@ namespace BlueControls.Forms
 			{
 				if (disposing )
 				{
-                FileList.Changed -= FileList_Changed;
-                FileList.Dispose();
+                //_fileList.Changed -= FileList_Changed;
+                //_fileList.Dispose();
 
                 }
 				base.Dispose(disposing);

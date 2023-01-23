@@ -207,7 +207,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         ic.Sort();
         var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, AddType.None, true);
         if (r == null || r.Count == 0) { return; }
-        CurrentArrangement.Add(Database.Column.SearchByKey(LongParse(r[0])), false);
+        CurrentArrangement.Add(Database.Column.Exists(r[0]), false);
         ShowOrder();
     }
 
@@ -406,7 +406,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         var dbColumnCombi = new List<string>();
         foreach (var thisc in Database?.Column) {
             if (thisc.LinkedDatabase != null) {
-                var dbN = thisc.LinkedDatabase.ConnectionData.TableName + "|" + thisc.LinkedCellFilterx.JoinWithCr();
+                var dbN = thisc.LinkedDatabase.ConnectionData.TableName + "|" + thisc.LinkedCellFilter.JoinWithCr();
                 dbColumnCombi.AddIfNotExists(dbN);
             }
         }
@@ -422,7 +422,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
                 if (thisc.Column.LinkedDatabase != null) {
                     // String als Namen als eindeutige Kennung
-                    var toCheckCombi = thisc.Column.LinkedDatabase.ConnectionData.TableName + "|" + thisc.Column.LinkedCellFilterx.JoinWithCr();
+                    var toCheckCombi = thisc.Column.LinkedDatabase.ConnectionData.TableName + "|" + thisc.Column.LinkedCellFilter.JoinWithCr();
 
                     if (toCheckCombi == thisCombi) {
 
@@ -443,23 +443,22 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
                         #region ANDERE Spalten (die Filterung der Einträge) aus eigener Datenbank zur Verknüpften Datenbank zeigen lassen
 
-                        for (var z = 0; z < Math.Min(thisc.Column.LinkedCellFilterx.Count, thisc.Column.LinkedDatabase.Column.Count); z++) {
-                            if (IntTryParse(thisc.Column.LinkedCellFilterx[z], out var key)) {
-                                var c = thisc?.Column?.Database?.Column.SearchByKey(key);
-                                if (c != null) {
-                                    var rkcolit = (ColumnPadItem?)Pad.Item[c.Name];
+                        foreach (var thisitem in thisc.Column.LinkedCellFilter) {
+                            var x = thisitem.SplitBy("|");
+
+                            foreach (var thisc2 in thisc?.Column?.Database?.Column) {
+                                if (x[2].Contains("~" + thisc2.Name + "~")) {
+                                    var rkcolit = (ColumnPadItem?)Pad.Item[thisc2.Name];
                                     rkcolit?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false, databItem, ConnectionType.Top, true, false));
                                 }
-                            }// else if (!string.IsNullOrEmpty(column.LinkedCellFilter[z]) && column.LinkedCellFilter[z].StartsWith("@")) {
-                            //    fi.GenerateAndAdd(new FilterItem(linkedDatabase.Column[z], enFilterType.Istgleich, column.LinkedCellFilter[z].Substring(1)));
-                            //}
+                            }
                         }
 
                         #endregion
 
                         #region Dann die Spalte erzeugen, aus der der der Wert kommt
 
-                        var c2 = thisc.Column.LinkedDatabase.Column.SearchByKey(thisc.Column.LinkedCell_ColumnKeyOfLinkedDatabase);
+                        var c2 = thisc.Column.LinkedDatabase.Column.Exists(thisc.Column.LinkedCell_ColumnNameOfLinkedDatabase);
                         if (c2 != null) {
                             var it2 = new ColumnPadItem(c2);
                             Pad.Item.Add(it2);

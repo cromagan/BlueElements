@@ -469,27 +469,35 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
         // Variablen ersetzen
         foreach (var thisColumnItem in Database.Column) {
             if (!erg.Contains("~")) { return erg; }
-            if (thisColumnItem != null) {
-                var txt = CellGetString(thisColumnItem);
-                if (fulltext) { txt = CellItem.ValueReadable(thisColumnItem, txt, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, removeLineBreaks); }
-                if (removeLineBreaks && !fulltext) {
-                    txt = txt.Replace("\r\n", " ");
-                    txt = txt.Replace("\r", " ");
-                }
 
-                erg = erg.Replace("~" + thisColumnItem.Name.ToUpper() + "~", txt, RegexOptions.IgnoreCase);
-                while (erg.ToUpper().Contains("~" + thisColumnItem.Name.ToUpper() + "(")) {
-                    var x = erg.ToUpper().IndexOf("~" + thisColumnItem.Name.ToUpper() + "(", StringComparison.Ordinal);
-                    var x2 = erg.IndexOf(")", x, StringComparison.Ordinal);
-                    if (x2 < x) { return erg; }
-                    var ww = erg.Substring(x + thisColumnItem.Name.Length + 2, x2 - x - thisColumnItem.Name.Length - 2);
-                    ww = ww.Replace(" ", string.Empty).ToUpper();
-                    var vals = ww.SplitAndCutBy(",");
-                    if (vals.Length != 2) { return formel; }
-                    if (vals[0] != "L") { return formel; }
-                    if (!IntTryParse(vals[1], out var stellen)) { return formel; }
-                    var newW = txt.Substring(0, Math.Min(stellen, txt.Length));
-                    erg = erg.Replace(erg.Substring(x, x2 - x + 1), newW);
+
+
+            if (thisColumnItem != null) {
+
+
+                if (erg.ToUpper().Contains("~" + thisColumnItem.Name.ToUpper())) {
+
+                    var txt = CellGetString(thisColumnItem);
+                    if (fulltext) { txt = CellItem.ValueReadable(thisColumnItem, txt, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, removeLineBreaks); }
+                    if (removeLineBreaks && !fulltext) {
+                        txt = txt.Replace("\r\n", " ");
+                        txt = txt.Replace("\r", " ");
+                    }
+
+                    erg = erg.Replace("~" + thisColumnItem.Name.ToUpper() + "~", txt, RegexOptions.IgnoreCase);
+                    while (erg.ToUpper().Contains("~" + thisColumnItem.Name.ToUpper() + "(")) {
+                        var x = erg.IndexOf("~" + thisColumnItem.Name.ToUpper() + "(", StringComparison.OrdinalIgnoreCase);
+                        var x2 = erg.IndexOf(")", x, StringComparison.Ordinal);
+                        if (x2 < x) { return erg; }
+                        var ww = erg.Substring(x + thisColumnItem.Name.Length + 2, x2 - x - thisColumnItem.Name.Length - 2);
+                        ww = ww.Replace(" ", string.Empty).ToUpper();
+                        var vals = ww.SplitAndCutBy(",");
+                        if (vals.Length != 2) { return formel; }
+                        if (vals[0] != "L") { return formel; }
+                        if (!IntTryParse(vals[1], out var stellen)) { return formel; }
+                        var newW = txt.Substring(0, Math.Min(stellen, txt.Length));
+                        erg = erg.Replace(erg.Substring(x, x2 - x + 1), newW);
+                    }
                 }
             }
         }

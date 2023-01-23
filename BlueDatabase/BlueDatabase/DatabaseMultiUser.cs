@@ -143,7 +143,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
         if (checkExists && !File.Exists(f)) { return null; }
 
-        return new ConnectionInfo(SQLBackAbstract.MakeValidTableName( tableName.FileNameWithoutSuffix()), null, DatabaseId, f);
+        return new ConnectionInfo(SQLBackAbstract.MakeValidTableName(tableName.FileNameWithoutSuffix()), null, DatabaseId, f);
     }
 
     public void DiscardPendingChanges(object sender, System.EventArgs e) => ChangeWorkItems();
@@ -204,6 +204,8 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
     public void UnlockHard() => _muf.UnlockHard();
 
     internal override string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height, bool isLoading) {
+        if (IsDisposed) { return "Datenbank verworfen!"; }
+
         var r = base.SetValueInternal(type, value, columnkey, rowkey, width, height, isLoading);
 
         if (type == DatabaseDataType.UndoInOne) {

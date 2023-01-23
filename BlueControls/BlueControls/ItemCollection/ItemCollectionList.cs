@@ -180,7 +180,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
                 if (db2 == null) { Notification.Show("Verknüpfte Datenbank nicht vorhanden", ImageCode.Information); return; }
 
                 /// Spalte aus der Ziel-Datenbank ermitteln
-                var targetColumn = db2.Column.SearchByKey(column.LinkedCell_ColumnKeyOfLinkedDatabase);
+                var targetColumn = db2.Column.Exists(column.LinkedCell_ColumnNameOfLinkedDatabase);
                 if (targetColumn == null) { Notification.Show("Die Spalte ist in der Zieldatenbank nicht vorhanden."); return; }
 
                 var (filter, info) = CellCollection.GetFilterFromLinkedCellData(db2, column, checkedItemsAtRow);
@@ -452,11 +452,11 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
     }
 
     /// <summary>
-    /// Fügt die Spalte hinzu. Als interner Name wird der Column.Key verwendet.
+    /// Fügt die Spalte hinzu. Als interner Name wird der Column.Name verwendet.
     /// </summary>
     /// <param name="column"></param>
     /// <returns></returns>
-    public TextListItem Add(ColumnItem column) => Add(column, column.Key.ToString());
+    public TextListItem Add(ColumnItem column) => Add(column, column.Name);
 
     public void AddRange(Type type) {
         foreach (int z1 in Enum.GetValues(type)) {
@@ -508,7 +508,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
     }
 
     /// <summary>
-    /// Fügt die Spalte hinzu. Als interner Name wird der Column.Key verwendet.
+    /// Fügt die Spalte hinzu. Als interner Name wird der Column.Name verwendet.
     /// </summary>
     /// <param name="columns"></param>
     /// <param name="doCaptionSort">Bei True werden auch die Überschriften der Spalte als Text hinzugefügt und auch danach sortiert</param>

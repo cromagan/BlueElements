@@ -29,7 +29,7 @@ public partial class PictureView : Form, IDisposableExtended {
 
     #region Fields
 
-    public readonly ListExt<string> FileList = new();
+    private readonly List<string> _fileList = new();
     private int _nr = -1;
 
     #endregion
@@ -51,11 +51,6 @@ public partial class PictureView : Form, IDisposableExtended {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
 
-        FileList.Clear();
-        if (fileList != null) { FileList.AddRange(fileList); }
-
-        FileList.Changed += FileList_Changed;
-
         if (mitScreenResize) {
             if (System.Windows.Forms.Screen.AllScreens.Length == 1 || openOnScreen < 0) {
                 var opScNr = Generic.PointOnScreenNr(System.Windows.Forms.Cursor.Position);
@@ -76,7 +71,7 @@ public partial class PictureView : Form, IDisposableExtended {
         btnZoomIn.Checked = true;
         btnChoose.Enabled = false;
 
-        //FileList_Changed(this, System.EventArgs.Empty);
+        SetFiles(fileList, imageno);
         LoadPic(imageno);
     }
 
@@ -93,11 +88,17 @@ public partial class PictureView : Form, IDisposableExtended {
 
     #region Methods
 
+    public void SetFiles(List<string>? fileList, int imageno) {
+        _fileList.Clear();
+        if (fileList != null) { _fileList.AddRange(fileList); }
+        LoadPic(imageno);
+    }
+
     protected void LoadPic(int nr) {
         _nr = nr;
-        if (FileList != null && nr < FileList.Count && nr > -1) {
+        if (_fileList != null && nr < _fileList.Count && nr > -1) {
             try {
-                Pad.Bmp = BitmapExt.Image_FromFile(FileList[nr]) as Bitmap;
+                Pad.Bmp = BitmapExt.Image_FromFile(_fileList[nr]) as Bitmap;
             } catch (Exception ex) {
                 Pad.Bmp = null;
                 Develop.DebugPrint(ex);
@@ -106,7 +107,7 @@ public partial class PictureView : Form, IDisposableExtended {
             Pad.Bmp = null;
         }
 
-        if (FileList == null || FileList.Count < 2) {
+        if (_fileList == null || _fileList.Count < 2) {
             grpSeiten.Visible = false;
             grpSeiten.Enabled = false;
             btnZurueck.Enabled = false;
@@ -115,7 +116,7 @@ public partial class PictureView : Form, IDisposableExtended {
             grpSeiten.Visible = true;
             grpSeiten.Enabled = true;
             btnZurueck.Enabled = _nr > 0;
-            btnVor.Enabled = _nr < FileList.Count - 1;
+            btnVor.Enabled = _nr < _fileList.Count - 1;
         }
 
         Pad.ZoomFit();
@@ -126,23 +127,19 @@ public partial class PictureView : Form, IDisposableExtended {
     }
 
     private void btnVor_Click(object sender, System.EventArgs e) {
-        if (FileList == null || FileList.Count < 2) { return; }
+        if (_fileList == null || _fileList.Count < 2) { return; }
         _nr++;
-        if (_nr >= FileList.Count - 1) { _nr = FileList.Count - 1; }
+        if (_nr >= _fileList.Count - 1) { _nr = _fileList.Count - 1; }
         LoadPic(_nr);
     }
 
     private void btnZoomFit_Click(object sender, System.EventArgs e) => Pad.ZoomFit();
 
     private void btnZurueck_Click(object sender, System.EventArgs e) {
-        if (FileList == null || FileList.Count < 2) { return; }
+        if (_fileList == null || _fileList.Count < 2) { return; }
         _nr--;
         if (_nr <= 0) { _nr = 0; }
         LoadPic(_nr);
-    }
-
-    private void FileList_Changed(object sender, System.EventArgs e) {
-        LoadPic(0);
     }
 
     private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {

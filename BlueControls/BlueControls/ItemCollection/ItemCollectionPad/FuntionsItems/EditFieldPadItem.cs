@@ -114,9 +114,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
 
             if (sho == null || sho.Count != 1) { return; }
 
-            var k = LongParse(sho[0]);
-
-            var col = GetRowFrom.Database.Column.SearchByKey(k);
+            var col = GetRowFrom.Database.Column.Exists(sho[0]);
 
             if (col == Column) { return; }
             Column = col;

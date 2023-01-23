@@ -166,7 +166,7 @@ public sealed class ColumnViewItem {
 
     public override string ToString() {
         var result = "{Type=" + (int)_viewType;
-        if (Column != null) { result = result + ", " + Column.ParsableColumnKey(); }
+        if (Column != null) { result = result + ", ColumnName=" + Column.Name; }
         //if (_spalteX1 > 0) { result = result + ", X=" + _spalteX1; }
         //if (_spalteWidth > 1) { result = result + ", Width=" + _spalteWidth; }
         //if (_spalteHeight > 1) { result = result + ", Height=" + _spalteHeight; }

@@ -77,15 +77,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capAutoReplace = new BlueControls.Controls.Caption();
             this.txbAutoRemove = new BlueControls.Controls.TextBox();
             this.capAutoRemove = new BlueControls.Controls.Caption();
-            this.cbxSchlüsselspalte = new BlueControls.Controls.ComboBox();
             this.tbxInitValue = new BlueControls.Controls.TextBox();
             this.Caption12 = new BlueControls.Controls.Caption();
-            this.capSchlüsselspalte = new BlueControls.Controls.Caption();
             this.btnAutoEditKleineFehler = new BlueControls.Controls.Button();
             this.btnAutoEditToUpper = new BlueControls.Controls.Button();
             this.tbxRunden = new BlueControls.Controls.TextBox();
-            this.cbxVorschlagSpalte = new BlueControls.Controls.ComboBox();
-            this.capVorschlag = new BlueControls.Controls.Caption();
             this.capNachkommastellen = new BlueControls.Controls.Caption();
             this.btnAutoEditAutoSort = new BlueControls.Controls.Button();
             this.tabFilter = new System.Windows.Forms.TabPage();
@@ -125,6 +121,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnOk = new BlueControls.Controls.Button();
             this.tabControl = new BlueControls.Controls.TabControl();
             this.tabDatenFormat = new System.Windows.Forms.TabPage();
+            this.btnCalculateMaxTextLenght = new BlueControls.Controls.Button();
             this.tbxMaxTextLenght = new BlueControls.Controls.TextBox();
             this.capMaxTextLenght = new BlueControls.Controls.Caption();
             this.grpSchnellformat = new BlueControls.Controls.GroupBox();
@@ -143,11 +140,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tblFilterliste = new BlueControls.Controls.Table();
             this.cbxTargetColumn = new BlueControls.Controls.ComboBox();
             this.capTargetColumn = new BlueControls.Controls.Caption();
-            this.capIntern = new BlueControls.Controls.Caption();
             this.caption5 = new BlueControls.Controls.Caption();
             this.butAktuellVor = new BlueControls.Controls.Button();
             this.butAktuellZurueck = new BlueControls.Controls.Button();
-            this.btnCalculateMaxTextLenght = new BlueControls.Controls.Button();
             this.tabAnzeige.SuspendLayout();
             this.tabBearbeitung.SuspendLayout();
             this.grpAuswahlmenuOptionen.SuspendLayout();
@@ -634,9 +629,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             // capImmerWerte
             // 
             this.capImmerWerte.CausesValidation = false;
-            this.capImmerWerte.Location = new System.Drawing.Point(8, 48);
+            this.capImmerWerte.Location = new System.Drawing.Point(8, 40);
             this.capImmerWerte.Name = "capImmerWerte";
-            this.capImmerWerte.Size = new System.Drawing.Size(216, 16);
+            this.capImmerWerte.Size = new System.Drawing.Size(440, 24);
             this.capImmerWerte.Text = "<b><u>Immer auswählbare Werte:";
             this.capImmerWerte.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
@@ -713,15 +708,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabAutoBearbeitung.Controls.Add(this.capAutoReplace);
             this.tabAutoBearbeitung.Controls.Add(this.txbAutoRemove);
             this.tabAutoBearbeitung.Controls.Add(this.capAutoRemove);
-            this.tabAutoBearbeitung.Controls.Add(this.cbxSchlüsselspalte);
             this.tabAutoBearbeitung.Controls.Add(this.tbxInitValue);
             this.tabAutoBearbeitung.Controls.Add(this.Caption12);
-            this.tabAutoBearbeitung.Controls.Add(this.capSchlüsselspalte);
             this.tabAutoBearbeitung.Controls.Add(this.btnAutoEditKleineFehler);
             this.tabAutoBearbeitung.Controls.Add(this.btnAutoEditToUpper);
             this.tabAutoBearbeitung.Controls.Add(this.tbxRunden);
-            this.tabAutoBearbeitung.Controls.Add(this.cbxVorschlagSpalte);
-            this.tabAutoBearbeitung.Controls.Add(this.capVorschlag);
             this.tabAutoBearbeitung.Controls.Add(this.capNachkommastellen);
             this.tabAutoBearbeitung.Controls.Add(this.btnAutoEditAutoSort);
             this.tabAutoBearbeitung.Location = new System.Drawing.Point(4, 25);
@@ -772,18 +763,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capAutoRemove.Size = new System.Drawing.Size(568, 16);
             this.capAutoRemove.Text = "Folgende Zeichen automatisch aus der Eingabe löschen:";
             // 
-            // cbxSchlüsselspalte
-            // 
-            this.cbxSchlüsselspalte.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbxSchlüsselspalte.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxSchlüsselspalte.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxSchlüsselspalte.Location = new System.Drawing.Point(408, 176);
-            this.cbxSchlüsselspalte.Name = "cbxSchlüsselspalte";
-            this.cbxSchlüsselspalte.Regex = null;
-            this.cbxSchlüsselspalte.Size = new System.Drawing.Size(577, 24);
-            this.cbxSchlüsselspalte.TabIndex = 35;
-            // 
             // tbxInitValue
             // 
             this.tbxInitValue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -802,16 +781,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.Caption12.Name = "Caption12";
             this.Caption12.Size = new System.Drawing.Size(568, 16);
             this.Caption12.Text = "Wenn eine neue Zeile erstellt wird, folgenden Wert in die Zelle schreiben:";
-            // 
-            // capSchlüsselspalte
-            // 
-            this.capSchlüsselspalte.CausesValidation = false;
-            this.capSchlüsselspalte.Location = new System.Drawing.Point(8, 176);
-            this.capSchlüsselspalte.Name = "capSchlüsselspalte";
-            this.capSchlüsselspalte.Size = new System.Drawing.Size(392, 40);
-            this.capSchlüsselspalte.Text = "Die Werte der Zelle gleichhalten, wenn die Schlüsselspalte den gleichen Wert enth" +
-    "ält:";
-            this.capSchlüsselspalte.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // btnAutoEditKleineFehler
             // 
@@ -839,28 +808,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tbxRunden.Regex = null;
             this.tbxRunden.Size = new System.Drawing.Size(88, 24);
             this.tbxRunden.TabIndex = 11;
-            // 
-            // cbxVorschlagSpalte
-            // 
-            this.cbxVorschlagSpalte.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbxVorschlagSpalte.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxVorschlagSpalte.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxVorschlagSpalte.Location = new System.Drawing.Point(416, 128);
-            this.cbxVorschlagSpalte.Name = "cbxVorschlagSpalte";
-            this.cbxVorschlagSpalte.Regex = null;
-            this.cbxVorschlagSpalte.Size = new System.Drawing.Size(577, 24);
-            this.cbxVorschlagSpalte.TabIndex = 5;
-            // 
-            // capVorschlag
-            // 
-            this.capVorschlag.CausesValidation = false;
-            this.capVorschlag.Location = new System.Drawing.Point(8, 128);
-            this.capVorschlag.Name = "capVorschlag";
-            this.capVorschlag.Size = new System.Drawing.Size(392, 40);
-            this.capVorschlag.Text = "Zelle automatisch befüllen, wenn diese leer ist und sie bearbeitet wird. Basieren" +
-    "d auf gleichen Werten in dieser Spalte:";
-            this.capVorschlag.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // capNachkommastellen
             // 
@@ -1305,6 +1252,16 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabDatenFormat.TabIndex = 12;
             this.tabDatenFormat.Text = "Daten-Format";
             // 
+            // btnCalculateMaxTextLenght
+            // 
+            this.btnCalculateMaxTextLenght.ImageCode = "Taschenrechner|16";
+            this.btnCalculateMaxTextLenght.Location = new System.Drawing.Point(776, 232);
+            this.btnCalculateMaxTextLenght.Name = "btnCalculateMaxTextLenght";
+            this.btnCalculateMaxTextLenght.QuickInfo = "Prüft alle Zellen und berechnet die ideale\r\nmaximale Text Länge";
+            this.btnCalculateMaxTextLenght.Size = new System.Drawing.Size(40, 24);
+            this.btnCalculateMaxTextLenght.TabIndex = 46;
+            this.btnCalculateMaxTextLenght.Click += new System.EventHandler(this.btnCalculateMaxTextLenght_Click);
+            // 
             // tbxMaxTextLenght
             // 
             this.tbxMaxTextLenght.AdditionalFormatCheck = BlueDatabase.Enums.AdditionalCheck.Integer;
@@ -1496,20 +1453,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capTargetColumn.Text = "Aus dieser Spalte die Werte holen:";
             this.capTargetColumn.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
-            // capIntern
-            // 
-            this.capIntern.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.capIntern.CausesValidation = false;
-            this.capIntern.Location = new System.Drawing.Point(193, 640);
-            this.capIntern.Name = "capIntern";
-            this.capIntern.Size = new System.Drawing.Size(104, 24);
-            this.capIntern.Text = "Interne Ansicht:";
-            // 
             // caption5
             // 
             this.caption5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.caption5.CausesValidation = false;
-            this.caption5.Location = new System.Drawing.Point(541, 641);
+            this.caption5.Location = new System.Drawing.Point(80, 640);
             this.caption5.Name = "caption5";
             this.caption5.Size = new System.Drawing.Size(104, 24);
             this.caption5.Text = "Aktuelle Ansicht:";
@@ -1518,7 +1466,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.butAktuellVor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.butAktuellVor.ImageCode = "Pfeil_Rechts|16|||0000FF";
-            this.butAktuellVor.Location = new System.Drawing.Point(733, 641);
+            this.butAktuellVor.Location = new System.Drawing.Point(272, 640);
             this.butAktuellVor.Name = "butAktuellVor";
             this.butAktuellVor.Size = new System.Drawing.Size(72, 24);
             this.butAktuellVor.TabIndex = 19;
@@ -1528,21 +1476,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.butAktuellZurueck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.butAktuellZurueck.ImageCode = "Pfeil_Links|16|||0000FF";
-            this.butAktuellZurueck.Location = new System.Drawing.Point(653, 641);
+            this.butAktuellZurueck.Location = new System.Drawing.Point(192, 640);
             this.butAktuellZurueck.Name = "butAktuellZurueck";
             this.butAktuellZurueck.Size = new System.Drawing.Size(72, 24);
             this.butAktuellZurueck.TabIndex = 18;
             this.butAktuellZurueck.Click += new System.EventHandler(this.butAktuellZurueck_Click);
-            // 
-            // btnCalculateMaxTextLenght
-            // 
-            this.btnCalculateMaxTextLenght.ImageCode = "Taschenrechner|16";
-            this.btnCalculateMaxTextLenght.Location = new System.Drawing.Point(776, 232);
-            this.btnCalculateMaxTextLenght.Name = "btnCalculateMaxTextLenght";
-            this.btnCalculateMaxTextLenght.QuickInfo = "Prüft alle Zellen und berechnet die ideale\r\nmaximale Text Länge";
-            this.btnCalculateMaxTextLenght.Size = new System.Drawing.Size(40, 24);
-            this.btnCalculateMaxTextLenght.TabIndex = 46;
-            this.btnCalculateMaxTextLenght.Click += new System.EventHandler(this.btnCalculateMaxTextLenght_Click);
             // 
             // ColumnEditor
             // 
@@ -1550,7 +1488,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.Controls.Add(this.caption5);
             this.Controls.Add(this.butAktuellVor);
             this.Controls.Add(this.butAktuellZurueck);
-            this.Controls.Add(this.capIntern);
             this.Controls.Add(this.tabControl);
             this.Controls.Add(this.BlueFrame1);
             this.Controls.Add(this.btnOk);
@@ -1652,20 +1589,15 @@ namespace BlueControls.BlueDatabaseDialogs {
         private TextBox txbPrefix;
         private Caption capPraefix;
         private Button btnStandard;
-        private ComboBox cbxSchlüsselspalte;
-        private Caption capSchlüsselspalte;
         private Caption capSortiermaske;
         private TextBox txbRegex;
         private Caption capRegex;
         private ComboBox cbxAlign;
         private Caption capAlign;
-        private ComboBox cbxVorschlagSpalte;
-        private Caption capVorschlag;
         private GroupBox grpAuswahlmenuOptionen;
         private TextBox txbAutoRemove;
         private Caption capAutoRemove;
         private Button butSaveContent;
-        private Caption capIntern;
         private Caption caption5;
         private Button butAktuellVor;
         private Button butAktuellZurueck;

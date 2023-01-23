@@ -634,7 +634,7 @@ public sealed class Database : DatabaseAbstract {
         SaveToByteList(l, DatabaseDataType.LineStyleRight, ((int)c.LineRight).ToString(), key);
         SaveToByteList(l, DatabaseDataType.EditableWithDropdown, c.DropdownBearbeitungErlaubt.ToPlusMinus(), key);
         SaveToByteList(l, DatabaseDataType.DropDownItems, c.DropDownItems.JoinWithCr(), key);
-        SaveToByteList(l, DatabaseDataType.LinkedCellFilter, c.LinkedCellFilterx.JoinWithCr(), key);
+        SaveToByteList(l, DatabaseDataType.LinkedCellFilter, c.LinkedCellFilter.JoinWithCr(), key);
         SaveToByteList(l, DatabaseDataType.OpticalTextReplace, c.OpticalReplace.JoinWithCr(), key);
         SaveToByteList(l, DatabaseDataType.AutoReplaceAfterEdit, c.AfterEditAutoReplace.JoinWithCr(), key);
         SaveToByteList(l, DatabaseDataType.RegexCheck, c.Regex, key);
@@ -657,9 +657,9 @@ public sealed class Database : DatabaseAbstract {
         SaveToByteList(l, DatabaseDataType.AdditionalFormatCheck, ((int)c.AdditionalFormatCheck).ToString(), key);
         SaveToByteList(l, DatabaseDataType.ScriptType, ((int)c.ScriptType).ToString(), key);
         SaveToByteList(l, DatabaseDataType.Prefix, c.Prefix, key);
-        SaveToByteList(l, DatabaseDataType.KeyColumnKey, c.KeyColumnKey.ToString(), key);
-        SaveToByteList(l, DatabaseDataType.ColumnKeyOfLinkedDatabase, c.LinkedCell_ColumnKeyOfLinkedDatabase.ToString(), key);
-        SaveToByteList(l, DatabaseDataType.MakeSuggestionFromSameKeyColumn, c.VorschlagsColumn.ToString(), key);
+        //SaveToByteList(l, DatabaseDataType.KeyColumnKey, c.KeyColumnKey.ToString(), key);
+        SaveToByteList(l, DatabaseDataType.ColumnNameOfLinkedDatabase, c.LinkedCell_ColumnNameOfLinkedDatabase, key);
+        //SaveToByteList(l, DatabaseDataType.MakeSuggestionFromSameKeyColumn, c.VorschlagsColumn.ToString(), key);
         SaveToByteList(l, DatabaseDataType.ColumnAlign, ((int)c.Align).ToString(), key);
         SaveToByteList(l, DatabaseDataType.SortType, ((int)c.SortType).ToString(), key);
         //SaveToByteList(l, DatabaseDataType.ColumnTimeCode, c.TimeCode, key);
@@ -717,6 +717,8 @@ public sealed class Database : DatabaseAbstract {
     }
 
     internal override string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height, bool isLoading) {
+        if (IsDisposed) { return "Datenbank verworfen!"; }
+
         var r = base.SetValueInternal(type, value, columnkey, rowkey, width, height, isLoading);
 
         if (type == DatabaseDataType.UndoInOne) {

@@ -251,7 +251,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
                 } else {
                     StyleComboBox(comboBox, item2, ComboBoxStyle.DropDownList, true);
                 }
-                comboBox.GotFocus += GotFocus_ComboBox;
+                //comboBox.GotFocus += GotFocus_ComboBox;
                 break;
 
             //case EasyPic easyPic:
@@ -266,7 +266,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
                     StyleTextBox(textBox);
                 }
                 textBox.NeedDatabaseOfAdditinalSpecialChars += textBox_NeedDatabaseOfAdditinalSpecialChars;
-                textBox.GotFocus += GotFocus_TextBox;
+                //textBox.GotFocus += GotFocus_TextBox;
                 textBox.TextChanged += TextBox_TextChanged;
                 break;
 
@@ -299,7 +299,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         base.OnControlRemoved(e);
         switch (e.Control) {
             case ComboBox comboBox:
-                comboBox.GotFocus -= GotFocus_ComboBox;
+                //comboBox.GotFocus -= GotFocus_ComboBox;
                 break;
 
             //case EasyPic easyPic:
@@ -309,7 +309,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
 
             case TextBox textBox:
                 textBox.NeedDatabaseOfAdditinalSpecialChars -= textBox_NeedDatabaseOfAdditinalSpecialChars;
-                textBox.GotFocus -= GotFocus_TextBox;
+                //textBox.GotFocus -= GotFocus_TextBox;
                 textBox.TextChanged -= TextBox_TextChanged;
                 break;
 
@@ -553,17 +553,17 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         }
     }
 
-    private void GotFocus_ComboBox(object sender, System.EventArgs e) {
-        if (_tmpColumn == null || _tmpRow == null) { return; }
-        if (!string.IsNullOrEmpty(((ComboBox)sender).Text)) { return; }
-        ValueSet(CellCollection.AutomaticInitalValue(_tmpColumn, _tmpRow), true, true);
-    }
+    //private void GotFocus_ComboBox(object sender, System.EventArgs e) {
+    //    if (_tmpColumn == null || _tmpRow == null) { return; }
+    //    if (!string.IsNullOrEmpty(((ComboBox)sender).Text)) { return; }
+    //    ValueSet(CellCollection.AutomaticInitalValue(_tmpColumn, _tmpRow), true, true);
+    //}
 
-    private void GotFocus_TextBox(object sender, System.EventArgs e) {
-        if (_tmpColumn == null || _tmpRow == null) { return; }
-        if (!string.IsNullOrEmpty(((TextBox)sender).Text)) { return; }
-        ValueSet(CellCollection.AutomaticInitalValue(_tmpColumn, _tmpRow), true, true);
-    }
+    //private void GotFocus_TextBox(object sender, System.EventArgs e) {
+    //    if (_tmpColumn == null || _tmpRow == null) { return; }
+    //    if (!string.IsNullOrEmpty(((TextBox)sender).Text)) { return; }
+    //    ValueSet(CellCollection.AutomaticInitalValue(_tmpColumn, _tmpRow), true, true);
+    //}
 
     private void ListBox_AddClicked(object sender, System.EventArgs e) {
         var dia = ColumnItem.UserEditDialogTypeInTable(_tmpColumn, false);
