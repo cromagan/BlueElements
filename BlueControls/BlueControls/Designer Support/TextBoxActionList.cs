@@ -1,5 +1,6 @@
 ﻿using BlueBasics.Enums;
 using BlueControls.Controls;
+using BlueDatabase;
 using BlueDatabase.Interfaces;
 using System.ComponentModel;
 using System.ComponentModel.Design;
@@ -29,21 +30,21 @@ public sealed class TextBoxActionList : DesignerActionList {
 
     #region Properties
 
-    public VarType TextFormat {
+    public IInputFormat TextFormat {
         get {
-            for (var z = 0; z < 100; z++) {
-                var st = (VarType)z;
-                if (st.ToString() == z.ToString()) {
-                    continue;
-                }
-
-                var x = new TextBox();
-                x.SetFormat(st);
-                if (x.IsFormatIdentical(_reverenceControl)) { return st; }
+            //for (var z = 0; z < 100; z++) {
+            //    var st = (VarType)z;
+            //    if (st.ToString() == z.ToString()) {
+            //        continue;
+            //    }
+            foreach (var thisFormat in FormatHolder.AllFormats) {
+                //var x = new TextBox();
+                //x.GetStyleFrom(st);
+                if (thisFormat.IsFormatIdentical(_reverenceControl)) { return thisFormat; }
             }
-            return VarType.Unbekannt;
+            return null;
         }
-        set => _reverenceControl.SetFormat(value);
+        set => _reverenceControl.GetStyleFrom(value);
     }
 
     #endregion

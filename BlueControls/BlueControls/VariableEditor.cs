@@ -74,12 +74,12 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
 
     private void GenerateVariableTable() {
         Database x = new(false, "Script_Variablen");
-        x.Column.GenerateAndAdd("Name", "N", VarType.Text, "Variablenname");
-        x.Column.GenerateAndAdd("Typ", "T", VarType.Text, "Variablentyp");
-        x.Column.GenerateAndAdd("RO", "R", VarType.Bit, "Readonly, Schreibgeschützt");
-        x.Column.GenerateAndAdd("System", "S", VarType.Bit, "Systemspalte\r\nIm Script nicht verfügbar");
-        x.Column.GenerateAndAdd("Inhalt", "I", VarType.Text, "Inhalt (gekürzte Ansicht)");
-        x.Column.GenerateAndAdd("Kommentar", "K", VarType.Text, "Komentar");
+        x.Column.GenerateAndAdd("Name", "N", FormatHolder.Text, "Variablenname");
+        x.Column.GenerateAndAdd("Typ", "T", FormatHolder.Text, "Variablentyp");
+        x.Column.GenerateAndAdd("RO", "R", FormatHolder.Bit, "Readonly, Schreibgeschützt");
+        x.Column.GenerateAndAdd("System", "S", FormatHolder.Bit, "Systemspalte\r\nIm Script nicht verfügbar");
+        x.Column.GenerateAndAdd("Inhalt", "I", FormatHolder.Text, "Inhalt (gekürzte Ansicht)");
+        x.Column.GenerateAndAdd("Kommentar", "K", FormatHolder.Text, "Komentar");
 
         foreach (var thisColumn in x.Column.Where(thisColumn => !thisColumn.IsSystemColumn())) {
             thisColumn.MultiLine = true;

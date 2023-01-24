@@ -31,6 +31,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Collections;
 using System.Runtime.CompilerServices;
+using BlueDatabase.Interfaces;
 
 namespace BlueDatabase;
 
@@ -218,21 +219,21 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         return testName;
     }
 
-    public ColumnItem? GenerateAndAdd(string internalName, string caption, string suffix, VarType format) => GenerateAndAdd(NextColumnKey(), internalName, caption, suffix, format, string.Empty);
+    public ColumnItem? GenerateAndAdd(string internalName, string caption, string suffix, IInputFormat format) => GenerateAndAdd(NextColumnKey(), internalName, caption, suffix, format, string.Empty);
 
-    public ColumnItem? GenerateAndAdd(string internalName, string caption, VarType format, string quickinfo) => GenerateAndAdd(NextColumnKey(), internalName, caption, string.Empty, format, quickinfo);
+    public ColumnItem? GenerateAndAdd(string internalName, string caption, IInputFormat format, string quickinfo) => GenerateAndAdd(NextColumnKey(), internalName, caption, string.Empty, format, quickinfo);
 
-    public ColumnItem? GenerateAndAdd(string internalName, string caption, VarType format) => GenerateAndAdd(NextColumnKey(), internalName, caption, string.Empty, format, string.Empty);
+    public ColumnItem? GenerateAndAdd(string internalName, string caption, IInputFormat format) => GenerateAndAdd(NextColumnKey(), internalName, caption, string.Empty, format, string.Empty);
 
-    public ColumnItem? GenerateAndAdd(long colKey) => GenerateAndAdd(colKey, Freename(string.Empty), string.Empty, string.Empty, VarType.Unbekannt, string.Empty);
+    public ColumnItem? GenerateAndAdd(long colKey) => GenerateAndAdd(colKey, Freename(string.Empty), string.Empty, string.Empty, null, string.Empty);
 
-    public ColumnItem? GenerateAndAdd(long colKey, string internalName) => GenerateAndAdd(colKey, internalName, string.Empty, string.Empty, VarType.Unbekannt, string.Empty);
+    public ColumnItem? GenerateAndAdd(long colKey, string internalName) => GenerateAndAdd(colKey, internalName, string.Empty, string.Empty, null, string.Empty);
 
-    public ColumnItem? GenerateAndAdd() => GenerateAndAdd(NextColumnKey(), Freename(string.Empty), string.Empty, string.Empty, VarType.Text, string.Empty);
+    public ColumnItem? GenerateAndAdd() => GenerateAndAdd(NextColumnKey(), Freename(string.Empty), string.Empty, string.Empty, null, string.Empty);
 
-    public ColumnItem? GenerateAndAdd(string internalName) => GenerateAndAdd(NextColumnKey(), internalName, internalName, string.Empty, VarType.Text, string.Empty);
+    public ColumnItem? GenerateAndAdd(string internalName) => GenerateAndAdd(NextColumnKey(), internalName, internalName, string.Empty, null, string.Empty);
 
-    public ColumnItem? GenerateAndAdd(long key, string internalName, string caption, string suffix, VarType format, string quickinfo) {
+    public ColumnItem? GenerateAndAdd(long key, string internalName, string caption, string suffix, IInputFormat? format, string quickinfo) {
         if (!ColumnItem.IsValidColumnName(internalName)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht erlaubt!");
             return null;
@@ -256,7 +257,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         item.Key = key;
         item.Caption = caption;
 
-        if (format != VarType.Unbekannt) { item.SetFormat(format); }
+        item.GetStyleFrom(format);
         item.Suffix = suffix;
         item.Quickinfo = quickinfo;
         return item;
@@ -480,7 +481,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         // Spalten erzeugen und Format übertragen
         foreach (var thisColumn in sourceDatabase.Column) {
             var l = Exists(thisColumn.Name) ??
-                GenerateAndAdd(thisColumn.Key, thisColumn.Name, thisColumn.Caption, thisColumn.Suffix, VarType.Unbekannt, thisColumn.Quickinfo);
+                GenerateAndAdd(thisColumn.Key, thisColumn.Name, thisColumn.Caption, thisColumn.Suffix, null, thisColumn.Quickinfo);
 
             if (l != null) {
                 l.CloneFrom(thisColumn, true);

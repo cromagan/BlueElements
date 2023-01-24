@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.ItemCollection.ItemCollectionList;
+using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using System;
@@ -338,34 +339,34 @@ public class FlexiControlForProperty<T> : FlexiControl {
                                 CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
                                 Size = new Size(200, 16 + (24 * textLines));
                                 MultiLine = true;
-                                this.SetFormat(VarType.Text);
+                                this.GetStyleFrom(FormatHolder.Text);
                             } else {
                                 CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
                                 Size = new Size(200, 24);
                                 MultiLine = false;
                                 switch (_accessor) {
                                     case Accessor<string>:
-                                        this.SetFormat(VarType.Text);
+                                        this.GetStyleFrom(FormatHolder.Text);
                                         break;
 
                                     case Accessor<int>:
-                                        this.SetFormat(VarType.Integer);
+                                        this.GetStyleFrom(FormatHolder.Integer);
                                         break;
 
                                     case Accessor<float>:
-                                        this.SetFormat(VarType.Float);
+                                        this.GetStyleFrom(FormatHolder.Float);
                                         break;
 
                                     case Accessor<double>:
-                                        this.SetFormat(VarType.Float);
+                                        this.GetStyleFrom(FormatHolder.Float);
                                         break;
 
                                     case Accessor<Color>:
-                                        this.SetFormat(VarType.Text);
+                                        this.GetStyleFrom(FormatHolder.Text);
                                         break;
 
                                     default:
-                                        this.SetFormat(VarType.Text);
+                                        this.GetStyleFrom(FormatHolder.Text);
                                         break;
                                 }
                             }

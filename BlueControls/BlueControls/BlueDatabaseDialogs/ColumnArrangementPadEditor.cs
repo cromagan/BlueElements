@@ -98,7 +98,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
     }
 
     private void btnAnsichtUmbenennen_Click(object sender, System.EventArgs e) {
-        var n = InputBox.Show("Umbenennen:", CurrentArrangement.Name, VarType.Text);
+        var n = InputBox.Show("Umbenennen:", CurrentArrangement.Name, FormatHolder.Text);
         if (!string.IsNullOrEmpty(n)) { CurrentArrangement.Name = n; }
         UpdateCombobox();
     }
@@ -130,11 +130,11 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         }
         string newname;
         if (MitVorlage) {
-            newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", "", VarType.Text);
+            newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", "", FormatHolder.Text);
             if (string.IsNullOrEmpty(newname)) { return; }
             car.Add(new ColumnViewCollection(Database, CurrentArrangement.ToString(), newname));
         } else {
-            newname = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", "", VarType.Text);
+            newname = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", "", FormatHolder.Text);
             if (string.IsNullOrEmpty(newname)) { return; }
             car.Add(new ColumnViewCollection(Database, "", newname));
         }

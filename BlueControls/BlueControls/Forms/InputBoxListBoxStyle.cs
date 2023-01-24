@@ -22,6 +22,7 @@ using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.ItemCollection.ItemCollectionList;
 using System.Collections.Generic;
+using BlueDatabase;
 
 namespace BlueControls.Forms;
 
@@ -58,7 +59,7 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
 
     public static string Show(string txt, List<string>? items) {
         if (items == null || items.Count == 0) {
-            return InputBox.Show(txt, "", VarType.Text);
+            return InputBox.Show(txt, "", FormatHolder.Text);
         }
         ItemCollectionList x = new(BlueListBoxAppearance.Listbox) {
             CheckBehavior = CheckBehavior.AlwaysSingleSelection

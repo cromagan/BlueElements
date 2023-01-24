@@ -92,12 +92,12 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
                 //    if (e.HotItem is ColumnItem col2) {
                 //        var pc = (Filterleiste)Parent; // Parent geht verlren, wenn der Filter selbst disposed und neu erzeugt wird
                 //        while (true) {
-                //            var nx = InputBox.Show("X, von 0 bis 10000", col2.DauerFilterPos.X.ToString(), enVarType.Integer);
+                //            var nx = InputBox.Show("X, von 0 bis 10000", col2.DauerFilterPos.X.ToString(), enFormatHolder.Integer);
                 //            if (string.IsNullOrEmpty(nx)) { return true; }
                 //            var nxi = Converter.IntParse(nx);
                 //            nxi = Math.Max(nxi, 0);
                 //            nxi = Math.Min(nxi, 10000);
-                //            var ny = InputBox.Show("Y, von 0 bis 10000", col2.DauerFilterPos.Y.ToString(), enVarType.Integer);
+                //            var ny = InputBox.Show("Y, von 0 bis 10000", col2.DauerFilterPos.Y.ToString(), enFormatHolder.Integer);
                 //            if (string.IsNullOrEmpty(ny)) { return true; }
                 //            var nyi = Converter.IntParse(ny);
                 //            nyi = Math.Max(nyi, 0);

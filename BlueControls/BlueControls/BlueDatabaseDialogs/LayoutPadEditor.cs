@@ -133,7 +133,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
 
     private void btnLayoutHinzu_Click(object sender, System.EventArgs e) {
         SaveCurrentLayout();
-        var ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", "", VarType.Text);
+        var ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", "", FormatHolder.Text);
         if (string.IsNullOrEmpty(ex)) { return; }
         LoadLayout(string.Empty);
 
@@ -176,7 +176,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
             MessageBox.Show("Layout kann nur manuell umbenannt werden.");
             return;
         }
-        var ex = InputBox.Show("Namen des Layouts ändern:", Pad.Item.Caption, VarType.Text);
+        var ex = InputBox.Show("Namen des Layouts ändern:", Pad.Item.Caption, FormatHolder.Text);
         if (string.IsNullOrEmpty(ex)) { return; }
         Pad.Item.Caption = ex;
         SaveCurrentLayout();

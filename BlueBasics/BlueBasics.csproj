@@ -105,7 +105,6 @@
     <Compile Include="EventArgs\MultiUserHasPendingChangesEventArgs.cs" />
     <Compile Include="ImageMatrix.cs" />
     <Compile Include="Enums\BlurType.cs" />
-    <Compile Include="Enums\VarType.cs" />
     <Compile Include="Enums\ErrorReason.cs" />
     <Compile Include="EventArgs\NeedImageEventArgs.cs" />
     <Compile Include="Extensions\RectangleFExtension.cs" />

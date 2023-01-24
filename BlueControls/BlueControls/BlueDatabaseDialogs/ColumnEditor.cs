@@ -522,14 +522,14 @@ internal sealed partial class ColumnEditor {
 
         if (tblFilterliste.Database == null) {
             Database db = new(false, "Filter " + _column.Database.ConnectionData.UniqueID + " " + _column.Name);
-            //db.Column.GenerateAndAdd("count", "count", VarType.IntegerPositive);
-            db.Column.GenerateAndAdd("SpalteName", "Spalte-Name", VarType.Text);
+            //db.Column.GenerateAndAdd("count", "count", FormatHolder.IntegerPositive);
+            db.Column.GenerateAndAdd("SpalteName", "Spalte-Name", FormatHolder.Text);
 
-            var vis = db.Column.GenerateAndAdd("visible", "visible", VarType.Bit);
-            var sp = db.Column.GenerateAndAdd("Spalte", "Spalte", VarType.Text);
+            var vis = db.Column.GenerateAndAdd("visible", "visible", FormatHolder.Bit);
+            var sp = db.Column.GenerateAndAdd("Spalte", "Spalte", FormatHolder.Text);
             sp.Align = AlignmentHorizontal.Rechts;
 
-            var b = db.Column.GenerateAndAdd("Such", "Suchtext", VarType.Text);
+            var b = db.Column.GenerateAndAdd("Such", "Suchtext", FormatHolder.Text);
             b.Quickinfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum suchen<br>Mischen wird nicht unterstützt.";
             b.MultiLine = false;
             b.TextBearbeitungErlaubt = true;

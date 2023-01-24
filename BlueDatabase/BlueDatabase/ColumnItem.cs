@@ -742,18 +742,36 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 return _tmpLinkedDatabase;
             }
 
-            if (string.IsNullOrEmpty(_linkedDatabaseFile)) {
-                return null;
+            if (string.IsNullOrEmpty(_linkedDatabaseFile)) { return null; }
+
+            if (!_linkedDatabaseFile.Contains("|") && !_linkedDatabaseFile.IsFormat(FormatHolder.FilepathAndName)) {
+                _linkedDatabaseFile = _linkedDatabaseFile.ToUpper().TrimEnd(".MDB");
+                _linkedDatabaseFile = SQLBackAbstract.MakeValidTableName(_linkedDatabaseFile);
             }
 
-            //if (_linkedDatabaseFile == "AutoVue.mdb") {
-            //    _linkedDatabaseFile = _linkedDatabaseFile;
+            if (SQLBackAbstract.IsValidTableName(_linkedDatabaseFile)) {
+                _tmpLinkedDatabase = Database.GetOtherTable(_linkedDatabaseFile);
+
+                if (_tmpLinkedDatabase != null) {
+                    if (_tmpLinkedDatabase != null) {
+                        _tmpLinkedDatabase.UserGroup = Database.UserGroup;
+                    }
+
+                    return _tmpLinkedDatabase;
+                }
+            }
+
+            //var tmp = _linkedDatabaseFile;
+
+            //if (!_linkedDatabaseFile.IsFormat(FormatHolder.FilepathAndName)) {
+            //    if (_linkedDatabaseFile.FileSuffix() == "MDB") {
+            //        Database.GetOtherTable(MDB);
+
+            //    }
+
             //}
 
             var ci = new ConnectionInfo(_linkedDatabaseFile);
-
-            //q
-            //var ci = Database.ConnectionDataOfOtherTable(_linkedDatabaseFile.FileNameWithoutSuffix());//  new ConnectionInfo(_linkedDatabaseFile, this, this.DatabaseID, string.Empty);
 
             Tmp_LinkedDatabase = DatabaseAbstract.GetByID(ci, null);
 
@@ -1966,64 +1984,64 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         }
     }
 
-    public void SetFormat(VarType format) {
-        switch (format) {
-            case VarType.Text:
-                SetFormatForText();
-                break;
+    //public void SetFormat(VarType format) {
+    //    switch (format) {
+    //        case FormatHolder.Text:
+    //            SetFormatForText();
+    //            break;
 
-            case VarType.Date:
-                SetFormatForDate();
-                break;
+    //        case FormatHolder.Date:
+    //            SetFormatForDate();
+    //            break;
 
-            case VarType.DateTime:
-                SetFormatForDateTime(true);
-                break;
+    //        case FormatHolder.DateTime:
+    //            SetFormatForDateTime(true);
+    //            break;
 
-            case VarType.Email:
-                SetFormatForEmail();
-                break;
+    //        case FormatHolder.Email:
+    //            SetFormatForEmail();
+    //            break;
 
-            case VarType.Float:
-                SetFormatForFloat();
-                break;
+    //        case FormatHolder.Float:
+    //            SetFormatForFloat();
+    //            break;
 
-            case VarType.FloatPositive:
-                SetFormatForFloatPositive();
-                break;
+    //        case FormatHolder.FloatPositive:
+    //            SetFormatForFloatPositive();
+    //            break;
 
-            case VarType.Integer:
-                SetFormatForInteger();
-                break;
+    //        case FormatHolder.Integer:
+    //            SetFormatForInteger();
+    //            break;
 
-            case VarType.IntegerPositive:
-                SetFormatForIntegerPositive();
-                break;
+    //        case FormatHolder.IntegerPositive:
+    //            SetFormatForIntegerPositive();
+    //            break;
 
-            case VarType.PhoneNumber:
-                SetFormatForPhoneNumber();
-                break;
+    //        case FormatHolder.PhoneNumber:
+    //            SetFormatForPhoneNumber();
+    //            break;
 
-            case VarType.TextMitFormatierung:
-                SetFormatForTextMitFormatierung();
-                break;
+    //        case FormatHolder.TextMitFormatierung:
+    //            SetFormatForTextMitFormatierung();
+    //            break;
 
-            case VarType.Url:
-                SetFormatForUrl();
-                break;
+    //        case FormatHolder.Url:
+    //            SetFormatForUrl();
+    //            break;
 
-            case VarType.Bit:
-                SetFormatForBit();
-                break;
+    //        case FormatHolder.Bit:
+    //            SetFormatForBit();
+    //            break;
 
-            default:
-                Develop.DebugPrint(FehlerArt.Warnung);
-                break;
-        }
-    }
+    //        default:
+    //            Develop.DebugPrint(FehlerArt.Warnung);
+    //            break;
+    //    }
+    //}
 
     public void SetFormatForBildCode() {
-        ((IInputFormat)this).SetFormat(VarType.Text); // Standard Verhalten
+        this.GetStyleFrom(FormatHolder.Text); // Standard Verhalten
 
         Format = DataFormat.Text;
         Align = AlignmentHorizontal.Links;
@@ -2035,7 +2053,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     }
 
     public void SetFormatForBit() {
-        ((IInputFormat)this).SetFormat(VarType.Bit); // Standard Verhalten
+        this.GetStyleFrom(FormatHolder.Bit); // Standard Verhalten
 
         Format = DataFormat.Text;
         Align = AlignmentHorizontal.Zentriert;
@@ -2057,7 +2075,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     }
 
     public void SetFormatForDate() {
-        ((IInputFormat)this).SetFormat(VarType.Date);
+        this.GetStyleFrom(FormatHolder.Date);
 
         Format = DataFormat.Text;
         Align = AlignmentHorizontal.Links;
@@ -2069,7 +2087,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     }
 
     public void SetFormatForDateTime(bool changeScriptType) {
-        ((IInputFormat)this).SetFormat(VarType.DateTime);
+        this.GetStyleFrom(FormatHolder.DateTime);
         Format = DataFormat.Text;
         Align = AlignmentHorizontal.Links;
         SortType = SortierTyp.Datum_Uhrzeit;
@@ -2080,7 +2098,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     }
 
     public void SetFormatForEmail() {
-        ((IInputFormat)this).SetFormat(VarType.Email);
+        this.GetStyleFrom(FormatHolder.Email);
 
         Format = DataFormat.Text;
         Align = AlignmentHorizontal.Links;
@@ -2092,7 +2110,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     }
 
     public void SetFormatForFloat() {
-        ((IInputFormat)this).SetFormat(VarType.Float);
+        this.GetStyleFrom(FormatHolder.Float);
 
         Format = DataFormat.Text;
         Align = AlignmentHorizontal.Rechts;
@@ -2104,7 +2122,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     }
 
     public void SetFormatForFloatPositive() {
-        ((IInputFormat)this).SetFormat(VarType.FloatPositive);
+        this.GetStyleFrom(FormatHolder.FloatPositive);
 
         Format = DataFormat.Text;
         Align = AlignmentHorizontal.Rechts;
@@ -2116,7 +2134,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     }
 
     public void SetFormatForInteger() {
-        ((IInputFormat)this).SetFormat(VarType.Integer);
+        this.GetStyleFrom(FormatHolder.Integer);
 
         Format = DataFormat.Text;
         Align = AlignmentHorizontal.Rechts;
@@ -2128,7 +2146,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     }
 
     public void SetFormatForIntegerPositive() {
-        ((IInputFormat)this).SetFormat(VarType.IntegerPositive);
+        this.GetStyleFrom(FormatHolder.IntegerPositive);
 
         Format = DataFormat.Text;
         Align = AlignmentHorizontal.Rechts;
@@ -2140,7 +2158,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     }
 
     public void SetFormatForPhoneNumber() {
-        ((IInputFormat)this).SetFormat(VarType.PhoneNumber);
+        this.GetStyleFrom(FormatHolder.PhoneNumber);
 
         Format = DataFormat.Text;
         Align = AlignmentHorizontal.Links;
@@ -2152,7 +2170,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     }
 
     public void SetFormatForText() {
-        ((IInputFormat)this).SetFormat(VarType.Text);
+        this.GetStyleFrom(FormatHolder.Text);
 
         Format = DataFormat.Text;
         Align = AlignmentHorizontal.Links;
@@ -2164,7 +2182,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     }
 
     public void SetFormatForTextMitFormatierung() {
-        ((IInputFormat)this).SetFormat(VarType.TextMitFormatierung);
+        this.GetStyleFrom(FormatHolder.TextMitFormatierung);
 
         Format = DataFormat.Text;
         Align = AlignmentHorizontal.Links;
@@ -2176,7 +2194,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     }
 
     public void SetFormatForTextOptions() {
-        ((IInputFormat)this).SetFormat(VarType.Text);
+        this.GetStyleFrom(FormatHolder.Text);
 
         MultiLine = true; // Verhalten von Setformat überschreiben
 
@@ -2190,7 +2208,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     }
 
     public void SetFormatForUrl() {
-        ((IInputFormat)this).SetFormat(VarType.Url);
+        this.GetStyleFrom(FormatHolder.Url);
 
         Format = DataFormat.Text;
         Align = AlignmentHorizontal.Links;
@@ -2672,15 +2690,22 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             //    break;
 
             case DatabaseDataType.ColumnNameOfLinkedDatabase:
-                var l = LongParse(newvalue);
-                if (l < 0) {
+
+                if (newvalue.IsFormat(FormatHolder.Integer)) {
                     _linkedCell_ColumnNameOfLinkedDatabase = string.Empty;
-                } else
-                if (l > 0) {
-                    _linkedCell_ColumnNameOfLinkedDatabase = Database?.Column.SearchByKey(l)?.Name ?? string.Empty;
                 } else {
                     _linkedCell_ColumnNameOfLinkedDatabase = newvalue;
                 }
+
+                //var l = LongParse(newvalue);
+                //if (l < 0) {
+                //    _linkedCell_ColumnNameOfLinkedDatabase = string.Empty;
+                //} else
+                //if (l > 0) {
+                //    _linkedCell_ColumnNameOfLinkedDatabase = Database?.Column.SearchByKey(l)?.Name ?? string.Empty;
+                //} else {
+                //    _linkedCell_ColumnNameOfLinkedDatabase = newvalue;
+                //}
                 break;
 
             case DatabaseDataType.SortType:

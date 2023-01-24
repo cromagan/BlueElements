@@ -61,11 +61,6 @@ public sealed class Database : DatabaseAbstract {
 
         Initialize();
 
-        // Muss vor dem Laden zu Allfiles hinzugfügt werde, weil das bei OnAdded
-        // Die Events registriert werden, um z.B: das Passwort abzufragen
-        // Zusätzlic werden z.B: Filter für den Export erstellt - auch der muss die Datenbank finden können
-        AllFiles.Add(this);
-
         if (!string.IsNullOrEmpty(filename)) {
             //DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + filename.FileNameWithoutSuffix()));
             LoadFromFile(filename, create, needPassword);
@@ -463,28 +458,6 @@ public sealed class Database : DatabaseAbstract {
         if (checkExists && !File.Exists(f)) { return null; }
 
         return new ConnectionInfo(SQLBackAbstract.MakeValidTableName(tableName.FileNameWithoutSuffix()), null, DatabaseId, f);
-    }
-
-    public bool IsFileAllowedToLoad(string fileName) {
-        foreach (var thisFile in AllFiles) {
-            if (thisFile is Database db) {
-                if (string.Equals(db.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
-                    thisFile.Save();
-                    Develop.DebugPrint(FehlerArt.Warnung, "Doppletes Laden von " + fileName);
-                    return false;
-                }
-            }
-
-            if (thisFile is DatabaseMultiUser dbm) {
-                if (string.Equals(dbm.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
-                    thisFile.Save();
-                    Develop.DebugPrint(FehlerArt.Warnung, "Doppletes Laden von " + fileName);
-                    return false;
-                }
-            }
-        }
-
-        return true;
     }
 
     public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword) {

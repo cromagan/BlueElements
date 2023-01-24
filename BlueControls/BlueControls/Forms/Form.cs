@@ -118,41 +118,48 @@ public partial class Form : System.Windows.Forms.Form {
     }
 
     public bool UpdateStatus(FehlerArt type, string message, bool didAlreadyMessagebox, Caption capStatusbar, bool dropMessages) {
-        if (InvokeRequired) {
-            return (bool)Invoke(new Func<bool>(() => UpdateStatus(type, message, didAlreadyMessagebox, capStatusbar, dropMessages)));
-        }
+        if (IsDisposed) { return false; }
+        if (capStatusbar == null || capStatusbar.IsDisposed) { return false; }
 
-        var imagecode = ImageCode.Information;
+        try {
+            if (InvokeRequired) {
+                return (bool)Invoke(new Func<bool>(() => UpdateStatus(type, message, didAlreadyMessagebox, capStatusbar, dropMessages)));
+            }
 
-        if (string.IsNullOrEmpty(message)) {
-            capStatusbar.Text = string.Empty;
-            capStatusbar.Refresh();
+            var imagecode = ImageCode.Information;
+
+            if (string.IsNullOrEmpty(message)) {
+                capStatusbar.Text = string.Empty;
+                capStatusbar.Refresh();
+                return false;
+            }
+
+            message = message.Replace("\r\n", "; ");
+            message = message.Replace("\r", "; ");
+            message = message.Replace("\n", "; ");
+            message = message.Replace("<BR>", "; ", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            message = message.Replace("; ; ", "; ");
+            message = message.TrimEnd("; ");
+
+            if (type == FehlerArt.Warnung) { imagecode = ImageCode.Warnung; }
+            if (type == FehlerArt.Fehler) { imagecode = ImageCode.Kritisch; }
+
+            if (type == FehlerArt.Info || type == FehlerArt.DevelopInfo || !dropMessages || didAlreadyMessagebox) {
+                capStatusbar.Text = "<imagecode=" + QuickImage.Get(imagecode, 16).ToString() + "> " + message;
+                capStatusbar.Refresh();
+                return false;
+            }
+
+            if (dropMessages) {
+                Develop.DebugPrint(FehlerArt.Warnung, message);
+                MessageBox.Show(message, imagecode, "Ok");
+                return true;
+            }
+
+            return false;
+        } catch {
             return false;
         }
-
-        message = message.Replace("\r\n", "; ");
-        message = message.Replace("\r", "; ");
-        message = message.Replace("\n", "; ");
-        message = message.Replace("<BR>", "; ", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-        message = message.Replace("; ; ", "; ");
-        message = message.TrimEnd("; ");
-
-        if (type == FehlerArt.Warnung) { imagecode = ImageCode.Warnung; }
-        if (type == FehlerArt.Fehler) { imagecode = ImageCode.Kritisch; }
-
-        if (type == FehlerArt.Info || type == FehlerArt.DevelopInfo || !dropMessages || didAlreadyMessagebox) {
-            capStatusbar.Text = "<imagecode=" + QuickImage.Get(imagecode, 16).ToString() + "> " + message;
-            capStatusbar.Refresh();
-            return false;
-        }
-
-        if (dropMessages) {
-            Develop.DebugPrint(FehlerArt.Warnung, message);
-            MessageBox.Show(message, imagecode, "Ok");
-            return true;
-        }
-
-        return false;
     }
 
     //MyBase.ScaleChildren

@@ -49,30 +49,50 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     public static readonly ListExt<DatabaseAbstract> AllFiles = new();
     public static List<Type>? DatabaseTypes;
+
     public readonly ListExt<ColumnViewCollection> _columnArrangements = new();
+
     public readonly List<string> _datenbankAdmin = new();
+
     public readonly CellCollection Cell;
 
     public readonly ColumnCollection Column;
-    public readonly RowCollection Row;
-    public readonly string TableName = string.Empty;
-    public readonly string UserName = Generic.UserName().ToUpper();
-    public string UserGroup;
-    protected string? _additionalFilesPfadtmp;
 
+    public readonly RowCollection Row;
+
+    public readonly string TableName = string.Empty;
+
+    public readonly string UserName = Generic.UserName().ToUpper();
+
+    public string UserGroup;
+
+    protected string? _additionalFilesPfadtmp;
     private static List<ConnectionInfo> _allavailabletables = new List<ConnectionInfo>();
+
     private static DateTime _lastTableCheck = new DateTime(1900, 1, 1);
+
     private readonly LayoutCollection _layouts = new();
+
     private readonly List<string> _permissionGroupsNewRow = new();
+
     private readonly long _startTick = DateTime.UtcNow.Ticks;
+
     private readonly List<string> _tags = new();
+
     private string _additionalFilesPfad = string.Empty;
+
     private BackgroundWorker _backgroundWorker;
+
     private string _cachePfad = string.Empty;
+
     private string _caption = string.Empty;
+
     private Timer _checker;
+
     private int _checkerTickCount = -5;
+
     private string _createDate = string.Empty;
+
     private string _creator = string.Empty;
 
     /// <summary>
@@ -85,8 +105,11 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     private double _globalScale;
 
     private string _globalShowPass = string.Empty;
+
     private DateTime _lastUserActionUtc = new(1900, 1, 1);
+
     private string _rulesScript = string.Empty;
+
     private RowSortDefinition? _sortDefinition;
 
     /// <summary>
@@ -117,6 +140,12 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
         Row = new RowCollection(this);
         Column = new ColumnCollection(this);
+
+        // Muss vor dem Laden der Datan zu Allfiles hinzugfügt werde, weil das bei OnAdded
+        // Die Events registriert werden, um z.B: das Passwort abzufragen
+        // Zusätzlich werden z.B: Filter für den Export erstellt - auch der muss die Datenbank finden können.
+        // Zusätzlich muss der Tablename stimme, dass in Added diesen verwerten kann.
+        AllFiles.Add(this);
     }
 
     #endregion
@@ -227,16 +256,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         }
     }
 
-    //[Browsable(false)]
-    //[Description("Welche Spalte bei Columnfirst zurückgegeben wird")]
-    //public string FirstColumn {
-    //    get => _firstColumn;
-    //    set {
-    //        if (_firstColumn == value) { return; }
-    //        ChangeData(DatabaseDataType.FirstColumn, null, null, _firstColumn, value, string.Empty);
-    //    }
-    //}
-
     [Browsable(false)]
     public double GlobalScale {
         get => _globalScale;
@@ -247,6 +266,15 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         }
     }
 
+    //[Browsable(false)]
+    //[Description("Welche Spalte bei Columnfirst zurückgegeben wird")]
+    //public string FirstColumn {
+    //    get => _firstColumn;
+    //    set {
+    //        if (_firstColumn == value) { return; }
+    //        ChangeData(DatabaseDataType.FirstColumn, null, null, _firstColumn, value, string.Empty);
+    //    }
+    //}
     public string GlobalShowPass {
         get => _globalShowPass;
         set {
@@ -400,6 +428,17 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
         _lastTableCheck = DateTime.Now;
         return _allavailabletables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
+    }
+
+    public static bool CriticalState() {
+        foreach (var thisDB in AllFiles) {
+            if (!thisDB.IsDisposed) {
+                if (!thisDB.LogUndo) { return true; } // Irgend ein heikler Prozess
+                if (thisDB.IsInCache == null) { return true; } // Irgend eine Datenbank wird aktuell geladen
+            }
+        }
+
+        return false;
     }
 
     public static void ForceSaveAll() {
@@ -964,6 +1003,11 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         //    return null;
         //}
 
+        if (!SQLBackAbstract.IsValidTableName(tablename)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Ungültiger Tabellenname: " + tablename);
+            return null;
+        }
+
         var x = ConnectionDataOfOtherTable(tablename, true);
         if (x == null) { return null; }
 
@@ -1125,6 +1169,28 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         if (_datenbankAdmin.Contains("#EVERYBODY", false)) { return true; }
         if (!string.IsNullOrEmpty(UserName) && _datenbankAdmin.Contains("#User: " + UserName, false)) { return true; }
         return !string.IsNullOrEmpty(UserGroup) && _datenbankAdmin.Contains(UserGroup, false);
+    }
+
+    public bool IsFileAllowedToLoad(string fileName) {
+        foreach (var thisFile in AllFiles) {
+            if (thisFile is Database db) {
+                if (string.Equals(db.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
+                    thisFile.Save();
+                    Develop.DebugPrint(FehlerArt.Warnung, "Doppletes Laden von " + fileName);
+                    return false;
+                }
+            }
+
+            if (thisFile is DatabaseMultiUser dbm) {
+                if (string.Equals(dbm.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
+                    thisFile.Save();
+                    Develop.DebugPrint(FehlerArt.Warnung, "Doppletes Laden von " + fileName);
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     //public abstract void Load_Reload();

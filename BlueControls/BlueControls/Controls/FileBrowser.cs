@@ -33,6 +33,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
+using BlueDatabase;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
@@ -229,7 +230,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
     private void lsbFiles_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         if (e.HotItem == null) { return; }
 
-        var it = ((BitmapListItem)e.HotItem) ;
+        var it = ((BitmapListItem)e.HotItem);
         var tags = (List<string>)(it.Tag) ?? new List<string>(); ;
 
         e.UserMenu.Add(ContextMenuComands.Ausschneiden, !tags.TagGet("Folder").FromPlusMinus());
@@ -269,7 +270,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
             case "Umbenennen":
                 var n = it.Internal;
 
-                var nn = InputBox.Show("Neuer Name:", n.FileNameWithoutSuffix(), VarType.Text);
+                var nn = InputBox.Show("Neuer Name:", n.FileNameWithoutSuffix(), FormatHolder.Text);
 
                 if (n.FileNameWithoutSuffix() == n) { return; }
 

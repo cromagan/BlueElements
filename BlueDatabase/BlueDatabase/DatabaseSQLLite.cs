@@ -69,12 +69,6 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
         Initialize();
 
-        // Muss vor dem Laden zu Allfiles hinzugfügt werde, weil das bei OnAdded
-        // Die Events registriert werden, um z.B: das Passwort abzufragen
-        // Zusätzlic werden z.B: Filter für den Export erstellt - auch der muss die Datenbank finden können
-
-        AllFiles.Add(this);
-
         if (sql != null) {
             LoadFromSQLBack();
         }
@@ -282,12 +276,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     private static void CheckSysUndo(object state) {
         if (DateTime.UtcNow.Subtract(_timerTimeStamp).TotalSeconds < 180) { return; }
 
-        foreach (var thisDB in AllFiles) {
-            if (!thisDB.IsDisposed) {
-                if (!thisDB.LogUndo) { return; } // Irgend ein heikler Prozess
-                if (thisDB.IsInCache == null) { return; } // Irgend eineDatenbank wird aktuell geladen
-            }
-        }
+        if (CriticalState()) { return; }
 
         if (_isInTimer) { return; }
         _isInTimer = true;

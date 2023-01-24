@@ -426,21 +426,21 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
     private DatabaseAbstract GenerateFilterDatabase() {
         Database x = new(false, "Filterdatabase_" + Internal);
-        var sp = x.Column.GenerateAndAdd("Spalte", "Spalte", VarType.Text);
+        var sp = x.Column.GenerateAndAdd("Spalte", "Spalte", FormatHolder.Text);
         sp.Align = AlignmentHorizontal.Rechts;
 
-        var fa = x.Column.GenerateAndAdd("FilterArt", "Art", VarType.Text);
+        var fa = x.Column.GenerateAndAdd("FilterArt", "Art", FormatHolder.Text);
         fa.MultiLine = false;
         fa.TextBearbeitungErlaubt = false;
         fa.DropdownAllesAbwählenErlaubt = true;
         fa.DropdownBearbeitungErlaubt = true;
         fa.DropDownItems = new List<string>() { "=", "=!empty" };
         fa.OpticalReplace = new List<string>() { "=|ist (GK egal)", "=!empty|wenn nicht leer, ist" };
-        var b1 = x.Column.GenerateAndAdd("suchsym", " ", VarType.Text);
+        var b1 = x.Column.GenerateAndAdd("suchsym", " ", FormatHolder.Text);
         b1.BehaviorOfImageAndText = BildTextVerhalten.Nur_Bild;
         b1.ScriptType = ScriptType.String;
 
-        var b = x.Column.GenerateAndAdd("suchtxt", "Suchtext", VarType.Text);
+        var b = x.Column.GenerateAndAdd("suchtxt", "Suchtext", FormatHolder.Text);
         b.MultiLine = false;
         b.TextBearbeitungErlaubt = false;
         b.DropdownAllesAbwählenErlaubt = true;
