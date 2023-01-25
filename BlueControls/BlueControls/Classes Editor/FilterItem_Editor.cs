@@ -57,7 +57,7 @@ internal sealed partial class FilterItem_Editor : AbstractClassEditor<FilterItem
             cbxColumns.Text = string.Empty;
             return;
         }
-        cbxColumns.Text = Item.Column.Key.ToString();
+        cbxColumns.Text = Item.Column.Name;
     }
 
     protected override void PrepaireFormula() {
@@ -81,7 +81,7 @@ internal sealed partial class FilterItem_Editor : AbstractClassEditor<FilterItem
     }
 
     private void btnFilterWahl_Click(object sender, System.EventArgs e) {
-        var c = Item.Database.Column.SearchByKey(LongParse(cbxColumns.Text));
+        var c = Item.Database.Column[cbxColumns.Text];
         if (c == null || !c.AutoFilterSymbolPossible()) { return; }
         FilterCollection tmpfc = new(Item.Database);
         if (Item.FilterType != FilterType.KeinFilter) { tmpfc.Add(Item); }
@@ -95,7 +95,7 @@ internal sealed partial class FilterItem_Editor : AbstractClassEditor<FilterItem
 
     private void cbxColumns_TextChanged(object sender, System.EventArgs e) {
         if (IsFilling) { return; }
-        var c = Item.Database.Column.SearchByKey(LongParse(cbxColumns.Text));
+        var c = Item.Database.Column[cbxColumns.Text];
         btnFilterWahl.Enabled = c == null || c.AutoFilterSymbolPossible() || true;
         Item.Column = c;
         Item.FilterType = FilterType.KeinFilter;

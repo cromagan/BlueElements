@@ -74,12 +74,12 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
 
     private void GenerateVariableTable() {
         Database x = new(false, "Script_Variablen");
-        x.Column.GenerateAndAdd("Name", "N", FormatHolder.Text, "Variablenname");
-        x.Column.GenerateAndAdd("Typ", "T", FormatHolder.Text, "Variablentyp");
-        x.Column.GenerateAndAdd("RO", "R", FormatHolder.Bit, "Readonly, Schreibgeschützt");
-        x.Column.GenerateAndAdd("System", "S", FormatHolder.Bit, "Systemspalte\r\nIm Script nicht verfügbar");
-        x.Column.GenerateAndAdd("Inhalt", "I", FormatHolder.Text, "Inhalt (gekürzte Ansicht)");
-        x.Column.GenerateAndAdd("Kommentar", "K", FormatHolder.Text, "Komentar");
+        x.Column.GenerateAndAdd("Name", "N", ColumnFormatHolder.Text, "Variablenname");
+        x.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder.Text, "Variablentyp");
+        x.Column.GenerateAndAdd("RO", "R", ColumnFormatHolder.Bit, "Readonly, Schreibgeschützt");
+        x.Column.GenerateAndAdd("System", "S", ColumnFormatHolder.Bit, "Systemspalte\r\nIm Script nicht verfügbar");
+        x.Column.GenerateAndAdd("Inhalt", "I", ColumnFormatHolder.Text, "Inhalt (gekürzte Ansicht)");
+        x.Column.GenerateAndAdd("Kommentar", "K", ColumnFormatHolder.Text, "Komentar");
 
         foreach (var thisColumn in x.Column.Where(thisColumn => !thisColumn.IsSystemColumn())) {
             thisColumn.MultiLine = true;
@@ -89,8 +89,8 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
 
         x.RepairAfterParse();
         var car = x.ColumnArrangements.CloneWithClones();
-        car[1].ShowAllColumns();
-        car[1].HideSystemColumns();
+        car[1].ShowColumns("Name", "Typ", "RO", "System", "Inhalt", "Kommentar");
+        //car[1].HideSystemColumns();
         x.ColumnArrangements = car;
         x.SortDefinition = new RowSortDefinition(x, "Name", true);
         tableVariablen.DatabaseSet(x, string.Empty);

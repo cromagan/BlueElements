@@ -247,20 +247,20 @@ public sealed partial class DatabaseHeadEditor {
 
     private void GenerateUndoTabelle() {
         Database x = new(false, "Undo " + _database.ConnectionData.TableName);
-        x.Column.GenerateAndAdd("hidden", "hidden", FormatHolder.Text);
-        x.Column.GenerateAndAdd("Index", "Index", FormatHolder.IntegerPositive);
-        x.Column.GenerateAndAdd("db", "Herkunft", FormatHolder.Text);
-        x.Column.GenerateAndAdd("ColumnKey", "Spalten-<br>Schlüssel", FormatHolder.IntegerPositive);
-        x.Column.GenerateAndAdd("ColumnName", "Spalten-<br>Name", FormatHolder.Text);
-        x.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", FormatHolder.Text);
-        x.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", FormatHolder.IntegerPositive);
-        x.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", FormatHolder.Text);
-        x.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", FormatHolder.Text);
-        x.Column.GenerateAndAdd("Aenderer", "Änderer", FormatHolder.Text);
-        x.Column.GenerateAndAdd("Symbol", "Symbol", FormatHolder.Text);
-        x.Column.GenerateAndAdd("Aenderung", "Änderung", FormatHolder.Text);
-        x.Column.GenerateAndAdd("WertAlt", "Wert alt", FormatHolder.Text);
-        x.Column.GenerateAndAdd("WertNeu", "Wert neu", FormatHolder.Text);
+        x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder.Text);
+        x.Column.GenerateAndAdd("Index", "Index", ColumnFormatHolder.IntegerPositive);
+        x.Column.GenerateAndAdd("db", "Herkunft", ColumnFormatHolder.Text);
+        x.Column.GenerateAndAdd("ColumnKey", "Spalten-<br>Schlüssel", ColumnFormatHolder.IntegerPositive);
+        x.Column.GenerateAndAdd("ColumnName", "Spalten-<br>Name", ColumnFormatHolder.Text);
+        x.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolder.Text);
+        x.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolder.IntegerPositive);
+        x.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", ColumnFormatHolder.Text);
+        x.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", ColumnFormatHolder.Text);
+        x.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder.Text);
+        x.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.Text);
+        x.Column.GenerateAndAdd("Aenderung", "Änderung", ColumnFormatHolder.Text);
+        x.Column.GenerateAndAdd("WertAlt", "Wert alt", ColumnFormatHolder.Text);
+        x.Column.GenerateAndAdd("WertNeu", "Wert neu", ColumnFormatHolder.Text);
         foreach (var thisColumn in x.Column.Where(thisColumn => !thisColumn.IsSystemColumn())) {
             thisColumn.MultiLine = true;
             thisColumn.TextBearbeitungErlaubt = false;

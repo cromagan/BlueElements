@@ -895,7 +895,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         CellOnCoordinate(e.X, e.Y, out _mouseOverColumn, out _mouseOverRow);
         tags.TagSet("CellKey", CellCollection.KeyOfCell(_mouseOverColumn, _mouseOverRow?.Row));
         if (_mouseOverColumn != null) {
-            tags.TagSet("ColumnKey", _mouseOverColumn.Key.ToString());
+            tags.TagSet("ColumnName", _mouseOverColumn.Name);
         }
         if (_mouseOverRow?.Row != null) {
             tags.TagSet("RowKey", _mouseOverRow.Row.Key.ToString());
@@ -1127,7 +1127,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
         if (CurrentArrangement != null) {
             foreach (var thiscol in CurrentArrangement) {
-                if (thiscol.TmpReduced) { x = x + ", Reduced=" + thiscol.Column.Key; }
+                if (thiscol.TmpReduced) { x = x + ", Reduced=" + thiscol.Column.Name; }
             }
         }
 
@@ -3086,7 +3086,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         break;
 
                     case "reduced":
-                        var c = _database.Column.SearchByKey(LongParse(pair.Value));
+                        var c = _database.Column[pair.Value];
                         var cv = CurrentArrangement[c];
                         if (cv != null) { cv.TmpReduced = true; }
                         break;

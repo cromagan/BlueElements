@@ -321,11 +321,11 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
                     fcfc.Database = Database;
 
                     if (co != null) {
-                        fcfc.ColumnKey = co.Key;
+                        fcfc.ColumnName = co.Name;
                         fcfc.RowKey = RowKey;
                     } else {
                         fcfc.RowKey = -1;
-                        fcfc.ColumnKey = -1;
+                        fcfc.ColumnName = string.Empty;
                     }
                 }
             }

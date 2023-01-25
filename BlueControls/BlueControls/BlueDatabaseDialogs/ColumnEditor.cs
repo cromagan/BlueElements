@@ -24,6 +24,7 @@ using BlueControls.Forms;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -61,15 +62,6 @@ internal sealed partial class ColumnEditor {
             e.Cancel = true;
         }
     }
-
-    //private static int ColumKeyFrom(DatabaseAbstract? database, string columnKey) {
-    //    if (database == null || string.IsNullOrEmpty(columnKey)) { return -1; }
-
-    //    IntTryParse(columnKey, out var c);
-    //    return c;
-    //}
-
-    //private static void SetKeyTo(TextBox combobox, long columnKey) => combobox.Text = columnKey.ToString();
 
     private bool AllOk() {
         var feh = string.Empty;
@@ -118,67 +110,67 @@ internal sealed partial class ColumnEditor {
 
     private void btnSchnellAuswahloptionen_Click(object sender, System.EventArgs e) {
         if (!AllOk()) { return; }
-        _column.SetFormatForTextOptions();
+        _column.GetStyleFrom(ColumnFormatHolder.TextOptions);
         Column_DatenAuslesen(_column);
     }
 
     private void btnSchnellBildCode_Click(object sender, System.EventArgs e) {
         if (!AllOk()) { return; }
-        _column.SetFormatForBildCode();
+        _column.GetStyleFrom(ColumnFormatHolder.BildCode);
         Column_DatenAuslesen(_column);
     }
 
     private void btnSchnellBit_Click(object sender, System.EventArgs e) {
         if (!AllOk()) { return; }
-        _column.SetFormatForBit();
+        _column.GetStyleFrom(ColumnFormatHolder.Bit);
         Column_DatenAuslesen(_column);
     }
 
     private void btnSchnellDatum_Click(object sender, System.EventArgs e) {
         if (!AllOk()) { return; }
-        _column.SetFormatForDate();
+        _column.GetStyleFrom(ColumnFormatHolder.Date);
         Column_DatenAuslesen(_column);
     }
 
     private void btnSchnellDatumUhrzeit_Click(object sender, System.EventArgs e) {
         if (!AllOk()) { return; }
-        _column.SetFormatForDateTime(true);
+        _column.GetStyleFrom(ColumnFormatHolder.DateTime);
         Column_DatenAuslesen(_column);
     }
 
     private void btnSchnellEmail_Click(object sender, System.EventArgs e) {
         if (!AllOk()) { return; }
-        _column.SetFormatForEmail();
+        _column.GetStyleFrom(ColumnFormatHolder.Email);
         Column_DatenAuslesen(_column);
     }
 
     private void btnSchnellGanzzahl_Click(object sender, System.EventArgs e) {
         if (!AllOk()) { return; }
-        _column.SetFormatForInteger();
+        _column.GetStyleFrom(ColumnFormatHolder.Integer);
         Column_DatenAuslesen(_column);
     }
 
     private void btnSchnellGleitkommazahl_Click(object sender, System.EventArgs e) {
         if (!AllOk()) { return; }
-        _column.SetFormatForFloat();
+        _column.GetStyleFrom(ColumnFormatHolder.Float);
         Column_DatenAuslesen(_column);
     }
 
     private void btnSchnellIInternetAdresse_Click(object sender, System.EventArgs e) {
         if (!AllOk()) { return; }
-        _column.SetFormatForUrl();
+        _column.GetStyleFrom(ColumnFormatHolder.Url);
         Column_DatenAuslesen(_column);
     }
 
     private void btnSchnellTelefonNummer_Click(object sender, System.EventArgs e) {
         if (!AllOk()) { return; }
-        _column.SetFormatForPhoneNumber();
+        _column.GetStyleFrom(ColumnFormatHolder.PhoneNumber);
         Column_DatenAuslesen(_column);
     }
 
     private void btnSchnellText_Click(object sender, System.EventArgs e) {
         if (!AllOk()) { return; }
-        _column.SetFormatForText();
+        _column.GetStyleFrom(ColumnFormatHolder.Text);
         Column_DatenAuslesen(_column);
     }
 
@@ -278,6 +270,8 @@ internal sealed partial class ColumnEditor {
     private void cbxTargetColumn_TextChanged(object sender, System.EventArgs e) => GeneratFilterListe();
 
     private void Column_DatenAuslesen(ColumnItem? fromColumn) {
+        capTabellenname.Text = LanguageTool.DoTranslate("<b>Tabellenname: </b>{0}", true, fromColumn.Database.TableName);
+
         _column = fromColumn;
         cbxFormat.Item.AddRange(typeof(DataFormat));
         cbxRandLinks.Item.AddRange(typeof(ColumnLineStyle));
@@ -522,14 +516,14 @@ internal sealed partial class ColumnEditor {
 
         if (tblFilterliste.Database == null) {
             Database db = new(false, "Filter " + _column.Database.ConnectionData.UniqueID + " " + _column.Name);
-            //db.Column.GenerateAndAdd("count", "count", FormatHolder.IntegerPositive);
-            db.Column.GenerateAndAdd("SpalteName", "Spalte-Name", FormatHolder.Text);
+            //db.Column.GenerateAndAdd("count", "count", ColumnFormatHolder.IntegerPositive);
+            db.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder.Text);
 
-            var vis = db.Column.GenerateAndAdd("visible", "visible", FormatHolder.Bit);
-            var sp = db.Column.GenerateAndAdd("Spalte", "Spalte", FormatHolder.Text);
+            var vis = db.Column.GenerateAndAdd("visible", "visible", ColumnFormatHolder.Bit);
+            var sp = db.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolder.Text);
             sp.Align = AlignmentHorizontal.Rechts;
 
-            var b = db.Column.GenerateAndAdd("Such", "Suchtext", FormatHolder.Text);
+            var b = db.Column.GenerateAndAdd("Such", "Suchtext", ColumnFormatHolder.Text);
             b.Quickinfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum suchen<br>Mischen wird nicht unterstützt.";
             b.MultiLine = false;
             b.TextBearbeitungErlaubt = true;

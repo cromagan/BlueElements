@@ -177,13 +177,13 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         return string.Empty;
     }
 
-    public void Clear(string comment) {
-        var keys = (from thiscolumnitem in _internal.Values where thiscolumnitem != null select thiscolumnitem.Key).Select(dummy => dummy).ToList();
+    //public void Clear(string comment) {
+    //    var name = (from thiscolumnitem in _internal.Values where thiscolumnitem != null select thiscolumnitem.Key).Select(dummy => dummy).ToList();
 
-        foreach (var thisKey in keys) {
-            Remove(thisKey, comment);
-        }
-    }
+    //    foreach (var thisKey in keys) {
+    //        Remove(thisKey, comment);
+    //    }
+    //}
 
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
@@ -219,11 +219,11 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         return testName;
     }
 
-    public ColumnItem? GenerateAndAdd(string internalName, string caption, string suffix, IInputFormat format) => GenerateAndAdd(NextColumnKey(), internalName, caption, suffix, format, string.Empty);
+    public ColumnItem? GenerateAndAdd(string internalName, string caption, string suffix, IColumnInputFormat format) => GenerateAndAdd(NextColumnKey(), internalName, caption, suffix, format, string.Empty);
 
-    public ColumnItem? GenerateAndAdd(string internalName, string caption, IInputFormat format, string quickinfo) => GenerateAndAdd(NextColumnKey(), internalName, caption, string.Empty, format, quickinfo);
+    public ColumnItem? GenerateAndAdd(string internalName, string caption, IColumnInputFormat format, string quickinfo) => GenerateAndAdd(NextColumnKey(), internalName, caption, string.Empty, format, quickinfo);
 
-    public ColumnItem? GenerateAndAdd(string internalName, string caption, IInputFormat format) => GenerateAndAdd(NextColumnKey(), internalName, caption, string.Empty, format, string.Empty);
+    public ColumnItem? GenerateAndAdd(string internalName, string caption, IColumnInputFormat format) => GenerateAndAdd(NextColumnKey(), internalName, caption, string.Empty, format, string.Empty);
 
     public ColumnItem? GenerateAndAdd(long colKey) => GenerateAndAdd(colKey, Freename(string.Empty), string.Empty, string.Empty, null, string.Empty);
 
@@ -233,7 +233,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public ColumnItem? GenerateAndAdd(string internalName) => GenerateAndAdd(NextColumnKey(), internalName, internalName, string.Empty, null, string.Empty);
 
-    public ColumnItem? GenerateAndAdd(long key, string internalName, string caption, string suffix, IInputFormat? format, string quickinfo) {
+    public ColumnItem? GenerateAndAdd(long key, string internalName, string caption, string suffix, IColumnInputFormat? format, string quickinfo) {
         if (!ColumnItem.IsValidColumnName(internalName)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht erlaubt!");
             return null;
@@ -246,7 +246,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!");
             return null;
         }
-        Database.ChangeData(DatabaseDataType.Comand_AddColumn, key, null, string.Empty, key.ToString(), string.Empty);
+        Database.ChangeData(DatabaseDataType.Comand_AddColumn, string.Empty, null, string.Empty, key.ToString(), string.Empty);
         item = SearchByKey(key);
         if (item == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen.");
@@ -367,10 +367,10 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //}
 
     public void Remove(ColumnItem item, string comment) {
-        Remove(item.Key, comment);
+        Remove(item.Name, comment);
     }
 
-    public bool Remove(long key, string comment) => string.IsNullOrEmpty(Database.ChangeData(DatabaseDataType.Comand_RemoveColumn, key, null, string.Empty, key.ToString(), comment));
+    public bool Remove(string name, string comment) => string.IsNullOrEmpty(Database.ChangeData(DatabaseDataType.Comand_RemoveColumn, name, null, string.Empty, name, comment));
 
     public void Repair() {
         List<string> w = new()

@@ -638,10 +638,10 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// <param name="row"></param>
     /// <param name="previousValue"></param>
     /// <param name="changedTo"></param>
-    public string ChangeData(DatabaseDataType comand, long? columnkey, long? rowkey, string previousValue, string changedTo, string comment) {
+    public string ChangeData(DatabaseDataType comand, string? columnname, long? rowkey, string previousValue, string changedTo, string comment) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
-        var f = SetValueInternal(comand, changedTo, columnkey, rowkey, -1, -1, false);
+        var f = SetValueInternal(comand, changedTo, columnname, rowkey, -1, -1, false);
 
         if (!string.IsNullOrEmpty(f)) { return f; }
 
@@ -657,7 +657,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         }
 
         if (LogUndo) {
-            AddUndo(TableName, comand, columnkey, rowkey, previousValue, changedTo, UserName, comment);
+            AddUndo(TableName, comand, columnname, rowkey, previousValue, changedTo, UserName, comment);
         }
 
         if (comand != DatabaseDataType.AutoExport) { SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
@@ -672,6 +672,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// <param name="cellDataToo"></param>
     /// <param name="tagsToo"></param>
     public void CloneFrom(DatabaseAbstract sourceDatabase, bool cellDataToo, bool tagsToo) {
+        sourceDatabase.Save();
         sourceDatabase.SetReadOnly();
 
         Column.CloneFrom(sourceDatabase);
@@ -1360,13 +1361,13 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// <param name="width"></param>
     /// <param name="height"></param>
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
-    internal virtual string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height, bool isLoading) {
+    internal virtual string SetValueInternal(DatabaseDataType type, string value, string? columnName, long? rowkey, int width, int height, bool isLoading) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
         if (type.IsObsolete()) { return string.Empty; }
 
         if (type.IsColumnTag()) {
-            var c = Column.SearchByKey(columnkey);
+            var c = Column[columnName];
             if (c == null) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Spalte ist null! " + type.ToString());
                 return "Wert nicht gesetzt!";
@@ -1383,14 +1384,17 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                 var enc1252 = Encoding.GetEncoding(1252);
                 value = Encoding.UTF8.GetString(enc1252.GetBytes(value));
             }
-            return Cell.SetValueInternal((long)columnkey, (long)rowkey, value, width, height, isLoading);
+            return Cell.SetValueInternal(columnName, (long)rowkey, value, width, height, isLoading);
         }
 
         if (type.IsCommand()) {
             switch (type) {
                 case DatabaseDataType.Comand_RemoveColumn:
+                    var c = Column[value];
+                    return Column.SetValueInternal(type, c.Key, isLoading);
+
                 case DatabaseDataType.Comand_AddColumn:
-                    return Column.SetValueInternal(type, columnkey, isLoading);
+                    return Column.SetValueInternal(type, LongParse(value), isLoading);
 
                 case DatabaseDataType.Comand_AddRow:
                 case DatabaseDataType.Comand_RemoveRow:
@@ -1540,9 +1544,9 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         return string.Empty;
     }
 
-    protected abstract void AddUndo(string tableName, DatabaseDataType comand, long? columnKey, long? rowKey, string previousValue, string changedTo, string userName, string comment);
+    protected abstract void AddUndo(string tableName, DatabaseDataType comand, string? columnname, long? rowKey, string previousValue, string changedTo, string userName, string comment);
 
-    protected void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, string comment) => AddUndo(tableName, comand, column?.Key ?? -1, row?.Key ?? -1, previousValue, changedTo, userName, comment);
+    protected void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, string comment) => AddUndo(tableName, comand, column?.Name ?? string.Empty, row?.Key ?? -1, previousValue, changedTo, userName, comment);
 
     protected void CreateWatcher() {
         if (!ReadOnly) {

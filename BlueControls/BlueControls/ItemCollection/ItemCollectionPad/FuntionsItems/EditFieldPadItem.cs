@@ -168,7 +168,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
 
             var con = new FlexiControlForCell();
             con.Database = Column?.Database;
-            con.ColumnKey = Column?.Key ?? -1;
+            con.ColumnName = Column?.Name ?? string.Empty;
             con.EditType = EditType;
             con.CaptionPosition = CaptionPosition;
             con.Name = DefaultItemToControlName();
@@ -227,6 +227,10 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
                 Column = GetRowFrom?.Database?.Column.SearchByKey(LongParse(value));
                 return true;
 
+            case "columnname":
+                Column = GetRowFrom?.Database?.Column[value];
+                return true;
+
             case "edittype":
                 _bearbeitung = (EditTypeFormula)IntParse(value);
                 return true;
@@ -263,7 +267,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         t = t.Substring(0, t.Length - 1) + ", ";
 
         if (Column != null) {
-            t = t + "Column=" + Column.Key + ", ";
+            t = t + "ColumnName=" + Column.Name + ", ";
         }
 
         t = t + "EditType=" + ((int)_bearbeitung).ToString() + ", ";

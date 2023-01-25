@@ -194,7 +194,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
                 #region Column ermitteln
 
-                var column = Database?.Column.SearchByKey(thisR.CellGetInteger("Spalte"));
+                var column = Database?.Column[thisR.CellGetString("Spalte")];
 
                 #endregion
 

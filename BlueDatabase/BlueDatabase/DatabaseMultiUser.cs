@@ -199,10 +199,10 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
     public void UnlockHard() => _muf.UnlockHard();
 
-    internal override string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height, bool isLoading) {
+    internal override string SetValueInternal(DatabaseDataType type, string value, string? columnName, long? rowkey, int width, int height, bool isLoading) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
-        var r = base.SetValueInternal(type, value, columnkey, rowkey, width, height, isLoading);
+        var r = base.SetValueInternal(type, value, columnName, rowkey, width, height, isLoading);
 
         if (type == DatabaseDataType.UndoInOne) {
             Works.Clear();
@@ -222,8 +222,8 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         return r;
     }
 
-    protected override void AddUndo(string tableName, DatabaseDataType comand, long? columnKey, long? rowKey, string previousValue, string changedTo, string userName, string comment) {
-        Works.Add(new WorkItem(comand, columnKey, rowKey, previousValue, changedTo, userName));
+    protected override void AddUndo(string tableName, DatabaseDataType comand, string? columnName, long? rowKey, string previousValue, string changedTo, string userName, string comment) {
+        Works.Add(new WorkItem(comand, columnName, rowKey, previousValue, changedTo, userName));
     }
 
     protected override void Dispose(bool disposing) {
@@ -343,7 +343,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
             //        //}
             //    }
             //}
-            SetValueInternal(thisPendingItem.Comand, thisPendingItem.ChangedTo, thisPendingItem.ColKey, thisPendingItem.RowKey, 0, 0, true);
+            SetValueInternal(thisPendingItem.Comand, thisPendingItem.ChangedTo, thisPendingItem.ColName, thisPendingItem.RowKey, 0, 0, true);
         }
     }
 

@@ -102,7 +102,9 @@
     <Compile Include="DatabaseMultiUser.cs" />
     <Compile Include="DatabaseSQLLite.cs" />
     <Compile Include="EventArgs\ColumnEventArgs.cs" />
+    <Compile Include="ColumnFormatHolder.cs" />
     <Compile Include="FormatHolder.cs" />
+    <Compile Include="Interfaces\IColumnInputFormat.cs" />
     <Compile Include="Interfaces\IHasChangeabelDatabase.cs" />
     <Compile Include="Interfaces\IHasDatabase.cs" />
     <Compile Include="SQLBackMicrosoftCE.cs" />

@@ -969,7 +969,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 control.Top = 0;
                 control.Width = Width - control.Left;
                 control.Height = Height;
-                if (_captionObject.Width < 4) { Develop.DebugPrint("Caption Width zu klein"); }
+                //if (_captionObject.Width < 4) { Develop.DebugPrint("Caption Width zu klein"); }
                 break;
 
             case ÜberschriftAnordnung.Über_dem_Feld:
@@ -978,7 +978,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 control.Top = _captionObject.Height;
                 control.Width = Width;
                 control.Height = Height - _captionObject.Height;
-                if (_captionObject.Height < 4) { Develop.DebugPrint("Caption Height zu klein"); }
+                //if ( _captionObject.Height < 4) { Develop.DebugPrint("Caption Height zu klein"); }
                 break;
 
             default:

@@ -115,7 +115,6 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         t = t.Substring(0, t.Length - 1) + ", ";
         if (Column != null) {
             t = t + "Database=" + Column.Database.ConnectionData.UniqueID.ToNonCritical() + ", ";
-            t = t + "ColumnKey=" + Column.Key + ", ";
             t = t + "ColumnName=" + Column.Name.ToNonCritical() + ", ";
         }
         return t.Trim(", ") + "}";

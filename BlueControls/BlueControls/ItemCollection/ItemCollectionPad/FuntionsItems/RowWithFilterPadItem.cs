@@ -337,7 +337,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         var or2 = new List<string>();
         if (Database != null) {
             foreach (var thisc in Database.Column) {
-                or2.Add(thisc.Key.ToString() + "|" + thisc.ReadableText());
+                or2.Add(thisc.Name + "|" + thisc.ReadableText());
             }
         }
 
@@ -426,21 +426,21 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
     private DatabaseAbstract GenerateFilterDatabase() {
         Database x = new(false, "Filterdatabase_" + Internal);
-        var sp = x.Column.GenerateAndAdd("Spalte", "Spalte", FormatHolder.Text);
+        var sp = x.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolder.Text);
         sp.Align = AlignmentHorizontal.Rechts;
 
-        var fa = x.Column.GenerateAndAdd("FilterArt", "Art", FormatHolder.Text);
+        var fa = x.Column.GenerateAndAdd("FilterArt", "Art", ColumnFormatHolder.Text);
         fa.MultiLine = false;
         fa.TextBearbeitungErlaubt = false;
         fa.DropdownAllesAbwählenErlaubt = true;
         fa.DropdownBearbeitungErlaubt = true;
         fa.DropDownItems = new List<string>() { "=", "=!empty" };
         fa.OpticalReplace = new List<string>() { "=|ist (GK egal)", "=!empty|wenn nicht leer, ist" };
-        var b1 = x.Column.GenerateAndAdd("suchsym", " ", FormatHolder.Text);
+        var b1 = x.Column.GenerateAndAdd("suchsym", " ", ColumnFormatHolder.Text);
         b1.BehaviorOfImageAndText = BildTextVerhalten.Nur_Bild;
         b1.ScriptType = ScriptType.String;
 
-        var b = x.Column.GenerateAndAdd("suchtxt", "Suchtext", FormatHolder.Text);
+        var b = x.Column.GenerateAndAdd("suchtxt", "Suchtext", ColumnFormatHolder.Text);
         b.MultiLine = false;
         b.TextBearbeitungErlaubt = false;
         b.DropdownAllesAbwählenErlaubt = true;

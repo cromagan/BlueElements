@@ -199,16 +199,16 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return (fi, string.Empty);
     }
 
-    public static string KeyOfCell(long colKey, long rowKey) => colKey + "|" + rowKey;
+    public static string KeyOfCell(string colname, long rowKey) => colname + "|" + rowKey;
 
     public static string KeyOfCell(ColumnItem? column, RowItem? row) {
         // Alte verweise eleminieren.
-        column = column?.Database?.Column.SearchByKey(column.Key);
+        column = column?.Database?.Column[column.Name];
         row = row?.Database?.Row.SearchByKey(row.Key);
 
-        if (column != null && row != null) { return KeyOfCell(column.Key, row.Key); }
-        if (column == null && row != null) { return KeyOfCell(-1, row.Key); }
-        if (column != null && row == null) { return KeyOfCell(column.Key, -1); }
+        if (column != null && row != null) { return KeyOfCell(column.Name, row.Key); }
+        if (column == null && row != null) { return KeyOfCell(string.Empty, row.Key); }
+        if (column != null && row == null) { return KeyOfCell(column.Name, -1); }
 
         return string.Empty;
     }
@@ -245,7 +245,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return (linkedDatabase.Column.Exists(column.LinkedCell_ColumnNameOfLinkedDatabase), null, "Keine Verlinkung vorhanden.");
         }
 
-        if(!key.IsNumeral()) { return (null, null, "Falsches Format"); }
+        if (!key.IsNumeral()) { return (null, null, "Falsches Format"); }
 
         //var v = key.SplitAndCutBy("|");
         //if (v.Length != 2) { return RepairLinkedCellValue(linkedDatabase, column, row, addRowIfNotExists); }
@@ -280,7 +280,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     }
 
     public void Delete(ColumnItem column, long rowKey) {
-        var cellKey = KeyOfCell(column.Key, rowKey);
+        var cellKey = KeyOfCell(column.Name, rowKey);
         if (!ContainsKey(cellKey)) { return; }
 
         if (!TryRemove(cellKey, out _)) {
@@ -448,7 +448,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             var (lcolumn, lrow, _) = LinkedCellData(column, row, false, false);
             return lcolumn == null || lrow == null || lrow.CellIsNullOrEmpty(lcolumn);
         }
-        var cellKey = KeyOfCell(column.Key, row.Key);
+        var cellKey = KeyOfCell(column.Name, row.Key);
         return !ContainsKey(cellKey) || string.IsNullOrEmpty(this[cellKey].Value);
     }
 
@@ -600,11 +600,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         this[cellKey].Size = contentSize;
     }
 
-    public string SetValueInternal(long columnkey, long rowkey, string value, int width, int height, bool isLoading) {
+    public string SetValueInternal(string columnName, long rowkey, string value, int width, int height, bool isLoading) {
         if (rowkey < 0) { return "Row konnte nicht generiert werden."; }
-        if (columnkey < 0) { return "Column konnte nicht generiert werden."; }
+        if (string.IsNullOrEmpty(columnName)) { return "Column konnte nicht generiert werden."; }
 
-        var cellKey = KeyOfCell(columnkey, rowkey);
+        var cellKey = KeyOfCell(columnName, rowkey);
 
         if (ContainsKey(cellKey)) {
             var c = this[cellKey];
@@ -613,14 +613,14 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (string.IsNullOrEmpty(value)) {
                 if (!TryRemove(cellKey, out _)) {
                     Develop.CheckStackForOverflow();
-                    return SetValueInternal(columnkey, rowkey, value, width, height, isLoading);
+                    return SetValueInternal(columnName, rowkey, value, width, height, isLoading);
                 }
             }
         } else {
             if (!string.IsNullOrEmpty(value)) {
                 if (!TryAdd(cellKey, new CellItem(value, width, height))) {
                     Develop.CheckStackForOverflow();
-                    return SetValueInternal(columnkey, rowkey, value, width, height, isLoading);
+                    return SetValueInternal(columnName, rowkey, value, width, height, isLoading);
                 }
             }
         }
@@ -734,7 +734,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (ContainsKey(cellKey)) { oldValue = this[cellKey].Value; }
         if (value == oldValue) { return; }
 
-        _database?.ChangeData(DatabaseDataType.Value_withoutSizeData, column.Key, row.Key, oldValue, value, string.Empty);
+        _database?.ChangeData(DatabaseDataType.Value_withoutSizeData, column.Name, row.Key, oldValue, value, string.Empty);
         column.UcaseNamesSortedByLenght = null;
 
         var checkValue = string.Empty;
@@ -773,7 +773,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
         }
         if (value == @string) { return; }
-        _database.ChangeData(DatabaseDataType.Value_withoutSizeData, column.Key, row.Key, @string, value, "SystemSet");
+        _database.ChangeData(DatabaseDataType.Value_withoutSizeData, column.Name, row.Key, @string, value, "SystemSet");
     }
 
     private static bool CompareValues(string istValue, string filterValue, FilterType typ) {

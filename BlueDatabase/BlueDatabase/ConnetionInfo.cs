@@ -20,6 +20,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueDatabase.Interfaces;
 using System.Collections.Generic;
 
 namespace BlueDatabase;
@@ -47,9 +48,8 @@ public class ConnectionInfo : IReadableText {
 
         #region Ist es NUR ein Dateiname? Dann im Single und Multiuser suchen und zur Not eine MultiUser zurück geben
 
-        if (uniqueID.Substring(1, 1) == ":" &&
-            uniqueID.FileSuffix().ToUpper() == "MDB" &&
-            System.IO.File.Exists(uniqueID)) {
+        if (uniqueID.IsFormat(FormatHolder.FilepathAndName) &&
+            uniqueID.FileSuffix().ToUpper() == "MDB") {
             foreach (var thisDB in alf) {
                 var d = thisDB.ConnectionData;
 
@@ -73,10 +73,14 @@ public class ConnectionInfo : IReadableText {
         #endregion
 
         var x = (uniqueID + "||||").SplitBy("|");
-        TableName = x[0];
-        Provider = null;
-        DatabaseID = x[1];
-        AdditionalData = x[2];
+
+        if (SQLBackAbstract.IsValidTableName(x[0])) {
+            TableName = x[0];
+            Provider = null;
+            DatabaseID = x[1];
+            AdditionalData = x[2];
+            return;
+        }
 
         //#region  Prüfen, ob eine vorhandene Datenbank den Provider machen kann
         //foreach (var thisDB in alf) {
@@ -128,7 +132,7 @@ public class ConnectionInfo : IReadableText {
         //    }
         //}
 
-        //Develop.DebugPrint(FehlerArt.Fehler, "Datenbank konnte nicht gefunden werden: " + uniqueID);
+        Develop.DebugPrint(FehlerArt.Warnung, "Datenbank konnte nicht gefunden werden: " + uniqueID);
     }
 
     public ConnectionInfo(string tablename, DatabaseAbstract? provider, string connectionString, string? additionalInfo) {

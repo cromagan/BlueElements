@@ -280,7 +280,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
         }
 
         foreach (var thisColumn in Database.Column) {
-            Database.Cell.SetValueBehindLinkedValue(thisColumn, this, source.Database.Cell.GetStringBehindLinkedValue(source.Database.Column.SearchByKey(thisColumn.Key), source), false);
+            Database.Cell.SetValueBehindLinkedValue(thisColumn, this, source.Database.Cell.GetStringBehindLinkedValue(source.Database.Column[thisColumn.Name], source), false);
         }
     }
 
@@ -470,13 +470,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
         foreach (var thisColumnItem in Database.Column) {
             if (!erg.Contains("~")) { return erg; }
 
-
-
             if (thisColumnItem != null) {
-
-
                 if (erg.ToUpper().Contains("~" + thisColumnItem.Name.ToUpper())) {
-
                     var txt = CellGetString(thisColumnItem);
                     if (fulltext) { txt = CellItem.ValueReadable(thisColumnItem, txt, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, removeLineBreaks); }
                     if (removeLineBreaks && !fulltext) {

@@ -32,7 +32,7 @@ public class WorkItem : IParseable {
 
     private string _changedTo;
 
-    private long _colKey;
+    private string _colName;
 
     private bool _isPending;
     private long _rowKey;
@@ -43,9 +43,9 @@ public class WorkItem : IParseable {
 
     #region Constructors
 
-    public WorkItem(DatabaseDataType comand, long? columnKey, long? rowkey, string previousValue, string changedTo, string user) {
+    public WorkItem(DatabaseDataType comand, string? columnName, long? rowkey, string previousValue, string changedTo, string user) {
         Comand = comand;
-        _colKey = columnKey ?? -1;
+        _colName = columnName ?? string.Empty;
         _rowKey = rowkey ?? -1;
         PreviousValue = previousValue;
         _changedTo = changedTo;
@@ -69,7 +69,7 @@ public class WorkItem : IParseable {
 
     #region Properties
 
-    public string CellKey => CellCollection.KeyOfCell(ColKey, RowKey);
+    public string CellKey => CellCollection.KeyOfCell(ColName, RowKey);
 
     public string ChangedTo {
         get => _changedTo;
@@ -80,11 +80,11 @@ public class WorkItem : IParseable {
         }
     }
 
-    public long ColKey {
-        get => _colKey;
+    public string ColName {
+        get => _colName;
         set {
-            if (value == _colKey) { return; }
-            _colKey = value;
+            if (value == _colName) { return; }
+            _colName = value;
             OnChanged();
         }
     }
@@ -121,7 +121,7 @@ public class WorkItem : IParseable {
 
     #region Methods
 
-    public string CompareKey() => Date.ToString(Constants.Format_Date) + ColKey;
+    public string CompareKey() => Date.ToString(Constants.Format_Date) + _colName;
 
     public void OnChanged() {
         if (IsParsing) {
@@ -143,8 +143,12 @@ public class WorkItem : IParseable {
                     Comand = (DatabaseDataType)IntParse(pair.Value);
                     break;
 
+                case "cn":
+                    _colName = pair.Value;
+                    break;
+
                 case "ck":
-                    _colKey = LongParse(pair.Value);
+                    //_colKey = LongParse(pair.Value);
                     break;
 
                 case "rk":
@@ -156,22 +160,22 @@ public class WorkItem : IParseable {
                     break;
 
                 case "cell":
-                    var cellKey = pair.Value.TrimStart("{ColumnKey=");
-                    if (cellKey == "{Disposed}") { cellKey = "-1|-1"; }
-                    cellKey = cellKey.Replace(", RowKey=", "|");
-                    cellKey = cellKey.TrimEnd("}");
-                    var x = cellKey.SplitAndCutBy("|");
-                    if (x.GetUpperBound(0) == 1) {
-                        LongTryParse(x[0], out _colKey);
-                        LongTryParse(x[1], out _rowKey);
-                    }
+                    //var cellKey = pair.Value.TrimStart("{ColumnKey=");
+                    //if (cellKey == "{Disposed}") { cellKey = "-1|-1"; }
+                    //cellKey = cellKey.Replace(", RowKey=", "|");
+                    //cellKey = cellKey.TrimEnd("}");
+                    //var x = cellKey.SplitAndCutBy("|");
+                    //if (x.GetUpperBound(0) == 1) {
+                    //    LongTryParse(x[0], out _colKey);
+                    //    LongTryParse(x[1], out _rowKey);
+                    //}
                     break;
 
                 case "cellkey":
-                    cellKey = pair.Value;
-                    var x2 = cellKey.SplitAndCutBy("|");
-                    LongTryParse(x2[0], out _colKey);
-                    LongTryParse(x2[1], out _rowKey);
+                    //cellKey = pair.Value;
+                    //var x2 = cellKey.SplitAndCutBy("|");
+                    //LongTryParse(x2[0], out _colKey);
+                    //LongTryParse(x2[1], out _rowKey);
                     break;
 
                 case "date":
@@ -219,7 +223,7 @@ public class WorkItem : IParseable {
     }
 
     public new string ToString() => "{CO=" + (int)Comand +
-                                    ", CK=" + _colKey +
+                                    ", CN=" + _colName +
                                     ", RK=" + _rowKey +
                                     ", D=" + Date +
                                     ", U=" + User.ToNonCritical() +
@@ -235,7 +239,7 @@ public class WorkItem : IParseable {
         return "<b>alt: </b>" + a + "<b> <IMAGECODE=Pfeil_Rechts_Scrollbar|8|16> neu: </b>" + n + "     <i>(" + Date + ", " + User + ")</i>";
     }
 
-    internal bool LogsUndo(DatabaseAbstract database) => database.Column.SearchByKey(ColKey) is ColumnItem c && c.ShowUndo;
+    internal bool LogsUndo(DatabaseAbstract database) => database.Column.Exists(_colName) is ColumnItem c && c.ShowUndo;
 
     #endregion
 }

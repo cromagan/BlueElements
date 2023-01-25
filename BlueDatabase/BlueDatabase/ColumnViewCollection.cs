@@ -222,6 +222,18 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem?>, IParseable,
         }
     }
 
+    public void ShowColumns(params string[] columnnames) {
+        if (Database == null || Database.IsDisposed) { return; }
+
+        foreach (var thisColumn in columnnames) {
+            var c = Database.Column[thisColumn];
+
+            if (c != null && this[c] == null) {
+                Add(new ColumnViewItem(c, ViewType.Column, this));
+            }
+        }
+    }
+
     public new void Swap(ColumnViewItem? viewItem1, ColumnViewItem? viewItem2) {
         if (viewItem1 == null || viewItem2 == null) { return; }
         base.Swap(viewItem1, viewItem2);

@@ -274,7 +274,7 @@ public sealed class Database : DatabaseAbstract {
 
                 #endregion
 
-                var fehler = db.SetValueInternal(art, inhalt, column?.Key, row?.Key, x, y, true);
+                var fehler = db.SetValueInternal(art, inhalt, column?.Name, row?.Key, x, y, true);
 
                 if (art == DatabaseDataType.EOF) { break; }
 
@@ -294,7 +294,7 @@ public sealed class Database : DatabaseAbstract {
 
         foreach (var thisColumn in l) {
             if (!columnUsed.Contains(thisColumn)) {
-                db.SetValueInternal(DatabaseDataType.Comand_RemoveColumn, thisColumn.Key.ToString(), thisColumn.Key, null, -1, -1, true);
+                db.SetValueInternal(DatabaseDataType.Comand_RemoveColumn, thisColumn.Key.ToString(), thisColumn.Name, null, -1, -1, true);
             }
         }
 
@@ -690,10 +690,10 @@ public sealed class Database : DatabaseAbstract {
         SaveToByteList(list, contentSize.Height, 2);
     }
 
-    internal override string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height, bool isLoading) {
+    internal override string SetValueInternal(DatabaseDataType type, string value, string? columnname, long? rowkey, int width, int height, bool isLoading) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
-        var r = base.SetValueInternal(type, value, columnkey, rowkey, width, height, isLoading);
+        var r = base.SetValueInternal(type, value, columnname, rowkey, width, height, isLoading);
 
         if (type == DatabaseDataType.UndoInOne) {
             Works.Clear();
@@ -711,8 +711,8 @@ public sealed class Database : DatabaseAbstract {
         return r;
     }
 
-    protected override void AddUndo(string tableName, DatabaseDataType comand, long? columnKey, long? rowKey, string previousValue, string changedTo, string userName, string comment) {
-        Works.Add(new WorkItem(comand, columnKey, rowKey, previousValue, changedTo, userName));
+    protected override void AddUndo(string tableName, DatabaseDataType comand, string? columnName, long? rowKey, string previousValue, string changedTo, string userName, string comment) {
+        Works.Add(new WorkItem(comand, columnName, rowKey, previousValue, changedTo, userName));
     }
 
     protected override void Dispose(bool disposing) {

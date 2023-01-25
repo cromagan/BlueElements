@@ -39,6 +39,7 @@ public abstract class SQLBackAbstract {
 
     #region Fields
 
+    public const string SYS_BACKUP = "SYS_BACKUP";
     public const string SYS_STYLE = "SYS_STYLE";
     public const string SYS_UNDO = "SYS_UNDO";
     public static List<SQLBackAbstract> ConnectedSQLBack = new();
@@ -126,17 +127,18 @@ public abstract class SQLBackAbstract {
         return SetStyleData(tablename, DatabaseDataType.ColumnKey, columnName.ToUpper(), columnKey.ToString());
     }
 
-    public string AddUndo(string tablename, DatabaseDataType comand, long? columnKey, long? rowKey, string previousValue, string changedTo, string userName, string comment) {
+    public string AddUndo(string tablename, DatabaseDataType comand, long? columnKey, string? columname, long? rowKey, string previousValue, string changedTo, string userName, string comment) {
         if (!OpenConnection()) { return "Verbindung fehlgeschlagen"; }
 
         var ck = columnKey is not null and > (-1) ? columnKey.ToString() : string.Empty;
         var rk = rowKey is not null and > (-1) ? rowKey.ToString() : string.Empty;
 
         var cmdString = "INSERT INTO " + SYS_UNDO +
-            " (TABLENAME, COMAND, COLUMNKEY, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, TIMECODEUTC, CMT) VALUES (" +
+            " (TABLENAME, COMAND, COLUMNKEY, COLUMNNAME, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, TIMECODEUTC, CMT) VALUES (" +
              DBVAL(tablename.ToUpper()) + "," +
              DBVAL(comand.ToString()) + "," +
              DBVAL(ck) + "," +
+             DBVAL(columname) + "," +
              DBVAL(rk) + "," +
              DBVAL(previousValue) + "," +
              DBVAL(changedTo) + "," +
@@ -368,7 +370,7 @@ public abstract class SQLBackAbstract {
 
                     for (var z = 1; z < dt.Columns.Count; z++) {
                         var cx = r.Database.Column.Exists(dt.Columns[z].ColumnName);
-                        r.Database.Cell.SetValueInternal(cx.Key, r.Key, reader[z].ToString(), -1, -1, true);
+                        r.Database.Cell.SetValueInternal(cx.Name, r.Key, reader[z].ToString(), -1, -1, true);
                     }
 
                     r.IsInCache = DateTime.UtcNow;
@@ -478,6 +480,20 @@ public abstract class SQLBackAbstract {
         //if (!colUndo.Contains("DATETIMEUTC")) { AddColumn(SYS_UNDO, "DATETIMEUTC", false); }
         if (!colUndo.Contains("TIMECODEUTC")) { AddColumn(SYS_UNDO, "TIMECODEUTC", Date, false); }
         if (!colUndo.Contains("CMT")) { AddColumn(SYS_UNDO, "CMT", VarChar255, true); }
+        if (!colUndo.Contains("COLUMNNAME")) { AddColumn(SYS_UNDO, "COLUMNNAME", VarChar255, true); }
+
+        #endregion
+
+        #region  Backup
+
+        if (!x.Contains(SYS_BACKUP)) { CreateTable(SYS_BACKUP); }
+
+        var colBackup = GetColumnNames(SYS_BACKUP);
+        if (colBackup == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
+        if (!colBackup.Contains("TABLENAME")) { AddColumn(SYS_BACKUP, "TABLENAME", VarChar255, false); }
+        if (!colBackup.Contains("TYPE")) { AddColumn(SYS_BACKUP, "TYPE", VarChar255, false); }
+        if (!colBackup.Contains("TIMECODEUTC")) { AddColumn(SYS_BACKUP, "TIMECODEUTC", Date, false); }
+        if (!colBackup.Contains("FILENAME")) { AddColumn(SYS_BACKUP, "FILENAME", VarChar(1000), true); }
 
         #endregion
 
@@ -650,6 +666,7 @@ public abstract class SQLBackAbstract {
 
         l.Remove(SYS_STYLE);
         l.Remove(SYS_UNDO);
+        l.Remove(SYS_BACKUP);
         return l;
     }
 
@@ -697,14 +714,14 @@ public abstract class SQLBackAbstract {
     /// <param name="fromDate"></param>
     /// <param name="toDate"></param>
     /// <returns>Gibt NULL zurück, wenn die Daten nicht geladen werden konnten</returns>
-    internal List<(string tablename, string comand, string columnkey, string rowkey, DateTime timecode)>? GetLastChanges(List<DatabaseSQLLite> db, DateTime fromDate, DateTime toDate) {
+    internal List<(string tablename, string comand, string columnkey, string columname, string rowkey, DateTime timecode)>? GetLastChanges(List<DatabaseSQLLite> db, DateTime fromDate, DateTime toDate) {
         if (!OpenConnection()) { return null; }
 
         try {
             lock (getChanges) {
                 //using var q = _connection.CreateCommand();
 
-                var CommandText = @"select TABLENAME, COMAND, COLUMNKEY, ROWKEY, TIMECODEUTC from " + SYS_UNDO + " ";
+                var CommandText = @"select TABLENAME, COMAND, COLUMNKEY, COLUMNNAME, ROWKEY, TIMECODEUTC from " + SYS_UNDO + " ";
 
                 // nur bestimmte Tabellen
                 CommandText += "WHERE (";
@@ -720,7 +737,7 @@ public abstract class SQLBackAbstract {
                 // Sortierung nach Tabellen
                 CommandText += " ORDER BY TIMECODEUTC ASC";
 
-                var fb = new List<(string tablename, string comand, string columnname, string rowid, DateTime timecode)>();
+                var fb = new List<(string tablename, string comand, string columnkey, string columnname, string rowid, DateTime timecode)>();
 
                 var dt = Fill_Table(CommandText);
 
@@ -732,7 +749,7 @@ public abstract class SQLBackAbstract {
 
                 foreach (var thisRow in dt.Rows) {
                     var reader = (DataRow)thisRow;
-                    fb.Add((reader[0].ToString(), reader[1].ToString(), reader[2].ToString(), reader[3].ToString(), DateTimeParse(reader[4].ToString())));
+                    fb.Add((reader[0].ToString(), reader[1].ToString(), reader[2].ToString(), reader[3].ToString(), reader[4].ToString(), DateTimeParse(reader[5].ToString())));
                 }
 
                 //CloseConnection();
@@ -849,7 +866,7 @@ public abstract class SQLBackAbstract {
                 #endregion
 
                 for (var z = 1; z < dt.Columns.Count; z++) {
-                    row.Database.Cell.SetValueInternal(columnsToLoad[z - 1].Key, row.Key, reader[z].ToString(), -1, -1, true);
+                    row.Database.Cell.SetValueInternal(columnsToLoad[z - 1].Name, row.Key, reader[z].ToString(), -1, -1, true);
                 }
             }
 
@@ -919,7 +936,9 @@ public abstract class SQLBackAbstract {
         DBVAL(Constants.Format_Date9.ToUpper().Replace(":MM:", ":MI:").Replace("HH:", "HH24:").Replace(".FFF", ".FF3")) +
         ")";
 
-    private string DBVAL(string original) {
+    private string DBVAL(string? original) {
+        if (original == null) { return "''"; }
+
         original = original.CutToUTF8Length(MaxStringLenght);
         original = original.Replace("'", "''");
         return "'" + original + "'";

@@ -251,22 +251,23 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         }
     }
 
-    internal override string SetValueInternal(DatabaseDataType type, string value, long? columnkey, long? rowkey, int width, int height, bool isLoading) {
+    internal override string SetValueInternal(DatabaseDataType type, string value, string? columnName, long? rowkey, int width, int height, bool isLoading) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
         if (type.IsObsolete()) { return string.Empty; }
 
         if (!isLoading && !ReadOnly) {
-            var c = Column.SearchByKey(columnkey);
+            var c = Column[columnName];
 
-            _sql?.SetValueInternal(TableName, type, value, c?.Name, columnkey, rowkey, -1, -1, isLoading);
+            _sql?.SetValueInternal(TableName, type, value, c?.Name, c?.Key, rowkey, -1, -1, isLoading);
         }
 
-        return base.SetValueInternal(type, value, columnkey, rowkey, width, height, isLoading);
+        return base.SetValueInternal(type, value, columnName, rowkey, width, height, isLoading);
     }
 
-    protected override void AddUndo(string tableName, DatabaseDataType comand, long? columnKey, long? rowKey, string previousValue, string changedTo, string userName, string comment) {
-        _sql.AddUndo(tableName, comand, columnKey, rowKey, previousValue, changedTo, UserName, comment);
+    protected override void AddUndo(string tableName, DatabaseDataType comand, string? columnName, long? rowKey, string previousValue, string changedTo, string userName, string comment) {
+        var ck = Column[columnName]?.Key ?? -1;
+        _sql.AddUndo(tableName, comand, ck, columnName, rowKey, previousValue, changedTo, UserName, comment);
     }
 
     protected override void SetUserDidSomething() { }
@@ -323,7 +324,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         return oo;
     }
 
-    private void DoLastChanges(List<(string tablename, string comand, string columnkey, string rowkey, DateTime timecode)>? data) {
+    private void DoLastChanges(List<(string tablename, string comand, string columnkey, string columnname, string rowkey, DateTime timecode)>? data) {
         if (data == null) { return; }
         if (IsDisposed) { return; }
 
@@ -335,7 +336,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         try {
             var rk = new List<long>();
 
-            foreach (var (tablename, comand, columnkey, rowkey, timecode) in data) {
+            foreach (var (tablename, comand, columnkey, columnname, rowkey, timecode) in data) {
                 if (TableName == tablename && timecode > IsInCache) {
                     Enum.TryParse(comand, out DatabaseDataType t);
 
@@ -373,7 +374,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
                                 Column.SetValueInternal(t, LongParse(columnkey), true);
                                 var c = Column.SearchByKey(LongParse(columnkey));
                                 var name = _sql.GetLastColumnName(TableName, c.Key);
-                                SetValueInternal(DatabaseDataType.ColumnName, name, c.Key, null, -1, -1, true);
+                                SetValueInternal(DatabaseDataType.ColumnName, name, c.Name, null, -1, -1, true);
                                 c.RefreshColumnsData(); // muss sein, alternativ alle geladenen Zeilen neu laden
                                 break;
 
@@ -425,7 +426,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
                         var c = Column.SearchByKey(LongParse(columnkey));
                         if (c != null) {
                             var v = _sql.GetStyleData(tablename, comand, c.Name);
-                            if (v != null) { SetValueInternal(t, v, c.Key, null, -1, -1, true); }
+                            if (v != null) { SetValueInternal(t, v, c.Name, null, -1, -1, true); }
                         }
 
                         #endregion
@@ -484,7 +485,8 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
                 if (column == null) {
                     var ck = Column.NextColumnKey();
                     Column.SetValueInternal(DatabaseDataType.Comand_AddColumn, ck, true);
-                    SetValueInternal(DatabaseDataType.ColumnName, thisCol, ck, null, -1, -1, true);
+                    var co = Column.SearchByKey(ck);
+                    SetValueInternal(DatabaseDataType.ColumnName, thisCol, co?.Name, null, -1, -1, true);
                     column = Column.Exists(thisCol);
                     if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht gefunden"); return; }
                     column = Column.SearchByKey(ck);

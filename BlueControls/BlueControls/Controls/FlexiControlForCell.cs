@@ -43,9 +43,6 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
 
     #region Fields
 
-    // Für automatisches Datenbank-Management
-    private long _colKey = -1;
-
     private string _columnName = string.Empty;
 
     private DatabaseAbstract? _database;
@@ -61,9 +58,9 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     #region Constructors
 
     // Für den Designer
-    public FlexiControlForCell() : this(null, -1, ÜberschriftAnordnung.Über_dem_Feld, EditTypeFormula.None) { }
+    public FlexiControlForCell() : this(null, string.Empty, ÜberschriftAnordnung.Über_dem_Feld, EditTypeFormula.None) { }
 
-    public FlexiControlForCell(DatabaseAbstract? database, long columnKey, ÜberschriftAnordnung captionPosition, EditTypeFormula editType) : base() {
+    public FlexiControlForCell(DatabaseAbstract? database, string column, ÜberschriftAnordnung captionPosition, EditTypeFormula editType) : base() {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -72,7 +69,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         CaptionPosition = captionPosition;
         EditType = editType;
         Database = database;
-        ColumnKey = columnKey;
+        ColumnName = column;
         CheckEnabledState();
     }
 
@@ -87,21 +84,6 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     #endregion
 
     #region Properties
-
-    [Description("Falls ein Key und ein Name befüllt sind, ist der Name führend.")]
-    public long ColumnKey {
-        //get {
-        //    return _ColKey;
-        //}
-        set {
-            if (value == _colKey) { return; }
-            FillCellNow();
-            _colKey = value;
-            GetTmpVariables();
-            UpdateColumnData();
-            SetValueFromCell();
-        }
-    }
 
     [Description("Dieses Feld kann für den Forms-Editor verwendet werden. Falls ein Key und ein Name befüllt sind, ist der Name führend.")]
     [DefaultValue("")]
@@ -537,11 +519,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     private void GetTmpVariables() {
         try {
             if (_database != null && !_database.IsDisposed) {
-                if (string.IsNullOrEmpty(_columnName)) {
-                    _tmpColumn = _database.Column.SearchByKey(_colKey);
-                } else {
-                    _tmpColumn = _database.Column[_columnName];
-                }
+                _tmpColumn = _database.Column.Exists(_columnName);
                 _tmpRow = _database.Row.SearchByKey(_rowKey);
             } else {
                 _tmpColumn = null;
