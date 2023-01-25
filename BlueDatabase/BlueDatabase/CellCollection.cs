@@ -203,7 +203,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     public static string KeyOfCell(ColumnItem? column, RowItem? row) {
         // Alte verweise eleminieren.
-        column = column?.Database?.Column[column.Name];
+        column = column?.Database?.Column.Exists(column.Name);
         row = row?.Database?.Row.SearchByKey(row.Key);
 
         if (column != null && row != null) { return KeyOfCell(column.Name, row.Key); }
