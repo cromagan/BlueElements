@@ -39,16 +39,15 @@ public class CellItem {
 
     #region Constructors
 
-    public CellItem(string value, int width, int height) {
+    public CellItem(string value) {
         _value = value;
-        if (width > 0) { Size = new Size(width, height); }
     }
 
     #endregion
 
-    #region Properties
+    //public Size Size { get; set; }
 
-    public Size Size { get; set; }
+    #region Properties
 
     //public Color BackColor { get; set; }
     //public Color FontColor { get; set; }
@@ -59,7 +58,7 @@ public class CellItem {
         set {
             if (_value == value) { return; }
             _value = value;
-            InvalidateSize();
+            //InvalidateSize();
         }
     }
 
@@ -67,14 +66,16 @@ public class CellItem {
 
     #region Methods
 
-    public static Tuple<string, QuickImage> GetDrawingData(ColumnItem? column, string originalText, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
+    public static (string text, QuickImage? image) GetDrawingData(ColumnItem? column, string originalText, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
+        if (column == null) { return (originalText, null); }
+
         var tmpText = ValueReadable(column, originalText, style, bildTextverhalten, true);
         var tmpImageCode = StandardImage(column, originalText, tmpText, style, bildTextverhalten);
 
         if (bildTextverhalten is BildTextVerhalten.Bild_oder_Text or BildTextVerhalten.Interpretiere_Bool) {
             if (tmpImageCode != null) { tmpText = string.Empty; }
         }
-        return new Tuple<string, QuickImage>(tmpText, tmpImageCode);
+        return (tmpText, tmpImageCode);
     }
 
     //public static enAlignment StandardAlignment(ColumnItem column, BildTextVerhalten bildTextverhalten) {
@@ -262,7 +263,7 @@ public class CellItem {
         return ret;
     }
 
-    internal void InvalidateSize() => Size = Size.Empty;
+    //internal void InvalidateSize() => Size = Size.Empty;
 
     private static QuickImage? StandardImage(ColumnItem? column, string originalText, string replacedText, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
         // replacedText kann auch empty sein. z.B. wenn er nicht angezeigt wird

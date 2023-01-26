@@ -63,8 +63,8 @@ namespace BlueDatabase {
 
         public static readonly FormatHolder DateTime = new() {
             Name = "DateTime",
-            Regex = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}[ ](0[0-9]|1[0-9]|2[0-3]) = new() {[0-5][0-9] = new() {[0-5][0-9]$",
-            AllowedChars = Constants.Char_Numerals + " = new() {. ",
+            Regex = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}[ ](0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$",
+            AllowedChars = Constants.Char_Numerals + ":. ",
             Suffix = string.Empty,
             Prefix = string.Empty,
             FormatierungErlaubt = false,
@@ -199,7 +199,7 @@ namespace BlueDatabase {
         public static readonly FormatHolder Url = new() {
             Name = "Url",
             //    https://regex101.com/r/S2CbwM/1
-            Regex = @"^(https = new() {|http = new() {|www\.)\S*$",
+            Regex = @"^(https:|http:|www\.)\S*$",
             AllowedChars = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + ":{.-_/",
             Suffix = string.Empty,
             Prefix = string.Empty,

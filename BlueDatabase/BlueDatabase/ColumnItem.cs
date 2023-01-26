@@ -25,6 +25,7 @@ using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
@@ -128,7 +129,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             Develop.DebugPrint(FehlerArt.Fehler, "ColumnKey < 0");
         }
 
-        var ex = Database.Column.SearchByKey(columnkey);
+        var ex = database.Column.SearchByKey(columnkey);
         if (ex != null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Key existiert bereits");
         }
@@ -138,6 +139,92 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         #region Standard-Werte
 
         _name = TmpNewDummy;
+        _caption = string.Empty;
+        //_CaptionBitmapCode = null;
+        _format = DataFormat.Text;
+        _lineLeft = ColumnLineStyle.Dünn;
+        _lineRight = ColumnLineStyle.Ohne;
+        _multiLine = false;
+        _quickInfo = string.Empty;
+        _captionGroup1 = string.Empty;
+        _captionGroup2 = string.Empty;
+        _captionGroup3 = string.Empty;
+        //_Intelligenter_Multifilter = string.Empty;
+        _foreColor = Color.Black;
+        _backColor = Color.White;
+        _cellInitValue = string.Empty;
+        //_linkedCellRowKeyIsInColumn = -1;
+        _linkedCell_ColumnNameOfLinkedDatabase = string.Empty;
+        _sortType = SortierTyp.Original_String;
+        //_ZellenZusammenfassen = false;
+        //_dropDownKey = -1;
+        //_vorschlagsColumn = -1;
+        _align = AlignmentHorizontal.Links;
+        //_keyColumnKey = -1;
+        _allowedChars = string.Empty;
+        _adminInfo = string.Empty;
+        _maxTextLenght = 4000;
+        _contentwidth = -1;
+        _unsavedContentWidth = -1;
+        _captionBitmapCode = string.Empty;
+        _filterOptions = FilterOptions.Enabled | FilterOptions.TextFilterEnabled | FilterOptions.ExtendedFilterEnabled;
+        //_AutofilterErlaubt = true;
+        //_AutofilterTextFilterErlaubt = true;
+        //_AutoFilterErweitertErlaubt = true;
+        _ignoreAtRowFilter = false;
+        _dropdownBearbeitungErlaubt = false;
+        _dropdownAllesAbwählenErlaubt = false;
+        _textBearbeitungErlaubt = false;
+        _dropdownWerteAndererZellenAnzeigen = false;
+        _afterEditQuickSortRemoveDouble = false;
+        _afterEditRunden = -1;
+        _afterEditAutoCorrect = false;
+        _afterEditDoUCase = false;
+        _formatierungErlaubt = false;
+        _additionalFormatCheck = AdditionalCheck.None;
+        _scriptType = ScriptType.undefiniert;
+        _autoRemove = string.Empty;
+        _autoFilterJoker = string.Empty;
+        _saveContent = true;
+        //_AutoFilter_Dauerfilter = enDauerfilter.ohne;
+        _spellCheckingEnabled = false;
+        //_CompactView = true;
+        _showUndo = true;
+        _doOpticalTranslation = TranslationType.Original_Anzeigen;
+        _showMultiLineInOneLine = false;
+        _editAllowedDespiteLock = false;
+        _suffix = string.Empty;
+        _linkedDatabaseFile = string.Empty;
+        _behaviorOfImageAndText = BildTextVerhalten.Nur_Text;
+        _constantHeightOfImageCode = string.Empty;
+        _prefix = string.Empty;
+        UcaseNamesSortedByLenght = null;
+        Am_A_Key_For_Other_Column = string.Empty;
+
+        #endregion Standard-Werte
+
+        Invalidate_Head();
+        Invalidate_LinkedDatabase();
+    }
+
+    public ColumnItem(DatabaseAbstract database, string name) {
+        if (!IsValidColumnName(name)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht erlaubt!");
+        }
+
+        Database = database;
+        Database.Disposing += Database_Disposing;
+
+        var ex = database.Column.Exists(name);
+        if (ex != null) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Key existiert bereits");
+        }
+
+        _key = database.Column.NextColumnKey();
+
+        #region Standard-Werte
+
+        _name = name;
         _caption = string.Empty;
         //_CaptionBitmapCode = null;
         _format = DataFormat.Text;
@@ -1601,9 +1688,9 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         Invalidate_Head();
         Invalidate_ContentWidth();
         Invalidate_LinkedDatabase();
-        foreach (var thisRow in Database.Row) {
-            if (thisRow != null) { CellCollection.Invalidate_CellContentSize(this, thisRow); }
-        }
+        //foreach (var thisRow in Database.Row) {
+        //    if (thisRow != null) { CellCollection.Invalidate_CellContentSize(this, thisRow); }
+        //}
         Database.OnViewChanged();
     }
 
@@ -2291,14 +2378,16 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                     return string.Empty;
                 }
 
-                Database.Column.ChangeKey(_key, nkey);
-
                 _key = nkey;
                 //Invalidate_TmpVariablesx();
                 break;
 
             case DatabaseDataType.ColumnName:
-                _name = newvalue.ToUpper();
+                var nname = newvalue.ToUpper();
+
+                Database.Column.ChangeName(_name, nname);
+
+                _name = nname;
                 //Invalidate_TmpVariablesx();
                 break;
 
@@ -2564,7 +2653,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         var tKey = CellCollection.KeyOfCell(e.Column, e.Row);
         foreach (var thisRow in Database.Row) {
             if (Database.Cell.GetStringBehindLinkedValue(this, thisRow) == tKey) {
-                CellCollection.Invalidate_CellContentSize(this, thisRow);
+                //CellCollection.Invalidate_CellContentSize(this, thisRow);
                 Invalidate_ContentWidth();
                 Database.Cell.OnCellValueChanged(new CellEventArgs(this, thisRow));
                 thisRow.DoAutomatic(true, false, 5, "value changed");

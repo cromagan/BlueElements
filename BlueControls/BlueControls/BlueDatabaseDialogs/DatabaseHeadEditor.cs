@@ -124,7 +124,7 @@ public sealed partial class DatabaseHeadEditor {
         var cd = work.CellKey.SplitAndCutBy("|");
         _database.Cell.DataOfCellKey(work.CellKey, out var col, out var row);
         var r = tblUndo.Database.Row.GenerateAndAdd(work.ToString(), "New Undo Item");
-        r.CellSet("ColumnKey", cd[0]);
+        r.CellSet("ColumnName", cd[0]);
         r.CellSet("RowKey", cd[1]);
         r.CellSet("index", index);
         r.CellSet("db", db);
@@ -250,7 +250,7 @@ public sealed partial class DatabaseHeadEditor {
         x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder.Text);
         x.Column.GenerateAndAdd("Index", "Index", ColumnFormatHolder.IntegerPositive);
         x.Column.GenerateAndAdd("db", "Herkunft", ColumnFormatHolder.Text);
-        x.Column.GenerateAndAdd("ColumnKey", "Spalten-<br>Schlüssel", ColumnFormatHolder.IntegerPositive);
+        //x.Column.GenerateAndAdd("ColumnKey", "Spalten-<br>Schlüssel", ColumnFormatHolder.IntegerPositive);
         x.Column.GenerateAndAdd("ColumnName", "Spalten-<br>Name", ColumnFormatHolder.Text);
         x.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolder.Text);
         x.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolder.IntegerPositive);

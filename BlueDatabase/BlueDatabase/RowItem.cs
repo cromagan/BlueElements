@@ -379,7 +379,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
                 doFemdZelleInvalidate = false; // Hier ja schon bei jedem gemacht
             }
             if (doFemdZelleInvalidate && thisColum.LinkedDatabase != null) {
-                CellCollection.Invalidate_CellContentSize(thisColum, this);
+                //CellCollection.Invalidate_CellContentSize(thisColum, this);
                 thisColum.Invalidate_ContentWidth();
             }
         }

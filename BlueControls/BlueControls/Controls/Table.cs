@@ -313,7 +313,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             var locker = new object();
 
             Parallel.ForEach(column.Database.Row, thisRowItem => {
+                var originalText = thisRowItem.CellGetString(column);
+
                 if (thisRowItem != null && !thisRowItem.CellIsNullOrEmpty(column)) {
+                    //var (s, quickImage) = CellItem.GetDrawingData(column, originalText, style, bildTextverhalten);
+
                     var wx = Cell_ContentSize(table, column, thisRowItem, cellFont, pix16).Width;
 
                     lock (locker) {
@@ -336,8 +340,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                                                    : new Size(pix16, pix16);
         }
 
-        var contentSize = column.Database.Cell.GetSizeOfCellContent(column, row);
-        if (contentSize.Width > 0 && contentSize.Height > 0) { return contentSize; }
+        var contentSizex = column.Database.Cell.GetSizeOfCellContent(column, row);
+        if (contentSizex != null) { return (Size)contentSizex; }
+
+        var contentSize = Size.Empty;
 
         if (column.Format == DataFormat.Button) {
             if (table is null) {
@@ -364,7 +370,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
         contentSize.Width = Math.Max(contentSize.Width, pix16);
         contentSize.Height = Math.Max(contentSize.Height, pix16);
-        if (Skin.Scale == 1 && LanguageTool.Translation == null) { column.Database.Cell.SetSizeOfCellContent(column, row, contentSize); }
+        column.Database.Cell.SetSizeOfCellContent(column, row, contentSize);
         return contentSize;
     }
 
@@ -1516,15 +1522,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     if (_mouseOverColumn.Format.NeedTargetDatabase()) {
                         if (_mouseOverColumn.LinkedDatabase != null) {
                             switch (_mouseOverColumn.Format) {
-                                //case DataFormat.Columns_für_LinkedCellDropdown:
-                                //    var txt = _mouseOverRow.Row.CellGetString(_mouseOverColumn);
-                                //    if (IntTryParse(txt, out var colKey)) {
-                                //        var c = _mouseOverColumn.LinkedDatabase().Column.SearchByKey(colKey);
-                                //        if (c != null) { _mouseOverText = c.QuickInfoText(_mouseOverColumn.Caption + ": " + c.Caption); }
-                                //    }
-                                //    break;
-
-                                //case DataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
                                 case DataFormat.Verknüpfung_zu_anderer_Datenbank:
 
                                     var (lcolumn, _, info) = CellCollection.LinkedCellData(_mouseOverColumn, _mouseOverRow.Row, true, false);

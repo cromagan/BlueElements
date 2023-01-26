@@ -305,7 +305,13 @@ public enum DatabaseDataType : byte {
     //AddColumnKeyInfo = 224,
     //AddColumnNameInfo = 225,
 
+    [Obsolete("Nur noch Comand_AddColumnByName benutzen", false)]
     Comand_AddColumn = 226,
+
+    [Obsolete("Nur noch Comand_AddColumnByName benutzen", false)]
+    Comand_AddColumnByKey = 227,
+
+    Comand_AddColumnByName = 228,
 
     UndoCount = 249,
 

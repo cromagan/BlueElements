@@ -39,7 +39,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     #region Fields
 
-    private readonly ConcurrentDictionary<long, ColumnItem?> _internal = new();
+    private readonly ConcurrentDictionary<string, ColumnItem?> _internal = new();
 
     private bool _throwEvents = true;
 
@@ -172,7 +172,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             if (thisc.Name.Equals(column.Name, StringComparison.OrdinalIgnoreCase)) { return "Hinzufügen fehlgeschlagen."; }
         }
 
-        if (!_internal.TryAdd(column.Key, column)) { return "Hinzufügen fehlgeschlagen."; }
+        if (!_internal.TryAdd(column.Name, column)) { return "Hinzufügen fehlgeschlagen."; }
         OnColumnAdded(new ColumnEventArgs(column));
         return string.Empty;
     }
@@ -192,16 +192,13 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     public ColumnItem? Exists(string? columnName) {
-        if (Database == null) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Database ist null bei " + columnName);
-            return null;
+        if (Database == null || Database.IsDisposed || columnName == null || string.IsNullOrEmpty(columnName)) { return null; }
+        try {
+            columnName = columnName.ToUpper();
+            return _internal.ContainsKey(columnName) ? _internal[columnName] : null;
+        } catch {
+            return Exists(columnName);
         }
-        if (columnName == null || string.IsNullOrEmpty(columnName)) {
-            //             Develop.DebugPrint(enFehlerArt.Warnung, "Leerer Spaltenname"); Neue Spalten haben noch keinen Namen
-            return null;
-        }
-        columnName = columnName.ToUpper();
-        return this.FirstOrDefault(thisColumn => thisColumn != null && thisColumn.Name == columnName);
     }
 
     public string Freename(string preferedName) {
@@ -246,8 +243,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!");
             return null;
         }
-        Database.ChangeData(DatabaseDataType.Comand_AddColumn, string.Empty, null, string.Empty, key.ToString(), string.Empty);
-        item = SearchByKey(key);
+        Database.ChangeData(DatabaseDataType.Comand_AddColumnByName, internalName, null, string.Empty, internalName, string.Empty);
+        item = Exists(internalName);
         if (item == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen.");
             return null;
@@ -441,26 +438,30 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     public ColumnItem? SearchByKey(long? key) {
-        if (Database == null || Database.IsDisposed || key == null || key < 0) { return null; }
-        try {
-            return _internal.ContainsKey((long)key) ? _internal[(long)key] : null;
-        } catch {
-            return SearchByKey(key);
+        if (Database == null || Database.IsDisposed) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Database ist null bei " + key.ToString());
+            return null;
         }
+        if (key is null or < 0) {
+            //             Develop.DebugPrint(enFehlerArt.Warnung, "Leerer Spaltenname"); Neue Spalten haben noch keinen Namen
+            return null;
+        }
+
+        return this.FirstOrDefault(thisColumn => thisColumn != null && thisColumn.Key == key);
     }
 
     //internal static string ParsableColumnName(ColumnItem? column) => column == null ? "ColumnName=?" : "ColumnName=" + column.Name;
 
-    internal void ChangeKey(long oldKey, long newKey) {
-        if (oldKey == newKey) { return; }
+    internal void ChangeName(string oldName, string newName) {
+        if (oldName == newName) { return; }
 
-        var x = _internal.TryRemove(oldKey, out var vcol);
+        var x = _internal.TryRemove(oldName, out var vcol);
         if (!x) {
             Develop.DebugPrint(FehlerArt.Fehler, "Schlüsselfehler 1");
             return;
         }
 
-        x = _internal.TryAdd(newKey, vcol);
+        x = _internal.TryAdd(newName, vcol);
         if (!x) {
             Develop.DebugPrint(FehlerArt.Fehler, "Schlüsselfehler 2");
             return;
@@ -517,11 +518,11 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         ColumnRemoving?.Invoke(this, e);
     }
 
-    internal string SetValueInternal(DatabaseDataType type, long? key, bool isLoading) {
+    internal string SetValueInternal(DatabaseDataType type, long? key, bool isLoading, string name) {
         if (Database == null || Database.IsDisposed) { return "Datenbank verworfen!"; }
         if (key is null or < 0) { return "Schlüsselfehler"; }
 
-        if (type == DatabaseDataType.Comand_AddColumn) {
+        if (type == DatabaseDataType.Comand_AddColumnByKey) {
             var c = SearchByKey(key);
             if (c != null) { return "Bereits vorhanden!"; }
 
@@ -536,12 +537,27 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             return string.Empty;
         }
 
+        if (type == DatabaseDataType.Comand_AddColumnByName) {
+            var c = Exists(name);
+            if (c != null) { return "Bereits vorhanden!"; }
+
+            c = new ColumnItem(Database, name);
+            Add(c);
+
+            if (!isLoading) {
+                Database.RepairColumnArrangements();
+                Database.RepairViews();
+            }
+
+            return string.Empty;
+        }
+
         if (type == DatabaseDataType.Comand_RemoveColumn) {
-            var c = SearchByKey(key);
+            var c = Exists(name);
             if (c == null) { return "Spalte nicht gefunden!"; }
 
             OnColumnRemoving(new ColumnEventArgs(c));
-            if (!_internal.TryRemove((long)key, out _)) { return "Löschen nicht erfolgreich"; }
+            if (!_internal.TryRemove(name.ToUpper(), out _)) { return "Löschen nicht erfolgreich"; }
             OnColumnRemoved();
 
             if (!isLoading) {

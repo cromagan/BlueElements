@@ -483,20 +483,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         ColumnItem? gbColumn;
 
         if (column?.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-            //var skriptgesteuert = column.LinkedCell_RowKey == -9999;
-
-            //if (column.LinkedDatabase() != null && column.LinkedCell_ColumnKey > -1) {
-            //    gbColumn = column.LinkedDatabase().Column.SearchByKey(column.LinkedCell_ColumnKey);
-            //}
-
-            //if(gbColumn == null && skriptgesteuert) {
             (gbColumn, _, _) = CellCollection.LinkedCellData(column, row, true, false);
-            //}
-
-            //if (gbColumn == null) {
-            //    Develop.DebugPrint("Column nicht gefunden");
-            //    return null;
-            //}
         } else {
             gbColumn = column;
         }

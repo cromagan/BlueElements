@@ -117,14 +117,14 @@ public abstract class SQLBackAbstract {
     /// <param name="tablename"></param>
     /// <param name="columnName"></param>
     /// <param name="columnKey"></param>
-    public string AddColumnToMain(string tablename, string columnName, long columnKey) {
+    public string AddColumnToMain(string tablename, string columnName) {
         columnName = columnName.ToUpper();
 
         var colMain = GetColumnNames(tablename.ToUpper());
         if (colMain == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return "Spalte nicht gefunden"; }
         if (!colMain.Contains(columnName)) { AddColumn(tablename.ToUpper(), columnName, VarChar4000, true); }
 
-        return SetStyleData(tablename, DatabaseDataType.ColumnKey, columnName.ToUpper(), columnKey.ToString());
+        return SetStyleData(tablename, DatabaseDataType.ColumnName, columnName.ToUpper(), columnName.ToUpper());
     }
 
     public string AddUndo(string tablename, DatabaseDataType comand, long? columnKey, string? columname, long? rowKey, string previousValue, string changedTo, string userName, string comment) {
@@ -323,7 +323,7 @@ public abstract class SQLBackAbstract {
 
     //    CloseConnection();
     //}
-    public void LoadRow(string tablename, List<RowItem> row) {
+    public void LoadRow(string tablename, List<RowItem> row, bool completeRow) {
         try {
             if (row == null || row.Count == 0 || row[0] is null || row[0]?.Database is null) { return; }
             if (!OpenConnection()) { return; }
@@ -338,7 +338,7 @@ public abstract class SQLBackAbstract {
                 //var c = new List<ColumnItem>();
 
                 foreach (var thiscolumn in row[0].Database.Column) {
-                    if (thiscolumn.IsInCache == null) {
+                    if (completeRow || thiscolumn.IsInCache == null) {
                         //c.Add(thiscolumn);
                         com = com + thiscolumn.Name.ToUpper() + ", ";
                     }
@@ -370,7 +370,7 @@ public abstract class SQLBackAbstract {
 
                     for (var z = 1; z < dt.Columns.Count; z++) {
                         var cx = r.Database.Column.Exists(dt.Columns[z].ColumnName);
-                        r.Database.Cell.SetValueInternal(cx.Name, r.Key, reader[z].ToString(), -1, -1, true);
+                        r.Database.Cell.SetValueInternal(cx.Name, r.Key, reader[z].ToString(), true);
                     }
 
                     r.IsInCache = DateTime.UtcNow;
@@ -384,7 +384,7 @@ public abstract class SQLBackAbstract {
         } catch {
             CloseConnection();
             Develop.CheckStackForOverflow();
-            LoadRow(tablename, row);
+            LoadRow(tablename, row, completeRow);
         }
     }
 
@@ -410,6 +410,8 @@ public abstract class SQLBackAbstract {
     //        var rk = LongParse(reader[0].ToString());
     //        var r = row.GenerateAndAdd(rk, string.Empty, false, false);
     public void RenameColumn(string tablename, string oldname, string newname) {
+        if (oldname.Equals(newname, StringComparison.OrdinalIgnoreCase)) { return; }
+
         //https://www.1keydata.com/sql/alter-table-rename-column.html
         var cmdString = @"ALTER TABLE " + tablename + " RENAME COLUMN " + oldname + " TO " + newname;
         ExecuteCommand(cmdString);
@@ -553,20 +555,20 @@ public abstract class SQLBackAbstract {
             ChangeDataType(tablename, columnName.ToUpper(), IntParse(newValue));
         }
 
-        if (type == DatabaseDataType.ColumnName) {
-            var test = GetStyleData(tablename, DatabaseDataType.ColumnName.ToString(), columnName);
-            if (!string.IsNullOrEmpty(test)) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Fataler Namensfehler 1!");
-            }
+        //if (type == DatabaseDataType.ColumnName) {
+        //    //var test = GetStyleData(tablename, DatabaseDataType.ColumnName.ToString(), columnName);
+        //    //if (!string.IsNullOrEmpty(test)) {
+        //    //    Develop.DebugPrint(FehlerArt.Fehler, "Fataler Namensfehler 1!");
+        //    //}
 
-            //if (columnName != newValue && columnName != ColumnItem.TmpNewDummy) {
-            //    Develop.DebugPrint(FehlerArt.Fehler, "Fataler Namensfehler 1: " + columnName + " -> " + newValue);
-            //}
-            test = GetStyleData(tablename, DatabaseDataType.ColumnName.ToString(), newValue);
-            if (newValue != test) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Fataler Namensfehler 2!");
-            }
-        }
+        //    //if (columnName != newValue && columnName != ColumnItem.TmpNewDummy) {
+        //    //    Develop.DebugPrint(FehlerArt.Fehler, "Fataler Namensfehler 1: " + columnName + " -> " + newValue);
+        //    //}
+        //    test = GetStyleData(tablename, DatabaseDataType.ColumnName.ToString(), newValue);
+        //    if (newValue != test) {
+        //        Develop.DebugPrint(FehlerArt.Fehler, "Fataler Namensfehler 2!");
+        //    }
+        //}
 
         return ok;
     }
@@ -584,7 +586,7 @@ public abstract class SQLBackAbstract {
     /// <param name="width"></param>
     /// <param name="height"></param>
     /// <returns></returns>
-    public string SetValueInternal(string tablename, DatabaseDataType type, string value, string? columname, long? columnkey, long? rowkey, int width, int height, bool isLoading) {
+    public string SetValueInternal(string tablename, DatabaseDataType type, string value, string? columname, long? rowkey, bool isLoading) {
 
         #region Ignorieren
 
@@ -632,8 +634,12 @@ public abstract class SQLBackAbstract {
 
         if (type.IsCommand()) {
             switch (type) {
-                case DatabaseDataType.Comand_AddColumn:
-                    return AddColumnToMain(tablename, ColumnItem.TmpNewDummy, (long)columnkey);
+                //case DatabaseDataType.Comand_AddColumn:
+                //case DatabaseDataType.Comand_AddColumnByKey:
+                //    return AddColumnToMain(tablename, ColumnItem.TmpNewDummy, (long)columnkey);
+
+                case DatabaseDataType.Comand_AddColumnByName:
+                    return AddColumnToMain(tablename, value);
 
                 case DatabaseDataType.Comand_RemoveColumn:
                     return RemoveColumn(tablename, columname);
@@ -866,7 +872,7 @@ public abstract class SQLBackAbstract {
                 #endregion
 
                 for (var z = 1; z < dt.Columns.Count; z++) {
-                    row.Database.Cell.SetValueInternal(columnsToLoad[z - 1].Name, row.Key, reader[z].ToString(), -1, -1, true);
+                    row.Database.Cell.SetValueInternal(columnsToLoad[z - 1].Name, row.Key, reader[z].ToString(), true);
                 }
             }
 

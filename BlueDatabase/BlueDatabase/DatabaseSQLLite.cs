@@ -171,7 +171,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         if (l.Count == 0) { return false; }
 
         try {
-            _sql.LoadRow(TableName, l);
+            _sql.LoadRow(TableName, l, refreshAlways);
         } catch {
             return RefreshRowData(rows, refreshAlways);
         }
@@ -179,59 +179,9 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         return true;
     }
 
-    //public override void RepairAfterParse() {
-    //    base.RepairAfterParse();
-    //    foreach (var thisC in Column) {
-    //        if (IsAdministrator() && thisC.Name.StartsWith("SYS_")) {
-    //            _sql.ChangeDataType(TableName, thisC.Name, thisC.MaxTextLenght);
-    //        }
-    //    }
-    //}
-
-    //private bool _checkedAndReloadNeed;
-
-    //private DateTime _lastCheck = DateTime.Now;
-
-    //private int _loadingCount = 0;
-    //public override string Filename => _sql.Filename;
-    //public override bool IsLoading { get => _isLoading; }
-
-    //public override bool ReloadNeeded => false;
-
-    //public override bool ReloadNeededSoft => false;
-
-    //public override bool ReloadNeeded {
-    //    get {
-    //        if (string.IsNullOrEmpty(TableName)) { return false; }
-    //        if (_checkedAndReloadNeed) { return true; }
-    //        _lastCheck = DateTime.Now;
-
-    //        if (_sql.GetStyleData(TableName, DatabaseDataType.TimeCode.ToString(), string.Empty) != TimeCode) {
-    //            _checkedAndReloadNeed = true;
-    //            return true;
-    //        }
-
-    //        return false;
-    //    }
-    //}
-
-    //public override bool ReloadNeededSoft {
-    //    get {
-    //        if (string.IsNullOrEmpty(TableName)) { return false; }
-    //        if (_checkedAndReloadNeed) { return true; }
-
-    //        if (DateTime.Now.Subtract(_lastCheck).TotalSeconds > 20) {
-    //            return ReloadNeeded;
-    //        }
-    //public override void Load_Reload() {
-    //    if (!ReloadNeeded) { return; }
     public override bool Save() => _sql.ConnectionOk;
 
     public override string UndoText(ColumnItem? column, RowItem? row) => string.Empty;
-
-    //public override void UnlockHard() { }
-
-    //public override void WaitEditable() { }
 
     /// <summary>
     /// Liest die Spaltenattribute aus der Style-Datenbank und schreibt sie in die Spalte
@@ -251,22 +201,22 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         }
     }
 
-    internal override string SetValueInternal(DatabaseDataType type, string value, string? columnName, long? rowkey, int width, int height, bool isLoading) {
+    internal override string SetValueInternal(DatabaseDataType type, string value, string? columnName, long? rowkey, bool isLoading) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
         if (type.IsObsolete()) { return string.Empty; }
 
         if (!isLoading && !ReadOnly) {
-            var c = Column[columnName];
+            var c = Column.Exists(columnName);
 
-            _sql?.SetValueInternal(TableName, type, value, c?.Name, c?.Key, rowkey, -1, -1, isLoading);
+            _sql?.SetValueInternal(TableName, type, value, c?.Name, rowkey, isLoading);
         }
 
-        return base.SetValueInternal(type, value, columnName, rowkey, width, height, isLoading);
+        return base.SetValueInternal(type, value, columnName, rowkey, isLoading);
     }
 
     protected override void AddUndo(string tableName, DatabaseDataType comand, string? columnName, long? rowKey, string previousValue, string changedTo, string userName, string comment) {
-        var ck = Column[columnName]?.Key ?? -1;
+        var ck = Column.Exists(columnName)?.Key ?? -1;
         _sql.AddUndo(tableName, comand, ck, columnName, rowKey, previousValue, changedTo, UserName, comment);
     }
 
@@ -315,7 +265,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         var oo = new List<DatabaseSQLLite>();
         foreach (var thisDb in AllFiles) {
             if (thisDb is DatabaseSQLLite thidDBSQLLIte) {
-                if (thidDBSQLLIte._sql == sql) {
+                if (sql.ConnectionString == thidDBSQLLIte._sql.ConnectionString) {
                     oo.Add(thidDBSQLLIte);
                 }
             }
@@ -352,12 +302,6 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
                         if (c != null) {
                             var newn = _sql.GetLastColumnName(tablename, c.Key);
                             c.Name = newn;
-                            //if (c.Name != newn) {
-                            //    //Develop.DebugPrint(FehlerArt.Fehler, "Spalte muss umbenannt werden???");
-                            //    //q
-                            //    //_sql.RenameColumn(tablename, c.Name, newn);
-
-                            //}
                         }
 
                         #endregion
@@ -367,15 +311,24 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
                         switch (t) {
                             case DatabaseDataType.Comand_RemoveColumn:
-                                Column.SetValueInternal(t, LongParse(columnkey), true);
+                                Column.SetValueInternal(t, LongParse(columnkey), true, columnname);
                                 break;
 
+                            case DatabaseDataType.Comand_AddColumnByKey:
                             case DatabaseDataType.Comand_AddColumn:
-                                Column.SetValueInternal(t, LongParse(columnkey), true);
+                                Column.SetValueInternal(t, LongParse(columnkey), true, columnname);
                                 var c = Column.SearchByKey(LongParse(columnkey));
                                 var name = _sql.GetLastColumnName(TableName, c.Key);
-                                SetValueInternal(DatabaseDataType.ColumnName, name, c.Name, null, -1, -1, true);
+                                SetValueInternal(DatabaseDataType.ColumnName, name, c.Name, null, true);
                                 c.RefreshColumnsData(); // muss sein, alternativ alle geladenen Zeilen neu laden
+                                break;
+
+                            case DatabaseDataType.Comand_AddColumnByName:
+                                Column.SetValueInternal(t, -1, true, columnname);
+                                var c2 = Column.Exists(columnname);
+                                //var columnname = _sql.GetLastColumnName(TableName, c.Key);
+                                SetValueInternal(DatabaseDataType.ColumnKey, columnkey, c2.Name, null, true);
+                                c2.RefreshColumnsData(); // muss sein, alternativ alle geladenen Zeilen neu laden
                                 break;
 
                             case DatabaseDataType.Comand_AddRow:
@@ -397,7 +350,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
                         #region Zeilen zum neu Einlesen merken uns Spaltenbreite invalidierne
 
-                        var c = Column.SearchByKey(LongParse(columnkey));
+                        var c = Column.Exists(columnname);
                         var r = Row.SearchByKey(LongParse(rowkey));
                         //if (r == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile nicht gefunden"); }
                         //if (c == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht gefunden"); }
@@ -416,7 +369,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
                         #region Datenbank-Styles
 
                         var v = _sql.GetStyleData(tablename, comand, "~DATABASE~");
-                        if (v != null) { SetValueInternal(t, v, null, null, -1, -1, true); }
+                        if (v != null) { SetValueInternal(t, v, null, null, true); }
 
                         #endregion
                     } else if (t.IsColumnTag()) {
@@ -426,7 +379,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
                         var c = Column.SearchByKey(LongParse(columnkey));
                         if (c != null) {
                             var v = _sql.GetStyleData(tablename, comand, c.Name);
-                            if (v != null) { SetValueInternal(t, v, c.Name, null, -1, -1, true); }
+                            if (v != null) { SetValueInternal(t, v, c.Name, null, true); }
                         }
 
                         #endregion
@@ -484,9 +437,9 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
                 var column = Column.Exists(thisCol);
                 if (column == null) {
                     var ck = Column.NextColumnKey();
-                    Column.SetValueInternal(DatabaseDataType.Comand_AddColumn, ck, true);
-                    var co = Column.SearchByKey(ck);
-                    SetValueInternal(DatabaseDataType.ColumnName, thisCol, co?.Name, null, -1, -1, true);
+                    Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByName, ck, true, thisCol);
+                    var co = Column.Exists(thisCol);
+                    SetValueInternal(DatabaseDataType.ColumnKey, ck.ToString(), co?.Name, null, true);
                     column = Column.Exists(thisCol);
                     if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht gefunden"); return; }
                     column = Column.SearchByKey(ck);
@@ -510,7 +463,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
                 foreach (var thisstyle in l) {
                     Enum.TryParse(thisstyle.Key, out DatabaseDataType t);
                     if (!t.IsObsolete()) {
-                        SetValueInternal(t, thisstyle.Value, null, null, -1, -1, true);
+                        SetValueInternal(t, thisstyle.Value, null, null, true);
                     }
                 }
             }

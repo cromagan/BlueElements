@@ -199,10 +199,10 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
     public void UnlockHard() => _muf.UnlockHard();
 
-    internal override string SetValueInternal(DatabaseDataType type, string value, string? columnName, long? rowkey, int width, int height, bool isLoading) {
+    internal override string SetValueInternal(DatabaseDataType type, string value, string? columnName, long? rowkey, bool isLoading) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
-        var r = base.SetValueInternal(type, value, columnName, rowkey, width, height, isLoading);
+        var r = base.SetValueInternal(type, value, columnName, rowkey, isLoading);
 
         if (type == DatabaseDataType.UndoInOne) {
             Works.Clear();
@@ -343,7 +343,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
             //        //}
             //    }
             //}
-            SetValueInternal(thisPendingItem.Comand, thisPendingItem.ChangedTo, thisPendingItem.ColName, thisPendingItem.RowKey, 0, 0, true);
+            SetValueInternal(thisPendingItem.Comand, thisPendingItem.ChangedTo, thisPendingItem.ColName, thisPendingItem.RowKey, true);
         }
     }
 

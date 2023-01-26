@@ -144,8 +144,6 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
             case "rowid": // TODO: alt
             case "rowkey":
                 _rowKey = LongParse(value);
-                //Row = ParseExplicit_TMPDatabase.Row.SearchByKey(LongParse(value));
-                //if (_Row != null) { ParseExplicit_TMPDatabase = null; }
                 return true;
 
             case "firstvalue":

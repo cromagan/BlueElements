@@ -82,118 +82,150 @@ public sealed class Database : DatabaseAbstract {
 
     #region Methods
 
-    public static void Parse(byte[] bLoaded, ref int pointer, out DatabaseDataType type, ref long colKey, ref long rowKey, out string value, out int width, out int height) {
-        int les;
+    public static void Parse(byte[] bLoaded, ref int pointer, out DatabaseDataType type, out long colKey, out long rowKey, out string value, out string colName) {
+        colName = string.Empty;
+        colKey = -1;
+        rowKey = -1;
+
         switch ((Routinen)bLoaded[pointer]) {
             case Routinen.CellFormat: {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
-                    les = NummerCode3(bLoaded, pointer + 2);
+                    var les = NummerCode3(bLoaded, pointer + 2);
                     colKey = NummerCode3(bLoaded, pointer + 5);
                     rowKey = NummerCode3(bLoaded, pointer + 8);
                     var b = new byte[les];
                     Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
                     value = b.ToStringWin1252();
-                    width = NummerCode2(bLoaded, pointer + 11 + les);
-                    height = NummerCode2(bLoaded, pointer + 11 + les + 2);
+                    //var width = NummerCode2(bLoaded, pointer + 11 + les);
+                    //var height = NummerCode2(bLoaded, pointer + 11 + les + 2);
                     pointer += 11 + les + 4;
                     break;
                 }
             case Routinen.CellFormatUTF8: {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
-                    les = NummerCode3(bLoaded, pointer + 2);
+                    var les = NummerCode3(bLoaded, pointer + 2);
                     colKey = NummerCode3(bLoaded, pointer + 5);
                     rowKey = NummerCode3(bLoaded, pointer + 8);
                     var b = new byte[les];
                     Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
                     value = b.ToStringUtf8();
-                    width = NummerCode2(bLoaded, pointer + 11 + les);
-                    height = NummerCode2(bLoaded, pointer + 11 + les + 2);
+                    //var width = NummerCode2(bLoaded, pointer + 11 + les);
+                    // var height = NummerCode2(bLoaded, pointer + 11 + les + 2);
                     pointer += 11 + les + 4;
                     break;
                 }
             case Routinen.CellFormatUTF8_V400: {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
-                    les = NummerCode3(bLoaded, pointer + 2);
+                    var les = NummerCode3(bLoaded, pointer + 2);
                     colKey = NummerCode7(bLoaded, pointer + 5);
                     rowKey = NummerCode7(bLoaded, pointer + 12);
                     var b = new byte[les];
                     Buffer.BlockCopy(bLoaded, pointer + 19, b, 0, les);
                     value = b.ToStringUtf8();
-                    width = NummerCode2(bLoaded, pointer + 19 + les);
-                    height = NummerCode2(bLoaded, pointer + 19 + les + 2);
+                    //var  width = NummerCode2(bLoaded, pointer + 19 + les);
+                    //var  height = NummerCode2(bLoaded, pointer + 19 + les + 2);
                     pointer += 19 + les + 4;
                     break;
                 }
+            case Routinen.CellFormatUTF8_V401: {
+                    type = (DatabaseDataType)bLoaded[pointer + 1];
+                    var les = NummerCode3(bLoaded, pointer + 2);
+                    rowKey = NummerCode7(bLoaded, pointer + 5);
+                    var b = new byte[les];
+                    Buffer.BlockCopy(bLoaded, pointer + 12, b, 0, les);
+                    value = b.ToStringUtf8();
+                    pointer += 12 + les;
+                    colKey = -1;
+                    break;
+                }
+
             case Routinen.DatenAllgemein: {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
-                    les = NummerCode3(bLoaded, pointer + 2);
+                    var les = NummerCode3(bLoaded, pointer + 2);
                     colKey = -1;
                     rowKey = -1;
                     var b = new byte[les];
                     Buffer.BlockCopy(bLoaded, pointer + 5, b, 0, les);
                     value = b.ToStringWin1252();
-                    width = 0;
-                    height = 0;
+                    //width = 0;
+                    //height = 0;
                     pointer += 5 + les;
                     break;
                 }
             case Routinen.DatenAllgemeinUTF8: {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
-                    les = NummerCode3(bLoaded, pointer + 2);
+                    var les = NummerCode3(bLoaded, pointer + 2);
                     colKey = -1;
                     rowKey = -1;
                     var b = new byte[les];
                     Buffer.BlockCopy(bLoaded, pointer + 5, b, 0, les);
                     value = b.ToStringUtf8();
-                    width = 0;
-                    height = 0;
+                    //width = 0;
+                    //height = 0;
                     pointer += 5 + les;
                     break;
                 }
             case Routinen.Column: {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
-                    les = NummerCode3(bLoaded, pointer + 2);
+                    var les = NummerCode3(bLoaded, pointer + 2);
                     colKey = NummerCode3(bLoaded, pointer + 5);
                     rowKey = NummerCode3(bLoaded, pointer + 8);
                     var b = new byte[les];
                     Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
                     value = b.ToStringWin1252();
-                    width = 0;
-                    height = 0;
+                    //width = 0;
+                    //height = 0;
                     pointer += 11 + les;
                     break;
                 }
             case Routinen.ColumnUTF8: {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
-                    les = NummerCode3(bLoaded, pointer + 2);
+                    var les = NummerCode3(bLoaded, pointer + 2);
                     colKey = NummerCode3(bLoaded, pointer + 5);
                     rowKey = NummerCode3(bLoaded, pointer + 8);
                     var b = new byte[les];
                     Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
                     value = b.ToStringUtf8();
-                    width = 0;
-                    height = 0;
+                    //width = 0;
+                    //height = 0;
                     pointer += 11 + les;
                     break;
                 }
             case Routinen.ColumnUTF8_V400: {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
-                    les = NummerCode3(bLoaded, pointer + 2);
+                    var les = NummerCode3(bLoaded, pointer + 2);
                     colKey = NummerCode7(bLoaded, pointer + 5);
                     rowKey = NummerCode7(bLoaded, pointer + 12);
                     var b = new byte[les];
                     Buffer.BlockCopy(bLoaded, pointer + 19, b, 0, les);
                     value = b.ToStringUtf8();
-                    width = 0;
-                    height = 0;
+                    //width = 0;
+                    //height = 0;
                     pointer += 19 + les;
                     break;
                 }
+            case Routinen.ColumnUTF8_V401: {
+                    type = (DatabaseDataType)bLoaded[pointer + 1];
+
+                    var cles = NummerCode1(bLoaded, pointer + 2);
+                    var cb = new byte[cles];
+                    Buffer.BlockCopy(bLoaded, pointer + 3, cb, 0, cles);
+                    colName = cb.ToStringUtf8();
+
+                    var les = NummerCode3(bLoaded, pointer + 3 + cles);
+                    var b = new byte[les];
+                    Buffer.BlockCopy(bLoaded, pointer + 6+ cles, b, 0, les);
+                    value = b.ToStringUtf8();
+
+                    pointer += 6 + les + cles;
+                    break;
+                }
+
             default: {
                     type = (DatabaseDataType)0;
                     value = string.Empty;
-                    width = 0;
-                    height = 0;
+                    //width = 0;
+                    //height = 0;
                     Develop.DebugPrint(FehlerArt.Fehler, "Laderoutine nicht definiert: " + bLoaded[pointer]);
                     break;
                 }
@@ -208,8 +240,9 @@ public sealed class Database : DatabaseAbstract {
         ColumnItem? column = null;
         RowItem? row = null;
 
-        long colKey = 0;
-        long rowKey = 0;
+        //long colKey = -1;
+        //long rowKey = -1;
+        //string columname = string.Empty;
 
         var columnUsed = new List<ColumnItem>();
 
@@ -218,7 +251,7 @@ public sealed class Database : DatabaseAbstract {
         do {
             if (pointer >= data.Length) { break; }
 
-            Parse(data, ref pointer, out var art, ref colKey, ref rowKey, out var inhalt, out var x, out var y);
+            Parse(data, ref pointer, out var art, out var colKey, out var rowKey, out var inhalt, out var columname);
             //Console.WriteLine(art);
             if (!art.IsObsolete()) {
 
@@ -242,12 +275,28 @@ public sealed class Database : DatabaseAbstract {
 
                 #region Spalte suchen oder erstellen
 
-                if (colKey > -1) {
+                if (colKey > -1 && string.IsNullOrEmpty(columname)) {
                     column = db.Column.SearchByKey(colKey);
                     if (column == null) {
                         if (art != DatabaseDataType.ColumnName) { Develop.DebugPrint(art + " an erster Stelle!"); }
-                        db.Column.SetValueInternal(DatabaseDataType.Comand_AddColumn, colKey, true);
+                        db.Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByKey, colKey, true, string.Empty);
                         column = db.Column.SearchByKey(colKey);
+                    }
+                    if (column == null) {
+                        Develop.DebugPrint(FehlerArt.Fehler, "Spalte hinzufügen Fehler");
+                        db.SetReadOnly();
+                        return;
+                    }
+                    column.IsInCache = DateTime.UtcNow;
+                    columnUsed.Add(column);
+                }
+
+                if (colKey < 0 && !string.IsNullOrEmpty(columname)) {
+                    column = db.Column.Exists(columname);
+                    if (column == null) {
+                        if (art != DatabaseDataType.ColumnName) { Develop.DebugPrint(art + " an erster Stelle!"); }
+                        db.Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByName, db.Column.NextColumnKey(), true, columname);
+                        column = db.Column.Exists(columname);
                     }
                     if (column == null) {
                         Develop.DebugPrint(FehlerArt.Fehler, "Spalte hinzufügen Fehler");
@@ -274,7 +323,7 @@ public sealed class Database : DatabaseAbstract {
 
                 #endregion
 
-                var fehler = db.SetValueInternal(art, inhalt, column?.Name, row?.Key, x, y, true);
+                var fehler = db.SetValueInternal(art, inhalt, column?.Name, row?.Key, true);
 
                 if (art == DatabaseDataType.EOF) { break; }
 
@@ -294,7 +343,7 @@ public sealed class Database : DatabaseAbstract {
 
         foreach (var thisColumn in l) {
             if (!columnUsed.Contains(thisColumn)) {
-                db.SetValueInternal(DatabaseDataType.Comand_RemoveColumn, thisColumn.Key.ToString(), thisColumn.Name, null, -1, -1, true);
+                db.SetValueInternal(DatabaseDataType.Comand_RemoveColumn, thisColumn.Key.ToString(), thisColumn.Name, null, true);
             }
         }
 
@@ -313,6 +362,72 @@ public sealed class Database : DatabaseAbstract {
         //}
 
         if (IntParse(db.LoadedVersion.Replace(".", "")) > IntParse(DatabaseVersion.Replace(".", ""))) { db.SetReadOnly(); }
+    }
+
+    public static void SaveToByteList(ColumnItem c, ref List<byte> l) {
+        var name = c.Name;
+
+        SaveToByteList(l, DatabaseDataType.ColumnName, c.Name, name);
+        SaveToByteList(l, DatabaseDataType.ColumnCaption, c.Caption, name);
+        SaveToByteList(l, DatabaseDataType.ColumnFormat, ((int)c.Format).ToString(), name);
+        SaveToByteList(l, DatabaseDataType.CaptionGroup1, c.CaptionGroup1, name);
+        SaveToByteList(l, DatabaseDataType.CaptionGroup2, c.CaptionGroup2, name);
+        SaveToByteList(l, DatabaseDataType.CaptionGroup3, c.CaptionGroup3, name);
+        SaveToByteList(l, DatabaseDataType.MultiLine, c.MultiLine.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.CellInitValue, c.CellInitValue, name);
+        SaveToByteList(l, DatabaseDataType.SortAndRemoveDoubleAfterEdit, c.AfterEditQuickSortRemoveDouble.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.DoUcaseAfterEdit, c.AfterEditDoUCase.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.AutoCorrectAfterEdit, c.AfterEditAutoCorrect.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.RoundAfterEdit, c.AfterEditRunden.ToString(), name);
+        SaveToByteList(l, DatabaseDataType.AutoRemoveCharAfterEdit, c.AutoRemove, name);
+        SaveToByteList(l, DatabaseDataType.SaveContent, c.SaveContent.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.FilterOptions, ((int)c.FilterOptions).ToString(), name);
+        SaveToByteList(l, DatabaseDataType.AutoFilterJoker, c.AutoFilterJoker, name);
+        SaveToByteList(l, DatabaseDataType.IgnoreAtRowFilter, c.IgnoreAtRowFilter.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.EditableWithTextInput, c.TextBearbeitungErlaubt.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.SpellCheckingEnabled, c.SpellCheckingEnabled.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.ShowMultiLineInOneLine, c.ShowMultiLineInOneLine.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.ShowUndo, c.ShowUndo.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.TextFormatingAllowed, c.FormatierungErlaubt.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.ForeColor, c.ForeColor.ToArgb().ToString(), name);
+        SaveToByteList(l, DatabaseDataType.BackColor, c.BackColor.ToArgb().ToString(), name);
+        SaveToByteList(l, DatabaseDataType.LineStyleLeft, ((int)c.LineLeft).ToString(), name);
+        SaveToByteList(l, DatabaseDataType.LineStyleRight, ((int)c.LineRight).ToString(), name);
+        SaveToByteList(l, DatabaseDataType.EditableWithDropdown, c.DropdownBearbeitungErlaubt.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.DropDownItems, c.DropDownItems.JoinWithCr(), name);
+        SaveToByteList(l, DatabaseDataType.LinkedCellFilter, c.LinkedCellFilter.JoinWithCr(), name);
+        SaveToByteList(l, DatabaseDataType.OpticalTextReplace, c.OpticalReplace.JoinWithCr(), name);
+        SaveToByteList(l, DatabaseDataType.AutoReplaceAfterEdit, c.AfterEditAutoReplace.JoinWithCr(), name);
+        SaveToByteList(l, DatabaseDataType.RegexCheck, c.Regex, name);
+        SaveToByteList(l, DatabaseDataType.DropdownDeselectAllAllowed, c.DropdownAllesAbwählenErlaubt.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.ShowValuesOfOtherCellsInDropdown, c.DropdownWerteAndererZellenAnzeigen.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.ColumnQuickInfo, c.Quickinfo, name);
+        SaveToByteList(l, DatabaseDataType.ColumnAdminInfo, c.AdminInfo, name);
+        SaveToByteList(l, DatabaseDataType.ColumnContentWidth, c.ContentWidth.ToString(), name);
+        SaveToByteList(l, DatabaseDataType.CaptionBitmapCode, c.CaptionBitmapCode, name);
+        SaveToByteList(l, DatabaseDataType.AllowedChars, c.AllowedChars, name);
+        SaveToByteList(l, DatabaseDataType.MaxTextLenght, c.MaxTextLenght.ToString(), name);
+        SaveToByteList(l, DatabaseDataType.PermissionGroupsChangeCell, c.PermissionGroupsChangeCell.JoinWithCr(), name);
+        SaveToByteList(l, DatabaseDataType.ColumnTags, c.Tags.JoinWithCr(), name);
+        SaveToByteList(l, DatabaseDataType.EditAllowedDespiteLock, c.EditAllowedDespiteLock.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.Suffix, c.Suffix, name);
+        SaveToByteList(l, DatabaseDataType.LinkedDatabase, c.LinkedDatabaseFile, name);
+        SaveToByteList(l, DatabaseDataType.ConstantHeightOfImageCode, c.ConstantHeightOfImageCode, name);
+        SaveToByteList(l, DatabaseDataType.BehaviorOfImageAndText, ((int)c.BehaviorOfImageAndText).ToString(), name);
+        SaveToByteList(l, DatabaseDataType.DoOpticalTranslation, ((int)c.DoOpticalTranslation).ToString(), name);
+        SaveToByteList(l, DatabaseDataType.AdditionalFormatCheck, ((int)c.AdditionalFormatCheck).ToString(), name);
+        SaveToByteList(l, DatabaseDataType.ScriptType, ((int)c.ScriptType).ToString(), name);
+        SaveToByteList(l, DatabaseDataType.Prefix, c.Prefix, name);
+        //SaveToByteList(l, DatabaseDataType.KeyColumnKey, c.KeyColumnKey.ToString(), key);
+        SaveToByteList(l, DatabaseDataType.ColumnNameOfLinkedDatabase, c.LinkedCell_ColumnNameOfLinkedDatabase, name);
+        //SaveToByteList(l, DatabaseDataType.MakeSuggestionFromSameKeyColumn, c.VorschlagsColumn.ToString(), key);
+        SaveToByteList(l, DatabaseDataType.ColumnAlign, ((int)c.Align).ToString(), name);
+        SaveToByteList(l, DatabaseDataType.SortType, ((int)c.SortType).ToString(), name);
+        //SaveToByteList(l, DatabaseDataType.ColumnTimeCode, c.TimeCode, key);
+
+        foreach (var thisR in c.Database.Row) {
+            SaveToByteList(l, c, thisR);
+        }
     }
 
     public static List<byte> ToListOfByte(DatabaseAbstract db, ListExt<WorkItem>? works) {
@@ -352,7 +467,7 @@ public sealed class Database : DatabaseAbstract {
             SaveToByteList(l, DatabaseDataType.StandardFormulaFile, db.StandardFormulaFile);
             SaveToByteList(l, db.Column);
             //Row.SaveToByteList(l);
-            SaveToByteList(l, db.Cell, db);
+            //SaveToByteList(l, db.Cell, db);
             if (db.SortDefinition == null) {
                 // Ganz neue Datenbank
                 SaveToByteList(l, DatabaseDataType.SortDefinition, string.Empty);
@@ -577,76 +692,31 @@ public sealed class Database : DatabaseAbstract {
 
     public override string UndoText(ColumnItem? column, RowItem? row) => UndoText(column, row, Works);
 
-    internal static void SaveToByteList(ColumnItem c, ref List<byte> l) {
-        var key = c.Key;
+    internal static void SaveToByteList(List<byte> list, ColumnItem c, RowItem r) {
+        var cv = r.CellGetString(c);
 
-        SaveToByteList(l, DatabaseDataType.ColumnName, c.Name, key);
-        SaveToByteList(l, DatabaseDataType.ColumnCaption, c.Caption, key);
-        SaveToByteList(l, DatabaseDataType.ColumnFormat, ((int)c.Format).ToString(), key);
-        SaveToByteList(l, DatabaseDataType.CaptionGroup1, c.CaptionGroup1, key);
-        SaveToByteList(l, DatabaseDataType.CaptionGroup2, c.CaptionGroup2, key);
-        SaveToByteList(l, DatabaseDataType.CaptionGroup3, c.CaptionGroup3, key);
-        SaveToByteList(l, DatabaseDataType.MultiLine, c.MultiLine.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.CellInitValue, c.CellInitValue, key);
-        SaveToByteList(l, DatabaseDataType.SortAndRemoveDoubleAfterEdit, c.AfterEditQuickSortRemoveDouble.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.DoUcaseAfterEdit, c.AfterEditDoUCase.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.AutoCorrectAfterEdit, c.AfterEditAutoCorrect.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.RoundAfterEdit, c.AfterEditRunden.ToString(), key);
-        SaveToByteList(l, DatabaseDataType.AutoRemoveCharAfterEdit, c.AutoRemove, key);
-        SaveToByteList(l, DatabaseDataType.SaveContent, c.SaveContent.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.FilterOptions, ((int)c.FilterOptions).ToString(), key);
-        SaveToByteList(l, DatabaseDataType.AutoFilterJoker, c.AutoFilterJoker, key);
-        SaveToByteList(l, DatabaseDataType.IgnoreAtRowFilter, c.IgnoreAtRowFilter.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.EditableWithTextInput, c.TextBearbeitungErlaubt.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.SpellCheckingEnabled, c.SpellCheckingEnabled.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.ShowMultiLineInOneLine, c.ShowMultiLineInOneLine.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.ShowUndo, c.ShowUndo.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.TextFormatingAllowed, c.FormatierungErlaubt.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.ForeColor, c.ForeColor.ToArgb().ToString(), key);
-        SaveToByteList(l, DatabaseDataType.BackColor, c.BackColor.ToArgb().ToString(), key);
-        SaveToByteList(l, DatabaseDataType.LineStyleLeft, ((int)c.LineLeft).ToString(), key);
-        SaveToByteList(l, DatabaseDataType.LineStyleRight, ((int)c.LineRight).ToString(), key);
-        SaveToByteList(l, DatabaseDataType.EditableWithDropdown, c.DropdownBearbeitungErlaubt.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.DropDownItems, c.DropDownItems.JoinWithCr(), key);
-        SaveToByteList(l, DatabaseDataType.LinkedCellFilter, c.LinkedCellFilter.JoinWithCr(), key);
-        SaveToByteList(l, DatabaseDataType.OpticalTextReplace, c.OpticalReplace.JoinWithCr(), key);
-        SaveToByteList(l, DatabaseDataType.AutoReplaceAfterEdit, c.AfterEditAutoReplace.JoinWithCr(), key);
-        SaveToByteList(l, DatabaseDataType.RegexCheck, c.Regex, key);
-        SaveToByteList(l, DatabaseDataType.DropdownDeselectAllAllowed, c.DropdownAllesAbwählenErlaubt.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.ShowValuesOfOtherCellsInDropdown, c.DropdownWerteAndererZellenAnzeigen.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.ColumnQuickInfo, c.Quickinfo, key);
-        SaveToByteList(l, DatabaseDataType.ColumnAdminInfo, c.AdminInfo, key);
-        SaveToByteList(l, DatabaseDataType.ColumnContentWidth, c.ContentWidth.ToString(), key);
-        SaveToByteList(l, DatabaseDataType.CaptionBitmapCode, c.CaptionBitmapCode, key);
-        SaveToByteList(l, DatabaseDataType.AllowedChars, c.AllowedChars, key);
-        SaveToByteList(l, DatabaseDataType.MaxTextLenght, c.MaxTextLenght.ToString(), key);
-        SaveToByteList(l, DatabaseDataType.PermissionGroupsChangeCell, c.PermissionGroupsChangeCell.JoinWithCr(), key);
-        SaveToByteList(l, DatabaseDataType.ColumnTags, c.Tags.JoinWithCr(), key);
-        SaveToByteList(l, DatabaseDataType.EditAllowedDespiteLock, c.EditAllowedDespiteLock.ToPlusMinus(), key);
-        SaveToByteList(l, DatabaseDataType.Suffix, c.Suffix, key);
-        SaveToByteList(l, DatabaseDataType.LinkedDatabase, c.LinkedDatabaseFile, key);
-        SaveToByteList(l, DatabaseDataType.ConstantHeightOfImageCode, c.ConstantHeightOfImageCode, key);
-        SaveToByteList(l, DatabaseDataType.BehaviorOfImageAndText, ((int)c.BehaviorOfImageAndText).ToString(), key);
-        SaveToByteList(l, DatabaseDataType.DoOpticalTranslation, ((int)c.DoOpticalTranslation).ToString(), key);
-        SaveToByteList(l, DatabaseDataType.AdditionalFormatCheck, ((int)c.AdditionalFormatCheck).ToString(), key);
-        SaveToByteList(l, DatabaseDataType.ScriptType, ((int)c.ScriptType).ToString(), key);
-        SaveToByteList(l, DatabaseDataType.Prefix, c.Prefix, key);
-        //SaveToByteList(l, DatabaseDataType.KeyColumnKey, c.KeyColumnKey.ToString(), key);
-        SaveToByteList(l, DatabaseDataType.ColumnNameOfLinkedDatabase, c.LinkedCell_ColumnNameOfLinkedDatabase, key);
-        //SaveToByteList(l, DatabaseDataType.MakeSuggestionFromSameKeyColumn, c.VorschlagsColumn.ToString(), key);
-        SaveToByteList(l, DatabaseDataType.ColumnAlign, ((int)c.Align).ToString(), key);
-        SaveToByteList(l, DatabaseDataType.SortType, ((int)c.SortType).ToString(), key);
-        //SaveToByteList(l, DatabaseDataType.ColumnTimeCode, c.TimeCode, key);
+        if (string.IsNullOrEmpty(cv)) { return; }
+        //db.Cell.DataOfCellKey(cell.Key, out var tColumn, out var tRow);
+        if (!c.SaveContent) { return; }
+        var b = cv.UTF8_ToByte();
+        list.Add((byte)Routinen.CellFormatUTF8_V401);
+        list.Add((byte)DatabaseDataType.Value_withoutSizeData);
+        SaveToByteList(list, b.Length, 3);
+        SaveToByteList(list, r.Key, 7);
+        list.AddRange(b);
     }
 
     //public override void WaitEditable() => _muf.WaitEditable();
-    internal static void SaveToByteList(List<byte> list, DatabaseDataType databaseDataType, string content, long columnKey) {
-        var b = content.UTF8_ToByte();
-        list.Add((byte)Routinen.ColumnUTF8_V400);
+    internal static void SaveToByteList(List<byte> list, DatabaseDataType databaseDataType, string content, string columnname) {
+        list.Add((byte)Routinen.ColumnUTF8_V401);
         list.Add((byte)databaseDataType);
+
+        var n = columnname.UTF8_ToByte();
+        SaveToByteList(list, n.Length, 1);
+        list.AddRange(n);
+
+        var b = content.UTF8_ToByte();
         SaveToByteList(list, b.Length, 3);
-        SaveToByteList(list, columnKey, 7);
-        SaveToByteList(list, 0, 7); //Zeile-Unötig
         list.AddRange(b);
     }
 
@@ -659,13 +729,6 @@ public sealed class Database : DatabaseAbstract {
         }
     }
 
-    internal static void SaveToByteList(List<byte> l, CellCollection c, DatabaseAbstract db) {
-        c.RemoveOrphans();
-        foreach (var thisString in c) {
-            SaveToByteList(l, thisString, db);
-        }
-    }
-
     internal static void SaveToByteList(List<byte> list, DatabaseDataType databaseDataType, string content) {
         var b = content.UTF8_ToByte();
         list.Add((byte)Routinen.DatenAllgemeinUTF8);
@@ -674,26 +737,10 @@ public sealed class Database : DatabaseAbstract {
         list.AddRange(b);
     }
 
-    internal static void SaveToByteList(List<byte> list, KeyValuePair<string, CellItem> cell, DatabaseAbstract db) {
-        if (string.IsNullOrEmpty(cell.Value.Value)) { return; }
-        db.Cell.DataOfCellKey(cell.Key, out var tColumn, out var tRow);
-        if (!tColumn.SaveContent) { return; }
-        var b = cell.Value.Value.UTF8_ToByte();
-        list.Add((byte)Routinen.CellFormatUTF8_V400);
-        list.Add((byte)DatabaseDataType.Value_withSizeData);
-        SaveToByteList(list, b.Length, 3);
-        SaveToByteList(list, tColumn.Key, 7);
-        SaveToByteList(list, tRow.Key, 7);
-        list.AddRange(b);
-        var contentSize = db.Cell.ContentSizeToSave(cell, tColumn);
-        SaveToByteList(list, contentSize.Width, 2);
-        SaveToByteList(list, contentSize.Height, 2);
-    }
-
-    internal override string SetValueInternal(DatabaseDataType type, string value, string? columnname, long? rowkey, int width, int height, bool isLoading) {
+    internal override string SetValueInternal(DatabaseDataType type, string value, string? columnname, long? rowkey, bool isLoading) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
-        var r = base.SetValueInternal(type, value, columnname, rowkey, width, height, isLoading);
+        var r = base.SetValueInternal(type, value, columnname, rowkey, isLoading);
 
         if (type == DatabaseDataType.UndoInOne) {
             Works.Clear();
@@ -725,6 +772,8 @@ public sealed class Database : DatabaseAbstract {
         base.Initialize();
         Works.Clear();
     }
+
+    private static int NummerCode1(byte[] b, int pointer) => b[pointer];
 
     private static int NummerCode2(byte[] b, int pointer) => (b[pointer] * 255) + b[pointer + 1];
 

@@ -41,6 +41,12 @@ public enum Routinen : byte {
     [Obsolete("Wird zukünftig entfernt werden", false)]
     ColumnUTF8 = 5,
 
+    [Obsolete("Wird zukünftig entfernt werden", false)]
     CellFormatUTF8_V400 = 6,
-    ColumnUTF8_V400 = 7
+
+    ColumnUTF8_V400 = 7,
+
+    CellFormatUTF8_V401 = 8,
+
+    ColumnUTF8_V401 = 9
 }

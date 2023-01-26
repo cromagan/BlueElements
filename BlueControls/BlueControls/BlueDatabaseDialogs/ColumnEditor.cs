@@ -566,13 +566,9 @@ internal sealed partial class ColumnEditor {
 
         linkdb.RepairAfterParse(); // Dass ja die 0 Ansicht stimmt
 
-        //var ok = IntTryParse(cbxTargetColumn.Text, out var key);
         ColumnItem? spalteauDb = linkdb.Column.Exists(cbxTargetColumn.Text);
-        //if (ok) { spalteauDb = linkdb.Column.SearchByKey(key); }
 
         foreach (var col in linkdb.Column) {
-            //var col = linkdb.ColumnArrangements[0][z].Column;
-
             var r = tblFilterliste.Database.Row[col.Name] ?? tblFilterliste.Database.Row.GenerateAndAdd(col.Name, "Neue Spalte");
 
             r.CellSet("Spalte", col.ReadableText() + " = ");
@@ -642,6 +638,4 @@ internal sealed partial class ColumnEditor {
     }
 
     #endregion
-
-    //if (database is null || columnKey < 0) {//    combobox.Text = "#Ohne";//} else {//    var c = database.Column.SearchByKey(columnKey);//    combobox.Text = c == null ? "#Ohne" : c.Name;//}
 }

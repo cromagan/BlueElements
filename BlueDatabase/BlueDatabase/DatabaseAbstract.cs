@@ -45,7 +45,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     #region Fields
 
-    public const string DatabaseVersion = "4.00";
+    public const string DatabaseVersion = "4.01";
 
     public static readonly ListExt<DatabaseAbstract> AllFiles = new();
     public static List<Type>? DatabaseTypes;
@@ -641,7 +641,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     public string ChangeData(DatabaseDataType comand, string? columnname, long? rowkey, string previousValue, string changedTo, string comment) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
-        var f = SetValueInternal(comand, changedTo, columnname, rowkey, -1, -1, false);
+        var f = SetValueInternal(comand, changedTo, columnname, rowkey, false);
 
         if (!string.IsNullOrEmpty(f)) { return f; }
 
@@ -1194,13 +1194,12 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         return true;
     }
 
-    //public abstract void Load_Reload();
-
     public void OnScriptError(RowCancelEventArgs e) {
         if (IsDisposed) { return; }
         ScriptError?.Invoke(this, e);
     }
 
+    //public abstract void Load_Reload();
     public void OnViewChanged() {
         if (IsDisposed) { return; }
         ViewChanged?.Invoke(this, System.EventArgs.Empty);
@@ -1298,6 +1297,10 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         DisposeBackgroundWorker();
     }
 
+    public override string ToString() {
+        return base.ToString() + " " + TableName;
+    }
+
     public abstract string UndoText(ColumnItem? column, RowItem? row);
 
     internal void DevelopWarnung(string t) {
@@ -1361,13 +1364,13 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// <param name="width"></param>
     /// <param name="height"></param>
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
-    internal virtual string SetValueInternal(DatabaseDataType type, string value, string? columnName, long? rowkey, int width, int height, bool isLoading) {
+    internal virtual string SetValueInternal(DatabaseDataType type, string value, string? columnName, long? rowkey, bool isLoading) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
         if (type.IsObsolete()) { return string.Empty; }
 
         if (type.IsColumnTag()) {
-            var c = Column[columnName];
+            var c = Column.Exists(columnName);
             if (c == null) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Spalte ist null! " + type.ToString());
                 return "Wert nicht gesetzt!";
@@ -1384,17 +1387,20 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                 var enc1252 = Encoding.GetEncoding(1252);
                 value = Encoding.UTF8.GetString(enc1252.GetBytes(value));
             }
-            return Cell.SetValueInternal(columnName, (long)rowkey, value, width, height, isLoading);
+            return Cell.SetValueInternal(columnName, (long)rowkey, value, isLoading);
         }
 
         if (type.IsCommand()) {
             switch (type) {
                 case DatabaseDataType.Comand_RemoveColumn:
-                    var c = Column[value];
-                    return Column.SetValueInternal(type, c.Key, isLoading);
+                    var c = Column.Exists(value);
+                    return Column.SetValueInternal(type, c.Key, isLoading, c.Name);
 
-                case DatabaseDataType.Comand_AddColumn:
-                    return Column.SetValueInternal(type, LongParse(value), isLoading);
+                case DatabaseDataType.Comand_AddColumnByKey:
+                    return Column.SetValueInternal(type, LongParse(value), isLoading, string.Empty);
+
+                case DatabaseDataType.Comand_AddColumnByName:
+                    return Column.SetValueInternal(type, Column.Database.Column.NextColumnKey(), isLoading, value);
 
                 case DatabaseDataType.Comand_AddRow:
                 case DatabaseDataType.Comand_RemoveRow:
