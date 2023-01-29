@@ -231,6 +231,18 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
                 FilterDefiniton.Row.Clear("Neue Filter-Datenbank per Parse");
                 FilterDatabaseUpdate();
                 FilterDefiniton.Import(value.FromNonCritical(), true, false, ";", false, false, false, string.Empty);
+
+                foreach (var thisRow in FilterDefiniton.Row) {
+                    var n = thisRow.CellGetString("Spalte");
+                    if (n.IsLong()) {
+                        var k = LongParse(n);
+                        var c = Database.Column.SearchByKey(k);
+                        if (c != null) {
+                            thisRow.CellSet("Spalte", c.Name);
+                        }
+                    }
+                }
+
                 return true;
 
             case "edittype":
