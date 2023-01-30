@@ -110,6 +110,7 @@
     <Compile Include="Extensions\RectangleFExtension.cs" />
     <Compile Include="Cryptogaphy.cs" />
     <Compile Include="HTML.cs" />
+    <Compile Include="Interfaces\IHasKeyName.cs" />
     <Compile Include="Interfaces\IErrorCheckable.cs" />
     <Compile Include="Interfaces\IDisposableExtended.cs" />
     <Compile Include="Interfaces\IStringable.cs" />

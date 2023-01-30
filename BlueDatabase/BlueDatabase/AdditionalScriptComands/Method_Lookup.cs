@@ -68,8 +68,8 @@ public class Method_Lookup : MethodDatabase {
                                     ((VariableString)attvar.Attributes[2]).ValueString);
         }
 
-        var r = RowCollection.MatchesTo(new FilterItem(db.Column.First, Enums.FilterType.Istgleich_GroßKleinEgal,
-            ((VariableString)attvar.Attributes[1]).ValueString));
+        var r = RowCollection.MatchesTo(new FilterItem(c, Enums.FilterType.Istgleich_GroßKleinEgal, ((VariableString)attvar.Attributes[1]).ValueString));
+
         if (r == null || r.Count == 0) {
             if (attvar.Attributes.Count > 3) {
                 return new DoItFeedback(new List<string> { ((VariableString)attvar.Attributes[3]).ValueString });

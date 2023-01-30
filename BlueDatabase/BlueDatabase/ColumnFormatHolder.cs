@@ -23,6 +23,7 @@ using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -44,7 +45,7 @@ namespace BlueDatabase {
             DropdownAllesAbwählenErlaubt = true,
             DropdownBearbeitungErlaubt = true,
             TextBearbeitungErlaubt = true,
-            DropDownItems = new List<string> { "+", "-" },
+            DropDownItems = new(Array.Empty<string>()),
             DropdownWerteAndererZellenAnzeigen = true
         };
 
@@ -59,7 +60,7 @@ namespace BlueDatabase {
             DropdownAllesAbwählenErlaubt = false,
             DropdownBearbeitungErlaubt = true,
             TextBearbeitungErlaubt = false,
-            DropDownItems = new List<string> { "+", "-" },
+            DropDownItems = new(new List<string> { "+", "-" }),
             DropdownWerteAndererZellenAnzeigen = true
         };
 
@@ -74,7 +75,7 @@ namespace BlueDatabase {
             DropdownAllesAbwählenErlaubt = false,
             DropdownBearbeitungErlaubt = false,
             TextBearbeitungErlaubt = true,
-            DropDownItems = new List<string>(),
+            DropDownItems = new(Array.Empty<string>()),
             DropdownWerteAndererZellenAnzeigen = true
         };
 
@@ -89,7 +90,7 @@ namespace BlueDatabase {
             DropdownAllesAbwählenErlaubt = false,
             DropdownBearbeitungErlaubt = false,
             TextBearbeitungErlaubt = true,
-            DropDownItems = new List<string>(),
+            DropDownItems = new(Array.Empty<string>()),
             DropdownWerteAndererZellenAnzeigen = false
         };
 
@@ -104,7 +105,7 @@ namespace BlueDatabase {
             DropdownAllesAbwählenErlaubt = false,
             DropdownBearbeitungErlaubt = false,
             TextBearbeitungErlaubt = true,
-            DropDownItems = new List<string>(),
+            DropDownItems = new(Array.Empty<string>()),
             DropdownWerteAndererZellenAnzeigen = false
         };
 
@@ -119,7 +120,7 @@ namespace BlueDatabase {
             DropdownAllesAbwählenErlaubt = false,
             DropdownBearbeitungErlaubt = false,
             TextBearbeitungErlaubt = true,
-            DropDownItems = new List<string>(),
+            DropDownItems = new(Array.Empty<string>()),
             DropdownWerteAndererZellenAnzeigen = false
         };
 
@@ -134,7 +135,7 @@ namespace BlueDatabase {
             DropdownAllesAbwählenErlaubt = false,
             DropdownBearbeitungErlaubt = false,
             TextBearbeitungErlaubt = true,
-            DropDownItems = new List<string>(),
+            DropDownItems = new(Array.Empty<string>()),
             DropdownWerteAndererZellenAnzeigen = false
         };
 
@@ -149,7 +150,7 @@ namespace BlueDatabase {
             DropdownAllesAbwählenErlaubt = false,
             DropdownBearbeitungErlaubt = false,
             TextBearbeitungErlaubt = true,
-            DropDownItems = new List<string>(),
+            DropDownItems = new(Array.Empty<string>()),
             DropdownWerteAndererZellenAnzeigen = false
         };
 
@@ -164,7 +165,7 @@ namespace BlueDatabase {
             DropdownAllesAbwählenErlaubt = false,
             DropdownBearbeitungErlaubt = false,
             TextBearbeitungErlaubt = true,
-            DropDownItems = new List<string>(),
+            DropDownItems = new(Array.Empty<string>()),
             DropdownWerteAndererZellenAnzeigen = false
         };
 
@@ -179,7 +180,22 @@ namespace BlueDatabase {
             DropdownAllesAbwählenErlaubt = false,
             DropdownBearbeitungErlaubt = false,
             TextBearbeitungErlaubt = true,
-            DropDownItems = new List<string>(),
+            DropDownItems = new(Array.Empty<string>()),
+            DropdownWerteAndererZellenAnzeigen = false
+        };
+
+        public new static readonly ColumnFormatHolder SystemName = new(FormatHolder.SystemName) {
+            Format = DataFormat.Text,
+            Align = AlignmentHorizontal.Links,
+            SortType = SortierTyp.Original_String,
+            DoOpticalTranslation = TranslationType.Original_Anzeigen,
+            AfterEditQuickSortRemoveDouble = false,
+            BehaviorOfImageAndText = BildTextVerhalten.Nur_Text,
+            ScriptType = ScriptType.String,
+            DropdownAllesAbwählenErlaubt = false,
+            DropdownBearbeitungErlaubt = false,
+            TextBearbeitungErlaubt = true,
+            DropDownItems = new(Array.Empty<string>()),
             DropdownWerteAndererZellenAnzeigen = false
         };
 
@@ -194,7 +210,7 @@ namespace BlueDatabase {
             DropdownAllesAbwählenErlaubt = false,
             DropdownBearbeitungErlaubt = false,
             TextBearbeitungErlaubt = true,
-            DropDownItems = new List<string>(),
+            DropDownItems = new(Array.Empty<string>()),
             DropdownWerteAndererZellenAnzeigen = false
         };
 
@@ -209,11 +225,11 @@ namespace BlueDatabase {
             DropdownAllesAbwählenErlaubt = false,
             DropdownBearbeitungErlaubt = false,
             TextBearbeitungErlaubt = true,
-            DropDownItems = new List<string>(),
+            DropDownItems = new(Array.Empty<string>()),
             DropdownWerteAndererZellenAnzeigen = false
         };
 
-        public new static readonly ColumnFormatHolder TextOptions = new(FormatHolder.Text) {
+        public static readonly ColumnFormatHolder TextOptions = new(FormatHolder.Text) {
             Format = DataFormat.Text,
             Align = AlignmentHorizontal.Links,
             SortType = SortierTyp.Sprachneutral_String,
@@ -224,7 +240,7 @@ namespace BlueDatabase {
             DropdownAllesAbwählenErlaubt = true,
             DropdownBearbeitungErlaubt = true,
             TextBearbeitungErlaubt = true,
-            DropDownItems = new List<string>(),
+            DropDownItems = new(Array.Empty<string>()),
             DropdownWerteAndererZellenAnzeigen = true,
             MultiLine = true // Verhalten von Setformat überschreiben
         };
@@ -240,7 +256,7 @@ namespace BlueDatabase {
             DropdownAllesAbwählenErlaubt = false,
             DropdownBearbeitungErlaubt = false,
             TextBearbeitungErlaubt = true,
-            DropDownItems = new List<string>(),
+            DropDownItems = new(Array.Empty<string>()),
             DropdownWerteAndererZellenAnzeigen = false
         };
 
@@ -264,7 +280,7 @@ namespace BlueDatabase {
         public TranslationType DoOpticalTranslation { get; set; }
         public bool DropdownAllesAbwählenErlaubt { get; set; }
         public bool DropdownBearbeitungErlaubt { get; set; }
-        public List<string> DropDownItems { get; set; }
+        public ReadOnlyCollection<string> DropDownItems { get; set; } = new(Array.Empty<string>());
         public bool DropdownWerteAndererZellenAnzeigen { get; set; }
         public DataFormat Format { get; set; }
         public ScriptType ScriptType { get; set; }

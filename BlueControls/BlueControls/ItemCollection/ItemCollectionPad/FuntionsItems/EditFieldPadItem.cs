@@ -32,6 +32,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollection;
@@ -270,8 +271,8 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
             t = t + "ColumnName=" + Column.Name + ", ";
         }
 
-        t = t + "EditType=" + ((int)_bearbeitung).ToString() + ", ";
-        t = t + "Caption=" + ((int)_überschiftanordung).ToString() + ", ";
+        t = t + "EditType=" + ((int)_bearbeitung) + ", ";
+        t = t + "Caption=" + ((int)_überschiftanordung) + ", ";
 
         return t.Trim(", ") + "}";
     }

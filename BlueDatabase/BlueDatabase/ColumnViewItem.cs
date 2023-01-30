@@ -23,6 +23,7 @@ using BlueDatabase.Enums;
 using System;
 using System.Drawing;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 
 namespace BlueDatabase;
 
@@ -53,7 +54,7 @@ public sealed class ColumnViewItem {
                 case "column":
 
                 case "columnname":// ColumnName wichtg, wegen CopyLayout
-                    Column = database.Column[pair.Value];
+                    Column = database.Column.Exists(pair.Value);
                     Column?.Repair(); // Alte Formate reparieren
                     break;
 
@@ -98,7 +99,7 @@ public sealed class ColumnViewItem {
                     break;
             }
         }
-        if (Column == null) { Develop.DebugPrint(FehlerArt.Warnung, "Ungültige Spalte"); }
+        //if (Column == null) { Develop.DebugPrint(FehlerArt.Warnung, "Ungültige Spalte"); }
         if (Column != null && _viewType == ViewType.None) { _viewType = ViewType.Column; }
         //if (Column != null && _viewType != ViewType.None) { Column.CheckFormulaEditType(); }
     }

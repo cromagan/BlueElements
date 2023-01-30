@@ -68,7 +68,7 @@ public sealed class MultiUserFile : IDisposableExtended {
 
     private DateTime _lastUserActionUtc = new(1900, 1, 1);
 
-    private int _loadingThreadId = -1;
+    //private int _loadingThreadId = -1;
 
     //private static string _lockLastastfile = string.Empty;
     private int _lockload = 0;
@@ -123,7 +123,7 @@ public sealed class MultiUserFile : IDisposableExtended {
 
     public event EventHandler? SavedToDisk;
 
-    public event EventHandler? Saving;
+    public event EventHandler<CancelEventArgs> Saving;
 
     public event EventHandler<MultiUserToListEventArgs>? ToListOfByte;
 
@@ -397,7 +397,7 @@ public sealed class MultiUserFile : IDisposableExtended {
                 //    _lockLastastfile = Filename;
                 //}
 
-                _loadingThreadId = Thread.CurrentThread.ManagedThreadId;
+                //_loadingThreadId = Thread.CurrentThread.ManagedThreadId;
 
                 if (_initialLoadDone && !ReloadNeeded) { return true; }
 
@@ -462,7 +462,11 @@ public sealed class MultiUserFile : IDisposableExtended {
         if (IsInSaveingLoop) { return false; }
         if (string.IsNullOrEmpty(Filename)) { return false; }
 
-        OnSaving();
+        var x = new CancelEventArgs();
+
+        OnSaving(x);
+        if (x.Cancel) { return false; }
+
         //OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs()); // Sonst meint der Benutzer evtl. noch, er könne Weiterarbeiten... Und Controlls haben die Möglichkeit, ihre Änderungen einzuchecken
         var d = DateTime.UtcNow; // Manchmal ist eine Block-Datei vorhanden, die just in dem Moment gelöscht wird. Also ein ganz kurze "Löschzeit" eingestehen.
         if (!mustSave && AgeOfBlockDatei >= 0) { RepairOldBlockFiles(); return false; }
@@ -763,9 +767,9 @@ public sealed class MultiUserFile : IDisposableExtended {
         SavedToDisk?.Invoke(this, System.EventArgs.Empty);
     }
 
-    private void OnSaving() {
+    private void OnSaving(CancelEventArgs e) {
         if (IsDisposed) { return; }
-        Saving?.Invoke(this, System.EventArgs.Empty);
+        Saving?.Invoke(this, e);
     }
 
     private byte[]? OnToListOfByte() {

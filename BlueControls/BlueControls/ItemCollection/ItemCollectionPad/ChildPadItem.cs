@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 
 namespace BlueControls.ItemCollection;
 
@@ -262,7 +263,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         if (Eingebettete_Ansichten.Count > 0) { t = t + "Embedded=" + Eingebettete_Ansichten.JoinWithCr().ToNonCritical() + ", "; }
         t = t + "Color=" + Randfarbe.ToHtmlCode() + ", ";
         if (PadInternal != null) {
-            t = t + "Data=" + PadInternal.Item.ToString() + ", ";
+            t = t + "Data=" + PadInternal.Item.ToString(false) + ", ";
         }
         return t.Trim(", ") + "}";
     }

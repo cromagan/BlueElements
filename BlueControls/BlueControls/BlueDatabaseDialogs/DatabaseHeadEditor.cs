@@ -28,6 +28,7 @@ using BlueDatabase.Enums;
 using System;
 using System.Linq;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
@@ -67,7 +68,7 @@ public sealed partial class DatabaseHeadEditor {
         if (_frmHeadEditorFormClosingIsin) { return; }
         _frmHeadEditorFormClosingIsin = true;
         base.OnFormClosing(e);
-        if (_database == null) {
+        if (_database == null || _database.IsDisposed) {
             return;
         }
 
@@ -275,7 +276,7 @@ public sealed partial class DatabaseHeadEditor {
         car[1].Hide("hidden");
         car[1].HideSystemColumns();
 
-        x.ColumnArrangements = car;
+        x.ColumnArrangements = new(car);
 
         x.SortDefinition = new RowSortDefinition(x, "Index", true);
         tblUndo.DatabaseSet(x, string.Empty);
@@ -322,7 +323,7 @@ public sealed partial class DatabaseHeadEditor {
     private void OkBut_Click(object sender, System.EventArgs e) => Close();
 
     private void RemoveDatabase() {
-        if (_database == null) { return; }
+        if (_database == null || _database.IsDisposed) { return; }
         _database.Disposing -= Database_Disposing;
         _database = null;
     }
@@ -354,7 +355,7 @@ public sealed partial class DatabaseHeadEditor {
     }
 
     private void WriteInfosBack() {
-        if (_database == null) { return; } // Disposed
+        if (_database == null || _database.IsDisposed) { return; } // Disposed
         if (_database.ReadOnly) { return; }
         scriptEditor.WriteScriptBack();
         _database.GlobalShowPass = txbKennwort.Text;
@@ -368,9 +369,9 @@ public sealed partial class DatabaseHeadEditor {
         _database.StandardFormulaFile = txbStandardFormulaFile.Text;
         _database.ZeilenQuickInfo = txbZeilenQuickInfo.Text.Replace("\r", "<br>");
 
-        _database.Tags = txbTags.Text.SplitAndCutByCrToList();
+        _database.Tags = new(txbTags.Text.SplitAndCutByCrToList());
 
-        _database.DatenbankAdmin = DatenbankAdmin.Item.ToListOfString();
+        _database.DatenbankAdmin = new(DatenbankAdmin.Item.ToListOfString());
 
         var tmp = PermissionGroups_NewRow.Item.ToListOfString();
         tmp.Remove("#Administrator");
@@ -386,7 +387,7 @@ public sealed partial class DatabaseHeadEditor {
         // Export ------------
         var t = new ListExt<ExportDefinition>();
         t.AddRange(lbxExportSets.Item.Select(thisItem => (ExportDefinition)((TextListItem)thisItem).Tag));
-        _database.Export = t;
+        _database.Export = new(t);
     }
 
     #endregion

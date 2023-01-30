@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -25,6 +26,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 
 namespace BlueBasics;
 
@@ -772,6 +774,14 @@ public static partial class Extensions {
         tXt = tXt.Replace("ž", "z");
         tXt = tXt.Replace("ß", "ss");
         return tXt;
+    }
+
+    public static List<string> ToListOfString(this IEnumerable<IHasKeyName?>? items) {
+        List<string> w = new();
+        if (items == null) { return w; }
+
+        w.AddRange(from thisItem in items where thisItem != null where !string.IsNullOrEmpty(thisItem.KeyName) select thisItem.KeyName);
+        return w;
     }
 
     public static string ToNonCritical(this string txt) {

@@ -133,7 +133,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
 
     private void btnLayoutHinzu_Click(object sender, System.EventArgs e) {
         SaveCurrentLayout();
-        var ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", "", FormatHolder.Text);
+        var ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", string.Empty,FormatHolder.Text);
         if (string.IsNullOrEmpty(ex)) { return; }
         LoadLayout(string.Empty);
 
@@ -141,7 +141,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
         c.Caption = ex;
 
         var lay = (LayoutCollection)Database.Layouts.Clone();
-        lay.Add(c.ToString());
+        lay.Add(c.ToString(false));
         Database.Layouts = lay;
 
         BefülleLayoutDropdown();
@@ -240,7 +240,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
     private void SaveCurrentLayout() {
         scriptEditor.WriteScriptBack();
         if (Database == null) { return; }
-        var newl = Pad.Item.ToString();
+        var newl = Pad.Item.ToString(false);
         var ind = Database.Layouts.LayoutIdToIndex(Pad.Item.Id);
         if (ind > -1) {
             if (Database.Layouts[ind] == newl) { return; }

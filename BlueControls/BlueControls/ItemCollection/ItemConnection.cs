@@ -90,10 +90,10 @@ public class ItemConnection {
 
         t = t + "Item1=" + myItem.Internal.ToNonCritical() + ", ";
         t = t + "Arrow1=" + ArrowOnMyItem.ToPlusMinus() + ", ";
-        t = t + "Type1=" + ((int)MyItemType).ToString() + ", ";
+        t = t + "Type1=" + ((int)MyItemType) + ", ";
         t = t + "Item2=" + OtherItem.Internal.ToNonCritical() + ", ";
         t = t + "Arrow2=" + ArrowOnOtherItem.ToPlusMinus() + ", ";
-        t = t + "Type2=" + ((int)OtherItemType).ToString() + ", ";
+        t = t + "Type2=" + ((int)OtherItemType) + ", ";
         t = t + "Print=" + _beiExportSichtbar.ToPlusMinus() + ", ";
 
         return t.TrimEnd(", ") + "}";

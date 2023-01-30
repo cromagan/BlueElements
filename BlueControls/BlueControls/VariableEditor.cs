@@ -91,7 +91,7 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
         var car = x.ColumnArrangements.CloneWithClones();
         car[1].ShowColumns("Name", "Typ", "RO", "System", "Inhalt", "Kommentar");
         //car[1].HideSystemColumns();
-        x.ColumnArrangements = car;
+        x.ColumnArrangements = new(car);
         x.SortDefinition = new RowSortDefinition(x, "Name", true);
         tableVariablen.DatabaseSet(x, string.Empty);
         tableVariablen.Arrangement = 1;

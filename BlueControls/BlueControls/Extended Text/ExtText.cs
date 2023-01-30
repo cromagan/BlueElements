@@ -28,6 +28,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 
 // VTextTyp-Hirachie
 // ~~~~~~~~~~~~~~~~~
@@ -513,7 +514,7 @@ public sealed class ExtText : ListExt<ExtChar> {
             cod = oricode.ToUpper().Trim();
             attribut = string.Empty;
         } else {
-            cod = oricode.Substring(0, istgleich).Replace(" ", "").ToUpper().Trim();
+            cod = oricode.Substring(0, istgleich).Replace(" ", string.Empty).ToUpper().Trim();
             attribut = oricode.Substring(istgleich + 1).Trim('\"');
         }
         switch (cod) {

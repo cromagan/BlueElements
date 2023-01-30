@@ -170,6 +170,19 @@ namespace BlueDatabase {
             MaxTextLenght = 255
         };
 
+        public static readonly FormatHolder SystemName = new() {
+            Name = "Systemname",
+            AllowedChars = Constants.Char_az + Constants.Char_az + Constants.Char_Numerals + "_",
+            Regex = @"^[A-Za-z]\\S*$",
+            Suffix = string.Empty,
+            Prefix = string.Empty,
+            FormatierungErlaubt = false,
+            AdditionalFormatCheck = AdditionalCheck.None,
+            SpellCheckingEnabled = false,
+            MultiLine = false,
+            MaxTextLenght = 128
+        };
+
         public static readonly FormatHolder Text = new() {
             Name = "Text",
             AllowedChars = string.Empty,

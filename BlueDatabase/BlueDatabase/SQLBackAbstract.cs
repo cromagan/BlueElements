@@ -28,6 +28,7 @@ using System.Data.Common;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace BlueDatabase;
@@ -237,7 +238,7 @@ public abstract class SQLBackAbstract {
                 value += ((DataRow)thisRow)[0].ToString();
             }
             //while (reader.Read()) {
-            //    value += reader[0].ToString();
+            //    value += reader[0].ToString(false);
             //}
 
             //CloseConnection();    // Nix vorhanden!
@@ -388,7 +389,7 @@ public abstract class SQLBackAbstract {
         }
     }
 
-    //    Develop.DebugPrint(FehlerArt.Info, "Datenbank Ladezeit: " + row.Database.TableName + " - " + DateTime.Now.Subtract(ti).TotalSeconds.ToString() + " Sekunden");
+    //    Develop.DebugPrint(FehlerArt.Info, "Datenbank Ladezeit: " + row.Database.TableName + " - " + DateTime.Now.Subtract(ti).TotalSeconds + " Sekunden");
     public bool OpenConnection() {
         lock (openclose) {
             if (_connection == null) { return false; }
@@ -401,13 +402,13 @@ public abstract class SQLBackAbstract {
     }
 
     //        for (var z = 1; z < reader.FieldCount; z++) {
-    //            row.Database.Cell.SetValueInternal(row.Database.Column[z - 1].Key, r, reader[z].ToString(), -1, -1);
+    //            row.Database.Cell.SetValueInternal(row.Database.Column[z - 1].Key, r, reader[z].ToString(false), -1, -1);
     //        }
     //    }
     public abstract SQLBackAbstract OtherTable(string tablename);
 
     //    while (await reader.ReadAsync()) {
-    //        var rk = LongParse(reader[0].ToString());
+    //        var rk = LongParse(reader[0].ToString(false));
     //        var r = row.GenerateAndAdd(rk, string.Empty, false, false);
     public void RenameColumn(string tablename, string oldname, string newname) {
         if (oldname.Equals(newname, StringComparison.OrdinalIgnoreCase)) { return; }
@@ -556,7 +557,7 @@ public abstract class SQLBackAbstract {
         }
 
         //if (type == DatabaseDataType.ColumnName) {
-        //    //var test = GetStyleData(tablename, DatabaseDataType.ColumnName.ToString(), columnName);
+        //    //var test = GetStyleData(tablename, DatabaseDataType.ColumnName.ToString(false), columnName);
         //    //if (!string.IsNullOrEmpty(test)) {
         //    //    Develop.DebugPrint(FehlerArt.Fehler, "Fataler Namensfehler 1!");
         //    //}
@@ -564,7 +565,7 @@ public abstract class SQLBackAbstract {
         //    //if (columnName != newValue && columnName != ColumnItem.TmpNewDummy) {
         //    //    Develop.DebugPrint(FehlerArt.Fehler, "Fataler Namensfehler 1: " + columnName + " -> " + newValue);
         //    //}
-        //    test = GetStyleData(tablename, DatabaseDataType.ColumnName.ToString(), newValue);
+        //    test = GetStyleData(tablename, DatabaseDataType.ColumnName.ToString(false), newValue);
         //    if (newValue != test) {
         //        Develop.DebugPrint(FehlerArt.Fehler, "Fataler Namensfehler 2!");
         //    }
@@ -651,7 +652,7 @@ public abstract class SQLBackAbstract {
                     return AddRow(tablename, LongParse(value));
 
                 default:
-                    Develop.DebugPrint(FehlerArt.Fehler, type.ToString() + " nicht definiert!");
+                    Develop.DebugPrint(FehlerArt.Fehler, type + " nicht definiert!");
                     return "Befehl nicht definiert";
             }
         }
@@ -750,7 +751,7 @@ public abstract class SQLBackAbstract {
                 //if (!OpenConnection()) { return null; }
                 //using var reader = q.ExecuteReader();
                 //while (reader.Read()) {
-                //    fb.Add((reader[0].ToString(), reader[1].ToString(), reader[2].ToString(), reader[3].ToString()));
+                //    fb.Add((reader[0].ToString(false), reader[1].ToString(false), reader[2].ToString(false), reader[3].ToString(false)));
                 //}
 
                 foreach (var thisRow in dt.Rows) {
@@ -877,7 +878,7 @@ public abstract class SQLBackAbstract {
             }
 
             foreach (var thiscolumn in columnsToLoad) {
-                //var val = GetStyleData(tablename, DatabaseDataType.ColumnTimeCode.ToString(), thiscolumn.Name);
+                //var val = GetStyleData(tablename, DatabaseDataType.ColumnTimeCode.ToString(false), thiscolumn.Name);
 
                 thiscolumn.IsInCache = DateTime.UtcNow;
 
@@ -889,7 +890,7 @@ public abstract class SQLBackAbstract {
                 //}
             }
 
-            //Develop.DebugPrint(FehlerArt.Info, "Datenbank Ladezeit: " + row.Database.TableName + " - " + DateTime.Now.Subtract(ti).TotalSeconds.ToString() + " Sekunden");
+            //Develop.DebugPrint(FehlerArt.Info, "Datenbank Ladezeit: " + row.Database.TableName + " - " + DateTime.Now.Subtract(ti).TotalSeconds + " Sekunden");
 
             CloseConnection();
         } catch {
@@ -976,7 +977,7 @@ public abstract class SQLBackAbstract {
                                    "where RK = " + DBVAL(rowkey);
 
             ////command.AddParameterWithValue("" + DBVAL(columnName.ToUpper()) , column.Name.ToUpper());
-            //command.AddParameterWithValue("" + DBVAL(row.Key)", row.Key.ToString());
+            //command.AddParameterWithValue("" + DBVAL(row.Key)", row.Key.ToString(false));
 
             var dt = Fill_Table(comm);
 
@@ -990,7 +991,7 @@ public abstract class SQLBackAbstract {
             //using var reader = q.ExecuteReader();
             //if (reader.Read()) {
             //    // you may want to check if value is NULL: reader.IsDBNull(0)
-            //    var value = reader[0].ToString();
+            //    var value = reader[0].ToString(false);
 
             //    if (reader.Read()) {
             //        // Doppelter Wert?!?Ersten Wert zurückgeben, um unendliche erweiterungen zu erhindern

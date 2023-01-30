@@ -22,8 +22,10 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 
 // ReSharper disable All
 
@@ -33,7 +35,7 @@ public sealed class RowSortDefinition : IParseable {
 
     #region Fields
 
-    public readonly ListExt<ColumnItem> Columns = new();
+    public List<ColumnItem> Columns = new();
     public DatabaseAbstract Database;
 
     #endregion

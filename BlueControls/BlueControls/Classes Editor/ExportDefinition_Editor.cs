@@ -25,6 +25,7 @@ using System;
 using System.Drawing;
 using System.Linq;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 
 namespace BlueControls.Classes_Editor;
@@ -125,7 +126,7 @@ internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<Expo
     //private void ExportFilter_AddClicked(object sender, System.EventArgs e)
     //{
     //    Develop.DebugPrint_NichtImplementiert();
-    //    var DummyFilter = new FilterItem(tmp.Database.Column.First, enFilterType.KeinFilter, "");
+    //    var DummyFilter = new FilterItem(tmp.Database.Column.First, enFilterType.KeinFilter, string.Empty);
     //    var NewFilter = FilterItem_Editor();// DialogBox.eEditClass(DummyFilter, false);
     //    if (NewFilter == DummyFilter) { return; }
     //    var NewFilter2 = (FilterItem)NewFilter;

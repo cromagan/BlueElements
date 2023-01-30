@@ -37,6 +37,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms.Design;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 using static BlueBasics.Develop;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
@@ -345,7 +346,7 @@ public partial class TableView : Form, IHasStatusbar {
         if (!did) {
             Table.DatabaseSet(database, string.Empty);
             if (Table.View_RowFirst() != null && database != null) {
-                Table.CursorPos_Set(database.Column.First, Table.View_RowFirst(), false);
+                Table.CursorPos_Set(Table.View_ColumnFirst(), Table.View_RowFirst(), false);
             }
         }
 
@@ -566,8 +567,8 @@ public partial class TableView : Form, IHasStatusbar {
     protected virtual string ViewToString() {
         //Reihenfolge wichtig, da die Ansicht vieles auf standard zurück setzt
         var s = "{" +
-                "Ansicht=" + ((int)_ansicht).ToString() + ", " +
-                "MainTab=" + ribMain.SelectedIndex.ToString() + ", " +
+                "Ansicht=" + ((int)_ansicht) + ", " +
+                "MainTab=" + ribMain.SelectedIndex + ", " +
                 "TableView=" + Table.ViewToString().ToNonCritical() +
                 "}";
         return s;
@@ -710,7 +711,7 @@ public partial class TableView : Form, IHasStatusbar {
 
         var car = Table?.Database?.ColumnArrangements.CloneWithClones();
         car[0].ShowAllColumns();
-        Table.Database.ColumnArrangements = car;
+        Table.Database.ColumnArrangements = new(car);
 
         Table.Invalidate_HeadSize();
         Table.Invalidate_AllColumnArrangements();
@@ -790,7 +791,7 @@ public partial class TableView : Form, IHasStatusbar {
             if (gefRow?.Row == Formula.ShowingRow) {
                 MessageBox.Show("Text nur im <b>aktuellen Eintrag</b> gefunden,<br>aber sonst keine weiteren Einträge!", ImageCode.Information, "OK");
             } else {
-                Table.CursorPos_Set(Table?.Database?.Column.First, gefRow, true);
+                Table.CursorPos_Set(Table?.View_ColumnFirst(), gefRow, true);
             }
         }
     }
@@ -907,12 +908,12 @@ public partial class TableView : Form, IHasStatusbar {
                 break;
         }
 
-        if (Table.Visible) {
+        if (Table?.Visible ?? false) {
             if (Table.Database != null) {
                 if (Table.CursorPosRow == null && Table.View_RowFirst() != null) {
-                    Table.CursorPos_Set(Table?.Database?.Column.First, Table.View_RowFirst(), false);
+                    Table.CursorPos_Set(Table?.View_ColumnFirst(), Table?.View_RowFirst(), false);
                 }
-                if (Table.CursorPosRow != null) {
+                if (Table?.CursorPosRow != null) {
                     FillFormula(Table.CursorPosRow.Row);
                 }
             }
@@ -949,7 +950,7 @@ public partial class TableView : Form, IHasStatusbar {
     }
 
     private void SuchEintragNoSave(Direction richtung, out ColumnItem? column, out RowData? row) {
-        column = Table?.Database?.Column.First;
+        column = Table?.View_ColumnFirst();
         row = null;
         if (Table.Database.Row.Count < 1) { return; }
         // Temporär berechnen, um geflacker zu vermeiden (Endabled - > Disabled bei Nothing)

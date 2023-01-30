@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 using BlueBasics.MultiUserFile;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
@@ -214,7 +215,7 @@ public sealed class Database : DatabaseAbstract {
 
                     var les = NummerCode3(bLoaded, pointer + 3 + cles);
                     var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 6+ cles, b, 0, les);
+                    Buffer.BlockCopy(bLoaded, pointer + 6 + cles, b, 0, les);
                     value = b.ToStringUtf8();
 
                     pointer += 6 + les + cles;
@@ -361,7 +362,7 @@ public sealed class Database : DatabaseAbstract {
         //    db.FirstColumn = Col
         //}
 
-        if (IntParse(db.LoadedVersion.Replace(".", "")) > IntParse(DatabaseVersion.Replace(".", ""))) { db.SetReadOnly(); }
+        if (IntParse(db.LoadedVersion.Replace(".", string.Empty)) > IntParse(DatabaseVersion.Replace(".", string.Empty))) { db.SetReadOnly(); }
     }
 
     public static void SaveToByteList(ColumnItem c, ref List<byte> l) {
@@ -418,9 +419,9 @@ public sealed class Database : DatabaseAbstract {
         SaveToByteList(l, DatabaseDataType.AdditionalFormatCheck, ((int)c.AdditionalFormatCheck).ToString(), name);
         SaveToByteList(l, DatabaseDataType.ScriptType, ((int)c.ScriptType).ToString(), name);
         SaveToByteList(l, DatabaseDataType.Prefix, c.Prefix, name);
-        //SaveToByteList(l, DatabaseDataType.KeyColumnKey, c.KeyColumnKey.ToString(), key);
+        //SaveToByteList(l, DatabaseDataType.KeyColumnKey, c.KeyColumnKey.ToString(false), key);
         SaveToByteList(l, DatabaseDataType.ColumnNameOfLinkedDatabase, c.LinkedCell_ColumnNameOfLinkedDatabase, name);
-        //SaveToByteList(l, DatabaseDataType.MakeSuggestionFromSameKeyColumn, c.VorschlagsColumn.ToString(), key);
+        //SaveToByteList(l, DatabaseDataType.MakeSuggestionFromSameKeyColumn, c.VorschlagsColumn.ToString(false), key);
         SaveToByteList(l, DatabaseDataType.ColumnAlign, ((int)c.Align).ToString(), name);
         SaveToByteList(l, DatabaseDataType.SortType, ((int)c.SortType).ToString(), name);
         //SaveToByteList(l, DatabaseDataType.ColumnTimeCode, c.TimeCode, key);
@@ -449,14 +450,14 @@ public sealed class Database : DatabaseAbstract {
             SaveToByteList(l, DatabaseDataType.Creator, db.Creator);
             SaveToByteList(l, DatabaseDataType.CreateDateUTC, db.CreateDate);
             SaveToByteList(l, DatabaseDataType.Caption, db.Caption);
-            //SaveToByteList(l, enDatabaseDataType.JoinTyp, ((int)_JoinTyp).ToString());
-            //SaveToByteList(l, DatabaseDataType.VerwaisteDaten, ((int)_verwaisteDaten).ToString());
+            //SaveToByteList(l, enDatabaseDataType.JoinTyp, ((int)_JoinTyp).ToString(false));
+            //SaveToByteList(l, DatabaseDataType.VerwaisteDaten, ((int)_verwaisteDaten).ToString(false));
             SaveToByteList(l, DatabaseDataType.Tags, db.Tags.JoinWithCr());
             SaveToByteList(l, DatabaseDataType.PermissionGroupsNewRow, db.PermissionGroupsNewRow.JoinWithCr());
             SaveToByteList(l, DatabaseDataType.DatabaseAdminGroups, db.DatenbankAdmin.JoinWithCr());
             SaveToByteList(l, DatabaseDataType.GlobalScale, db.GlobalScale.ToString(Constants.Format_Float1));
-            //SaveToByteList(l, DatabaseDataType.Ansicht, ((int)_ansicht).ToString());
-            //SaveToByteList(l, DatabaseDataType.ReloadDelaySecond, ReloadDelaySecond.ToString());
+            //SaveToByteList(l, DatabaseDataType.Ansicht, ((int)_ansicht).ToString(false));
+            //SaveToByteList(l, DatabaseDataType.ReloadDelaySecond, ReloadDelaySecond.ToString(false));
             //SaveToByteList(l, enDatabaseDataType.ImportScript, _ImportScript);
             SaveToByteList(l, DatabaseDataType.RulesScript, db.RulesScript);
             //SaveToByteList(l, enDatabaseDataType.BinaryDataInOne, Bins.ToString(true));
@@ -475,7 +476,7 @@ public sealed class Database : DatabaseAbstract {
                 SaveToByteList(l, DatabaseDataType.SortDefinition, db.SortDefinition.ToString());
             }
             //SaveToByteList(l, enDatabaseDataType.Rules_ALT, Rules.ToString(true));
-            SaveToByteList(l, DatabaseDataType.ColumnArrangement, db.ColumnArrangements.ToString());
+            SaveToByteList(l, DatabaseDataType.ColumnArrangement, db.ColumnArrangements.ToString(false));
             SaveToByteList(l, DatabaseDataType.Layouts, db.Layouts.JoinWithCr());
             SaveToByteList(l, DatabaseDataType.AutoExport, db.Export.ToString(true));
             // Beim Erstellen des Undo-Speichers die Works nicht verändern, da auch bei einem nicht
@@ -537,7 +538,7 @@ public sealed class Database : DatabaseAbstract {
         return string.Empty;
     }
 
-    public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked, List<string>? ignorePath) {
+    public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked) {
         if (string.IsNullOrWhiteSpace(Filename)) { return null; } // Stream-Datenbank
 
         if (allreadychecked != null) {
@@ -551,11 +552,11 @@ public sealed class Database : DatabaseAbstract {
             }
         }
 
-        if (ignorePath != null) {
-            foreach (var thisPf in ignorePath) {
-                if (Filename.FilePath().StartsWith(thisPf, StringComparison.OrdinalIgnoreCase)) { return null; }
-            }
-        }
+        //if (ignorePath != null) {
+        //    foreach (var thisPf in ignorePath) {
+        //        if (Filename.FilePath().StartsWith(thisPf, StringComparison.OrdinalIgnoreCase)) { return null; }
+        //    }
+        //}
 
         var nn = Directory.GetFiles(Filename.FilePath(), "*.mdb", SearchOption.AllDirectories);
         var gb = new List<ConnectionInfo>();
@@ -721,7 +722,7 @@ public sealed class Database : DatabaseAbstract {
     }
 
     internal static void SaveToByteList(List<byte> list, ColumnCollection c) {
-        //Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString());
+        //Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString(false));
         foreach (var columnitem in c) {
             if (columnitem != null && !string.IsNullOrEmpty(columnitem.Name)) {
                 SaveToByteList(columnitem, ref list);
@@ -941,7 +942,7 @@ public sealed class Database : DatabaseAbstract {
     //        //    row = Row.SearchByKey(thisPendingItem.RowKey);
     //        //    if (row == null) {
     //        //        if (thisPendingItem.Comand != DatabaseDataType.Comand_AddRow && thisPendingItem.User != UserName) {
-    //        //            Develop.DebugPrint("Pending verworfen, Zeile gelöscht.<br>" + ConnectionData.TableName + "<br>" + thisPendingItem.ToString());
+    //        //            Develop.DebugPrint("Pending verworfen, Zeile gelöscht.<br>" + ConnectionData.TableName + "<br>" + thisPendingItem.ToString(false));
     //        //            return;
     //        //        }
     //        //    }
@@ -951,7 +952,7 @@ public sealed class Database : DatabaseAbstract {
     //        //    col = Column.SearchByKey(thisPendingItem.ColKey);
     //        //    if (col == null) {
     //        //        //if (thisPendingItem.Comand != DatabaseDataType.AddColumnKeyInfo && thisPendingItem.User != UserName) {
-    //        //        Develop.DebugPrint("Pending verworfen, Spalte gelöscht.<br>" + ConnectionData.TableName + "<br>" + thisPendingItem.ToString());
+    //        //        Develop.DebugPrint("Pending verworfen, Spalte gelöscht.<br>" + ConnectionData.TableName + "<br>" + thisPendingItem.ToString(false));
     //        //        return;
     //        //        //}
     //        //    }

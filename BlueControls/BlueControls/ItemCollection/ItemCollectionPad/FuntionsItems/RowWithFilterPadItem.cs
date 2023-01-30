@@ -26,12 +26,15 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 
 namespace BlueControls.ItemCollection;
 
@@ -220,7 +223,14 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         if (base.ParseThis(tag, value)) { return true; }
         switch (tag) {
             case "database":
-                Database = DatabaseAbstract.GetByID(new ConnectionInfo(value.FromNonCritical()), null);
+
+                var na = value.FromNonCritical();
+
+                if (na.IsFormat(FormatHolder.FilepathAndName)) {
+                    na = na.FilePath() + SQLBackAbstract.MakeValidTableName(na.FileNameWithoutSuffix()) + "." + na.FileSuffix();
+                }
+
+                Database = DatabaseAbstract.GetByID(new ConnectionInfo(na), null);
                 return true;
 
             case "id":
@@ -236,7 +246,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
                     var n = thisRow.CellGetString("Spalte");
                     if (n.IsLong()) {
                         var k = LongParse(n);
-                        var c = Database.Column.SearchByKey(k);
+                        var c = Database?.Column.SearchByKey(k);
                         if (c != null) {
                             thisRow.CellSet("Spalte", c.Name);
                         }
@@ -282,10 +292,10 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         t = t + "ShowFormat=" + _anzeige.ToNonCritical() + ", ";
         //t = t + "Variable=" + _variable.ToNonCritical() + ", ";
 
-        t = t + "EditType=" + ((int)_bearbeitung).ToString() + ", ";
-        t = t + "Caption=" + ((int)_überschiftanordung).ToString() + ", ";
+        t = t + "EditType=" + ((int)_bearbeitung) + ", ";
+        t = t + "Caption=" + ((int)_überschiftanordung) + ", ";
 
-        t = t + "ID=" + Id.ToString() + ", ";
+        t = t + "ID=" + Id + ", ";
 
         if (Database != null) {
             t = t + "Database=" + Database.ConnectionData.UniqueID.ToNonCritical() + ", ";
@@ -346,14 +356,19 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
         var hs = FilterDefiniton.Column["spalte"];
 
-        var or2 = new List<string>();
-        if (Database != null) {
-            foreach (var thisc in Database.Column) {
-                or2.Add(thisc.Name + "|" + thisc.ReadableText());
+        if (hs != null) {
+            if (Database != null) {
+                var or2 = new List<string>();
+                foreach (var thisc in Database.Column) {
+                    or2.Add(thisc.Name + "|" + thisc.ReadableText());
+                }
+                hs.OpticalReplace = new(or2);
+                hs.DropDownItems = new System.Collections.ObjectModel.ReadOnlyCollection<string>(Database.Column.ToListOfString());
+            } else {
+                hs.OpticalReplace = new(Array.Empty<string>());
+                hs.DropDownItems = new(Array.Empty<string>());
             }
         }
-
-        hs.OpticalReplace = or2;
 
         #endregion
 
@@ -382,8 +397,8 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
                 }
             }
         }
-        b.DropDownItems = dd;
-        b.OpticalReplace = or;
+        b.DropDownItems = new(dd);
+        b.OpticalReplace = new(or);
 
         #endregion
 
@@ -438,16 +453,23 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
     private DatabaseAbstract GenerateFilterDatabase() {
         Database x = new(false, "Filterdatabase_" + Internal);
-        var sp = x.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolder.Text);
-        sp.Align = AlignmentHorizontal.Rechts;
 
+        var sp = x.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolder.TextOptions);
+        sp.Align = AlignmentHorizontal.Rechts;
+        sp.DropdownBearbeitungErlaubt = true;
+        sp.DropdownAllesAbwählenErlaubt = false;
+
+        //if (Database != null) {
+        //    sp.DropDownItems = new System.Collections.ObjectModel.ReadOnlyCollection<string>(Database.Column.ToListOfString());
+        //}
         var fa = x.Column.GenerateAndAdd("FilterArt", "Art", ColumnFormatHolder.Text);
         fa.MultiLine = false;
         fa.TextBearbeitungErlaubt = false;
         fa.DropdownAllesAbwählenErlaubt = true;
         fa.DropdownBearbeitungErlaubt = true;
-        fa.DropDownItems = new List<string>() { "=", "=!empty" };
-        fa.OpticalReplace = new List<string>() { "=|ist (GK egal)", "=!empty|wenn nicht leer, ist" };
+        fa.DropDownItems = new(new List<string>() { "=", "=!empty" });
+        fa.OpticalReplace = new(new List<string>() { "=|ist (GK egal)", "=!empty|wenn nicht leer, ist" });
+
         var b1 = x.Column.GenerateAndAdd("suchsym", " ", ColumnFormatHolder.Text);
         b1.BehaviorOfImageAndText = BildTextVerhalten.Nur_Bild;
         b1.ScriptType = ScriptType.String;
@@ -464,9 +486,8 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         x.RepairAfterParse();
 
         var car = x.ColumnArrangements.CloneWithClones();
-        car[1].ShowAllColumns();
-        car[1].HideSystemColumns();
-        x.ColumnArrangements = car;
+        car[1].ShowColumns("Spalte", "FilterArt", "suchsym", "suchtxt");
+        x.ColumnArrangements = new(car);
 
         x.SortDefinition = new RowSortDefinition(x, "Spalte", false);
 

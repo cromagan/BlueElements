@@ -72,7 +72,7 @@ public class Script {
     //    catch (Exception ex) {
     //        Develop.DebugPrint(ex);
     //        if (ex is System.Reflection.ReflectionTypeLoadException typeLoadException) {
-    //            Develop.DebugPrint(typeLoadException.LoaderExceptions.ToString());
+    //            Develop.DebugPrint(typeLoadException.LoaderExceptions.ToString(false));
     //            //var loaderExceptions = typeLoadException.LoaderExceptions;
     //        }
     //        return objects;
@@ -116,7 +116,7 @@ public class Script {
     /// </summary>
     public string Error {
         get => _error;
-        private set => _error = value.Replace("{", "").Replace("}", "");
+        private set => _error = value.Replace("{", string.Empty).Replace("}", string.Empty);
     }
 
     /// <summary>
@@ -124,7 +124,7 @@ public class Script {
     /// </summary>
     public string ErrorCode {
         get => _errorCode;
-        private set => _errorCode = value.Replace("{", "").Replace("}", "");
+        private set => _errorCode = value.Replace("{", string.Empty).Replace("}", string.Empty);
     }
 
     public int Line { get; internal set; }

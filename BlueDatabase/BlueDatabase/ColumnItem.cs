@@ -25,17 +25,19 @@ using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data.Common;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 
 namespace BlueDatabase;
 
-public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended, IColumnInputFormat, IErrorCheckable, IHasDatabase {
+public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended, IColumnInputFormat, IErrorCheckable, IHasDatabase, IHasKeyName {
 
     #region Fields
 
@@ -113,8 +115,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     private DatabaseAbstract? _tmpLinkedDatabase;
 
     #endregion
-
-    //private string _vorschlagsColumn;
 
     #region Constructors
 
@@ -207,6 +207,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         Invalidate_LinkedDatabase();
     }
 
+    //private string _vorschlagsColumn;
     public ColumnItem(DatabaseAbstract database, string name) {
         if (!IsValidColumnName(name)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht erlaubt!");
@@ -351,8 +352,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         }
     }
 
-    public List<string> AfterEditAutoReplace {
-        get => _afterEditAutoReplace;
+    public ReadOnlyCollection<string> AfterEditAutoReplace {
+        get => new(_afterEditAutoReplace);
         set {
             if (!_afterEditAutoReplace.IsDifferentTo(value)) {
                 return;
@@ -406,12 +407,9 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     public AlignmentHorizontal Align {
         get => _align;
         set {
-            if (_align == value) {
-                return;
-            }
+            if (_align == value) { return; }
 
-            Database?.ChangeData(DatabaseDataType.ColumnAlign, Name, null, ((int)_align).ToString(),
-                ((int)value).ToString(), string.Empty);
+            Database?.ChangeData(DatabaseDataType.ColumnAlign, Name, null, ((int)_align).ToString(), ((int)value).ToString(), string.Empty);
             OnChanged();
         }
     }
@@ -419,12 +417,9 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     public string AllowedChars {
         get => _allowedChars;
         set {
-            if (_allowedChars == value) {
-                return;
-            }
+            if (_allowedChars == value) { return; }
 
-            Database?.ChangeData(DatabaseDataType.AllowedChars, Name, null, _allowedChars, value, string.Empty);
-            OnChanged();
+            Database?.ChangeData(DatabaseDataType.AllowedChars, Name, null, _allowedChars, value, string.Empty); OnChanged();
         }
     }
 
@@ -433,9 +428,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     public string AutoFilterJoker {
         get => _autoFilterJoker;
         set {
-            if (_autoFilterJoker == value) {
-                return;
-            }
+            if (_autoFilterJoker == value) { return; }
 
             Database?.ChangeData(DatabaseDataType.AutoFilterJoker, Name, null, _autoFilterJoker, value, string.Empty);
             OnChanged();
@@ -445,9 +438,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     public string AutoRemove {
         get => _autoRemove;
         set {
-            if (_autoRemove == value) {
-                return;
-            }
+            if (_autoRemove == value) { return; }
 
             Database?.ChangeData(DatabaseDataType.AutoRemoveCharAfterEdit, Name, null, _autoRemove, value, string.Empty);
             OnChanged();
@@ -457,12 +448,9 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     public Color BackColor {
         get => _backColor;
         set {
-            if (_backColor.ToArgb() == value.ToArgb()) {
-                return;
-            }
+            if (_backColor.ToArgb() == value.ToArgb()) { return; }
 
-            Database?.ChangeData(DatabaseDataType.BackColor, Name, null, _backColor.ToArgb().ToString(),
-                value.ToArgb().ToString(), string.Empty);
+            Database?.ChangeData(DatabaseDataType.BackColor, Name, null, _backColor.ToArgb().ToString(), value.ToArgb().ToString(), string.Empty);
             OnChanged();
         }
     }
@@ -474,8 +462,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 return;
             }
 
-            Database?.ChangeData(DatabaseDataType.BehaviorOfImageAndText, Name, null,
-                ((int)_behaviorOfImageAndText).ToString(), ((int)value).ToString(), string.Empty);
+            Database?.ChangeData(DatabaseDataType.BehaviorOfImageAndText, Name, null, ((int)_behaviorOfImageAndText).ToString(), ((int)value).ToString(), string.Empty);
             OnChanged();
         }
     }
@@ -484,9 +471,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         get => _caption;
         set {
             value = value.Replace("<br>", "\r", RegexOptions.IgnoreCase);
-            if (_caption == value) {
-                return;
-            }
+            if (_caption == value) { return; }
 
             Database?.ChangeData(DatabaseDataType.ColumnCaption, Name, null, _caption, value, string.Empty);
             Invalidate_Head();
@@ -497,9 +482,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     public string CaptionBitmapCode {
         get => _captionBitmapCode;
         set {
-            if (_captionBitmapCode == value) {
-                return;
-            }
+            if (_captionBitmapCode == value) { return; }
 
             Database?.ChangeData(DatabaseDataType.CaptionBitmapCode, Name, null, _captionBitmapCode, value, string.Empty);
             _captionBitmapCode = value;
@@ -511,9 +494,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     public string CaptionGroup1 {
         get => _captionGroup1;
         set {
-            if (_captionGroup1 == value) {
-                return;
-            }
+            if (_captionGroup1 == value) { return; }
 
             Database?.ChangeData(DatabaseDataType.CaptionGroup1, Name, null, _captionGroup1, value, string.Empty);
             OnChanged();
@@ -523,9 +504,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     public string CaptionGroup2 {
         get => _captionGroup2;
         set {
-            if (_captionGroup2 == value) {
-                return;
-            }
+            if (_captionGroup2 == value) { return; }
 
             Database?.ChangeData(DatabaseDataType.CaptionGroup2, Name, null, _captionGroup2, value, string.Empty);
             OnChanged();
@@ -535,9 +514,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     public string CaptionGroup3 {
         get => _captionGroup3;
         set {
-            if (_captionGroup3 == value) {
-                return;
-            }
+            if (_captionGroup3 == value) { return; }
 
             Database?.ChangeData(DatabaseDataType.CaptionGroup3, Name, null, _captionGroup3, value, string.Empty);
             OnChanged();
@@ -547,9 +524,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     public string CellInitValue {
         get => _cellInitValue;
         set {
-            if (_cellInitValue == value) {
-                return;
-            }
+            if (_cellInitValue == value) { return; }
 
             Database?.ChangeData(DatabaseDataType.CellInitValue, Name, null, _cellInitValue, value, string.Empty);
             OnChanged();
@@ -559,9 +534,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     public string ConstantHeightOfImageCode {
         get => _constantHeightOfImageCode;
         set {
-            if (_constantHeightOfImageCode == value) {
-                return;
-            }
+            if (_constantHeightOfImageCode == value) { return; }
 
             Database?.ChangeData(DatabaseDataType.ConstantHeightOfImageCode, Name, null, _constantHeightOfImageCode, value, string.Empty);
             Invalidate_ColumAndContent();
@@ -589,9 +562,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     public TranslationType DoOpticalTranslation {
         get => _doOpticalTranslation;
         set {
-            if (_doOpticalTranslation == value) {
-                return;
-            }
+            if (_doOpticalTranslation == value) { return; }
 
             Database?.ChangeData(DatabaseDataType.DoOpticalTranslation, Name, null, ((int)_doOpticalTranslation).ToString(), ((int)value).ToString(), string.Empty);
             OnChanged();
@@ -622,8 +593,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         }
     }
 
-    public List<string> DropDownItems {
-        get => _dropDownItems;
+    public ReadOnlyCollection<string> DropDownItems {
+        get => new(_dropDownItems);
         set {
             if (!_dropDownItems.IsDifferentTo(value)) {
                 return;
@@ -734,6 +705,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         }
     }
 
+    public string KeyName => _name;
     ///// <summary>
     ///// Hält Werte, dieser Spalte gleich, bezugnehmend der KeyColumn(key)
     ///// </summary>
@@ -746,7 +718,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
     //        var c = Database?.Column.SearchByKey(_keyColumnKey);
     //        c?.CheckIfIAmAKeyColumn();
-    //        Database?.ChangeData(DatabaseDataType.KeyColumnKey, Key, null, _keyColumnKey.ToString(), value.ToString(), string.Empty);
+    //        Database?.ChangeData(DatabaseDataType.KeyColumnKey, Key, null, _keyColumnKey.ToString(false), value.ToString(false), string.Empty);
     //        c = Database?.Column.SearchByKey(_keyColumnKey);
     //        c?.CheckIfIAmAKeyColumn();
     //        OnChanged();
@@ -789,7 +761,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 return;
             }
 
-            Database?.ChangeData(DatabaseDataType.ColumnNameOfLinkedDatabase, Name, null, _linkedCell_ColumnNameOfLinkedDatabase.ToString(), value.ToString(), string.Empty);
+            Database?.ChangeData(DatabaseDataType.ColumnNameOfLinkedDatabase, Name, null, _linkedCell_ColumnNameOfLinkedDatabase, value, string.Empty);
             Invalidate_ColumAndContent();
             OnChanged();
         }
@@ -931,22 +903,22 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         }
     }
 
-    public List<string> OpticalReplace {
-        get => _opticalReplace;
+    public ReadOnlyCollection<string> OpticalReplace {
+        get => new(_opticalReplace);
         set {
             if (!_opticalReplace.IsDifferentTo(value)) { return; }
 
-            Database.ChangeData(DatabaseDataType.OpticalTextReplace, Name, null, _opticalReplace.JoinWithCr(), value.JoinWithCr(), string.Empty);
+            Database?.ChangeData(DatabaseDataType.OpticalTextReplace, Name, null, _opticalReplace.JoinWithCr(), value.JoinWithCr(), string.Empty);
             OnChanged();
         }
     }
 
-    public List<string> PermissionGroupsChangeCell {
-        get => _permissionGroupsChangeCell;
+    public ReadOnlyCollection<string> PermissionGroupsChangeCell {
+        get => new(_permissionGroupsChangeCell);
         set {
             if (!_permissionGroupsChangeCell.IsDifferentTo(value)) { return; }
 
-            Database.ChangeData(DatabaseDataType.PermissionGroupsChangeCell, Name, null, _permissionGroupsChangeCell.JoinWithCr(), value.JoinWithCr(), string.Empty);
+            Database?.ChangeData(DatabaseDataType.PermissionGroupsChangeCell, Name, null, _permissionGroupsChangeCell.JoinWithCr(), value.JoinWithCr(), string.Empty);
             OnChanged();
         }
     }
@@ -1089,7 +1061,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     //    set {
     //        if (_vorschlagsColumn == value) { return; }
 
-    //        Database?.ChangeData(DatabaseDataType.MakeSuggestionFromSameKeyColumn, Key, null, _vorschlagsColumn.ToString(), value.ToString(), string.Empty);
+    //        Database?.ChangeData(DatabaseDataType.MakeSuggestionFromSameKeyColumn, Key, null, _vorschlagsColumn.ToString(false), value.ToString(false), string.Empty);
     //        OnChanged();
     //    }
     //}
@@ -1273,7 +1245,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     public void CloneFrom(ColumnItem source, bool nameAndKeyToo) {
         if (nameAndKeyToo) {
             Name = source.Name;
-            //Database.ChangeData(DatabaseDataType.ColumnKey, this, null, this.Key.ToString(), source.Key.ToString());
+            //Database?.ChangeData(DatabaseDataType.ColumnKey, this, null, this.Key.ToString(false), source.Key.ToString(false));
 
             Key = source.Key;
         }
@@ -1440,7 +1412,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             if (thisRowItem != null) {
                 if (thisRowItem.MatchesTo(filter) ||
                     (pinned != null && pinned.Contains(thisRowItem))) {
-                    thisRowItem.CellSet(this, "");
+                    thisRowItem.CellSet(this, string.Empty);
                 }
             }
         }
@@ -1665,9 +1637,9 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     //        var te = Enum.GetName(t, thisItem);
     //        var th = (int)thisItem;
     //        if (!string.IsNullOrEmpty(te)) {
-    //            NewReplacer.GenerateAndAdd(th.ToString() + "|" + te);
+    //            NewReplacer.GenerateAndAdd(th + "|" + te);
     //            if (th >= ZumDropdownHinzuAb && th < ZumDropdownHinzuBis) {
-    //                NewAuswahl.GenerateAndAdd(th.ToString());
+    //                NewAuswahl.GenerateAndAdd(th.ToString(false));
     //            }
     //        }
     //    }
@@ -1851,7 +1823,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                     //if (LinkedCell_RowKeyIsInColumn != -9999) {
                     _format = DataFormat.Verknüpfung_zu_anderer_Datenbank;
                     _linkedCellFilter.Clear();
-                    //LinkedCellFilter.GenerateAndAdd(LinkedCell_RowKeyIsInColumn.ToString());
+                    //LinkedCellFilter.GenerateAndAdd(LinkedCell_RowKeyIsInColumn.ToString(false));
                     //LinkedCell_RowKeyIsInColumn = -1;
                     //}
                     break;
@@ -2229,7 +2201,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         if (this == null) { return "NULL"; }
         if (IsDisposed) { return "Disposed"; }
 
-        return Name + " -> " + Caption + " (Key: " + Key.ToString() + ")";
+        return Name + " -> " + Caption + " (Key: " + Key + ")";
     }
 
     public bool UserEditDialogTypeInFormula(EditTypeFormula editTypeToCheck) {
@@ -2640,7 +2612,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
             default:
                 if (!string.Equals(type.ToString(), ((int)type).ToString(), StringComparison.Ordinal)) {
-                    return "Interner Fehler: Für den Datentyp  '" + type + "'  wurde keine Laderegel definiert.";
+                    return "Interner Fehler: Für den Datentyp '" + type + "' wurde keine Laderegel definiert.";
                 }
                 break;
         }
@@ -2663,8 +2635,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
     //private void _TMP_LinkedDatabase_ColumnKeyChanged(object sender, KeyChangedEventArgs e) {
     //    if (_Format != DataFormat.Columns_für_LinkedCellDropdown) {
-    //        var os = e.KeyOld.ToString();
-    //        var ns = e.KeyNew.ToString();
+    //        var os = e.KeyOld.ToString(false);
+    //        var ns = e.KeyNew.ToString(false);
     //        foreach (var ThisRow in Database.Row) {
     //            if (Database.Cell.GetStringBehindLinkedValue(this, ThisRow) == os) {
     //                Database.Cell.SetValueBehindLinkedValue(this, ThisRow, ns);
@@ -2672,8 +2644,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     //        }
     //    }
     //    if (_Format != DataFormat.LinkedCell) {
-    //        var os = e.KeyOld.ToString() + "|";
-    //        var ns = e.KeyNew.ToString() + "|";
+    //        var os = e.KeyOld + "|";
+    //        var ns = e.KeyNew + "|";
     //        foreach (var ThisRow in Database.Row) {
     //            var val = Database.Cell.GetStringBehindLinkedValue(this, ThisRow);
     //            if (val.StartsWith(os)) {
@@ -2696,8 +2668,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
     //private void _TMP_LinkedDatabase_RowKeyChanged(object sender, KeyChangedEventArgs e) {
     //    if (_Format != DataFormat.LinkedCell) {
-    //        var os = "|" + e.KeyOld.ToString();
-    //        var ns = "|" + e.KeyNew.ToString();
+    //        var os = "|" + e.KeyOld.ToString(false);
+    //        var ns = "|" + e.KeyNew.ToString(false);
     //        foreach (var ThisRow in Database.Row) {
     //            var val = Database.Cell.GetStringBehindLinkedValue(this, ThisRow);
     //            if (val.EndsWith(os)) {

@@ -29,6 +29,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 
 namespace BlueDatabase;
@@ -61,6 +62,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         _muf.ParseExternal += Parse;
         _muf.ToListOfByte += ToListOfByte;
         _muf.ReloadDelaySecond = 180;
+        _muf.Saving += _muf_Saving;
 
         Works = new ListExt<WorkItem>();
 
@@ -77,6 +79,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
     #region Properties
 
     public static string DatabaseId => typeof(DatabaseMultiUser).Name;
+
     public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename);
 
     public string Filename => _muf?.Filename ?? string.Empty;
@@ -104,7 +107,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         return string.Empty;
     }
 
-    public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked, List<string>? ignorePath) {
+    public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked) {
         if (string.IsNullOrWhiteSpace(Filename)) { return null; } // Stream-Datenbank
 
         if (allreadychecked != null) {
@@ -118,11 +121,11 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
             }
         }
 
-        if (ignorePath != null) {
-            foreach (var thisPf in ignorePath) {
-                if (Filename.FilePath().StartsWith(thisPf, StringComparison.OrdinalIgnoreCase)) { return null; }
-            }
-        }
+        //if (ignorePath != null) {
+        //    foreach (var thisPf in ignorePath) {
+        //        if (Filename.FilePath().StartsWith(thisPf, StringComparison.OrdinalIgnoreCase)) { return null; }
+        //    }
+        //}
 
         var nn = Directory.GetFiles(Filename.FilePath(), "*.mdb", SearchOption.AllDirectories);
         var gb = new List<ConnectionInfo>();
@@ -182,6 +185,8 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
     public override bool Save() {
         if (_muf == null || IsDisposed || ReadOnly || !HasPendingChanges) { return false; }
 
+        if (_muf.IsLoading) { return false; }
+
         OnDropMessage(FehlerArt.Info, "Speichere Datenbank: " + TableName);
 
         var x = _muf?.Save(true) ?? false;
@@ -240,12 +245,11 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
     protected override void SetUserDidSomething() => _muf.SetUserDidSomething();
 
-    //protected string SpecialErrorReason(ErrorReason mode) => _muf.ErrorReason(mode);
-
     private void _muf_HasPendingChanges(object sender, MultiUserFileHasPendingChangesEventArgs e) {
         e.HasPendingChanges = HasPendingChanges;
     }
 
+    //protected string SpecialErrorReason(ErrorReason mode) => _muf.ErrorReason(mode);
     private void _muf_Loaded(object sender, System.EventArgs e) {
         RepairAfterParse();
         OnLoaded();
@@ -260,6 +264,14 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         if (IsDisposed) { return; }
         HasPendingChanges = false;
         ChangeWorkItems();
+    }
+
+    private void _muf_Saving(object sender, CancelEventArgs e) {
+        if (e.Cancel) { return; }
+
+        var x = ErrorReason(BlueBasics.Enums.ErrorReason.Save);
+
+        e.Cancel = !string.IsNullOrEmpty(x);
     }
 
     private void ChangeWorkItems() {
@@ -328,7 +340,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
             //    row = Row.SearchByKey(thisPendingItem.RowKey);
             //    if (row == null) {
             //        if (thisPendingItem.Comand != DatabaseDataType.Comand_AddRow && thisPendingItem.User != UserName) {
-            //            Develop.DebugPrint("Pending verworfen, Zeile gelöscht.<br>" + ConnectionData.TableName + "<br>" + thisPendingItem.ToString());
+            //            Develop.DebugPrint("Pending verworfen, Zeile gelöscht.<br>" + ConnectionData.TableName + "<br>" + thisPendingItem.ToString(false));
             //            return;
             //        }
             //    }
@@ -338,7 +350,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
             //    col = Column.SearchByKey(thisPendingItem.ColKey);
             //    if (col == null) {
             //        //if (thisPendingItem.Comand != DatabaseDataType.AddColumnKeyInfo && thisPendingItem.User != UserName) {
-            //        Develop.DebugPrint("Pending verworfen, Spalte gelöscht.<br>" + ConnectionData.TableName + "<br>" + thisPendingItem.ToString());
+            //        Develop.DebugPrint("Pending verworfen, Spalte gelöscht.<br>" + ConnectionData.TableName + "<br>" + thisPendingItem.ToString(false));
             //        return;
             //        //}
             //    }

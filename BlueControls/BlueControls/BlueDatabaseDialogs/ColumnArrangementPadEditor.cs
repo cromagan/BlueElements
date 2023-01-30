@@ -31,6 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -85,7 +86,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         if (MessageBox.Show("Anordung <b>'" + CurrentArrangement.Name + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         var car = Database.ColumnArrangements.CloneWithClones();
         car.RemoveAt(Arrangement);
-        Database.ColumnArrangements = car;
+        Database.ColumnArrangements = new System.Collections.ObjectModel.ReadOnlyCollection<ColumnViewCollection>(car);
         Arrangement = 1;
         UpdateCombobox();
         ShowOrder();
@@ -126,20 +127,20 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         //car.RemoveAt(Arrangement);
 
         if (car.Count < 1) {
-            car.Add(new ColumnViewCollection(Database, "", ""));
+            car.Add(new ColumnViewCollection(Database, string.Empty, string.Empty));
         }
         string newname;
         if (MitVorlage) {
-            newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", "", FormatHolder.Text);
+            newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder.Text);
             if (string.IsNullOrEmpty(newname)) { return; }
             car.Add(new ColumnViewCollection(Database, CurrentArrangement.ToString(), newname));
         } else {
-            newname = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", "", FormatHolder.Text);
+            newname = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder.Text);
             if (string.IsNullOrEmpty(newname)) { return; }
-            car.Add(new ColumnViewCollection(Database, "", newname));
+            car.Add(new ColumnViewCollection(Database, string.Empty, newname));
         }
 
-        Database.ColumnArrangements = car;
+        Database.ColumnArrangements = new System.Collections.ObjectModel.ReadOnlyCollection<ColumnViewCollection>(car);
         Arrangement = car.Count - 1;
         UpdateCombobox();
 
@@ -322,7 +323,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
         Fixing--;
 
-        Database.ColumnArrangements = cloneOfColumnArrangements;
+        Database.ColumnArrangements = new System.Collections.ObjectModel.ReadOnlyCollection<ColumnViewCollection>(cloneOfColumnArrangements);
 
         if (did) {
             Database?.RepairAfterParse();

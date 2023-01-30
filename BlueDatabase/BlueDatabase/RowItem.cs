@@ -31,10 +31,11 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 
 namespace BlueDatabase;
 
-public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
+public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
 
     #region Fields
 
@@ -87,6 +88,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended {
     public DatabaseAbstract? Database { get; private set; }
     public bool IsDisposed { get; private set; }
     public long Key { get; private set; }
+
+    public string KeyName => Key.ToString();
 
     public string QuickInfo {
         get {

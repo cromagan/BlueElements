@@ -25,6 +25,7 @@ using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 
 namespace BlueDatabase;
 

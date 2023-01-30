@@ -145,7 +145,7 @@ public partial class Form : System.Windows.Forms.Form {
             if (type == FehlerArt.Fehler) { imagecode = ImageCode.Kritisch; }
 
             if (type == FehlerArt.Info || type == FehlerArt.DevelopInfo || !dropMessages || didAlreadyMessagebox) {
-                capStatusbar.Text = "<imagecode=" + QuickImage.Get(imagecode, 16).ToString() + "> " + message;
+                capStatusbar.Text = "<imagecode=" + QuickImage.Get(imagecode, 16) + "> " + message;
                 capStatusbar.Refresh();
                 return false;
             }

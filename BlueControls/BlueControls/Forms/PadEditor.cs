@@ -22,7 +22,7 @@ using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using System;
 using System.Drawing;
-using static BlueBasics.Converter;
+using static BlueBasics.Converter;using static BlueBasics.Extensions;
 
 namespace BlueControls.Forms;
 
@@ -34,7 +34,7 @@ public partial class PadEditor : PadEditorReadOnly {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        //InitWindow(false, "", -1, "");
+        //InitWindow(false, string.Empty,-1, string.Empty);
 
         //if (FitWindowToBest) {
         //    if (System.Windows.Forms.Screen.AllScreens.Length == 1 || OpenOnScreen < 0) {

@@ -19,6 +19,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
@@ -27,22 +28,7 @@ using System.Linq;
 
 namespace BlueControls.ItemCollection.ItemCollectionList;
 
-public static class BasicListItemExtensions {
-
-    #region Methods
-
-    public static List<string> ToListOfString(this List<BasicListItem>? items) {
-        List<string> w = new();
-        if (items == null) { return w; }
-
-        w.AddRange(from thisItem in items where thisItem != null where !string.IsNullOrEmpty(thisItem.Internal) select thisItem.Internal);
-        return w;
-    }
-
-    #endregion
-}
-
-public abstract class BasicListItem : IComparable, ICloneable {
+public abstract class BasicListItem : IComparable, ICloneable, IHasKeyName {
 
     #region Fields
 
@@ -109,6 +95,8 @@ public abstract class BasicListItem : IComparable, ICloneable {
     public string Internal { get; set; }
 
     public bool IsCaption { get; protected set; }
+
+    public string KeyName => Internal;
 
     public ItemCollectionList? Parent {
         get => _parent;

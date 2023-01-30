@@ -120,7 +120,7 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
             ok = true;
         } catch (Exception ex) {
             Develop.DebugPrint(ex);
-            //MessageBox.Show(ex.ToString(), "MyProgram", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //MessageBox.Show(ex.ToString(false), "MyProgram", MessageBoxButtons.OK, MessageBoxIcon.Information);
         } finally {
             if (myConn.State == ConnectionState.Open) {
                 myConn.Close();
@@ -157,7 +157,7 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
 
     public override SQLBackAbstract OtherTable(string tablename) => new SQLBackMicrosoftCE(this, tablename);
 
-    public override string VarChar(int lenght) => "VARCHAR(" + lenght.ToString() + ")";
+    public override string VarChar(int lenght) => "VARCHAR(" + lenght + ")";
 
     protected override List<string> AllTables() {
         List<string> tables = new();

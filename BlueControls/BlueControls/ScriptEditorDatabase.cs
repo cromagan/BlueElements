@@ -51,7 +51,7 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
                 _database.Disposing -= _Database_Disposing;
             }
             _database = value;
-            if (_database == null) {
+            if (_database == null || _database.IsDisposed) {
                 return;
             }
 
@@ -65,12 +65,12 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
     #region Methods
 
     internal void WriteScriptBack() {
-        if (_database == null) { return; }
+        if (_database == null || _database.IsDisposed) { return; }
         _database.RulesScript = ScriptText;
     }
 
     protected override Script? GenerateAndDoScript() {
-        if (_database == null) {
+        if (_database == null || _database.IsDisposed) {
             Message("Keine Datenbank geladen.");
             return null;
         }
@@ -101,7 +101,7 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
     }
 
     protected override void OpenAdditionalFileFolder() {
-        if (_database == null) {
+        if (_database == null || _database.IsDisposed) {
             Message("Keine Datenbank geladen.");
             return;
         }

@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 
 namespace BlueControls.ItemCollection;
 
@@ -167,8 +168,8 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
         t = t + "CaptionText=" + _überschrift.ToNonCritical() + ", ";
         t = t + "Variable=" + _variable.ToNonCritical() + ", ";
 
-        t = t + "EditType=" + ((int)_bearbeitung).ToString() + ", ";
-        t = t + "Caption=" + ((int)_überschriftanordung).ToString() + ", ";
+        t = t + "EditType=" + ((int)_bearbeitung) + ", ";
+        t = t + "Caption=" + ((int)_überschriftanordung) + ", ";
 
         return t.Trim(", ") + "}";
     }

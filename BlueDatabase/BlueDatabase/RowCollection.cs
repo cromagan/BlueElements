@@ -355,7 +355,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
         var item = SearchByKey(key);
         if (item != null) { Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!"); }
-        Database.ChangeData(DatabaseDataType.Comand_AddRow, null, key, string.Empty, key.ToString(), comment);
+        Database?.ChangeData(DatabaseDataType.Comand_AddRow, null, key, string.Empty, key.ToString(), comment);
         item = SearchByKey(key);
         if (item == null) { Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen."); }
 
@@ -425,7 +425,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     //foreach (var ThisRowItem in _Internal.Values)//{//    if (ThisRowItem != null) { return ThisRowItem; }//}//return null;
     IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();
 
-    public bool Remove(long key, string comment) => string.IsNullOrEmpty(Database.ChangeData(DatabaseDataType.Comand_RemoveRow, null, key, string.Empty, key.ToString(), comment));
+    public bool Remove(long key, string comment) => string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Comand_RemoveRow, null, key, string.Empty, key.ToString(), comment));
 
     public bool Remove(FilterItem filter, List<RowItem?>? pinned, string comment) {
         FilterCollection nf = new(Database) { filter };
@@ -514,7 +514,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     }
 
     //        default:
-    //            if (type.ToString() == ((int)type).ToString()) {
+    //            if (type.ToString(false) == ((int)type).ToString(false)) {
     //                Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + type + "' nicht definiert.<br>Wert: " + value + "<br>Datei: " + Database.Filename);
     //            } else {
     //                return "Interner Fehler: Für den Datentyp  '" + type + "'  wurde keine Laderegel definiert.";

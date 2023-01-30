@@ -21,6 +21,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -32,24 +33,13 @@ public static partial class Extensions {
 
     #region Methods
 
-    public static bool AddIfNotExists<T>(this List<T> l, BindingList<T>? values) {
-        if (values == null || values.Count == 0) { return false; }
-        var ok1 = false;
-        foreach (var thivalue in values) {
-            if (l.AddIfNotExists(thivalue)) {
-                ok1 = true;
-            }
-        }
-        return ok1;
-    }
-
-    public static bool AddIfNotExists<T>(this List<T> l, List<T>? values) {
+    public static bool AddIfNotExists<T>(this ICollection<T> l, ICollection<T>? values) {
         if (values == null || values.Count == 0) { return false; }
         var ok1 = values.Count(l.AddIfNotExists) > 0;
         return ok1;
     }
 
-    public static bool AddIfNotExists<T>(this List<T> l, T value) {
+    public static bool AddIfNotExists<T>(this ICollection<T> l, T value) {
         if (l.Contains(value)) {
             return false;
         }
@@ -58,13 +48,7 @@ public static partial class Extensions {
         return true;
     }
 
-    public static ListExt<T> Clone<T>(this ListExt<T> l) {
-        var l2 = new ListExt<T>();
-        l2.AddRange(l);
-        return l2;
-    }
-
-    public static List<T> Clone<T>(this List<T> l) {
+    public static List<T> Clone<T>(this ICollection<T> l) {
         var l2 = new List<T>();
         l2.AddRange(l);
         return l2;
@@ -76,7 +60,7 @@ public static partial class Extensions {
     /// <typeparam name="T"></typeparam>
     /// <param name="list1"></param>
     /// <param name="list2"></param>
-    public static void CloneFrom<T>(this List<T> list1, List<T> list2) where T : IComparable {
+    public static void CloneFrom<T>(this IList<T> list1, IList<T> list2) where T : IComparable {
         if (!list1.IsDifferentTo(list2)) { return; }
 
         //if (list2 == null) { list1 = null; return; }
@@ -99,11 +83,13 @@ public static partial class Extensions {
         }
     }
 
-    public static ListExt<T> CloneWithClones<T>(this ListExt<T> l) where T : ICloneable {
-        var l2 = new ListExt<T>();
+    public static List<T?> CloneWithClones<T>(this ICollection<T?>? l) where T : ICloneable {
+        var l2 = new List<T?>();
+
+        if (l == null) { return l2; }
 
         foreach (var item in l) {
-            var it = item.Clone();
+            var it = item?.Clone();
             if (it != null) {
                 l2.Add((T)it);
             }
@@ -112,20 +98,7 @@ public static partial class Extensions {
         return l2;
     }
 
-    public static List<T> CloneWithClones<T>(this List<T> l) where T : ICloneable {
-        var l2 = new List<T>();
-
-        foreach (var item in l) {
-            var it = item.Clone();
-            if (it != null) {
-                l2.Add((T)it);
-            }
-        }
-
-        return l2;
-    }
-
-    public static bool IsDifferentTo<T>(this List<T>? list1, List<T>? list2) =>
+    public static bool IsDifferentTo<T>(this ICollection<T>? list1, ICollection<T>? list2) =>
             // https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.sequenceequal?redirectedfrom=MSDN&view=netcore-3.1#System_Linq_Enumerable_SequenceEqual__1_System_Collections_Generic_IEnumerable___0__System_Collections_Generic_IEnumerable___0__
             list1 != list2 && (list1 is null || list2 is null || !list1.SequenceEqual(list2));
 
@@ -141,11 +114,11 @@ public static partial class Extensions {
     /// <typeparam name="T"></typeparam>
     /// <param name="l"></param>
     /// <param name="value"></param>
-    public static void Remove<T>(this List<T> l, T value) where T : IComparable {
+    public static void Remove<T>(this IList<T> l, T value) where T : IComparable {
         do { } while (l.Remove(value));
     }
 
-    public static bool RemoveNull<T>(this List<T>? l) {
+    public static bool RemoveNull<T>(this IList<T>? l) {
         if (l == null || l.Count == 0) { return false; }
         var did = false;
         var z = 0;
@@ -160,7 +133,7 @@ public static partial class Extensions {
         return did;
     }
 
-    public static bool RemoveNullOrEmpty<T>(this List<T>? l) where T : ICanBeEmpty {
+    public static bool RemoveNullOrEmpty<T>(this IList<T>? l) where T : ICanBeEmpty {
         if (l == null || l.Count == 0) { return false; }
         var did = false;
         var z = 0;
@@ -188,7 +161,7 @@ public static partial class Extensions {
     //        L.Remove(Item);
     //    }
     // }
-    public static void RemoveNullOrEmpty(this List<string?>? l) {
+    public static void RemoveNullOrEmpty(this IList<string?>? l) {
         if (l == null || l.Count == 0) { return; }
 
         var z = 0;
@@ -201,7 +174,7 @@ public static partial class Extensions {
         }
     }
 
-    public static void RemoveString(this List<string?> l, string value, bool caseSensitive) {
+    public static void RemoveString(this IList<string?> l, string value, bool caseSensitive) {
         var cas = StringComparison.OrdinalIgnoreCase;
         if (!caseSensitive) { cas = StringComparison.Ordinal; }
         var z = 0;
@@ -214,7 +187,7 @@ public static partial class Extensions {
         }
     }
 
-    public static void RemoveString(this List<string>? l, List<string>? value, bool caseSensitive) {
+    public static void RemoveString(this IList<string>? l, List<string>? value, bool caseSensitive) {
         if (l == null || value == null) { return; }
 
         foreach (var t in value) {
@@ -222,7 +195,7 @@ public static partial class Extensions {
         }
     }
 
-    public static void RemoveString(this List<string>? l, string[]? value, bool caseSensitive) {
+    public static void RemoveString(this IList<string>? l, string[]? value, bool caseSensitive) {
         if (l == null || value == null) { return; }
 
         for (var z = 0; z <= value.GetUpperBound(0); z++) {
@@ -230,7 +203,7 @@ public static partial class Extensions {
         }
     }
 
-    public static void Save(this List<string> l, string dateiName, System.Text.Encoding code, bool executeAfter) {
+    public static void Save(this ICollection<string> l, string dateiName, System.Text.Encoding code, bool executeAfter) {
         var t = l.JoinWith("\r\n").TrimEnd("\r\n");
         if (!DirectoryExists(dateiName.FilePath())) {
             Directory.CreateDirectory(dateiName.FilePath());
@@ -241,7 +214,7 @@ public static partial class Extensions {
     // public static bool IsDifferentTo<T>(this List<T> List1, List<T> List2) where T : IParseable
     // {
     //    if (List1.Count != List2.Count) { return true; }
-    // return List1.Where((t, Count) => t.ToString() != List2[Count].ToString()).Any();
+    // return List1.Where((t, Count) => t.ToString(false) != List2[Count].ToString(false)).Any();
     // }
     // public static bool IsDifferentTo(this List<string> List1, List<string> List2)
     // {
@@ -350,7 +323,7 @@ public static partial class Extensions {
     /// <param name="l"></param>
     /// <param name="removeEmpty"></param>
     /// <returns></returns>
-    public static string ToString<T>(this List<T> l, bool removeEmpty) where T : IStringable? {
+    public static string ToString<T>(this ICollection<T> l, bool removeEmpty) where T : IStringable? {
         // Remove Empty sollte eigentlich selbstverständlich sein. Ist nur als Dummy drinnen, dass der Interpreter zwischen der Internen und Extension unterscheiden kann.
         var tmp = string.Empty;
         foreach (var item in l) {

@@ -27,6 +27,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 
 namespace BlueDatabase;
 
@@ -93,7 +94,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     #region Methods
 
-    public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked, List<string>? ignorePath) {
+    public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked) {
         if (allreadychecked != null) {
             foreach (var thisa in allreadychecked) {
                 if (thisa is DatabaseSQLLite db) {
@@ -144,7 +145,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
         if (!need) { return; }
 
-        OnDropMessage(FehlerArt.Info, "Lade " + columns.Count.ToString() + " Spalte(n) nach.");
+        OnDropMessage(FehlerArt.Info, "Lade " + columns.Count + " Spalte(n) nach.");
 
         try {
             _sql.LoadColumns(TableName, columns);

@@ -47,7 +47,7 @@ public partial class InputBox : DialogWithOkAndCancel {
 
     #region Methods
 
-    public static string Show(string txt) => Show(txt, "", FormatHolder.Text, false);
+    public static string Show(string txt) => Show(txt, string.Empty, FormatHolder.Text, false);
 
     public static string Show(string txt, string vorschlagsText, IInputFormat textformat) => Show(txt, vorschlagsText, textformat, false);
 

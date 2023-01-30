@@ -184,6 +184,8 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
     private void CalculateRows() {
         if (_disposing || IsDisposed) { return; }
 
+        if (FilterDefiniton == null || FilterDefiniton.IsDisposed) { return; }
+
         if (FilterDefiniton.Row.Count > 0) {
 
             #region Filter erstellen
@@ -194,7 +196,8 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
                 #region Column ermitteln
 
-                var column = Database?.Column[thisR.CellGetString("Spalte")];
+                var column = Database?.Column.Exists(thisR.CellGetString("Spalte"));
+                if (column == null) { return; }
 
                 #endregion
 

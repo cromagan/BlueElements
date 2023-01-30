@@ -40,6 +40,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 
 #nullable enable
@@ -288,7 +289,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public RowItem? Unterschiede {
         get => _unterschiede;
         set {
-            //if (_Unterschiede != null && value != null && _sortDefinitionTemporary.ToString() == value.ToString()) { return; }
+            //if (_Unterschiede != null && value != null && _sortDefinitionTemporary.ToString(false) == value.ToString(false)) { return; }
             if (_unterschiede == value) { return; }
             _unterschiede = value;
             Invalidate();
@@ -859,14 +860,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public string Export_CSV(FirstRow firstRow) => _database == null ? string.Empty : _database.Export_CSV(firstRow, CurrentArrangement, SortedRows());
 
     public string Export_CSV(FirstRow firstRow, ColumnItem onlyColumn) {
-        if (_database == null) { return string.Empty; }
+        if (_database == null || _database.IsDisposed) { return string.Empty; }
         List<ColumnItem> l = new() { onlyColumn };
         return _database.Export_CSV(firstRow, l, SortedRows());
     }
 
     public void Export_HTML(string filename = "", bool execute = true) {
-        if (_database == null) { return; }
-        if (string.IsNullOrEmpty(filename)) { filename = TempFile("", "", "html"); }
+        if (_database == null || _database.IsDisposed) { return; }
+        if (string.IsNullOrEmpty(filename)) { filename = TempFile("", string.Empty, "html"); }
         _database.Export_HTML(filename, CurrentArrangement, SortedRows(), execute);
     }
 
@@ -922,7 +923,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public void ImportCsv(string csvtxt) => ImportCsv(_database, csvtxt);
 
     public void Invalidate_AllColumnArrangements() {
-        if (_database == null) { return; }
+        if (_database == null || _database.IsDisposed) { return; }
 
         foreach (var thisArrangement in _database.ColumnArrangements) {
             thisArrangement?.Invalidate_DrawWithOfAllItems();
@@ -1087,20 +1088,27 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
+    public ColumnItem? View_ColumnFirst() {
+        if (_database == null || _database.IsDisposed) { return null; }
+        var s = CurrentArrangement;
+
+        return s == null || s.Count == 0 ? null : s[0]?.Column;
+    }
+
     public RowData? View_NextRow(RowData? row) {
-        if (_database == null) { return null; }
+        if (_database == null || _database.IsDisposed) { return null; }
         var rowNr = SortedRows()?.IndexOf(row) ?? -1;
         return rowNr < 0 || rowNr >= SortedRows().Count - 1 ? null : SortedRows()[rowNr + 1];
     }
 
     public RowData? View_PreviousRow(RowData? row) {
-        if (_database == null) { return null; }
+        if (_database == null || _database.IsDisposed) { return null; }
         var rowNr = SortedRows()?.IndexOf(row) ?? -1;
         return rowNr < 1 ? null : SortedRows()[rowNr - 1];
     }
 
     public RowData? View_RowFirst() {
-        if (_database == null) { return null; }
+        if (_database == null || _database.IsDisposed) { return null; }
         var s = SortedRows();
         return s == null || s.Count == 0 ? null : SortedRows()[0];
     }
@@ -1113,7 +1121,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         x = x + "ArrangementNr=" + _arrangementNr;
 
         if (Filter != null) {
-            var tmp = Filter.ToString();
+            var tmp = Filter.ToString(false);
             if (tmp.Length > 2) {
                 x = x + ", Filters=" + Filter;
             }
@@ -1267,7 +1275,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnClick(System.EventArgs e) {
         base.OnClick(e);
-        if (_database == null) { return; }
+        if (_database == null || _database.IsDisposed) { return; }
         lock (_lockUserAction) {
             if (_isinClick) { return; }
             _isinClick = true;
@@ -1279,7 +1287,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnDoubleClick(System.EventArgs e) {
         //    base.OnDoubleClick(e); Wird komplett selbst gehandlet und das neue Ereigniss ausgelöst
-        if (_database == null) { return; }
+        if (_database == null || _database.IsDisposed) { return; }
         lock (_lockUserAction) {
             if (_isinDoubleClick) { return; }
             _isinDoubleClick = true;
@@ -1305,7 +1313,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     protected override void OnKeyDown(System.Windows.Forms.KeyEventArgs e) {
         base.OnKeyDown(e);
 
-        if (_database == null) { return; }
+        if (_database == null || _database.IsDisposed) { return; }
 
         lock (_lockUserAction) {
             if (_isinKeyDown) { return; }
@@ -1451,7 +1459,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
         base.OnMouseDown(e);
-        if (_database == null) { return; }
+        if (_database == null || _database.IsDisposed) { return; }
         lock (_lockUserAction) {
             if (_isinMouseDown) { return; }
             _isinMouseDown = true;
@@ -1486,7 +1494,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnMouseEnter(System.EventArgs e) {
         base.OnMouseEnter(e);
-        if (_database == null) { return; }
+        if (_database == null || _database.IsDisposed) { return; }
         lock (_lockUserAction) {
             if (_isinMouseEnter) { return; }
             _isinMouseEnter = true;
@@ -1497,7 +1505,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnMouseLeave(System.EventArgs e) {
         base.OnMouseLeave(e);
-        if (_database == null) { return; }
+        if (_database == null || _database.IsDisposed) { return; }
         lock (_lockUserAction) {
             if (_isinMouseLeave) { return; }
             _isinMouseLeave = true;
@@ -1559,13 +1567,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
         base.OnMouseUp(e);
 
-        if (_database == null) { return; }
+        if (_database == null || _database.IsDisposed) { return; }
 
         lock (_lockUserAction) {
             //if (_isinMouseUp) { return; }
             _isinMouseUp = true;
 
-            if (_database == null) {
+            if (_database == null || _database.IsDisposed) {
                 Forms.QuickInfo.Close();
                 _isinMouseUp = false;
                 return;
@@ -1613,7 +1621,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
         base.OnMouseWheel(e);
-        if (_database == null) { return; }
+        if (_database == null || _database.IsDisposed) { return; }
 
         lock (_lockUserAction) {
             if (_isinMouseWheel) { return; }
@@ -1631,7 +1639,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnSizeChanged(System.EventArgs e) {
         base.OnSizeChanged(e);
-        if (_database == null) { return; }
+        if (_database == null || _database.IsDisposed) { return; }
         lock (_lockUserAction) {
             if (_isinSizeChanged) { return; }
             _isinSizeChanged = true;
@@ -1644,7 +1652,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnVisibleChanged(System.EventArgs e) {
         base.OnVisibleChanged(e);
-        if (_database == null) { return; }
+        if (_database == null || _database.IsDisposed) { return; }
         lock (_lockUserAction) {
             if (_isinVisibleChanged) { return; }
             _isinVisibleChanged = true;
@@ -1751,7 +1759,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
                     var sr = table.SortedRows();
                     var rd = sr.Get(row);
-                    table.CursorPos_Set(table.Database?.Column.First, rd, true);
+                    table.CursorPos_Set(table?.View_ColumnFirst(), rd, true);
                 }
             } else {
                 var f = CellCollection.ErrorReason(column, row, ErrorReason.EditGeneral);
@@ -1897,33 +1905,33 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 }
                 break;
 
-            case "dospaltenvergleich": {
-                    List<RowItem> ro = new();
-                    ro.AddRange(VisibleUniqueRows());
+            //case "dospaltenvergleich": {
+            //        List<RowItem> ro = new();
+            //        ro.AddRange(VisibleUniqueRows());
 
-                    ItemCollectionList ic = new();
-                    foreach (var thisColumnItem in e.Column.Database.Column) {
-                        if (thisColumnItem != null && thisColumnItem != e.Column) { ic.Add(thisColumnItem); }
-                    }
-                    ic.Sort();
+            //        ItemCollectionList ic = new();
+            //        foreach (var thisColumnItem in e.Column.Database.Column) {
+            //            if (thisColumnItem != null && thisColumnItem != e.Column) { ic.Add(thisColumnItem); }
+            //        }
+            //        ic.Sort();
 
-                    var r = InputBoxListBoxStyle.Show("Mit welcher Spalte vergleichen?", ic, AddType.None, true);
-                    if (r == null || r.Count == 0) { return; }
+            //        var r = InputBoxListBoxStyle.Show("Mit welcher Spalte vergleichen?", ic, AddType.None, true);
+            //        if (r == null || r.Count == 0) { return; }
 
-                    var c = e.Column.Database.Column.Exists(r[0]);
+            //        var c = e.Column.Database.Column.Exists(r[0]);
 
-                    List<string> d = new();
-                    foreach (var thisR in ro) {
-                        if (thisR.CellGetString(e.Column) != thisR.CellGetString(c)) { d.Add(thisR.CellFirstString()); }
-                    }
-                    if (d.Count > 0) {
-                        Filter.Add(new FilterItem(e.Column.Database.Column.First, FilterType.Istgleich_ODER_GroßKleinEgal, d));
-                        Notification.Show("Die aktuell <b>unterschiedlichen</b> Einträge wurden berechnet<br>und als <b>ODER-Filter</b> in der <b>ersten Spalte</b> gespeichert.", ImageCode.Trichter);
-                    } else {
-                        Notification.Show("Keine Filter verändert,<br>da <b>alle Einträge</b> identisch sind.", ImageCode.Trichter);
-                    }
-                    break;
-                }
+            //        List<string> d = new();
+            //        foreach (var thisR in ro) {
+            //            if (thisR.CellGetString(e.Column) != thisR.CellGetString(c)) { d.Add(thisR.CellFirstString()); }
+            //        }
+            //        if (d.Count > 0) {
+            //            Filter.Add(new FilterItem(e.Column.Database.Column.First, FilterType.Istgleich_ODER_GroßKleinEgal, d));
+            //            Notification.Show("Die aktuell <b>unterschiedlichen</b> Einträge wurden berechnet<br>und als <b>ODER-Filter</b> in der <b>ersten Spalte</b> gespeichert.", ImageCode.Trichter);
+            //        } else {
+            //            Notification.Show("Keine Filter verändert,<br>da <b>alle Einträge</b> identisch sind.", ImageCode.Trichter);
+            //        }
+            //        break;
+            //    }
 
             case "doclipboard": {
                     var clipTmp = System.Windows.Forms.Clipboard.GetText();
@@ -2283,7 +2291,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             Invoke(new Action(CloseAllComponents));
             return;
         }
-        if (_database == null) { return; }
+        if (_database == null || _database.IsDisposed) { return; }
         TXTBox_Close(BTB);
         TXTBox_Close(BCB);
         FloatingForm.Close(this);
@@ -2414,7 +2422,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     /// </summary>
     /// <remarks></remarks>
     private void Cursor_Move(Direction richtung) {
-        if (_database == null) { return; }
+        if (_database == null || _database.IsDisposed) { return; }
         Neighbour(_cursorPosColumn, _cursorPosRow, richtung, out var newCol, out var newRow);
         CursorPos_Set(newCol, newRow, richtung != Direction.Nichts);
     }
@@ -2555,16 +2563,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private void Draw_Column_Cells(Graphics gr, List<RowData?>? sr, ColumnViewItem viewItem, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, States state, bool firstOnScreen) {
-
-        #region Neue Zeile
-
         if (UserEdit_NewRowAllowed() && viewItem == CurrentArrangement[Database.Column.First]) {
             Skin.Draw_FormatedText(gr, "[Neue Zeile]", QuickImage.Get(ImageCode.PlusZeichen, _pix16), Alignment.Left, new Rectangle((int)viewItem.OrderTmpSpalteX1 + 1, (int)(-SliderY.Value + HeadSize() + 1), (int)viewItem.TmpDrawWidth - 2, 16 - 2), this, false, _newRowFont, Translate);
         }
-
-        #endregion
-
-        #region Zeilen Zeichnen (Alle Zellen)
 
         for (var zei = firstVisibleRow; zei <= lastVisibleRow; zei++) {
             var currentRow = sr[zei];
@@ -2574,22 +2575,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 Column_DrawWidth(viewItem, displayRectangleWoSlider), Math.Max(currentRow.DrawHeight, _pix16));
 
             if (currentRow.Expanded) {
-
-                #region Hintergrund gelb zeichnen
-
                 if (currentRow.MarkYellow) {
                     gr.FillRectangle(BrushYellowTransparent, cellrectangle);
                 }
 
-                #endregion
-
-                #region Trennlinie zeichnen
-
                 gr.DrawLine(Skin.PenLinieDünn, cellrectangle.Left, cellrectangle.Bottom - 1, cellrectangle.Right - 1, cellrectangle.Bottom - 1);
-
-                #endregion
-
-                #region Die Cursorposition ermittleln und Zeichnen
 
                 if (!Thread.CurrentThread.IsBackground && _cursorPosColumn == viewItem.Column && _cursorPosRow == currentRow) {
                     _tmpCursorRect = cellrectangle;
@@ -2597,15 +2587,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     Draw_Cursor(gr, displayRectangleWoSlider, false);
                 }
 
-                #endregion
-
-                #region Zelleninhalt zeichnen
-
                 Draw_CellTransparent(gr, viewItem, currentRow, cellrectangle, _cellFont, state);
-
-                #endregion
-
-                #region Unterschiede rot markieren
 
                 if (_unterschiede != null && _unterschiede != currentRow.Row) {
                     if (currentRow.Row.CellGetString(viewItem.Column) != _unterschiede.CellGetString(viewItem.Column)) {
@@ -2614,11 +2596,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         gr.DrawRectangle(PenRed1, tmpr);
                     }
                 }
-
-                #endregion
             }
-
-            #region Spaltenüberschrift
 
             if (firstOnScreen) {
                 // Überschrift in der ersten Spalte zeichnen
@@ -2641,11 +2619,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     gr.DrawLine(Skin.PenLinieDick, 0, DrawY(currentRow), displayRectangleWoSlider.Width, DrawY(currentRow));
                 }
             }
-
-            #endregion
         }
-
-        #endregion
     }
 
     private void Draw_Column_Head_Captions(Graphics gr) {
@@ -2770,7 +2744,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             Skin.Draw_Border(gr, Enums.Design.Table_And_Pad, state, displayRectangleWoSlider);
 
             ////gr.Clear(Color.White);
-            //gr.DrawString("Test " + Constants.GlobalRND.Next().ToString(), new Font("Arial", 20), Brushes.Black, new Point(0, 0));
+            //gr.DrawString("Test " + Constants.GlobalRND.Next().ToString(false), new Font("Arial", 20), Brushes.Black, new Point(0, 0));
 
             //return;
 
@@ -2940,7 +2914,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private void Invalidate_Filterinfo() {
-        if (_database == null) { return; }
+        if (_database == null || _database.IsDisposed) { return; }
 
         foreach (var thisColumn in _database.Column.Where(thisColumn => thisColumn != null)) {
             thisColumn.TmpIfFilterRemoved = null;

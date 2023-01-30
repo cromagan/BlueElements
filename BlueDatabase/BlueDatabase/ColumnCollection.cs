@@ -82,11 +82,22 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    if (Contains(column)) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte bereits vorhanden!"); }
     //    base.GenerateAndAdd(column);
     //}
-    /// <summary>
-    /// Gib ColumnFirst oder Spalte 0 zurück
-    /// </summary>
-    /// <returns></returns>
-    public ColumnItem? First => Database?.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column != null)?.Column;
+    //    /// <summary>
+    //    /// Gib erste Spalte des ersten Arrangements zurück, die nicht mit "SYS_" beginnt
+    //    /// </summary>
+    //    /// <returns></returns>
+    public ColumnItem? First {
+        get {
+            if (Database == null || Database.IsDisposed) { return null; }
+
+            if (Database.ColumnArrangements[0].Count != Database.Column.Count()) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Ansicht 0 fehlerhaft!");
+                return null;
+            }
+
+            return Database?.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column != null && !thisViewItem.Column.Name.StartsWith("SYS_"))?.Column;
+        }
+    }
 
     public bool IsDisposed { get; private set; }
 
@@ -243,7 +254,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!");
             return null;
         }
-        Database.ChangeData(DatabaseDataType.Comand_AddColumnByName, internalName, null, string.Empty, internalName, string.Empty);
+        Database?.ChangeData(DatabaseDataType.Comand_AddColumnByName, internalName, null, string.Empty, internalName, string.Empty);
         item = Exists(internalName);
         if (item == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen.");
@@ -367,7 +378,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         Remove(item.Name, comment);
     }
 
-    public bool Remove(string name, string comment) => string.IsNullOrEmpty(Database.ChangeData(DatabaseDataType.Comand_RemoveColumn, name, null, string.Empty, name, comment));
+    public bool Remove(string name, string comment) => string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Comand_RemoveColumn, name, null, string.Empty, name, comment));
 
     public void Repair() {
         List<string> w = new()

@@ -27,6 +27,7 @@ using BlueScript.Methods;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
@@ -34,7 +35,11 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 using static BlueBasics.IO;
+
+using static BlueBasics.Extensions;
+
 using Timer = System.Threading.Timer;
 
 namespace BlueDatabase;
@@ -50,26 +55,25 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     public static readonly ListExt<DatabaseAbstract> AllFiles = new();
     public static List<Type>? DatabaseTypes;
 
-    public readonly ListExt<ColumnViewCollection> _columnArrangements = new();
-
+    public readonly List<ColumnViewCollection> _columnArrangements = new();
     public readonly List<string> _datenbankAdmin = new();
-
     public readonly CellCollection Cell;
-
     public readonly ColumnCollection Column;
-
     public readonly RowCollection Row;
-
     public readonly string TableName = string.Empty;
-
     public readonly string UserName = Generic.UserName().ToUpper();
-
     public string UserGroup;
 
     protected string? _additionalFilesPfadtmp;
-    private static List<ConnectionInfo> _allavailabletables = new List<ConnectionInfo>();
+    private static List<ConnectionInfo> _allavailabletables = new();
 
-    private static DateTime _lastTableCheck = new DateTime(1900, 1, 1);
+    private static DateTime _lastTableCheck = new(1900, 1, 1);
+
+    /// <summary>
+    /// Exporte werden nur internal verwaltet. Wegen zu vieler erzeigter Pendings, z.B. bei LayoutExport.
+    /// Der Head-Editor kann und muss (manuelles Löschen) auf die Exporte Zugreifen und kümmert sich auch um die Pendings
+    /// </summary>
+    private readonly List<ExportDefinition?> _export = new();
 
     private readonly LayoutCollection _layouts = new();
 
@@ -94,12 +98,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     private string _createDate = string.Empty;
 
     private string _creator = string.Empty;
-
-    /// <summary>
-    /// Exporte werden nur internal verwaltet. Wegen zu vieler erzeigter Pendings, z.B. bei LayoutExport.
-    /// Der Head-Editor kann und muss (manuelles Löschen) auf die Exporte Zugreifen und kümmert sich auch um die Pendings
-    /// </summary>
-    private ListExt<ExportDefinition?> _export = new();
 
     //private string _firstColumn;
     private double _globalScale;
@@ -211,11 +209,11 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         }
     }
 
-    public ListExt<ColumnViewCollection> ColumnArrangements {
-        get => _columnArrangements;
+    public ReadOnlyCollection<ColumnViewCollection> ColumnArrangements {
+        get => new(_columnArrangements);
         set {
-            if (_columnArrangements.ToString() == value.ToString()) { return; }
-            ChangeData(DatabaseDataType.ColumnArrangement, null, null, _columnArrangements.ToString(), value.ToString(), string.Empty);
+            if (_columnArrangements.ToString(false) == value.ToString(false)) { return; }
+            ChangeData(DatabaseDataType.ColumnArrangement, null, null, _columnArrangements.ToString(false), value.ToString(false), string.Empty);
             OnViewChanged();
         }
     }
@@ -240,18 +238,18 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         }
     }
 
-    public List<string> DatenbankAdmin {
-        get => _datenbankAdmin;
+    public ReadOnlyCollection<string> DatenbankAdmin {
+        get => new(_datenbankAdmin);
         set {
             if (!_datenbankAdmin.IsDifferentTo(value)) { return; }
             ChangeData(DatabaseDataType.DatabaseAdminGroups, null, null, _datenbankAdmin.JoinWithCr(), value.JoinWithCr(), string.Empty);
         }
     }
 
-    public ListExt<ExportDefinition?> Export {
-        get => _export;
+    public ReadOnlyCollection<ExportDefinition?> Export {
+        get => new ReadOnlyCollection<ExportDefinition?>(_export);
         set {
-            if (_export.ToString() == value.ToString()) { return; }
+            if (_export.ToString(false) == value.ToString(false)) { return; }
             ChangeData(DatabaseDataType.AutoExport, null, null, _export.ToString(true), value.ToString(true), string.Empty);
         }
     }
@@ -352,8 +350,8 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         }
     }
 
-    public List<string> Tags {
-        get => _tags;
+    public ReadOnlyCollection<string> Tags {
+        get => new(_tags);
         set {
             if (!_tags.IsDifferentTo(value)) { return; }
             ChangeData(DatabaseDataType.Tags, null, null, _tags.JoinWithCr(), value.JoinWithCr(), string.Empty);
@@ -382,12 +380,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     #region Methods
 
-    /// <summary>
-    /// Gibt einen neue Liste zurück
-    /// </summary>
-    /// <param name="ignorePath"></param>
-    /// <returns></returns>
-    public static List<ConnectionInfo> AllAvailableTables(List<string>? ignorePath) {
+    public static List<ConnectionInfo> AllAvailableTables() {
         if (DateTime.Now.Subtract(_lastTableCheck).TotalMinutes < 1) {
             return _allavailabletables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
         }
@@ -401,7 +394,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         alf.AddRange(AllFiles);
 
         foreach (var thisDB in alf) {
-            var possibletables = thisDB.AllAvailableTables(allreadychecked, ignorePath);
+            var possibletables = thisDB.AllAvailableTables(allreadychecked);
 
             allreadychecked.Add(thisDB);
 
@@ -621,7 +614,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         return string.Empty;
     }
 
-    public abstract List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked, List<string>? ignorePath);
+    public abstract List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked);
 
     public void CancelBackGroundWorker() {
         if (_backgroundWorker != null && _backgroundWorker.IsBusy && !_backgroundWorker.CancellationPending) {
@@ -699,18 +692,18 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         UndoCount = sourceDatabase.UndoCount;
         ZeilenQuickInfo = sourceDatabase.ZeilenQuickInfo;
         if (tagsToo) {
-            Tags = sourceDatabase.Tags.Clone();
+            Tags = new(sourceDatabase.Tags.Clone());
         }
         Layouts = sourceDatabase.Layouts;
 
-        DatenbankAdmin = sourceDatabase.DatenbankAdmin.Clone();
+        DatenbankAdmin = new(sourceDatabase.DatenbankAdmin.Clone());
         PermissionGroupsNewRow = sourceDatabase.PermissionGroupsNewRow.Clone();
 
         var tcvc = new ListExt<ColumnViewCollection>();
         foreach (var t in sourceDatabase.ColumnArrangements) {
             tcvc.Add(new ColumnViewCollection(this, t.ToString()));
         }
-        ColumnArrangements = tcvc;
+        ColumnArrangements = new(tcvc);
 
         Export = sourceDatabase.Export;
 
@@ -807,7 +800,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             if (_backgroundWorker?.IsBusy ?? false) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
         }
 
-        return IntParse(LoadedVersion.Replace(".", "")) > IntParse(DatabaseVersion.Replace(".", ""))
+        return IntParse(LoadedVersion.Replace(".", string.Empty)) > IntParse(DatabaseVersion.Replace(".", string.Empty))
             ? "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."
             : string.Empty;
     }
@@ -1161,7 +1154,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             }
         }
 
-        Export = ex;
+        Export = new(ex);
     }
 
     public bool IsAdministrator() {
@@ -1232,7 +1225,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         return e.SortedDistinctList();
     }
 
-    public bool PermissionCheck(List<string>? allowed, RowItem? row) {
+    public bool PermissionCheck(IList<string>? allowed, RowItem? row) {
         try {
             if (IsAdministrator()) { return true; }
             if (PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0) { return true; }
@@ -1335,12 +1328,14 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
         var x = _columnArrangements.CloneWithClones();
 
+        if (x == null) { return; }
+
         for (var z = 0; z < Math.Max(2, x.Count); z++) {
             if (x.Count < z + 1) { x.Add(new ColumnViewCollection(this, string.Empty)); }
             x[z].Repair(z);
         }
 
-        ColumnArrangements = x;
+        ColumnArrangements = new ReadOnlyCollection<ColumnViewCollection>(x);
     }
 
     internal void RepairViews() {
@@ -1372,7 +1367,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         if (type.IsColumnTag()) {
             var c = Column.Exists(columnName);
             if (c == null) {
-                Develop.DebugPrint(FehlerArt.Warnung, "Spalte ist null! " + type.ToString());
+                Develop.DebugPrint(FehlerArt.Warnung, "Spalte ist null! " + type);
                 return "Wert nicht gesetzt!";
             }
             return c.SetValueInternal(type, value, isLoading);
@@ -1681,7 +1676,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             }
         }
 
-        Export = tmpe;
+        Export = new ReadOnlyCollection<ExportDefinition?>(tmpe);
     }
 
     //protected abstract string SpecialErrorReason(ErrorReason mode);
@@ -1858,17 +1853,17 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     //private void Row_RowAdded(object sender, RowEventArgs e) {
     //    //if (IsLoading) {
-    //    ChangeData(DatabaseDataType.Comand_RowAdded, null, e.Row, String.Empty, e.Row.Key.ToString());
+    //    ChangeData(DatabaseDataType.Comand_RowAdded, null, e.Row, String.Empty, e.Row.Key.ToString(false));
     //    //}
     //}
 
     //private void Row_RowRemoving(object sender, RowEventArgs e) {
-    //    ChangeData(DatabaseDataType.Comand_RemovingRow, null, e.Row, string.Empty, e.Row.Key.ToString());
+    //    ChangeData(DatabaseDataType.Comand_RemovingRow, null, e.Row, string.Empty, e.Row.Key.ToString(false));
     //}
 
     //private void Row_RowRemoving(object sender, RowEventArgs e) {
     //    Develop.CheckStackForOverflow();
-    //    ChangeData(DatabaseDataType.dummyComand_RemoveRow, null, e.Row, string.Empty, e.Row.Key.ToString());
+    //    ChangeData(DatabaseDataType.dummyComand_RemoveRow, null, e.Row, string.Empty, e.Row.Key.ToString(false));
 
     //}
 

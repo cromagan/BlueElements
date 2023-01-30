@@ -22,7 +22,7 @@ using BlueControls.EventArgs;
 using System;
 using System.Drawing;
 using static BlueBasics.BitmapExt;
-using static BlueBasics.Converter;
+using static BlueBasics.Converter;using static BlueBasics.Extensions;
 
 namespace BluePaint;
 

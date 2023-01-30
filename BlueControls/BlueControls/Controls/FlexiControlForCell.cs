@@ -617,7 +617,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         if (_tmpRow == null) { return; }
         if (Marker.CancellationPending) { return; }
         List<string> names = new();
-        if (_database == null) { return; }
+        if (_database == null || _database.IsDisposed) { return; }
 
         var col = _database.Column.First;
         if (col == null) { return; }

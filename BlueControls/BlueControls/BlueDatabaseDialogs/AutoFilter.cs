@@ -31,6 +31,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -150,7 +151,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
             lsbStandardFilter.Item.Add("negativ Auswahl aktivieren", "ModusNegativ", QuickImage.Get(ImageCode.MinusZeichen, 17), !lColumn.MultiLine && lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && nochOk, Constants.FirstSortChar + "09");
             lsbStandardFilter.Item.Add("Einzigartige Einträge", "Einzigartig", QuickImage.Get(ImageCode.Eins, 17), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "10");
             lsbStandardFilter.Item.Add("Nicht Einzigartige Einträge", "NichtEinzigartig", QuickImage.Get("Eins|17||1"), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "11");
-            lsbStandardFilter.Item.Add("Vergleiche mit anderer Spalte", "Spaltenvergleich", QuickImage.Get(ImageCode.Spalte, 17), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && filter[_column.Database.Column.First] == null, Constants.FirstSortChar + "12");
+            //lsbStandardFilter.Item.Add("Vergleiche mit anderer Spalte", "Spaltenvergleich", QuickImage.Get(ImageCode.Spalte, 17), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && filter[_column.Database.Column.First] == null, Constants.FirstSortChar + "12");
         }
         Width = Math.Max(lsbFilterItems.Right + (Skin.PaddingSmal * 2), Width);
         Height = lsbFilterItems.Bottom + Skin.PaddingSmal;
@@ -254,12 +255,12 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
     private void sFilter_ItemClicked(object sender, BasicListItemEventArgs e) {
         switch (e.Item.Internal.ToLower()) {
             case "filterleere": {
-                    CloseAndDispose("Filter", new FilterItem(_column, FilterType.Istgleich | FilterType.MultiRowIgnorieren, ""));
+                    CloseAndDispose("Filter", new FilterItem(_column, FilterType.Istgleich | FilterType.MultiRowIgnorieren, string.Empty));
                     break;
                 }
 
             case "filternichtleere": {
-                    CloseAndDispose("Filter", new FilterItem(_column, FilterType.Ungleich_MultiRowIgnorieren, ""));
+                    CloseAndDispose("Filter", new FilterItem(_column, FilterType.Ungleich_MultiRowIgnorieren, string.Empty));
                     break;
                 }
 
@@ -310,10 +311,10 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
                     break;
                 }
 
-            case "spaltenvergleich": {
-                    CloseAndDispose("DoSpaltenvergleich", null);
-                    break;
-                }
+            //case "spaltenvergleich": {
+            //        CloseAndDispose("DoSpaltenvergleich", null);
+            //        break;
+            //    }
             default: {
                     Develop.DebugPrint("Unbekannter Filter: " + e.Item.Internal);
                     break;
@@ -363,7 +364,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         }
         if (_column.SortType is SortierTyp.ZahlenwertFloat or SortierTyp.ZahlenwertInt) {
             if (txbEingabe.Text.Contains("-")) {
-                var tmp = txbEingabe.Text.Replace(" ", "");
+                var tmp = txbEingabe.Text.Replace(" ", string.Empty);
                 var l = Berechnung.LastMinusIndex(tmp);
                 if (l > 0 && l < tmp.Length - 1) {
                     var z1 = tmp.Substring(0, l);

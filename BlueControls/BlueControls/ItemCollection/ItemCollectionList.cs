@@ -26,6 +26,7 @@ using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -156,7 +157,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
             //    if (db != null && !string.IsNullOrEmpty(column.LinkedKeyKennung)) {
             //        foreach (var thisColumn in db.Column) {
             //            if (thisColumn.Name.ToLower().StartsWith(column.LinkedKeyKennung.ToLower())) {
-            //                l.GenerateAndAdd(thisColumn.Key.ToString());
+            //                l.GenerateAndAdd(thisColumn.Key.ToString(false));
             //            }
             //        }
             //    }
@@ -456,22 +457,29 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         Sort();
     }
 
-    public void AddRange(string[]? values) {
-        if (values == null) { return; }
-        foreach (var thisstring in values) {
-            if (this[thisstring] == null) { Add(thisstring); }
-        }
-    }
+    //public void AddRange(string[]? values) {
+    //    if (values == null) { return; }
+    //    foreach (var thisstring in values) {
+    //        if (this[thisstring] == null) { Add(thisstring); }
+    //    }
+    //}
 
-    public void AddRange(ListExt<string>? values) {
-        if (values == null) { return; }
+    //public void AddRange(ICollection<string>? values) {
+    //    if (values == null) { return; }
 
-        foreach (var thisstring in values.Where(thisstring => this[thisstring] == null)) {
+    //    foreach (var thisstring in values.Where(thisstring => this[thisstring] == null)) {
+    //        Add(thisstring, thisstring);
+    //    }
+    //}
+    public void AddRange(ICollection<string>? list) {
+        if (list == null) { return; }
+
+        foreach (var thisstring in list.Where(thisstring => !string.IsNullOrEmpty(thisstring) && this[thisstring] == null)) {
             Add(thisstring, thisstring);
         }
     }
 
-    public void AddRange(List<string>? values, ColumnItem? columnStyle, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
+    public void AddRange(ICollection<string>? values, ColumnItem? columnStyle, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
         if (values == null) { return; }
         if (values.Count > 10000) {
             Develop.DebugPrint(FehlerArt.Fehler, "Values > 100000");
@@ -482,19 +490,11 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         }
     }
 
-    public void AddRange(List<RowItem?>? list, string layoutId) {
+    public void AddRange(ICollection<RowItem?>? list, string layoutId) {
         if (list == null || list.Count == 0) { return; }
 
         foreach (var thisRow in list) {
             Add(thisRow, layoutId);
-        }
-    }
-
-    public void AddRange(List<string>? list) {
-        if (list == null) { return; }
-
-        foreach (var thisstring in list.Where(thisstring => !string.IsNullOrEmpty(thisstring) && this[thisstring] == null)) {
-            Add(thisstring, thisstring);
         }
     }
 
@@ -503,7 +503,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
     /// </summary>
     /// <param name="columns"></param>
     /// <param name="doCaptionSort">Bei True werden auch die Überschriften der Spalte als Text hinzugefügt und auch danach sortiert</param>
-    public void AddRange(ColumnCollection columns, bool doCaptionSort) {
+    public void AddRange(IEnumerable<ColumnItem> columns, bool doCaptionSort) {
         foreach (var thisColumnItem in columns) {
             if (thisColumnItem != null) {
                 var co = Add(thisColumnItem);
@@ -535,12 +535,12 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         return ComputeAllItemPositions(new Size(1, 30), null, biggestItemX, heightAdded, senkrechtAllowed);
     }
 
-    public void Check(ListExt<string> vItems, bool @checked) => Check(vItems.ToArray(), @checked);
+    //public void Check(ListExt<string> vItems, bool @checked) => Check(vItems.ToArray(), @checked);
 
-    public void Check(List<string> vItems, bool @checked) => Check(vItems.ToArray(), @checked);
+    //public void Check(List<string> vItems, bool @checked) => Check(vItems.ToArray(), @checked);
 
-    public void Check(string[] vItems, bool @checked) {
-        for (var z = 0; z <= vItems.GetUpperBound(0); z++) {
+    public void Check(IList<string> vItems, bool @checked) {
+        for (var z = 0; z < vItems.Count; z++) {
             if (this[vItems[z]] != null) {
                 this[vItems[z]].Checked = @checked;
             }
@@ -578,7 +578,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
             var te = Enum.GetName(t, thisItem);
             var th = (int)thisItem;
             if (!string.IsNullOrEmpty(te)) {
-                //NewReplacer.GenerateAndAdd(th.ToString() + "|" + te);
+                //NewReplacer.GenerateAndAdd(th + "|" + te);
                 if (th >= zumDropdownHinzuAb && th < zumDropdownHinzuBis) {
                     Add(te, th.ToString());
                 }

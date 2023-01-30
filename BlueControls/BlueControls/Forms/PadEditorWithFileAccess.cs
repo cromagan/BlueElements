@@ -88,7 +88,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     }
 
     private void SaveTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e) {
-        var t = Pad.Item.ToString();
+        var t = Pad.Item.ToString(false);
         WriteAllText(SaveTab.FileName, t, Constants.Win1252, false);
         btnLastFiles.AddFileName(SaveTab.FileName, string.Empty);
     }

@@ -21,6 +21,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace BlueDatabase.Interfaces;
@@ -35,7 +36,7 @@ public interface IColumnInputFormat : IInputFormat {
     public TranslationType DoOpticalTranslation { get; set; }
     public bool DropdownAllesAbwählenErlaubt { get; set; }
     public bool DropdownBearbeitungErlaubt { get; set; }
-    public List<string> DropDownItems { get; set; }
+    public ReadOnlyCollection<string> DropDownItems { get; set; }
     public bool DropdownWerteAndererZellenAnzeigen { get; set; }
     public DataFormat Format { get; set; }
     public ScriptType ScriptType { get; set; }

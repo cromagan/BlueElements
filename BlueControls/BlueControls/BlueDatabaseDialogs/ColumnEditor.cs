@@ -31,6 +31,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -456,10 +457,10 @@ internal sealed partial class ColumnEditor {
         //_Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled) = AutoFilterErw.Checked;
         _column.FilterOptions = tmpf;
         _column.IgnoreAtRowFilter = btnZeilenFilterIgnorieren.Checked;
-        _column.PermissionGroupsChangeCell = lbxCellEditor.Item.ToListOfString();
-        _column.DropDownItems = tbxAuswaehlbareWerte.Text.SplitAndCutByCrToList().SortedDistinctList();
-        _column.OpticalReplace = txbReplacer.Text.SplitAndCutByCrToList();
-        _column.AfterEditAutoReplace = txbAutoReplace.Text.SplitAndCutByCrToList();
+        _column.PermissionGroupsChangeCell = new(lbxCellEditor.Item.ToListOfString());
+        _column.DropDownItems = new System.Collections.ObjectModel.ReadOnlyCollection<string>(tbxAuswaehlbareWerte.Text.SplitAndCutByCrToList().SortedDistinctList());
+        _column.OpticalReplace = new(txbReplacer.Text.SplitAndCutByCrToList());
+        _column.AfterEditAutoReplace = new(txbAutoReplace.Text.SplitAndCutByCrToList());
 
         _column.AutoFilterJoker = tbxJoker.Text;
         _column.CaptionGroup1 = txbUeberschift1.Text;
@@ -520,7 +521,7 @@ internal sealed partial class ColumnEditor {
             db.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder.Text);
 
             var vis = db.Column.GenerateAndAdd("visible", "visible", ColumnFormatHolder.Bit);
-            var sp = db.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolder.Text);
+            var sp = db.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolder.SystemName);
             sp.Align = AlignmentHorizontal.Rechts;
 
             var b = db.Column.GenerateAndAdd("Such", "Suchtext", ColumnFormatHolder.Text);
@@ -538,8 +539,8 @@ internal sealed partial class ColumnEditor {
                 or.Add("~" + thisColumn.Name.ToLower() + "~|[Spalte: " + thisColumn.ReadableText() + "]");
             }
 
-            b.DropDownItems = dd;
-            b.OpticalReplace = or;
+            b.DropDownItems = new System.Collections.ObjectModel.ReadOnlyCollection<string>(dd);
+            b.OpticalReplace = new(or);
 
             db.RepairAfterParse();
             var car = db.ColumnArrangements.CloneWithClones();
@@ -551,7 +552,7 @@ internal sealed partial class ColumnEditor {
             //car[1].Hide("visible");
             //car[1].HideSystemColumns();
 
-            db.ColumnArrangements = car;
+            db.ColumnArrangements = new System.Collections.ObjectModel.ReadOnlyCollection<ColumnViewCollection>(car);
 
             db.SortDefinition = new RowSortDefinition(db, "Spalte", false);
             tblFilterliste.DatabaseSet(db, string.Empty);
@@ -559,14 +560,14 @@ internal sealed partial class ColumnEditor {
 
             var t = db.Tags.Clone();
             t.TagSet("Filename", linkdb.ConnectionData.UniqueID);
-            db.Tags = t;
+            db.Tags = new System.Collections.ObjectModel.ReadOnlyCollection<string>(t);
 
             tblFilterliste.Filter.Add(vis, FilterType.Istgleich, "+");
         }
 
         linkdb.RepairAfterParse(); // Dass ja die 0 Ansicht stimmt
 
-        ColumnItem? spalteauDb = linkdb.Column.Exists(cbxTargetColumn.Text);
+        var spalteauDb = linkdb.Column.Exists(cbxTargetColumn.Text);
 
         foreach (var col in linkdb.Column) {
             var r = tblFilterliste.Database.Row[col.Name] ?? tblFilterliste.Database.Row.GenerateAndAdd(col.Name, "Neue Spalte");
@@ -625,7 +626,7 @@ internal sealed partial class ColumnEditor {
 
     private void tabControl_SelectedIndexChanged(object sender, System.EventArgs e) {
         if (tabControl.SelectedTab == tabSpaltenVerlinkung && cbxLinkedDatabase.Item.Count == 0) {
-            var l = DatabaseAbstract.AllAvailableTables(null);
+            var l = DatabaseAbstract.AllAvailableTables();
 
             //if (!string.IsNullOrEmpty(_column.Database.Filename)) {
             //var all = Directory.GetFiles(_column.Database.Filename.FilePath(), "*.mdb", SearchOption.TopDirectoryOnly);

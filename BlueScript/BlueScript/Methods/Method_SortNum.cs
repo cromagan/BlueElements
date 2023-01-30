@@ -21,7 +21,7 @@ using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using static BlueBasics.Converter;
+using static BlueBasics.Converter;using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods;
 

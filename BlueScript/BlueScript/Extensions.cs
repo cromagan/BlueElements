@@ -18,8 +18,8 @@
 namespace BlueScript;
 
 public static class Extensions {
-    //public static readonly string ImageKennung = ((char)9001).ToString();
-    //public static readonly string ObjectKennung = ((char)9002).ToString();
+    //public static readonly string ImageKennung = ((char)9001).ToString(false);
+    //public static readonly string ObjectKennung = ((char)9002).ToString(false);
 
     #region Fields
 

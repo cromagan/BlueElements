@@ -14,7 +14,7 @@ internal static class CommonDialogs {
     #region Methods
 
     public static BlueDatabase.DatabaseAbstract? ChooseKnownDatabase() {
-        var l = DatabaseAbstract.AllAvailableTables(null);
+        var l = DatabaseAbstract.AllAvailableTables();
 
         var l2 = new ItemCollection.ItemCollectionList.ItemCollectionList();
 

@@ -26,7 +26,9 @@ using BlueDatabase;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Windows.Media.Animation;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 using static BlueBasics.Develop;
 using static BlueBasics.IO;
 
@@ -36,15 +38,13 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
 
     #region Fields
 
-    public const string Version = "0.01";
+    public const string Version = "0.10";
     public static readonly ListExt<ConnectedFormula> AllFiles = new();
     public static readonly float StandardHöhe = 1.75f;
-
     public static readonly float Umrechnungsfaktor2 = MmToPixel(StandardHöhe, 300) / 22;
-
     public readonly ListExt<string> DatabaseFiles = new();
     public readonly ListExt<string> NotAllowedChilds = new();
-
+    public string _loadedVersion = "0.00";
     private string _createDate;
     private string _creator;
     private int _id = -1;
@@ -72,6 +72,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
         _muf.HasPendingChanges += HasPendingChanges;
         _muf.ParseExternal += ParseExternal;
         _muf.ToListOfByte += ToListOfByte;
+        _muf.Saving += _muf_Saving;
 
         _createDate = DateTime.Now.ToString(Constants.Format_Date5);
         _creator = Generic.UserName();
@@ -98,8 +99,6 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
     #region Events
 
     public event EventHandler? Changed;
-
-    //public event EventHandler<MultiUserFileStopWorkingEventArgs>? ConnectedControlsStopAllWorking;
 
     public event EventHandler? Loaded;
 
@@ -170,7 +169,13 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
         GC.SuppressFinalize(this);
     }
 
-    public void HasPendingChanges(object sender, MultiUserFileHasPendingChangesEventArgs e) => e.HasPendingChanges = !_saved;
+    public void HasPendingChanges(object sender, MultiUserFileHasPendingChangesEventArgs e) {
+        if (!_saved) { e.HasPendingChanges = true; return; }
+
+        if (IntParse(_loadedVersion.Replace(".", string.Empty)) < IntParse(Version.Replace(".", string.Empty))) {
+            e.HasPendingChanges = true;
+        }
+    }
 
     public int NextId() {
         _id++;
@@ -179,6 +184,10 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
     }
 
     public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+
+    public void Save() {
+        _muf.Save(true);
+    }
 
     /// <summary>
     /// Prüft, ob das Formular sichtbare Elemente hat.
@@ -233,6 +242,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
                     break;
 
                 case "version":
+                    _loadedVersion = pair.Value;
                     break;
 
                 //case "filepath":
@@ -272,6 +282,16 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
         }
     }
 
+    private void _muf_Saving(object sender, System.ComponentModel.CancelEventArgs e) {
+        if (e.Cancel) { return; }
+
+        e.Cancel = IntParse(_loadedVersion.Replace(".", string.Empty)) > IntParse(Version.Replace(".", string.Empty));
+
+        //return IntParse(LoadedVersion.Replace(".", string.Empty)) > IntParse(DatabaseVersion.Replace(".", string.Empty))
+        //    ? "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."
+        //    : string.Empty;
+    }
+
     private void DatabaseFiles_Changed(object sender, System.EventArgs e) {
         if (_saving || _muf.IsLoading) { return; }
 
@@ -305,6 +325,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
 
     private void OnSavedToDisk(object sender, System.EventArgs e) {
         _saved = true;
+        _loadedVersion = Version;
         SavedToDisk?.Invoke(this, e);
     }
 
@@ -344,7 +365,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
         t.Add("CreateDate=" + _createDate.ToNonCritical());
         t.Add("CreateName=" + _creator.ToNonCritical());
         //t.GenerateAndAdd("FilePath=" + FilePath.ToNonCritical());
-        t.Add("LastUsedID=" + _id.ToString());
+        t.Add("LastUsedID=" + _id);
         t.Add("DatabaseFiles=" + DatabaseFiles.JoinWithCr().ToNonCritical());
         t.Add("NotAllowedChilds=" + NotAllowedChilds.JoinWithCr().ToNonCritical());
         t.Add("PadItemData=" + PadData.ToString().ToNonCritical());
