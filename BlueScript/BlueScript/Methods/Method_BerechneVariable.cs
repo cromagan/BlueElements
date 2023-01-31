@@ -87,7 +87,7 @@ internal class Method_BerechneVariable : Method {
         return v.GetValueFrom(attvar.Attributes[0]);
     }
 
-    public override List<string> Comand(Script? s) => s == null ? (new List<string>()) : s.Variables.AllNames();
+    public override List<string> Comand(Script? s) => s == null ? new List<string>() : s.Variables.AllNames();
 
     /// <summary>
     /// Berechnet z.B.   X = 5;

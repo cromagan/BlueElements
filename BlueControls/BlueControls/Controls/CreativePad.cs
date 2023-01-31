@@ -196,9 +196,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
 
                 case "#duplicate":
                     done = true;
-                    if (_item != null) {
-                        _item.Add((BasicPadItem)((ICloneable)thisItem).Clone());
-                    }
+                    _item?.Add((BasicPadItem)((ICloneable)thisItem).Clone());
 
                     break;
             }
@@ -266,15 +264,15 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         CheckHotItem(e, true);
         selectedHotItem = HotItem;
         if (selectedHotItem != null) {
-            items.Add("Allgemeine Element-Aktionen", true);
+            _ = items.Add("Allgemeine Element-Aktionen", true);
             //items.GenerateAndAdd("Objekt bearbeiten", "#Erweitert", ImageCode.Stift);
             //items.AddSeparator();
-            items.Add("Objekt duplizieren", "#Duplicate", ImageCode.Kopieren, selectedHotItem is ICloneable);
-            items.AddSeparator();
-            items.Add("In den Vordergrund", "#Vordergrund", ImageCode.InDenVordergrund);
-            items.Add("In den Hintergrund", "#Hintergrund", ImageCode.InDenHintergrund);
-            items.Add("Eine Ebene nach vorne", "#Vorne", ImageCode.EbeneNachVorne);
-            items.Add("Eine Ebene nach hinten", "#Hinten", ImageCode.EbeneNachHinten);
+            _ = items.Add("Objekt duplizieren", "#Duplicate", ImageCode.Kopieren, selectedHotItem is ICloneable);
+            _ = items.AddSeparator();
+            _ = items.Add("In den Vordergrund", "#Vordergrund", ImageCode.InDenVordergrund);
+            _ = items.Add("In den Hintergrund", "#Hintergrund", ImageCode.InDenHintergrund);
+            _ = items.Add("Eine Ebene nach vorne", "#Vorne", ImageCode.EbeneNachVorne);
+            _ = items.Add("Eine Ebene nach hinten", "#Hinten", ImageCode.EbeneNachHinten);
         }
     }
 
@@ -302,7 +300,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     public void OpenSaveDialog(string title) {
         title = title.RemoveChars(Constants.Char_DateiSonderZeichen);
         PicsSave.FileName = title + ".png";
-        PicsSave.ShowDialog();
+        _ = PicsSave.ShowDialog();
     }
 
     public void Print() {
@@ -330,7 +328,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
 
     public void ShowPrintPreview() {
         DruckerDokument.DefaultPageSettings.Margins = new Margins(0, 0, 0, 0);
-        PrintPreviewDialog1.ShowDialog();
+        _ = PrintPreviewDialog1.ShowDialog();
         RepairPrinterData();
     }
 
@@ -474,7 +472,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray,
             LinearGradientMode.Vertical);
         gr.FillRectangle(lgb, ClientRectangle);
-        _item?.DrawCreativePadTo(gr, Size, state, Zoom, ShiftX, ShiftY, _currentPage, _showInPrintMode);
+        _ = (_item?.DrawCreativePadTo(gr, Size, state, Zoom, ShiftX, ShiftY, _currentPage, _showInPrintMode));
 
         #region Dann die selektierten Punkte
 
@@ -507,7 +505,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         // http://technet.microsoft.com/de-de/subscriptions/control.isinputkey%28v=vs.100%29
         // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
         // Ganz wichtig diese Routine!
-        (keyData is Keys.Up or Keys.Down or Keys.Left or Keys.Right);
+        keyData is Keys.Up or Keys.Down or Keys.Left or Keys.Right;
 
     protected override RectangleF MaxBounds() {
         if (_item == null) { return new RectangleF(0, 0, 0, 0); }

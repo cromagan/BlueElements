@@ -249,7 +249,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
-        Focus();
+        _ = Focus();
         var newWord = "";
         _markStart = IntParse(e.Tags.TagGet("MarkStart"));
         _markEnd = IntParse(e.Tags.TagGet("MarkEnd"));
@@ -346,6 +346,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     //    if (Focused()) { return; }
     //    base.Focus();
     //}
+
     public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
         AbortSpellChecking();
         hotItem = null;
@@ -358,39 +359,39 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         var tmpWord = _eTxt.Word(tmp);
         tags.TagSet("Word", tmpWord);
         if (_spellChecking && !Dictionary.IsWordOk(tmpWord)) {
-            items.Add("Rechtschreibprüfung", true);
+            _ = items.Add("Rechtschreibprüfung", true);
             if (Dictionary.IsSpellChecking) {
-                items.Add("Gerade ausgelastet...", "Gerade ausgelastet...", false);
-                items.AddSeparator();
+                _ = items.Add("Gerade ausgelastet...", "Gerade ausgelastet...", false);
+                _ = items.AddSeparator();
             } else {
                 var sim = Dictionary.SimilarTo(tmpWord);
                 if (sim != null) {
                     foreach (var thisS in sim) {
-                        items.Add(" - " + thisS, "#ChangeTo:" + thisS);
+                        _ = items.Add(" - " + thisS, "#ChangeTo:" + thisS);
                     }
-                    items.AddSeparator();
+                    _ = items.AddSeparator();
                 }
-                items.Add("'" + tmpWord + "' ins Wörterbuch aufnehmen", "#SpellAdd", Dictionary.IsWriteable());
+                _ = items.Add("'" + tmpWord + "' ins Wörterbuch aufnehmen", "#SpellAdd", Dictionary.IsWriteable());
                 if (tmpWord.ToLower() != tmpWord) {
-                    items.Add("'" + tmpWord.ToLower() + "' ins Wörterbuch aufnehmen", "#SpellAddLower", Dictionary.IsWriteable());
+                    _ = items.Add("'" + tmpWord.ToLower() + "' ins Wörterbuch aufnehmen", "#SpellAddLower", Dictionary.IsWriteable());
                 }
-                items.Add("Schnelle Rechtschreibprüfung", "#SpellChecking", Dictionary.IsWriteable());
-                items.Add("Alle Wörter sind ok", "#SpellChecking2", Dictionary.IsWriteable());
-                items.AddSeparator();
+                _ = items.Add("Schnelle Rechtschreibprüfung", "#SpellChecking", Dictionary.IsWriteable());
+                _ = items.Add("Alle Wörter sind ok", "#SpellChecking2", Dictionary.IsWriteable());
+                _ = items.AddSeparator();
             }
         }
         if (this is not ComboBox cbx || cbx.DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
-            items.Add(ContextMenuComands.Ausschneiden, Convert.ToBoolean(_markStart >= 0) && Enabled);
-            items.Add(ContextMenuComands.Kopieren, Convert.ToBoolean(_markStart >= 0));
-            items.Add(ContextMenuComands.Einfügen, System.Windows.Forms.Clipboard.ContainsText() && Enabled);
+            _ = items.Add(ContextMenuComands.Ausschneiden, Convert.ToBoolean(_markStart >= 0) && Enabled);
+            _ = items.Add(ContextMenuComands.Kopieren, Convert.ToBoolean(_markStart >= 0));
+            _ = items.Add(ContextMenuComands.Einfügen, System.Windows.Forms.Clipboard.ContainsText() && Enabled);
             if (_formatierungErlaubt) {
-                items.AddSeparator();
-                items.Add("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(ImageCode.Sonne, 16), _cursorCharPos > -1);
+                _ = items.AddSeparator();
+                _ = items.Add("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(ImageCode.Sonne, 16), _cursorCharPos > -1);
                 if (Convert.ToBoolean(_markEnd > -1)) {
-                    items.AddSeparator();
-                    items.Add("Als Überschrift markieren", "#Caption", Skin.GetBlueFont(Design.TextBox_Stufe3, States.Standard).SymbolForReadableText(), _markEnd > -1);
-                    items.Add("Fettschrift", "#Bold", Skin.GetBlueFont(Design.TextBox_Bold, States.Standard).SymbolForReadableText(), Convert.ToBoolean(_markEnd > -1));
-                    items.Add("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont(Design.TextBox, States.Standard).SymbolForReadableText(), Convert.ToBoolean(_markEnd > -1));
+                    _ = items.AddSeparator();
+                    _ = items.Add("Als Überschrift markieren", "#Caption", Skin.GetBlueFont(Design.TextBox_Stufe3, States.Standard).SymbolForReadableText(), _markEnd > -1);
+                    _ = items.Add("Fettschrift", "#Bold", Skin.GetBlueFont(Design.TextBox_Bold, States.Standard).SymbolForReadableText(), Convert.ToBoolean(_markEnd > -1));
+                    _ = items.Add("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont(Design.TextBox, States.Standard).SymbolForReadableText(), Convert.ToBoolean(_markEnd > -1));
                 }
             }
         }
@@ -421,6 +422,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     /// <param name="mitMeldung"></param>
     /// <returns>Ergibt Wahr, wenn der komplette Text dem Format entspricht. Andernfalls Falsch.</returns>
     /// <remarks></remarks>
+
     public bool Text_IsOkay(bool mitMeldung) {
         if (!_eTxt.PlainText.IsFormat(this)) {
             if (mitMeldung) { MessageBox.Show("Ihre Eingabe entspricht nicht<br>dem erwarteten Format.", ImageCode.Warnung, "OK"); }
@@ -432,6 +434,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     public void Unmark(MarkState markstate) => _eTxt?.Unmark(markstate);
 
     // Tastatur
+
     internal new void KeyPress(AsciiKey keyAscii) {
         // http://www.manderby.com/informatik/allgemeines/ascii.php
         if (_mouseValue != 0) { return; }
@@ -643,6 +646,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     // Tastatur
+
     protected override void OnKeyDown(System.Windows.Forms.KeyEventArgs e) {
         base.OnKeyDown(e);
 
@@ -849,7 +853,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         if (string.IsNullOrEmpty(tt)) { return; }
         tt = tt.Replace("\n", string.Empty);
         tt = tt.Replace("\r", "\r\n");
-        Generic.CopytoClipboard(tt);
+        _ = Generic.CopytoClipboard(tt);
     }
 
     private void Clipboard_Paste() {
@@ -931,7 +935,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     /// <remarks></remarks>
     private void GenerateEtxt(bool resetCoords) {
         if (InvokeRequired) {
-            Invoke(new Action(() => GenerateEtxt(resetCoords)));
+            _ = Invoke(new Action(() => GenerateEtxt(resetCoords)));
             return;
         }
 

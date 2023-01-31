@@ -52,8 +52,8 @@ public partial class FontSelectDialog {
                 if (f.IsStyleAvailable(FontStyle.Regular)) {
                     Font fo = new(f.Name, 100);
                     try {
-                        BlueFont.MeasureString("T", fo);
-                        _fnList.Add(string.Empty, f.Name, BlueFont.Get(f, 12).NameInStyle(), true);
+                        _ = BlueFont.MeasureString("T", fo);
+                        _ = _fnList.Add(string.Empty, f.Name, BlueFont.Get(f, 12).NameInStyle(), true);
                     } catch (Exception) { }
                 }
             }
@@ -96,10 +96,10 @@ public partial class FontSelectDialog {
         set {
             _adding = true;
             value ??= BlueFont.Get(Skin.DummyStandardFont);
-            if (FName.Item[value.FontName] == null) { FName.Item.Add(value.FontName, value.FontName, QuickImage.Get(ImageCode.Warnung, 20)); }
+            if (FName.Item[value.FontName] == null) { _ = FName.Item.Add(value.FontName, value.FontName, QuickImage.Get(ImageCode.Warnung, 20)); }
             FName.Item.UncheckAll();
             FName.Item[value.FontName].Checked = true;
-            if (FSize.Item[value.FontSize.ToString(Constants.Format_Float1)] == null) { FSize.Item.Add(value.FontSize.ToString(Constants.Format_Float1)); }
+            if (FSize.Item[value.FontSize.ToString(Constants.Format_Float1)] == null) { _ = FSize.Item.Add(value.FontSize.ToString(Constants.Format_Float1)); }
             FSize.Item.UncheckAll();
             FSize.Item[value.FontSize.ToString(Constants.Format_Float1)].Checked = true;
             fFett.Checked = value.Bold;
@@ -123,14 +123,14 @@ public partial class FontSelectDialog {
 
     private void cFarbe_Click(object sender, System.EventArgs e) {
         ColorDia.Color = QuickImage.Get(cFarbe.ImageCode).ChangeGreenTo.FromHtmlCode();
-        ColorDia.ShowDialog();
+        _ = ColorDia.ShowDialog();
         cFarbe.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToString();
         UpdateSampleText();
     }
 
     private void cRandF_Click(object sender, System.EventArgs e) {
         ColorDia.Color = QuickImage.Get(cRandF.ImageCode).ChangeGreenTo.FromHtmlCode();
-        ColorDia.ShowDialog();
+        _ = ColorDia.ShowDialog();
         cRandF.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToString();
         UpdateSampleText();
     }

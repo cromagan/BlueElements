@@ -151,7 +151,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
         hotItem = null;
         if (_bitmap != null) {
-            items.Add("Externes Fenster öffnen", "ExF");
+            _ = items.Add("Externes Fenster öffnen", "ExF");
         }
     }
 
@@ -226,9 +226,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         ZoomFitInvalidateAndCheckButtons();
     }
 
-    private void DelP_Click(object sender, System.EventArgs e) {
-        DeleteImageInFileSystem();
-    }
+    private void DelP_Click(object sender, System.EventArgs e) => DeleteImageInFileSystem();
 
     private void EditPanel_Tick(object sender, System.EventArgs e) {
         if (_panelMoveDirection == 0) {
@@ -279,7 +277,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     private void Lade_Click(object sender, System.EventArgs e) {
         if (!DeleteImageInFileSystem()) { return; }
         if (!HasFileName()) { return; }
-        OpenDia.ShowDialog();
+        _ = OpenDia.ShowDialog();
     }
 
     private void OpenDia_FileOk(object sender, CancelEventArgs e) {
@@ -291,9 +289,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
 
     private void SaveNewPicToDisc() {
         if (!HasFileName()) { return; }
-        if (_bitmap != null) {
-            _bitmap.Save(_filename, ImageFormat.Png);
-        }
+        _bitmap?.Save(_filename, ImageFormat.Png);
     }
 
     private void ZoomFitInvalidateAndCheckButtons() {

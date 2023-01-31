@@ -22,7 +22,6 @@ using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 
 namespace BlueDatabase;
 
@@ -39,9 +38,7 @@ public class CellItem {
 
     #region Constructors
 
-    public CellItem(string value) {
-        _value = value;
-    }
+    public CellItem(string value) => _value = value;
 
     #endregion
 
@@ -160,6 +157,7 @@ public class CellItem {
     /// <param name="style"></param>
     /// <param name="removeLineBreaks">bei TRUE werden Zeilenumbrüche mit Leerzeichen ersetzt</param>
     /// <returns></returns>
+
     public static string ValueReadable(ColumnItem? column, string txt, ShortenStyle style, BildTextVerhalten bildTextverhalten, bool removeLineBreaks) {
         if (bildTextverhalten == BildTextVerhalten.Nur_Bild && style != ShortenStyle.HTML) { return string.Empty; }
 
@@ -240,6 +238,7 @@ public class CellItem {
     /// Jede Zeile für sich richtig formatiert.
     /// </summary>
     /// <returns></returns>
+
     public static List<string> ValuesReadable(ColumnItem? column, RowItem Row, ShortenStyle Style) {
         if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             //var LinkedData = CellCollection.LinkedCellData(column, Row, false, false);

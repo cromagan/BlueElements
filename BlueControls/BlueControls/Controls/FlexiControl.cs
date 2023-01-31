@@ -354,9 +354,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     #region Methods
 
-    public void DeleteValue() {
-        ValueSet(string.Empty, true, true);
-    }
+    public void DeleteValue() => ValueSet(string.Empty, true, true);
 
     public bool ParseVariables(List<Variable>? list) {
         var ct = string.Empty;
@@ -370,7 +368,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     public void StyleComboBox(ItemCollectionList? list, ComboBoxStyle style, bool removevalueIfNotExists) {
-        if (!Allinitialized) { CreateSubControls(); }
+        if (!Allinitialized) { _ = CreateSubControls(); }
         foreach (var thiscb in Controls) {
             if (thiscb is ComboBox cb) { StyleComboBox(cb, list, style, removevalueIfNotExists); }
         }
@@ -382,6 +380,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// <param name="newvalue"></param>
     /// <param name="updateControls"></param>
     /// <param name="alwaysValueChanged">Steuerelemente, wie Button, Checkboxen, DropDownListen müssen hier TRUE setzen. Auch Texte, die in einem Stück gesetzt werden.</param>
+
     public void ValueSet(string? newvalue, bool updateControls, bool alwaysValueChanged) {
         if (IsDisposed) { return; }
         newvalue ??= string.Empty;
@@ -398,6 +397,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// Erstellt die Steuerelemente zur Bearbeitung und auch die Caption und alles was gebrauch wird.
     /// Die Events werden Registriert und auch der Wert gesetzt.
     /// </summary>
+
     protected GenericControl? CreateSubControls() {
         if (Allinitialized) {
             Develop.DebugPrint(FehlerArt.Warnung, "Bereits initialisiert");
@@ -474,7 +474,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         //        gr.FillRectangle(lgb, ClientRectangle);
         //    }
         //}
-        if (!Allinitialized) { CreateSubControls(); }
+        if (!Allinitialized) { _ = CreateSubControls(); }
         //if (_EditType == enEditTypeFormula.Listbox || _EditType == enEditTypeFormula.Listbox_1_Zeile || _EditType == enEditTypeFormula.Listbox_3_Zeilen) {
         //    ListBoxen(out var Main, out var Suggest);
         //    if (Suggest != null) {
@@ -731,14 +731,14 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         if (LastTextChange == null) { return; }
         if (_pauseValueChanged) { return; }
         if (DateTime.UtcNow.Subtract((DateTime)LastTextChange).TotalSeconds < 20) { return; }
-        Focus(); // weitere Tastatureingabn verhindern. Z.B: wenn was mariert wird und dann entfernen gedrück wird. Wenn die Box neu sortiert wird, ist dsa ergebnis nicht schön
+        _ = Focus(); // weitere Tastatureingabn verhindern. Z.B: wenn was mariert wird und dann entfernen gedrück wird. Wenn die Box neu sortiert wird, ist dsa ergebnis nicht schön
         RaiseEventIfChanged();
     }
 
     private void _InfoCaption_Click(object sender, System.EventArgs e) {
         foreach (var thisc in Controls) {
             if (thisc is ComboBox cbx) {
-                cbx.Focus();
+                _ = cbx.Focus();
                 cbx.ShowMenu(null, null);
                 return;
             }
@@ -786,6 +786,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// <summary>
     /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
     /// </summary>
+
     private Button Control_Create_ButtonYesNo() {
         Button control = new() {
             Enabled = Enabled,
@@ -820,6 +821,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// <summary>
     /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
     /// </summary>
+
     private ComboBox Control_Create_ComboBox() {
         ComboBox control = new();
         StyleComboBox(control, null, ComboBoxStyle.DropDownList, false);
@@ -843,6 +845,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// <summary>
     /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
     /// </summary>
+
     private ListBox Control_Create_ListBox() {
         ListBox control = new() {
             Enabled = Enabled
@@ -854,6 +857,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     // Nimmt Teilweise die Routinen der Listbox her
+
     private SwapListBox Control_Create_SwapListBox() {
         SwapListBox control = new() {
             Enabled = Enabled
@@ -867,6 +871,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// <summary>
     /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
     /// </summary>
+
     private TextBox Control_Create_TextBox() {
         TextBox control = new();
         StyleTextBox(control);
@@ -1056,6 +1061,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// <summary>
     /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
     /// </summary>
+
     private void UpdateValueTo_Combobox(TextBox control) => control.Text = Value;
 
     /// <summary>
@@ -1066,14 +1072,16 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// <summary>
     /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
     /// </summary>
+
     private void UpdateValueTo_TextBox(TextBox control) => control.Text = Value;
 
     /// <summary>
     /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Die Filling-Variable wird währenddessen umgesetzt.
     /// sollte vor StandardBehandlung kommen, da dort das Objekt gesetzt wird und dann die Handler generiert werden.
     /// </summary>
+
     private void UpdateValueToControl() {
-        if (!Allinitialized) { CreateSubControls(); }
+        if (!Allinitialized) { _ = CreateSubControls(); }
         IsFilling = true;
         foreach (Control control in Controls) {
             switch (control) {
@@ -1126,6 +1134,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     // TODO: Erstellen!//if (_EditType != enEditTypeFormula.Button) { return; }//CheckIfChanged("+");//OnButtonClicked();
+
     private void YesNoButton_CheckedChanged(object sender, System.EventArgs e) => ValueSet(((Button)sender).Checked.ToPlusMinus(), false, true);
 
     #endregion

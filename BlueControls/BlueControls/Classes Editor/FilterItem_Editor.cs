@@ -24,7 +24,6 @@ using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System.Drawing;
-using static BlueBasics.Converter;
 
 namespace BlueControls.Classes_Editor;
 
@@ -38,9 +37,7 @@ internal sealed partial class FilterItem_Editor : AbstractClassEditor<FilterItem
 
     #region Constructors
 
-    public FilterItem_Editor() : base() {
-        InitializeComponent();
-    }
+    public FilterItem_Editor() : base() => InitializeComponent();
 
     #endregion
 

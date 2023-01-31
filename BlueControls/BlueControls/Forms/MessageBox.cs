@@ -36,8 +36,6 @@ public partial class MessageBox : Form {
 
     #endregion
 
-    #region Constructors
-
     //private MessageBox()
     //{
     //    InitializeComponent();
@@ -46,6 +44,9 @@ public partial class MessageBox : Form {
     //        StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
     //    }
     //}
+
+    #region Constructors
+
     private MessageBox(string txt, ImageCode pic, params string[] buttons) : base(Design.Form_MsgBox) {
         InitializeComponent();
         Text = Develop.AppName();
@@ -89,7 +90,7 @@ public partial class MessageBox : Form {
     public static int Show(string txt, ImageCode pic, bool dialog, params string[] buttons) {
         MessageBox mb = new(txt, pic, buttons);
         if (dialog) {
-            mb.ShowDialog();
+            _ = mb.ShowDialog();
         } else {
             mb.Show();
             while (mb._pressed == null) {

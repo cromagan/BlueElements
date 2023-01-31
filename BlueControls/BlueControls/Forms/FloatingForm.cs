@@ -91,7 +91,7 @@ public partial class FloatingForm : Form {
 
     public new void Close() {
         try {
-            if (AllBoxes != null && AllBoxes.Contains(this)) { AllBoxes.Remove(this); }
+            if (AllBoxes != null && AllBoxes.Contains(this)) { _ = AllBoxes.Remove(this); }
             base.Close();
         } catch {
             Close();
@@ -139,7 +139,7 @@ public partial class FloatingForm : Form {
 
     public new void Show() {
         try {
-            WindowsRemoteControl.ShowWindow(Handle, (int)Sw.ShowNoActivate);
+            _ = WindowsRemoteControl.ShowWindow(Handle, (int)Sw.ShowNoActivate);
         } catch (ObjectDisposedException) {
             // kommt vor, wenn der Aufbau zu lange dauert. Ignorierbar.
         } catch (Exception ex) {

@@ -37,9 +37,7 @@ public class EasyPicPadItem : CustomizableShowPadItem, IItemToControl {
 
     #region Constructors
 
-    public EasyPicPadItem(string internalname) : base(internalname) {
-        SetCoordinates(new RectangleF(0, 0, 50, 30), true);
-    }
+    public EasyPicPadItem(string internalname) : base(internalname) => SetCoordinates(new RectangleF(0, 0, 50, 30), true);
 
     #endregion
 
@@ -64,9 +62,10 @@ public class EasyPicPadItem : CustomizableShowPadItem, IItemToControl {
     #region Methods
 
     public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
-        var con = new EasyPic();
-        con.OriginalText = Bild_Dateiname;
-        con.Name = DefaultItemToControlName();
+        var con = new EasyPic {
+            OriginalText = Bild_Dateiname,
+            Name = DefaultItemToControlName()
+        };
 
         if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
             var ff = parent.SearchOrGenerate(rfw2);

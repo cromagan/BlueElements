@@ -82,7 +82,7 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
         if (items == null || items.Count == 0) { return null; }
 
         var x = new ItemSelect(items);
-        x.ShowDialog();
+        _ = x.ShowDialog();
 
         return x._giveBack;
     }

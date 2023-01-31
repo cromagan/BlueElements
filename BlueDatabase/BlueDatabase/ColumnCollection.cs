@@ -21,17 +21,14 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
+using BlueDatabase.Interfaces;
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using static BlueBasics.IO;
-using BlueDatabase.EventArgs;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Collections;
-using System.Runtime.CompilerServices;
-using BlueDatabase.Interfaces;
 
 namespace BlueDatabase;
 
@@ -86,6 +83,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    /// Gib erste Spalte des ersten Arrangements zurück, die nicht mit "SYS_" beginnt
     //    /// </summary>
     //    /// <returns></returns>
+
     public ColumnItem? First {
         get {
             if (Database == null || Database.IsDisposed) { return null; }
@@ -254,7 +252,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!");
             return null;
         }
-        Database?.ChangeData(DatabaseDataType.Comand_AddColumnByName, internalName, null, string.Empty, internalName, string.Empty);
+        _ = (Database?.ChangeData(DatabaseDataType.Comand_AddColumnByName, internalName, null, string.Empty, internalName, string.Empty));
         item = Exists(internalName);
         if (item == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen.");
@@ -316,6 +314,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     /// Setzt die fest vermerkten Spalten zurück und durchsucht die Spalten nach dem Identifier.
     /// Es werden nur die gefunden Spalten gemerkt - keine neuen erstellt!
     /// </summary>
+
     public void GetSystems() {
         SysLocked = null;
         SysRowCreateDate = null;
@@ -374,9 +373,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    return -1;
     //}
 
-    public void Remove(ColumnItem item, string comment) {
-        Remove(item.Name, comment);
-    }
+    public void Remove(ColumnItem item, string comment) => Remove(item.Name, comment);
 
     public bool Remove(string name, string comment) => string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Comand_RemoveColumn, name, null, string.Empty, name, comment));
 
@@ -538,7 +535,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             if (c != null) { return "Bereits vorhanden!"; }
 
             c = new ColumnItem(Database, (long)key);
-            Add(c);
+            _ = Add(c);
 
             if (!isLoading) {
                 Database.RepairColumnArrangements();
@@ -553,7 +550,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             if (c != null) { return "Bereits vorhanden!"; }
 
             c = new ColumnItem(Database, name);
-            Add(c);
+            _ = Add(c);
 
             if (!isLoading) {
                 Database.RepairColumnArrangements();

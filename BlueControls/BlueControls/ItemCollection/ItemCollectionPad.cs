@@ -85,7 +85,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
 
     public ItemCollectionPad(string layoutId, DatabaseAbstract database, long rowkey) : this(database.Layouts[database.Layouts.LayoutIdToIndex(layoutId)], string.Empty) {
         // Wenn nur die Row ankommt und diese null ist, kann gar nix generiert werden
-        ResetVariables();
+        _ = ResetVariables();
         ParseVariable(database.Row.SearchByKey(rowkey));
     }
 
@@ -94,6 +94,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
     /// </summary>
     /// <param name="toParse"></param>
     /// <param name="useThisId">Wenn das Blatt bereits eine Id hat, muss die Id verwendet werden. Wird das Feld leer gelassen, wird die beinhaltete Id benutzt.</param>
+
     public ItemCollectionPad(string toParse, string useThisId) : this() {
         if (string.IsNullOrEmpty(toParse) || toParse.Length < 3) { return; }
         if (toParse.Substring(0, 1) != "{") { return; }// Alte Daten gehen eben verloren.
@@ -130,7 +131,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
 
                 case "style":
                     _sheetStyle = Skin.StyleDb.Row[pair.Value];
-                    if (_sheetStyle == null) { _sheetStyle = Skin.StyleDb.Row.First(); }// Einfach die Erste nehmen
+                    _sheetStyle ??= Skin.StyleDb.Row.First();// Einfach die Erste nehmen
                     break;
 
                 case "fontscale":
@@ -324,7 +325,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
 
         foreach (var thisp in this) {
             if (!string.IsNullOrEmpty(thisp.Page)) {
-                p.AddIfNotExists(thisp.Page);
+                _ = p.AddIfNotExists(thisp.Page);
             }
         }
 
@@ -413,7 +414,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
     public void DrawCreativePadToBitmap(Bitmap? bmp, States vState, float zoomf, float x, float y, string seite) {
         if (bmp == null) { return; }
         var gr = Graphics.FromImage(bmp);
-        DrawCreativePadTo(gr, bmp.Size, vState, zoomf, x, y, seite, true);
+        _ = DrawCreativePadTo(gr, bmp.Size, vState, zoomf, x, y, seite, true);
         gr.Dispose();
     }
 
@@ -440,7 +441,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         var (_, _, script) = row.DoAutomatic("export");
         if (script?.Variables == null) { return; }
         foreach (var thisV in script.Variables) {
-            ParseVariable(thisV);
+            _ = ParseVariable(thisV);
         }
     }
 

@@ -18,11 +18,10 @@
 #nullable enable
 
 using BlueBasics;
-using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.ItemCollection.ItemCollectionList;
-using System.Collections.Generic;
 using BlueDatabase;
+using System.Collections.Generic;
 
 namespace BlueControls.Forms;
 
@@ -72,7 +71,7 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
 
     public static List<string>? Show(string txt, ItemCollectionList? items, AddType addNewAllowed, bool cancelErl) {
         InputBoxListBoxStyle mb = new(txt, items, addNewAllowed, cancelErl);
-        mb.ShowDialog();
+        _ = mb.ShowDialog();
         return mb._giveBack;
     }
 

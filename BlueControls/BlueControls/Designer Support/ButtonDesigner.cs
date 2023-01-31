@@ -17,7 +17,6 @@
 
 #nullable enable
 
-
 using System.ComponentModel.Design;
 
 namespace BlueControls.Designer_Support;
@@ -34,12 +33,10 @@ internal sealed class ButtonDesigner : BasicDesigner {
 
     public override DesignerActionListCollection ActionLists {
         get {
-            if (_aList == null) {
-                _aList = new DesignerActionListCollection
+            _aList ??= new DesignerActionListCollection
                 {
                     new ButtonActionList(Component)
                 };
-            }
             return _aList;
         }
     }

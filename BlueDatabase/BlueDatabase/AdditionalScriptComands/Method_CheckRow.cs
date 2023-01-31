@@ -52,7 +52,7 @@ public class Method_CheckRow : MethodDatabase {
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
         var row = Method_Row.ObjectToRow(attvar.Attributes[0]);
-        row?.DoAutomatic("script");
+        _ = (row?.DoAutomatic("script"));
         return DoItFeedback.Null();
     }
 

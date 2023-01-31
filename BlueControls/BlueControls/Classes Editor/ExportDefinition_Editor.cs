@@ -34,9 +34,7 @@ internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<Expo
 {
     #region Constructors
 
-    public ExportDefinition_Editor() : base() {
-        InitializeComponent();
-    }
+    public ExportDefinition_Editor() : base() => InitializeComponent();
 
     #endregion
 
@@ -87,17 +85,17 @@ internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<Expo
         ExportSpaltenAnsicht.Text = Item.ExportSpaltenAnsicht.ToString();
         lbxFilter.Item.Clear();
         foreach (var thisFilter in Item.Filter.Where(thisFilter => thisFilter != null)) {
-            lbxFilter.Item.Add(thisFilter, string.Empty, string.Empty);
+            _ = lbxFilter.Item.Add(thisFilter, string.Empty, string.Empty);
         }
         lsbExportDateien.Item.Clear();
         foreach (var t1 in Item.BereitsExportiert) {
             if (!string.IsNullOrEmpty(t1)) {
                 var t = t1.Split('|');
                 if (!FileExists(t[0])) {
-                    lsbExportDateien.Item.Add(t[0], t1, QuickImage.Get(ImageCode.Kritisch), true, "0000");
+                    _ = lsbExportDateien.Item.Add(t[0], t1, QuickImage.Get(ImageCode.Kritisch), true, "0000");
                 } else {
                     var q1 = QuickImage.Get(ImageCode.Kugel, 16, Color.Red.MixColor(Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / Item.AutoDelete), Color.Transparent);
-                    lsbExportDateien.Item.Add(t[0], t1, q1, true, t[1].CompareKey(SortierTyp.Datum_Uhrzeit));
+                    _ = lsbExportDateien.Item.Add(t[0], t1, q1, true, t[1].CompareKey(SortierTyp.Datum_Uhrzeit));
                 }
             }
         }
@@ -108,7 +106,7 @@ internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<Expo
         Forms.ExportDialog.AddLayoutsOff(cbxExportFormularID.Item, Item.Database, true);
         ExportSpaltenAnsicht.Item.Clear();
         for (var spa = 0; spa < Item.Database.ColumnArrangements.Count; spa++) {
-            ExportSpaltenAnsicht.Item.Add(Item.Database.ColumnArrangements[spa].Name, spa.ToString());
+            _ = ExportSpaltenAnsicht.Item.Add(Item.Database.ColumnArrangements[spa].Name, spa.ToString());
         }
         if (!string.IsNullOrEmpty(Item.Database.GlobalShowPass)) {
             ExportCSVFormat.Enabled = false;
@@ -134,6 +132,7 @@ internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<Expo
     //    ExportFilter.Item.Add(new ObjectListItem(NewFilter2));
     //    UpdateExport(false);
     //}
+
     private void ExportDateien_ListOrItemChanged(object sender, System.EventArgs e) => UpdateExport(false);
 
     private void ExportDateien_RemoveClicked(object sender, ListOfBasicListItemEventArgs e) {
@@ -146,7 +145,7 @@ internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<Expo
                 } else {
                     fil = ThisItemBasic.Internal;
                 }
-                if (FileExists(fil)) { DeleteFile(fil, false); }
+                if (FileExists(fil)) { _ = DeleteFile(fil, false); }
             }
         }
     }

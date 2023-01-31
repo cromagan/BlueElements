@@ -21,7 +21,7 @@ using System.Collections.Generic;
 
 namespace BlueScript.Structures;
 
-public struct SplittedAttributesFeedback {
+public readonly struct SplittedAttributesFeedback {
 
     #region Fields
 

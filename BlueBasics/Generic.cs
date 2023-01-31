@@ -51,7 +51,7 @@ public static class Generic {
         GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
         //GC.WaitForPendingFinalizers();
         //GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
-        GC.WaitForFullGCComplete(1000);
+        _ = GC.WaitForFullGCComplete(1000);
     }
 
     public static bool CopytoClipboard(string text) {
@@ -159,8 +159,9 @@ public static class Generic {
 
     public static string GetHashString(this string inputString) {
         var sb = new StringBuilder();
-        foreach (var b in GetHash(inputString))
-            sb.Append(b.ToString("X2"));
+        foreach (var b in GetHash(inputString)) {
+            _ = sb.Append(b.ToString("X2"));
+        }
 
         return sb.ToString();
     }
@@ -214,7 +215,7 @@ public static class Generic {
             }
         }
         // browserName = "edge.exe";
-        Process.Start(new ProcessStartInfo(browserName, adds + " " + url));
+        _ = Process.Start(new ProcessStartInfo(browserName, adds + " " + url));
     }
 
     public static int LevenshteinDistance(string txt1, string txt2) {
@@ -284,9 +285,7 @@ public static class Generic {
     /// <returns></returns>
     public static double Sigmoid(double x) => 1 / (1 + Math.Exp(-x));
 
-    public static void Swap<T>(ref T w1, ref T w2) {
-        (w1, w2) = (w2, w1);
-    }
+    public static void Swap<T>(ref T w1, ref T w2) => (w1, w2) = (w2, w1);
 
     /// <summary>
     /// Gibt einen Wert zwischen -1 und 1 zurück

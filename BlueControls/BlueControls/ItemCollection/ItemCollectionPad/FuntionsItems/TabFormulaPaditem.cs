@@ -66,8 +66,9 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
     #region Methods
 
     public override Control CreateControl(ConnectedFormulaView parent) {
-        var con = new Controls.TabControl();
-        con.Name = DefaultItemToControlName();
+        var con = new Controls.TabControl {
+            Name = DefaultItemToControlName()
+        };
 
         if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
             var ff = parent.SearchOrGenerate(rfw2);
@@ -114,9 +115,10 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
             if (cf != null) {
                 if (cf.HasVisibleItemsForMe(pgvis, myGroup, myName)) {
                     if (existTab == null) {
-                        var t = new TabPage();
-                        t.Name = thisc.FileNameWithoutSuffix();
-                        t.Text = thisc.FileNameWithoutSuffix();
+                        var t = new TabPage {
+                            Name = thisc.FileNameWithoutSuffix(),
+                            Text = thisc.FileNameWithoutSuffix()
+                        };
                         c3.TabPages.Add(t);
 
                         var cc = new ConnectedFormulaView(pg);
@@ -230,17 +232,17 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
     }
 
     private Controls.ListBox Childs() {
-        var childs = new Controls.ListBox();
-
-        childs.AddAllowed = AddType.OnlySuggests;
-        childs.RemoveAllowed = true;
-        childs.MoveAllowed = true;
+        var childs = new Controls.ListBox {
+            AddAllowed = AddType.OnlySuggests,
+            RemoveAllowed = true,
+            MoveAllowed = true
+        };
         childs.Suggestions.Clear();
 
         if (_cf != null && System.IO.File.Exists(_cf.Filename)) {
             foreach (var thisf in System.IO.Directory.GetFiles(_cf.Filename.FilePath(), "*.cfo")) {
                 if (!_cf.NotAllowedChilds.Contains(thisf)) {
-                    childs.Suggestions.Add(thisf, ImageCode.Diskette);
+                    _ = childs.Suggestions.Add(thisf, ImageCode.Diskette);
                 }
             }
         }
@@ -248,13 +250,13 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
         if (_cf != null && _cf.PadData != null) {
             foreach (var thisf in _cf.PadData.AllPages()) {
                 if (!_cf.NotAllowedChilds.Contains(thisf) && !string.Equals("Head", thisf, StringComparison.OrdinalIgnoreCase)) {
-                    childs.Suggestions.Add(thisf, ImageCode.Formel);
+                    _ = childs.Suggestions.Add(thisf, ImageCode.Formel);
                 }
             }
         }
 
         foreach (var thisf in _childs) {
-            childs.Item.Add(thisf, System.IO.File.Exists(thisf) ? ImageCode.Diskette : ImageCode.Formel);
+            _ = childs.Item.Add(thisf, System.IO.File.Exists(thisf) ? ImageCode.Diskette : ImageCode.Formel);
         }
 
         childs.ListOrItemChanged += Childs_ListOrItemChanged;
@@ -265,16 +267,14 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
         return childs;
     }
 
-    private void Childs_ContextMenuInit(object sender, EventArgs.ContextMenuInitEventArgs e) {
-        e.UserMenu.Add(ContextMenuComands.Bearbeiten);
-    }
+    private void Childs_ContextMenuInit(object sender, EventArgs.ContextMenuInitEventArgs e) => e.UserMenu.Add(ContextMenuComands.Bearbeiten);
 
     private void Childs_ContextMenuItemClicked(object sender, EventArgs.ContextMenuItemClickedEventArgs e) {
         if (e.ClickedComand.ToLower() == "bearbeiten") {
             MultiUserFile.SaveAll(false);
 
             var x = new ConnectedFormulaEditor(((BasicListItem)e.HotItem).Internal, _cf?.NotAllowedChilds);
-            x.ShowDialog();
+            _ = x.ShowDialog();
             MultiUserFile.SaveAll(false);
             x.Dispose();
         }
@@ -298,7 +298,7 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
 
     private void NotAllowedChilds_Changed(object sender, System.EventArgs e) {
         foreach (var thisl in _cf.NotAllowedChilds) {
-            _childs.Remove(thisl);
+            _ = _childs.Remove(thisl);
         }
 
         OnChanged();

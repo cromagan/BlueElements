@@ -60,8 +60,8 @@ public static partial class Extensions {
 
         foreach (var thisitem in collection) {
             if (sb.Length + thisitem.Length <= maxlenght) {
-                if (sb.Length > 0) { sb.Append("\r"); }
-                sb.Append(thisitem);
+                if (sb.Length > 0) { _ = sb.Append("\r"); }
+                _ = sb.Append(thisitem);
             } else {
                 return sb.ToString();
             }
@@ -73,7 +73,7 @@ public static partial class Extensions {
 
     public static void RemoveRange<Tt>(this ICollection<Tt> iC, List<Tt> remove) {
         foreach (var thisItem in remove) {
-            iC.Remove(thisItem);
+            _ = iC.Remove(thisItem);
         }
     }
 

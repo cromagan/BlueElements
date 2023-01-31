@@ -27,9 +27,7 @@ public partial class Tool_DummyGenerator {
 
     #region Constructors
 
-    public Tool_DummyGenerator() : base() {
-        InitializeComponent();
-    }
+    public Tool_DummyGenerator() : base() => InitializeComponent();
 
     #endregion
 

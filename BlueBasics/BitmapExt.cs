@@ -59,17 +59,11 @@ public class BitmapExt : IDisposableExtended {
         }
     }
 
-    public BitmapExt(string filename, bool setDummyPicIfFails) {
-        FromFile(filename, setDummyPicIfFails);
-    }
+    public BitmapExt(string filename, bool setDummyPicIfFails) => FromFile(filename, setDummyPicIfFails);
 
-    public BitmapExt(int width, int height) {
-        EmptyBitmap(width, height);
-    }
+    public BitmapExt(int width, int height) => EmptyBitmap(width, height);
 
-    public BitmapExt() {
-        EmptyBitmap(1, 1);
-    }
+    public BitmapExt() => EmptyBitmap(1, 1);
 
     public BitmapExt(Icon icon) : this(icon.ToBitmap()) { }
 
@@ -77,9 +71,7 @@ public class BitmapExt : IDisposableExtended {
     /// Achtung, das eingehende Bild wird geclont!
     /// </summary>
     /// <param name="bmp"></param>
-    public BitmapExt(Bitmap bmp) {
-        CloneFromBitmap(bmp);
-    }
+    public BitmapExt(Bitmap bmp) => CloneFromBitmap(bmp);
 
     #endregion
 
@@ -261,9 +253,7 @@ public class BitmapExt : IDisposableExtended {
                 }
             }
         }
-        bool IsWhite(int x, int y) {
-            return x < 0 || y < 0 || x >= pic.Width || y >= pic.Height || pic.GetPixel(x, y).IsNearWhite(0.9);
-        }
+        bool IsWhite(int x, int y) => x < 0 || y < 0 || x >= pic.Width || y >= pic.Height || pic.GetPixel(x, y).IsNearWhite(0.9);
     }
 
     public static Bitmap? AutoCrop(Bitmap? pic, double minBrightness) {

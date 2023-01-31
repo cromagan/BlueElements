@@ -95,9 +95,7 @@ public abstract class RectanglePadItem : BasicPadItem {
         return l;
     }
 
-    public override void InitialPosition(int x, int y, int width, int height) {
-        SetCoordinates(new RectangleF(x, y, width, height), true);
-    }
+    public override void InitialPosition(int x, int y, int width, int height) => SetCoordinates(new RectangleF(x, y, width, height), true);
 
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }

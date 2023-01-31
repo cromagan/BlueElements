@@ -87,12 +87,13 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
     #region Methods
 
     public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
-        var con = new FlexiControl();
-        con.Caption = Überschrift + ":";
-        con.EditType = _bearbeitung;
-        con.CaptionPosition = CaptionPosition;
-        con.Name = DefaultItemToControlName();
-        con.OriginalText = _variable;
+        var con = new FlexiControl {
+            Caption = Überschrift + ":",
+            EditType = _bearbeitung,
+            CaptionPosition = CaptionPosition,
+            Name = DefaultItemToControlName(),
+            OriginalText = _variable
+        };
         if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
             var ff = parent.SearchOrGenerate(rfw2);
 

@@ -50,10 +50,10 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
         foreach (PaperSize ps in printDocument1.PrinterSettings.PaperSizes) {
             var nn = ps.Width + ";" + ps.Height;
             if (Format.Item[nn] == null) {
-                Format.Item.Add(ps.PaperName, nn, QuickImage.Get(ImageCode.Datei), true, ps.PaperName);
+                _ = Format.Item.Add(ps.PaperName, nn, QuickImage.Get(ImageCode.Datei), true, ps.PaperName);
             }
         }
-        Format.Item.Add("Manuelle Eingabe", "neu", ImageCode.Stern, true, Constants.FirstSortChar.ToString());
+        _ = Format.Item.Add("Manuelle Eingabe", "neu", ImageCode.Stern, true, Constants.FirstSortChar.ToString());
         Format.Item.Sort();
         if (nurHochformat) {
             Hochformat.Checked = true;
@@ -83,7 +83,7 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
 
     public static PrintDocument? Show(PrintDocument printDocument1, bool nurHochformat) {
         PageSetupDialog mb = new(printDocument1, nurHochformat);
-        mb.ShowDialog();
+        _ = mb.ShowDialog();
         return mb._giveBack;
     }
 

@@ -18,7 +18,6 @@
 #nullable enable
 
 using BlueBasics;
-using BlueBasics.Enums;
 using BlueDatabase;
 using BlueScript.Variables;
 using System.Collections.Generic;
@@ -68,18 +67,16 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
         }
     }
 
-    internal void Clear() {
-        tableVariablen.Database?.Row.Clear("Variablen gelöscht");
-    }
+    internal void Clear() => tableVariablen.Database?.Row.Clear("Variablen gelöscht");
 
     private void GenerateVariableTable() {
         Database x = new(false, "Script_Variablen");
-        x.Column.GenerateAndAdd("Name", "N", ColumnFormatHolder.Text, "Variablenname");
-        x.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder.Text, "Variablentyp");
-        x.Column.GenerateAndAdd("RO", "R", ColumnFormatHolder.Bit, "Readonly, Schreibgeschützt");
-        x.Column.GenerateAndAdd("System", "S", ColumnFormatHolder.Bit, "Systemspalte\r\nIm Script nicht verfügbar");
-        x.Column.GenerateAndAdd("Inhalt", "I", ColumnFormatHolder.Text, "Inhalt (gekürzte Ansicht)");
-        x.Column.GenerateAndAdd("Kommentar", "K", ColumnFormatHolder.Text, "Komentar");
+        _ = x.Column.GenerateAndAdd("Name", "N", ColumnFormatHolder.Text, "Variablenname");
+        _ = x.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder.Text, "Variablentyp");
+        _ = x.Column.GenerateAndAdd("RO", "R", ColumnFormatHolder.Bit, "Readonly, Schreibgeschützt");
+        _ = x.Column.GenerateAndAdd("System", "S", ColumnFormatHolder.Bit, "Systemspalte\r\nIm Script nicht verfügbar");
+        _ = x.Column.GenerateAndAdd("Inhalt", "I", ColumnFormatHolder.Text, "Inhalt (gekürzte Ansicht)");
+        _ = x.Column.GenerateAndAdd("Kommentar", "K", ColumnFormatHolder.Text, "Komentar");
 
         foreach (var thisColumn in x.Column.Where(thisColumn => !thisColumn.IsSystemColumn())) {
             thisColumn.MultiLine = true;

@@ -56,9 +56,7 @@ public class WorkItem : IParseable {
 
     //public WorkItem(DatabaseDataType comand, ColumnItem column, RowItem row, string previousValue, string changedTo, string user) : this(comand, column?.Key ?? -1, row?.Key ?? -1, previousValue, changedTo, user) { }
 
-    public WorkItem(string s) {
-        Parse(s);
-    }
+    public WorkItem(string s) => Parse(s);
 
     #endregion
 

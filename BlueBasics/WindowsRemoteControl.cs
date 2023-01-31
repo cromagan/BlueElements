@@ -96,10 +96,10 @@ public static class WindowsRemoteControl {
 
     public static void FensterPosSetzen(IntPtr handle, int left, int top) {
         Rectangle r = new();
-        GetWindowRect(handle, ref r);
+        _ = GetWindowRect(handle, ref r);
         if (r.Width == 0) { return; }
         if (r.Height == 0) { return; }
-        SetWindowPos(handle, 0, left, top, r.Width - r.Left, r.Height - r.Top, 0);
+        _ = SetWindowPos(handle, 0, left, top, r.Width - r.Left, r.Height - r.Top, 0);
     }
 
     public static void FensterRestore(IntPtr handle) => ShowWindow(handle, (int)Sw.Restore);
@@ -127,7 +127,7 @@ public static class WindowsRemoteControl {
         // Dim PridA As Integer
         var prid = 0;
         var hParent = GetAncestor(wDescr.MainWindowHandle);
-        GetWindowThreadProcessId(hParent, ref prid);
+        _ = GetWindowThreadProcessId(hParent, ref prid);
         wDescr.MainWindowTitle = WinTitle(wDescr.MainWindowHandle);
         wDescr.Klasse = WinClass(wDescr.MainWindowHandle);
         wDescr.ExeName = WinExeName(wDescr.MainWindowHandle);
@@ -176,7 +176,7 @@ public static class WindowsRemoteControl {
             CreateNoWindow = true,
             UseShellExecute = false
         };
-        Process.Start(psi);
+        _ = Process.Start(psi);
 
         Develop.AbortExe();
     }
@@ -194,7 +194,7 @@ public static class WindowsRemoteControl {
             CreateNoWindow = true,
             UseShellExecute = false
         };
-        Process.Start(psi);
+        _ = Process.Start(psi);
 
         Develop.AbortExe();
     }

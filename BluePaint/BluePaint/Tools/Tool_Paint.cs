@@ -27,9 +27,7 @@ public partial class Tool_Paint {
 
     #region Constructors
 
-    public Tool_Paint() : base() {
-        InitializeComponent();
-    }
+    public Tool_Paint() : base() => InitializeComponent();
 
     #endregion
 

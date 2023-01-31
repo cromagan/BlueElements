@@ -315,7 +315,7 @@ public static class Develop {
                 _traceListener.Close();
                 _traceListener.Dispose();
                 _traceListener = null;
-                if (_deleteTraceLog && FileExists(_currentTraceLogFile)) { DeleteFile(_currentTraceLogFile, false); }
+                if (_deleteTraceLog && FileExists(_currentTraceLogFile)) { _ = DeleteFile(_currentTraceLogFile, false); }
             }
         } catch {
         }
@@ -329,7 +329,7 @@ public static class Develop {
         if (FileExists(_currentTraceLogFile)) { File.Delete(_currentTraceLogFile); }
         _currentTraceLogFile = TempFile(traceFileName);
         _traceListener = new TextWriterTraceListener(_currentTraceLogFile);
-        Trace.Listeners.Add(_traceListener);
+        _ = Trace.Listeners.Add(_traceListener);
         try {
             Trace.AutoFlush = true;
             Trace.WriteLine("<!DOctypex HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"");

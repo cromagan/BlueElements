@@ -1,9 +1,4 @@
 ﻿using BlueDatabase;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #nullable enable
 
@@ -19,7 +14,7 @@ internal static class CommonDialogs {
         var l2 = new ItemCollection.ItemCollectionList.ItemCollectionList();
 
         foreach (var thisd in l) {
-            l2.Add(thisd, thisd.UniqueID);
+            _ = l2.Add(thisd, thisd.UniqueID);
         }
 
         var x = BlueControls.Forms.InputBoxListBoxStyle.Show("Datenbank wählen:", l2, Enums.AddType.None, true);

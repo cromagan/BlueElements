@@ -85,10 +85,10 @@ public class FlexiControlForProperty<T> : FlexiControl {
         EditType = EditTypeFormula.Textfeld;
         Size = new Size(200, 24);
 
-        _isButton = (image != ImageCode.None);
+        _isButton = image != ImageCode.None;
 
         UpdateControlData(rowCount, list, image);
-        CheckEnabledState();
+        _ = CheckEnabledState();
     }
 
     #endregion
@@ -113,7 +113,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
     }
 
     protected override void OnControlAdded(ControlEventArgs e) {
-        CheckEnabledState();
+        _ = CheckEnabledState();
         base.OnControlAdded(e);
     }
 
@@ -188,17 +188,17 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 break;
 
             case Accessor<int> ai:
-                IntTryParse(Value, out var i);
+                _ = IntTryParse(Value, out var i);
                 if (ai.Get() != i) { ai.Set(i); }
                 break;
 
             case Accessor<double> ad:
-                DoubleTryParse(Value, out var d);
+                _ = DoubleTryParse(Value, out var d);
                 if (ad.Get() != d) { ad.Set(d); }
                 break;
 
             case Accessor<float> af:
-                FloatTryParse(Value, out var f);
+                _ = FloatTryParse(Value, out var f);
                 if (af.Get() != f) { af.Set(f); }
                 break;
 
@@ -210,7 +210,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
             default:
 
                 if (_accessor.Get() is Enum) {
-                    IntTryParse(Value, out var ef);
+                    _ = IntTryParse(Value, out var ef);
                     var nval = (T)Enum.ToObject(typeof(T), ef); // https://stackoverflow.com/questions/29482/how-can-i-cast-int-to-enum
                     if (nval.ToString() != _accessor.Get().ToString()) { _accessor.Set(nval); }
                 } else {
@@ -220,7 +220,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
         }
     }
 
-    private void GenFehlerText() {
+    private void GenFehlerText() =>
         //if ( _accessor != null) {
         //    InfoText = string.Empty;
         //    return;
@@ -238,7 +238,6 @@ public class FlexiControlForProperty<T> : FlexiControl {
         ////    return;
         ////}
         InfoText = string.Empty;
-    }
 
     private void SetValueFromProperty() {
         if (_accessor == null || !_accessor.CanRead) {
@@ -307,8 +306,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
             CaptionPosition = ÜberschriftAnordnung.ohne;
             var s0 = BlueFont.MeasureStringOfCaption(Caption.TrimEnd(":"));
             Size = new Size((int)s0.Width + 50 + 22, 30);
-            var c0 = CreateSubControls() as Button;
-            if (c0 != null) {
+            if (CreateSubControls() is Button c0) {
                 c0.Text = Caption.TrimEnd(":");
                 if (image != ImageCode.None) {
                     c0.ImageCode = QuickImage.Get(image, 22).ToString();

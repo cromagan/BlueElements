@@ -69,18 +69,20 @@ public class RowInputPadItem : RectanglePadItemWithVersion, IReadableText, ICont
     #region Methods
 
     public Control CreateControl(ConnectedFormulaView parent) {
-        var con = new FlexiControlForCell();
-        con.Width = 200;
-        con.Height = 32;
-        con.CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
-        con.EditType = EditTypeFormula.nur_als_Text_anzeigen;
-        con.Name = DefaultItemToControlName();
+        var con = new FlexiControlForCell {
+            Width = 200,
+            Height = 32,
+            CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld,
+            EditType = EditTypeFormula.nur_als_Text_anzeigen,
+            Name = DefaultItemToControlName()
+        };
         return con;
     }
 
     public override List<GenericControl> GetStyleOptions() {
-        List<GenericControl> l = new();
-        l.Add(new FlexiControlForProperty<string>(() => Spaltenname));
+        List<GenericControl> l = new() {
+            new FlexiControlForProperty<string>(() => Spaltenname)
+        };
         return l;
     }
 

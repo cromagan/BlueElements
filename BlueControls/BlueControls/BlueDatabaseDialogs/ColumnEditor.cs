@@ -21,7 +21,6 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Forms;
-using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
@@ -92,7 +91,7 @@ internal sealed partial class ColumnEditor {
 
     private void btnBackColor_Click(object sender, System.EventArgs e) {
         ColorDia.Color = QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo.FromHtmlCode();
-        ColorDia.ShowDialog();
+        _ = ColorDia.ShowDialog();
         btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToString();
     }
 
@@ -183,7 +182,7 @@ internal sealed partial class ColumnEditor {
 
     private void btnTextColor_Click(object sender, System.EventArgs e) {
         ColorDia.Color = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo.FromHtmlCode();
-        ColorDia.ShowDialog();
+        _ = ColorDia.ShowDialog();
         btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToString();
     }
 
@@ -236,6 +235,7 @@ internal sealed partial class ColumnEditor {
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
+
     private void cbxLinkedDatabase_TextChanged(object? sender, System.EventArgs e) {
         _column.LinkedDatabaseFile = cbxLinkedDatabase.Text;
 
@@ -252,7 +252,7 @@ internal sealed partial class ColumnEditor {
             //}
             foreach (var thisLinkedColumn in _column.LinkedDatabase.Column) {
                 if (!thisLinkedColumn.IsFirst() && thisLinkedColumn.Format.CanBeChangedByRules() && !thisLinkedColumn.Format.NeedTargetDatabase()) {
-                    cbxTargetColumn.Item.Add(thisLinkedColumn);
+                    _ = cbxTargetColumn.Item.Add(thisLinkedColumn);
                 }
             }
         }
@@ -286,22 +286,22 @@ internal sealed partial class ColumnEditor {
         cbxLinkedDatabase.Item.Clear();
 
         if (cbxEinheit.Item.Count < 1) {
-            cbxEinheit.Item.Add("µm", ImageCode.Lineal);
-            cbxEinheit.Item.Add("mm", ImageCode.Lineal);
-            cbxEinheit.Item.Add("cm", ImageCode.Lineal);
-            cbxEinheit.Item.Add("dm", ImageCode.Lineal);
-            cbxEinheit.Item.Add("m", ImageCode.Lineal);
-            cbxEinheit.Item.Add("km", ImageCode.Lineal);
-            cbxEinheit.Item.Add("mm²", ImageCode.GrößeÄndern);
-            cbxEinheit.Item.Add("m²", ImageCode.GrößeÄndern);
-            cbxEinheit.Item.Add("µg", ImageCode.Gewicht);
-            cbxEinheit.Item.Add("mg", ImageCode.Gewicht);
-            cbxEinheit.Item.Add("g", ImageCode.Gewicht);
-            cbxEinheit.Item.Add("kg", ImageCode.Gewicht);
-            cbxEinheit.Item.Add("t", ImageCode.Gewicht);
-            cbxEinheit.Item.Add("h", ImageCode.Uhr);
-            cbxEinheit.Item.Add("min", ImageCode.Uhr);
-            cbxEinheit.Item.Add("St.", ImageCode.Eins);
+            _ = cbxEinheit.Item.Add("µm", ImageCode.Lineal);
+            _ = cbxEinheit.Item.Add("mm", ImageCode.Lineal);
+            _ = cbxEinheit.Item.Add("cm", ImageCode.Lineal);
+            _ = cbxEinheit.Item.Add("dm", ImageCode.Lineal);
+            _ = cbxEinheit.Item.Add("m", ImageCode.Lineal);
+            _ = cbxEinheit.Item.Add("km", ImageCode.Lineal);
+            _ = cbxEinheit.Item.Add("mm²", ImageCode.GrößeÄndern);
+            _ = cbxEinheit.Item.Add("m²", ImageCode.GrößeÄndern);
+            _ = cbxEinheit.Item.Add("µg", ImageCode.Gewicht);
+            _ = cbxEinheit.Item.Add("mg", ImageCode.Gewicht);
+            _ = cbxEinheit.Item.Add("g", ImageCode.Gewicht);
+            _ = cbxEinheit.Item.Add("kg", ImageCode.Gewicht);
+            _ = cbxEinheit.Item.Add("t", ImageCode.Gewicht);
+            _ = cbxEinheit.Item.Add("h", ImageCode.Uhr);
+            _ = cbxEinheit.Item.Add("min", ImageCode.Uhr);
+            _ = cbxEinheit.Item.Add("St.", ImageCode.Eins);
         }
         lbxCellEditor.Suggestions.Clear();
         lbxCellEditor.Suggestions.AddRange(_column.Database.Permission_AllUsed(true));
@@ -414,6 +414,7 @@ internal sealed partial class ColumnEditor {
     /// Schreibt die Werte hart zurück.
     /// Diese Routine sollte nicht benutzt werden, sondern AllOk
     /// </summary>
+
     private void Column_DatenZurückschreiben() {
         if (_column?.Database?.ReadOnly ?? true) { return; }
         if (_column.IsDisposed) { return; }
@@ -479,7 +480,7 @@ internal sealed partial class ColumnEditor {
         _column.MaxTextLenght = IntParse(tbxMaxTextLenght.Text);
 
         _column.ConstantHeightOfImageCode = txbBildCodeConstHeight.Text;
-        IntTryParse(cbxBildTextVerhalten.Text, out var imNf);
+        _ = IntTryParse(cbxBildTextVerhalten.Text, out var imNf);
         _column.BehaviorOfImageAndText = (BildTextVerhalten)imNf;
         //_column.BestFile_StandardFolder = txbBestFileStandardFolder.Text;
         //_column.BestFile_StandardSuffix = txbBestFileStandardSuffix.Text;
@@ -518,7 +519,7 @@ internal sealed partial class ColumnEditor {
         if (tblFilterliste.Database == null) {
             Database db = new(false, "Filter " + _column.Database.ConnectionData.UniqueID + " " + _column.Name);
             //db.Column.GenerateAndAdd("count", "count", ColumnFormatHolder.IntegerPositive);
-            db.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder.Text);
+            _ = db.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder.Text);
 
             var vis = db.Column.GenerateAndAdd("visible", "visible", ColumnFormatHolder.Bit);
             var sp = db.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolder.SystemName);
@@ -589,6 +590,7 @@ internal sealed partial class ColumnEditor {
     /// Holt die Werte aus tblFilterliste und schreibt sie in _Column.LinkedCellFilter
     /// Hat tblFilterliste keine Datenbank, bleibt die Variable _Column.LinkedCellFilter unverändert
     /// </summary>
+
     private void GetLinkedCellFilter() {
         if (tblFilterliste.Database == null) { return; }
 
@@ -606,6 +608,7 @@ internal sealed partial class ColumnEditor {
     /// Holt die Werte aus _Column.LinkedCellFilter und schreibt sie in tblFilterliste
     ///Leer evtl. Werte aus tblFilterliste
     /// </summary>
+
     private void SetLinkedCellFilter() {
         foreach (var thisr in tblFilterliste.Database.Row) {
             thisr.CellSet("Such", string.Empty);
@@ -631,7 +634,7 @@ internal sealed partial class ColumnEditor {
             //if (!string.IsNullOrEmpty(_column.Database.Filename)) {
             //var all = Directory.GetFiles(_column.Database.Filename.FilePath(), "*.mdb", SearchOption.TopDirectoryOnly);
             foreach (var thisString in l) {
-                if (!string.Equals(thisString.UniqueID, _column.Database.ConnectionData.UniqueID, StringComparison.OrdinalIgnoreCase)) { cbxLinkedDatabase.Item.Add(thisString.TableName, thisString.UniqueID); }
+                if (!string.Equals(thisString.UniqueID, _column.Database.ConnectionData.UniqueID, StringComparison.OrdinalIgnoreCase)) { _ = cbxLinkedDatabase.Item.Add(thisString.TableName, thisString.UniqueID); }
             }
             //}
             cbxLinkedDatabase.Item.Sort();

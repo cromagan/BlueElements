@@ -37,9 +37,7 @@ public sealed class FilterCollection : ListExt<FilterItem>, IParseable, IHasData
         if (Database != null) { Database.Disposing += Database_Disposing; }
     }
 
-    public FilterCollection(DatabaseAbstract? database, string toParse) : this(database) {
-        Parse(toParse);
-    }
+    public FilterCollection(DatabaseAbstract? database, string toParse) : this(database) => Parse(toParse);
 
     #endregion
 
@@ -114,7 +112,7 @@ public sealed class FilterCollection : ListExt<FilterItem>, IParseable, IHasData
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key) {
                 case "filter":
-                    AddIfNotExists(new FilterItem(Database, pair.Value));
+                    _ = AddIfNotExists(new FilterItem(Database, pair.Value));
                     break;
 
                 default:

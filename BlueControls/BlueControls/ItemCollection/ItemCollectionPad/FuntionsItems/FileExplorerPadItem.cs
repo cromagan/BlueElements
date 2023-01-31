@@ -37,9 +37,7 @@ public class FileExplorerPadItem : CustomizableShowPadItem, IItemToControl {
 
     #region Constructors
 
-    public FileExplorerPadItem(string internalname) : base(internalname) {
-        SetCoordinates(new RectangleF(0, 0, 50, 30), true);
-    }
+    public FileExplorerPadItem(string internalname) : base(internalname) => SetCoordinates(new RectangleF(0, 0, 50, 30), true);
 
     #endregion
 
@@ -64,9 +62,10 @@ public class FileExplorerPadItem : CustomizableShowPadItem, IItemToControl {
     #region Methods
 
     public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
-        var con = new FileBrowser();
-        con.OriginalText = Pfad;
-        con.Name = DefaultItemToControlName();
+        var con = new FileBrowser {
+            OriginalText = Pfad,
+            Name = DefaultItemToControlName()
+        };
 
         if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
             var ff = parent.SearchOrGenerate(rfw2);

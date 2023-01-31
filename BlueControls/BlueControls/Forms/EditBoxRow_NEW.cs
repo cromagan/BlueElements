@@ -40,7 +40,7 @@ public partial class EditBoxRow_NEW : DialogWithOkAndCancel {
     public static void Show(string txt, ConnectedFormula.ConnectedFormula? cf, bool isDialog) {
         EditBoxRow_NEW MB = new(txt, cf);
         if (isDialog) {
-            MB.ShowDialog();
+            _ = MB.ShowDialog();
             MB.Dispose();
         } else {
             MB.Show();

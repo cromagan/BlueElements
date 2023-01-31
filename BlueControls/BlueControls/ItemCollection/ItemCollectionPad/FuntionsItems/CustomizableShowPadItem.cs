@@ -51,9 +51,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
 
     #region Constructors
 
-    protected CustomizableShowPadItem(string internalname) : base(internalname) {
-        SetCoordinates(new RectangleF(0, 0, 50, 30), true);
-    }
+    protected CustomizableShowPadItem(string internalname) : base(internalname) => SetCoordinates(new RectangleF(0, 0, 50, 30), true);
 
     #endregion
 
@@ -64,10 +62,10 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
         set {
             var li = new ItemCollectionList.ItemCollectionList();
             for (var br = 1; br <= 20; br++) {
-                li.Add(br + " Spalte(n)", br.ToString(), true, string.Empty);
+                _ = li.Add(br + " Spalte(n)", br.ToString(), true, string.Empty);
 
                 for (var pos = 1; pos <= br; pos++) {
-                    li.Add(br + " Spalte(n) - Position: " + pos, br + ";" + pos);
+                    _ = li.Add(br + " Spalte(n) - Position: " + pos, br + ";" + pos);
                 }
             }
 
@@ -99,11 +97,11 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
             var x = new ItemCollectionList.ItemCollectionList();
             foreach (var thisR in Parent) {
                 if (thisR.IsVisibleOnPage(Page) && thisR is ICalculateRowsItemLevel rfp) {
-                    x.Add(rfp, thisR.Internal);
+                    _ = x.Add(rfp, thisR.Internal);
                 }
             }
 
-            x.Add("<Keine Quelle>");
+            _ = x.Add("<Keine Quelle>");
 
             var it = InputBoxListBoxStyle.Show("Quelle wählen:", x, AddType.None, true);
 
@@ -141,7 +139,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
             ItemCollectionList.ItemCollectionList aa = new();
             aa.AddRange(Permission_AllUsed());
 
-            if (aa["#Administrator"] == null) { aa.Add("#Administrator"); }
+            if (aa["#Administrator"] == null) { _ = aa.Add("#Administrator"); }
             aa.Sort();
             aa.CheckBehavior = CheckBehavior.MultiSelection;
             aa.Check(VisibleFor, true);
@@ -226,14 +224,15 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
     public virtual Control? CreateControl(ConnectedFormulaView parent) => throw new NotImplementedException();
 
     public override List<GenericControl> GetStyleOptions() {
-        List<GenericControl> l = new();
-        l.Add(new FlexiControlForProperty<string>(() => Datenquelle_wählen, ImageCode.Pfeil_Rechts));
-        l.Add(new FlexiControlForProperty<string>(() => Datenbank));
+        List<GenericControl> l = new() {
+            new FlexiControlForProperty<string>(() => Datenquelle_wählen, ImageCode.Pfeil_Rechts),
+            new FlexiControlForProperty<string>(() => Datenbank),
 
-        l.Add(new FlexiControl());
-        l.Add(new FlexiControlForProperty<string>(() => Sichtbarkeit, ImageCode.Schild));
-        l.Add(new FlexiControlForProperty<string>(() => Standardhöhe_setzen, ImageCode.GrößeÄndern));
-        l.Add(new FlexiControlForProperty<string>(() => Breite_berechnen, ImageCode.GrößeÄndern));
+            new FlexiControl(),
+            new FlexiControlForProperty<string>(() => Sichtbarkeit, ImageCode.Schild),
+            new FlexiControlForProperty<string>(() => Standardhöhe_setzen, ImageCode.GrößeÄndern),
+            new FlexiControlForProperty<string>(() => Breite_berechnen, ImageCode.GrößeÄndern)
+        };
 
         return l;
     }
@@ -251,7 +250,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
 
             case "visiblefor":
                 VisibleFor.Clear();
-                VisibleFor.AddRange((value.FromNonCritical()).SplitAndCutByCr());
+                VisibleFor.AddRange(value.FromNonCritical().SplitAndCutByCr());
                 if (VisibleFor.Count == 0) { VisibleFor.Add("#Everybody"); }
                 return true;
         }
@@ -273,7 +272,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
 
         if (VisibleFor.Count == 0) { VisibleFor.Add("#Everybody"); }
 
-        t = t + "VisibleFor=" + (VisibleFor.JoinWithCr()).ToNonCritical() + ", ";
+        t = t + "VisibleFor=" + VisibleFor.JoinWithCr().ToNonCritical() + ", ";
 
         if (GetRowFrom != null) {
             t = t + "GetValueFrom=" + GetRowFrom.Internal.ToNonCritical() + ", ";

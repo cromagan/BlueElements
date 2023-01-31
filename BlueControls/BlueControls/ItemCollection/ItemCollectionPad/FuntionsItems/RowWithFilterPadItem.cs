@@ -31,7 +31,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
@@ -126,7 +125,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
             var c = new ItemCollectionList.ItemCollectionList();
             foreach (var thiscol in Database.Column) {
                 if (thiscol.Format.Autofilter_möglich() && !thiscol.Format.NeedTargetDatabase()) {
-                    c.Add(thiscol);
+                    _ = c.Add(thiscol);
                 }
             }
 
@@ -160,18 +159,20 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
     #region Methods
 
     public Control CreateControl(ConnectedFormulaView parent) {
-        var con = new FlexiControlRowSelector(Database, Parent, FilterDefiniton, _überschrift, _anzeige);
-        con.EditType = _bearbeitung;
-        con.CaptionPosition = CaptionPosition;
-        con.Name = DefaultItemToControlName();
+        var con = new FlexiControlRowSelector(Database, Parent, FilterDefiniton, _überschrift, _anzeige) {
+            EditType = _bearbeitung,
+            CaptionPosition = CaptionPosition,
+            Name = DefaultItemToControlName()
+        };
         return con;
     }
 
     public Table FilterTable() {
-        var FilterTable = new Table();
-        FilterTable.DropMessages = false;
-        FilterTable.ShowWaitScreen = true;
-        FilterTable.Size = new Size(968, 400);
+        var FilterTable = new Table {
+            DropMessages = false,
+            ShowWaitScreen = true,
+            Size = new Size(968, 400)
+        };
 
         FilterTable.DatabaseSet(FilterDefiniton, string.Empty);
 
@@ -184,10 +185,10 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
     }
 
     public override List<GenericControl> GetStyleOptions() {
-        List<GenericControl> l = new();
-
-        l.Add(new FlexiControlForProperty<string>(() => Datenbank_wählen, ImageCode.Datenbank));
-        l.Add(new FlexiControl());
+        List<GenericControl> l = new() {
+            new FlexiControlForProperty<string>(() => Datenbank_wählen, ImageCode.Datenbank),
+            new FlexiControl()
+        };
         if (Database == null) { return l; }
         l.Add(new FlexiControlForProperty<string>(() => Überschrift));
         l.Add(new FlexiControlForProperty<string>(() => Anzeige));
@@ -238,9 +239,9 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
                 return true;
 
             case "filterdb":
-                FilterDefiniton.Row.Clear("Neue Filter-Datenbank per Parse");
+                _ = FilterDefiniton.Row.Clear("Neue Filter-Datenbank per Parse");
                 FilterDatabaseUpdate();
-                FilterDefiniton.Import(value.FromNonCritical(), true, false, ";", false, false, false, string.Empty);
+                _ = FilterDefiniton.Import(value.FromNonCritical(), true, false, ";", false, false, false, string.Empty);
 
                 foreach (var thisRow in FilterDefiniton.Row) {
                     var n = thisRow.CellGetString("Spalte");
@@ -343,9 +344,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         return null;
     }
 
-    private void Cell_CellValueChanged(object sender, BlueDatabase.EventArgs.CellEventArgs e) {
-        RepairConnections();
-    }
+    private void Cell_CellValueChanged(object sender, BlueDatabase.EventArgs.CellEventArgs e) => RepairConnections();
 
     private void FilterDatabaseUpdate() {
         if (FilterDefiniton == null) { return; }
@@ -405,7 +404,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         #region Zeilen Prüfen
 
         foreach (var thisrow in FilterDefiniton.Row) {
-            thisrow.DoAutomatic("to be sure");
+            _ = thisrow.DoAutomatic("to be sure");
         }
 
         #endregion
@@ -421,7 +420,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         bt.Database?.Cell.DataOfCellKey(cellKey, out _, out row);
         if (row == null) { return; }
 
-        e.UserMenu.Add(ContextMenuComands.Löschen);
+        _ = e.UserMenu.Add(ContextMenuComands.Löschen);
     }
 
     private void Filtertable_ContextMenuItemClicked(object sender, EventArgs.ContextMenuItemClickedEventArgs e) {
@@ -434,7 +433,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
         switch (e.ClickedComand.ToLower()) {
             case "löschen":
-                row.Database?.Row.Remove(row, "Benutzer: Filter (und somit Zeile) gelöscht");
+                _ = (row.Database?.Row.Remove(row, "Benutzer: Filter (und somit Zeile) gelöscht"));
                 break;
 
             default:

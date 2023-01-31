@@ -16,14 +16,14 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.MultiUserFile;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueDatabase;
+using System;
 using System.ComponentModel;
 using System.Drawing;
-using BlueBasics.MultiUserFile;
-using BlueDatabase;
-using BlueBasics.Enums;
-using System;
 
 namespace BlueControls.Forms;
 
@@ -175,7 +175,7 @@ public partial class Form : System.Windows.Forms.Form {
         //https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.form.closed?view=netframework-4.8
         if (IsClosed) { return; }
 
-        if (this is not FloatingForm && this is not MessageBox) {
+        if (this is not FloatingForm and not MessageBox) {
             DatabaseAbstract.ForceSaveAll();
             MultiUserFile.ForceLoadSaveAll();
         }

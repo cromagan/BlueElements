@@ -129,16 +129,14 @@ public sealed class ExtText : ListExt<ExtChar> {
             if (value == _design) { return; }
             _design = value;
 
-            Parallel.ForEach(this, ch => { ch.Design = _design; });
+            _ = Parallel.ForEach(this, ch => { ch.Design = _design; });
             OnChanged();
         }
     }
 
     public string HtmlText {
         get {
-            if (_tmpHtmlText == null) {
-                _tmpHtmlText = ConvertCharToHtmlText(0, Count - 1);
-            }
+            _tmpHtmlText ??= ConvertCharToHtmlText(0, Count - 1);
             return _tmpHtmlText;
         }
         set {
@@ -151,9 +149,7 @@ public sealed class ExtText : ListExt<ExtChar> {
     public string PlainText {
         get {
             if (IsDisposed) { return string.Empty; }
-            if (_tmpPlainText == null) {
-                _tmpPlainText = ConvertCharToPlainText(0, Count - 1);
-            }
+            _tmpPlainText ??= ConvertCharToPlainText(0, Count - 1);
             return _tmpPlainText;
         }
         set {
@@ -171,7 +167,7 @@ public sealed class ExtText : ListExt<ExtChar> {
             _state = value;
 
             try {
-                Parallel.ForEach(this, ch => {
+                _ = Parallel.ForEach(this, ch => {
                     if (ch != null) { ch.State = _state; }
                 });
             } catch { }
@@ -374,7 +370,7 @@ public sealed class ExtText : ListExt<ExtChar> {
         try {
             var T = new StringBuilder();
             for (var cZ = first; cZ <= Math.Min(last, Count - 1); cZ++) {
-                T.Append(this[cZ].PlainText());
+                _ = T.Append(this[cZ].PlainText());
             }
             return T.ToString().Replace("\n", string.Empty);
         } catch {
@@ -435,11 +431,11 @@ public sealed class ExtText : ListExt<ExtChar> {
 
         for (var z = first; z <= last; z++) {
             if (lastStufe != this[z].Stufe) {
-                t.Append("<H" + this[z].Stufe + ">");
+                _ = t.Append("<H" + this[z].Stufe + ">");
                 lastStufe = this[z].Stufe;
             }
 
-            t.Append(this[z].HtmlText());
+            _ = t.Append(this[z].HtmlText());
         }
 
         return t.ToString();
@@ -559,7 +555,7 @@ public sealed class ExtText : ListExt<ExtChar> {
                 break;
 
             case "FONTSIZE":
-                FloatTryParse(attribut, out var fs);
+                _ = FloatTryParse(attribut, out var fs);
                 font = BlueFont.Get(font.FontName, fs, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                 break;
 
@@ -876,7 +872,7 @@ public sealed class ExtText : ListExt<ExtChar> {
         do {
             akt++;
             if (akt > Count - 1) {
-                Row_SetOnLine(zbChar, akt - 1);
+                _ = Row_SetOnLine(zbChar, akt - 1);
                 ri.Add(zbChar + ";" + (akt - 1));
                 break;
             }
@@ -910,7 +906,7 @@ public sealed class ExtText : ListExt<ExtChar> {
             if (this[akt].IsLineBreak()) {
                 isX = vZbxPixel;
                 if (this[akt] is ExtCharTopCode) {
-                    Row_SetOnLine(zbChar, akt);
+                    _ = Row_SetOnLine(zbChar, akt);
                     ri.Add(zbChar + ";" + akt);
                 } else {
                     isY += (int)(Row_SetOnLine(zbChar, akt) * _zeilenabstand);

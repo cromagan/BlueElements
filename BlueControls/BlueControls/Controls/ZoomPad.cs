@@ -57,9 +57,7 @@ public partial class ZoomPad : GenericControl {
 
     #region Constructors
 
-    public ZoomPad() : base(true, true) {
-        InitializeComponent();
-    }
+    public ZoomPad() : base(true, true) => InitializeComponent();
 
     #endregion
 
@@ -252,13 +250,9 @@ public partial class ZoomPad : GenericControl {
         base.OnSizeChanged(e);
     }
 
-    private void SliderX_ValueChanged(object sender, System.EventArgs e) {
-        ShiftX = SliderX.Value;
-    }
+    private void SliderX_ValueChanged(object sender, System.EventArgs e) => ShiftX = SliderX.Value;
 
-    private void SliderY_ValueChanged(object sender, System.EventArgs e) {
-        ShiftY = SliderY.Value;
-    }
+    private void SliderY_ValueChanged(object sender, System.EventArgs e) => ShiftY = SliderY.Value;
 
     #endregion
 }

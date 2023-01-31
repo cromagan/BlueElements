@@ -184,7 +184,7 @@ public class ListExt<T> : List<T>, IChangedFeedback, IDisposableExtended {
     public new void Remove(T item) {
         if (!Contains(item)) { return; }
         OnItemRemoving(item);
-        base.Remove(item);
+        _ = base.Remove(item);
         OnItemRemoved();
     }
 
@@ -265,8 +265,8 @@ public class ListExt<T> : List<T>, IChangedFeedback, IDisposableExtended {
                 System.Text.StringBuilder a = new();
                 foreach (var thisItem in this) {
                     if (thisItem is IStringable t) {
-                        a.Append(t.ToString());
-                        a.Append("\r");
+                        _ = a.Append(t.ToString());
+                        _ = a.Append("\r");
                     }
                 }
                 return a.ToString().TrimCr();

@@ -151,7 +151,7 @@ public class WindowsThumbnailProvider {
         try {
             return GetBitmapFromHBitmap((IntPtr)hBitmap);
         } finally {
-            DeleteObject((IntPtr)hBitmap);
+            _ = DeleteObject((IntPtr)hBitmap);
         }
     }
 
@@ -181,13 +181,14 @@ public class WindowsThumbnailProvider {
 
         if (retCode != 0) { throw Marshal.GetExceptionForHR(retCode); }
 
-        var nativeSize = new NativeSize();
-        nativeSize.Width = width;
-        nativeSize.Height = height;
+        var nativeSize = new NativeSize {
+            Width = width,
+            Height = height
+        };
 
         var hr = ((IShellItemImageFactory)nativeShellItem).GetImage(nativeSize, options, out var hBitmap);
 
-        Marshal.ReleaseComObject(nativeShellItem);
+        _ = Marshal.ReleaseComObject(nativeShellItem);
 
         if (hr == HResult.Ok) { return hBitmap; }
 

@@ -23,9 +23,6 @@ using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq.Expressions;
-using System.Threading;
-using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 
@@ -158,6 +155,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     //    LoadFromSQLBack();
     //}
+
     public override bool RefreshRowData(List<RowItem> rows, bool refreshAlways) {
         if (rows == null || rows.Count == 0) { return false; }
 
@@ -165,7 +163,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
         foreach (var thisr in rows) {
             if (refreshAlways || thisr.IsInCache == null) {
-                l.AddIfNotExists(thisr);
+                _ = l.AddIfNotExists(thisr);
             }
         }
 
@@ -190,13 +188,14 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     /// </summary>
     /// <param name="column"></param>
     /// <param name="sql"></param>
+
     internal void GetColumnAttributesColumn(ColumnItem column, SQLBackAbstract sql) {
         var l = sql.GetStyleDataAll(TableName.FileNameWithoutSuffix(), column.Name);
         if (l != null && l.Count > 0) {
             foreach (var thisstyle in l) {
-                Enum.TryParse(thisstyle.Key, out DatabaseDataType t);
+                _ = Enum.TryParse(thisstyle.Key, out DatabaseDataType t);
                 if (!t.IsObsolete()) {
-                    column.SetValueInternal(t, thisstyle.Value, true);
+                    _ = column.SetValueInternal(t, thisstyle.Value, true);
                 }
             }
         }
@@ -210,7 +209,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         if (!isLoading && !ReadOnly) {
             var c = Column.Exists(columnName);
 
-            _sql?.SetValueInternal(TableName, type, value, c?.Name, rowkey, isLoading);
+            _ = (_sql?.SetValueInternal(TableName, type, value, c?.Name, rowkey, isLoading));
         }
 
         return base.SetValueInternal(type, value, columnName, rowkey, isLoading);
@@ -218,7 +217,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     protected override void AddUndo(string tableName, DatabaseDataType comand, string? columnName, long? rowKey, string previousValue, string changedTo, string userName, string comment) {
         var ck = Column.Exists(columnName)?.Key ?? -1;
-        _sql.AddUndo(tableName, comand, ck, columnName, rowKey, previousValue, changedTo, UserName, comment);
+        _ = _sql.AddUndo(tableName, comand, ck, columnName, rowKey, previousValue, changedTo, UserName, comment);
     }
 
     protected override void SetUserDidSomething() { }
@@ -289,7 +288,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
             foreach (var (tablename, comand, columnkey, columnname, rowkey, timecode) in data) {
                 if (TableName == tablename && timecode > IsInCache) {
-                    Enum.TryParse(comand, out DatabaseDataType t);
+                    _ = Enum.TryParse(comand, out DatabaseDataType t);
 
                     if (t.IsObsolete()) {
                         // Nix tun
@@ -312,33 +311,33 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
                         switch (t) {
                             case DatabaseDataType.Comand_RemoveColumn:
-                                Column.SetValueInternal(t, LongParse(columnkey), true, columnname);
+                                _ = Column.SetValueInternal(t, LongParse(columnkey), true, columnname);
                                 break;
 
                             case DatabaseDataType.Comand_AddColumnByKey:
                             case DatabaseDataType.Comand_AddColumn:
-                                Column.SetValueInternal(t, LongParse(columnkey), true, columnname);
+                                _ = Column.SetValueInternal(t, LongParse(columnkey), true, columnname);
                                 var c = Column.SearchByKey(LongParse(columnkey));
                                 var name = _sql.GetLastColumnName(TableName, c.Key);
-                                SetValueInternal(DatabaseDataType.ColumnName, name, c.Name, null, true);
+                                _ = SetValueInternal(DatabaseDataType.ColumnName, name, c.Name, null, true);
                                 c.RefreshColumnsData(); // muss sein, alternativ alle geladenen Zeilen neu laden
                                 break;
 
                             case DatabaseDataType.Comand_AddColumnByName:
-                                Column.SetValueInternal(t, -1, true, columnname);
+                                _ = Column.SetValueInternal(t, -1, true, columnname);
                                 var c2 = Column.Exists(columnname);
                                 //var columnname = _sql.GetLastColumnName(TableName, c.Key);
-                                SetValueInternal(DatabaseDataType.ColumnKey, columnkey, c2.Name, null, true);
+                                _ = SetValueInternal(DatabaseDataType.ColumnKey, columnkey, c2.Name, null, true);
                                 c2.RefreshColumnsData(); // muss sein, alternativ alle geladenen Zeilen neu laden
                                 break;
 
                             case DatabaseDataType.Comand_AddRow:
-                                Row.SetValueInternal(t, LongParse(rowkey), true);
-                                rk.AddIfNotExists(LongParse(rowkey)); // Nachher auch laden
+                                _ = Row.SetValueInternal(t, LongParse(rowkey), true);
+                                _ = rk.AddIfNotExists(LongParse(rowkey)); // Nachher auch laden
                                 break;
 
                             case DatabaseDataType.Comand_RemoveRow:
-                                Row.SetValueInternal(t, LongParse(rowkey), true);
+                                _ = Row.SetValueInternal(t, LongParse(rowkey), true);
                                 break;
 
                             default:
@@ -359,7 +358,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
                             // Kann sein, dass der Bentzer hier ja schon eine Zeile oder so geklscht hat
                             // hier geklscht, aber anderer PC mat bei der noch vorhanden Zeile eine Änderung
                             if (timecode > r.IsInCache || timecode > c.IsInCache) {
-                                rk.AddIfNotExists(r.Key);
+                                _ = rk.AddIfNotExists(r.Key);
                                 c?.Invalidate_ContentWidth();
                             }
                         }
@@ -370,7 +369,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
                         #region Datenbank-Styles
 
                         var v = _sql.GetStyleData(tablename, comand, "~DATABASE~");
-                        if (v != null) { SetValueInternal(t, v, null, null, true); }
+                        if (v != null) { _ = SetValueInternal(t, v, null, null, true); }
 
                         #endregion
                     } else if (t.IsColumnTag()) {
@@ -380,7 +379,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
                         var c = Column.SearchByKey(LongParse(columnkey));
                         if (c != null) {
                             var v = _sql.GetStyleData(tablename, comand, c.Name);
-                            if (v != null) { SetValueInternal(t, v, c.Name, null, true); }
+                            if (v != null) { _ = SetValueInternal(t, v, c.Name, null, true); }
                         }
 
                         #endregion
@@ -388,7 +387,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
                 }
             }
 
-            RefreshRowData(rk, true);
+            _ = RefreshRowData(rk, true);
         } catch {
             DoLastChanges(data);
         }
@@ -401,7 +400,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         if (_timer != null) { return; }
         _timerTimeStamp = DateTime.UtcNow.AddMinutes(-5);
         _timer = new System.Threading.Timer(CheckSysUndo);
-        _timer.Change(10000, 10000);
+        _ = _timer.Change(10000, 10000);
     }
 
     private void LoadFromSQLBack() {
@@ -415,7 +414,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
             #region Spalten richtig stellen
 
             var columnsToLoad = _sql.GetColumnNames(TableName.ToUpper());
-            columnsToLoad.Remove("RK");
+            _ = columnsToLoad.Remove("RK");
 
             #region Nicht mehr vorhandene Spalten löschen
 
@@ -438,9 +437,9 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
                 var column = Column.Exists(thisCol);
                 if (column == null) {
                     var ck = Column.NextColumnKey();
-                    Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByName, ck, true, thisCol);
+                    _ = Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByName, ck, true, thisCol);
                     var co = Column.Exists(thisCol);
-                    SetValueInternal(DatabaseDataType.ColumnKey, ck.ToString(), co?.Name, null, true);
+                    _ = SetValueInternal(DatabaseDataType.ColumnKey, ck.ToString(), co?.Name, null, true);
                     column = Column.Exists(thisCol);
                     if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht gefunden"); return; }
                     column = Column.SearchByKey(ck);
@@ -462,9 +461,9 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
             var l = _sql.GetStyleDataAll(TableName, "~DATABASE~");
             if (l != null && l.Count > 0) {
                 foreach (var thisstyle in l) {
-                    Enum.TryParse(thisstyle.Key, out DatabaseDataType t);
+                    _ = Enum.TryParse(thisstyle.Key, out DatabaseDataType t);
                     if (!t.IsObsolete()) {
-                        SetValueInternal(t, thisstyle.Value, null, null, true);
+                        _ = SetValueInternal(t, thisstyle.Value, null, null, true);
                     }
                 }
             }
@@ -481,7 +480,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
             #endregion
 
-            _sql.CloseConnection();
+            _ = _sql.CloseConnection();
 
             //Row.RemoveNullOrEmpty();
             Cell.RemoveOrphans();

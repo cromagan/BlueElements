@@ -97,6 +97,7 @@ public class LinePadItem : BasicPadItem {
     //        Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
     //    }
     //}
+
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
         ItemCollectionList.ItemCollectionList verhalt = new()

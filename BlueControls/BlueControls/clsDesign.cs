@@ -66,7 +66,7 @@ public static class clsDesignExtensions {
 
     public static void Remove(this Dictionary<Design, Dictionary<States, clsDesign>> dictControl, Design ds, States status) {
         if (dictControl.TryGetValue(ds, out var existingDictOfControl)) {
-            existingDictOfControl.Remove(status);
+            _ = existingDictOfControl.Remove(status);
         }
     }
 

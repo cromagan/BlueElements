@@ -268,7 +268,7 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem?>, IParseable,
                 this[z] = null;
             }
         }
-        this.RemoveNull();
+        _ = this.RemoveNull();
 
         #endregion
 
@@ -284,7 +284,7 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem?>, IParseable,
 
             case 1:
                 if (string.IsNullOrEmpty(Name)) { Name = "Standard"; }
-                tmp.AddIfNotExists("#Everybody");
+                _ = tmp.AddIfNotExists("#Everybody");
                 break;
         }
 

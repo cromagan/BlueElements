@@ -38,10 +38,11 @@ public partial class RelationDiagram : PadEditor {
 
     #endregion
 
-    #region Constructors
-
     //private bool RelationsValid;
     //   Dim ItS As New Size(60, 80)
+
+    #region Constructors
+
     public RelationDiagram(DatabaseAbstract database) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
@@ -101,8 +102,8 @@ public partial class RelationDiagram : PadEditor {
         names.AddRange(_database.Column.First.GetUcaseNamesSortedByLenght());
         // Namen ermitteln, die relevant sind
         List<string> bez = new();
-        foreach (var thisN in names.Where(thisN => t.Contains(thisN))) {
-            bez.AddIfNotExists(thisN);
+        foreach (var thisN in names.Where(t.Contains)) {
+            _ = bez.AddIfNotExists(thisN);
             t = t.Replace(thisN, string.Empty);
         }
         if (bez.Count == 0) { return; }
@@ -274,11 +275,11 @@ public partial class RelationDiagram : PadEditor {
 
     private void btnTextExport_Click(object sender, System.EventArgs e) {
         System.Windows.Forms.FolderBrowserDialog fl = new();
-        fl.ShowDialog();
+        _ = fl.ShowDialog();
         List<string> l = new();
         foreach (var thisR in Pad.Item) {
             if (thisR is RowFormulaPadItem r) {
-                r.Row.DoAutomatic(true, true, "to be sure");
+                _ = r.Row.DoAutomatic(true, true, "to be sure");
                 l.Add("#######################################################################");
                 l.Add(" ");
                 l.Add(r.Row.CellFirstString());
@@ -313,7 +314,7 @@ public partial class RelationDiagram : PadEditor {
         if (i == null || i.Count != 1) {
             return;
         }
-        AddOne(i[0], 0, 0, string.Empty);
+        _ = AddOne(i[0], 0, 0, string.Empty);
         if (Pad.Item.Count < 10) {
             Pad.ZoomFit();
         }
@@ -323,7 +324,7 @@ public partial class RelationDiagram : PadEditor {
     private void Pad_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         //Dim i As BasicItem = DirectCast(MouseOver, BasicItem)
         if (e.HotItem is not RowFormulaPadItem) { return; }
-        e.UserMenu.Add("Alle Einträge hinzufügen, die mit diesem hier Beziehungen haben", "Bez+", ImageCode.PlusZeichen);
+        _ = e.UserMenu.Add("Alle Einträge hinzufügen, die mit diesem hier Beziehungen haben", "Bez+", ImageCode.PlusZeichen);
     }
 
     private void Pad_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {

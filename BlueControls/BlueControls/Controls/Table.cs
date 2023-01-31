@@ -17,7 +17,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.EventArgs;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
@@ -25,7 +24,6 @@ using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
@@ -69,9 +67,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private BlueFont? _chapterFont;
     private BlueFont? _columnFilterFont;
     private BlueFont? _columnFont;
-    private ColumnItem? _cursorPosColumn;
-    private RowData? _cursorPosRow;
-    private DatabaseAbstract? _database;
     private BlueTableAppearance _design = BlueTableAppearance.Standard;
     private List<RowItem>? _filteredRows;
     private int? _headSize;
@@ -175,28 +170,28 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 CurrentArrangement?.Invalidate_DrawWithOfAllItems();
                 Invalidate();
                 OnViewChanged();
-                CursorPos_Set(_cursorPosColumn, _cursorPosRow, true);
+                CursorPos_Set(CursorPosColumn, CursorPosRow, true);
             }
         }
     }
 
     public ColumnViewCollection? CurrentArrangement {
         get {
-            if (_database?.ColumnArrangements == null || _database.ColumnArrangements.Count <= _arrangementNr) {
+            if (Database?.ColumnArrangements == null || Database.ColumnArrangements.Count <= _arrangementNr) {
                 return null;
             }
 
-            return _database.ColumnArrangements[_arrangementNr];
+            return Database.ColumnArrangements[_arrangementNr];
         }
     }
 
-    public ColumnItem? CursorPosColumn => _cursorPosColumn;
-    public RowData? CursorPosRow => _cursorPosRow;
+    public ColumnItem? CursorPosColumn { get; private set; }
+    public RowData? CursorPosRow { get; private set; }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public DatabaseAbstract? Database => _database;
+    public DatabaseAbstract? Database { get; private set; }
 
     [DefaultValue(BlueTableAppearance.Standard)]
     public BlueTableAppearance Design {
@@ -224,15 +219,15 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public FilterCollection? Filter { get; private set; }
 
     [DefaultValue(1.0f)]
-    public double FontScale => _database?.GlobalScale ?? 1f;
+    public double FontScale => Database?.GlobalScale ?? 1f;
 
     public List<RowItem?> PinnedRows { get; } = new();
 
     public DateTime PowerEdit {
         //private get => _database?.PowerEdit;
         set {
-            if (_database == null || _database.IsDisposed) { return; }
-            _database.PowerEdit = value;
+            if (Database == null || Database.IsDisposed) { return; }
+            Database.PowerEdit = value;
             Invalidate_SortedRowData(); // Neue Zeilen können nun erlaubt sein
         }
     }
@@ -313,7 +308,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         } else {
             var locker = new object();
 
-            Parallel.ForEach(column.Database.Row, thisRowItem => {
+            _ = Parallel.ForEach(column.Database.Row, thisRowItem => {
                 var originalText = thisRowItem.CellGetString(column);
 
                 if (thisRowItem != null && !thisRowItem.CellIsNullOrEmpty(column)) {
@@ -381,7 +376,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 var c = row.CellGetString(column);
                 c = c.Replace("\r\n", "\r");
                 c = c.Replace("\r", "\r\n");
-                Generic.CopytoClipboard(c);
+                _ = Generic.CopytoClipboard(c);
                 if (meldung) { Notification.Show(LanguageTool.DoTranslate("<b>{0}</b><br>ist nun in der Zwischenablage.", true, c), ImageCode.Kopieren); }
             } else {
                 if (meldung) { Notification.Show(LanguageTool.DoTranslate("Bei dieser Zelle nicht möglich."), ImageCode.Warnung); }
@@ -413,13 +408,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (v[0] == "Cancel") { return; } // =Aktueller Eintrag angeklickt
         row.CellSet(column, v[0].Substring(5));
         //Database.Cell.Set(column, row, v[0].Substring(5), false);
-        row.DoAutomatic(true, true, 5, "value changed");
+        _ = row.DoAutomatic(true, true, 5, "value changed");
     }
 
     /// <summary>
     /// Status des Bildes (Disabled) wird geändert. Diese Routine sollte nicht innerhalb der Table Klasse aufgerufen werden.
     /// Sie dient nur dazu, das Aussehen eines Textes wie eine Zelle zu imitieren.
     /// </summary>
+
     public static void Draw_FormatedText(Graphics gr, string text, ColumnItem? column, Rectangle fitInRect, Design design, States state, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
         if (string.IsNullOrEmpty(text)) { return; }
         var d = Skin.DesignOf(design, state);
@@ -437,13 +433,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     //}
     public static void ImportCsv(DatabaseAbstract database, string csvtxt) {
         using Import x = new(database, csvtxt);
-        x.ShowDialog();
+        _ = x.ShowDialog();
         x.Dispose();
     }
 
     //        newFiles.GenerateAndAdd(neu);
     //        delList.GenerateAndAdd(thisf);
     //    }
+
     public static void SearchNextText(string searchTxt, Table tableView, ColumnItem? column, RowData? row, out ColumnItem? foundColumn, out RowData? foundRow, bool vereinfachteSuche) {
         searchTxt = searchTxt.Trim();
         var ca = tableView.CurrentArrangement;
@@ -547,7 +544,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             if (las != null) {
                 co++;
-                i.Add("vor " + database.Works[lasNr].Date + " UTC",
+                _ = i.Add("vor " + database.Works[lasNr].Date + " UTC",
                     co.ToString(Constants.Format_Integer5) + database.Works[lasNr].PreviousValue);
             }
         }
@@ -577,7 +574,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         foreach (var thisArrangement in database.ColumnArrangements) {
             if (thisArrangement != null) {
                 if (columnArrangementSelector != null && database.PermissionCheck(thisArrangement.PermissionGroups_Show, null)) {
-                    columnArrangementSelector.Item.Add(thisArrangement.Name, database.ColumnArrangements.IndexOf(thisArrangement).ToString());
+                    _ = columnArrangementSelector.Item.Add(thisArrangement.Name, database.ColumnArrangements.IndexOf(thisArrangement).ToString());
                 }
             }
         }
@@ -590,21 +587,21 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public void CheckView() {
         if (Filter == null) {
-            Filter = new FilterCollection(_database, string.Empty);
+            Filter = new FilterCollection(Database, string.Empty);
             Filter.Changed += Filter_Changed;
             OnFilterChanged();
         }
 
         if (_arrangementNr != 1) {
-            if (_database?.ColumnArrangements == null || _arrangementNr >= _database.ColumnArrangements.Count || CurrentArrangement == null || !_database.PermissionCheck(CurrentArrangement.PermissionGroups_Show, null)) {
+            if (Database?.ColumnArrangements == null || _arrangementNr >= Database.ColumnArrangements.Count || CurrentArrangement == null || !Database.PermissionCheck(CurrentArrangement.PermissionGroups_Show, null)) {
                 _arrangementNr = 1;
             }
         }
 
-        if (_mouseOverColumn != null && _mouseOverColumn.Database != _database) { _mouseOverColumn = null; }
-        if (_mouseOverRow != null && _mouseOverRow.Row != null && _mouseOverRow.Row.Database != _database) { _mouseOverRow = null; }
-        if (_cursorPosColumn != null && _cursorPosColumn.Database != _database) { _cursorPosColumn = null; }
-        if (_cursorPosRow != null && _cursorPosRow.Row != null && _cursorPosRow.Row.Database != _database) { _cursorPosRow = null; }
+        if (_mouseOverColumn != null && _mouseOverColumn.Database != Database) { _mouseOverColumn = null; }
+        if (_mouseOverRow != null && _mouseOverRow.Row != null && _mouseOverRow.Row.Database != Database) { _mouseOverRow = null; }
+        if (CursorPosColumn != null && CursorPosColumn.Database != Database) { CursorPosColumn = null; }
+        if (CursorPosRow != null && CursorPosRow.Row != null && CursorPosRow.Row.Database != Database) { CursorPosRow = null; }
     }
 
     public void CollapesAll() {
@@ -620,73 +617,73 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public void CursorPos_Reset() => CursorPos_Set(null, null, false);
 
     public void CursorPos_Set(ColumnItem? column, RowData? row, bool ensureVisible) {
-        if (_database == null || _database.ColumnArrangements.Count == 0 || CurrentArrangement[column] == null || SortedRows() == null || !SortedRows().Contains(row)) {
+        if (Database == null || Database.ColumnArrangements.Count == 0 || CurrentArrangement[column] == null || SortedRows() == null || !SortedRows().Contains(row)) {
             column = null;
             row = null;
         }
 
-        var SameRow = _cursorPosRow == row;
+        var SameRow = CursorPosRow == row;
 
-        if (_cursorPosColumn == column && _cursorPosRow == row) { return; }
+        if (CursorPosColumn == column && CursorPosRow == row) { return; }
         _mouseOverText = string.Empty;
-        _cursorPosColumn = column;
-        _cursorPosRow = row;
-        if (ensureVisible) { EnsureVisible(_cursorPosColumn, _cursorPosRow); }
+        CursorPosColumn = column;
+        CursorPosRow = row;
+        if (ensureVisible) { _ = EnsureVisible(CursorPosColumn, CursorPosRow); }
         Invalidate();
 
-        OnSelectedCellChanged(new CellExtEventArgs(_cursorPosColumn, _cursorPosRow));
+        OnSelectedCellChanged(new CellExtEventArgs(CursorPosColumn, CursorPosRow));
 
-        if (!SameRow) { OnSelectedRowChanged(new RowEventArgs(_cursorPosRow?.Row)); }
+        if (!SameRow) { OnSelectedRowChanged(new RowEventArgs(CursorPosRow?.Row)); }
     }
 
     public void DatabaseSet(DatabaseAbstract? value, string viewCode) {
-        if (_database == value && string.IsNullOrEmpty(viewCode)) { return; }
+        if (Database == value && string.IsNullOrEmpty(viewCode)) { return; }
 
         CloseAllComponents();
 
-        if (_database != null) {
+        if (Database != null) {
             // auch Disposed Datenbanken die Bezüge entfernen!
-            _database.Cell.CellValueChanged -= _Database_CellValueChanged;
-            _database.Loaded -= _Database_DatabaseLoaded;
-            _database.Loading -= _Database_StoreView;
-            _database.ViewChanged -= _Database_ViewChanged;
+            Database.Cell.CellValueChanged -= _Database_CellValueChanged;
+            Database.Loaded -= _Database_DatabaseLoaded;
+            Database.Loading -= _Database_StoreView;
+            Database.ViewChanged -= _Database_ViewChanged;
             //_Database.RowKeyChanged -= _Database_RowKeyChanged;
             //_Database.ColumnKeyChanged -= _Database_ColumnKeyChanged;
-            _database.Column.ColumnInternalChanged -= _Database_ColumnContentChanged;
-            _database.SortParameterChanged -= _Database_SortParameterChanged;
-            _database.Row.RowRemoving -= Row_RowRemoving;
-            _database.Row.RowRemoved -= _Database_RowRemoved;
-            _database.Row.RowAdded -= _Database_Row_RowAdded;
-            _database.Column.ColumnRemoving -= Column_ItemRemoving;
-            _database.Column.ColumnRemoved -= _Database_ViewChanged;
-            _database.Column.ColumnAdded -= _Database_ViewChanged;
-            _database.ProgressbarInfo -= _Database_ProgressbarInfo;
-            _database.Disposing -= _Database_Disposing;
+            Database.Column.ColumnInternalChanged -= _Database_ColumnContentChanged;
+            Database.SortParameterChanged -= _Database_SortParameterChanged;
+            Database.Row.RowRemoving -= Row_RowRemoving;
+            Database.Row.RowRemoved -= _Database_RowRemoved;
+            Database.Row.RowAdded -= _Database_Row_RowAdded;
+            Database.Column.ColumnRemoving -= Column_ItemRemoving;
+            Database.Column.ColumnRemoved -= _Database_ViewChanged;
+            Database.Column.ColumnAdded -= _Database_ViewChanged;
+            Database.ProgressbarInfo -= _Database_ProgressbarInfo;
+            Database.Disposing -= _Database_Disposing;
             DatabaseAbstract.ForceSaveAll();
             BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
             //_database.Save(false);         // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
         }
         ShowWaitScreen = true;
         Refresh(); // um die Uhr anzuzeigen
-        _database = value;
+        Database = value;
         InitializeSkin(); // Neue Schriftgrößen
-        if (_database != null) {
-            _database.Cell.CellValueChanged += _Database_CellValueChanged;
-            _database.Loaded += _Database_DatabaseLoaded;
-            _database.Loading += _Database_StoreView;
-            _database.ViewChanged += _Database_ViewChanged;
+        if (Database != null) {
+            Database.Cell.CellValueChanged += _Database_CellValueChanged;
+            Database.Loaded += _Database_DatabaseLoaded;
+            Database.Loading += _Database_StoreView;
+            Database.ViewChanged += _Database_ViewChanged;
             //_Database.RowKeyChanged += _Database_RowKeyChanged;
             //_Database.ColumnKeyChanged += _Database_ColumnKeyChanged;
-            _database.Column.ColumnInternalChanged += _Database_ColumnContentChanged;
-            _database.SortParameterChanged += _Database_SortParameterChanged;
-            _database.Row.RowRemoving += Row_RowRemoving;
-            _database.Row.RowRemoved += _Database_RowRemoved;
-            _database.Row.RowAdded += _Database_Row_RowAdded;
-            _database.Column.ColumnAdded += _Database_ViewChanged;
-            _database.Column.ColumnRemoving += Column_ItemRemoving;
-            _database.Column.ColumnRemoved += _Database_ViewChanged;
-            _database.ProgressbarInfo += _Database_ProgressbarInfo;
-            _database.Disposing += _Database_Disposing;
+            Database.Column.ColumnInternalChanged += _Database_ColumnContentChanged;
+            Database.SortParameterChanged += _Database_SortParameterChanged;
+            Database.Row.RowRemoving += Row_RowRemoving;
+            Database.Row.RowRemoved += _Database_RowRemoved;
+            Database.Row.RowAdded += _Database_Row_RowAdded;
+            Database.Column.ColumnAdded += _Database_ViewChanged;
+            Database.Column.ColumnRemoving += Column_ItemRemoving;
+            Database.Column.ColumnRemoved += _Database_ViewChanged;
+            Database.ProgressbarInfo += _Database_ProgressbarInfo;
+            Database.Disposing += _Database_Disposing;
         }
 
         ParseView(viewCode);
@@ -857,24 +854,25 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Invalidate_SortedRowData();
     }
 
-    public string Export_CSV(FirstRow firstRow) => _database == null ? string.Empty : _database.Export_CSV(firstRow, CurrentArrangement, SortedRows());
+    public string Export_CSV(FirstRow firstRow) => Database == null ? string.Empty : Database.Export_CSV(firstRow, CurrentArrangement, SortedRows());
 
     public string Export_CSV(FirstRow firstRow, ColumnItem onlyColumn) {
-        if (_database == null || _database.IsDisposed) { return string.Empty; }
+        if (Database == null || Database.IsDisposed) { return string.Empty; }
         List<ColumnItem> l = new() { onlyColumn };
-        return _database.Export_CSV(firstRow, l, SortedRows());
+        return Database.Export_CSV(firstRow, l, SortedRows());
     }
 
     public void Export_HTML(string filename = "", bool execute = true) {
-        if (_database == null || _database.IsDisposed) { return; }
+        if (Database == null || Database.IsDisposed) { return; }
         if (string.IsNullOrEmpty(filename)) { filename = TempFile("", string.Empty, "html"); }
-        _database.Export_HTML(filename, CurrentArrangement, SortedRows(), execute);
+        Database.Export_HTML(filename, CurrentArrangement, SortedRows(), execute);
     }
 
     /// <summary>
     /// Alle gefilteren Zeilen. Jede Zeile ist maximal einmal in dieser Liste vorhanden. Angepinnte Zeilen addiert worden
     /// </summary>
     /// <returns></returns>
+
     public List<RowItem> FilteredRows() {
         if (_filteredRows != null) { return _filteredRows; }
         if (Database == null || Database.IsDisposed) { return new List<RowItem>(); }
@@ -884,7 +882,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public new void Focus() {
         if (Focused()) { return; }
-        base.Focus();
+        _ = base.Focus();
     }
 
     public new bool Focused() => base.Focused || SliderY.Focused() || SliderX.Focused() || BTB.Focused || BCB.Focused;
@@ -920,12 +918,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         ImportCsv(nt);
     }
 
-    public void ImportCsv(string csvtxt) => ImportCsv(_database, csvtxt);
+    public void ImportCsv(string csvtxt) => ImportCsv(Database, csvtxt);
 
     public void Invalidate_AllColumnArrangements() {
-        if (_database == null || _database.IsDisposed) { return; }
+        if (Database == null || Database.IsDisposed) { return; }
 
-        foreach (var thisArrangement in _database.ColumnArrangements) {
+        foreach (var thisArrangement in Database.ColumnArrangements) {
             thisArrangement?.Invalidate_DrawWithOfAllItems();
         }
     }
@@ -971,7 +969,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public void PinRemove(RowItem? row) {
-        PinnedRows.Remove(row);
+        _ = PinnedRows.Remove(row);
         Invalidate_SortedRowData();
         OnPinnedChanged();
     }
@@ -989,8 +987,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         _sortDefinitionTemporary = null;
         _mouseOverColumn = null;
         _mouseOverRow = null;
-        _cursorPosColumn = null;
-        _cursorPosRow = null;
+        CursorPosColumn = null;
+        CursorPosRow = null;
         _arrangementNr = 1;
         _unterschiede = null;
 
@@ -1029,9 +1027,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     _mouseOverRow.GetDataFrom(thisRowData);
                     thisRowData = _mouseOverRow;
                 } // Mouse-Daten wiederverwenden
-                if (_cursorPosRow != null && _cursorPosRow.Row == thisRow.Row && _cursorPosRow.Chapter == thisRow.Chapter) {
-                    _cursorPosRow.GetDataFrom(thisRowData);
-                    thisRowData = _cursorPosRow;
+                if (CursorPosRow != null && CursorPosRow.Row == thisRow.Row && CursorPosRow.Chapter == thisRow.Chapter) {
+                    CursorPosRow.GetDataFrom(thisRowData);
+                    thisRowData = CursorPosRow;
                 } // Cursor-Daten wiederverwenden
 
                 thisRowData.Y = maxY;
@@ -1068,7 +1066,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 _sortedRowData.Add(thisRowData);
             }
 
-            if (_cursorPosRow?.Row != null && !_sortedRowData.Contains(_cursorPosRow)) { CursorPos_Reset(); }
+            if (CursorPosRow?.Row != null && !_sortedRowData.Contains(CursorPosRow)) { CursorPos_Reset(); }
             _mouseOverRow = null;
 
             #region Slider berechnen
@@ -1077,7 +1075,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             #endregion
 
-            EnsureVisible(_cursorPosColumn, _cursorPosRow);
+            _ = EnsureVisible(CursorPosColumn, CursorPosRow);
             OnVisibleRowsChanged();
 
             return SortedRows(); // Rekursiver aufruf. Manchmal funktiniert OnRowsSorted nicht...
@@ -1089,31 +1087,31 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public ColumnItem? View_ColumnFirst() {
-        if (_database == null || _database.IsDisposed) { return null; }
+        if (Database == null || Database.IsDisposed) { return null; }
         var s = CurrentArrangement;
 
         return s == null || s.Count == 0 ? null : s[0]?.Column;
     }
 
     public RowData? View_NextRow(RowData? row) {
-        if (_database == null || _database.IsDisposed) { return null; }
+        if (Database == null || Database.IsDisposed) { return null; }
         var rowNr = SortedRows()?.IndexOf(row) ?? -1;
         return rowNr < 0 || rowNr >= SortedRows().Count - 1 ? null : SortedRows()[rowNr + 1];
     }
 
     public RowData? View_PreviousRow(RowData? row) {
-        if (_database == null || _database.IsDisposed) { return null; }
+        if (Database == null || Database.IsDisposed) { return null; }
         var rowNr = SortedRows()?.IndexOf(row) ?? -1;
         return rowNr < 1 ? null : SortedRows()[rowNr - 1];
     }
 
     public RowData? View_RowFirst() {
-        if (_database == null || _database.IsDisposed) { return null; }
+        if (Database == null || Database.IsDisposed) { return null; }
         var s = SortedRows();
         return s == null || s.Count == 0 ? null : SortedRows()[0];
     }
 
-    public RowData? View_RowLast() => _database == null ? null : SortedRows().Count == 0 ? null : SortedRows()[SortedRows().Count - 1];
+    public RowData? View_RowLast() => Database == null ? null : SortedRows().Count == 0 ? null : SortedRows()[SortedRows().Count - 1];
 
     public string ViewToString() {
         var x = "{";
@@ -1149,8 +1147,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             x = x + ", TempSort=" + _sortDefinitionTemporary;
         }
 
-        if (_cursorPosColumn != null && _cursorPosRow?.Row != null) {
-            x = x + ", CursorPos=" + CellCollection.KeyOfCell(_cursorPosColumn, _cursorPosRow?.Row);
+        if (CursorPosColumn != null && CursorPosRow?.Row != null) {
+            x = x + ", CursorPos=" + CellCollection.KeyOfCell(CursorPosColumn, CursorPosRow?.Row);
         }
         return x + "}";
     }
@@ -1159,7 +1157,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         var l = new List<RowItem>();
         var f = FilteredRows();
         var lockMe = new object();
-        Parallel.ForEach(Database.Row, thisRowItem => {
+        _ = Parallel.ForEach(Database.Row, thisRowItem => {
             if (thisRowItem != null) {
                 if (f.Contains(thisRowItem) || PinnedRows.Contains(thisRowItem)) {
                     lock (lockMe) { l.Add(thisRowItem); }
@@ -1173,7 +1171,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void DrawControl(Graphics gr, States state) {
         if (InvokeRequired) {
-            Invoke(new Action(() => DrawControl(gr, state)));
+            _ = Invoke(new Action(() => DrawControl(gr, state)));
             return;
         }
 
@@ -1184,7 +1182,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             state ^= States.Standard_HasFocus;
         }
 
-        if (_database == null || DesignMode || ShowWaitScreen) {
+        if (Database == null || DesignMode || ShowWaitScreen) {
             DrawWaitScreen(gr);
             return;
         }
@@ -1219,7 +1217,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 foreach (var thisRow in sr) {
                     if (IsOnScreen(thisRow, displayRectangleWoSlider)) {
                         if (thisRow?.Row != null) {
-                            rw.AddIfNotExists(thisRow.Row);
+                            _ = rw.AddIfNotExists(thisRow.Row);
                             var T = sr.IndexOf(thisRow);
                             firstVisibleRow = Math.Min(T, firstVisibleRow);
                             lastVisibleRow = Math.Max(T, lastVisibleRow);
@@ -1227,7 +1225,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     }
                 }
 
-                if (!_database.RefreshRowData(rw, false)) { break; }
+                if (!Database.RefreshRowData(rw, false)) { break; }
                 Invalidate_SortedRowData();
             } while (true);
 
@@ -1275,7 +1273,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnClick(System.EventArgs e) {
         base.OnClick(e);
-        if (_database == null || _database.IsDisposed) { return; }
+        if (Database == null || Database.IsDisposed) { return; }
         lock (_lockUserAction) {
             if (_isinClick) { return; }
             _isinClick = true;
@@ -1287,7 +1285,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnDoubleClick(System.EventArgs e) {
         //    base.OnDoubleClick(e); Wird komplett selbst gehandlet und das neue Ereigniss ausgelöst
-        if (_database == null || _database.IsDisposed) { return; }
+        if (Database == null || Database.IsDisposed) { return; }
         lock (_lockUserAction) {
             if (_isinDoubleClick) { return; }
             _isinDoubleClick = true;
@@ -1313,7 +1311,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     protected override void OnKeyDown(System.Windows.Forms.KeyEventArgs e) {
         base.OnKeyDown(e);
 
-        if (_database == null || _database.IsDisposed) { return; }
+        if (Database == null || Database.IsDisposed) { return; }
 
         lock (_lockUserAction) {
             if (_isinKeyDown) { return; }
@@ -1324,11 +1322,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             switch (e.KeyCode) {
                 case System.Windows.Forms.Keys.Oemcomma: // normales ,
                     if (e.Modifiers == System.Windows.Forms.Keys.Control) {
-                        var lp = CellCollection.ErrorReason(_cursorPosColumn, _cursorPosRow?.Row, ErrorReason.EditGeneral);
-                        Neighbour(_cursorPosColumn, _cursorPosRow, Direction.Oben, out _, out var newRow);
-                        if (newRow == _cursorPosRow) { lp = "Das geht nicht bei dieser Zeile."; }
+                        var lp = CellCollection.ErrorReason(CursorPosColumn, CursorPosRow?.Row, ErrorReason.EditGeneral);
+                        Neighbour(CursorPosColumn, CursorPosRow, Direction.Oben, out _, out var newRow);
+                        if (newRow == CursorPosRow) { lp = "Das geht nicht bei dieser Zeile."; }
                         if (string.IsNullOrEmpty(lp) && newRow != null) {
-                            UserEdited(this, newRow?.Row.CellGetString(_cursorPosColumn), _cursorPosColumn, _cursorPosRow?.Row, newRow?.Chapter, true);
+                            UserEdited(this, newRow?.Row.CellGetString(CursorPosColumn), CursorPosColumn, CursorPosRow?.Row, newRow?.Chapter, true);
                         } else {
                             NotEditableInfo(lp);
                         }
@@ -1337,14 +1335,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
                 case System.Windows.Forms.Keys.X:
                     if (e.Modifiers == System.Windows.Forms.Keys.Control) {
-                        CopyToClipboard(_cursorPosColumn, _cursorPosRow?.Row, true);
-                        if (_cursorPosRow is null || _cursorPosRow.Row.CellIsNullOrEmpty(_cursorPosColumn)) {
+                        CopyToClipboard(CursorPosColumn, CursorPosRow?.Row, true);
+                        if (CursorPosRow is null || CursorPosRow.Row.CellIsNullOrEmpty(CursorPosColumn)) {
                             _isinKeyDown = false;
                             return;
                         }
-                        var l2 = CellCollection.ErrorReason(_cursorPosColumn, _cursorPosRow?.Row, ErrorReason.EditGeneral);
+                        var l2 = CellCollection.ErrorReason(CursorPosColumn, CursorPosRow?.Row, ErrorReason.EditGeneral);
                         if (string.IsNullOrEmpty(l2)) {
-                            UserEdited(this, string.Empty, _cursorPosColumn, _cursorPosRow?.Row, _cursorPosRow?.Chapter, true);
+                            UserEdited(this, string.Empty, CursorPosColumn, CursorPosRow?.Row, CursorPosRow?.Chapter, true);
                         } else {
                             NotEditableInfo(l2);
                         }
@@ -1352,13 +1350,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     break;
 
                 case System.Windows.Forms.Keys.Delete:
-                    if (_cursorPosRow is null || _cursorPosRow.Row.CellIsNullOrEmpty(_cursorPosColumn)) {
+                    if (CursorPosRow is null || CursorPosRow.Row.CellIsNullOrEmpty(CursorPosColumn)) {
                         _isinKeyDown = false;
                         return;
                     }
-                    var l = CellCollection.ErrorReason(_cursorPosColumn, _cursorPosRow?.Row, ErrorReason.EditGeneral);
+                    var l = CellCollection.ErrorReason(CursorPosColumn, CursorPosRow?.Row, ErrorReason.EditGeneral);
                     if (string.IsNullOrEmpty(l)) {
-                        UserEdited(this, string.Empty, _cursorPosColumn, _cursorPosRow?.Row, _cursorPosRow?.Chapter, true);
+                        UserEdited(this, string.Empty, CursorPosColumn, CursorPosRow?.Row, CursorPosRow?.Chapter, true);
                     } else {
                         NotEditableInfo(l);
                     }
@@ -1410,7 +1408,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
                 case System.Windows.Forms.Keys.C:
                     if (e.Modifiers == System.Windows.Forms.Keys.Control) {
-                        CopyToClipboard(_cursorPosColumn, _cursorPosRow?.Row, true);
+                        CopyToClipboard(CursorPosColumn, CursorPosRow?.Row, true);
                     }
                     break;
 
@@ -1422,13 +1420,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     break;
 
                 case System.Windows.Forms.Keys.F2:
-                    Cell_Edit(_cursorPosColumn, _cursorPosRow, true);
+                    Cell_Edit(CursorPosColumn, CursorPosRow, true);
                     break;
 
                 case System.Windows.Forms.Keys.V:
                     if (e.Modifiers == System.Windows.Forms.Keys.Control) {
-                        if (_cursorPosColumn != null && _cursorPosRow != null) {
-                            if (!_cursorPosColumn.Format.TextboxEditPossible() && _cursorPosColumn.Format != DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) {
+                        if (CursorPosColumn != null && CursorPosRow != null) {
+                            if (!CursorPosColumn.Format.TextboxEditPossible() && CursorPosColumn.Format != DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) {
                                 NotEditableInfo("Die Zelle hat kein passendes Format.");
                                 _isinKeyDown = false;
                                 return;
@@ -1439,13 +1437,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                                 return;
                             }
                             var ntxt = System.Windows.Forms.Clipboard.GetText();
-                            if (_cursorPosRow?.Row.CellGetString(_cursorPosColumn) == ntxt) {
+                            if (CursorPosRow?.Row.CellGetString(CursorPosColumn) == ntxt) {
                                 _isinKeyDown = false;
                                 return;
                             }
-                            var l2 = CellCollection.ErrorReason(_cursorPosColumn, _cursorPosRow?.Row, ErrorReason.EditAcut);
+                            var l2 = CellCollection.ErrorReason(CursorPosColumn, CursorPosRow?.Row, ErrorReason.EditAcut);
                             if (string.IsNullOrEmpty(l2)) {
-                                UserEdited(this, ntxt, _cursorPosColumn, _cursorPosRow?.Row, _cursorPosRow?.Chapter, true);
+                                UserEdited(this, ntxt, CursorPosColumn, CursorPosRow?.Row, CursorPosRow?.Chapter, true);
                             } else {
                                 NotEditableInfo(l2);
                             }
@@ -1459,7 +1457,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
         base.OnMouseDown(e);
-        if (_database == null || _database.IsDisposed) { return; }
+        if (Database == null || Database.IsDisposed) { return; }
         lock (_lockUserAction) {
             if (_isinMouseDown) { return; }
             _isinMouseDown = true;
@@ -1479,14 +1477,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
                 if (!string.IsNullOrEmpty(rc)) {
                     if (_collapsed.Contains(rc)) {
-                        _collapsed.Remove(rc);
+                        _ = _collapsed.Remove(rc);
                     } else {
                         _collapsed.Add(rc);
                     }
                     Invalidate_SortedRowData();
                 }
             }
-            EnsureVisible(_mouseOverColumn, _mouseOverRow);
+            _ = EnsureVisible(_mouseOverColumn, _mouseOverRow);
             CursorPos_Set(_mouseOverColumn, _mouseOverRow, false);
             _isinMouseDown = false;
         }
@@ -1494,7 +1492,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnMouseEnter(System.EventArgs e) {
         base.OnMouseEnter(e);
-        if (_database == null || _database.IsDisposed) { return; }
+        if (Database == null || Database.IsDisposed) { return; }
         lock (_lockUserAction) {
             if (_isinMouseEnter) { return; }
             _isinMouseEnter = true;
@@ -1505,7 +1503,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnMouseLeave(System.EventArgs e) {
         base.OnMouseLeave(e);
-        if (_database == null || _database.IsDisposed) { return; }
+        if (Database == null || Database.IsDisposed) { return; }
         lock (_lockUserAction) {
             if (_isinMouseLeave) { return; }
             _isinMouseLeave = true;
@@ -1552,7 +1550,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         } else {
                             _mouseOverText = "Verknüpfung zur Ziel-Datenbank fehlerhaft.";
                         }
-                    } else if (_database.IsAdministrator()) {
+                    } else if (Database.IsAdministrator()) {
                         _mouseOverText = Database.UndoText(_mouseOverColumn, _mouseOverRow.Row);
                     }
                 }
@@ -1567,19 +1565,19 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
         base.OnMouseUp(e);
 
-        if (_database == null || _database.IsDisposed) { return; }
+        if (Database == null || Database.IsDisposed) { return; }
 
         lock (_lockUserAction) {
             //if (_isinMouseUp) { return; }
             _isinMouseUp = true;
 
-            if (_database == null || _database.IsDisposed) {
+            if (Database == null || Database.IsDisposed) {
                 Forms.QuickInfo.Close();
                 _isinMouseUp = false;
                 return;
             }
             CellOnCoordinate(e.X, e.Y, out _mouseOverColumn, out _mouseOverRow);
-            if (_cursorPosColumn != _mouseOverColumn || _cursorPosRow != _mouseOverRow) { Forms.QuickInfo.Close(); }
+            if (CursorPosColumn != _mouseOverColumn || CursorPosRow != _mouseOverRow) { Forms.QuickInfo.Close(); }
             // TXTBox_Close() NICHT! Weil sonst nach dem öffnen sofort wieder gschlossen wird
             // AutoFilter_Close() NICHT! Weil sonst nach dem öffnen sofort wieder geschlossen wird
             FloatingForm.Close(this, Enums.Design.Form_KontextMenu);
@@ -1621,7 +1619,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
         base.OnMouseWheel(e);
-        if (_database == null || _database.IsDisposed) { return; }
+        if (Database == null || Database.IsDisposed) { return; }
 
         lock (_lockUserAction) {
             if (_isinMouseWheel) { return; }
@@ -1639,7 +1637,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnSizeChanged(System.EventArgs e) {
         base.OnSizeChanged(e);
-        if (_database == null || _database.IsDisposed) { return; }
+        if (Database == null || Database.IsDisposed) { return; }
         lock (_lockUserAction) {
             if (_isinSizeChanged) { return; }
             _isinSizeChanged = true;
@@ -1652,7 +1650,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnVisibleChanged(System.EventArgs e) {
         base.OnVisibleChanged(e);
-        if (_database == null || _database.IsDisposed) { return; }
+        if (Database == null || Database.IsDisposed) { return; }
         lock (_lockUserAction) {
             if (_isinVisibleChanged) { return; }
             _isinVisibleChanged = true;
@@ -1681,6 +1679,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     //    if (e.Type is enFehlerArt.DevelopInfo or enFehlerArt.Info) { return; }
+
     private static void Draw_CellTransparentDirect_OneLine(Graphics gr, string drawString, ColumnItem contentHolderColumnStyle, Rectangle drawarea, int txtYPix, bool changeToDot, BlueFont? font, int pix16, ShortenStyle style, BildTextVerhalten bildTextverhalten, States state) {
         Rectangle r = new(drawarea.Left, drawarea.Top + txtYPix, drawarea.Width, pix16);
 
@@ -1690,10 +1689,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
 
         var tmpData = CellItem.GetDrawingData(contentHolderColumnStyle, drawString, style, bildTextverhalten);
-        var tmpImageCode = tmpData.Item2;
+        var tmpImageCode = tmpData.image;
         if (tmpImageCode != null) { tmpImageCode = QuickImage.Get(tmpImageCode, Skin.AdditionalState(state)); }
 
-        Skin.Draw_FormatedText(gr, tmpData.Item1, tmpImageCode, (Alignment)contentHolderColumnStyle.Align, r, null, false, font, false);
+        Skin.Draw_FormatedText(gr, tmpData.text, tmpImageCode, (Alignment)contentHolderColumnStyle.Align, r, null, false, font, false);
     }
 
     private static int GetPix(int pix, BlueFont? f, double scale) => Skin.FormatedText_NeededSize("@|", null, f, (int)((pix * scale) + 0.5)).Height;
@@ -1767,7 +1766,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 row.CellSet(column, newValue);
             }
             if (table.Database == column.Database) { table.CursorPos_Set(column, row, false, chapter); }
-            row.DoAutomatic(true, false, 5, "value changed");
+            _ = row.DoAutomatic(true, false, 5, "value changed");
 
             // EnsureVisible ganz schlecht: Daten verändert, keine Positionen bekannt - und da soll sichtbar gemacht werden?
             // CursorPos.EnsureVisible(SliderX, SliderY, DisplayRectangle)
@@ -1825,6 +1824,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     //    if (string.IsNullOrEmpty(_StoredView)) { return; }
     //    _StoredView = ColumnCollection.ChangeKeysInString(_StoredView, e.KeyOld, e.KeyNew);
     //}
+
     private void _Database_Disposing(object sender, System.EventArgs e) => DatabaseSet(null, string.Empty);
 
     private void _Database_ProgressbarInfo(object sender, ProgressbarEventArgs e) {
@@ -1857,7 +1857,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Invalidate_HeadSize();
         Invalidate_AllColumnArrangements();
         //Invalidate_RowSort();
-        CursorPos_Set(_cursorPosColumn, _cursorPosRow, true);
+        CursorPos_Set(CursorPosColumn, CursorPosRow, true);
         Invalidate();
     }
 
@@ -1998,6 +1998,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     /// </summary>
     /// <param name="column"></param>
     /// <returns></returns>
+
     private int Autofilter_Text(ColumnItem? column) {
         if (column.TmpIfFilterRemoved != null) { return (int)column.TmpIfFilterRemoved; }
         var tfilter = new FilterCollection(column.Database);
@@ -2110,11 +2111,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
         switch (dia) {
             case EditTypeTable.Textfeld:
-                Cell_Edit_TextBox(cellInThisDatabaseColumn, cellInThisDatabaseRow, contentHolderCellColumn, contentHolderCellRow, BTB, 0, 0);
+                _ = Cell_Edit_TextBox(cellInThisDatabaseColumn, cellInThisDatabaseRow, contentHolderCellColumn, contentHolderCellRow, BTB, 0, 0);
                 break;
 
             case EditTypeTable.Textfeld_mit_Auswahlknopf:
-                Cell_Edit_TextBox(cellInThisDatabaseColumn, cellInThisDatabaseRow, contentHolderCellColumn, contentHolderCellRow, BCB, 20, 18);
+                _ = Cell_Edit_TextBox(cellInThisDatabaseColumn, cellInThisDatabaseRow, contentHolderCellColumn, contentHolderCellRow, BCB, 20, 18);
                 break;
 
             case EditTypeTable.Dropdown_Single:
@@ -2175,7 +2176,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         ColDia.Color = cellInThisDatabaseRow.Row.CellGetColor(cellInThisDatabaseColumn);
         ColDia.Tag = CellCollection.KeyOfCell(cellInThisDatabaseColumn, cellInThisDatabaseRow.Row);
         List<int> colList = new();
-        foreach (var thisRowItem in _database.Row) {
+        foreach (var thisRowItem in Database.Row) {
             if (thisRowItem != null) {
                 if (thisRowItem.CellGetInteger(cellInThisDatabaseColumn) != 0) {
                     colList.Add(thisRowItem.CellGetColorBgr(cellInThisDatabaseColumn));
@@ -2184,7 +2185,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
         colList.Sort();
         ColDia.CustomColors = colList.Distinct().ToArray();
-        ColDia.ShowDialog();
+        _ = ColDia.ShowDialog();
         ColDia.Dispose();
         UserEdited(this, Color.FromArgb(255, ColDia.Color).ToArgb().ToString(), cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, cellInThisDatabaseRow?.Chapter, false);
     }
@@ -2220,8 +2221,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 Cell_Edit(cellInThisDatabaseColumn, cellInThisDatabaseRow, false);
                 return;
             }
-            t.Add("Erweiterte Eingabe", "#Erweitert", QuickImage.Get(ImageCode.Stift), true, Constants.FirstSortChar + "1");
-            t.AddSeparator(Constants.FirstSortChar + "2");
+            _ = t.Add("Erweiterte Eingabe", "#Erweitert", QuickImage.Get(ImageCode.Stift), true, Constants.FirstSortChar + "1");
+            _ = t.AddSeparator(Constants.FirstSortChar + "2");
             t.Sort();
         }
 
@@ -2272,7 +2273,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         Box.Visible = true;
         Box.BringToFront();
-        Box.Focus();
+        _ = Box.Focus();
         return true;
     }
 
@@ -2281,6 +2282,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     //    if (l == null) { return; }
     //    UserEdited(this, l.JoinWithCr(), cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, cellInThisDatabaseRow?.Chapter, false);
     //}
+
     private void CellOnCoordinate(int xpos, int ypos, out ColumnItem? column, out RowData? row) {
         column = ColumnOnCoordinate(xpos);
         row = RowOnCoordinate(ypos);
@@ -2288,10 +2290,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void CloseAllComponents() {
         if (InvokeRequired) {
-            Invoke(new Action(CloseAllComponents));
+            _ = Invoke(new Action(CloseAllComponents));
             return;
         }
-        if (_database == null || _database.IsDisposed) { return; }
+        if (Database == null || Database.IsDisposed) { return; }
         TXTBox_Close(BTB);
         TXTBox_Close(BCB);
         FloatingForm.Close(this);
@@ -2324,7 +2326,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private void Column_ItemRemoving(object sender, ColumnEventArgs e) {
-        if (e.Column == _cursorPosColumn) {
+        if (e.Column == CursorPosColumn) {
             CursorPos_Reset();
         }
         if (e.Column == _mouseOverColumn) {
@@ -2361,7 +2363,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private ColumnItem? ColumnOnCoordinate(int xpos) {
-        if (_database == null || _database.ColumnArrangements.Count - 1 < _arrangementNr) { return null; }
+        if (Database == null || Database.ColumnArrangements.Count - 1 < _arrangementNr) { return null; }
         var cua = CurrentArrangement;
         if (cua == null) { return null; }
 
@@ -2378,7 +2380,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private bool ComputeAllColumnPositions() {
         try {
             // Kommt vor, dass spontan doch geparsed wird...
-            if (_database.ColumnArrangements == null || _arrangementNr >= _database.ColumnArrangements.Count) { return false; }
+            if (Database.ColumnArrangements == null || _arrangementNr >= Database.ColumnArrangements.Count) { return false; }
 
             var cua = CurrentArrangement;
             if (cua == null) { return false; }
@@ -2421,9 +2423,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     /// Setzt die Variable CursorPos um X Columns und Y Reihen um. Dabei wird die Columns und Zeilensortierung berücksichtigt.
     /// </summary>
     /// <remarks></remarks>
+
     private void Cursor_Move(Direction richtung) {
-        if (_database == null || _database.IsDisposed) { return; }
-        Neighbour(_cursorPosColumn, _cursorPosRow, richtung, out var newCol, out var newRow);
+        if (Database == null || Database.IsDisposed) { return; }
+        Neighbour(CursorPosColumn, CursorPosRow, richtung, out var newCol, out var newRow);
         CursorPos_Set(newCol, newRow, richtung != Direction.Nichts);
     }
 
@@ -2499,6 +2502,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     /// <param name="displayRectangleWoSlider"></param>
     /// <param name="design"></param>
     /// <param name="state"></param>
+
     private void Draw_CellListBox(Graphics gr, ColumnViewItem column, RowData row, Rectangle cellrectangle, Rectangle displayRectangleWoSlider, Design design, States state) {
         Skin.Draw_Back(gr, design, state, displayRectangleWoSlider, null, false);
         Skin.Draw_Border(gr, design, state, displayRectangleWoSlider);
@@ -2515,6 +2519,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     /// <param name="cellInThisDatabaseRow"></param>
     /// <param name="displayRectangleWOSlider"></param>
     /// <param name="font"></param>
+
     private void Draw_CellTransparent(Graphics gr, ColumnViewItem cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, Rectangle cellrectangle, BlueFont? font, States state) {
         if (cellInThisDatabaseRow == null) { return; }
 
@@ -2545,6 +2550,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     /// <param name="contentHolderCellRow"></param>
     /// <param name="displayRectangleWOSlider"></param>
     /// <param name="font"></param>
+
     private void Draw_CellTransparentDirect(Graphics gr, ColumnViewItem cellInThisDatabaseColumn, RowData cellInThisDatabaseRow, Rectangle cellrectangle, ColumnItem? contentHolderCellColumn, RowItem? contentHolderCellRow, BlueFont? font, States state) {
         if (cellInThisDatabaseColumn.Column.Format == DataFormat.Button) {
             Draw_CellAsButton(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle);
@@ -2581,7 +2587,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
                 gr.DrawLine(Skin.PenLinieDünn, cellrectangle.Left, cellrectangle.Bottom - 1, cellrectangle.Right - 1, cellrectangle.Bottom - 1);
 
-                if (!Thread.CurrentThread.IsBackground && _cursorPosColumn == viewItem.Column && _cursorPosRow == currentRow) {
+                if (!Thread.CurrentThread.IsBackground && CursorPosColumn == viewItem.Column && CursorPosRow == currentRow) {
                     _tmpCursorRect = cellrectangle;
                     _tmpCursorRect.Height -= 1;
                     Draw_Cursor(gr, displayRectangleWoSlider, false);
@@ -2687,10 +2693,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         // Zeilen Zeichnen (Alle Zellen)
         for (var zeiv = vFirstVisibleRow; zeiv <= vLastVisibleRow; zeiv++) {
             var currentRow = sr[zeiv];
-            var viewItem = _database.ColumnArrangements[0][col];
+            var viewItem = Database.ColumnArrangements[0][col];
             Rectangle r = new(0, DrawY(currentRow), DisplayRectangleWithoutSlider().Width,
                 currentRow.DrawHeight);
-            if (_cursorPosColumn != null && _cursorPosRow.Row == currentRow.Row) {
+            if (CursorPosColumn != null && CursorPosRow.Row == currentRow.Row) {
                 itStat |= States.Checked;
             } else {
                 if (Convert.ToBoolean(itStat & States.Checked)) {
@@ -2702,7 +2708,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 Math.Min(currentRow.DrawHeight, 24));
 
             Draw_CellListBox(gr, viewItem, currentRow, cellrectangle, r, Enums.Design.Item_Listbox, itStat);
-            if (!currentRow.Row.CellGetBoolean(_database.Column.SysCorrect)) {
+            if (!currentRow.Row.CellGetBoolean(Database.Column.SysCorrect)) {
                 gr.DrawImage(QuickImage.Get("Warnung|16||||||120||50"), new Point(r.Right - 19, (int)(r.Top + ((r.Height - 16) / 2.0))));
             }
             if (currentRow.ShowCap) {
@@ -2803,6 +2809,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     /// </summary>
     /// <param name="r"></param>
     /// <returns></returns>
+
     private int DrawY(RowData? r) => r == null ? 0 : r.Y + HeadSize() - (int)SliderY.Value;
 
     private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
@@ -2866,7 +2873,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (viewItem?.Column == null) { return false; }
         if (viewItem.OrderTmpSpalteX1 == null && !ComputeAllColumnPositions()) { return false; }
         var r = DisplayRectangleWithoutSlider();
-        ComputeAllColumnPositions();
+        _ = ComputeAllColumnPositions();
         if (viewItem.ViewType == ViewType.PermanentColumn) {
             if (viewItem.OrderTmpSpalteX1 + Column_DrawWidth(viewItem, r) <= r.Width) { return true; }
             //Develop.DebugPrint(enFehlerArt.Info,"Unsichtbare Wiederholungsspalte: " + ViewItem.Column.Name);
@@ -2887,7 +2894,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private int HeadSize() {
         if (_headSize != null) { return (int)_headSize; }
-        if (_database.ColumnArrangements.Count - 1 < _arrangementNr) {
+        if (Database.ColumnArrangements.Count - 1 < _arrangementNr) {
             _headSize = 0;
             return 0;
         }
@@ -2914,9 +2921,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private void Invalidate_Filterinfo() {
-        if (_database == null || _database.IsDisposed) { return; }
+        if (Database == null || Database.IsDisposed) { return; }
 
-        foreach (var thisColumn in _database.Column.Where(thisColumn => thisColumn != null)) {
+        foreach (var thisColumn in Database.Column.Where(thisColumn => thisColumn != null)) {
             thisColumn.TmpIfFilterRemoved = null;
             thisColumn.TmpAutoFilterSinnvoll = null;
         }
@@ -2946,12 +2953,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     /// Gibt des keine Nachbarszelle, wird die Eingangszelle zurückgegeben.
     /// </summary>
     /// <remarks></remarks>
+
     private void Neighbour(ColumnItem? column, RowData? row, Direction direction, out ColumnItem? newColumn, out RowData? newRow) {
         newColumn = column;
         newRow = row;
         if (_design == BlueTableAppearance.OnlyMainColumnWithoutHead) {
             if (direction is not Direction.Oben and not Direction.Unten) {
-                newColumn = _database.Column.First;
+                newColumn = Database.Column.First;
                 return;
             }
         }
@@ -3013,6 +3021,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     /// Reset - Parse - CheckView
     /// </summary>
     /// <param name="toParse"></param>
+
     private void ParseView(string toParse) {
         ResetView();
 
@@ -3024,7 +3033,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         break;
 
                     case "filters":
-                        Filter = new FilterCollection(_database, pair.Value);
+                        Filter = new FilterCollection(Database, pair.Value);
                         Filter.Changed += Filter_Changed;
                         OnFilterChanged();
                         break;
@@ -3045,11 +3054,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         break;
 
                     case "tempsort":
-                        _sortDefinitionTemporary = new RowSortDefinition(_database, pair.Value);
+                        _sortDefinitionTemporary = new RowSortDefinition(Database, pair.Value);
                         break;
 
                     case "pin":
-                        PinnedRows.Add(_database.Row.SearchByKey(LongParse(pair.Value)));
+                        PinnedRows.Add(Database.Row.SearchByKey(LongParse(pair.Value)));
                         break;
 
                     case "collapsed":
@@ -3057,7 +3066,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         break;
 
                     case "reduced":
-                        var c = _database.Column[pair.Value];
+                        var c = Database.Column[pair.Value];
                         var cv = CurrentArrangement[c];
                         if (cv != null) { cv.TmpReduced = true; }
                         break;
@@ -3090,9 +3099,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private void Row_RowRemoving(object sender, RowEventArgs e) {
-        if (e.Row == _cursorPosRow?.Row) { CursorPos_Reset(); }
+        if (e.Row == CursorPosRow?.Row) { CursorPos_Reset(); }
         if (e.Row == _mouseOverRow?.Row) { _mouseOverRow = null; }
-        if (PinnedRows.Contains(e.Row)) { PinnedRows.Remove(e.Row); }
+        if (PinnedRows.Contains(e.Row)) { _ = PinnedRows.Remove(e.Row); }
     }
 
     private string RowCaptionOnCoordinate(int pixelX, int pixelY) {
@@ -3108,7 +3117,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private RowData? RowOnCoordinate(int pixelY) {
-        if (_database == null || pixelY <= HeadSize()) { return null; }
+        if (Database == null || pixelY <= HeadSize()) { return null; }
         var s = SortedRows();
         if (s == null) { return null; }
 
@@ -3129,20 +3138,16 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         SliderX.Enabled = Convert.ToBoolean(SliderX.Maximum > 0);
     }
 
-    private void SliderX_ValueChanged(object sender, System.EventArgs e) {
-        Invalidate();
-    }
+    private void SliderX_ValueChanged(object sender, System.EventArgs e) => Invalidate();
 
-    private void SliderY_ValueChanged(object sender, System.EventArgs e) {
-        Invalidate();
-    }
+    private void SliderY_ValueChanged(object sender, System.EventArgs e) => Invalidate();
 
     private RowSortDefinition? SortUsed() => _sortDefinitionTemporary?.Columns != null
         ? _sortDefinitionTemporary
-        : _database.SortDefinition?.Columns != null ? _database.SortDefinition : null;
+        : Database.SortDefinition?.Columns != null ? Database.SortDefinition : null;
 
     private void TXTBox_Close(TextBox? textbox) {
-        if (textbox == null || _database == null || _database.IsDisposed) { return; }
+        if (textbox == null || Database == null || Database.IsDisposed) { return; }
         if (!textbox.Visible) { return; }
         if (textbox.Tag == null || string.IsNullOrEmpty(textbox.Tag.ToString())) {
             textbox.Visible = false;
@@ -3150,23 +3155,23 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
         var w = textbox.Text;
         var tmpTag = (string)textbox.Tag;
-        _database.Cell.DataOfCellKey(tmpTag, out var column, out var row);
+        Database.Cell.DataOfCellKey(tmpTag, out var column, out var row);
         textbox.Tag = null;
         textbox.Visible = false;
-        UserEdited(this, w, column, row, _cursorPosRow?.Chapter, true);
+        UserEdited(this, w, column, row, CursorPosRow?.Chapter, true);
         Focus();
     }
 
     private bool UserEdit_NewRowAllowed() {
-        if (_database == null || _database.Column.Count == 0 || _database.Column.First == null) { return false; }
+        if (Database == null || Database.Column.Count == 0 || Database.Column.First == null) { return false; }
         if (_design == BlueTableAppearance.OnlyMainColumnWithoutHead) { return false; }
-        if (_database.ColumnArrangements.Count == 0) { return false; }
-        if (CurrentArrangement?[_database.Column.First] == null) { return false; }
-        if (!_database.PermissionCheck(_database.PermissionGroupsNewRow, null)) { return false; }
+        if (Database.ColumnArrangements.Count == 0) { return false; }
+        if (CurrentArrangement?[Database.Column.First] == null) { return false; }
+        if (!Database.PermissionCheck(Database.PermissionGroupsNewRow, null)) { return false; }
 
-        if (_database.PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0) { return true; }
+        if (Database.PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0) { return true; }
 
-        return CellCollection.UserEditPossible(_database.Column.First, null, ErrorReason.EditNormaly);
+        return CellCollection.UserEditPossible(Database.Column.First, null, ErrorReason.EditNormaly);
     }
 
     #endregion

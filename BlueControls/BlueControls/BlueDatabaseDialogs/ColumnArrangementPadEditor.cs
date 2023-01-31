@@ -65,9 +65,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         ShowOrder();
     }
 
-    private ColumnArrangementPadEditor() {
-        InitializeComponent();
-    }
+    private ColumnArrangementPadEditor() => InitializeComponent();
 
     #endregion
 
@@ -184,7 +182,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
             }
         }
         using (ColumnEditor w = new(newc, null)) {
-            w.ShowDialog();
+            _ = w.ShowDialog();
             newc.Invalidate_ColumAndContent();
             w.Dispose();
         }
@@ -199,7 +197,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
     private void btnSpalteEinblenden_Click(object sender, System.EventArgs e) {
         ItemCollectionList ic = new();
         foreach (var ThisColumnItem in Database.Column) {
-            if (ThisColumnItem != null && CurrentArrangement[ThisColumnItem] == null) { ic.Add(ThisColumnItem); }
+            if (ThisColumnItem != null && CurrentArrangement[ThisColumnItem] == null) { _ = ic.Add(ThisColumnItem); }
         }
         if (ic.Count == 0) {
             MessageBox.Show("Es werden bereits alle<br>Spalten angezeigt.", ImageCode.Information, "Ok");
@@ -231,6 +229,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
     /// <summary>
     /// Überträgt die aktuelle Ansicht fest in den Datenbankcode hinein
     /// </summary>
+
     private void FixColumnArrangement() {
         if (Generating || Sorting) { return; }
 
@@ -341,16 +340,15 @@ public partial class ColumnArrangementPadEditor : PadEditor {
                 var oo = c[cpi.Column];
 
                 if (oo != null) {
-                    cpi.AdditionalStyleOptions = new List<FlexiControl>();
-                    cpi.AdditionalStyleOptions.Add(new FlexiControlForProperty<bool>(() => oo.Permanent));
+                    cpi.AdditionalStyleOptions = new List<FlexiControl> {
+                        new FlexiControlForProperty<bool>(() => oo.Permanent)
+                    };
                 }
             }
         }
     }
 
-    private void Item_ItemRemoved(object sender, System.EventArgs e) {
-        Pad_MouseUp(null, null);
-    }
+    private void Item_ItemRemoved(object sender, System.EventArgs e) => Pad_MouseUp(null, null);
 
     private ColumnPadItem? LeftestItem(List<BasicPadItem> ignore) {
         ColumnPadItem? found = null;
@@ -408,13 +406,11 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         foreach (var thisc in Database?.Column) {
             if (thisc.LinkedDatabase != null) {
                 var dbN = thisc.LinkedDatabase.ConnectionData.TableName + "|" + thisc.LinkedCellFilter.JoinWithCr();
-                dbColumnCombi.AddIfNotExists(dbN);
+                _ = dbColumnCombi.AddIfNotExists(dbN);
             }
         }
 
         #endregion
-
-        #region Im dritten Durchlauf nun die Verknüpfungen erstellen
 
         var kx = 0f;
         foreach (var thisCombi in dbColumnCombi) {
@@ -426,11 +422,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
                     var toCheckCombi = thisc.Column.LinkedDatabase.ConnectionData.TableName + "|" + thisc.Column.LinkedCellFilter.JoinWithCr();
 
                     if (toCheckCombi == thisCombi) {
-
-                        #region Database-Item 'databItem' erzeugen
-
-                        var databItem = Pad.Item[toCheckCombi] as GenericPadItem;
-                        if (databItem == null) {
+                        if (Pad.Item[toCheckCombi] is not GenericPadItem databItem) {
                             var nam = thisc.Column.LinkedDatabase.ConnectionData.TableName;
                             databItem = new GenericPadItem(toCheckCombi, nam, new Size((int)(anyitem.UsedArea.Height / 2), (int)anyitem.UsedArea.Height));
                             Pad.Item.Add(databItem);
@@ -438,26 +430,16 @@ public partial class ColumnArrangementPadEditor : PadEditor {
                             kx = databItem.UsedArea.Right;
                         }
 
-                        #endregion
-
-                        #region LinkedDatabase-ColumnItems erzeugen
-
-                        #region ANDERE Spalten (die Filterung der Einträge) aus eigener Datenbank zur Verknüpften Datenbank zeigen lassen
-
                         foreach (var thisitem in thisc.Column.LinkedCellFilter) {
                             var x = thisitem.SplitBy("|");
 
                             foreach (var thisc2 in thisc?.Column?.Database?.Column) {
                                 if (x[2].Contains("~" + thisc2.Name + "~")) {
                                     var rkcolit = (ColumnPadItem?)Pad.Item[thisc2.Name];
-                                    rkcolit?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false, databItem, ConnectionType.Top, true, false));
+                                    _ = (rkcolit?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false, databItem, ConnectionType.Top, true, false)));
                                 }
                             }
                         }
-
-                        #endregion
-
-                        #region Dann die Spalte erzeugen, aus der der der Wert kommt
 
                         var c2 = thisc.Column.LinkedDatabase.Column.Exists(thisc.Column.LinkedCell_ColumnNameOfLinkedDatabase);
                         if (c2 != null) {
@@ -468,20 +450,14 @@ public partial class ColumnArrangementPadEditor : PadEditor {
                             kx = it2.UsedArea.Right;
 
                             // und noch die Datenbank auf die Spalte zeigen lassem
-                            databItem?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false, it2, ConnectionType.Bottom, false, false));
+                            _ = (databItem?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false, it2, ConnectionType.Bottom, false, false)));
                         }
-
-                        #endregion
-
-                        #endregion
                     }
                 }
             }
 
             kx += 30;
         }
-
-        #endregion
 
         SortColumns();
         Pad.ZoomFit();

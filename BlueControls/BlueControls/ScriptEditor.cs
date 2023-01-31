@@ -49,9 +49,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended 
 
     #region Constructors
 
-    public ScriptEditor() {
-        InitializeComponent();
-    }
+    public ScriptEditor() => InitializeComponent();
 
     #endregion
 
@@ -81,7 +79,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended 
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
         switch (e.ClickedComand.ToLower()) {
             case "variableninhalt kopieren":
-                Generic.CopytoClipboard(_lastVariableContent);
+                _ = Generic.CopytoClipboard(_lastVariableContent);
                 return true;
         }
 
@@ -90,7 +88,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended 
 
     public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
         if (!string.IsNullOrEmpty(_lastVariableContent)) {
-            items.Add("Variableninhalt kopieren");
+            _ = items.Add("Variableninhalt kopieren");
         }
 
         hotItem = _lastWord;
@@ -121,7 +119,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended 
 
     protected virtual Script? GenerateAndDoScript() {
         var s = new Script(null, string.Empty, true);
-        s.Parse();
+        _ = s.Parse();
         return s;
     }
 
@@ -184,9 +182,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended 
         }
     }
 
-    private void btnZusatzDateien_Click(object sender, System.EventArgs e) {
-        OpenAdditionalFileFolder();
-    }
+    private void btnZusatzDateien_Click(object sender, System.EventArgs e) => OpenAdditionalFileFolder();
 
     private void lstFunktionen_ItemClicked(object sender, BasicListItemEventArgs e) {
         if (e.Item.Internal == "[Main]") {
@@ -250,7 +246,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended 
     private void UpdateSubs(string? s) {
         lstFunktionen.Item.Clear();
 
-        lstFunktionen.Item.Add("[Main]");
+        _ = lstFunktionen.Item.Add("[Main]");
 
         if (s == null) { return; }
 
@@ -267,7 +263,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended 
                 if (endp > stp) {
                     var n = s.Substring(stp + 3, endp - stp - 3);
                     if (!Variable.IsValidName(n)) { break; }
-                    lstFunktionen.Item.Add(n);
+                    _ = lstFunktionen.Item.Add(n);
                     pos = endp + 2;
                 } else {
                     break;

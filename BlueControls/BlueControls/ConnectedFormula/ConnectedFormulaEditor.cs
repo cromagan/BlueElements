@@ -19,7 +19,6 @@
 
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
-using BlueDatabase;
 using System.Collections.Generic;
 using System.ComponentModel;
 using static BlueBasics.IO;
@@ -112,14 +111,14 @@ public partial class ConnectedFormulaEditor : PadEditor {
             if (_cf != null) { FormulaSet(null as ConnectedFormula.ConnectedFormula, null); }
         }
 
-        SaveTab.ShowDialog();
+        _ = SaveTab.ShowDialog();
         if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
         if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
         if (sender == btnNeuDB) {
             FormulaSet(new ConnectedFormula.ConnectedFormula(), null); // Ab jetzt in der Variable _Database zu finden
         }
-        if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
+        if (FileExists(SaveTab.FileName)) { _ = DeleteFile(SaveTab.FileName, true); }
 
         _cf?.SaveAsAndChangeTo(SaveTab.FileName);
 
@@ -128,7 +127,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
         BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
-        LoadTab.ShowDialog();
+        _ = LoadTab.ShowDialog();
     }
 
     private void btnPfeileAusblenden_CheckedChanged(object sender, System.EventArgs e) => btnVorschauModus.Checked = btnPfeileAusblenden.Checked;
@@ -143,15 +142,14 @@ public partial class ConnectedFormulaEditor : PadEditor {
         it.Page = n;
     }
 
-    private void btnSpeichern_Click(object sender, System.EventArgs e) {
-        BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
-    }
+    private void btnSpeichern_Click(object sender, System.EventArgs e) => BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
 
     private void btnTabControlAdd_Click(object sender, System.EventArgs e) {
         if (_cf == null) { return; }
 
-        var x = new TabFormulaPadItem(string.Empty, _cf);
-        x.Bei_Export_sichtbar = true;
+        var x = new TabFormulaPadItem(string.Empty, _cf) {
+            Bei_Export_sichtbar = true
+        };
         Pad.AddCentered(x);
     }
 
@@ -239,9 +237,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     private void LoadTab_FileOk(object sender, CancelEventArgs e) => FormulaSet(LoadTab.FileName, null);
 
-    private void Pad_GotNewItemCollection(object sender, System.EventArgs e) {
-        Pad.CurrentPage = "Head";
-    }
+    private void Pad_GotNewItemCollection(object sender, System.EventArgs e) => Pad.CurrentPage = "Head";
 
     #endregion
 }

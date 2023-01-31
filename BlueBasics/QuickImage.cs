@@ -58,13 +58,13 @@ public sealed class QuickImage : BitmapExt, IReadableText {
         var w = (imageCode + "||||||||||").Split('|');
         Name = w[0];
         var width = -1;
-        if (!string.IsNullOrEmpty(w[1])) { IntTryParse(w[1], out width); }
+        if (!string.IsNullOrEmpty(w[1])) { _ = IntTryParse(w[1], out width); }
         var height = -1;
-        if (!string.IsNullOrEmpty(w[2])) { IntTryParse(w[2], out height); }
+        if (!string.IsNullOrEmpty(w[2])) { _ = IntTryParse(w[2], out height); }
         CorrectSize(width, height, null);
         Effekt = ImageCodeEffect.Ohne;
         if (!string.IsNullOrEmpty(w[3])) {
-            IntTryParse(w[3], out var tmp);
+            _ = IntTryParse(w[3], out var tmp);
             Effekt = (ImageCodeEffect)tmp;
         }
         Färbung = w[4];
@@ -200,28 +200,28 @@ public sealed class QuickImage : BitmapExt, IReadableText {
     public static string GenerateCode(string name, int width, int height, ImageCodeEffect effekt, string färbung, string changeGreenTo, int sättigung, int helligkeit, int drehwinkel, int transparenz, string? zweitsymbol) {
         var c = new StringBuilder();
 
-        c.Append(name);
-        c.Append("|");
-        if (width > 0) { c.Append(width); }
-        c.Append("|");
-        if (height > 0 && width != height) { c.Append(height); }
-        c.Append("|");
-        if (effekt != ImageCodeEffect.Ohne) { c.Append((int)effekt); }
-        c.Append("|");
-        if (färbung != "00ffffff") { c.Append(färbung); }
+        _ = c.Append(name);
+        _ = c.Append("|");
+        if (width > 0) { _ = c.Append(width); }
+        _ = c.Append("|");
+        if (height > 0 && width != height) { _ = c.Append(height); }
+        _ = c.Append("|");
+        if (effekt != ImageCodeEffect.Ohne) { _ = c.Append((int)effekt); }
+        _ = c.Append("|");
+        if (färbung != "00ffffff") { _ = c.Append(färbung); }
 
-        c.Append("|");
-        if (changeGreenTo != "00ffffff") { c.Append(changeGreenTo); }
-        c.Append("|");
-        if (helligkeit != 100) { c.Append(helligkeit); }
-        c.Append("|");
-        if (sättigung != 100) { c.Append(sättigung); }
-        c.Append("|");
-        if (drehwinkel > 0) { c.Append(drehwinkel); }
-        c.Append("|");
-        if (transparenz > 0) { c.Append(transparenz); }
-        c.Append("|");
-        if (!string.IsNullOrEmpty(zweitsymbol)) { c.Append(zweitsymbol); }
+        _ = c.Append("|");
+        if (changeGreenTo != "00ffffff") { _ = c.Append(changeGreenTo); }
+        _ = c.Append("|");
+        if (helligkeit != 100) { _ = c.Append(helligkeit); }
+        _ = c.Append("|");
+        if (sättigung != 100) { _ = c.Append(sättigung); }
+        _ = c.Append("|");
+        if (drehwinkel > 0) { _ = c.Append(drehwinkel); }
+        _ = c.Append("|");
+        if (transparenz > 0) { _ = c.Append(transparenz); }
+        _ = c.Append("|");
+        if (!string.IsNullOrEmpty(zweitsymbol)) { _ = c.Append(zweitsymbol); }
         return c.ToString().TrimEnd('|');
     }
 

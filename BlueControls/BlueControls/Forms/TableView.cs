@@ -35,10 +35,9 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Forms.Design;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 using static BlueBasics.Develop;
+using static BlueBasics.Extensions;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 
@@ -70,16 +69,16 @@ public partial class TableView : Form, IHasStatusbar {
 
         if (btnDrucken != null) {
             btnDrucken.Item.Clear();
-            btnDrucken.Item.Add("Drucken bzw. Export", "erweitert", QuickImage.Get(ImageCode.Drucker, 28));
-            btnDrucken.Item.AddSeparator();
-            btnDrucken.Item.Add("CSV-Format für Excel in die Zwischenablage", "csv", QuickImage.Get(ImageCode.Excel, 28));
-            btnDrucken.Item.Add("HTML-Format für Internet-Seiten", "html", QuickImage.Get(ImageCode.Globus, 28));
-            btnDrucken.Item.AddSeparator();
-            btnDrucken.Item.Add("Layout-Editor öffnen", "editor", QuickImage.Get(ImageCode.Layout, 28));
+            _ = btnDrucken.Item.Add("Drucken bzw. Export", "erweitert", QuickImage.Get(ImageCode.Drucker, 28));
+            _ = btnDrucken.Item.AddSeparator();
+            _ = btnDrucken.Item.Add("CSV-Format für Excel in die Zwischenablage", "csv", QuickImage.Get(ImageCode.Excel, 28));
+            _ = btnDrucken.Item.Add("HTML-Format für Internet-Seiten", "html", QuickImage.Get(ImageCode.Globus, 28));
+            _ = btnDrucken.Item.AddSeparator();
+            _ = btnDrucken.Item.Add("Layout-Editor öffnen", "editor", QuickImage.Get(ImageCode.Layout, 28));
         }
         Check_OrderButtons();
 
-        SwitchTabToDatabase(database);
+        _ = SwitchTabToDatabase(database);
     }
 
     #endregion
@@ -138,7 +137,7 @@ public partial class TableView : Form, IHasStatusbar {
 
     public static void OpenColumnEditor(ColumnItem? column, Table? tableview) {
         using ColumnEditor w = new(column, tableview);
-        w.ShowDialog();
+        _ = w.ShowDialog();
         //column?.Invalidate_ColumAndContentx();
     }
 
@@ -148,7 +147,7 @@ public partial class TableView : Form, IHasStatusbar {
     /// <param name="db"></param>
     public static void OpenDatabaseHeadEditor(DatabaseAbstract db) {
         using DatabaseHeadEditor w = new(db);
-        w.ShowDialog();
+        _ = w.ShowDialog();
     }
 
     public static void OpenLayoutEditor(DatabaseAbstract db, string layoutToOpen) {
@@ -160,7 +159,7 @@ public partial class TableView : Form, IHasStatusbar {
         db.CancelBackGroundWorker();
         LayoutPadEditor w = new(db);
         if (!string.IsNullOrEmpty(layoutToOpen)) { w.LoadLayout(layoutToOpen); }
-        w.ShowDialog();
+        _ = w.ShowDialog();
     }
 
     public static ItemCollectionList Vorgängerversionen(Database db) {
@@ -169,7 +168,7 @@ public partial class TableView : Form, IHasStatusbar {
         foreach (var thisExport in db.Export) {
             if (thisExport.Typ == ExportTyp.DatenbankOriginalFormat) {
                 var lockMe = new object();
-                Parallel.ForEach(thisExport.BereitsExportiert, (thisString, _) => {
+                _ = Parallel.ForEach(thisExport.BereitsExportiert, (thisString, _) => {
                     var t = thisString.SplitAndCutBy("|");
                     if (FileExists(t[0])) {
                         var q1 = QuickImage.Get(ImageCode.Kugel, 16, Color.Red.MixColor(Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / thisExport.AutoDelete), Color.Transparent);
@@ -183,7 +182,7 @@ public partial class TableView : Form, IHasStatusbar {
             }
         }
         foreach (var thisString in zusatz.Where(thisString => l[thisString] == null)) {
-            l.Add(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(ImageCode.Warnung), true, new FileInfo(thisString).CreationTime.ToString().CompareKey(SortierTyp.Datum_Uhrzeit));
+            _ = l.Add(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(ImageCode.Warnung), true, new FileInfo(thisString).CreationTime.ToString().CompareKey(SortierTyp.Datum_Uhrzeit));
         }
         l.Sort();
         return l;
@@ -198,9 +197,7 @@ public partial class TableView : Form, IHasStatusbar {
         }
     }
 
-    public bool UpdateStatus(FehlerArt type, string message, bool didAlreadyMessagebox) {
-        return base.UpdateStatus(type, message, didAlreadyMessagebox, capStatusbar, DropMessages);
-    }
+    public bool UpdateStatus(FehlerArt type, string message, bool didAlreadyMessagebox) => base.UpdateStatus(type, message, didAlreadyMessagebox, capStatusbar, DropMessages);
 
     /// <summary>
     /// Erstellt einen Reiter mit den nötigen Tags um eine Datenbank laden zu können - lädt die Datenbank aber selbst nicht.
@@ -218,7 +215,7 @@ public partial class TableView : Form, IHasStatusbar {
     }
 
     protected virtual void btnCSVClipboard_Click(object sender, System.EventArgs e) {
-        CopytoClipboard(Table.Export_CSV(FirstRow.ColumnCaption));
+        _ = CopytoClipboard(Table.Export_CSV(FirstRow.ColumnCaption));
         Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
     }
 
@@ -234,13 +231,13 @@ public partial class TableView : Form, IHasStatusbar {
                     selectedRows = Table.VisibleUniqueRows();
                 }
                 using (ExportDialog l = new(Table.Database, selectedRows)) {
-                    l.ShowDialog();
+                    _ = l.ShowDialog();
                 }
                 Visible = true;
                 break;
 
             case "csv":
-                CopytoClipboard(Table.Export_CSV(FirstRow.ColumnCaption));
+                _ = CopytoClipboard(Table.Export_CSV(FirstRow.ColumnCaption));
                 MessageBox.Show("Die gewünschten Daten<br>sind nun im Zwischenspeicher.", ImageCode.Clipboard, "Ok");
                 break;
 
@@ -254,9 +251,7 @@ public partial class TableView : Form, IHasStatusbar {
         }
     }
 
-    protected virtual void btnHTMLExport_Click(object sender, System.EventArgs e) {
-        Table.Export_HTML();
-    }
+    protected virtual void btnHTMLExport_Click(object sender, System.EventArgs e) => Table.Export_HTML();
 
     protected void ChangeDatabaseInTab(ConnectionInfo connectionID, System.Windows.Forms.TabPage? xtab) {
         if (xtab == null) { return; }
@@ -266,7 +261,7 @@ public partial class TableView : Form, IHasStatusbar {
         Table.ShowWaitScreen = true;
         Table.Refresh();
 
-        var s = (List<object>)(xtab.Tag);
+        var s = (List<object>)xtab.Tag;
         s[0] = connectionID;
         s[1] = string.Empty;
         xtab.Tag = s;
@@ -395,6 +390,7 @@ public partial class TableView : Form, IHasStatusbar {
     /// </summary>
     /// <param name="connectionInfo"></param>
     /// <returns></returns>
+
     protected bool SwitchTabToDatabase(ConnectionInfo connectionInfo) {
         if (connectionInfo is null) { return false; }
 
@@ -431,34 +427,34 @@ public partial class TableView : Form, IHasStatusbar {
         var editable = string.IsNullOrEmpty(CellCollection.ErrorReason(column, row, ErrorReason.EditNormaly));
 
         if (_ansicht != Ansicht.Überschriften_und_Formular) {
-            e.UserMenu.Add("Info", true);
+            _ = e.UserMenu.Add("Info", true);
             if (tbl.PinnedRows.Contains(row)) {
-                e.UserMenu.Add("Zeile nicht mehr pinnen", "pinlösen", QuickImage.Get(ImageCode.Pinnadel, 16), row != null);
+                _ = e.UserMenu.Add("Zeile nicht mehr pinnen", "pinlösen", QuickImage.Get(ImageCode.Pinnadel, 16), row != null);
             } else {
-                e.UserMenu.Add("Zeile anpinnen", "anpinnen", QuickImage.Get(ImageCode.Pinnadel, 16), row != null);
+                _ = e.UserMenu.Add("Zeile anpinnen", "anpinnen", QuickImage.Get(ImageCode.Pinnadel, 16), row != null);
             }
 
-            e.UserMenu.Add("Sortierung", true);
-            e.UserMenu.Add(ContextMenuComands.SpaltenSortierungAZ, column != null && column.Format.CanBeCheckedByRules());
-            e.UserMenu.Add(ContextMenuComands.SpaltenSortierungZA, column != null && column.Format.CanBeCheckedByRules());
-            e.UserMenu.AddSeparator();
-            e.UserMenu.Add("Zelle", true);
-            e.UserMenu.Add("Inhalt Kopieren", "ContentCopy", ImageCode.Kopieren, column != null && column.Format.CanBeChangedByRules());
-            e.UserMenu.Add("Inhalt Einfügen", "ContentPaste", ImageCode.Clipboard, editable && column.Format.CanBeChangedByRules());
-            e.UserMenu.Add("Inhalt löschen", "ContentDelete", ImageCode.Radiergummi, editable && column.Format.CanBeChangedByRules());
-            e.UserMenu.Add(ContextMenuComands.VorherigenInhaltWiederherstellen, editable && column.Format.CanBeChangedByRules() && column.ShowUndo);
-            e.UserMenu.Add(ContextMenuComands.SuchenUndErsetzen, column != null && tbl.Database.IsAdministrator());
-            e.UserMenu.AddSeparator();
-            e.UserMenu.Add("Spalte", true);
-            e.UserMenu.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten, column != null && tbl.Database.IsAdministrator());
-            e.UserMenu.Add("Statistik", "Statistik", QuickImage.Get(ImageCode.Balken, 16), column != null && tbl.Database.IsAdministrator());
+            _ = e.UserMenu.Add("Sortierung", true);
+            _ = e.UserMenu.Add(ContextMenuComands.SpaltenSortierungAZ, column != null && column.Format.CanBeCheckedByRules());
+            _ = e.UserMenu.Add(ContextMenuComands.SpaltenSortierungZA, column != null && column.Format.CanBeCheckedByRules());
+            _ = e.UserMenu.AddSeparator();
+            _ = e.UserMenu.Add("Zelle", true);
+            _ = e.UserMenu.Add("Inhalt Kopieren", "ContentCopy", ImageCode.Kopieren, column != null && column.Format.CanBeChangedByRules());
+            _ = e.UserMenu.Add("Inhalt Einfügen", "ContentPaste", ImageCode.Clipboard, editable && column.Format.CanBeChangedByRules());
+            _ = e.UserMenu.Add("Inhalt löschen", "ContentDelete", ImageCode.Radiergummi, editable && column.Format.CanBeChangedByRules());
+            _ = e.UserMenu.Add(ContextMenuComands.VorherigenInhaltWiederherstellen, editable && column.Format.CanBeChangedByRules() && column.ShowUndo);
+            _ = e.UserMenu.Add(ContextMenuComands.SuchenUndErsetzen, column != null && tbl.Database.IsAdministrator());
+            _ = e.UserMenu.AddSeparator();
+            _ = e.UserMenu.Add("Spalte", true);
+            _ = e.UserMenu.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten, column != null && tbl.Database.IsAdministrator());
+            _ = e.UserMenu.Add("Statistik", "Statistik", QuickImage.Get(ImageCode.Balken, 16), column != null && tbl.Database.IsAdministrator());
             //e.UserMenu.GenerateAndAdd("Inhalte aller angezeigten Zellen dieser Spalte löschen", "ColumnContentDelete", ImageCode.Radiergummi, column != null && column.Format.CanBeChangedByRules() && tbl.Database.IsAdministrator());
-            e.UserMenu.Add("Summe", "Summe", ImageCode.Summe, column != null && tbl.Database.IsAdministrator());
-            e.UserMenu.AddSeparator();
+            _ = e.UserMenu.Add("Summe", "Summe", ImageCode.Summe, column != null && tbl.Database.IsAdministrator());
+            _ = e.UserMenu.AddSeparator();
         }
-        e.UserMenu.Add("Zeile", true);
-        e.UserMenu.Add(ContextMenuComands.ZeileLöschen, row != null && tbl.Database.IsAdministrator());
-        e.UserMenu.Add("Zeile prüfen", "Fehlersuche", ImageCode.Zeile, row != null);
+        _ = e.UserMenu.Add("Zeile", true);
+        _ = e.UserMenu.Add(ContextMenuComands.ZeileLöschen, row != null && tbl.Database.IsAdministrator());
+        _ = e.UserMenu.Add("Zeile prüfen", "Fehlersuche", ImageCode.Zeile, row != null);
     }
 
     protected virtual void TableView_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
@@ -497,7 +493,7 @@ public partial class TableView : Form, IHasStatusbar {
                 if (!tbl.Database.IsAdministrator()) { return; }
                 if (row == null) { return; }
                 if (MessageBox.Show("Zeile wirklich löschen? (<b>" + ValueCol0 + "</b>)", ImageCode.Frage, "Ja", "Nein") == 0) {
-                    tbl.Database.Row.Remove(row, "Benutzer: löschen Befehl");
+                    _ = tbl.Database.Row.Remove(row, "Benutzer: löschen Befehl");
                 }
 
                 break;
@@ -564,6 +560,7 @@ public partial class TableView : Form, IHasStatusbar {
     //    tbcDatabaseSelector.Enabled = true;
     //    Table.Enabled = true;
     //}
+
     protected virtual string ViewToString() {
         //Reihenfolge wichtig, da die Ansicht vieles auf standard zurück setzt
         var s = "{" +
@@ -597,10 +594,10 @@ public partial class TableView : Form, IHasStatusbar {
         BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
 
         if (Table.Database is DatabaseMultiUser BDBM) {
-            ExecuteFile(BDBM.Filename.FilePath());
+            _ = ExecuteFile(BDBM.Filename.FilePath());
         }
         if (Table.Database is Database BDB) {
-            ExecuteFile(BDB.Filename.FilePath());
+            _ = ExecuteFile(BDB.Filename.FilePath());
         }
     }
 
@@ -632,7 +629,7 @@ public partial class TableView : Form, IHasStatusbar {
 
     private void btnLetzteDateien_ItemClicked(object sender, BasicListItemEventArgs e) {
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-        SwitchTabToDatabase(new ConnectionInfo(e.Item.Internal));
+        _ = SwitchTabToDatabase(new ConnectionInfo(e.Item.Internal));
     }
 
     private void btnLoeschen_Click(object sender, System.EventArgs e) {
@@ -645,9 +642,9 @@ public partial class TableView : Form, IHasStatusbar {
             if (MessageBox.Show("Soll der Eintrag<br><b>" + tmpr.CellFirstString() + "</b><br>wirklich <b>gelöscht</b> werden?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             SuchEintragNoSave(Direction.Unten, out var column, out var row);
             Table.CursorPos_Set(column, row, false);
-            Table.Database.Row.Remove(tmpr, "Benutzer: Eintrag löschen");
+            _ = Table.Database.Row.Remove(tmpr, "Benutzer: Eintrag löschen");
         } else {
-            Table.Database.Row.Remove(Table.Filter, Table.PinnedRows, "Benutzer: Zeilen löschen");
+            _ = Table.Database.Row.Remove(Table.Filter, Table.PinnedRows, "Benutzer: Zeilen löschen");
         }
     }
 
@@ -661,22 +658,22 @@ public partial class TableView : Form, IHasStatusbar {
     private void btnNeuDB_Click(object sender, System.EventArgs e) {
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
 
-        SaveTab.ShowDialog();
+        _ = SaveTab.ShowDialog();
         if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
         if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
-        if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
+        if (FileExists(SaveTab.FileName)) { _ = DeleteFile(SaveTab.FileName, true); }
 
         var db = new Database(false, string.Empty);
         db.SaveAsAndChangeTo(SaveTab.FileName);
-        SwitchTabToDatabase(new ConnectionInfo(SaveTab.FileName));
+        _ = SwitchTabToDatabase(new ConnectionInfo(SaveTab.FileName));
     }
 
     private void btnNummerierung_CheckedChanged(object sender, System.EventArgs e) => Table.ShowNumber = btnNummerierung.Checked;
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-        LoadTab.ShowDialog();
+        _ = LoadTab.ShowDialog();
     }
 
     private void btnPowerBearbeitung_Click(object sender, System.EventArgs e) {
@@ -690,24 +687,22 @@ public partial class TableView : Form, IHasStatusbar {
         if (Table.Database is Database db) {
             BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
 
-            SaveTab.ShowDialog();
+            _ = SaveTab.ShowDialog();
             if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
             if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
-            if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
+            if (FileExists(SaveTab.FileName)) { _ = DeleteFile(SaveTab.FileName, true); }
 
             db.SaveAsAndChangeTo(SaveTab.FileName);
-            SwitchTabToDatabase(new ConnectionInfo(SaveTab.FileName));
+            _ = SwitchTabToDatabase(new ConnectionInfo(SaveTab.FileName));
         }
     }
 
-    private void btnSaveLoad_Click(object sender, System.EventArgs e) {
-        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(true);
-    }
+    private void btnSaveLoad_Click(object sender, System.EventArgs e) => BlueBasics.MultiUserFile.MultiUserFile.SaveAll(true);
 
     private void btnSpaltenanordnung_Click(object sender, System.EventArgs e) {
         var x = new ColumnArrangementPadEditor(Table.Database);
-        x.ShowDialog();
+        _ = x.ShowDialog();
 
         var car = Table?.Database?.ColumnArrangements.CloneWithClones();
         car[0].ShowAllColumns();
@@ -729,7 +724,7 @@ public partial class TableView : Form, IHasStatusbar {
     private void btnTemporärenSpeicherortÖffnen_Click(object sender, System.EventArgs e) {
         DatabaseAbstract.ForceSaveAll();
         BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
-        ExecuteFile(Path.GetTempPath());
+        _ = ExecuteFile(Path.GetTempPath());
     }
 
     private void btnTextSuche_Click(object sender, System.EventArgs e) {
@@ -807,7 +802,7 @@ public partial class TableView : Form, IHasStatusbar {
         if (!Table.Database.IsAdministrator()) { return; }
         var m = MessageBox.Show("Angezeigte Zeilen löschen?", ImageCode.Warnung, "Ja", "Nein");
         if (m != 0) { return; }
-        Table.Database.Row.Remove(Table.Filter, Table.PinnedRows, "Benutzer: Zeile löschen");
+        _ = Table.Database.Row.Remove(Table.Filter, Table.PinnedRows, "Benutzer: Zeile löschen");
     }
 
     private void btnZurück_Click(object sender, System.EventArgs e) {
@@ -831,7 +826,7 @@ public partial class TableView : Form, IHasStatusbar {
 
     private void Check_OrderButtons() {
         if (InvokeRequired) {
-            Invoke(new Action(Check_OrderButtons));
+            _ = Invoke(new Action(Check_OrderButtons));
             return;
         }
         const bool enTabAllgemein = true;
@@ -971,7 +966,7 @@ public partial class TableView : Form, IHasStatusbar {
 
     private void Table_SelectedCellChanged(object sender, CellExtEventArgs e) {
         if (InvokeRequired) {
-            Invoke(new Action(() => Table_SelectedCellChanged(sender, e)));
+            _ = Invoke(new Action(() => Table_SelectedCellChanged(sender, e)));
             return;
         }
 
@@ -983,7 +978,7 @@ public partial class TableView : Form, IHasStatusbar {
 
     private void Table_SelectedRowChanged(object sender, RowEventArgs? e) {
         if (InvokeRequired) {
-            Invoke(new Action(() => Table_SelectedRowChanged(sender, e)));
+            _ = Invoke(new Action(() => Table_SelectedRowChanged(sender, e)));
             return;
         }
 
@@ -996,7 +991,7 @@ public partial class TableView : Form, IHasStatusbar {
 
     private void Table_VisibleRowsChanged(object sender, System.EventArgs e) {
         if (InvokeRequired) {
-            Invoke(new Action(() => Table_VisibleRowsChanged(sender, e)));
+            _ = Invoke(new Action(() => Table_VisibleRowsChanged(sender, e)));
             return;
         }
 
@@ -1016,7 +1011,7 @@ public partial class TableView : Form, IHasStatusbar {
     private void TableView_EnabledChanged(object sender, System.EventArgs e) => Check_OrderButtons();
 
     private void tbcDatabaseSelector_Deselecting(object sender, System.Windows.Forms.TabControlCancelEventArgs e) {
-        var s = (List<object>)(e.TabPage.Tag);
+        var s = (List<object>)e.TabPage.Tag;
         s[1] = ViewToString();
         e.TabPage.Tag = s;
     }
@@ -1026,6 +1021,7 @@ public partial class TableView : Form, IHasStatusbar {
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
+
     private void tbcDatabaseSelector_Selected(object? sender, System.Windows.Forms.TabControlEventArgs e) {
         Table.ShowWaitScreen = true;
         tbcDatabaseSelector.Enabled = false;
@@ -1038,7 +1034,7 @@ public partial class TableView : Form, IHasStatusbar {
 
         if (e.TabPage == null) { return; }
 
-        var s = (List<object>)(e.TabPage.Tag);
+        var s = (List<object>)e.TabPage.Tag;
 
         var DB = DatabaseAbstract.GetByID((ConnectionInfo)s[0], Table.Database_NeedPassword);
 

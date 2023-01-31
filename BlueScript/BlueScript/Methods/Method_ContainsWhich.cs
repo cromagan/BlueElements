@@ -74,14 +74,14 @@ internal class Method_ContainsWhitch : Method {
 
         if (attvar.Attributes[0] is VariableString vs2) {
             foreach (var thisW in wordlist.Where(thisW => vs2.ValueString.ContainsWord(thisW, rx))) {
-                found.AddIfNotExists(thisW);
+                _ = found.AddIfNotExists(thisW);
             }
         }
 
         if (attvar.Attributes[0] is VariableListString vl2) {
             foreach (var thiss in vl2.ValueList) {
                 foreach (var thisW in wordlist.Where(thisW => thiss.ContainsWord(thisW, rx))) {
-                    found.AddIfNotExists(thisW);
+                    _ = found.AddIfNotExists(thisW);
                 }
             }
         }

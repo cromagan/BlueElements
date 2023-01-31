@@ -96,7 +96,7 @@ public class FormManager : ApplicationContext {
 
     //When each form closes, close the application if no other open forms
     private void onFormClosed(object sender, System.EventArgs e) {
-        Forms.Remove((Form)sender);
+        _ = Forms.Remove((Form)sender);
         if (FirstWindowShown && !Forms.Any()) {
             if (sender != _lastStartForm) {
                 if (NewModeSelectionForm != null) {

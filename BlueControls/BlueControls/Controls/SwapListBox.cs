@@ -32,9 +32,7 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
 
     #region Constructors
 
-    public SwapListBox() {
-        InitializeComponent();
-    }
+    public SwapListBox() => InitializeComponent();
 
     #endregion
 

@@ -22,7 +22,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq.Expressions;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -106,10 +105,10 @@ public static class IO {
         if (NoWriteAccess.Contains(dirUpper)) { return false; }
         try {
             using (_ = File.Create(Path.Combine(directory, Path.GetRandomFileName()), 1, FileOptions.DeleteOnClose)) { }
-            WriteAccess.AddIfNotExists(dirUpper); // Multitasking
+            _ = WriteAccess.AddIfNotExists(dirUpper); // Multitasking
             return true;
         } catch {
-            NoWriteAccess.AddIfNotExists(dirUpper); // Multitasking
+            _ = NoWriteAccess.AddIfNotExists(dirUpper); // Multitasking
             return false;
         }
     }
@@ -172,9 +171,9 @@ public static class IO {
         var lockMe = new object();
         var did = false;
 
-        Parallel.ForEach(filelist, thisf => {
+        _ = Parallel.ForEach(filelist, thisf => {
             if (FileExists(thisf)) {
-                DeleteFile(thisf, false);
+                _ = DeleteFile(thisf, false);
 
                 if (!did) {
                     lock (lockMe) {
@@ -349,7 +348,7 @@ public static class IO {
         f.Multiselect = multi;
         f.InitialDirectory = _lastFilePath;
         f.Title = "Datei hinzufügen:";
-        f.ShowDialog();
+        _ = f.ShowDialog();
         if (f.FileNames == null) { return null; }
 
         if (!multi && f.FileNames.Length != 1) { return null; }
@@ -414,7 +413,7 @@ public static class IO {
         if (string.IsNullOrEmpty(wunschname)) { wunschname = UserName() + DateTime.Now.ToString(Constants.Format_Date6); }
         var z = -1;
         pfad = pfad.CheckPath();
-        if (!DirectoryExists(pfad)) { Directory.CreateDirectory(pfad); }
+        if (!DirectoryExists(pfad)) { _ = Directory.CreateDirectory(pfad); }
         wunschname = wunschname.RemoveChars(Constants.Char_DateiSonderZeichen);
         string? filename;
         do {
@@ -436,10 +435,10 @@ public static class IO {
             filename = filename.CheckFile();
 
             var pfad = filename.FilePath();
-            if (!DirectoryExists(pfad)) { Directory.CreateDirectory(pfad); }
+            if (!DirectoryExists(pfad)) { _ = Directory.CreateDirectory(pfad); }
 
             File.WriteAllText(filename, contents, encoding);
-            if (executeAfter) { ExecuteFile(filename); }
+            if (executeAfter) { _ = ExecuteFile(filename); }
         } catch (Exception ex) {
             Develop.DebugPrint(ex);
         }

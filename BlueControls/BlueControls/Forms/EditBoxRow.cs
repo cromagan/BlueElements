@@ -46,7 +46,7 @@ public partial class EditBoxRow : DialogWithOkAndCancel {
     public static void Show(string txt, RowItem? row, bool isDialog) {
         EditBoxRow MB = new(txt, row);
         if (isDialog) {
-            MB.ShowDialog();
+            _ = MB.ShowDialog();
         } else {
             MB.Show();
         }

@@ -35,9 +35,7 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
 
     #region Constructors
 
-    public ScriptEditorDatabase() {
-        InitializeComponent();
-    }
+    public ScriptEditorDatabase() => InitializeComponent();
 
     #endregion
 
@@ -105,7 +103,7 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
             Message("Keine Datenbank geladen.");
             return;
         }
-        if (DirectoryExists(_database.AdditionalFilesPfadWhole())) { ExecuteFile(_database.AdditionalFilesPfadWhole()); }
+        if (DirectoryExists(_database.AdditionalFilesPfadWhole())) { _ = ExecuteFile(_database.AdditionalFilesPfadWhole()); }
     }
 
     private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
@@ -114,7 +112,7 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
         if (e.HotItem is string txt) {
             var c = _database.Column.Exists(txt);
             if (c is null) { return; }
-            e.UserMenu.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten);
+            _ = e.UserMenu.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten);
         }
     }
 

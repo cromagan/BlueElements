@@ -287,10 +287,8 @@ public enum DatabaseDataType : byte {
     Value_withoutSizeData = 200,
     Value_withSizeData = 201,
 
-    [Obsolete]
     UTF8Value_withoutSizeData = 202,
 
-    [Obsolete]
     UTF8Value_withSizeData = 203,
 
     //Dummy_ce_ValueWithoutSizeUncrypted = 204,

@@ -22,7 +22,8 @@ using BlueControls.EventArgs;
 using System;
 using System.Drawing;
 using static BlueBasics.BitmapExt;
-using static BlueBasics.Converter;using static BlueBasics.Extensions;
+using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 
 namespace BluePaint;
 
@@ -30,9 +31,7 @@ public partial class Tool_Eraser : GenericTool {
 
     #region Constructors
 
-    public Tool_Eraser() : base() {
-        InitializeComponent();
-    }
+    public Tool_Eraser() : base() => InitializeComponent();
 
     #endregion
 

@@ -567,7 +567,7 @@ public sealed class BlueFont : IReadableTextWithChanging {
         if (sizeToCheck <= _sizeTestedAndOk) { return true; }
         if (sizeToCheck >= _sizeTestedAndFailed) { return false; }
         try {
-            MeasureString("x", new Font(_font.Name, sizeToCheck / Skin.Scale, _font.Style, _font.Unit));
+            _ = MeasureString("x", new Font(_font.Name, sizeToCheck / Skin.Scale, _font.Style, _font.Unit));
             _sizeTestedAndOk = sizeToCheck;
             return true;
         } catch {

@@ -26,7 +26,6 @@ using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -448,11 +447,12 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
     /// </summary>
     /// <param name="column"></param>
     /// <returns></returns>
+
     public TextListItem Add(ColumnItem column) => Add(column, column.Name);
 
     public void AddRange(Type type) {
         foreach (int z1 in Enum.GetValues(type)) {
-            if (this[z1.ToString()] == null) { Add(Enum.GetName(type, z1).Replace("_", " "), z1.ToString()); }
+            if (this[z1.ToString()] == null) { _ = Add(Enum.GetName(type, z1).Replace("_", " "), z1.ToString()); }
         }
         Sort();
     }
@@ -475,7 +475,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         if (list == null) { return; }
 
         foreach (var thisstring in list.Where(thisstring => !string.IsNullOrEmpty(thisstring) && this[thisstring] == null)) {
-            Add(thisstring, thisstring);
+            _ = Add(thisstring, thisstring);
         }
     }
 
@@ -486,7 +486,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
             return;
         }
         foreach (var thisstring in values) {
-            Add(thisstring, columnStyle, style, bildTextverhalten); // If Item(thisstring) Is Nothing Then GenerateAndAdd(New CellLikeItem(thisstring, ColumnStyle))
+            _ = Add(thisstring, columnStyle, style, bildTextverhalten); // If Item(thisstring) Is Nothing Then GenerateAndAdd(New CellLikeItem(thisstring, ColumnStyle))
         }
     }
 
@@ -494,7 +494,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         if (list == null || list.Count == 0) { return; }
 
         foreach (var thisRow in list) {
-            Add(thisRow, layoutId);
+            _ = Add(thisRow, layoutId);
         }
     }
 
@@ -503,6 +503,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
     /// </summary>
     /// <param name="columns"></param>
     /// <param name="doCaptionSort">Bei True werden auch die Überschriften der Spalte als Text hinzugefügt und auch danach sortiert</param>
+
     public void AddRange(IEnumerable<ColumnItem> columns, bool doCaptionSort) {
         foreach (var thisColumnItem in columns) {
             if (thisColumnItem != null) {
@@ -580,7 +581,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
             if (!string.IsNullOrEmpty(te)) {
                 //NewReplacer.GenerateAndAdd(th + "|" + te);
                 if (th >= zumDropdownHinzuAb && th < zumDropdownHinzuBis) {
-                    Add(te, th.ToString());
+                    _ = Add(te, th.ToString());
                 }
             }
         }
@@ -796,12 +797,12 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         foreach (var thisString in zuwenig) {
             if (IO.FileExists(thisString)) {
                 if (thisString.FileType() == FileFormat.Image) {
-                    Add(thisString, thisString, thisString.FileNameWithoutSuffix());
+                    _ = Add(thisString, thisString, thisString.FileNameWithoutSuffix());
                 } else {
-                    Add(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(thisString.FileType(), 48));
+                    _ = Add(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(thisString.FileType(), 48));
                 }
             } else {
-                Add(thisString);
+                _ = Add(thisString);
             }
         }
     }
@@ -882,8 +883,8 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
 
     private void PreComputeSize() {
         try {
-            System.Threading.Tasks.Parallel.ForEach(this, thisItem => {
-                thisItem.SizeUntouchedForListBox();
+            _ = System.Threading.Tasks.Parallel.ForEach(this, thisItem => {
+                _ = thisItem.SizeUntouchedForListBox();
             });
         } catch {
             PreComputeSize();

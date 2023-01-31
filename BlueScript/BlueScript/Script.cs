@@ -194,8 +194,8 @@ public class Script {
                     break;
 
                 case "\r":
-                    if (gänsef) { s.Append("\";Exception(\"Fehler mit Anführungsstrichen\");"); }
-                    s.Append("¶");
+                    if (gänsef) { _ = s.Append("\";Exception(\"Fehler mit Anführungsstrichen\");"); }
+                    _ = s.Append("¶");
                     comment = false;
                     addt = false;
                     break;
@@ -209,7 +209,7 @@ public class Script {
                     break;
             }
             if (!comment && addt) {
-                s.Append(c);
+                _ = s.Append(c);
             }
         }
         return s.ToString();

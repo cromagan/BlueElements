@@ -125,6 +125,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
     }
 
     //public Bitmap? Bitmap { get; set; }
+
     public string Spalten_AdminInfo {
         get {
             if (Column != null) { return Column.AdminInfo; }
@@ -136,6 +137,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
     }
 
     //public enSizeModes Bild_Modus { get; set; }
+
     public string Spalten_QuickInfo {
         get {
             if (Column != null) { return Column.Quickinfo; }
@@ -167,12 +169,13 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
             var ff = parent.SearchOrGenerate(rfw2);
 
-            var con = new FlexiControlForCell();
-            con.Database = Column?.Database;
-            con.ColumnName = Column?.Name ?? string.Empty;
-            con.EditType = EditType;
-            con.CaptionPosition = CaptionPosition;
-            con.Name = DefaultItemToControlName();
+            var con = new FlexiControlForCell {
+                Database = Column?.Database,
+                ColumnName = Column?.Name ?? string.Empty,
+                EditType = EditType,
+                CaptionPosition = CaptionPosition,
+                Name = DefaultItemToControlName()
+            };
             if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(con); }
             return con;
         }

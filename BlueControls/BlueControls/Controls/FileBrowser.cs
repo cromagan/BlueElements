@@ -24,6 +24,7 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
+using BlueDatabase;
 using BlueScript.Variables;
 using Microsoft.Win32;
 using System;
@@ -33,7 +34,6 @@ using System.Drawing.Imaging;
 using System.IO;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
-using BlueDatabase;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
@@ -53,9 +53,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
 
     #region Constructors
 
-    public FileBrowser() {
-        InitializeComponent();
-    }
+    public FileBrowser() => InitializeComponent();
 
     #endregion
 
@@ -163,13 +161,9 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         return ct == OriginalText;
     }
 
-    public void Reload() {
-        ÖffnePfad(txbPfad.Text);
-    }
+    public void Reload() => ÖffnePfad(txbPfad.Text);
 
-    protected override void DrawControl(Graphics gr, States state) {
-        Skin.Draw_Back_Transparent(gr, ClientRectangle, this);
-    }
+    protected override void DrawControl(Graphics gr, States state) => Skin.Draw_Back_Transparent(gr, ClientRectangle, this);
 
     protected override void OnVisibleChanged(System.EventArgs e) {
         AbortThumbs();
@@ -211,13 +205,9 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         txbPfad_Enter(null, null);
     }
 
-    private void btnExplorerÖffnen_Click(object sender, System.EventArgs e) {
-        ExecuteFile(txbPfad.Text);
-    }
+    private void btnExplorerÖffnen_Click(object sender, System.EventArgs e) => ExecuteFile(txbPfad.Text);
 
-    private void btnZurück_Click(object? sender, System.EventArgs e) {
-        ÖffnePfad(txbPfad.Text.PathParent(1));
-    }
+    private void btnZurück_Click(object? sender, System.EventArgs e) => ÖffnePfad(txbPfad.Text.PathParent(1));
 
     private void CheckButtons() {
         txbPfad.Enabled = Enabled && string.IsNullOrEmpty(OriginalText);
@@ -230,24 +220,24 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
     private void lsbFiles_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         if (e.HotItem == null) { return; }
 
-        var it = ((BitmapListItem)e.HotItem);
-        var tags = (List<string>)(it.Tag) ?? new List<string>(); ;
+        var it = (BitmapListItem)e.HotItem;
+        var tags = (List<string>)it.Tag ?? new List<string>(); ;
 
-        e.UserMenu.Add(ContextMenuComands.Ausschneiden, !tags.TagGet("Folder").FromPlusMinus());
-        e.UserMenu.Add(ContextMenuComands.Einfügen, tags.TagGet("Folder").FromPlusMinus() && !string.IsNullOrEmpty(_ausschneiden));
-        e.UserMenu.AddSeparator();
-        e.UserMenu.Add(ContextMenuComands.Umbenennen, FileExists(it.Internal));
-        e.UserMenu.Add(ContextMenuComands.Löschen, FileExists(it.Internal));
-        e.UserMenu.AddSeparator();
+        _ = e.UserMenu.Add(ContextMenuComands.Ausschneiden, !tags.TagGet("Folder").FromPlusMinus());
+        _ = e.UserMenu.Add(ContextMenuComands.Einfügen, tags.TagGet("Folder").FromPlusMinus() && !string.IsNullOrEmpty(_ausschneiden));
+        _ = e.UserMenu.AddSeparator();
+        _ = e.UserMenu.Add(ContextMenuComands.Umbenennen, FileExists(it.Internal));
+        _ = e.UserMenu.Add(ContextMenuComands.Löschen, FileExists(it.Internal));
+        _ = e.UserMenu.AddSeparator();
         //e.UserMenu.GenerateAndAdd("Screenshot als Vorschau", "Screenshot", QuickImage.Get(ImageCode.Bild), FileExists(it.Internal));
         //e.UserMenu.AddSeparator();
 
-        e.UserMenu.Add("Im Explorer öffnen", "Explorer", QuickImage.Get(ImageCode.Ordner));
+        _ = e.UserMenu.Add("Im Explorer öffnen", "Explorer", QuickImage.Get(ImageCode.Ordner));
         //TextListItem I1 = new TextListItem("#Relation", "Neue Beziehung hinzufügen", QuickImage.Get(ImageCode.Herz), true);
     }
 
     private void lsbFiles_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        var it = ((BitmapListItem)e.HotItem);
+        var it = (BitmapListItem)e.HotItem;
         //var tags = (List<string>)(it.Tag);
 
         switch (e.ClickedComand) {
@@ -264,7 +254,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
                 break;
 
             case "Explorer":
-                ExecuteFile(it.Internal);
+                _ = ExecuteFile(it.Internal);
                 break;
 
             case "Umbenennen":
@@ -276,7 +266,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
 
                 nn = n.FilePath() + nn + "." + n.FileSuffix();
 
-                MoveFile(it.Internal, nn, true);
+                _ = MoveFile(it.Internal, nn, true);
 
                 Reload();
                 break;
@@ -300,11 +290,11 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
                 var ziel = it.Internal + "\\" + _ausschneiden.FileNameWithSuffix();
 
                 if (FileExists(ziel)) {
-                    MessageBox.Show("Datei existiert am Zielort bereits, abbruch.", ImageCode.Information);
+                    _ = MessageBox.Show("Datei existiert am Zielort bereits, abbruch.", ImageCode.Information);
                     return;
                 }
 
-                MoveFile(_ausschneiden, ziel, true);
+                _ = MoveFile(_ausschneiden, ziel, true);
 
                 //if (FileExists(ThumbFile(_ausschneiden))) {
                 //    RenameFile(ThumbFile(_ausschneiden), ThumbFile(ziel), true);
@@ -340,15 +330,16 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
 
                     var no = l.IndexOf(e.Item.Internal);
                     if (no > -1) {
-                        var d = new PictureView(l, true, e.Item.Internal.FilePath(), no);
-                        d.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+                        var d = new PictureView(l, true, e.Item.Internal.FilePath(), no) {
+                            WindowState = System.Windows.Forms.FormWindowState.Maximized
+                        };
                         d.Show();
                     }
 
                     return;
 
                 case FileFormat.Textdocument:
-                    ExecuteFile("Notepad.exe", e.Item.Internal);
+                    _ = ExecuteFile("Notepad.exe", e.Item.Internal);
                     return;
             }
 
@@ -373,12 +364,13 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
 
             x = x.Replace("%1", e.Item.Internal);
             var process = new System.Diagnostics.Process();
-            var startInfo = new System.Diagnostics.ProcessStartInfo();
-            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-            startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = "/C \"" + x + "\"";
+            var startInfo = new System.Diagnostics.ProcessStartInfo {
+                WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
+                FileName = "cmd.exe",
+                Arguments = "/C \"" + x + "\""
+            };
             process.StartInfo = startInfo;
-            process.Start();
+            _ = process.Start();
 
             return;
         }
@@ -409,9 +401,9 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         foreach (var fileName in allF) {
             if (AddThis(fileName, true)) {
                 //var suffix = fileName.FileSuffix().ToUpper();
-                var p = new BitmapListItem(QuickImage.Get(fileName.FileType(), 64), fileName, fileName.FileNameWithoutSuffix());
-
-                p.Padding = 6;
+                var p = new BitmapListItem(QuickImage.Get(fileName.FileType(), 64), fileName, fileName.FileNameWithoutSuffix()) {
+                    Padding = 6
+                };
 
                 switch (_sort) {
                     case "Größe":
@@ -464,9 +456,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         _isLoading = false;
     }
 
-    private void OnFolderChanged() {
-        FolderChanged?.Invoke(this, System.EventArgs.Empty);
-    }
+    private void OnFolderChanged() => FolderChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void StartThumbs() {
         AbortThumbs();
@@ -497,36 +487,36 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
             if (ThumbGenerator.CancellationPending) { return; }
             if (AddThis(thisString, true)) // Prüfung 1, ob .cyo und auch unverschlüsselte
             {
-                var feedBack = new List<object?> { thisString }; // Zeile 1, Dateiname auf Festplatte, ZEile 2 das Bild selbst
+                var feedBack = new List<object?> {
+                    thisString,                 //if (cryptet) {
+                                                //    var rEadable = CryptedFileName(thisString, 10);
 
-                //if (cryptet) {
-                //    var rEadable = CryptedFileName(thisString, 10);
+                    //    if (AddThis(rEadable, true)) {
+                    //        var th = ThumbFile(thisString);
 
-                //    if (AddThis(rEadable, true)) {
-                //        var th = ThumbFile(thisString);
+                    //        if (!FileExists(th)) {
+                    //            var thumbnail = GetThumbnail(thisString, rEadable);
+                    //            if (!DirectoryExists(th.FilePath())) {
+                    //                Directory.CreateDirectory(th.FilePath());
+                    //            }
 
-                //        if (!FileExists(th)) {
-                //            var thumbnail = GetThumbnail(thisString, rEadable);
-                //            if (!DirectoryExists(th.FilePath())) {
-                //                Directory.CreateDirectory(th.FilePath());
-                //            }
+                    //            if (thumbnail != null) {
+                    //                thumbnail.Save(th, ImageFormat.Png);
+                    //                feedBack.GenerateAndAdd(thumbnail);
+                    //            }
+                    //        } else {
+                    //            feedBack.GenerateAndAdd(Image_FromFile(th));
+                    //        }
+                    //    }
 
-                //            if (thumbnail != null) {
-                //                thumbnail.Save(th, ImageFormat.Png);
-                //                feedBack.GenerateAndAdd(thumbnail);
-                //            }
-                //        } else {
-                //            feedBack.GenerateAndAdd(Image_FromFile(th));
-                //        }
-                //    }
+                    //    if (feedBack.Count == 1) {
+                    //        // Verschlüsselte Dateinamen....schwierig ein echtes Bild zu kriegen...
+                    //        feedBack.GenerateAndAdd(QuickImage.Get(rEadable.FileType(), 64));
+                    //    }
+                    //}
 
-                //    if (feedBack.Count == 1) {
-                //        // Verschlüsselte Dateinamen....schwierig ein echtes Bild zu kriegen...
-                //        feedBack.GenerateAndAdd(QuickImage.Get(rEadable.FileType(), 64));
-                //    }
-                //}
-
-                feedBack.Add(WindowsThumbnailProvider.GetThumbnail(thisString, 64, 64, ThumbnailOptions.BiggerSizeOk));
+                    WindowsThumbnailProvider.GetThumbnail(thisString, 64, 64, ThumbnailOptions.BiggerSizeOk)
+                }; // Zeile 1, Dateiname auf Festplatte, ZEile 2 das Bild selbst
 
                 ThumbGenerator.ReportProgress(0, feedBack);
             }

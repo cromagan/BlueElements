@@ -1,5 +1,4 @@
-﻿using BlueBasics.Enums;
-using BlueControls.Controls;
+﻿using BlueControls.Controls;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
 using System.ComponentModel;

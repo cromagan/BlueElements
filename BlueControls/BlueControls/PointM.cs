@@ -54,9 +54,7 @@ public sealed class PointM : IMoveable {
 
     public PointM(PointF startPoint, float laenge, float alpha) : this(null, string.Empty, startPoint.X, startPoint.Y, laenge, alpha) { }
 
-    public PointM(object? parent, string codeToParse) : this(parent) {
-        Parse(codeToParse);
-    }
+    public PointM(object? parent, string codeToParse) : this(parent) => Parse(codeToParse);
 
     public PointM(object? parent, string name, float x, float y, string tag) {
         Parent = parent;

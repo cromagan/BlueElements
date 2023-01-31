@@ -19,7 +19,7 @@ using System.Linq;
 
 namespace BlueScript.Structures;
 
-public struct CanDoFeedback {
+public readonly struct CanDoFeedback {
 
     #region Fields
 

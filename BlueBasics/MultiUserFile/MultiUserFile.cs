@@ -94,7 +94,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         _lastSaveCode = string.Empty;
         AutoDeleteBak = false;
 
-        _checker.Change(2000, 2000);
+        _ = _checker.Change(2000, 2000);
     }
 
     #endregion
@@ -208,7 +208,7 @@ public sealed class MultiUserFile : IDisposableExtended {
 
         var x = _all_Files.Count;
         foreach (var thisFile in _all_Files) {
-            thisFile?.Save(mustSave);
+            _ = (thisFile?.Save(mustSave));
             if (x != _all_Files.Count) {
                 // Die Auflistung wurde verändert! Selten, aber kann passieren!
                 SaveAll(mustSave);
@@ -247,7 +247,7 @@ public sealed class MultiUserFile : IDisposableExtended {
             }
             // TODO: nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer weiter unten überschreiben.
             // TODO: große Felder auf Null setzen.
-            Save(false);
+            _ = Save(false);
             while (_pureBinSaver.IsBusy) { Pause(0.5, true); }
             // https://stackoverflow.com/questions/2542326/proper-way-to-dispose-of-a-backgroundworker
             _pureBinSaver.Dispose();
@@ -342,14 +342,12 @@ public sealed class MultiUserFile : IDisposableExtended {
         }
     }
 
-    public void ForceLoadSave() {
-        _checkerTickCount = Math.Max(ReloadDelaySecond, 10) + 10;
-    }
+    public void ForceLoadSave() => _checkerTickCount = Math.Max(ReloadDelaySecond, 10) + 10;
 
     public bool IsFileAllowedToLoad(string fileName) {
         foreach (var thisFile in _all_Files) {
             if (thisFile != null && string.Equals(thisFile.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
-                thisFile.Save(true);
+                _ = thisFile.Save(true);
                 Develop.DebugPrint(FehlerArt.Warnung, "Doppletes Laden von " + fileName);
                 return false;
             }
@@ -422,7 +420,7 @@ public sealed class MultiUserFile : IDisposableExtended {
                 return false;
             } finally {
                 IsLoading = false;
-                Interlocked.Decrement(ref _lockload);
+                _ = Interlocked.Decrement(ref _lockload);
             }
         }
         return false;
@@ -502,7 +500,7 @@ public sealed class MultiUserFile : IDisposableExtended {
 
     public void SaveAsAndChangeTo(string newFileName) {
         if (string.Equals(newFileName, Filename, StringComparison.OrdinalIgnoreCase)) { Develop.DebugPrint(FehlerArt.Fehler, "Dateiname unterscheiden sich nicht!"); }
-        Save(true); // Original-Datei speichern, die ist ja dann weg.
+        _ = Save(true); // Original-Datei speichern, die ist ja dann weg.
         // Jetzt kann es aber immer noch sein, das PendingChanges da sind.
         // Wenn kein Dateiname angegeben ist oder bei Readonly wird die Datei nicht gespeichert und die Pendings bleiben erhalten!
         RemoveWatcher();
@@ -524,9 +522,9 @@ public sealed class MultiUserFile : IDisposableExtended {
 
     public void UnlockHard() {
         try {
-            Load_Reload();
-            if (AgeOfBlockDatei >= 0) { DeleteBlockDatei(true, true); }
-            Save(true);
+            _ = Load_Reload();
+            if (AgeOfBlockDatei >= 0) { _ = DeleteBlockDatei(true, true); }
+            _ = Save(true);
         } catch {
         }
     }
@@ -610,7 +608,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         if (mustReload && mustSave) {
             if (!string.IsNullOrEmpty(ErrorReason(Enums.ErrorReason.Load))) { return; }
             // Checker_Tick_count nicht auf 0 setzen, dass der Saver noch stimmt.
-            Load_Reload();
+            _ = Load_Reload();
             return;
         }
 
@@ -633,7 +631,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         if (mustReload && _checkerTickCount > ReloadDelaySecond) {
             RepairOldBlockFiles();
             if (!string.IsNullOrEmpty(ErrorReason(Enums.ErrorReason.Load))) { return; }
-            Load_Reload();
+            _ = Load_Reload();
             _checkerTickCount = 0;
         }
     }
@@ -758,9 +756,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         Loading?.Invoke(this, e);
     }
 
-    private void OnParseExternal(byte[] toParse) {
-        ParseExternal?.Invoke(this, new MultiUserParseEventArgs(toParse));
-    }
+    private void OnParseExternal(byte[] toParse) => ParseExternal?.Invoke(this, new MultiUserParseEventArgs(toParse));
 
     private void OnSavedToDisk() {
         if (IsDisposed) { return; }
@@ -792,7 +788,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         if (e.UserState == null) { return; }
         var (s, item2, bytes) = ((string, string, byte[]))e.UserState;
         // var Data = (Tuple<string, string, string>)e.UserState;
-        SaveRoutine(true, s, item2, bytes);
+        _ = SaveRoutine(true, s, item2, bytes);
     }
 
     private void ReCreateWatcher() {
@@ -839,12 +835,12 @@ public sealed class MultiUserFile : IDisposableExtended {
         }
         // Blockdatei da, wir sind save. Andere Computer lassen die Datei ab jetzt in Ruhe!
         if (GetFileInfo(Filename, true) != fileInfoBeforeSaving) {
-            DeleteBlockDatei(false, true);
+            _ = DeleteBlockDatei(false, true);
             IsSaving = false;
             return Feedback("Datei wurde inzwischen verändert.");
         }
         if (!savedDataUncompressed.SequenceEqual(OnToListOfByte())) {
-            DeleteBlockDatei(false, true);
+            _ = DeleteBlockDatei(false, true);
             IsSaving = false;
             return Feedback("Daten wurden inzwischen verändert.");
         }
@@ -857,18 +853,18 @@ public sealed class MultiUserFile : IDisposableExtended {
         if (!MoveFile(Filename, Backupdateiname(), false)) { return Feedback("Umbenennen der Hauptdatei fehlgeschlagen"); }
 
         // --- TmpFile wird zum Haupt ---
-        MoveFile(tmpFileName, Filename, true);
+        _ = MoveFile(tmpFileName, Filename, true);
 
         //// ---- Steuerelemente Sagen, was gespeichert wurde
         //_data_On_Disk = savedDataUncompressed;
 
         // Und nun den Block entfernen
-        CanWrite(Filename, 30); // sobald die Hauptdatei wieder frei ist
-        DeleteBlockDatei(false, true);
+        _ = CanWrite(Filename, 30); // sobald die Hauptdatei wieder frei ist
+        _ = DeleteBlockDatei(false, true);
 
         // Evtl. das BAK löschen
         if (AutoDeleteBak && FileExists(Backupdateiname())) {
-            DeleteFile(Backupdateiname(), false);
+            _ = DeleteFile(Backupdateiname(), false);
         }
 
         // --- nun Sollte alles auf der Festplatte sein, prüfen! ---
@@ -888,7 +884,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         IsSaving = false;
         return string.Empty;
         string Feedback(string txt) {
-            DeleteFile(tmpFileName, false);
+            _ = DeleteFile(tmpFileName, false);
             //Develop.DebugPrint(enFehlerArt.Info, "Speichern der Datei abgebrochen.<br>Datei: " + Filename + "<br><br>Grund:<br>" + txt);
             RepairOldBlockFiles();
             return txt;

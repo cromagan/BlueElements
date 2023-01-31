@@ -32,7 +32,7 @@ public partial class Befehlsreferenz : Form {
         if (Script.Comands == null) { return; }
 
         foreach (var thisc in Script.Comands) {
-            lstComands.Item.Add(thisc, thisc.Syntax.ToLower());
+            _ = lstComands.Item.Add(thisc, thisc.Syntax.ToLower());
         }
 
         lstComands.Item.Sort();

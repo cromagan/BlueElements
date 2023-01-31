@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.EventArgs;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -55,9 +54,10 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
 
     #endregion
 
+    // Für den Designer
+
     #region Constructors
 
-    // Für den Designer
     public FlexiControlForCell() : this(null, string.Empty, ÜberschriftAnordnung.Über_dem_Feld, EditTypeFormula.None) { }
 
     public FlexiControlForCell(DatabaseAbstract? database, string column, ÜberschriftAnordnung captionPosition, EditTypeFormula editType) : base() {
@@ -181,10 +181,10 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
         GetTmpVariables();
         if (_tmpColumn != null && _tmpColumn.Database.IsAdministrator()) {
-            items.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten);
+            _ = items.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten);
         }
         if (_tmpColumn != null && _tmpRow != null && _tmpColumn.Database.IsAdministrator()) {
-            items.Add(ContextMenuComands.VorherigenInhaltWiederherstellen);
+            _ = items.Add(ContextMenuComands.VorherigenInhaltWiederherstellen);
         }
         //if (Parent is Formula f) {
         //    ItemCollectionList x = new(BlueListBoxAppearance.KontextMenu);
@@ -343,13 +343,13 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     private static void ListBox_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         if (e.HotItem is TextListItem t) {
             if (FileExists(t.Internal)) {
-                e.UserMenu.Add(ContextMenuComands.DateiÖffnen);
+                _ = e.UserMenu.Add(ContextMenuComands.DateiÖffnen);
             }
         }
         if (e.HotItem is BitmapListItem) {
             //if (FileExists(t.Internal))
             //{
-            e.UserMenu.Add("Bild öffnen");
+            _ = e.UserMenu.Add("Bild öffnen");
             //}
         }
     }
@@ -361,7 +361,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
 
         if (InvokeRequired) {
             try {
-                Invoke(new Action(() => _Database_Loaded(sender, e)));
+                _ = Invoke(new Action(() => _Database_Loaded(sender, e)));
                 return;
             } catch {
                 // Kann dank Multitasking disposed sein
@@ -476,7 +476,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         var tmpC2 = _tmpColumn;
 
         tmpR2.CellSet(tmpC2, newValue);
-        if (oldVal != tmpR2.CellGetString(tmpC2)) { tmpR2.DoAutomatic(false, false, 1, "value changed"); }
+        if (oldVal != tmpR2.CellGetString(tmpC2)) { _ = tmpR2.DoAutomatic(false, false, 1, "value changed"); }
     }
 
     private ColumnItem? GetRealColumn(ColumnItem? column, RowItem? row) {
@@ -557,7 +557,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
             //    return;
 
             case EditTypeTable.Textfeld:
-                lbx.Add_Text();
+                _ = lbx.Add_Text();
                 return;
 
             case EditTypeTable.Listbox:
@@ -575,7 +575,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
             case "dateiöffnen":
                 if (e.HotItem is TextListItem t) {
                     if (FileExists(t.Internal)) {
-                        ExecuteFile(t.Internal);
+                        _ = ExecuteFile(t.Internal);
                         //var b = Converter.FileToByte(t.Internal);
                         ////b = Cryptography.SimpleCrypt(b, FileEncryptionKey, -1);
                         //var tmp = TempFile(string.Empty, string.Empty, t.Internal.FileSuffix());
@@ -726,7 +726,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
             //    break;
 
             case DataFormat.Verknüpfung_zu_anderer_Datenbank:
-                GetRealColumn(_tmpColumn, _tmpRow);
+                _ = GetRealColumn(_tmpColumn, _tmpRow);
                 ValueSet(_tmpRow.CellGetString(_tmpColumn), true, true);
                 break;
 

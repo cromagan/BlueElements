@@ -28,9 +28,7 @@ using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.EventArgs;
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace BlueControls;
 
@@ -132,9 +130,7 @@ public static class Allgemein {
         }
     }
 
-    private static void Db_DropMessage(object sender, MessageEventArgs e) {
-        UpdateStatusBar(e.Type, e.Message, true);
-    }
+    private static void Db_DropMessage(object sender, MessageEventArgs e) => UpdateStatusBar(e.Type, e.Message, true);
 
     private static void DB_GenerateLayoutInternal(object sender, GenerateLayoutInternalEventArgs e) {
         if (e.Handled) { return; }

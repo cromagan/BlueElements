@@ -24,7 +24,6 @@ using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using System;
-using System.ComponentModel;
 using System.Drawing;
 using static BlueBasics.IO;
 
@@ -38,9 +37,10 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
 
     #endregion
 
+    //private string _LoadedLayout = string.Empty;
+
     #region Constructors
 
-    //private string _LoadedLayout = string.Empty;
     public LayoutPadEditor(DatabaseAbstract database) : base() {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
@@ -127,18 +127,19 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
 
     private void btnCopyID_Click(object sender, System.EventArgs e) {
         SaveCurrentLayout();
-        Generic.CopytoClipboard(Pad.Item.Id);
+        _ = Generic.CopytoClipboard(Pad.Item.Id);
         Notification.Show("ID kopiert.", ImageCode.Clipboard);
     }
 
     private void btnLayoutHinzu_Click(object sender, System.EventArgs e) {
         SaveCurrentLayout();
-        var ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", string.Empty,FormatHolder.Text);
+        var ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", string.Empty, FormatHolder.Text);
         if (string.IsNullOrEmpty(ex)) { return; }
         LoadLayout(string.Empty);
 
-        ItemCollectionPad c = new();
-        c.Caption = ex;
+        ItemCollectionPad c = new() {
+            Caption = ex
+        };
 
         var lay = (LayoutCollection)Database.Layouts.Clone();
         lay.Add(c.ToString(false));
@@ -187,9 +188,9 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
     private void btnLayoutVerzeichnis_Click(object sender, System.EventArgs e) {
         if (Database == null) { return; }
         if (!string.IsNullOrEmpty(Database.AdditionalFilesPfadWhole())) {
-            ExecuteFile(Database.AdditionalFilesPfadWhole());
+            _ = ExecuteFile(Database.AdditionalFilesPfadWhole());
         }
-        ExecuteFile(Database.DefaultLayoutPath());
+        _ = ExecuteFile(Database.DefaultLayoutPath());
     }
 
     private void btnTextEditor_Click(object sender, System.EventArgs e) => ExecuteFile("notepad.exe", cbxLayout.Text, false);

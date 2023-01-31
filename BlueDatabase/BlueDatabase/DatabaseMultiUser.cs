@@ -21,14 +21,11 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 
@@ -227,9 +224,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         return r;
     }
 
-    protected override void AddUndo(string tableName, DatabaseDataType comand, string? columnName, long? rowKey, string previousValue, string changedTo, string userName, string comment) {
-        Works.Add(new WorkItem(comand, columnName, rowKey, previousValue, changedTo, userName));
-    }
+    protected override void AddUndo(string tableName, DatabaseDataType comand, string? columnName, long? rowKey, string previousValue, string changedTo, string userName, string comment) => Works.Add(new WorkItem(comand, columnName, rowKey, previousValue, changedTo, userName));
 
     protected override void Dispose(bool disposing) {
         _muf.Dispose();
@@ -245,20 +240,17 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
     protected override void SetUserDidSomething() => _muf.SetUserDidSomething();
 
-    private void _muf_HasPendingChanges(object sender, MultiUserFileHasPendingChangesEventArgs e) {
-        e.HasPendingChanges = HasPendingChanges;
-    }
+    private void _muf_HasPendingChanges(object sender, MultiUserFileHasPendingChangesEventArgs e) => e.HasPendingChanges = HasPendingChanges;
 
     //protected string SpecialErrorReason(ErrorReason mode) => _muf.ErrorReason(mode);
+
     private void _muf_Loaded(object sender, System.EventArgs e) {
         RepairAfterParse();
         OnLoaded();
         CreateWatcher();
     }
 
-    private void _muf_Loading(object sender, System.EventArgs e) {
-        OnLoading();
-    }
+    private void _muf_Loading(object sender, System.EventArgs e) => OnLoading();
 
     private void _muf_SavedToDisk(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
@@ -355,13 +347,11 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
             //        //}
             //    }
             //}
-            SetValueInternal(thisPendingItem.Comand, thisPendingItem.ChangedTo, thisPendingItem.ColName, thisPendingItem.RowKey, true);
+            _ = SetValueInternal(thisPendingItem.Comand, thisPendingItem.ChangedTo, thisPendingItem.ColName, thisPendingItem.RowKey, true);
         }
     }
 
-    private void ToListOfByte(object sender, MultiUserToListEventArgs e) {
-        e.Data = Database.ToListOfByte(this, Works).ToArray();
-    }
+    private void ToListOfByte(object sender, MultiUserToListEventArgs e) => e.Data = Database.ToListOfByte(this, Works).ToArray();
 
     #endregion
 }

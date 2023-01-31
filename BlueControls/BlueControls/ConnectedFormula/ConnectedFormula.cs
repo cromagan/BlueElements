@@ -26,10 +26,9 @@ using BlueDatabase;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Windows.Media.Animation;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 using static BlueBasics.Develop;
+using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 
 namespace BlueControls.ConnectedFormula;
@@ -185,9 +184,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
 
     public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
-    public void Save() {
-        _muf.Save(true);
-    }
+    public void Save() => _muf.Save(true);
 
     /// <summary>
     /// Prüft, ob das Formular sichtbare Elemente hat.
@@ -220,7 +217,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
         if (!IsDisposed) {
             AllFiles.Remove(this);
             if (disposing) {
-                _muf.Save(true);
+                _ = _muf.Save(true);
                 _muf.Dispose();
                 _muf = null;
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
@@ -296,7 +293,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
         if (_saving || _muf.IsLoading) { return; }
 
         foreach (var thisfile in DatabaseFiles) {
-            DatabaseAbstract.GetByID(new ConnectionInfo(thisfile), null);
+            _ = DatabaseAbstract.GetByID(new ConnectionInfo(thisfile), null);
         }
 
         _saved = false;
@@ -349,7 +346,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
         foreach (var thisit in PadData) {
             if (thisit is RowWithFilterPadItem rwf) {
                 if (rwf.Database != null) {
-                    DatabaseFiles.AddIfNotExists(rwf.Database.ConnectionData.UniqueID);
+                    _ = DatabaseFiles.AddIfNotExists(rwf.Database.ConnectionData.UniqueID);
                     _id = Math.Max(_id, rwf.Id);
                 }
             }

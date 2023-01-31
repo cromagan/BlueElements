@@ -39,9 +39,7 @@ internal partial class AbstractClassEditor<T> : Controls.GroupBox where T : IPar
 
     #region Constructors
 
-    public AbstractClassEditor() : base() {
-        InitializeComponent();
-    }
+    public AbstractClassEditor() : base() => InitializeComponent();
 
     #endregion
 

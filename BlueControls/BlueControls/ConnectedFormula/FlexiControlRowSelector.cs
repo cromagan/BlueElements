@@ -176,10 +176,9 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         }
     }
 
-    private static void DoChilds_VariableList(IAcceptVariableList fcfc, Script? script) {
+    private static void DoChilds_VariableList(IAcceptVariableList fcfc, Script? script) =>
         // Normales Zellenfeld
         fcfc.ParseVariables(script?.Variables);
-    }
 
     private void CalculateRows() {
         if (_disposing || IsDisposed) { return; }
@@ -317,9 +316,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         UpdateMyCollection();
     }
 
-    private void Childs_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
-        DoChilds(this, _row);
-    }
+    private void Childs_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) => DoChilds(this, _row);
 
     private void GetParentsList() {
         if (_disposing || IsDisposed || Parent == null) { return; }
@@ -333,9 +330,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         }
     }
 
-    private void Parent_ValueChanged(object sender, System.EventArgs e) {
-        CalculateRows();
-    }
+    private void Parent_ValueChanged(object sender, System.EventArgs e) => CalculateRows();
 
     private void Parents_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
         if (e.Item is FlexiControlForCell fcfc) {
@@ -358,7 +353,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
     private void UpdateMyCollection() {
         if (IsDisposed) { return; }
-        if (!Allinitialized) { CreateSubControls(); }
+        if (!Allinitialized) { _ = CreateSubControls(); }
 
         #region Combobox suchen
 
@@ -380,12 +375,12 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
             foreach (var thisR in _rows) {
                 if (cb?.Item?[thisR.Key.ToString()] == null) {
                     var tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, true);
-                    cb?.Item?.Add(tmpQuickInfo, thisR.Key.ToString());
+                    _ = (cb?.Item?.Add(tmpQuickInfo, thisR.Key.ToString()));
                     //cb.Item.Add(thisR, string.Empty);
                 } else {
                     foreach (var thisIt in ex) {
                         if (thisIt.Internal == thisR.Key.ToString()) {
-                            ex.Remove(thisIt);
+                            _ = ex.Remove(thisIt);
                             break;
                         }
                     }

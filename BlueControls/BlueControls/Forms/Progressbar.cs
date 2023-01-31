@@ -36,9 +36,7 @@ public partial class Progressbar : FloatingForm {
 
     #region Constructors
 
-    private Progressbar() : base(Enums.Design.Form_BitteWarten) {
-        InitializeComponent();
-    }
+    private Progressbar() : base(Enums.Design.Form_BitteWarten) => InitializeComponent();
 
     private Progressbar(string text) : this() {
         // InitializeComponent();
@@ -79,7 +77,7 @@ public partial class Progressbar : FloatingForm {
     public void Update(int current) {
         if (InvokeRequired) {
             // Es kommt zwar die ganze Berechnung durcheinander, aber besser als ein Fehler
-            Invoke(new Action(() => Update(current)));
+            _ = Invoke(new Action(() => Update(current)));
             return;
         }
         UpdateInternal(CalculateText(_baseText, current, _count));

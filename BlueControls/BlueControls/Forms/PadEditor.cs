@@ -22,7 +22,8 @@ using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using System;
 using System.Drawing;
-using static BlueBasics.Converter;using static BlueBasics.Extensions;
+using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 
 namespace BlueControls.Forms;
 
@@ -57,19 +58,19 @@ public partial class PadEditor : PadEditorReadOnly {
         PadDesign.Item.AddRange(Skin.AllStyles());
         PadDesign.Text = PadDesign.Item[0].Internal;
         Pad.Item.SheetStyle = Skin.StyleDb.Row[PadDesign.Text];
-        cbxSchriftGröße.Item.Add("30%", "030");
-        cbxSchriftGröße.Item.Add("40%", "040");
-        cbxSchriftGröße.Item.Add("50%", "050");
-        cbxSchriftGröße.Item.Add("60%", "060");
-        cbxSchriftGröße.Item.Add("70%", "070");
-        cbxSchriftGröße.Item.Add("80%", "080");
-        cbxSchriftGröße.Item.Add("90%", "090");
-        cbxSchriftGröße.Item.Add("100%", "100");
-        cbxSchriftGröße.Item.Add("110%", "110");
-        cbxSchriftGröße.Item.Add("120%", "120");
-        cbxSchriftGröße.Item.Add("130%", "130");
-        cbxSchriftGröße.Item.Add("140%", "140");
-        cbxSchriftGröße.Item.Add("150%", "150");
+        _ = cbxSchriftGröße.Item.Add("30%", "030");
+        _ = cbxSchriftGröße.Item.Add("40%", "040");
+        _ = cbxSchriftGröße.Item.Add("50%", "050");
+        _ = cbxSchriftGröße.Item.Add("60%", "060");
+        _ = cbxSchriftGröße.Item.Add("70%", "070");
+        _ = cbxSchriftGröße.Item.Add("80%", "080");
+        _ = cbxSchriftGröße.Item.Add("90%", "090");
+        _ = cbxSchriftGröße.Item.Add("100%", "100");
+        _ = cbxSchriftGröße.Item.Add("110%", "110");
+        _ = cbxSchriftGröße.Item.Add("120%", "120");
+        _ = cbxSchriftGröße.Item.Add("130%", "130");
+        _ = cbxSchriftGröße.Item.Add("140%", "140");
+        _ = cbxSchriftGröße.Item.Add("150%", "150");
         cbxSchriftGröße.Item.Sort();
         cbxSchriftGröße.Text = "100";
     }
@@ -133,7 +134,7 @@ public partial class PadEditor : PadEditorReadOnly {
 
     private void btnHintergrundFarbe_Click(object sender, System.EventArgs e) {
         ColorDia.Color = Pad.Item.BackColor;
-        ColorDia.ShowDialog();
+        _ = ColorDia.ShowDialog();
         Pad.Item.BackColor = ColorDia.Color;
         Pad.Invalidate();
     }

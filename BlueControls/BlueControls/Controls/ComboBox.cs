@@ -230,7 +230,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     protected override void OnGotFocus(System.EventArgs e) {
         if (_dropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDownList) {
-            btnDropDown.Focus();
+            _ = btnDropDown.Focus();
         } else {
             base.OnGotFocus(e);
         }
@@ -307,7 +307,7 @@ public partial class ComboBox : TextBox, ITranslateable {
     private void DropDownMenu_Cancel(object sender, object mouseOver) {
         Item.UncheckAll();
         FloatingForm.Close(this);
-        Focus();
+        _ = Focus();
     }
 
     private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
@@ -318,7 +318,7 @@ public partial class ComboBox : TextBox, ITranslateable {
             Text = e.ClickedComand;
             OnItemClicked(new BasicListItemEventArgs(Item[e.ClickedComand]));
         }
-        Focus();
+        _ = Focus();
     }
 
     private void OnDropDownShowing() => DropDownShowing?.Invoke(this, System.EventArgs.Empty);

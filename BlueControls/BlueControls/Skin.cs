@@ -1126,6 +1126,7 @@ public static class Skin {
     /// <param name="fitInRect"></param>
     /// <param name="child"></param>
     /// <param name="deleteBack"></param>
+
     public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, clsDesign design, Alignment align, Rectangle fitInRect, Control? child, bool deleteBack, bool translate) {
         if (string.IsNullOrEmpty(txt) && qi == null) { return; }
         QuickImage? tmpImage = null;
@@ -1144,6 +1145,7 @@ public static class Skin {
     /// <param name="child"></param>
     /// <param name="deleteBack"></param>
     /// <param name="bFont"></param>
+
     public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, Alignment align, Rectangle fitInRect, Control? child, bool deleteBack, BlueFont? bFont, bool translate) {
         var pSize = SizeF.Empty;
         var tSize = SizeF.Empty;
@@ -1219,6 +1221,7 @@ public static class Skin {
     /// </summary>
     /// <param name="sheetStyle"></param>
     /// <returns></returns>
+
     public static ItemCollectionList GetFonts(RowItem? sheetStyle) {
         ItemCollectionList rahms = new()
         {
@@ -1238,15 +1241,15 @@ public static class Skin {
     public static ItemCollectionList GetRahmenArt(RowItem? sheetStyle, bool mitOhne) {
         ItemCollectionList rahms = new();
         if (mitOhne) {
-            rahms.Add("Ohne Rahmen", ((int)PadStyles.Undefiniert).ToString(), ImageCode.Kreuz);
+            _ = rahms.Add("Ohne Rahmen", ((int)PadStyles.Undefiniert).ToString(), ImageCode.Kreuz);
         }
-        rahms.Add("Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Haupt).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Haupt, sheetStyle).SymbolOfLine());
-        rahms.Add("Untertitel für Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Untertitel).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Untertitel, sheetStyle).SymbolOfLine());
-        rahms.Add("Überschrift für Kapitel", ((int)PadStyles.Style_Überschrift_Kapitel).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Kapitel, sheetStyle).SymbolOfLine());
-        rahms.Add("Standard", ((int)PadStyles.Style_Standard).ToString(), GetBlueFont(PadStyles.Style_Standard, sheetStyle).SymbolOfLine());
-        rahms.Add("Standard Fett", ((int)PadStyles.Style_StandardFett).ToString(), GetBlueFont(PadStyles.Style_StandardFett, sheetStyle).SymbolOfLine());
-        rahms.Add("Standard Alternativ-Design", ((int)PadStyles.Style_StandardAlternativ).ToString(), GetBlueFont(PadStyles.Style_StandardAlternativ, sheetStyle).SymbolOfLine());
-        rahms.Add("Kleiner Zusatz", ((int)PadStyles.Style_KleinerZusatz).ToString(), GetBlueFont(PadStyles.Style_KleinerZusatz, sheetStyle).SymbolOfLine());
+        _ = rahms.Add("Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Haupt).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Haupt, sheetStyle).SymbolOfLine());
+        _ = rahms.Add("Untertitel für Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Untertitel).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Untertitel, sheetStyle).SymbolOfLine());
+        _ = rahms.Add("Überschrift für Kapitel", ((int)PadStyles.Style_Überschrift_Kapitel).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Kapitel, sheetStyle).SymbolOfLine());
+        _ = rahms.Add("Standard", ((int)PadStyles.Style_Standard).ToString(), GetBlueFont(PadStyles.Style_Standard, sheetStyle).SymbolOfLine());
+        _ = rahms.Add("Standard Fett", ((int)PadStyles.Style_StandardFett).ToString(), GetBlueFont(PadStyles.Style_StandardFett, sheetStyle).SymbolOfLine());
+        _ = rahms.Add("Standard Alternativ-Design", ((int)PadStyles.Style_StandardAlternativ).ToString(), GetBlueFont(PadStyles.Style_StandardAlternativ, sheetStyle).SymbolOfLine());
+        _ = rahms.Add("Kleiner Zusatz", ((int)PadStyles.Style_KleinerZusatz).ToString(), GetBlueFont(PadStyles.Style_KleinerZusatz, sheetStyle).SymbolOfLine());
         rahms.Sort();
         return rahms;
     }
@@ -1671,6 +1674,7 @@ public static class Skin {
     //    GR.FillRectangle(b, new Rectangle(rect.Left + r2, rect.Top, rect.Width - r, rect.Height));
     //    GR.FillRectangle(b, new Rectangle(rect.Left, rect.Top + r2, rect.Width, rect.Height - r));
     //}
+
     internal static BlueFont? GetBlueFont(PadStyles padStyle, RowItem? rowOfStyle, int stufe) {
         switch (stufe) {
             case 4:

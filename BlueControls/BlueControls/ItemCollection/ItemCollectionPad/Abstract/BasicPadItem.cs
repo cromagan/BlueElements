@@ -460,7 +460,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
         }
     }
 
-    public virtual void PointMoved(object sender, MoveEventArgs e) { OnChanged(); }
+    public virtual void PointMoved(object sender, MoveEventArgs e) => OnChanged();
 
     public virtual void PointMoving(object sender, MoveEventArgs e) { }
 

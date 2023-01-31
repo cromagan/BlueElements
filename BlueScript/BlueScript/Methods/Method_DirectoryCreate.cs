@@ -53,7 +53,7 @@ internal class Method_DirectoryCreate : Method {
         if (DirectoryExists(p)) { return DoItFeedback.Wahr(); }
 
         try {
-            System.IO.Directory.CreateDirectory(p);
+            _ = System.IO.Directory.CreateDirectory(p);
         } catch { }
 
         return !DirectoryExists(p) ? DoItFeedback.Falsch() : DoItFeedback.Wahr();

@@ -248,7 +248,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public new void Focus() {
         if (Focused()) { return; }
-        base.Focus();
+        _ = base.Focus();
     }
 
     public new bool Focused() => base.Focused || Plus.Focused || Minus.Focused || Up.Focused || Down.Focused || SliderY.Focused() || FilterCap.Focused || FilterTxt.Focused;
@@ -277,7 +277,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
         if (ButtonsVisible()) { paintModYx = Plus.Height; }
         var (biggestItemX, _, heightAdded, senkrechtAllowed) = Item.ItemData();
-        Item.ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height - paintModYx), SliderY, biggestItemX, heightAdded, senkrechtAllowed);
+        _ = Item.ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height - paintModYx), SliderY, biggestItemX, heightAdded, senkrechtAllowed);
         if (SliderY.Visible) { paintModXx = SliderY.Width; }
         var borderCoords = new Rectangle(DisplayRectangle.Left, DisplayRectangle.Top,
            DisplayRectangle.Width - paintModXx, DisplayRectangle.Height - paintModYx);
@@ -295,7 +295,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
         _mouseOverItem = MouseOverNode(MousePos().X, MousePos().Y);
         object locker = new();
-        System.Threading.Tasks.Parallel.ForEach(Item, thisItem => {
+        _ = System.Threading.Tasks.Parallel.ForEach(Item, thisItem => {
             if (thisItem.Pos.IntersectsWith(visArea)) {
                 var vStateItem = vStateBox;
                 if (_mouseOverItem == thisItem && Enabled) { vStateItem |= States.Standard_MouseOver; }
@@ -500,7 +500,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                 break;
 
             case AddType.Text:
-                Add_Text();
+                _ = Add_Text();
                 break;
 
             case AddType.OnlySuggests:

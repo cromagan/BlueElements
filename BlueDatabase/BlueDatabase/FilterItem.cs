@@ -82,6 +82,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
     /// Bei diesem Construktor mus der Tag database vorkommen!
     /// </summary>
     /// <param name="filterCode"></param>
+
     public FilterItem(string filterCode) {
         Parse(filterCode);
 
@@ -247,7 +248,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
                     break;
 
                 case "value":
-                    SearchValue.AddIfNotExists(pair.Value.FromNonCritical());
+                    _ = SearchValue.AddIfNotExists(pair.Value.FromNonCritical());
                     break;
 
                 case "herkunft":
@@ -259,7 +260,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
                     break;
             }
         }
-        if (toParse.Contains(", Value=}") || toParse.Contains(", Value=,")) { SearchValue.AddIfNotExists(""); }
+        if (toParse.Contains(", Value=}") || toParse.Contains(", Value=,")) { _ = SearchValue.AddIfNotExists(""); }
 
         IsParsing = false;
     }

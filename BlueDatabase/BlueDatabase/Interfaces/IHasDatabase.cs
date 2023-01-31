@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using BlueDatabase;
-
 namespace BlueDatabase.Interfaces;
 
 public interface IHasDatabase {

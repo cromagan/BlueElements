@@ -68,7 +68,7 @@ public sealed partial class ExportDialog {
         }
         try {
             if (!DirectoryExists(_zielPfad)) {
-                Directory.CreateDirectory(_zielPfad);
+                _ = Directory.CreateDirectory(_zielPfad);
             }
         } catch { }
 
@@ -93,7 +93,7 @@ public sealed partial class ExportDialog {
         if (database != null) {
             foreach (var t in database.Layouts) {
                 ItemCollectionPad p = new(t, string.Empty);
-                addHere.Add(p.Caption, p.Id, ImageCode.Stern);
+                _ = addHere.Add(p.Caption, p.Id, ImageCode.Stern);
             }
         }
         if (!addDiskLayouts) { return; }
@@ -105,7 +105,7 @@ public sealed partial class ExportDialog {
                 var e = Directory.GetFiles(thisP);
                 foreach (var thisFile in e) {
                     if (thisFile.FileType() is FileFormat.HTML or FileFormat.Textdocument or FileFormat.Visitenkarte or FileFormat.BlueCreativeFile or FileFormat.XMLFile) {
-                        if (addHere[thisFile] == null) { addHere.Add(thisFile.FileNameWithSuffix(), thisFile, QuickImage.Get(thisFile.FileType(), 16)); }
+                        if (addHere[thisFile] == null) { _ = addHere.Add(thisFile.FileNameWithSuffix(), thisFile, QuickImage.Get(thisFile.FileType(), 16)); }
                     }
                 }
             }
@@ -120,6 +120,7 @@ public sealed partial class ExportDialog {
     /// <param name="layout"></param>
     /// <param name="rowsForExport"></param>
     /// <returns>Gibt das Item zurück, dass nicht mehr auf den Druckbereich gepasst hat. -1 falls keine (gültige) Liste übergeben wurde.</returns>
+
     public static int GeneratePrintPad(CreativePad pad, int startNr, string layout, List<RowItem>? rowsForExport, float abstandMm) {
         pad.Item.Clear();
         Generic.CollectGarbage();
@@ -162,16 +163,16 @@ public sealed partial class ExportDialog {
     private void _Database_Disposing(object sender, System.EventArgs e) => Close();
 
     private void Attribute_Changed(object? sender, System.EventArgs? e) {
-        FloatTryParse(flxBreite.Value, out var b);
-        FloatTryParse(flxHöhe.Value, out var h);
-        FloatTryParse(flxAbstand.Value, out var ab);
+        _ = FloatTryParse(flxBreite.Value, out var b);
+        _ = FloatTryParse(flxHöhe.Value, out var h);
+        _ = FloatTryParse(flxAbstand.Value, out var ab);
         if (ab < 1) { ab = 0; }
         if (b < 10) { b = 10; }
         if (h < 10) { h = 10; }
         padSchachteln.Item.SheetSizeInMm = new SizeF(b, h);
         padSchachteln.Item.RandinMm = Padding.Empty;
         padSchachteln.Item.BackColor = Color.Transparent;
-        GeneratePrintPad(padSchachteln, 0, cbxLayoutWahl.Text, _rowsForExport, ab);
+        _ = GeneratePrintPad(padSchachteln, 0, cbxLayoutWahl.Text, _rowsForExport, ab);
     }
 
     private void BefülleLayoutDropdowns() {
@@ -198,9 +199,9 @@ public sealed partial class ExportDialog {
     }
 
     private void btnSchachtelnSpeichern_Click(object sender, System.EventArgs e) {
-        FloatTryParse(flxBreite.Value, out var b);
-        FloatTryParse(flxHöhe.Value, out var h);
-        FloatTryParse(flxAbstand.Value, out var ab);
+        _ = FloatTryParse(flxBreite.Value, out var b);
+        _ = FloatTryParse(flxHöhe.Value, out var h);
+        _ = FloatTryParse(flxAbstand.Value, out var ab);
         if (ab < 1) { ab = 0; }
         if (b < 10) { b = 10; }
         if (h < 10) { h = 10; }
@@ -229,7 +230,7 @@ public sealed partial class ExportDialog {
     private void Button_PageSetup_Click(object? sender, System.EventArgs e) {
         padPrint.ShowPrinterPageSetup();
         padPrint.CopyPrinterSettingsToWorkingArea();
-        GeneratePrintPad(padPrint, 0, cbxLayoutWahl.Text, _rowsForExport, 0);
+        _ = GeneratePrintPad(padPrint, 0, cbxLayoutWahl.Text, _rowsForExport, 0);
     }
 
     private void Button1_Click(object sender, System.EventArgs e) => ExecuteFile(_zielPfad);
@@ -279,8 +280,8 @@ public sealed partial class ExportDialog {
     }
 
     private void lstExported_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        e.UserMenu.Add(ContextMenuComands.DateiPfadÖffnen);
-        e.UserMenu.Add(ContextMenuComands.Kopieren);
+        _ = e.UserMenu.Add(ContextMenuComands.DateiPfadÖffnen);
+        _ = e.UserMenu.Add(ContextMenuComands.Kopieren);
     }
 
     private void lstExported_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
@@ -288,7 +289,7 @@ public sealed partial class ExportDialog {
 
         switch (e.ClickedComand) {
             case "DateiPfadÖffnen":
-                ExecuteFile(tl.Internal.FilePath());
+                _ = ExecuteFile(tl.Internal.FilePath());
                 break;
 
             case "Kopieren":
@@ -342,7 +343,7 @@ public sealed partial class ExportDialog {
             tabDrucken.Enabled = true;
             Tabs.SelectedTab = tabDrucken;
             Button_PageSetup_Click(null, System.EventArgs.Empty);
-            GeneratePrintPad(padPrint, 0, cbxLayoutWahl.Text, _rowsForExport, 0);
+            _ = GeneratePrintPad(padPrint, 0, cbxLayoutWahl.Text, _rowsForExport, 0);
         }
 
         if (optSpeichern.Checked || optSpezialFormat.Checked) {

@@ -3,7 +3,7 @@ using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using static BlueBasics.Converter;using static BlueBasics.Extensions;
+using static BlueBasics.Converter;
 
 #nullable enable
 

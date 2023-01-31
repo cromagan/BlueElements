@@ -15,9 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Enums;
-using BlueDatabase.Interfaces;
 using BlueDatabase;
+using BlueDatabase.Interfaces;
 
 namespace BlueControls.Forms;
 
@@ -53,7 +52,7 @@ public partial class InputBox : DialogWithOkAndCancel {
 
     public static string Show(string txt, string vorschlagsText, IInputFormat textformat, bool bigMultiLineBox) {
         InputBox mb = new(txt, vorschlagsText, textformat, bigMultiLineBox);
-        mb.ShowDialog();
+        _ = mb.ShowDialog();
         return mb._giveBack;
     }
 

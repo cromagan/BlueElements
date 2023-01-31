@@ -42,9 +42,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
     #region Constructors
 
-    private FloatingInputBoxListBoxStyle() : base(Design.Form_QuickInfo) {
-        InitializeComponent();
-    }
+    private FloatingInputBoxListBoxStyle() : base(Design.Form_QuickInfo) => InitializeComponent();
 
     private FloatingInputBoxListBoxStyle(ItemCollectionList? items, int xpos, int ypos, int steuerWi, object tag, Control? connectedControl, bool translate) : base(connectedControl, items.ControlDesign) {
         InitializeComponent();
@@ -91,17 +89,17 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         control.OnContextMenuInit(ec);
         if (ec.Cancel) { return; }
         if (!ec.Translate) { translate = false; }
-        if (thisContextMenu.Count > 0 && userMenu.Count > 0) { thisContextMenu.AddSeparator(); }
+        if (thisContextMenu.Count > 0 && userMenu.Count > 0) { _ = thisContextMenu.AddSeparator(); }
         if (userMenu.Count > 0) { thisContextMenu.AddClonesFrom(userMenu); }
 
         var par = control.ParentControlWithCommands();
         if (thisContextMenu.Count > 0) {
             if (par != null) {
-                thisContextMenu.AddSeparator();
-                thisContextMenu.Add(ContextMenuComands.WeitereBefehle);
+                _ = thisContextMenu.AddSeparator();
+                _ = thisContextMenu.Add(ContextMenuComands.WeitereBefehle);
             }
-            thisContextMenu.AddSeparator();
-            thisContextMenu.Add(ContextMenuComands.Abbruch);
+            _ = thisContextMenu.AddSeparator();
+            _ = thisContextMenu.Add(ContextMenuComands.Abbruch);
             List<object?> infos = new()
             {
                 userMenu,
@@ -167,7 +165,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         var infos = (List<object>)e.HotItem;
         var userMmenu = (ItemCollectionList)infos[0];
         var hotItem = infos[1];
-        var tags = (List<string>)infos[2] ?? new List<string>(); 
+        var tags = (List<string>)infos[2] ?? new List<string>();
         var ob = (IContextMenu)infos[3];
         Close(BlueListBoxAppearance.KontextMenu);
         Close(ob);

@@ -30,7 +30,7 @@ public static partial class Extensions {
         if (arr == null || arr.Count == 0) { return new List<string>(); }
 
         var arr2 = arr.Distinct().ToList();
-        if (arr2.Contains(string.Empty)) { arr2.Remove(string.Empty); }
+        if (arr2.Contains(string.Empty)) { _ = arr2.Remove(string.Empty); }
         arr2.Sort();
         return arr2;
     }

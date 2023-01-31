@@ -23,7 +23,6 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
@@ -74,9 +73,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
         _autoDelete = autodelete;
     }
 
-    public ExportDefinition(DatabaseAbstract database, string toParse) : this(database) {
-        Parse(toParse);
-    }
+    public ExportDefinition(DatabaseAbstract database, string toParse) : this(database) => Parse(toParse);
 
     public ExportDefinition(DatabaseAbstract database) {
         Database = database;
@@ -214,7 +211,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
             if (!string.IsNullOrEmpty(BereitsExportiert[n])) {
                 var x = BereitsExportiert[n].SplitAndCutBy("|");
                 if (FileExists(x[0])) {
-                    DeleteFile(x[0], false);
+                    _ = DeleteFile(x[0], false);
                     BereitsExportiert[n] = string.Empty;
                 }
             }
@@ -476,7 +473,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
                 if (!string.IsNullOrEmpty(BereitsExportiert[n])) {
                     var x = BereitsExportiert[n].SplitAndCutBy("|");
                     if ((float)DateTime.Now.Subtract(DateTimeParse(x[1])).TotalDays > _autoDelete) {
-                        if (FileExists(x[0])) { DeleteFile(x[0], false); }
+                        if (FileExists(x[0])) { _ = DeleteFile(x[0], false); }
                     }
                     if (!FileExists(x[0])) {
                         BereitsExportiert[n] = string.Empty;
@@ -515,7 +512,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
                 if (!string.IsNullOrEmpty(BereitsExportiert[n])) {
                     var x = BereitsExportiert[n].SplitAndCutBy("|");
                     if (x.GetUpperBound(0) > 1 && Database.Row.SearchByKey(LongParse(x[2])) == null) {
-                        if (FileExists(x[0])) { DeleteFile(x[0], false); }
+                        if (FileExists(x[0])) { _ = DeleteFile(x[0], false); }
                     }
                     if (!FileExists(x[0])) {
                         BereitsExportiert[n] = string.Empty;
@@ -545,7 +542,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
             savePath = (System.Windows.Forms.Application.StartupPath + "\\Backup\\").CheckPath();
         }
 
-        if (!DirectoryExists(savePath)) { Directory.CreateDirectory(savePath); }
+        if (!DirectoryExists(savePath)) { _ = Directory.CreateDirectory(savePath); }
 
         var singleFileExport = savePath + Database.TableName.FileNameWithoutSuffix().StarkeVereinfachung(" _-+") + "_" + DateTime.Now.ToString(Constants.Format_Date4);
 
@@ -597,7 +594,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
                                         Export.SaveAsBitmap(thisrow, _exportFormularId, singleFileExport);
                                     } else {
                                         singleFileExport = TempFile(savePath, thisrow.CellFirstString().StarkeVereinfachung(" "), _exportFormularId.FileSuffix());
-                                        Export.SaveAs(thisrow, _exportFormularId, singleFileExport);
+                                        _ = Export.SaveAs(thisrow, _exportFormularId, singleFileExport);
                                     }
                                     added.Add(singleFileExport + "|" + tim + "|" + thisrow.Key);
                                 }
@@ -644,7 +641,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
             if (!string.IsNullOrEmpty(BereitsExportiert[f])) {
                 if (BereitsExportiert[f].EndsWith("|" + id)) {
                     var x = BereitsExportiert[f].SplitAndCutBy("|");
-                    if (FileExists(x[0])) { DeleteFile(x[0], false); }
+                    if (FileExists(x[0])) { _ = DeleteFile(x[0], false); }
                     if (!FileExists(x[0])) {
                         BereitsExportiert[f] = string.Empty;
                         did = true;

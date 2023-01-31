@@ -93,10 +93,9 @@ internal sealed class QuickPic : Panel {
 
     #region Constructors
 
-    public QuickPic() {
+    public QuickPic() =>
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
-    }
 
     #endregion
 
@@ -122,7 +121,7 @@ internal sealed class QuickPic : Panel {
         const ImageCode tempVar = (ImageCode)9999;
         for (ImageCode z = 0; z <= tempVar; z++) {
             var w = Enum.GetName(z.GetType(), z);
-            if (!string.IsNullOrEmpty(w)) { LB.Items.Add(w); }
+            if (!string.IsNullOrEmpty(w)) { _ = LB.Items.Add(w); }
         }
         QuickImage l = new(qicode, true);
         PicName.Text = l.Name;

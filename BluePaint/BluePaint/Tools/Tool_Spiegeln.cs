@@ -37,9 +37,7 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
 
     #region Constructors
 
-    public Tool_Spiegeln() : base() {
-        InitializeComponent();
-    }
+    public Tool_Spiegeln() : base() => InitializeComponent();
 
     #endregion
 

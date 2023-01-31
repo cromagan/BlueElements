@@ -27,9 +27,6 @@ using static BlueBasics.IO;
 namespace BlueDatabase;
 
 public static class Export {
-
-    #region Methods
-
     //public static string CreateLayout(RowItem Row, string LoadedFile, bool ToNonCriticalText) {
     //    if (string.IsNullOrEmpty(LoadedFile)) {
     //        return string.Empty;
@@ -44,6 +41,9 @@ public static class Export {
     //    };
     //    return InternalCreateLayout(TMPList, LoadedFile, string.Empty, ToNonCriticalText);
     //}
+
+    #region Methods
+
     public static string CreateLayout(RowItem row, string loadFile, string saveFile) {
         if (!FileExists(loadFile)) { return "Datei nicht gefunden."; }
         List<RowItem?> tmpList = new()
@@ -74,6 +74,7 @@ public static class Export {
     //    GenerateLayout_Internal(Row, 0, False, True, String.Empty)
     //    '   End If
     //End Sub
+
     public static (List<string>? files, string error) GenerateLayout_FileSystem(List<RowItem?>? liste, string lad, string optionalFileName, bool eineGrosseDatei, string zielPfad) {
         List<string> l = new();
         if (liste == null) { return (null, "Keine Zeilen angegeben"); }
@@ -483,6 +484,7 @@ public static class Export {
     //        }
     //    } while (true);
     //}
+
     public static (List<string>? files, string error) SaveAs(RowItem row, string layout, string destinationFile) {
         List<RowItem?> l = new()
         {

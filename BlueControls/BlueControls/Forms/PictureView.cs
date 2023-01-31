@@ -122,9 +122,7 @@ public partial class PictureView : Form, IDisposableExtended {
         Pad.ZoomFit();
     }
 
-    private void btnTopMost_CheckedChanged(object sender, System.EventArgs e) {
-        TopMost = btnTopMost.Checked;
-    }
+    private void btnTopMost_CheckedChanged(object sender, System.EventArgs e) => TopMost = btnTopMost.Checked;
 
     private void btnVor_Click(object sender, System.EventArgs e) {
         if (_fileList == null || _fileList.Count < 2) { return; }

@@ -52,9 +52,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
     #region Constructors
 
-    public ZoomPicWithPoints() : base() {
-        InitializeComponent();
-    }
+    public ZoomPicWithPoints() : base() => InitializeComponent();
 
     #endregion
 
@@ -165,7 +163,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
     public void PointRemove(string name) {
         var p = GetPoint(name);
         if (p == null) { return; }
-        _points.Remove(p);
+        _ = _points.Remove(p);
         WritePointsInTags();
         Invalidate();
     }
@@ -202,7 +200,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
             }
         } catch {
             Develop.DebugPrint("Fehler beim Speichern: " + pathtxt);
-            MessageBox.Show("Fehler beim Speichern");
+            _ = MessageBox.Show("Fehler beim Speichern");
         }
     }
 

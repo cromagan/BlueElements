@@ -64,6 +64,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     /// <summary>
     /// Wird von Flexoptions aufgerufen
     /// </summary>
+
     public string Spalte_bearbeiten {
         get => string.Empty;
         set {

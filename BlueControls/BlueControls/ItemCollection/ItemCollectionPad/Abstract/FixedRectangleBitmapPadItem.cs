@@ -31,12 +31,11 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
 
     #region Constructors
 
-    protected FixedRectangleBitmapPadItem(string internalname) : base(internalname) {
-        RemovePic();
-        //GeneratePic(); // Im Construcor nicht möglich, weil noch Werte fehlen.
-    }
+    protected FixedRectangleBitmapPadItem(string internalname) : base(internalname) => RemovePic();
 
     #endregion
+
+    //GeneratePic(); // Im Construcor nicht möglich, weil noch Werte fehlen.
 
     #region Properties
 

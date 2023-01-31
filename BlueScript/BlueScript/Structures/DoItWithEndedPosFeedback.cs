@@ -21,7 +21,7 @@ using BlueScript.Variables;
 
 namespace BlueScript.Structures;
 
-public struct DoItWithEndedPosFeedback {
+public readonly struct DoItWithEndedPosFeedback {
 
     #region Fields
 

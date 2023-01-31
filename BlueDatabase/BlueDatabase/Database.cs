@@ -19,19 +19,16 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.MultiUserFile;
 using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
-using BlueBasics.MultiUserFile;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
-using static BlueDatabase.DatabaseAbstract;
-using System.Configuration;
 
 namespace BlueDatabase;
 
@@ -223,7 +220,7 @@ public sealed class Database : DatabaseAbstract {
                 }
 
             default: {
-                    type = (DatabaseDataType)0;
+                    type = 0;
                     value = string.Empty;
                     //width = 0;
                     //height = 0;
@@ -261,7 +258,7 @@ public sealed class Database : DatabaseAbstract {
                 if (rowKey > -1) {
                     row = db.Row.SearchByKey(rowKey);
                     if (row == null) {
-                        db.Row.SetValueInternal(DatabaseDataType.Comand_AddRow, rowKey, true);
+                        _ = db.Row.SetValueInternal(DatabaseDataType.Comand_AddRow, rowKey, true);
                         row = db.Row.SearchByKey(rowKey);
                     }
                     if (row == null) {
@@ -280,7 +277,7 @@ public sealed class Database : DatabaseAbstract {
                     column = db.Column.SearchByKey(colKey);
                     if (column == null) {
                         if (art != DatabaseDataType.ColumnName) { Develop.DebugPrint(art + " an erster Stelle!"); }
-                        db.Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByKey, colKey, true, string.Empty);
+                        _ = db.Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByKey, colKey, true, string.Empty);
                         column = db.Column.SearchByKey(colKey);
                     }
                     if (column == null) {
@@ -296,7 +293,7 @@ public sealed class Database : DatabaseAbstract {
                     column = db.Column.Exists(columname);
                     if (column == null) {
                         if (art != DatabaseDataType.ColumnName) { Develop.DebugPrint(art + " an erster Stelle!"); }
-                        db.Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByName, db.Column.NextColumnKey(), true, columname);
+                        _ = db.Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByName, db.Column.NextColumnKey(), true, columname);
                         column = db.Column.Exists(columname);
                     }
                     if (column == null) {
@@ -344,7 +341,7 @@ public sealed class Database : DatabaseAbstract {
 
         foreach (var thisColumn in l) {
             if (!columnUsed.Contains(thisColumn)) {
-                db.SetValueInternal(DatabaseDataType.Comand_RemoveColumn, thisColumn.Key.ToString(), thisColumn.Name, null, true);
+                _ = db.SetValueInternal(DatabaseDataType.Comand_RemoveColumn, thisColumn.Key.ToString(), thisColumn.Name, null, true);
             }
         }
 
@@ -670,7 +667,7 @@ public sealed class Database : DatabaseAbstract {
         if (!MoveFile(Filename, Backupdateiname(), false)) { return false; }
 
         // --- TmpFile wird zum Haupt ---
-        MoveFile(tmpFileName, Filename, true);
+        _ = MoveFile(tmpFileName, Filename, true);
 
         HasPendingChanges = false;
         return true;
@@ -678,7 +675,7 @@ public sealed class Database : DatabaseAbstract {
 
     public void SaveAsAndChangeTo(string newFileName) {
         if (string.Equals(newFileName, Filename, StringComparison.OrdinalIgnoreCase)) { Develop.DebugPrint(FehlerArt.Fehler, "Dateiname unterscheiden sich nicht!"); }
-        Save(); // Original-Datei speichern, die ist ja dann weg.
+        _ = Save(); // Original-Datei speichern, die ist ja dann weg.
         // Jetzt kann es aber immer noch sein, das PendingChanges da sind.
         // Wenn kein Dateiname angegeben ist oder bei Readonly wird die Datei nicht gespeichert und die Pendings bleiben erhalten!
 
@@ -759,9 +756,7 @@ public sealed class Database : DatabaseAbstract {
         return r;
     }
 
-    protected override void AddUndo(string tableName, DatabaseDataType comand, string? columnName, long? rowKey, string previousValue, string changedTo, string userName, string comment) {
-        Works.Add(new WorkItem(comand, columnName, rowKey, previousValue, changedTo, userName));
-    }
+    protected override void AddUndo(string tableName, DatabaseDataType comand, string? columnName, long? rowKey, string previousValue, string changedTo, string userName, string comment) => Works.Add(new WorkItem(comand, columnName, rowKey, previousValue, changedTo, userName));
 
     protected override void Dispose(bool disposing) {
         //_muf.Dispose();

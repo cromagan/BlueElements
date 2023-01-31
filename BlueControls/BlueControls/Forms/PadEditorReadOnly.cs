@@ -22,7 +22,6 @@ using BlueBasics.Enums;
 using BlueControls.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Net.NetworkInformation;
 using System.Windows.Forms;
 
 namespace BlueControls.Forms;
@@ -31,13 +30,13 @@ public partial class PadEditorReadOnly : Form, IHasStatusbar {
 
     #region Constructors
 
-    public PadEditorReadOnly() : base() {
+    public PadEditorReadOnly() : base() =>
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
-        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-    }
 
     #endregion
+
+    // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
     #region Properties
 
@@ -47,9 +46,7 @@ public partial class PadEditorReadOnly : Form, IHasStatusbar {
 
     #region Methods
 
-    public bool UpdateStatus(FehlerArt type, string message, bool didAlreadyMessagebox) {
-        return base.UpdateStatus(type, message, didAlreadyMessagebox, capStatusBar, DropMessages);
-    }
+    public bool UpdateStatus(FehlerArt type, string message, bool didAlreadyMessagebox) => base.UpdateStatus(type, message, didAlreadyMessagebox, capStatusBar, DropMessages);
 
     private void btnAlsBildSpeichern_Click(object sender, System.EventArgs e) => Pad.OpenSaveDialog(string.Empty);
 
@@ -67,7 +64,7 @@ public partial class PadEditorReadOnly : Form, IHasStatusbar {
 
     private void DoPages() {
         if (InvokeRequired) {
-            Invoke(new Action(DoPages));
+            _ = Invoke(new Action(DoPages));
             return;
         }
 
@@ -75,7 +72,7 @@ public partial class PadEditorReadOnly : Form, IHasStatusbar {
 
         if (Pad?.Item != null) { x.AddRange(Pad.Item.AllPages()); }
 
-        if (Pad != null) { x.AddIfNotExists(Pad.CurrentPage); }
+        if (Pad != null) { _ = x.AddIfNotExists(Pad.CurrentPage); }
 
         TabPage? later = null;
 
@@ -93,13 +90,14 @@ public partial class PadEditorReadOnly : Form, IHasStatusbar {
                     return;
                 }
 
-                x.Remove(tb.Text);
+                _ = x.Remove(tb.Text);
                 if (tb.Text == Pad.CurrentPage) { later = tb; }
             }
 
             foreach (var thisn in x) {
-                var t = new TabPage(thisn);
-                t.Name = "Seite_" + thisn;
+                var t = new TabPage(thisn) {
+                    Name = "Seite_" + thisn
+                };
                 tabSeiten.TabPages.Add(t);
 
                 if (t.Text == Pad.CurrentPage) { later = t; }
@@ -112,9 +110,7 @@ public partial class PadEditorReadOnly : Form, IHasStatusbar {
         tabSeiten.SelectedTab = later;
     }
 
-    private void Pad_Changed(object sender, System.EventArgs e) {
-        DoPages();
-    }
+    private void Pad_Changed(object sender, System.EventArgs e) => DoPages();
 
     private void Pad_DrawModChanged(object sender, System.EventArgs e) {
         btnVorschauModus.Checked = Pad.ShowInPrintMode;

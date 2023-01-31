@@ -68,14 +68,15 @@ public class ConstantTextPadItem : CustomizableShowPadItem, IReadableText, ICont
     #region Methods
 
     public override Control CreateControl(ConnectedFormulaView parent) {
-        var con = new FlexiControl();
-        con.Width = 100;
-        con.Height = 16;
+        var con = new FlexiControl {
+            Width = 100,
+            Height = 16,
 
-        con.CaptionPosition = ÜberschriftAnordnung.ohne;
+            CaptionPosition = ÜberschriftAnordnung.ohne,
 
-        con.EditType = EditTypeFormula.Textfeld;
-        con.DisabledReason = "Konstanter Wert";
+            EditType = EditTypeFormula.Textfeld,
+            DisabledReason = "Konstanter Wert"
+        };
 
         con.ValueSet(Text, true, true);
         con.Name = DefaultItemToControlName();
@@ -83,8 +84,9 @@ public class ConstantTextPadItem : CustomizableShowPadItem, IReadableText, ICont
     }
 
     public override List<GenericControl> GetStyleOptions() {
-        List<GenericControl> l = new();
-        l.Add(new FlexiControlForProperty<string>(() => Text));
+        List<GenericControl> l = new() {
+            new FlexiControlForProperty<string>(() => Text)
+        };
         return l;
     }
 
@@ -115,7 +117,7 @@ public class ConstantTextPadItem : CustomizableShowPadItem, IReadableText, ICont
         gr.DrawRectangle(new Pen(Color.Black, zoom), positionModified);
 
         var t = string.Empty;
-        t = t + _text;
+        t += _text;
 
         Skin.Draw_FormatedText(gr, t, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont.Scale(zoom), false);
 

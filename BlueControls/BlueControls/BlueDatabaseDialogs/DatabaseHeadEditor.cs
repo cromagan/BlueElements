@@ -88,7 +88,7 @@ public sealed partial class DatabaseHeadEditor {
             btnSortRichtung.Checked = _database.SortDefinition.Reverse;
             if (_database.SortDefinition.Columns != null) {
                 foreach (var thisColumn in _database.SortDefinition.Columns.Where(thisColumn => thisColumn != null && !thisColumn.IsDisposed)) {
-                    lbxSortierSpalten.Item.Add(thisColumn);
+                    _ = lbxSortierSpalten.Item.Add(thisColumn);
                 }
             }
         }
@@ -96,7 +96,7 @@ public sealed partial class DatabaseHeadEditor {
         // Exports ----------------
         lbxExportSets.Item.Clear();
         foreach (var thisSet in _database.Export.Where(thisSet => thisSet != null)) {
-            lbxExportSets.Item.Add((ExportDefinition)(thisSet.Clone()), string.Empty, string.Empty);
+            _ = lbxExportSets.Item.Add((ExportDefinition)thisSet.Clone(), string.Empty, string.Empty);
         }
         lbxExportSets.Item.Sort();
         // -----------------------------
@@ -248,20 +248,20 @@ public sealed partial class DatabaseHeadEditor {
 
     private void GenerateUndoTabelle() {
         Database x = new(false, "Undo " + _database.ConnectionData.TableName);
-        x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder.Text);
-        x.Column.GenerateAndAdd("Index", "Index", ColumnFormatHolder.IntegerPositive);
-        x.Column.GenerateAndAdd("db", "Herkunft", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("Index", "Index", ColumnFormatHolder.IntegerPositive);
+        _ = x.Column.GenerateAndAdd("db", "Herkunft", ColumnFormatHolder.Text);
         //x.Column.GenerateAndAdd("ColumnKey", "Spalten-<br>Schlüssel", ColumnFormatHolder.IntegerPositive);
-        x.Column.GenerateAndAdd("ColumnName", "Spalten-<br>Name", ColumnFormatHolder.Text);
-        x.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolder.Text);
-        x.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolder.IntegerPositive);
-        x.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", ColumnFormatHolder.Text);
-        x.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", ColumnFormatHolder.Text);
-        x.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder.Text);
-        x.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.Text);
-        x.Column.GenerateAndAdd("Aenderung", "Änderung", ColumnFormatHolder.Text);
-        x.Column.GenerateAndAdd("WertAlt", "Wert alt", ColumnFormatHolder.Text);
-        x.Column.GenerateAndAdd("WertNeu", "Wert neu", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("ColumnName", "Spalten-<br>Name", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolder.IntegerPositive);
+        _ = x.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("Aenderung", "Änderung", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("WertAlt", "Wert alt", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("WertNeu", "Wert neu", ColumnFormatHolder.Text);
         foreach (var thisColumn in x.Column.Where(thisColumn => !thisColumn.IsSystemColumn())) {
             thisColumn.MultiLine = true;
             thisColumn.TextBearbeitungErlaubt = false;
@@ -333,9 +333,9 @@ public sealed partial class DatabaseHeadEditor {
         var cellKey = e.Tags.TagGet("Cellkey");
         if (string.IsNullOrEmpty(cellKey)) { return; }
         bt.Database.Cell.DataOfCellKey(cellKey, out var column, out _);
-        e.UserMenu.Add("Sortierung", true);
-        e.UserMenu.Add(ContextMenuComands.SpaltenSortierungAZ, column != null && column.Format.CanBeChangedByRules());
-        e.UserMenu.Add(ContextMenuComands.SpaltenSortierungZA, column != null && column.Format.CanBeChangedByRules());
+        _ = e.UserMenu.Add("Sortierung", true);
+        _ = e.UserMenu.Add(ContextMenuComands.SpaltenSortierungAZ, column != null && column.Format.CanBeChangedByRules());
+        _ = e.UserMenu.Add(ContextMenuComands.SpaltenSortierungZA, column != null && column.Format.CanBeChangedByRules());
     }
 
     private void tblUndo_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
@@ -374,7 +374,7 @@ public sealed partial class DatabaseHeadEditor {
         _database.DatenbankAdmin = new(DatenbankAdmin.Item.ToListOfString());
 
         var tmp = PermissionGroups_NewRow.Item.ToListOfString();
-        tmp.Remove("#Administrator");
+        _ = tmp.Remove("#Administrator");
         _database.PermissionGroupsNewRow = tmp;
 
         #region Sortierung

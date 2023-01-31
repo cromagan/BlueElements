@@ -48,9 +48,7 @@ public partial class MainWindow {
         tabRibbonbar.SelectedIndex = 1;
     }
 
-    public MainWindow(string filename, bool loadSaveEnabled) : this(loadSaveEnabled) {
-        LoadFromDisk(filename);
-    }
+    public MainWindow(string filename, bool loadSaveEnabled) : this(loadSaveEnabled) => LoadFromDisk(filename);
 
     private MainWindow() : this(true) { }
 
@@ -105,7 +103,7 @@ public partial class MainWindow {
 
     public new Bitmap? ShowDialog() {
         if (Visible) { Visible = false; }
-        base.ShowDialog();
+        _ = base.ShowDialog();
         return P.Bmp;
     }
 
@@ -150,7 +148,7 @@ public partial class MainWindow {
             Notification.Show("Abbruch,<br>kein Bild im Zwischenspeicher!", ImageCode.Information);
             return;
         }
-        SetPic(((Bitmap)System.Windows.Forms.Clipboard.GetImage()));
+        SetPic((Bitmap)System.Windows.Forms.Clipboard.GetImage());
         _isSaved = false;
         _filename = "*";
         P.ZoomFit();
@@ -171,13 +169,13 @@ public partial class MainWindow {
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
         if (!IsSaved()) { return; }
-        LoadTab.ShowDialog();
+        _ = LoadTab.ShowDialog();
     }
 
     private void btnSave_Click(object sender, System.EventArgs e) => Speichern();
 
     private void btnSaveAs_Click(object? sender, System.EventArgs e) {
-        SaveTab.ShowDialog();
+        _ = SaveTab.ShowDialog();
         if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
         if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
         if (FileExists(SaveTab.FileName)) {

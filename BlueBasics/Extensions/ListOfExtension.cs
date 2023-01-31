@@ -21,8 +21,6 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using static BlueBasics.IO;
@@ -206,7 +204,7 @@ public static partial class Extensions {
     public static void Save(this ICollection<string> l, string dateiName, System.Text.Encoding code, bool executeAfter) {
         var t = l.JoinWith("\r\n").TrimEnd("\r\n");
         if (!DirectoryExists(dateiName.FilePath())) {
-            Directory.CreateDirectory(dateiName.FilePath());
+            _ = Directory.CreateDirectory(dateiName.FilePath());
         }
         WriteAllText(dateiName, t, code, executeAfter);
     }
@@ -300,7 +298,7 @@ public static partial class Extensions {
     public static void TagRemove(this ICollection<string> col, string tagname) {
         var found = col.TagGetPosition(tagname);
         if (found >= 0) {
-            col.Remove(col.ElementAtOrDefault(found));
+            _ = col.Remove(col.ElementAtOrDefault(found));
         }
     }
 
@@ -310,7 +308,7 @@ public static partial class Extensions {
 
         if (found >= 0) {
             if (col.ElementAtOrDefault(found) == n) { return; }
-            col.Remove(col.ElementAtOrDefault(found));
+            _ = col.Remove(col.ElementAtOrDefault(found));
         }
 
         col.Add(n);

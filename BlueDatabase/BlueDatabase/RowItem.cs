@@ -101,14 +101,15 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
 
     #endregion
 
-    #region Methods
-
     /// <summary>
     /// Diese Routine konvertiert den Inhalt der Zelle in eine vom Skript lesbaren Variable
     /// </summary>
     /// <param name="column"></param>
     /// <param name="row"></param>
     /// <returns></returns>
+
+    #region Methods
+
     public static List<Variable>? CellToVariable(ColumnItem? column, RowItem? row) {
         if (column == null || row == null) { return null; }
         if (!column.Format.CanBeCheckedByRules()) { return null; }
@@ -178,7 +179,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
                 break;
 
             case ScriptType.DateTime:
-                qi = qi + "\r\nFalls die Zelle keinen gültiges Datum enthält, wird 01.01.0001 als Datum verwendet.";
+                qi += "\r\nFalls die Zelle keinen gültiges Datum enthält, wird 01.01.0001 als Datum verwendet.";
                 if (DateTimeTryParse(wert, out var d)) {
                     vars.Add(new VariableDateTime(column.Name, d, ro, false, qi));
                 } else {
@@ -277,6 +278,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     /// Überschreibt alle Zellen-Werte mit der der Vorlage.
     /// </summary>
     /// <param name="source"></param>
+
     public void CloneFrom(RowItem source, bool nameAndKeyToo) {
         if (nameAndKeyToo) {
             Key = source.Key;
@@ -292,6 +294,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     /// </summary>
     /// <param name="columns">Nur diese Spalten in deser Reihenfolge werden berücksichtigt</param>
     /// <returns>Den String mit dem abschluß <<>key<>> und dessen Key.</returns>
+
     public string CompareKey(List<ColumnItem>? columns) {
         StringBuilder r = new();
         if (columns != null) {
@@ -308,6 +311,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     /// </summary>
     /// <param name="columns">Nur diese Spalten in deser Reihenfolge werden berücksichtigt</param>
     /// <returns>Den String mit dem abschluß <<>key<>> und dessen Key.</returns>
+
     public string CompareKeyx() => CompareKey(Database.SortDefinition?.Columns);
 
     public void Dispose() {
@@ -326,6 +330,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgefphrt</param>
     /// <param name="tryforsceonds"></param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
+
     public (bool checkPerformed, string error, Script? script) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, float tryforsceonds, string startroutine) {
         if (Database == null || Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
         var t = DateTime.Now;
@@ -343,6 +348,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     /// <param name="doFemdZelleInvalidate">bei verlinkten Zellen wird der verlinkung geprüft und erneuert.</param>
     /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgeführt</param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
+
     public (bool checkPerformed, string error, Script? skript) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, string startroutine) {
         if (Database == null || Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
 
@@ -362,8 +368,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
                 Database.OnScriptError(new RowCancelEventArgs(this, "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode));
                 return (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
             }
-            var doch = script?.Variables?.GetSystem("CellChangesEnabled") as VariableBool;
-            if (doch == null || !doch.ValueBool) { return (true, string.Empty, script); }
+            if (script?.Variables?.GetSystem("CellChangesEnabled") is not VariableBool doch || !doch.ValueBool) { return (true, string.Empty, script); }
         }
         // Dann die Abschließenden Korrekturen vornehmen
         foreach (var thisColum in Database.Column.Where(thisColum => thisColum != null)) {
@@ -465,6 +470,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     /// <param name="formel"></param>
     /// <param name="fulltext">Bei TRUE wird der Text so zurückgegeben, wie er in der Zelle angezeigt werden würde: Mit Suffix und Ersetzungen. Zeilenumbrüche werden eleminiert!</param>
     /// <returns></returns>
+
     public string ReplaceVariables(string formel, bool fulltext, bool removeLineBreaks) {
         if (Database == null) { return formel; }
 
@@ -532,6 +538,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     /// Führt alle Regeln aus und löst das Ereignis DoSpecialRules aus. Setzt ansonsten keine Änderungen, wie z.B. SysCorrect oder Runden-Befehle.
     /// </summary>
     /// <returns>Gibt Regeln, die einen Fehler verursachen zurück. z.B. SPALTE1|Die Splate darf nicht leer sein.</returns>
+
     private Script? DoRules(string startRoutine) {
         try {
             if (Database == null || Database.IsDisposed || string.IsNullOrWhiteSpace(Database.RulesScript)) { return null; }
@@ -569,8 +576,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
 
             #endregion
 
-            var doch = vars.GetSystem("CellChangesEnabled") as VariableBool;
-            if (startRoutine != "script testing" && doch != null && doch.ValueBool) {
+            if (startRoutine != "script testing" && vars.GetSystem("CellChangesEnabled") is VariableBool doch && doch.ValueBool) {
 
                 #region Variablen zurückschreiben und Special Rules ausführen
 

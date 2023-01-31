@@ -27,17 +27,16 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
     #region Constructors
 
-    public PadEditorWithFileAccess() : base() {
-        InitializeComponent();
-    }
+    public PadEditorWithFileAccess() : base() => InitializeComponent();
 
     #endregion
-
-    #region Methods
 
     /// <summary>
     /// löscht den kompletten Inhalt des Pads auch die ID und setzt es auf Disabled
     /// </summary>
+
+    #region Methods
+
     public void DisablePad() {
         Pad.Item = new ItemCollectionPad();
         Pad.Enabled = false;
@@ -48,6 +47,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     /// </summary>
     /// <param name="fileName"></param>
     /// <param name="useThisID">Wenn das Blatt bereits eine Id hat, muss die Id verwendet werden. Wird das Feld leer gelassen, wird die beinhaltete Id benutzt.</param>
+
     public void LoadFile(string fileName, string useThisID) {
         var t = File.ReadAllText(fileName, Constants.Win1252);
         LoadFromString(t, useThisID);
@@ -58,6 +58,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     ///
     /// </summary>
     /// <param name="useThisID">Wenn das Blatt bereits eine Id hat, muss die Id verwendet werden. Wird das Feld leer gelassen, wird die beinhaltete Id benutzt.</param>
+
     public void LoadFromString(string data, string useThisID) {
         Pad.Enabled = true;
         Pad.Item = new ItemCollectionPad(data, useThisID);
@@ -73,7 +74,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
         LoadTab.Tag = sender;
-        LoadTab.ShowDialog();
+        _ = LoadTab.ShowDialog();
     }
 
     private void btnSpeichern_Click(object sender, System.EventArgs e) => SaveTab.ShowDialog();

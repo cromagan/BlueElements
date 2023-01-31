@@ -22,8 +22,6 @@ using BlueScript.Structures;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 
-using static BlueBasics.Extensions;
-
 namespace BlueScript.Variables;
 
 public class VariableFloat : Variable {

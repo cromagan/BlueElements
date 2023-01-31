@@ -94,7 +94,7 @@ public class SymbolPadItem : RectanglePadItem {
                 return true;
 
             case "borderwidth":
-                FloatTryParse(value.FromNonCritical(), out var tRanddicke);
+                _ = FloatTryParse(value.FromNonCritical(), out var tRanddicke);
                 Randdicke = tRanddicke;
                 return true;
 

@@ -132,8 +132,8 @@ internal static class Dictionary {
     }
 
     public static void WordAdd(string wort) {
-        if (_dictWords.Row[wort] != null) { _dictWords.Row.Remove(_dictWords.Row[wort], "Remove Dictionary word for Upadte"); }
-        _dictWords.Row.GenerateAndAdd(wort, "Add Word (after deleting)");
+        if (_dictWords.Row[wort] != null) { _ = _dictWords.Row.Remove(_dictWords.Row[wort], "Remove Dictionary word for Upadte"); }
+        _ = _dictWords.Row.GenerateAndAdd(wort, "Add Word (after deleting)");
     }
 
     private static void Init() {

@@ -172,13 +172,9 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
         SetInputRow();
     }
 
-    private void _cf_Changed(object sender, System.EventArgs e) {
-        InvalidateView();
-    }
+    private void _cf_Changed(object sender, System.EventArgs e) => InvalidateView();
 
-    private void _cf_Loaded(object sender, System.EventArgs e) {
-        InvalidateView();
-    }
+    private void _cf_Loaded(object sender, System.EventArgs e) => InvalidateView();
 
     private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
 
@@ -259,7 +255,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
                         var o = SearchOrGenerate(thisitco);
 
                         if (o is System.Windows.Forms.Control c) {
-                            unused.Remove(c);
+                            _ = unused.Remove(c);
 
                             if (thisit is CustomizableShowPadItem cspi) {
                                 c.Visible = cspi.IsVisibleForMe(_database?.UserGroup, _database?.UserName);

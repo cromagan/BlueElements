@@ -65,11 +65,12 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
 
     #endregion
 
-    #region Properties
-
     /// <summary>
     /// Wird von Flexoptions aufgerufen
     /// </summary>
+
+    #region Properties
+
     public string Datensatz_bearbeiten {
         get => string.Empty;
         set {
@@ -122,7 +123,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
         ItemCollectionList.ItemCollectionList layouts = new();
         foreach (var thisLayouts in Row.Database.Layouts) {
             ItemCollectionPad p = new(thisLayouts, string.Empty);
-            layouts.Add(p.Caption, p.Id, ImageCode.Stern);
+            _ = layouts.Add(p.Caption, p.Id, ImageCode.Stern);
         }
         l.Add(new FlexiControlForProperty<string>(() => Layout_Id, layouts));
         l.AddRange(base.GetStyleOptions());

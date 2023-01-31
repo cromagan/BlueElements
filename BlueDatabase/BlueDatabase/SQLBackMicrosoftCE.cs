@@ -47,7 +47,7 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
     }
 
     public SQLBackMicrosoftCE(string filename, bool create) : base() {
-        if (create && !File.Exists(filename)) { CreateDatabase(filename); }
+        if (create && !File.Exists(filename)) { _ = CreateDatabase(filename); }
 
         ConnectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" + filename + ";" +
                            "Integrated Security=True;Trusted_Connection=Yes;";
@@ -63,7 +63,7 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellename ungültig: " + tablename);
         }
 
-        if (create && !File.Exists(filename)) { CreateDatabase(filename); }
+        if (create && !File.Exists(filename)) { _ = CreateDatabase(filename); }
 
         ConnectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" + filename + ";" +
                            "Integrated Security=True;Trusted_Connection=Yes;";
@@ -115,7 +115,7 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
         var ok = false;
         try {
             myConn.Open();
-            myCommand.ExecuteNonQuery();
+            _ = myCommand.ExecuteNonQuery();
             //MessageBox.Show("DataBase is Created Successfully", "MyProgram", MessageBoxButtons.OK, MessageBoxIcon.Information);
             ok = true;
         } catch (Exception ex) {
@@ -151,7 +151,7 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
             columns.Add(colRow.Field<string>("ColumnName").ToUpper());
         }
 
-        CloseConnection();
+        _ = CloseConnection();
         return columns;
     }
 
@@ -162,7 +162,7 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
     protected override List<string> AllTables() {
         List<string> tables = new();
 
-        OpenConnection();
+        _ = OpenConnection();
 
         var dt = _connection.GetSchema("Tables");
         foreach (DataRow row in dt.Rows) {
@@ -170,7 +170,7 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
             tables.Add(tablename);
         }
 
-        CloseConnection();
+        _ = CloseConnection();
 
         return tables;
     }

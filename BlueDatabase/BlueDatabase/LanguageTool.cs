@@ -34,8 +34,6 @@ public static class LanguageTool {
 
     #endregion
 
-    #region Methods
-
     /// <summary>
     /// Fügt Präfix und Suffix hinzu und ersetzt den Text nach dem gewünschten Stil.
     /// </summary>
@@ -43,6 +41,9 @@ public static class LanguageTool {
     /// <param name="column"></param>
     /// <param name="style"></param>
     /// <returns></returns>
+
+    #region Methods
+
     public static string ColumnReplace(string txt, ColumnItem column, ShortenStyle style) {
         if (column == null) { return txt; }
 
@@ -82,6 +83,7 @@ public static class LanguageTool {
     /// <param name="txt"></param>
     /// <param name="mustTranslate">TRUE erstellt einen Eintrag in der Englisch-Datenbank, falls nicht vorhanden.</param>
     /// <returns></returns>
+
     public static string DoTranslate(string txt, bool mustTranslate, params object?[] args) {
         try {
             if (Translation == null) {

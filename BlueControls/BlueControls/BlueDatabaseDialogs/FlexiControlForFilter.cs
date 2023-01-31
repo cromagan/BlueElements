@@ -128,7 +128,7 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
         if (Filter?.Column == null || !Filter.Column.Database.IsAdministrator()) { return; }
 
         hotItem = Filter.Column;
-        items.Add("Spalte bearbeiten", "#ColumnEdit", QuickImage.Get(ImageCode.Spalte));
+        _ = items.Add("Spalte bearbeiten", "#ColumnEdit", QuickImage.Get(ImageCode.Spalte));
 
         //if (Parent is Filterleiste f) {
         //    if (f.pic.Visible) {
@@ -202,17 +202,17 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
         cbx.Item.Clear();
         cbx.Item.CheckBehavior = CheckBehavior.MultiSelection;
         if (TableView == null) {
-            cbx.Item.Add("Anzeigefehler", "|~", ImageCode.Kreuz, false);
+            _ = cbx.Item.Add("Anzeigefehler", "|~", ImageCode.Kreuz, false);
             return;
         }
         var listFilterString = AutoFilter.Autofilter_ItemList(Filter.Column, TableView.Filter, TableView.PinnedRows);
         if (listFilterString.Count == 0) {
-            cbx.Item.Add("Keine weiteren Einträge vorhanden", "|~", ImageCode.Kreuz, false);
+            _ = cbx.Item.Add("Keine weiteren Einträge vorhanden", "|~", ImageCode.Kreuz, false);
         } else if (listFilterString.Count < 400) {
             cbx.Item.AddRange(listFilterString, Filter.Column, ShortenStyle.Replaced, Filter.Column.BehaviorOfImageAndText);
             cbx.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
         } else {
-            cbx.Item.Add("Zu viele Einträge", "|~", ImageCode.Kreuz, false);
+            _ = cbx.Item.Add("Zu viele Einträge", "|~", ImageCode.Kreuz, false);
         }
     }
 

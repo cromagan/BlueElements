@@ -28,7 +28,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace BlueDatabase;
 
@@ -95,13 +94,14 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
     #endregion
 
-    #region Indexers
-
     /// <summary>
     /// Durchsucht die erste (interne) Spalte der Datenbank nach dem hier angegebenen Prmärschlüssel.
     /// </summary>
     /// <param name="primärSchlüssel">Der Primärschlüssel, nach dem gesucht werden soll. Groß/Kleinschreibung wird ignoriert.</param>
     /// <returns>Die Zeile, dessen erste Spalte den Primärschlüssel enthält oder - falls nicht gefunden - NULL.</returns>
+
+    #region Indexers
+
     public RowItem? this[string primärSchlüssel] => this[new FilterItem(Database.Column.First, FilterType.Istgleich_GroßKleinEgal | FilterType.MultiRowIgnorieren, primärSchlüssel)];
 
     public RowItem? this[params FilterItem[]? filter] {
@@ -120,12 +120,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
     #endregion
 
-    #region Methods
-
     /// <summary>
     /// Gibt einen Zeilenschlüssel zurück, der bei allen aktuell geladenen Datenbanken einzigartig ist.
     /// </summary>
     /// <returns></returns>
+
+    #region Methods
+
     public static string UniqueKeyValue() {
         var x = 9999;
         do {
@@ -159,6 +160,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     /// </summary>
     /// <param name="filter"></param>
     /// <returns></returns>
+
     public List<RowItem> CalculateFilteredRows(List<FilterItem>? filter) {
         List<RowItem> tmpVisibleRows = new();
         if (Database == null) { return tmpVisibleRows; }
@@ -167,7 +169,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
         try {
             var lockMe = new object();
-            Parallel.ForEach(Database.Row, thisRowItem => {
+            _ = Parallel.ForEach(Database.Row, thisRowItem => {
                 if (thisRowItem != null) {
                     if (thisRowItem.MatchesTo(filter)) {
                         lock (lockMe) { tmpVisibleRows.Add(thisRowItem); }
@@ -201,7 +203,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
         var l = new List<ColumnItem>();
         if (rowSortDefinition != null) { l.AddRange(rowSortDefinition.Columns); }
-        if (Database.Column.SysChapter != null) { l.AddIfNotExists(Database.Column.SysChapter); }
+        if (Database.Column.SysChapter != null) { _ = l.AddIfNotExists(Database.Column.SysChapter); }
 
         Database.RefreshColumnsData(l);
 
@@ -210,7 +212,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         List<RowData> pinnedData = new();
         var lockMe = new object();
         if (pinnedRows != null) {
-            Parallel.ForEach(pinnedRows, thisRow => {
+            _ = Parallel.ForEach(pinnedRows, thisRow => {
                 var rd = reUseMe.Get(thisRow, "Angepinnt") ?? new RowData(thisRow, "Angepinnt");
                 rd.PinStateSortAddition = "1";
                 rd.MarkYellow = true;
@@ -228,7 +230,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         #region Gefiltere Zeilen erstellen (_rowData)
 
         List<RowData?> rowData = new();
-        Parallel.ForEach(filteredRows, thisRow => {
+        _ = Parallel.ForEach(filteredRows, thisRow => {
             var adk = rowSortDefinition == null ? thisRow.CompareKey(null) : thisRow.CompareKey(rowSortDefinition.Columns);
 
             var markYellow = pinnedRows != null && pinnedRows.Contains(thisRow);
@@ -238,7 +240,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
             if (caps.Count > 0) {
                 if (caps.Contains(string.Empty)) {
-                    caps.Remove(string.Empty);
+                    _ = caps.Remove(string.Empty);
                     caps.Add("-?-");
                 }
             }
@@ -276,6 +278,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     /// <param name="filter"></param>
     /// <param name="pinnedRows"></param>
     /// <returns></returns>
+
     public List<RowItem> CalculateVisibleRows(List<FilterItem>? filter, List<RowItem?>? pinnedRows) {
         List<RowItem> tmpVisibleRows = new();
         if (Database == null) { return tmpVisibleRows; }
@@ -283,7 +286,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         pinnedRows ??= new List<RowItem?>();
 
         var lockMe = new object();
-        Parallel.ForEach(Database.Row, thisRowItem => {
+        _ = Parallel.ForEach(Database.Row, thisRowItem => {
             if (thisRowItem != null) {
                 if (thisRowItem.MatchesTo(filter) || pinnedRows.Contains(thisRowItem)) {
                     lock (lockMe) { tmpVisibleRows.Add(thisRowItem); }
@@ -350,12 +353,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     /// <param name="runScriptOfNewRow"></param>
     /// <param name="fullprocessing">Sollen der Zeilenersteller, das Datum und die Initalwerte geschrieben werden?</param>
     /// <returns></returns>
+
     public RowItem? GenerateAndAdd(long key, string valueOfCellInFirstColumn, bool runScriptOfNewRow, bool fullprocessing, string comment) {
         Develop.DebugPrint_Disposed(Database);
 
         var item = SearchByKey(key);
         if (item != null) { Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!"); }
-        Database?.ChangeData(DatabaseDataType.Comand_AddRow, null, key, string.Empty, key.ToString(), comment);
+        _ = (Database?.ChangeData(DatabaseDataType.Comand_AddRow, null, key, string.Empty, key.ToString(), comment));
         item = SearchByKey(key);
         if (item == null) { Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen."); }
 
@@ -374,7 +378,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         }
 
         if (runScriptOfNewRow) {
-            item.DoAutomatic(false, false, 1, "new row");
+            _ = item.DoAutomatic(false, false, 1, "new row");
         }
 
         return item;
@@ -388,6 +392,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     /// </summary>
     /// <param name="fi"></param>
     /// <returns></returns>
+
     public RowItem? GenerateAndAdd(List<FilterItem> fi, string comment) {
         if (Database == null || Database.IsDisposed) { return null; }
 
@@ -413,7 +418,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
             row.CellSet(thisfi.Column, thisfi.SearchValue);
         }
 
-        row.DoAutomatic(false, false, 1, "new row");
+        _ = row.DoAutomatic(false, false, 1, "new row");
 
         return row;
     }
@@ -463,7 +468,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         //}
         if (x.Count == 0) { return false; }
         foreach (var thisKey in x) {
-            Remove(thisKey, comment);
+            _ = Remove(thisKey, comment);
         }
         return true;
     }
@@ -499,7 +504,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         // Zeilen, die zu viel sind, löschen
         foreach (var thisRow in this) {
             var l = sourceDatabase.Row.SearchByKey(thisRow.Key);
-            if (l == null) { Remove(thisRow, "Clone - Zeile zuviel"); }
+            if (l == null) { _ = Remove(thisRow, "Clone - Zeile zuviel"); }
         }
 
         // Zeilen erzeugen und Format übertragen

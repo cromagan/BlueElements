@@ -118,7 +118,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         if (IsDisposed) { return; }
 
         if (InvokeRequired) {
-            Invoke(new Action(FillFilters));
+            _ = Invoke(new Action(FillFilters));
             return;
         }
         if (_isFilling) { return; }
@@ -179,16 +179,16 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
             if (orderArrangement != null) {
                 foreach (var thisclsVitem in orderArrangement) {
-                    columSort.AddIfNotExists(thisclsVitem.Column);
+                    _ = columSort.AddIfNotExists(thisclsVitem.Column);
                 }
             }
             if (_tableView?.CurrentArrangement != null) {
                 foreach (var thisclsVitem in _tableView?.CurrentArrangement) {
-                    columSort.AddIfNotExists(thisclsVitem.Column);
+                    _ = columSort.AddIfNotExists(thisclsVitem.Column);
                 }
             }
             foreach (var thisColumn in _tableView.Database.Column) {
-                columSort.AddIfNotExists(thisColumn);
+                _ = columSort.AddIfNotExists(thisColumn);
             }
 
             #endregion Reihenfolge der Spalten bestimmen
@@ -220,7 +220,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
                     var flx = FlexiItemOf(filterItem);
                     if (flx != null) {
                         // Sehr Gut, Flex vorhanden, wird später nicht mehr gelöscht
-                        flexsToDelete.Remove(flx);
+                        _ = flexsToDelete.Remove(flx);
                     } else {
                         // Na gut, eben neuen Flex erstellen
                         flx = new FlexiControlForFilter(_tableView, filterItem, this);
@@ -323,9 +323,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         }
     }
 
-    private void btnPin_Click(object sender, System.EventArgs e) {
-        _tableView?.Pin(_tableView.VisibleUniqueRows());
-    }
+    private void btnPin_Click(object sender, System.EventArgs e) => _tableView?.Pin(_tableView.VisibleUniqueRows());
 
     private void btnPinZurück_Click(object sender, System.EventArgs e) {
         _lastLooked = string.Empty;

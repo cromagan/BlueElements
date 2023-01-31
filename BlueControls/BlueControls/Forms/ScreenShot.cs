@@ -199,7 +199,7 @@ public sealed partial class ScreenShot {
             Width = r.Width;
             Height = r.Height;
             OnMouseMove(null);
-            ShowDialog();
+            _ = ShowDialog();
 
             if (frm != null) {
                 frm.Opacity = op;

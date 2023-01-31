@@ -292,7 +292,7 @@ public class GenericControl : System.Windows.Forms.Control {
 
     protected override void OnEnabledChanged(System.EventArgs e) {
         if (InvokeRequired) {
-            Invoke(new Action(() => OnEnabledChanged(e)));
+            _ = Invoke(new Action(() => OnEnabledChanged(e)));
             return;
         }
         if (IsDisposed) { return; }
@@ -303,7 +303,7 @@ public class GenericControl : System.Windows.Forms.Control {
     protected override void OnGotFocus(System.EventArgs e) {
         if (IsDisposed) { return; }
         if (!GetStyle(System.Windows.Forms.ControlStyles.Selectable)) {
-            Parent.SelectNextControl(this, true, true, true, true);
+            _ = Parent.SelectNextControl(this, true, true, true, true);
         } else {
             base.OnGotFocus(e);
             Invalidate();
@@ -342,7 +342,7 @@ public class GenericControl : System.Windows.Forms.Control {
             _mousePressing = true;
             Forms.QuickInfo.Close();
             if (Enabled) {
-                if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && Focus()) { Focus(); }
+                if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && Focus()) { _ = Focus(); }
             }
             base.OnMouseDown(e);
         }

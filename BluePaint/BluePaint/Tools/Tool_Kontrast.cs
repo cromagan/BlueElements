@@ -19,7 +19,8 @@ using BlueBasics;
 using BlueControls.EventArgs;
 using System.Drawing;
 using static BlueBasics.BitmapExt;
-using static BlueBasics.Converter;using static BlueBasics.Extensions;
+using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 
 #nullable enable
 
@@ -29,9 +30,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
 {
     #region Constructors
 
-    public Tool_Kontrast() : base() {
-        InitializeComponent();
-    }
+    public Tool_Kontrast() : base() => InitializeComponent();
 
     #endregion
 

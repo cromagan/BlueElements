@@ -45,9 +45,7 @@ public sealed class LastFilesCombo : ComboBox {
 
     #region Constructors
 
-    public LastFilesCombo() : base() {
-        SetLastFilesStyle();
-    }
+    public LastFilesCombo() : base() => SetLastFilesStyle();
 
     #endregion
 
