@@ -47,7 +47,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     #region Fields
 
-    public const string DatabaseVersion = "4.01";
+    public const string DatabaseVersion = "4.02";
 
     public static readonly ListExt<DatabaseAbstract> AllFiles = new();
     public static List<Type>? DatabaseTypes;
@@ -397,9 +397,8 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             allreadychecked.Add(thisDB);
 
             if (possibletables != null) {
-                var canadd = true;
-
                 foreach (var thistable in possibletables) {
+                    var canadd = true;
 
                     #region prüfen, ob schon voranden, z.b. DatabaseAbstract.AllFiles
 

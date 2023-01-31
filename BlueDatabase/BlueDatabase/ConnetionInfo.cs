@@ -74,29 +74,32 @@ public class ConnectionInfo : IReadableText {
 
         var x = (uniqueID + "||||").SplitBy("|");
 
-        if (SQLBackAbstract.IsValidTableName(x[0])) {
+        #region Prüfen, ob eine ConnectionInfo als String übergeben wurde
+
+        if (SQLBackAbstract.IsValidTableName(x[0]) && !string.IsNullOrEmpty(x[1])) {
             TableName = x[0];
             Provider = null;
             DatabaseID = x[1];
             AdditionalData = x[2];
             return;
         }
+        #endregion
 
-        //#region  Prüfen, ob eine vorhandene Datenbank den Provider machen kann
-        //foreach (var thisDB in alf) {
-        //    var d = thisDB.ConnectionData;
+        #region  Prüfen, ob eine vorhandene Datenbank den Provider machen kann
+        foreach (var thisDB in alf) {
+            //var d = thisDB.ConnectionData;
 
-        //    if (thisDB.ConnectionDataOfOtherTable(x[0], true) is ConnectionInfo nci) {
-        //        TableName = nci.TableName;
-        //        Provider = nci.Provider;
-        //        DatabaseID = nci.DatabaseID;
-        //        AdditionalData = nci.AdditionalData;
-        //        return;
-        //    }
+            if (thisDB.ConnectionDataOfOtherTable(x[0], true) is ConnectionInfo nci) {
+                TableName = nci.TableName;
+                Provider = nci.Provider;
+                DatabaseID = nci.DatabaseID;
+                AdditionalData = nci.AdditionalData;
+                return;
+            }
 
-        //}
+        }
 
-        //#endregion
+        #endregion
 
         //if (d.DatabaseID == Database.DatabaseId) {
         //    // Dateisystem

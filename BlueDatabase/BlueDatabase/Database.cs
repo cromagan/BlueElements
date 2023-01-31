@@ -691,11 +691,11 @@ public sealed class Database : DatabaseAbstract {
     public override string UndoText(ColumnItem? column, RowItem? row) => UndoText(column, row, Works);
 
     internal static void SaveToByteList(List<byte> list, ColumnItem c, RowItem r) {
-        var cv = r.CellGetString(c);
-
-        if (string.IsNullOrEmpty(cv)) { return; }
-        //db.Cell.DataOfCellKey(cell.Key, out var tColumn, out var tRow);
         if (!c.SaveContent) { return; }
+
+        var cv = c?.Database?.Cell.GetStringBehindLinkedValue(c, r);
+
+        if (cv == null || string.IsNullOrEmpty(cv)) { return; }
         var b = cv.UTF8_ToByte();
         list.Add((byte)Routinen.CellFormatUTF8_V401);
         list.Add((byte)DatabaseDataType.Value_withoutSizeData);

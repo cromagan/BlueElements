@@ -799,7 +799,9 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
     public DatabaseAbstract? LinkedDatabase {
         get {
-            if (_tmpLinkedDatabase != null) {
+            if (Database == null || Database.IsDisposed) { return null; }
+
+            if (_tmpLinkedDatabase != null && !_tmpLinkedDatabase.IsDisposed) {
                 return _tmpLinkedDatabase;
             }
 
@@ -1069,7 +1071,9 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     //    }
     //}
 
-    private DatabaseAbstract Tmp_LinkedDatabase {
+    private DatabaseAbstract? Tmp_LinkedDatabase {
+        get => _tmpLinkedDatabase;
+
         set {
             if (value == _tmpLinkedDatabase) { return; }
 
@@ -1994,6 +1998,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 _dropdownBearbeitungErlaubt = false;
                 _behaviorOfImageAndText = BildTextVerhalten.Interpretiere_Bool;
                 _maxTextLenght = 1;
+                _dropdownWerteAndererZellenAnzeigen = false;
+                _adminInfo = "Diese Spalte kann nur über ein Skript bearbeitet werden,\r\nmit dem Befehl SetError";
 
                 if (setOpticalToo) {
                     ForeColor = Color.FromArgb(128, 0, 0);

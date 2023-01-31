@@ -72,7 +72,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DropdownBearbeitungErlaubt = false,
         TextBearbeitungErlaubt = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = true
+        DropdownWerteAndererZellenAnzeigen = false
     };
 
     public new static readonly ColumnFormatHolder DateTime = new(FormatHolder.DateTime) {

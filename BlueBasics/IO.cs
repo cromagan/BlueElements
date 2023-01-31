@@ -292,6 +292,11 @@ public static class IO {
             _ => FileFormat.Unknown
         };
 
+    /// <summary>
+    /// Gibt von einem Pfad den letzten Ordner zurück
+    /// </summary>
+    /// <param name="pathx"></param>
+    /// <returns></returns>
     public static string Folder(this string pathx) {
         if (string.IsNullOrEmpty(pathx)) { return string.Empty; }
         // Kann vorkommen, wenn ein Benutzer einen Pfad
