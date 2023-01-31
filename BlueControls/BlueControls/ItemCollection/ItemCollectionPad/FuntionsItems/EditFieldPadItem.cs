@@ -110,6 +110,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
 
             var lst = new ItemCollectionList.ItemCollectionList();
             lst.AddRange(GetRowFrom.Database.Column, false);
+            lst.Sort();
 
             var sho = InputBoxListBoxStyle.Show("Spalte wählen:", lst, AddType.None, true);
 
