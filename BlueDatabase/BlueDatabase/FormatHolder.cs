@@ -18,13 +18,15 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using System.Collections.Generic;
 
 namespace BlueDatabase;
 
-public class FormatHolder : IInputFormat {
+public class FormatHolder : IInputFormat, IReadableText {
 
     #region Fields
 
@@ -32,6 +34,7 @@ public class FormatHolder : IInputFormat {
 
     public static readonly FormatHolder Bit = new() {
         Name = "Bit",
+        Image = QuickImage.Get(ImageCode.Häkchen, 16),
         AllowedChars = "+-",
         Regex = @"^([+]|[-])$",
         Suffix = string.Empty,
@@ -45,6 +48,7 @@ public class FormatHolder : IInputFormat {
 
     public static readonly FormatHolder Date = new() {
         Name = "Date",
+        Image = QuickImage.Get(ImageCode.Uhr, 16),
         Regex = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}$",
         AllowedChars = Constants.Char_Numerals + ".",
         Suffix = string.Empty,
@@ -58,6 +62,7 @@ public class FormatHolder : IInputFormat {
 
     public static readonly FormatHolder DateTime = new() {
         Name = "DateTime",
+        Image = QuickImage.Get(ImageCode.Uhr, 16),
         Regex = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}[ ](0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$",
         AllowedChars = Constants.Char_Numerals + ":. ",
         Suffix = string.Empty,
@@ -71,6 +76,7 @@ public class FormatHolder : IInputFormat {
 
     public static readonly FormatHolder Email = new() {
         Name = "EMail",
+        Image = QuickImage.Get(ImageCode.Brief, 16),
         //http://emailregex.com/
         Regex = @"^[a-z0-9A-Z._-]{1,40}[@][a-z0-9A-Z._-]{1,40}[.][a-zA-Z]{1,3}$",
         AllowedChars = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + "@.-_",
@@ -85,6 +91,7 @@ public class FormatHolder : IInputFormat {
 
     public static readonly FormatHolder FilepathAndName = new() {
         Name = "FilepathAndName",
+        Image = QuickImage.Get(ImageCode.Ordner, 16),
         //    https://regex101.com/r/S2CbwM/1
         Regex = @"^[A-Za-z]:\\.*[.].*$",
         AllowedChars = Constants.Char_Numerals + Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + "\\#:.+-_ ",
@@ -99,6 +106,7 @@ public class FormatHolder : IInputFormat {
 
     public static readonly FormatHolder Float = new() {
         Name = "Float",
+        Image = QuickImage.Get(ImageCode.Gleitkommazahl, 16),
         //https://regex101.com/r/onr0NZ/1
         Regex = @"(^-?([1-9]\d*)|^0)([.|,]\d*[1-9])?$",
         AllowedChars = Constants.Char_Numerals + ",-",
@@ -113,6 +121,7 @@ public class FormatHolder : IInputFormat {
 
     public static readonly FormatHolder FloatPositive = new() {
         Name = "Float only Positive",
+        Image = QuickImage.Get(ImageCode.Gleitkommazahl, 16),
         //https://regex101.com/r/onr0NZ/1
         Regex = @"(^([1-9]\d*)|^0)([.|,]\d*[1-9])?$",
         AllowedChars = Constants.Char_Numerals + ",-",
@@ -127,6 +136,7 @@ public class FormatHolder : IInputFormat {
 
     public static readonly FormatHolder Integer = new() {
         Name = "Integer",
+        Image = QuickImage.Get(ImageCode.Ganzzahl, 16),
         Regex = @"^((-?[1-9]\d*)|0)$",
         AllowedChars = Constants.Char_Numerals + "-",
         Suffix = string.Empty,
@@ -140,6 +150,7 @@ public class FormatHolder : IInputFormat {
 
     public static readonly FormatHolder IntegerPositive = new() {
         Name = "Integer only Positive",
+        Image = QuickImage.Get(ImageCode.Ganzzahl, 16),
         Regex = @"^(([1-9]\d*)|0)$",
         AllowedChars = Constants.Char_Numerals + "-",
         Suffix = string.Empty,
@@ -153,6 +164,7 @@ public class FormatHolder : IInputFormat {
 
     public static readonly FormatHolder PhoneNumber = new() {
         Name = "PhoneNumber",
+        Image = QuickImage.Get(ImageCode.Telefon, 16),
         //https://regex101.com/r/OzJr8j/1
         Regex = @"^[+][1-9][\s0-9]*[0-9]$",
         AllowedChars = Constants.Char_Numerals + "+ ",
@@ -167,6 +179,7 @@ public class FormatHolder : IInputFormat {
 
     public static readonly FormatHolder SystemName = new() {
         Name = "Systemname",
+        Image = QuickImage.Get(ImageCode.Variable, 16),
         AllowedChars = Constants.Char_az + Constants.Char_az + Constants.Char_Numerals + "_",
         Regex = @"^[A-Za-z]\\S*$",
         Suffix = string.Empty,
@@ -180,6 +193,7 @@ public class FormatHolder : IInputFormat {
 
     public static readonly FormatHolder Text = new() {
         Name = "Text",
+        Image = QuickImage.Get(ImageCode.Textfeld, 16),
         AllowedChars = string.Empty,
         Regex = string.Empty,
         Suffix = string.Empty,
@@ -193,6 +207,7 @@ public class FormatHolder : IInputFormat {
 
     public static readonly FormatHolder TextMitFormatierung = new() {
         Name = "Text with format",
+        Image = QuickImage.Get(ImageCode.Word, 16),
         AllowedChars = string.Empty,
         Regex = string.Empty,
         Suffix = string.Empty,
@@ -206,6 +221,7 @@ public class FormatHolder : IInputFormat {
 
     public static readonly FormatHolder Url = new() {
         Name = "Url",
+        Image = QuickImage.Get(ImageCode.Globus, 16),
         //    https://regex101.com/r/S2CbwM/1
         Regex = @"^(https:|http:|www\.)\S*$",
         AllowedChars = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + ":{.-_/",
@@ -231,6 +247,7 @@ public class FormatHolder : IInputFormat {
     public AdditionalCheck AdditionalFormatCheck { get; set; } = AdditionalCheck.None;
     public string AllowedChars { get; set; } = string.Empty;
     public bool FormatierungErlaubt { get; set; } = false;
+    public QuickImage? Image { get; set; } = null;
     public int MaxTextLenght { get; set; } = 0;
     public bool MultiLine { get; set; } = false;
     public string Name { get; set; } = string.Empty;
@@ -238,6 +255,14 @@ public class FormatHolder : IInputFormat {
     public string Regex { get; set; } = string.Empty;
     public bool SpellCheckingEnabled { get; set; } = false;
     public string Suffix { get; set; } = string.Empty;
+
+    #endregion
+
+    #region Methods
+
+    public string ReadableText() => Name;
+
+    public QuickImage? SymbolForReadableText() => Image;
 
     #endregion
 }

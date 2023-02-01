@@ -30,6 +30,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
@@ -1457,14 +1458,22 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         if (_format.NeedTargetDatabase()) {
             if (LinkedDatabase == null) { return "Verknüpfte Datenbank fehlt oder existiert nicht."; }
             if (LinkedDatabase == Database) { return "Zirkelbezug mit verknüpfter Datenbank."; }
+                var c = LinkedDatabase.Column.Exists(_linkedCell_ColumnNameOfLinkedDatabase);
+             if (c == null) { return "Die verknüpfte Schlüsselspalte existiert nicht."; }
+            //var (filter, info) = CellCollection.GetFilterFromLinkedCellData(LinkedDatabase, column, row);
+            if (_linkedCellFilter == null || _linkedCellFilter.Count ==0 ) { return "Keine Filter für verknüpfte Datenbank definiert."; }
+
+        } else {
+            if (!string.IsNullOrEmpty(_linkedCell_ColumnNameOfLinkedDatabase)) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
         }
+
         if (!_format.Autofilter_möglich() && _filterOptions != FilterOptions.None) { return "Bei diesem Format keine Filterung erlaubt."; }
         if (_filterOptions != FilterOptions.None && !_filterOptions.HasFlag(FilterOptions.Enabled)) { return "Filter Kombination nicht möglich."; }
         if (_filterOptions != FilterOptions.Enabled_OnlyAndAllowed && _filterOptions.HasFlag(FilterOptions.OnlyAndAllowed)) { return "Filter Kombination nicht möglich."; }
         if (_filterOptions != FilterOptions.Enabled_OnlyOrAllowed && _filterOptions.HasFlag(FilterOptions.OnlyOrAllowed)) { return "Filter Kombination nicht möglich."; }
         if (_filterOptions.HasFlag(FilterOptions.OnlyAndAllowed) || _filterOptions.HasFlag(FilterOptions.OnlyOrAllowed)) {
             if (!_multiLine) {
-                return "Dieser Filter kann nur bei Mehrzeiligen Spalten benutzt werden.";
+                return "Dieser Filter kann nur bei mehrzeiligen Spalten benutzt werden.";
             }
         }
         switch (_format) {
@@ -1480,24 +1489,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             //    if (MaxTextLenght < 35) { return "Maximallänge bei diesem Format mindestens 35!"; }
             //    break;
 
-            //case DataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
-            //    //case DataFormat.Verknüpfung_zu_anderer_Datenbank:
-            //    if (!string.IsNullOrEmpty(_cellInitValue)) { return "Dieses Format kann keinen Initial-Text haben."; }
-            //    if (_keyColumnKey > -1) { return "Dieses Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
-            //    if (IsFirst()) { return "Dieses Format ist bei der ersten (intern) erste Spalte nicht erlaubt."; }
-            //    if (_linkedCellRowKeyIsInColumn is < 0 and not (-9999)) { return "Die Angabe der Spalte, aus der der Schlüsselwert geholt wird, fehlt."; }
-            //    if (_vorschlagsColumn > 0) { return "Dieses Format kann keine Vorschlags-Spalte haben."; }
-            //    if (_linkedCellRowKeyIsInColumn >= 0) {
-            //        var c = LinkedDatabase().Column.SearchByKey(_linkedCell_ColumnKeyOfLinkedDatabase);
-            //        if (c == null) { return "Die verknüpfte Spalte existiert nicht."; }
-            //        //this.GetStyleFrom(c);
-            //        //BildTextVerhalten = c.BildTextVerhalten;
 
-            //        //_MultiLine = c.MultiLine;// != ) { return "Multiline stimmt nicht mit der Ziel-Spalte Multiline überein"; }
-            //        //} else {
-            //        //    if (!_MultiLine) { return "Dieses Format muss mehrzeilig sein, da es von der Ziel-Spalte gesteuert wird."; }
-            //    }
-            //    break;
 
             case DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
                 //Develop.DebugPrint("Values_für_LinkedCellDropdown Verwendung bei:" + Database.Filename); //TODO: 29.07.2021 Values_für_LinkedCellDropdown Format entfernen
@@ -1508,16 +1500,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
                 break;
 
-                //case DataFormat.Link_To_Filesystem:
-                //    if (!string.IsNullOrEmpty(_cellInitValue)) { return "Dieses Format kann keinen Initial-Text haben."; }
-                //    if (_multiLine && !_afterEditQuickSortRemoveDouble) { return "Format muss sortiert werden."; }
-                //    if (_vorschlagsColumn > 0) { return "Dieses Format kann keine Vorschlags-Spalte haben."; }
-                //    if (!string.IsNullOrEmpty(_autoRemove)) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
-                //    if (_afterEditAutoCorrect) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
-                //    if (_afterEditDoUCase) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
-                //    if (_afterEditRunden != -1) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
-                //    if (AfterEditAutoReplace.Count > 0) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
-                //    break;
+
         }
 
         if (_multiLine) {
@@ -1527,7 +1510,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             if (_showMultiLineInOneLine) { return "Wenn mehrzeilige Texte einzeilig dargestellt werden sollen, muss mehrzeilig angewählt sein."; }
             if (_afterEditQuickSortRemoveDouble) { return "Sortierung kann nur bei mehrzeiligen Feldern erfolgen."; }
         }
-        //if (_SpellCheckingEnabled && !_Format.SpellCheckingPossible()) { return "Rechtschreibprüfung bei diesem Format nicht möglich."; }
+        if (_spellCheckingEnabled && !_format.SpellCheckingPossible()) { return "Rechtschreibprüfung bei diesem Format nicht möglich."; }
         if (_editAllowedDespiteLock && !_textBearbeitungErlaubt && !_dropdownBearbeitungErlaubt) { return "Wenn die Zeilensperre ignoriert werden soll, muss eine Bearbeitungsmethode definiert sein."; }
         var tmpEditDialog = UserEditDialogTypeInTable(_format, false, true, _multiLine);
         if (_textBearbeitungErlaubt) {
@@ -1544,10 +1527,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         if (!_dropdownBearbeitungErlaubt && !_textBearbeitungErlaubt) {
             if (_permissionGroupsChangeCell.Count > 0) { return "Bearbeitungsberechtigungen entfernen, wenn keine Bearbeitung erlaubt ist."; }
         }
-        //if (!string.IsNullOrEmpty(_cellInitValue)) {
-        //    if (IsFirst()) { return "Die erste Spalte darf keinen InitialWert haben."; }
-        //    //if (_vorschlagsColumn > -1) { return "InitialWert und Vorschlagspalten-Initial-Text gemeinsam nicht möglich"; }
-        //}
+
         foreach (var thisS in _permissionGroupsChangeCell) {
             if (thisS.Contains("|")) { return "Unerlaubtes Zeichen bei den Gruppen, die eine Zelle bearbeiten dürfen."; }
             if (thisS.ToUpper() == "#ADMINISTRATOR") { return "'#Administrator' bei den Bearbeitern entfernen."; }
@@ -1564,13 +1544,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         if (_dropdownWerteAndererZellenAnzeigen && !_format.DropdownItemsOfOtherCellsAllowed()) { return "'Dropdownmenu alles hinzufügen' bei diesem Format nicht erlaubt."; }
         if (_dropdownAllesAbwählenErlaubt && !_format.DropdownUnselectAllAllowed()) { return "'Dropdownmenu alles abwählen' bei diesem Format nicht erlaubt."; }
         if (_dropDownItems.Count > 0 && !_format.DropdownItemsAllowed()) { return "Manuelle 'Dropdow-Items' bei diesem Format nicht erlaubt."; }
-        if (_behaviorOfImageAndText != BildTextVerhalten.Nur_Text) {
-            //if (_Format is DataFormat.Text) {
-            //    // Performance-Teschnische Gründe
-            //    _BildTextVerhalten = BildTextVerhalten.Nur_Text;
-            //    //return "Bei diesem Format muss das Bild/Text-Verhalten 'Nur Text' sein.";
-            //}
-        }
+
         if (!string.IsNullOrEmpty(_suffix)) {
             if (_multiLine) { return "Einheiten und Mehrzeilig darf nicht kombiniert werden."; }
         }
@@ -1578,25 +1552,13 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         if (_filterOptions == FilterOptions.None) {
             if (!string.IsNullOrEmpty(_autoFilterJoker)) { return "Wenn kein Autofilter erlaubt ist, immer anzuzeigende Werte entfernen"; }
         }
-        //if (string.IsNullOrEmpty(_linkedKeyKennung) && _format.NeedLinkedKeyKennung()) { return "Spaltenkennung für verlinkte Datenbanken fehlt."; }
         if (_opticalReplace.Count > 0) {
             if (_format is not DataFormat.Text and
                 not DataFormat.RelationText) { return "Format unterstützt keine Ersetzungen."; }
             if (_filterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled)) { return "Entweder 'Ersetzungen' oder 'erweiternden Autofilter'"; }
             if (!string.IsNullOrEmpty(_autoFilterJoker)) { return "Entweder 'Ersetzungen' oder 'Autofilter Joker'"; }
         }
-        //if (_keyColumnKey > -1) {
-        //    if (!string.IsNullOrEmpty(Am_A_Key_For_Other_Column)) { return "Eine Schlüsselspalte darf selbst keine Verknüpfung zu einer anderen Spalte haben: " + Am_A_Key_For_Other_Column; }
-        //    var c = Database.Column.SearchByKey(_keyColumnKey);
-        //    if (c == null) { return "Die verknüpfte Schlüsselspalte existiert nicht."; }
-        //}
-        //if (IsFirst()) {
-        //    if (_keyColumnKey > -1) { return "Die (intern) erste Spalte darf keine Verknüpfung zu einer andern Schlüsselspalte haben."; }
-        //}
-        if (_format is not DataFormat.Verknüpfung_zu_anderer_Datenbank and not DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) {
-            //if (_LinkedCell_RowKeyIsInColumn > -1) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
-            if (!string.IsNullOrEmpty(_linkedCell_ColumnNameOfLinkedDatabase)) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
-        }
+
         return string.Empty;
     }
 
@@ -2200,19 +2162,44 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         return summ;
     }
 
-    public QuickImage? SymbolForReadableText() => this == Database.Column.SysRowChanger
-        ? QuickImage.Get(ImageCode.Person)
-        : this == Database.Column.SysRowCreator
-            ? QuickImage.Get(ImageCode.Person)
-            : _format switch {
-                DataFormat.RelationText => QuickImage.Get(ImageCode.Herz, 16),
-                DataFormat.FarbeInteger => QuickImage.Get(ImageCode.Pinsel, 16),
-                DataFormat.Verknüpfung_zu_anderer_Datenbank => QuickImage.Get(ImageCode.Fernglas, 16),
-                DataFormat.Button => QuickImage.Get(ImageCode.Kugel, 16),
-                _ => _format.TextboxEditPossible()
-                    ? _multiLine ? QuickImage.Get(ImageCode.Textfeld, 16, Color.Red, Color.Transparent) : QuickImage.Get(ImageCode.Textfeld)
-                    : QuickImage.Get("Pfeil_Unten_Scrollbar|14|||||0")
-            };
+    public QuickImage? SymbolForReadableText() {
+        if (IsDisposed) { return null; }
+        if (Database == null || Database.IsDisposed) { return null; }
+
+        if (this == Database.Column.SysRowChanger) { return QuickImage.Get(ImageCode.Person); }
+
+        if (this == Database.Column.SysRowChanger) { return QuickImage.Get(ImageCode.Person); }
+        if (this == Database.Column.SysRowCreator) { return QuickImage.Get(ImageCode.Person); }
+        if (this == Database.Column.SysRowCreateDate) { return QuickImage.Get(ImageCode.Uhr); }
+        if (this == Database.Column.SysRowChangeDate) { return QuickImage.Get(ImageCode.Uhr); }
+
+        if (this == Database.Column.SysLocked) { return QuickImage.Get(ImageCode.Schloss); }
+
+        if (this == Database.Column.SysCorrect) { return QuickImage.Get(ImageCode.Warnung); }
+
+        if (_format == DataFormat.RelationText) { return QuickImage.Get(ImageCode.Herz, 16); }
+
+        if (_format == DataFormat.FarbeInteger) { return QuickImage.Get(ImageCode.Pinsel, 16); }
+
+        if (_format == DataFormat.FarbeInteger) { return QuickImage.Get(ImageCode.Pinsel, 16); }
+        if (_format == DataFormat.Button) { return QuickImage.Get(ImageCode.Kugel, 16); }
+        if (_format == DataFormat.Verknüpfung_zu_anderer_Datenbank) { return QuickImage.Get(ImageCode.Fernglas, 16); }
+
+        foreach (var thisFormat in FormatHolder.AllFormats) {
+            if (thisFormat.IsFormatIdentical(this)) { return thisFormat.Image; }
+        }
+
+        if (_dropdownBearbeitungErlaubt) {
+            return QuickImage.Get("Pfeil_Unten_Scrollbar|14|||||0");
+        }
+
+        if (_format.TextboxEditPossible()) {
+            return _multiLine ? QuickImage.Get(ImageCode.Textfeld, 16, Color.Red, Color.Transparent) :
+                           QuickImage.Get(ImageCode.Textfeld);
+        }
+
+        return null;
+    }
 
     public override string ToString() {
         if (this == null) { return "NULL"; }

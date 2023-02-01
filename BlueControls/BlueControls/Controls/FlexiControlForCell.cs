@@ -494,11 +494,12 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
             //AllowedChars = gbColumn.AllowedChars;
             //Regex = gbColumn.Regex;
             //MultiLine = gbColumn.MultiLine;
-        } else {
-            if (column == null) { return null; }  // Bei Steuerelementen, die manuell hinzugefügt werden
-            if (row == null) { return null; }  // Beim initualisieren des Controls und Linked Cell kann das vorkommen
-            Develop.DebugPrint("Column nicht gefunden: " + column.Name + " " + column.Database.TableName);
         }
+        //else {
+        //    if (column == null) { return null; }  // Bei Steuerelementen, die manuell hinzugefügt werden
+        //    if (row == null) { return null; }  // Beim initualisieren des Controls und Linked Cell kann das vorkommen
+        //    Develop.DebugPrint("Column nicht gefunden: " + column.Name + " " + column.Database.TableName);
+        //}
 
         return gbColumn;
     }
