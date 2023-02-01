@@ -313,7 +313,7 @@ public static class Develop {
                 Trace.Listeners.Remove(_traceListener);
                 _traceListener.Flush();
                 _traceListener.Close();
-                _traceListener.Dispose();
+                _traceListener?.Dispose();
                 _traceListener = null;
                 if (_deleteTraceLog && FileExists(_currentTraceLogFile)) { _ = DeleteFile(_currentTraceLogFile, false); }
             }

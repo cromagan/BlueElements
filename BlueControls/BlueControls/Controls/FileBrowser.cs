@@ -200,7 +200,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
 
         var dateiPng = TempFile(txbPfad.Text.TrimEnd("\\"), "Screenshot " + DateTime.Now.ToString(Constants.Format_Date4), "PNG");
         i.Save(dateiPng, ImageFormat.Png);
-        i.Dispose();
+        i?.Dispose();
         CollectGarbage();
         txbPfad_Enter(null, null);
     }

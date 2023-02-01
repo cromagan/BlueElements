@@ -41,7 +41,7 @@ public partial class EditBoxRow_NEW : DialogWithOkAndCancel {
         EditBoxRow_NEW MB = new(txt, cf);
         if (isDialog) {
             _ = MB.ShowDialog();
-            MB.Dispose();
+            MB?.Dispose();
         } else {
             MB.Show();
         }

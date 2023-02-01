@@ -33,7 +33,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 
 namespace BlueControls.ItemCollection;
 
@@ -96,7 +95,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
     public string Datenbank_wählen {
         get => string.Empty;
         set {
-            var db = BlueControls.Forms.CommonDialogs.ChooseKnownDatabase();
+            var db = Forms.CommonDialogs.ChooseKnownDatabase();
 
             if (db == null) { return; }
 
@@ -168,20 +167,20 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
     }
 
     public Table FilterTable() {
-        var FilterTable = new Table {
+        var filterTable = new Table {
             DropMessages = false,
             ShowWaitScreen = true,
             Size = new Size(968, 400)
         };
 
-        FilterTable.DatabaseSet(FilterDefiniton, string.Empty);
+        filterTable.DatabaseSet(FilterDefiniton, string.Empty);
 
-        FilterTable.Arrangement = 1;
-        FilterTable.ContextMenuInit += FilterTable_ContextMenuInit;
-        FilterTable.ContextMenuItemClicked += Filtertable_ContextMenuItemClicked;
-        FilterTable.Disposed += FilterTable_Disposed;
+        filterTable.Arrangement = 1;
+        filterTable.ContextMenuInit += FilterTable_ContextMenuInit;
+        filterTable.ContextMenuItemClicked += Filtertable_ContextMenuItemClicked;
+        filterTable.Disposed += FilterTable_Disposed;
 
-        return FilterTable;
+        return filterTable;
     }
 
     public override List<GenericControl> GetStyleOptions() {
@@ -231,7 +230,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
                     na = na.FilePath() + SQLBackAbstract.MakeValidTableName(na.FileNameWithoutSuffix()) + "." + na.FileSuffix();
                 }
 
-                Database = DatabaseAbstract.GetByID(new ConnectionInfo(na), null);
+                Database = DatabaseAbstract.GetById(new ConnectionInfo(na, null), null);
                 return true;
 
             case "id":
@@ -326,9 +325,9 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
             if (Database != null) {
                 var txt = "eine Zeile aus " + Database.Caption;
 
-                Skin.Draw_FormatedText(gr, txt, QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont.Scale(zoom), false);
+                Skin.Draw_FormatedText(gr, txt, QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
             } else {
-                Skin.Draw_FormatedText(gr, "Bezug fehlt", QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont.Scale(zoom), false);
+                Skin.Draw_FormatedText(gr, "Bezug fehlt", QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
             }
         } else {
             CustomizableShowPadItem.DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
@@ -497,10 +496,10 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         ConnectsTo.Clear();
 
         foreach (var thisRow in FilterDefiniton.Row) {
-            var GetValueFrom = Parent[thisRow.CellGetString("suchtxt")];
+            var getValueFrom = Parent[thisRow.CellGetString("suchtxt")];
 
-            if (GetValueFrom != null) {
-                ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, GetValueFrom, ConnectionType.Bottom, false, false));
+            if (getValueFrom != null) {
+                ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, getValueFrom, ConnectionType.Bottom, false, false));
             }
         }
     }

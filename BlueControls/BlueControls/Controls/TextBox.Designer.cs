@@ -14,8 +14,8 @@ namespace BlueControls.Controls
             {
                 if (disposing && components != null)
                 {
-                    //if (_BitmapOfControl != null) { _BitmapOfControl.Dispose(); }
-                    components.Dispose();
+                    //if (_BitmapOfControl != null) { _BitmapOfControl?.Dispose(); }
+                    components?.Dispose();
                 }
             }
             finally
@@ -29,7 +29,7 @@ namespace BlueControls.Controls
                 _cursorVisible = false;
                 _suffix = null;
                 _eTxt.Changed -= _eTxt_Changed;
-                _eTxt.Dispose();
+                _eTxt?.Dispose();
             }
         }
         //Wird vom Windows Form-Designer benötigt.

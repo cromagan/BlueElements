@@ -180,7 +180,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
 
     public bool ResetVariables() {
         if (!string.IsNullOrEmpty(Platzhalter_Für_Layout) && Bitmap != null) {
-            Bitmap.Dispose();
+            Bitmap?.Dispose();
             Bitmap = null;
             OnChanged();
             return true;
@@ -218,7 +218,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen
             if (Bitmap != null) {
-                Bitmap.Dispose();
+                Bitmap?.Dispose();
                 Bitmap = null;
             }
 

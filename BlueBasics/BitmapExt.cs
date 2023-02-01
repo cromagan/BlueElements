@@ -416,7 +416,7 @@ public class BitmapExt : IDisposableExtended {
         ImageAttributes attributes = new();
         attributes.SetColorMatrix(colorMatrix);
         g.DrawImage(original, new Rectangle(0, 0, original.Width, original.Height), 0, 0, original.Width, original.Height, GraphicsUnit.Pixel, attributes);
-        g.Dispose();
+        g?.Dispose();
         return newBitmap;
     }
 
@@ -441,7 +441,7 @@ public class BitmapExt : IDisposableExtended {
             FileStream fs = new(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
             var im = Image.FromStream(fs);
             fs.Close();
-            fs.Dispose();
+            fs?.Dispose();
             return im;
         } catch (Exception) {
             return null;
@@ -591,7 +591,7 @@ public class BitmapExt : IDisposableExtended {
         g.DrawImage(source, new Rectangle(0, 0, source.Width, source.Height),
             0, 0, source.Width, source.Height, GraphicsUnit.Pixel, attributes);
         // dispose the Graphics object
-        g.Dispose();
+        g?.Dispose();
         return newBitmap;
     }
 
@@ -854,7 +854,7 @@ public class BitmapExt : IDisposableExtended {
             }
         }
         imageStreamSource.Close();
-        imageStreamSource.Dispose();
+        imageStreamSource?.Dispose();
         return l;
     }
 

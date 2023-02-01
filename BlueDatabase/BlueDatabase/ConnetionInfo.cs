@@ -42,11 +42,11 @@ public class ConnectionInfo : IReadableText {
     /// Versucht das beste daraus zu machen....
     /// </summary>
     /// <param name="uniqueID"></param>
-    public ConnectionInfo(string uniqueID) {
+    public ConnectionInfo(string uniqueID, string? preveredFileFormatID) {
         var alf = new List<DatabaseAbstract>();// könnte sich ändern, deswegen Zwischenspeichern
         alf.AddRange(DatabaseAbstract.AllFiles);
 
-        #region Ist es NUR ein Dateiname? Dann im Single und Multiuser suchen und zur Not eine MultiUser zurück geben
+        #region Ist es NUR ein Dateiname? Dann im Single und Multiuser suchen und zur Not eine preveredFileFormatID zurück geben
 
         if (uniqueID.IsFormat(FormatHolder.FilepathAndName) &&
             uniqueID.FileSuffix().ToUpper() == "MDB") {
@@ -64,7 +64,7 @@ public class ConnectionInfo : IReadableText {
 
             TableName = SQLBackAbstract.MakeValidTableName(uniqueID.FileNameWithoutSuffix());
             Provider = null;
-            DatabaseID = DatabaseMultiUser.DatabaseId;
+            DatabaseID = preveredFileFormatID ?? Database.DatabaseId;
             AdditionalData = uniqueID;
 
             return;
@@ -83,9 +83,11 @@ public class ConnectionInfo : IReadableText {
             AdditionalData = x[2];
             return;
         }
+
         #endregion
 
         #region  Prüfen, ob eine vorhandene Datenbank den Provider machen kann
+
         foreach (var thisDB in alf) {
             //var d = thisDB.ConnectionData;
 
@@ -96,7 +98,6 @@ public class ConnectionInfo : IReadableText {
                 AdditionalData = nci.AdditionalData;
                 return;
             }
-
         }
 
         #endregion
@@ -173,7 +174,7 @@ public class ConnectionInfo : IReadableText {
     public string TableName {
         get => _tablename; set {
             if (!SQLBackAbstract.IsValidTableName(value)) {
-                Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Tabellenname ungültig: " + value);
+                Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + value);
             }
 
             _tablename = value;

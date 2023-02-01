@@ -32,7 +32,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollection;

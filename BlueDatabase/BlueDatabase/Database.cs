@@ -26,7 +26,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 
@@ -476,6 +475,8 @@ public sealed class Database : DatabaseAbstract {
             SaveToByteList(l, DatabaseDataType.ColumnArrangement, db.ColumnArrangements.ToString(false));
             SaveToByteList(l, DatabaseDataType.Layouts, db.Layouts.JoinWithCr());
             SaveToByteList(l, DatabaseDataType.AutoExport, db.Export.ToString(true));
+            SaveToByteList(l, DatabaseDataType.ImportScript, db.ImportScript.ToString(true));
+
             // Beim Erstellen des Undo-Speichers die Works nicht verändern, da auch bei einem nicht
             // erfolgreichen Speichervorgang der Datenbank-String erstellt wird.
             // Status des Work-Items ist egal, da es beim LADEN automatisch auf 'Undo' gesetzt wird.
@@ -527,11 +528,11 @@ public sealed class Database : DatabaseAbstract {
         if (!string.IsNullOrEmpty(Filename)) {
             var t = (Filename.FilePath() + "AdditionalFiles\\").CheckPath();
             if (DirectoryExists(t)) {
-                _additionalFilesPfadtmp = t;
+                AdditionalFilesPfadtmp = t;
                 return t;
             }
         }
-        _additionalFilesPfadtmp = string.Empty;
+        AdditionalFilesPfadtmp = string.Empty;
         return string.Empty;
     }
 
@@ -604,7 +605,7 @@ public sealed class Database : DatabaseAbstract {
         var bLoaded = LoadBytesFromDisk(BlueBasics.Enums.ErrorReason.Load);
         if (bLoaded == null) { return; }
 
-        Database.Parse(bLoaded, this, Works, needPassword);
+        Parse(bLoaded, this, Works, needPassword);
 
         RepairAfterParse();
         OnLoaded();
@@ -624,7 +625,7 @@ public sealed class Database : DatabaseAbstract {
         //    bLoaded = MultiUserFile.UnzipIt(bLoaded);
         //}
 
-        Database.Parse(bLoaded, this, Works, null);
+        Parse(bLoaded, this, Works, null);
 
         RepairAfterParse();
         OnLoaded();
@@ -759,8 +760,8 @@ public sealed class Database : DatabaseAbstract {
     protected override void AddUndo(string tableName, DatabaseDataType comand, string? columnName, long? rowKey, string previousValue, string changedTo, string userName, string comment) => Works.Add(new WorkItem(comand, columnName, rowKey, previousValue, changedTo, userName));
 
     protected override void Dispose(bool disposing) {
-        //_muf.Dispose();
-        Works.Dispose();
+        //_muf?.Dispose();
+        Works?.Dispose();
         base.Dispose(disposing);
     }
 

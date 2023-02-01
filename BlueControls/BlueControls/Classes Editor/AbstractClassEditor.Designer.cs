@@ -14,7 +14,7 @@ namespace BlueControls.Classes_Editor
             {
                 //if (disposing && components != null)
                 //{
-                //	components.Dispose();
+                //	components?.Dispose();
                 //}
             }
             finally

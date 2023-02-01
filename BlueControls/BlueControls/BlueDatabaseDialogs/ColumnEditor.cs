@@ -30,7 +30,6 @@ using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 
 namespace BlueControls.BlueDatabaseDialogs;
 

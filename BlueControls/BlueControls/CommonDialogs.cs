@@ -8,7 +8,7 @@ internal static class CommonDialogs {
 
     #region Methods
 
-    public static BlueDatabase.DatabaseAbstract? ChooseKnownDatabase() {
+    public static DatabaseAbstract? ChooseKnownDatabase() {
         var l = DatabaseAbstract.AllAvailableTables();
 
         var l2 = new ItemCollection.ItemCollectionList.ItemCollectionList();
@@ -17,11 +17,11 @@ internal static class CommonDialogs {
             _ = l2.Add(thisd, thisd.UniqueID);
         }
 
-        var x = BlueControls.Forms.InputBoxListBoxStyle.Show("Datenbank wählen:", l2, Enums.AddType.None, true);
+        var x = InputBoxListBoxStyle.Show("Datenbank wählen:", l2, Enums.AddType.None, true);
 
         if (x == null || x.Count != 1) { return null; }
 
-        return DatabaseAbstract.GetByID(new ConnectionInfo(x[0]), Controls.Table.Database_NeedPassword);
+        return DatabaseAbstract.GetById(new ConnectionInfo(x[0], null), Controls.Table.Database_NeedPassword);
     }
 
     #endregion

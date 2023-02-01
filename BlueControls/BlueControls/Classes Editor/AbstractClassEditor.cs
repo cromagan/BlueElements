@@ -97,10 +97,13 @@ internal partial class AbstractClassEditor<T> : Controls.GroupBox where T : IPar
     /// </summary>
     protected virtual void EnabledAndFillFormula() => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
 
-    protected void OnChanged(T obj) {
+    protected void OnChanged() {
         if (IsFilling) { return; }
-        var newstatse = obj.ToString();
+        if (_item == null) { return; }
+
+        var newstatse = _item.ToString();
         if (newstatse == _lastState) { return; }
+
         _lastState = newstatse;
         Changed?.Invoke(this, System.EventArgs.Empty);
     }

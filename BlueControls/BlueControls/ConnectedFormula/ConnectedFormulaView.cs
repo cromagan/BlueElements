@@ -281,7 +281,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
 
         foreach (var thisc in unused) {
             Controls.Remove(thisc);
-            thisc.Dispose();
+            thisc?.Dispose();
         }
     }
 

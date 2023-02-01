@@ -60,7 +60,6 @@ namespace BlueControls.Forms
             this.FName.CheckBehavior = CheckBehavior.AlwaysSingleSelection;
             this.FName.Location = new Point(8, 32);
             this.FName.Name = "FName";
-            this.FName.QuickInfo = "";
             this.FName.Size = new Size(216, 296);
             this.FName.TabIndex = 0;
             this.FName.Text = "FontF";
@@ -88,7 +87,6 @@ namespace BlueControls.Forms
             this.FSize.CheckBehavior = CheckBehavior.AlwaysSingleSelection;
             this.FSize.Location = new Point(232, 32);
             this.FSize.Name = "FSize";
-            this.FSize.QuickInfo = "";
             this.FSize.Size = new Size(88, 296);
             this.FSize.TabIndex = 2;
             this.FSize.Text = "SizeF";

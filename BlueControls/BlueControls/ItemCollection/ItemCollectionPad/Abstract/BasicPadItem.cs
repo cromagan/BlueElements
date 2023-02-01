@@ -61,7 +61,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     private bool _beiExportSichtbar = true;
 
     private string _page = string.Empty;
-    private ItemCollectionPad _parent;
+    private ItemCollectionPad? _parent;
     private PadStyles _style = PadStyles.Style_Standard;
     private RectangleF _usedArea;
     private int _zoomPadding;
@@ -122,7 +122,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
         }
     }
 
-    public ItemCollectionPad Parent {
+    public ItemCollectionPad? Parent {
         get => _parent;
         set {
             if (_parent == null || _parent == value) {
@@ -513,22 +513,22 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     internal void AddStyleOption(List<GenericControl> l) => l.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetFonts(_parent.SheetStyle)));
 
     internal BasicPadItem? Next() {
-        var itemCount = _parent.IndexOf(this);
+        var itemCount = _parent?.IndexOf(this) ?? 0;
         if (itemCount < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
         do {
             itemCount++;
-            if (itemCount >= _parent.Count) { return null; }
-            if (_parent[itemCount] != null) { return _parent[itemCount]; }
+            if (_parent == null || _parent.IsSaved || itemCount >= _parent.Count) { return null; }
+            if (_parent?[itemCount] != null) { return _parent?[itemCount]; }
         } while (true);
     }
 
     internal BasicPadItem? Previous() {
-        var itemCount = _parent.IndexOf(this);
+        var itemCount = _parent?.IndexOf(this) ?? 0;
         if (itemCount < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
         do {
             itemCount--;
-            if (itemCount < 0) { return null; }
-            if (_parent[itemCount] != null) { return _parent[itemCount]; }
+            if (_parent == null || _parent.IsSaved || itemCount < 0) { return null; }
+            if (_parent?[itemCount] != null) { return _parent[itemCount]; }
         } while (true);
     }
 

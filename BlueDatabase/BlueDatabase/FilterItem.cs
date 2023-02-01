@@ -25,7 +25,6 @@ using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 
 namespace BlueDatabase;
 
@@ -230,7 +229,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
 
                 case "database":
                     if (Database != null) { Database.Disposing -= Database_Disposing; }
-                    Database = DatabaseAbstract.GetByID(new ConnectionInfo(pair.Value.FromNonCritical()), null);
+                    Database = DatabaseAbstract.GetById(new ConnectionInfo(pair.Value.FromNonCritical(), null), null);
                     Database.Disposing += Database_Disposing;
                     break;
 
@@ -355,7 +354,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
             }
             Column = null;
             if (Database != null) {
-                Database.Disposing -= Database_Disposing;
+                if (Database != null) { Database.Disposing -= Database_Disposing; }
                 Database = null;
             }
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben

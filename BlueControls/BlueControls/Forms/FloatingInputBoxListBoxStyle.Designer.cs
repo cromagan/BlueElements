@@ -16,7 +16,7 @@ namespace BlueControls.Forms
         {
             if (disposing && (components != null))
             {
-                components.Dispose();
+                components?.Dispose();
             }
             base.Dispose(disposing);
         }
@@ -41,7 +41,6 @@ namespace BlueControls.Forms
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lstbx.Location = new System.Drawing.Point(8, 8);
             this.lstbx.Name = "lstbx";
-            this.lstbx.QuickInfo = "";
             this.lstbx.Size = new System.Drawing.Size(212, 233);
             this.lstbx.TabIndex = 0;
             this.lstbx.TabStop = false;

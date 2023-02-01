@@ -110,7 +110,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
 
     protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
         if (Database != null) {
-            Database.Disposing -= Database_Disposing;
+            if (Database != null) { Database.Disposing -= Database_Disposing; }
         }
         SaveCurrentLayout();
         scriptEditor.Database = null;

@@ -17,7 +17,7 @@ namespace BlueControls.Forms
         {
             if (disposing && (components != null))
             {
-                components.Dispose();
+                components?.Dispose();
             }
             base.Dispose(disposing);
         }
@@ -40,7 +40,6 @@ namespace BlueControls.Forms
             this.txbText.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbText.Location = new System.Drawing.Point(8, 16);
             this.txbText.Name = "txbText";
-            this.txbText.QuickInfo = "";
             this.txbText.Size = new System.Drawing.Size(232, 264);
             this.txbText.TabIndex = 4;
             // 

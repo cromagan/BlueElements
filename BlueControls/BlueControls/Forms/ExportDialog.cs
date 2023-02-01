@@ -131,7 +131,7 @@ public sealed partial class ExportDialog {
         var oneItem = tmp.MaxBounds(null);
         pad.Item.SheetStyle = tmp.SheetStyle;
         pad.Item.SheetStyleScale = tmp.SheetStyleScale;
-        tmp.Dispose();
+        tmp?.Dispose();
         var druckB = pad.Item.DruckbereichRect();
         var abstand = (float)Math.Round(MmToPixel(abstandMm, ItemCollectionPad.Dpi), 1);
         var tempVar = Math.Max(1, (int)Math.Floor((druckB.Width / (double)(oneItem.Width + abstand)) + 0.01));

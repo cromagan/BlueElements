@@ -2,6 +2,7 @@ using BlueControls.Classes_Editor;
 using BlueControls.Controls;
 using BlueControls.Forms;
 using System.Diagnostics;
+using BlueControls.Enums;
 
 namespace BlueControls.BlueDatabaseDialogs
 {
@@ -54,6 +55,10 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnSpaltenuebersicht = new BlueControls.Controls.Button();
             this.Tab_Regeln = new System.Windows.Forms.TabPage();
             this.scriptEditor = new BlueControls.ScriptEditorDatabase();
+            this.tabImportScript = new System.Windows.Forms.TabPage();
+            this.importScriptEditor = new BlueControls.Classes_Editor.ImportScript_Editor();
+            this.grpVerfügbareSkripte = new BlueControls.Controls.GroupBox();
+            this.lstImportScripts = new BlueControls.Controls.ListBox();
             this.Tab_Rechte = new System.Windows.Forms.TabPage();
             this.Tab_Sortierung = new System.Windows.Forms.TabPage();
             this.Tab_Backup = new System.Windows.Forms.TabPage();
@@ -72,6 +77,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.GlobalTab.SuspendLayout();
             this.Tab_Allgemein.SuspendLayout();
             this.Tab_Regeln.SuspendLayout();
+            this.tabImportScript.SuspendLayout();
+            this.grpVerfügbareSkripte.SuspendLayout();
             this.Tab_Rechte.SuspendLayout();
             this.Tab_Sortierung.SuspendLayout();
             this.Tab_Backup.SuspendLayout();
@@ -201,9 +208,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnSortRichtung
             // 
-            this.btnSortRichtung.ButtonStyle = Enums.ButtonStyle.Pic1_or_Pic2;
-            this.btnSortRichtung.ImageCode = "AZ|16|8";
-            this.btnSortRichtung.ImageCode_Checked = "ZA|16|8";
+            this.btnSortRichtung.ButtonStyle = BlueControls.Enums.ButtonStyle.Yes_or_No;
             this.btnSortRichtung.Location = new System.Drawing.Point(288, 32);
             this.btnSortRichtung.Name = "btnSortRichtung";
             this.btnSortRichtung.Size = new System.Drawing.Size(184, 40);
@@ -277,6 +282,7 @@ namespace BlueControls.BlueDatabaseDialogs
             | System.Windows.Forms.AnchorStyles.Right)));
             this.GlobalTab.Controls.Add(this.Tab_Allgemein);
             this.GlobalTab.Controls.Add(this.Tab_Regeln);
+            this.GlobalTab.Controls.Add(this.tabImportScript);
             this.GlobalTab.Controls.Add(this.Tab_Rechte);
             this.GlobalTab.Controls.Add(this.Tab_Sortierung);
             this.GlobalTab.Controls.Add(this.Tab_Backup);
@@ -408,7 +414,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Regeln.Padding = new System.Windows.Forms.Padding(3);
             this.Tab_Regeln.Size = new System.Drawing.Size(1039, 616);
             this.Tab_Regeln.TabIndex = 3;
-            this.Tab_Regeln.Text = "Skript";
+            this.Tab_Regeln.Text = "Zeilen-Skript";
             // 
             // scriptEditor
             // 
@@ -417,9 +423,62 @@ namespace BlueControls.BlueDatabaseDialogs
             this.scriptEditor.Dock = System.Windows.Forms.DockStyle.Fill;
             this.scriptEditor.Location = new System.Drawing.Point(3, 3);
             this.scriptEditor.Name = "scriptEditor";
+            this.scriptEditor.ScriptText = "";
             this.scriptEditor.Size = new System.Drawing.Size(1033, 610);
             this.scriptEditor.TabIndex = 0;
             this.scriptEditor.TabStop = false;
+            // 
+            // tabImportScript
+            // 
+            this.tabImportScript.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabImportScript.Controls.Add(this.importScriptEditor);
+            this.tabImportScript.Controls.Add(this.grpVerfügbareSkripte);
+            this.tabImportScript.Location = new System.Drawing.Point(4, 25);
+            this.tabImportScript.Name = "tabImportScript";
+            this.tabImportScript.Padding = new System.Windows.Forms.Padding(3);
+            this.tabImportScript.Size = new System.Drawing.Size(1039, 616);
+            this.tabImportScript.TabIndex = 7;
+            this.tabImportScript.Text = "Import-Skripte";
+            // 
+            // importScript_Editor1
+            // 
+            this.importScriptEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.importScriptEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.importScriptEditor.Location = new System.Drawing.Point(3, 171);
+            this.importScriptEditor.Name = "importScriptEditor";
+            this.importScriptEditor.Size = new System.Drawing.Size(1033, 442);
+            this.importScriptEditor.TabIndex = 3;
+            this.importScriptEditor.TabStop = false;
+            this.importScriptEditor.Text = "importScript_Editor";
+            this.importScriptEditor.Changed += new System.EventHandler(this.importScript_Editor1_Changed);
+            // 
+            // grpVerfügbareSkripte
+            // 
+            this.grpVerfügbareSkripte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.grpVerfügbareSkripte.CausesValidation = false;
+            this.grpVerfügbareSkripte.Controls.Add(this.lstImportScripts);
+            this.grpVerfügbareSkripte.Dock = System.Windows.Forms.DockStyle.Top;
+            this.grpVerfügbareSkripte.Location = new System.Drawing.Point(3, 3);
+            this.grpVerfügbareSkripte.Name = "grpVerfügbareSkripte";
+            this.grpVerfügbareSkripte.Size = new System.Drawing.Size(1033, 168);
+            this.grpVerfügbareSkripte.TabIndex = 2;
+            this.grpVerfügbareSkripte.TabStop = false;
+            this.grpVerfügbareSkripte.Text = "Verfügbare Skripte:";
+            // 
+            // lstImportScripts
+            // 
+            this.lstImportScripts.AddAllowed = BlueControls.Enums.AddType.UserDef;
+            this.lstImportScripts.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lstImportScripts.FilterAllowed = true;
+            this.lstImportScripts.Location = new System.Drawing.Point(8, 24);
+            this.lstImportScripts.Name = "lstImportScripts";
+            this.lstImportScripts.RemoveAllowed = true;
+            this.lstImportScripts.Size = new System.Drawing.Size(1018, 136);
+            this.lstImportScripts.TabIndex = 0;
+            this.lstImportScripts.AddClicked += new System.EventHandler(this.lstImportScripts_AddClicked);
+            this.lstImportScripts.ItemCheckedChanged += new System.EventHandler(this.lstImportScripts_ItemCheckedChanged);
             // 
             // Tab_Rechte
             // 
@@ -501,7 +560,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lbxExportSets.Size = new System.Drawing.Size(1016, 136);
             this.lbxExportSets.TabIndex = 0;
             this.lbxExportSets.Text = "ExportAufgaben";
-            this.lbxExportSets.AddClicked += new System.EventHandler(this.ExportSets_AddClicked);
+            this.lbxExportSets.AddClicked += new System.EventHandler(this.lbxExportSets_AddClicked);
             this.lbxExportSets.ItemCheckedChanged += new System.EventHandler(this.lbxExportSets_ItemCheckedChanged);
             this.lbxExportSets.RemoveClicked += new System.EventHandler<BlueControls.EventArgs.ListOfBasicListItemEventArgs>(this.lbxExportSets_RemoveClicked);
             // 
@@ -596,6 +655,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.GlobalTab.ResumeLayout(false);
             this.Tab_Allgemein.ResumeLayout(false);
             this.Tab_Regeln.ResumeLayout(false);
+            this.tabImportScript.ResumeLayout(false);
+            this.grpVerfügbareSkripte.ResumeLayout(false);
             this.Tab_Rechte.ResumeLayout(false);
             this.Tab_Sortierung.ResumeLayout(false);
             this.Tab_Backup.ResumeLayout(false);
@@ -648,5 +709,9 @@ namespace BlueControls.BlueDatabaseDialogs
         private Button btnClipboard;
         private TextBox txbStandardFormulaFile;
         private Caption capStandardFormulaFile;
+        private System.Windows.Forms.TabPage tabImportScript;
+        private GroupBox grpVerfügbareSkripte;
+        private ListBox lstImportScripts;
+        private ImportScript_Editor importScriptEditor;
     }
 }

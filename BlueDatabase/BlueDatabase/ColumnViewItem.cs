@@ -23,7 +23,6 @@ using BlueDatabase.Enums;
 using System;
 using System.Drawing;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 
 namespace BlueDatabase;
 

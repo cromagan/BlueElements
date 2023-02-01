@@ -48,7 +48,7 @@ public sealed class ButtonActionList : DesignerActionList {
             new DesignerActionHeaderItem("Allgemein"),
             new DesignerActionPropertyItem("ButtonStyle", "ButtonStyle", "Allgemein", "Das Verhalten des Buttons.")
         };
-        if ((int)_reverenceControl.ButtonStyle % 1000 is ((int)ButtonStyle.Checkbox) or ((int)ButtonStyle.Yes_or_No) or ((int)ButtonStyle.Pic1_or_Pic2) or ((int)ButtonStyle.Optionbox)) {
+        if ((int)_reverenceControl.ButtonStyle % 1000 is (int)ButtonStyle.Checkbox or (int)ButtonStyle.Yes_or_No or (int)ButtonStyle.Optionbox) {
             _ = items.Add(new DesignerActionPropertyItem("Checked", "Checked", "Allgemein", "Der Checked-Status."));
         }
         return items;

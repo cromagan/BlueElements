@@ -25,7 +25,6 @@ using System;
 using System.Drawing;
 using System.Linq;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 
 namespace BlueControls.Classes_Editor;
@@ -164,7 +163,7 @@ internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<Expo
                 }
             }
         }
-        OnChanged(Item);
+        OnChanged();
     }
 
     private void lbxFilter_AddClicked(object sender, System.EventArgs e) {
@@ -237,7 +236,7 @@ internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<Expo
         }
         Item.BereitsExportiert.Clear();
         Item.BereitsExportiert.AddRange(lsbExportDateien.Item.ToListOfString());
-        OnChanged(Item);
+        OnChanged();
     }
 
     #endregion

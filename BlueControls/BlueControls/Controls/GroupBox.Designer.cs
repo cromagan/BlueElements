@@ -15,12 +15,12 @@ namespace BlueControls.Controls
                 {
                     //if (_BitmapOfControl != null)
                     //{
-                    //    _BitmapOfControl.Dispose();
+                    //    _BitmapOfControl?.Dispose();
                     //}
                     //_BitmapOfControl = null;
                     if (components != null)
                     {
-                        components.Dispose();
+                        components?.Dispose();
                     }
                 }
             }

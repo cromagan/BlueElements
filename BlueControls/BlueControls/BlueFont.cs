@@ -202,9 +202,9 @@ public sealed class BlueFont : IReadableTextWithChanging {
             }
         }
 
-        bmp.Dispose();
-        gr.Dispose();
-        tmpfont.Dispose();
+        bmp?.Dispose();
+        gr?.Dispose();
+        tmpfont?.Dispose();
 
         _widthOf2Points = MeasureString("..", StringFormat.GenericTypographic).Width;
         //http://www.vb-helper.com/howto_net_rainbow_text.html

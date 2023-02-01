@@ -27,13 +27,13 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 
 namespace BlueDatabase;
 
-public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, IDisposableExtended, ICloneable, IErrorCheckable {
+public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, IDisposableExtended, ICloneable, IErrorCheckable, IHasDatabase {
 
     #region Fields
 
@@ -116,7 +116,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
     public float AutoDelete {
         get => _autoDelete;
         set {
-            if (_autoDelete == value) { return; }
+            if (Math.Abs(_autoDelete - value) < 0.0001) { return; }
             _autoDelete = value;
             OnChanged();
         }
@@ -128,7 +128,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
     public float BackupInterval {
         get => _backupInterval;
         set {
-            if (_backupInterval == value) { return; }
+            if (Math.Abs(_backupInterval - value) < 0.0001) { return; }
             _backupInterval = value;
             OnChanged();
         }
@@ -204,7 +204,10 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
 
     #region Methods
 
-    public object Clone() => new ExportDefinition(Database, ToString());
+    public object? Clone() {
+        if (Database == null || Database.IsDisposed || IsDisposed) { return null; }
+        return new ExportDefinition(Database, ToString());
+    }
 
     public void DeleteAllBackups() {
         for (var n = 0; n < BereitsExportiert.Count; n++) {
@@ -216,7 +219,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
                 }
             }
         }
-        BereitsExportiert.RemoveNullOrEmpty();
+        BereitsExportiert!.RemoveNullOrEmpty();
     }
 
     public void Dispose() {
@@ -398,7 +401,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
             }
         }
 
-        if (_filter.Count > 0) {
+        if (_filter != null && _filter.IsDisposed && _filter.Count > 0) {
             t += " Nur bestimmte Einträge.";
         }
         if (_autoDelete > 0) {
@@ -445,8 +448,8 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
             } else {
                 result = result + "exid=" + _exportFormularId.ToNonCritical() + ", ";
             }
-            if (_filter.Count > 0) {
-                result = result + "flt=" + _filter + ", ";
+            if (_filter != null && _filter.IsDisposed && _filter.Count > 0) {
+                result = result + "flt=" + _filter.ToString(true) + ", ";
             }
             if (BereitsExportiert.Count > 0) {
                 result += "exp=";
@@ -466,10 +469,13 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
     internal bool DeleteOutdatedBackUps(BackgroundWorker worker) {
         var did = false;
         if (!IsOk()) { return false; }
+
+        if (Database == null) { return false; } // Obsolet, aber um die Null-Prüfung zu bestehen ohne ! benutzen zu müssen
+
         if (_typ is ExportTyp.DatenbankCSVFormat or ExportTyp.DatenbankHTMLFormat or ExportTyp.DatenbankOriginalFormat) {
             for (var n = 0; n < BereitsExportiert.Count; n++) {
                 if (worker != null && worker.CancellationPending) { break; }
-                if (Database.IsDisposed) { return false; }
+                if (Database == null || Database.IsDisposed) { return false; }
                 if (!string.IsNullOrEmpty(BereitsExportiert[n])) {
                     var x = BereitsExportiert[n].SplitAndCutBy("|");
                     if ((float)DateTime.Now.Subtract(DateTimeParse(x[1])).TotalDays > _autoDelete) {
@@ -486,7 +492,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
             // Dabei ist der Filter egall
             foreach (var thisrow in Database.Row) {
                 if (worker != null && worker.CancellationPending) { break; }
-                if (Database.IsDisposed) { return false; }
+                if (Database == null || Database.IsDisposed) { return false; }
                 if (thisrow != null) {
                     if (_filter != null && _filter.Count > 0 && !thisrow.MatchesTo(_filter)) {
                         var tmp = DeleteId(thisrow.Key, worker);
@@ -497,7 +503,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
             // Einträge, die noch vorhanden sind aber der Filter NICHT mehr zutrifft, löschen
             foreach (var thisrow in Database.Row) {
                 if (worker != null && worker.CancellationPending) { break; }
-                if (Database.IsDisposed) { return false; }
+                if (Database == null || Database.IsDisposed) { return false; }
                 if (thisrow != null) {
                     if (Database.Cell.GetDateTime(Database.Column.SysRowChangeDate, thisrow).Subtract(_lastExportTimeUtc).TotalSeconds > 0) {
                         var tmp = DeleteId(thisrow.Key, worker);
@@ -522,13 +528,14 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
             }
         }
         if (did) {
-            BereitsExportiert.RemoveNullOrEmpty();
+            BereitsExportiert!.RemoveNullOrEmpty();
         }
         return did;
     }
 
     internal bool DoBackUp(BackgroundWorker worker) {
         if (!IsOk()) { return false; }
+        if (Database == null) { return false; } // Obsolet, aber um die Null-Prüfung zu bestehen ohne ! benutzen zu müssen
 
         string savePath;
 
@@ -554,15 +561,15 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
                 case ExportTyp.DatenbankOriginalFormat:
                     if (_backupInterval > (float)DateTime.UtcNow.Subtract(_lastExportTimeUtc).TotalDays) { return false; }
 
-                    if (Database is Database DBD) {
+                    if (Database is Database dbd) {
                         singleFileExport = TempFile(singleFileExport + ".MDB");
-                        if (!FileExists(singleFileExport)) { File.Copy(DBD.Filename, singleFileExport); }
+                        if (!FileExists(singleFileExport)) { File.Copy(dbd.Filename, singleFileExport); }
                         added.Add(singleFileExport + "|" + tim);
                     }
 
-                    if (Database is DatabaseMultiUser DBDM) {
+                    if (Database is DatabaseMultiUser dbdm) {
                         singleFileExport = TempFile(singleFileExport + ".MDB");
-                        if (!FileExists(singleFileExport)) { File.Copy(DBDM.Filename, singleFileExport); }
+                        if (!FileExists(singleFileExport)) { File.Copy(dbdm.Filename, singleFileExport); }
                         added.Add(singleFileExport + "|" + tim);
                     }
 
@@ -633,10 +640,10 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
 
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
-    private bool DeleteId(long id, BackgroundWorker worker) {
+    private bool DeleteId(long id, BackgroundWorker? worker) {
         var did = false;
         for (var f = 0; f < BereitsExportiert.Count; f++) {
-            if (worker.CancellationPending) { break; }
+            if (worker != null && worker.CancellationPending) { break; }
             if (Database?.IsDisposed ?? true) { return false; }
             if (!string.IsNullOrEmpty(BereitsExportiert[f])) {
                 if (BereitsExportiert[f].EndsWith("|" + id)) {
@@ -650,25 +657,25 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
             }
         }
         if (did) {
-            BereitsExportiert.RemoveNullOrEmpty();
+            BereitsExportiert!.RemoveNullOrEmpty();
         }
         return did;
     }
 
     private void Dispose(bool disposing) {
-        if (!IsDisposed) {
-            if (disposing) {
-                // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
-            }
-            Database.Disposing -= Database_Disposing;
-            Database = null;
-            Filter.Dispose();
+        if (IsDisposed) { return; }
 
-            BereitsExportiert.Changed -= _BereitsExportiert_ListOrItemChanged;
-            BereitsExportiert = new ListExt<string>();
-            BereitsExportiert.Dispose();
-            IsDisposed = true;
+        if (disposing) {
+            // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
         }
+        if (Database != null) { Database.Disposing -= Database_Disposing; }
+        Database = null;
+        Filter?.Dispose();
+
+        BereitsExportiert.Changed -= _BereitsExportiert_ListOrItemChanged;
+        BereitsExportiert = new ListExt<string>();
+        BereitsExportiert.Dispose();
+        IsDisposed = true;
     }
 
     private string GetShortener() {

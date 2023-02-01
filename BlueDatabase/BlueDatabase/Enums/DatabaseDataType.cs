@@ -130,7 +130,7 @@ public enum DatabaseDataType : byte {
 
     //VerwaisteDaten = 62,
 
-    //ImportScript = 63,
+    ImportScript = 63,
     GlobalScale = 64,
 
     //FilterImagePfad = 65,

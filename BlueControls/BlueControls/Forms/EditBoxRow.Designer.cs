@@ -16,7 +16,7 @@ namespace BlueControls.Forms
         {
             if (disposing && (components != null))
             {
-                components.Dispose();
+                components?.Dispose();
             }
             base.Dispose(disposing);
         }

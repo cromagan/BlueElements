@@ -72,7 +72,7 @@ public partial class MainWindow {
         }
         if (_currentTool != null) {
             _currentTool.OnToolChanging();
-            _currentTool.Dispose();
+            _currentTool?.Dispose();
             Split.Panel1.Controls.Remove(_currentTool);
             _currentTool.ZoomFit -= CurrentTool_ZoomFit;
             _currentTool.HideMainWindow -= CurrentTool_HideMainWindow;
@@ -195,7 +195,7 @@ public partial class MainWindow {
     private void CurrentTool_ForceUndoSaving(object sender, System.EventArgs e) {
         _isSaved = false;
         if (_picUndo != null) {
-            _picUndo.Dispose();
+            _picUndo?.Dispose();
             _picUndo = null;
             GC.Collect();
         }

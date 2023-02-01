@@ -26,7 +26,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 
 namespace BlueDatabase;
@@ -96,11 +95,11 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         if (!string.IsNullOrEmpty(Filename)) {
             var t = (Filename.FilePath() + "AdditionalFiles\\").CheckPath();
             if (DirectoryExists(t)) {
-                _additionalFilesPfadtmp = t;
+                AdditionalFilesPfadtmp = t;
                 return t;
             }
         }
-        _additionalFilesPfadtmp = string.Empty;
+        AdditionalFilesPfadtmp = string.Empty;
         return string.Empty;
     }
 
@@ -227,8 +226,8 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
     protected override void AddUndo(string tableName, DatabaseDataType comand, string? columnName, long? rowKey, string previousValue, string changedTo, string userName, string comment) => Works.Add(new WorkItem(comand, columnName, rowKey, previousValue, changedTo, userName));
 
     protected override void Dispose(bool disposing) {
-        _muf.Dispose();
-        Works.Dispose();
+        _muf?.Dispose();
+        Works?.Dispose();
         base.Dispose(disposing);
     }
 

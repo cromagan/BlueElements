@@ -30,9 +30,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 
 namespace BlueDatabase;
@@ -420,7 +418,8 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         set {
             if (_allowedChars == value) { return; }
 
-            _ = (Database?.ChangeData(DatabaseDataType.AllowedChars, Name, null, _allowedChars, value, string.Empty)); OnChanged();
+            _ = (Database?.ChangeData(DatabaseDataType.AllowedChars, Name, null, _allowedChars, value, string.Empty));
+            OnChanged();
         }
     }
 
@@ -835,9 +834,9 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
 
             //}
 
-            var ci = new ConnectionInfo(_linkedDatabaseFile);
+            var ci = new ConnectionInfo(_linkedDatabaseFile, null);
 
-            Tmp_LinkedDatabase = DatabaseAbstract.GetByID(ci, null);
+            Tmp_LinkedDatabase = DatabaseAbstract.GetById(ci, null);
 
             if (_tmpLinkedDatabase != null) {
                 _tmpLinkedDatabase.UserGroup = Database.UserGroup;
@@ -1458,11 +1457,10 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         if (_format.NeedTargetDatabase()) {
             if (LinkedDatabase == null) { return "Verknüpfte Datenbank fehlt oder existiert nicht."; }
             if (LinkedDatabase == Database) { return "Zirkelbezug mit verknüpfter Datenbank."; }
-                var c = LinkedDatabase.Column.Exists(_linkedCell_ColumnNameOfLinkedDatabase);
-             if (c == null) { return "Die verknüpfte Schlüsselspalte existiert nicht."; }
+            var c = LinkedDatabase.Column.Exists(_linkedCell_ColumnNameOfLinkedDatabase);
+            if (c == null) { return "Die verknüpfte Schlüsselspalte existiert nicht."; }
             //var (filter, info) = CellCollection.GetFilterFromLinkedCellData(LinkedDatabase, column, row);
-            if (_linkedCellFilter == null || _linkedCellFilter.Count ==0 ) { return "Keine Filter für verknüpfte Datenbank definiert."; }
-
+            if (_linkedCellFilter == null || _linkedCellFilter.Count == 0) { return "Keine Filter für verknüpfte Datenbank definiert."; }
         } else {
             if (!string.IsNullOrEmpty(_linkedCell_ColumnNameOfLinkedDatabase)) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
         }
@@ -1489,8 +1487,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             //    if (MaxTextLenght < 35) { return "Maximallänge bei diesem Format mindestens 35!"; }
             //    break;
 
-
-
             case DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
                 //Develop.DebugPrint("Values_für_LinkedCellDropdown Verwendung bei:" + Database.Filename); //TODO: 29.07.2021 Values_für_LinkedCellDropdown Format entfernen
                 if (!string.IsNullOrEmpty(_cellInitValue)) { return "Dieses Format kann keinen Initial-Text haben."; }
@@ -1499,8 +1495,6 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 //if (MaxTextLenght < 15) { return "Maximallänge bei diesem Format mindestens 15!"; }
 
                 break;
-
-
         }
 
         if (_multiLine) {
@@ -2689,27 +2683,27 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
-            Database.Disposing -= Database_Disposing;
+            if (Database != null) { Database.Disposing -= Database_Disposing; }
             Invalidate_LinkedDatabase();
             Database = null;
 
             //DropDownItems.Changed -= DropDownItems_ListOrItemChanged;
-            //DropDownItems.Dispose();
+            //DropDownItems?.Dispose();
 
             //LinkedCellFilter.Changed -= LinkedCellFilters_ListOrItemChanged;
-            //LinkedCellFilter.Dispose();
+            //LinkedCellFilter?.Dispose();
 
             //Tags.Changed -= Tags_ListOrItemChanged;
-            //Tags.Dispose();
+            //Tags?.Dispose();
 
             //PermissionGroupsChangeCell.Changed -= PermissionGroups_ChangeCell_ListOrItemChanged;
-            //PermissionGroupsChangeCell.Dispose();
+            //PermissionGroupsChangeCell?.Dispose();
 
             //OpticalReplace.Changed -= OpticalReplacer_ListOrItemChanged;
-            //OpticalReplace.Dispose();
+            //OpticalReplace?.Dispose();
 
             //AfterEditAutoReplace.Changed -= AfterEdit_AutoReplace_ListOrItemChanged;
-            //AfterEditAutoReplace.Dispose();
+            //AfterEditAutoReplace?.Dispose();
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen
             IsDisposed = true;

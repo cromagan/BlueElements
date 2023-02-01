@@ -116,7 +116,7 @@ public sealed partial class ScreenShot {
     //public static Bitmap GrabContinuus() {
     //    ScreenShot x = new();
     //    var im = x.GrabContinuusIntern();
-    //    x.Dispose();
+    //    x?.Dispose();
     //    Generic.CollectGarbage();
     //    return im;
     //}
@@ -214,7 +214,7 @@ public sealed partial class ScreenShot {
             _feedBack.CloneFromBitmap(_clipedArea);
             //FeedBack.IsResized = false;
             //}
-            _clipedArea.Dispose();
+            _clipedArea?.Dispose();
             return _feedBack;
         } catch {
             return new ScreenData();
@@ -256,7 +256,7 @@ public sealed partial class ScreenShot {
     //        }
     //    } while (true);
     //    Hook.RemoveHook();
-    //    Rahm.Dispose();
+    //    Rahm?.Dispose();
     //    var MinX = 0;
     //    var MinY = 0;
     //    var maxx = AllS[0].GrabedArea().Width;
@@ -281,7 +281,7 @@ public sealed partial class ScreenShot {
     //        VersX = VersX + AllS[z].HookP1.X - AllS[z].HookP2.X;
     //        VersY = VersY + AllS[z].HookP1.Y - AllS[z].HookP2.Y;
     //        gr.DrawImage(AllS[z].Pic, VersX, VersY);
-    //        AllS[z].Pic.Dispose();
+    //        AllS[z].Pic?.Dispose();
     //    }
     //    return bmp;
     //}

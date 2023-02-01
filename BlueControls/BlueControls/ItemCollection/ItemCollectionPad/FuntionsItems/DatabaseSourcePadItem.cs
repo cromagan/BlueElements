@@ -30,7 +30,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 
 namespace BlueControls.ItemCollection;
 
@@ -94,7 +93,7 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
         if (base.ParseThis(tag, value)) { return true; }
         switch (tag) {
             case "database":
-                Database = DatabaseAbstract.GetByID(new ConnectionInfo(value.FromNonCritical()), null);
+                Database = DatabaseAbstract.GetById(new ConnectionInfo(value.FromNonCritical(), null), null);
                 return true;
 
             case "id":

@@ -28,7 +28,6 @@ using BlueDatabase.Enums;
 using System;
 using System.Linq;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
@@ -93,13 +92,27 @@ public sealed partial class DatabaseHeadEditor {
             }
         }
         txbTags.Text = _database.Tags.JoinWithCr();
-        // Exports ----------------
+
+        #region Exports
+
         lbxExportSets.Item.Clear();
         foreach (var thisSet in _database.Export.Where(thisSet => thisSet != null)) {
             _ = lbxExportSets.Item.Add((ExportDefinition)thisSet.Clone(), string.Empty, string.Empty);
         }
         lbxExportSets.Item.Sort();
-        // -----------------------------
+
+        #endregion
+
+        #region Import Scripte
+
+        lstImportScripts.Item.Clear();
+        foreach (var thisSet in _database.ImportScript.Where(thisSet => thisSet != null)) {
+            _ = lstImportScripts.Item.Add((ImportScript)thisSet.Clone(), string.Empty, string.Empty);
+        }
+        lstImportScripts.Item.Sort();
+
+        #endregion
+
         txbCaption.Text = _database.Caption;
         txbGlobalScale.Text = _database.GlobalScale.ToString(Constants.Format_Float1);
         txbAdditionalFiles.Text = _database.AdditionalFilesPfad;
@@ -156,6 +169,13 @@ public sealed partial class DatabaseHeadEditor {
                 alt = "";
                 neu = "";
                 symb = ImageCode.Karton;
+                break;
+
+            case DatabaseDataType.ImportScript:
+                aenderung = "Import Script geändert";
+                alt = "";
+                neu = "";
+                symb = ImageCode.Pfeil_Links;
                 break;
 
             case DatabaseDataType.Layouts:
@@ -234,11 +254,6 @@ public sealed partial class DatabaseHeadEditor {
         }
     }
 
-    private void ExportSets_AddClicked(object sender, System.EventArgs e) {
-        var newExportItem = lbxExportSets.Item.Add(new ExportDefinition(_database), string.Empty, string.Empty);
-        newExportItem.Checked = true;
-    }
-
     private void GenerateInfoText() {
         var t = "<b>Tabelle:</b> <tab>" + _database.ConnectionData.TableName + "<br>";
         t = t + "<b>ID:</b> <tab>" + _database.ConnectionData.UniqueID + "<br>";
@@ -298,12 +313,28 @@ public sealed partial class DatabaseHeadEditor {
         }
     }
 
+    private void importScript_Editor1_Changed(object sender, System.EventArgs e) {
+        foreach (var thisitem in lstImportScripts.Item) {
+            if (thisitem is TextListItem tli) {
+                if (tli.Tag == ExportEditor.Item) {
+                    tli.Text = ExportEditor.Item.ReadableText();
+                    tli.Symbol = ExportEditor.Item.SymbolForReadableText();
+                }
+            }
+        }
+    }
+
+    private void lbxExportSets_AddClicked(object sender, System.EventArgs e) {
+        var newExportItem = lbxExportSets.Item.Add(new ExportDefinition(_database), string.Empty, string.Empty);
+        newExportItem.Checked = true;
+    }
+
     private void lbxExportSets_ItemCheckedChanged(object sender, System.EventArgs e) {
         if (lbxExportSets.Item.Checked().Count != 1) {
             ExportEditor.Item = null;
             return;
         }
-        if (_database.ReadOnly) {
+        if (_database == null || _database.IsDisposed || _database.ReadOnly) {
             ExportEditor.Item = null;
             return;
         }
@@ -318,6 +349,26 @@ public sealed partial class DatabaseHeadEditor {
                 tempVar.DeleteAllBackups();
             }
         }
+    }
+
+    private void lstImportScripts_AddClicked(object sender, System.EventArgs e) {
+        if (_database == null || _database.IsDisposed) { return; }
+
+        var newScriptItem = lstImportScripts.Item.Add(new ImportScript(_database), string.Empty, string.Empty);
+        newScriptItem.Checked = true;
+    }
+
+    private void lstImportScripts_ItemCheckedChanged(object sender, System.EventArgs e) {
+        if (lstImportScripts.Item.Checked().Count != 1) {
+            importScriptEditor.Item = null;
+            return;
+        }
+        if (_database == null || _database.IsDisposed || _database.ReadOnly) {
+            importScriptEditor.Item = null;
+            return;
+        }
+        var selectedlstImportScripts = (ImportScript)((TextListItem)lstImportScripts.Item.Checked()[0]).Tag;
+        importScriptEditor.Item = selectedlstImportScripts;
     }
 
     private void OkBut_Click(object sender, System.EventArgs e) => Close();
@@ -355,8 +406,8 @@ public sealed partial class DatabaseHeadEditor {
     }
 
     private void WriteInfosBack() {
-        if (_database == null || _database.IsDisposed) { return; } // Disposed
-        if (_database.ReadOnly) { return; }
+        if (_database == null || _database.IsDisposed || _database.ReadOnly) { return; } // Disposed
+
         scriptEditor.WriteScriptBack();
         _database.GlobalShowPass = txbKennwort.Text;
         _database.Caption = txbCaption.Text;
@@ -384,10 +435,21 @@ public sealed partial class DatabaseHeadEditor {
 
         #endregion
 
-        // Export ------------
-        var t = new ListExt<ExportDefinition>();
+        #region  Export
+
+        var t = new ListExt<ExportDefinition?>();
         t.AddRange(lbxExportSets.Item.Select(thisItem => (ExportDefinition)((TextListItem)thisItem).Tag));
         _database.Export = new(t);
+
+        #endregion
+
+        #region  Import
+
+        var t2 = new ListExt<ImportScript?>();
+        t2.AddRange(lstImportScripts.Item.Select(thisItem => (ImportScript)((TextListItem)thisItem).Tag));
+        _database.ImportScript = new(t2);
+
+        #endregion
     }
 
     #endregion

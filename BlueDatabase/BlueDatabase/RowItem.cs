@@ -31,7 +31,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 
 namespace BlueDatabase;
 
@@ -332,7 +331,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
 
     public (bool checkPerformed, string error, Script? script) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, float tryforsceonds, string startroutine) {
-        if (Database == null || Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
+        if  (Database == null || Database.IsDisposed || Database.ReadOnly){ return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
         var t = DateTime.Now;
         do {
             var erg = DoAutomatic(doFemdZelleInvalidate, fullCheck, startroutine);
@@ -350,7 +349,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
 
     public (bool checkPerformed, string error, Script? skript) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, string startroutine) {
-        if (Database == null || Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
+        if  (Database == null || Database.IsDisposed || Database.ReadOnly){ return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
 
         var feh = Database.ErrorReason(ErrorReason.EditAcut);
         if (!string.IsNullOrEmpty(feh)) { return (false, feh, null); }
@@ -527,7 +526,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen
             Database.Cell.CellValueChanged -= Cell_CellValueChanged;
-            Database.Disposing -= Database_Disposing;
+            if (Database != null) { Database.Disposing -= Database_Disposing; }
             Database = null;
             _tmpQuickInfo = null;
             IsDisposed = true;
@@ -615,7 +614,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     }
 
     private void VariableToCell(ColumnItem? column, List<Variable> vars) {
-        if (Database == null || Database.ReadOnly) { return; }
+        if  (Database == null || Database.IsDisposed || Database.ReadOnly){ return; }
 
         var columnVar = vars.Get(column.Name);
         if (columnVar == null || columnVar.Readonly) { return; }

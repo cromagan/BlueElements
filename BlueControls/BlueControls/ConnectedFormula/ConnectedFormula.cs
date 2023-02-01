@@ -28,7 +28,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.Converter;
 using static BlueBasics.Develop;
-using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 
 namespace BlueControls.ConnectedFormula;
@@ -162,7 +161,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
 
     public void DiscardPendingChanges(object sender, System.EventArgs e) => _saved = true;
 
-    void IDisposable.Dispose() {
+    public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
@@ -218,7 +217,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
             AllFiles.Remove(this);
             if (disposing) {
                 _ = _muf.Save(true);
-                _muf.Dispose();
+                _muf?.Dispose();
                 _muf = null;
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
@@ -293,7 +292,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
         if (_saving || _muf.IsLoading) { return; }
 
         foreach (var thisfile in DatabaseFiles) {
-            _ = DatabaseAbstract.GetByID(new ConnectionInfo(thisfile), null);
+            _ = DatabaseAbstract.GetById(new ConnectionInfo(thisfile, null), null);
         }
 
         _saved = false;

@@ -31,7 +31,6 @@ public enum ButtonStyle {
     Checkbox_Big_Borderless = Checkbox | Button_Big_Borderless,
     Checkbox_Text = Checkbox | Text,
     Yes_or_No = Checkbox | 4,
-    Pic1_or_Pic2 = Checkbox | 8,
 
     Optionbox = 16,
     Optionbox_Big_Borderless = Optionbox | Button_Big_Borderless,
@@ -39,8 +38,6 @@ public enum ButtonStyle {
 
     ComboBoxButton = 32,
     ComboBoxButton_Borderless = ComboBoxButton | Borderless,
-
-    Pic1_or_Pic2_Big_Borderless = Pic1_or_Pic2 | Button_Big_Borderless,
 
     Text = 131072,
 

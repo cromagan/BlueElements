@@ -26,7 +26,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 
 namespace BlueDatabase;
 
@@ -686,7 +685,7 @@ public abstract class SQLBackAbstract {
     //    //DbDataAdapter da = DbProviderFactories.GetFactory(_connection).CreateDataAdapter();
     //    //da.SelectCommand = cmd;
     //    //da.Fill(dataTable);
-    //    //da.Dispose();
+    //    //da?.Dispose();
 
     //    var allcols = GetColumnNames(tablename);
     //    allcols.Remove("RK");

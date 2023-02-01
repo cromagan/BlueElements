@@ -399,7 +399,7 @@ public class GenericControl : System.Windows.Forms.Control {
         Invalidate();
         if (_bitmapOfControl != null) {
             if (_bitmapOfControl.Width < Width || _bitmapOfControl.Height < Height) {
-                _bitmapOfControl.Dispose();
+                _bitmapOfControl?.Dispose();
                 _bitmapOfControl = null;
             }
         }
@@ -466,7 +466,7 @@ public class GenericControl : System.Windows.Forms.Control {
                     if (_bitmapOfControl != null) {
                         gr.DrawImage(_bitmapOfControl, 0, 0);
                     }
-                    tmpgr.Dispose();
+                    tmpgr?.Dispose();
                 } else {
                     DrawControl(gr, IsStatus());
                 }

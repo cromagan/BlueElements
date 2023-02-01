@@ -130,12 +130,12 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
                     if (existTab != null) {
                         foreach (var thisC in existTab.Controls) {
                             if (thisC is IDisposable c) {
-                                c.Dispose();
+                                c?.Dispose();
                             }
                         }
 
                         c3.TabPages.Remove(existTab);
-                        existTab.Dispose();
+                        existTab?.Dispose();
                     }
                 }
             }
@@ -276,7 +276,7 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
             var x = new ConnectedFormulaEditor(((BasicListItem)e.HotItem).Internal, _cf?.NotAllowedChilds);
             _ = x.ShowDialog();
             MultiUserFile.SaveAll(false);
-            x.Dispose();
+            x?.Dispose();
         }
     }
 

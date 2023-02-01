@@ -145,7 +145,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         } while (true);
     }
 
-    public List<RowData> AllRows() {
+    public List<RowData?> AllRows() {
         var sortedRows = new List<RowData>();
         foreach (var thisRowItem in this) {
             if (thisRowItem != null) {
@@ -183,7 +183,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         return tmpVisibleRows;
     }
 
-    public List<RowData> CalculateSortedRows(List<FilterItem>? filter, RowSortDefinition rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) => CalculateSortedRows(CalculateFilteredRows(filter), rowSortDefinition, pinnedRows, reUseMe);
+    public List<RowData> CalculateSortedRows(List<FilterItem>? filter, RowSortDefinition? rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) => CalculateSortedRows(CalculateFilteredRows(filter), rowSortDefinition, pinnedRows, reUseMe);
 
     public List<RowData> CalculateSortedRows(List<RowItem> filteredRows, RowSortDefinition? rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) {
         if (Database == null) { return new List<RowData>(); }
@@ -314,12 +314,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     }
 
     public string DoAutomatic(FilterCollection? filter, bool fullCheck, List<RowItem?>? pinned, string startroutine) {
-        if (Database == null || Database.ReadOnly) { return "Datenbank schreibgeschützt."; }
+        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return "Datenbank schreibgeschützt."; }
         return DoAutomatic(CalculateVisibleRows(filter, pinned), fullCheck, startroutine);
     }
 
     public string DoAutomatic(List<RowItem>? rows, bool fullCheck, string startroutine) {
-        if (Database == null || Database.ReadOnly) { return "Datenbank schreibgeschützt."; }
+        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return "Datenbank schreibgeschützt."; }
 
         if (rows == null || rows.Count == 0) { return "Keine Zeilen angekommen."; }
 
@@ -597,7 +597,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
-            Database.Disposing -= Database_Disposing;
+            if (Database != null) { Database.Disposing -= Database_Disposing; }
             Database = null;
             _throwEvents = false;
             _internal.Clear();

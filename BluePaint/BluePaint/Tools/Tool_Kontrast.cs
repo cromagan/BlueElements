@@ -20,7 +20,6 @@ using BlueControls.EventArgs;
 using System.Drawing;
 using static BlueBasics.BitmapExt;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 
 #nullable enable
 

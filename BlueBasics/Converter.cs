@@ -97,7 +97,7 @@ public static class Converter {
         l.Write(b, 0, b.Length);
         l.Flush();
         l.Close();
-        l.Dispose();
+        l?.Dispose();
     }
 
     // public static string FileToString(string Dateiname) {
@@ -188,9 +188,9 @@ public static class Converter {
         BinaryReader r = new(obFi);
         var b = r.ReadBytes((int)new FileInfo(dateiname).Length);
         r.Close();
-        r.Dispose();
+        r?.Dispose();
         obFi.Close();
-        obFi.Dispose();
+        obFi?.Dispose();
         return b;
     }
 

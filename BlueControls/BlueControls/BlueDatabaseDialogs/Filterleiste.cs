@@ -250,7 +250,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
             thisFlexi.Visible = false;
             //thisFlexi.thisFilter = null;
             Controls.Remove(thisFlexi);
-            thisFlexi.Dispose();
+            thisFlexi?.Dispose();
         }
 
         #endregion Unnötige Flexis löschen
@@ -284,7 +284,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     //    BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
     //    frmTableView x = new(_TableView.Database, false, true);
     //    x.ShowDialog();
-    //    x.Dispose();
+    //    x?.Dispose();
     //    BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
     //}
 

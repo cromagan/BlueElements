@@ -37,10 +37,8 @@ namespace BlueControls.Controls
             this.But1.ButtonStyle = ButtonStyle.SliderButton;
             this.But1.Checked = false;
             this.But1.ImageCode = "Pfeil_Oben_Scrollbar|8|||||0";
-            this.But1.ImageCode_Checked = "";
             this.But1.Location = new Point(56, 48);
             this.But1.Name = "But1";
-            this.But1.QuickInfo = "";
             this.But1.Size = new Size(24, 24);
             this.But1.TabIndex = 0;
             But1.Click += new EventHandler(But1_Click);
@@ -50,10 +48,8 @@ namespace BlueControls.Controls
             this.But2.ButtonStyle = ButtonStyle.SliderButton;
             this.But2.Checked = false;
             this.But2.ImageCode = "Pfeil_Unten_Scrollbar|8|||||0";
-            this.But2.ImageCode_Checked = "";
             this.But2.Location = new Point(24, 24);
             this.But2.Name = "But2";
-            this.But2.QuickInfo = "";
             this.But2.Size = new Size(24, 24);
             this.But2.TabIndex = 0;
             But2.Click += new EventHandler(But2_Click);

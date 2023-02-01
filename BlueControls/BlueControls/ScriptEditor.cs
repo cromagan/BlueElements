@@ -35,7 +35,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueControls;
 
-public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended //  System.Windows.Forms.UserControl, IContextMenu//
+public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended, IChangedFeedback //  System.Windows.Forms.UserControl, IContextMenu//
 {
     #region Fields
 
@@ -43,7 +43,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended 
     private string _lastVariableContent = string.Empty;
     private string? _lastWord = string.Empty;
     private bool _menuDone;
-    private AutocompleteMenu _popupMenu;
+    private AutocompleteMenu? _popupMenu;
 
     #endregion
 
@@ -55,6 +55,8 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended 
 
     #region Events
 
+    public event EventHandler? Changed;
+
     public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
     public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
@@ -63,11 +65,10 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended 
 
     #region Properties
 
-    protected string ScriptText {
+    public string ScriptText {
         get => txtSkript.Text.TrimEnd(" ");
         set {
             txtSkript.Text = value.TrimEnd(" ") + "    ";
-
             UpdateSubs(Script.ReduceText(value));
         }
     }
@@ -96,6 +97,10 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended 
 
     public void Message(string txt) => txbSkriptInfo.Text = "[" + DateTime.Now.ToLongTimeString() + "] " + txt;
 
+    public virtual void OnChanged() {
+        Changed?.Invoke(this, System.EventArgs.Empty);
+    }
+
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
@@ -110,7 +115,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended 
 
             if (_befehlsReferenz != null && _befehlsReferenz.Visible) {
                 _befehlsReferenz.Close();
-                _befehlsReferenz.Dispose();
+                _befehlsReferenz?.Dispose();
                 _befehlsReferenz = null;
             }
         }
@@ -152,7 +157,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended 
     private void btnBefehlsUebersicht_Click(object sender, System.EventArgs e) {
         if (_befehlsReferenz != null && _befehlsReferenz.Visible) {
             _befehlsReferenz.Close();
-            _befehlsReferenz.Dispose();
+            _befehlsReferenz?.Dispose();
             _befehlsReferenz = null;
         }
 
@@ -206,6 +211,10 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended 
         if (e.Button == System.Windows.Forms.MouseButtons.Right) {
             FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
         }
+    }
+
+    private void TxtSkript_TextChangedDelayed(object sender, FastColoredTextBoxNS.TextChangedEventArgs e) {
+        OnChanged();
     }
 
     private void txtSkript_ToolTipNeeded(object sender, ToolTipNeededEventArgs e) {

@@ -207,7 +207,7 @@ public partial class Notification : FloatingForm {
 
     //            if (x != null && !x.IsDisposed) {
     //            x.Close();
-    //            x.Dispose();
+    //            x?.Dispose();
     //        }
 
     //    }

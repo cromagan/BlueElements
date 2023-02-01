@@ -187,7 +187,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
     private void ChooseDatabaseAndId(ICalculateRowsItemLevel? it) {
         if (_cf == null || it == null) { return; }
 
-        var db = BlueControls.Forms.CommonDialogs.ChooseKnownDatabase();
+        var db = CommonDialogs.ChooseKnownDatabase();
 
         if (db == null) { return; }
 

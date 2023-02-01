@@ -71,7 +71,7 @@ public sealed class MultiUserFile : IDisposableExtended {
     //private int _loadingThreadId = -1;
 
     //private static string _lockLastastfile = string.Empty;
-    private int _lockload = 0;
+    private int _lockload;
 
     private FileSystemWatcher? _watcher;
 
@@ -250,9 +250,9 @@ public sealed class MultiUserFile : IDisposableExtended {
             _ = Save(false);
             while (_pureBinSaver.IsBusy) { Pause(0.5, true); }
             // https://stackoverflow.com/questions/2542326/proper-way-to-dispose-of-a-backgroundworker
-            _pureBinSaver.Dispose();
-            _checker.Dispose();
-            _checker.Dispose();
+            _pureBinSaver?.Dispose();
+            _checker?.Dispose();
+            _checker?.Dispose();
             IsDisposed = true;
         }
     }
@@ -804,7 +804,7 @@ public sealed class MultiUserFile : IDisposableExtended {
             _watcher.Deleted -= Watcher_Deleted;
             _watcher.Renamed -= Watcher_Renamed;
             _watcher.Error -= Watcher_Error;
-            _watcher.Dispose();
+            _watcher?.Dispose();
             _watcher = null;
         }
     }

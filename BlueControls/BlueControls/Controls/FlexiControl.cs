@@ -639,7 +639,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         foreach (var thisc in l) {
             thisc.Visible = false;
             if (thisc != _captionObject && thisc != _infoCaption) {
-                thisc.Dispose(); // Dispose entfernt dass Control aus der Collection
+                thisc?.Dispose(); // Dispose entfernt dass Control aus der Collection
             }
         }
 
@@ -910,7 +910,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         if (string.IsNullOrEmpty(txt)) {
             //Controls.Remove(_InfoCaption);
             //_InfoCaption.Click -= _InfoCaption_Click;
-            //_InfoCaption.Dispose();
+            //_InfoCaption?.Dispose();
             //_InfoCaption = null;
             _infoCaption.Visible = false;
         } else {

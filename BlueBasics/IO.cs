@@ -206,7 +206,7 @@ public static class IO {
             if (waitForExit) {
                 if (processx == null) { return true; }// Windows 8, DANKE!
                 processx.WaitForExit();
-                processx.Dispose();
+                processx?.Dispose();
             }
         } catch (Exception ex) {
             if (logException) { Develop.DebugPrint("ExecuteFile konnte nicht ausgeführt werden:<br>" + ex.Message + "<br>Datei: " + fileName); }

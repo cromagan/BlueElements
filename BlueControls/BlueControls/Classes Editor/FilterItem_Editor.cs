@@ -74,7 +74,7 @@ internal sealed partial class FilterItem_Editor : AbstractClassEditor<FilterItem
         Item.FilterType = e.Filter.FilterType;
         Item.SearchValue.Clear();
         Item.SearchValue.AddRange(e.Filter.SearchValue);
-        OnChanged(Item);
+        OnChanged();
     }
 
     private void btnFilterWahl_Click(object sender, System.EventArgs e) {
@@ -97,7 +97,7 @@ internal sealed partial class FilterItem_Editor : AbstractClassEditor<FilterItem
         Item.Column = c;
         Item.FilterType = FilterType.KeinFilter;
         Item.SearchValue.Clear();
-        OnChanged(Item);
+        OnChanged();
     }
 
     #endregion

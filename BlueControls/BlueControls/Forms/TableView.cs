@@ -37,7 +37,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using static BlueBasics.Converter;
 using static BlueBasics.Develop;
-using static BlueBasics.Extensions;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 
@@ -86,6 +85,8 @@ public partial class TableView : Form, IHasStatusbar {
     #region Properties
 
     public bool DropMessages { get; set; }
+
+    public string PreveredDatabaseID { get; set; } = Database.DatabaseId;
 
     #endregion
 
@@ -344,6 +345,17 @@ public partial class TableView : Form, IHasStatusbar {
                 Table.CursorPos_Set(Table.View_ColumnFirst(), Table.View_RowFirst(), false);
             }
         }
+
+        //if (btnDrucken != null) {
+        //    btnDrucken.Item.Clear();
+        //    _ = btnDrucken.Item.Add("Drucken bzw. Export", "erweitert", QuickImage.Get(ImageCode.Drucker, 28));
+        //    _ = btnDrucken.Item.AddSeparator();
+        //    _ = btnDrucken.Item.Add("CSV-Format für Excel in die Zwischenablage", "csv", QuickImage.Get(ImageCode.Excel, 28));
+        //    _ = btnDrucken.Item.Add("HTML-Format für Internet-Seiten", "html", QuickImage.Get(ImageCode.Globus, 28));
+        //    _ = btnDrucken.Item.AddSeparator();
+        //    _ = btnDrucken.Item.Add("Layout-Editor öffnen", "editor", QuickImage.Get(ImageCode.Layout, 28));
+        //}
+        Check_OrderButtons();
 
         Table.ShowWaitScreen = false;
         tbcDatabaseSelector.Enabled = true;
@@ -618,7 +630,7 @@ public partial class TableView : Form, IHasStatusbar {
 
         var x = new ConnectedFormulaEditor(Table?.Database.FormulaFileName(), null);
         x.Show();
-        //x.Dispose();
+        //x?.Dispose();
     }
 
     private void btnLayouts_Click(object sender, System.EventArgs e) {
@@ -629,7 +641,7 @@ public partial class TableView : Form, IHasStatusbar {
 
     private void btnLetzteDateien_ItemClicked(object sender, BasicListItemEventArgs e) {
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-        _ = SwitchTabToDatabase(new ConnectionInfo(e.Item.Internal));
+        _ = SwitchTabToDatabase(new ConnectionInfo(e.Item.Internal, PreveredDatabaseID));
     }
 
     private void btnLoeschen_Click(object sender, System.EventArgs e) {
@@ -666,7 +678,7 @@ public partial class TableView : Form, IHasStatusbar {
 
         var db = new Database(false, string.Empty);
         db.SaveAsAndChangeTo(SaveTab.FileName);
-        _ = SwitchTabToDatabase(new ConnectionInfo(SaveTab.FileName));
+        _ = SwitchTabToDatabase(new ConnectionInfo(SaveTab.FileName, PreveredDatabaseID));
     }
 
     private void btnNummerierung_CheckedChanged(object sender, System.EventArgs e) => Table.ShowNumber = btnNummerierung.Checked;
@@ -683,6 +695,7 @@ public partial class TableView : Form, IHasStatusbar {
 
     private void btnSaveAs_Click(object sender, System.EventArgs e) {
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+        Database.ForceSaveAll();
 
         if (Table.Database is Database db) {
             BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
@@ -694,7 +707,7 @@ public partial class TableView : Form, IHasStatusbar {
             if (FileExists(SaveTab.FileName)) { _ = DeleteFile(SaveTab.FileName, true); }
 
             db.SaveAsAndChangeTo(SaveTab.FileName);
-            _ = SwitchTabToDatabase(new ConnectionInfo(SaveTab.FileName));
+            _ = SwitchTabToDatabase(new ConnectionInfo(SaveTab.FileName, PreveredDatabaseID));
         }
     }
 
@@ -815,6 +828,9 @@ public partial class TableView : Form, IHasStatusbar {
         Table.Arrangement = int.Parse(e.Item.Internal);
     }
 
+    private void cbxSriptImport_ItemClicked(object sender, BasicListItemEventArgs e) {
+    }
+
     private void ChangeDatabase(DatabaseAbstract? database) {
         if (_originalDb != null) {
             _originalDb.Disposing -= _originalDB_Disposing;
@@ -917,7 +933,7 @@ public partial class TableView : Form, IHasStatusbar {
         }
     }
 
-    private void LoadTab_FileOk(object sender, CancelEventArgs e) => SwitchTabToDatabase(new ConnectionInfo(LoadTab.FileName));
+    private void LoadTab_FileOk(object sender, CancelEventArgs e) => SwitchTabToDatabase(new ConnectionInfo(LoadTab.FileName, PreveredDatabaseID));
 
     private string NameRepair(string istName, RowItem? vRow) {
         var newName = istName;
@@ -1036,7 +1052,7 @@ public partial class TableView : Form, IHasStatusbar {
 
         var s = (List<object>)e.TabPage.Tag;
 
-        var DB = DatabaseAbstract.GetByID((ConnectionInfo)s[0], Table.Database_NeedPassword);
+        var DB = DatabaseAbstract.GetById((ConnectionInfo)s[0], Table.Database_NeedPassword);
 
         if (DB is Database BDB) {
             if (!string.IsNullOrEmpty(BDB.Filename)) {

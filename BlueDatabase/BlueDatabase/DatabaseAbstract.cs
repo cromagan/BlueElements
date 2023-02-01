@@ -34,7 +34,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 
 using Timer = System.Threading.Timer;
@@ -52,25 +51,25 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     public static readonly ListExt<DatabaseAbstract> AllFiles = new();
     public static List<Type>? DatabaseTypes;
 
-    public readonly List<ColumnViewCollection> _columnArrangements = new();
-    public readonly List<string> _datenbankAdmin = new();
     public readonly CellCollection Cell;
     public readonly ColumnCollection Column;
     public readonly RowCollection Row;
     public readonly string TableName = string.Empty;
     public readonly string UserName = Generic.UserName().ToUpper();
     public string UserGroup;
-
-    protected string? _additionalFilesPfadtmp;
-    private static readonly List<ConnectionInfo> _allavailabletables = new();
-
+    protected string? AdditionalFilesPfadtmp;
+    private static readonly List<ConnectionInfo> Allavailabletables = new();
     private static DateTime _lastTableCheck = new(1900, 1, 1);
+    private readonly List<ColumnViewCollection> _columnArrangements = new();
+    private readonly List<string> _datenbankAdmin = new();
 
     /// <summary>
     /// Exporte werden nur internal verwaltet. Wegen zu vieler erzeigter Pendings, z.B. bei LayoutExport.
     /// Der Head-Editor kann und muss (manuelles Löschen) auf die Exporte Zugreifen und kümmert sich auch um die Pendings
     /// </summary>
     private readonly List<ExportDefinition?> _export = new();
+
+    private readonly List<ImportScript?> _importScript = new();
 
     private readonly LayoutCollection _layouts = new();
 
@@ -82,7 +81,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     private string _additionalFilesPfad = string.Empty;
 
-    private BackgroundWorker _backgroundWorker;
+    private BackgroundWorker? _backgroundWorker;
 
     private string _cachePfad = string.Empty;
 
@@ -119,9 +118,9 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     #endregion
 
-    #region Constructors
+    //public DatabaseAbstract(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) : this(ci.TableName, readOnly) { }
 
-    public DatabaseAbstract(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) : this(ci.TableName, readOnly) { }
+    #region Constructors
 
     protected DatabaseAbstract(string tablename, bool readOnly) {
         Develop.StartService();
@@ -181,7 +180,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         get => _additionalFilesPfad;
         set {
             if (_additionalFilesPfad == value) { return; }
-            _additionalFilesPfadtmp = null;
+            AdditionalFilesPfadtmp = null;
             _ = ChangeData(DatabaseDataType.AdditionalFilesPath, null, null, _additionalFilesPfad, value, string.Empty);
             Cell.InvalidateAllSizes();
         }
@@ -191,6 +190,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     public string CachePfad {
         get => _cachePfad;
         set {
+            // ReSharper disable once RedundantCheckBeforeAssignment
             if (_cachePfad == value) { return; }
             _cachePfad = value;
         }
@@ -255,9 +255,17 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     public double GlobalScale {
         get => _globalScale;
         set {
-            if (_globalScale == value) { return; }
+            if (Math.Abs(_globalScale - value) < 0.0001) { return; }
             _ = ChangeData(DatabaseDataType.GlobalScale, null, null, _globalScale.ToString(CultureInfo.InvariantCulture), value.ToString(CultureInfo.InvariantCulture), string.Empty);
             Cell.InvalidateAllSizes();
+        }
+    }
+
+    public string GlobalShowPass {
+        get => _globalShowPass;
+        set {
+            if (_globalShowPass == value) { return; }
+            _ = ChangeData(DatabaseDataType.GlobalShowPass, null, null, _globalShowPass, value, string.Empty);
         }
     }
 
@@ -270,23 +278,22 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     //        ChangeData(DatabaseDataType.FirstColumn, null, null, _firstColumn, value, string.Empty);
     //    }
     //}
+    public bool HasPendingChanges { get; protected set; } = false;
 
-    public string GlobalShowPass {
-        get => _globalShowPass;
+    public ReadOnlyCollection<ImportScript?> ImportScript {
+        get => new(_importScript);
         set {
-            if (_globalShowPass == value) { return; }
-            _ = ChangeData(DatabaseDataType.GlobalShowPass, null, null, _globalShowPass, value, string.Empty);
+            if (_importScript.ToString(false) == value.ToString(false)) { return; }
+            _ = ChangeData(DatabaseDataType.ImportScript, null, null, _importScript.ToString(true), value.ToString(true), string.Empty);
         }
     }
-
-    public bool HasPendingChanges { get; protected set; } = false;
 
     public bool IsDisposed { get; private set; }
 
     /// <summary>
     /// Letzter Lade-Stand der Daten. Wird in OnLoaded gesetzt
     /// </summary>
-    public DateTime? IsInCache { get; private set; } = null;
+    public DateTime? IsInCache { get; private set; }
 
     public LayoutCollection Layouts {
         get => _layouts;
@@ -310,7 +317,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     public DateTime PowerEdit { get; set; }
 
-    public bool ReadOnly { get; private set; } = false;
+    public bool ReadOnly { get; private set; }
 
     public string RulesScript {
         get => _rulesScript;
@@ -380,7 +387,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     public static List<ConnectionInfo> AllAvailableTables() {
         if (DateTime.Now.Subtract(_lastTableCheck).TotalMinutes < 1) {
-            return _allavailabletables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
+            return Allavailabletables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
         }
 
         // Wird benutzt, um z.b. das Dateisystem nicht doppelt und dreifach abzufragen.
@@ -391,10 +398,10 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         var alf = new List<DatabaseAbstract>();// könnte sich ändern, deswegen Zwischenspeichern
         alf.AddRange(AllFiles);
 
-        foreach (var thisDB in alf) {
-            var possibletables = thisDB.AllAvailableTables(allreadychecked);
+        foreach (var thisDb in alf) {
+            var possibletables = thisDb.AllAvailableTables(allreadychecked);
 
-            allreadychecked.Add(thisDB);
+            allreadychecked.Add(thisDb);
 
             if (possibletables != null) {
                 foreach (var thistable in possibletables) {
@@ -402,7 +409,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
                     #region prüfen, ob schon voranden, z.b. DatabaseAbstract.AllFiles
 
-                    foreach (var checkme in _allavailabletables) {
+                    foreach (var checkme in Allavailabletables) {
                         if (string.Equals(checkme.TableName, thistable.TableName, StringComparison.InvariantCultureIgnoreCase)) {
                             canadd = false;
                             break;
@@ -411,20 +418,20 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
                     #endregion
 
-                    if (canadd) { _allavailabletables.Add(thistable); }
+                    if (canadd) { Allavailabletables.Add(thistable); }
                 }
             }
         }
 
         _lastTableCheck = DateTime.Now;
-        return _allavailabletables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
+        return Allavailabletables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
     }
 
     public static bool CriticalState() {
-        foreach (var thisDB in AllFiles) {
-            if (!thisDB.IsDisposed) {
-                if (!thisDB.LogUndo) { return true; } // Irgend ein heikler Prozess
-                if (thisDB.IsInCache == null) { return true; } // Irgend eine Datenbank wird aktuell geladen
+        foreach (var thisDb in AllFiles) {
+            if (!thisDb.IsDisposed) {
+                if (!thisDb.LogUndo) { return true; } // Irgend ein heikler Prozess
+                if (thisDb.IsInCache == null) { return true; } // Irgend eine Datenbank wird aktuell geladen
             }
         }
 
@@ -447,7 +454,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// Sucht die Datenbank im Speicher. Wird sie nicht gefunden, wird sie geladen.
     /// </summary>
 
-    public static DatabaseAbstract? GetByID(ConnectionInfo? ci, DatabaseAbstract.NeedPassword? needPassword) {
+    public static DatabaseAbstract? GetById(ConnectionInfo? ci, NeedPassword? needPassword) {
         if (ci is null) { return null; }
 
         #region Schauen, ob die Datenbank bereits geladen ist
@@ -502,8 +509,8 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         #endregion
 
         if (SQLBackAbstract.ConnectedSQLBack != null) {
-            foreach (var thisSQL in SQLBackAbstract.ConnectedSQLBack) {
-                var h = thisSQL.HandleMe(ci);
+            foreach (var thisSql in SQLBackAbstract.ConnectedSQLBack) {
+                var h = thisSql.HandleMe(ci);
                 if (h != null) {
                     return new DatabaseSQLLite(h, false, ci.TableName);
                 }
@@ -565,11 +572,11 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                         break;
                 }
                 if (FileExists(pf)) {
-                    var ci = new ConnectionInfo(pf);
+                    var ci = new ConnectionInfo(pf, Database.DatabaseId);
 
-                    var tmp = GetByID(ci, null);
+                    var tmp = GetById(ci, null);
                     if (tmp != null) { return tmp; }
-                    tmp = new DatabaseMultiUser(pf, false, false, pf.FileNameWithoutSuffix());
+                    tmp = new Database(pf, false, false, pf.FileNameWithoutSuffix(), null);
                     return tmp;
                 }
             } while (pf != string.Empty);
@@ -584,8 +591,8 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         var alf = new List<DatabaseAbstract>();// könnte sich ändern, deswegen Zwischenspeichern
         alf.AddRange(AllFiles);
 
-        foreach (var thisDB in alf) {
-            if (thisDB.ConnectionDataOfOtherTable(tablename, true) is ConnectionInfo ci) {
+        foreach (var thisDb in alf) {
+            if (thisDb.ConnectionDataOfOtherTable(tablename, true) is ConnectionInfo ci) {
                 return ci;
             }
         }
@@ -598,17 +605,17 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// </summary>
     /// <returns></returns>
     public virtual string AdditionalFilesPfadWhole() {
-        if (_additionalFilesPfadtmp != null) { return _additionalFilesPfadtmp; }
+        if (AdditionalFilesPfadtmp != null) { return AdditionalFilesPfadtmp; }
 
         if (!string.IsNullOrEmpty(_additionalFilesPfad)) {
             var t = _additionalFilesPfad.CheckPath();
             if (DirectoryExists(t)) {
-                _additionalFilesPfadtmp = t;
+                AdditionalFilesPfadtmp = t;
                 return t;
             }
         }
 
-        _additionalFilesPfadtmp = string.Empty;
+        AdditionalFilesPfadtmp = string.Empty;
         return string.Empty;
     }
 
@@ -625,11 +632,11 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// Der Wert wird intern fest verankert - bei ReadOnly werden aber weitere Schritte ignoriert.
     /// </summary>
     /// <param name="comand"></param>
-    /// <param name="column"></param>
-    /// <param name="row"></param>
+    /// <param name="columnname"></param>
+    /// <param name="rowkey"></param>
     /// <param name="previousValue"></param>
     /// <param name="changedTo"></param>
-
+    /// <param name="comment"></param>
     public string ChangeData(DatabaseDataType comand, string? columnname, long? rowkey, string previousValue, string changedTo, string comment) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
@@ -707,6 +714,8 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
         Export = sourceDatabase.Export;
 
+        ImportScript = sourceDatabase.ImportScript;
+
         UndoCount = sourceDatabase.UndoCount;
     }
 
@@ -718,7 +727,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             t += " - Systemspalte<br>";
         }
 
-        if (SortDefinition.Columns.Contains(column)) { t += " - Sortierung<br>"; }
+        if (SortDefinition?.Columns.Contains(column) ?? false) { t += " - Sortierung<br>"; }
         //var view = false;
         //foreach (var thisView in OldFormulaViews) {
         //    if (thisView[column] != null) { view = true; }
@@ -1014,7 +1023,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
         x.Provider = null;  // KEINE Vorage mitgeben, weil sonst eine Endlosschleife aufgerufen wird!
 
-        return GetByID(x, null);// new DatabaseSQL(_sql, readOnly, tablename);
+        return GetById(x, null);// new DatabaseSQL(_sql, readOnly, tablename);
     }
 
     public string Import(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart, bool dorowautmatic, string script) {
@@ -1126,7 +1135,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         return string.Empty;
     }
 
-    public string ImportCSV(string filename, string script) {
+    public string ImportCsv(string filename, string script) {
         if (!FileExists(filename)) { return "Datei nicht gefunden"; }
         var importText = File.ReadAllText(filename, Constants.Win1252);
 
@@ -1508,6 +1517,14 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                 }
                 break;
 
+            case DatabaseDataType.ImportScript:
+                _importScript.Clear();
+                List<string> ai = new(value.SplitAndCutByCr());
+                foreach (var t in ai) {
+                    _importScript.Add(new ImportScript(this, t));
+                }
+                break;
+
             case DatabaseDataType.ColumnArrangement:
                 _columnArrangements.Clear();
                 List<string> ca = new(value.SplitAndCutByCr());
@@ -1603,16 +1620,16 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         //Column.ItemRemoving -= Column_ItemRemoving;
         //Column.ItemRemoved -= Column_ItemRemoved;
         //Column.ItemAdded -= Column_ItemAdded;
-        Column.Dispose();
-        //Cell.Dispose();
-        Row.Dispose();
+        Column?.Dispose();
+        //Cell?.Dispose();
+        Row?.Dispose();
 
-        //_columnArrangements.Dispose();
-        //_cags.Dispose();
-        //_export.Dispose();
-        //_datenbankAdmin.Dispose();
-        //_permissionGroupsNewRow.Dispose();
-        _layouts.Dispose();
+        //_columnArrangements?.Dispose();
+        //_cags?.Dispose();
+        //_export?.Dispose();
+        //_datenbankAdmin?.Dispose();
+        //_permissionGroupsNewRow?.Dispose();
+        _layouts?.Dispose();
     }
 
     protected virtual void Initialize() {
@@ -1746,7 +1763,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         CancelBackGroundWorker();
 
         if (_backgroundWorker != null) {
-            _backgroundWorker.Dispose();
+            _backgroundWorker?.Dispose();
             _backgroundWorker.DoWork -= BackgroundWorker_DoWork;
         }
     }

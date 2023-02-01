@@ -12,7 +12,7 @@ namespace BlueControls.Forms {
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing) {
             if (disposing && (components != null)) {
-                components.Dispose();
+                components?.Dispose();
             }
             base.Dispose(disposing);
         }
@@ -92,6 +92,7 @@ namespace BlueControls.Forms {
             this.capZeilen2 = new BlueControls.Controls.Caption();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
+            this.cbxSriptImport = new BlueControls.Controls.ComboBox();
             this.ribMain.SuspendLayout();
             this.tabFile.SuspendLayout();
             this.grpOrdner.SuspendLayout();
@@ -727,7 +728,7 @@ namespace BlueControls.Forms {
             this.grpExport.Controls.Add(this.btnCSVClipboard);
             this.grpExport.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpExport.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpExport.Location = new System.Drawing.Point(80, 0);
+            this.grpExport.Location = new System.Drawing.Point(144, 0);
             this.grpExport.Name = "grpExport";
             this.grpExport.Size = new System.Drawing.Size(224, 81);
             this.grpExport.TabIndex = 3;
@@ -775,12 +776,13 @@ namespace BlueControls.Forms {
             // 
             this.grpImport.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpImport.CausesValidation = false;
+            this.grpImport.Controls.Add(this.cbxSriptImport);
             this.grpImport.Controls.Add(this.btnClipboardImport);
             this.grpImport.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpImport.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpImport.Location = new System.Drawing.Point(0, 0);
             this.grpImport.Name = "grpImport";
-            this.grpImport.Size = new System.Drawing.Size(80, 81);
+            this.grpImport.Size = new System.Drawing.Size(144, 81);
             this.grpImport.TabIndex = 4;
             this.grpImport.TabStop = false;
             this.grpImport.Text = "Import";
@@ -961,6 +963,20 @@ namespace BlueControls.Forms {
             this.SaveTab.Title = "Bitte neuen Dateinamen der Datenbank wählen.";
             this.SaveTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
             // 
+            // cbxSriptImport
+            // 
+            this.cbxSriptImport.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.cbxSriptImport.DrawStyle = BlueControls.Enums.ComboboxStyle.RibbonBar;
+            this.cbxSriptImport.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxSriptImport.Enabled = false;
+            this.cbxSriptImport.ImageCode = "Skript||||||||||Pfeil_Links";
+            this.cbxSriptImport.Location = new System.Drawing.Point(72, 2);
+            this.cbxSriptImport.Name = "cbxSriptImport";
+            this.cbxSriptImport.Size = new System.Drawing.Size(64, 66);
+            this.cbxSriptImport.TabIndex = 40;
+            this.cbxSriptImport.Text = "Skript-Import";
+            this.cbxSriptImport.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.cbxSriptImport_ItemClicked);
+            // 
             // TableView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1072,5 +1088,6 @@ namespace BlueControls.Forms {
         private Controls.Button btnSuchFenster;
         protected Controls.GroupBox grpAnsichtWahl;
         private Controls.Button btnSaveLoad;
+        private Controls.ComboBox cbxSriptImport;
     }
 }

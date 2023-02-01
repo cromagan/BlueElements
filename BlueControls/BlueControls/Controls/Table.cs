@@ -38,7 +38,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 
 #nullable enable
@@ -434,7 +433,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public static void ImportCsv(DatabaseAbstract database, string csvtxt) {
         using Import x = new(database, csvtxt);
         _ = x.ShowDialog();
-        x.Dispose();
+        x?.Dispose();
     }
 
     //        newFiles.GenerateAndAdd(neu);
@@ -940,8 +939,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     public void OpenSearchAndReplace() {
+        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return; }
+
         if (!Database.IsAdministrator()) { return; }
-        if (Database.ReadOnly) { return; }
+
         if (_searchAndReplace == null || _searchAndReplace.IsDisposed || !_searchAndReplace.Visible) {
             _searchAndReplace = new SearchAndReplace(this);
             _searchAndReplace.Show();
@@ -1864,7 +1865,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private void AutoFilter_Close() {
         if (_autoFilter != null) {
             _autoFilter.FilterComand -= AutoFilter_FilterComand;
-            _autoFilter.Dispose();
+            _autoFilter?.Dispose();
             _autoFilter = null;
         }
     }
@@ -2186,7 +2187,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         colList.Sort();
         ColDia.CustomColors = colList.Distinct().ToArray();
         _ = ColDia.ShowDialog();
-        ColDia.Dispose();
+        ColDia?.Dispose();
         UserEdited(this, Color.FromArgb(255, ColDia.Color).ToArgb().ToString(), cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, cellInThisDatabaseRow?.Chapter, false);
     }
 

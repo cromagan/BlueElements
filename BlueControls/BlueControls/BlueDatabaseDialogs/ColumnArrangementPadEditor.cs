@@ -30,8 +30,8 @@ using BlueDatabase;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using BlueControls.Interfaces;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -53,7 +53,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
     #region Constructors
 
     public ColumnArrangementPadEditor(DatabaseAbstract? database) : this() {
-        if (database == null || database.ReadOnly) {
+        if (database == null || database.IsDisposed || database.ReadOnly) {
             MessageBox.Show("Datenbank schreibgeschützt.", ImageCode.Information, "OK");
             Close();
             return;
@@ -146,7 +146,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
     }
 
     private void btnNeueSpalte_Click(object sender, System.EventArgs e) {
-        if (Database == null || Database.ReadOnly) { return; }
+        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return; }
 
         ColumnItem? vorlage = null;
         if (Pad.LastClickedItem is ColumnPadItem cpi && cpi.Column.Database == Database) {
@@ -184,7 +184,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         using (ColumnEditor w = new(newc, null)) {
             _ = w.ShowDialog();
             newc.Invalidate_ColumAndContent();
-            w.Dispose();
+            w?.Dispose();
         }
         Database.Column.Repair();
 

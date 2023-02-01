@@ -103,6 +103,7 @@
     <Compile Include="DatabaseSQLLite.cs" />
     <Compile Include="EventArgs\ColumnEventArgs.cs" />
     <Compile Include="ColumnFormatHolder.cs" />
+    <Compile Include="ImportScript.cs" />
     <Compile Include="FormatHolder.cs" />
     <Compile Include="Interfaces\IColumnInputFormat.cs" />
     <Compile Include="Interfaces\IHasChangeabelDatabase.cs" />

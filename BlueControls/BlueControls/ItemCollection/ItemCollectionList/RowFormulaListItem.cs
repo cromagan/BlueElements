@@ -166,7 +166,7 @@ public class RowFormulaListItem : BasicListItem {
 
     private void RemovePic() {
         if (_tmpBmp != null) {
-            _tmpBmp.Dispose();
+            _tmpBmp?.Dispose();
             _tmpBmp = null;
         }
     }

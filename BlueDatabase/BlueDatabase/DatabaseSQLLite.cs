@@ -24,7 +24,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 
 namespace BlueDatabase;
 
@@ -39,12 +38,12 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     /// </summary>
     public readonly SQLBackAbstract? _sql;
 
-    private static bool _isInTimer = false;
+    private static bool _isInTimer;
 
     /// <summary>
     /// Der Globale Timer, der die Sys_Undo Datenbank abfrägt
     /// </summary>
-    private static System.Threading.Timer? _timer = null;
+    private static System.Threading.Timer? _timer;
 
     /// <summary>
     /// Der Zeitstempel der letzten Abfrage des _timer

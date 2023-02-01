@@ -415,7 +415,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         if (bmp == null) { return; }
         var gr = Graphics.FromImage(bmp);
         _ = DrawCreativePadTo(gr, bmp.Size, vState, zoomf, x, y, seite, true);
-        gr.Dispose();
+        gr?.Dispose();
     }
 
     public override void OnChanged() {

@@ -32,7 +32,7 @@ public abstract class RectanglePadItemWithVersion : RectanglePadItem {
 
     #region Properties
 
-    public int Version { get; set; } = 0;
+    public int Version { get; set; }
 
     #endregion
 

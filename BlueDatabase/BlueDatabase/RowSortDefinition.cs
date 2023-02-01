@@ -24,7 +24,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 
 // ReSharper disable All
 

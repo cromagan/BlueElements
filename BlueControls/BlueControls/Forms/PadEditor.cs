@@ -23,7 +23,6 @@ using BlueControls.ItemCollection;
 using System;
 using System.Drawing;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 
 namespace BlueControls.Forms;
 
@@ -155,7 +154,7 @@ public partial class PadEditor : PadEditorReadOnly {
         // Und deswegen können sie auch disposed werden.
 
         foreach (var thisControl in tabElementEigenschaften.Controls) {
-            if (thisControl is IDisposable d) { d.Dispose(); }
+            if (thisControl is IDisposable d) { d?.Dispose(); }
         }
         tabElementEigenschaften.Controls.Clear();
 

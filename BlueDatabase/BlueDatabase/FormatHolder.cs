@@ -246,14 +246,14 @@ public class FormatHolder : IInputFormat, IReadableText {
 
     public AdditionalCheck AdditionalFormatCheck { get; set; } = AdditionalCheck.None;
     public string AllowedChars { get; set; } = string.Empty;
-    public bool FormatierungErlaubt { get; set; } = false;
-    public QuickImage? Image { get; set; } = null;
-    public int MaxTextLenght { get; set; } = 0;
-    public bool MultiLine { get; set; } = false;
+    public bool FormatierungErlaubt { get; set; }
+    public QuickImage? Image { get; set; }
+    public int MaxTextLenght { get; set; }
+    public bool MultiLine { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Prefix { get; set; } = string.Empty;
     public string Regex { get; set; } = string.Empty;
-    public bool SpellCheckingEnabled { get; set; } = false;
+    public bool SpellCheckingEnabled { get; set; }
     public string Suffix { get; set; } = string.Empty;
 
     #endregion

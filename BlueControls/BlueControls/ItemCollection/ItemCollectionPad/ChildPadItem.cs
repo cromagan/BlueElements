@@ -28,7 +28,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 
 namespace BlueControls.ItemCollection;
 
@@ -281,7 +280,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
                 PadInternal.Item.SheetStyleScale = Parent.SheetStyleScale;
                 if (_tmpBmp != null) {
                     if (_tmpBmp.Width != positionModified.Width || positionModified.Height != _tmpBmp.Height) {
-                        _tmpBmp.Dispose();
+                        _tmpBmp?.Dispose();
                         RemovePic();
                         Generic.CollectGarbage();
                     }
@@ -360,7 +359,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
 
     private void RemovePic() {
         if (_tmpBmp != null) {
-            _tmpBmp.Dispose();
+            _tmpBmp?.Dispose();
             _tmpBmp = null;
         }
     }

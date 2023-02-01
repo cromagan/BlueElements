@@ -56,8 +56,6 @@ public sealed class Button : GenericControl, IBackgroundNone, ITranslateable {
 
     private string _imageCode = string.Empty;
 
-    private string _imageCodeChecked = string.Empty;
-
     private bool _isFireing;
 
     private string _text = string.Empty;
@@ -88,7 +86,7 @@ public sealed class Button : GenericControl, IBackgroundNone, ITranslateable {
             if (_clickFirerer != null) {
                 _clickFirerer.Enabled = false;
                 _clickFirerer.Tick -= ClickFirerer_Tick;
-                _clickFirerer.Dispose();
+                _clickFirerer?.Dispose();
                 _clickFirerer = null;
             }
 
@@ -137,17 +135,17 @@ public sealed class Button : GenericControl, IBackgroundNone, ITranslateable {
         }
     }
 
-    [Category("Darstellung")]
-    [DefaultValue("")]
-    [Editor(typeof(QuickPicSelector), typeof(UITypeEditor))]
-    public string ImageCode_Checked {
-        get => _imageCodeChecked;
-        set {
-            if (_imageCodeChecked == value) { return; }
-            _imageCodeChecked = value;
-            Invalidate();
-        }
-    }
+    //[Category("Darstellung")]
+    //[DefaultValue("")]
+    //[Editor(typeof(QuickPicSelector), typeof(UITypeEditor))]
+    //public string ImageCode_Checked {
+    //    get => _imageCodeChecked;
+    //    set {
+    //        if (_imageCodeChecked == value) { return; }
+    //        _imageCodeChecked = value;
+    //        Invalidate();
+    //    }
+    //}
 
     [DefaultValue("")]
     public new string Text {
@@ -188,7 +186,7 @@ public sealed class Button : GenericControl, IBackgroundNone, ITranslateable {
 
         picHeight44 = picHeight44 && control.Height >= 40 && pic != null;
 
-        if (picHeight44) {
+        if (picHeight44 && pic != null) {
             // Großes Bild per automatik generieren und Zeichnen
             //if (pic.Width != -1 || pic.Height != -1) { Develop.DebugPrint("Bei Bildcode " + pic + " die Größenangabe entfernen, da es ein grosses Bild wird!"); }
             //var Zoom = Math.Min((control.Width - 6) / (double)pic.Width, 28 / (double)pic.Height);
@@ -230,11 +228,14 @@ public sealed class Button : GenericControl, IBackgroundNone, ITranslateable {
 
     protected override void DrawControl(Graphics gr, States state) {
         try {
-            var pic = (ButtonStyle)((int)_buttonStyle % 1000) switch {
-                ButtonStyle.Yes_or_No => _checked || MousePressing() ? QuickImage.Get(BlueBasics.Enums.ImageCode.Häkchen) : QuickImage.Get(BlueBasics.Enums.ImageCode.Kreuz),
-                ButtonStyle.Pic1_or_Pic2 => _checked || MousePressing() ? QuickImage.Get(_imageCodeChecked) : QuickImage.Get(_imageCode),
-                _ => string.IsNullOrEmpty(ImageCode) ? null : QuickImage.Get(_imageCode)
-            };
+            QuickImage? pic;
+            if ((ButtonStyle)((int)_buttonStyle % 1000) == ButtonStyle.Yes_or_No) {
+                pic = _checked || MousePressing()
+                    ? QuickImage.Get(BlueBasics.Enums.ImageCode.Häkchen)
+                    : QuickImage.Get(BlueBasics.Enums.ImageCode.Kreuz);
+            } else {
+                pic = string.IsNullOrEmpty(ImageCode) ? null : QuickImage.Get(_imageCode);
+            }
 
             #region State modifzieren
 
@@ -266,13 +267,11 @@ public sealed class Button : GenericControl, IBackgroundNone, ITranslateable {
                     break;
 
                 case ButtonStyle.Yes_or_No:
-                case ButtonStyle.Pic1_or_Pic2:
                 case ButtonStyle.Checkbox:
                     DrawButton(this, gr, Design.Button_CheckBox, state, pic, Alignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
                     break;
 
                 case ButtonStyle.Checkbox_Big_Borderless:
-                case ButtonStyle.Pic1_or_Pic2_Big_Borderless:
                     DrawButton(this, gr, Design.Ribbonbar_Button_CheckBox, state, pic, Alignment.VerticalCenter_Left, true, _etxt, _text, DisplayRectangle, Translate);
                     break;
 
@@ -351,7 +350,7 @@ public sealed class Button : GenericControl, IBackgroundNone, ITranslateable {
         if (!Enabled || IsDisposed) { return; }
 
         if (_buttonStyle == ButtonStyle.SliderButton) {
-            _clickFirerer.Interval = 500;
+            if (_clickFirerer != null) { _clickFirerer.Interval = 500; }
             ClickFirerer_Tick(null, e);
         }
 
