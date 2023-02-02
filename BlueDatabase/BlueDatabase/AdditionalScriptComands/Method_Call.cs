@@ -21,7 +21,6 @@ using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace BlueDatabase.AdditionalScriptComands;
 

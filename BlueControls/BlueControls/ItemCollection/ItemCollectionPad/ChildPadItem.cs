@@ -77,11 +77,11 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     public CreativePad? PadInternal {
         get => _padInternal;
         set {
-            if (_padInternal != null) {
+            if (_padInternal?.Item != null) {
                 _padInternal.Item.Changed -= _Pad_DoInvalidate;
             }
             _padInternal = value;
-            if (value != null) {
+            if (_padInternal?.Item != null) {
                 _padInternal.Item.Changed += _Pad_DoInvalidate;
             }
         }
@@ -113,13 +113,13 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     }
 
     public bool KeyUp(object sender, System.Windows.Forms.KeyEventArgs e, float cZoom, float shiftX, float shiftY) {
-        if (PadInternal.Item.Count == 0) { return false; }
+        if (PadInternal?.Item == null || PadInternal.Item.Count == 0) { return false; }
         PadInternal.DoKeyUp(e, false);
         return true;
     }
 
     public bool MouseDown(object sender, System.Windows.Forms.MouseEventArgs e, float cZoom, float shiftX, float shiftY) {
-        if (PadInternal == null || PadInternal.Item.Count == 0) { return false; }
+        if (PadInternal?.Item == null || PadInternal.Item.Count == 0) { return false; }
         var l1 = UsedArea.ZoomAndMoveRect(cZoom, shiftX, shiftY, false);
         var l2 = PadInternal.Item.MaxBounds(ZoomItems);
         if (l1.Width <= 0 || l2.Height <= 0) { return false; }
@@ -144,7 +144,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     }
 
     public bool MouseMove(object sender, System.Windows.Forms.MouseEventArgs e, float zoom, float shiftX, float shiftY) {
-        if (PadInternal == null || PadInternal.Item.Count == 0) { return false; }
+        if (PadInternal?.Item == null || PadInternal.Item.Count == 0) { return false; }
         var l1 = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
         var l2 = PadInternal.Item.MaxBounds(ZoomItems);
         if (l1.Width <= 0 || l2.Height <= 0) { return false; }
@@ -170,7 +170,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     }
 
     public bool MouseUp(object sender, System.Windows.Forms.MouseEventArgs e, float zoom, float shiftX, float shiftY) {
-        if (PadInternal.Item.Count == 0) { return false; }
+        if (PadInternal?.Item == null || PadInternal.Item.Count == 0) { return false; }
         var l1 = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
         var l2 = PadInternal.Item.MaxBounds(ZoomItems);
         if (l1.Width <= 0 || l2.Height <= 0) { return false; }
@@ -234,20 +234,22 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     }
 
     public override void ProcessStyleChange() {
+        if (PadInternal?.Item == null || Parent == null) { return; }
+
         RemovePic();
         PadInternal.Item.SheetStyle = Parent.SheetStyle;
         PadInternal.Item.SheetStyleScale = Parent.SheetStyleScale;
     }
 
     public bool ReplaceVariable(Variable variable) {
-        if (PadInternal == null) { return false; }
+        if (PadInternal?.Item == null) { return false; }
         var b = PadInternal.Item.ParseVariable(variable);
         if (b) { OnChanged(); }
         return b;
     }
 
     public bool ResetVariables() {
-        if (PadInternal == null) { return false; }
+        if (PadInternal?.Item == null) { return false; }
         var b = PadInternal.Item.ResetVariables();
         if (b) { OnChanged(); }
         return b;
@@ -261,7 +263,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         if (Textlage != (Alignment)(-1)) { t = t + "Pos=" + (int)Textlage + ", "; }
         if (Eingebettete_Ansichten.Count > 0) { t = t + "Embedded=" + Eingebettete_Ansichten.JoinWithCr().ToNonCritical() + ", "; }
         t = t + "Color=" + Randfarbe.ToHtmlCode() + ", ";
-        if (PadInternal != null) {
+        if (PadInternal?.Item != null) {
             t = t + "Data=" + PadInternal.Item.ToString(false) + ", ";
         }
         return t.Trim(", ") + "}";
@@ -270,12 +272,14 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     protected override string ClassId() => "CHILDPAD";
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+        if (PadInternal?.Item == null || Parent == null) { return; }
+
         try {
             var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
             gr.TranslateTransform(trp.X, trp.Y);
             gr.RotateTransform(-Drehwinkel);
             Font font = new("Arial", 30 * zoom);
-            if (PadInternal != null) {
+            if (PadInternal?.Item != null) {
                 PadInternal.Item.SheetStyle = Parent.SheetStyle;
                 PadInternal.Item.SheetStyleScale = Parent.SheetStyleScale;
                 if (_tmpBmp != null) {
@@ -305,7 +309,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
                                 }
                             }
                         }
-                        if (pad != null) {
+                        if (pad?.PadInternal?.Item != null) {
                             var mb2 = pad.PadInternal.Item.MaxBounds(pad.ZoomItems);
                             mb2.Inflate(-1, -1);
                             var tmpG = Graphics.FromImage(_tmpBmp);

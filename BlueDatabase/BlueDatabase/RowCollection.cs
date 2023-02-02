@@ -597,7 +597,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
-            if (Database != null) { Database.Disposing -= Database_Disposing; }
+            if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
             Database = null;
             _throwEvents = false;
             _internal.Clear();

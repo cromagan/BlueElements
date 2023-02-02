@@ -253,7 +253,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public new bool Focused() => base.Focused || Plus.Focused || Minus.Focused || Up.Focused || Down.Focused || SliderY.Focused() || FilterCap.Focused || FilterTxt.Focused;
 
-    public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) => hotItem = e == null ? null : MouseOverNode(e.X, e.Y);
+    public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) => hotItem = e == null ? null : MouseOverNode(e.X, e.Y);
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 

@@ -68,8 +68,8 @@ public partial class PadEditorWithFileAccess : PadEditor {
     private void btnLastFiles_ItemClicked(object sender, BasicListItemEventArgs e) => LoadFile(e.Item.Internal, string.Empty);
 
     private void btnNeu_Click(object sender, System.EventArgs e) {
-        Pad.Item.Clear();
-        Pad.ZoomFit();
+        Pad?.Item?.Clear();
+        Pad?.ZoomFit();
     }
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
@@ -89,6 +89,8 @@ public partial class PadEditorWithFileAccess : PadEditor {
     }
 
     private void SaveTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e) {
+        if (Pad?.Item == null) { return; }
+
         var t = Pad.Item.ToString(false);
         WriteAllText(SaveTab.FileName, t, Constants.Win1252, false);
         btnLastFiles.AddFileName(SaveTab.FileName, string.Empty);

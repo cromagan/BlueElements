@@ -959,7 +959,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// Konext-Menü-Events werden ebenfalls registriert, die andern Events werden nicht registriert und sollten nach dieser Rountine registert werden.
     /// </summary>
     /// <param name="control"></param>
-    private void StandardBehandlung(GenericControl? control) {
+    private void StandardBehandlung(Control? control) {
         Control_Create_Caption();
         switch (_captionPosition) {
             case ÜberschriftAnordnung.ohne:

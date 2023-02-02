@@ -63,7 +63,7 @@ public class Method_AddRow : MethodDatabase {
         if (string.IsNullOrEmpty(((VariableString)attvar.Attributes[1]).ValueString)) { return new DoItFeedback("KeyValue muss einen Wert enthalten."); }
         //var r = db.Row[((VariableString)attvar.Attributes[1]).ValueString];
 
-        //if (r != null && !((VariableBool)attvar.Attributes[2]).ValueBool) { return Method_Row.RowToObject(r); }
+        //if (r != null && !((VariableBool)attvar.Attributes[2]).ValueBool) { return Method_Row?.RowToObject(r); }
 
         if (((VariableBool)attvar.Attributes[2]).ValueBool) {
             StackTrace stackTrace = new();

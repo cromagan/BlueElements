@@ -304,7 +304,7 @@ public partial class TableView : Form, IHasStatusbar {
     }
 
     protected virtual void DatabaseSet(DatabaseAbstract? database, string toParse) {
-        if (database != null) {
+        if (database != null && !database.IsDisposed) {
             DropMessages = database.IsAdministrator();
         }
 
@@ -804,7 +804,7 @@ public partial class TableView : Form, IHasStatusbar {
         }
     }
 
-    private void btnUnterschiede_CheckedChanged(object sender, System.EventArgs e) => Table.Unterschiede = btnUnterschiede.Checked ? Table.CursorPosRow.Row : null;
+    private void btnUnterschiede_CheckedChanged(object sender, System.EventArgs e) => Table.Unterschiede = btnUnterschiede.Checked ? Table.CursorPosRow?.Row : null;
 
     private void btnVorwärts_Click(object sender, System.EventArgs e) {
         SuchEintragNoSave(Direction.Unten, out var column, out var row);
@@ -924,8 +924,8 @@ public partial class TableView : Form, IHasStatusbar {
                 if (Table.CursorPosRow == null && Table.View_RowFirst() != null) {
                     Table.CursorPos_Set(Table?.View_ColumnFirst(), Table?.View_RowFirst(), false);
                 }
-                if (Table?.CursorPosRow != null) {
-                    FillFormula(Table.CursorPosRow.Row);
+                if (Table?.CursorPosRow?.Row != null) {
+                    FillFormula(Table.CursorPosRow?.Row);
                 }
             }
         } else {
@@ -950,7 +950,7 @@ public partial class TableView : Form, IHasStatusbar {
     }
 
     private void SetFormula(DatabaseAbstract? database) {
-        if (database != null) {
+        if (database != null && !database.IsDisposed) {
             Formula.GetConnectedFormulaFromDatabase(database);
             Formula.Database = database;
             return;

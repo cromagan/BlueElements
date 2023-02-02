@@ -20,7 +20,6 @@
 using BlueBasics;
 using BlueScript.Methods;
 using BlueScript.Structures;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -47,9 +46,8 @@ public class VariableListString : Variable {
     public VariableListString(string name) : this(name, null, true, false, string.Empty) { }
 
     /// <summary>
-    /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
+    /// Wichtig für: GetEnumerableOfType Variable("NAME");
     /// </summary>
-    /// <param name="name"></param>
     public VariableListString(List<string>? value) : this(DummyName(), value, true, false, string.Empty) { }
 
     public VariableListString(IEnumerable<string> value) : this(value.ToList()) { }
@@ -125,7 +123,7 @@ public class VariableListString : Variable {
         return DoItFeedback.Null();
     }
 
-    protected override Variable? NewWithThisValue(object x, Script s) {
+    protected override Variable NewWithThisValue(object x, Script s) {
         var v = new VariableListString(string.Empty);
         v.SetValue(x);
         return v;

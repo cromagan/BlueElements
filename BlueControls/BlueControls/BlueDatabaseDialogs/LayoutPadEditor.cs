@@ -109,8 +109,8 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
     }
 
     protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
-        if (Database != null) {
-            if (Database != null) { Database.Disposing -= Database_Disposing; }
+        if (Database != null && !Database.IsDisposed) {
+            Database.Disposing -= Database_Disposing;
         }
         SaveCurrentLayout();
         scriptEditor.Database = null;
@@ -119,7 +119,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
     }
 
     private void BefülleLayoutDropdown() {
-        if (Database != null) {
+        if (Database != null && !Database.IsDisposed) {
             cbxLayout.Item.Clear();
             ExportDialog.AddLayoutsOff(cbxLayout.Item, Database, true);
         }

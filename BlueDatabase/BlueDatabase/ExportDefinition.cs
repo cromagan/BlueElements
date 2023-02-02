@@ -668,7 +668,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
         if (disposing) {
             // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
         }
-        if (Database != null) { Database.Disposing -= Database_Disposing; }
+        if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
         Database = null;
         Filter?.Dispose();
 

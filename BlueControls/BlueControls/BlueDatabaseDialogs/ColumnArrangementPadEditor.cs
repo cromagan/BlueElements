@@ -30,7 +30,6 @@ using BlueDatabase;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using BlueControls.Interfaces;
 using static BlueBasics.Converter;
 
 namespace BlueControls.BlueDatabaseDialogs;
@@ -46,7 +45,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
     public bool Sorting;
 
-    private int Arrangement = -1;
+    private int _arrangement = -1;
 
     #endregion
 
@@ -60,7 +59,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         }
 
         Database = database;
-        Arrangement = 1;
+        _arrangement = 1;
         UpdateCombobox();
         ShowOrder();
     }
@@ -71,21 +70,21 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
     #region Properties
 
-    public ColumnViewCollection? CurrentArrangement => Database?.ColumnArrangements == null || Database.ColumnArrangements.Count <= Arrangement
+    public ColumnViewCollection? CurrentArrangement => Database?.ColumnArrangements == null || Database.ColumnArrangements.Count <= _arrangement
         ? null
-        : Database.ColumnArrangements[Arrangement];
+        : Database.ColumnArrangements[_arrangement];
 
     #endregion
 
     #region Methods
 
     private void btnAktuelleAnsichtLoeschen_Click(object sender, System.EventArgs e) {
-        if (Database == null || Arrangement < 2 || Arrangement >= Database.ColumnArrangements.Count) { return; }
+        if (Database == null || _arrangement < 2 || _arrangement >= Database.ColumnArrangements.Count) { return; }
         if (MessageBox.Show("Anordung <b>'" + CurrentArrangement.Name + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         var car = Database.ColumnArrangements.CloneWithClones();
-        car.RemoveAt(Arrangement);
+        car.RemoveAt(_arrangement);
         Database.ColumnArrangements = new System.Collections.ObjectModel.ReadOnlyCollection<ColumnViewCollection>(car);
-        Arrangement = 1;
+        _arrangement = 1;
         UpdateCombobox();
         ShowOrder();
     }
@@ -112,13 +111,13 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         if (b == null) { return; }
         CurrentArrangement.PermissionGroups_Show.Clear();
         CurrentArrangement.PermissionGroups_Show.AddRange(b.ToArray());
-        if (Arrangement == 1) { CurrentArrangement.PermissionGroups_Show.Add("#Everybody"); }
+        if (_arrangement == 1) { CurrentArrangement.PermissionGroups_Show.Add("#Everybody"); }
     }
 
     private void btnNeueAnsichtErstellen_Click(object sender, System.EventArgs e) {
-        var MitVorlage = false;
-        if (Arrangement > 0 && CurrentArrangement != null) {
-            MitVorlage = Convert.ToBoolean(MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", ImageCode.Frage, "Ja", "Nein") == 0);
+        var mitVorlage = false;
+        if (_arrangement > 0 && CurrentArrangement != null) {
+            mitVorlage = Convert.ToBoolean(MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", ImageCode.Frage, "Ja", "Nein") == 0);
         }
 
         var car = Database.ColumnArrangements.CloneWithClones();
@@ -128,7 +127,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
             car.Add(new ColumnViewCollection(Database, string.Empty, string.Empty));
         }
         string newname;
-        if (MitVorlage) {
+        if (mitVorlage) {
             newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder.Text);
             if (string.IsNullOrEmpty(newname)) { return; }
             car.Add(new ColumnViewCollection(Database, CurrentArrangement.ToString(), newname));
@@ -139,7 +138,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         }
 
         Database.ColumnArrangements = new System.Collections.ObjectModel.ReadOnlyCollection<ColumnViewCollection>(car);
-        Arrangement = car.Count - 1;
+        _arrangement = car.Count - 1;
         UpdateCombobox();
 
         ShowOrder();
@@ -188,7 +187,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         }
         Database.Column.Repair();
 
-        if (Arrangement > 0 && CurrentArrangement != null) { CurrentArrangement.Add(newc, false); }
+        if (_arrangement > 0 && CurrentArrangement != null) { CurrentArrangement.Add(newc, false); }
 
         Database.RepairAfterParse();
         ShowOrder();
@@ -196,8 +195,8 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
     private void btnSpalteEinblenden_Click(object sender, System.EventArgs e) {
         ItemCollectionList ic = new();
-        foreach (var ThisColumnItem in Database.Column) {
-            if (ThisColumnItem != null && CurrentArrangement[ThisColumnItem] == null) { _ = ic.Add(ThisColumnItem); }
+        foreach (var thisColumnItem in Database.Column) {
+            if (thisColumnItem != null && CurrentArrangement[thisColumnItem] == null) { _ = ic.Add(thisColumnItem); }
         }
         if (ic.Count == 0) {
             MessageBox.Show("Es werden bereits alle<br>Spalten angezeigt.", ImageCode.Information, "Ok");
@@ -220,9 +219,9 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
         var tmporder = IntParse(e.Item.Internal);
 
-        if (Arrangement == tmporder) { return; }
+        if (_arrangement == tmporder) { return; }
 
-        Arrangement = tmporder;
+        _arrangement = tmporder;
         ShowOrder();
     }
 
@@ -234,7 +233,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         if (Generating || Sorting) { return; }
 
         var cloneOfColumnArrangements = Database.ColumnArrangements.CloneWithClones();
-        var thisColumnViewCollection = cloneOfColumnArrangements[Arrangement];
+        var thisColumnViewCollection = cloneOfColumnArrangements[_arrangement];
 
         if (thisColumnViewCollection == null) { return; }
         var did = false;
@@ -292,7 +291,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         // Prüfen, ob Items gelöscht wurden.
         // Diese dann ebenfalls löschen
         if (thisColumnViewCollection.Count > itemsdone.Count) {
-            if (Arrangement > 0) {
+            if (_arrangement > 0) {
 
                 #region Code für Ansichten > 0
 
@@ -336,7 +335,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
             var c = CurrentArrangement;
 
-            if (c != null && cpi.Column.Database == Database && Arrangement > 0) {
+            if (c != null && cpi.Column.Database == Database && _arrangement > 0) {
                 var oo = c[cpi.Column];
 
                 if (oo != null) {
@@ -350,7 +349,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
     private void Item_ItemRemoved(object sender, System.EventArgs e) => Pad_MouseUp(null, null);
 
-    private ColumnPadItem? LeftestItem(List<BasicPadItem> ignore) {
+    private ColumnPadItem? LeftestItem(ICollection<BasicPadItem> ignore) {
         ColumnPadItem? found = null;
 
         foreach (var thisIt in Pad.Item) {
@@ -385,13 +384,13 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
         #region Erst alle Spalten der eigenen Datenbank erzeugen, um später verweisen zu können
 
-        var X = 0f;
+        var x = 0f;
         foreach (var thisc in ca) {
             if (thisc?.Column != null) {
                 var it = new ColumnPadItem(thisc?.Column);
                 Pad.Item.Add(it);
-                it.SetLeftTopPoint(X, 0);
-                X = it.UsedArea.Right;
+                it.SetLeftTopPoint(x, 0);
+                x = it.UsedArea.Right;
                 anyitem = it;
             }
         }
@@ -431,10 +430,10 @@ public partial class ColumnArrangementPadEditor : PadEditor {
                         }
 
                         foreach (var thisitem in thisc.Column.LinkedCellFilter) {
-                            var x = thisitem.SplitBy("|");
+                            var tmp = thisitem.SplitBy("|");
 
                             foreach (var thisc2 in thisc?.Column?.Database?.Column) {
-                                if (x[2].Contains("~" + thisc2.Name + "~")) {
+                                if (tmp[2].Contains("~" + thisc2.Name + "~")) {
                                     var rkcolit = (ColumnPadItem?)Pad.Item[thisc2.Name];
                                     _ = (rkcolit?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false, databItem, ConnectionType.Top, true, false)));
                                 }
@@ -480,7 +479,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         Sorting = false;
     }
 
-    private void UpdateCombobox() => Table.WriteColumnArrangementsInto(cbxInternalColumnArrangementSelector, Database, Arrangement);
+    private void UpdateCombobox() => Table.WriteColumnArrangementsInto(cbxInternalColumnArrangementSelector, Database, _arrangement);
 
     #endregion
 }

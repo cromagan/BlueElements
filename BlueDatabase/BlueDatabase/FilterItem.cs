@@ -46,7 +46,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
 
     public FilterItem(DatabaseAbstract database, FilterType filterType, IReadOnlyCollection<string> searchValue) {
         Database = database;
-        if (Database != null) {
+        if (Database != null && !Database.IsDisposed) {
             Database.Disposing += Database_Disposing;
         }
 
@@ -63,7 +63,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
 
     public FilterItem(DatabaseAbstract database, string filterCode) {
         Database = database;
-        if (Database != null) {
+        if (Database != null && !Database.IsDisposed) {
             Database.Disposing += Database_Disposing;
         }
 
@@ -228,9 +228,11 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
                     break;
 
                 case "database":
-                    if (Database != null) { Database.Disposing -= Database_Disposing; }
+                    if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
                     Database = DatabaseAbstract.GetById(new ConnectionInfo(pair.Value.FromNonCritical(), null), null);
-                    Database.Disposing += Database_Disposing;
+
+                    if (Database != null && !Database.IsDisposed) { Database.Disposing += Database_Disposing; }
+
                     break;
 
                 case "type":
@@ -329,7 +331,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
             if (!IsOk()) { return string.Empty; }
             var result = "{Type=" + (int)_filterType;
 
-            if (Database != null) { result = result + ", Database=" + Database.ConnectionData.UniqueID; }
+            if (Database != null && !Database.IsDisposed) { result = result + ", Database=" + Database.ConnectionData.UniqueID; }
 
             if (_column != null) {
                 result = result + ", ColumnName=" + _column.Name;
@@ -353,8 +355,8 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
             Column = null;
-            if (Database != null) {
-                if (Database != null) { Database.Disposing -= Database_Disposing; }
+            if (Database != null && !Database.IsDisposed) {
+                if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
                 Database = null;
             }
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben

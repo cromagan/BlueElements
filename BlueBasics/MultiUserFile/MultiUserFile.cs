@@ -21,6 +21,7 @@ using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
@@ -36,7 +37,7 @@ public sealed class MultiUserFile : IDisposableExtended {
     #region Fields
 
     public int ReloadDelaySecond = 10;
-    private static readonly ListExt<MultiUserFile> _all_Files = new();
+    private static readonly ListExt<MultiUserFile> AllFiles = new();
 
     private readonly Timer _checker;
 
@@ -80,7 +81,7 @@ public sealed class MultiUserFile : IDisposableExtended {
     #region Constructors
 
     public MultiUserFile() {
-        _all_Files.Add(this);
+        AllFiles.Add(this);
         //OnMultiUserFileCreated(this); // Ruft ein statisches Event auf, deswegen geht das.
         _pureBinSaver = new BackgroundWorker {
             WorkerReportsProgress = true
@@ -188,10 +189,10 @@ public sealed class MultiUserFile : IDisposableExtended {
     #region Methods
 
     public static void ForceLoadSaveAll() {
-        var x = _all_Files.Count;
-        foreach (var thisFile in _all_Files) {
+        var x = AllFiles.Count;
+        foreach (var thisFile in AllFiles) {
             thisFile?.ForceLoadSave();
-            if (x != _all_Files.Count) {
+            if (x != AllFiles.Count) {
                 // Die Auflistung wurde verändert! Selten, aber kann passieren!
                 ForceLoadSaveAll();
                 return;
@@ -206,10 +207,10 @@ public sealed class MultiUserFile : IDisposableExtended {
     public static void SaveAll(bool mustSave) {
         if (mustSave) { SaveAll(false); } // Beenden, was geht, dann erst der muss
 
-        var x = _all_Files.Count;
-        foreach (var thisFile in _all_Files) {
+        var x = AllFiles.Count;
+        foreach (var thisFile in AllFiles) {
             _ = (thisFile?.Save(mustSave));
-            if (x != _all_Files.Count) {
+            if (x != AllFiles.Count) {
                 // Die Auflistung wurde verändert! Selten, aber kann passieren!
                 SaveAll(mustSave);
                 return;
@@ -241,7 +242,7 @@ public sealed class MultiUserFile : IDisposableExtended {
 
     public void Dispose(bool disposing) {
         if (!IsDisposed) {
-            _all_Files.Remove(this);
+            AllFiles.Remove(this);
             if (disposing) {
                 // TODO: verwalteten Zustand (verwaltete Objekte) entsorgen.
             }
@@ -250,9 +251,8 @@ public sealed class MultiUserFile : IDisposableExtended {
             _ = Save(false);
             while (_pureBinSaver.IsBusy) { Pause(0.5, true); }
             // https://stackoverflow.com/questions/2542326/proper-way-to-dispose-of-a-backgroundworker
-            _pureBinSaver?.Dispose();
-            _checker?.Dispose();
-            _checker?.Dispose();
+            _pureBinSaver.Dispose();
+            _checker.Dispose();
             IsDisposed = true;
         }
     }
@@ -345,7 +345,7 @@ public sealed class MultiUserFile : IDisposableExtended {
     public void ForceLoadSave() => _checkerTickCount = Math.Max(ReloadDelaySecond, 10) + 10;
 
     public bool IsFileAllowedToLoad(string fileName) {
-        foreach (var thisFile in _all_Files) {
+        foreach (var thisFile in AllFiles) {
             if (thisFile != null && string.Equals(thisFile.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
                 _ = thisFile.Save(true);
                 Develop.DebugPrint(FehlerArt.Warnung, "Doppletes Laden von " + fileName);
@@ -817,10 +817,10 @@ public sealed class MultiUserFile : IDisposableExtended {
     /// <param name="fileInfoBeforeSaving"></param>
     /// <param name="savedDataUncompressed"></param>
     /// <returns></returns>
-    private string SaveRoutine(bool fromParallelProzess, string? tmpFileName, string? fileInfoBeforeSaving, byte[]? savedDataUncompressed) {
+    private string SaveRoutine(bool fromParallelProzess, string? tmpFileName, string? fileInfoBeforeSaving, IReadOnlyCollection<byte>? savedDataUncompressed) {
         if (tmpFileName == null || string.IsNullOrEmpty(tmpFileName) ||
             fileInfoBeforeSaving == null || string.IsNullOrEmpty(fileInfoBeforeSaving) ||
-            savedDataUncompressed == null || savedDataUncompressed.Length == 0) { return Feedback("Keine Daten angekommen."); }
+            savedDataUncompressed == null || savedDataUncompressed.Count == 0) { return Feedback("Keine Daten angekommen."); }
         if (!fromParallelProzess && _pureBinSaver.IsBusy) { return Feedback("Anderer interner binärer Speichervorgang noch nicht abgeschlossen."); }
         if (fromParallelProzess && IsInSaveingLoop) { return Feedback("Anderer manuell ausgelöster binärer Speichervorgang noch nicht abgeschlossen."); }
         var f = ErrorReason(Enums.ErrorReason.Save);

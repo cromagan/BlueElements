@@ -15,18 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
-using BlueDatabase.Enums;
-using System;
-using System.Drawing;
-using System.Linq;
-using static BlueBasics.Converter;
-using static BlueBasics.IO;
 
 namespace BlueControls.Classes_Editor;
 

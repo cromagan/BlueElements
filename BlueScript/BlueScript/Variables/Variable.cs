@@ -43,13 +43,7 @@ public static class VariableExtensions {
         }
     }
 
-    public static List<string> AllNames(this ICollection<Variable>? vars) {
-        if (vars != null) {
-            return vars.Select(thisvar => thisvar.Name).ToList();
-        }
-
-        return new List<string>();
-    }
+    public static List<string> AllNames(this ICollection<Variable>? vars) => vars != null ? vars.Select(thisvar => thisvar.Name).ToList() : new List<string>();
 
     public static List<string> AllStringableNames(this ICollection<Variable>? vars) {
         var l = new List<string>();

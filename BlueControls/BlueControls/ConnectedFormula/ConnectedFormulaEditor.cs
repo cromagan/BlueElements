@@ -210,7 +210,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
         FormulaSet(tmpDatabase, notAllowedchilds);
     }
 
-    private void FormulaSet(ConnectedFormula.ConnectedFormula? formular, List<string>? notAllowedchilds) {
+    private void FormulaSet(ConnectedFormula.ConnectedFormula? formular, IReadOnlyCollection<string>? notAllowedchilds) {
         _cf = formular;
 
         if (notAllowedchilds != null && _cf != null) {

@@ -18,7 +18,6 @@
 #nullable enable
 
 using BlueBasics;
-using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
@@ -26,12 +25,10 @@ using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueScript;
-using BlueScript.Variables;
 using FastColoredTextBoxNS;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static BlueBasics.Extensions;
 
 namespace BlueControls;
 
@@ -84,7 +81,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
         return false;
     }
 
-    public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
         if (!string.IsNullOrEmpty(_lastVariableContent)) {
             _ = items.Add("Variableninhalt kopieren");
         }
@@ -184,24 +181,6 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
     }
 
     private void btnZusatzDateien_Click(object sender, System.EventArgs e) => OpenAdditionalFileFolder();
-
-    private void lstFunktionen_ItemClicked(object sender, BasicListItemEventArgs e) {
-        if (e.Item.Internal == "[Main]") {
-            txtSkript.Navigate(0);
-            return;
-        }
-
-        var sc = Script.ReduceText(txtSkript.Text).ToLower();
-        var x = new List<string> { "sub" + e.Item.Internal.ToLower() + "()" };
-
-        var (pos, _) = NextText(sc, 0, x, true, false, KlammernStd);
-        if (pos < 1) {
-            MessageBox.Show("Routine " + e.Item.Internal + " nicht gefunden.<br>Skript starten, um diese<br>Liste zu aktualisieren.", ImageCode.Information, "OK");
-            return;
-        }
-
-        txtSkript.Navigate(sc.Substring(0, pos).Count(c => c == '¶') + 1);
-    }
 
     private void TxtSkript_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
         if (e.Button == System.Windows.Forms.MouseButtons.Right) {

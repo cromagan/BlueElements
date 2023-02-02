@@ -32,7 +32,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
@@ -894,7 +893,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             if (thisRow != null) {
                 for (var colNr = 0; colNr < columnList.Count; colNr++) {
                     if (columnList[colNr] != null) {
-                        var tmp = Cell.GetString(columnList[colNr], thisRow.Row);
+                        var tmp = Cell.GetString(columnList[colNr], thisRow?.Row);
                         tmp = tmp.Replace("\r\n", "|");
                         tmp = tmp.Replace("\r", "|");
                         tmp = tmp.Replace("\n", "|");
@@ -966,9 +965,9 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                 foreach (var thisColumn in columnList) {
                     if (thisColumn != null) {
                         var lcColumn = thisColumn;
-                        var lCrow = thisRow.Row;
+                        var lCrow = thisRow?.Row;
                         if (thisColumn.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-                            (lcColumn, lCrow, _) = CellCollection.LinkedCellData(thisColumn, thisRow.Row, false, false);
+                            (lcColumn, lCrow, _) = CellCollection.LinkedCellData(thisColumn, thisRow?.Row, false, false);
                         }
                         if (lCrow != null && lcColumn != null) {
                             da.CellAdd(lCrow.CellGetValuesReadable(lcColumn, ShortenStyle.HTML).JoinWith("<br>"), thisColumn.BackColor);
@@ -1634,9 +1633,9 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         //Export.Changed -= Export_ListOrItemChanged;
         //DatenbankAdmin.Changed -= DatabaseAdmin_ListOrItemChanged;
 
-        //Row.RowRemoving -= Row_RowRemoving;
-        ////Row.RowRemoved -= Row_RowRemoved;
-        //Row.RowAdded -= Row_RowAdded;
+        //Row?.RowRemoving -= Row_RowRemoving;
+        ////Row?.RowRemoved -= Row_RowRemoved;
+        //Row?.RowAdded -= Row_RowAdded;
 
         //Column.ItemRemoving -= Column_ItemRemoving;
         //Column.ItemRemoved -= Column_ItemRemoved;

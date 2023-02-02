@@ -64,7 +64,7 @@ public partial class Start : Form {
 
     private void btnLayout_Click(object sender, System.EventArgs e) => DoForm(new LayoutPadEditor(null));
 
-    private void DoForm(Form frm) {
+    private void DoForm(System.Windows.Forms.Form frm) {
         FormManager.Current.RegisterForm(frm);
         frm.Show();
         Close();

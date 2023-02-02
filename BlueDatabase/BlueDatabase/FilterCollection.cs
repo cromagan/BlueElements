@@ -34,7 +34,9 @@ public sealed class FilterCollection : ListExt<FilterItem>, IParseable, IHasData
 
     public FilterCollection(DatabaseAbstract? database) {
         Database = database;
-        if (Database != null) { Database.Disposing += Database_Disposing; }
+        if (Database != null && !Database.IsDisposed) {
+            Database.Disposing += Database_Disposing;
+        }
     }
 
     public FilterCollection(DatabaseAbstract? database, string toParse) : this(database) => Parse(toParse);
@@ -50,15 +52,23 @@ public sealed class FilterCollection : ListExt<FilterItem>, IParseable, IHasData
     public string RowFilterText {
         get {
             var f = this[null];
-            return f != null ? f.SearchValue[0] : string.Empty;
+            return f != null ? f?.SearchValue[0] : string.Empty;
         }
         set {
+            if (Database == null || Database.IsDisposed) {
+                return;
+            }
+
             var f = this[null];
             if (f != null) {
-                if (string.Equals(f.SearchValue[0], value, StringComparison.OrdinalIgnoreCase)) { return; }
+                if (string.Equals(f.SearchValue[0], value, StringComparison.OrdinalIgnoreCase)) {
+                    return;
+                }
+
                 f.SearchValue[0] = value;
                 return;
             }
+
             FilterItem fi = new(Database, FilterType.Instr_UND_GroﬂKleinEgal, value);
             Add(fi);
         }
@@ -68,23 +78,45 @@ public sealed class FilterCollection : ListExt<FilterItem>, IParseable, IHasData
 
     #region Indexers
 
-    public FilterItem? this[ColumnItem? column] => this.Where(thisFilterItem => thisFilterItem != null && thisFilterItem.FilterType != FilterType.KeinFilter).FirstOrDefault(thisFilterItem => thisFilterItem.Column == column);
+    public FilterItem? this[ColumnItem? column] => this
+        .Where(thisFilterItem => thisFilterItem != null && thisFilterItem.FilterType != FilterType.KeinFilter)
+        .FirstOrDefault(thisFilterItem => thisFilterItem.Column == column);
 
     #endregion
 
     #region Methods
 
-    public void Add(FilterType filterType, string filterBy) => AddIfNotExists(new FilterItem(Database, filterType, filterBy));
+    public void Add(FilterType filterType, string filterBy) {
+        if (Database == null || Database.IsDisposed) { return; }
+        AddIfNotExists(new FilterItem(Database, filterType, filterBy));
+    }
 
-    public void Add(FilterType filterType, List<string> filterBy) => AddIfNotExists(new FilterItem(Database, filterType, filterBy));
+    public void Add(FilterType filterType, List<string> filterBy) {
+        if (Database == null || Database.IsDisposed) { return; }
+        AddIfNotExists(new FilterItem(Database, filterType, filterBy));
+    }
 
-    public void Add(string columnName, FilterType filterType, string filterBy) => Add(Database?.Column[columnName], filterType, filterBy);
+    public void Add(string columnName, FilterType filterType, string filterBy) {
+        if (Database == null || Database.IsDisposed) { return; }
 
-    public void Add(string columnName, FilterType filterType, List<string> filterBy) => Add(Database?.Column[columnName], filterType, filterBy);
+        Add(Database?.Column.Exists(columnName), filterType, filterBy);
+    }
 
-    public void Add(ColumnItem? column, FilterType filterType, List<string> filterBy) => AddIfNotExists(new FilterItem(column, filterType, filterBy));
+    public void Add(string columnName, FilterType filterType, List<string> filterBy) {
+        if (Database == null || Database.IsDisposed) { return; }
+        Add(Database?.Column.Exists(columnName), filterType, filterBy);
+    }
 
-    public void Add(ColumnItem? column, FilterType filterType, string filterBy) => AddIfNotExists(new FilterItem(column, filterType, filterBy));
+    public void Add(ColumnItem? column, FilterType filterType, List<string> filterBy) {
+        if (column?.Database == null || column.Database.IsDisposed) { return; }
+
+        AddIfNotExists(new FilterItem(column, filterType, filterBy));
+    }
+
+    public void Add(ColumnItem? column, FilterType filterType, string filterBy) {
+        if (column?.Database == null || column.Database.IsDisposed) { return; }
+        AddIfNotExists(new FilterItem(column, filterType, filterBy));
+    }
 
     public bool Exists(FilterItem filterItem) {
         foreach (var thisFilter in this) {
@@ -103,7 +135,10 @@ public sealed class FilterCollection : ListExt<FilterItem>, IParseable, IHasData
 
     public bool IsRowFilterActiv() => this[null] != null;
 
-    public bool MayHasRowFilter(ColumnItem? column) => !column.IgnoreAtRowFilter && IsRowFilterActiv();
+    public bool MayHasRowFilter(ColumnItem? column) {
+        if (column == null) { return false; }
+        return !column.IgnoreAtRowFilter && IsRowFilterActiv();
+    }
 
     public void Parse(string toParse) {
         IsParsing = true;
@@ -112,7 +147,8 @@ public sealed class FilterCollection : ListExt<FilterItem>, IParseable, IHasData
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key) {
                 case "filter":
-                    _ = AddIfNotExists(new FilterItem(Database, pair.Value));
+                    if (Database != null && !Database.IsDisposed)
+                        _ = AddIfNotExists(new FilterItem(Database, pair.Value));
                     break;
 
                 default:
@@ -171,7 +207,7 @@ public sealed class FilterCollection : ListExt<FilterItem>, IParseable, IHasData
 
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
-        if (Database != null) {
+        if (Database != null && !Database.IsDisposed) {
             Database.Disposing += Database_Disposing;
             Database = null;
         }

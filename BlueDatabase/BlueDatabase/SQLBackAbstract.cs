@@ -947,7 +947,7 @@ public abstract class SQLBackAbstract {
         return "'" + original + "'";
     }
 
-    private string ExecuteCommand(DbCommand command) {
+    private string ExecuteCommand(IDbCommand command) {
         if (!OpenConnection()) { return "Verbindung konnte nicht geöffnet werden"; }
 
         try {

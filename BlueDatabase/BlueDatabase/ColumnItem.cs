@@ -2148,7 +2148,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
     public double? Summe(List<RowData?> sort) {
         double summ = 0;
         foreach (var thisrow in sort) {
-            if (thisrow != null && !thisrow.Row.CellIsNullOrEmpty(this)) {
+            if (thisrow?.Row != null && !thisrow.Row.CellIsNullOrEmpty(this)) {
                 if (!thisrow.Row.CellGetString(this).IsDouble()) { return null; }
                 summ += thisrow.Row.CellGetDouble(this);
             }
@@ -2683,7 +2683,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
-            if (Database != null) { Database.Disposing -= Database_Disposing; }
+            if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
             Invalidate_LinkedDatabase();
             Database = null;
 

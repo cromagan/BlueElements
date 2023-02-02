@@ -76,7 +76,7 @@ public class VariableUnknown : Variable {
         return DoItFeedback.Null();
     }
 
-    protected override Variable? NewWithThisValue(object x, Script s) {
+    protected override Variable NewWithThisValue(object x, Script s) {
         var v = new VariableUnknown(string.Empty);
         v.SetValue(x);
         return v;
@@ -84,7 +84,7 @@ public class VariableUnknown : Variable {
 
     protected override void SetValue(object? x) { }
 
-    protected override object? TryParse(string txt, Script? s) => txt;
+    protected override object TryParse(string txt, Script? s) => txt;
 
     #endregion
 }

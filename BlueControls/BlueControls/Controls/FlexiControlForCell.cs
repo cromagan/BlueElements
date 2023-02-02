@@ -178,7 +178,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         return false;
     }
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
         GetTmpVariables();
         if (_tmpColumn != null && _tmpColumn.Database.IsAdministrator()) {
             _ = items.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten);
@@ -400,7 +400,8 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     private void Database_RowChecked(object sender, RowCheckedEventArgs e) {
         if (e.Row != _tmpRow) { return; }
         if (e.ColumnsWithErrors == null) {
-            InfoText = string.Empty; return;
+            InfoText = string.Empty;
+            return;
         }
 
         var newT = string.Empty;

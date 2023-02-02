@@ -39,8 +39,9 @@ public class CellLikeListItem : BasicListItem {
     private readonly ShortenStyle _style;
 
     /// <summary>
-    /// Nach welche Spalte sich der Stil richten muss.
-    /// Wichtig, dass es ein Spalten-item ist, da bei neuen Datenbanken zwar die Spalte vorhnden ist, aber wenn keine Zeile Vorhanden ist, logischgerweise auch keine Zelle da ist.
+    /// Nach welcher Spalte sich der Stil richten muss.
+    /// Wichtig, dass es ein Spalten-Item ist, da bei neuen Datenbanken zwar die Spalte vorhanden ist,
+    /// aber wenn keine Zeile Vorhanden ist, logischgerweise auch keine Zelle da ist.
     /// </summary>
     private readonly ColumnItem? _styleLikeThis;
 
@@ -73,6 +74,7 @@ public class CellLikeListItem : BasicListItem {
 
     public override bool FilterMatch(string filterText) {
         if (base.FilterMatch(filterText)) { return true; }
+        if (_styleLikeThis == null) { return false; }
         var txt = CellItem.ValueReadable(_styleLikeThis, Internal, ShortenStyle.Both, _styleLikeThis.BehaviorOfImageAndText, true);
         return txt.ToUpper().Contains(filterText.ToUpper());
     }

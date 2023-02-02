@@ -90,7 +90,7 @@ public sealed partial class ExportDialog {
     #region Methods
 
     public static void AddLayoutsOff(ItemCollectionList addHere, DatabaseAbstract? database, bool addDiskLayouts) {
-        if (database != null) {
+        if (database != null && !database.IsDisposed) {
             foreach (var t in database.Layouts) {
                 ItemCollectionPad p = new(t, string.Empty);
                 _ = addHere.Add(p.Caption, p.Id, ImageCode.Stern);
@@ -98,8 +98,8 @@ public sealed partial class ExportDialog {
         }
         if (!addDiskLayouts) { return; }
         List<string> path = new();
-        if (database != null) { path.Add(database.DefaultLayoutPath()); }
-        if (!string.IsNullOrEmpty(database.AdditionalFilesPfadWhole())) { path.Add(database.AdditionalFilesPfadWhole()); }
+        if (database != null && !database.IsDisposed) { path.Add(database.DefaultLayoutPath()); }
+        if (!string.IsNullOrEmpty(database?.AdditionalFilesPfadWhole())) { path.Add(database.AdditionalFilesPfadWhole()); }
         foreach (var thisP in path) {
             if (DirectoryExists(thisP)) {
                 var e = Directory.GetFiles(thisP);
@@ -153,7 +153,7 @@ public sealed partial class ExportDialog {
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
-        if (Database != null) {
+        if (Database != null && !Database.IsDisposed) {
             Database.Disposing -= _Database_Disposing;
             Database = null;
         }

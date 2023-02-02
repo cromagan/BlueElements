@@ -21,7 +21,7 @@ using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Reflection;
@@ -34,18 +34,18 @@ public sealed class QuickImage : BitmapExt, IReadableText {
 
     #region Fields
 
-    public readonly string ChangeGreenTo;
-    public readonly string Code;
+    public readonly string ChangeGreenTo = string.Empty;
+    public readonly string Code = string.Empty;
     public readonly int DrehWinkel;
-    public readonly ImageCodeEffect Effekt;
-    public readonly string Färbung;
+    public readonly ImageCodeEffect Effekt = ImageCodeEffect.Ohne;
+    public readonly string Färbung = string.Empty;
     public readonly int Helligkeit;
-    public readonly string Name;
+    public readonly string Name = string.Empty;
     public readonly int Sättigung;
     public readonly int Transparenz;
-    public readonly string? Zweitsymbol;
+    public readonly string Zweitsymbol = string.Empty;
     private static readonly object Locker = new();
-    private static readonly Dictionary<string, QuickImage> Pics = new();
+    private static readonly ConcurrentDictionary<string, QuickImage> Pics = new();
 
     #endregion
 
@@ -94,7 +94,7 @@ public sealed class QuickImage : BitmapExt, IReadableText {
         Code = Name;
         lock (Locker) {
             CorrectSize(-1, -1, bmp);
-            Pics.Add(Code, this);
+            Pics.TryAdd(Code, this);
         }
 
         if (bmp == null) {
@@ -235,7 +235,7 @@ public sealed class QuickImage : BitmapExt, IReadableText {
         lock (Locker) {
             if (Pics.TryGetValue(imageCode, out var p)) { return p; }
             x = new QuickImage(imageCode, false);
-            Pics.Add(imageCode, x);
+            Pics.TryAdd(imageCode, x);
         }
 
         x.Generate();
@@ -286,6 +286,7 @@ public sealed class QuickImage : BitmapExt, IReadableText {
         IsError = true;
 
         EmptyBitmap(Width, Height);
+
         using var gr = Graphics.FromImage(this);
         gr.Clear(Color.Black);
         gr.DrawLine(new Pen(Color.Red, 3), 0, 0, Width - 1, Height - 1);
@@ -337,7 +338,7 @@ public sealed class QuickImage : BitmapExt, IReadableText {
 
         #region Bild ohne besonderen Effekte, schnell abhandeln
 
-        if (bmpOri != null && Effekt == ImageCodeEffect.Ohne && string.IsNullOrEmpty(ChangeGreenTo) && string.IsNullOrEmpty(Färbung) && Sättigung == 100 && Helligkeit == 100 && Transparenz == 100 && string.IsNullOrEmpty(Zweitsymbol)) {
+        if (Effekt == ImageCodeEffect.Ohne && string.IsNullOrEmpty(ChangeGreenTo) && string.IsNullOrEmpty(Färbung) && Sättigung == 100 && Helligkeit == 100 && Transparenz == 100 && string.IsNullOrEmpty(Zweitsymbol)) {
             CloneFromBitmap(bmpOri);
             Resize(Width, Height, SizeModes.EmptySpace, InterpolationMode.High, false);
             return;
@@ -397,10 +398,14 @@ public sealed class QuickImage : BitmapExt, IReadableText {
                     if (Effekt.HasFlag(ImageCodeEffect.Graustufen)) { c = c.ToGrey(); }
                 }
                 if (Effekt.HasFlag(ImageCodeEffect.Durchgestrichen)) {
-                    if (c.IsMagentaOrTransparent()) {
-                        c = bmpKreuz.GetPixel(x, y);
-                    } else {
-                        if (bmpKreuz.GetPixel(x, y).A > 0) { c = bmpKreuz.GetPixel(x, y).MixColor(c, 0.5); }
+                    if (bmpKreuz != null) {
+                        if (c.IsMagentaOrTransparent()) {
+                            c = bmpKreuz.GetPixel(x, y);
+                        } else {
+                            if (bmpKreuz.GetPixel(x, y).A > 0) {
+                                c = bmpKreuz.GetPixel(x, y).MixColor(c, 0.5);
+                            }
+                        }
                     }
                 }
                 if (!c.IsMagentaOrTransparent() && Transparenz > 0 && Transparenz < 100) {

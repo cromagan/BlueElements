@@ -347,7 +347,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     //    base.Focus();
     //}
 
-    public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
         AbortSpellChecking();
         hotItem = null;
         tags.TagSet("CursorPosBeforeClick", _cursorCharPos.ToString());

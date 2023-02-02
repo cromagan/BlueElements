@@ -31,7 +31,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using static BlueBasics.Converter;
-using static BlueScript.Variables.VariableExtensions;
 
 namespace BlueDatabase;
 
@@ -50,7 +49,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
         Database = database;
         Key = key;
         _tmpQuickInfo = null;
-        if (Database != null) {
+        if (Database != null && !Database.IsDisposed) {
             Database.Cell.CellValueChanged += Cell_CellValueChanged;
             Database.Disposing += Database_Disposing;
         }
@@ -526,8 +525,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
             }
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen
-            Database.Cell.CellValueChanged -= Cell_CellValueChanged;
-            if (Database != null) { Database.Disposing -= Database_Disposing; }
+
+            if (Database != null && !Database.IsDisposed) {
+                Database.Cell.CellValueChanged -= Cell_CellValueChanged;
+                Database.Disposing -= Database_Disposing;
+            }
             Database = null;
             _tmpQuickInfo = null;
             IsDisposed = true;
@@ -630,7 +632,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
         return false;
     }
 
-    private void VariableToCell(ColumnItem? column, List<Variable> vars) {
+    private void VariableToCell(ColumnItem? column, ICollection<Variable> vars) {
         if (Database == null || Database.IsDisposed || Database.ReadOnly) { return; }
 
         var columnVar = vars.Get(column.Name);

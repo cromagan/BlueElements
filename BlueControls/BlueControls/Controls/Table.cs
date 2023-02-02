@@ -598,14 +598,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
 
         if (_mouseOverColumn != null && _mouseOverColumn.Database != Database) { _mouseOverColumn = null; }
-        if (_mouseOverRow != null && _mouseOverRow.Row != null && _mouseOverRow.Row.Database != Database) { _mouseOverRow = null; }
+        if (_mouseOverRow?.Row != null && _mouseOverRow?.Row.Database != Database) { _mouseOverRow = null; }
         if (CursorPosColumn != null && CursorPosColumn.Database != Database) { CursorPosColumn = null; }
-        if (CursorPosRow != null && CursorPosRow.Row != null && CursorPosRow.Row.Database != Database) { CursorPosRow = null; }
+        if (CursorPosRow?.Row != null && CursorPosRow?.Row.Database != Database) { CursorPosRow = null; }
     }
 
     public void CollapesAll() {
         _collapsed.Clear();
-        if (Database != null) {
+        if (Database != null && !Database.IsDisposed && Database?.Column?.SysChapter != null) {
             _collapsed.AddRange(Database.Column.SysChapter.Contents());
         }
         Invalidate_SortedRowData();
@@ -640,7 +640,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         CloseAllComponents();
 
-        if (Database != null) {
+        if (Database != null && !Database.IsDisposed) {
             // auch Disposed Datenbanken die Bezüge entfernen!
             Database.Cell.CellValueChanged -= _Database_CellValueChanged;
             Database.Loaded -= _Database_DatabaseLoaded;
@@ -666,7 +666,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Refresh(); // um die Uhr anzuzeigen
         Database = value;
         InitializeSkin(); // Neue Schriftgrößen
-        if (Database != null) {
+        if (Database != null && !Database.IsDisposed) {
             Database.Cell.CellValueChanged += _Database_CellValueChanged;
             Database.Loaded += _Database_DatabaseLoaded;
             Database.Loading += _Database_StoreView;
@@ -886,7 +886,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public new bool Focused() => base.Focused || SliderY.Focused() || SliderX.Focused() || BTB.Focused || BCB.Focused;
 
-    public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
         hotItem = null;
         DatabaseAbstract.ForceSaveAll();
         BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
@@ -902,7 +902,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             tags.TagSet("ColumnName", _mouseOverColumn.Name);
         }
         if (_mouseOverRow?.Row != null) {
-            tags.TagSet("RowKey", _mouseOverRow.Row.Key.ToString());
+            tags.TagSet("RowKey", _mouseOverRow?.Row.Key.ToString());
         }
     }
 
@@ -1024,11 +1024,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             foreach (var thisRow in sortedRowDataNew) {
                 var thisRowData = thisRow;
-                if (_mouseOverRow != null && _mouseOverRow.Row == thisRow.Row && _mouseOverRow.Chapter == thisRow.Chapter) {
+                if (_mouseOverRow != null && _mouseOverRow?.Row == thisRow?.Row && _mouseOverRow.Chapter == thisRow.Chapter) {
                     _mouseOverRow.GetDataFrom(thisRowData);
                     thisRowData = _mouseOverRow;
                 } // Mouse-Daten wiederverwenden
-                if (CursorPosRow != null && CursorPosRow.Row == thisRow.Row && CursorPosRow.Chapter == thisRow.Chapter) {
+                if (CursorPosRow?.Row != null && CursorPosRow?.Row == thisRow?.Row && CursorPosRow.Chapter == thisRow.Chapter) {
                     CursorPosRow.GetDataFrom(thisRowData);
                     thisRowData = CursorPosRow;
                 } // Cursor-Daten wiederverwenden
@@ -1218,7 +1218,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 foreach (var thisRow in sr) {
                     if (IsOnScreen(thisRow, displayRectangleWoSlider)) {
                         if (thisRow?.Row != null) {
-                            _ = rw.AddIfNotExists(thisRow.Row);
+                            _ = rw.AddIfNotExists(thisRow?.Row);
                             var T = sr.IndexOf(thisRow);
                             firstVisibleRow = Math.Min(T, firstVisibleRow);
                             lastVisibleRow = Math.Max(T, lastVisibleRow);
@@ -1253,7 +1253,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         _columnFilterFont = BlueFont.Get(_columnFont.FontName, _columnFont.FontSize, false, false, false, false, true, Color.White, Color.Red, false, false, false);
 
         _newRowFont = Skin.GetBlueFont(Enums.Design.Table_Cell_New, States.Standard).Scale(FontScale);
-        if (Database != null) {
+        if (Database != null && !Database.IsDisposed) {
             _pix16 = GetPix(16, _cellFont, Database.GlobalScale);
             _pix18 = GetPix(18, _cellFont, Database.GlobalScale);
             _rowCaptionFontY = GetPix(26, _cellFont, Database.GlobalScale);
@@ -1326,7 +1326,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         var lp = CellCollection.ErrorReason(CursorPosColumn, CursorPosRow?.Row, ErrorReason.EditGeneral);
                         Neighbour(CursorPosColumn, CursorPosRow, Direction.Oben, out _, out var newRow);
                         if (newRow == CursorPosRow) { lp = "Das geht nicht bei dieser Zeile."; }
-                        if (string.IsNullOrEmpty(lp) && newRow != null) {
+                        if (string.IsNullOrEmpty(lp) && newRow?.Row != null) {
                             UserEdited(this, newRow?.Row.CellGetString(CursorPosColumn), CursorPosColumn, CursorPosRow?.Row, newRow?.Chapter, true);
                         } else {
                             NotEditableInfo(lp);
@@ -1337,7 +1337,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 case System.Windows.Forms.Keys.X:
                     if (e.Modifiers == System.Windows.Forms.Keys.Control) {
                         CopyToClipboard(CursorPosColumn, CursorPosRow?.Row, true);
-                        if (CursorPosRow is null || CursorPosRow.Row.CellIsNullOrEmpty(CursorPosColumn)) {
+                        if (CursorPosRow?.Row is null || CursorPosRow.Row.CellIsNullOrEmpty(CursorPosColumn)) {
                             _isinKeyDown = false;
                             return;
                         }
@@ -1351,7 +1351,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     break;
 
                 case System.Windows.Forms.Keys.Delete:
-                    if (CursorPosRow is null || CursorPosRow.Row.CellIsNullOrEmpty(CursorPosColumn)) {
+                    if (CursorPosRow?.Row is null || CursorPosRow.Row.CellIsNullOrEmpty(CursorPosColumn)) {
                         _isinKeyDown = false;
                         return;
                     }
@@ -1426,7 +1426,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
                 case System.Windows.Forms.Keys.V:
                     if (e.Modifiers == System.Windows.Forms.Keys.Control) {
-                        if (CursorPosColumn != null && CursorPosRow != null) {
+                        if (CursorPosColumn != null && CursorPosRow?.Row != null) {
                             if (!CursorPosColumn.Format.TextboxEditPossible() && CursorPosColumn.Format != DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) {
                                 NotEditableInfo("Die Zelle hat kein passendes Format.");
                                 _isinKeyDown = false;
@@ -1531,7 +1531,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                             switch (_mouseOverColumn.Format) {
                                 case DataFormat.Verknüpfung_zu_anderer_Datenbank:
 
-                                    var (lcolumn, _, info) = CellCollection.LinkedCellData(_mouseOverColumn, _mouseOverRow.Row, true, false);
+                                    var (lcolumn, _, info) = CellCollection.LinkedCellData(_mouseOverColumn, _mouseOverRow?.Row, true, false);
                                     if (lcolumn != null) { _mouseOverText = lcolumn.QuickInfoText(_mouseOverColumn.ReadableText() + " bei " + lcolumn.ReadableText() + ":"); }
 
                                     if (!string.IsNullOrEmpty(info) && _mouseOverColumn.Database.IsAdministrator()) {
@@ -1552,7 +1552,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                             _mouseOverText = "Verknüpfung zur Ziel-Datenbank fehlerhaft.";
                         }
                     } else if (Database.IsAdministrator()) {
-                        _mouseOverText = Database.UndoText(_mouseOverColumn, _mouseOverRow.Row);
+                        _mouseOverText = Database.UndoText(_mouseOverColumn, _mouseOverRow?.Row);
                     }
                 }
                 _mouseOverText = _mouseOverText.Trim();
@@ -1689,11 +1689,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (changeToDot) { drawString = "..."; }// Die letzte Zeile noch ganz hinschreiben
         }
 
-        var tmpData = CellItem.GetDrawingData(contentHolderColumnStyle, drawString, style, bildTextverhalten);
-        var tmpImageCode = tmpData.image;
+        var (text, image) = CellItem.GetDrawingData(contentHolderColumnStyle, drawString, style, bildTextverhalten);
+        var tmpImageCode = image;
         if (tmpImageCode != null) { tmpImageCode = QuickImage.Get(tmpImageCode, Skin.AdditionalState(state)); }
 
-        Skin.Draw_FormatedText(gr, tmpData.text, tmpImageCode, (Alignment)contentHolderColumnStyle.Align, r, null, false, font, false);
+        Skin.Draw_FormatedText(gr, text, tmpImageCode, (Alignment)contentHolderColumnStyle.Align, r, null, false, font, false);
     }
 
     private static int GetPix(int pix, BlueFont? f, double scale) => Skin.FormatedText_NeededSize("@|", null, f, (int)((pix * scale) + 0.5)).Height;
@@ -2098,7 +2098,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
         var cancel = "";
         if (cellInThisDatabaseRow != null) {
-            CellCancelEventArgs ed = new(cellInThisDatabaseColumn, cellInThisDatabaseRow.Row, cancel);
+            CellCancelEventArgs ed = new(cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, cancel);
             OnEditBeforeBeginEdit(ed);
             cancel = ed.CancelReason;
         } else {
@@ -2175,7 +2175,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void Cell_Edit_Color(ColumnItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow) {
         ColDia.Color = cellInThisDatabaseRow.Row.CellGetColor(cellInThisDatabaseColumn);
-        ColDia.Tag = CellCollection.KeyOfCell(cellInThisDatabaseColumn, cellInThisDatabaseRow.Row);
+        ColDia.Tag = CellCollection.KeyOfCell(cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row);
         List<int> colList = new();
         foreach (var thisRowItem in Database.Row) {
             if (thisRowItem != null) {
@@ -2483,7 +2483,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private void Draw_CellAsButton(Graphics gr, ColumnViewItem cellInThisDatabaseColumn, RowData cellInThisDatabaseRow, Rectangle cellrectangle) {
-        ButtonCellEventArgs e = new(cellInThisDatabaseColumn.Column, cellInThisDatabaseRow.Row);
+        ButtonCellEventArgs e = new(cellInThisDatabaseColumn.Column, cellInThisDatabaseRow?.Row);
         OnNeedButtonArgs(e);
 
         var s = States.Standard;
@@ -2525,7 +2525,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (cellInThisDatabaseRow == null) { return; }
 
         if (cellInThisDatabaseColumn.Column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-            var (lcolumn, lrow, _) = CellCollection.LinkedCellData(cellInThisDatabaseColumn.Column, cellInThisDatabaseRow.Row, false, false);
+            var (lcolumn, lrow, _) = CellCollection.LinkedCellData(cellInThisDatabaseColumn.Column, cellInThisDatabaseRow?.Row, false, false);
 
             if (lcolumn != null && lrow != null) {
                 Draw_CellTransparentDirect(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle, lcolumn, lrow, font, state);
@@ -2537,7 +2537,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             return;
         }
 
-        Draw_CellTransparentDirect(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle, cellInThisDatabaseColumn.Column, cellInThisDatabaseRow.Row, font, state);
+        Draw_CellTransparentDirect(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle, cellInThisDatabaseColumn.Column, cellInThisDatabaseRow?.Row, font, state);
     }
 
     /// <summary>
@@ -2569,7 +2569,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Draw_Border(gr, cellInThisDatabaseColumn, displayRectangleWoSlider, false);
     }
 
-    private void Draw_Column_Cells(Graphics gr, List<RowData?>? sr, ColumnViewItem viewItem, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, States state, bool firstOnScreen) {
+    private void Draw_Column_Cells(Graphics gr, IReadOnlyList<RowData?>? sr, ColumnViewItem viewItem, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, States state, bool firstOnScreen) {
         if (UserEdit_NewRowAllowed() && viewItem == CurrentArrangement[Database.Column.First]) {
             Skin.Draw_FormatedText(gr, "[Neue Zeile]", QuickImage.Get(ImageCode.PlusZeichen, _pix16), Alignment.Left, new Rectangle((int)viewItem.OrderTmpSpalteX1 + 1, (int)(-SliderY.Value + HeadSize() + 1), (int)viewItem.TmpDrawWidth - 2, 16 - 2), this, false, _newRowFont, Translate);
         }
@@ -2596,8 +2596,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
                 Draw_CellTransparent(gr, viewItem, currentRow, cellrectangle, _cellFont, state);
 
-                if (_unterschiede != null && _unterschiede != currentRow.Row) {
-                    if (currentRow.Row.CellGetString(viewItem.Column) != _unterschiede.CellGetString(viewItem.Column)) {
+                if (_unterschiede != null && _unterschiede != currentRow?.Row) {
+                    if (currentRow?.Row.CellGetString(viewItem.Column) != _unterschiede.CellGetString(viewItem.Column)) {
                         Rectangle tmpr = new((int)viewItem.OrderTmpSpalteX1 + 1, DrawY(currentRow) + 1,
                             Column_DrawWidth(viewItem, displayRectangleWoSlider) - 2, currentRow.DrawHeight - 2);
                         gr.DrawRectangle(PenRed1, tmpr);
@@ -2687,7 +2687,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    private void Draw_Table_ListboxStyle(Graphics gr, List<RowData?>? sr, States state, Rectangle displayRectangleWoSlider, int vFirstVisibleRow, int vLastVisibleRow) {
+    private void Draw_Table_ListboxStyle(Graphics gr, IReadOnlyList<RowData?>? sr, States state, Rectangle displayRectangleWoSlider, int vFirstVisibleRow, int vLastVisibleRow) {
         var itStat = state;
         Skin.Draw_Back(gr, Enums.Design.ListBox, state, base.DisplayRectangle, this, true);
         var col = Database.Column.First;
@@ -2697,7 +2697,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             var viewItem = Database.ColumnArrangements[0][col];
             Rectangle r = new(0, DrawY(currentRow), DisplayRectangleWithoutSlider().Width,
                 currentRow.DrawHeight);
-            if (CursorPosColumn != null && CursorPosRow.Row == currentRow.Row) {
+            if (CursorPosColumn != null && CursorPosRow?.Row == currentRow?.Row) {
                 itStat |= States.Checked;
             } else {
                 if (Convert.ToBoolean(itStat & States.Checked)) {

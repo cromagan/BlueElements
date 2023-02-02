@@ -61,7 +61,7 @@ public sealed partial class Import {
     #region Methods
 
     protected override void OnClosing(CancelEventArgs e) {
-      if (Database != null) { Database.Disposing -= Database_Disposing; }
+      if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
         base.OnClosing(e);
     }
 

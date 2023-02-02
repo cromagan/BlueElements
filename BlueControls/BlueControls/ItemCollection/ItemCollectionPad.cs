@@ -758,12 +758,12 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
             }
             return;
         }
-        if (_prLo == null) {
-            _prLo = new PointM(this, "Druckbereich LO", 0, 0);
-            _prRo = new PointM(this, "Druckbereich RO", 0, 0);
-            _prRu = new PointM(this, "Druckbereich RU", 0, 0);
-            _prLu = new PointM(this, "Druckbereich LU", 0, 0);
-        }
+
+        _prLo ??= new PointM(this, "Druckbereich LO", 0, 0);
+        _prRo ??= new PointM(this, "Druckbereich RO", 0, 0);
+        _prRu ??= new PointM(this, "Druckbereich RU", 0, 0);
+        _prLu ??= new PointM(this, "Druckbereich LU", 0, 0);
+
         var ssw = (float)Math.Round(MmToPixel(_sheetSizeInMm.Width, Dpi), 1);
         var ssh = (float)Math.Round(MmToPixel(_sheetSizeInMm.Height, Dpi), 1);
         var rr = (float)Math.Round(MmToPixel(_randinMm.Right, Dpi), 1);
@@ -776,7 +776,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         _prLu.SetTo(rl, ssh - ru);
     }
 
-    private RectangleF MaximumBounds(List<BasicPadItem>? zoomItems) {
+    private RectangleF MaximumBounds(ICollection<BasicPadItem>? zoomItems) {
         var x1 = float.MaxValue;
         var y1 = float.MaxValue;
         var x2 = float.MinValue;

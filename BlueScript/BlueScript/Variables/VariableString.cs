@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueScript.Structures;
-using System;
 
 namespace BlueScript.Variables;
 
@@ -36,7 +35,7 @@ public class VariableString : Variable {
     public VariableString(string name, string value, bool ronly, bool system, string comment) : base(name, ronly, system, comment) => _valueString = value.RestoreCriticalVariableChars();
 
     /// <summary>
-    /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
+    /// Wichtig für: GetEnumerableOfType Variable ("NAME");
     /// </summary>
     /// <param name="name"></param>
     public VariableString(string name) : this(name, string.Empty, true, false, string.Empty) { }
@@ -99,7 +98,7 @@ public class VariableString : Variable {
         return DoItFeedback.Null();
     }
 
-    protected override Variable? NewWithThisValue(object x, Script s) {
+    protected override Variable NewWithThisValue(object x, Script s) {
         var v = new VariableString(string.Empty);
         v.SetValue(x);
         return v;

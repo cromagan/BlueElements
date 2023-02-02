@@ -58,15 +58,15 @@ public static partial class Extensions {
     /// <typeparam name="T"></typeparam>
     /// <param name="list1"></param>
     /// <param name="list2"></param>
-    public static void CloneFrom<T>(this IList<T> list1, IList<T> list2) where T : IComparable {
+    public static void CloneFrom<T>(this IList<T?> list1, IList<T?> list2) where T : IComparable {
         if (!list1.IsDifferentTo(list2)) { return; }
 
         //if (list2 == null) { list1 = null; return; }
 
-        if (list1 == null || list2 == null) {
-            Develop.DebugPrint("Null-Listen nicht unterstützt.");
-            return;
-        }
+        //if (list1 == null || list2 == null) {
+        //    Develop.DebugPrint("Null-Listen nicht unterstützt.");
+        //    return;
+        //}
 
         for (var z = 0; z < list2.Count; z++) {
             if (z >= list1.Count) { list1.Add(list2[z]); }
@@ -81,8 +81,8 @@ public static partial class Extensions {
         }
     }
 
-    public static List<T?> CloneWithClones<T>(this ICollection<T?>? l) where T : ICloneable {
-        var l2 = new List<T?>();
+    public static List<T> CloneWithClones<T>(this ICollection<T?>? l) where T : ICloneable {
+        var l2 = new List<T>();
 
         if (l == null) { return l2; }
 
@@ -344,8 +344,6 @@ public static partial class Extensions {
     /// <summary>
     /// Cloned eine Liste mit Clonen drinnen.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="l"></param>
     /// <returns></returns>
     private static int TagGetPosition(this ICollection<string>? col, string tagname) {
         if (col == null) { return -1; }

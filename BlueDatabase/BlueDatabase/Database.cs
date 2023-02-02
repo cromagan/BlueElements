@@ -772,14 +772,14 @@ public sealed class Database : DatabaseAbstract {
         Works.Clear();
     }
 
-    private static int NummerCode1(byte[] b, int pointer) => b[pointer];
+    private static int NummerCode1(IReadOnlyList<byte> b, int pointer) => b[pointer];
 
-    private static int NummerCode2(byte[] b, int pointer) => (b[pointer] * 255) + b[pointer + 1];
+    private static int NummerCode2(IReadOnlyList<byte> b, int pointer) => (b[pointer] * 255) + b[pointer + 1];
 
     //protected override string SpecialErrorReason(ErrorReason mode) => _muf.ErrorReason(mode);
-    private static int NummerCode3(byte[] b, int pointer) => (b[pointer] * 65025) + (b[pointer + 1] * 255) + b[pointer + 2];
+    private static int NummerCode3(IReadOnlyList<byte> b, int pointer) => (b[pointer] * 65025) + (b[pointer + 1] * 255) + b[pointer + 2];
 
-    private static long NummerCode7(byte[] b, int pointer) {
+    private static long NummerCode7(IReadOnlyList<byte> b, int pointer) {
         long nu = 0;
         for (var n = 0; n < 7; n++) {
             nu += b[pointer + n] * (long)Math.Pow(255, 6 - n);
@@ -787,7 +787,7 @@ public sealed class Database : DatabaseAbstract {
         return nu;
     }
 
-    private static void SaveToByteList(List<byte> list, long numberToAdd, int byteCount) {
+    private static void SaveToByteList(ICollection<byte> list, long numberToAdd, int byteCount) {
         //var tmp = numberToAdd;
         //var nn = byteCount;
 

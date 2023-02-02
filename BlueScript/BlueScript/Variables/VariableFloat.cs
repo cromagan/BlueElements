@@ -18,7 +18,6 @@
 #nullable enable
 
 using BlueBasics;
-using BlueScript.Methods;
 using BlueScript.Structures;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
@@ -94,7 +93,7 @@ public class VariableFloat : Variable {
         return DoItFeedback.Null();
     }
 
-    protected override Variable? NewWithThisValue(object x, Script s) {
+    protected override Variable NewWithThisValue(object x, Script s) {
         var v = new VariableFloat(string.Empty);
         v.SetValue(x);
         return v;

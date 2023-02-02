@@ -42,7 +42,7 @@ public class ConnectionInfo : IReadableText {
     /// Versucht das beste daraus zu machen....
     /// </summary>
     /// <param name="uniqueID"></param>
-    public ConnectionInfo(string uniqueID, string? preveredFileFormatID) {
+    public ConnectionInfo(string uniqueID, string? preveredFileFormatId) {
         var alf = new List<DatabaseAbstract>();// könnte sich ändern, deswegen Zwischenspeichern
         alf.AddRange(DatabaseAbstract.AllFiles);
 
@@ -64,7 +64,7 @@ public class ConnectionInfo : IReadableText {
 
             TableName = SQLBackAbstract.MakeValidTableName(uniqueID.FileNameWithoutSuffix());
             Provider = null;
-            DatabaseID = preveredFileFormatID ?? Database.DatabaseId;
+            DatabaseID = preveredFileFormatId ?? Database.DatabaseId;
             AdditionalData = uniqueID;
 
             return;

@@ -20,8 +20,6 @@
 using BlueBasics;
 using BlueScript.Methods;
 using BlueScript.Structures;
-using System.ComponentModel;
-using System.Linq.Expressions;
 using static BlueBasics.Extensions;
 
 namespace BlueScript.Variables;
@@ -93,7 +91,7 @@ public class VariableBool : Variable {
         return DoItFeedback.Null();
     }
 
-    protected override Variable? NewWithThisValue(object x, Script s) {
+    protected override Variable NewWithThisValue(object x, Script s) {
         var v = new VariableBool(string.Empty);
         v.SetValue(x);
         return v;

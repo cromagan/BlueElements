@@ -123,9 +123,9 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
         return false;
     }
 
-    public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
         hotItem = null;
-        if (Filter?.Column == null || !Filter.Column.Database.IsAdministrator()) { return; }
+        if (Filter?.Column?.Database == null || !Filter.Column.Database.IsAdministrator()) { return; }
 
         hotItem = Filter.Column;
         _ = items.Add("Spalte bearbeiten", "#ColumnEdit", QuickImage.Get(ImageCode.Spalte));

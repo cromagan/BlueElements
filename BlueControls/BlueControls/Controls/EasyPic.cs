@@ -148,7 +148,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         return false;
     }
 
-    public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
         hotItem = null;
         if (_bitmap != null) {
             _ = items.Add("Externes Fenster öffnen", "ExF");

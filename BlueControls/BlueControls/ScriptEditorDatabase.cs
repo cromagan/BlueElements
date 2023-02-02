@@ -24,7 +24,6 @@ using BlueScript;
 using System;
 using static BlueBasics.IO;
 using static BlueBasics.Extensions;
-using static BlueScript.Variables.VariableExtensions;
 using System.Collections.ObjectModel;
 
 namespace BlueControls;

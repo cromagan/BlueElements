@@ -100,7 +100,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
     #region Methods
 
     public void GetConnectedFormulaFromDatabase(DatabaseAbstract? database) {
-        if (database != null) {
+        if (database != null && !database.IsDisposed) {
             var f = database.FormulaFileName();
 
             if (f != null) {

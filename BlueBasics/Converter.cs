@@ -48,6 +48,7 @@ public static class Converter {
     public static string BitmapToBase64(Bitmap? bMp, ImageFormat bFormat) {
         if (bMp == null) { return string.Empty; }
         if (bMp.PixelFormat != PixelFormat.Format32bppPArgb) { bMp = Bitmap_ChangePixelFormat(bMp); }
+        if (bMp == null) { return string.Empty; }
         MemoryStream memory = new();
         bMp.Save(memory, bFormat);
         var base64 = Convert.ToBase64String(memory.ToArray());
@@ -58,6 +59,7 @@ public static class Converter {
     public static byte[]? BitmapToByte(Bitmap? bMp, ImageFormat format) {
         if (bMp == null) { return null; }
         if (bMp.PixelFormat != PixelFormat.Format32bppPArgb) { bMp = Bitmap_ChangePixelFormat(bMp); }
+        if (bMp == null) { return null; }
         MemoryStream memSt = new();
         bMp.Save(memSt, format);
         return memSt.ToArray();
@@ -377,7 +379,8 @@ public static class Converter {
         return bmp;
     }
 
-    private static Bitmap Bitmap_ChangePixelFormat(Bitmap? oldBmp) {
+    private static Bitmap? Bitmap_ChangePixelFormat(Bitmap? oldBmp) {
+        if (oldBmp == null) { return null; }
         Generic.CollectGarbage();
         return new Bitmap(oldBmp);
         // Return oldBmp.Clone(New Rectangle(0, 0, oldBmp.Width, oldBmp.Height), NewFormat)

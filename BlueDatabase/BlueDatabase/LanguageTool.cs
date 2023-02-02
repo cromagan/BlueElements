@@ -20,6 +20,7 @@
 using BlueBasics;
 using BlueDatabase.Enums;
 using System;
+using BlueDatabase.Interfaces;
 
 namespace BlueDatabase;
 
@@ -116,7 +117,7 @@ public static class LanguageTool {
         }
     }
 
-    private static string ColumnReplaceTranslated(string newTxt, ColumnItem column) => column.DoOpticalTranslation == TranslationType.Übersetzen ? DoTranslate(newTxt, false) : newTxt;
+    private static string ColumnReplaceTranslated(string newTxt, IColumnInputFormat column) => column.DoOpticalTranslation == TranslationType.Übersetzen ? DoTranslate(newTxt, false) : newTxt;
 
     #endregion
 }

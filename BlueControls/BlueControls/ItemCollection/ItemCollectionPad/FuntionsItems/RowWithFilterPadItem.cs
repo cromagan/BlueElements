@@ -276,7 +276,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
     }
 
     public string ReadableText() {
-        if (Database != null) {
+        if (Database != null && !Database.IsDisposed) {
             return "eine Zeile aus: " + Database.Caption;
         }
 
@@ -298,7 +298,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
         t = t + "ID=" + Id + ", ";
 
-        if (Database != null) {
+        if (Database != null && !Database.IsDisposed) {
             t = t + "Database=" + Database.ConnectionData.UniqueID.ToNonCritical() + ", ";
         }
 
@@ -323,7 +323,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, Id);
 
-            if (Database != null) {
+            if (Database != null && !Database.IsDisposed) {
                 var txt = "eine Zeile aus " + Database.Caption;
 
                 Skin.Draw_FormatedText(gr, txt, QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
@@ -356,7 +356,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         var hs = FilterDefiniton.Column["spalte"];
 
         if (hs != null) {
-            if (Database != null) {
+            if (Database != null && !Database.IsDisposed) {
                 var or2 = new List<string>();
                 foreach (var thisc in Database.Column) {
                     or2.Add(thisc.Name + "|" + thisc.ReadableText());
@@ -478,7 +478,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         sp.DropdownBearbeitungErlaubt = true;
         sp.DropdownAllesAbwählenErlaubt = false;
 
-        //if (Database != null) {
+        //if (Database != null && !Database.IsDisposed) {
         //    sp.DropDownItems = new System.Collections.ObjectModel.ReadOnlyCollection<string>(Database.Column.ToListOfString());
         //}
         var fa = x.Column.GenerateAndAdd("FilterArt", "Art", ColumnFormatHolder.Text);

@@ -107,7 +107,7 @@ public sealed class PointM : IMoveable, IHasKeyName {
     public float X {
         get => _x;
         set {
-            if (_x == value) { return; }
+            if (Math.Abs(_x - value) < 0.0000001) { return; }
             SetTo(value, _y);
         }
     }
@@ -115,7 +115,7 @@ public sealed class PointM : IMoveable, IHasKeyName {
     public float Y {
         get => _y;
         set {
-            if (_y == value) { return; }
+            if (Math.Abs(_y - value) < 0.0000001) { return; }
             SetTo(_x, value);
         }
     }
@@ -130,11 +130,11 @@ public sealed class PointM : IMoveable, IHasKeyName {
 
     public static implicit operator PointF(PointM p) => new(p.X, p.Y);
 
-    public static PointM operator -(PointM? a) => new(-a._x, -a._y);
+    public static PointM operator -(PointM a) => new(-a._x, -a._y);
 
-    public static PointM operator -(PointM? a, PointM? b) => new(a._x - b._x, a._y - b._y);
+    public static PointM operator -(PointM a, PointM b) => new(a._x - b._x, a._y - b._y);
 
-    public static PointM operator *(PointM? a, float b) => new(a._x * b, a._y * b);
+    public static PointM operator *(PointM a, float b) => new(a._x * b, a._y * b);
 
     public static PointM operator +(PointM a, PointM b) => new(a._x + b._x, a._y + b._y);
 
@@ -217,8 +217,8 @@ public sealed class PointM : IMoveable, IHasKeyName {
     }
 
     public void SetTo(float x, float y) {
-        var mx = x != _x;
-        var my = y != _y;
+        var mx = Math.Abs(x - _x) > 0.0000001;
+        var my = Math.Abs(y - _y) > 0.0000001;
 
         if (!mx && !my) { return; }
         OnMoving(new MoveEventArgs(mx, my));
@@ -227,7 +227,7 @@ public sealed class PointM : IMoveable, IHasKeyName {
         OnMoved(new MoveEventArgs(mx, my));
     }
 
-    public void SetTo(PointM? startPoint, float länge, float alpha) {
+    public void SetTo(PointM startPoint, float länge, float alpha) {
         var tempVar = PolarToCartesian(länge, alpha);
         SetTo(startPoint.X + tempVar.X, Y = startPoint.Y + tempVar.Y);
     }

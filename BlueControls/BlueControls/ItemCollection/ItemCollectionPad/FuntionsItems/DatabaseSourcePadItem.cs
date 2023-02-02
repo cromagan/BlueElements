@@ -104,7 +104,7 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
     }
 
     public string ReadableText() {
-        if (Database != null) {
+        if (Database != null && !Database.IsDisposed) {
             return "Datenbank: " + Database.Caption;
         }
 
@@ -119,7 +119,7 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
 
         t = t + "ID=" + Id + ", ";
 
-        if (Database != null) {
+        if (Database != null && !Database.IsDisposed) {
             t = t + "Database=" + Database.ConnectionData.UniqueID.ToNonCritical() + ", ";
         }
 
@@ -139,7 +139,7 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, Id);
 
-            if (Database != null) {
+            if (Database != null && !Database.IsDisposed) {
                 var txt = "Datenbank " + Database.Caption;
 
                 Skin.Draw_FormatedText(gr, txt, QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont.Scale(zoom), false);

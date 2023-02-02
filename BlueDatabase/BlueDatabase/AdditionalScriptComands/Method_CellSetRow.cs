@@ -54,7 +54,7 @@ public class Method_CellSetRow : MethodDatabase {
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
         var row = Method_Row.ObjectToRow(attvar.Attributes[2]);
-        if (row is null) { return new DoItFeedback("Fehler in der Zeile"); }
+        if (row?.Database is null || row.Database.IsDisposed) { return new DoItFeedback("Fehler in der Zeile"); }
 
         var columnToSet = row.Database.Column.Exists(((VariableString)attvar.Attributes[1]).ValueString);
         if (columnToSet == null) { return new DoItFeedback("Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[1]).ValueString); }

@@ -239,7 +239,7 @@ public class CellItem {
     /// </summary>
     /// <returns></returns>
 
-    public static List<string> ValuesReadable(ColumnItem? column, RowItem Row, ShortenStyle Style) {
+    public static List<string> ValuesReadable(ColumnItem? column, RowItem Row, ShortenStyle style) {
         if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             //var LinkedData = CellCollection.LinkedCellData(column, Row, false, false);
             //if (LinkedData.Item1 != null && LinkedData.Item2 != null) { return ValuesReadable(LinkedData.Item1, LinkedData.Item2, Style); }
@@ -248,15 +248,15 @@ public class CellItem {
         }
         List<string> ret = new();
         if (!column.MultiLine) {
-            ret.Add(ValueReadable(column, Row.CellGetString(column), Style, column.BehaviorOfImageAndText, true));
+            ret.Add(ValueReadable(column, Row.CellGetString(column), style, column.BehaviorOfImageAndText, true));
             return ret;
         }
         var x = Row.CellGetList(column);
         foreach (var thisstring in x) {
-            ret.Add(ValueReadable(column, thisstring, Style, column.BehaviorOfImageAndText, true));
+            ret.Add(ValueReadable(column, thisstring, style, column.BehaviorOfImageAndText, true));
         }
         if (x.Count == 0) {
-            var tmp = ValueReadable(column, string.Empty, Style, column.BehaviorOfImageAndText, true);
+            var tmp = ValueReadable(column, string.Empty, style, column.BehaviorOfImageAndText, true);
             if (!string.IsNullOrEmpty(tmp)) { ret.Add(tmp); }
         }
         return ret;
