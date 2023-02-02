@@ -273,6 +273,9 @@ public static partial class Extensions {
 
     public static string GenerateSlash(this string txt) => txt.Replace("[Slash]", "/");
 
+    public static T? Get<T>(this IEnumerable<T?>? items, string name) where T : IHasKeyName
+           => items.FirstOrDefault(thisp => thisp != null && string.Equals(thisp.KeyName, name, StringComparison.OrdinalIgnoreCase));
+
     /// <summary>
     /// Teilt einen String, der geparsed werden kann in seine Bestandteile auf.
     /// </summary>

@@ -33,7 +33,7 @@ public class VariableDatabase : Variable {
 
     #region Constructors
 
-    public VariableDatabase(string name, DatabaseAbstract? value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _db = value;
+    public VariableDatabase(string name, DatabaseAbstract? value, bool ronly, bool system, string Comment) : base(name, ronly, system, Comment) => _db = value;
 
     public VariableDatabase(string name) : this(name, null, true, false, string.Empty) { }
 
@@ -44,36 +44,47 @@ public class VariableDatabase : Variable {
     #region Properties
 
     public static string ShortName_Variable => "*dbs";
+
     public override int CheckOrder => 99;
 
     public DatabaseAbstract? Database {
         get => _db;
         set {
-            if (Readonly) { return; }
+            if (ReadOnly) { return; }
             _db = value;
         }
     }
 
     public override bool GetFromStringPossible => false;
+
     public override bool IsNullOrEmpty => _db == null || _db.IsDisposed;
+
     public override string ShortName => "dbs";
+
     public override bool ToStringPossible => false;
 
     #endregion
 
     #region Methods
 
+    public override object Clone() {
+        var v = new VariableDatabase(Name);
+        v.Parse(ToString());
+        return v;
+    }
+
     public override DoItFeedback GetValueFrom(Variable variable) {
         if (variable is not VariableDatabase v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
-        if (Readonly) { return DoItFeedback.Schreibgschützt(); }
+        if (ReadOnly) { return DoItFeedback.Schreibgschützt(); }
         Database = v.Database;
         return DoItFeedback.Null();
     }
 
-    protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
-        succesVar = null;
-        return false;
-    }
+    protected override Variable? NewWithThisValue(object x, Script s) => null;
+
+    protected override void SetValue(object? x) { }
+
+    protected override object? TryParse(string txt, Script? s) => null;
 
     #endregion
 }

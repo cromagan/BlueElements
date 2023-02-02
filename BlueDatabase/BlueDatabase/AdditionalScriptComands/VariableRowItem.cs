@@ -33,7 +33,7 @@ public class VariableRowItem : Variable {
 
     #region Constructors
 
-    public VariableRowItem(string name, RowItem? value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _row = value;
+    public VariableRowItem(string name, RowItem? value, bool ronly, bool system, string Comment) : base(name, ronly, system, Comment) => _row = value;
 
     public VariableRowItem(string name) : this(name, null, true, false, string.Empty) { }
 
@@ -44,36 +44,47 @@ public class VariableRowItem : Variable {
     #region Properties
 
     public static string ShortName_Variable => "*row";
+
     public override int CheckOrder => 99;
+
     public override bool GetFromStringPossible => false;
+
     public override bool IsNullOrEmpty => _row == null;
 
     public RowItem? RowItem {
         get => _row;
         set {
-            if (Readonly) { return; }
+            if (ReadOnly) { return; }
             _row = value;
         }
     }
 
     public override string ShortName => "row";
+
     public override bool ToStringPossible => false;
 
     #endregion
 
     #region Methods
 
+    public override object Clone() {
+        var v = new VariableRowItem(Name);
+        v.Parse(ToString());
+        return v;
+    }
+
     public override DoItFeedback GetValueFrom(Variable variable) {
         if (variable is not VariableRowItem v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
-        if (Readonly) { return DoItFeedback.Schreibgschützt(); }
+        if (ReadOnly) { return DoItFeedback.Schreibgschützt(); }
         RowItem = v.RowItem;
         return DoItFeedback.Null();
     }
 
-    protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
-        succesVar = null;
-        return false;
-    }
+    protected override Variable? NewWithThisValue(object x, Script s) => null;
+
+    protected override void SetValue(object? x) { }
+
+    protected override object? TryParse(string txt, Script? s) => null;
 
     #endregion
 }

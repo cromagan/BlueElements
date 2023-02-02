@@ -27,6 +27,7 @@ using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
+using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -403,12 +404,32 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         #region Zeilen Prüfen
 
         foreach (var thisrow in FilterDefiniton.Row) {
-            _ = thisrow.DoAutomatic("to be sure");
+            _ = thisrow.DoAutomatic("value changed", false, string.Empty);
         }
 
         #endregion
 
-        FilterDefiniton.RulesScript = sc;
+        #region Events Mappen
+
+        var eves = FilterDefiniton.EventScript.CloneWithClones();
+        var l = new EventScript(FilterDefiniton) {
+            NeedRow = true,
+            ManualExecutable = false,
+            Script = sc,
+            Name = "Main"
+        };
+        eves.Add(l);
+        FilterDefiniton.EventScript = new System.Collections.ObjectModel.ReadOnlyCollection<EventScript>(eves);
+
+        #endregion
+
+        #region gemapptes Script Main erstellen
+
+        var eve = FilterDefiniton.Events.CloneWithClones();
+        eve.Set("Value changed", "Main");
+        FilterDefiniton.Events = new System.Collections.ObjectModel.ReadOnlyCollection<Variable>(eve);
+
+        #endregion
     }
 
     private void FilterTable_ContextMenuInit(object sender, EventArgs.ContextMenuInitEventArgs e) {

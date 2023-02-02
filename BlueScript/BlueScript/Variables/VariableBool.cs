@@ -17,8 +17,11 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueScript.Methods;
 using BlueScript.Structures;
+using System.ComponentModel;
+using System.Linq.Expressions;
 using static BlueBasics.Extensions;
 
 namespace BlueScript.Variables;
@@ -33,7 +36,7 @@ public class VariableBool : Variable {
 
     #region Constructors
 
-    public VariableBool(string name, bool value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _valuebool = value;
+    public VariableBool(string name, bool value, bool ronly, bool system, string comment) : base(name, ronly, system, comment) => _valuebool = value;
 
     /// <summary>
     /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
@@ -48,18 +51,25 @@ public class VariableBool : Variable {
     #region Properties
 
     public static string ShortName_Plain => "bol";
+
     public static string ShortName_Variable => "*bol";
+
     public override int CheckOrder => 0;
+
     public override bool GetFromStringPossible => true;
+
     public override bool IsNullOrEmpty => false;
+
     public override string ReadableText => _valuebool.ToString();
+
     public override string ShortName => "bol";
+
     public override bool ToStringPossible => true;
 
     public bool ValueBool {
         get => _valuebool;
         set {
-            if (Readonly) { return; }
+            if (ReadOnly) { return; }
             _valuebool = value; // Variablen enthalten immer den richtigen Wert und es werden nur beim Ersetzen im Script die kritischen Zeichen entfernt
         }
     }
@@ -70,20 +80,35 @@ public class VariableBool : Variable {
 
     #region Methods
 
+    public override object Clone() {
+        var v = new VariableBool(Name);
+        v.Parse(ToString());
+        return v;
+    }
+
     public override DoItFeedback GetValueFrom(Variable variable) {
         if (variable is not VariableBool v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
-        if (Readonly) { return DoItFeedback.Schreibgschützt(); }
+        if (ReadOnly) { return DoItFeedback.Schreibgschützt(); }
         ValueBool = v.ValueBool;
         return DoItFeedback.Null();
     }
 
-    protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
-        var x = Method_if.GetBool(txt);
-        if (x != null) {
-            succesVar = new VariableBool((bool)x);
-            return true;
+    protected override Variable? NewWithThisValue(object x, Script s) {
+        var v = new VariableBool(string.Empty);
+        v.SetValue(x);
+        return v;
+    }
+
+    protected override void SetValue(object? x) {
+        if (x is bool val) {
+            _valuebool = val;
+        } else {
+            Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Variablenfehler!");
         }
-        succesVar = null;
+    }
+
+    protected override object? TryParse(string txt, Script? s) {
+        if (Method_if.GetBool(txt) is bool b) { return b; }
 
         #region Auf Restliche Boolsche Operationen testen
 
@@ -207,14 +232,13 @@ public class VariableBool : Variable {
             }
 
             if (!string.IsNullOrEmpty(replacer)) {
-                succesVar = new VariableBool((bool)Method_if.GetBool(replacer));
-                return true;
+                return Method_if.GetBool(replacer);
             }
         }
 
         #endregion
 
-        return false;
+        return null;
     }
 
     #endregion

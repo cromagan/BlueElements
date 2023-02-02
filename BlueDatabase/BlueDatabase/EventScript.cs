@@ -24,31 +24,36 @@ using System;
 
 namespace BlueDatabase;
 
-public sealed class ImportScript : IParseable, IReadableTextWithChanging, IDisposableExtended, ICloneable, IErrorCheckable {
+public sealed class EventScript : IParseable, IReadableTextWithChanging, IDisposableExtended, ICloneable, IErrorCheckable, IHasKeyName {
 
     #region Fields
+
+    private bool _executable;
 
     //private string _lastUsed;
     private string _name;
 
+    private bool _needRow;
     private string _script;
 
     #endregion
 
     #region Constructors
 
-    public ImportScript(DatabaseAbstract database, string name, string script) : this(database) {
+    public EventScript(DatabaseAbstract database, string name, string script) : this(database) {
         _name = name;
         _script = script;
     }
 
-    public ImportScript(DatabaseAbstract database, string toParse) : this(database) => Parse(toParse);
+    public EventScript(DatabaseAbstract database, string toParse) : this(database) => Parse(toParse);
 
-    public ImportScript(DatabaseAbstract database) {
+    public EventScript(DatabaseAbstract database) {
         Database = database;
         Database.Disposing += Database_Disposing;
         _name = string.Empty;
         _script = string.Empty;
+        _executable = false;
+        _needRow = false;
     }
 
     #endregion
@@ -56,7 +61,7 @@ public sealed class ImportScript : IParseable, IReadableTextWithChanging, IDispo
     #region Destructors
 
     // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
-    ~ImportScript() {
+    ~EventScript() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(false);
     }
@@ -76,11 +81,31 @@ public sealed class ImportScript : IParseable, IReadableTextWithChanging, IDispo
 
     public bool IsParsing { get; private set; }
 
+    public string KeyName => _name;
+
+    public bool ManualExecutable {
+        get => _executable;
+        set {
+            if (_executable == value) { return; }
+            _executable = value;
+            OnChanged();
+        }
+    }
+
     public string Name {
         get => _name;
         set {
             if (_name == value) { return; }
             _name = value;
+            OnChanged();
+        }
+    }
+
+    public bool NeedRow {
+        get => _needRow;
+        set {
+            if (_needRow == value) { return; }
+            _needRow = value;
             OnChanged();
         }
     }
@@ -98,7 +123,7 @@ public sealed class ImportScript : IParseable, IReadableTextWithChanging, IDispo
 
     #region Methods
 
-    public object Clone() => new ImportScript(Database, ToString());
+    public object Clone() => new EventScript(Database, ToString());
 
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
@@ -136,6 +161,16 @@ public sealed class ImportScript : IParseable, IReadableTextWithChanging, IDispo
                 case "script":
 
                     _script = pair.Value.FromNonCritical();
+                    break;
+
+                case "needrow":
+
+                    _needRow = pair.Value.FromPlusMinus();
+                    break;
+
+                case "manualexecutable":
+
+                    _needRow = pair.Value.FromPlusMinus();
                     break;
 
                 //case "lastdone":
@@ -177,7 +212,9 @@ public sealed class ImportScript : IParseable, IReadableTextWithChanging, IDispo
             result = result + "Database=" + Database?.ConnectionData.UniqueID.ToNonCritical() + ", ";
             result = result + "Name=" + Name.ToNonCritical() + ", ";
             result = result + "Script=" + Script.ToNonCritical() + ", ";
-            //result = result + "LastDone=" + _lastUsed.ToNonCritical() + ", ";
+
+            result = result + "ManualExecutable=" + ManualExecutable.ToPlusMinus() + ", ";
+            result = result + "NeedRow=" + NeedRow.ToPlusMinus() + ", ";
 
             return result.TrimEnd(", ") + "}";
         } catch {

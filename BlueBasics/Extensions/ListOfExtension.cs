@@ -106,6 +106,12 @@ public static partial class Extensions {
         l.AddRange(t.SplitAndCutByCr());
     }
 
+    public static string Parseable(this ICollection<string> col) => "{" + col.JoinWith(", ") + "}";
+
+    public static void ParseableAdd(this ICollection<string> col, string tagname, string value) => col.Add(tagname + "=" + value.ToNonCritical());
+
+    public static void ParseableAdd(this ICollection<string> col, string tagname, bool value) => col.Add(tagname + "=" + value.ToPlusMinus());
+
     /// <summary>
     ///  Falls der Dateityp String ist, WIRD zwischen Gross und Kleinschreibung unterschieden! Dafür kann RemoveString benutzt werden.
     /// </summary>

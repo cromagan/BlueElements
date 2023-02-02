@@ -313,12 +313,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         GC.SuppressFinalize(this);
     }
 
-    public string DoAutomatic(FilterCollection? filter, bool fullCheck, List<RowItem?>? pinned, string startroutine) {
+    public string DoAutomatic(FilterCollection? filter, bool fullCheck, List<RowItem?>? pinned, string startroutine, bool onlyTesting, string scriptname) {
         if (Database == null || Database.IsDisposed || Database.ReadOnly) { return "Datenbank schreibgeschützt."; }
-        return DoAutomatic(CalculateVisibleRows(filter, pinned), fullCheck, startroutine);
+        return DoAutomatic(CalculateVisibleRows(filter, pinned), fullCheck, startroutine, onlyTesting, scriptname);
     }
 
-    public string DoAutomatic(List<RowItem>? rows, bool fullCheck, string startroutine) {
+    public string DoAutomatic(List<RowItem>? rows, bool fullCheck, string startroutine, bool onlyTesting, string scriptname) {
         if (Database == null || Database.IsDisposed || Database.ReadOnly) { return "Datenbank schreibgeschützt."; }
 
         if (rows == null || rows.Count == 0) { return "Keine Zeilen angekommen."; }
@@ -329,7 +329,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         while (rows.Count > 0) {
             Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", all - rows.Count, all, false, false));
 
-            var (checkPerformed, _, s) = rows[0].DoAutomatic(true, fullCheck, startroutine);
+            var (checkPerformed, _, s) = rows[0].DoAutomatic(true, fullCheck, startroutine, onlyTesting, scriptname);
 
             if (s != null && !string.IsNullOrEmpty(s.Error)) {
                 var w = rows[0].CellFirstString();
@@ -378,7 +378,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         }
 
         if (runScriptOfNewRow) {
-            _ = item.DoAutomatic(false, false, 1, "new row");
+            _ = item.DoAutomatic(false, false, 1, "new row", false, string.Empty);
         }
 
         return item;
@@ -418,7 +418,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
             row.CellSet(thisfi.Column, thisfi.SearchValue);
         }
 
-        _ = row.DoAutomatic(false, false, 1, "new row");
+        _ = row.DoAutomatic(false, false, 1, "new row", false, string.Empty);
 
         return row;
     }

@@ -454,8 +454,7 @@ public sealed class Database : DatabaseAbstract {
             SaveToByteList(l, DatabaseDataType.GlobalScale, db.GlobalScale.ToString(Constants.Format_Float1));
             //SaveToByteList(l, DatabaseDataType.Ansicht, ((int)_ansicht).ToString(false));
             //SaveToByteList(l, DatabaseDataType.ReloadDelaySecond, ReloadDelaySecond.ToString(false));
-            //SaveToByteList(l, enDatabaseDataType.ImportScript, _ImportScript);
-            SaveToByteList(l, DatabaseDataType.RulesScript, db.RulesScript);
+            //SaveToByteList(l, DatabaseDataType.RulesScript, db.RulesScript);
             //SaveToByteList(l, enDatabaseDataType.BinaryDataInOne, Bins.ToString(true));
             //SaveToByteList(l, enDatabaseDataType.FilterImagePfad, _filterImagePfad);
             SaveToByteList(l, DatabaseDataType.AdditionalFilesPath, db.AdditionalFilesPfad);
@@ -475,7 +474,9 @@ public sealed class Database : DatabaseAbstract {
             SaveToByteList(l, DatabaseDataType.ColumnArrangement, db.ColumnArrangements.ToString(false));
             SaveToByteList(l, DatabaseDataType.Layouts, db.Layouts.JoinWithCr());
             SaveToByteList(l, DatabaseDataType.AutoExport, db.Export.ToString(true));
-            SaveToByteList(l, DatabaseDataType.ImportScript, db.ImportScript.ToString(true));
+            SaveToByteList(l, DatabaseDataType.EventScript, db.EventScript.ToString(true));
+            SaveToByteList(l, DatabaseDataType.Events, db.Events.ToString(true));
+            SaveToByteList(l, DatabaseDataType.DatabaseVariables, db.Variables.ToString(true));
 
             // Beim Erstellen des Undo-Speichers die Works nicht verändern, da auch bei einem nicht
             // erfolgreichen Speichervorgang der Datenbank-String erstellt wird.
@@ -651,6 +652,7 @@ public sealed class Database : DatabaseAbstract {
     }
 
     public override bool Save() {
+        return true;
         if (ReadOnly) { return false; }
         if (string.IsNullOrEmpty(Filename)) { return false; }
 

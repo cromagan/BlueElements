@@ -19,6 +19,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using System;
@@ -32,17 +33,17 @@ public static class VariableExtensions {
 
     #region Methods
 
-    public static void AddComment(this List<Variable> vars, string additionalComent) {
+    public static void AddComment(this ICollection<Variable> vars, string additionalComment) {
         foreach (var thisvar in vars) {
-            if (!string.IsNullOrEmpty(thisvar.Coment)) {
-                thisvar.Coment += "\r";
+            if (!string.IsNullOrEmpty(thisvar.Comment)) {
+                thisvar.Comment += "\r";
             }
 
-            thisvar.Coment += additionalComent;
+            thisvar.Comment += additionalComment;
         }
     }
 
-    public static List<string> AllNames(this List<Variable>? vars) {
+    public static List<string> AllNames(this ICollection<Variable>? vars) {
         if (vars != null) {
             return vars.Select(thisvar => thisvar.Name).ToList();
         }
@@ -50,7 +51,7 @@ public static class VariableExtensions {
         return new List<string>();
     }
 
-    public static List<string> AllStringableNames(this List<Variable>? vars) {
+    public static List<string> AllStringableNames(this ICollection<Variable>? vars) {
         var l = new List<string>();
         if (vars != null) {
             foreach (var thisvar in vars) {
@@ -65,7 +66,7 @@ public static class VariableExtensions {
     /// </summary>
     /// <param name="vars"></param>
     /// <returns></returns>
-    public static List<string> AllStringValues(this List<Variable>? vars) {
+    public static List<string> AllStringValues(this ICollection<Variable>? vars) {
         var l = new List<string>();
         if (vars != null) {
             foreach (var thisvar in vars) {
@@ -75,7 +76,7 @@ public static class VariableExtensions {
         return l;
     }
 
-    public static Variable? Get(this List<Variable>? vars, string name) {
+    public static Variable? Get(this ICollection<Variable>? vars, string name) {
         if (vars == null || vars.Count == 0) { return null; }
 
         return vars.FirstOrDefault(thisv =>
@@ -88,7 +89,7 @@ public static class VariableExtensions {
     /// <param name="vars"></param>
     /// <param name="name"></param>
     /// <returns></returns>
-    public static bool GetBool(this List<Variable> vars, string name) {
+    public static bool GetBool(this ICollection<Variable> vars, string name) {
         var v = vars.Get(name);
 
         if (v is not VariableBool vf) {
@@ -104,7 +105,7 @@ public static class VariableExtensions {
     /// </summary>
     /// <param name="vars"></param>
     /// <param name="name"></param>
-    public static double GetDouble(this List<Variable> vars, string name) {
+    public static double GetDouble(this ICollection<Variable> vars, string name) {
         var v = vars.Get(name);
 
         if (v is not VariableFloat vf) {
@@ -120,7 +121,7 @@ public static class VariableExtensions {
     /// </summary>
     /// <param name="vars"></param>
     /// <param name="name"></param>
-    public static int GetInt(this List<Variable> vars, string name) {
+    public static int GetInt(this ICollection<Variable> vars, string name) {
         var v = vars.Get(name);
 
         if (v is not VariableFloat vf) {
@@ -136,7 +137,7 @@ public static class VariableExtensions {
     /// </summary>
     /// <param name="vars"></param>
     /// <param name="name"></param>
-    public static List<string> GetList(this List<Variable> vars, string name) {
+    public static List<string> GetList(this ICollection<Variable> vars, string name) {
         var v = vars.Get(name);
         if (v == null) { return new List<string>(); }
 
@@ -154,7 +155,7 @@ public static class VariableExtensions {
     /// <param name="vars"></param>
     /// <param name="name"></param>
     /// <returns></returns>
-    public static string GetString(this List<Variable> vars, string name) {
+    public static string GetString(this ICollection<Variable> vars, string name) {
         var v = vars.Get(name);
 
         if (v is not VariableString vf) {
@@ -165,13 +166,13 @@ public static class VariableExtensions {
         return vf.ValueString;
     }
 
-    public static Variable? GetSystem(this List<Variable> vars, string name) => vars.FirstOrDefault(thisv =>
+    public static Variable? GetSystem(this ICollection<Variable> vars, string name) => vars.FirstOrDefault(thisv =>
         thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper());
 
-    public static void RemoveWithComment(this List<Variable> vars, string coment) {
+    public static void RemoveWithComment(this List<Variable> vars, string Comment) {
         var z = 0;
         do {
-            if (vars[z].Coment.Contains(coment)) {
+            if (vars[z].Comment.Contains(Comment)) {
                 vars.RemoveAt(z);
             } else {
                 z++;
@@ -179,7 +180,7 @@ public static class VariableExtensions {
         } while (z < vars.Count);
     }
 
-    public static string ReplaceInText(this List<Variable> vars, string originalText) {
+    public static string ReplaceInText(this ICollection<Variable> vars, string originalText) {
         foreach (var thisvar in vars) {
             originalText = thisvar.ReplaceInText(originalText);
         }
@@ -199,7 +200,7 @@ public static class VariableExtensions {
     /// <param name="vars"></param>
     /// <param name="name"></param>
     /// <param name="value"></param>
-    public static void Set(this List<Variable> vars, string name, string value) {
+    public static void Set(this ICollection<Variable> vars, string name, string value) {
         var v = vars.Get(name);
         if (v == null) {
             v = new VariableString(name, string.Empty, false, false, string.Empty);
@@ -211,9 +212,9 @@ public static class VariableExtensions {
             return;
         }
 
-        vf.Readonly = false; // sonst werden keine Daten geschrieben
+        vf.ReadOnly = false; // sonst werden keine Daten geschrieben
         vf.ValueString = value;
-        vf.Readonly = true;
+        vf.ReadOnly = true;
     }
 
     /// <summary>
@@ -222,7 +223,7 @@ public static class VariableExtensions {
     /// <param name="vars"></param>
     /// <param name="name"></param>
     /// <param name="value"></param>
-    public static void Set(this List<Variable> vars, string name, double value) {
+    public static void Set(this ICollection<Variable> vars, string name, double value) {
         var v = vars.Get(name);
         if (v == null) {
             v = new VariableFloat(name);
@@ -234,9 +235,9 @@ public static class VariableExtensions {
             return;
         }
 
-        vf.Readonly = false; // sonst werden keine Daten geschrieben
+        vf.ReadOnly = false; // sonst werden keine Daten geschrieben
         vf.ValueNum = value;
-        vf.Readonly = true;
+        vf.ReadOnly = true;
     }
 
     /// <summary>
@@ -245,7 +246,7 @@ public static class VariableExtensions {
     /// <param name="vars"></param>
     /// <param name="name"></param>
     /// <param name="value"></param>
-    public static void Set(this List<Variable> vars, string name, List<string> value) {
+    public static void Set(this ICollection<Variable> vars, string name, List<string> value) {
         var v = vars.Get(name);
         if (v == null) {
             v = new VariableListString(name);
@@ -257,9 +258,9 @@ public static class VariableExtensions {
             return;
         }
 
-        vf.Readonly = false; // sonst werden keine Daten geschrieben
+        vf.ReadOnly = false; // sonst werden keine Daten geschrieben
         vf.ValueList = value;
-        vf.Readonly = true;
+        vf.ReadOnly = true;
     }
 
     /// <summary>
@@ -268,7 +269,7 @@ public static class VariableExtensions {
     /// <param name="vars"></param>
     /// <param name="name"></param>
     /// <param name="value"></param>
-    public static void Set(this List<Variable> vars, string name, bool value) {
+    public static void Set(this ICollection<Variable> vars, string name, bool value) {
         var v = vars.Get(name);
         if (v == null) {
             v = new VariableBool(name);
@@ -280,54 +281,96 @@ public static class VariableExtensions {
             return;
         }
 
-        vf.Readonly = false; // sonst werden keine Daten geschrieben
+        vf.ReadOnly = false; // sonst werden keine Daten geschrieben
         vf.ValueBool = value;
-        vf.Readonly = true;
+        vf.ReadOnly = true;
     }
 
     #endregion
 }
 
-public abstract class Variable : IComparable {
+public abstract class Variable : IComparable, IParseable, ICloneable {
 
     #region Fields
 
-    public readonly bool SystemVariable;
-
     private static long _dummyCount;
+    private string _comment = string.Empty;
+    private string _name = string.Empty;
+    private bool _readOnly = false;
+    private bool _systemVariable = false;
 
     #endregion
 
     #region Constructors
 
-    protected Variable(string name, bool ronly, bool system, string coment) {
+    protected Variable(string name, bool ronly, bool system, string Comment) {
         Name = system ? "*" + name.ToLower() : name.ToLower();
-        Readonly = ronly;
+        ReadOnly = ronly;
         SystemVariable = system;
-        Coment = coment;
+        Comment = Comment;
     }
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler? Changed;
 
     #endregion
 
     #region Properties
 
     public static string Any_Plain => "any";
+
     public static string Any_Variable => "*any";
+
     public abstract int CheckOrder { get; }
-    public string Coment { get; set; }
+
+    public string Comment {
+        get => _comment;
+        set {
+            if (_comment == value) { return; }
+            _comment = value;
+            OnChanged();
+        }
+    }
 
     public abstract bool GetFromStringPossible { get; }
+
     public abstract bool IsNullOrEmpty { get; }
 
     /// <summary>
     /// Variablen-Namen werden immer in Kleinbuchstaben gespeichert.
     /// </summary>
-    public string Name { get; set; }
+    public string Name {
+        get => _name; set {
+            if (_name == value) { return; }
+            _name = value;
+            OnChanged();
+        }
+    }
 
     public virtual string ReadableText => "Objekt: " + ShortName;
 
-    public bool Readonly { get; set; }
+    public bool ReadOnly {
+        get => _readOnly;
+        set {
+            if (_readOnly == value) { return; }
+            _readOnly = value;
+            OnChanged();
+        }
+    }
+
     public abstract string ShortName { get; }
+
+    public bool SystemVariable {
+        get => _systemVariable;
+        private set {
+            if (_systemVariable == value) { return; }
+            _systemVariable = value;
+            OnChanged();
+        }
+    }
 
     public abstract bool ToStringPossible { get; }
 
@@ -336,6 +379,13 @@ public abstract class Variable : IComparable {
             if (ToStringPossible) { Develop.DebugPrint(FehlerArt.Fehler, "Routine muss überschrieben werden!"); }
 
             return "\"" + ShortName + ";" + Name + "\"";
+        }
+        set {
+            var x = TryParse(value, null);
+            if (x == null) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Variablenfehler");
+            }
+            SetValue(x);
         }
     }
 
@@ -469,6 +519,8 @@ public abstract class Variable : IComparable {
         return v == vo && !string.IsNullOrEmpty(v);
     }
 
+    public abstract object Clone();
+
     public int CompareTo(object obj) {
         if (obj is Variable v) {
             return CheckOrder.CompareTo(v.CheckOrder);
@@ -480,12 +532,88 @@ public abstract class Variable : IComparable {
 
     public abstract DoItFeedback GetValueFrom(Variable attvarAttribute);
 
+    public virtual void OnChanged() {
+        Changed?.Invoke(this, System.EventArgs.Empty);
+    }
+
+    public void Parse(string toParse) {
+        //IsParsing = true;
+        //ThrowEvents = false;
+        //PermissionGroups_Show.ThrowEvents = false;
+        //Initialize();
+        foreach (var pair in toParse.GetAllTags()) {
+            switch (pair.Key) {
+                case "name":
+                    _name = pair.Value.FromNonCritical();
+                    break;
+
+                case "type":
+                    if (pair.Value.ToNonCritical() != ShortName) {
+                        Develop.DebugPrint(FehlerArt.Fehler, "Variablenfehler: " + toParse);
+                    }
+                    break;
+
+                case "value":
+                    ValueForReplace = pair.Value.FromNonCritical();
+                    break;
+
+                case "comment":
+                    _comment = pair.Value.FromNonCritical();
+                    break;
+
+                case "readonly":
+                    ReadOnly = pair.Value.FromPlusMinus();
+                    break;
+
+                case "system":
+                    SystemVariable = pair.Value.FromPlusMinus();
+                    break;
+
+                default:
+                    Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
+                    break;
+            }
+        }
+        //PermissionGroups_Show.ThrowEvents = true;
+        //ThrowEvents = true;
+        //IsParsing = false;
+    }
+
     public string ReplaceInText(string txt) {
         if (!txt.ToLower().Contains("~" + Name.ToLower() + "~")) { return txt; }
         return txt.Replace("~" + Name + "~", ReadableText, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
     }
 
-    protected abstract bool TryParse(string txt, out Variable? succesVar, Script s);
+    public new string ToString() {
+        if (!ToStringPossible) { return string.Empty; }
+
+        var result = new List<string>();
+        result.ParseableAdd("Name", Name);
+        result.ParseableAdd("Type", ShortName);
+        result.ParseableAdd("Value", ValueForReplace);
+        result.ParseableAdd("Comment", Comment);
+        result.ParseableAdd("ReadOnly", ReadOnly);
+        result.ParseableAdd("System", SystemVariable);
+
+        return result.Parseable();
+    }
+
+    protected abstract Variable? NewWithThisValue(object x, Script s);
+
+    protected abstract void SetValue(object? x);
+
+    protected abstract object? TryParse(string txt, Script? s);
+
+    protected bool TryParse(string txt, out Variable? succesVar, Script s) {
+        var x = TryParse(txt, s);
+        if (x == null) {
+            succesVar = null;
+            return false;
+        }
+
+        succesVar = NewWithThisValue(x, s);
+        return succesVar != null;
+    }
 
     #endregion
 }

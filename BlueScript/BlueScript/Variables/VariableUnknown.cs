@@ -25,7 +25,7 @@ public class VariableUnknown : Variable {
 
     #region Constructors
 
-    public VariableUnknown(string name, bool ronly, bool system, string coment) : base(name, ronly, system, coment) { }
+    public VariableUnknown(string name, bool ronly, bool system, string comment) : base(name, ronly, system, comment) { }
 
     /// <summary>
     /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
@@ -40,9 +40,11 @@ public class VariableUnknown : Variable {
     #region Properties
 
     public static string ShortName_Variable => "*ukn";
+
     public override int CheckOrder => 100;
 
     public override bool GetFromStringPossible => true;
+
     public override bool IsNullOrEmpty => false;
 
     /// <summary>
@@ -51,25 +53,38 @@ public class VariableUnknown : Variable {
     public override string ReadableText => "[unknown]";
 
     public override string ShortName => "ukn";
+
     public override bool ToStringPossible => false;
+
     public override string ValueForReplace => ReadableText;
 
     #endregion
 
-    //public override string ValueForReplace { get => "\"" + _valueString.RemoveCriticalVariableChars() + "\""; }
-
     #region Methods
+
+    public override object Clone() {
+        var v = new VariableUnknown(Name);
+        v.Parse(ToString());
+        return v;
+    }
+
+    //public override string ValueForReplace { get => "\"" + _valueString.RemoveCriticalVariableChars() + "\""; }
 
     public override DoItFeedback GetValueFrom(Variable variable) {
         if (variable is not VariableUnknown) { return DoItFeedback.VerschiedeneTypen(this, variable); }
-        if (Readonly) { return DoItFeedback.Schreibgschützt(); }
+        if (ReadOnly) { return DoItFeedback.Schreibgschützt(); }
         return DoItFeedback.Null();
     }
 
-    protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
-        succesVar = new VariableUnknown(txt);
-        return true;
+    protected override Variable? NewWithThisValue(object x, Script s) {
+        var v = new VariableUnknown(string.Empty);
+        v.SetValue(x);
+        return v;
     }
+
+    protected override void SetValue(object? x) { }
+
+    protected override object? TryParse(string txt, Script? s) => txt;
 
     #endregion
 }

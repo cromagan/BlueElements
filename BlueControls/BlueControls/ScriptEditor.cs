@@ -67,10 +67,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
 
     public string ScriptText {
         get => txtSkript.Text.TrimEnd(" ");
-        set {
-            txtSkript.Text = value.TrimEnd(" ") + "    ";
-            UpdateSubs(Script.ReduceText(value));
-        }
+        set => txtSkript.Text = value.TrimEnd(" ") + "    ";
     }
 
     #endregion
@@ -178,7 +175,6 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
         }
         grpVariablen.WriteVariablesToTable(s.Variables);
         WriteComandsToList(s);
-        UpdateSubs(s?.ReducedScriptText);
 
         if (string.IsNullOrEmpty(s.Error)) {
             Message("Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden.");
@@ -250,37 +246,6 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
         } catch (Exception ex) {
             Develop.DebugPrint(ex);
         }
-    }
-
-    private void UpdateSubs(string? s) {
-        lstFunktionen.Item.Clear();
-
-        _ = lstFunktionen.Item.Add("[Main]");
-
-        if (s == null) { return; }
-
-        var st = new List<string> { "sub" };
-        var en = new List<string> { "()" };
-
-        var pos = 0;
-        do {
-            var (stp, _) = NextText(s, pos, st, true, false, KlammernStd);
-
-            if (stp > 0) {
-                var (endp, _) = NextText(s, stp, en, false, false, KlammernStd);
-
-                if (endp > stp) {
-                    var n = s.Substring(stp + 3, endp - stp - 3);
-                    if (!Variable.IsValidName(n)) { break; }
-                    _ = lstFunktionen.Item.Add(n);
-                    pos = endp + 2;
-                } else {
-                    break;
-                }
-            } else {
-                break;
-            }
-        } while (true);
     }
 
     #endregion

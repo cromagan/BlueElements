@@ -33,7 +33,7 @@ public class VariableDateTime : Variable {
 
     #region Constructors
 
-    public VariableDateTime(string name, DateTime value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _valueDateTime = value;
+    public VariableDateTime(string name, DateTime value, bool ronly, bool system, string comment) : base(name, ronly, system, comment) => _valueDateTime = value;
 
     /// <summary>
     /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
@@ -48,13 +48,17 @@ public class VariableDateTime : Variable {
     #region Properties
 
     public static string ShortName_Variable => "*dat";
+
     public override int CheckOrder => 5;
+
     public override bool GetFromStringPossible => false;
+
     public override bool IsNullOrEmpty => false;
 
     public override string ReadableText => _valueDateTime.ToString(Constants.Format_Date4);
 
     public override string ShortName => "dat";
+
     public override bool ToStringPossible => false;
 
     /// <summary>
@@ -63,7 +67,7 @@ public class VariableDateTime : Variable {
     public DateTime ValueDate {
         get => _valueDateTime;
         set {
-            if (Readonly) { return; }
+            if (ReadOnly) { return; }
             _valueDateTime = value;
         }
     }
@@ -72,17 +76,24 @@ public class VariableDateTime : Variable {
 
     #region Methods
 
+    public override object Clone() {
+        var v = new VariableDateTime(Name);
+        v.Parse(ToString());
+        return v;
+    }
+
     public override DoItFeedback GetValueFrom(Variable variable) {
         if (variable is not VariableDateTime v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
-        if (Readonly) { return DoItFeedback.Schreibgschützt(); }
+        if (ReadOnly) { return DoItFeedback.Schreibgschützt(); }
         ValueDate = v.ValueDate;
         return DoItFeedback.Null();
     }
 
-    protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
-        succesVar = null;
-        return false;
-    }
+    protected override Variable? NewWithThisValue(object x, Script s) => null;
+
+    protected override void SetValue(object? x) { }
+
+    protected override object? TryParse(string txt, Script? s) => null;
 
     #endregion
 }

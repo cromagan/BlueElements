@@ -526,7 +526,7 @@ public static class Export {
                 if (thisRow != null) {
                     var tmpBody = body;
 
-                    var (_, _, script) = thisRow.DoAutomatic("export");
+                    var (_, _, script) = thisRow.DoAutomatic("export", false, string.Empty);
                     if (script == null) { return "Script Fehler!"; }
 
                     if (!string.IsNullOrEmpty(script.Error)) {

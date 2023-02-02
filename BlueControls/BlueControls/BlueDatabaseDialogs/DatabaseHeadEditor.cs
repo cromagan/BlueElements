@@ -19,6 +19,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.Classes_Editor;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -103,13 +104,13 @@ public sealed partial class DatabaseHeadEditor {
 
         #endregion
 
-        #region Import Scripte
+        #region Event Scripte
 
-        lstImportScripts.Item.Clear();
-        foreach (var thisSet in _database.ImportScript.Where(thisSet => thisSet != null)) {
-            _ = lstImportScripts.Item.Add((ImportScript)thisSet.Clone(), string.Empty, string.Empty);
+        lstEventScripts.Item.Clear();
+        foreach (var thisSet in _database.EventScript.Where(thisSet => thisSet != null)) {
+            _ = lstEventScripts.Item.Add((EventScript)thisSet.Clone(), string.Empty, string.Empty);
         }
-        lstImportScripts.Item.Sort();
+        lstEventScripts.Item.Sort();
 
         #endregion
 
@@ -171,7 +172,7 @@ public sealed partial class DatabaseHeadEditor {
                 symb = ImageCode.Karton;
                 break;
 
-            case DatabaseDataType.ImportScript:
+            case DatabaseDataType.EventScript:
                 aenderung = "Import Script geändert";
                 alt = "";
                 neu = "";
@@ -190,13 +191,13 @@ public sealed partial class DatabaseHeadEditor {
                 symb = ImageCode.PlusZeichen;
                 break;
 
-            case DatabaseDataType.RulesScript:
-                //case enDatabaseDataType.Rules_ALT:
-                aenderung = "Regeln verändert";
-                symb = ImageCode.Formel;
-                alt = "";
-                neu = "";
-                break;
+            //case DatabaseDataType.RulesScript:
+            //    //case enDatabaseDataType.Rules_ALT:
+            //    aenderung = "Regeln verändert";
+            //    symb = ImageCode.Formel;
+            //    alt = "";
+            //    neu = "";
+            //    break;
 
             case DatabaseDataType.ColumnArrangement:
                 aenderung = "Spalten-Anordnungen verändert";
@@ -220,7 +221,8 @@ public sealed partial class DatabaseHeadEditor {
 
     private void btnSave_Click(object sender, System.EventArgs e) {
         btnSave.Enabled = false;
-        scriptEditor.Message("Speichervorgang...");
+
+        //scriptEditor.Message("Speichervorgang...");
 
         var ok = false;
         if (_database != null) {
@@ -228,9 +230,9 @@ public sealed partial class DatabaseHeadEditor {
             ok = _database.Save();
         }
         if (ok) {
-            scriptEditor.Message("Speichern erfolgreich.");
+            MessageBox.Show("Speichern erfolgreich.");
         } else {
-            scriptEditor.Message("Speichern fehlgeschlagen!");
+            //scriptEditor.Message("Speichern fehlgeschlagen!");
             MessageBox.Show("Speichern fehlgeschlagen!");
         }
         btnSave.Enabled = true;
@@ -241,6 +243,17 @@ public sealed partial class DatabaseHeadEditor {
     private void Database_Disposing(object sender, System.EventArgs e) {
         RemoveDatabase();
         Close();
+    }
+
+    private void eventScript_Editor1_Changed(object sender, System.EventArgs e) {
+        foreach (var thisitem in lstEventScripts.Item) {
+            if (thisitem is TextListItem tli) {
+                if (tli.Tag == eventScriptEditor.Item) {
+                    tli.Text = eventScriptEditor.Item.ReadableText();
+                    tli.Symbol = eventScriptEditor.Item.SymbolForReadableText();
+                }
+            }
+        }
     }
 
     private void ExportEditor_Changed(object sender, System.EventArgs e) {
@@ -305,22 +318,11 @@ public sealed partial class DatabaseHeadEditor {
     }
 
     private void GlobalTab_Selecting(object sender, System.Windows.Forms.TabControlCancelEventArgs e) {
-        if (e.TabPage == Tab_Regeln) {
-            scriptEditor.Database = _database;
+        if (e.TabPage == tabScripts) {
+            eventScriptEditor.Database = _database;
         }
-        if (e.TabPage == Tab_Undo) {
+        if (e.TabPage == tabUndo) {
             if (tblUndo.Database == null) { GenerateUndoTabelle(); }
-        }
-    }
-
-    private void importScript_Editor1_Changed(object sender, System.EventArgs e) {
-        foreach (var thisitem in lstImportScripts.Item) {
-            if (thisitem is TextListItem tli) {
-                if (tli.Tag == ExportEditor.Item) {
-                    tli.Text = ExportEditor.Item.ReadableText();
-                    tli.Symbol = ExportEditor.Item.SymbolForReadableText();
-                }
-            }
         }
     }
 
@@ -351,24 +353,24 @@ public sealed partial class DatabaseHeadEditor {
         }
     }
 
-    private void lstImportScripts_AddClicked(object sender, System.EventArgs e) {
+    private void lstEventScripts_AddClicked(object sender, System.EventArgs e) {
         if (_database == null || _database.IsDisposed) { return; }
 
-        var newScriptItem = lstImportScripts.Item.Add(new ImportScript(_database), string.Empty, string.Empty);
+        var newScriptItem = lstEventScripts.Item.Add(new EventScript(_database), string.Empty, string.Empty);
         newScriptItem.Checked = true;
     }
 
-    private void lstImportScripts_ItemCheckedChanged(object sender, System.EventArgs e) {
-        if (lstImportScripts.Item.Checked().Count != 1) {
-            importScriptEditor.Item = null;
+    private void lstEventScripts_ItemCheckedChanged(object sender, System.EventArgs e) {
+        if (lstEventScripts.Item.Checked().Count != 1) {
+            eventScriptEditor.Item = null;
             return;
         }
         if (_database == null || _database.IsDisposed || _database.ReadOnly) {
-            importScriptEditor.Item = null;
+            eventScriptEditor.Item = null;
             return;
         }
-        var selectedlstImportScripts = (ImportScript)((TextListItem)lstImportScripts.Item.Checked()[0]).Tag;
-        importScriptEditor.Item = selectedlstImportScripts;
+        var selectedlstEventScripts = (EventScript)((TextListItem)lstEventScripts.Item.Checked()[0]).Tag;
+        eventScriptEditor.Item = selectedlstEventScripts;
     }
 
     private void OkBut_Click(object sender, System.EventArgs e) => Close();
@@ -408,7 +410,7 @@ public sealed partial class DatabaseHeadEditor {
     private void WriteInfosBack() {
         if (_database == null || _database.IsDisposed || _database.ReadOnly) { return; } // Disposed
 
-        scriptEditor.WriteScriptBack();
+        eventScriptEditor.WriteScriptBack();
         _database.GlobalShowPass = txbKennwort.Text;
         _database.Caption = txbCaption.Text;
         _database.UndoCount = tbxUndoAnzahl.Text.IsLong() ? Math.Max(IntParse(tbxUndoAnzahl.Text), 5) : 5;
@@ -445,9 +447,9 @@ public sealed partial class DatabaseHeadEditor {
 
         #region  Import
 
-        var t2 = new ListExt<ImportScript?>();
-        t2.AddRange(lstImportScripts.Item.Select(thisItem => (ImportScript)((TextListItem)thisItem).Tag));
-        _database.ImportScript = new(t2);
+        var t2 = new ListExt<EventScript?>();
+        t2.AddRange(lstEventScripts.Item.Select(thisItem => (EventScript)((TextListItem)thisItem).Tag));
+        _database.EventScript = new(t2);
 
         #endregion
     }

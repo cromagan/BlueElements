@@ -17,12 +17,9 @@ namespace BlueControls {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ScriptEditor));
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.grpCode = new BlueControls.Controls.GroupBox();
             this.txtSkript = new FastColoredTextBoxNS.FastColoredTextBox();
-            this.grpRoutinen = new BlueControls.Controls.GroupBox();
-            this.lstFunktionen = new BlueControls.Controls.ListBox();
-            this.grpVariablen = new VariableEditor();
+            this.grpVariablen = new BlueControls.VariableEditor();
             this.grpAusgabeFenster = new BlueControls.Controls.GroupBox();
             this.txbSkriptInfo = new BlueControls.Controls.TextBox();
             this.grpMainBar = new BlueControls.Controls.GroupBox();
@@ -33,13 +30,8 @@ namespace BlueControls {
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
-            this.splitContainer2.Panel1.SuspendLayout();
-            this.splitContainer2.Panel2.SuspendLayout();
-            this.splitContainer2.SuspendLayout();
             this.grpCode.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtSkript)).BeginInit();
-            this.grpRoutinen.SuspendLayout();
             this.grpAusgabeFenster.SuspendLayout();
             this.grpMainBar.SuspendLayout();
             this.SuspendLayout();
@@ -53,7 +45,7 @@ namespace BlueControls {
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.splitContainer2);
+            this.splitContainer1.Panel1.Controls.Add(this.grpCode);
             // 
             // splitContainer1.Panel2
             // 
@@ -63,24 +55,6 @@ namespace BlueControls {
             this.splitContainer1.SplitterWidth = 8;
             this.splitContainer1.TabIndex = 4;
             // 
-            // splitContainer2
-            // 
-            this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer2.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer2.Name = "splitContainer2";
-            // 
-            // splitContainer2.Panel1
-            // 
-            this.splitContainer2.Panel1.Controls.Add(this.grpCode);
-            // 
-            // splitContainer2.Panel2
-            // 
-            this.splitContainer2.Panel2.Controls.Add(this.grpRoutinen);
-            this.splitContainer2.Size = new System.Drawing.Size(603, 154);
-            this.splitContainer2.SplitterDistance = 535;
-            this.splitContainer2.SplitterWidth = 8;
-            this.splitContainer2.TabIndex = 0;
-            // 
             // grpCode
             // 
             this.grpCode.Controls.Add(this.txtSkript);
@@ -88,7 +62,7 @@ namespace BlueControls {
             this.grpCode.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.NormalBold;
             this.grpCode.Location = new System.Drawing.Point(0, 0);
             this.grpCode.Name = "grpCode";
-            this.grpCode.Size = new System.Drawing.Size(535, 154);
+            this.grpCode.Size = new System.Drawing.Size(603, 154);
             this.grpCode.TabIndex = 3;
             this.grpCode.TabStop = false;
             this.grpCode.Text = "Code";
@@ -119,7 +93,6 @@ namespace BlueControls {
             this.txtSkript.CharWidth = 8;
             this.txtSkript.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txtSkript.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
-            this.txtSkript.Font = new System.Drawing.Font("Courier New", 9.75F);
             this.txtSkript.IsReplaceMode = false;
             this.txtSkript.Language = FastColoredTextBoxNS.Language.CSharp;
             this.txtSkript.LeftBracket = '(';
@@ -131,39 +104,12 @@ namespace BlueControls {
             this.txtSkript.RightBracket2 = '}';
             this.txtSkript.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
             this.txtSkript.ServiceColors = ((FastColoredTextBoxNS.ServiceColors)(resources.GetObject("txtSkript.ServiceColors")));
-            this.txtSkript.Size = new System.Drawing.Size(519, 113);
+            this.txtSkript.Size = new System.Drawing.Size(587, 113);
             this.txtSkript.TabIndex = 2;
             this.txtSkript.Zoom = 100;
             this.txtSkript.ToolTipNeeded += new System.EventHandler<FastColoredTextBoxNS.ToolTipNeededEventArgs>(this.txtSkript_ToolTipNeeded);
-            this.txtSkript.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TxtSkript_MouseUp);
             this.txtSkript.TextChangedDelayed += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.TxtSkript_TextChangedDelayed);
-            // 
-            // grpRoutinen
-            // 
-            this.grpRoutinen.Controls.Add(this.lstFunktionen);
-            this.grpRoutinen.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.grpRoutinen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.NormalBold;
-            this.grpRoutinen.Location = new System.Drawing.Point(0, 0);
-            this.grpRoutinen.Name = "grpRoutinen";
-            this.grpRoutinen.Size = new System.Drawing.Size(60, 154);
-            this.grpRoutinen.TabIndex = 4;
-            this.grpRoutinen.TabStop = false;
-            this.grpRoutinen.Text = "Routinen";
-            // 
-            // lstFunktionen
-            // 
-            this.lstFunktionen.AddAllowed = BlueControls.Enums.AddType.None;
-            this.lstFunktionen.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lstFunktionen.CheckBehavior = BlueControls.Enums.CheckBehavior.NoSelection;
-            this.lstFunktionen.FilterAllowed = true;
-            this.lstFunktionen.Location = new System.Drawing.Point(8, 24);
-            this.lstFunktionen.Name = "lstFunktionen";
-            this.lstFunktionen.Size = new System.Drawing.Size(44, 115);
-            this.lstFunktionen.TabIndex = 4;
-            this.lstFunktionen.Translate = false;
-            this.lstFunktionen.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.lstFunktionen_ItemClicked);
+            this.txtSkript.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TxtSkript_MouseUp);
             // 
             // grpVariablen
             // 
@@ -173,7 +119,6 @@ namespace BlueControls {
             this.grpVariablen.Size = new System.Drawing.Size(603, 173);
             this.grpVariablen.TabIndex = 3;
             this.grpVariablen.TabStop = false;
-            this.grpVariablen.Text = "Variablen";
             // 
             // grpAusgabeFenster
             // 
@@ -256,13 +201,8 @@ namespace BlueControls {
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
-            this.splitContainer2.Panel1.ResumeLayout(false);
-            this.splitContainer2.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
-            this.splitContainer2.ResumeLayout(false);
             this.grpCode.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.txtSkript)).EndInit();
-            this.grpRoutinen.ResumeLayout(false);
             this.grpAusgabeFenster.ResumeLayout(false);
             this.grpMainBar.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -275,14 +215,11 @@ namespace BlueControls {
         private Controls.GroupBox grpAusgabeFenster;
         private Controls.TextBox txbSkriptInfo;
         private SplitContainer splitContainer1;
-        private SplitContainer splitContainer2;
         private Controls.GroupBox grpCode;
         private VariableEditor grpVariablen;
         protected Controls.GroupBox grpMainBar;
         protected Controls.Button btnBefehlsUebersicht;
         protected Controls.Button btnTest;
-        private Controls.GroupBox grpRoutinen;
-        private Controls.ListBox lstFunktionen;
         protected Controls.Button btnZusatzDateien;
     }
 }

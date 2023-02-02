@@ -137,7 +137,7 @@ public class RowFormulaListItem : BasicListItem {
         }
     }
 
-    protected override string GetCompareKey() => _row.CompareKeyx();
+    protected override string GetCompareKey() => _row.CompareKey();
 
     private void GeneratePic() {
         if (string.IsNullOrEmpty(_layoutId) || !_layoutId.StartsWith("#")) {

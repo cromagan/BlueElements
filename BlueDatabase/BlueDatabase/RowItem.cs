@@ -31,6 +31,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using static BlueBasics.Converter;
+using static BlueScript.Variables.VariableExtensions;
 
 namespace BlueDatabase;
 
@@ -311,7 +312,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     /// <param name="columns">Nur diese Spalten in deser Reihenfolge werden berücksichtigt</param>
     /// <returns>Den String mit dem abschluß <<>key<>> und dessen Key.</returns>
 
-    public string CompareKeyx() => CompareKey(Database.SortDefinition?.Columns);
+    public string CompareKey() => CompareKey(Database.SortDefinition?.Columns);
 
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
@@ -319,7 +320,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
         GC.SuppressFinalize(this);
     }
 
-    public (bool checkPerformed, string error, Script? script) DoAutomatic(string startroutine) => DoAutomatic(false, false, startroutine);
+    public (bool checkPerformed, string error, Script? script) DoAutomatic(string eventname, bool onlyTesting, string scriptname) => DoAutomatic(false, false, eventname, onlyTesting, scriptname);
 
     /// <summary>
     /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initalwerte der Zellen.
@@ -330,11 +331,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     /// <param name="tryforsceonds"></param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
 
-    public (bool checkPerformed, string error, Script? script) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, float tryforsceonds, string startroutine) {
-        if  (Database == null || Database.IsDisposed || Database.ReadOnly){ return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
+    public (bool checkPerformed, string error, Script? script) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, float tryforsceonds, string eventname, bool onlyTesting, string scriptname) {
+        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
         var t = DateTime.Now;
         do {
-            var erg = DoAutomatic(doFemdZelleInvalidate, fullCheck, startroutine);
+            var erg = DoAutomatic(doFemdZelleInvalidate, fullCheck, eventname, onlyTesting, scriptname);
             if (erg.checkPerformed) { return erg; }
             if (DateTime.Now.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
         } while (true);
@@ -348,18 +349,18 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgeführt</param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
 
-    public (bool checkPerformed, string error, Script? skript) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, string startroutine) {
-        if  (Database == null || Database.IsDisposed || Database.ReadOnly){ return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
+    public (bool checkPerformed, string error, Script? skript) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, string eventname, bool onlyTesting, string scriptname) {
+        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
 
         var feh = Database.ErrorReason(ErrorReason.EditAcut);
         if (!string.IsNullOrEmpty(feh)) { return (false, feh, null); }
 
         // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
         DoingScript = true;
-        var script = DoRules(startroutine);
+        var script = DoRules(eventname, onlyTesting, scriptname);
         DoingScript = false;
 
-        if (startroutine == "script testing") { return (true, string.Empty, script); }
+        if (onlyTesting) { return (true, string.Empty, script); }
 
         // checkPerformed geht von Dateisystemfehlern aus
         if (script != null) {
@@ -538,13 +539,29 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     /// </summary>
     /// <returns>Gibt Regeln, die einen Fehler verursachen zurück. z.B. SPALTE1|Die Splate darf nicht leer sein.</returns>
 
-    private Script? DoRules(string startRoutine) {
+    private Script? DoRules(string eventname, bool onlyTesting, string scriptname) {
         try {
-            if (Database == null || Database.IsDisposed || string.IsNullOrWhiteSpace(Database.RulesScript)) { return null; }
+            if (Database == null || Database.IsDisposed) { return null; }
+
+            if (!string.IsNullOrEmpty(eventname) && !string.IsNullOrEmpty(eventname)) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Event und Skript angekommen!");
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(scriptname)) {
+                scriptname = Database.Events.GetString(eventname);
+            }
+
+            if (scriptname == null || string.IsNullOrWhiteSpace(scriptname)) { return null; }
+
+            var script = Database.EventScript.Get(scriptname);
+            if (script == null) { return null; }
+
+            if (!script.NeedRow) { return null; }
 
             List<Variable> vars = new()
             {
-                new VariableString("Startroutine", startRoutine, true, false, "ACHTUNG: Keinesfalls dürfen Startroutinenabhängig Werte verändert werden.\r\nMögliche Werte:\r\nnew row\r\nvalue changed\r\nscript testing\r\nmanual check\r\nto be sure\r\nimport\r\nexport\r\nscript"),
+                //new VariableString("Startroutine", startRoutine, true, false, "ACHTUNG: Keinesfalls dürfen Startroutinenabhängig Werte verändert werden.\r\nMögliche Werte:\r\nnew row\r\nvalue changed\r\nscript testing\r\nmanual check\r\nto be sure\r\nimport\r\nexport\r\nscript"),
                 new VariableBool("CellChangesEnabled", true, true, true, "Nur wenn TRUE werden nach dem Skript die Änderungen\r\nin die Datenbank aufgenommen.\r\nKann mit DisableCellChanges umgesetzt werden.")
             };
 
@@ -568,14 +585,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
 
             #region Script ausführen
 
-            Script sc = new(vars, Database.AdditionalFilesPfadWhole(), startRoutine.Equals("script testing", StringComparison.OrdinalIgnoreCase)) {
-                ScriptText = Database.RulesScript
+            Script sc = new(vars, Database.AdditionalFilesPfadWhole(), onlyTesting) {
+                ScriptText = script.Script
             };
             sc.Parse();
 
             #endregion
 
-            if (startRoutine != "script testing" && vars.GetSystem("CellChangesEnabled") is VariableBool doch && doch.ValueBool) {
+            if (!onlyTesting && vars.GetSystem("CellChangesEnabled") is VariableBool doch && doch.ValueBool) {
 
                 #region Variablen zurückschreiben und Special Rules ausführen
 
@@ -589,7 +606,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
             }
             return sc;
         } catch {
-            return DoRules(startRoutine);
+            return DoRules(eventname, onlyTesting, scriptname);
         }
     }
 
@@ -614,10 +631,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     }
 
     private void VariableToCell(ColumnItem? column, List<Variable> vars) {
-        if  (Database == null || Database.IsDisposed || Database.ReadOnly){ return; }
+        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return; }
 
         var columnVar = vars.Get(column.Name);
-        if (columnVar == null || columnVar.Readonly) { return; }
+        if (columnVar == null || columnVar.ReadOnly) { return; }
         if (!column.SaveContent || !column.Format.CanBeChangedByRules()) { return; }
 
         //if (column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {

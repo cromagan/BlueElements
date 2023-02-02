@@ -18,6 +18,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
@@ -29,20 +30,31 @@ using static BlueBasics.IO;
 
 namespace BlueControls.Classes_Editor;
 
-internal sealed partial class ImportScript_Editor : AbstractClassEditor<ImportScript> //System.Windows.Forms.UserControl//
+internal sealed partial class EventScript_Editor : AbstractClassEditor<EventScript>, IHasDatabase //System.Windows.Forms.UserControl//
 {
     #region Constructors
 
-    public ImportScript_Editor() : base() => InitializeComponent();
+    public EventScript_Editor() : base() => InitializeComponent();
+
+    #endregion
+
+    #region Properties
+
+    public DatabaseAbstract Database {
+        get => scriptEditor.Database;
+        set => scriptEditor.Database = value;
+    }
 
     #endregion
 
     #region Methods
 
+    public void WriteScriptBack() => scriptEditor.WriteScriptBack();
+
     protected override void DisableAndClearFormula() {
         Enabled = false;
         txbName.Text = string.Empty;
-        scriptEditor.ScriptText = string.Empty;
+        scriptEditor.SkriptName = string.Empty;
     }
 
     protected override void EnabledAndFillFormula() {
@@ -50,16 +62,28 @@ internal sealed partial class ImportScript_Editor : AbstractClassEditor<ImportSc
         Enabled = true;
 
         txbName.Text = Item.Name;
-        scriptEditor.ScriptText = Item.Script;
+        scriptEditor.IsRowScript = Item.NeedRow;
+        scriptEditor.SkriptName = Item.Name;
     }
 
     protected override void PrepaireFormula() { }
 
-    private void ScriptEditor_Changed(object sender, System.EventArgs e) {
+    private void chkExternVerfügbar_CheckedChanged(object sender, System.EventArgs e) {
+        Item.ManualExecutable = chkExternVerfügbar.Checked;
         OnChanged();
     }
 
+    private void chkZeile_CheckedChanged(object sender, System.EventArgs e) {
+        Item.NeedRow = chkZeile.Checked;
+        OnChanged();
+    }
+
+    private void ScriptEditor_Changed(object sender, System.EventArgs e) => OnChanged();
+
     private void txbName_TextChanged(object sender, System.EventArgs e) {
+        if (Item == null) { return; }
+
+        Item.Name = txbName.Text;
         OnChanged();
     }
 

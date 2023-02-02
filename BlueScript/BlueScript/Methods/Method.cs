@@ -227,7 +227,7 @@ public abstract class Method : IReadableText {
 
                 //if (!exceptetType.HasFlag(v.Type)) {
                 //    //if (v.Type == VariableDataType.Error) {
-                //    //    return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Attribut " + (n + 1) + ": " + v.Coment);
+                //    //    return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Attribut " + (n + 1) + ": " + v.Comment);
                 //    //}
                 //    //if (exceptetType == VariableDataType.Integer) {
                 //    //    if (v is not VariableFloat vn) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }

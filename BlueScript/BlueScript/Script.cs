@@ -97,6 +97,7 @@ public class Script {
             VarTypes.Sort();
         }
 
+        ReducedScriptText = string.Empty;
         OnlyTesting = onlyTesting;
         Variables = variablen ?? new();
 

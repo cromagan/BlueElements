@@ -54,9 +54,9 @@ public class Method_DisableCellChanges : MethodDatabase {
 
         var ve = s.Variables.GetSystem("CellChangesEnabled");
         if (ve is VariableBool veb) {
-            veb.Readonly = false;
+            veb.ReadOnly = false;
             veb.ValueBool = false;
-            veb.Readonly = true;
+            veb.ReadOnly = true;
         }
 
         return DoItFeedback.Null();

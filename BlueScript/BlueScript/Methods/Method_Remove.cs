@@ -47,7 +47,7 @@ internal class Method_Remove : Method {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-        if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
+        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(); }
 
         var tmpList = ((VariableListString)attvar.Attributes[0]).ValueList;
         for (var z = 2; z < attvar.Attributes.Count; z++) {

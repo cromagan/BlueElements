@@ -79,7 +79,7 @@ internal class Method_BerechneVariable : Method {
 
         if (generateVariable) {
             attvar.Attributes[0].Name = varnam.ToLower();
-            attvar.Attributes[0].Readonly = false;
+            attvar.Attributes[0].ReadOnly = false;
             s.Variables.Add(attvar.Attributes[0]);
             return new DoItFeedback(attvar.Attributes[0]);
         }

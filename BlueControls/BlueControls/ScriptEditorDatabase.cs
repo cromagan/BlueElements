@@ -21,7 +21,11 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueDatabase;
 using BlueScript;
+using System;
 using static BlueBasics.IO;
+using static BlueBasics.Extensions;
+using static BlueScript.Variables.VariableExtensions;
+using System.Collections.ObjectModel;
 
 namespace BlueControls;
 
@@ -30,6 +34,9 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
     #region Fields
 
     private DatabaseAbstract? _database;
+
+    private bool _isRowSkript = false;
+    private string _skriptname = string.Empty;
 
     #endregion
 
@@ -45,7 +52,7 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
         get => _database;
         set {
             if (_database != null) {
-                _database.RulesScript = ScriptText;
+                WriteScriptBack();
                 _database.Disposing -= _Database_Disposing;
             }
             _database = value;
@@ -53,8 +60,31 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
                 return;
             }
 
-            ScriptText = _database.RulesScript;
+            LoadScriptText();
             _database.Disposing += _Database_Disposing;
+        }
+    }
+
+    public bool IsRowScript {
+        get => _isRowSkript;
+        set {
+            if (_isRowSkript == value) { return; }
+            WriteScriptBack();
+            _isRowSkript = value;
+            LoadScriptText();
+        }
+    }
+
+    [Obsolete("Kann nur über Skriptname gesetzt werden!")]
+    public new string ScriptText { get; set; }
+
+    public string SkriptName {
+        get => _skriptname;
+        set {
+            if (_skriptname == value) { return; }
+            WriteScriptBack();
+            _skriptname = value;
+            LoadScriptText();
         }
     }
 
@@ -64,7 +94,15 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
 
     internal void WriteScriptBack() {
         if (_database == null || _database.IsDisposed) { return; }
-        _database.RulesScript = ScriptText;
+
+        var sc = _database.EventScript.CloneWithClones();
+
+        var ev = sc.Get(_skriptname);
+        if (ev == null) { return; }
+
+        ev.Script = base.ScriptText;
+
+        _database.EventScript = new ReadOnlyCollection<EventScript?>(sc);
     }
 
     protected override Script? GenerateAndDoScript() {
@@ -72,30 +110,36 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
             Message("Keine Datenbank geladen.");
             return null;
         }
-        _database.RulesScript = ScriptText;
+        WriteScriptBack();
+        string message = string.Empty;
+        Script? sc = null;
 
-        if (_database.Row.Count == 0) {
-            Message("Zum Test wird zumindest eine Zeile benötigt.");
-            return null;
-        }
-        if (string.IsNullOrEmpty(txbTestZeile.Text)) {
-            txbTestZeile.Text = _database.Row.First().CellFirstString();
-        }
+        if (_isRowSkript) {
+            if (_isRowSkript && _database.Row.Count == 0) {
+                Message("Zum Test wird zumindest eine Zeile benötigt.");
+                return null;
+            }
+            if (string.IsNullOrEmpty(txbTestZeile.Text)) {
+                txbTestZeile.Text = _database.Row.First().CellFirstString();
+            }
 
-        var r = _database.Row[txbTestZeile.Text];
-        if (r == null) {
-            Message("Zeile nicht gefunden.");
-            return null;
-        }
+            var r = _database.Row[txbTestZeile.Text];
+            if (r == null) {
+                Message("Zeile nicht gefunden.");
+                return null;
+            }
 
-        var (_, message, s) = r.DoAutomatic("script testing");
+            var (_, m, s) = r.DoAutomatic(string.Empty, true, _skriptname);
+            message = m;
+            sc = s;
+        }
 
         if (!string.IsNullOrEmpty(message)) {
             Message("Allgemeiner Fehler: " + message);
             return null;
         }
 
-        return s;
+        return sc;
     }
 
     protected override void OpenAdditionalFileFolder() {
@@ -107,6 +151,20 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
     }
 
     private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
+
+    private void LoadScriptText() {
+        if (_database == null || _database.IsDisposed) { return; }
+
+        var sc = _database.EventScript.CloneWithClones();
+
+        var ev = sc.Get(_skriptname);
+        if (ev == null) {
+            base.ScriptText = string.Empty;
+            return;
+        }
+
+        base.ScriptText = ev.Script;
+    }
 
     private void scriptEditor_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         if (e.HotItem is string txt) {

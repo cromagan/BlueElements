@@ -43,7 +43,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capTags = new BlueControls.Controls.Caption();
             this.capInfo = new BlueControls.Controls.Caption();
             this.GlobalTab = new BlueControls.Controls.TabControl();
-            this.Tab_Allgemein = new System.Windows.Forms.TabPage();
+            this.tabAllgemein = new System.Windows.Forms.TabPage();
             this.txbStandardFormulaFile = new BlueControls.Controls.TextBox();
             this.capStandardFormulaFile = new BlueControls.Controls.Caption();
             this.txbAdditionalFiles = new BlueControls.Controls.TextBox();
@@ -53,19 +53,18 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txbGlobalScale = new BlueControls.Controls.TextBox();
             this.caption1 = new BlueControls.Controls.Caption();
             this.btnSpaltenuebersicht = new BlueControls.Controls.Button();
-            this.Tab_Regeln = new System.Windows.Forms.TabPage();
-            this.scriptEditor = new BlueControls.ScriptEditorDatabase();
-            this.tabImportScript = new System.Windows.Forms.TabPage();
-            this.importScriptEditor = new BlueControls.Classes_Editor.ImportScript_Editor();
+            this.tabEvents = new System.Windows.Forms.TabPage();
+            this.tabScripts = new System.Windows.Forms.TabPage();
+            this.eventScriptEditor = new BlueControls.Classes_Editor.EventScript_Editor();
             this.grpVerfügbareSkripte = new BlueControls.Controls.GroupBox();
-            this.lstImportScripts = new BlueControls.Controls.ListBox();
-            this.Tab_Rechte = new System.Windows.Forms.TabPage();
-            this.Tab_Sortierung = new System.Windows.Forms.TabPage();
-            this.Tab_Backup = new System.Windows.Forms.TabPage();
+            this.lstEventScripts = new BlueControls.Controls.ListBox();
+            this.tabRechte = new System.Windows.Forms.TabPage();
+            this.tabSortierung = new System.Windows.Forms.TabPage();
+            this.tabBackup = new System.Windows.Forms.TabPage();
             this.ExportEditor = new BlueControls.Classes_Editor.ExportDefinition_Editor();
             this.grpExport = new BlueControls.Controls.GroupBox();
             this.lbxExportSets = new BlueControls.Controls.ListBox();
-            this.Tab_Undo = new System.Windows.Forms.TabPage();
+            this.tabUndo = new System.Windows.Forms.TabPage();
             this.btnClipboard = new BlueControls.Controls.Button();
             this.tbxUndoAnzahl = new BlueControls.Controls.TextBox();
             this.capUndoAnzahl = new BlueControls.Controls.Caption();
@@ -75,15 +74,14 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
             this.GlobalTab.SuspendLayout();
-            this.Tab_Allgemein.SuspendLayout();
-            this.Tab_Regeln.SuspendLayout();
-            this.tabImportScript.SuspendLayout();
+            this.tabAllgemein.SuspendLayout();
+            this.tabScripts.SuspendLayout();
             this.grpVerfügbareSkripte.SuspendLayout();
-            this.Tab_Rechte.SuspendLayout();
-            this.Tab_Sortierung.SuspendLayout();
-            this.Tab_Backup.SuspendLayout();
+            this.tabRechte.SuspendLayout();
+            this.tabSortierung.SuspendLayout();
+            this.tabBackup.SuspendLayout();
             this.grpExport.SuspendLayout();
-            this.Tab_Undo.SuspendLayout();
+            this.tabUndo.SuspendLayout();
             this.SuspendLayout();
             // 
             // grpBenutzergruppen
@@ -280,13 +278,13 @@ namespace BlueControls.BlueDatabaseDialogs
             this.GlobalTab.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.GlobalTab.Controls.Add(this.Tab_Allgemein);
-            this.GlobalTab.Controls.Add(this.Tab_Regeln);
-            this.GlobalTab.Controls.Add(this.tabImportScript);
-            this.GlobalTab.Controls.Add(this.Tab_Rechte);
-            this.GlobalTab.Controls.Add(this.Tab_Sortierung);
-            this.GlobalTab.Controls.Add(this.Tab_Backup);
-            this.GlobalTab.Controls.Add(this.Tab_Undo);
+            this.GlobalTab.Controls.Add(this.tabAllgemein);
+            this.GlobalTab.Controls.Add(this.tabEvents);
+            this.GlobalTab.Controls.Add(this.tabScripts);
+            this.GlobalTab.Controls.Add(this.tabRechte);
+            this.GlobalTab.Controls.Add(this.tabSortierung);
+            this.GlobalTab.Controls.Add(this.tabBackup);
+            this.GlobalTab.Controls.Add(this.tabUndo);
             this.GlobalTab.HotTrack = true;
             this.GlobalTab.Location = new System.Drawing.Point(0, 0);
             this.GlobalTab.Name = "GlobalTab";
@@ -298,29 +296,29 @@ namespace BlueControls.BlueDatabaseDialogs
             this.GlobalTab.TabIndex = 21;
             this.GlobalTab.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.GlobalTab_Selecting);
             // 
-            // Tab_Allgemein
+            // tabAllgemein
             // 
-            this.Tab_Allgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.Tab_Allgemein.Controls.Add(this.txbStandardFormulaFile);
-            this.Tab_Allgemein.Controls.Add(this.capStandardFormulaFile);
-            this.Tab_Allgemein.Controls.Add(this.txbAdditionalFiles);
-            this.Tab_Allgemein.Controls.Add(this.capAdditional);
-            this.Tab_Allgemein.Controls.Add(this.txbZeilenQuickInfo);
-            this.Tab_Allgemein.Controls.Add(this.capZeilenQuickInfo);
-            this.Tab_Allgemein.Controls.Add(this.txbGlobalScale);
-            this.Tab_Allgemein.Controls.Add(this.caption1);
-            this.Tab_Allgemein.Controls.Add(this.txbTags);
-            this.Tab_Allgemein.Controls.Add(this.btnSpaltenuebersicht);
-            this.Tab_Allgemein.Controls.Add(this.capInfo);
-            this.Tab_Allgemein.Controls.Add(this.capTags);
-            this.Tab_Allgemein.Controls.Add(this.txbCaption);
-            this.Tab_Allgemein.Controls.Add(this.capCaption);
-            this.Tab_Allgemein.Location = new System.Drawing.Point(4, 25);
-            this.Tab_Allgemein.Name = "Tab_Allgemein";
-            this.Tab_Allgemein.Padding = new System.Windows.Forms.Padding(3);
-            this.Tab_Allgemein.Size = new System.Drawing.Size(1039, 616);
-            this.Tab_Allgemein.TabIndex = 1;
-            this.Tab_Allgemein.Text = "Allgemein";
+            this.tabAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabAllgemein.Controls.Add(this.txbStandardFormulaFile);
+            this.tabAllgemein.Controls.Add(this.capStandardFormulaFile);
+            this.tabAllgemein.Controls.Add(this.txbAdditionalFiles);
+            this.tabAllgemein.Controls.Add(this.capAdditional);
+            this.tabAllgemein.Controls.Add(this.txbZeilenQuickInfo);
+            this.tabAllgemein.Controls.Add(this.capZeilenQuickInfo);
+            this.tabAllgemein.Controls.Add(this.txbGlobalScale);
+            this.tabAllgemein.Controls.Add(this.caption1);
+            this.tabAllgemein.Controls.Add(this.txbTags);
+            this.tabAllgemein.Controls.Add(this.btnSpaltenuebersicht);
+            this.tabAllgemein.Controls.Add(this.capInfo);
+            this.tabAllgemein.Controls.Add(this.capTags);
+            this.tabAllgemein.Controls.Add(this.txbCaption);
+            this.tabAllgemein.Controls.Add(this.capCaption);
+            this.tabAllgemein.Location = new System.Drawing.Point(4, 25);
+            this.tabAllgemein.Name = "tabAllgemein";
+            this.tabAllgemein.Padding = new System.Windows.Forms.Padding(3);
+            this.tabAllgemein.Size = new System.Drawing.Size(1039, 616);
+            this.tabAllgemein.TabIndex = 1;
+            this.tabAllgemein.Text = "Allgemein";
             // 
             // txbStandardFormulaFile
             // 
@@ -405,58 +403,45 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnSpaltenuebersicht.Text = "Spaltenübersicht";
             this.btnSpaltenuebersicht.Click += new System.EventHandler(this.btnSpaltenuebersicht_Click);
             // 
-            // Tab_Regeln
+            // tabEvents
             // 
-            this.Tab_Regeln.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.Tab_Regeln.Controls.Add(this.scriptEditor);
-            this.Tab_Regeln.Location = new System.Drawing.Point(4, 25);
-            this.Tab_Regeln.Name = "Tab_Regeln";
-            this.Tab_Regeln.Padding = new System.Windows.Forms.Padding(3);
-            this.Tab_Regeln.Size = new System.Drawing.Size(1039, 616);
-            this.Tab_Regeln.TabIndex = 3;
-            this.Tab_Regeln.Text = "Zeilen-Skript";
+            this.tabEvents.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabEvents.Location = new System.Drawing.Point(4, 25);
+            this.tabEvents.Name = "tabEvents";
+            this.tabEvents.Padding = new System.Windows.Forms.Padding(3);
+            this.tabEvents.Size = new System.Drawing.Size(1039, 616);
+            this.tabEvents.TabIndex = 3;
+            this.tabEvents.Text = "Event-Zuordnungen";
             // 
-            // scriptEditor
+            // tabScripts
             // 
-            this.scriptEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.scriptEditor.Database = null;
-            this.scriptEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.scriptEditor.Location = new System.Drawing.Point(3, 3);
-            this.scriptEditor.Name = "scriptEditor";
-            this.scriptEditor.ScriptText = "";
-            this.scriptEditor.Size = new System.Drawing.Size(1033, 610);
-            this.scriptEditor.TabIndex = 0;
-            this.scriptEditor.TabStop = false;
+            this.tabScripts.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabScripts.Controls.Add(this.eventScriptEditor);
+            this.tabScripts.Controls.Add(this.grpVerfügbareSkripte);
+            this.tabScripts.Location = new System.Drawing.Point(4, 25);
+            this.tabScripts.Name = "tabScripts";
+            this.tabScripts.Padding = new System.Windows.Forms.Padding(3);
+            this.tabScripts.Size = new System.Drawing.Size(1039, 616);
+            this.tabScripts.TabIndex = 7;
+            this.tabScripts.Text = "Skripte";
             // 
-            // tabImportScript
+            // eventScriptEditor
             // 
-            this.tabImportScript.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabImportScript.Controls.Add(this.importScriptEditor);
-            this.tabImportScript.Controls.Add(this.grpVerfügbareSkripte);
-            this.tabImportScript.Location = new System.Drawing.Point(4, 25);
-            this.tabImportScript.Name = "tabImportScript";
-            this.tabImportScript.Padding = new System.Windows.Forms.Padding(3);
-            this.tabImportScript.Size = new System.Drawing.Size(1039, 616);
-            this.tabImportScript.TabIndex = 7;
-            this.tabImportScript.Text = "Import-Skripte";
-            // 
-            // importScript_Editor1
-            // 
-            this.importScriptEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.importScriptEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.importScriptEditor.Location = new System.Drawing.Point(3, 171);
-            this.importScriptEditor.Name = "importScriptEditor";
-            this.importScriptEditor.Size = new System.Drawing.Size(1033, 442);
-            this.importScriptEditor.TabIndex = 3;
-            this.importScriptEditor.TabStop = false;
-            this.importScriptEditor.Text = "importScript_Editor";
-            this.importScriptEditor.Changed += new System.EventHandler(this.importScript_Editor1_Changed);
+            this.eventScriptEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.eventScriptEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.eventScriptEditor.Location = new System.Drawing.Point(3, 171);
+            this.eventScriptEditor.Name = "eventScriptEditor";
+            this.eventScriptEditor.Size = new System.Drawing.Size(1033, 442);
+            this.eventScriptEditor.TabIndex = 3;
+            this.eventScriptEditor.TabStop = false;
+            this.eventScriptEditor.Text = "eventScript_Editor";
+            this.eventScriptEditor.Changed += new System.EventHandler(this.eventScript_Editor1_Changed);
             // 
             // grpVerfügbareSkripte
             // 
             this.grpVerfügbareSkripte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpVerfügbareSkripte.CausesValidation = false;
-            this.grpVerfügbareSkripte.Controls.Add(this.lstImportScripts);
+            this.grpVerfügbareSkripte.Controls.Add(this.lstEventScripts);
             this.grpVerfügbareSkripte.Dock = System.Windows.Forms.DockStyle.Top;
             this.grpVerfügbareSkripte.Location = new System.Drawing.Point(3, 3);
             this.grpVerfügbareSkripte.Name = "grpVerfügbareSkripte";
@@ -465,57 +450,57 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpVerfügbareSkripte.TabStop = false;
             this.grpVerfügbareSkripte.Text = "Verfügbare Skripte:";
             // 
-            // lstImportScripts
+            // lstEventScripts
             // 
-            this.lstImportScripts.AddAllowed = BlueControls.Enums.AddType.UserDef;
-            this.lstImportScripts.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.lstEventScripts.AddAllowed = BlueControls.Enums.AddType.UserDef;
+            this.lstEventScripts.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lstImportScripts.FilterAllowed = true;
-            this.lstImportScripts.Location = new System.Drawing.Point(8, 24);
-            this.lstImportScripts.Name = "lstImportScripts";
-            this.lstImportScripts.RemoveAllowed = true;
-            this.lstImportScripts.Size = new System.Drawing.Size(1018, 136);
-            this.lstImportScripts.TabIndex = 0;
-            this.lstImportScripts.AddClicked += new System.EventHandler(this.lstImportScripts_AddClicked);
-            this.lstImportScripts.ItemCheckedChanged += new System.EventHandler(this.lstImportScripts_ItemCheckedChanged);
+            this.lstEventScripts.FilterAllowed = true;
+            this.lstEventScripts.Location = new System.Drawing.Point(8, 24);
+            this.lstEventScripts.Name = "lstEventScripts";
+            this.lstEventScripts.RemoveAllowed = true;
+            this.lstEventScripts.Size = new System.Drawing.Size(1018, 136);
+            this.lstEventScripts.TabIndex = 0;
+            this.lstEventScripts.AddClicked += new System.EventHandler(this.lstEventScripts_AddClicked);
+            this.lstEventScripts.ItemCheckedChanged += new System.EventHandler(this.lstEventScripts_ItemCheckedChanged);
             // 
-            // Tab_Rechte
+            // tabRechte
             // 
-            this.Tab_Rechte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.Tab_Rechte.Controls.Add(this.grpKennwort);
-            this.Tab_Rechte.Controls.Add(this.grpBenutzergruppen);
-            this.Tab_Rechte.Location = new System.Drawing.Point(4, 25);
-            this.Tab_Rechte.Name = "Tab_Rechte";
-            this.Tab_Rechte.Padding = new System.Windows.Forms.Padding(3);
-            this.Tab_Rechte.Size = new System.Drawing.Size(1039, 616);
-            this.Tab_Rechte.TabIndex = 4;
-            this.Tab_Rechte.Text = "Rechte";
+            this.tabRechte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabRechte.Controls.Add(this.grpKennwort);
+            this.tabRechte.Controls.Add(this.grpBenutzergruppen);
+            this.tabRechte.Location = new System.Drawing.Point(4, 25);
+            this.tabRechte.Name = "tabRechte";
+            this.tabRechte.Padding = new System.Windows.Forms.Padding(3);
+            this.tabRechte.Size = new System.Drawing.Size(1039, 616);
+            this.tabRechte.TabIndex = 4;
+            this.tabRechte.Text = "Rechte";
             // 
-            // Tab_Sortierung
+            // tabSortierung
             // 
-            this.Tab_Sortierung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.Tab_Sortierung.Controls.Add(this.lbxSortierSpalten);
-            this.Tab_Sortierung.Controls.Add(this.capSortierspalten);
-            this.Tab_Sortierung.Controls.Add(this.btnSortRichtung);
-            this.Tab_Sortierung.Location = new System.Drawing.Point(4, 25);
-            this.Tab_Sortierung.Name = "Tab_Sortierung";
-            this.Tab_Sortierung.Padding = new System.Windows.Forms.Padding(3);
-            this.Tab_Sortierung.Size = new System.Drawing.Size(1039, 616);
-            this.Tab_Sortierung.TabIndex = 2;
-            this.Tab_Sortierung.Text = "Sortierung";
+            this.tabSortierung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabSortierung.Controls.Add(this.lbxSortierSpalten);
+            this.tabSortierung.Controls.Add(this.capSortierspalten);
+            this.tabSortierung.Controls.Add(this.btnSortRichtung);
+            this.tabSortierung.Location = new System.Drawing.Point(4, 25);
+            this.tabSortierung.Name = "tabSortierung";
+            this.tabSortierung.Padding = new System.Windows.Forms.Padding(3);
+            this.tabSortierung.Size = new System.Drawing.Size(1039, 616);
+            this.tabSortierung.TabIndex = 2;
+            this.tabSortierung.Text = "Sortierung";
             // 
-            // Tab_Backup
+            // tabBackup
             // 
-            this.Tab_Backup.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.Tab_Backup.Controls.Add(this.ExportEditor);
-            this.Tab_Backup.Controls.Add(this.grpExport);
-            this.Tab_Backup.Location = new System.Drawing.Point(4, 25);
-            this.Tab_Backup.Name = "Tab_Backup";
-            this.Tab_Backup.Padding = new System.Windows.Forms.Padding(3);
-            this.Tab_Backup.Size = new System.Drawing.Size(1039, 616);
-            this.Tab_Backup.TabIndex = 5;
-            this.Tab_Backup.Text = "Backup & Export";
+            this.tabBackup.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabBackup.Controls.Add(this.ExportEditor);
+            this.tabBackup.Controls.Add(this.grpExport);
+            this.tabBackup.Location = new System.Drawing.Point(4, 25);
+            this.tabBackup.Name = "tabBackup";
+            this.tabBackup.Padding = new System.Windows.Forms.Padding(3);
+            this.tabBackup.Size = new System.Drawing.Size(1039, 616);
+            this.tabBackup.TabIndex = 5;
+            this.tabBackup.Text = "Backup & Export";
             // 
             // ExportEditor
             // 
@@ -564,18 +549,18 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lbxExportSets.ItemCheckedChanged += new System.EventHandler(this.lbxExportSets_ItemCheckedChanged);
             this.lbxExportSets.RemoveClicked += new System.EventHandler<BlueControls.EventArgs.ListOfBasicListItemEventArgs>(this.lbxExportSets_RemoveClicked);
             // 
-            // Tab_Undo
+            // tabUndo
             // 
-            this.Tab_Undo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.Tab_Undo.Controls.Add(this.btnClipboard);
-            this.Tab_Undo.Controls.Add(this.tbxUndoAnzahl);
-            this.Tab_Undo.Controls.Add(this.capUndoAnzahl);
-            this.Tab_Undo.Controls.Add(this.tblUndo);
-            this.Tab_Undo.Location = new System.Drawing.Point(4, 25);
-            this.Tab_Undo.Name = "Tab_Undo";
-            this.Tab_Undo.Size = new System.Drawing.Size(1039, 616);
-            this.Tab_Undo.TabIndex = 6;
-            this.Tab_Undo.Text = "Undo";
+            this.tabUndo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabUndo.Controls.Add(this.btnClipboard);
+            this.tabUndo.Controls.Add(this.tbxUndoAnzahl);
+            this.tabUndo.Controls.Add(this.capUndoAnzahl);
+            this.tabUndo.Controls.Add(this.tblUndo);
+            this.tabUndo.Location = new System.Drawing.Point(4, 25);
+            this.tabUndo.Name = "tabUndo";
+            this.tabUndo.Size = new System.Drawing.Size(1039, 616);
+            this.tabUndo.TabIndex = 6;
+            this.tabUndo.Text = "Undo";
             // 
             // btnClipboard
             // 
@@ -653,15 +638,14 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpBenutzergruppen.ResumeLayout(false);
             this.grpKennwort.ResumeLayout(false);
             this.GlobalTab.ResumeLayout(false);
-            this.Tab_Allgemein.ResumeLayout(false);
-            this.Tab_Regeln.ResumeLayout(false);
-            this.tabImportScript.ResumeLayout(false);
+            this.tabAllgemein.ResumeLayout(false);
+            this.tabScripts.ResumeLayout(false);
             this.grpVerfügbareSkripte.ResumeLayout(false);
-            this.Tab_Rechte.ResumeLayout(false);
-            this.Tab_Sortierung.ResumeLayout(false);
-            this.Tab_Backup.ResumeLayout(false);
+            this.tabRechte.ResumeLayout(false);
+            this.tabSortierung.ResumeLayout(false);
+            this.tabBackup.ResumeLayout(false);
             this.grpExport.ResumeLayout(false);
-            this.Tab_Undo.ResumeLayout(false);
+            this.tabUndo.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -679,14 +663,14 @@ namespace BlueControls.BlueDatabaseDialogs
         private ListBox lbxSortierSpalten;
         private Caption Caption22;
         private ListBox DatenbankAdmin;
-        private  System.Windows.Forms.TabPage Tab_Allgemein;
-        private  System.Windows.Forms.TabPage Tab_Sortierung;
-        private  System.Windows.Forms.TabPage Tab_Regeln;
-        private  System.Windows.Forms.TabPage Tab_Rechte;
-        private  System.Windows.Forms.TabPage Tab_Backup;
+        private  System.Windows.Forms.TabPage tabAllgemein;
+        private  System.Windows.Forms.TabPage tabSortierung;
+        private  System.Windows.Forms.TabPage tabEvents;
+        private  System.Windows.Forms.TabPage tabRechte;
+        private  System.Windows.Forms.TabPage tabBackup;
         private GroupBox grpKennwort;
         private GroupBox grpBenutzergruppen;
-        private  System.Windows.Forms.TabPage Tab_Undo;
+        private  System.Windows.Forms.TabPage tabUndo;
         private ListBox lbxExportSets;
         private Caption capKennwort;
         private GroupBox grpExport;
@@ -705,13 +689,12 @@ namespace BlueControls.BlueDatabaseDialogs
         private TextBox txbAdditionalFiles;
         private Caption capAdditional;
         private Button btnSave;
-        private ScriptEditorDatabase scriptEditor;
         private Button btnClipboard;
         private TextBox txbStandardFormulaFile;
         private Caption capStandardFormulaFile;
-        private System.Windows.Forms.TabPage tabImportScript;
+        private System.Windows.Forms.TabPage tabScripts;
         private GroupBox grpVerfügbareSkripte;
-        private ListBox lstImportScripts;
-        private ImportScript_Editor importScriptEditor;
+        private ListBox lstEventScripts;
+        private EventScript_Editor eventScriptEditor;
     }
 }

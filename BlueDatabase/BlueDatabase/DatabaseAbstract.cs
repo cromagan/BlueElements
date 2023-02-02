@@ -32,6 +32,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
@@ -63,22 +64,20 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     private readonly List<ColumnViewCollection> _columnArrangements = new();
     private readonly List<string> _datenbankAdmin = new();
 
+    private readonly List<Variable> _events = new();
+    private readonly List<EventScript?> _EventScript = new();
+
     /// <summary>
     /// Exporte werden nur internal verwaltet. Wegen zu vieler erzeigter Pendings, z.B. bei LayoutExport.
     /// Der Head-Editor kann und muss (manuelles Löschen) auf die Exporte Zugreifen und kümmert sich auch um die Pendings
     /// </summary>
     private readonly List<ExportDefinition?> _export = new();
 
-    private readonly List<ImportScript?> _importScript = new();
-
     private readonly LayoutCollection _layouts = new();
-
     private readonly List<string> _permissionGroupsNewRow = new();
-
     private readonly long _startTick = DateTime.UtcNow.Ticks;
-
     private readonly List<string> _tags = new();
-
+    private readonly List<Variable> _variables = new();
     private string _additionalFilesPfad = string.Empty;
 
     private BackgroundWorker? _backgroundWorker;
@@ -102,7 +101,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     private DateTime _lastUserActionUtc = new(1900, 1, 1);
 
-    private string _rulesScript = string.Empty;
+    //private string _rulesScript = string.Empty;
 
     private RowSortDefinition? _sortDefinition;
 
@@ -243,6 +242,23 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         }
     }
 
+    public ReadOnlyCollection<Variable> Events {
+        get => new(_events);
+        set {
+            if (_events.ToString(true) == value.ToString(true)) { return; }
+            _ = ChangeData(DatabaseDataType.Events, null, null, _events.ToString(true), value.ToString(true), string.Empty);
+            OnViewChanged();
+        }
+    }
+
+    public ReadOnlyCollection<EventScript?> EventScript {
+        get => new(_EventScript);
+        set {
+            if (_EventScript.ToString(false) == value.ToString(false)) { return; }
+            _ = ChangeData(DatabaseDataType.EventScript, null, null, _EventScript.ToString(true), value.ToString(true), string.Empty);
+        }
+    }
+
     public ReadOnlyCollection<ExportDefinition?> Export {
         get => new(_export);
         set {
@@ -280,14 +296,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     //}
     public bool HasPendingChanges { get; protected set; } = false;
 
-    public ReadOnlyCollection<ImportScript?> ImportScript {
-        get => new(_importScript);
-        set {
-            if (_importScript.ToString(false) == value.ToString(false)) { return; }
-            _ = ChangeData(DatabaseDataType.ImportScript, null, null, _importScript.ToString(true), value.ToString(true), string.Empty);
-        }
-    }
-
     public bool IsDisposed { get; private set; }
 
     /// <summary>
@@ -319,13 +327,13 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
     public bool ReadOnly { get; private set; }
 
-    public string RulesScript {
-        get => _rulesScript;
-        set {
-            if (_rulesScript == value) { return; }
-            _ = ChangeData(DatabaseDataType.RulesScript, null, null, _rulesScript, value, string.Empty);
-        }
-    }
+    //public string RulesScript {
+    //    get => _rulesScript;
+    //    set {
+    //        if (_rulesScript == value) { return; }
+    //        _ = ChangeData(DatabaseDataType.RulesScript, null, null, _rulesScript, value, string.Empty);
+    //    }
+    //}
 
     [Browsable(false)]
     public RowSortDefinition? SortDefinition {
@@ -369,6 +377,15 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         set {
             if (_undoCount == value) { return; }
             _ = ChangeData(DatabaseDataType.UndoCount, null, null, _undoCount.ToString(), value.ToString(), string.Empty);
+        }
+    }
+
+    public ReadOnlyCollection<Variable> Variables {
+        get => new(_variables);
+        set {
+            if (_variables.ToString(true) == value.ToString(true)) { return; }
+            _ = ChangeData(DatabaseDataType.DatabaseVariables, null, null, _variables.ToString(true), value.ToString(true), string.Empty);
+            OnViewChanged();
         }
     }
 
@@ -691,7 +708,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         //TimeCode - nope
         GlobalScale = sourceDatabase.GlobalScale;
         GlobalShowPass = sourceDatabase.GlobalShowPass;
-        RulesScript = sourceDatabase.RulesScript;
+        //RulesScript = sourceDatabase.RulesScript;
         if (SortDefinition == null || SortDefinition.ToString() != sourceDatabase.SortDefinition?.ToString()) {
             SortDefinition = new RowSortDefinition(this, sourceDatabase.SortDefinition?.ToString());
         }
@@ -714,7 +731,9 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
         Export = sourceDatabase.Export;
 
-        ImportScript = sourceDatabase.ImportScript;
+        EventScript = sourceDatabase.EventScript;
+        Variables = sourceDatabase.Variables;
+        Events = sourceDatabase.Events;
 
         UndoCount = sourceDatabase.UndoCount;
     }
@@ -740,7 +759,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             first = false;
         }
         if (cola) { t += " - Benutzerdefinierte Spalten-Anordnungen<br>"; }
-        if (RulesScript.ToUpper().Contains(column.Name.ToUpper())) { t += " - Regeln-Skript<br>"; }
+        //if (RulesScript.ToUpper().Contains(column.Name.ToUpper())) { t += " - Regeln-Skript<br>"; }
         if (ZeilenQuickInfo.ToUpper().Contains(column.Name.ToUpper())) { t += " - Zeilen-Quick-Info<br>"; }
         if (_tags.JoinWithCr().ToUpper().Contains(column.Name.ToUpper())) { t += " - Datenbank-Tags<br>"; }
         var layout = false;
@@ -1127,7 +1146,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                 } else {
                     row?.CellSet(columns[spaltNo], zeil[zeilNo][spaltNo].SplitAndCutBy("|").JoinWithCr());
                 }
-                if (row != null && dorowautmatic) { _ = row.DoAutomatic(true, true, "import"); }
+                if (row != null && dorowautmatic) { _ = row.DoAutomatic(true, true, "import", false, string.Empty); }
             }
         }
 
@@ -1293,6 +1312,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     public bool RefreshRowData(RowItem row, bool refreshAlways) => RefreshRowData(new List<RowItem>() { row }, refreshAlways);
 
     public virtual void RepairAfterParse() {
+        RepairEvents();
         Column.Repair();
         RepairColumnArrangements();
         RepairViews();
@@ -1517,11 +1537,11 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                 }
                 break;
 
-            case DatabaseDataType.ImportScript:
-                _importScript.Clear();
+            case DatabaseDataType.EventScript:
+                _EventScript.Clear();
                 List<string> ai = new(value.SplitAndCutByCr());
                 foreach (var t in ai) {
-                    _importScript.Add(new ImportScript(this, t));
+                    _EventScript.Add(new EventScript(this, t));
                 }
                 break;
 
@@ -1541,8 +1561,9 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                 _globalShowPass = value;
                 break;
 
-            case DatabaseDataType.RulesScript:
-                _rulesScript = value;
+            case (DatabaseDataType)67: //.RulesScript:
+                ConvertRules(value);
+                //_rulesScript = value;
                 break;
 
             case DatabaseDataType.UndoCount:
@@ -1649,11 +1670,14 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         //_timeCode = string.Empty;
         //_verwaisteDaten = VerwaisteDaten.Ignorieren;
         LoadedVersion = DatabaseVersion;
-        _rulesScript = string.Empty;
+        //_rulesScript = string.Empty;
         _globalScale = 1f;
         _additionalFilesPfad = "AdditionalFiles";
         _zeilenQuickInfo = string.Empty;
         _sortDefinition = null;
+        _events.Clear();
+        _variables.Clear();
+        _events.Clear();
     }
 
     protected void OnLoaded() {
@@ -1759,6 +1783,35 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         //}
     }
 
+    private void ConvertRules(string scriptText) {
+        RepairEvents();
+
+        //var eves = EventScript.CloneWithClones();
+        var l = new EventScript(this) {
+            NeedRow = true,
+            ManualExecutable = false,
+            Script = scriptText,
+            Name = "Main"
+        };
+        _EventScript.Add(l);
+
+        foreach (var thisevent in _events) {
+            if (thisevent is VariableString s) {
+                s.ValueString = thisevent.Name.Replace(" ", "_");
+
+                var sc = new EventScript(this) {
+                    Name = s.ValueString,
+                    NeedRow = true,
+                    ManualExecutable = false,
+                    Script = "//ACHTUNG: Keinesfalls dürfen Startroutinenabhängig Werte verändert werden.\r\n" +
+                             "var Startroutine = \"" + thisevent.Name + "\";\r\n" +
+                             "Call(\"Main\", false);"
+                };
+                _EventScript.Add(sc);
+            }
+        }
+    }
+
     private void DisposeBackgroundWorker() {
         CancelBackGroundWorker();
 
@@ -1767,20 +1820,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             _backgroundWorker.DoWork -= BackgroundWorker_DoWork;
         }
     }
-
-    //private void Column_ItemAdded(object sender, ListEventArgs e) {
-    //    if (IsLoadingx) { return; }
-    //    CheckViewsAndArrangements();
-    //}
-
-    //private void Column_ItemRemoved(object sender, System.EventArgs e) {
-    //    //if (IsLoadingx) { Develop.DebugPrint(FehlerArt.Warnung, "Loading Falsch!"); }
-    //    CheckViewsAndArrangements();
-
-    //    var lay = (LayoutCollection)Layouts.Clone();
-    //    lay.Check();
-    //    Layouts = lay;
-    //}
 
     private bool IsThereBackgroundWorkToDo() {
         if (IsDisposed || ReadOnly || !LogUndo) { return false; }
@@ -1799,13 +1838,24 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         return false;
     }
 
+    //    var lay = (LayoutCollection)Layouts.Clone();
+    //    lay.Check();
+    //    Layouts = lay;
+    //}
     private void OnDisposing() => Disposing?.Invoke(this, System.EventArgs.Empty);
 
+    //private void Column_ItemRemoved(object sender, System.EventArgs e) {
+    //    //if (IsLoadingx) { Develop.DebugPrint(FehlerArt.Warnung, "Loading Falsch!"); }
+    //    CheckViewsAndArrangements();
     private void OnSortParameterChanged() {
         if (IsDisposed) { return; }
         SortParameterChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
+    //private void Column_ItemAdded(object sender, ListEventArgs e) {
+    //    if (IsLoadingx) { return; }
+    //    CheckViewsAndArrangements();
+    //}
     private bool PermissionCheckWithoutAdmin(string allowed, RowItem? row) {
         var tmpName = UserName.ToUpper();
         var tmpGroup = UserGroup.ToUpper();
@@ -1867,6 +1917,20 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             var l = new List<string>();
             l.Save(fullhashname, Encoding.UTF8, false);
         } catch { }
+    }
+
+    private void RepairEvents() {
+        var possnames = new List<string>() { "new row", "value changed", "manual check", "to be sure", "import", "export", "script" };
+
+        //var ev = _events.CloneWithClones() ?? new List<Variable?>();
+
+        foreach (var thisName in possnames) {
+            var e = _events.Get(thisName);
+
+            if (e == null) {
+                _events.Set(thisName, string.Empty);
+            }
+        }
     }
 
     //private void Row_RowAdded(object sender, RowEventArgs e) {

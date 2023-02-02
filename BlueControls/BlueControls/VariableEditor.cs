@@ -56,14 +56,14 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
             var ro = RowOfVariable(thisv) ?? tableVariablen.Database.Row.GenerateAndAdd(thisv.Name, "Neue Variable");
 
             ro.CellSet("typ", thisv.ShortName);
-            ro.CellSet("RO", thisv.Readonly);
+            ro.CellSet("RO", thisv.ReadOnly);
             ro.CellSet("System", thisv.SystemVariable);
 
             var tmpi = thisv.ReadableText;
             if (tmpi.Length > 500) { tmpi = tmpi.Substring(0, 500) + "..."; }
 
             ro.CellSet("Inhalt", tmpi);
-            ro.CellSet("Kommentar", thisv.Coment);
+            ro.CellSet("Kommentar", thisv.Comment);
         }
     }
 

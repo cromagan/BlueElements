@@ -33,7 +33,7 @@ public class VariableFilterItem : Variable {
 
     #region Constructors
 
-    public VariableFilterItem(string name, FilterItem value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _filter = value;
+    public VariableFilterItem(string name, FilterItem value, bool ronly, bool system, string Comment) : base(name, ronly, system, Comment) => _filter = value;
 
     public VariableFilterItem(string name) : this(name, null!, true, false, string.Empty) { }
 
@@ -44,36 +44,47 @@ public class VariableFilterItem : Variable {
     #region Properties
 
     public static string ShortName_Variable => "*fil";
+
     public override int CheckOrder => 99;
 
     public FilterItem FilterItem {
         get => _filter;
         set {
-            if (Readonly) { return; }
+            if (ReadOnly) { return; }
             _filter = value;
         }
     }
 
     public override bool GetFromStringPossible => false;
+
     public override bool IsNullOrEmpty => _filter == null;
+
     public override string ShortName => "fil";
+
     public override bool ToStringPossible => false;
 
     #endregion
 
     #region Methods
 
+    public override object Clone() {
+        var v = new VariableFilterItem(Name);
+        v.Parse(ToString());
+        return v;
+    }
+
     public override DoItFeedback GetValueFrom(Variable variable) {
         if (variable is not VariableFilterItem v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
-        if (Readonly) { return DoItFeedback.Schreibgschützt(); }
+        if (ReadOnly) { return DoItFeedback.Schreibgschützt(); }
         FilterItem = v.FilterItem;
         return DoItFeedback.Null();
     }
 
-    protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
-        succesVar = null;
-        return false;
-    }
+    protected override Variable? NewWithThisValue(object x, Script s) => null;
+
+    protected override void SetValue(object? x) { }
+
+    protected override object? TryParse(string txt, Script? s) => null;
 
     #endregion
 }

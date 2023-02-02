@@ -130,16 +130,22 @@ public enum DatabaseDataType : byte {
 
     //VerwaisteDaten = 62,
 
-    ImportScript = 63,
+    EventScript = 63,
     GlobalScale = 64,
 
     //FilterImagePfad = 65,
 
     RowQuickInfo = 66,
-    RulesScript = 67,
+
+    //RulesScript = 67,
     AdditionalFilesPath = 68,
+
     StandardFormulaFile = 69,
+
     //FirstColumn = 70,
+    DatabaseVariables = 71,
+
+    Events = 72,
 
     //Info_ColumDataSart = 100,
     //Info_ColumnDataEnd = 199,

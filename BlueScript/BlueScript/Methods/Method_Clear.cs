@@ -45,7 +45,7 @@ internal class Method_Clear : Method {
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
-        if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
+        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(); }
         ((VariableListString)attvar.Attributes[0]).ValueList = new List<string>();
         return DoItFeedback.Null();
     }

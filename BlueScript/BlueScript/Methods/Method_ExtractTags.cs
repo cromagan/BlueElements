@@ -51,8 +51,8 @@ internal class Method_ExtractTags : Method {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-        const string coment = "Mit dem Befehl 'ExtractTags' erstellt";
-        s.Variables.RemoveWithComment(coment);
+        const string Comment = "Mit dem Befehl 'ExtractTags' erstellt";
+        s.Variables.RemoveWithComment(Comment);
 
         var tags = new List<string>();
         if (attvar.Attributes[0] is VariableString vs) { tags.Add(vs.ValueString); }
@@ -65,7 +65,7 @@ internal class Method_ExtractTags : Method {
                 var vn = x[0].ToLower().ReduceToChars(Constants.AllowedCharsVariableName);
                 var thisv = x[1].Trim();
                 if (!string.IsNullOrEmpty(vn) && !string.IsNullOrEmpty(thisv)) {
-                    s.Variables.Add(new VariableString("extracted_" + vn, thisv, true, false, coment));
+                    s.Variables.Add(new VariableString("extracted_" + vn, thisv, true, false, Comment));
                 }
             }
         }

@@ -19,6 +19,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -31,7 +32,7 @@ using static BlueBasics.Geometry;
 
 namespace BlueControls;
 
-public sealed class PointM : IMoveable {
+public sealed class PointM : IMoveable, IHasKeyName {
 
     #region Fields
 
@@ -96,6 +97,7 @@ public sealed class PointM : IMoveable {
 
     #region Properties
 
+    public string KeyName => Name;
     public float Magnitude => (float)Math.Sqrt((_x * _x) + (_y * _y));
     public string Name { get; private set; }
     public object? Parent { get; set; }

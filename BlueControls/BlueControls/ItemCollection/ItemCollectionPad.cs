@@ -438,7 +438,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
     public void ParseVariable(RowItem? row) {
         if (row == null) { return; }
 
-        var (_, _, script) = row.DoAutomatic("export");
+        var (_, _, script) = row.DoAutomatic("export", false, string.Empty);
         if (script?.Variables == null) { return; }
         foreach (var thisV in script.Variables) {
             _ = ParseVariable(thisV);

@@ -17,7 +17,9 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueScript.Structures;
+using System;
 
 namespace BlueScript.Variables;
 
@@ -31,7 +33,7 @@ public class VariableString : Variable {
 
     #region Constructors
 
-    public VariableString(string name, string value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _valueString = value.RestoreCriticalVariableChars();
+    public VariableString(string name, string value, bool ronly, bool system, string comment) : base(name, ronly, system, comment) => _valueString = value.RestoreCriticalVariableChars();
 
     /// <summary>
     /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
@@ -46,9 +48,13 @@ public class VariableString : Variable {
     #region Properties
 
     public static string ShortName_Plain => "str";
+
     public static string ShortName_Variable => "*str";
+
     public override int CheckOrder => 2;
+
     public override bool GetFromStringPossible => true;
+
     public override bool IsNullOrEmpty => string.IsNullOrEmpty(_valueString);
 
     /// <summary>
@@ -57,6 +63,7 @@ public class VariableString : Variable {
     public override string ReadableText => _valueString;
 
     public override string ShortName => "str";
+
     public override bool ToStringPossible => true;
 
     /// <summary>
@@ -70,7 +77,7 @@ public class VariableString : Variable {
     public string ValueString {
         get => _valueString;
         set {
-            if (Readonly) { return; }
+            if (ReadOnly) { return; }
             _valueString = value.RestoreCriticalVariableChars(); // Variablen enthalten immer den richtigen Wert und es werden nur beim Ersetzen im Script die kritischen Zeichen entfernt
         }
     }
@@ -79,25 +86,42 @@ public class VariableString : Variable {
 
     #region Methods
 
+    public override object Clone() {
+        var v = new VariableString(Name);
+        v.Parse(ToString());
+        return v;
+    }
+
     public override DoItFeedback GetValueFrom(Variable variable) {
         if (variable is not VariableString v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
-        if (Readonly) { return DoItFeedback.Schreibgschützt(); }
+        if (ReadOnly) { return DoItFeedback.Schreibgschützt(); }
         ValueString = v.ValueString;
         return DoItFeedback.Null();
     }
 
-    protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
-        succesVar = null;
+    protected override Variable? NewWithThisValue(object x, Script s) {
+        var v = new VariableString(string.Empty);
+        v.SetValue(x);
+        return v;
+    }
+
+    protected override void SetValue(object? x) {
+        if (x is string val) {
+            _valueString = val;
+        } else {
+            Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Variablenfehler!");
+        }
+    }
+
+    protected override object? TryParse(string txt, Script? s) {
         if (txt.Length > 1 && txt.StartsWith("\"") && txt.EndsWith("\"")) {
             var tmp = txt.Substring(1, txt.Length - 2); // Nicht Trimmen! Ansonsten wird sowas falsch: "X=" + "";
             tmp = tmp.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
             if (tmp.Contains("\"")) { return false; } //SetError("Verkettungsfehler"); return; } // Beispiel: s ist nicht definiert und "jj" + s + "kk
 
-            succesVar = new VariableString(DummyName(), tmp);
-            return true;
+            return tmp;
         }
-
-        return false;
+        return null;
     }
 
     #endregion

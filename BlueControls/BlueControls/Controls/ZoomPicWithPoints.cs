@@ -31,6 +31,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.IO;
+using static BlueBasics.Extensions;
 
 namespace BlueControls.Controls;
 
@@ -135,8 +136,6 @@ public partial class ZoomPicWithPoints : ZoomPic {
         return GenerateBitmapListItem(Bmp, Tags);
     }
 
-    public PointM? GetPoint(string name) => _points.FirstOrDefault(thisp => thisp != null && string.Equals(thisp.Name, name, StringComparison.OrdinalIgnoreCase));
-
     public void LetUserAddAPoint(string pointName, Helpers helper, BlueBasics.Enums.Orientation mittelline) {
         _mittelLinie = mittelline;
         _helper = helper;
@@ -161,7 +160,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
     }
 
     public void PointRemove(string name) {
-        var p = GetPoint(name);
+        var p = _points.Get(name);
         if (p == null) { return; }
         _ = _points.Remove(p);
         WritePointsInTags();
@@ -171,7 +170,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
     public void PointSet(string name, int x, int y) => PointSet(name, x, (float)y);
 
     public void PointSet(string name, float x, float y) {
-        var p = GetPoint(name);
+        var p = _points.Get(name);
         if (p == null) {
             p = new PointM(name, x, y);
             _points.Add(p);

@@ -109,9 +109,9 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
             }
 
             if (!did && thischild is IAcceptVariableList rv) {
-                if (row != null && rv.OriginalText.Contains("~") && con.Script == null) {
-                    (_, _, con.Script) = row.DoAutomatic("to be sure");
-                }
+                //if (row != null && rv.OriginalText.Contains("~") && con.Script == null) {
+                //    (_, _, con.Script) = row.DoAutomatic("to be sure", false);
+                //}
 
                 DoChilds_VariableList(rv, con.Script);
                 did = true;

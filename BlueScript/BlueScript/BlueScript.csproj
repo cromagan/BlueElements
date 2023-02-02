@@ -82,8 +82,6 @@
     <Compile Include="Methods\Method_IsDateTime.cs" />
     <Compile Include="Methods\Method_SortNum.cs" />
     <Compile Include="Methods\Method_ExtractTags.cs" />
-    <Compile Include="Methods\Method_Call.cs" />
-    <Compile Include="Methods\Method_Sub.cs" />
     <Compile Include="Methods\Method_FileExists.cs" />
     <Compile Include="Methods\Method_TrimEnd.cs" />
     <Compile Include="Methods\Method_TrimStart.cs" />
@@ -132,7 +130,6 @@
     <Compile Include="Variables\VariableListString.cs" />
     <Compile Include="Variables\VariableFloat.cs" />
     <Compile Include="Variables\VariableDateTime.cs" />
-    <Compile Include="Variables\VariableSub.cs" />
     <Compile Include="Variables\VariableUnknown.cs" />
     <Compile Include="Variables\VariableString.cs" />
     <Compile Include="Variables\Variable.cs" />

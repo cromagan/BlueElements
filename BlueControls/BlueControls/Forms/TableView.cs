@@ -497,7 +497,7 @@ public partial class TableView : Form, IHasStatusbar {
                 break;
 
             case "Fehlersuche":
-                MessageBox.Show(row.DoAutomatic(true, true, 10, "manual check").error);
+                MessageBox.Show(row.DoAutomatic(true, true, 10, "manual check", false, string.Empty).error);
                 break;
 
             case "ZeileLöschen":
@@ -617,7 +617,7 @@ public partial class TableView : Form, IHasStatusbar {
 
     private void btnDatenüberprüfung_Click(object sender, System.EventArgs e) {
         if (Table.Database == null || !Table.Database.IsAdministrator()) { return; }
-        var m = Table.Database.Row.DoAutomatic(Table.Filter, true, Table.PinnedRows, "manual check");
+        var m = Table.Database.Row.DoAutomatic(Table.Filter, true, Table.PinnedRows, "manual check", false, string.Empty);
 
         if (!string.IsNullOrEmpty(m)) {
             MessageBox.Show(m);

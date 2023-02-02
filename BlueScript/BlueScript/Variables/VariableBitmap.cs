@@ -19,6 +19,7 @@
 
 using BlueScript.Structures;
 using System.Drawing;
+using System.Runtime.Remoting.Messaging;
 
 namespace BlueScript.Variables;
 
@@ -32,7 +33,7 @@ public class VariableBitmap : Variable {
 
     #region Constructors
 
-    public VariableBitmap(string name, Bitmap? value, bool ronly, bool system, string coment) : base(name, ronly, system, coment) => _bmp = value;
+    public VariableBitmap(string name, Bitmap? value, bool ronly, bool system, string comment) : base(name, ronly, system, comment) => _bmp = value;
 
     /// <summary>
     /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
@@ -56,7 +57,7 @@ public class VariableBitmap : Variable {
     public Bitmap? ValueBitmap {
         get => _bmp;
         set {
-            if (Readonly) { return; }
+            if (ReadOnly) { return; }
             _bmp = value;
         }
     }
@@ -65,17 +66,24 @@ public class VariableBitmap : Variable {
 
     #region Methods
 
+    public override object Clone() {
+        var v = new VariableBitmap(Name);
+        v.Parse(ToString());
+        return v;
+    }
+
     public override DoItFeedback GetValueFrom(Variable variable) {
         if (variable is not VariableBitmap v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
-        if (Readonly) { return DoItFeedback.Schreibgschützt(); }
+        if (ReadOnly) { return DoItFeedback.Schreibgschützt(); }
         ValueBitmap = v.ValueBitmap;
         return DoItFeedback.Null();
     }
 
-    protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
-        succesVar = null;
-        return false;
-    }
+    protected override Variable? NewWithThisValue(object x, Script s) => null;
+
+    protected override void SetValue(object? x) { }
+
+    protected override object? TryParse(string txt, Script? s) => null;
 
     #endregion
 }

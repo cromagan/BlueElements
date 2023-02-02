@@ -20,6 +20,7 @@
 using BlueBasics;
 using BlueScript.Methods;
 using BlueScript.Structures;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -35,21 +36,20 @@ public class VariableListString : Variable {
 
     #region Constructors
 
-    public VariableListString(string name, List<string>? value, bool ronly, bool system, string coment) : base(name,
-        ronly, system, coment) {
+    public VariableListString(string name, List<string>? value, bool ronly, bool system, string comment) : base(name,
+        ronly, system, comment) {
         _list = new List<string>();
         if (value != null) {
             _list.AddRange(value);
         }
     }
 
+    public VariableListString(string name) : this(name, null, true, false, string.Empty) { }
+
     /// <summary>
     /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
     /// </summary>
     /// <param name="name"></param>
-
-    public VariableListString(string name) : this(name, null, true, false, string.Empty) { }
-
     public VariableListString(List<string>? value) : this(DummyName(), value, true, false, string.Empty) { }
 
     public VariableListString(IEnumerable<string> value) : this(value.ToList()) { }
@@ -59,10 +59,13 @@ public class VariableListString : Variable {
     #region Properties
 
     public static string ShortName_Plain => "lst";
+
     public static string ShortName_Variable => "*lst";
 
     public override int CheckOrder => 3;
+
     public override bool GetFromStringPossible => true;
+
     public override bool IsNullOrEmpty => _list == null || _list.Count == 0;
 
     /// <summary>
@@ -84,13 +87,15 @@ public class VariableListString : Variable {
     }
 
     public override string ShortName => "lst";
+
     public override bool ToStringPossible => true;
+
     public override string ValueForReplace => ReadableText;
 
     public List<string> ValueList {
         get => _list;
         set {
-            if (Readonly) { return; }
+            if (ReadOnly) { return; }
 
             _list = new List<string>();
             if (value != null) { _list.AddRange(value); }
@@ -101,12 +106,18 @@ public class VariableListString : Variable {
 
     #region Methods
 
+    public override object Clone() {
+        var v = new VariableListString(Name);
+        v.Parse(ToString());
+        return v;
+    }
+
     public override DoItFeedback GetValueFrom(Variable variable) {
         if (variable is not VariableListString v) {
             return DoItFeedback.VerschiedeneTypen(this, variable);
         }
 
-        if (Readonly) {
+        if (ReadOnly) {
             return DoItFeedback.Schreibgschützt();
         }
 
@@ -114,26 +125,37 @@ public class VariableListString : Variable {
         return DoItFeedback.Null();
     }
 
-    protected override bool TryParse(string txt, out Variable? succesVar, Script s) {
-        succesVar = null;
+    protected override Variable? NewWithThisValue(object x, Script s) {
+        var v = new VariableListString(string.Empty);
+        v.SetValue(x);
+        return v;
+    }
+
+    protected override void SetValue(object? x) {
+        if (x is List<string> val) {
+            _list = val;
+        } else {
+            Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Variablenfehler!");
+        }
+    }
+
+    protected override object? TryParse(string txt, Script? s) {
         if (txt.Length > 1 && txt.StartsWith("{") && txt.EndsWith("}")) {
             var t = txt.DeKlammere(false, true, false, true);
 
             if (string.IsNullOrEmpty(t)) {
-                succesVar = new VariableListString(new List<string>()); // Leere Liste
-                return true;
-            }
+                return new List<string>();
+            } // Leere Liste
 
             var l = Method.SplitAttributeToVars(t, s, new List<List<string>>() { new() { VariableString.ShortName_Plain } }, true);
             if (!string.IsNullOrEmpty(l.ErrorMessage)) {
-                return false;
+                return null;
             }
 
-            succesVar = new VariableListString(l.Attributes.AllStringValues());
-            return true;
+            return l.Attributes.AllStringValues();
         }
 
-        return false;
+        return null;
     }
 
     #endregion
