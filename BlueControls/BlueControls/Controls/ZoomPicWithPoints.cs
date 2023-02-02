@@ -136,6 +136,8 @@ public partial class ZoomPicWithPoints : ZoomPic {
         return GenerateBitmapListItem(Bmp, Tags);
     }
 
+    public PointM GetPoint(string name) => _points.Get(name);
+
     public void LetUserAddAPoint(string pointName, Helpers helper, BlueBasics.Enums.Orientation mittelline) {
         _mittelLinie = mittelline;
         _helper = helper;

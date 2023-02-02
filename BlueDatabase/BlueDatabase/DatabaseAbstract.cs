@@ -1024,7 +1024,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
         //var newpf = Filename.FilePath() + tablename.FileNameWithoutSuffix() + ".mdb";
 
-        //return GetByID(new ConnectionInfo(tablename, null, DatabaseID, newpf);
+        //return GetById(new ConnectionInfo(tablename, null, DatabaseID, newpf);
         //// KEINE Vorage mitgeben, weil sonst eine Endlosschleife aufgerufen wird!
 
         //    public override DatabaseAbstract? GetOtherTable(string tablename) {
