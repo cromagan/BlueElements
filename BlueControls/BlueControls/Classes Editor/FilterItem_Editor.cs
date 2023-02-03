@@ -48,17 +48,19 @@ internal sealed partial class FilterItem_Editor : AbstractClassEditor<FilterItem
         cbxColumns.Text = string.Empty;
     }
 
-    protected override void EnabledAndFillFormula() {
+    protected override void EnabledAndFillFormula(FilterItem data) {
+        if (data == null) { return; }
+
         Enabled = true;
-        if (Item?.Column == null) {
+        if (data?.Column == null) {
             cbxColumns.Text = string.Empty;
             return;
         }
-        cbxColumns.Text = Item.Column.Name;
+        cbxColumns.Text = data.Column.Name;
     }
 
-    protected override void PrepaireFormula() {
-        if (Item?.Database?.Column != null) { cbxColumns.Item?.AddRange(Item.Database.Column, true); }
+    protected override void PrepaireFormula(FilterItem data) {
+        if (data?.Database?.Column != null) { cbxColumns.Item?.AddRange(data.Database.Column, true); }
     }
 
     private void AutoFilter_FilterComand(object sender, FilterComandEventArgs e) {

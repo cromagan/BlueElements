@@ -32,7 +32,7 @@ using System.Linq;
 
 namespace BlueControls;
 
-public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended, IChangedFeedback //  System.Windows.Forms.UserControl, IContextMenu//
+public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended, IChangedFeedback //System.Windows.Forms.UserControl, IContextMenu//
 {
     #region Fields
 

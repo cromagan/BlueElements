@@ -65,16 +65,17 @@ internal partial class AbstractClassEditor<T> : Controls.GroupBox, IChangedFeedb
                 _item.Changed -= _item_Changed;
             }
 
-            _item = value;
+            _item = default;
 
-            if (_item != null) {
-                _lastState = _item.ToString();
+            if (value != null) {
+                _lastState = value.ToString();
                 if (!Inited) {
                     Inited = true;
-                    PrepaireFormula();
+                    PrepaireFormula(value);
                 }
 
-                EnabledAndFillFormula();
+                EnabledAndFillFormula(value);
+                _item = value;
                 _item.Changed += _item_Changed;
             } else {
                 _lastState = string.Empty;
@@ -100,7 +101,7 @@ internal partial class AbstractClassEditor<T> : Controls.GroupBox, IChangedFeedb
     /// <summary>
     /// Erlaubt die Bearbeitung des Objektes und füllt den aktuellen Zustand in das Formular.
     /// </summary>
-    protected virtual void EnabledAndFillFormula() => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
+    protected virtual void EnabledAndFillFormula(T data) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
 
     protected override void OnVisibleChanged(System.EventArgs e) {
         base.OnVisibleChanged(e);
@@ -117,7 +118,7 @@ internal partial class AbstractClassEditor<T> : Controls.GroupBox, IChangedFeedb
     /// Bereitet das Formular vor. Z.B. werden in den Auswahldialog-Boxen die voreingestellten Werte hineingeschrieben.
     /// Diese Routine wird aufgerufen, wenn das Item zum ersten Mal empfangen wurde.
     /// </summary>
-    protected virtual void PrepaireFormula() => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
+    protected virtual void PrepaireFormula(T data) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
 
     private void _item_Changed(object sender, System.EventArgs e) {
         if (_item == null) { return; }

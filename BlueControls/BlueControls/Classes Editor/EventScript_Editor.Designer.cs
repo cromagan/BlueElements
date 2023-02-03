@@ -56,12 +56,12 @@ namespace BlueControls.Classes_Editor {
             this.scriptEditor.IsRowScript = false;
             this.scriptEditor.Location = new System.Drawing.Point(8, 56);
             this.scriptEditor.Name = "scriptEditor";
-            this.scriptEditor.ScriptText = null;
+            this.scriptEditor.ScriptText = "";
             this.scriptEditor.Size = new System.Drawing.Size(1008, 392);
             this.scriptEditor.TabIndex = 5;
             this.scriptEditor.TabStop = false;
             this.scriptEditor.Text = "Skript";
-            this.scriptEditor.Changed += ScriptEditor_Changed;
+            this.scriptEditor.Changed += new System.EventHandler(this.ScriptEditor_Changed);
             // 
             // chkZeile
             // 

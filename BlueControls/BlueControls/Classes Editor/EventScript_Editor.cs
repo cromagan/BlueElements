@@ -81,20 +81,21 @@ internal sealed partial class EventScript_Editor : AbstractClassEditor<EventScri
     }
 
     //public void WriteScriptBack() => scriptEditor.WriteScriptBack();
-    protected override void EnabledAndFillFormula() {
-        if (Item == null) { return; }
+    protected override void EnabledAndFillFormula(EventScript data) {
+        if (data == null) { return; }
         Enabled = true;
 
-        txbName.Text = Item.Name;
-        scriptEditor.IsRowScript = Item.NeedRow;
-        scriptEditor.ScriptText = Item.Name;
-        chkAuslöser_newrow.Checked = Item.Events.HasFlag(BlueDatabase.Enums.Events.new_row);
-        chkAuslöser_valuechanged.Checked = Item.Events.HasFlag(BlueDatabase.Enums.Events.value_changed);
-        chkExternVerfügbar.Checked = Item.ManualExecutable;
-        chkAendertWerte.Checked = Item.ChangeValues;
+        txbName.Text = data.Name;
+        scriptEditor.IsRowScript = data.NeedRow;
+        chkZeile.Checked = data.NeedRow;
+        scriptEditor.ScriptText = data.Script;
+        chkAuslöser_newrow.Checked = data.Events.HasFlag(BlueDatabase.Enums.Events.new_row);
+        chkAuslöser_valuechanged.Checked = data.Events.HasFlag(BlueDatabase.Enums.Events.value_changed);
+        chkExternVerfügbar.Checked = data.ManualExecutable;
+        chkAendertWerte.Checked = data.ChangeValues;
     }
 
-    protected override void PrepaireFormula() { }
+    protected override void PrepaireFormula(EventScript data) { }
 
     private void CheckEvents() {
         if (Item == null) { return; }
