@@ -28,7 +28,7 @@ namespace BlueDatabase;
 /// <summary>
 /// Informationen über eine Datenbank oder wie diese erzeugt werden kann.
 /// </summary>
-public class ConnectionInfo : IReadableText {
+public class ConnectionInfo : IReadableText, IHasKeyName {
 
     #region Fields
 
@@ -162,6 +162,8 @@ public class ConnectionInfo : IReadableText {
     /// Um eine Datenbank wieder zu finden, muss uniqueID verwendet werden.
     /// </summary>
     public string DatabaseID { get; } = string.Empty;
+
+    public string KeyName => UniqueID;
 
     /// <summary>
     /// Welche bereits vorhandene Datenbank den in dieser Klasse aufgezeigten Tabellenamen erzeugen kann

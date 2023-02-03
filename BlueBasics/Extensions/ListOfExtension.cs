@@ -21,8 +21,10 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Windows.Markup;
 using static BlueBasics.IO;
 
 namespace BlueBasics;
@@ -108,7 +110,52 @@ public static partial class Extensions {
 
     public static string Parseable(this ICollection<string> col) => "{" + col.JoinWith(", ") + "}";
 
-    public static void ParseableAdd(this ICollection<string> col, string tagname, string value) => col.Add(tagname + "=" + value.ToNonCritical());
+    public static void ParseableAdd(this ICollection<string> col, string tagname, string? value) {
+        if (value == null || string.IsNullOrEmpty(value)) { return; }
+        col.Add(tagname + "=" + value.ToNonCritical());
+    }
+
+    public static void ParseableAdd<T>(this ICollection<string> col, string tagname, ICollection<T>? value) where T : IStringable? {
+        if (value == null) { return; }
+
+        if (value is IDisposableExtended d && d.IsDisposed) { return; }
+
+        if (value.Count < 1) { return; }
+
+        col.Add(tagname + "=" + value.ToString(true));
+    }
+
+    public static void ParseableAdd(this ICollection<string> col, string tagname, DateTime value) {
+        if (value == null) { return; }
+
+        col.Add(tagname + "=" + value.ToString(Constants.Format_Date5));
+    }
+
+    public static void ParseableAdd(this ICollection<string> col, string tagname, float value) => col.Add(tagname + "=" + value.ToString(CultureInfo.InvariantCulture).ToNonCritical());
+
+    public static void ParseableAdd(this ICollection<string> col, string tagname, IHasKeyName? value) {
+        if (value == null) { return; }
+
+        if (value is IDisposableExtended d && d.IsDisposed) { return; }
+
+        var v = value.KeyName;
+        if (string.IsNullOrEmpty(v)) { return; }
+
+        col.Add(tagname + "=" + v.ToNonCritical());
+    }
+
+    public static void ParseableAdd<t>(this ICollection<string> col, string tagname, t? value) where t : System.Enum {
+        if (value == null) { return; }
+        col.Add(tagname + "=" + ((int)(object)value).ToString());
+    }
+
+    public static void ParseableAdd(this ICollection<string> col, string tagname, IStringable? value) {
+        if (value == null) { return; }
+
+        if (value is IDisposableExtended d && d.IsDisposed) { return; }
+
+        col.Add(tagname + "=" + value.ToString().ToNonCritical());
+    }
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, bool value) => col.Add(tagname + "=" + value.ToPlusMinus());
 

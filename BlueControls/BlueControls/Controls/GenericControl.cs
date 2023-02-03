@@ -51,7 +51,7 @@ public class GenericControl : System.Windows.Forms.Control {
     private PartentType _myParentType = PartentType.Unbekannt;
 
     // Dieser Codeblock ist im Interface IQuickInfo herauskopiert und muss überall Identisch sein.
-    private string _quickInfo = "";
+    private string _quickInfo = string.Empty;
 
     #endregion
 

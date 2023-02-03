@@ -475,7 +475,7 @@ public sealed class Database : DatabaseAbstract {
             SaveToByteList(l, DatabaseDataType.Layouts, db.Layouts.JoinWithCr());
             SaveToByteList(l, DatabaseDataType.AutoExport, db.Export.ToString(true));
             SaveToByteList(l, DatabaseDataType.EventScript, db.EventScript.ToString(true));
-            SaveToByteList(l, DatabaseDataType.Events, db.Events.ToString(true));
+            //SaveToByteList(l, DatabaseDataType.Events, db.Events.ToString(true));
             SaveToByteList(l, DatabaseDataType.DatabaseVariables, db.Variables.ToString(true));
 
             // Beim Erstellen des Undo-Speichers die Works nicht verändern, da auch bei einem nicht
@@ -509,7 +509,7 @@ public sealed class Database : DatabaseAbstract {
     public static string UndoText(ColumnItem? column, RowItem? row, ListExt<WorkItem>? works) {
         if (works == null || works.Count == 0) { return string.Empty; }
         var cellKey = CellCollection.KeyOfCell(column, row);
-        var t = "";
+        var t = string.Empty;
         for (var z = works.Count - 1; z >= 0; z--) {
             if (works[z] != null && works[z].CellKey == cellKey) {
                 t = t + works[z].UndoTextTableMouseOver() + "<br>";

@@ -282,13 +282,13 @@ public partial class MainWindow {
                             "<br>Y: " + e.Current.TrimmedY +
                             "<br>Farbe: " + c.ToHtmlCode().ToUpper();
         } else {
-            InfoText.Text = "";
+            InfoText.Text = string.Empty;
         }
     }
 
     private void P_ImageMouseUp(object sender, BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e) => _currentTool?.MouseUp(e, P.Bmp);
 
-    private void P_MouseLeave(object sender, System.EventArgs e) => InfoText.Text = "";
+    private void P_MouseLeave(object sender, System.EventArgs e) => InfoText.Text = string.Empty;
 
     private void Radiergummi_Click(object sender, System.EventArgs e) => SetTool(new Tool_Eraser());
 

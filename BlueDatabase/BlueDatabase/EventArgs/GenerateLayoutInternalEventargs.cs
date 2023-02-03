@@ -24,7 +24,6 @@ public class GenerateLayoutInternalEventArgs : RowEventArgs {
     public GenerateLayoutInternalEventArgs(RowItem row, string layoutId, string saveTo) : base(row) {
         LayoutId = layoutId;
         Filename = saveTo;
-        Handled = false;
     }
 
     #endregion

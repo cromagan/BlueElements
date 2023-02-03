@@ -166,22 +166,22 @@ public sealed partial class DatabaseHeadEditor {
 
             case DatabaseDataType.AutoExport:
                 aenderung = "Export ausgeführt oder geändert";
-                alt = "";
-                neu = "";
+                alt = string.Empty;
+                neu = string.Empty;
                 symb = ImageCode.Karton;
                 break;
 
             case DatabaseDataType.EventScript:
                 aenderung = "Import Script geändert";
-                alt = "";
-                neu = "";
+                alt = string.Empty;
+                neu = string.Empty;
                 symb = ImageCode.Pfeil_Links;
                 break;
 
             case DatabaseDataType.Layouts:
                 aenderung = "Layouts verändert";
-                alt = "";
-                neu = "";
+                alt = string.Empty;
+                neu = string.Empty;
                 symb = ImageCode.Layout;
                 break;
 
@@ -194,15 +194,15 @@ public sealed partial class DatabaseHeadEditor {
             //    //case enDatabaseDataType.Rules_ALT:
             //    aenderung = "Regeln verändert";
             //    symb = ImageCode.Formel;
-            //    alt = "";
-            //    neu = "";
+            //    alt = string.Empty;
+            //    neu = string.Empty;
             //    break;
 
             case DatabaseDataType.ColumnArrangement:
                 aenderung = "Spalten-Anordnungen verändert";
                 symb = ImageCode.Spalte;
-                alt = "";
-                neu = "";
+                alt = string.Empty;
+                neu = string.Empty;
                 break;
 
             case DatabaseDataType.Comand_RemoveRow:
@@ -409,7 +409,7 @@ public sealed partial class DatabaseHeadEditor {
     private void WriteInfosBack() {
         if (_database == null || _database.IsDisposed || _database.ReadOnly) { return; } // Disposed
 
-        eventScriptEditor.WriteScriptBack();
+        //eventScriptEditor.WriteScriptBack();
         _database.GlobalShowPass = txbKennwort.Text;
         _database.Caption = txbCaption.Text;
         _database.UndoCount = tbxUndoAnzahl.Text.IsLong() ? Math.Max(IntParse(tbxUndoAnzahl.Text), 5) : 5;

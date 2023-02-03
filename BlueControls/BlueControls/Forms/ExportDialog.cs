@@ -41,7 +41,7 @@ public sealed partial class ExportDialog {
     #region Fields
 
     private readonly List<RowItem>? _rowsForExport;
-    private readonly string _saveTo = "";
+    private readonly string _saveTo = string.Empty;
     private readonly string _zielPfad;
     private int _itemNrForPrint;
 
@@ -352,7 +352,7 @@ public sealed partial class ExportDialog {
             Tabs.SelectedTab = tabDateiExport;
             var (files, error) = Database.Layouts.LayoutIdToIndex(cbxLayoutWahl.Text) > -1
                 ? Export.SaveAsBitmap(_rowsForExport, cbxLayoutWahl.Text, _zielPfad)
-                : Export.GenerateLayout_FileSystem(_rowsForExport, cbxLayoutWahl.Text, _saveTo, optSpezialFormat.Checked, _zielPfad);
+                : Export.GenerateLayout_FileSystem(_rowsForExport, cbxLayoutWahl.Text, _saveTo, optSpezialFormat.Checked, _zielPfad, string.Empty);
             lstExported.Item.AddRange(files);
 
             if (!string.IsNullOrEmpty(error)) {

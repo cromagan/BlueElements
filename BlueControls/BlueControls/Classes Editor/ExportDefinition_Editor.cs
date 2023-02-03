@@ -154,7 +154,6 @@ internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<Expo
     private void ExportVerzeichnis_TextChanged(object sender, System.EventArgs e) => UpdateExport(true);
 
     private void filterItemEditor_Changed(object sender, System.EventArgs e) {
-        if (IsFilling) { return; }
         foreach (var thisitem in lbxFilter.Item) {
             if (thisitem is TextListItem tli) {
                 if (tli.Tag == filterItemEditor.Item) {
@@ -163,7 +162,6 @@ internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<Expo
                 }
             }
         }
-        OnChanged();
     }
 
     private void lbxFilter_AddClicked(object sender, System.EventArgs e) {
@@ -205,7 +203,7 @@ internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<Expo
             ExportAutomatischLöschen.Enabled = false;
             lbxFilter.Enabled = true;
         }
-        if (IsFilling) { return; }
+
         if (Item == null) { return; }
         if (MustDeleteAllExportFiles) {
             Item.DeleteAllBackups();
@@ -236,7 +234,6 @@ internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<Expo
         }
         Item.BereitsExportiert.Clear();
         Item.BereitsExportiert.AddRange(lsbExportDateien.Item.ToListOfString());
-        OnChanged();
     }
 
     #endregion

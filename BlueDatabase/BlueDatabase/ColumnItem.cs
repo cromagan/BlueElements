@@ -26,6 +26,7 @@ using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data.Common;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
@@ -1996,19 +1997,19 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
             //case "System: State":
             //    _name = "SYS_RowState";
             //    _caption = "veraltet und kann gelöscht werden: Zeilenstand";
-            //    _identifierx = "";
+            //    _identifierx = string.Empty;
             //    break;
 
             //case "System: ID":
             //    _name = "SYS_ID";
             //    _caption = "veraltet und kann gelöscht werden: Zeilen-ID";
-            //    _identifierx = "";
+            //    _identifierx = string.Empty;
             //    break;
 
             //case "System: Last Used Layout":
             //    _name = "SYS_Layout";
             //    _caption = "veraltet und kann gelöscht werden:  Letztes Layout";
-            //    _identifierx = "";
+            //    _identifierx = string.Empty;
             //    break;
 
             default:
@@ -2279,18 +2280,27 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
         }
     }
 
-    internal EditTypeFormula CheckFormulaEditType(EditTypeFormula toCheck) {
-        if (UserEditDialogTypeInFormula(toCheck)) { return toCheck; }// Alles OK!
-        for (var z = 0; z <= 999; z++) {
-            var w = (EditTypeFormula)z;
-            if (w.ToString() != z.ToString()) {
-                if (UserEditDialogTypeInFormula(w)) {
-                    return w;
-                }
-            }
-        }
-        return EditTypeFormula.None;
-    }
+    //internal EditTypeFormula CheckFormulaEditType(EditTypeFormula toCheck) {
+    //    if (UserEditDialogTypeInFormula(toCheck)) { return toCheck; }// Alles OK!
+
+    //    var t = typeof(EditTypeFormula);
+
+    //    foreach (int z1 in Enum.GetValues(t)) {
+    //        if (column.UserEditDialogTypeInFormula((EditTypeFormula)z1)) {
+    //            l.Add(new TextListItem(Enum.GetName(t, z1).Replace("_", " "), z1.ToString(), null, false, true, string.Empty));
+    //        }
+    //    }
+
+    //    for (var z = 0; z <= 999; z++) {
+    //        var w = (EditTypeFormula)z;
+    //        if (w.ToString() != z.ToString()) {
+    //            if (UserEditDialogTypeInFormula(w)) {
+    //                return w;
+    //            }
+    //        }
+    //    }
+    //    return EditTypeFormula.None;
+    //}
 
     internal void CheckIfIAmAKeyColumn() {
         Am_A_Key_For_Other_Column = string.Empty;
@@ -2626,7 +2636,7 @@ public sealed class ColumnItem : IReadableTextWithChanging, IDisposableExtended,
                 //CellCollection.Invalidate_CellContentSize(this, thisRow);
                 Invalidate_ContentWidth();
                 Database.Cell.OnCellValueChanged(new CellEventArgs(this, thisRow));
-                _ = thisRow.DoAutomatic(true, false, 5, "value changed", false, string.Empty);
+                _ = thisRow.DoAutomatic(true, false, 5, Events.value_changed, false, string.Empty);
             }
         }
     }

@@ -30,6 +30,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
@@ -319,7 +320,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
         GC.SuppressFinalize(this);
     }
 
-    public (bool checkPerformed, string error, Script? script) DoAutomatic(string eventname, bool onlyTesting, string scriptname) => DoAutomatic(false, false, eventname, onlyTesting, scriptname);
+    public (bool checkPerformed, string error, Script? script) DoAutomatic(Events? eventname, bool onlyTesting, string scriptname) => DoAutomatic(false, false, eventname, onlyTesting, scriptname);
 
     /// <summary>
     /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initalwerte der Zellen.
@@ -330,7 +331,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     /// <param name="tryforsceonds"></param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
 
-    public (bool checkPerformed, string error, Script? script) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, float tryforsceonds, string eventname, bool onlyTesting, string scriptname) {
+    public (bool checkPerformed, string error, Script? script) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, float tryforsceonds, Events? eventname, bool onlyTesting, string scriptname) {
         if (Database == null || Database.IsDisposed || Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
         var t = DateTime.Now;
         do {
@@ -348,7 +349,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgeführt</param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
 
-    public (bool checkPerformed, string error, Script? skript) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, string eventname, bool onlyTesting, string scriptname) {
+    public (bool checkPerformed, string error, Script? skript) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, Events? eventname, bool onlyTesting, string scriptname) {
         if (Database == null || Database.IsDisposed || Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
 
         var feh = Database.ErrorReason(ErrorReason.EditAcut);
@@ -367,7 +368,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
                 Database.OnScriptError(new RowCancelEventArgs(this, "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode));
                 return (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
             }
-            if (script?.Variables?.GetSystem("CellChangesEnabled") is not VariableBool doch || !doch.ValueBool) { return (true, string.Empty, script); }
+            //if (script?.Variables?.GetSystem("CellChangesEnabled") is not VariableBool doch || !doch.ValueBool) { return (true, string.Empty, script); }
         }
         // Dann die Abschließenden Korrekturen vornehmen
         foreach (var thisColum in Database.Column.Where(thisColum => thisColum != null)) {
@@ -421,6 +422,94 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
         }
 
         return (true, infoTxt, script);
+    }
+
+    public Script? DoRules(Events? eventname, bool onlyTesting, string scriptname) {
+        try {
+            if (Database == null || Database.IsDisposed) { return null; }
+
+            if (eventname != null && !string.IsNullOrEmpty(scriptname)) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Event und Skript angekommen!");
+                return null;
+            }
+
+            if (eventname == null && string.IsNullOrEmpty(scriptname)) { return null; }
+
+            if (string.IsNullOrEmpty(scriptname)) {
+                foreach (var thisEvent in Database.EventScript) {
+                    if (thisEvent != null && thisEvent.Events.HasFlag(eventname)) {
+                        scriptname = thisEvent.Name; break;
+                    }
+                }
+            }
+
+            if (scriptname == null || string.IsNullOrWhiteSpace(scriptname)) { return null; }
+
+            var script = Database.EventScript.Get(scriptname);
+            if (script == null) { return null; }
+
+            if (!script.NeedRow) { return null; }
+
+            return DoRules(script.Script, onlyTesting);
+        } catch {
+            return DoRules(eventname, onlyTesting, scriptname);
+        }
+    }
+
+    /// <summary>
+    /// Führt alle Regeln aus und löst das Ereignis DoSpecialRules aus. Setzt ansonsten keine Änderungen, wie z.B. SysCorrect oder Runden-Befehle.
+    /// </summary>
+    /// <returns>Gibt Regeln, die einen Fehler verursachen zurück. z.B. SPALTE1|Die Splate darf nicht leer sein.</returns>
+    public Script? DoRules(string scripttext, bool onlyTesting) {
+        try {
+            List<Variable> vars = new() {
+                //new VariableString("Startroutine", startRoutine, true, false, "ACHTUNG: Keinesfalls dürfen Startroutinenabhängig Werte verändert werden.\r\nMögliche Werte:\r\nnew row\r\nvalue changed\r\nscript testing\r\nmanual check\r\nto be sure\r\nimport\r\nexport\r\nscript"),
+                //new VariableBool("CellChangesEnabled", true, true, true, "Nur wenn TRUE werden nach dem Skript die Änderungen\r\nin die Datenbank aufgenommen.\r\nKann mit DisableCellChanges umgesetzt werden.")
+            };
+
+            #region Variablen für Skript erstellen
+
+            foreach (var thisCol in Database.Column) {
+                var v = CellToVariable(thisCol, this);
+                if (v != null) { vars.AddRange(v); }
+            }
+            vars.Add(new VariableString("User", Database.UserName, true, false, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
+            vars.Add(new VariableString("Usergroup", Database.UserGroup, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
+            vars.Add(new VariableBool("Administrator", Database.IsAdministrator(), true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
+            vars.Add(new VariableDatabase("Database", Database, true, true, string.Empty));
+
+            if (!string.IsNullOrEmpty(Database.AdditionalFilesPfadWhole())) {
+                vars.Add(new VariableString("AdditionalFilesPfad", Database.AdditionalFilesPfadWhole(), true, false, "Der Dateipfad der Datenbank, in dem zusäzliche Daten gespeichert werden."));
+            }
+            //vars.GenerateAndAdd(new VariableString("DatabasePath", Database.Filename2.FilePath(), true, false, "Der Dateipfad der Datenbank."));
+
+            #endregion Variablen für Skript erstellen
+
+            #region Script ausführen
+
+            Script sc = new(vars, Database.AdditionalFilesPfadWhole(), onlyTesting) {
+                ScriptText = scripttext
+            };
+            sc.Parse();
+
+            #endregion
+
+            if (!onlyTesting) {
+
+                #region Variablen zurückschreiben und Special Rules ausführen
+
+                if (!string.IsNullOrEmpty(sc.Error)) { return sc; }
+                foreach (var thisCol in Database.Column) { VariableToCell(thisCol, vars); }
+                // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
+                DoRowAutomaticEventArgs e = new(this);
+                OnDoSpecialRules(e);
+
+                #endregion
+            }
+            return sc;
+        } catch {
+            return DoRules(scripttext, onlyTesting);
+        }
     }
 
     public bool IsNullOrEmpty() => Database.Column.All(thisColumnItem => thisColumnItem != null && CellIsNullOrEmpty(thisColumnItem));
@@ -533,82 +622,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
             Database = null;
             _tmpQuickInfo = null;
             IsDisposed = true;
-        }
-    }
-
-    /// <summary>
-    /// Führt alle Regeln aus und löst das Ereignis DoSpecialRules aus. Setzt ansonsten keine Änderungen, wie z.B. SysCorrect oder Runden-Befehle.
-    /// </summary>
-    /// <returns>Gibt Regeln, die einen Fehler verursachen zurück. z.B. SPALTE1|Die Splate darf nicht leer sein.</returns>
-
-    private Script? DoRules(string eventname, bool onlyTesting, string scriptname) {
-        try {
-            if (Database == null || Database.IsDisposed) { return null; }
-
-            if (!string.IsNullOrEmpty(eventname) && !string.IsNullOrEmpty(eventname)) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Event und Skript angekommen!");
-                return null;
-            }
-
-            if (string.IsNullOrEmpty(scriptname)) {
-                scriptname = Database.Events.GetString(eventname);
-            }
-
-            if (scriptname == null || string.IsNullOrWhiteSpace(scriptname)) { return null; }
-
-            var script = Database.EventScript.Get(scriptname);
-            if (script == null) { return null; }
-
-            if (!script.NeedRow) { return null; }
-
-            List<Variable> vars = new()
-            {
-                //new VariableString("Startroutine", startRoutine, true, false, "ACHTUNG: Keinesfalls dürfen Startroutinenabhängig Werte verändert werden.\r\nMögliche Werte:\r\nnew row\r\nvalue changed\r\nscript testing\r\nmanual check\r\nto be sure\r\nimport\r\nexport\r\nscript"),
-                new VariableBool("CellChangesEnabled", true, true, true, "Nur wenn TRUE werden nach dem Skript die Änderungen\r\nin die Datenbank aufgenommen.\r\nKann mit DisableCellChanges umgesetzt werden.")
-            };
-
-            #region Variablen für Skript erstellen
-
-            foreach (var thisCol in Database.Column) {
-                var v = CellToVariable(thisCol, this);
-                if (v != null) { vars.AddRange(v); }
-            }
-            vars.Add(new VariableString("User", Database.UserName, true, false, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
-            vars.Add(new VariableString("Usergroup", Database.UserGroup, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
-            vars.Add(new VariableBool("Administrator", Database.IsAdministrator(), true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
-            vars.Add(new VariableDatabase("Database", Database, true, true, string.Empty));
-
-            if (!string.IsNullOrEmpty(Database.AdditionalFilesPfadWhole())) {
-                vars.Add(new VariableString("AdditionalFilesPfad", Database.AdditionalFilesPfadWhole(), true, false, "Der Dateipfad der Datenbank, in dem zusäzliche Daten gespeichert werden."));
-            }
-            //vars.GenerateAndAdd(new VariableString("DatabasePath", Database.Filename2.FilePath(), true, false, "Der Dateipfad der Datenbank."));
-
-            #endregion Variablen für Skript erstellen
-
-            #region Script ausführen
-
-            Script sc = new(vars, Database.AdditionalFilesPfadWhole(), onlyTesting) {
-                ScriptText = script.Script
-            };
-            sc.Parse();
-
-            #endregion
-
-            if (!onlyTesting && vars.GetSystem("CellChangesEnabled") is VariableBool doch && doch.ValueBool) {
-
-                #region Variablen zurückschreiben und Special Rules ausführen
-
-                if (!string.IsNullOrEmpty(sc.Error)) { return sc; }
-                foreach (var thisCol in Database.Column) { VariableToCell(thisCol, vars); }
-                // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
-                DoRowAutomaticEventArgs e = new(this);
-                OnDoSpecialRules(e);
-
-                #endregion
-            }
-            return sc;
-        } catch {
-            return DoRules(eventname, onlyTesting, scriptname);
         }
     }
 

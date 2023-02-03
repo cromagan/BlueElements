@@ -188,7 +188,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
         }
     }
 
-    private void TxtSkript_TextChangedDelayed(object sender, FastColoredTextBoxNS.TextChangedEventArgs e) {
+    private void TxtSkript_TextChanged(object sender, FastColoredTextBoxNS.TextChangedEventArgs e) {
         OnChanged();
     }
 

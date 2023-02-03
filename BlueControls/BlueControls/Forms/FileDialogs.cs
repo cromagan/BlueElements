@@ -55,7 +55,7 @@ public static class FileDialogs {
     public static bool DeleteFile(List<string> filelist, bool meldungen) {
         var buttonNumber = 0;
         for (var z = 0; z < filelist.Count; z++) {
-            if (!FileExists(filelist[z])) { filelist[z] = ""; }
+            if (!FileExists(filelist[z])) { filelist[z] = string.Empty; }
         }
         filelist = filelist.SortedDistinctList();
         if (filelist.Count == 0) { return false; }

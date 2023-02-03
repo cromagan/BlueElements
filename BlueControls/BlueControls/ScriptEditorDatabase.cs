@@ -35,7 +35,6 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
     private DatabaseAbstract? _database;
 
     private bool _isRowSkript = false;
-    private string _skriptname = string.Empty;
 
     #endregion
 
@@ -51,16 +50,14 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
         get => _database;
         set {
             if (_database != null) {
-                WriteScriptBack();
                 _database.Disposing -= _Database_Disposing;
             }
-            _database = value;
-            if (_database == null || _database.IsDisposed) {
-                return;
-            }
 
-            LoadScriptText();
-            _database.Disposing += _Database_Disposing;
+            _database = value;
+
+            if (_database != null && !_database.IsDisposed) {
+                _database.Disposing += _Database_Disposing;
+            }
         }
     }
 
@@ -68,22 +65,9 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
         get => _isRowSkript;
         set {
             if (_isRowSkript == value) { return; }
-            WriteScriptBack();
             _isRowSkript = value;
-            LoadScriptText();
-        }
-    }
-
-    [Obsolete("Kann nur über Skriptname gesetzt werden!")]
-    public new string ScriptText { get; set; }
-
-    public string SkriptName {
-        get => _skriptname;
-        set {
-            if (_skriptname == value) { return; }
-            WriteScriptBack();
-            _skriptname = value;
-            LoadScriptText();
+            txbTestZeile.Enabled = value;
+            OnChanged();
         }
     }
 
@@ -91,25 +75,12 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
 
     #region Methods
 
-    internal void WriteScriptBack() {
-        if (_database == null || _database.IsDisposed) { return; }
-
-        var sc = _database.EventScript.CloneWithClones();
-
-        var ev = sc.Get(_skriptname);
-        if (ev == null) { return; }
-
-        ev.Script = base.ScriptText;
-
-        _database.EventScript = new ReadOnlyCollection<EventScript?>(sc);
-    }
-
     protected override Script? GenerateAndDoScript() {
         if (_database == null || _database.IsDisposed) {
             Message("Keine Datenbank geladen.");
             return null;
         }
-        WriteScriptBack();
+
         string message = string.Empty;
         Script? sc = null;
 
@@ -127,16 +98,16 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
                 Message("Zeile nicht gefunden.");
                 return null;
             }
-
-            var (_, m, s) = r.DoAutomatic(string.Empty, true, _skriptname);
-            message = m;
+            var s = r.DoRules(base.ScriptText, true);
+            //var (_, m, s) = r.DoAutomatic(null, true, _skriptname);
+            //message = m;
             sc = s;
         }
 
-        if (!string.IsNullOrEmpty(message)) {
-            Message("Allgemeiner Fehler: " + message);
-            return null;
-        }
+        //if (!string.IsNullOrEmpty(message)) {
+        //    Message("Allgemeiner Fehler: " + message);
+        //    return null;
+        //}
 
         return sc;
     }
@@ -150,20 +121,6 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
     }
 
     private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
-
-    private void LoadScriptText() {
-        if (_database == null || _database.IsDisposed) { return; }
-
-        var sc = _database.EventScript.CloneWithClones();
-
-        var ev = sc.Get(_skriptname);
-        if (ev == null) {
-            base.ScriptText = string.Empty;
-            return;
-        }
-
-        base.ScriptText = ev.Script;
-    }
 
     private void scriptEditor_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         if (e.HotItem is string txt) {

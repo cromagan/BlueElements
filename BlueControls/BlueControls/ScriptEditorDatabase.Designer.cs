@@ -47,6 +47,7 @@ namespace BlueControls {
             // txbTestZeile
             // 
             this.txbTestZeile.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbTestZeile.Enabled = false;
             this.txbTestZeile.Location = new System.Drawing.Point(120, 8);
             this.txbTestZeile.Name = "txbTestZeile";
             this.txbTestZeile.Size = new System.Drawing.Size(256, 32);

@@ -108,7 +108,7 @@ namespace BlueControls {
             this.txtSkript.TabIndex = 2;
             this.txtSkript.Zoom = 100;
             this.txtSkript.ToolTipNeeded += new System.EventHandler<FastColoredTextBoxNS.ToolTipNeededEventArgs>(this.txtSkript_ToolTipNeeded);
-            this.txtSkript.TextChangedDelayed += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.TxtSkript_TextChangedDelayed);
+            this.txtSkript.TextChanged += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.TxtSkript_TextChanged);
             this.txtSkript.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TxtSkript_MouseUp);
             // 
             // grpVariablen

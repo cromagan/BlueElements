@@ -125,7 +125,7 @@ internal sealed partial class SearchAndReplace : Form {
             }
         }
         var count = 0;
-        var geändeterText = "";
+        var geändeterText = string.Empty;
         var co = 0;
         var p = Progressbar.Show("Ersetze...", ro.Count);
         foreach (var thisRow in ro) {
@@ -161,7 +161,7 @@ internal sealed partial class SearchAndReplace : Form {
                     }
                 }
             }
-            if (rowChanged) { _ = thisRow.DoAutomatic(true, false, 10, "value changed", false, string.Empty); }
+            if (rowChanged) { _ = thisRow.DoAutomatic(true, false, 10, BlueDatabase.Enums.Events.value_changed, false, string.Empty); }
         }
         p?.Close();
         MessageBox.Show(count + " Ersetzung(en) vorgenommen.", ImageCode.Information, "OK");

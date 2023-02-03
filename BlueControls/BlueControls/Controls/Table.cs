@@ -407,7 +407,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (v[0] == "Cancel") { return; } // =Aktueller Eintrag angeklickt
         row.CellSet(column, v[0].Substring(5));
         //Database.Cell.Set(column, row, v[0].Substring(5), false);
-        _ = row.DoAutomatic(true, true, 5, "value changed", false, string.Empty);
+        _ = row.DoAutomatic(true, true, 5, BlueDatabase.Enums.Events.value_changed, false, string.Empty);
     }
 
     /// <summary>
@@ -863,7 +863,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public void Export_HTML(string filename = "", bool execute = true) {
         if (Database == null || Database.IsDisposed) { return; }
-        if (string.IsNullOrEmpty(filename)) { filename = TempFile("", string.Empty, "html"); }
+        if (string.IsNullOrEmpty(filename)) { filename = TempFile(string.Empty, string.Empty, "html"); }
         Database.Export_HTML(filename, CurrentArrangement, SortedRows(), execute);
     }
 
@@ -1767,7 +1767,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 row.CellSet(column, newValue);
             }
             if (table.Database == column.Database) { table.CursorPos_Set(column, row, false, chapter); }
-            _ = row.DoAutomatic(true, false, 5, "value changed", false, string.Empty);
+            _ = row.DoAutomatic(true, false, 5, BlueDatabase.Enums.Events.value_changed, false, string.Empty);
 
             // EnsureVisible ganz schlecht: Daten verändert, keine Positionen bekannt - und da soll sichtbar gemacht werden?
             // CursorPos.EnsureVisible(SliderX, SliderY, DisplayRectangle)
@@ -2096,7 +2096,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             }
             SliderY.Value = 0;
         }
-        var cancel = "";
+        var cancel = string.Empty;
         if (cellInThisDatabaseRow != null) {
             CellCancelEventArgs ed = new(cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, cancel);
             OnEditBeforeBeginEdit(ed);
@@ -2255,7 +2255,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             // Neue Zeile...
             Box.Location = new Point((int)viewItemx.OrderTmpSpalteX1, HeadSize());
             Box.Size = new Size(Column_DrawWidth(viewItemx, DisplayRectangle) + addWith, _pix18);
-            Box.Text = "";
+            Box.Text = string.Empty;
         }
 
         Box.GetStyleFrom(contentHolderCellColumn);

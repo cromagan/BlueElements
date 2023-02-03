@@ -250,7 +250,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
         _ = Focus();
-        var newWord = "";
+        var newWord = string.Empty;
         _markStart = IntParse(e.Tags.TagGet("MarkStart"));
         _markEnd = IntParse(e.Tags.TagGet("MarkEnd"));
         _cursorCharPos = IntParse(e.Tags.TagGet("Cursorpos"));

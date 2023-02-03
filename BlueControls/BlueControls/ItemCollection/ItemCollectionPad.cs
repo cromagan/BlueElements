@@ -44,6 +44,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
 
     public const int Dpi = 300;
     public static List<BasicPadItem>? PadItemTypes;
+    public string _scriptName = string.Empty;
     internal string Caption;
     internal string Id;
 
@@ -74,7 +75,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         if (Skin.StyleDb == null) { Skin.InitStyles(); }
         SheetSizeInMm = Size.Empty;
         RandinMm = Padding.Empty;
-        Caption = "";
+        Caption = string.Empty;
         _idCount++;
         Id = "#" + DateTime.UtcNow.ToString(Constants.Format_Date) + _idCount; // # ist die erkennung, dass es kein Dateiname sondern ein Item ist
         if (Skin.StyleDb == null) { Skin.InitStyles(); }
@@ -123,6 +124,10 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
 
                 case "backcolor":
                     BackColor = Color.FromArgb(IntParse(pair.Value));
+                    break;
+
+                case "scriptname":
+                    _scriptName = pair.Value;
                     break;
 
                 case "id":
@@ -223,6 +228,15 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         set {
             _randinMm = new Padding(Math.Max(0, value.Left), Math.Max(0, value.Top), Math.Max(0, value.Right), Math.Max(0, value.Bottom));
             GenPoints();
+        }
+    }
+
+    public string ScriptName {
+        get => _scriptName;
+        set {
+            if (_scriptName == value) { return; }
+            _scriptName = value;
+            OnChanged();
         }
     }
 
@@ -438,7 +452,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
     public void ParseVariable(RowItem? row) {
         if (row == null) { return; }
 
-        var (_, _, script) = row.DoAutomatic("export", false, string.Empty);
+        var (_, _, script) = row.DoAutomatic(null, false, _scriptName);
         if (script?.Variables == null) { return; }
         foreach (var thisV in script.Variables) {
             _ = ParseVariable(thisV);
@@ -605,6 +619,8 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         t = t.TrimEnd(", ") + "}, ";
 
         #endregion
+
+        t = t + "ScriptName=" + _scriptName + ", ";
 
         t = t + "SnapMode=" + ((int)_snapMode) + ", ";
         t = t + "GridShow=" + _gridShow + ", ";

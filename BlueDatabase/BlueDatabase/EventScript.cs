@@ -21,6 +21,9 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
+using BlueDatabase.Enums;
+using System.Collections.Generic;
+using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
@@ -28,6 +31,8 @@ public sealed class EventScript : IParseable, IReadableTextWithChanging, IDispos
 
     #region Fields
 
+    private bool _changeValues;
+    private Events _events = Events.only_manual;
     private bool _executable;
 
     //private string _lastUsed;
@@ -76,7 +81,26 @@ public sealed class EventScript : IParseable, IReadableTextWithChanging, IDispos
 
     #region Properties
 
+    public bool ChangeValues {
+        get => _changeValues;
+        set {
+            if (_changeValues == value) { return; }
+            _changeValues = value;
+            OnChanged();
+        }
+    }
+
     public DatabaseAbstract? Database { get; private set; }
+
+    public Events Events {
+        get => _events;
+        set {
+            if (_events == value) { return; }
+            _events = value;
+            OnChanged();
+        }
+    }
+
     public bool IsDisposed { get; private set; }
 
     public bool IsParsing { get; private set; }
@@ -173,6 +197,14 @@ public sealed class EventScript : IParseable, IReadableTextWithChanging, IDispos
                     _needRow = pair.Value.FromPlusMinus();
                     break;
 
+                case "changevalues":
+                    _changeValues = pair.Value.FromPlusMinus();
+                    break;
+
+                case "events":
+                    _events = (Events)IntParse(pair.Value);
+                    break;
+
                 //case "lastdone":
 
                 //    _lastUsed = pair.Value.FromNonCritical();
@@ -208,15 +240,17 @@ public sealed class EventScript : IParseable, IReadableTextWithChanging, IDispos
 
     public override string ToString() {
         try {
-            var result = "{";
-            result = result + "Database=" + Database?.ConnectionData.UniqueID.ToNonCritical() + ", ";
-            result = result + "Name=" + Name.ToNonCritical() + ", ";
-            result = result + "Script=" + Script.ToNonCritical() + ", ";
+            var Result = new List<string>();
 
-            result = result + "ManualExecutable=" + ManualExecutable.ToPlusMinus() + ", ";
-            result = result + "NeedRow=" + NeedRow.ToPlusMinus() + ", ";
+            Result.ParseableAdd("Database", Database);
+            Result.ParseableAdd("Name", Name);
+            Result.ParseableAdd("Script", Script);
+            Result.ParseableAdd("ManualExecutable", ManualExecutable);
+            Result.ParseableAdd("NeedRow", NeedRow);
+            Result.ParseableAdd("ChangeValues", ChangeValues);
+            Result.ParseableAdd("Events", Events);
 
-            return result.TrimEnd(", ") + "}";
+            return Result.Parseable();
         } catch {
             return ToString();
         }

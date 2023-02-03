@@ -34,6 +34,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using static BlueBasics.Converter;
 using static BlueBasics.Develop;
@@ -479,7 +480,9 @@ public partial class TableView : Form, IHasStatusbar {
         if (row != null) { ValueCol0 = row.CellFirstString(); }
         var editable = string.IsNullOrEmpty(CellCollection.ErrorReason(column, row, ErrorReason.EditAcut));
 
-        switch (e.ClickedComand) {
+        var ev = (e.ClickedComand + "|").SplitAndCutBy("|");
+
+        switch (ev[0]) {
             case "pinlösen":
                 tbl.PinRemove(row);
                 break;
@@ -497,7 +500,7 @@ public partial class TableView : Form, IHasStatusbar {
                 break;
 
             case "Fehlersuche":
-                MessageBox.Show(row.DoAutomatic(true, true, 10, "manual check", false, string.Empty).error);
+                MessageBox.Show(row.DoAutomatic(true, true, 10, null, false, ev[1]).error);
                 break;
 
             case "ZeileLöschen":
@@ -616,12 +619,12 @@ public partial class TableView : Form, IHasStatusbar {
     private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => OpenDatabaseHeadEditor(Table.Database);
 
     private void btnDatenüberprüfung_Click(object sender, System.EventArgs e) {
-        if (Table.Database == null || !Table.Database.IsAdministrator()) { return; }
-        var m = Table.Database.Row.DoAutomatic(Table.Filter, true, Table.PinnedRows, "manual check", false, string.Empty);
+        //if (Table.Database == null || !Table.Database.IsAdministrator()) { return; }
+        //var m = Table.Database.Row.DoAutomatic(Table.Filter, true, Table.PinnedRows, "manual check", false, string.Empty);
 
-        if (!string.IsNullOrEmpty(m)) {
-            MessageBox.Show(m);
-        }
+        //if (!string.IsNullOrEmpty(m)) {
+        //    MessageBox.Show(m);
+        //}
     }
 
     private void btnFormular_Click(object sender, System.EventArgs e) {

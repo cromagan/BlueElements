@@ -336,7 +336,7 @@ public partial class RelationDiagram : PadEditor {
                 break;
 
             default:
-                Develop.DebugPrint(e);
+                Develop.DebugPrint(e.ClickedComand);
                 break;
         }
         //RepairLinesAndFullProcessing();

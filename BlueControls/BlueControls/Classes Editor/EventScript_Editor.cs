@@ -17,6 +17,8 @@
 
 using BlueControls.Interfaces;
 using BlueDatabase;
+using System;
+using System.Collections.ObjectModel;
 
 namespace BlueControls.Classes_Editor;
 
@@ -37,44 +39,103 @@ internal sealed partial class EventScript_Editor : AbstractClassEditor<EventScri
 
     #endregion
 
-    #region Methods
+    //private void LoadScriptText() {
+    //    if (_database == null || _database.IsDisposed) { return; }
 
-    public void WriteScriptBack() => scriptEditor.WriteScriptBack();
+    //    var sc = _database.EventScript.CloneWithClones();
+
+    //    var ev = sc.Get(_skriptname);
+    //    if (ev == null) {
+    //        base.ScriptText = string.Empty;
+    //        return;
+    //    }
+
+    //    base.ScriptText = ev.Script;
+    //}
+
+    //internal void WriteScriptBack() {
+    //    if (_database == null || _database.IsDisposed) { return; }
+
+    //    var sc = _database.EventScript.CloneWithClones();
+
+    //    var ev = sc.Get(_skriptname);
+    //    if (ev == null) { return; }
+
+    //    ev.Script = base.ScriptText;
+
+    //    _database.EventScript = new ReadOnlyCollection<EventScript?>(sc);
+    //}
+
+    #region Methods
 
     protected override void DisableAndClearFormula() {
         Enabled = false;
+
         txbName.Text = string.Empty;
-        scriptEditor.SkriptName = string.Empty;
+        scriptEditor.ScriptText = string.Empty;
+        scriptEditor.IsRowScript = false;
+        chkAuslöser_newrow.Checked = false;
+        chkAuslöser_valuechanged.Checked = false;
+        chkExternVerfügbar.Checked = false;
+        chkAendertWerte.Checked = false;
     }
 
+    //public void WriteScriptBack() => scriptEditor.WriteScriptBack();
     protected override void EnabledAndFillFormula() {
         if (Item == null) { return; }
         Enabled = true;
 
         txbName.Text = Item.Name;
         scriptEditor.IsRowScript = Item.NeedRow;
-        scriptEditor.SkriptName = Item.Name;
+        scriptEditor.ScriptText = Item.Name;
+        chkAuslöser_newrow.Checked = Item.Events.HasFlag(BlueDatabase.Enums.Events.new_row);
+        chkAuslöser_valuechanged.Checked = Item.Events.HasFlag(BlueDatabase.Enums.Events.value_changed);
+        chkExternVerfügbar.Checked = Item.ManualExecutable;
+        chkAendertWerte.Checked = Item.ChangeValues;
     }
 
     protected override void PrepaireFormula() { }
 
+    private void CheckEvents() {
+        if (Item == null) { return; }
+
+        BlueDatabase.Enums.Events tmp = 0;
+        if (chkAuslöser_newrow.Checked) { tmp |= BlueDatabase.Enums.Events.new_row; }
+        if (chkAuslöser_valuechanged.Checked) { tmp |= BlueDatabase.Enums.Events.value_changed; }
+        Item.Events = tmp;
+    }
+
+    private void chkAendertWerte_CheckedChanged(object sender, System.EventArgs e) {
+        if (Item == null) { return; }
+        Item.ChangeValues = chkAendertWerte.Checked;
+    }
+
+    private void chkAuslöser_newrow_CheckedChanged(object sender, System.EventArgs e) {
+        CheckEvents();
+    }
+
+    private void chkAuslöser_valuechanged_CheckedChanged(object sender, System.EventArgs e) {
+        CheckEvents();
+    }
+
     private void chkExternVerfügbar_CheckedChanged(object sender, System.EventArgs e) {
+        if (Item == null) { return; }
         Item.ManualExecutable = chkExternVerfügbar.Checked;
-        OnChanged();
     }
 
     private void chkZeile_CheckedChanged(object sender, System.EventArgs e) {
+        if (Item == null) { return; }
         Item.NeedRow = chkZeile.Checked;
-        OnChanged();
     }
 
-    private void ScriptEditor_Changed(object sender, System.EventArgs e) => OnChanged();
+    private void ScriptEditor_Changed(object sender, System.EventArgs e) {
+        if (Item == null) { return; }
+        Item.Script = scriptEditor.ScriptText;
+    }
 
     private void txbName_TextChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
-
         Item.Name = txbName.Text;
-        OnChanged();
     }
 
     #endregion

@@ -401,14 +401,6 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
         #endregion
 
-        #region Zeilen Prüfen
-
-        foreach (var thisrow in FilterDefiniton.Row) {
-            _ = thisrow.DoAutomatic("value changed", false, string.Empty);
-        }
-
-        #endregion
-
         #region Events Mappen
 
         var eves = FilterDefiniton.EventScript.CloneWithClones();
@@ -416,18 +408,19 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
             NeedRow = true,
             ManualExecutable = false,
             Script = sc,
-            Name = "Main"
+            Name = "Main",
+            Events = Events.value_changed | Events.new_row
         };
         eves.Add(l);
         FilterDefiniton.EventScript = new System.Collections.ObjectModel.ReadOnlyCollection<EventScript>(eves);
 
         #endregion
 
-        #region gemapptes Script Main erstellen
+        #region Zeilen Prüfen
 
-        var eve = FilterDefiniton.Events.CloneWithClones();
-        eve.Set("Value changed", "Main");
-        FilterDefiniton.Events = new System.Collections.ObjectModel.ReadOnlyCollection<Variable>(eve);
+        foreach (var thisrow in FilterDefiniton.Row) {
+            _ = thisrow.DoAutomatic(Events.new_row, false, string.Empty);
+        }
 
         #endregion
     }

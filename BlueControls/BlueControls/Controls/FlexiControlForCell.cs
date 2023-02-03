@@ -477,7 +477,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         var tmpC2 = _tmpColumn;
 
         tmpR2.CellSet(tmpC2, newValue);
-        if (oldVal != tmpR2.CellGetString(tmpC2)) { _ = tmpR2.DoAutomatic(false, false, 1, "value changed", false, string.Empty); }
+        if (oldVal != tmpR2.CellGetString(tmpC2)) { _ = tmpR2.DoAutomatic(false, false, 1, BlueDatabase.Enums.Events.value_changed, false, string.Empty); }
     }
 
     private ColumnItem? GetRealColumn(ColumnItem? column, RowItem? row) {

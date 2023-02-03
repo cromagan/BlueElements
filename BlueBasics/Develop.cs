@@ -90,6 +90,10 @@ public static class Develop {
         }
     }
 
+    public static void DebugPrint(IHasKeyName warnung) => DebugPrint(FehlerArt.Warnung, "Unbekanntes Item:" + warnung.KeyName);
+
+    public static void DebugPrint(IReadableText warnung) => DebugPrint(FehlerArt.Warnung, "Unbekanntes Item:" + warnung.ReadableText());
+
     public static void DebugPrint(string warnung) => DebugPrint(FehlerArt.Warnung, warnung);
 
     public static void DebugPrint(FehlerArt art, Exception ex) {
@@ -99,7 +103,7 @@ public static class Develop {
 
     public static void DebugPrint(Exception warnung) => DebugPrint(FehlerArt.Warnung, warnung);
 
-    public static void DebugPrint(object @enum) => DebugPrint(FehlerArt.Warnung, "Ein Wert einer Enumeration konnte nicht verarbeitet werden.\r\nEnumeration: " + @enum.GetType().FullName + "\r\nParameter: " + @enum);
+    public static void DebugPrint<T>(T @enum) where T : System.Enum => DebugPrint(FehlerArt.Warnung, "Ein Wert einer Enumeration konnte nicht verarbeitet werden.\r\nEnumeration: " + @enum.GetType().FullName + "\r\nParameter: " + @enum);
 
     public static void DebugPrint(FehlerArt art, string meldung) {
         lock (SyncLockObject) {

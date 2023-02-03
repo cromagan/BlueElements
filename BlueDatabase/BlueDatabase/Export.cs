@@ -44,18 +44,18 @@ public static class Export {
 
     #region Methods
 
-    public static string CreateLayout(RowItem row, string loadFile, string saveFile) {
+    public static string CreateLayout(RowItem row, string loadFile, string saveFile, string scriptname) {
         if (!FileExists(loadFile)) { return "Datei nicht gefunden."; }
         List<RowItem?> tmpList = new()
         {
             row
         };
-        return InternalCreateLayout(tmpList, File.ReadAllText(loadFile, Constants.Win1252), saveFile);
+        return InternalCreateLayout(tmpList, File.ReadAllText(loadFile, Constants.Win1252), saveFile, scriptname);
     }
 
-    public static string CreateLayout(List<RowItem?> rows, string loadFile, string saveFile) {
+    public static string CreateLayout(List<RowItem?> rows, string loadFile, string saveFile, string scriptname) {
         if (!FileExists(loadFile)) { return "Datei nicht gefunden."; }
-        return InternalCreateLayout(rows, File.ReadAllText(loadFile, Constants.Win1252), saveFile);
+        return InternalCreateLayout(rows, File.ReadAllText(loadFile, Constants.Win1252), saveFile, scriptname);
     }
 
     //Shared Sub SaveAsBitmap(Row As RowItem)
@@ -75,7 +75,7 @@ public static class Export {
     //    '   End If
     //End Sub
 
-    public static (List<string>? files, string error) GenerateLayout_FileSystem(List<RowItem?>? liste, string lad, string optionalFileName, bool eineGrosseDatei, string zielPfad) {
+    public static (List<string>? files, string error) GenerateLayout_FileSystem(List<RowItem?>? liste, string lad, string optionalFileName, bool eineGrosseDatei, string zielPfad, string scriptname) {
         List<string> l = new();
         if (liste == null) { return (null, "Keine Zeilen angegeben"); }
         string sav;
@@ -87,7 +87,7 @@ public static class Export {
                 sav = TempFile(zielPfad, liste[0].CellFirstString(), lad.FileSuffix());
             }
 
-            fehler = CreateLayout(liste, lad, sav);
+            fehler = CreateLayout(liste, lad, sav, scriptname);
             l.Add(sav);
         } else {
             foreach (var thisRow in liste) {
@@ -98,7 +98,7 @@ public static class Export {
                     sav = TempFile(zielPfad, thisRow.CellFirstString(), lad.FileSuffix());
                 }
 
-                fehler = CreateLayout(thisRow, lad, sav);
+                fehler = CreateLayout(thisRow, lad, sav, scriptname);
                 l.Add(sav);
             }
             //    If OpenIt Then ExecuteFile(ZielPfad)
@@ -467,7 +467,7 @@ public static class Export {
     //    var codes = Code.Split('/');
     //    var z = -1;
     //    object Tx = string.Empty;
-    //    var BT = "";
+    //    var BT = string.Empty;
     //    var Ended = false;
     //    //http://de.selfhtml.org/html/referenz/zeichen.htm#benannte_iso8859_1
     //    ColumnItem Col = null;
@@ -485,12 +485,12 @@ public static class Export {
     //    } while (true);
     //}
 
-    public static (List<string>? files, string error) SaveAs(RowItem row, string layout, string destinationFile) {
+    public static (List<string>? files, string error) SaveAs(RowItem row, string layout, string destinationFile, string scriptname) {
         List<RowItem?> l = new()
         {
             row
         };
-        return GenerateLayout_FileSystem(l, layout, destinationFile, false, string.Empty);
+        return GenerateLayout_FileSystem(l, layout, destinationFile, false, string.Empty, scriptname);
     }
 
     public static (List<string>? files, string error) SaveAsBitmap(List<RowItem?> row, string layoutId, string path) {
@@ -505,7 +505,7 @@ public static class Export {
 
     public static void SaveAsBitmap(RowItem row, string layoutId, string filename) => row.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventArgs(row, layoutId, filename));
 
-    private static string InternalCreateLayout(List<RowItem?>? rows, string fileLoaded, string saveFileName) {
+    private static string InternalCreateLayout(List<RowItem?>? rows, string fileLoaded, string saveFileName, string scriptname) {
         var head = string.Empty;
         var foot = string.Empty;
         var body = fileLoaded;
@@ -526,7 +526,7 @@ public static class Export {
                 if (thisRow != null) {
                     var tmpBody = body;
 
-                    var (_, _, script) = thisRow.DoAutomatic("export", false, string.Empty);
+                    var (_, _, script) = thisRow.DoAutomatic(null, false, scriptname);
                     if (script == null) { return "Script Fehler!"; }
 
                     if (!string.IsNullOrEmpty(script.Error)) {

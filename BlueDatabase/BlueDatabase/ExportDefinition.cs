@@ -51,6 +51,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
     private int _exportSpaltenAnsicht;
     private FilterCollection? _filter;
     private DateTime _lastExportTimeUtc;
+    private string _scriptname;
     private ExportTyp _typ;
     private string _verzeichnis;
 
@@ -171,6 +172,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
     }
 
     public bool IsDisposed { get; private set; }
+
     public bool IsParsing { get; private set; }
 
     public DateTime LastExportTimeUtc {
@@ -178,6 +180,15 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
         set {
             if (_lastExportTimeUtc == value) { return; }
             _lastExportTimeUtc = value;
+            OnChanged();
+        }
+    }
+
+    public string ScriptName {
+        get => _scriptname;
+        set {
+            if (_scriptname == value) { return; }
+            _scriptname = value;
             OnChanged();
         }
     }
@@ -434,33 +445,31 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
     public override string ToString() {
         try {
             var shortener = GetShortener();
-            var result = "{";
-            result = result + "sho=" + shortener.ToNonCritical() + ", ";
-            result = result + "dest=" + _verzeichnis.ToNonCritical() + ", ";
-            result = result + "typ=" + (int)_typ + ", ";
-            result = result + "let=" + _lastExportTimeUtc.ToString(Constants.Format_Date5) + ", ";
-            result = result + "itv=" + _backupInterval.ToString(CultureInfo.InvariantCulture).ToNonCritical() + ", ";
-            if (_typ is ExportTyp.DatenbankCSVFormat or ExportTyp.DatenbankHTMLFormat or ExportTyp.DatenbankOriginalFormat) {
-                result = result + "aud=" + _autoDelete.ToString(CultureInfo.InvariantCulture).ToNonCritical() + ", ";
-                if (_typ != ExportTyp.DatenbankOriginalFormat) {
-                    result = result + "exc=" + _exportSpaltenAnsicht + ", ";
-                }
-            } else {
-                result = result + "exid=" + _exportFormularId.ToNonCritical() + ", ";
-            }
-            if (_filter != null && _filter.IsDisposed && _filter.Count > 0) {
-                result = result + "flt=" + _filter.ToString(true) + ", ";
-            }
+
+            var Result = new List<string>();
+            Result.ParseableAdd("sho", shortener);
+            Result.ParseableAdd("dest", _verzeichnis);
+            Result.ParseableAdd("typ", _typ);
+            Result.ParseableAdd("let", _lastExportTimeUtc);
+            Result.ParseableAdd("itv", _backupInterval);
+            Result.ParseableAdd("scn", _scriptname);
+            Result.ParseableAdd("aud", _autoDelete);
+            Result.ParseableAdd("exc", _exportSpaltenAnsicht);
+            Result.ParseableAdd("exid", _exportFormularId);
+            Result.ParseableAdd("flt", (IStringable?)_filter);
+
+            var tmp = string.Empty;
             if (BereitsExportiert.Count > 0) {
-                result += "exp=";
                 foreach (var thise in BereitsExportiert) {
-                    result = !string.IsNullOrEmpty(shortener) && thise.StartsWith(shortener)
-                        ? result + "@" + thise.TrimStart(shortener) + "#"
-                        : result + thise + "#";
+                    tmp = !string.IsNullOrEmpty(shortener) && thise.StartsWith(shortener)
+                        ? tmp + "@" + thise.TrimStart(shortener) + "#"
+                        : tmp + thise + "#";
                 }
-                result = result.TrimEnd("#") + ", ";
+                tmp = tmp.TrimEnd("#");
             }
-            return result.TrimEnd(", ") + "}";
+            Result.ParseableAdd("exp", tmp);
+
+            return Result.Parseable();
         } catch {
             return ToString();
         }
@@ -601,7 +610,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
                                         Export.SaveAsBitmap(thisrow, _exportFormularId, singleFileExport);
                                     } else {
                                         singleFileExport = TempFile(savePath, thisrow.CellFirstString().StarkeVereinfachung(" "), _exportFormularId.FileSuffix());
-                                        _ = Export.SaveAs(thisrow, _exportFormularId, singleFileExport);
+                                        _ = Export.SaveAs(thisrow, _exportFormularId, singleFileExport, _scriptname);
                                     }
                                     added.Add(singleFileExport + "|" + tim + "|" + thisrow.Key);
                                 }

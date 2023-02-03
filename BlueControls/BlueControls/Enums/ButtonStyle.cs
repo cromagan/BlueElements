@@ -30,7 +30,7 @@ public enum ButtonStyle {
     Checkbox = 2,
     Checkbox_Big_Borderless = Checkbox | Button_Big_Borderless,
     Checkbox_Text = Checkbox | Text,
-    Yes_or_No = Checkbox | 4,
+    Yes_or_No = 6, // = Checkbox | 4,
 
     Optionbox = 16,
     Optionbox_Big_Borderless = Optionbox | Button_Big_Borderless,

@@ -33,7 +33,7 @@ namespace BlueControls.Classes_Editor
             //AbstractClassEditor
             //
             this.Size = new Size(480, 218);
-            this.Text = "";
+            this.Text = string.Empty;
             this.ResumeLayout(false);
         }
     }

@@ -239,7 +239,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
     private void Database_Disposing(object sender, System.EventArgs e) => Close();
 
     private void SaveCurrentLayout() {
-        scriptEditor.WriteScriptBack();
+        //scriptEditor.WriteScriptBack();
         if (Database == null) { return; }
         var newl = Pad.Item.ToString(false);
         var ind = Database.Layouts.LayoutIdToIndex(Pad.Item.Id);

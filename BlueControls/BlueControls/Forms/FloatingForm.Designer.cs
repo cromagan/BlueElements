@@ -44,7 +44,7 @@ namespace BlueControls.Forms
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Text = "";
+            this.Text = string.Empty;
             this.ResumeLayout(false);
         }
         #endregion

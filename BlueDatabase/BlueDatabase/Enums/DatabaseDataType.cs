@@ -145,8 +145,6 @@ public enum DatabaseDataType : byte {
     //FirstColumn = 70,
     DatabaseVariables = 71,
 
-    Events = 72,
-
     //Info_ColumDataSart = 100,
     //Info_ColumnDataEnd = 199,
     ColumnName = 100,

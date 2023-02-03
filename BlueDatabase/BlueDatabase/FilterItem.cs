@@ -329,19 +329,17 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
         Develop.DebugPrint_Disposed(IsDisposed);
         try {
             if (!IsOk()) { return string.Empty; }
-            var result = "{Type=" + (int)_filterType;
 
-            if (Database != null && !Database.IsDisposed) { result = result + ", Database=" + Database.ConnectionData.UniqueID; }
+            var Result = new List<string>();
+            Result.ParseableAdd("Type", _filterType);
 
-            if (_column != null) {
-                result = result + ", ColumnName=" + _column.Name;
-            }
-
+            Result.ParseableAdd("Database", Database);
+            Result.ParseableAdd("ColumnName", _column);
             foreach (var t in SearchValue) {
-                result = result + ", Value=" + t.ToNonCritical();
+                Result.ParseableAdd("Value", t);
             }
-            if (!string.IsNullOrEmpty(Herkunft)) { result = result + ", Herkunft=" + Herkunft.ToNonCritical(); }
-            return result + "}";
+            Result.ParseableAdd("Herkunft", Herkunft);
+            return Result.Parseable();
         } catch {
             return ToString();
         }

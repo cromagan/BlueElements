@@ -62,8 +62,6 @@ internal sealed partial class FilterItem_Editor : AbstractClassEditor<FilterItem
     }
 
     private void AutoFilter_FilterComand(object sender, FilterComandEventArgs e) {
-        if (IsFilling) { return; }
-
         if (e.Comand != "Filter") {
             Notification.Show("Diese Funktion wird nicht unterstützt,<br>abbruch.");
             return;
@@ -74,7 +72,6 @@ internal sealed partial class FilterItem_Editor : AbstractClassEditor<FilterItem
         Item.FilterType = e.Filter.FilterType;
         Item.SearchValue.Clear();
         Item.SearchValue.AddRange(e.Filter.SearchValue);
-        OnChanged();
     }
 
     private void btnFilterWahl_Click(object sender, System.EventArgs e) {
@@ -91,13 +88,11 @@ internal sealed partial class FilterItem_Editor : AbstractClassEditor<FilterItem
     }
 
     private void cbxColumns_TextChanged(object sender, System.EventArgs e) {
-        if (IsFilling) { return; }
         var c = Item.Database.Column[cbxColumns.Text];
         btnFilterWahl.Enabled = c == null || c.AutoFilterSymbolPossible() || true;
         Item.Column = c;
         Item.FilterType = FilterType.KeinFilter;
         Item.SearchValue.Clear();
-        OnChanged();
     }
 
     #endregion

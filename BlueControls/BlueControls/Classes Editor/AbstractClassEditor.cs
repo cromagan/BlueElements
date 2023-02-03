@@ -25,7 +25,7 @@ using System.ComponentModel;
 namespace BlueControls.Classes_Editor;
 
 [DefaultEvent("Changed")]
-internal partial class AbstractClassEditor<T> : Controls.GroupBox where T : IParseable {
+internal partial class AbstractClassEditor<T> : Controls.GroupBox, IChangedFeedback, IDisposableExtended where T : IParseable {
 
     #region Fields
 
@@ -53,8 +53,6 @@ internal partial class AbstractClassEditor<T> : Controls.GroupBox where T : IPar
 
     public bool Inited { get; private set; }
 
-    public bool IsFilling { get; private set; }
-
     /// <summary>
     /// Das Objekt, das im Original bearbeitet wird.
     /// </summary>
@@ -63,21 +61,24 @@ internal partial class AbstractClassEditor<T> : Controls.GroupBox where T : IPar
     internal T? Item {
         get => _item;
         set {
+            if (_item != null) {
+                _item.Changed -= _item_Changed;
+            }
+
             _item = value;
+
             if (_item != null) {
                 _lastState = _item.ToString();
                 if (!Inited) {
                     Inited = true;
                     PrepaireFormula();
                 }
-                IsFilling = true;
+
                 EnabledAndFillFormula();
-                IsFilling = false;
+                _item.Changed += _item_Changed;
             } else {
                 _lastState = string.Empty;
-                IsFilling = true;
                 DisableAndClearFormula();
-                IsFilling = false;
             }
         }
     }
@@ -85,6 +86,10 @@ internal partial class AbstractClassEditor<T> : Controls.GroupBox where T : IPar
     #endregion
 
     #region Methods
+
+    public void OnChanged() {
+        Changed?.Invoke(this, System.EventArgs.Empty);
+    }
 
     /// <summary>
     /// Sperrt die komplette Bearbeitung des Formulars und löscht alle Einträge.
@@ -97,26 +102,14 @@ internal partial class AbstractClassEditor<T> : Controls.GroupBox where T : IPar
     /// </summary>
     protected virtual void EnabledAndFillFormula() => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
 
-    protected void OnChanged() {
-        if (IsFilling) { return; }
-        if (_item == null) { return; }
-
-        var newstatse = _item.ToString();
-        if (newstatse == _lastState) { return; }
-
-        _lastState = newstatse;
-        Changed?.Invoke(this, System.EventArgs.Empty);
-    }
-
     protected override void OnVisibleChanged(System.EventArgs e) {
         base.OnVisibleChanged(e);
         // Damit das Formular nach der Anzeige erstmal deaktiviert ist.
         if (_visibleChangedDone) { return; }
         _visibleChangedDone = true;
+
         if (_item == null) {
-            IsFilling = true;
             DisableAndClearFormula();
-            IsFilling = false;
         }
     }
 
@@ -125,6 +118,18 @@ internal partial class AbstractClassEditor<T> : Controls.GroupBox where T : IPar
     /// Diese Routine wird aufgerufen, wenn das Item zum ersten Mal empfangen wurde.
     /// </summary>
     protected virtual void PrepaireFormula() => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
+
+    private void _item_Changed(object sender, System.EventArgs e) {
+        if (_item == null) { return; }
+
+        if (_item is IDisposableExtended d && d.IsDisposed) { return; }
+
+        var newstatse = _item.ToString();
+        if (newstatse == _lastState) { return; }
+
+        _lastState = newstatse;
+        OnChanged();
+    }
 
     #endregion
 }

@@ -305,7 +305,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
                 break;
 
             default:
-                Develop.DebugPrint(e);
+                Develop.DebugPrint(e.ClickedComand);
                 break;
         }
     }

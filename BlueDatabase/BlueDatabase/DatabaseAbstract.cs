@@ -23,6 +23,7 @@ using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
+using BlueScript;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
@@ -42,7 +43,7 @@ namespace BlueDatabase;
 
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public abstract class DatabaseAbstract : IDisposableExtended {
+public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     #region Fields
 
@@ -63,7 +64,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     private readonly List<ColumnViewCollection> _columnArrangements = new();
     private readonly List<string> _datenbankAdmin = new();
 
-    private readonly List<Variable> _events = new();
     private readonly List<EventScript?> _EventScript = new();
 
     /// <summary>
@@ -241,15 +241,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         }
     }
 
-    public ReadOnlyCollection<Variable> Events {
-        get => new(_events);
-        set {
-            if (_events.ToString(true) == value.ToString(true)) { return; }
-            _ = ChangeData(DatabaseDataType.Events, null, null, _events.ToString(true), value.ToString(true), string.Empty);
-            OnViewChanged();
-        }
-    }
-
     public ReadOnlyCollection<EventScript?> EventScript {
         get => new(_EventScript);
         set {
@@ -301,6 +292,13 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     /// Letzter Lade-Stand der Daten. Wird in OnLoaded gesetzt
     /// </summary>
     public DateTime? IsInCache { get; private set; }
+
+    public string KeyName {
+        get {
+            if (IsDisposed) { return string.Empty; }
+            return ConnectionData.UniqueID;
+        }
+    }
 
     public LayoutCollection Layouts {
         get => _layouts;
@@ -732,7 +730,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
 
         EventScript = sourceDatabase.EventScript;
         Variables = sourceDatabase.Variables;
-        Events = sourceDatabase.Events;
+        //Events = sourceDatabase.Events;
 
         UndoCount = sourceDatabase.UndoCount;
     }
@@ -1044,7 +1042,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         return GetById(x, null);// new DatabaseSQL(_sql, readOnly, tablename);
     }
 
-    public string Import(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart, bool dorowautmatic, string script) {
+    public string Import(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart, bool dorowautmatic, string scriptnameeverychangedrow) {
         // Vorbereitung des Textes -----------------------------
         importText = importText.Replace("\r\n", "\r").Trim("\r");
 
@@ -1054,26 +1052,25 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         List<string[]> zeil = new();
         var neuZ = 0;
         for (var z = 0; z <= ein.GetUpperBound(0); z++) {
+            //#region Das Skript berechnen
 
-            #region Das Skript berechnen
+            //if (!string.IsNullOrEmpty(scriptnameeverychangedrow)) {
+            //    var vars = new List<Variable> {
+            //        new VariableString("Row", ein[z], false, false, "Der Original-Text. Dieser kann (und soll) manipuliert werden."),
+            //        new VariableBool("IsCaption", spalteZuordnen && z == 0, true, false, "Wenn TRUE, ist das die erste Zeile, die Überschriften enthält."),
+            //        new VariableString("Seperator", splitChar, true, false, "Das Trennzeichen")
+            //    };
+            //    var x = new BlueScript.Script(vars, string.Empty, false) {
+            //        ScriptText = scriptnameeverychangedrow
+            //    };
+            //    if (!x.Parse()) {
+            //        OnDropMessage(FehlerArt.Warnung, "Skript-Fehler, Import kann nicht ausgeführt werden.");
+            //        return x.Error;
+            //    }
+            //    ein[z] = vars.GetString("Row");
+            //}
 
-            if (!string.IsNullOrEmpty(script)) {
-                var vars = new List<Variable> {
-                    new VariableString("Row", ein[z], false, false, "Der Original-Text. Dieser kann (und soll) manipuliert werden."),
-                    new VariableBool("IsCaption", spalteZuordnen && z == 0, true, false, "Wenn TRUE, ist das die erste Zeile, die Überschriften enthält."),
-                    new VariableString("Seperator", splitChar, true, false, "Das Trennzeichen")
-                };
-                var x = new BlueScript.Script(vars, string.Empty, false) {
-                    ScriptText = script
-                };
-                if (!x.Parse()) {
-                    OnDropMessage(FehlerArt.Warnung, "Skript-Fehler, Import kann nicht ausgeführt werden.");
-                    return x.Error;
-                }
-                ein[z] = vars.GetString("Row");
-            }
-
-            #endregion
+            //#endregion
 
             if (eliminateMultipleSplitter) {
                 ein[z] = ein[z].Replace(splitChar + splitChar, splitChar);
@@ -1145,7 +1142,7 @@ public abstract class DatabaseAbstract : IDisposableExtended {
                 } else {
                     row?.CellSet(columns[spaltNo], zeil[zeilNo][spaltNo].SplitAndCutBy("|").JoinWithCr());
                 }
-                if (row != null && dorowautmatic) { _ = row.DoAutomatic(true, true, "import", false, string.Empty); }
+                if (row != null && dorowautmatic) { _ = row.DoAutomatic(true, true, null, false, scriptnameeverychangedrow); }
             }
         }
 
@@ -1311,7 +1308,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     public bool RefreshRowData(RowItem row, bool refreshAlways) => RefreshRowData(new List<RowItem>() { row }, refreshAlways);
 
     public virtual void RepairAfterParse() {
-        RepairEvents();
         Column.Repair();
         RepairColumnArrangements();
         RepairViews();
@@ -1674,9 +1670,8 @@ public abstract class DatabaseAbstract : IDisposableExtended {
         _additionalFilesPfad = "AdditionalFiles";
         _zeilenQuickInfo = string.Empty;
         _sortDefinition = null;
-        _events.Clear();
+        _EventScript.Clear();
         _variables.Clear();
-        _events.Clear();
     }
 
     protected void OnLoaded() {
@@ -1783,31 +1778,28 @@ public abstract class DatabaseAbstract : IDisposableExtended {
     }
 
     private void ConvertRules(string scriptText) {
-        RepairEvents();
-
         //var eves = EventScript.CloneWithClones();
         var l = new EventScript(this) {
             NeedRow = true,
             ManualExecutable = false,
             Script = scriptText,
-            Name = "Main"
+            Name = "DatenueberpruefungIntern"
         };
         _EventScript.Add(l);
 
-        foreach (var thisevent in _events) {
-            if (thisevent is VariableString s) {
-                s.ValueString = thisevent.Name.Replace(" ", "_");
+        var t = typeof(Events);
 
-                var sc = new EventScript(this) {
-                    Name = s.ValueString,
-                    NeedRow = true,
-                    ManualExecutable = false,
-                    Script = "//ACHTUNG: Keinesfalls dürfen Startroutinenabhängig Werte verändert werden.\r\n" +
-                             "var Startroutine = \"" + thisevent.Name + "\";\r\n" +
-                             "Call(\"Main\", false);"
-                };
-                _EventScript.Add(sc);
-            }
+        foreach (int z1 in Enum.GetValues(t)) {
+            var ln = new EventScript(this) {
+                NeedRow = true,
+                ManualExecutable = false,
+                Name = Enum.GetName(t, z1),
+                Events = (Events)z1,
+                Script = "//ACHTUNG: Keinesfalls dürfen startroutinenabhängig Werte verändert werden.\r\n" +
+                         "var Startroutine = \"" + Enum.GetName(t, z1).Replace("_", " ") + "\";\r\n" +
+                         "Call(\"DatenueberpruefungIntern\", false);"
+            };
+            _EventScript.Add(ln);
         }
     }
 
@@ -1916,20 +1908,6 @@ public abstract class DatabaseAbstract : IDisposableExtended {
             var l = new List<string>();
             l.Save(fullhashname, Encoding.UTF8, false);
         } catch { }
-    }
-
-    private void RepairEvents() {
-        var possnames = new List<string>() { "new row", "value changed", "manual check", "to be sure", "import", "export", "script" };
-
-        //var ev = _events.CloneWithClones() ?? new List<Variable?>();
-
-        foreach (var thisName in possnames) {
-            var e = _events.Get(thisName);
-
-            if (e == null) {
-                _events.Set(thisName, string.Empty);
-            }
-        }
     }
 
     //private void Row_RowAdded(object sender, RowEventArgs e) {

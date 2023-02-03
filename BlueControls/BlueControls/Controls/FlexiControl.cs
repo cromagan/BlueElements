@@ -792,8 +792,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             Enabled = Enabled,
             Name = "YesNoButton",
             ButtonStyle = ButtonStyle.Yes_or_No,
-            Text = "",
-            ImageCode = ""
+            Text = string.Empty,
+            ImageCode = string.Empty
         };
         UpdateValueToControl();
         StandardBehandlung(control);

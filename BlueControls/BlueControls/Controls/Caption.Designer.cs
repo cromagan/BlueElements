@@ -30,7 +30,7 @@ namespace BlueControls.Controls
             // 
             //Caption
             // 
-            this.Name = "";
+            this.Name = string.Empty;
             this.ResumeLayout(false);
         }
     }

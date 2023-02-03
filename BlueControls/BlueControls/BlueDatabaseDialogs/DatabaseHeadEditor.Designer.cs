@@ -71,10 +71,12 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tblUndo = new BlueControls.Controls.Table();
             this.capBinInfo = new BlueControls.Controls.Caption();
             this.btnSave = new BlueControls.Controls.Button();
+            this.table1 = new BlueControls.Controls.Table();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
             this.GlobalTab.SuspendLayout();
             this.tabAllgemein.SuspendLayout();
+            this.tabEvents.SuspendLayout();
             this.tabScripts.SuspendLayout();
             this.grpVerfügbareSkripte.SuspendLayout();
             this.tabRechte.SuspendLayout();
@@ -406,6 +408,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // tabEvents
             // 
             this.tabEvents.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabEvents.Controls.Add(this.table1);
             this.tabEvents.Location = new System.Drawing.Point(4, 25);
             this.tabEvents.Name = "tabEvents";
             this.tabEvents.Padding = new System.Windows.Forms.Padding(3);
@@ -428,13 +431,13 @@ namespace BlueControls.BlueDatabaseDialogs
             // eventScriptEditor
             // 
             this.eventScriptEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.eventScriptEditor.Database = null;
             this.eventScriptEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.eventScriptEditor.Location = new System.Drawing.Point(3, 171);
+            this.eventScriptEditor.Location = new System.Drawing.Point(3, 128);
             this.eventScriptEditor.Name = "eventScriptEditor";
-            this.eventScriptEditor.Size = new System.Drawing.Size(1033, 442);
+            this.eventScriptEditor.Size = new System.Drawing.Size(1033, 485);
             this.eventScriptEditor.TabIndex = 3;
             this.eventScriptEditor.TabStop = false;
-            this.eventScriptEditor.Text = "eventScript_Editor";
             this.eventScriptEditor.Changed += new System.EventHandler(this.eventScript_Editor1_Changed);
             // 
             // grpVerfügbareSkripte
@@ -445,7 +448,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpVerfügbareSkripte.Dock = System.Windows.Forms.DockStyle.Top;
             this.grpVerfügbareSkripte.Location = new System.Drawing.Point(3, 3);
             this.grpVerfügbareSkripte.Name = "grpVerfügbareSkripte";
-            this.grpVerfügbareSkripte.Size = new System.Drawing.Size(1033, 168);
+            this.grpVerfügbareSkripte.Size = new System.Drawing.Size(1033, 125);
             this.grpVerfügbareSkripte.TabIndex = 2;
             this.grpVerfügbareSkripte.TabStop = false;
             this.grpVerfügbareSkripte.Text = "Verfügbare Skripte:";
@@ -460,7 +463,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lstEventScripts.Location = new System.Drawing.Point(8, 24);
             this.lstEventScripts.Name = "lstEventScripts";
             this.lstEventScripts.RemoveAllowed = true;
-            this.lstEventScripts.Size = new System.Drawing.Size(1018, 136);
+            this.lstEventScripts.Size = new System.Drawing.Size(1018, 93);
             this.lstEventScripts.TabIndex = 0;
             this.lstEventScripts.AddClicked += new System.EventHandler(this.lstEventScripts_AddClicked);
             this.lstEventScripts.ItemCheckedChanged += new System.EventHandler(this.lstEventScripts_ItemCheckedChanged);
@@ -624,6 +627,16 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnSave.Text = "Speichern";
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
+            // table1
+            // 
+            this.table1.DropMessages = false;
+            this.table1.Location = new System.Drawing.Point(16, 16);
+            this.table1.Name = "table1";
+            this.table1.ShowWaitScreen = true;
+            this.table1.Size = new System.Drawing.Size(728, 464);
+            this.table1.TabIndex = 0;
+            this.table1.Text = "tblEventZuordnungen";
+            // 
             // DatabaseHeadEditor
             // 
             this.ClientSize = new System.Drawing.Size(1050, 677);
@@ -639,6 +652,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpKennwort.ResumeLayout(false);
             this.GlobalTab.ResumeLayout(false);
             this.tabAllgemein.ResumeLayout(false);
+            this.tabEvents.ResumeLayout(false);
             this.tabScripts.ResumeLayout(false);
             this.grpVerfügbareSkripte.ResumeLayout(false);
             this.tabRechte.ResumeLayout(false);
@@ -696,5 +710,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private GroupBox grpVerfügbareSkripte;
         private ListBox lstEventScripts;
         private EventScript_Editor eventScriptEditor;
+        private Table table1;
     }
 }

@@ -19,6 +19,7 @@
 
 using BlueScript;
 using BlueScript.Structures;
+using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueDatabase.AdditionalScriptComands;
@@ -27,8 +28,8 @@ public class Method_CheckRow : MethodDatabase {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableRowItem.ShortName_Variable } };
-    public override string Description => "Prüft die angegebene Zeile mit der Startroutine 'script'. Wenn die Zeile Null ist, wird kein Fehler ausgegeben.";
+    public override List<List<string>> Args => new() { new List<string> { VariableRowItem.ShortName_Variable, VariableString.ShortName_Plain, } };
+    public override string Description => "Prüft die angegebene Zeile. Wenn die Zeile Null ist, wird kein Fehler ausgegeben.";
 
     public override bool EndlessArgs => false;
 
@@ -39,7 +40,7 @@ public class Method_CheckRow : MethodDatabase {
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
 
-    public override string Syntax => "CheckRow(Row);";
+    public override string Syntax => "CheckRow(Row, Scriptname);";
 
     #endregion
 
@@ -52,7 +53,7 @@ public class Method_CheckRow : MethodDatabase {
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
         var row = Method_Row.ObjectToRow(attvar.Attributes[0]);
-        _ = (row?.DoAutomatic("script", s.OnlyTesting, string.Empty));
+        _ = (row?.DoAutomatic(null, s.OnlyTesting, ((VariableString)attvar.Attributes[0]).ValueString));
         return DoItFeedback.Null();
     }
 
