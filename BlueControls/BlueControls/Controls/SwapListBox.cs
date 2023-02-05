@@ -95,7 +95,7 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
         //    TargetItem = new TextListItem(Internal);
         //    Target.Item.Add(TargetItem);
         //}
-        target.Item.Sort();
+        //target.Item.Sort();
         if (sourceItem != null && doRemove) { source.Item.Remove(sourceItem); }
     }
 
@@ -123,16 +123,16 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
 
     private void Main_AddClicked(object sender, System.EventArgs e) => OnAddClicked();
 
-    private void Main_ItemAdded(object sender, ListEventArgs e) {
-        MoveItemBetweenList(Suggest, Main, ((BasicListItem)e.Item).Internal, true);
-        OnItemAdded(e);
-    }
+    //private void Main_ItemAdded(object sender, ListEventArgs e) {
+    //    MoveItemBetweenList(Suggest, Main, ((BasicListItem)e.Item).Internal, true);
+    //    OnItemAdded(e);
+    //}
 
     private void Main_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) => MoveItemBetweenList(Main, Suggest, e.Item.Internal, true);
 
-    private void Main_ItemRemoved(object sender, System.EventArgs e) => OnItemRemoved(e);
+    //private void Main_ItemRemoved(object sender, System.EventArgs e) => OnItemRemoved(e);
 
-    private void Main_ItemRemoving(object sender, ListEventArgs e) => MoveItemBetweenList(Main, Suggest, ((BasicListItem)e.Item).Internal, false);
+    //private void Main_ItemRemoving(object sender, ListEventArgs e) => MoveItemBetweenList(Main, Suggest, ((BasicListItem)e.Item).Internal, false);
 
     private void Suggest_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) => MoveItemBetweenList(Suggest, Main, e.Item.Internal, true);
 

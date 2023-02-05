@@ -36,6 +36,12 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
 
     #endregion
 
+    #region Properties
+
+    public bool Editabe { get; set; }
+
+    #endregion
+
     #region Methods
 
     public RowItem? RowOfVariable(string variable) {
@@ -48,7 +54,7 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
         return tableVariablen.Database.Row[variable.Name];
     }
 
-    public void WriteVariablesToTable(List<Variable>? variables) {
+    public void WriteVariablesToTable(IList<Variable>? variables) {
         if (tableVariablen?.Database == null) { return; }
         if (variables == null) { return; }
 
@@ -60,7 +66,7 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
             ro.CellSet("System", thisv.SystemVariable);
 
             var tmpi = thisv.ReadableText;
-            if (tmpi.Length > 500) { tmpi = tmpi.Substring(0, 500) + "..."; }
+            if (!Editabe && tmpi.Length > 500) { tmpi = tmpi.Substring(0, 500) + "..."; }
 
             ro.CellSet("Inhalt", tmpi);
             ro.CellSet("Kommentar", thisv.Comment);
@@ -71,12 +77,20 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
 
     private void GenerateVariableTable() {
         Database x = new(false, "Script_Variablen");
-        _ = x.Column.GenerateAndAdd("Name", "N", ColumnFormatHolder.Text, "Variablenname");
+        var na = x.Column.GenerateAndAdd("Name", "N", ColumnFormatHolder.SystemName, "Variablenname");
         _ = x.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder.Text, "Variablentyp");
         _ = x.Column.GenerateAndAdd("RO", "R", ColumnFormatHolder.Bit, "Readonly, Schreibgeschützt");
         _ = x.Column.GenerateAndAdd("System", "S", ColumnFormatHolder.Bit, "Systemspalte\r\nIm Script nicht verfügbar");
-        _ = x.Column.GenerateAndAdd("Inhalt", "I", ColumnFormatHolder.Text, "Inhalt (gekürzte Ansicht)");
-        _ = x.Column.GenerateAndAdd("Kommentar", "K", ColumnFormatHolder.Text, "Komentar");
+        var inh = x.Column.GenerateAndAdd("Inhalt", "I", ColumnFormatHolder.Text, "Inhalt");
+        var kom = x.Column.GenerateAndAdd("Kommentar", "K", ColumnFormatHolder.Text, "Komentar");
+
+        if (Editabe) {
+            x.PermissionGroupsNewRow = new(new List<string>() { "#Everybody" });
+        }
+
+        //        if (Editabe) {
+        //na.ed
+        //        }
 
         foreach (var thisColumn in x.Column.Where(thisColumn => !thisColumn.IsSystemColumn())) {
             thisColumn.MultiLine = true;

@@ -57,9 +57,9 @@ public class TextListItem : BasicListItem {
 
     public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Text.ToUpper().Contains(filterText.ToUpper());
 
-    public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth) => SizeUntouchedForListBox().Height;
+    public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth, Design itemdesign) => SizeUntouchedForListBox(itemdesign).Height;
 
-    protected override Size ComputeSizeUntouchedForListBox() => Skin.FormatedText_NeededSize(Text, Symbol, Skin.GetBlueFont(TempDesign(Parent.ItemDesign), States.Standard), 16);
+    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => Skin.FormatedText_NeededSize(Text, Symbol, Skin.GetBlueFont(TempDesign(itemdesign), States.Standard), 16);
 
     protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design design, States vState, bool drawBorderAndBack, bool translate) {
         var tmpd = TempDesign(design);

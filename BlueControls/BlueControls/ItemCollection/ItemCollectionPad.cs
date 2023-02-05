@@ -44,7 +44,6 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
 
     public const int Dpi = 300;
     public static List<BasicPadItem>? PadItemTypes;
-    public string _scriptName = string.Empty;
     internal string Caption;
     internal string Id;
 
@@ -60,6 +59,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
     private PointM? _prRo;
     private PointM? _prRu;
     private Padding _randinMm = Padding.Empty;
+    private string _scriptName = string.Empty;
     private SizeF _sheetSizeInMm = SizeF.Empty;
     private RowItem? _sheetStyle;
     private float _sheetStyleScale;
@@ -214,7 +214,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
     public float GridSnap {
         get => _gridsnap;
         set {
-            if (_gridsnap == value) { return; }
+            if (Math.Abs(_gridsnap - value) < 0.00001) { return; }
             _gridsnap = value;
             OnChanged();
         }
@@ -581,51 +581,42 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
     }
 
     public new string ToString() {
-        var t = "{";
-        if (!string.IsNullOrEmpty(Id)) { t = t + "ID=" + Id.ToNonCritical() + ", "; }
-        if (!string.IsNullOrEmpty(Caption)) { t = t + "Caption=" + Caption.ToNonCritical() + ", "; }
-        if (SheetStyle != null) { t = t + "Style=" + SheetStyle.CellFirstString().ToNonCritical() + ", "; }
-        if (SheetStyleScale < 0.1d) { SheetStyleScale = 1.0f; }
-        t = t + "BackColor=" + BackColor.ToArgb() + ", ";
-        if (Math.Abs(SheetStyleScale - 1) > 0.001d) { t = t + "FontScale=" + SheetStyleScale + ", "; }
+        List<string> result = new();
+        result.ParseableAdd("ID", Id);
+        result.ParseableAdd("Caption", Caption);
+        result.ParseableAdd("Style", SheetStyle);
+
+        result.ParseableAdd("BackColor", BackColor);
+        if (Math.Abs(SheetStyleScale - 1) > 0.001d) {
+            result.ParseableAdd("FontScale", SheetStyleScale);
+        }
+
         if (SheetSizeInMm.Width > 0 && SheetSizeInMm.Height > 0) {
-            t = t + "SheetSize=" + SheetSizeInMm + ", ";
-            t = t + "PrintArea=" + RandinMm + ", ";
+            result.ParseableAdd("SheetSize", SheetSizeInMm);
+            result.ParseableAdd("PrintArea", RandinMm.ToString());
         }
-        //t = t + "Dpi=" + Dpi + ", "; // TODO: Nach Update wieder aktivieren
 
-        #region Items
+        result.ParseableAdd("Items", "Item", this.ToList());
 
-        t += "Items={";
-        foreach (var thisitem in this) {
-            if (thisitem != null) {
-                t = t + "Item=" + thisitem + ", ";
-            }
-        }
-        t = t.TrimEnd(", ") + "}, ";
+        result.ParseableAdd("ScriptName", _scriptName);
 
-        #endregion
+        result.ParseableAdd("SnapMode", _snapMode);
+        result.ParseableAdd("GridShow", _gridShow);
+        result.ParseableAdd("GridSnap", _gridsnap);
 
-        #region Items
+        var tmp = result.Parseable();
 
-        t += "Connections={";
+        result.Clear();
+        //t += "Connections={";
         foreach (var thisitem in this) {
             if (thisitem != null) {
                 foreach (var thisCon in thisitem.ConnectsTo) {
-                    t = t + "Connection=" + thisCon.ToString(thisitem) + ", ";
+                    result.ParseableAdd("Connection", thisCon.ToString(thisitem));
                 }
             }
         }
-        t = t.TrimEnd(", ") + "}, ";
 
-        #endregion
-
-        t = t + "ScriptName=" + _scriptName + ", ";
-
-        t = t + "SnapMode=" + ((int)_snapMode) + ", ";
-        t = t + "GridShow=" + _gridShow + ", ";
-        t = t + "GridSnap=" + _gridsnap + ", ";
-        return t.TrimEnd(", ") + "}";
+        return result.Parseable(tmp);
     }
 
     internal Rectangle DruckbereichRect() => _prLo == null ? new Rectangle(0, 0, 0, 0) : new Rectangle((int)_prLo.X, (int)_prLo.Y, (int)(_prRu.X - _prLo.X), (int)(_prRu.Y - _prLo.Y));

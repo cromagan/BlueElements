@@ -92,12 +92,9 @@ public class EasyPicPadItem : CustomizableShowPadItem, IItemToControl {
     }
 
     public override string ToString() {
-        var t = base.ToString();
-        t = t.Substring(0, t.Length - 1) + ", ";
-
-        t = t + "ImageName=" + _bild_Dateiname.ToNonCritical() + ", ";
-
-        return t.Trim(", ") + "}";
+        var result = new List<string>();
+        result.ParseableAdd("ImageName", _bild_Dateiname);
+        return result.Parseable(base.ToString());
     }
 
     protected override string ClassId() => "FI-EasyPic";

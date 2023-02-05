@@ -399,9 +399,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     public void InsertText(string? nt) {
         if (nt == null) { return; }
-        nt = nt.Replace(Constants.beChrW1.ToString(), "\r");
+        //nt = nt.Replace(Constants.beChrW1.ToString(), "\r");
         nt = nt.RemoveChars(Constants.Char_NotFromClip);
-        if (!MultiLine) { nt = nt.RemoveChars("\r\t"); }
+        if (!MultiLine) { nt = nt.RemoveChars("\r\n"); }
 
         foreach (var t in nt) {
             if (_eTxt.InsertChar((AsciiKey)t, _cursorCharPos)) { _cursorCharPos++; }
@@ -797,7 +797,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         var x = _cursorCharPos;
         MultiUserFileGiveBackEventArgs e = new();
         OnNeedDatabaseOfAdditinalSpecialChars(e);
-        ItemCollectionList i = new(BlueListBoxAppearance.Listbox)
+        ItemCollectionList i = new(BlueListBoxAppearance.Listbox, false)
         {
             //if (e.File is Database DB && DB.Bins.Count > 0) {
             //    foreach (var bmp in DB.Bins) {

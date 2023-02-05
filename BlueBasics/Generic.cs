@@ -43,6 +43,10 @@ public static class Generic {
 
     private static string _gotUserName = string.Empty;
 
+    private static int _uniqueInternalCount;
+
+    private static string _uniqueInternalLastTime = "InitialDummy";
+
     #endregion
 
     #region Methods
@@ -296,6 +300,17 @@ public static class Generic {
         if (x > 20) { return 1; }
         var et = (float)Math.Pow(Math.E, x);
         return (et / (1 + et) * 2) - 1;
+    }
+
+    public static string UniqueInternal() {
+        var neueZeit = DateTime.UtcNow.ToString(Constants.Format_Date7).ReduceToChars(Constants.Char_Numerals);
+        if (neueZeit == _uniqueInternalLastTime) {
+            _uniqueInternalCount++;
+        } else {
+            _uniqueInternalCount = 0;
+            _uniqueInternalLastTime = neueZeit;
+        }
+        return "ID_" + neueZeit + "_" + _uniqueInternalCount.ToString(Constants.Format_Integer3);
     }
 
     public static string UserName() {

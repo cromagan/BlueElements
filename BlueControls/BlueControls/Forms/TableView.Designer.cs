@@ -59,9 +59,9 @@ namespace BlueControls.Forms {
             this.btnZurück = new BlueControls.Controls.Button();
             this.tabAdmin = new System.Windows.Forms.TabPage();
             this.grpAdminZeilen = new BlueControls.Controls.GroupBox();
+            this.cbxDoSript = new BlueControls.Controls.ComboBox();
             this.btnSuchenUndErsetzen = new BlueControls.Controls.Button();
             this.btnZeileLöschen = new BlueControls.Controls.Button();
-            this.btnDatenüberprüfung = new BlueControls.Controls.Button();
             this.grpAdminBearbeiten = new BlueControls.Controls.GroupBox();
             this.btnFormular = new BlueControls.Controls.Button();
             this.btnPowerBearbeitung = new BlueControls.Controls.Button();
@@ -92,7 +92,6 @@ namespace BlueControls.Forms {
             this.capZeilen2 = new BlueControls.Controls.Caption();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
-            this.cbxSriptImport = new BlueControls.Controls.ComboBox();
             this.ribMain.SuspendLayout();
             this.tabFile.SuspendLayout();
             this.grpOrdner.SuspendLayout();
@@ -549,9 +548,9 @@ namespace BlueControls.Forms {
             // 
             this.grpAdminZeilen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpAdminZeilen.CausesValidation = false;
+            this.grpAdminZeilen.Controls.Add(this.cbxDoSript);
             this.grpAdminZeilen.Controls.Add(this.btnSuchenUndErsetzen);
             this.grpAdminZeilen.Controls.Add(this.btnZeileLöschen);
-            this.grpAdminZeilen.Controls.Add(this.btnDatenüberprüfung);
             this.grpAdminZeilen.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAdminZeilen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAdminZeilen.Location = new System.Drawing.Point(456, 0);
@@ -560,6 +559,20 @@ namespace BlueControls.Forms {
             this.grpAdminZeilen.TabIndex = 8;
             this.grpAdminZeilen.TabStop = false;
             this.grpAdminZeilen.Text = "Zeilen";
+            // 
+            // cbxDoSript
+            // 
+            this.cbxDoSript.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.cbxDoSript.DrawStyle = BlueControls.Enums.ComboboxStyle.RibbonBar;
+            this.cbxDoSript.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxDoSript.Enabled = false;
+            this.cbxDoSript.ImageCode = "Skript||||||||||Pfeil_Links";
+            this.cbxDoSript.Location = new System.Drawing.Point(88, 2);
+            this.cbxDoSript.Name = "cbxDoSript";
+            this.cbxDoSript.Size = new System.Drawing.Size(64, 66);
+            this.cbxDoSript.TabIndex = 41;
+            this.cbxDoSript.Text = "Skript ausführen";
+            this.cbxDoSript.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.cbxDoSript_ItemClicked);
             // 
             // btnSuchenUndErsetzen
             // 
@@ -583,18 +596,6 @@ namespace BlueControls.Forms {
             this.btnZeileLöschen.TabIndex = 42;
             this.btnZeileLöschen.Text = "Zeilen löschen";
             this.btnZeileLöschen.Click += new System.EventHandler(this.btnZeileLöschen_Click);
-            // 
-            // btnDatenüberprüfung
-            // 
-            this.btnDatenüberprüfung.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnDatenüberprüfung.ImageCode = "Zeile||||||||||Häkchen";
-            this.btnDatenüberprüfung.Location = new System.Drawing.Point(88, 2);
-            this.btnDatenüberprüfung.Name = "btnDatenüberprüfung";
-            this.btnDatenüberprüfung.QuickInfo = "Aktuell angezeigte Zeilen<br>automatisch überprüfen.";
-            this.btnDatenüberprüfung.Size = new System.Drawing.Size(64, 66);
-            this.btnDatenüberprüfung.TabIndex = 41;
-            this.btnDatenüberprüfung.Text = "Datenüber-prüfung";
-            this.btnDatenüberprüfung.Click += new System.EventHandler(this.btnDatenüberprüfung_Click);
             // 
             // grpAdminBearbeiten
             // 
@@ -728,7 +729,7 @@ namespace BlueControls.Forms {
             this.grpExport.Controls.Add(this.btnCSVClipboard);
             this.grpExport.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpExport.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpExport.Location = new System.Drawing.Point(144, 0);
+            this.grpExport.Location = new System.Drawing.Point(88, 0);
             this.grpExport.Name = "grpExport";
             this.grpExport.Size = new System.Drawing.Size(224, 81);
             this.grpExport.TabIndex = 3;
@@ -776,13 +777,12 @@ namespace BlueControls.Forms {
             // 
             this.grpImport.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpImport.CausesValidation = false;
-            this.grpImport.Controls.Add(this.cbxSriptImport);
             this.grpImport.Controls.Add(this.btnClipboardImport);
             this.grpImport.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpImport.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpImport.Location = new System.Drawing.Point(0, 0);
             this.grpImport.Name = "grpImport";
-            this.grpImport.Size = new System.Drawing.Size(144, 81);
+            this.grpImport.Size = new System.Drawing.Size(88, 81);
             this.grpImport.TabIndex = 4;
             this.grpImport.TabStop = false;
             this.grpImport.Text = "Import";
@@ -963,20 +963,6 @@ namespace BlueControls.Forms {
             this.SaveTab.Title = "Bitte neuen Dateinamen der Datenbank wählen.";
             this.SaveTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
             // 
-            // cbxSriptImport
-            // 
-            this.cbxSriptImport.Cursor = System.Windows.Forms.Cursors.Arrow;
-            this.cbxSriptImport.DrawStyle = BlueControls.Enums.ComboboxStyle.RibbonBar;
-            this.cbxSriptImport.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxSriptImport.Enabled = false;
-            this.cbxSriptImport.ImageCode = "Skript||||||||||Pfeil_Links";
-            this.cbxSriptImport.Location = new System.Drawing.Point(72, 2);
-            this.cbxSriptImport.Name = "cbxSriptImport";
-            this.cbxSriptImport.Size = new System.Drawing.Size(64, 66);
-            this.cbxSriptImport.TabIndex = 40;
-            this.cbxSriptImport.Text = "Skript-Import";
-            this.cbxSriptImport.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.cbxSriptImport_ItemClicked);
-            // 
             // TableView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1029,7 +1015,6 @@ namespace BlueControls.Forms {
         protected System.Windows.Forms.SplitContainer SplitContainer1;
         protected System.Windows.Forms.TabPage tabAdmin;
         private Controls.Button btnZeileLöschen;
-        private Controls.Button btnDatenüberprüfung;
         private Controls.Button btnPowerBearbeitung;
         private Controls.Button btnSpaltenanordnung;
         private Controls.Button btnLayouts;
@@ -1088,6 +1073,6 @@ namespace BlueControls.Forms {
         private Controls.Button btnSuchFenster;
         protected Controls.GroupBox grpAnsichtWahl;
         private Controls.Button btnSaveLoad;
-        private Controls.ComboBox cbxSriptImport;
+        private Controls.ComboBox cbxDoSript;
     }
 }

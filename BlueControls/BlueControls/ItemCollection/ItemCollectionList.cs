@@ -27,42 +27,55 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Drawing;
 using System.Linq;
 
 namespace BlueControls.ItemCollection.ItemCollectionList;
 
-public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
+public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneable, IChangedFeedback {
 
     #region Fields
 
     private BlueListBoxAppearance _appearance;
-    private Size _cellposCorrect;
+
+    private bool _autoSort = false;
+
     private CheckBehavior _checkBehavior;
+
     private Design _controlDesign;
+
     private Design _itemDesign;
+
+    private ReadOnlyCollection<BasicListItem>? _itemOrder;
+
     private SizeF _lastCheckedMaxSize = Size.Empty;
-    private bool _validating;
+
+    private Size _maxNeededItemSize;
 
     #endregion
 
     #region Constructors
 
-    public ItemCollectionList() : this(BlueListBoxAppearance.Listbox) { }
+    public ItemCollectionList(bool autosort) : this(BlueListBoxAppearance.Listbox, autosort) { }
 
-    public ItemCollectionList(BlueListBoxAppearance design) : base() {
-        _cellposCorrect = Size.Empty;
+    public ItemCollectionList(BlueListBoxAppearance design, bool autosort) : base() {
+        _maxNeededItemSize = Size.Empty;
         _appearance = BlueListBoxAppearance.Listbox;
         _itemDesign = Design.Undefiniert;
         _controlDesign = Design.Undefiniert;
         _checkBehavior = CheckBehavior.SingleSelection;
         _appearance = design;
+        _autoSort = autosort;
         GetDesigns();
     }
 
     #endregion
 
     #region Events
+
+    public event EventHandler? Changed;
 
     public event EventHandler? ItemCheckedChanged;
 
@@ -77,6 +90,17 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
             _appearance = value;
             GetDesigns();
             //DesignOrStyleChanged();
+            OnChanged();
+        }
+    }
+
+    public bool AutoSort {
+        get => _autoSort;
+        set {
+            if (value == _autoSort) { return; }
+            _autoSort = value;
+            _maxNeededItemSize = Size.Empty;
+            _itemOrder = null;
             OnChanged();
         }
     }
@@ -113,6 +137,20 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         get {
             if (_itemDesign == Design.Undefiniert) { Develop.DebugPrint(FehlerArt.Fehler, "ItemDesign undefiniert!"); }
             return _itemDesign;
+        }
+    }
+
+    public ReadOnlyCollection<BasicListItem> ItemOrder {
+        get {
+            if (_itemOrder == null) {
+                CalculateItemOrder();
+            }
+
+            return (ReadOnlyCollection<BasicListItem>)_itemOrder;
+        }
+        private set {
+            _itemOrder = value;
+            OnChanged();
         }
     }
 
@@ -212,7 +250,7 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
                 if (e[t] is BasicListItem bli) { bli.Checked = true; }
             }
         }
-        e.Sort();
+        //e.Sort();
     }
 
     public TextListItem Add(string internalAndReadableText) => Add(internalAndReadableText, internalAndReadableText, null, false, true, string.Empty);
@@ -221,21 +259,9 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
     /// Fügt das übergebende Object den Tags hinzu.
     /// </summary>
     /// <param name="readableObject"></param>
-    /// <param name="internalname"></param>
-    public TextListItem Add(IReadableText readableObject, string internalname) {
-        var i = Add(readableObject, internalname, string.Empty);
-        i.Tag = readableObject;
-        return i;
-    }
-
-    /// <summary>
-    /// Fügt das übergebende Object den Tags hinzu.
-    /// </summary>
-    /// <param name="internalname"></param>
-    /// <param name="readableObject"></param>
-    public TextListItem Add(IReadableText readableObject, string internalname, string userDefCompareKey) {
-        var i = Add(readableObject.ReadableText(), internalname, readableObject.SymbolForReadableText(), true, userDefCompareKey);
-        i.Tag = readableObject;
+    public TextListItem Add(IReadableTextWithChangingAndKey readableObject) {
+        var i = new ReadableListItem(readableObject, false, true, string.Empty);
+        Add(i);
         return i;
     }
 
@@ -271,22 +297,28 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         return x;
     }
 
-    //public DataListItem Add(byte[] b, string caption) {
-    //    DataListItem i = new(b, string.Empty, caption);
-    //    Add(i);
-    //    return i;
-    //}
-
     public BitmapListItem Add(Bitmap? bmp, string caption) {
         BitmapListItem i = new(bmp, string.Empty, caption);
         Add(i);
         return i;
     }
 
+    //public DataListItem Add(byte[] b, string caption) {
+    //    DataListItem i = new(b, string.Empty, caption);
+    //    Add(i);
+    //    return i;
+    //}
     public new void Add(BasicListItem? item) {
+        if (item == null) { Develop.DebugPrint(FehlerArt.Fehler, "Item ist null"); return; }
         if (Contains(item)) { Develop.DebugPrint(FehlerArt.Fehler, "Bereits vorhanden!"); return; }
         if (this[item.Internal] != null) { Develop.DebugPrint(FehlerArt.Warnung, "Name bereits vorhanden: " + item.Internal); return; }
+
+        if (string.IsNullOrEmpty(item.Internal)) { Develop.DebugPrint(FehlerArt.Fehler, "Item ohne Namen!"); return; }
         base.Add(item);
+
+        item.Changed += Item_Changed;
+        item.CheckedChanged += Item_CheckedChanged;
+        item.CompareKeyChanged += Item_CompareKeyChangedChanged;
     }
 
     public BitmapListItem Add(string filename, string internalname, string caption) {
@@ -442,35 +474,37 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         return null;
     }
 
-    /// <summary>
-    /// Fügt die Spalte hinzu. Als interner Name wird der Column.Name verwendet.
-    /// </summary>
-    /// <param name="column"></param>
-    /// <returns></returns>
+    public TextListItem Add(ColumnItem column) => Add((IReadableTextWithChangingAndKey)column);
 
-    public TextListItem Add(ColumnItem column) => Add(column, column.Name);
+    public void AddClonesFrom(ICollection<BasicListItem>? itemstoclone) {
+        if (itemstoclone == null || itemstoclone.Count == 0) { return; }
 
-    public void AddRange(Type type) {
-        foreach (int z1 in Enum.GetValues(type)) {
-            if (this[z1.ToString()] == null) { _ = Add(Enum.GetName(type, z1).Replace("_", " "), z1.ToString()); }
+        foreach (var thisItem in itemstoclone) {
+            if (thisItem.Clone() is BasicListItem c) {
+                Add(c);
+            }
         }
-        Sort();
     }
 
-    //public void AddRange(string[]? values) {
-    //    if (values == null) { return; }
-    //    foreach (var thisstring in values) {
-    //        if (this[thisstring] == null) { Add(thisstring); }
-    //    }
-    //}
+    public void AddRange(ICollection<BasicListItem?>? list) {
+        if (list == null || list.Count == 0) { return; }
 
-    //public void AddRange(ICollection<string>? values) {
-    //    if (values == null) { return; }
+        foreach (var thisitem in list) {
+            if (thisitem == null) { Add(thisitem); }
+        }
+    }
 
-    //    foreach (var thisstring in values.Where(thisstring => this[thisstring] == null)) {
-    //        Add(thisstring, thisstring);
-    //    }
-    //}
+    /// <summary>
+    /// Fügt eine Enumeration hinzu.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public void AddRange(Type type) {
+        foreach (int z1 in Enum.GetValues(type)) {
+            if (this[z1.ToString()] == null) { _ = Add(Enum.GetName(type, z1)?.Replace("_", " "), z1.ToString()); }
+        }
+    }
+
     public void AddRange(ICollection<string>? list) {
         if (list == null) { return; }
 
@@ -498,12 +532,6 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         }
     }
 
-    /// <summary>
-    /// Fügt die Spalte hinzu. Als interner Name wird der Column.Name verwendet.
-    /// </summary>
-    /// <param name="columns"></param>
-    /// <param name="doCaptionSort">Bei True werden auch die Überschriften der Spalte als Text hinzugefügt und auch danach sortiert</param>
-
     public void AddRange(IEnumerable<ColumnItem> columns, bool doCaptionSort) {
         foreach (var thisColumnItem in columns) {
             if (thisColumnItem != null) {
@@ -530,34 +558,29 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
     public LineListItem AddSeparator() => AddSeparator(string.Empty);
 
     public Size CalculateColumnAndSize() {
-        var (biggestItemX, _, heightAdded, senkrechtAllowed) = ItemData();
-        if (senkrechtAllowed == Orientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), null, biggestItemX, heightAdded, senkrechtAllowed); }
-        BreakAfterItems = CalculateColumnCount(biggestItemX, heightAdded, senkrechtAllowed);
-        return ComputeAllItemPositions(new Size(1, 30), null, biggestItemX, heightAdded, senkrechtAllowed);
+        var (biggestItemX, _, heightAdded, orienation) = ItemData();
+        if (orienation == Orientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), null, biggestItemX, heightAdded, orienation); }
+        BreakAfterItems = CalculateColumnCount(biggestItemX, heightAdded, orienation);
+        return ComputeAllItemPositions(new Size(1, 30), null, biggestItemX, heightAdded, orienation);
     }
 
-    //public void Check(ListExt<string> vItems, bool @checked) => Check(vItems.ToArray(), @checked);
-
-    //public void Check(List<string> vItems, bool @checked) => Check(vItems.ToArray(), @checked);
-
-    public void Check(IList<string> vItems, bool @checked) {
+    public void Check(IList<string> vItems, bool checkstate) {
         for (var z = 0; z < vItems.Count; z++) {
             if (this[vItems[z]] != null) {
-                this[vItems[z]].Checked = @checked;
+                this[vItems[z]].Checked = checkstate;
             }
-        }
-    }
-
-    public void CheckAll() {
-        foreach (var thisItem in this.Where(thisItem => thisItem != null)) {
-            thisItem.Checked = true;
         }
     }
 
     public List<BasicListItem> Checked() => this.Where(thisItem => thisItem != null && thisItem.Checked).ToList();
 
+    //public void CheckAll() {
+    //    foreach (var thisItem in this.Where(thisItem => thisItem != null)) {
+    //        thisItem.Checked = true;
+    //    }
+    //}
     public object Clone() {
-        ItemCollectionList x = new(_appearance) {
+        ItemCollectionList x = new(_appearance, _autoSort) {
             CheckBehavior = _checkBehavior
         };
         foreach (var thisItem in this) {
@@ -566,30 +589,31 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         return x;
     }
 
-    /// <summary>
-    /// Füllt die Ersetzungen mittels eines Übergebenen Enums aus.
-    /// </summary>
-    /// <param name="t">Beispiel: GetType(enDesign)</param>
-    /// <param name="zumDropdownHinzuAb">Erster Wert der Enumeration, der Hinzugefügt werden soll. Inklusive deses Wertes</param>
-    /// <param name="zumDropdownHinzuBis">Letzter Wert der Enumeration, der nicht mehr hinzugefügt wird, also exklusives diese Wertes</param>
-    public void GetValuesFromEnum(Type t, int zumDropdownHinzuAb, int zumDropdownHinzuBis) {
-        var items = Enum.GetValues(t);
-        Clear();
-        foreach (var thisItem in items) {
-            var te = Enum.GetName(t, thisItem);
-            var th = (int)thisItem;
-            if (!string.IsNullOrEmpty(te)) {
-                //NewReplacer.GenerateAndAdd(th + "|" + te);
-                if (th >= zumDropdownHinzuAb && th < zumDropdownHinzuBis) {
-                    _ = Add(te, th.ToString());
-                }
-            }
-        }
-    }
+    ///// <summary>
+    ///// Füllt die Ersetzungen mittels eines Übergebenen Enums aus.
+    ///// </summary>
+    ///// <param name="t">Beispiel: GetType(enDesign)</param>
+    ///// <param name="zumDropdownHinzuAb">Erster Wert der Enumeration, der Hinzugefügt werden soll. Inklusive deses Wertes</param>
+    ///// <param name="zumDropdownHinzuBis">Letzter Wert der Enumeration, der nicht mehr hinzugefügt wird, also exklusives diese Wertes</param>
+    //public void GetValuesFromEnum(Type t, int zumDropdownHinzuAb, int zumDropdownHinzuBis) {
+    //    var items = Enum.GetValues(t);
+    //    Clear();
+    //    foreach (var thisItem in items) {
+    //        var te = Enum.GetName(t, thisItem);
+    //        var th = (int)thisItem;
+    //        if (!string.IsNullOrEmpty(te)) {
+    //            //NewReplacer.GenerateAndAdd(th + "|" + te);
+    //            if (th >= zumDropdownHinzuAb && th < zumDropdownHinzuBis) {
+    //                _ = Add(te, th.ToString());
+    //            }
+    //        }
+    //    }
+    //}
+    public void OnChanged() {
+        _maxNeededItemSize = Size.Empty;
+        _itemOrder = null;
 
-    public override void OnChanged() {
-        _cellposCorrect = Size.Empty;
-        base.OnChanged();
+        Changed?.Invoke(this, System.EventArgs.Empty);
     }
 
     //public ListExt<clsNamedBinary> GetNamedBinaries() {
@@ -606,12 +630,24 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
     //    }
     //    return l;
     //}
-    public void Remove(string @internal) => Remove(this[@internal]);
+    public void Remove(string internalnam) => Remove(this[internalnam]);
 
-    public void RemoveRange(List<string> @internal) {
-        foreach (var item in @internal) {
-            Remove(item);
-        }
+    public new void Remove(BasicListItem? item) {
+        if (item == null) { return; }
+        item.Changed -= Item_Changed;
+        item.CheckedChanged -= Item_CheckedChanged;
+        item.CompareKeyChanged -= Item_CompareKeyChangedChanged;
+        base.Remove(item);
+        OnChanged();
+    }
+
+    public void Swap(int index1, int index2) {
+        if (index1 == index2) { return; }
+        var l = ItemOrder.ToList();
+        (l[index1], l[index2]) = (l[index2], l[index1]);
+        _maxNeededItemSize = Size.Empty;
+        _itemOrder = null;
+        OnChanged();
     }
 
     public void UncheckAll() {
@@ -624,11 +660,11 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         try {
             if (Math.Abs(_lastCheckedMaxSize.Width - controlDrawingArea.Width) > 0.1 || Math.Abs(_lastCheckedMaxSize.Height - controlDrawingArea.Height) > 0.1) {
                 _lastCheckedMaxSize = controlDrawingArea;
-                _cellposCorrect = Size.Empty;
+                _maxNeededItemSize = Size.Empty;
             }
-            if (!_cellposCorrect.IsEmpty) { return _cellposCorrect; }
+            if (!_maxNeededItemSize.IsEmpty) { return _maxNeededItemSize; }
             if (Count == 0) {
-                _cellposCorrect = Size.Empty;
+                _maxNeededItemSize = Size.Empty;
                 return Size.Empty;
             }
             PreComputeSize();
@@ -640,6 +676,9 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
                     sliderWidth = sliderY.Width;
                 }
             }
+
+            #region colWidth
+
             int colWidth;
             switch (_appearance) {
                 case BlueListBoxAppearance.Gallery:
@@ -662,11 +701,14 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
                     }
                     break;
             }
+
+            #endregion
+
             var maxX = int.MinValue;
             var maxy = int.MinValue;
             var itenc = -1;
             BasicListItem? previtem = null;
-            foreach (var thisItem in this) {
+            foreach (var thisItem in ItemOrder) {
                 // PaintmodX kann immer abgezogen werden, da es eh nur bei einspaltigen Listboxen verändert wird!
                 if (thisItem != null) {
                     var cx = 0;
@@ -676,9 +718,9 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
                     itenc++;
                     if (senkrechtAllowed == Orientation.Waagerecht) {
                         if (thisItem.IsCaption) { wi = controlDrawingArea.Width - sliderWidth; }
-                        he = thisItem.HeightForListBox(_appearance, wi);
+                        he = thisItem.HeightForListBox(_appearance, wi, ItemDesign);
                     } else {
-                        he = thisItem.HeightForListBox(_appearance, wi);
+                        he = thisItem.HeightForListBox(_appearance, wi, ItemDesign);
                     }
                     if (previtem != null) {
                         if (senkrechtAllowed == Orientation.Waagerecht) {
@@ -705,6 +747,9 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
                     previtem = thisItem;
                 }
             }
+
+            #region  sliderY
+
             if (sliderY != null) {
                 bool setTo0;
                 if (sliderWidth > 0) {
@@ -731,18 +776,38 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
                     sliderY.Value = 0;
                 }
             }
-            _cellposCorrect = new Size(maxX, maxy);
-            return _cellposCorrect;
+
+            #endregion
+
+            _maxNeededItemSize = new Size(maxX, maxy);
+            return _maxNeededItemSize;
         } catch {
             return ComputeAllItemPositions(controlDrawingArea, sliderY, biggestItemX, heightAdded, senkrechtAllowed);
         }
+    }
+
+    internal void Item_CheckedChanged(object sender, System.EventArgs e) {
+        if (sender is not BasicListItem item) { return; }
+
+        if (item.Checked) {
+            ValidateCheckStates(item);
+        } else {
+            ValidateCheckStates(null);
+        }
+
+        OnItemCheckedChanged();
+    }
+
+    internal void Item_CompareKeyChangedChanged(object sender, System.EventArgs e) {
+        _maxNeededItemSize = Size.Empty;
+        _itemOrder = null;
     }
 
     /// <summary>
     ///  BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
     /// </summary>
     /// <returns></returns>
-    internal (int BiggestItemX, int BiggestItemY, int HeightAdded, Orientation SenkrechtAllowed) ItemData() {
+    internal (int BiggestItemX, int BiggestItemY, int HeightAdded, Orientation Orientation) ItemData() {
         try {
             var w = 16;
             var h = 0;
@@ -750,39 +815,27 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
             var sameh = -1;
             var or = Orientation.Senkrecht;
             PreComputeSize();
-            foreach (var thisItem in this) {
+
+            foreach (var thisItem in ItemOrder) {
                 if (thisItem != null) {
-                    var s = thisItem.SizeUntouchedForListBox();
+                    var s = thisItem.SizeUntouchedForListBox(ItemDesign);
                     w = Math.Max(w, s.Width);
                     h = Math.Max(h, s.Height);
                     hall += s.Height;
                     if (sameh < 0) {
-                        sameh = thisItem.SizeUntouchedForListBox().Height;
+                        sameh = thisItem.SizeUntouchedForListBox(ItemDesign).Height;
                     } else {
-                        if (sameh != thisItem.SizeUntouchedForListBox().Height) { or = Orientation.Waagerecht; }
-                        sameh = thisItem.SizeUntouchedForListBox().Height;
+                        if (sameh != thisItem.SizeUntouchedForListBox(ItemDesign).Height) { or = Orientation.Waagerecht; }
+                        sameh = thisItem.SizeUntouchedForListBox(ItemDesign).Height;
                     }
                     if (thisItem is not TextListItem) { or = Orientation.Waagerecht; }
                 }
             }
+
             return (w, h, hall, or);
         } catch {
             return ItemData();
         }
-    }
-
-    internal void SetNewCheckState(BasicListItem @this, bool value, ref bool checkVariable) {
-        if (!@this.IsClickable()) { value = false; }
-        if (_checkBehavior == CheckBehavior.NoSelection) {
-            value = false;
-        } else if (checkVariable && value == false && _checkBehavior == CheckBehavior.AlwaysSingleSelection) {
-            if (Checked().Count == 1) { value = true; }
-        }
-        if (value == checkVariable) { return; }
-        checkVariable = value;
-        if (_validating) { return; }
-        ValidateCheckStates(@this);
-        OnItemCheckedChanged();
     }
 
     internal void SetValuesTo(List<string> values) {
@@ -807,12 +860,10 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         }
     }
 
-    protected override void OnItemAdded(BasicListItem item) {
-        if (string.IsNullOrEmpty(item.Internal)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + item.Internal);
-        }
-        item.Parent = this;
-        base.OnItemAdded(item);
+    protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e) {
+        _maxNeededItemSize = Size.Empty;
+        _itemOrder = null;
+        base.OnCollectionChanged(e);
     }
 
     private int CalculateColumnCount(int biggestItemWidth, int allItemsHeight, Orientation orientation) {
@@ -839,6 +890,22 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         return -1;
     }
 
+    private void CalculateItemOrder() {
+        var l = new List<BasicListItem>();
+        l.AddRange(this);
+
+        if (_autoSort) { l.Sort(); }
+
+        _itemOrder = new ReadOnlyCollection<BasicListItem>(l);
+    }
+
+    //protected override void OnItemAdded(BasicListItem item) {
+    //    if (string.IsNullOrEmpty(item.Internal)) {
+    //        Develop.DebugPrint(FehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + item.Internal);
+    //    }
+    //    item.Parent = this;
+    //    base.OnItemAdded(item);
+    //}
     private void GetDesigns() {
         _controlDesign = (Design)_appearance;
         switch (_appearance) {
@@ -879,12 +946,14 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
         }
     }
 
+    private void Item_Changed(object sender, System.EventArgs e) => OnChanged();
+
     private void OnItemCheckedChanged() => ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void PreComputeSize() {
         try {
             _ = System.Threading.Tasks.Parallel.ForEach(this, thisItem => {
-                _ = thisItem.SizeUntouchedForListBox();
+                _ = thisItem.SizeUntouchedForListBox(ItemDesign);
             });
         } catch {
             PreComputeSize();
@@ -892,10 +961,6 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
     }
 
     private void ValidateCheckStates(BasicListItem? thisMustBeChecked) {
-        _validating = true;
-
-        var done = false;
-        BasicListItem? f = null;
         switch (_checkBehavior) {
             case CheckBehavior.NoSelection:
                 UncheckAll();
@@ -905,30 +970,22 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
                 break;
 
             case CheckBehavior.SingleSelection:
-            case CheckBehavior.AlwaysSingleSelection:
-                foreach (var thisItem in this) {
-                    if (thisItem != null) {
-                        if (thisMustBeChecked == null) {
-                            f ??= thisItem;
-                            if (thisItem.Checked) {
-                                if (!done) {
-                                    done = true;
-                                } else {
-                                    if (thisItem.Checked) {
-                                        thisItem.Checked = false;
-                                    }
-                                }
-                            }
-                        } else {
-                            done = true;
-                            if (thisItem != thisMustBeChecked && thisItem.Checked) {
-                                thisItem.Checked = false;
-                            }
-                        }
+                if (Checked().Count > 1) {
+                    foreach (var thisItem in this) {
+                        if (thisItem != null && thisItem != thisMustBeChecked) { thisItem.Checked = false; }
                     }
                 }
-                if (_checkBehavior == CheckBehavior.AlwaysSingleSelection && !done && f != null && !f.Checked) {
-                    f.Checked = true;
+                break;
+
+            case CheckBehavior.AlwaysSingleSelection:
+                if (Checked().Count != 1) {
+                    thisMustBeChecked ??= this.FirstOrDefault(thisp => thisp != null && !thisp.IsClickable());
+
+                    foreach (var thisItem in this) {
+                        if (thisItem != null && thisItem != thisMustBeChecked) { thisItem.Checked = false; }
+                    }
+
+                    if (thisMustBeChecked != null) { thisMustBeChecked.Checked = true; }
                 }
                 break;
 
@@ -936,7 +993,6 @@ public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
                 Develop.DebugPrint(_checkBehavior);
                 break;
         }
-        _validating = false;
     }
 
     #endregion

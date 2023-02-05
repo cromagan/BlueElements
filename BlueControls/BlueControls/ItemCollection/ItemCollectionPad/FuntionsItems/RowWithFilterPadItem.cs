@@ -27,7 +27,6 @@ using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
-using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -122,7 +121,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         set {
             if (Database == null) { return; }
 
-            var c = new ItemCollectionList.ItemCollectionList();
+            var c = new ItemCollectionList.ItemCollectionList(true);
             foreach (var thiscol in Database.Column) {
                 if (thiscol.Format.Autofilter_möglich() && !thiscol.Format.NeedTargetDatabase()) {
                     _ = c.Add(thiscol);
@@ -193,7 +192,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         l.Add(new FlexiControlForProperty<string>(() => Überschrift));
         l.Add(new FlexiControlForProperty<string>(() => Anzeige));
 
-        var u = new ItemCollection.ItemCollectionList.ItemCollectionList();
+        var u = new ItemCollection.ItemCollectionList.ItemCollectionList(false);
         u.AddRange(typeof(ÜberschriftAnordnung));
         l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
         l.Add(new FlexiControl());
@@ -286,27 +285,15 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(Id));
 
     public override string ToString() {
-        var t = base.ToString();
-        t = t.Substring(0, t.Length - 1) + ", ";
-
-        t = t + "CaptionText=" + _überschrift.ToNonCritical() + ", ";
-        t = t + "ShowFormat=" + _anzeige.ToNonCritical() + ", ";
-        //t = t + "Variable=" + _variable.ToNonCritical() + ", ";
-
-        t = t + "EditType=" + ((int)_bearbeitung) + ", ";
-        t = t + "Caption=" + ((int)_überschiftanordung) + ", ";
-
-        t = t + "ID=" + Id + ", ";
-
-        if (Database != null && !Database.IsDisposed) {
-            t = t + "Database=" + Database.ConnectionData.UniqueID.ToNonCritical() + ", ";
-        }
-
-        if (FilterDefiniton != null) {
-            t = t + "FilterDB=" + FilterDefiniton.Export_CSV(FirstRow.ColumnInternalName, null as List<ColumnItem>, null).ToNonCritical() + ", ";
-        }
-
-        return t.Trim(", ") + "}";
+        var result = new List<string>();
+        result.ParseableAdd("CaptionText", _überschrift);
+        result.ParseableAdd("ShowFormat", _anzeige);
+        result.ParseableAdd("EditType", _bearbeitung);
+        result.ParseableAdd("Caption", _überschiftanordung);
+        result.ParseableAdd("ID", Id);
+        result.ParseableAdd("Database", Database);
+        result.ParseableAdd("FilterDB", FilterDefiniton.Export_CSV(FirstRow.ColumnInternalName, null as List<ColumnItem>, null));
+        return result.Parseable(base.ToString());
     }
 
     protected override string ClassId() => "FI-RowWithFilter";

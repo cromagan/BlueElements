@@ -97,9 +97,8 @@ public sealed partial class DatabaseHeadEditor {
 
         lbxExportSets.Item.Clear();
         foreach (var thisSet in _database.Export.Where(thisSet => thisSet != null)) {
-            _ = lbxExportSets.Item.Add((ExportDefinition)thisSet.Clone(), string.Empty, string.Empty);
+            _ = lbxExportSets.Item.Add((ExportDefinition)thisSet.Clone());
         }
-        lbxExportSets.Item.Sort();
 
         #endregion
 
@@ -107,9 +106,8 @@ public sealed partial class DatabaseHeadEditor {
 
         lstEventScripts.Item.Clear();
         foreach (var thisSet in _database.EventScript.Where(thisSet => thisSet != null)) {
-            _ = lstEventScripts.Item.Add((EventScript)thisSet.Clone(), string.Empty, string.Empty);
+            _ = lstEventScripts.Item.Add((EventScript)thisSet.Clone());
         }
-        lstEventScripts.Item.Sort();
 
         #endregion
 
@@ -130,6 +128,8 @@ public sealed partial class DatabaseHeadEditor {
         lbxSortierSpalten.Suggestions.AddRange(_database.Column, false);
 
         GenerateInfoText();
+
+        variableEditor.WriteVariablesToTable(_database.Variables);
     }
 
     private void AddUndoToTable(WorkItem work, int index, string db, bool checkNeeded) {
@@ -244,16 +244,16 @@ public sealed partial class DatabaseHeadEditor {
         Close();
     }
 
-    private void eventScript_Editor1_Changed(object sender, System.EventArgs e) {
-        foreach (var thisitem in lstEventScripts.Item) {
-            if (thisitem is TextListItem tli) {
-                if (tli.Tag == eventScriptEditor.Item) {
-                    tli.Text = eventScriptEditor.Item.ReadableText();
-                    tli.Symbol = eventScriptEditor.Item.SymbolForReadableText();
-                }
-            }
-        }
-    }
+    //private void eventScript_Editor1_Changed(object sender, System.EventArgs e) {
+    //    foreach (var thisitem in lstEventScripts.Item) {
+    //        if (thisitem is TextListItem tli) {
+    //            if (tli.Tag == eventScriptEditor.Item) {
+    //                tli.Text = eventScriptEditor.Item.ReadableText();
+    //                tli.Symbol = eventScriptEditor.Item.SymbolForReadableText();
+    //            }
+    //        }
+    //    }
+    //}
 
     private void ExportEditor_Changed(object sender, System.EventArgs e) {
         foreach (var thisitem in lbxExportSets.Item) {
@@ -268,8 +268,8 @@ public sealed partial class DatabaseHeadEditor {
 
     private void GenerateInfoText() {
         var t = "<b>Tabelle:</b> <tab>" + _database.ConnectionData.TableName + "<br>";
-        t = t + "<b>ID:</b> <tab>" + _database.ConnectionData.UniqueID + "<br>";
-        t = t + "<b>Zeilen:</b> <tab>" + (_database.Row.Count() - 1);
+        t += "<b>ID:</b> <tab>" + _database.ConnectionData.UniqueID + "<br>";
+        t += "<b>Zeilen:</b> <tab>" + (_database.Row.Count() - 1);
         capInfo.Text = t.TrimEnd("<br>");
     }
 
@@ -326,7 +326,7 @@ public sealed partial class DatabaseHeadEditor {
     }
 
     private void lbxExportSets_AddClicked(object sender, System.EventArgs e) {
-        var newExportItem = lbxExportSets.Item.Add(new ExportDefinition(_database), string.Empty, string.Empty);
+        var newExportItem = lbxExportSets.Item.Add(new ExportDefinition(_database));
         newExportItem.Checked = true;
     }
 
@@ -339,23 +339,23 @@ public sealed partial class DatabaseHeadEditor {
             ExportEditor.Item = null;
             return;
         }
-        var selectedExport = (ExportDefinition)((TextListItem)lbxExportSets.Item.Checked()[0]).Tag;
+        var selectedExport = (ExportDefinition)((ReadableListItem)lbxExportSets.Item.Checked()[0]).Item;
         ExportEditor.Item = selectedExport;
     }
 
-    private void lbxExportSets_RemoveClicked(object sender, ListOfBasicListItemEventArgs e) {
-        foreach (var thisitem in e.Items) {
-            if (thisitem is BasicListItem thisItemBasic) {
-                var tempVar = (ExportDefinition)((TextListItem)thisItemBasic).Tag;
-                tempVar.DeleteAllBackups();
-            }
-        }
-    }
+    //private void lbxExportSets_RemoveClicked(object sender, ListOfBasicListItemEventArgs e) {
+    //    foreach (var thisitem in e.Items) {
+    //        if (thisitem is BasicListItem thisItemBasic) {
+    //            var tempVar = (ExportDefinition)((TextListItem)thisItemBasic).Tag;
+    //            tempVar.DeleteAllBackups();
+    //        }
+    //    }
+    //}
 
     private void lstEventScripts_AddClicked(object sender, System.EventArgs e) {
         if (_database == null || _database.IsDisposed) { return; }
 
-        var newScriptItem = lstEventScripts.Item.Add(new EventScript(_database), string.Empty, string.Empty);
+        var newScriptItem = lstEventScripts.Item.Add(new EventScript(_database));
         newScriptItem.Checked = true;
     }
 
@@ -368,8 +368,10 @@ public sealed partial class DatabaseHeadEditor {
             eventScriptEditor.Item = null;
             return;
         }
-        var selectedlstEventScripts = (EventScript)((TextListItem)lstEventScripts.Item.Checked()[0]).Tag;
+        var selectedlstEventScripts = (EventScript)((ReadableListItem)lstEventScripts.Item.Checked()[0]).Item;
         eventScriptEditor.Item = selectedlstEventScripts;
+
+        WriteInfosBack();
     }
 
     private void OkBut_Click(object sender, System.EventArgs e) => Close();
@@ -427,11 +429,11 @@ public sealed partial class DatabaseHeadEditor {
 
         var tmp = PermissionGroups_NewRow.Item.ToListOfString();
         _ = tmp.Remove("#Administrator");
-        _database.PermissionGroupsNewRow = tmp;
+        _database.PermissionGroupsNewRow = new(tmp);
 
         #region Sortierung
 
-        var colnam = lbxSortierSpalten.Item.Select(thisk => ((ColumnItem)thisk.Tag).Name).ToList();
+        var colnam = lbxSortierSpalten.Item.Select(thisk => ((ColumnItem)((ReadableListItem)thisk).Item).Name).ToList();
         _database.SortDefinition = new RowSortDefinition(_database, colnam, btnSortRichtung.Checked);
 
         #endregion
@@ -439,7 +441,7 @@ public sealed partial class DatabaseHeadEditor {
         #region  Export
 
         var t = new ListExt<ExportDefinition?>();
-        t.AddRange(lbxExportSets.Item.Select(thisItem => (ExportDefinition)((TextListItem)thisItem).Tag));
+        t.AddRange(lbxExportSets.Item.Select(thisItem => (ExportDefinition)((ReadableListItem)thisItem).Item));
         _database.Export = new(t);
 
         #endregion
@@ -447,7 +449,7 @@ public sealed partial class DatabaseHeadEditor {
         #region  Import
 
         var t2 = new ListExt<EventScript?>();
-        t2.AddRange(lstEventScripts.Item.Select(thisItem => (EventScript)((TextListItem)thisItem).Tag));
+        t2.AddRange(lstEventScripts.Item.Select(thisItem => (EventScript)((ReadableListItem)thisItem).Item));
         _database.EventScript = new(t2);
 
         #endregion

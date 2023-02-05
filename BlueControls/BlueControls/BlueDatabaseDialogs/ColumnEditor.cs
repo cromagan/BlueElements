@@ -255,7 +255,7 @@ internal sealed partial class ColumnEditor {
                 }
             }
         }
-        cbxTargetColumn.Item.Sort();
+        //cbxTargetColumn.Item.Sort();
         cbxTargetColumn.Text = _column.LinkedCell_ColumnNameOfLinkedDatabase;
         //SetKeyTo(cbxTargetColumn, _column.LinkedCell_ColumnKeyOfLinkedDatabase);
         cbxTargetColumn.Enabled = cbxTargetColumn.Item.Count > 0;
@@ -636,7 +636,7 @@ internal sealed partial class ColumnEditor {
                 if (!string.Equals(thisString.UniqueID, _column.Database.ConnectionData.UniqueID, StringComparison.OrdinalIgnoreCase)) { _ = cbxLinkedDatabase.Item.Add(thisString.TableName, thisString.UniqueID); }
             }
             //}
-            cbxLinkedDatabase.Item.Sort();
+            //cbxLinkedDatabase.Item.Sort();
         }
     }
 

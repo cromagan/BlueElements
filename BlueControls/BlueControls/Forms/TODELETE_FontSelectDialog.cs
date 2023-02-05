@@ -43,7 +43,7 @@ public partial class FontSelectDialog {
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         if (_fnList == null) {
-            _fnList = new ItemCollectionList();
+            _fnList = new ItemCollectionList(true);
             foreach (var f in FontFamily.Families) {
                 if (string.IsNullOrEmpty(f.Name)) {
                     continue;
@@ -57,8 +57,8 @@ public partial class FontSelectDialog {
                     } catch (Exception) { }
                 }
             }
-            _fnList.Sort();
-            _fsList = new ItemCollectionList
+            //_fnList.Sort();
+            _fsList = new ItemCollectionList(true)
             {
                 { "8",SortierTyp.ZahlenwertFloat },
                 { "9", SortierTyp.ZahlenwertFloat },
@@ -77,12 +77,12 @@ public partial class FontSelectDialog {
                 { "48", SortierTyp.ZahlenwertFloat },
                 { "72", SortierTyp.ZahlenwertFloat }
             };
-            _fsList.Sort();
+            //_fsList.Sort();
         }
         FName.Item.AddRange(_fnList);
-        FName.Item.Sort();
+        //FName.Item.Sort();
         FSize.Item.AddRange(_fsList);
-        FSize.Item.Sort();
+        //FSize.Item.Sort();
         Font = BlueFont.Get(Skin.DummyStandardFont); //, False, False, False, False, False, "000000", "", False)
         UpdateSampleText();
     }

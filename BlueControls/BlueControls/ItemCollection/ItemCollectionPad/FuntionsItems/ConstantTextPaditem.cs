@@ -40,7 +40,7 @@ public class ConstantTextPadItem : CustomizableShowPadItem, IReadableText, ICont
 
     #region Constructors
 
-    public ConstantTextPadItem() : this(UniqueInternal(), string.Empty) { }
+    public ConstantTextPadItem() : this(BlueBasics.Generic.UniqueInternal(), string.Empty) { }
 
     public ConstantTextPadItem(string intern, string text) : base(intern) => _text = text;
 
@@ -105,10 +105,9 @@ public class ConstantTextPadItem : CustomizableShowPadItem, IReadableText, ICont
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld, 16);
 
     public override string ToString() {
-        var t = base.ToString();
-        t = t.Substring(0, t.Length - 1) + ", ";
-        t = t + "Text=" + _text.ToNonCritical() + ", ";
-        return t.Trim(", ") + "}";
+        var result = new List<string>();
+        result.ParseableAdd("Text", _text);
+        return result.Parseable(base.ToString());
     }
 
     protected override string ClassId() => "FI-ConstantText";

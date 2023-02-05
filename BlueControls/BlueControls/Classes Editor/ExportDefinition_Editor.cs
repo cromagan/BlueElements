@@ -85,7 +85,7 @@ internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<Expo
         ExportSpaltenAnsicht.Text = data.ExportSpaltenAnsicht.ToString();
         lbxFilter.Item.Clear();
         foreach (var thisFilter in data.Filter.Where(thisFilter => thisFilter != null)) {
-            _ = lbxFilter.Item.Add(thisFilter, string.Empty, string.Empty);
+            _ = lbxFilter.Item.Add(thisFilter);
         }
         lsbExportDateien.Item.Clear();
         foreach (var t1 in data.BereitsExportiert) {
@@ -135,20 +135,20 @@ internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<Expo
 
     private void ExportDateien_ListOrItemChanged(object sender, System.EventArgs e) => UpdateExport(false);
 
-    private void ExportDateien_RemoveClicked(object sender, ListOfBasicListItemEventArgs e) {
-        foreach (var thisItem in e.Items) {
-            if (thisItem is BasicListItem ThisItemBasic) {
-                string fil;
-                if (ThisItemBasic.Internal.Contains("|")) {
-                    var f = ThisItemBasic.Internal.SplitAndCutBy("|");
-                    fil = f[0];
-                } else {
-                    fil = ThisItemBasic.Internal;
-                }
-                if (FileExists(fil)) { _ = DeleteFile(fil, false); }
-            }
-        }
-    }
+    //private void ExportDateien_RemoveClicked(object sender, ListOfBasicListItemEventArgs e) {
+    //    foreach (var thisItem in e.Items) {
+    //        if (thisItem is BasicListItem ThisItemBasic) {
+    //            string fil;
+    //            if (ThisItemBasic.Internal.Contains("|")) {
+    //                var f = ThisItemBasic.Internal.SplitAndCutBy("|");
+    //                fil = f[0];
+    //            } else {
+    //                fil = ThisItemBasic.Internal;
+    //            }
+    //            if (FileExists(fil)) { _ = DeleteFile(fil, false); }
+    //        }
+    //    }
+    //}
 
     private void ExportOriginalFormat_CheckedChanged(object sender, System.EventArgs e) => UpdateExport(true);
 
@@ -166,7 +166,7 @@ internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<Expo
     }
 
     private void lbxFilter_AddClicked(object sender, System.EventArgs e) {
-        var NewFilterItem = lbxFilter.Item.Add(new FilterItem(Item.Database, string.Empty), string.Empty, string.Empty);
+        var NewFilterItem = lbxFilter.Item.Add(new FilterItem(Item.Database, string.Empty));
         NewFilterItem.Checked = true;
     }
 

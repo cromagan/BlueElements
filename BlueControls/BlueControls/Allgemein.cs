@@ -62,8 +62,8 @@ public static class Allgemein {
     public static IContextMenu? ParentControlWithCommands(this object o) {
         var par = o.ParentControl<IContextMenu>();
         if (par == null) { return null; }
-        ItemCollectionList? thisContextMenu = new(BlueListBoxAppearance.KontextMenu);
-        ItemCollectionList userMenu = new(BlueListBoxAppearance.KontextMenu);
+        ItemCollectionList? thisContextMenu = new(BlueListBoxAppearance.KontextMenu, false);
+        ItemCollectionList userMenu = new(BlueListBoxAppearance.KontextMenu, false);
         List<string> tags = new();
         var cancel = false;
         var translate = true;

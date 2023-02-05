@@ -25,7 +25,7 @@ public static partial class Extensions {
     #region Methods
 
     public static SizeF SizeFParse(this string code) {
-        code = code.RemoveChars("{}Widtheg= ");
+        code = code.FromNonCritical().RemoveChars("{}Widtheg= ");
         var w = code.SplitBy(",H");
         return new SizeF(FloatParse(w[0]), FloatParse(w[1]));
     }

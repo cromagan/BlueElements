@@ -45,7 +45,7 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
             List.Item.Add(thisItem);
         }
 
-        List.Item.Sort();
+        //List.Item.Sort();
 
         Setup(400, List.Bottom);
     }

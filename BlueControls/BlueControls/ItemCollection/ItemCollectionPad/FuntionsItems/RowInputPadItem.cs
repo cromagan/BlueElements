@@ -41,7 +41,7 @@ public class RowInputPadItem : RectanglePadItemWithVersion, IReadableText, ICont
 
     #region Constructors
 
-    public RowInputPadItem() : this(UniqueInternal(), string.Empty) { }
+    public RowInputPadItem() : this(BlueBasics.Generic.UniqueInternal(), string.Empty) { }
 
     public RowInputPadItem(string intern, string spaltenname) : base(intern) => _spaltenname = spaltenname;
 
@@ -101,11 +101,9 @@ public class RowInputPadItem : RectanglePadItemWithVersion, IReadableText, ICont
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Zeile, 10, Color.Transparent, Color.Green);
 
     public override string ToString() {
-        var t = base.ToString();
-        t = t.Substring(0, t.Length - 1) + ", ";
-
-        t = t + "Column=" + _spaltenname.ToNonCritical() + ", ";
-        return t.Trim(", ") + "}";
+        var result = new List<string>();
+        result.ParseableAdd("Column", _spaltenname);
+        return result.Parseable(base.ToString());
     }
 
     protected override string ClassId() => "FI-InputRow";

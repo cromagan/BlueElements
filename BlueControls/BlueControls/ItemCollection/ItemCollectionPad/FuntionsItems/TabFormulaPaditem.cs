@@ -44,7 +44,7 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
 
     #region Constructors
 
-    public TabFormulaPadItem() : this(UniqueInternal(), null) { }
+    public TabFormulaPadItem() : this(BlueBasics.Generic.UniqueInternal(), null) { }
 
     public TabFormulaPadItem(string intern, ConnectedFormula.ConnectedFormula? cf) : base(intern) {
         _cf = cf;
@@ -178,14 +178,10 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
     }
 
     public override string ToString() {
-        var t = base.ToString();
-        t = t.Substring(0, t.Length - 1) + ", ";
-
-        if (_cf != null) {
-            t = t + "Parent=" + _cf.Filename.ToNonCritical() + ", ";
-        }
-        t = t + "Childs=" + _childs.JoinWith("|").ToNonCritical() + ", ";
-        return t.Trim(", ") + "}";
+        var result = new List<string>();
+        result.ParseableAdd("Parent", _cf);
+        result.ParseableAdd("Childs", _childs);
+        return result.Parseable(base.ToString());
     }
 
     protected override string ClassId() => "FI-ChildFormula";

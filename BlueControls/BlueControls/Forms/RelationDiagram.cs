@@ -306,9 +306,9 @@ public partial class RelationDiagram : PadEditor {
     private void Database_Disposing(object sender, System.EventArgs e) => Close();
 
     private void Hinzu_Click(object sender, System.EventArgs e) {
-        ItemCollectionList il = new();
+        ItemCollectionList il = new(true);
         il.AddRange(_database.Column.First.Contents());
-        il.Sort();
+        //il.Sort();
         il.CheckBehavior = CheckBehavior.SingleSelection;
         var i = InputBoxListBoxStyle.Show("Objekt hinzufügen:", il, AddType.None, true);
         if (i == null || i.Count != 1) {

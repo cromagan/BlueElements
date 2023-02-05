@@ -53,9 +53,9 @@ public partial class InputBoxComboStyle : DialogWithOkAndCancel {
     public static string Show(string txt, ItemCollectionList? suggest, bool texteingabeErlaubt) => Show(txt, string.Empty, suggest, texteingabeErlaubt);
 
     public static string Show(string txt, List<string> suggest, bool texteingabeErlaubt) {
-        ItemCollectionList Suggest = new();
+        ItemCollectionList Suggest = new(true);
         Suggest.AddRange(suggest);
-        Suggest.Sort();
+        //Suggest.Sort();
         return Show(txt, string.Empty, Suggest, texteingabeErlaubt);
     }
 

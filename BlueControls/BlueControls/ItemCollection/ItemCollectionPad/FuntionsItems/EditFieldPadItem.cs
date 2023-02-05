@@ -107,9 +107,9 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
                 return;
             }
 
-            var lst = new ItemCollectionList.ItemCollectionList();
+            var lst = new ItemCollectionList.ItemCollectionList(true);
             lst.AddRange(GetRowFrom.Database.Column, false);
-            lst.Sort();
+            //lst.Sort();
 
             var sho = InputBoxListBoxStyle.Show("Spalte wählen:", lst, AddType.None, true);
 
@@ -202,10 +202,10 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         l.Add(new FlexiControlForProperty<string>(() => Interner_Name));
         l.Add(new FlexiControlForProperty<string>(() => Spalte_bearbeiten, ImageCode.Spalte));
 
-        var u = new ItemCollection.ItemCollectionList.ItemCollectionList();
+        var u = new ItemCollection.ItemCollectionList.ItemCollectionList(false);
         u.AddRange(typeof(ÜberschriftAnordnung));
         l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
-        var b = new ItemCollection.ItemCollectionList.ItemCollectionList();
+        var b = new ItemCollection.ItemCollectionList.ItemCollectionList(false);
         b.AddRange(GetAllowedEditTypes(Column));
         l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
         l.Add(new FlexiControl());
@@ -267,17 +267,11 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
     }
 
     public override string ToString() {
-        var t = base.ToString();
-        t = t.Substring(0, t.Length - 1) + ", ";
-
-        if (Column != null) {
-            t = t + "ColumnName=" + Column.Name + ", ";
-        }
-
-        t = t + "EditType=" + ((int)_bearbeitung) + ", ";
-        t = t + "Caption=" + ((int)_überschiftanordung) + ", ";
-
-        return t.Trim(", ") + "}";
+        var result = new List<string>();
+        result.ParseableAdd("ColumnName", Column);
+        result.ParseableAdd("EditType", _bearbeitung);
+        result.ParseableAdd("Caption", _überschiftanordung);
+        return result.Parseable(base.ToString());
     }
 
     protected override string ClassId() => "FI-EditField";

@@ -28,7 +28,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using MessageBox = BlueControls.Forms.MessageBox;
@@ -121,7 +120,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
             new FlexiControlForProperty<string>(() => Platzhalter_Für_Layout, 2),
             new FlexiControl()
         };
-        ItemCollectionList.ItemCollectionList comms = new()
+        ItemCollectionList.ItemCollectionList comms = new(false)
         {
             { "Abschneiden", ((int)SizeModes.BildAbschneiden).ToString(), QuickImage.Get("BildmodusAbschneiden|32") },
             { "Verzerren", ((int)SizeModes.Verzerren).ToString(), QuickImage.Get("BildmodusVerzerren|32") },
@@ -189,21 +188,17 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
     }
 
     public override string ToString() {
-        var t = base.ToString();
-        t = t.Substring(0, t.Length - 1) + ", ";
-        t = t + "Modus=" + (int)Bild_Modus + ", ";
-        if (!string.IsNullOrEmpty(Platzhalter_Für_Layout)) {
-            t = t + "Placeholder=" + Platzhalter_Für_Layout.ToNonCritical() + ", ";
-        }
-        t = t + "WhiteBack=" + Hintergrund_Weiß_Füllen.ToPlusMinus() + ", ";
-        foreach (var thisQi in Overlays) {
-            t = t + "Overlay=" + thisQi + ", ";
-        }
-        t = t + "Padding=" + Padding + ", ";
-        if (Bitmap != null) {
-            t = t + "Image=" + BitmapToBase64(Bitmap, ImageFormat.Png) + ", ";
-        }
-        return t.Trim(", ") + "}";
+        var result = new List<string>();
+
+        result.ParseableAdd("Modus", Bild_Modus);
+        result.ParseableAdd("Placeholder", Platzhalter_Für_Layout);
+        result.ParseableAdd("WhiteBack", Hintergrund_Weiß_Füllen);
+        result.ParseableAdd("Overlays", "Overlay", Overlays);
+
+        result.ParseableAdd("Padding", Padding);
+        result.ParseableAdd("Image", Bitmap);
+
+        return result.Parseable(base.ToString());
     }
 
     protected override string ClassId() => "IMAGE";

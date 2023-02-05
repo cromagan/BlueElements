@@ -52,21 +52,20 @@ namespace BlueControls.Controls {
             // Main
             // 
             this.Main.AddAllowed = BlueControls.Enums.AddType.Text;
+            this.Main.AutoSort = true;
             this.Main.CheckBehavior = BlueControls.Enums.CheckBehavior.NoSelection;
             this.Main.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Main.Location = new System.Drawing.Point(0, 0);
             this.Main.Name = "Main";
             this.Main.Size = new System.Drawing.Size(345, 115);
             this.Main.TabIndex = 0;
-            this.Main.ItemAdded += new System.EventHandler<BlueBasics.EventArgs.ListEventArgs>(this.Main_ItemAdded);
-            this.Main.ItemRemoving += new System.EventHandler<BlueBasics.EventArgs.ListEventArgs>(this.Main_ItemRemoving);
-            this.Main.ItemRemoved += new System.EventHandler(this.Main_ItemRemoved);
             this.Main.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.Main_ItemClicked);
             this.Main.AddClicked += new System.EventHandler(this.Main_AddClicked);
             // 
             // Suggest
             // 
             this.Suggest.AddAllowed = BlueControls.Enums.AddType.None;
+            this.Suggest.AutoSort = true;
             this.Suggest.CheckBehavior = BlueControls.Enums.CheckBehavior.NoSelection;
             this.Suggest.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Suggest.FilterAllowed = true;

@@ -15,25 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using static BlueBasics.Converter;
+namespace BlueBasics.Interfaces;
 
-namespace BlueBasics;
-
-public static partial class Extensions {
-
-    #region Methods
-
-    public static System.Windows.Forms.Padding PaddingParse(this string code) {
-        code = code.FromNonCritical().RemoveChars("{}LeftTopRightBm= ");
-        var w = code.Split(',');
-        System.Windows.Forms.Padding p = new() {
-            Left = IntParse(w[0]),
-            Top = IntParse(w[1]),
-            Right = IntParse(w[2]),
-            Bottom = IntParse(w[3])
-        };
-        return p;
-    }
-
-    #endregion
-}
+public interface IReadableTextWithChangingAndKey : IReadableTextWithChanging, IHasKeyName { }

@@ -35,8 +35,6 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
 
     #endregion
 
-    //GeneratePic(); // Im Construcor nicht möglich, weil noch Werte fehlen.
-
     #region Properties
 
     public Bitmap? GeneratedBitmap {
@@ -75,12 +73,6 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
         }
     }
 
-    //public override string ToString() {
-    //    var t = base.ToString();
-    //    t = t.Substring(0, t.Length - 1) + ", ";
-    //    if (Drehwinkel != 0) { t = t + "Rotation=" + Drehwinkel + ", "; }
-    //    return t.Trim(", ") + "}";
-    //}
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (_generatedBitmap == null) { GeneratePic(); }
 
@@ -104,29 +96,6 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
-    //public override List<GenericControl> GetStyleOptions() {
-    //    List<FlexiControl> l = new()
-    //    {
-    //        new FlexiControl(),
-    //        //new FlexiControlForProperty(()=> this.Drehwinkel"),
-    //        //new FlexiControlForProperty(()=> this.Größe_fixiert")
-    //    };
-    //    l.AddRange(base.GetStyleOptions());
-    //    return l;
-    //}
-    //    public void SetCoordinates(RectangleF r) {
-    //    var vr = r.PointOf(enAlignment.Horizontal_Vertical_Center);
-    //    var ur = UsedArea();
-    //    p_LO.SetTo(vr.X - (ur.Width / 2), vr.Y - (ur.Height / 2));
-    //    p_RU.SetTo(p_LO.X + ur.Width, p_LO.Y + ur.Height);
-    //}
-    //public virtual void SizeChanged() {
-    //    // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
-    //    p_L.SetTo(p_LO.X, p_LO.Y + ((p_LU.Y - p_LO.Y) / 2));
-    //    p_R.SetTo(p_RO.X, p_LO.Y + ((p_LU.Y - p_LO.Y) / 2));
-    //    p_U.SetTo(p_LO.X + ((p_RO.X - p_LO.X) / 2), p_RU.Y);
-    //    p_O.SetTo(p_LO.X + ((p_RO.X - p_LO.X) / 2), p_RO.Y);
-    //}
     protected abstract void GeneratePic();
 
     protected override void ParseFinished() => SizeChanged();

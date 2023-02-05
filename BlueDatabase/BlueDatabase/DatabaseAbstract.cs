@@ -23,7 +23,6 @@ using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
-using BlueScript;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
@@ -312,8 +311,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     public bool LogUndo { get; set; } = true;
 
-    public List<string> PermissionGroupsNewRow {
-        get => _permissionGroupsNewRow;
+    public ReadOnlyCollection<string> PermissionGroupsNewRow {
+        get => new(_permissionGroupsNewRow);
         set {
             if (!_permissionGroupsNewRow.IsDifferentTo(value)) { return; }
             _ = ChangeData(DatabaseDataType.PermissionGroupsNewRow, null, null, _permissionGroupsNewRow.JoinWithCr(), value.JoinWithCr(), string.Empty);
@@ -323,14 +322,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     public DateTime PowerEdit { get; set; }
 
     public bool ReadOnly { get; private set; }
-
-    //public string RulesScript {
-    //    get => _rulesScript;
-    //    set {
-    //        if (_rulesScript == value) { return; }
-    //        _ = ChangeData(DatabaseDataType.RulesScript, null, null, _rulesScript, value, string.Empty);
-    //    }
-    //}
 
     [Browsable(false)]
     public RowSortDefinition? SortDefinition {
@@ -718,7 +709,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         Layouts = sourceDatabase.Layouts;
 
         DatenbankAdmin = new(sourceDatabase.DatenbankAdmin.Clone());
-        PermissionGroupsNewRow = sourceDatabase.PermissionGroupsNewRow.Clone();
+        PermissionGroupsNewRow = new(sourceDatabase.PermissionGroupsNewRow.Clone());
 
         var tcvc = new ListExt<ColumnViewCollection>();
         foreach (var t in sourceDatabase.ColumnArrangements) {
@@ -1645,7 +1636,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         //_export?.Dispose();
         //_datenbankAdmin?.Dispose();
         //_permissionGroupsNewRow?.Dispose();
-        _layouts?.Dispose();
+        _layouts.Clear();
+        //_layouts = null;
     }
 
     protected virtual void Initialize() {
@@ -1779,13 +1771,23 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     private void ConvertRules(string scriptText) {
         //var eves = EventScript.CloneWithClones();
-        var l = new EventScript(this) {
+        var l1 = new EventScript(this) {
             NeedRow = true,
             ManualExecutable = false,
             Script = scriptText,
             Name = "DatenueberpruefungIntern"
         };
-        _EventScript.Add(l);
+        _EventScript.Add(l1);
+
+        var l2 = new EventScript(this) {
+            NeedRow = true,
+            ManualExecutable = true,
+            Script = "//ACHTUNG: Keinesfalls dürfen startroutinenabhängig Werte verändert werden.\r\n" +
+                     "var Startroutine = \"manual check\";\r\n" +
+                     "Call(\"DatenueberpruefungIntern\", false);",
+            Name = "Datenüberprüfung"
+        };
+        _EventScript.Add(l2);
 
         var t = typeof(Events);
 

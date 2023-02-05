@@ -30,7 +30,6 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
@@ -438,7 +437,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
             if (string.IsNullOrEmpty(scriptname)) {
                 foreach (var thisEvent in Database.EventScript) {
                     if (thisEvent != null && thisEvent.Events.HasFlag(eventname)) {
-                        scriptname = thisEvent.Name; break;
+                        scriptname = thisEvent.Name;
+                        break;
                     }
                 }
             }

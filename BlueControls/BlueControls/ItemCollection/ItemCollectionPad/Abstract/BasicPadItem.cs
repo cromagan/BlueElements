@@ -33,7 +33,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
 
-public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, IMoveable, IDisposableExtended, IComparable {
+public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, IMoveable, IDisposableExtended, IComparable, IHasKeyName {
 
     #region Fields
 
@@ -50,9 +50,6 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     public readonly List<PointM> PointsForSuccesfullyMove = new();
 
     public List<FlexiControl>? AdditionalStyleOptions = null;
-
-    private static int _uniqueInternalCount;
-    private static string _uniqueInternalLastTime = "InitialDummy";
 
     /// <summary>
     /// Soll es gedruckt werden?
@@ -71,7 +68,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     #region Constructors
 
     protected BasicPadItem(string internalname) {
-        Internal = string.IsNullOrEmpty(internalname) ? UniqueInternal() : internalname;
+        Internal = string.IsNullOrEmpty(internalname) ? BlueBasics.Generic.UniqueInternal() : internalname;
         if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben."); }
 
         MovablePoint.ItemAdded += Points_ItemAdded;
@@ -111,6 +108,14 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     public string Internal { get; }
     public bool IsDisposed { get; private set; }
     public bool IsParsing { get; private set; }
+
+    // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+    // ~BasicPadItem()
+    // {
+    //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+    //     Dispose(disposing: false);
+    // }
+    public string KeyName => Internal;
 
     [Description("Ist Page befüllt, wird das Item nur angezeigt, wenn die anzuzeigende Seite mit dem String übereinstimmt.")]
     public string Page {
@@ -180,9 +185,13 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     #region Methods
 
     public static BasicPadItem? NewByParsing(string code) {
-        var x = code.GetAllTags();
         var ding = string.Empty;
         var name = string.Empty;
+
+        if (code.StartsWith("[I]")) { code = code.FromNonCritical(); }
+
+        var x = code.GetAllTags();
+
         foreach (var thisIt in x) {
             switch (thisIt.Key) {
                 case "type":
@@ -212,17 +221,6 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
             }
         }
         return null;
-    }
-
-    public static string UniqueInternal() {
-        var neueZeit = DateTime.UtcNow.ToString(Constants.Format_Date7).ReduceToChars(Constants.Char_Numerals);
-        if (neueZeit == _uniqueInternalLastTime) {
-            _uniqueInternalCount++;
-        } else {
-            _uniqueInternalCount = 0;
-            _uniqueInternalLastTime = neueZeit;
-        }
-        return "Auto " + neueZeit + " IDX" + _uniqueInternalCount;
     }
 
     public object? Clone() {
@@ -471,30 +469,31 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     public virtual void ProcessStyleChange() { }
 
     public override string ToString() {
-        var t = "{";
-        t = t + "ClassID=" + ClassId() + ", ";
-        t = t + "InternalName=" + Internal.ToNonCritical() + ", ";
-        t = t + "Page=" + _page.ToNonCritical() + ", ";
+        List<string> result = new();
+
+        result.ParseableAdd("ClassID", ClassId());
+        result.ParseableAdd("InternalName", Internal);
+        result.ParseableAdd("Page", _page);
         if (Tags.Count > 0) {
             foreach (var thisTag in Tags) {
-                t = t + "Tag=" + thisTag.ToNonCritical() + ", ";
+                result.ParseableAdd("Tag", thisTag);
             }
         }
-        t = t + "Style=" + (int)_style + ", ";
-        t = t + "Print=" + _beiExportSichtbar.ToPlusMinus() + ", ";
-        t = t + "QuickInfo=" + QuickInfo.ToNonCritical() + ", ";
+        result.ParseableAdd("Style", (int)_style);
+        result.ParseableAdd("Print", _beiExportSichtbar.ToPlusMinus());
+        result.ParseableAdd("QuickInfo", QuickInfo);
 
         if (_zoomPadding != 0) {
-            t = t + "ZoomPadding=" + _zoomPadding + ", ";
+            result.ParseableAdd("ZoomPadding", _zoomPadding);
         }
         foreach (var thisPoint in MovablePoint) {
-            t = t + "Point=" + thisPoint + ", ";
+            result.ParseableAdd("Point", thisPoint);
         }
         if (!string.IsNullOrEmpty(Gruppenzugehörigkeit)) {
-            t = t + "RemoveTooGroup=" + Gruppenzugehörigkeit.ToNonCritical() + ", ";
+            result.ParseableAdd("RemoveTooGroup", Gruppenzugehörigkeit);
         }
 
-        return t.Trim(", ") + "}";
+        return result.Parseable();
     }
 
     /// <summary>
@@ -635,11 +634,4 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     }
 
     #endregion
-
-    // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
-    // ~BasicPadItem()
-    // {
-    //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-    //     Dispose(disposing: false);
-    // }
 }

@@ -53,7 +53,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txbGlobalScale = new BlueControls.Controls.TextBox();
             this.caption1 = new BlueControls.Controls.Caption();
             this.btnSpaltenuebersicht = new BlueControls.Controls.Button();
-            this.tabEvents = new System.Windows.Forms.TabPage();
+            this.tabVariablen = new System.Windows.Forms.TabPage();
+            this.variableEditor = new BlueControls.VariableEditor();
             this.tabScripts = new System.Windows.Forms.TabPage();
             this.eventScriptEditor = new BlueControls.Classes_Editor.EventScript_Editor();
             this.grpVerfügbareSkripte = new BlueControls.Controls.GroupBox();
@@ -71,12 +72,11 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tblUndo = new BlueControls.Controls.Table();
             this.capBinInfo = new BlueControls.Controls.Caption();
             this.btnSave = new BlueControls.Controls.Button();
-            this.table1 = new BlueControls.Controls.Table();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
             this.GlobalTab.SuspendLayout();
             this.tabAllgemein.SuspendLayout();
-            this.tabEvents.SuspendLayout();
+            this.tabVariablen.SuspendLayout();
             this.tabScripts.SuspendLayout();
             this.grpVerfügbareSkripte.SuspendLayout();
             this.tabRechte.SuspendLayout();
@@ -281,7 +281,7 @@ namespace BlueControls.BlueDatabaseDialogs
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.GlobalTab.Controls.Add(this.tabAllgemein);
-            this.GlobalTab.Controls.Add(this.tabEvents);
+            this.GlobalTab.Controls.Add(this.tabVariablen);
             this.GlobalTab.Controls.Add(this.tabScripts);
             this.GlobalTab.Controls.Add(this.tabRechte);
             this.GlobalTab.Controls.Add(this.tabSortierung);
@@ -405,16 +405,25 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnSpaltenuebersicht.Text = "Spaltenübersicht";
             this.btnSpaltenuebersicht.Click += new System.EventHandler(this.btnSpaltenuebersicht_Click);
             // 
-            // tabEvents
+            // tabVariablen
             // 
-            this.tabEvents.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabEvents.Controls.Add(this.table1);
-            this.tabEvents.Location = new System.Drawing.Point(4, 25);
-            this.tabEvents.Name = "tabEvents";
-            this.tabEvents.Padding = new System.Windows.Forms.Padding(3);
-            this.tabEvents.Size = new System.Drawing.Size(1039, 616);
-            this.tabEvents.TabIndex = 3;
-            this.tabEvents.Text = "Event-Zuordnungen";
+            this.tabVariablen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabVariablen.Controls.Add(this.variableEditor);
+            this.tabVariablen.Location = new System.Drawing.Point(4, 25);
+            this.tabVariablen.Name = "tabVariablen";
+            this.tabVariablen.Padding = new System.Windows.Forms.Padding(3);
+            this.tabVariablen.Size = new System.Drawing.Size(1039, 616);
+            this.tabVariablen.TabIndex = 3;
+            this.tabVariablen.Text = "Variablen";
+            // 
+            // variableEditor
+            // 
+            this.variableEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.variableEditor.Editabe = false;
+            this.variableEditor.Location = new System.Drawing.Point(3, 3);
+            this.variableEditor.Name = "variableEditor";
+            this.variableEditor.Size = new System.Drawing.Size(1033, 610);
+            this.variableEditor.TabIndex = 0;
             // 
             // tabScripts
             // 
@@ -438,7 +447,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.eventScriptEditor.Size = new System.Drawing.Size(1033, 485);
             this.eventScriptEditor.TabIndex = 3;
             this.eventScriptEditor.TabStop = false;
-            this.eventScriptEditor.Changed += new System.EventHandler(this.eventScript_Editor1_Changed);
+            this.eventScriptEditor.Text = "Verfügbare Exporte:";
             // 
             // grpVerfügbareSkripte
             // 
@@ -550,7 +559,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lbxExportSets.Text = "ExportAufgaben";
             this.lbxExportSets.AddClicked += new System.EventHandler(this.lbxExportSets_AddClicked);
             this.lbxExportSets.ItemCheckedChanged += new System.EventHandler(this.lbxExportSets_ItemCheckedChanged);
-            this.lbxExportSets.RemoveClicked += new System.EventHandler<BlueControls.EventArgs.ListOfBasicListItemEventArgs>(this.lbxExportSets_RemoveClicked);
             // 
             // tabUndo
             // 
@@ -627,16 +635,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnSave.Text = "Speichern";
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
-            // table1
-            // 
-            this.table1.DropMessages = false;
-            this.table1.Location = new System.Drawing.Point(16, 16);
-            this.table1.Name = "table1";
-            this.table1.ShowWaitScreen = true;
-            this.table1.Size = new System.Drawing.Size(728, 464);
-            this.table1.TabIndex = 0;
-            this.table1.Text = "tblEventZuordnungen";
-            // 
             // DatabaseHeadEditor
             // 
             this.ClientSize = new System.Drawing.Size(1050, 677);
@@ -652,7 +650,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpKennwort.ResumeLayout(false);
             this.GlobalTab.ResumeLayout(false);
             this.tabAllgemein.ResumeLayout(false);
-            this.tabEvents.ResumeLayout(false);
+            this.tabVariablen.ResumeLayout(false);
             this.tabScripts.ResumeLayout(false);
             this.grpVerfügbareSkripte.ResumeLayout(false);
             this.tabRechte.ResumeLayout(false);
@@ -679,7 +677,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private ListBox DatenbankAdmin;
         private  System.Windows.Forms.TabPage tabAllgemein;
         private  System.Windows.Forms.TabPage tabSortierung;
-        private  System.Windows.Forms.TabPage tabEvents;
+        private  System.Windows.Forms.TabPage tabVariablen;
         private  System.Windows.Forms.TabPage tabRechte;
         private  System.Windows.Forms.TabPage tabBackup;
         private GroupBox grpKennwort;
@@ -710,6 +708,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private GroupBox grpVerfügbareSkripte;
         private ListBox lstEventScripts;
         private EventScript_Editor eventScriptEditor;
-        private Table table1;
+        private VariableEditor variableEditor;
     }
 }

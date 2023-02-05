@@ -187,7 +187,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
             _ = items.Add(ContextMenuComands.VorherigenInhaltWiederherstellen);
         }
         //if (Parent is Formula f) {
-        //    ItemCollectionList x = new(BlueListBoxAppearance.KontextMenu);
+        //    ItemCollectionList x = new(BlueListBoxAppearance.KontextMenu, false);
         //    f.GetContextMenuItems(null, x, out _, tags, ref cancel, ref translate);
         //    if (x.Count > 0) {
         //        if (items.Count > 0) {
@@ -226,7 +226,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
 
         switch (e.Control) {
             case ComboBox comboBox:
-                ItemCollectionList item2 = new();
+                ItemCollectionList item2 = new(true);
                 ItemCollectionList.GetItemCollection(item2, column1, null, ShortenStyle.Replaced, 10000);
                 if (column1 != null && column1.TextBearbeitungErlaubt) {
                     StyleComboBox(comboBox, item2, ComboBoxStyle.DropDown, false);

@@ -15,8 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
 using System;
+using System.Collections.Generic;
 
 namespace BlueDatabase;
 
@@ -25,7 +25,7 @@ namespace BlueDatabase;
 /// Noch dazu ist ItemCollectionPad in BlueConrolls verankert, das nur die Sichtbarmachung einen Sinn macht.
 /// Und diese Sichtbarmachung braucht braucht Controls für die Bearbeitung.
 /// </summary>
-public class LayoutCollection : ListExt<string>, ICloneable {
+public class LayoutCollection : List<string>, ICloneable {
     //public string ToString(
     //     return this.JoinWithCr();
     //    )

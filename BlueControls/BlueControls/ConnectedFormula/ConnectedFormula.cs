@@ -32,7 +32,7 @@ using static BlueBasics.IO;
 
 namespace BlueControls.ConnectedFormula;
 
-public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
+public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyName {
 
     #region Fields
 
@@ -117,6 +117,8 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended {
     //     Dispose(disposing: false);
     // }
     public bool IsDisposed { get; private set; }
+
+    public string KeyName => Filename;
 
     public ItemCollectionPad? PadData {
         get => _padData;

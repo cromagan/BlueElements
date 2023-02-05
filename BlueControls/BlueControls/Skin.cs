@@ -1223,7 +1223,7 @@ public static class Skin {
     /// <returns></returns>
 
     public static ItemCollectionList GetFonts(RowItem? sheetStyle) {
-        ItemCollectionList rahms = new()
+        ItemCollectionList rahms = new(false)
         {
             //   Rahms.GenerateAndAdd(New ItemCollection.TextListItem(CInt(PadStyles.Undefiniert).ToString, "Ohne Rahmen", ImageCode.Kreuz))
             { "Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Haupt).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Haupt, sheetStyle).SymbolForReadableText() },
@@ -1234,12 +1234,12 @@ public static class Skin {
             { "Standard Alternativ-Design", ((int)PadStyles.Style_StandardAlternativ).ToString(), GetBlueFont(PadStyles.Style_StandardAlternativ, sheetStyle).SymbolForReadableText() },
             { "Kleiner Zusatz", ((int)PadStyles.Style_KleinerZusatz).ToString(), GetBlueFont(PadStyles.Style_KleinerZusatz, sheetStyle).SymbolForReadableText() }
         };
-        rahms.Sort();
+        //rahms.Sort();
         return rahms;
     }
 
     public static ItemCollectionList GetRahmenArt(RowItem? sheetStyle, bool mitOhne) {
-        ItemCollectionList rahms = new();
+        ItemCollectionList rahms = new(false);
         if (mitOhne) {
             _ = rahms.Add("Ohne Rahmen", ((int)PadStyles.Undefiniert).ToString(), ImageCode.Kreuz);
         }
@@ -1250,7 +1250,7 @@ public static class Skin {
         _ = rahms.Add("Standard Fett", ((int)PadStyles.Style_StandardFett).ToString(), GetBlueFont(PadStyles.Style_StandardFett, sheetStyle).SymbolOfLine());
         _ = rahms.Add("Standard Alternativ-Design", ((int)PadStyles.Style_StandardAlternativ).ToString(), GetBlueFont(PadStyles.Style_StandardAlternativ, sheetStyle).SymbolOfLine());
         _ = rahms.Add("Kleiner Zusatz", ((int)PadStyles.Style_KleinerZusatz).ToString(), GetBlueFont(PadStyles.Style_KleinerZusatz, sheetStyle).SymbolOfLine());
-        rahms.Sort();
+        //rahms.Sort();
         return rahms;
     }
 

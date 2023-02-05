@@ -261,11 +261,10 @@ namespace BlueControls.Classes_Editor
             this.lsbExportDateien.FilterAllowed = true;
             this.lsbExportDateien.Location = new System.Drawing.Point(8, 24);
             this.lsbExportDateien.Name = "lsbExportDateien";
-            this.lsbExportDateien.RemoveAllowed = true;
+            this.lsbExportDateien.RemoveAllowed = false;
             this.lsbExportDateien.Size = new System.Drawing.Size(984, 133);
             this.lsbExportDateien.TabIndex = 0;
             this.lsbExportDateien.ListOrItemChanged += new System.EventHandler(this.ExportDateien_ListOrItemChanged);
-            this.lsbExportDateien.RemoveClicked += new System.EventHandler<BlueControls.EventArgs.ListOfBasicListItemEventArgs>(this.ExportDateien_RemoveClicked);
             // 
             // ExportVerzeichnis
             // 

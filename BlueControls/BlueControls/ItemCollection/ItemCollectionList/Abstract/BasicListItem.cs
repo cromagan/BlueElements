@@ -26,7 +26,7 @@ using System.Drawing;
 
 namespace BlueControls.ItemCollection.ItemCollectionList;
 
-public abstract class BasicListItem : IComparable, ICloneable, IHasKeyName {
+public abstract class BasicListItem : IComparable, ICloneable, IHasKeyName, IChangedFeedback {
 
     #region Fields
 
@@ -50,15 +50,20 @@ public abstract class BasicListItem : IComparable, ICloneable, IHasKeyName {
     /// <remarks></remarks>
     private bool _enabled;
 
-    private ItemCollectionList? _parent;
+    private string _internal;
+    private bool _isCaption;
+
+    //private ItemCollectionList? _parent;
     private Size _sizeUntouchedForListBox = Size.Empty;
+
+    private string _userDefCompareKey;
 
     #endregion
 
     #region Constructors
 
     protected BasicListItem(string internalname, bool enabled) {
-        Internal = string.IsNullOrEmpty(internalname) ? BasicPadItem.UniqueInternal() : internalname;
+        Internal = string.IsNullOrEmpty(internalname) ? BlueBasics.Generic.UniqueInternal() : internalname;
         if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben."); }
         _checked = false;
         _enabled = enabled;
@@ -68,16 +73,32 @@ public abstract class BasicListItem : IComparable, ICloneable, IHasKeyName {
 
     #endregion
 
+    #region Events
+
+    public event EventHandler? Changed;
+
+    public event EventHandler? CheckedChanged;
+
+    public event EventHandler? CompareKeyChanged;
+
+    #endregion
+
     #region Properties
 
     public bool Checked {
         get => _checked;
         set {
-            if (Parent == null) {
-                _checked = value;
-            } else {
-                Parent?.SetNewCheckState(this, value, ref _checked);
-            }
+            if (!IsClickable()) { value = false; }
+            if (value == _checked) { return; }
+            _checked = value;
+            OnCheckedChanged();
+            OnChanged();
+
+            //if (Parent == null) {
+            //    _checked = value;
+            //} else {
+            //    Parent?.SetNewCheckState(this, value, ref _checked);
+            //}
         }
     }
 
@@ -86,31 +107,53 @@ public abstract class BasicListItem : IComparable, ICloneable, IHasKeyName {
         set {
             if (_enabled == value) { return; }
             _enabled = value;
-            Parent?.OnChanged();
+            OnChanged();
         }
     }
 
-    public string Internal { get; set; }
+    public string Internal {
+        get => _internal;
+        set {
+            if (_internal == value) { return; }
+            _internal = value;
+            OnChanged();
+        }
+    }
 
-    public bool IsCaption { get; protected set; }
+    public bool IsCaption {
+        get => _isCaption;
+        protected set {
+            if (_isCaption == value) { return; }
+            _isCaption = value;
+            OnChanged();
+        }
+    }
 
     public string KeyName => Internal;
 
-    public ItemCollectionList? Parent {
-        get => _parent;
-        set {
-            if (_parent == null || _parent == value) {
-                _parent = value;
-                return;
-            }
+    //public ItemCollectionList? Parent {
+    //    get => _parent;
+    //    set {
+    //        if (_parent == null || _parent == value) {
+    //            _parent = value;
+    //            return;
+    //        }
 
-            Develop.DebugPrint(FehlerArt.Fehler, "Parent Fehler!");
-        }
-    }
+    //        Develop.DebugPrint(FehlerArt.Fehler, "Parent Fehler!");
+    //    }
+    //}
 
     public abstract string QuickInfo { get; }
 
-    public string UserDefCompareKey { get; set; }
+    public string UserDefCompareKey {
+        get => _userDefCompareKey;
+        set {
+            if (_userDefCompareKey == value) { return; }
+            _userDefCompareKey = value;
+            OnCompareKeyChanged();
+            OnChanged();
+        }
+    }
 
     #endregion
 
@@ -136,7 +179,8 @@ public abstract class BasicListItem : IComparable, ICloneable, IHasKeyName {
     public string CompareKey() {
         if (!string.IsNullOrEmpty(UserDefCompareKey)) {
             if (Convert.ToChar(UserDefCompareKey.Substring(0, 1)) < 32) { Develop.DebugPrint("Sortierung inkorrekt: " + UserDefCompareKey); }
-            return UserDefCompareKey + Constants.FirstSortChar + Parent?.IndexOf(this).ToString(Constants.Format_Integer6);
+
+            return UserDefCompareKey;// + Constants.FirstSortChar + Parent?.IndexOf(this).ToString(Constants.Format_Integer6);
         }
         return GetCompareKey();
     }
@@ -153,7 +197,7 @@ public abstract class BasicListItem : IComparable, ICloneable, IHasKeyName {
     public bool Contains(int x, int y) => Pos.Contains(x, y);
 
     public void Draw(Graphics gr, int xModifier, int yModifier, Design controldesign, Design itemdesign, States vState, bool drawBorderAndBack, string filterText, bool translate) {
-        if (Parent == null) { Develop.DebugPrint(FehlerArt.Fehler, "Parent nicht definiert"); }
+        //if (Parent == null) { Develop.DebugPrint(FehlerArt.Fehler, "Parent nicht definiert"); }
         if (itemdesign == Design.Undefiniert) { return; }
         var positionModified = Pos with { X = Pos.X - xModifier, Y = Pos.Y - yModifier };
         DrawExplicit(gr, positionModified, itemdesign, vState, drawBorderAndBack, translate);
@@ -168,29 +212,33 @@ public abstract class BasicListItem : IComparable, ICloneable, IHasKeyName {
 
     public virtual bool FilterMatch(string filterText) => Internal.ToUpper().Contains(filterText.ToUpper());
 
-    public abstract int HeightForListBox(BlueListBoxAppearance style, int columnWidth);
+    public abstract int HeightForListBox(BlueListBoxAppearance style, int columnWidth, Design itemdesign);
 
     public virtual bool IsClickable() => !IsCaption;
 
+    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+
+    public void OnCheckedChanged() => CheckedChanged?.Invoke(this, System.EventArgs.Empty);
+
+    public void OnCompareKeyChanged() => CompareKeyChanged?.Invoke(this, System.EventArgs.Empty);
+
     public void SetCoordinates(Rectangle r) {
         Pos = r;
-        Parent?.OnChanged();
+        OnChanged();
     }
 
-    public Size SizeUntouchedForListBox() {
+    public Size SizeUntouchedForListBox(Design itemdesign) {
         if (_sizeUntouchedForListBox.IsEmpty) {
-            _sizeUntouchedForListBox = ComputeSizeUntouchedForListBox();
+            _sizeUntouchedForListBox = ComputeSizeUntouchedForListBox(itemdesign);
         }
         return _sizeUntouchedForListBox;
     }
 
-    protected abstract Size ComputeSizeUntouchedForListBox();
+    protected abstract Size ComputeSizeUntouchedForListBox(Design itemdesign);
 
     protected abstract void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate);
 
     protected abstract string GetCompareKey();
 
     #endregion
-
-    //return null;
 }

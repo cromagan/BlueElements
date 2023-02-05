@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics;
+using System.Collections.Generic;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
@@ -56,10 +57,9 @@ public abstract class RectanglePadItemWithVersion : RectanglePadItem {
     }
 
     public override string ToString() {
-        var t = base.ToString();
-        t = t.Substring(0, t.Length - 1) + ", ";
-        t = t + "Version=" + Version + ", ";
-        return t.Trim(", ") + "}";
+        var result = new List<string>();
+        result.ParseableAdd("Version", Version);
+        return result.Parseable(base.ToString());
     }
 
     #endregion

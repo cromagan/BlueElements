@@ -25,7 +25,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Globalization;
 using static BlueBasics.Converter;
 using static BlueBasics.Polygons;
 
@@ -59,7 +58,7 @@ public class SymbolPadItem : RectanglePadItem {
     #region Methods
 
     public override List<GenericControl> GetStyleOptions() {
-        ItemCollectionList.ItemCollectionList comms = new()
+        ItemCollectionList.ItemCollectionList comms = new(false)
         {
             { "Ohne", ((int)Symbol.Ohne).ToString(), QuickImage.Get("Datei|32") },
             { "Rechteck", ((int)Symbol.Rechteck).ToString(), QuickImage.Get("Stop|32") },
@@ -106,13 +105,12 @@ public class SymbolPadItem : RectanglePadItem {
     }
 
     public override string ToString() {
-        var t = base.ToString();
-        t = t.Substring(0, t.Length - 1) + ", ";
-        t = t + "Symbol=" + (int)Symbol + ", ";
-        t = t + "Backcolor=" + Hintergrundfarbe.ToHtmlCode() + ", ";
-        t = t + "BorderColor=" + Randfarbe.ToHtmlCode() + ", ";
-        t = t + "BorderWidth=" + Randdicke.ToString(CultureInfo.InvariantCulture).ToNonCritical() + ", ";
-        return t.Trim(", ") + "}";
+        var result = new List<string>();
+        result.ParseableAdd("Symbol", Symbol);
+        result.ParseableAdd("Backcolor", Hintergrundfarbe);
+        result.ParseableAdd("BorderColor", Randfarbe);
+        result.ParseableAdd("BorderWidth", Randdicke);
+        return result.Parseable(base.ToString());
     }
 
     protected override string ClassId() => "Symbol";

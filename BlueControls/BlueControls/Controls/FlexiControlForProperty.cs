@@ -330,7 +330,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                             var x2 = Math.Max((int)(biggestItemX + 20 + s2.Width), 200);
                             var y2 = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
                             Size = new Size(x2, y2);
-                            StyleComboBox(CreateSubControls() as ComboBox, list, ComboBoxStyle.DropDownList, true);
+                            StyleComboBox(CreateSubControls() as ComboBox, list.ItemOrder, ComboBoxStyle.DropDownList, true);
                         } else {
                             EditType = EditTypeFormula.Textfeld;
                             if (textLines >= 2) {

@@ -35,7 +35,7 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
 
     #region Constructors
 
-    private InputBoxListBoxStyle() : this(string.Empty, new ItemCollectionList(), AddType.None, true) { }
+    private InputBoxListBoxStyle() : this(string.Empty, new ItemCollectionList(true), AddType.None, true) { }
 
     private InputBoxListBoxStyle(string txt, ItemCollectionList itemsOriginal, AddType addNewAllowed, bool cancelErl) : base(cancelErl, true) {
         InitializeComponent();
@@ -60,11 +60,11 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
         if (items == null || items.Count == 0) {
             return InputBox.Show(txt, string.Empty, FormatHolder.Text);
         }
-        ItemCollectionList x = new(BlueListBoxAppearance.Listbox) {
+        ItemCollectionList x = new(BlueListBoxAppearance.Listbox, true) {
             CheckBehavior = CheckBehavior.AlwaysSingleSelection
         };
         x.AddRange(items);
-        x.Sort();
+        //x.Sort();
         var erg = Show(txt, x, AddType.None, true);
         return erg is null || erg.Count != 1 ? string.Empty : erg[0];
     }

@@ -79,8 +79,7 @@ public class BitmapListItem : BasicListItem {
         set {
             _imageFilename = string.Empty;
             _bitmap = value;
-            //OnChanged();
-            Parent?.OnChanged();
+            OnChanged();
         }
     }
 
@@ -90,7 +89,7 @@ public class BitmapListItem : BasicListItem {
             if (_caption == value) { return; }
             _caption = value;
             _captiontmp.Clear();
-            //OnChanged();
+            OnChanged();
         }
     }
 
@@ -101,7 +100,7 @@ public class BitmapListItem : BasicListItem {
             if (_captionlines == value) { return; }
             _captionlines = value;
             _captiontmp.Clear();
-            //OnChanged();
+            OnChanged();
         }
     }
 
@@ -122,7 +121,7 @@ public class BitmapListItem : BasicListItem {
 
     public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Caption.ToUpper().Contains(filterText.ToUpper()) || (_imageFilename != null && _imageFilename.ToUpper().Contains(filterText.ToUpper()));
 
-    public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth) {
+    public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth, Design itemdesign) {
         if (style == BlueListBoxAppearance.FileSystem) {
             return 110 + (_captionlines * ConstMy);
         }
@@ -138,7 +137,7 @@ public class BitmapListItem : BasicListItem {
 
     public bool ImageLoaded() => _bitmap != null;
 
-    protected override Size ComputeSizeUntouchedForListBox() {
+    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) {
         try {
             if (_bitmap == null) { return new Size(300, 300); }
 
@@ -149,7 +148,7 @@ public class BitmapListItem : BasicListItem {
             return new Size(300, (int)(sc * 300));
         } catch {
             //... wird an anderer Stelle verwendet...
-            return ComputeSizeUntouchedForListBox();
+            return ComputeSizeUntouchedForListBox(itemdesign);
         }
     }
 

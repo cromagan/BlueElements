@@ -28,7 +28,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Globalization;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
@@ -116,13 +115,13 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
         {
             new FlexiControlForProperty<string>(() => Text, 5)
         };
-        ItemCollectionList.ItemCollectionList aursicht = new()
+        ItemCollectionList.ItemCollectionList aursicht = new(false)
         {
             { "Linksbündig ausrichten", ((int)Alignment.Top_Left).ToString(), ImageCode.Linksbündig },
             { "Zentrieren", ((int)Alignment.Top_HorizontalCenter).ToString(), ImageCode.Zentrieren },
             { "Rechtsbündig ausrichten", ((int)Alignment.Top_Right).ToString(), ImageCode.Rechtsbündig }
         };
-        aursicht.Sort();
+        //aursicht.Sort();
         l.Add(new FlexiControlForProperty<Alignment>(() => Ausrichtung, aursicht));
         l.Add(new FlexiControlForProperty<float>(() => Skalierung));
         AddStyleOption(l);
@@ -188,13 +187,12 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
     }
 
     public override string ToString() {
-        var t = base.ToString();
-        t = t.Substring(0, t.Length - 1) + ", ";
-        if (!string.IsNullOrEmpty(_textOriginal)) { t = t + "ReadableText=" + _textOriginal.ToNonCritical() + ", "; }
-        if (Format != DataFormat.Text) { t = t + "Format=" + (int)Format + ", "; }
-        if (_ausrichtung != Alignment.Top_Left) { t = t + "Alignment=" + (int)_ausrichtung + ", "; }
-        t = t + "AdditionalScale=" + Skalierung.ToString(CultureInfo.InvariantCulture).ToNonCritical() + ", ";
-        return t.Trim(", ") + "}";
+        var result = new List<string>();
+        result.ParseableAdd("ReadableText", _textOriginal);
+        result.ParseableAdd("Format", Format);
+        result.ParseableAdd("Alignment", _ausrichtung);
+        result.ParseableAdd("AdditionalScale", Skalierung);
+        return result.Parseable(base.ToString());
     }
 
     protected override string ClassId() => "TEXT";

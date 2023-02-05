@@ -235,15 +235,14 @@ public class DimensionPadItem : BasicPadItem {
     public override void PointMoved(object sender, MoveEventArgs e) => CalculateOtherPoints();
 
     public override string ToString() {
-        var t = base.ToString();
-        t = t.Substring(0, t.Length - 1);
-        return t +
-               ", Text1=" + Text_Oben.ToNonCritical() +
-               ", Text2=" + Text_Unten.ToNonCritical() +
-               ", Decimal=" + Nachkommastellen +
-               ", Prefix=" + Präfix.ToNonCritical() +
-               ", Suffix=" + Suffix.ToNonCritical() +
-               ", AdditionalScale=" + Skalierung.ToString(CultureInfo.InvariantCulture).ToNonCritical() + "}";
+        var result = new List<string>();
+        result.ParseableAdd("Text1", Text_Oben);
+        result.ParseableAdd("Text2", Text_Unten);
+        result.ParseableAdd("Decimal", Nachkommastellen);
+        result.ParseableAdd("refix", Präfix);
+        result.ParseableAdd("Suffix", Suffix);
+        result.ParseableAdd("AdditionalScale", Skalierung);
+        return result.Parseable(base.ToString());
     }
 
     protected override RectangleF CalculateUsedArea() {

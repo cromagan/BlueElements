@@ -17,8 +17,6 @@
 
 using BlueControls.Interfaces;
 using BlueDatabase;
-using System;
-using System.Collections.ObjectModel;
 
 namespace BlueControls.Classes_Editor;
 

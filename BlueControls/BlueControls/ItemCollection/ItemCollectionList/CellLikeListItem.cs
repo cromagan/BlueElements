@@ -79,9 +79,9 @@ public class CellLikeListItem : BasicListItem {
         return txt.ToUpper().Contains(filterText.ToUpper());
     }
 
-    public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth) => SizeUntouchedForListBox().Height;
+    public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth, Design itemdesign) => SizeUntouchedForListBox(itemdesign).Height;
 
-    protected override Size ComputeSizeUntouchedForListBox() => Table.FormatedText_NeededSize(_styleLikeThis, Internal, Skin.GetBlueFont(Parent.ItemDesign, States.Standard), _style, 16, _bildTextverhalten);
+    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => Table.FormatedText_NeededSize(_styleLikeThis, Internal, Skin.GetBlueFont(itemdesign, States.Standard), _style, 16, _bildTextverhalten);
 
     protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States vState, bool drawBorderAndBack, bool translate) {
         if (drawBorderAndBack) {

@@ -110,7 +110,7 @@ public class Script {
 
     #region Properties
 
-    public bool BreakFired { get; internal set; }
+    public bool BreakFired { get; set; }
 
     /// <summary>
     /// Es sind keine {} in diesem Text erlaubt und werden eliminiert
@@ -128,14 +128,14 @@ public class Script {
         private set => _errorCode = value.Replace("{", string.Empty).Replace("}", string.Empty);
     }
 
-    public int Line { get; internal set; }
+    public int Line { get; set; }
 
     public string ReducedScriptText { get; private set; }
     public int Schleife { get; internal set; }
 
     public string ScriptText { get; set; } = string.Empty;
 
-    public int Sub { get; internal set; }
+    public int Sub { get; set; }
 
     #endregion
 
@@ -247,7 +247,7 @@ public class Script {
     //    return BitmapCache.IndexOf(bmp);
     //}
 
-    internal (string, string) Parse(string redScriptText) {
+    public (string, string) Parse(string redScriptText) {
         var pos = 0;
         EndScript = false;
 

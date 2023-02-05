@@ -28,7 +28,7 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEmpty, IDisposableExtended, IErrorCheckable, IHasDatabase {
+public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IReadableTextWithChanging, ICanBeEmpty, IDisposableExtended, IErrorCheckable, IHasDatabase {
 
     #region Fields
 
@@ -37,6 +37,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
     private ColumnItem? _column;
 
     private FilterType _filterType = FilterType.KeinFilter;
+    private string _id;
 
     #endregion
 
@@ -46,6 +47,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
 
     public FilterItem(DatabaseAbstract database, FilterType filterType, IReadOnlyCollection<string> searchValue) {
         Database = database;
+        _id = Generic.UniqueInternal();
         if (Database != null && !Database.IsDisposed) {
             Database.Disposing += Database_Disposing;
         }
@@ -66,6 +68,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
         if (Database != null && !Database.IsDisposed) {
             Database.Disposing += Database_Disposing;
         }
+        _id = Generic.UniqueInternal();
 
         Parse(filterCode);
 
@@ -83,6 +86,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
     /// <param name="filterCode"></param>
 
     public FilterItem(string filterCode) {
+        _id = Generic.UniqueInternal();
         Parse(filterCode);
 
         //if (!IsOk()) {
@@ -104,6 +108,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
             Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht vorhanden.");
             return;
         }
+        _id = Generic.UniqueInternal();
         Database = column.Database;
         _column = column;
         _filterType = filterType;
@@ -158,6 +163,7 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
 
     public bool IsDisposed { get; private set; }
     public bool IsParsing { get; private set; }
+    public string KeyName => _id;
     public ListExt<string> SearchValue { get; } = new();
 
     #endregion
@@ -256,6 +262,10 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
                     Herkunft = pair.Value.FromNonCritical();
                     break;
 
+                case "id":
+                    _id = pair.Value.FromNonCritical();
+                    break;
+
                 default:
                     Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
                     break;
@@ -330,16 +340,17 @@ public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEm
         try {
             if (!IsOk()) { return string.Empty; }
 
-            var Result = new List<string>();
-            Result.ParseableAdd("Type", _filterType);
+            var result = new List<string>();
+            result.ParseableAdd("ID", _id);
+            result.ParseableAdd("Type", _filterType);
 
-            Result.ParseableAdd("Database", Database);
-            Result.ParseableAdd("ColumnName", _column);
+            result.ParseableAdd("Database", Database);
+            result.ParseableAdd("ColumnName", _column);
             foreach (var t in SearchValue) {
-                Result.ParseableAdd("Value", t);
+                result.ParseableAdd("Value", t);
             }
-            Result.ParseableAdd("Herkunft", Herkunft);
-            return Result.Parseable();
+            result.ParseableAdd("Herkunft", Herkunft);
+            return result.Parseable();
         } catch {
             return ToString();
         }

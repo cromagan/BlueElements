@@ -112,7 +112,7 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
         l.Add(new FlexiControlForProperty<string>(() => Überschrift));
         l.Add(new FlexiControlForProperty<string>(() => Variable));
 
-        var u = new ItemCollection.ItemCollectionList.ItemCollectionList();
+        var u = new ItemCollection.ItemCollectionList.ItemCollectionList(false);
         u.AddRange(typeof(ÜberschriftAnordnung));
         l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
         //var b = new ItemCollection.ItemCollectionList.ItemCollectionList();
@@ -162,16 +162,12 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
     }
 
     public override string ToString() {
-        var t = base.ToString();
-        t = t.Substring(0, t.Length - 1) + ", ";
-
-        t = t + "CaptionText=" + _überschrift.ToNonCritical() + ", ";
-        t = t + "Variable=" + _variable.ToNonCritical() + ", ";
-
-        t = t + "EditType=" + ((int)_bearbeitung) + ", ";
-        t = t + "Caption=" + ((int)_überschriftanordung) + ", ";
-
-        return t.Trim(", ") + "}";
+        var result = new List<string>();
+        result.ParseableAdd("CaptionText", _überschrift);
+        result.ParseableAdd("Variable", _variable);
+        result.ParseableAdd("EditType", _bearbeitung);
+        result.ParseableAdd("Caption", _überschriftanordung);
+        return result.Parseable(base.ToString());
     }
 
     protected override string ClassId() => "FI-VariableField";

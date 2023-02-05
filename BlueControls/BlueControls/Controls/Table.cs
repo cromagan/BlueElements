@@ -509,7 +509,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public static ItemCollectionList UndoItems(DatabaseAbstract db, string cellkey) {
-        ItemCollectionList i = new(BlueListBoxAppearance.KontextMenu) {
+        ItemCollectionList i = new(BlueListBoxAppearance.KontextMenu, false) {
             CheckBehavior = CheckBehavior.AlwaysSingleSelection
         };
 
@@ -2203,7 +2203,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             }
         }
 
-        ItemCollectionList t = new() {
+        ItemCollectionList t = new(true) {
             Appearance = BlueListBoxAppearance.DropdownSelectbox
         };
 
@@ -2224,7 +2224,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             }
             _ = t.Add("Erweiterte Eingabe", "#Erweitert", QuickImage.Get(ImageCode.Stift), true, Constants.FirstSortChar + "1");
             _ = t.AddSeparator(Constants.FirstSortChar + "2");
-            t.Sort();
+            //t.Sort();
         }
 
         var dropDownMenu = FloatingInputBoxListBoxStyle.Show(t, new CellExtEventArgs(cellInThisDatabaseColumn, cellInThisDatabaseRow), this, Translate);
@@ -2250,7 +2250,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (isHeight > 0) { h = isHeight; }
             Box.Location = new Point((int)viewItemx.OrderTmpSpalteX1, DrawY(cellInThisDatabaseRow));
             Box.Size = new Size(Column_DrawWidth(viewItemx, DisplayRectangle) + addWith, h);
-            Box.Text = contentHolderCellRow.CellGetString(contentHolderCellColumn).Replace(Constants.beChrW1.ToString(), "\r"); // Texte aus alter Zeit...
+            //Box.Text = contentHolderCellRow.CellGetString(contentHolderCellColumn).Replace(Constants.beChrW1.ToString(), "\r"); // Texte aus alter Zeit...
         } else {
             // Neue Zeile...
             Box.Location = new Point((int)viewItemx.OrderTmpSpalteX1, HeadSize());

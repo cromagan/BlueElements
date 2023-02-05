@@ -20,6 +20,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection;
@@ -59,13 +60,10 @@ public class GenericPadItem : FixedRectangleBitmapPadItem {
     public override void ProcessStyleChange() => RemovePic();
 
     public override string ToString() {
-        var t = base.ToString();
-        t = t.Substring(0, t.Length - 1) + ", ";
-
-        t = t + "Text=" + _text.ToNonCritical() + ", ";
-        t = t + "Size=" + Size + ", ";
-
-        return t.Trim(", ") + "}";
+        var result = new List<string>();
+        result.ParseableAdd("Text", _text.ToNonCritical());
+        result.ParseableAdd("Size", Size);
+        return result.Parseable(base.ToString());
     }
 
     protected override string ClassId() => "GenericPadItem";

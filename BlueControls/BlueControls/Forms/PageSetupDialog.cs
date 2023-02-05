@@ -54,7 +54,7 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
             }
         }
         _ = Format.Item.Add("Manuelle Eingabe", "neu", ImageCode.Stern, true, Constants.FirstSortChar.ToString());
-        Format.Item.Sort();
+        //Format.Item.Sort();
         if (nurHochformat) {
             Hochformat.Checked = true;
             Querformat.Enabled = false;

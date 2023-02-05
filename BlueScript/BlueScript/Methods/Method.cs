@@ -29,7 +29,13 @@ using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods;
 
-public abstract class Method : IReadableText {
+public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
+
+    #region Events
+
+    public event EventHandler? Changed;
+
+    #endregion
 
     #region Properties
 
@@ -42,6 +48,11 @@ public abstract class Method : IReadableText {
     public abstract string EndSequence { get; }
 
     public abstract bool GetCodeBlockAfter { get; }
+
+    /// <summary>
+    ///  Gibt die Syntax zurück, weil der Befehl selbst anders sein könnte. Z.B. Bei Variablan
+    /// </summary>
+    public string KeyName => Syntax;
 
     public abstract string Returns { get; }
 
@@ -307,6 +318,8 @@ public abstract class Method : IReadableText {
         co = co + Description + "\r\n";
         return co;
     }
+
+    public void OnChanged() => Changed?.Invoke(this, EventArgs.Empty);
 
     public string ReadableText() => Syntax;
 

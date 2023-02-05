@@ -17,14 +17,13 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
 
@@ -32,14 +31,14 @@ public abstract class RectanglePadItem : BasicPadItem {
 
     #region Fields
 
-    private readonly PointM? _pl;
-    private readonly PointM? _pLo;
-    private readonly PointM? _pLu;
-    private readonly PointM? _po;
-    private readonly PointM? _pr;
-    private readonly PointM? _pRo;
-    private readonly PointM? _pRu;
-    private readonly PointM? _pu;
+    private readonly PointM _pl;
+    private readonly PointM _pLo;
+    private readonly PointM _pLu;
+    private readonly PointM _po;
+    private readonly PointM _pr;
+    private readonly PointM _pRo;
+    private readonly PointM _pRu;
+    private readonly PointM _pu;
     private int _drehwinkel;
 
     #endregion
@@ -105,7 +104,7 @@ public abstract class RectanglePadItem : BasicPadItem {
                 return true;
 
             case "rotation":
-                _drehwinkel = IntParse(value);
+                _drehwinkel = Converter.IntParse(value);
                 return true;
         }
         return false;
@@ -113,15 +112,11 @@ public abstract class RectanglePadItem : BasicPadItem {
 
     public override void PointMoved(object sender, MoveEventArgs e) {
         base.PointMoved(sender, e);
-        var x = 0f;
-        var y = 0f;
 
-        var point = (PointM)sender;
+        if (sender is not PointM point) { return; }
 
-        if (point != null) {
-            x = point.X;
-            y = point.Y;
-        }
+        var x = point.X;
+        var y = point.Y;
 
         if (point == _pLo) {
             if (e.Y) { _po.Y = y; }
@@ -170,7 +165,7 @@ public abstract class RectanglePadItem : BasicPadItem {
         if (!overrideFixedSize) {
             var vr = r.PointOf(Alignment.Horizontal_Vertical_Center);
             var ur = UsedArea;
-            _pLo.SetTo(vr.X - (ur.Width / 2), vr.Y - (ur.Height / 2));
+            _pLo.SetTo(vr.X - ur.Width / 2, vr.Y - ur.Height / 2);
             _pRu.SetTo(_pLo.X + ur.Width, _pLo.Y + ur.Height);
         } else {
             _pLo.SetTo(r.PointOf(Alignment.Top_Left));
@@ -180,21 +175,22 @@ public abstract class RectanglePadItem : BasicPadItem {
 
     public virtual void SizeChanged() {
         // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
-        _pl.SetTo(_pLo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2));
-        _pr.SetTo(_pRo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2));
-        _pu.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRu.Y);
-        _po.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRo.Y);
+        _pl.SetTo(_pLo.X, _pLo.Y + (_pLu.Y - _pLo.Y) / 2);
+        _pr.SetTo(_pRo.X, _pLo.Y + (_pLu.Y - _pLo.Y) / 2);
+        _pu.SetTo(_pLo.X + (_pRo.X - _pLo.X) / 2, _pRu.Y);
+        _po.SetTo(_pLo.X + (_pRo.X - _pLo.X) / 2, _pRo.Y);
     }
 
     public override string ToString() {
-        var t = base.ToString();
-        t = t.Substring(0, t.Length - 1) + ", ";
-        if (Drehwinkel != 0) { t = t + "Rotation=" + Drehwinkel + ", "; }
-        return t.Trim(", ") + "}";
+        var result = new List<string>();
+        result.ParseableAdd("Rotation", Drehwinkel);
+        return result.Parseable(base.ToString());
     }
 
-    protected override RectangleF CalculateUsedArea() => _pLo == null || _pRu == null ? RectangleF.Empty
-        : new RectangleF(Math.Min(_pLo.X, _pRu.X), Math.Min(_pLo.Y, _pRu.Y), Math.Abs(_pRu.X - _pLo.X), Math.Abs(_pRu.Y - _pLo.Y));
+    protected override RectangleF CalculateUsedArea() => new(Math.Min(_pLo.X, _pRu.X),
+                                                               Math.Min(_pLo.Y, _pRu.Y),
+                                                               Math.Abs(_pRu.X - _pLo.X),
+                                                               Math.Abs(_pRu.Y - _pLo.Y));
 
     protected override void ParseFinished() => SizeChanged();
 

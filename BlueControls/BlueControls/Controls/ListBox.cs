@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.EventArgs;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -45,6 +44,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private BlueListBoxAppearance _appearance;
 
+    private bool _autosort = true;
     private bool _filterAllowed;
 
     //Muss was gesetzt werden, sonst hat der Designer nachher einen Fehler
@@ -62,12 +62,13 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        Item = new ItemCollectionList();
-        Item.Changed += _Item_ListOrItemChanged;
+        Item = new ItemCollectionList(true);
+        Item.Changed += _Item_Changed;
         Item.ItemCheckedChanged += _Item_ItemCheckedChanged;
-        Item.ItemAdded += _Item_ItemAdded;
-        Item.ItemRemoved += _Item_ItemRemoved;
-        Item.ItemRemoving += _Item_ItemRemoving;
+        Item.CollectionChanged += Item_CollectionChanged;
+        //Item.ItemAdded += _Item_ItemAdded;
+        //Item.ItemRemoved += _Item_ItemRemoved;
+        //Item.ItemRemoving += _Item_ItemRemoving;
         _appearance = BlueListBoxAppearance.Listbox;
     }
 
@@ -81,32 +82,14 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
 
-    public event EventHandler<ListEventArgs>? ItemAdded;
-
     public event EventHandler? ItemCheckedChanged;
 
+    //public event EventHandler<ListEventArgs>? ItemAdded;
     public event EventHandler<BasicListItemEventArgs>? ItemClicked;
 
     public event EventHandler<BasicListItemEventArgs>? ItemDoubleClick;
 
-    /// <summary>
-    /// Wird nach jedem entfernen eines Items ausgelöst. Auch beim Initialisiern oder bei einem Clear.
-    /// Soll eine Benutzerinteraktion abgefragt werden, ist RemoveClicked besser.
-    /// </summary>
-    public event EventHandler? ItemRemoved;
-
-    /// <summary>
-    /// Wird vor jedem entfernen eines Items ausgelöst. Auch beim Initialisiern oder bei einem Clear.
-    /// Soll eine Benutzerinteraktion abgefragt werden, ist RemoveClicked besser.
-    /// </summary>
-    public event EventHandler<ListEventArgs>? ItemRemoving;
-
     public event EventHandler? ListOrItemChanged;
-
-    /// <summary>
-    /// Wird nur ausgelöst, wenn explicit der Button gedrückt wird.
-    /// </summary>
-    public event EventHandler<ListOfBasicListItemEventArgs>? RemoveClicked;
 
     #endregion
 
@@ -122,6 +105,15 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
+    ///// <summary>
+    ///// Wird vor jedem entfernen eines Items ausgelöst. Auch beim Initialisiern oder bei einem Clear.
+    ///// Soll eine Benutzerinteraktion abgefragt werden, ist RemoveClicked besser.
+    ///// </summary>
+    //public event EventHandler<ListEventArgs>? ItemRemoving;
+    ///// <summary>
+    ///// Wird nur ausgelöst, wenn explicit der Button gedrückt wird.
+    ///// </summary>
+    //public event EventHandler<ListOfBasicListItemEventArgs>? RemoveClicked;
     [DefaultValue(BlueListBoxAppearance.Listbox)]
     public BlueListBoxAppearance Appearance {
         get => _appearance;
@@ -132,6 +124,22 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
+    [DefaultValue(true)]
+    public bool AutoSort {
+        get => _autosort;
+        set {
+            if (_autosort == value) { return; }
+            _autosort = value;
+            Item.AutoSort = _autosort;
+            CheckButtons();
+        }
+    }
+
+    ///// <summary>
+    ///// Wird nach jedem entfernen eines Items ausgelöst. Auch beim Initialisiern oder bei einem Clear.
+    ///// Soll eine Benutzerinteraktion abgefragt werden, ist RemoveClicked besser.
+    ///// </summary>
+    //public event EventHandler? ItemRemoved;
     [DefaultValue(CheckBehavior.SingleSelection)]
     public CheckBehavior CheckBehavior {
         get => Item.CheckBehavior;
@@ -196,20 +204,12 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ItemCollectionList Suggestions { get; } = new();
+    public ItemCollectionList Suggestions { get; } = new(true);
 
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
 
     #endregion
-
-    //public BasicListItem? Add_FromFileSystem() {
-    //    var f = IO.GetFilesWithFileSelector(string.Empty, false);
-    //    if (f is null) { return null; }
-
-    //    var picture = BitmapExt.Image_FromFile(f[0]);
-    //    return picture != null ? Item.Add((Bitmap)picture, f[0]) : Item.Add(Converter.FileToByte(f[0]), f[0]);
-    //}
 
     #region Methods
 
@@ -223,11 +223,17 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         return i;
     }
 
+    //    var picture = BitmapExt.Image_FromFile(f[0]);
+    //    return picture != null ? Item.Add((Bitmap)picture, f[0]) : Item.Add(Converter.FileToByte(f[0]), f[0]);
+    //}
     public TextListItem? Add_Text() {
         var val = InputBoxComboStyle.Show("Bitte geben sie einen Wert ein:", Suggestions, true);
         return Add_Text(val);
     }
 
+    //public BasicListItem? Add_FromFileSystem() {
+    //    var f = IO.GetFilesWithFileSelector(string.Empty, false);
+    //    if (f is null) { return null; }
     public void Add_TextBySuggestion() {
         if (Suggestions == null || Suggestions.Count == 0) {
             MessageBox.Show("Keine (weiteren) Werte vorhanden.", ImageCode.Information, "OK");
@@ -262,42 +268,52 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     public void OnListOrItemChanged() => ListOrItemChanged?.Invoke(this, System.EventArgs.Empty);
 
     protected override void DrawControl(Graphics gr, States state) {
-        if (Item != null) { Item.Appearance = _appearance; }
-        var tmp = Design.ListBox;
-        if (_appearance is not BlueListBoxAppearance.Gallery and not BlueListBoxAppearance.FileSystem) { tmp = (Design)_appearance; }
-        var paintModXx = 0;
-        var paintModYx = 0;
-        var vStateBox = state;
-        if (Convert.ToBoolean(vStateBox & States.Standard_MouseOver)) { vStateBox ^= States.Standard_MouseOver; }
-        if (Convert.ToBoolean(vStateBox & States.Standard_MousePressed)) { vStateBox ^= States.Standard_MousePressed; }
-        if (Convert.ToBoolean(vStateBox & States.Standard_HasFocus)) { vStateBox ^= States.Standard_HasFocus; }
+
+        #region  tmpDesign
+
+        var tmpDesign = Design.ListBox;
+        if (_appearance is not BlueListBoxAppearance.Gallery and not BlueListBoxAppearance.FileSystem) { tmpDesign = (Design)_appearance; }
+
+        #endregion
+
+        #region tmpState
+
+        var tmpState = state;
+        if (tmpState.HasFlag(States.Standard_MouseOver)) { tmpState ^= States.Standard_MouseOver; }
+        if (tmpState.HasFlag(States.Standard_MousePressed)) { tmpState ^= States.Standard_MousePressed; }
+        if (tmpState.HasFlag(States.Standard_HasFocus)) { tmpState ^= States.Standard_HasFocus; }
+
+        #endregion
+
+        #region tmpbuttonleisteHeight
+
+        var tmpbuttonleisteHeight = 0;
+        if (ButtonsVisible()) { tmpbuttonleisteHeight = Plus.Height; }
+
+        #endregion
+
         if (Item.Count == 0) {
             SliderY.Visible = false;
             SliderY.Value = 0;
         }
-        if (ButtonsVisible()) { paintModYx = Plus.Height; }
+
         var (biggestItemX, _, heightAdded, senkrechtAllowed) = Item.ItemData();
-        _ = Item.ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height - paintModYx), SliderY, biggestItemX, heightAdded, senkrechtAllowed);
-        if (SliderY.Visible) { paintModXx = SliderY.Width; }
+        _ = Item.ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height - tmpbuttonleisteHeight), SliderY, biggestItemX, heightAdded, senkrechtAllowed);
+
+        var tmpsliderWidth = 0;
+        if (SliderY.Visible) { tmpsliderWidth = SliderY.Width; }
+
         var borderCoords = new Rectangle(DisplayRectangle.Left, DisplayRectangle.Top,
-           DisplayRectangle.Width - paintModXx, DisplayRectangle.Height - paintModYx);
+           DisplayRectangle.Width - tmpsliderWidth, DisplayRectangle.Height - tmpbuttonleisteHeight);
         var visArea = borderCoords with { Y = (int)(borderCoords.Y + SliderY.Value) };
         if (borderCoords.Height > 0) {
-            //// Kann sein, wenn PaintModY größer als die Höhe ist
-            //if (_Appearance == BlueListBoxAppearance.Listbox)
-            //{
-            Skin.Draw_Back(gr, tmp, vStateBox, borderCoords, this, true);
-            //}
-            //else
-            //{
-            //    clsSkin.Draw_Back_Transparent(GR, DisplayRectangle, this);
-            //}
+            Skin.Draw_Back(gr, tmpDesign, tmpState, borderCoords, this, true);
         }
         _mouseOverItem = MouseOverNode(MousePos().X, MousePos().Y);
         object locker = new();
-        _ = System.Threading.Tasks.Parallel.ForEach(Item, thisItem => {
+        _ = System.Threading.Tasks.Parallel.ForEach(Item.ItemOrder, thisItem => {
             if (thisItem.Pos.IntersectsWith(visArea)) {
-                var vStateItem = vStateBox;
+                var vStateItem = tmpState;
                 if (_mouseOverItem == thisItem && Enabled) { vStateItem |= States.Standard_MouseOver; }
                 if (!thisItem.Enabled) { vStateItem = States.Standard_Disabled; }
                 if (thisItem.Checked) { vStateItem |= States.Checked; }
@@ -308,9 +324,9 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         });
         if (borderCoords.Height > 0) {
             // Kann sein, wenn PaintModY größer als die Höhe ist
-            if (tmp == Design.ListBox) { Skin.Draw_Border(gr, tmp, vStateBox, borderCoords); }
+            if (tmpDesign == Design.ListBox) { Skin.Draw_Border(gr, tmpDesign, tmpState, borderCoords); }
         }
-        if (paintModYx > 0) { Skin.Draw_Back_Transparent(gr, new Rectangle(0, borderCoords.Bottom, Width, paintModYx), this); }
+        if (tmpbuttonleisteHeight > 0) { Skin.Draw_Back_Transparent(gr, new Rectangle(0, borderCoords.Bottom, Width, tmpbuttonleisteHeight), this); }
     }
 
     protected override void OnDoubleClick(System.EventArgs e) {
@@ -326,12 +342,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         CheckButtons();
     }
 
-    protected void OnItemAdded(ListEventArgs e) => ItemAdded?.Invoke(this, e);
-
-    protected void OnItemRemoved(System.EventArgs e) => ItemRemoved?.Invoke(this, e);
-
-    protected void OnItemRemoving(ListEventArgs e) => ItemRemoving?.Invoke(this, e);
-
     protected override void OnMouseLeave(System.EventArgs e) {
         base.OnMouseLeave(e);
         if (_mouseOverItem != null) {
@@ -340,6 +350,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
+    //protected void OnItemRemoving(ListEventArgs e) => ItemRemoving?.Invoke(this, e);
     protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
         base.OnMouseMove(e);
         var nd = MouseOverNode(MousePos().X, MousePos().Y);
@@ -350,6 +361,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
+    //protected void OnItemRemoved(System.EventArgs e) => ItemRemoved?.Invoke(this, e);
     protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
         base.OnMouseUp(e);
         if (!Enabled) { return; }
@@ -371,6 +383,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
+    //protected void OnItemAdded(ListEventArgs e) => ItemAdded?.Invoke(this, e);
     protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
         base.OnMouseWheel(e);
         if (!SliderY.Visible) { return; }
@@ -395,11 +408,10 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         base.OnVisibleChanged(e);
     }
 
-    private void _Item_ItemAdded(object sender, ListEventArgs e) {
+    private void _Item_Changed(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
-        //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
         Invalidate();
-        OnItemAdded(e);
+        OnListOrItemChanged();
     }
 
     private void _Item_ItemCheckedChanged(object sender, System.EventArgs e) {
@@ -409,26 +421,24 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         OnItemCheckedChanged();
     }
 
-    private void _Item_ItemRemoved(object sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-        Invalidate();
-        OnItemRemoved(e);
-    }
-
-    private void _Item_ItemRemoving(object sender, ListEventArgs e) {
-        if (IsDisposed) { return; }
-        Invalidate();
-        OnItemRemoving(e);
-    }
-
-    private void _Item_ListOrItemChanged(object sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-        Invalidate();
-        OnListOrItemChanged();
-    }
-
+    //private void _Item_ItemRemoving(object sender, ListEventArgs e) {
+    //    if (IsDisposed) { return; }
+    //    Invalidate();
+    //    OnItemRemoving(e);
+    //}
     private bool ButtonsVisible() => Plus.Visible || Minus.Visible || Up.Visible || Down.Visible || FilterTxt.Visible;
 
+    //private void _Item_ItemAdded(object sender, ListEventArgs e) {
+    //    if (IsDisposed) { return; }
+    //    //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
+    //    Invalidate();
+    //    OnItemAdded(e);
+    //}
+    //private void _Item_ItemRemoved(object sender, System.EventArgs e) {
+    //    if (IsDisposed) { return; }
+    //    Invalidate();
+    //    OnItemRemoved(e);
+    //}
     private void CheckButtons() {
         if (!Visible) { return; }
         if (Parent == null) { return; }
@@ -458,7 +468,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private void Down_Click(object sender, System.EventArgs e) {
         var ln = -1;
-        for (var z = Item.Count - 1; z >= 0; z--) {
+        for (var z = Item.ItemOrder.Count - 1; z >= 0; z--) {
             if (Item[z] != null) {
                 if (Item[z].Checked) {
                     if (ln < 0) { return; }// Befehl verwerfen...
@@ -473,8 +483,15 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private void FilterTxt_TextChanged(object sender, System.EventArgs e) => Invalidate();
 
+    private void Item_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+        if (IsDisposed) { return; }
+        //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
+        Invalidate();
+        OnListOrItemChanged();
+    }
+
     private void Minus_Click(object sender, System.EventArgs e) {
-        OnRemoveClicked(new ListOfBasicListItemEventArgs(Item.Checked()));
+        //OnRemoveClicked(new ListOfBasicListItemEventArgs(Item.Checked()));
         foreach (var thisItem in Item.Checked()) {
             Item.Remove(thisItem);
         }
@@ -491,7 +508,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private void OnItemDoubleClick(BasicListItemEventArgs e) => ItemDoubleClick?.Invoke(this, e);
 
-    private void OnRemoveClicked(ListOfBasicListItemEventArgs e) => RemoveClicked?.Invoke(this, e);
+    //private void OnRemoveClicked(ListOfBasicListItemEventArgs e) => RemoveClicked?.Invoke(this, e);
 
     private void Plus_Click(object sender, System.EventArgs e) {
         OnAddClicked();
@@ -533,7 +550,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     //}
     private void Up_Click(object sender, System.EventArgs e) {
         BasicListItem? ln = null;
-        foreach (var thisItem in Item) {
+        foreach (var thisItem in Item.ItemOrder) {
             if (thisItem != null) {
                 if (thisItem.Checked) {
                     if (ln == null) { return; }// Befehl verwerfen...

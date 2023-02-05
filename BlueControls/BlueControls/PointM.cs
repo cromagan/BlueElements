@@ -26,6 +26,7 @@ using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.Converter;
 using static BlueBasics.Geometry;
@@ -241,31 +242,29 @@ public sealed class PointM : IMoveable, IHasKeyName {
     public void SetTo(int x, int y) => SetTo(x, (float)y);
 
     public override string ToString() {
-        var t = "{";
+        List<string> result = new();
+
         if (Parent != null) {
             switch (Parent) {
                 case BasicPadItem item:
-                    t = t + "ParentName=" + item.Internal.ToNonCritical() + ", ";
-                    break;
-
-                case CreativePad:
-                    t += "ParentType=Main, ";
+                    result.ParseableAdd("ParentName", item.Internal);
                     break;
 
                 case ItemCollectionPad:
-                    t += "ParentType=Main, ";
+                case CreativePad:
+                    result.ParseableAdd("ParentType", "Main");
                     break;
 
                 default:
-                    t = t + "ParentType=" + Parent.GetType().FullName + ", ";
+                    result.ParseableAdd("ParentType", Parent.GetType().FullName);
                     break;
             }
         }
-        t = t + "Name=" + Name.ToNonCritical() + ", ";
-        t = t + "X=" + _x.ToString(Constants.Format_Float1).Replace(",", ".") + ", ";
-        t = t + "Y=" + _y.ToString(Constants.Format_Float1).Replace(",", ".") + ", ";
-        if (!string.IsNullOrEmpty(Tag)) { t = t + "Tag=" + Tag.ToNonCritical() + ", "; }
-        return t.Trim(", ") + "}";
+        result.ParseableAdd("Name", Name);
+        result.ParseableAdd("X", _x);
+        result.ParseableAdd("Y", _y);
+        result.ParseableAdd("Tag", Tag);
+        return result.Parseable(base.ToString());
     }
 
     public PointF ZoomAndMove(AdditionalDrawing e) => ZoomAndMove(e.Zoom, e.ShiftX, e.ShiftY);

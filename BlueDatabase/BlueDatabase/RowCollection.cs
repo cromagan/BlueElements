@@ -323,23 +323,26 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
         if (rows == null || rows.Count == 0) { return "Keine Zeilen angekommen."; }
 
-        Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", 0, rows.Count, true, false));
+        var txt = "Skript wird ausgeführt: " + scriptname;
+
+        Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, 0, rows.Count, true, false));
 
         var all = rows.Count;
         while (rows.Count > 0) {
-            Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", all - rows.Count, all, false, false));
+            Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, all - rows.Count, all, false, false));
 
             var (checkPerformed, _, s) = rows[0].DoAutomatic(true, fullCheck, eventname, onlyTesting, scriptname);
 
             if (s != null && !string.IsNullOrEmpty(s.Error)) {
                 var w = rows[0].CellFirstString();
                 rows.Clear();
+                Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, rows.Count, rows.Count, false, true));
                 Database.OnDropMessage(FehlerArt.Warnung, "Skript fehlerhaft bei " + w + "\r\n" + s.Error);
                 return "Skript fehlerhaft bei " + w + "\r\n" + s.Error;
             }
             if (checkPerformed) { rows.RemoveAt(0); }
         }
-        Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", rows.Count, rows.Count, false, true));
+        Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, rows.Count, rows.Count, false, true));
         return string.Empty;
     }
 

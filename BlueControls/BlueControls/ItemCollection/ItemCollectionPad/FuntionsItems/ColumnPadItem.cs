@@ -112,13 +112,12 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     }
 
     public override string ToString() {
-        var t = base.ToString();
-        t = t.Substring(0, t.Length - 1) + ", ";
-        if (Column != null) {
-            t = t + "Database=" + Column.Database.ConnectionData.UniqueID.ToNonCritical() + ", ";
-            t = t + "ColumnName=" + Column.Name.ToNonCritical() + ", ";
-        }
-        return t.Trim(", ") + "}";
+        var result = new List<string>();
+
+        result.ParseableAdd("Database", Column?.Database);
+        result.ParseableAdd("ColumnName", Column);
+
+        return result.Parseable(base.ToString());
     }
 
     protected override string ClassId() => "FI-Column";

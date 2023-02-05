@@ -26,7 +26,7 @@ namespace BlueControls.Interfaces;
 /// Wird verwendet, wenn das PadItem Zeilen berechnen kann und dann das
 /// erzeugte Control es an Childs weiter geben kann.
 /// </summary>
-public interface ICalculateRowsItemLevel : IHasChangeabelDatabase, IReadableText, IItemToControl {
+public interface ICalculateRowsItemLevel : IReadableTextWithChangingAndKey, IHasChangeabelDatabase, IReadableText, IItemToControl, IHasKeyName {
 
     #region Properties
 

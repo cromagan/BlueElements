@@ -120,7 +120,7 @@ public class ListExt<T> : List<T>, IChangedFeedback, IDisposableExtended {
         OnItemAdded(item);
     }
 
-    public void AddClonesFrom<T1>(List<T1>? itemstoclone) where T1 : T, ICloneable {
+    public void AddClonesFrom<T1>(ICollection<T1>? itemstoclone) where T1 : T, ICloneable {
         if (itemstoclone == null || itemstoclone.Count == 0) { return; }
 
         foreach (var thisItem in itemstoclone) {
@@ -239,8 +239,6 @@ public class ListExt<T> : List<T>, IChangedFeedback, IDisposableExtended {
     }
 
     public new void Sort(IComparer<T> comparer) => Develop.DebugPrint_NichtImplementiert();
-
-    //#pragma warning restore IDE0060 // Nicht verwendete Parameter entfernen
 
     public void Swap(T item1, T item2) {
         var nr1 = IndexOf(item1);

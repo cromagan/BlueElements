@@ -241,7 +241,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
     private void SaveCurrentLayout() {
         //scriptEditor.WriteScriptBack();
         if (Database == null) { return; }
-        var newl = Pad.Item.ToString(false);
+        var newl = Pad.Item.ToString();
         var ind = Database.Layouts.LayoutIdToIndex(Pad.Item.Id);
         if (ind > -1) {
             if (Database.Layouts[ind] == newl) { return; }

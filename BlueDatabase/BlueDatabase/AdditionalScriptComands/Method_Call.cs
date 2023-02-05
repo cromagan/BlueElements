@@ -21,6 +21,9 @@ using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
+using System.IO;
+using BlueBasics;
+using BlueBasics.Interfaces;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
@@ -44,45 +47,57 @@ internal class Method_Call : MethodDatabase {
     public override List<string> Comand(Script? s) => new() { "call" };
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        //var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        //if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-        ////if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback("Kein Text angekommen."); }
+        var vs = (VariableString)attvar.Attributes[0];
 
-        ////if (!Variable.IsValidName(infos.AttributText)) { return new DoItFeedback(infos.AttributText + " ist kein gültiger Subroutinen-Name."); }
+        var db = MyDatabase(s);
+        if (db == null) { return new DoItFeedback("Datenbankfehler!"); }
 
-        ////var such = new List<string> { "sub" + infos.AttributText.ToLower() + "()" };
+        var sc = db.EventScript.Get(vs.ValueString);
 
-        ////var (pos, _) = NextText(s.ReducedScriptText.ToLower(), 0, such, true, false, KlammernStd);
+        if (sc == null) { return new DoItFeedback("Skript nicht vorhanden: " + vs.ValueString); }
 
-        ////if (pos < 0) { return new DoItFeedback("Subroutine " + infos.AttributText + " nicht definert."); }
+        //try {
+        //    if (FileExists(vs.ValueString)) {
+        //        f = File.ReadAllText(vs.ValueString, System.Text.Encoding.UTF8);
+        //    } else if (FileExists(s.AdditionalFilesPath + vs.ValueString)) {
+        //        f = File.ReadAllText(s.AdditionalFilesPath + vs.ValueString, System.Text.Encoding.UTF8);
+        //    } else {
+        //        return new DoItFeedback("Datei nicht gefunden: " + vs.ValueString);
+        //    }
+        //} catch {
+        //    return new DoItFeedback("Fehler beim Lesen der Datei: " + vs.ValueString);
+        //}
 
-        ////var (pos2, _) = NextText(s.ReducedScriptText.ToLower(), pos + 1, such, true, false, KlammernStd);
-        ////if (pos2 > 0) { return new DoItFeedback("Subroutine " + infos.AttributText + " mehrfach definert."); }
-        //var vs = (VariableSub)attvar.Attributes[0];
+        var f = Script.ReduceText(sc.Script);
 
-        //var weiterLine = s.Line;
+        var weiterLine = s.Line;
 
-        ////var (item1, item2) = GetCodeBlockText(s.ReducedScriptText, pos + such[0].Length);
+        s.Line = 1;
 
-        ////if (!string.IsNullOrEmpty(item2)) { return new DoItFeedback("Subroutine " + infos.AttributText + ": " + item2); }
+        s.Sub++;
 
-        //s.Line = vs.SubOnLine;//  s.ReducedScriptText.Substring(0, pos).Count(c => c == '¶') + 1;
-        //s.Sub++;
+        if (((VariableBool)attvar.Attributes[1]).ValueBool) {
+            var (err, _) = s.Parse(f);
+            if (!string.IsNullOrEmpty(err)) { return new DoItFeedback("Subroutine " + vs.ValueString + ": " + err); }
+        } else {
+            var tmpv = new List<Variable>();
+            tmpv.AddRange(s.Variables);
 
-        //var tmpv = new List<Variable>();
-        //tmpv.AddRange(s.Variables);
+            var (err, _) = s.Parse(f);
+            if (!string.IsNullOrEmpty(err)) { return new DoItFeedback("Subroutine " + vs.ValueString + ": " + err); }
 
-        //var (err, _) = s.Parse(vs.SubCode);
-        //if (!string.IsNullOrEmpty(err)) { return new DoItFeedback("Subroutine " + infos.AttributText + ": " + err); }
+            s.Variables.Clear();
+            s.Variables.AddRange(tmpv);
+        }
+        s.Sub--;
 
-        //s.Variables.Clear();
-        //s.Variables.AddRange(tmpv);
-        //s.Sub--;
+        if (s.Sub < 0) { return new DoItFeedback("Subroutinen-Fehler"); }
 
-        //if (s.Sub < 0) { return new DoItFeedback("Subroutinen-Fehler"); }
-
-        //s.Line = weiterLine;
+        s.Line = weiterLine;
+        s.BreakFired = false;
 
         return new DoItFeedback(string.Empty);
     }

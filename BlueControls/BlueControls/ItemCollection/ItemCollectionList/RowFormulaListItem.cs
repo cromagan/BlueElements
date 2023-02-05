@@ -99,7 +99,7 @@ public class RowFormulaListItem : BasicListItem {
         return x;
     }
 
-    public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth) {
+    public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth, Design itemdesign) {
         if (_tmpBmp == null) { GeneratePic(); }
         return _tmpBmp?.Height ?? 200;
 
@@ -110,12 +110,12 @@ public class RowFormulaListItem : BasicListItem {
         //return (int)(sc * columnWidth);
     }
 
-    protected override Size ComputeSizeUntouchedForListBox() {
+    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) {
         try {
             if (_tmpBmp == null) { GeneratePic(); }
             return _tmpBmp?.Size ?? new Size(200, 200);
         } catch {
-            return ComputeSizeUntouchedForListBox();
+            return ComputeSizeUntouchedForListBox(itemdesign);
         }
     }
 

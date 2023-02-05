@@ -15,15 +15,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueScript;
 using System;
 
 namespace BlueDatabase.Enums;
 
 [Flags]
-public enum Events : int {
-    only_manual = 0,
+public enum Events {
+
+    //only_manual = 0,
     new_row = 1,
+
     value_changed = 2,
 
     //manual_check =3,

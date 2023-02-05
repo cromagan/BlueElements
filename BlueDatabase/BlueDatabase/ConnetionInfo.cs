@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using System;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -28,10 +29,13 @@ namespace BlueDatabase;
 /// <summary>
 /// Informationen über eine Datenbank oder wie diese erzeugt werden kann.
 /// </summary>
-public class ConnectionInfo : IReadableText, IHasKeyName {
+public class ConnectionInfo : IReadableTextWithChangingAndKey {
 
     #region Fields
 
+    private readonly string _databaseId = string.Empty;
+    private string _additionalData = string.Empty;
+    private DatabaseAbstract? _provider;
     private string _tablename = string.Empty;
 
     #endregion
@@ -41,45 +45,46 @@ public class ConnectionInfo : IReadableText, IHasKeyName {
     /// <summary>
     /// Versucht das beste daraus zu machen....
     /// </summary>
-    /// <param name="uniqueID"></param>
-    public ConnectionInfo(string uniqueID, string? preveredFileFormatId) {
+    /// <param name="uniqueId"></param>
+    /// <param name="preveredFileFormatId"></param>
+    public ConnectionInfo(string uniqueId, string? preveredFileFormatId) {
         var alf = new List<DatabaseAbstract>();// könnte sich ändern, deswegen Zwischenspeichern
         alf.AddRange(DatabaseAbstract.AllFiles);
 
         #region Ist es NUR ein Dateiname? Dann im Single und Multiuser suchen und zur Not eine preveredFileFormatID zurück geben
 
-        if (uniqueID.IsFormat(FormatHolder.FilepathAndName) &&
-            uniqueID.FileSuffix().ToUpper() == "MDB") {
-            foreach (var thisDB in alf) {
-                var d = thisDB.ConnectionData;
+        if (uniqueId.IsFormat(FormatHolder.FilepathAndName) &&
+            uniqueId.FileSuffix().ToUpper() == "MDB") {
+            foreach (var thisDb in alf) {
+                var d = thisDb.ConnectionData;
 
-                if (d.UniqueID.ToUpper().EndsWith(uniqueID.ToUpper())) {
+                if (d.UniqueID.ToUpper().EndsWith(uniqueId.ToUpper())) {
                     TableName = d.TableName;
                     Provider = d.Provider;
-                    DatabaseID = d.DatabaseID;
+                    _databaseId = d.DatabaseID;
                     AdditionalData = d.AdditionalData;
                     return;
                 }
             }
 
-            TableName = SQLBackAbstract.MakeValidTableName(uniqueID.FileNameWithoutSuffix());
+            TableName = SQLBackAbstract.MakeValidTableName(uniqueId.FileNameWithoutSuffix());
             Provider = null;
-            DatabaseID = preveredFileFormatId ?? Database.DatabaseId;
-            AdditionalData = uniqueID;
+            _databaseId = preveredFileFormatId ?? Database.DatabaseId;
+            AdditionalData = uniqueId;
 
             return;
         }
 
         #endregion
 
-        var x = (uniqueID + "||||").SplitBy("|");
+        var x = (uniqueId + "||||").SplitBy("|");
 
         #region Prüfen, ob eine ConnectionInfo als String übergeben wurde
 
         if (SQLBackAbstract.IsValidTableName(x[0]) && !string.IsNullOrEmpty(x[1])) {
             TableName = x[0];
             Provider = null;
-            DatabaseID = x[1];
+            _databaseId = x[1];
             AdditionalData = x[2];
             return;
         }
@@ -88,13 +93,13 @@ public class ConnectionInfo : IReadableText, IHasKeyName {
 
         #region  Prüfen, ob eine vorhandene Datenbank den Provider machen kann
 
-        foreach (var thisDB in alf) {
+        foreach (var thisDb in alf) {
             //var d = thisDB.ConnectionData;
 
-            if (thisDB.ConnectionDataOfOtherTable(x[0], true) is ConnectionInfo nci) {
+            if (thisDb.ConnectionDataOfOtherTable(x[0], true) is ConnectionInfo nci) {
                 TableName = nci.TableName;
                 Provider = nci.Provider;
-                DatabaseID = nci.DatabaseID;
+                _databaseId = nci.DatabaseID;
                 AdditionalData = nci.AdditionalData;
                 return;
             }
@@ -136,15 +141,21 @@ public class ConnectionInfo : IReadableText, IHasKeyName {
         //    }
         //}
 
-        Develop.DebugPrint(FehlerArt.Warnung, "Datenbank konnte nicht gefunden werden: " + uniqueID);
+        Develop.DebugPrint(FehlerArt.Warnung, "Datenbank konnte nicht gefunden werden: " + uniqueId);
     }
 
     public ConnectionInfo(string tablename, DatabaseAbstract? provider, string connectionString, string? additionalInfo) {
         TableName = tablename.ToUpper();
         Provider = provider;
-        DatabaseID = connectionString;
+        _databaseId = connectionString;
         AdditionalData = additionalInfo ?? string.Empty;
     }
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler? Changed;
 
     #endregion
 
@@ -154,21 +165,35 @@ public class ConnectionInfo : IReadableText, IHasKeyName {
     /// z.B. wenn ein Dateiname oder sowas mitgegeben werden soll.
     /// Ist nur wichtig für von DatabaseAbstract abgeleiten Klassen und nur diese können damit umgehen.
     /// </summary>
-    public string AdditionalData { get; set; } = string.Empty;
+    public string AdditionalData {
+        get => _additionalData;
+        set {
+            if (_additionalData == value) { return; }
+            _additionalData = value;
+            OnChanged();
+        }
+    }
 
     /// <summary>
     /// Eine Kennung, die von von DatabaseAbstract abgeleiten Klassen erkannt werden kann.
     /// Enthänt nur eine Wert wie z.B. DatabaseSQL.
     /// Um eine Datenbank wieder zu finden, muss uniqueID verwendet werden.
     /// </summary>
-    public string DatabaseID { get; } = string.Empty;
+    public string DatabaseID => _databaseId;
 
     public string KeyName => UniqueID;
 
     /// <summary>
     /// Welche bereits vorhandene Datenbank den in dieser Klasse aufgezeigten Tabellenamen erzeugen kann
     /// </summary>
-    public DatabaseAbstract? Provider { get; set; }
+    public DatabaseAbstract? Provider {
+        get => _provider;
+        set {
+            if (_provider == value) { return; }
+            _provider = value;
+            OnChanged();
+        }
+    }
 
     /// <summary>
     /// Die Tabelle, um die es geht.
@@ -191,6 +216,8 @@ public class ConnectionInfo : IReadableText, IHasKeyName {
     #endregion
 
     #region Methods
+
+    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
     public string ReadableText() => TableName;
 

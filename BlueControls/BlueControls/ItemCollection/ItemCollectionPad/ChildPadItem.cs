@@ -101,7 +101,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
             new FlexiControlForProperty<string>(() => Name),
             new FlexiControlForProperty<Color>(() => Randfarbe)
         };
-        ItemCollectionList.ItemCollectionList lage = new()
+        ItemCollectionList.ItemCollectionList lage = new(false)
         {
             { "ohne", "-1" },
             { "Links oben", ((int)Alignment.Top_Left).ToString() }
@@ -256,17 +256,16 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     }
 
     public override string ToString() {
-        var t = base.ToString();
-        t = t.Substring(0, t.Length - 1) + ", ";
-        if (!string.IsNullOrEmpty(_name)) { t = t + "Name=" + _name.ToNonCritical() + ", "; }
-        //if (!string.IsNullOrEmpty(_ReadableText)) { t = t + "ReadableText=" + _ReadableText.ToNonCritical() + ", "; }
-        if (Textlage != (Alignment)(-1)) { t = t + "Pos=" + (int)Textlage + ", "; }
-        if (Eingebettete_Ansichten.Count > 0) { t = t + "Embedded=" + Eingebettete_Ansichten.JoinWithCr().ToNonCritical() + ", "; }
-        t = t + "Color=" + Randfarbe.ToHtmlCode() + ", ";
-        if (PadInternal?.Item != null) {
-            t = t + "Data=" + PadInternal.Item.ToString(false) + ", ";
-        }
-        return t.Trim(", ") + "}";
+        var result = new List<string>();
+
+        result.ParseableAdd("Name", _name);
+
+        if (Textlage != (Alignment)(-1)) { result.ParseableAdd("Pos", Textlage); }
+        result.ParseableAdd("Embedded", Eingebettete_Ansichten);
+        result.ParseableAdd("Color", Randfarbe);
+        result.ParseableAdd("Data", "Item", PadInternal?.Item);
+
+        return result.Parseable(base.ToString());
     }
 
     protected override string ClassId() => "CHILDPAD";

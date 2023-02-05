@@ -114,16 +114,10 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(Id));
 
     public override string ToString() {
-        var t = base.ToString();
-        t = t.Substring(0, t.Length - 1) + ", ";
-
-        t = t + "ID=" + Id + ", ";
-
-        if (Database != null && !Database.IsDisposed) {
-            t = t + "Database=" + Database.ConnectionData.UniqueID.ToNonCritical() + ", ";
-        }
-
-        return t.Trim(", ") + "}";
+        var result = new List<string>();
+        result.ParseableAdd("ID", Id);
+        result.ParseableAdd("Database", Database);
+        return result.Parseable(base.ToString());
     }
 
     protected override string ClassId() => "FI-DatabaseSource";

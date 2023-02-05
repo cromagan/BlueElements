@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.EventArgs;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -65,9 +64,8 @@ public partial class ComboBox : TextBox, ITranslateable {
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         MouseHighlight = true;
         SetStyle(System.Windows.Forms.ControlStyles.ContainerControl, true);
-        Item.ItemAdded += _Item_ItemAdded;
         Item.ItemCheckedChanged += _Item_ItemCheckedChanged;
-        Item.ItemRemoved += _Item_ItemRemoved;
+        Item.CollectionChanged += Item_CollectionChanged;
         btnDropDown.Left = Width - btnDropDown.Width;
         btnDropDown.Top = 0;
         btnDropDown.Height = Height;
@@ -123,7 +121,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
     }
 
-    public ItemCollectionList Item { get; } = new ItemCollectionList(BlueListBoxAppearance.DropdownSelectbox);
+    public ItemCollectionList Item { get; } = new ItemCollectionList(BlueListBoxAppearance.DropdownSelectbox, true);
 
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
@@ -185,7 +183,7 @@ public partial class ComboBox : TextBox, ITranslateable {
             return;
         }
 
-        i.Parent = Item; // Um den Stil zu wissen
+        //i.Parent = Item; // Um den Stil zu wissen
         if (Focused && _dropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
             // Focused = Bearbeitung erwünscht, Cursor anzeigen und KEINE Items zeichnen
             base.DrawControl(gr, state);
@@ -208,8 +206,8 @@ public partial class ComboBox : TextBox, ITranslateable {
         if (!FloatingForm.IsShowing(this)) {
             // Nur wenn die Selectbox gerade Nicht angezeigt wird, um hin und her Konvertierungen zu vermeiden
             var r = i.Pos;
-            var ymod = -(int)((DisplayRectangle.Height - i.SizeUntouchedForListBox().Height) / 2.0);
-            i.SetCoordinates(new Rectangle(Skin.PaddingSmal, -ymod, Width - 30, i.SizeUntouchedForListBox().Height));
+            var ymod = -(int)((DisplayRectangle.Height - i.SizeUntouchedForListBox(Item.ItemDesign).Height) / 2.0);
+            i.SetCoordinates(new Rectangle(Skin.PaddingSmal, -ymod, Width - 30, i.SizeUntouchedForListBox(Item.ItemDesign).Height));
             i.Draw(gr, 0, 0, Design.ComboBox_Textbox, Design.ComboBox_Textbox, state, false, string.Empty, Translate);
             i.SetCoordinates(r);
         }
@@ -274,21 +272,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         FloatingForm.Close(this);
     }
 
-    private void _Item_ItemAdded(object sender, ListEventArgs e) {
-        if (IsDisposed) { return; }
-        if (_btnDropDownIsIn) { return; }
-        FloatingForm.Close(this);
-        Invalidate();
-    }
-
     private void _Item_ItemCheckedChanged(object sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-        if (_btnDropDownIsIn) { return; }
-        FloatingForm.Close(this);
-        Invalidate();
-    }
-
-    private void _Item_ItemRemoved(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         if (_btnDropDownIsIn) { return; }
         FloatingForm.Close(this);
@@ -297,6 +281,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     private void btnDropDown_LostFocus(object sender, System.EventArgs e) => CheckLostFocus(e);
 
+    //}
     private void CheckLostFocus(System.EventArgs e) {
         try {
             if (btnDropDown == null) { return; }
@@ -304,6 +289,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         } catch (Exception) { }
     }
 
+    //private void _Item_ItemRemoved(object sender, System.EventArgs e) {
     private void DropDownMenu_Cancel(object sender, object mouseOver) {
         Item.UncheckAll();
         FloatingForm.Close(this);
@@ -319,6 +305,14 @@ public partial class ComboBox : TextBox, ITranslateable {
             OnItemClicked(new BasicListItemEventArgs(Item[e.ClickedComand]));
         }
         _ = Focus();
+    }
+
+    private void Item_CollectionChanged(object sender,
+                                                                                                    System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+        if (IsDisposed) { return; }
+        if (_btnDropDownIsIn) { return; }
+        FloatingForm.Close(this);
+        Invalidate();
     }
 
     private void OnDropDownShowing() => DropDownShowing?.Invoke(this, System.EventArgs.Empty);

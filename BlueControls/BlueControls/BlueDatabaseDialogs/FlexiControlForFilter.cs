@@ -160,7 +160,7 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
         base.OnControlAdded(e);
         e.Control.MouseUp += Control_MouseUp;
         if (e.Control is ComboBox cbx) {
-            ItemCollectionList item2 = new()
+            ItemCollectionList item2 = new(true)
             {
                 { "Keine weiteren Einträge vorhanden", "|~" }
             };
@@ -210,7 +210,7 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
             _ = cbx.Item.Add("Keine weiteren Einträge vorhanden", "|~", ImageCode.Kreuz, false);
         } else if (listFilterString.Count < 400) {
             cbx.Item.AddRange(listFilterString, Filter.Column, ShortenStyle.Replaced, Filter.Column.BehaviorOfImageAndText);
-            cbx.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
+            //cbx.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
         } else {
             _ = cbx.Item.Add("Zu viele Einträge", "|~", ImageCode.Kreuz, false);
         }

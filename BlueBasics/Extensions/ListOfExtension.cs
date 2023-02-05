@@ -21,11 +21,14 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Windows.Markup;
+using System.Text;
 using static BlueBasics.IO;
+using static BlueBasics.Converter;
 
 namespace BlueBasics;
 
@@ -108,6 +111,16 @@ public static partial class Extensions {
         l.AddRange(t.SplitAndCutByCr());
     }
 
+    public static string Parseable(this ICollection<string> col, string baseToString) {
+        if (string.IsNullOrEmpty(baseToString) ||
+            !baseToString.StartsWith("{") ||
+            !baseToString.EndsWith("}")) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Basestringfehler!");
+        }
+
+        return baseToString.Substring(0, baseToString.Length - 1) + ", " + col.JoinWith(", ") + "}";
+    }
+
     public static string Parseable(this ICollection<string> col) => "{" + col.JoinWith(", ") + "}";
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, string? value) {
@@ -115,26 +128,55 @@ public static partial class Extensions {
         col.Add(tagname + "=" + value.ToNonCritical());
     }
 
-    public static void ParseableAdd<T>(this ICollection<string> col, string tagname, ICollection<T>? value) where T : IStringable? {
+    public static void ParseableAdd<T>(this ICollection<string> col, string tagname, string nameofeveryItem, ICollection<T>? value) where T : IStringable? {
         if (value == null) { return; }
 
         if (value is IDisposableExtended d && d.IsDisposed) { return; }
 
+        if (value is IStringable) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Stringable Collection nicht möglich!");
+        }
+
         if (value.Count < 1) { return; }
 
-        col.Add(tagname + "=" + value.ToString(true));
+        var txt = tagname + "={";
+
+        foreach (var item in value) {
+            var tmp2 = string.Empty;
+            if (item != null) { tmp2 = item.ToString(); }
+            if (!string.IsNullOrEmpty(tmp2)) {
+                txt = txt + nameofeveryItem + "=" + tmp2.ToNonCritical() + ", ";
+            }
+        }
+
+        txt = txt.TrimEnd(", ") + "}";
+
+        col.Add(txt);
     }
 
-    public static void ParseableAdd(this ICollection<string> col, string tagname, DateTime value) {
+    public static void ParseableAdd(this ICollection<string> col, string tagname, DateTime? value) {
         if (value == null) { return; }
 
-        col.Add(tagname + "=" + value.ToString(Constants.Format_Date5));
+        col.Add(tagname + "=" + ((DateTime)value).ToString(Constants.Format_Date5));
     }
+
+    public static void ParseableAdd(this ICollection<string> col, string tagname, Color value) => col.Add(tagname + "=" + value.ToHtmlCode());
+
+    public static void ParseableAdd(this ICollection<string> col, string tagname, Bitmap? value) {
+        if (value == null) { return; }
+        col.Add(tagname + "=" + BitmapToBase64(value, ImageFormat.Png));
+    }
+
+    public static void ParseableAdd(this ICollection<string> col, string tagname, SizeF value) => col.Add(tagname + "=" + value.ToString().ToNonCritical());
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, float value) => col.Add(tagname + "=" + value.ToString(CultureInfo.InvariantCulture).ToNonCritical());
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, IHasKeyName? value) {
         if (value == null) { return; }
+
+        if (value is IStringable) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Stringable und KeyName nicht möglich!");
+        }
 
         if (value is IDisposableExtended d && d.IsDisposed) { return; }
 
@@ -144,13 +186,30 @@ public static partial class Extensions {
         col.Add(tagname + "=" + v.ToNonCritical());
     }
 
-    public static void ParseableAdd<t>(this ICollection<string> col, string tagname, t? value) where t : System.Enum {
+    public static void ParseableAdd(this ICollection<string> col, string tagname, ICollection<string>? value) {
+        if (value == null || value.Count == 0) { return; }
+
+        var l = new StringBuilder();
+
+        foreach (var thisString in value) {
+            l.Append(thisString.ToNonCritical());
+            l.Append(",");
+        }
+
+        col.Add(tagname + "=" + l.ToString().TrimEnd(",").ToNonCritical());
+    }
+
+    public static void ParseableAdd<T>(this ICollection<string> col, string tagname, T? value) where T : System.Enum {
         if (value == null) { return; }
         col.Add(tagname + "=" + ((int)(object)value).ToString());
     }
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, IStringable? value) {
         if (value == null) { return; }
+
+        if (value is IHasKeyName) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Stringable und KeyName nicht möglich!");
+        }
 
         if (value is IDisposableExtended d && d.IsDisposed) { return; }
 

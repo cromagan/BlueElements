@@ -102,9 +102,9 @@ public partial class ColumnArrangementPadEditor : PadEditor {
     }
 
     private void btnBerechtigungsgruppen_Click(object sender, System.EventArgs e) {
-        ItemCollectionList aa = new();
+        ItemCollectionList aa = new(true);
         aa.AddRange(Database.Permission_AllUsed(false));
-        aa.Sort();
+        //aa.Sort();
         aa.CheckBehavior = CheckBehavior.MultiSelection;
         aa.Check(CurrentArrangement.PermissionGroups_Show, true);
         var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, AddType.Text, true);
@@ -194,7 +194,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
     }
 
     private void btnSpalteEinblenden_Click(object sender, System.EventArgs e) {
-        ItemCollectionList ic = new();
+        ItemCollectionList ic = new(true);
         foreach (var thisColumnItem in Database.Column) {
             if (thisColumnItem != null && CurrentArrangement[thisColumnItem] == null) { _ = ic.Add(thisColumnItem); }
         }
@@ -202,7 +202,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
             MessageBox.Show("Es werden bereits alle<br>Spalten angezeigt.", ImageCode.Information, "Ok");
             return;
         }
-        ic.Sort();
+        //ic.Sort();
         var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, AddType.None, true);
         if (r == null || r.Count == 0) { return; }
         CurrentArrangement.Add(Database.Column.Exists(r[0]), false);

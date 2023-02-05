@@ -76,8 +76,8 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         Close(BlueListBoxAppearance.KontextMenu);
         Close(control);
 
-        ItemCollectionList thisContextMenu = new(BlueListBoxAppearance.KontextMenu);
-        ItemCollectionList userMenu = new(BlueListBoxAppearance.KontextMenu);
+        ItemCollectionList thisContextMenu = new(BlueListBoxAppearance.KontextMenu, false);
+        ItemCollectionList userMenu = new(BlueListBoxAppearance.KontextMenu, false);
 
         List<string> tags = new();
         var cancel = false;
@@ -123,12 +123,13 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     public static FloatingInputBoxListBoxStyle Show(ItemCollectionList? items, int xpos, int ypos, int steuerWi, object? tag, Control? connectedControl, bool translate) =>
         new(items, xpos, ypos, steuerWi, tag, connectedControl, translate);
 
-    public void Generate_ListBox1(ItemCollectionList? items, int minWidth, AddType addNewAllowed, bool translate) {
-        //var itemsClone = (ItemCollectionList)ItemsOri.Clone();
+    public void Generate_ListBox1(ItemCollectionList items, int minWidth, AddType addNewAllowed, bool translate) {
+
         var (biggestItemX, _, heightAdded, _) = items.ItemData();
         if (addNewAllowed != AddType.None) { heightAdded += 24; }
         lstbx.Appearance = (BlueListBoxAppearance)items.ControlDesign;
         lstbx.Translate = translate;
+        lstbx.AutoSort = items.AutoSort;
         //if (data.Item4 == BlueBasics.Enums.enOrientation.Senkrecht)
         //{
         //    He += Skin.PaddingSmal * 2;

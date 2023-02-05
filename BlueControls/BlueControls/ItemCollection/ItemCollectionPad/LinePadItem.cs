@@ -100,7 +100,7 @@ public class LinePadItem : BasicPadItem {
 
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
-        ItemCollectionList.ItemCollectionList verhalt = new()
+        ItemCollectionList.ItemCollectionList verhalt = new(false)
         {
             { "Linie direkt zwischen zwei Punkten", ((int)ConectorStyle.Direct).ToString(), QuickImage.Get(ImageCode.Linie) },
             { "Linie soll Objekten ausweichen", ((int)ConectorStyle.Ausweichenx).ToString(), QuickImage.Get(ImageCode.Linie) },
@@ -135,10 +135,9 @@ public class LinePadItem : BasicPadItem {
     }
 
     public override string ToString() {
-        var t = base.ToString();
-        t = t.Substring(0, t.Length - 1) + ", ";
-        if (Linien_Verhalten != ConectorStyle.Direct) { t = t + "Connection=" + (int)Linien_Verhalten + ", "; }
-        return t.TrimEnd(", ") + "}";
+        var result = new List<string>();
+        result.ParseableAdd("Connection", Linien_Verhalten);
+        return result.Parseable(base.ToString());
     }
 
     protected override RectangleF CalculateUsedArea() {

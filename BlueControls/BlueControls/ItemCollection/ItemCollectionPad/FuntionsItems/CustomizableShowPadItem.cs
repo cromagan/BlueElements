@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using BlueBasics.Interfaces;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
@@ -44,7 +45,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
 
     public static BlueFont? CaptionFnt = Skin.GetBlueFont(Design.Caption, States.Standard);
 
-    public ListExt<string> VisibleFor = new();
+    public List<string> VisibleFor = new();
     private ICalculateRowsItemLevel? _getValueFrom;
 
     #endregion
@@ -60,7 +61,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
     public string Breite_berechnen {
         get => string.Empty;
         set {
-            var li = new ItemCollectionList.ItemCollectionList();
+            var li = new ItemCollectionList.ItemCollectionList(false);
             for (var br = 1; br <= 20; br++) {
                 _ = li.Add(br + " Spalte(n)", br.ToString(), true, string.Empty);
 
@@ -94,10 +95,10 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
     public string Datenquelle_wählen {
         get => string.Empty;
         set {
-            var x = new ItemCollectionList.ItemCollectionList();
+            var x = new ItemCollectionList.ItemCollectionList(true);
             foreach (var thisR in Parent) {
                 if (thisR.IsVisibleOnPage(Page) && thisR is ICalculateRowsItemLevel rfp) {
-                    _ = x.Add(rfp, thisR.Internal);
+                    _ = x.Add(rfp);
                 }
             }
 
@@ -136,11 +137,11 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
     public string Sichtbarkeit {
         get => string.Empty;
         set {
-            ItemCollectionList.ItemCollectionList aa = new();
+            ItemCollectionList.ItemCollectionList aa = new(true);
             aa.AddRange(Permission_AllUsed());
 
             if (aa["#Administrator"] == null) { _ = aa.Add("#Administrator"); }
-            aa.Sort();
+            //aa.Sort();
             aa.CheckBehavior = CheckBehavior.MultiSelection;
             aa.Check(VisibleFor, true);
             var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:", aa, AddType.Text, true);
@@ -266,17 +267,15 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
 
     public override string ToString() {
         var t = base.ToString();
-        t = t.Substring(0, t.Length - 1) + ", ";
+        t = t.Substring(0, t.Length - 1);
+        var result = new List<string>();
 
-        t = t + "Version=" + Version + ", ";
+        result.ParseableAdd("Version", Version);
 
         if (VisibleFor.Count == 0) { VisibleFor.Add("#Everybody"); }
 
-        t = t + "VisibleFor=" + VisibleFor.JoinWithCr().ToNonCritical() + ", ";
-
-        if (GetRowFrom != null) {
-            t = t + "GetValueFrom=" + GetRowFrom.Internal.ToNonCritical() + ", ";
-        }
+        result.ParseableAdd("VisibleFor", VisibleFor);
+        result.ParseableAdd("GetValueFrom", GetRowFrom?.KeyName);
 
         return t.Trim(", ") + "}";
     }

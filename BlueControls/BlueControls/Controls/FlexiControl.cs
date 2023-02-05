@@ -525,8 +525,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 break;
 
             case ListBox listBox:
-                listBox.ItemAdded += ListBox_ItemAdded;
-                listBox.ItemRemoved += ListBox_ItemRemoved;
+                listBox.ListOrItemChanged += ListBox_ListOrItemChanged;
+                //listBox.ItemRemoved += ListBox_ItemRemoved;
                 break;
 
             case Button button:
@@ -574,8 +574,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 break;
 
             case ListBox listBox:
-                listBox.ItemAdded -= ListBox_ItemAdded;
-                listBox.ItemRemoved -= ListBox_ItemRemoved;
+                listBox.ListOrItemChanged -= ListBox_ListOrItemChanged;
+                //listBox.ItemRemoved -= ListBox_ItemRemoved;
                 break;
 
             case SwapListBox swapListBox:
@@ -646,7 +646,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         Allinitialized = false;
     }
 
-    protected void StyleComboBox(ComboBox? control, ItemCollectionList? list, ComboBoxStyle style, bool removevalueIfNotExists) {
+    protected void StyleComboBox(ComboBox? control, ICollection<BasicListItem>? list, ComboBoxStyle style, bool removevalueIfNotExists) {
         if (control == null) {
             if (removevalueIfNotExists) {
                 ValueSet(string.Empty, true, true);
@@ -661,7 +661,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         if (list != null) {
             control.Item.AddClonesFrom(list);
         }
-        control.Item.Sort();
+        //control.Item.Sort();
 
         if (removevalueIfNotExists) {
             if (control.Item[Value] == null) {
@@ -675,7 +675,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         control.Item.Clear();
         control.Item.CheckBehavior = CheckBehavior.MultiSelection;
         if (column == null) { return; }
-        ItemCollectionList item = new();
+        ItemCollectionList item = new(true);
         if (column.DropdownBearbeitungErlaubt) {
             ItemCollectionList.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
             if (!column.DropdownWerteAndererZellenAnzeigen) {
@@ -713,7 +713,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         control.Item.Clear();
         control.Item.CheckBehavior = CheckBehavior.NoSelection;
         if (column == null) { return; }
-        ItemCollectionList item = new();
+        ItemCollectionList item = new(true);
         ItemCollectionList.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
         control.SuggestionsAdd(item);
         control.AddAllowed = AddType.UserDef;
@@ -933,15 +933,15 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    private void ListBox_ItemAdded(object sender, ListEventArgs e) {
+    private void ListBox_ListOrItemChanged(object sender, System.EventArgs e) {
         if (IsFilling) { return; }
         ValueSet(((ListBox)sender).Item.ToListOfString().JoinWithCr(), false, true);
     }
 
-    private void ListBox_ItemRemoved(object sender, System.EventArgs e) {
-        if (IsFilling) { return; }
-        ValueSet(((ListBox)sender).Item.ToListOfString().JoinWithCr(), false, true);
-    }
+    //private void ListBox_ItemRemoved(object sender, System.EventArgs e) {
+    //    if (IsFilling) { return; }
+    //    ValueSet(((ListBox)sender).Item.ToListOfString().JoinWithCr(), false, true);
+    //}
 
     private void ParentForm_FormClosing(object sender, FormClosingEventArgs e) => RaiseEventIfChanged(); // Versuchen, die Werte noch zurückzugeben
 

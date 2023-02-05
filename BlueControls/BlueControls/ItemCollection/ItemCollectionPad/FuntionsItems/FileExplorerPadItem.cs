@@ -92,12 +92,9 @@ public class FileExplorerPadItem : CustomizableShowPadItem, IItemToControl {
     }
 
     public override string ToString() {
-        var t = base.ToString();
-        t = t.Substring(0, t.Length - 1) + ", ";
-
-        t = t + "Pfad=" + _pfad.ToNonCritical() + ", ";
-
-        return t.Trim(", ") + "}";
+        var result = new List<string>();
+        result.ParseableAdd("Pfad", _pfad);
+        return result.Parseable(base.ToString());
     }
 
     protected override string ClassId() => "FI-FileExplorer";

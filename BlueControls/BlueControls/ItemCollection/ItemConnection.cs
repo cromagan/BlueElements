@@ -15,15 +15,20 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
+using System;
+using System.Collections.Generic;
 using BlueBasics.Enums;
 using BlueControls.Enums;
 using System.ComponentModel;
 using System.Drawing;
+using BlueBasics.Interfaces;
 using static BlueBasics.Extensions;
 
 namespace BlueControls.ItemCollection;
 
-public class ItemConnection {
+public class ItemConnection : IStringable, IChangedFeedback {
 
     #region Fields
 
@@ -50,6 +55,12 @@ public class ItemConnection {
 
     #endregion
 
+    #region Events
+
+    public event EventHandler? Changed;
+
+    #endregion
+
     #region Properties
 
     [Description("Wird bei einem Export (wie z. B. Drucken) nur angezeigt, wenn das Häkchen gesetzt ist.")]
@@ -58,6 +69,7 @@ public class ItemConnection {
         set {
             if (_beiExportSichtbar == value) { return; }
             _beiExportSichtbar = value;
+            OnChanged();
         }
     }
 
@@ -85,18 +97,18 @@ public class ItemConnection {
         }
     }
 
+    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+
     internal string ToString(BasicPadItem myItem) {
-        var t = "{";
-
-        t = t + "Item1=" + myItem.Internal.ToNonCritical() + ", ";
-        t = t + "Arrow1=" + ArrowOnMyItem.ToPlusMinus() + ", ";
-        t = t + "Type1=" + ((int)MyItemType) + ", ";
-        t = t + "Item2=" + OtherItem.Internal.ToNonCritical() + ", ";
-        t = t + "Arrow2=" + ArrowOnOtherItem.ToPlusMinus() + ", ";
-        t = t + "Type2=" + ((int)OtherItemType) + ", ";
-        t = t + "Print=" + _beiExportSichtbar.ToPlusMinus() + ", ";
-
-        return t.TrimEnd(", ") + "}";
+        List<string> result = new();
+        result.ParseableAdd("Item1", myItem.KeyName);
+        result.ParseableAdd("Arrow1", ArrowOnMyItem);
+        result.ParseableAdd("Type1", MyItemType);
+        result.ParseableAdd("Item2", OtherItem.KeyName);
+        result.ParseableAdd("Arrow2", ArrowOnOtherItem);
+        result.ParseableAdd("Type2", OtherItemType);
+        result.ParseableAdd("Print", _beiExportSichtbar);
+        return result.Parseable(base.ToString());
     }
 
     #endregion

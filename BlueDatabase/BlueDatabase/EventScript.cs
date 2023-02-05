@@ -27,12 +27,12 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class EventScript : IParseable, IReadableTextWithChanging, IDisposableExtended, ICloneable, IErrorCheckable, IHasKeyName {
+public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, IDisposableExtended, ICloneable, IErrorCheckable, IHasKeyName {
 
     #region Fields
 
     private bool _changeValues;
-    private Events _events = Events.only_manual;
+    private Events _events = 0;
     private bool _executable;
 
     //private string _lastUsed;
@@ -50,11 +50,15 @@ public sealed class EventScript : IParseable, IReadableTextWithChanging, IDispos
         _script = script;
     }
 
-    public EventScript(DatabaseAbstract database, string toParse) : this(database) => Parse(toParse);
+    public EventScript(DatabaseAbstract? database, string toParse) : this(database) => Parse(toParse);
 
-    public EventScript(DatabaseAbstract database) {
+    public EventScript(DatabaseAbstract? database) {
         Database = database;
-        Database.Disposing += Database_Disposing;
+
+        if (Database != null && !Database.IsDisposed) {
+            Database.Disposing += Database_Disposing;
+        }
+
         _name = string.Empty;
         _script = string.Empty;
         _executable = false;
@@ -240,17 +244,17 @@ public sealed class EventScript : IParseable, IReadableTextWithChanging, IDispos
 
     public override string ToString() {
         try {
-            var Result = new List<string>();
+            var result = new List<string>();
 
-            Result.ParseableAdd("Database", Database);
-            Result.ParseableAdd("Name", Name);
-            Result.ParseableAdd("Script", Script);
-            Result.ParseableAdd("ManualExecutable", ManualExecutable);
-            Result.ParseableAdd("NeedRow", NeedRow);
-            Result.ParseableAdd("ChangeValues", ChangeValues);
-            Result.ParseableAdd("Events", Events);
+            result.ParseableAdd("Database", Database);
+            result.ParseableAdd("Name", Name);
+            result.ParseableAdd("Script", Script);
+            result.ParseableAdd("ManualExecutable", ManualExecutable);
+            result.ParseableAdd("NeedRow", NeedRow);
+            result.ParseableAdd("ChangeValues", ChangeValues);
+            result.ParseableAdd("Events", Events);
 
-            return Result.Parseable();
+            return result.Parseable();
         } catch {
             return ToString();
         }

@@ -27,12 +27,11 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Globalization;
-using System.Linq;
 using static BlueBasics.Converter;
 
 namespace BlueControls;
 
-public sealed class BlueFont : IReadableTextWithChanging {
+public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName {
 
     #region Fields
 
@@ -225,6 +224,12 @@ public sealed class BlueFont : IReadableTextWithChanging {
 
     #endregion
 
+    #region Properties
+
+    public string KeyName => ToString().Replace(" ", string.Empty).ToUpper();
+
+    #endregion
+
     #region Methods
 
     public static void DrawString(Graphics gr, string text, Font font, Brush brush, float x, float y) => DrawString(gr, text, font, brush, x, y, StringFormat.GenericDefault);
@@ -247,14 +252,9 @@ public sealed class BlueFont : IReadableTextWithChanging {
 
     public static BlueFont Get(string code) {
         if (string.IsNullOrEmpty(code) || !code.Contains("{")) { code = "{Name=Arial, Size=10, Color=ff0000}"; }
-        var searchcode = code.ToUpper().Replace(" ", string.Empty);
-        try {
-            foreach (var thisfont in FontsAll.Where(thisfont => thisfont.ToString().Replace(" ", string.Empty).ToUpper() == searchcode)) {
-                return thisfont;
-            }
-        } catch {
-            return Get(code);
-        }
+
+        if (FontsAll.Get(code.ToUpper().Replace(" ", string.Empty)) is BlueFont found) { return found; }
+
         BlueFont f = new(code);
         FontsAll.Add(f);
 

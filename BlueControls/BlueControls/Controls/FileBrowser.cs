@@ -221,7 +221,8 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         if (e.HotItem == null) { return; }
 
         var it = (BitmapListItem)e.HotItem;
-        var tags = (List<string>)it.Tag ?? new List<string>(); ;
+        var tags = (List<string>)it.Tag ?? new List<string>();
+        ;
 
         _ = e.UserMenu.Add(ContextMenuComands.Ausschneiden, !tags.TagGet("Folder").FromPlusMinus());
         _ = e.UserMenu.Add(ContextMenuComands.Einfügen, tags.TagGet("Folder").FromPlusMinus() && !string.IsNullOrEmpty(_ausschneiden));
@@ -312,7 +313,8 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
 
     private void lsbFiles_ItemClicked(object sender, BasicListItemEventArgs e) {
         if (File.Exists(e.Item.Internal)) {
-            var tags = (List<string>)e.Item.Tag ?? new List<string>(); ;
+            var tags = (List<string>)e.Item.Tag ?? new List<string>();
+            ;
 
             switch (e.Item.Internal.FileType()) {
                 case FileFormat.Link:
@@ -450,7 +452,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
             }
         }
 
-        lsbFiles.Item.Sort();
+        //lsbFiles.Item.Sort();
 
         StartThumbs();
         _isLoading = false;

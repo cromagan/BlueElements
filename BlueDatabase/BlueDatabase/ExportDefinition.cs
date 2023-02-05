@@ -24,7 +24,6 @@ using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using BlueDatabase.Interfaces;
@@ -33,7 +32,7 @@ using static BlueBasics.IO;
 
 namespace BlueDatabase;
 
-public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, IDisposableExtended, ICloneable, IErrorCheckable, IHasDatabase {
+public sealed class ExportDefinition : IParseable, IReadableTextWithChangingAndKey, IDisposableExtended, ICloneable, IErrorCheckable, IHasDatabase {
 
     #region Fields
 
@@ -50,6 +49,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
     private string _exportFormularId;
     private int _exportSpaltenAnsicht;
     private FilterCollection? _filter;
+    private string _id;
     private DateTime _lastExportTimeUtc;
     private string _scriptname;
     private ExportTyp _typ;
@@ -89,6 +89,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
         BereitsExportiert = new ListExt<string>();
         BereitsExportiert.Changed += _BereitsExportiert_ListOrItemChanged;
         _lastExportTimeUtc = new DateTime(1900, 1, 1);
+        _id = BlueBasics.Generic.UniqueInternal();
     }
 
     #endregion
@@ -174,6 +175,8 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
     public bool IsDisposed { get; private set; }
 
     public bool IsParsing { get; private set; }
+
+    public string KeyName => _id;
 
     public DateTime LastExportTimeUtc {
         get => _lastExportTimeUtc;
@@ -360,6 +363,10 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
                     _lastExportTimeUtc = DateTimeParse(pair.Value);
                     break;
 
+                case "id":
+                    _id = pair.Value.FromNonCritical();
+                    break;
+
                 default:
                     Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
                     break;
@@ -446,17 +453,18 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
         try {
             var shortener = GetShortener();
 
-            var Result = new List<string>();
-            Result.ParseableAdd("sho", shortener);
-            Result.ParseableAdd("dest", _verzeichnis);
-            Result.ParseableAdd("typ", _typ);
-            Result.ParseableAdd("let", _lastExportTimeUtc);
-            Result.ParseableAdd("itv", _backupInterval);
-            Result.ParseableAdd("scn", _scriptname);
-            Result.ParseableAdd("aud", _autoDelete);
-            Result.ParseableAdd("exc", _exportSpaltenAnsicht);
-            Result.ParseableAdd("exid", _exportFormularId);
-            Result.ParseableAdd("flt", (IStringable?)_filter);
+            var result = new List<string>();
+            result.ParseableAdd("id", _id);
+            result.ParseableAdd("sho", shortener);
+            result.ParseableAdd("dest", _verzeichnis);
+            result.ParseableAdd("typ", _typ);
+            result.ParseableAdd("let", _lastExportTimeUtc);
+            result.ParseableAdd("itv", _backupInterval);
+            result.ParseableAdd("scn", _scriptname);
+            result.ParseableAdd("aud", _autoDelete);
+            result.ParseableAdd("exc", _exportSpaltenAnsicht);
+            result.ParseableAdd("exid", _exportFormularId);
+            result.ParseableAdd("flt", (IStringable?)_filter);
 
             var tmp = string.Empty;
             if (BereitsExportiert.Count > 0) {
@@ -467,9 +475,9 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChanging, ID
                 }
                 tmp = tmp.TrimEnd("#");
             }
-            Result.ParseableAdd("exp", tmp);
+            result.ParseableAdd("exp", tmp);
 
-            return Result.Parseable();
+            return result.Parseable();
         } catch {
             return ToString();
         }

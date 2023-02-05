@@ -70,7 +70,7 @@ public partial class PadEditor : PadEditorReadOnly {
         _ = cbxSchriftGröße.Item.Add("130%", "130");
         _ = cbxSchriftGröße.Item.Add("140%", "140");
         _ = cbxSchriftGröße.Item.Add("150%", "150");
-        cbxSchriftGröße.Item.Sort();
+        //cbxSchriftGröße.Item.Sort();
         cbxSchriftGröße.Text = "100";
     }
 
@@ -80,7 +80,7 @@ public partial class PadEditor : PadEditorReadOnly {
 
     public virtual void ItemChanged() {
         Pad.ZoomFit();
-        Ribbon.SelectedIndex = 1;
+        //Ribbon.SelectedIndex = 1;
         PadDesign.Text = Pad.Item.SheetStyle.CellFirstString();
         cbxSchriftGröße.Text = ((int)(Pad.Item.SheetStyleScale * 100)).ToString(Constants.Format_Integer3);
     }

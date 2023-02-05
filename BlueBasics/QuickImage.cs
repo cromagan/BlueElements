@@ -30,7 +30,7 @@ using static BlueBasics.Converter;
 
 namespace BlueBasics;
 
-public sealed class QuickImage : BitmapExt, IReadableText {
+public sealed class QuickImage : BitmapExt, IReadableText, IStringable {
 
     #region Fields
 

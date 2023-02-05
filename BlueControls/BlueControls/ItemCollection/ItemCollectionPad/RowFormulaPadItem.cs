@@ -120,7 +120,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
             new FlexiControlForProperty<string>(() => Datensatz_bearbeiten, ImageCode.Stift),
             new FlexiControl()
         };
-        ItemCollectionList.ItemCollectionList layouts = new();
+        ItemCollectionList.ItemCollectionList layouts = new(true);
         foreach (var thisLayouts in Row.Database.Layouts) {
             ItemCollectionPad p = new(thisLayouts, string.Empty);
             _ = layouts.Add(p.Caption, p.Id, ImageCode.Stern);
@@ -170,13 +170,12 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
     public override void ProcessStyleChange() => RemovePic();
 
     public override string ToString() {
-        var t = base.ToString();
-        t = t.Substring(0, t.Length - 1) + ", ";
-        t = t + "LayoutID=" + _layoutId.ToNonCritical() + ", ";
-        if (_database != null) { t = t + "Database=" + _database.ConnectionData.DatabaseID.ToNonCritical() + ", "; }
-        if (_rowKey != 0) { t = t + "RowKey=" + _rowKey + ", "; }
-        if (Row is RowItem r) { t = t + "FirstValue=" + r.CellFirstString().ToNonCritical() + ", "; }
-        return t.Trim(", ") + "}";
+        var result = new List<string>();
+        result.ParseableAdd("LayoutID", _layoutId);
+        result.ParseableAdd("Database", _database);
+        if (_rowKey != 0) { result.ParseableAdd("RowKey", _rowKey); }
+        if (Row is RowItem r) { result.ParseableAdd("FirstValue", r.CellFirstString()); }
+        return result.Parseable(base.ToString());
     }
 
     protected override string ClassId() => "ROW";
