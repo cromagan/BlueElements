@@ -43,8 +43,8 @@ public class VariableFilterItem : Variable {
 
     #region Properties
 
+    public static string ClassId => "fil";
     public static string ShortName_Variable => "*fil";
-
     public override int CheckOrder => 99;
 
     public FilterItem FilterItem {
@@ -56,11 +56,8 @@ public class VariableFilterItem : Variable {
     }
 
     public override bool GetFromStringPossible => false;
-
     public override bool IsNullOrEmpty => _filter == null;
-
-    public override string ShortName => "fil";
-
+    public override string MyClassId => ClassId;
     public override bool ToStringPossible => false;
 
     #endregion

@@ -69,7 +69,7 @@ internal sealed partial class FilterItem_Editor : AbstractClassEditor<FilterItem
             return;
         }
 
-        if (Item == null) { return; }
+        if (Item == null || e.Filter == null) { return; }
 
         Item.FilterType = e.Filter.FilterType;
         Item.SearchValue.Clear();
@@ -77,6 +77,8 @@ internal sealed partial class FilterItem_Editor : AbstractClassEditor<FilterItem
     }
 
     private void btnFilterWahl_Click(object sender, System.EventArgs e) {
+        if (Item?.Database == null || Item.Database.IsDisposed) { return; }
+
         var c = Item.Database.Column[cbxColumns.Text];
         if (c == null || !c.AutoFilterSymbolPossible()) { return; }
         FilterCollection tmpfc = new(Item.Database);

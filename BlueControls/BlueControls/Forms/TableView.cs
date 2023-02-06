@@ -257,7 +257,7 @@ public partial class TableView : Form, IHasStatusbar {
 
     protected virtual void btnDrucken_ItemClicked(object sender, BasicListItemEventArgs e) {
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-        switch (e.Item.Internal) {
+        switch (e.Item.KeyName) {
             case "erweitert":
                 Visible = false;
                 List<RowItem?> selectedRows = new();
@@ -759,7 +759,7 @@ public partial class TableView : Form, IHasStatusbar {
 
     private void btnLetzteDateien_ItemClicked(object sender, BasicListItemEventArgs e) {
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-        _ = SwitchTabToDatabase(new ConnectionInfo(e.Item.Internal, PreveredDatabaseID));
+        _ = SwitchTabToDatabase(new ConnectionInfo(e.Item.KeyName, PreveredDatabaseID));
     }
 
     private void btnLoeschen_Click(object sender, System.EventArgs e) {
@@ -979,7 +979,7 @@ public partial class TableView : Form, IHasStatusbar {
             return;
         }
 
-        Table.Arrangement = int.Parse(e.Item.Internal);
+        Table.Arrangement = int.Parse(e.Item.KeyName);
     }
 
     private void cbxDoSript_ItemClicked(object sender, BasicListItemEventArgs e) {

@@ -195,7 +195,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
 
     private void btnTextEditor_Click(object sender, System.EventArgs e) => ExecuteFile("notepad.exe", cbxLayout.Text, false);
 
-    private void cbxLayout_ItemClicked(object sender, BasicListItemEventArgs e) => LoadLayout(e.Item.Internal);
+    private void cbxLayout_ItemClicked(object sender, BasicListItemEventArgs e) => LoadLayout(e.Item.KeyName);
 
     private void CheckButtons() {
         if (Database == null) {

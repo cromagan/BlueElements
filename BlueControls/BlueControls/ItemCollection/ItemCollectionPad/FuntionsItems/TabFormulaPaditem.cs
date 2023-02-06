@@ -59,6 +59,8 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
 
     #region Properties
 
+    public static string ClassId => "FI-ChildFormula";
+
     protected override int SaveOrder => 1000;
 
     #endregion
@@ -184,8 +186,6 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
         return result.Parseable(base.ToString());
     }
 
-    protected override string ClassId() => "FI-ChildFormula";
-
     protected override void Dispose(bool disposing) {
         if (disposing) {
             if (_cf != null) {
@@ -220,12 +220,12 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
-    protected override BasicPadItem? TryCreate(string id, string name) {
-        if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-            return new TabFormulaPadItem(name);
-        }
-        return null;
-    }
+    //protected override BasicPadItem? TryCreate(string id, string name) {
+    //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
+    //        return new TabFormulaPadItem(name);
+    //    }
+    //    return null;
+    //}
 
     private Controls.ListBox Childs() {
         var childs = new Controls.ListBox {
@@ -269,7 +269,7 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
         if (e.ClickedComand.ToLower() == "bearbeiten") {
             MultiUserFile.SaveAll(false);
 
-            var x = new ConnectedFormulaEditor(((BasicListItem)e.HotItem).Internal, _cf?.NotAllowedChilds);
+            var x = new ConnectedFormulaEditor(((BasicListItem)e.HotItem).KeyName, _cf?.NotAllowedChilds);
             _ = x.ShowDialog();
             MultiUserFile.SaveAll(false);
             x?.Dispose();

@@ -75,7 +75,7 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
             }
         }
         var x = Show(items);
-        return x != null ? x.Internal : string.Empty;
+        return x != null ? x.KeyName : string.Empty;
     }
 
     public static BasicListItem? Show(List<BasicListItem?>? items) {

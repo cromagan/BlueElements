@@ -71,6 +71,8 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
 
     #region Properties
 
+    public static string ClassId => "ROW";
+
     public string Datensatz_bearbeiten {
         get => string.Empty;
         set {
@@ -178,8 +180,6 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
         return result.Parseable(base.ToString());
     }
 
-    protected override string ClassId() => "ROW";
-
     protected override void GeneratePic() {
         if (string.IsNullOrEmpty(_layoutId) || !_layoutId.StartsWith("#")) {
             GeneratedBitmap = QuickImage.Get(ImageCode.Warnung, 128);
@@ -204,12 +204,12 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
         GeneratedBitmap = generatedBitmap;
     }
 
-    protected override BasicPadItem? TryCreate(string id, string name) {
-        if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-            return new RowFormulaPadItem(name);
-        }
-        return null;
-    }
+    //protected override BasicPadItem? TryCreate(string id, string name) {
+    //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
+    //        return new RowFormulaPadItem(name);
+    //    }
+    //    return null;
+    //}
 
     private void _Database_Disposing(object sender, System.EventArgs e) {
         _database.Disposing -= _Database_Disposing;

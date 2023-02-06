@@ -48,20 +48,14 @@ public class VariableFloat : Variable {
 
     #region Properties
 
+    public static string ClassId => "num";
     public static string ShortName_Plain => "num";
-
     public static string ShortName_Variable => "*num";
-
     public override int CheckOrder => 1;
-
     public override bool GetFromStringPossible => true;
-
     public override bool IsNullOrEmpty => false;
-
+    public override string MyClassId => ClassId;
     public override string ReadableText => _double.ToString(Constants.Format_Float1);
-
-    public override string ShortName => "num";
-
     public override bool ToStringPossible => true;
 
     public override string ValueForReplace => ReadableText;

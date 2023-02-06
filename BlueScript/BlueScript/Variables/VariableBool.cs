@@ -48,20 +48,14 @@ public class VariableBool : Variable {
 
     #region Properties
 
+    public static string ClassId => "bol";
     public static string ShortName_Plain => "bol";
-
     public static string ShortName_Variable => "*bol";
-
     public override int CheckOrder => 0;
-
     public override bool GetFromStringPossible => true;
-
     public override bool IsNullOrEmpty => false;
-
+    public override string MyClassId => ClassId;
     public override string ReadableText => _valuebool.ToString();
-
-    public override string ShortName => "bol";
-
     public override bool ToStringPossible => true;
 
     public bool ValueBool {
@@ -154,7 +148,7 @@ public class VariableBool : Variable {
 
             // V2 braucht nicht peprüft werden, muss ja eh der gleiche TYpe wie V1 sein
             if (v1 != null) {
-                if (v1.ShortName != v2.ShortName) { return false; }// return new DoItFeedback("Typen unterschiedlich: " + txt);
+                if (v1.MyClassId != v2.MyClassId) { return false; }// return new DoItFeedback("Typen unterschiedlich: " + txt);
 
                 if (!v1.ToStringPossible) { return false; }// return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
             } else {

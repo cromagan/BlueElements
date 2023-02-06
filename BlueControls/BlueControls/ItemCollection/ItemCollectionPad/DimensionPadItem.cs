@@ -72,8 +72,6 @@ public class DimensionPadItem : BasicPadItem {
     public DimensionPadItem(PointM? point1, PointM? point2, float abstandinMm) : this(string.Empty, point1, point2, abstandinMm) { }
 
     public DimensionPadItem(string internalname, PointM? point1, PointM? point2, float abstandinMm) : base(internalname) {
-        if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben."); }
-
         if (point1 != null) { _point1.SetTo(point1.X, point1.Y); }
         if (point2 != null) { _point2.SetTo(point2.X, point2.Y); }
         ComputeData();
@@ -109,6 +107,8 @@ public class DimensionPadItem : BasicPadItem {
     #endregion
 
     #region Properties
+
+    public static string ClassId => "DIMENSION";
 
     public float Länge_In_Mm => (float)Math.Round(PixelToMm(_länge, ItemCollectionPad.Dpi), Nachkommastellen);
 
@@ -262,8 +262,6 @@ public class DimensionPadItem : BasicPadItem {
         return x;
     }
 
-    protected override string ClassId() => "DIMENSION";
-
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (Stil != PadStyles.Undefiniert) {
             var geszoom = Parent.SheetStyleScale * Skalierung * zoom;
@@ -314,14 +312,14 @@ public class DimensionPadItem : BasicPadItem {
 
     protected override void ParseFinished() => CalculateOtherPoints();
 
-    protected override BasicPadItem? TryCreate(string id, string name) {
-        if (id.Equals("blueelements.clsitemimage", StringComparison.OrdinalIgnoreCase) ||
-            id.Equals("blueelements.imageitem", StringComparison.OrdinalIgnoreCase) ||
-            id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-            return new DimensionPadItem(name);
-        }
-        return null;
-    }
+    //protected override BasicPadItem? TryCreate(string id, string name) {
+    //    if (id.Equals("blueelements.clsitemimage", StringComparison.OrdinalIgnoreCase) ||
+    //        id.Equals("blueelements.imageitem", StringComparison.OrdinalIgnoreCase) ||
+    //        id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
+    //        return new DimensionPadItem(name);
+    //    }
+    //    return null;
+    //}
 
     private void CalculateOtherPoints() {
         var tmppW = -90;

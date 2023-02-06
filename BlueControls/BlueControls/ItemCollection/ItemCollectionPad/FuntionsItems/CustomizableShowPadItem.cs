@@ -46,7 +46,8 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
     public static BlueFont? CaptionFnt = Skin.GetBlueFont(Design.Caption, States.Standard);
 
     public List<string> VisibleFor = new();
-    private ICalculateRowsItemLevel? _getValueFrom;
+    private string _getValueFromkey = null;
+    private ICalculateRowsItemLevel? _tmpgetValueFrom;
 
     #endregion
 
@@ -123,11 +124,15 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
     }
 
     public ICalculateRowsItemLevel? GetRowFrom {
-        get => _getValueFrom;
+        get {
+            _tmpgetValueFrom ??= Parent[_getValueFromkey] as ICalculateRowsItemLevel;
 
+            return _tmpgetValueFrom;
+        }
         set {
-            if (value == _getValueFrom) { return; }
-            _getValueFrom = value;
+            if (value.KeyName == _getValueFromkey) { return; }
+            _getValueFromkey = value.KeyName;
+            _tmpgetValueFrom = null;
             RepairConnections();
             RaiseVersion();
             OnChanged();
@@ -246,7 +251,8 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
                 return true;
 
             case "getvaluefrom":
-                GetRowFrom = Parent[value.FromNonCritical()] as ICalculateRowsItemLevel;
+                _getValueFromkey = value.FromNonCritical();
+
                 return true;
 
             case "visiblefor":

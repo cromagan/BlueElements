@@ -51,6 +51,8 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
 
     #region Properties
 
+    public static string ClassId => "FI-DatabaseSource";
+
     public DatabaseAbstract? Database { get; set; }
 
     public string Datenbankkopf {
@@ -120,8 +122,6 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
         return result.Parseable(base.ToString());
     }
 
-    protected override string ClassId() => "FI-DatabaseSource";
-
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
 
@@ -145,12 +145,12 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
-    protected override BasicPadItem? TryCreate(string id, string name) {
-        if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-            return new DatabaseSourcePadItem(name);
-        }
-        return null;
-    }
-
     #endregion
+
+    //protected override BasicPadItem? TryCreate(string id, string name) {
+    //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
+    //        return new DatabaseSourcePadItem(name);
+    //    }
+    //    return null;
+    //}
 }

@@ -43,6 +43,8 @@ public class FileExplorerPadItem : CustomizableShowPadItem, IItemToControl {
 
     #region Properties
 
+    public static string ClassId => "FI-FileExplorer";
+
     [Description("Der Dateipfad, dessen Dateien angezeigt werden sollen.\r\nEs können Variablen aus dem Skript benutzt werden.\r\nDiese müssen im Format ~variable~ angegeben werden.")]
     public string Pfad {
         get => _pfad;
@@ -97,8 +99,6 @@ public class FileExplorerPadItem : CustomizableShowPadItem, IItemToControl {
         return result.Parseable(base.ToString());
     }
 
-    protected override string ClassId() => "FI-FileExplorer";
-
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         var id = -1;
         if (GetRowFrom != null) { id = GetRowFrom.Id; }
@@ -112,12 +112,12 @@ public class FileExplorerPadItem : CustomizableShowPadItem, IItemToControl {
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
-    protected override BasicPadItem? TryCreate(string id, string name) {
-        if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-            return new FileExplorerPadItem(name);
-        }
-        return null;
-    }
-
     #endregion
+
+    //protected override BasicPadItem? TryCreate(string id, string name) {
+    //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
+    //        return new FileExplorerPadItem(name);
+    //    }
+    //    return null;
+    //}
 }

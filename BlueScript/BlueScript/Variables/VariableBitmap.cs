@@ -46,11 +46,12 @@ public class VariableBitmap : Variable {
 
     #region Properties
 
+    public static string ClassId => "bmp";
     public static string ShortName_Variable => "*bmp";
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => false;
     public override bool IsNullOrEmpty => _bmp == null;
-    public override string ShortName => "bmp";
+    public override string MyClassId => ClassId;
     public override bool ToStringPossible => false;
 
     public Bitmap? ValueBitmap {

@@ -251,7 +251,7 @@ public sealed partial class ExportDialog {
             ? "Es ist genau ein Eintrag gew‰hlt:<br> <b>-" + _rowsForExport[0].CellFirstString().Replace("\r\n", " ")
             : "Es sind <b>" + _rowsForExport.Count + "</b> Eintr‰ge gew‰hlt.";
 
-    private void Exported_ItemClicked(object sender, BasicListItemEventArgs e) => ExecuteFile(e.Item.Internal);
+    private void Exported_ItemClicked(object sender, BasicListItemEventArgs e) => ExecuteFile(e.Item.KeyName);
 
     private string Fehler() {
         if (Database == null || Database.IsDisposed) { return "Datenbank verworfen"; }
@@ -289,12 +289,12 @@ public sealed partial class ExportDialog {
 
         switch (e.ClickedComand) {
             case "DateiPfad÷ffnen":
-                _ = ExecuteFile(tl.Internal.FilePath());
+                _ = ExecuteFile(tl.KeyName.FilePath());
                 break;
 
             case "Kopieren":
                 var x = new System.Collections.Specialized.StringCollection {
-                    tl.Internal
+                    tl.KeyName
                 };
                 Clipboard.SetFileDropList(x);
                 break;

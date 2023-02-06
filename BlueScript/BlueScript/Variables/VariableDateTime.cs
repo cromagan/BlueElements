@@ -47,18 +47,13 @@ public class VariableDateTime : Variable {
 
     #region Properties
 
+    public static string ClassId => "dat";
     public static string ShortName_Variable => "*dat";
-
     public override int CheckOrder => 5;
-
     public override bool GetFromStringPossible => false;
-
     public override bool IsNullOrEmpty => false;
-
+    public override string MyClassId => ClassId;
     public override string ReadableText => _valueDateTime.ToString(Constants.Format_Date4);
-
-    public override string ShortName => "dat";
-
     public override bool ToStringPossible => false;
 
     /// <summary>

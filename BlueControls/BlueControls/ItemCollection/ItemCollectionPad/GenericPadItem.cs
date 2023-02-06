@@ -51,6 +51,8 @@ public class GenericPadItem : FixedRectangleBitmapPadItem {
 
     #region Properties
 
+    public static string ClassId => "GenericPadItem";
+
     protected override int SaveOrder => 999;
 
     #endregion
@@ -65,8 +67,6 @@ public class GenericPadItem : FixedRectangleBitmapPadItem {
         result.ParseableAdd("Size", Size);
         return result.Parseable(base.ToString());
     }
-
-    protected override string ClassId() => "GenericPadItem";
 
     protected override void GeneratePic() {
         var bmp = new Bitmap(Size.Width, Size.Height);
@@ -87,12 +87,12 @@ public class GenericPadItem : FixedRectangleBitmapPadItem {
         GeneratedBitmap = bmp;
     }
 
-    protected override BasicPadItem? TryCreate(string id, string name) {
-        if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-            return new GenericPadItem(name);
-        }
-        return null;
-    }
-
     #endregion
+
+    //protected override BasicPadItem? TryCreate(string id, string name) {
+    //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
+    //        return new GenericPadItem(name);
+    //    }
+    //    return null;
+    //}
 }

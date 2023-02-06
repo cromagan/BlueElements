@@ -47,7 +47,7 @@ internal class Method_IsType : Method {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-        if (string.Equals(attvar.Attributes[1].ReadableText, attvar.Attributes[0].ShortName, System.StringComparison.OrdinalIgnoreCase)) {
+        if (string.Equals(attvar.Attributes[1].ReadableText, attvar.Attributes[0].MyClassId, System.StringComparison.OrdinalIgnoreCase)) {
             return DoItFeedback.Wahr();
         }
         return DoItFeedback.Falsch();

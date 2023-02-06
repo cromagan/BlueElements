@@ -47,6 +47,8 @@ public class SymbolPadItem : RectanglePadItem {
 
     #region Properties
 
+    public static string ClassId => "Symbol";
+
     public Color Hintergrundfarbe { get; set; }
     public float Randdicke { get; set; }
     public Color Randfarbe { get; set; }
@@ -107,13 +109,11 @@ public class SymbolPadItem : RectanglePadItem {
     public override string ToString() {
         var result = new List<string>();
         result.ParseableAdd("Symbol", Symbol);
-        result.ParseableAdd("Backcolor", Hintergrundfarbe);
-        result.ParseableAdd("BorderColor", Randfarbe);
+        result.ParseableAdd("Backcolor", Hintergrundfarbe.ToArgb());
+        result.ParseableAdd("BorderColor", Randfarbe.ToArgb());
         result.ParseableAdd("BorderWidth", Randdicke);
         return result.Parseable(base.ToString());
     }
-
-    protected override string ClassId() => "Symbol";
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
@@ -161,12 +161,12 @@ public class SymbolPadItem : RectanglePadItem {
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
-    protected override BasicPadItem? TryCreate(string id, string name) {
-        if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-            return new SymbolPadItem(name);
-        }
-        return null;
-    }
-
     #endregion
+
+    //protected override BasicPadItem? TryCreate(string id, string name) {
+    //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
+    //        return new SymbolPadItem(name);
+    //    }
+    //    return null;
+    //}
 }

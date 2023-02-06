@@ -39,20 +39,17 @@ public class VariableUnknown : Variable {
 
     #region Properties
 
+    public static string ClassId => "ukn";
     public static string ShortName_Variable => "*ukn";
-
     public override int CheckOrder => 100;
-
     public override bool GetFromStringPossible => true;
-
     public override bool IsNullOrEmpty => false;
+    public override string MyClassId => ClassId;
 
     /// <summary>
     /// Gleichgesetzt mit ValueString
     /// </summary>
     public override string ReadableText => "[unknown]";
-
-    public override string ShortName => "ukn";
 
     public override bool ToStringPossible => false;
 

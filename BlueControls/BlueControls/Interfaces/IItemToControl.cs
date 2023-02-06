@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics.Interfaces;
 using BlueControls.Controls;
 
 namespace BlueControls.Interfaces;
@@ -24,11 +25,9 @@ namespace BlueControls.Interfaces;
 /// <summary>
 /// Wird verwendet, wenn das PadItem zu einem ConnectedFormula-Control übersetzt werden kann.
 /// </summary>
-public interface IItemToControl {
+public interface IItemToControl : IHasKeyName {
 
     #region Properties
-
-    public string Internal { get; }
 
     public int Version { get; set; }
 

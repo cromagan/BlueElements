@@ -40,16 +40,16 @@ public class ConstantTextPadItem : CustomizableShowPadItem, IReadableText, ICont
 
     #region Constructors
 
-    public ConstantTextPadItem() : this(BlueBasics.Generic.UniqueInternal(), string.Empty) { }
-
-    public ConstantTextPadItem(string intern, string text) : base(intern) => _text = text;
+    public ConstantTextPadItem() : this(BlueBasics.Generic.UniqueInternal()) { }
 
     //Size = new Size(150, 24);
-    public ConstantTextPadItem(string intern) : this(intern, string.Empty) { }
+    public ConstantTextPadItem(string intern) : base(intern) { }
 
     #endregion
 
     #region Properties
+
+    public static string ClassId => "FI-ConstantText";
 
     public string Text {
         get => _text;
@@ -110,8 +110,6 @@ public class ConstantTextPadItem : CustomizableShowPadItem, IReadableText, ICont
         return result.Parseable(base.ToString());
     }
 
-    protected override string ClassId() => "FI-ConstantText";
-
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         gr.DrawRectangle(new Pen(Color.Black, zoom), positionModified);
 
@@ -125,12 +123,12 @@ public class ConstantTextPadItem : CustomizableShowPadItem, IReadableText, ICont
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
-    protected override BasicPadItem? TryCreate(string id, string name) {
-        if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-            return new ConstantTextPadItem(name);
-        }
-        return null;
-    }
-
     #endregion
+
+    //protected override BasicPadItem? TryCreate(string id, string name) {
+    //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
+    //        return new ConstantTextPadItem(name);
+    //    }
+    //    return null;
+    //}
 }

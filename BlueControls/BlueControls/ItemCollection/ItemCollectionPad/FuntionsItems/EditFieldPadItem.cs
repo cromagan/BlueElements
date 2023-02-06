@@ -55,6 +55,8 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
 
     #region Properties
 
+    public static string ClassId => "FI-EditField";
+
     public ÜberschriftAnordnung CaptionPosition {
         get => _überschiftanordung;
         set {
@@ -190,7 +192,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         cy.EditType = EditType;
         cy.CaptionPosition = CaptionPosition;
         cy.DisabledReason = "Keine Verknüpfung vorhanden.";
-        cy.Tag = Internal;
+        cy.Tag = KeyName;
         return cy;
     }
 
@@ -274,8 +276,6 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         return result.Parseable(base.ToString());
     }
 
-    protected override string ClassId() => "FI-EditField";
-
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         var id = -1;
         if (GetRowFrom != null) { id = GetRowFrom.Id; }
@@ -295,6 +295,8 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
+    #endregion
+
     //public bool ReplaceVariable(Variable variable) {
     //    if (string.IsNullOrEmpty(Platzhalter_Für_Layout)) { return false; }
     //    if ("~" + variable.Name.ToLower() + "~" != Platzhalter_Für_Layout.ToLower()) { return false; }
@@ -305,14 +307,12 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
     //        OnChanged();
     //        return true;
     //    }
-    protected override BasicPadItem? TryCreate(string id, string name) {
-        if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-            return new EditFieldPadItem(name);
-        }
-        return null;
-    }
-
-    #endregion
+    //protected override BasicPadItem? TryCreate(string id, string name) {
+    //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
+    //        return new EditFieldPadItem(name);
+    //    }
+    //    return null;
+    //}
 
     //private void RepairConnections() {
     //    ConnectsTo.Clear();

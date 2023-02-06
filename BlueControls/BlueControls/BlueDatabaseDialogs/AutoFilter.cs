@@ -23,6 +23,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
+using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
@@ -37,7 +38,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 {
     #region Fields
 
-    private readonly ColumnItem? _column;
+    private readonly ColumnItem _column;
 
     private bool _multiAuswahlOder;
 
@@ -49,21 +50,10 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
     #region Constructors
 
-    public AutoFilter(ColumnItem? column, FilterCollection? filter, List<RowItem>? pinned) : base(Design.Form_AutoFilter) {
+    public AutoFilter(ColumnItem column, FilterCollection? filter, List<RowItem?>? pinned) : base(Design.Form_AutoFilter) {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
-        //Me.SetNotFocusable()
-        SetStyle(System.Windows.Forms.ControlStyles.Selectable, false);
-        SetStyle(System.Windows.Forms.ControlStyles.StandardClick, false);
-        SetStyle(System.Windows.Forms.ControlStyles.StandardDoubleClick, false);
-        // Initialisierungen nach dem Aufruf InitializeComponent() hinzufügen
-        SetStyle(System.Windows.Forms.ControlStyles.ResizeRedraw, false);
-        SetStyle(System.Windows.Forms.ControlStyles.SupportsTransparentBackColor, false);
-        SetStyle(System.Windows.Forms.ControlStyles.Opaque, false);
-        //The next 3 styles are allefor double buffering
-        SetStyle(System.Windows.Forms.ControlStyles.DoubleBuffer, true);
-        SetStyle(System.Windows.Forms.ControlStyles.AllPaintingInWmPaint, true);
-        SetStyle(System.Windows.Forms.ControlStyles.UserPaint, true);
+
         _column = column;
         GenerateAll(filter, pinned);
     }
@@ -78,7 +68,9 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
     #region Methods
 
-    public static List<string> Autofilter_ItemList(ColumnItem column, FilterCollection? filter, List<RowItem?> pinned) {
+    public static List<string> Autofilter_ItemList(ColumnItem? column, FilterCollection? filter, List<RowItem?>? pinned) {
+        if (column == null) { return new List<string>(); }
+
         if (filter == null || filter.Count < 0) { return column.Contents(); }
         FilterCollection tfilter = new(column.Database);
         foreach (var thisFilter in filter.Where(thisFilter => thisFilter != null && column != thisFilter.Column)) {
@@ -87,7 +79,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         return column.Contents(tfilter, pinned);
     }
 
-    public void GenerateAll(FilterCollection? filter, List<RowItem?> pinned) {
+    public void GenerateAll(FilterCollection? filter, List<RowItem?>? pinned) {
         var nochOk = true;
         var listFilterString = Autofilter_ItemList(_column, filter, pinned);
         var f = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
@@ -122,6 +114,11 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         lsbFilterItems.Width = Math.Max(lsbFilterItems.Width, Width - (Skin.PaddingSmal * 2));
         lsbFilterItems.Height = Math.Min(lsbFilterItems.Height, 560);
 
+        BasicListItem? leere = null;
+        BasicListItem? nichtleere = null;
+
+        #region die Besonderen Filter generieren
+
         if (lColumn.FilterOptions is not FilterOptions.Enabled_OnlyAndAllowed and not FilterOptions.Enabled_OnlyOrAllowed) {
             txbEingabe.Enabled = lColumn.FilterOptions.HasFlag(FilterOptions.TextFilterEnabled);
             capWas.Enabled = lColumn.FilterOptions.HasFlag(FilterOptions.TextFilterEnabled);
@@ -134,13 +131,14 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
             } else {
                 _ = lsbStandardFilter.Item.Add("Filter löschen", "filterlöschen", QuickImage.Get("Trichter|16||1"), false, Constants.FirstSortChar + "01");
             }
+
             var tmp = CellItem.ValueReadable(lColumn, string.Empty, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, true);
             if (string.IsNullOrEmpty(tmp)) {
-                _ = lsbStandardFilter.Item.Add("leere", "filterleere", QuickImage.Get("TasteABC|20|16|1"), true, Constants.FirstSortChar + "02");
-                _ = lsbStandardFilter.Item.Add("nicht leere", "filternichtleere", QuickImage.Get("TasteABC|20|16"), true, Constants.FirstSortChar + "03");
+                leere = lsbStandardFilter.Item.Add("leere", "filterleere", QuickImage.Get("TasteABC|20|16|1"), true, Constants.FirstSortChar + "02");
+                nichtleere = lsbStandardFilter.Item.Add("nicht leere", "filternichtleere", QuickImage.Get("TasteABC|20|16"), true, Constants.FirstSortChar + "03");
             } else {
-                _ = lsbStandardFilter.Item.Add(tmp + " (= leere)", "filterleere", QuickImage.Get("TasteABC|20|16|1"), true, Constants.FirstSortChar + "02");
-                _ = lsbStandardFilter.Item.Add("nicht leere", "filternichtleere", QuickImage.Get("TasteABC|20|16"), false, Constants.FirstSortChar + "03");
+                leere = lsbStandardFilter.Item.Add(tmp + " (= leere)", "filterleere", QuickImage.Get("TasteABC|20|16|1"), true, Constants.FirstSortChar + "02");
+                nichtleere = lsbStandardFilter.Item.Add("nicht leere", "filternichtleere", QuickImage.Get("TasteABC|20|16"), false, Constants.FirstSortChar + "03");
             }
             _ = lsbStandardFilter.Item.Add("aus der Zwischenablage", "clipboard", QuickImage.Get(ImageCode.Clipboard, 17), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "05");
             _ = lsbStandardFilter.Item.Add("NICHT in der Zwischenablage", "nichtclipboard", QuickImage.Get("Clipboard|17||1"), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && !_column.MultiLine && string.IsNullOrEmpty(tmp), Constants.FirstSortChar + "06");
@@ -151,27 +149,36 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
             _ = lsbStandardFilter.Item.Add("Nicht Einzigartige Einträge", "NichtEinzigartig", QuickImage.Get("Eins|17||1"), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "11");
             //lsbStandardFilter.Item.Add("Vergleiche mit anderer Spalte", "Spaltenvergleich", QuickImage.Get(ImageCode.Spalte, 17), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && filter[_column.Database.Column.First] == null, Constants.FirstSortChar + "12");
         }
+
+        #endregion
+
         Width = Math.Max(lsbFilterItems.Right + (Skin.PaddingSmal * 2), Width);
         Height = lsbFilterItems.Bottom + Skin.PaddingSmal;
+
+        #region Wenn ein Filter übergeben wurde, die Einträge markieren
+
         if (filter != null) {
             foreach (var thisfilter in filter.Where(thisfilter => thisfilter != null && thisfilter.FilterType != FilterType.KeinFilter).Where(thisfilter => thisfilter.Column == _column)) {
                 if (thisfilter.FilterType.HasFlag(FilterType.Istgleich)) {
                     foreach (var thisValue in thisfilter.SearchValue) {
-                        if (lsbFilterItems.Item[thisValue] != null) {
-                            lsbFilterItems.Item[thisValue].Checked = true;
-                        } else if (string.IsNullOrEmpty(thisValue)) {
-                            lsbStandardFilter.Item["filterleere"].Checked = true;
+                        if (lsbFilterItems.Item[thisValue] is BasicListItem bli) {
+                            bli.Checked = true;
+                        } else if (string.IsNullOrEmpty(thisValue) && leere != null) {
+                            leere.Checked = true;
                         }
                     }
                 } else if (thisfilter.FilterType.HasFlag(FilterType.Instr)) {
                     txbEingabe.Text = thisfilter.SearchValue[0];
                 } else if (Convert.ToBoolean((int)thisfilter.FilterType & 2)) {
-                    if (thisfilter.SearchValue.Count == 1 && string.IsNullOrEmpty(thisfilter.SearchValue[0])) {
-                        lsbStandardFilter.Item["filternichtleere"].Checked = true;
+                    if (thisfilter.SearchValue.Count == 1 && string.IsNullOrEmpty(thisfilter.SearchValue[0]) && nichtleere != null) {
+                        nichtleere.Checked = true;
                     }
                 }
             }
         }
+
+        #endregion
+
         if (nochOk) {
             if (lColumn.FilterOptions == FilterOptions.Enabled_OnlyAndAllowed) { ChangeToMultiUnd(); }
             if (lColumn.FilterOptions == FilterOptions.Enabled_OnlyOrAllowed) { ChangeToMultiOder(); }
@@ -206,7 +213,6 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         capWas.Visible = false;
         txbEingabe.Visible = false;
         txbEingabe.Text = string.Empty;
-        //Line.Visible = false;
         capInfo.Visible = true;
         butFertig.Visible = true;
     }
@@ -233,11 +239,12 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
     private void FiltItems_ItemClicked(object sender, BasicListItemEventArgs e) {
         if (_multiAuswahlUnd || _multiAuswahlOder) { return; }
+
         var doJoker = !string.IsNullOrEmpty(_column.AutoFilterJoker);
         if (_negativAuswahl) { doJoker = false; }
         List<string> l = new()
         {
-            e.Item.Internal
+            e.Item.KeyName
         };
         if (doJoker) { l.Add(_column.AutoFilterJoker); }
         if (_negativAuswahl) {
@@ -251,7 +258,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
     private void OnFilterComand(FilterComandEventArgs e) => FilterComand?.Invoke(this, e);
 
     private void sFilter_ItemClicked(object sender, BasicListItemEventArgs e) {
-        switch (e.Item.Internal.ToLower()) {
+        switch (e.Item.KeyName.ToLower()) {
             case "filterleere": {
                     CloseAndDispose("Filter", new FilterItem(_column, FilterType.Istgleich | FilterType.MultiRowIgnorieren, string.Empty));
                     break;
@@ -291,11 +298,11 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
                     _negativAuswahl = true;
                     _multiAuswahlUnd = false;
                     _multiAuswahlOder = false;
-                    lsbStandardFilter.Item["FilterLeere"].Enabled = false;
-                    lsbStandardFilter.Item["FilterNichtLeere"].Enabled = false;
-                    lsbStandardFilter.Item["Clipboard"].Enabled = false;
-                    lsbStandardFilter.Item["ModusMultiUnd"].Enabled = false;
-                    lsbStandardFilter.Item["ModusMultiOder"].Enabled = false;
+                    lsbStandardFilter.Item["FilterLeere"]?.Disable();
+                    lsbStandardFilter.Item["FilterNichtLeere"]?.Disable();
+                    lsbStandardFilter.Item["Clipboard"]?.Disable();
+                    lsbStandardFilter.Item["ModusMultiUnd"]?.Disable();
+                    lsbStandardFilter.Item["ModusMultiOder"]?.Disable();
                     break;
                 }
 
@@ -314,7 +321,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
             //        break;
             //    }
             default: {
-                    Develop.DebugPrint("Unbekannter Filter: " + e.Item.Internal);
+                    Develop.DebugPrint("Unbekannter Filter: " + e.Item.KeyName);
                     break;
                 }
         }
@@ -340,27 +347,12 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         }
     }
 
-    //private void OnMouseEnter(object sender, System.EventArgs e)
-    //{
-    //    IsMouseInControl();
-    //    MouseMoved?.Invoke(this, System.EventArgs.Empty);
-    //}
-    //private void OnMouseLeave(object sender, System.EventArgs e)
-    //{
-    //    IsMouseInControl();
-    //    MouseMoved?.Invoke(this, System.EventArgs.Empty);
-    //}
-    //private void OnMouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
-    //{
-    //    IsMouseInControl();
-    //    MouseMoved?.Invoke(this, System.EventArgs.Empty);
-    //}
-
     private void TXTBox_Enter(object sender, System.EventArgs e) {
         if (string.IsNullOrEmpty(txbEingabe.Text)) {
             CloseAndDispose("FilterDelete", null);
             return;
         }
+
         if (_column.SortType is SortierTyp.ZahlenwertFloat or SortierTyp.ZahlenwertInt) {
             if (txbEingabe.Text.Contains("-")) {
                 var tmp = txbEingabe.Text.Replace(" ", string.Empty);

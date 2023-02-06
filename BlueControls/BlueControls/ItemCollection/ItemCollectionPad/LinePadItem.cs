@@ -66,6 +66,8 @@ public class LinePadItem : BasicPadItem {
 
     #region Properties
 
+    public static string ClassId => "LINE";
+
     public ConectorStyle Linien_Verhalten { get; set; }
 
     protected override int SaveOrder => 999;
@@ -158,8 +160,6 @@ public class LinePadItem : BasicPadItem {
         //Return New Rectangle(CInt(Math.Min(Point1.X, Point2.X)), CInt(Math.Min(Point1.Y, Point2.Y)), CInt(Math.Abs(Point2.X - Point1.X)), CInt(Math.Abs(Point2.Y - Point1.Y)))
     }
 
-    protected override string ClassId() => "LINE";
-
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (Stil != PadStyles.Undefiniert) {
             CalcTempPoints();
@@ -173,14 +173,14 @@ public class LinePadItem : BasicPadItem {
 
     protected override void ParseFinished() { }
 
-    protected override BasicPadItem? TryCreate(string id, string name) {
-        if (id.Equals("blueelements.clsitemline", StringComparison.OrdinalIgnoreCase) ||
-            id.Equals("blueelements.itemline", StringComparison.OrdinalIgnoreCase) ||
-            id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-            return new LinePadItem(name);
-        }
-        return null;
-    }
+    //protected override BasicPadItem? TryCreate(string id, string name) {
+    //    if (id.Equals("blueelements.clsitemline", StringComparison.OrdinalIgnoreCase) ||
+    //        id.Equals("blueelements.itemline", StringComparison.OrdinalIgnoreCase) ||
+    //        id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
+    //        return new LinePadItem(name);
+    //    }
+    //    return null;
+    //}
 
     private static bool SchneidetDas(BasicPadItem? thisBasicItem, PointM p1, PointM p2) {
         if (thisBasicItem == null) { return false; }

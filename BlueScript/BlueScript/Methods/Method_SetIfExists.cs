@@ -52,7 +52,7 @@ internal class Method_SetIfExists : Method {
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             if (attvar.Attributes[z] is VariableUnknown) { continue; }
 
-            if (attvar.Attributes[z].ShortName != attvar.Attributes[0].ShortName) { return new DoItFeedback("Variablentyp zur Ausgangsvariable unterschiedlich."); }
+            if (attvar.Attributes[z].MyClassId != attvar.Attributes[0].MyClassId) { return new DoItFeedback("Variablentyp zur Ausgangsvariable unterschiedlich."); }
 
             switch (attvar.Attributes[z]) {
                 case VariableString vs:

@@ -232,7 +232,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
             var ok = false;
 
             foreach (var thisAt in exceptetType) {
-                if (thisAt.TrimStart("*") == v.ShortName) { ok = true; break; }
+                if (thisAt.TrimStart("*") == v.MyClassId) { ok = true; break; }
 
                 if (thisAt.TrimStart("*") == Variable.Any_Plain) { ok = true; break; }
 
@@ -248,7 +248,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
                 //}
             }
 
-            if (!ok) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht einer der erwarteten Typen '" + exceptetType.JoinWith("' oder '") + "', sondern " + v.ShortName); }
+            if (!ok) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht einer der erwarteten Typen '" + exceptetType.JoinWith("' oder '") + "', sondern " + v.MyClassId); }
 
             feedbackVariables.Add(v);
 

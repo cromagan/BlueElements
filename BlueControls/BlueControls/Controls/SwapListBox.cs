@@ -70,7 +70,7 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
 
     internal void SuggestionsAdd(ItemCollectionList? item) {
         if (item == null) { return; }
-        foreach (var thisi in item.Where(thisi => Main.Item[thisi.Internal] == null && Suggest.Item[thisi.Internal] == null)) {
+        foreach (var thisi in item.Where(thisi => Main.Item[thisi.KeyName] == null && Suggest.Item[thisi.KeyName] == null)) {
             thisi.Checked = false;
             Suggest.Item.Add(thisi.Clone() as BasicListItem);
         }
@@ -128,13 +128,13 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
     //    OnItemAdded(e);
     //}
 
-    private void Main_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) => MoveItemBetweenList(Main, Suggest, e.Item.Internal, true);
+    private void Main_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) => MoveItemBetweenList(Main, Suggest, e.Item.KeyName, true);
 
     //private void Main_ItemRemoved(object sender, System.EventArgs e) => OnItemRemoved(e);
 
     //private void Main_ItemRemoving(object sender, ListEventArgs e) => MoveItemBetweenList(Main, Suggest, ((BasicListItem)e.Item).Internal, false);
 
-    private void Suggest_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) => MoveItemBetweenList(Suggest, Main, e.Item.Internal, true);
+    private void Suggest_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) => MoveItemBetweenList(Suggest, Main, e.Item.KeyName, true);
 
     #endregion
 

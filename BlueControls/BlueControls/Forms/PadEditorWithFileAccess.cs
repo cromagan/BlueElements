@@ -65,7 +65,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
         ItemChanged();
     }
 
-    private void btnLastFiles_ItemClicked(object sender, BasicListItemEventArgs e) => LoadFile(e.Item.Internal, string.Empty);
+    private void btnLastFiles_ItemClicked(object sender, BasicListItemEventArgs e) => LoadFile(e.Item.KeyName, string.Empty);
 
     private void btnNeu_Click(object sender, System.EventArgs e) {
         Pad?.Item?.Clear();

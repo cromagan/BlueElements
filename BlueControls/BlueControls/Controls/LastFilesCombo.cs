@@ -123,7 +123,7 @@ public sealed class LastFilesCombo : ComboBox {
     protected override void OnItemClicked(BasicListItemEventArgs e) {
         base.OnItemClicked(e);
         var t = (List<string>)e.Item.Tag;
-        AddFileName(e.Item.Internal, t[0]);
+        AddFileName(e.Item.KeyName, t[0]);
     }
 
     private void GenerateMenu() {

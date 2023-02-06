@@ -342,7 +342,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
 
     private static void ListBox_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         if (e.HotItem is TextListItem t) {
-            if (FileExists(t.Internal)) {
+            if (FileExists(t.KeyName)) {
                 _ = e.UserMenu.Add(ContextMenuComands.DateiÖffnen);
             }
         }
@@ -576,8 +576,8 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         switch (e.ClickedComand.ToLower()) {
             case "dateiöffnen":
                 if (e.HotItem is TextListItem t) {
-                    if (FileExists(t.Internal)) {
-                        _ = ExecuteFile(t.Internal);
+                    if (FileExists(t.KeyName)) {
+                        _ = ExecuteFile(t.KeyName);
                         //var b = Converter.FileToByte(t.Internal);
                         ////b = Cryptography.SimpleCrypt(b, FileEncryptionKey, -1);
                         //var tmp = TempFile(string.Empty, string.Empty, t.Internal.FileSuffix());

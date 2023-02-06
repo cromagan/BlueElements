@@ -61,6 +61,8 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
 
     #region Properties
 
+    public static string ClassId => "CHILDPAD";
+
     [Description("Soll eine Umrandung einer anderen Ansicht hier angezeigt werden,<br>muss dessen Name hier eingegeben werden.")]
     public List<string> Eingebettete_Ansichten { get; set; }
 
@@ -262,13 +264,11 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
 
         if (Textlage != (Alignment)(-1)) { result.ParseableAdd("Pos", Textlage); }
         result.ParseableAdd("Embedded", Eingebettete_Ansichten);
-        result.ParseableAdd("Color", Randfarbe);
+        result.ParseableAdd("Color", Randfarbe.ToArgb());
         result.ParseableAdd("Data", "Item", PadInternal?.Item);
 
         return result.Parseable(base.ToString());
     }
-
-    protected override string ClassId() => "CHILDPAD";
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (PadInternal?.Item == null || Parent == null) { return; }
@@ -346,14 +346,14 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
-    protected override BasicPadItem? TryCreate(string id, string name) {
-        if (id.Equals("blueelements.clsitempad", StringComparison.OrdinalIgnoreCase) ||
-            id.Equals("blueelements.itempad", StringComparison.OrdinalIgnoreCase) ||
-            id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-            return new ChildPadItem(name);
-        }
-        return null;
-    }
+    //protected override BasicPadItem? TryCreate(string id, string name) {
+    //    if (id.Equals("blueelements.clsitempad", StringComparison.OrdinalIgnoreCase) ||
+    //        id.Equals("blueelements.itempad", StringComparison.OrdinalIgnoreCase) ||
+    //        id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
+    //        return new ChildPadItem(name);
+    //    }
+    //    return null;
+    //}
 
     private void _Pad_DoInvalidate(object sender, System.EventArgs e) {
         if (IsParsing) { return; }

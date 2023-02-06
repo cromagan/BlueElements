@@ -300,7 +300,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
                 return null;
             }
 
-            return this.FirstOrDefault(thisItem => thisItem != null && string.Equals(@internal, thisItem.Internal, StringComparison.OrdinalIgnoreCase));
+            return this.FirstOrDefault(thisItem => thisItem != null && string.Equals(@internal, thisItem.KeyName, StringComparison.OrdinalIgnoreCase));
         }
     }
 
@@ -332,6 +332,11 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
 
         return Math.Min(sizeOfPaintArea.Width / maxBounds.Width,
             sizeOfPaintArea.Height / maxBounds.Height);
+    }
+
+    public new void Add(BasicPadItem item) {
+        item.Parent = this;
+        base.Add(item);
     }
 
     public List<string> AllPages() {
@@ -430,6 +435,22 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         var gr = Graphics.FromImage(bmp);
         _ = DrawCreativePadTo(gr, bmp.Size, vState, zoomf, x, y, seite, true);
         gr?.Dispose();
+    }
+
+    public void EineEbeneNachHinten(BasicPadItem bpi) {
+        var i2 = Previous(bpi);
+        if (i2 != null) {
+            var tempVar = bpi;
+            Swap(tempVar, i2);
+        }
+    }
+
+    public void EineEbeneNachVorne(BasicPadItem bpi) {
+        var i2 = Next(bpi);
+        if (i2 != null) {
+            var tempVar = bpi;
+            Swap(tempVar, i2);
+        }
     }
 
     public override void OnChanged() {
@@ -584,9 +605,9 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         List<string> result = new();
         result.ParseableAdd("ID", Id);
         result.ParseableAdd("Caption", Caption);
-        result.ParseableAdd("Style", SheetStyle);
+        result.ParseableAdd("Style", SheetStyle?.CellFirstString());
 
-        result.ParseableAdd("BackColor", BackColor);
+        result.ParseableAdd("BackColor", BackColor.ToArgb());
         if (Math.Abs(SheetStyleScale - 1) > 0.001d) {
             result.ParseableAdd("FontScale", SheetStyleScale);
         }
@@ -651,14 +672,34 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         return r;
     }
 
+    internal BasicPadItem? Next(BasicPadItem bpi) {
+        var itemCount = IndexOf(bpi);
+        if (itemCount < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
+        do {
+            itemCount++;
+            if (IsSaved || itemCount >= Count) { return null; }
+            if (this?[itemCount] != null) { return this?[itemCount]; }
+        } while (true);
+    }
+
+    internal BasicPadItem? Previous(BasicPadItem bpi) {
+        var itemCount = IndexOf(bpi);
+        if (itemCount < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
+        do {
+            itemCount--;
+            if (IsSaved || itemCount < 0) { return null; }
+            if (this?[itemCount] != null) { return this[itemCount]; }
+        } while (true);
+    }
+
     protected RectangleF MaxBounds() => MaxBounds(null);
 
     protected override void OnItemAdded(BasicPadItem item) {
         //if (item == null) {
         //    Develop.DebugPrint(FehlerArt.Fehler, "Null Item soll hinzugefügt werden!");
         //}
-        if (string.IsNullOrEmpty(item.Internal)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + item.Internal);
+        if (string.IsNullOrEmpty(item.KeyName)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + item.KeyName);
         }
 
         item.Parent = this;
@@ -724,7 +765,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key.ToLower()) {
                 case "item":
-                    var i = BasicPadItem.NewByParsing(pair.Value);
+                    var i = BlueBasics.ParsableItem.NewByParsing<BasicPadItem>(pair.Value);
                     if (i != null) { Add(i); }
                     break;
 

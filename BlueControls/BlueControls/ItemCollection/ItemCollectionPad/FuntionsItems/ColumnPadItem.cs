@@ -52,6 +52,8 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     #region Properties
 
+    public static string ClassId => "FI-Column";
+
     public string Datenbank {
         get {
             if (Column?.Database == null) { return "?"; }
@@ -120,8 +122,6 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         return result.Parseable(base.ToString());
     }
 
-    protected override string ClassId() => "FI-Column";
-
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
         if (disposing) {
@@ -171,12 +171,12 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         GeneratedBitmap = bmp;
     }
 
-    protected override BasicPadItem? TryCreate(string id, string name) {
-        if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-            return new ColumnPadItem(name);
-        }
-        return null;
-    }
+    //protected override BasicPadItem? TryCreate(string id, string name) {
+    //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
+    //        return new ColumnPadItem(name);
+    //    }
+    //    return null;
+    //}
 
     private void Column_Changed(object sender, System.EventArgs e) {
         RemovePic();

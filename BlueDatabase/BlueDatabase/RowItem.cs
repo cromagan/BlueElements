@@ -687,7 +687,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
             return;
         }
 
-        Develop.DebugPrint("Typ nicht erkannt: " + columnVar.ShortName);
+        Develop.DebugPrint("Typ nicht erkannt: " + columnVar.MyClassId);
     }
 
     #endregion

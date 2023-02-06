@@ -217,7 +217,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
     private void cbxInternalColumnArrangementSelector_ItemClicked(object sender, BasicListItemEventArgs e) {
         if (string.IsNullOrEmpty(cbxInternalColumnArrangementSelector.Text)) { return; }
 
-        var tmporder = IntParse(e.Item.Internal);
+        var tmporder = IntParse(e.Item.KeyName);
 
         if (_arrangement == tmporder) { return; }
 

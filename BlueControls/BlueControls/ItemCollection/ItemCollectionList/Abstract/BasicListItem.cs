@@ -51,6 +51,7 @@ public abstract class BasicListItem : IComparable, ICloneable, IHasKeyName, ICha
     private bool _enabled;
 
     private string _internal;
+
     private bool _isCaption;
 
     //private ItemCollectionList? _parent;
@@ -131,20 +132,11 @@ public abstract class BasicListItem : IComparable, ICloneable, IHasKeyName, ICha
 
     public string KeyName => Internal;
 
-    //public ItemCollectionList? Parent {
-    //    get => _parent;
-    //    set {
-    //        if (_parent == null || _parent == value) {
-    //            _parent = value;
-    //            return;
-    //        }
+    public abstract string QuickInfo { get; }
 
     //        Develop.DebugPrint(FehlerArt.Fehler, "Parent Fehler!");
     //    }
     //}
-
-    public abstract string QuickInfo { get; }
-
     public string UserDefCompareKey {
         get => _userDefCompareKey;
         set {
@@ -159,13 +151,14 @@ public abstract class BasicListItem : IComparable, ICloneable, IHasKeyName, ICha
 
     #region Methods
 
+    //public ItemCollectionList? Parent {
+    //    get => _parent;
+    //    set {
+    //        if (_parent == null || _parent == value) {
+    //            _parent = value;
+    //            return;
+    //        }
     public abstract object? Clone();
-
-    ///// <summary>
-    ///// Klont das aktuelle Objekt (es wird ein neues Objekt des gleichen Typs erstellt) und fügt es in die angegebene ItemCollection hinzu
-    ///// </summary>
-    ///// <param name="newParent"></param>
-    //public virtual void CloneToNewCollection(ItemCollectionList newParent) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
 
     public void CloneBasicStatesFrom(BasicListItem sourceItem) {
         Checked = sourceItem.Checked;
@@ -176,6 +169,11 @@ public abstract class BasicListItem : IComparable, ICloneable, IHasKeyName, ICha
         IsCaption = sourceItem.IsCaption;
     }
 
+    ///// <summary>
+    ///// Klont das aktuelle Objekt (es wird ein neues Objekt des gleichen Typs erstellt) und fügt es in die angegebene ItemCollection hinzu
+    ///// </summary>
+    ///// <param name="newParent"></param>
+    //public virtual void CloneToNewCollection(ItemCollectionList newParent) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
     public string CompareKey() {
         if (!string.IsNullOrEmpty(UserDefCompareKey)) {
             if (Convert.ToChar(UserDefCompareKey.Substring(0, 1)) < 32) { Develop.DebugPrint("Sortierung inkorrekt: " + UserDefCompareKey); }
@@ -195,6 +193,13 @@ public abstract class BasicListItem : IComparable, ICloneable, IHasKeyName, ICha
     }
 
     public bool Contains(int x, int y) => Pos.Contains(x, y);
+
+    /// <summary>
+    /// Vereinfacung für Null Conditional Operator.
+    /// </summary>
+    public void Disable() {
+        Enabled = false;
+    }
 
     public void Draw(Graphics gr, int xModifier, int yModifier, Design controldesign, Design itemdesign, States vState, bool drawBorderAndBack, string filterText, bool translate) {
         //if (Parent == null) { Develop.DebugPrint(FehlerArt.Fehler, "Parent nicht definiert"); }

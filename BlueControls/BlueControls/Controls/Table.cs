@@ -220,7 +220,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [DefaultValue(1.0f)]
     public double FontScale => Database?.GlobalScale ?? 1f;
 
-    public List<RowItem?> PinnedRows { get; } = new();
+    public List<RowItem?>? PinnedRows { get; } = new();
 
     public DateTime PowerEdit {
         //private get => _database?.PowerEdit;
@@ -1966,7 +1966,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private void AutoFilter_Show(ColumnViewItem? columnviewitem, int screenx, int screeny) {
-        if (columnviewitem == null) { return; }
+        if (columnviewitem?.Column == null) { return; }
         if (_design == BlueTableAppearance.OnlyMainColumnWithoutHead) { return; }
         if (!columnviewitem.Column.AutoFilterSymbolPossible()) { return; }
         if (Filter.Any(thisFilter => thisFilter != null && thisFilter.Column == columnviewitem.Column && !string.IsNullOrEmpty(thisFilter.Herkunft))) {

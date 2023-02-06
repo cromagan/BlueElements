@@ -27,7 +27,7 @@ public class FilterComandEventArgs : FilterEventArgs {
     #region Constructors
 
     // string Comand, ColumnItem ThisColumn, FilterItem NewFilter
-    public FilterComandEventArgs(string comand, ColumnItem? column, FilterItem newFilter) : base(newFilter) {
+    public FilterComandEventArgs(string comand, ColumnItem? column, FilterItem? newFilter) : base(newFilter) {
         Comand = comand;
         Column = column;
     }

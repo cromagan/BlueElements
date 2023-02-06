@@ -73,6 +73,8 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
 
     #region Properties
 
+    public static string ClassId => "TEXT";
+
     public Alignment Ausrichtung {
         get => _ausrichtung;
         set {
@@ -195,8 +197,6 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
         return result.Parseable(base.ToString());
     }
 
-    protected override string ClassId() => "TEXT";
-
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (Stil != PadStyles.Undefiniert) {
             gr.SetClip(positionModified);
@@ -226,14 +226,14 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
         InvalidateText();
     }
 
-    protected override BasicPadItem? TryCreate(string id, string name) {
-        if (id.Equals("blueelements.clsitemtext", StringComparison.OrdinalIgnoreCase) ||
-            id.Equals("blueelements.textitem", StringComparison.OrdinalIgnoreCase) ||
-            id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-            return new TextPadItem(name);
-        }
-        return null;
-    }
+    //protected override BasicPadItem? TryCreate(string id, string name) {
+    //    if (id.Equals("blueelements.clsitemtext", StringComparison.OrdinalIgnoreCase) ||
+    //        id.Equals("blueelements.textitem", StringComparison.OrdinalIgnoreCase) ||
+    //        id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
+    //        return new TextPadItem(name);
+    //    }
+    //    return null;
+    //}
 
     private void InvalidateText() => _txt = null;
 

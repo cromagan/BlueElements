@@ -52,6 +52,8 @@ public class RowInputPadItem : RectanglePadItemWithVersion, IReadableText, ICont
 
     #region Properties
 
+    public static string ClassId => "FI-InputRow";
+
     [Description("Aus welcher Spalte der Eingangs-Zeile kommen soll.\r\nEs muss der interne Spaltenname der ankommenden Zeile verwendet werden.\r\nAlternativ kann auch #first benutzt werden, wenn die erste Spalte benutzt werden soll.")]
     public string Spaltenname {
         get => _spaltenname;
@@ -106,8 +108,6 @@ public class RowInputPadItem : RectanglePadItemWithVersion, IReadableText, ICont
         return result.Parseable(base.ToString());
     }
 
-    protected override string ClassId() => "FI-InputRow";
-
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
             gr.DrawRectangle(new Pen(Color.Black, zoom), positionModified);
@@ -121,12 +121,12 @@ public class RowInputPadItem : RectanglePadItemWithVersion, IReadableText, ICont
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
-    protected override BasicPadItem? TryCreate(string id, string name) {
-        if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-            return new RowInputPadItem(name);
-        }
-        return null;
-    }
-
     #endregion
+
+    //protected override BasicPadItem? TryCreate(string id, string name) {
+    //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
+    //        return new RowInputPadItem(name);
+    //    }
+    //    return null;
+    //}
 }

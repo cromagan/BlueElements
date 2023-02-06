@@ -43,6 +43,8 @@ public class EasyPicPadItem : CustomizableShowPadItem, IItemToControl {
 
     #region Properties
 
+    public static string ClassId => "FI-EasyPic";
+
     [Description("Der Datename des Bildes, das angezeigt werden sollen.\r\nEs können Variablen aus dem Skript benutzt werden.\r\nDiese müssen im Format ~variable~ angegeben werden.")]
     public string Bild_Dateiname {
         get => _bild_Dateiname;
@@ -97,8 +99,6 @@ public class EasyPicPadItem : CustomizableShowPadItem, IItemToControl {
         return result.Parseable(base.ToString());
     }
 
-    protected override string ClassId() => "FI-EasyPic";
-
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         var id = -1;
         if (GetRowFrom != null) { id = GetRowFrom.Id; }
@@ -112,12 +112,12 @@ public class EasyPicPadItem : CustomizableShowPadItem, IItemToControl {
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
-    protected override BasicPadItem? TryCreate(string id, string name) {
-        if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-            return new EasyPicPadItem(name);
-        }
-        return null;
-    }
-
     #endregion
+
+    //protected override BasicPadItem? TryCreate(string id, string name) {
+    //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
+    //        return new EasyPicPadItem(name);
+    //    }
+    //    return null;
+    //}
 }

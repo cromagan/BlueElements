@@ -158,7 +158,7 @@ public partial class MainWindow {
 
     private void btnLetzteDateien_ItemClicked(object sender, BlueControls.EventArgs.BasicListItemEventArgs e) {
         if (!IsSaved() || e.Item == null) { return; }
-        LoadFromDisk(e.Item.Internal);
+        LoadFromDisk(e.Item.KeyName);
     }
 
     private void btnNeu_Click(object sender, System.EventArgs e) {

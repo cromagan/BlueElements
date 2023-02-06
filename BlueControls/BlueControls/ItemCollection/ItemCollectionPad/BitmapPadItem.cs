@@ -67,6 +67,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
 
     #region Properties
 
+    public static string ClassId => "IMAGE";
     public SizeModes Bild_Modus { get; set; }
 
     public string Bildschirmbereich_wählen {
@@ -165,7 +166,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
 
     public bool ReplaceVariable(Variable variable) {
         if (string.IsNullOrEmpty(Platzhalter_Für_Layout)) { return false; }
-        if ("~" + variable.Name.ToLower() + "~" != Platzhalter_Für_Layout.ToLower()) { return false; }
+        if ("~" + variable.KeyName.ToLower() + "~" != Platzhalter_Für_Layout.ToLower()) { return false; }
         if (variable is not VariableBitmap vbmp) { return false; }
         var ot = vbmp.ValueBitmap;
         if (ot is Bitmap bmp) {
@@ -200,8 +201,6 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
 
         return result.Parseable(base.ToString());
     }
-
-    protected override string ClassId() => "IMAGE";
 
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
@@ -292,12 +291,12 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
-    protected override BasicPadItem? TryCreate(string id, string name) {
-        if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-            return new BitmapPadItem(name);
-        }
-        return null;
-    }
-
     #endregion
+
+    //protected override BasicPadItem? TryCreate(string id, string name) {
+    //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
+    //        return new BitmapPadItem(name);
+    //    }
+    //    return null;
+    //}
 }

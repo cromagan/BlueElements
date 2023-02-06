@@ -43,8 +43,8 @@ public class VariableDatabase : Variable {
 
     #region Properties
 
+    public static string ClassId => "dbs";
     public static string ShortName_Variable => "*dbs";
-
     public override int CheckOrder => 99;
 
     public DatabaseAbstract? Database {
@@ -56,11 +56,8 @@ public class VariableDatabase : Variable {
     }
 
     public override bool GetFromStringPossible => false;
-
     public override bool IsNullOrEmpty => _db == null || _db.IsDisposed;
-
-    public override string ShortName => "dbs";
-
+    public override string MyClassId => ClassId;
     public override bool ToStringPossible => false;
 
     #endregion

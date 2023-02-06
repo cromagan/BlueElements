@@ -283,13 +283,12 @@ public static class VariableExtensions {
     #endregion
 }
 
-public abstract class Variable : IComparable, IParseable, ICloneable {
+public abstract class Variable : ParsableItem, IComparable, IParseable, ICloneable, IHasKeyName {
 
     #region Fields
 
     private static long _dummyCount;
     private string _comment = string.Empty;
-    private string _name = string.Empty;
     private bool _readOnly = false;
     private bool _systemVariable = false;
 
@@ -297,18 +296,11 @@ public abstract class Variable : IComparable, IParseable, ICloneable {
 
     #region Constructors
 
-    protected Variable(string name, bool ronly, bool system, string Comment) {
-        Name = system ? "*" + name.ToLower() : name.ToLower();
+    protected Variable(string name, bool ronly, bool system, string comment) : base(system ? "*" + name.ToLower() : name.ToLower()) {
         ReadOnly = ronly;
         SystemVariable = system;
-        Comment = Comment;
+        Comment = comment;
     }
-
-    #endregion
-
-    #region Events
-
-    public event EventHandler? Changed;
 
     #endregion
 
@@ -319,6 +311,8 @@ public abstract class Variable : IComparable, IParseable, ICloneable {
     public static string Any_Variable => "*any";
 
     public abstract int CheckOrder { get; }
+
+    //public abstract string ClassId { get; }
 
     public string Comment {
         get => _comment;
@@ -333,18 +327,10 @@ public abstract class Variable : IComparable, IParseable, ICloneable {
 
     public abstract bool IsNullOrEmpty { get; }
 
-    /// <summary>
-    /// Variablen-Namen werden immer in Kleinbuchstaben gespeichert.
-    /// </summary>
-    public string Name {
-        get => _name; set {
-            if (_name == value) { return; }
-            _name = value;
-            OnChanged();
-        }
-    }
+    public abstract string MyClassId { get; }
+    public string Name => KeyName;
 
-    public virtual string ReadableText => "Objekt: " + ShortName;
+    public virtual string ReadableText => "Objekt: " + MyClassId;
 
     public bool ReadOnly {
         get => _readOnly;
@@ -354,8 +340,6 @@ public abstract class Variable : IComparable, IParseable, ICloneable {
             OnChanged();
         }
     }
-
-    public abstract string ShortName { get; }
 
     public bool SystemVariable {
         get => _systemVariable;
@@ -372,7 +356,7 @@ public abstract class Variable : IComparable, IParseable, ICloneable {
         get {
             if (ToStringPossible) { Develop.DebugPrint(FehlerArt.Fehler, "Routine muss überschrieben werden!"); }
 
-            return "\"" + ShortName + ";" + Name + "\"";
+            return "\"" + MyClassId + ";" + Name + "\"";
         }
         set {
             var x = TryParse(value, null);
@@ -396,8 +380,6 @@ public abstract class Variable : IComparable, IParseable, ICloneable {
     public static DoItFeedback GetVariableByParsing(string txt, Script? s) {
         if (string.IsNullOrEmpty(txt)) { return new DoItFeedback("Kein Wert zum Parsen angekommen."); }
 
-        #region Prüfen, Ob noch mehre Klammern da sind, oder Anfangs/End-Klammern entfernen
-
         if (txt.StartsWith("(")) {
             var (pose, _) = NextText(txt, 0, KlammerZu, false, false, KlammernStd);
             if (pose < txt.Length - 1) {
@@ -405,18 +387,12 @@ public abstract class Variable : IComparable, IParseable, ICloneable {
                 var tmp = GetVariableByParsing(txt.Substring(1, pose - 1), s);
                 if (!string.IsNullOrEmpty(tmp.ErrorMessage)) { return new DoItFeedback("Befehls-Berechnungsfehler in ():" + tmp.ErrorMessage); }
                 if (tmp.Variable == null) { return new DoItFeedback("Allgemeiner Befehls-Berechnungsfehler"); }
-                if (!tmp.Variable.ToStringPossible) { return new DoItFeedback("Falscher Variablentyp: " + tmp.Variable.ShortName); }
+                if (!tmp.Variable.ToStringPossible) { return new DoItFeedback("Falscher Variablentyp: " + tmp.Variable.MyClassId); }
                 return GetVariableByParsing(tmp.Variable.ValueForReplace + txt.Substring(pose + 1), s);
             }
         }
 
-        #endregion
-
         txt = txt.DeKlammere(true, false, false, true);
-
-        #region Auf boolsche AndAlso und OrElse prüfen und nur die nötigen ausführen
-
-        #region AndAlso
 
         var (uu, _) = NextText(txt, 0, Method_if.UndUnd, false, false, KlammernStd);
         if (uu > 0) {
@@ -428,10 +404,6 @@ public abstract class Variable : IComparable, IParseable, ICloneable {
                     : GetVariableByParsing(txt.Substring(uu + 2), s);
         }
 
-        #endregion AndAlso
-
-        #region OrElse
-
         var (oo, _) = NextText(txt, 0, Method_if.OderOder, false, false, KlammernStd);
         if (oo > 0) {
             var txt1 = GetVariableByParsing(txt.Substring(0, oo), s);
@@ -442,12 +414,6 @@ public abstract class Variable : IComparable, IParseable, ICloneable {
                     : GetVariableByParsing(txt.Substring(oo + 2), s);
         }
 
-        #endregion OrElse
-
-        #endregion
-
-        #region Evtl. Variable an erster Stelle ersetzen
-
         if (s != null) {
             var t = Method.ReplaceVariable(txt, s);
             if (!string.IsNullOrEmpty(t.ErrorMessage)) { return new DoItFeedback("Variablen-Berechnungsfehler: " + t.ErrorMessage); }
@@ -455,20 +421,12 @@ public abstract class Variable : IComparable, IParseable, ICloneable {
             if (txt != t.AttributeText) { return GetVariableByParsing(t.AttributeText, s); }
         }
 
-        #endregion
-
-        #region Routinen ersetzen, vor den Klammern, das ansonsten Min(x,y,z) falsch anschlägt
-
         if (s != null) {
             var t = Method.ReplaceComands(txt, s);
             if (!string.IsNullOrEmpty(t.ErrorMessage)) { return new DoItFeedback("Befehls-Berechnungsfehler: " + t.ErrorMessage); }
             if (t.Variable != null) { return new DoItFeedback(t.Variable); }
             if (txt != t.AttributeText) { return GetVariableByParsing(t.AttributeText, s); }
         }
-
-        #endregion
-
-        #region Klammern am Ende berechnen, das ansonsten Min(x,y,z) falsch anschlägt
 
         var (posa, _) = NextText(txt, 0, KlammerAuf, false, false, KlammernStd);
         if (posa > -1) {
@@ -480,14 +438,10 @@ public abstract class Variable : IComparable, IParseable, ICloneable {
                 var tmp = GetVariableByParsing(tmptxt, s);
                 if (!string.IsNullOrEmpty(tmp.ErrorMessage)) { return new DoItFeedback("Befehls-Berechnungsfehler in ():" + tmp.ErrorMessage); }
                 if (tmp.Variable == null) { return new DoItFeedback("Allgemeiner Berechnungsfehler in ()"); }
-                if (!tmp.Variable.ToStringPossible) { return new DoItFeedback("Falscher Variablentyp: " + tmp.Variable.ShortName); }
+                if (!tmp.Variable.ToStringPossible) { return new DoItFeedback("Falscher Variablentyp: " + tmp.Variable.MyClassId); }
                 return GetVariableByParsing(txt.Substring(0, posa) + tmp.Variable.ValueForReplace + txt.Substring(pose + 1), s);
             }
         }
-
-        #endregion
-
-        #region Jetzt die Variablen durchprüfen, ob eine ein OK gibt
 
         if (Script.VarTypes == null) {
             return new DoItFeedback("Variablentypen nicht initialisiert");
@@ -500,8 +454,6 @@ public abstract class Variable : IComparable, IParseable, ICloneable {
                 }
             }
         }
-
-        #endregion
 
         return new DoItFeedback("Wert kann nicht geparsed werden: " + txt);
     }
@@ -526,11 +478,7 @@ public abstract class Variable : IComparable, IParseable, ICloneable {
 
     public abstract DoItFeedback GetValueFrom(Variable attvarAttribute);
 
-    public virtual void OnChanged() {
-        Changed?.Invoke(this, System.EventArgs.Empty);
-    }
-
-    public void Parse(string toParse) {
+    public override void Parse(string toParse) {
         //IsParsing = true;
         //ThrowEvents = false;
         //PermissionGroups_Show.ThrowEvents = false;
@@ -538,11 +486,15 @@ public abstract class Variable : IComparable, IParseable, ICloneable {
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key) {
                 case "name":
-                    _name = pair.Value.FromNonCritical();
+                    if (pair.Value.FromNonCritical() != KeyName) {
+                        Develop.DebugPrint(FehlerArt.Fehler, "Variablenfehler: " + toParse);
+                    }
+                    //_name = pair.Value.FromNonCritical();
                     break;
 
+                case "classid":
                 case "type":
-                    if (pair.Value.ToNonCritical() != ShortName) {
+                    if (pair.Value.ToNonCritical() != MyClassId) {
                         Develop.DebugPrint(FehlerArt.Fehler, "Variablenfehler: " + toParse);
                     }
                     break;
@@ -582,14 +534,14 @@ public abstract class Variable : IComparable, IParseable, ICloneable {
         if (!ToStringPossible) { return string.Empty; }
 
         var result = new List<string>();
-        result.ParseableAdd("Name", Name);
-        result.ParseableAdd("Type", ShortName);
+        //result.ParseableAdd("Type", ShortName);
+        //result.ParseableAdd("Name", Name);
         result.ParseableAdd("Value", ValueForReplace);
         result.ParseableAdd("Comment", Comment);
         result.ParseableAdd("ReadOnly", ReadOnly);
         result.ParseableAdd("System", SystemVariable);
 
-        return result.Parseable();
+        return result.Parseable(base.ToString());
     }
 
     protected abstract Variable? NewWithThisValue(object x, Script s);

@@ -78,7 +78,7 @@ internal class Method_BerechneVariable : Method {
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(new Method_BerechneVariable(), attvar); }
 
         if (generateVariable) {
-            attvar.Attributes[0].Name = varnam.ToLower();
+            attvar.Attributes[0].KeyName = varnam.ToLower();
             attvar.Attributes[0].ReadOnly = false;
             s.Variables.Add(attvar.Attributes[0]);
             return new DoItFeedback(attvar.Attributes[0]);

@@ -46,22 +46,18 @@ public class VariableString : Variable {
 
     #region Properties
 
+    public static string ClassId => "str";
     public static string ShortName_Plain => "str";
-
     public static string ShortName_Variable => "*str";
-
     public override int CheckOrder => 2;
-
     public override bool GetFromStringPossible => true;
-
     public override bool IsNullOrEmpty => string.IsNullOrEmpty(_valueString);
+    public override string MyClassId => ClassId;
 
     /// <summary>
     /// Der Wert ohne " am Anfang/Ende. Gleichgesetzt mit ValueString
     /// </summary>
     public override string ReadableText => _valueString;
-
-    public override string ShortName => "str";
 
     public override bool ToStringPossible => true;
 

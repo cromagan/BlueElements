@@ -50,6 +50,8 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
 
     #region Properties
 
+    public static string ClassId => "FI-VariableField";
+
     public ÜberschriftAnordnung CaptionPosition {
         get => _überschriftanordung;
         set {
@@ -170,8 +172,6 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
         return result.Parseable(base.ToString());
     }
 
-    protected override string ClassId() => "FI-VariableField";
-
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         var id = -1;
         if (GetRowFrom != null) { id = GetRowFrom.Id; }
@@ -189,6 +189,8 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
+    #endregion
+
     //public bool ReplaceVariable(Variable variable) {
     //    if (string.IsNullOrEmpty(Platzhalter_Für_Layout)) { return false; }
     //    if ("~" + variable.Name.ToLower() + "~" != Platzhalter_Für_Layout.ToLower()) { return false; }
@@ -199,14 +201,12 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
     //        OnChanged();
     //        return true;
     //    }
-    protected override BasicPadItem? TryCreate(string id, string name) {
-        if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-            return new VariableFieldPadItem(name);
-        }
-        return null;
-    }
-
-    #endregion
+    //protected override BasicPadItem? TryCreate(string id, string name) {
+    //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
+    //        return new VariableFieldPadItem(name);
+    //    }
+    //    return null;
+    //}
 
     // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
     // ~BitmapPadItem()

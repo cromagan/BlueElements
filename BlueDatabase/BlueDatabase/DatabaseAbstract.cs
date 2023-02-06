@@ -912,14 +912,14 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     /// </summary>
     /// <returns></returns>
 
-    public string Export_CSV(FirstRow firstRow, int arrangementNo, FilterCollection? filter, List<RowItem>? pinned) => Export_CSV(firstRow, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null));
+    public string Export_CSV(FirstRow firstRow, int arrangementNo, FilterCollection? filter, List<RowItem?>? pinned) => Export_CSV(firstRow, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null));
 
     /// <summary>
     /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
     /// </summary>
     /// <returns></returns>
 
-    public void Export_HTML(string filename, int arrangementNo, FilterCollection? filter, List<RowItem>? pinned) => Export_HTML(filename, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null), false);
+    public void Export_HTML(string filename, int arrangementNo, FilterCollection? filter, List<RowItem?>? pinned) => Export_HTML(filename, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null), false);
 
     /// <summary>
     /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
@@ -1528,6 +1528,14 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 List<string> ai = new(value.SplitAndCutByCr());
                 foreach (var t in ai) {
                     _EventScript.Add(new EventScript(this, t));
+                }
+                break;
+
+            case DatabaseDataType.DatabaseVariables:
+                _variables.Clear();
+                List<string> va = new(value.SplitAndCutByCr());
+                foreach (var t in va) {
+                    _variables.Add(ParsableItem.NewByParsing<Variable>(t));
                 }
                 break;
 

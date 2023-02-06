@@ -683,7 +683,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 do {
                     again = false;
                     foreach (var thisItem in item) {
-                        if (!column.DropDownItems.Contains(thisItem.Internal)) {
+                        if (!column.DropDownItems.Contains(thisItem.KeyName)) {
                             again = true;
                             item.Remove(thisItem);
                             break;

@@ -201,7 +201,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         if (!e.Item.IsClickable()) { return; }
 
         if (lstbx.Appearance is not BlueListBoxAppearance.Listbox and not BlueListBoxAppearance.Gallery and not BlueListBoxAppearance.FileSystem) {
-            OnItemClicked(new ContextMenuItemClickedEventArgs(e.Item.Internal, Tag, null)); // Das Tag hier ist eigentlich das HotItem
+            OnItemClicked(new ContextMenuItemClickedEventArgs(e.Item.KeyName, Tag, null)); // Das Tag hier ist eigentlich das HotItem
             if (!IsDisposed) { Close(); }
         }
     }

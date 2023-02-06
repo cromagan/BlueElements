@@ -379,7 +379,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
                     //cb.Item.Add(thisR, string.Empty);
                 } else {
                     foreach (var thisIt in ex) {
-                        if (thisIt.Internal == thisR.Key.ToString()) {
+                        if (thisIt.KeyName == thisR.Key.ToString()) {
                             _ = ex.Remove(thisIt);
                             break;
                         }
@@ -402,7 +402,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
         // nicht vorher auf null setzen, um Blinki zu vermeiden
         if (cb.Item.Count == 1) {
-            ValueSet(cb.Item[0].Internal, true, true);
+            ValueSet(cb.Item[0].KeyName, true, true);
         }
 
         #endregion

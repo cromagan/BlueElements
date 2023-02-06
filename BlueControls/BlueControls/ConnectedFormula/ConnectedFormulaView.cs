@@ -131,14 +131,14 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
         foreach (var thisC in Controls) {
             if (thisC is System.Windows.Forms.Control c) {
                 if (c.Name is string s) {
-                    if (s == thisit.Internal + "-" + thisit.Version) { return c; }
+                    if (s == thisit.KeyName + "-" + thisit.Version) { return c; }
                 }
             }
         }
 
         if (thisit is IItemToControl it) {
             var c = it.CreateControl(this);
-            if (c != null && c.Name is string s && s == thisit.Internal + "-" + it.Version) {
+            if (c != null && c.Name is string s && s == thisit.KeyName + "-" + it.Version) {
                 //alles ok
             } else {
                 Develop.DebugPrint("Name muß intern mit Internal-Version beschrieben werden!");

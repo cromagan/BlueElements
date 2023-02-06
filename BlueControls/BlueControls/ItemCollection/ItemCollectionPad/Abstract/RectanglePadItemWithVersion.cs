@@ -39,7 +39,7 @@ public abstract class RectanglePadItemWithVersion : RectanglePadItem {
 
     #region Methods
 
-    public string DefaultItemToControlName() => Internal + "-" + Version;
+    public string DefaultItemToControlName() => KeyName + "-" + Version;
 
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }

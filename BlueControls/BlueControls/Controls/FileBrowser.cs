@@ -227,8 +227,8 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         _ = e.UserMenu.Add(ContextMenuComands.Ausschneiden, !tags.TagGet("Folder").FromPlusMinus());
         _ = e.UserMenu.Add(ContextMenuComands.Einfügen, tags.TagGet("Folder").FromPlusMinus() && !string.IsNullOrEmpty(_ausschneiden));
         _ = e.UserMenu.AddSeparator();
-        _ = e.UserMenu.Add(ContextMenuComands.Umbenennen, FileExists(it.Internal));
-        _ = e.UserMenu.Add(ContextMenuComands.Löschen, FileExists(it.Internal));
+        _ = e.UserMenu.Add(ContextMenuComands.Umbenennen, FileExists(it.KeyName));
+        _ = e.UserMenu.Add(ContextMenuComands.Löschen, FileExists(it.KeyName));
         _ = e.UserMenu.AddSeparator();
         //e.UserMenu.GenerateAndAdd("Screenshot als Vorschau", "Screenshot", QuickImage.Get(ImageCode.Bild), FileExists(it.Internal));
         //e.UserMenu.AddSeparator();
@@ -243,7 +243,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
 
         switch (e.ClickedComand) {
             case "Löschen":
-                var I = new FileInfo(it.Internal);
+                var I = new FileInfo(it.KeyName);
                 //var attribute = I.Attributes;
 
                 var silent = !I.Attributes.HasFlag(FileAttributes.ReadOnly);
@@ -255,11 +255,11 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
                 break;
 
             case "Explorer":
-                _ = ExecuteFile(it.Internal);
+                _ = ExecuteFile(it.KeyName);
                 break;
 
             case "Umbenennen":
-                var n = it.Internal;
+                var n = it.KeyName;
 
                 var nn = InputBox.Show("Neuer Name:", n.FileNameWithoutSuffix(), FormatHolder.Text);
 
@@ -267,7 +267,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
 
                 nn = n.FilePath() + nn + "." + n.FileSuffix();
 
-                _ = MoveFile(it.Internal, nn, true);
+                _ = MoveFile(it.KeyName, nn, true);
 
                 Reload();
                 break;
@@ -284,11 +284,11 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
             //    break;
 
             case "Ausschneiden":
-                _ausschneiden = it.Internal;
+                _ausschneiden = it.KeyName;
                 break;
 
             case "Einfügen":
-                var ziel = it.Internal + "\\" + _ausschneiden.FileNameWithSuffix();
+                var ziel = it.KeyName + "\\" + _ausschneiden.FileNameWithSuffix();
 
                 if (FileExists(ziel)) {
                     _ = MessageBox.Show("Datei existiert am Zielort bereits, abbruch.", ImageCode.Information);
@@ -312,11 +312,11 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
     }
 
     private void lsbFiles_ItemClicked(object sender, BasicListItemEventArgs e) {
-        if (File.Exists(e.Item.Internal)) {
+        if (File.Exists(e.Item.KeyName)) {
             var tags = (List<string>)e.Item.Tag ?? new List<string>();
             ;
 
-            switch (e.Item.Internal.FileType()) {
+            switch (e.Item.KeyName.FileType()) {
                 case FileFormat.Link:
                     LaunchBrowser(tags.TagGet("URL"));
                     return;
@@ -325,14 +325,14 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
                     var l = new List<string>();
 
                     foreach (var thisS in lsbFiles.Item) {
-                        if (thisS.Internal.FileType() == FileFormat.Image && FileExists(thisS.Internal)) {
-                            l.Add(thisS.Internal);
+                        if (thisS.KeyName.FileType() == FileFormat.Image && FileExists(thisS.KeyName)) {
+                            l.Add(thisS.KeyName);
                         }
                     }
 
-                    var no = l.IndexOf(e.Item.Internal);
+                    var no = l.IndexOf(e.Item.KeyName);
                     if (no > -1) {
-                        var d = new PictureView(l, true, e.Item.Internal.FilePath(), no) {
+                        var d = new PictureView(l, true, e.Item.KeyName.FilePath(), no) {
                             WindowState = System.Windows.Forms.FormWindowState.Maximized
                         };
                         d.Show();
@@ -341,14 +341,14 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
                     return;
 
                 case FileFormat.Textdocument:
-                    _ = ExecuteFile("Notepad.exe", e.Item.Internal);
+                    _ = ExecuteFile("Notepad.exe", e.Item.KeyName);
                     return;
             }
 
             //if (FileExists(CryoptErkennungsFile(txbPfad.Text.TrimEnd("\\") + "\\"))) {
             //    tmp = CryptedFileName(e.Item.Internal, 10);
             //} else {
-            var tmp = e.Item.Internal;
+            var tmp = e.Item.KeyName;
             //}
 
             var x = GestStandardCommand("." + tmp.FileSuffix());
@@ -364,7 +364,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
                 return;
             }
 
-            x = x.Replace("%1", e.Item.Internal);
+            x = x.Replace("%1", e.Item.KeyName);
             var process = new System.Diagnostics.Process();
             var startInfo = new System.Diagnostics.ProcessStartInfo {
                 WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
@@ -377,7 +377,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
             return;
         }
 
-        ÖffnePfad(e.Item.Internal);
+        ÖffnePfad(e.Item.KeyName);
     }
 
     private void ÖffnePfad(string newPath) {

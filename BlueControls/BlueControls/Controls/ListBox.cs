@@ -215,7 +215,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public TextListItem? Add_Text(string? val) {
         if (val == null || string.IsNullOrEmpty(val)) { return null; }
-        if (Item.Any(thisItem => thisItem != null && string.Equals(thisItem.Internal, val, StringComparison.OrdinalIgnoreCase))) {
+        if (Item.Any(thisItem => thisItem != null && string.Equals(thisItem.KeyName, val, StringComparison.OrdinalIgnoreCase))) {
             return null;
         }
         var i = Item.Add(val, val);

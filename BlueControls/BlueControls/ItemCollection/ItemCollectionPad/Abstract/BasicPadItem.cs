@@ -29,11 +29,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
 
-public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, IMoveable, IDisposableExtended, IComparable, IHasKeyName {
+public abstract class BasicPadItem : ParsableItem, IParseable, ICloneable, IChangedFeedback, IMoveable, IDisposableExtended, IComparable, IHasKeyName {
 
     #region Fields
 
@@ -58,19 +59,20 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     private bool _beiExportSichtbar = true;
 
     private string _page = string.Empty;
+
     private ItemCollectionPad? _parent;
+
     private PadStyles _style = PadStyles.Style_Standard;
+
     private RectangleF _usedArea;
+
     private int _zoomPadding;
 
     #endregion
 
     #region Constructors
 
-    protected BasicPadItem(string internalname) {
-        Internal = string.IsNullOrEmpty(internalname) ? BlueBasics.Generic.UniqueInternal() : internalname;
-        if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben."); }
-
+    protected BasicPadItem(string internalname) : base(internalname) {
         MovablePoint.ItemAdded += Points_ItemAdded;
         MovablePoint.ItemRemoving += Points_ItemRemoving;
 
@@ -83,7 +85,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
 
     #region Events
 
-    public event EventHandler? Changed;
+    public event EventHandler? ParentChanged;
 
     #endregion
 
@@ -105,17 +107,9 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     [Description("Alle Elemente, die der selben Gruppe angehören, werden beim Löschen eines Elements ebenfalls gelöscht.")]
     public string Gruppenzugehörigkeit { get; set; } = string.Empty;
 
-    public string Internal { get; }
     public bool IsDisposed { get; private set; }
-    public bool IsParsing { get; private set; }
 
-    // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
-    // ~BasicPadItem()
-    // {
-    //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-    //     Dispose(disposing: false);
-    // }
-    public string KeyName => Internal;
+    public bool IsParsing { get; private set; }
 
     [Description("Ist Page befüllt, wird das Item nur angezeigt, wenn die anzuzeigende Seite mit dem String übereinstimmt.")]
     public string Page {
@@ -127,11 +121,18 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
         }
     }
 
+    // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+    // ~BasicPadItem()
+    // {
+    //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+    //     Dispose(disposing: false);
+    // }
     public ItemCollectionPad? Parent {
         get => _parent;
         set {
             if (_parent == null || _parent == value) {
                 _parent = value;
+                OnParentChanged();
                 return;
             }
 
@@ -184,54 +185,23 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
 
     #region Methods
 
-    public static BasicPadItem? NewByParsing(string code) {
-        var ding = string.Empty;
-        var name = string.Empty;
-
-        if (code.StartsWith("[I]")) { code = code.FromNonCritical(); }
-
-        var x = code.GetAllTags();
-
-        foreach (var thisIt in x) {
-            switch (thisIt.Key) {
-                case "type":
-
-                case "classid":
-                    ding = thisIt.Value;
-                    break;
-
-                case "internalname":
-                    name = thisIt.Value;
-                    break;
-            }
-        }
-        if (string.IsNullOrEmpty(ding)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Itemtyp unbekannt: " + code);
-            return null;
-        }
-        if (string.IsNullOrEmpty(name)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Itemname unbekannt: " + code);
-            return null;
-        }
-
-        if (ItemCollectionPad.PadItemTypes != null) {
-            foreach (var thisType in ItemCollectionPad.PadItemTypes) {
-                var i = thisType.TryCreate(ding, name);
-                if (i != null) { return i; }
-            }
-        }
-        return null;
-    }
-
     public object? Clone() {
         var x = ToString();
 
-        var i = NewByParsing(x);
+        var i = BlueBasics.ParsableItem.NewByParsing<BasicPadItem>(x);
         i?.Parse(x);
 
         return i;
     }
 
+    //    if (ItemCollectionPad.PadItemTypes != null) {
+    //        foreach (var thisType in ItemCollectionPad.PadItemTypes) {
+    //            var i = thisType.TryCreate(ding, name);
+    //            if (i != null) { return i; }
+    //        }
+    //    }
+    //    return null;
+    //}
     public int CompareTo(object obj) {
         if (obj is BasicPadItem v) {
             return SaveOrder.CompareTo(v.SaveOrder);
@@ -241,6 +211,19 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
         return 0;
     }
 
+    //            case "internalname":
+    //                name = thisIt.Value;
+    //                break;
+    //        }
+    //    }
+    //    if (string.IsNullOrEmpty(ding)) {
+    //        Develop.DebugPrint(FehlerArt.Fehler, "Itemtyp unbekannt: " + code);
+    //        return null;
+    //    }
+    //    if (string.IsNullOrEmpty(name)) {
+    //        Develop.DebugPrint(FehlerArt.Fehler, "Itemname unbekannt: " + code);
+    //        return null;
+    //    }
     /// <summary>
     /// Prüft, ob die angegebenen Koordinaten das Element berühren.
     /// Der Zoomfaktor wird nur benötigt, um Maßstabsunabhängige Punkt oder Linienberührungen zu berechnen.
@@ -254,12 +237,19 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
         return tmp.Contains(value);
     }
 
+    //    foreach (var thisIt in x) {
+    //        switch (thisIt.Key) {
+    //            case "type":
+    //            case "classid":
+    //                ding = thisIt.Value;
+    //                break;
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
+    //    var x = code.GetAllTags();
     public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting) {
         if (_parent == null) { Develop.DebugPrint(FehlerArt.Fehler, "Parent nicht definiert"); }
 
@@ -296,6 +286,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
         #endregion
     }
 
+    //    if (code.StartsWith("[I]")) { code = code.FromNonCritical(); }
     /// <summary>
     /// Zeichnet die UsedArea. mehr für Debugging gedacht.
     /// </summary>
@@ -306,24 +297,9 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     /// <param name="c"></param>
     public void DrawOutline(Graphics gr, float zoom, float shiftX, float shiftY, Color c) => gr.DrawRectangle(new Pen(c), UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false));
 
-    public void EineEbeneNachHinten() {
-        if (_parent == null) { return; }
-        var i2 = Previous();
-        if (i2 != null) {
-            var tempVar = this;
-            _parent.Swap(tempVar, i2);
-        }
-    }
-
-    public void EineEbeneNachVorne() {
-        if (_parent == null) { return; }
-        var i2 = Next();
-        if (i2 != null) {
-            var tempVar = this;
-            _parent.Swap(tempVar, i2);
-        }
-    }
-
+    //public static BasicPadItem? NewByParsing(string code) {
+    //    var ding = string.Empty;
+    //    var name = string.Empty;
     /// <summary>
     /// Gibt für das aktuelle Item das "Kontext-Menü" zurück.
     /// Alle Elemente für dieses Menü müssen neu erzeugt werden
@@ -344,10 +320,6 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
 
         return l;
     }
-
-    public void InDenHintergrund() => _parent?.InDenHintergrund(this);
-
-    public void InDenVordergrund() => _parent?.InDenVordergrund(this);
 
     /// <summary>
     /// Wird für den Editor benötigt, um bei hinzufügen es für den Benutzer mittig zu Plazieren
@@ -375,10 +347,10 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     /// <summary>
     /// Invalidiert UsedArea und löst das Ereignis Changed aus
     /// </summary>
-    public void OnChanged() {
+    public override void OnChanged() {
         //if (this is IParseable O && O.IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
         _usedArea = default;
-        Changed?.Invoke(this, System.EventArgs.Empty);
+        base.OnChanged();
     }
 
     public void Parse(List<KeyValuePair<string, string>> toParse) {
@@ -391,7 +363,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
         IsParsing = false;
     }
 
-    public void Parse(string toParse) => Parse(toParse.GetAllTags());
+    public override void Parse(string toParse) => Parse(toParse.GetAllTags());
 
     public virtual bool ParseThis(string tag, string value) {
         switch (tag.ToLower()) {
@@ -435,9 +407,10 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
                 Gruppenzugehörigkeit = value.FromNonCritical();
                 return true;
 
+            case "keyname":
             case "internalname":
-                if (value != Internal) {
-                    Develop.DebugPrint(FehlerArt.Fehler, "Namen unterschiedlich: " + value + " / " + Internal);
+                if (value != KeyName) {
+                    Develop.DebugPrint(FehlerArt.Fehler, "Namen unterschiedlich: " + value + " / " + KeyName);
                 }
                 return true;
 
@@ -471,8 +444,8 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
     public override string ToString() {
         List<string> result = new();
 
-        result.ParseableAdd("ClassID", ClassId());
-        result.ParseableAdd("InternalName", Internal);
+        //result.ParseableAdd("ClassID", ClassId());
+        //result.ParseableAdd("InternalName", Internal);
         result.ParseableAdd("Page", _page);
         if (Tags.Count > 0) {
             foreach (var thisTag in Tags) {
@@ -493,7 +466,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
             result.ParseableAdd("RemoveTooGroup", Gruppenzugehörigkeit);
         }
 
-        return result.Parseable();
+        return result.Parseable(base.ToString());
     }
 
     /// <summary>
@@ -511,29 +484,7 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
 
     internal void AddStyleOption(List<GenericControl> l) => l.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetFonts(_parent.SheetStyle)));
 
-    internal BasicPadItem? Next() {
-        var itemCount = _parent?.IndexOf(this) ?? 0;
-        if (itemCount < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
-        do {
-            itemCount++;
-            if (_parent == null || _parent.IsSaved || itemCount >= _parent.Count) { return null; }
-            if (_parent?[itemCount] != null) { return _parent?[itemCount]; }
-        } while (true);
-    }
-
-    internal BasicPadItem? Previous() {
-        var itemCount = _parent?.IndexOf(this) ?? 0;
-        if (itemCount < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
-        do {
-            itemCount--;
-            if (_parent == null || _parent.IsSaved || itemCount < 0) { return null; }
-            if (_parent?[itemCount] != null) { return _parent[itemCount]; }
-        } while (true);
-    }
-
     protected abstract RectangleF CalculateUsedArea();
-
-    protected abstract string ClassId();
 
     protected virtual void Dispose(bool disposing) {
         if (!IsDisposed) {
@@ -599,9 +550,11 @@ public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, I
         sizeOfParentControl.Height == 0 ||
         drawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, sizeOfParentControl));
 
+    protected virtual void OnParentChanged() => ParentChanged?.Invoke(this, System.EventArgs.Empty);
+
     protected abstract void ParseFinished();
 
-    protected abstract BasicPadItem? TryCreate(string id, string name);
+    //protected abstract BasicPadItem? TryCreate(string id, string name);
 
     private void ConnectsTo_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
         var x = (ItemConnection)e.Item;

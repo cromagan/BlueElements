@@ -1341,7 +1341,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     /// <param name="pinned"></param>
     /// <returns></returns>
 
-    public List<string> Contents(List<FilterItem>? filter, List<RowItem>? pinned) {
+    public List<string> Contents(List<FilterItem>? filter, List<RowItem?>? pinned) {
         if (filter == null || filter.Count == 0) { return Contents(); }
         var ficol = new FilterCollection(filter[0].Database);
         ficol.AddRange(filter);
@@ -1355,7 +1355,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     /// <param name="pinned"></param>
     /// <returns></returns>
 
-    public List<string> Contents(FilterItem filter, List<RowItem>? pinned) {
+    public List<string> Contents(FilterItem filter, List<RowItem?>? pinned) {
         var x = new FilterCollection(filter.Database) { filter };
         return Contents(x, pinned);
     }
@@ -1386,7 +1386,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     /// <param name="pinned"></param>
     /// <returns></returns>
 
-    public List<string> Contents(FilterCollection? filter, List<RowItem>? pinned) {
+    public List<string> Contents(FilterCollection? filter, List<RowItem?>? pinned) {
         List<string> list = new();
         if (Database == null) { return list; }
 
@@ -1417,7 +1417,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     /// <param name="pinned"></param>
     /// <returns></returns>
 
-    public void DeleteContents(FilterCollection filter, List<RowItem>? pinned) {
+    public void DeleteContents(FilterCollection filter, List<RowItem?>? pinned) {
         if (Database == null || Database.IsDisposed) { return; }
 
         foreach (var thisRowItem in Database.Row) {

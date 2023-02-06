@@ -54,6 +54,8 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
     #region Constructors
 
+    public RowWithFilterPadItem(string keyname, string toParse) : this(keyname, null, 0) => Parse(toParse);
+
     public RowWithFilterPadItem(DatabaseAbstract? db, int id) : this(string.Empty, db, id) { }
 
     public RowWithFilterPadItem(string intern, DatabaseAbstract? db, int id) : base(intern) {
@@ -70,6 +72,8 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
     #endregion
 
     #region Properties
+
+    public static string ClassId => "FI-RowWithFilter";
 
     [Description("Nach welchem Format die Zeilen angezeigt werden sollen. Es können Variablen im Format ~Variable~ benutzt werden. Achtung, KEINE Skript-Variaben, nur Spaltennamen.")]
     public string Anzeige {
@@ -296,8 +300,6 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         return result.Parseable(base.ToString());
     }
 
-    protected override string ClassId() => "FI-RowWithFilter";
-
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
 
@@ -324,12 +326,17 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
-    protected override BasicPadItem? TryCreate(string id, string name) {
-        if (id.Equals(ClassId(), StringComparison.OrdinalIgnoreCase)) {
-            return new RowWithFilterPadItem(name);
-        }
-        return null;
+    protected override void OnParentChanged() {
+        base.OnParentChanged();
+        RepairConnections();
     }
+
+    //protected override BasicPadItem? TryCreate(string id, string name) {
+    //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
+    //        return new RowWithFilterPadItem(name);
+    //    }
+    //    return null;
+    //}
 
     private void Cell_CellValueChanged(object sender, BlueDatabase.EventArgs.CellEventArgs e) => RepairConnections();
 
@@ -372,13 +379,13 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
                     if (efpi is IAcceptAndSends aas) { rek = aas.IsRecursiveWith(this); }
 
                     if (!rek) {
-                        dd.Add(efpi.Internal);
-                        or.Add(efpi.Internal + "|" + efpi.ReadableText());
+                        dd.Add(efpi.KeyName);
+                        or.Add(efpi.KeyName + "|" + efpi.ReadableText());
                         var s = string.Empty;
                         var tmp = efpi.SymbolForReadableText();
                         if (tmp != null) { s = tmp.ToString(); }
 
-                        sc = sc + "if (" + b.Name + "==\"" + efpi.Internal + "\") {suchsym=\"" + s + "\";}";
+                        sc = sc + "if (" + b.Name + "==\"" + efpi.KeyName + "\") {suchsym=\"" + s + "\";}";
                     }
                 }
             }
@@ -451,7 +458,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
     }
 
     private DatabaseAbstract GenerateFilterDatabase() {
-        Database x = new(false, "Filterdatabase_" + Internal);
+        Database x = new(false, "Filterdatabase_" + KeyName);
 
         var sp = x.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolder.TextOptions);
         sp.Align = AlignmentHorizontal.Rechts;
@@ -494,6 +501,8 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
     }
 
     private void RepairConnections() {
+        if (Parent == null) { return; }
+
         ConnectsTo.Clear();
 
         foreach (var thisRow in FilterDefiniton.Row) {

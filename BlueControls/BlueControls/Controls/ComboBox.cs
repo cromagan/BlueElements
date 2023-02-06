@@ -131,7 +131,7 @@ public partial class ComboBox : TextBox, ITranslateable {
     #region Methods
 
     public void SetTextIfItemExists(string text) {
-        if (Item.Any(thisItem => thisItem.Internal == text)) {
+        if (Item.Any(thisItem => thisItem.KeyName == text)) {
             Text = text;
         }
     }

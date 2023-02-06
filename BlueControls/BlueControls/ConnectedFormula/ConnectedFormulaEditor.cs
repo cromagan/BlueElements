@@ -97,7 +97,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
         BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
 
         if (e?.Item == null) { return; }
-        FormulaSet(e.Item.Internal, null);
+        FormulaSet(e.Item.KeyName, null);
     }
 
     private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e) {

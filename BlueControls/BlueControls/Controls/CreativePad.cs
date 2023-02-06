@@ -176,22 +176,22 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
             switch (e.ClickedComand.ToLower()) {
                 case "#vordergrund":
                     done = true;
-                    thisItem.InDenVordergrund();
+                    thisItem.Parent.InDenVordergrund(thisItem);
                     break;
 
                 case "#hintergrund":
                     done = true;
-                    thisItem.InDenHintergrund();
+                    thisItem.Parent.InDenHintergrund(thisItem);
                     break;
 
                 case "#vorne":
                     done = true;
-                    thisItem.EineEbeneNachVorne();
+                    thisItem.Parent.EineEbeneNachVorne(thisItem);
                     break;
 
                 case "#hinten":
                     done = true;
-                    thisItem.EineEbeneNachHinten();
+                    thisItem.Parent.EineEbeneNachHinten(thisItem);
                     break;
 
                 case "#duplicate":

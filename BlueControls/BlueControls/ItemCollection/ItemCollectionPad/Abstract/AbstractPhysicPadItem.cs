@@ -212,7 +212,7 @@ public abstract class AbstractPhysicPadItem : BasicPadItem {
     public PointM FindCentroid() {
         // GenerateAndAdd the first point at the end of the array.
         var numPoints = MovablePoint.Count - 1;
-        var pts = new PointM?[numPoints + 1];
+        var pts = new PointM[numPoints + 1];
         MovablePoint.CopyTo(pts, 0);
         pts[numPoints] = MovablePoint[0];
         // Find the centroid.
@@ -503,7 +503,7 @@ public abstract class AbstractPhysicPadItem : BasicPadItem {
     private float SignedPolygonArea() {
         // GenerateAndAdd the first point to the end.
         var numPoints = MovablePoint.Count - 1;
-        var pts = new PointM?[numPoints + 1];
+        var pts = new PointM[numPoints + 1];
         MovablePoint.CopyTo(pts, 0);
         pts[numPoints] = MovablePoint[0];
         // Get the areas.

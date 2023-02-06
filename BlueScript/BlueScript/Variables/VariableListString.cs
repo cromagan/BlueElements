@@ -56,15 +56,13 @@ public class VariableListString : Variable {
 
     #region Properties
 
+    public static string ClassId => "lst";
     public static string ShortName_Plain => "lst";
-
     public static string ShortName_Variable => "*lst";
-
     public override int CheckOrder => 3;
-
     public override bool GetFromStringPossible => true;
-
     public override bool IsNullOrEmpty => _list == null || _list.Count == 0;
+    public override string MyClassId => ClassId;
 
     /// <summary>
     /// Die Liste als Text formatiert. z.B. {"A", "B", "C"}
@@ -83,8 +81,6 @@ public class VariableListString : Variable {
             return "{" + s.TrimEnd(", ") + "}";
         }
     }
-
-    public override string ShortName => "lst";
 
     public override bool ToStringPossible => true;
 

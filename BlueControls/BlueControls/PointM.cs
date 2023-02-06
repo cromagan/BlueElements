@@ -247,7 +247,7 @@ public sealed class PointM : IMoveable, IHasKeyName {
         if (Parent != null) {
             switch (Parent) {
                 case BasicPadItem item:
-                    result.ParseableAdd("ParentName", item.Internal);
+                    result.ParseableAdd("ParentName", item.KeyName);
                     break;
 
                 case ItemCollectionPad:

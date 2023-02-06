@@ -55,7 +55,7 @@ public partial class PadEditor : PadEditorReadOnly {
         //}
         PadDesign.Item.Clear();
         PadDesign.Item.AddRange(Skin.AllStyles());
-        PadDesign.Text = PadDesign.Item[0].Internal;
+        PadDesign.Text = PadDesign.Item[0].KeyName;
         Pad.Item.SheetStyle = Skin.StyleDb.Row[PadDesign.Text];
         _ = cbxSchriftGröße.Item.Add("30%", "030");
         _ = cbxSchriftGröße.Item.Add("40%", "040");
@@ -188,7 +188,7 @@ public partial class PadEditor : PadEditorReadOnly {
         }
     }
 
-    private void PadDesign_ItemClicked(object sender, BasicListItemEventArgs e) => Pad.Item.SheetStyle = Skin.StyleDb.Row[e.Item.Internal];
+    private void PadDesign_ItemClicked(object sender, BasicListItemEventArgs e) => Pad.Item.SheetStyle = Skin.StyleDb.Row[e.Item.KeyName];
 
     private void txbRasterAnzeige_TextChanged(object sender, System.EventArgs e) {
         if (!txbRasterAnzeige.Text.IsNumeral()) { return; }

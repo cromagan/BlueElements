@@ -61,7 +61,7 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
         foreach (var thisv in variables) {
             var ro = RowOfVariable(thisv) ?? tableVariablen.Database.Row.GenerateAndAdd(thisv.Name, "Neue Variable");
 
-            ro.CellSet("typ", thisv.ShortName);
+            ro.CellSet("typ", thisv.MyClassId);
             ro.CellSet("RO", thisv.ReadOnly);
             ro.CellSet("System", thisv.SystemVariable);
 

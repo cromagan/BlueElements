@@ -104,8 +104,8 @@ public struct DoItFeedback {
     public static DoItFeedback Schreibgschützt() => new("Variable ist schreibgeschützt.");
 
     public static DoItFeedback VerschiedeneTypen(Variable var1, Variable var2) =>
-        new("Variable '" + var1.Name + "' ist nicht der erwartete Typ {" + var2.ShortName +
-            "}, sondern {" + var1.ShortName + "}");
+        new("Variable '" + var1.KeyName + "' ist nicht der erwartete Typ {" + var2.MyClassId +
+            "}, sondern {" + var1.MyClassId + "}");
 
     public static DoItFeedback Wahr() => new(true);
 

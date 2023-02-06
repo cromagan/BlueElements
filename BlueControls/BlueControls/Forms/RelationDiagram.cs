@@ -72,7 +72,7 @@ public partial class RelationDiagram : PadEditor {
         Pad.AddCentered(i2);
         //  Pad.Invalidate()
         i2.SetLeftTopPoint(xPos, ypos);
-        i2.InDenVordergrund();
+        //i2.InDenVordergrund();
         //RelationsValid = false;
         return i2;
     }

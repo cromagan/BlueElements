@@ -183,9 +183,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         return tmpVisibleRows;
     }
 
-    public List<RowData> CalculateSortedRows(List<FilterItem>? filter, RowSortDefinition? rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) => CalculateSortedRows(CalculateFilteredRows(filter), rowSortDefinition, pinnedRows, reUseMe);
+    public List<RowData> CalculateSortedRows(List<FilterItem>? filter, RowSortDefinition? rowSortDefinition, List<RowItem?>? pinnedRows, List<RowData>? reUseMe) => CalculateSortedRows(CalculateFilteredRows(filter), rowSortDefinition, pinnedRows, reUseMe);
 
-    public List<RowData> CalculateSortedRows(List<RowItem> filteredRows, RowSortDefinition? rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) {
+    public List<RowData> CalculateSortedRows(List<RowItem> filteredRows, RowSortDefinition? rowSortDefinition, List<RowItem?>? pinnedRows, List<RowData>? reUseMe) {
         if (Database == null) { return new List<RowData>(); }
 
         VisibleRowCount = 0;
