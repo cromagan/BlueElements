@@ -40,9 +40,9 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
 
     #region Fields
 
-    public ColumnItem? Column;
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
-
+    private ColumnItem? _column;
+    private string _columnName = string.Empty;
     private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
     #endregion
@@ -63,6 +63,19 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
             if (_überschiftanordung == value) { return; }
             RaiseVersion();
             _überschiftanordung = value;
+            OnChanged();
+        }
+    }
+
+    public ColumnItem? Column {
+        get {
+            _column ??= GetRowFrom?.Database?.Column[_columnName];
+
+            return _column;
+        }
+        set {
+            _columnName = value.Name;
+            _column = null;
             OnChanged();
         }
     }
@@ -234,7 +247,8 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
                 return true;
 
             case "columnname":
-                Column = GetRowFrom?.Database?.Column[value];
+
+                _columnName = value;
                 return true;
 
             case "edittype":
@@ -270,7 +284,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
 
     public override string ToString() {
         var result = new List<string>();
-        result.ParseableAdd("ColumnName", Column);
+        result.ParseableAdd("ColumnName", _columnName);
         result.ParseableAdd("EditType", _bearbeitung);
         result.ParseableAdd("Caption", _überschiftanordung);
         return result.Parseable(base.ToString());

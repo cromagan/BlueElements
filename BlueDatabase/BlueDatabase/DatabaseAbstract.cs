@@ -1535,7 +1535,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 _variables.Clear();
                 List<string> va = new(value.SplitAndCutByCr());
                 foreach (var t in va) {
-                    _variables.Add(ParsableItem.NewByParsing<Variable>(t));
+                    _variables.Add(ParsebleItem.NewByParsing<Variable>(t));
                 }
                 break;
 

@@ -106,9 +106,10 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
     }
 
     protected override int SaveOrder => 999;
-    private DataFormat Format { get; set; } = DataFormat.Text;
 
     #endregion
+
+    //private DataFormat Format { get; set; } = DataFormat.Text;
 
     #region Methods
 
@@ -143,9 +144,9 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
                 _ausrichtung = (Alignment)byte.Parse(value);
                 return true;
 
-            case "format":
-                Format = (DataFormat)IntParse(value);
-                return true;
+            //case "format":
+            //    Format = (DataFormat)IntParse(value);
+            //    return true;
 
             case "additionalscale":
                 Skalierung = FloatParse(value.FromNonCritical());
@@ -191,7 +192,6 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
     public override string ToString() {
         var result = new List<string>();
         result.ParseableAdd("ReadableText", _textOriginal);
-        result.ParseableAdd("Format", Format);
         result.ParseableAdd("Alignment", _ausrichtung);
         result.ParseableAdd("AdditionalScale", Skalierung);
         return result.Parseable(base.ToString());

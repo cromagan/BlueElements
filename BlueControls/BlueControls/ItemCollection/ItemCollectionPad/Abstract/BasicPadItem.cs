@@ -34,7 +34,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
 
-public abstract class BasicPadItem : ParsableItem, IParseable, ICloneable, IChangedFeedback, IMoveable, IDisposableExtended, IComparable, IHasKeyName {
+public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChangedFeedback, IMoveable, IDisposableExtended, IComparable, IHasKeyName {
 
     #region Fields
 
@@ -152,11 +152,11 @@ public abstract class BasicPadItem : ParsableItem, IParseable, ICloneable, IChan
         }
     }
 
-    /// <summary>
-    /// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
-    /// </summary>
-    /// <remarks></remarks>
-    public List<string> Tags { get; } = new();
+    ///// <summary>
+    ///// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
+    ///// </summary>
+    ///// <remarks></remarks>
+    //public List<string> Tags { get; } = new();
 
     /// <summary>
     /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht.
@@ -188,7 +188,7 @@ public abstract class BasicPadItem : ParsableItem, IParseable, ICloneable, IChan
     public object? Clone() {
         var x = ToString();
 
-        var i = BlueBasics.ParsableItem.NewByParsing<BasicPadItem>(x);
+        var i = BlueBasics.ParsebleItem.NewByParsing<BasicPadItem>(x);
         i?.Parse(x);
 
         return i;
@@ -367,17 +367,14 @@ public abstract class BasicPadItem : ParsableItem, IParseable, ICloneable, IChan
 
     public virtual bool ParseThis(string tag, string value) {
         switch (tag.ToLower()) {
-            case "classid":
-
+            case "classid": // Wurde bereits abgefragt, dadurch st erst die Routine aufgerufen worden
             case "type":
-
             case "enabled":
-
             case "checked":
                 return true;
 
             case "tag":
-                Tags.Add(value.FromNonCritical());
+                //Tags.Add(value.FromNonCritical());
                 return true;
 
             case "print":
@@ -385,16 +382,15 @@ public abstract class BasicPadItem : ParsableItem, IParseable, ICloneable, IChan
                 return true;
 
             case "point":
+                if (value.StartsWith("[I]")) { value = value.FromNonCritical(); }
 
-                foreach (var thisPoint in MovablePoint.Where(thisPoint => value.Contains("Name=" + thisPoint.Name + ","))) {
+                foreach (var thisPoint in MovablePoint.Where(thisPoint => value.Contains("Name=" + thisPoint.KeyName + ","))) {
                     thisPoint.Parse(value);
                 }
                 return true;
 
             case "format": // = Textformat!!!
-
             case "design":
-
             case "style":
                 _style = (PadStyles)IntParse(value);
                 return true;
@@ -407,6 +403,7 @@ public abstract class BasicPadItem : ParsableItem, IParseable, ICloneable, IChan
                 Gruppenzugehörigkeit = value.FromNonCritical();
                 return true;
 
+            case "key":
             case "keyname":
             case "internalname":
                 if (value != KeyName) {
@@ -444,23 +441,14 @@ public abstract class BasicPadItem : ParsableItem, IParseable, ICloneable, IChan
     public override string ToString() {
         List<string> result = new();
 
-        //result.ParseableAdd("ClassID", ClassId());
-        //result.ParseableAdd("InternalName", Internal);
+        result.ParseableAdd("Style", _style);
         result.ParseableAdd("Page", _page);
-        if (Tags.Count > 0) {
-            foreach (var thisTag in Tags) {
-                result.ParseableAdd("Tag", thisTag);
-            }
-        }
-        result.ParseableAdd("Style", (int)_style);
-        result.ParseableAdd("Print", _beiExportSichtbar.ToPlusMinus());
+        result.ParseableAdd("Print", _beiExportSichtbar);
         result.ParseableAdd("QuickInfo", QuickInfo);
+        result.ParseableAdd("ZoomPadding", _zoomPadding);
 
-        if (_zoomPadding != 0) {
-            result.ParseableAdd("ZoomPadding", _zoomPadding);
-        }
         foreach (var thisPoint in MovablePoint) {
-            result.ParseableAdd("Point", thisPoint);
+            result.ParseableAdd("Point", thisPoint as IStringable);
         }
         if (!string.IsNullOrEmpty(Gruppenzugehörigkeit)) {
             result.ParseableAdd("RemoveTooGroup", Gruppenzugehörigkeit);

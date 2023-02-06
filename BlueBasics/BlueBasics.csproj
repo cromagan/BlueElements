@@ -122,7 +122,7 @@
     <Compile Include="Enums\FehlerArt.cs" />
     <Compile Include="Extensions\GraphicsExtensions.cs" />
     <Compile Include="ListExt.cs" />
-    <Compile Include="ParsableItem.cs" />
+    <Compile Include="ParsebleItem.cs" />
     <Compile Include="Polygons.cs" />
     <Compile Include="QuickImage.cs" />
     <Compile Include="EventArgs\ListEventArgs.cs" />

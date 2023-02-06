@@ -173,10 +173,6 @@ public static partial class Extensions {
     public static void ParseableAdd(this ICollection<string> col, string tagname, IHasKeyName? value) {
         if (value == null) { return; }
 
-        if (value is IStringable) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Stringable und KeyName nicht möglich!");
-        }
-
         if (value is IDisposableExtended d && d.IsDisposed) { return; }
 
         var v = value.KeyName;
@@ -205,10 +201,6 @@ public static partial class Extensions {
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, IStringable? value) {
         if (value == null) { return; }
-
-        if (value is IHasKeyName) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Stringable und KeyName nicht möglich!");
-        }
 
         if (value is IDisposableExtended d && d.IsDisposed) { return; }
 

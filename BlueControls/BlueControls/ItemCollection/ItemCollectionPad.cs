@@ -765,7 +765,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key.ToLower()) {
                 case "item":
-                    var i = BlueBasics.ParsableItem.NewByParsing<BasicPadItem>(pair.Value);
+                    var i = BlueBasics.ParsebleItem.NewByParsing<BasicPadItem>(pair.Value);
                     if (i != null) { Add(i); }
                     break;
 

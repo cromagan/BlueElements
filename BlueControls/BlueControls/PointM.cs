@@ -33,10 +33,11 @@ using static BlueBasics.Geometry;
 
 namespace BlueControls;
 
-public sealed class PointM : IMoveable, IHasKeyName {
+public sealed class PointM : IMoveable, IHasKeyName, IParseable {
 
     #region Fields
 
+    private object? _parent;
     private float _x;
     private float _y;
 
@@ -45,11 +46,11 @@ public sealed class PointM : IMoveable, IHasKeyName {
     #region Constructors
 
     public PointM(object? parent, string name, float startX, float startY, float laenge, float alpha) : this(parent) {
-        Name = name;
+        KeyName = name;
         var tempVar = PolarToCartesian(laenge, alpha);
         _x = startX + tempVar.X;
         _y = startY + tempVar.Y;
-        Tag = string.Empty;
+        //Tag = string.Empty;
     }
 
     public PointM(PointM startPoint, float laenge, float alpha) : this(null, string.Empty, startPoint.X, startPoint.Y, laenge, alpha) { }
@@ -58,37 +59,37 @@ public sealed class PointM : IMoveable, IHasKeyName {
 
     public PointM(object? parent, string codeToParse) : this(parent) => Parse(codeToParse);
 
-    public PointM(object? parent, string name, float x, float y, string tag) {
+    public PointM(object? parent, string name, float x, float y) {
         Parent = parent;
         _x = x;
         _y = y;
-        Name = name;
-        Tag = tag;
+        KeyName = name;
+        //Tag = tag;
     }
 
-    public PointM() : this(null, string.Empty, 0f, 0f, string.Empty) { }
+    public PointM() : this((object?)null, string.Empty, (float)0f, (float)0f) { }
 
-    public PointM(object? parent) : this(parent, string.Empty, 0f, 0f, string.Empty) { }
+    public PointM(object? parent) : this(parent, string.Empty, (float)0f, (float)0f) { }
 
-    public PointM(string name, float x, float y) : this(null, name, x, y, string.Empty) { }
+    public PointM(string name, float x, float y) : this((object?)null, name, x, y) { }
 
-    public PointM(object? parent, string name, int x, int y) : this(parent, name, x, y, string.Empty) { }
+    public PointM(object? parent, string name, int x, int y) : this(parent, name, (float)x, (float)y) { }
 
-    public PointM(object parent, string name, float x, float y) : this(parent, name, x, y, string.Empty) { }
+    public PointM(PointF point) : this((object?)null, string.Empty, point.X, point.Y) { }
 
-    public PointM(PointF point) : this(null, string.Empty, point.X, point.Y, string.Empty) { }
+    public PointM(int x, int y) : this(null, string.Empty, (float)x, (float)y) { }
 
-    public PointM(int x, int y) : this(null, string.Empty, x, y, string.Empty) { }
+    public PointM(float x, float y) : this((object?)null, string.Empty, x, y) { }
 
-    public PointM(float x, float y) : this(null, string.Empty, x, y, string.Empty) { }
+    public PointM(PointM point) : this((object?)null, string.Empty, point.X, point.Y) { }
 
-    public PointM(PointM point) : this(null, string.Empty, point.X, point.Y, string.Empty) { }
-
-    public PointM(object parent, PointM template) : this(parent, template.Name, template.X, template.Y, template.Tag) { }
+    public PointM(object parent, PointM template) : this(parent, template.KeyName, template.X, template.Y) { }
 
     #endregion
 
     #region Events
+
+    public event EventHandler? Changed;
 
     public event EventHandler<MoveEventArgs>? Moved;
 
@@ -98,12 +99,17 @@ public sealed class PointM : IMoveable, IHasKeyName {
 
     #region Properties
 
-    public string KeyName => Name;
+    public string KeyName { get; private set; }
     public float Magnitude => (float)Math.Sqrt((_x * _x) + (_y * _y));
-    public string Name { get; private set; }
-    public object? Parent { get; set; }
 
-    public string Tag { get; set; }
+    public object? Parent {
+        get => _parent;
+        set {
+            if (_parent == value) { return; }
+            _parent = value;
+            OnChanged();
+        }
+    }
 
     public float X {
         get => _x;
@@ -149,20 +155,8 @@ public sealed class PointM : IMoveable, IHasKeyName {
         var tx = (_x * zoom) - shiftX + (zoom / 2);
         var ty = (_y * zoom) - shiftY + (zoom / 2);
         Rectangle r = new((int)(tx - 4), (int)(ty - 4), 9, 9);
-        //if (!_UserSelectable) {
-        //    type = enDesign.Button_EckpunktSchieber_Phantom;
-        //    state = enStates.Standard;
-        //}
         Skin.Draw_Back(gr, type, state, r, null, false);
         Skin.Draw_Border(gr, type, state, r);
-        //if (!string.IsNullOrEmpty(textToDraw)) {
-        //    for (var x = -1; x < 2; x++) {
-        //        for (var y = -1; y < 2; y++) {
-        //            BlueFont.DrawString(GR,textToDraw, SimpleArial, Brushes.White, (float)tx + x, (float)ty + y - 16);
-        //        }
-        //    }
-        //    BlueFont.DrawString(GR,textToDraw, SimpleArial, Brushes.Black, (float)tx, (float)ty - 16);
-        //}
     }
 
     public void Move(float x, float y) => SetTo(_x + x, _y + y);
@@ -171,6 +165,8 @@ public sealed class PointM : IMoveable, IHasKeyName {
         var magnitude = Magnitude;
         SetTo(_x / magnitude, _y / magnitude);
     }
+
+    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
     public void OnMoved(MoveEventArgs e) => Moved?.Invoke(this, e);
 
@@ -183,11 +179,11 @@ public sealed class PointM : IMoveable, IHasKeyName {
                     break;
 
                 case "name":
-                    Name = pair.Value.FromNonCritical();
+                    KeyName = pair.Value.FromNonCritical();
                     break;
 
-                case "tag":
-                    Tag = pair.Value.FromNonCritical();
+                case "tag": // TODO: Entfernt, 06.02.2023
+                    //Tag = pair.Value.FromNonCritical();
                     break;
 
                 case "x":
@@ -226,6 +222,7 @@ public sealed class PointM : IMoveable, IHasKeyName {
         _x = x;
         _y = y;
         OnMoved(new MoveEventArgs(mx, my));
+        OnChanged();
     }
 
     public void SetTo(PointM startPoint, float länge, float alpha) {
@@ -260,11 +257,11 @@ public sealed class PointM : IMoveable, IHasKeyName {
                     break;
             }
         }
-        result.ParseableAdd("Name", Name);
+        result.ParseableAdd("Name", KeyName);
         result.ParseableAdd("X", _x);
         result.ParseableAdd("Y", _y);
-        result.ParseableAdd("Tag", Tag);
-        return result.Parseable(base.ToString());
+        //result.ParseableAdd("Tag", Tag);
+        return result.Parseable();
     }
 
     public PointF ZoomAndMove(AdditionalDrawing e) => ZoomAndMove(e.Zoom, e.ShiftX, e.ShiftY);

@@ -283,7 +283,7 @@ public static class VariableExtensions {
     #endregion
 }
 
-public abstract class Variable : ParsableItem, IComparable, IParseable, ICloneable, IHasKeyName {
+public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneable, IHasKeyName {
 
     #region Fields
 

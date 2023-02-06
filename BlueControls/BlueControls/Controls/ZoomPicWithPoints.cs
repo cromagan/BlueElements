@@ -124,7 +124,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
             PointM thisP = new(null, s);
             thisP.X *= zoomx;
             thisP.Y *= zoomy;
-            tags2.TagSet(thisP.Name, thisP.ToString());
+            tags2.TagSet(thisP.KeyName, thisP.ToString());
         }
         return new Tuple<Bitmap?, List<string>>(pic2, tags2);
     }
@@ -133,8 +133,6 @@ public partial class ZoomPicWithPoints : ZoomPic {
         WritePointsInTags();
         return GenerateBitmapListItem(Bmp, Tags);
     }
-
-    public PointM GetPoint(string name) => _points.Get(name);
 
     public void LetUserAddAPoint(string pointName, Helpers helper, BlueBasics.Enums.Orientation mittelline) {
         _mittelLinie = mittelline;
@@ -341,8 +339,8 @@ public partial class ZoomPicWithPoints : ZoomPic {
         }
         var s = string.Empty;
         foreach (var thisP in _points) {
-            s = s + thisP.Name + "|";
-            Tags.TagSet(thisP.Name, thisP.ToString());
+            s = s + thisP.KeyName + "|";
+            Tags.TagSet(thisP.KeyName, thisP.ToString());
         }
         Tags.TagSet("AllPointNames", s.TrimEnd("|").ToNonCritical());
     }
