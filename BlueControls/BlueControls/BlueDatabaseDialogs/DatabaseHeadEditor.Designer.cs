@@ -419,7 +419,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // variableEditor
             // 
             this.variableEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.variableEditor.Editabe = false;
+            this.variableEditor.Editabe = true;
             this.variableEditor.Location = new System.Drawing.Point(3, 3);
             this.variableEditor.Name = "variableEditor";
             this.variableEditor.Size = new System.Drawing.Size(1033, 610);

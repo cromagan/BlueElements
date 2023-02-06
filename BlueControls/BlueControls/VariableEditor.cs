@@ -21,17 +21,23 @@ using BlueBasics;
 using BlueDatabase;
 using BlueScript.Variables;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 
 namespace BlueControls;
 
 public partial class VariableEditor : System.Windows.Forms.UserControl {
 
+    #region Fields
+
+    private bool _inited;
+
+    #endregion
+
     #region Constructors
 
     public VariableEditor() {
         InitializeComponent();
-        GenerateVariableTable();
     }
 
     #endregion
@@ -44,6 +50,22 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
 
     #region Methods
 
+    public List<Variable> GetVariables() {
+        if (!Editabe) {
+            Develop.DebugPrint_NichtImplementiert();
+            // Bei Editable TRUE sind es nur string variablen
+        }
+        var list = new List<Variable>();
+
+        foreach (var thisr in filterVariablen.Table.Database.Row) {
+            var v = new VariableString(thisr.CellGetString("Name"), thisr.CellGetString("Inhalt"), false, false,
+                thisr.CellGetString("Kommentar"));
+            list.Add(v);
+        }
+
+        return list;
+    }
+
     public RowItem? RowOfVariable(string variable) {
         if (tableVariablen?.Database == null) { return null; }
         return tableVariablen.Database.Row[variable];
@@ -55,6 +77,11 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
     }
 
     public void WriteVariablesToTable(IList<Variable>? variables) {
+        if (!_inited) {
+            _inited = true;
+            GenerateVariableTable();
+        }
+
         if (tableVariablen?.Database == null) { return; }
         if (variables == null) { return; }
 
@@ -75,6 +102,15 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
 
     internal void Clear() => tableVariablen.Database?.Row.Clear("Variablen gelöscht");
 
+    protected override void OnVisibleChanged(System.EventArgs e) {
+        base.OnVisibleChanged(e);
+
+        if (Visible && !_inited && !Disposing) {
+            _inited = true;
+            GenerateVariableTable();
+        }
+    }
+
     private void GenerateVariableTable() {
         Database x = new(false, "Script_Variablen");
         var na = x.Column.GenerateAndAdd("Name", "N", ColumnFormatHolder.SystemName, "Variablenname");
@@ -84,23 +120,39 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
         var inh = x.Column.GenerateAndAdd("Inhalt", "I", ColumnFormatHolder.Text, "Inhalt");
         var kom = x.Column.GenerateAndAdd("Kommentar", "K", ColumnFormatHolder.Text, "Komentar");
 
-        if (Editabe) {
-            x.PermissionGroupsNewRow = new(new List<string>() { "#Everybody" });
-        }
-
-        //        if (Editabe) {
-        //na.ed
-        //        }
-
         foreach (var thisColumn in x.Column.Where(thisColumn => !thisColumn.IsSystemColumn())) {
             thisColumn.MultiLine = true;
             thisColumn.TextBearbeitungErlaubt = false;
             thisColumn.DropdownBearbeitungErlaubt = false;
         }
 
+        if (Editabe) {
+            var l = new List<ColumnItem?>() { na, inh, kom };
+
+            foreach (var thisColumn2 in l) {
+                if (thisColumn2 != null) {
+                    thisColumn2.TextBearbeitungErlaubt = true;
+                    thisColumn2.MultiLine = false;
+                    thisColumn2.PermissionGroupsChangeCell = new(new List<string>() { "#Everybody" });
+                }
+            }
+
+            if (na != null) { na.Caption = "Variablen-\rName"; }
+            if (inh != null) { inh.Caption = "Inhalt"; }
+            if (kom != null) { kom.Caption = "Kommentar"; }
+
+            x.PermissionGroupsNewRow = new(new List<string>() { "#Everybody" });
+        }
+
         x.RepairAfterParse();
         var car = x.ColumnArrangements.CloneWithClones();
-        car[1].ShowColumns("Name", "Typ", "RO", "System", "Inhalt", "Kommentar");
+
+        if (Editabe) {
+            car[1].ShowColumns("Name", "Inhalt", "Kommentar");
+        } else {
+            car[1].ShowColumns("Name", "Typ", "RO", "System", "Inhalt", "Kommentar");
+        }
+
         //car[1].HideSystemColumns();
         x.ColumnArrangements = new(car);
         x.SortDefinition = new RowSortDefinition(x, "Name", true);

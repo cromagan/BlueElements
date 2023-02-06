@@ -26,7 +26,9 @@ using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
+using BlueScript.Variables;
 using static BlueBasics.Converter;
 using MessageBox = BlueControls.Forms.MessageBox;
 
@@ -128,8 +130,10 @@ public sealed partial class DatabaseHeadEditor {
         lbxSortierSpalten.Suggestions.AddRange(_database.Column, false);
 
         GenerateInfoText();
+    }
 
-        variableEditor.WriteVariablesToTable(_database.Variables);
+    protected override void OnShown(System.EventArgs e) {
+        variableEditor.WriteVariablesToTable(_database?.Variables);
     }
 
     private void AddUndoToTable(WorkItem work, int index, string db, bool checkNeeded) {
@@ -453,6 +457,9 @@ public sealed partial class DatabaseHeadEditor {
         _database.EventScript = new(t2);
 
         #endregion
+
+        var l = variableEditor.GetVariables();
+        _database.Variables = new ReadOnlyCollection<Variable>(l);
     }
 
     #endregion

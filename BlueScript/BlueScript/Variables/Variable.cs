@@ -485,6 +485,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         //Initialize();
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key) {
+                case "key":
                 case "name":
                     if (pair.Value.FromNonCritical() != KeyName) {
                         Develop.DebugPrint(FehlerArt.Fehler, "Variablenfehler: " + toParse);

@@ -840,9 +840,9 @@ public static class Skin {
     public static readonly float Scale = (float)Math.Round(SystemInformation.VirtualScreen.Width / System.Windows.SystemParameters.VirtualScreenWidth, 2);
     public static bool Inited;
     public static DatabaseAbstract? StyleDb;
-    internal static Pen? PenLinieDick;
-    internal static Pen? PenLinieDünn;
-    internal static Pen? PenLinieKräftig;
+    internal static Pen PenLinieDick;
+    internal static Pen PenLinieDünn;
+    internal static Pen PenLinieKräftig;
     private static readonly ImageCodeEffect[] St = new ImageCodeEffect[1];
 
     #endregion
@@ -1181,7 +1181,7 @@ public static class Skin {
         }
     }
 
-    public static Size FormatedText_NeededSize(string text, QuickImage? image, BlueFont font, int minSie) {
+    public static Size FormatedText_NeededSize(string text, QuickImage? image, BlueFont? font, int minSie) {
         try {
             var pSize = SizeF.Empty;
             var tSize = SizeF.Empty;
