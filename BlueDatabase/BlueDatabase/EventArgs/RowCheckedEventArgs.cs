@@ -17,15 +17,16 @@
 
 #nullable enable
 
+using BlueDatabase.Enums;
 using System.Collections.Generic;
 
 namespace BlueDatabase.EventArgs;
 
-public class RowCheckedEventArgs : RowEventArgs {
+public class RowCheckedEventArgs : DoRowAutomaticEventArgs {
 
     #region Constructors
 
-    public RowCheckedEventArgs(RowItem row, List<string>? columnsWithErrors) : base(row) => ColumnsWithErrors = columnsWithErrors;
+    public RowCheckedEventArgs(RowItem row, Events eventn, List<string>? columnsWithErrors) : base(row, eventn) => ColumnsWithErrors = columnsWithErrors;
 
     #endregion
 

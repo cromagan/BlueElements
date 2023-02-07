@@ -472,7 +472,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         x = _internal.TryAdd(newName, vcol);
         if (!x) {
             Develop.DebugPrint(FehlerArt.Fehler, "Schlüsselfehler 2");
-            return;
         }
     }
 

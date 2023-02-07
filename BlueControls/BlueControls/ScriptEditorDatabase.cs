@@ -78,8 +78,9 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
             return null;
         }
 
-        string message = string.Empty;
-        Script? sc = null;
+        //string message = string.Empty;
+        //Script? sc = null;
+        RowItem? r = null;
 
         if (_isRowSkript) {
             if (_isRowSkript && _database.Row.Count == 0) {
@@ -90,23 +91,23 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
                 txbTestZeile.Text = _database.Row.First().CellFirstString();
             }
 
-            var r = _database.Row[txbTestZeile.Text];
+            r = _database.Row[txbTestZeile.Text];
             if (r == null) {
                 Message("Zeile nicht gefunden.");
                 return null;
             }
-            var s = r.DoRules(base.ScriptText, true);
-            //var (_, m, s) = r.DoAutomatic(null, true, _skriptname);
-            //message = m;
-            sc = s;
         }
+        var s = _database.DoScript(base.ScriptText, true, r);
+        //var (_, m, s) = r.DoAutomatic(null, true, _skriptname);
+        //message = m;
+        //sc = s;
 
         //if (!string.IsNullOrEmpty(message)) {
         //    Message("Allgemeiner Fehler: " + message);
         //    return null;
         //}
 
-        return sc;
+        return s;
     }
 
     protected override void OpenAdditionalFileFolder() {

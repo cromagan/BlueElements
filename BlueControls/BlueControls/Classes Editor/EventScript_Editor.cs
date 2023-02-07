@@ -74,6 +74,7 @@ internal sealed partial class EventScript_Editor : AbstractClassEditor<EventScri
         scriptEditor.IsRowScript = false;
         chkAuslöser_newrow.Checked = false;
         chkAuslöser_valuechanged.Checked = false;
+        chkAuslöser_errorcheck.Checked = false;
         chkExternVerfügbar.Checked = false;
         chkAendertWerte.Checked = false;
     }
@@ -101,6 +102,7 @@ internal sealed partial class EventScript_Editor : AbstractClassEditor<EventScri
         BlueDatabase.Enums.Events tmp = 0;
         if (chkAuslöser_newrow.Checked) { tmp |= BlueDatabase.Enums.Events.new_row; }
         if (chkAuslöser_valuechanged.Checked) { tmp |= BlueDatabase.Enums.Events.value_changed; }
+        if (chkAuslöser_errorcheck.Checked) { tmp |= BlueDatabase.Enums.Events.error_check; }
         Item.Events = tmp;
     }
 
@@ -111,10 +113,10 @@ internal sealed partial class EventScript_Editor : AbstractClassEditor<EventScri
 
     private void chkAuslöser_newrow_CheckedChanged(object sender, System.EventArgs e) {
         CheckEvents();
-    }
 
-    private void chkAuslöser_valuechanged_CheckedChanged(object sender, System.EventArgs e) {
-        CheckEvents();
+        if (chkAuslöser_errorcheck.Checked) {
+            chkAendertWerte.Checked = false;
+        }
     }
 
     private void chkExternVerfügbar_CheckedChanged(object sender, System.EventArgs e) {

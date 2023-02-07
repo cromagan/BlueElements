@@ -26,6 +26,7 @@ using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using BlueScript.Variables;
@@ -459,7 +460,14 @@ public sealed partial class DatabaseHeadEditor {
         #endregion
 
         var l = variableEditor.GetVariables();
-        _database.Variables = new ReadOnlyCollection<Variable>(l);
+        var l2 = new List<VariableString>();
+        foreach (var thisv in l) {
+            if (thisv is VariableString vs) {
+                l2.Add(vs);
+            }
+        }
+
+        _database.Variables = new ReadOnlyCollection<VariableString>(l2);
     }
 
     #endregion

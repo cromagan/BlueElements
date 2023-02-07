@@ -45,7 +45,7 @@ public static class LanguageTool {
 
     #region Methods
 
-    public static string ColumnReplace(string txt, ColumnItem column, ShortenStyle style) {
+    public static string ColumnReplace(string txt, ColumnItem? column, ShortenStyle style) {
         if (column == null) { return txt; }
 
         if (!string.IsNullOrEmpty(txt)) {
@@ -83,8 +83,8 @@ public static class LanguageTool {
     /// </summary>
     /// <param name="txt"></param>
     /// <param name="mustTranslate">TRUE erstellt einen Eintrag in der Englisch-Datenbank, falls nicht vorhanden.</param>
+    /// <param name="args"></param>
     /// <returns></returns>
-
     public static string DoTranslate(string txt, bool mustTranslate, params object?[] args) {
         try {
             if (Translation == null) {

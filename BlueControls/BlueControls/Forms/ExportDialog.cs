@@ -357,7 +357,6 @@ public sealed partial class ExportDialog {
 
             if (!string.IsNullOrEmpty(error)) {
                 MessageBox.Show(error);
-                return;
             }
         }
     }

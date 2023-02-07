@@ -26,6 +26,7 @@ namespace BlueControls.Classes_Editor {
             this.chkAendertWerte = new BlueControls.Controls.Button();
             this.chkAuslöser_newrow = new BlueControls.Controls.Button();
             this.chkAuslöser_valuechanged = new BlueControls.Controls.Button();
+            this.chkAuslöser_errorcheck = new BlueControls.Controls.Button();
             this.SuspendLayout();
             // 
             // txbName
@@ -35,7 +36,7 @@ namespace BlueControls.Classes_Editor {
             this.txbName.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbName.Location = new System.Drawing.Point(64, 16);
             this.txbName.Name = "txbName";
-            this.txbName.Size = new System.Drawing.Size(784, 22);
+            this.txbName.Size = new System.Drawing.Size(760, 22);
             this.txbName.TabIndex = 4;
             this.txbName.TextChanged += new System.EventHandler(this.txbName_TextChanged);
             // 
@@ -103,10 +104,10 @@ namespace BlueControls.Classes_Editor {
             // 
             this.chkAuslöser_newrow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.chkAuslöser_newrow.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
-            this.chkAuslöser_newrow.Location = new System.Drawing.Point(864, 16);
+            this.chkAuslöser_newrow.Location = new System.Drawing.Point(840, 8);
             this.chkAuslöser_newrow.Name = "chkAuslöser_newrow";
-            this.chkAuslöser_newrow.QuickInfo = "Das Script wir nach dem Erstellen einer\r\nneuen Zeile ausgeführt.";
-            this.chkAuslöser_newrow.Size = new System.Drawing.Size(152, 16);
+            this.chkAuslöser_newrow.QuickInfo = "Das Skript wir nach dem Erstellen einer\r\nneuen Zeile ausgeführt.";
+            this.chkAuslöser_newrow.Size = new System.Drawing.Size(176, 16);
             this.chkAuslöser_newrow.TabIndex = 9;
             this.chkAuslöser_newrow.Text = "Auslöser: Neue Zeile";
             this.chkAuslöser_newrow.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
@@ -115,16 +116,29 @@ namespace BlueControls.Classes_Editor {
             // 
             this.chkAuslöser_valuechanged.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.chkAuslöser_valuechanged.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
-            this.chkAuslöser_valuechanged.Location = new System.Drawing.Point(864, 40);
+            this.chkAuslöser_valuechanged.Location = new System.Drawing.Point(840, 24);
             this.chkAuslöser_valuechanged.Name = "chkAuslöser_valuechanged";
-            this.chkAuslöser_valuechanged.QuickInfo = "Das Script wir nach dem Ändern eines\r\nWertes einer Zelle ausgeführt";
-            this.chkAuslöser_valuechanged.Size = new System.Drawing.Size(152, 16);
+            this.chkAuslöser_valuechanged.QuickInfo = "Das Skript wir nach dem Ändern eines\r\nWertes einer Zelle ausgeführt";
+            this.chkAuslöser_valuechanged.Size = new System.Drawing.Size(176, 16);
             this.chkAuslöser_valuechanged.TabIndex = 10;
             this.chkAuslöser_valuechanged.Text = "Auslöser: Wert geändert";
-            this.chkAuslöser_valuechanged.CheckedChanged += new System.EventHandler(this.chkAuslöser_valuechanged_CheckedChanged);
+            this.chkAuslöser_valuechanged.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
+            // 
+            // chkAuslöser_errorcheck
+            // 
+            this.chkAuslöser_errorcheck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.chkAuslöser_errorcheck.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
+            this.chkAuslöser_errorcheck.Location = new System.Drawing.Point(840, 40);
+            this.chkAuslöser_errorcheck.Name = "chkAuslöser_errorcheck";
+            this.chkAuslöser_errorcheck.QuickInfo = "Das Skript wird nur zur Datenkonsitenzprüfung\r\nverendet und ändert keine Daten.";
+            this.chkAuslöser_errorcheck.Size = new System.Drawing.Size(176, 16);
+            this.chkAuslöser_errorcheck.TabIndex = 11;
+            this.chkAuslöser_errorcheck.Text = "Auslöser: Fehlerprüfung";
+            this.chkAuslöser_errorcheck.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
             // 
             // EventScript_Editor
             // 
+            this.Controls.Add(this.chkAuslöser_errorcheck);
             this.Controls.Add(this.chkAuslöser_valuechanged);
             this.Controls.Add(this.chkAuslöser_newrow);
             this.Controls.Add(this.chkAendertWerte);
@@ -148,5 +162,6 @@ namespace BlueControls.Classes_Editor {
         private Button chkAendertWerte;
         private Button chkAuslöser_newrow;
         private Button chkAuslöser_valuechanged;
+        private Button chkAuslöser_errorcheck;
     }
 }

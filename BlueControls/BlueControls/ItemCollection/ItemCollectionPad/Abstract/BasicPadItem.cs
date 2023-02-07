@@ -29,7 +29,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
@@ -253,7 +252,10 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
 
     //    var x = code.GetAllTags();
     public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting) {
-        if (_parent == null) { Develop.DebugPrint(FehlerArt.Fehler, "Parent nicht definiert"); }
+        if (_parent == null) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Parent nicht definiert");
+            return;
+        }
 
         if (forPrinting && !_beiExportSichtbar) { return; }
 
@@ -269,7 +271,7 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
         if (zoom > 1) { line = zoom; }
         foreach (var thisV in ConnectsTo) {
             if (!forPrinting || thisV.Bei_Export_sichtbar) {
-                if (thisV != null && Parent.Contains(thisV.OtherItem) && thisV.OtherItem != this) {
+                if (thisV != null && _parent.Contains(thisV.OtherItem) && thisV.OtherItem != this) {
                     if (!forPrinting || thisV.OtherItem.Bei_Export_sichtbar) {
                         var t1 = ItemConnection.GetConnectionPoint(this, thisV.MyItemType, thisV.OtherItem).ZoomAndMove(zoom, shiftX, shiftY);
                         var t2 = ItemConnection.GetConnectionPoint(thisV.OtherItem, thisV.OtherItemType, this).ZoomAndMove(zoom, shiftX, shiftY);
@@ -478,9 +480,15 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
         return x;
     }
 
-    internal void AddLineStyleOption(List<GenericControl> l) => l.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(_parent.SheetStyle, true)));
+    internal void AddLineStyleOption(List<GenericControl> l) {
+        if (_parent == null) { return; }
+        l.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(_parent.SheetStyle, true)));
+    }
 
-    internal void AddStyleOption(List<GenericControl> l) => l.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetFonts(_parent.SheetStyle)));
+    internal void AddStyleOption(List<GenericControl> l) {
+        if (_parent == null) { return; }
+        l.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetFonts(_parent.SheetStyle)));
+    }
 
     protected abstract RectangleF CalculateUsedArea();
 
@@ -537,7 +545,8 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
             }
 
             if (!_beiExportSichtbar) {
-                gr.DrawImage(QuickImage.Get("Drucker|16||1"), positionModified.X, positionModified.Y);
+                var q = QuickImage.Get("Drucker|16||1");
+                if (q != null) { gr.DrawImage(q, positionModified.X, positionModified.Y); }
             }
         } catch { }
     }

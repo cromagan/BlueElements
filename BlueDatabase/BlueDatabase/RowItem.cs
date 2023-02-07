@@ -356,7 +356,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
 
         // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
         DoingScript = true;
-        var script = DoRules(eventname, onlyTesting, scriptname);
+        var script = Database.DoScript(eventname, onlyTesting, scriptname, this);
+
+        if (!onlyTesting) {
+            // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
+            DoRowAutomaticEventArgs e = new(this, eventname);
+            OnDoSpecialRules(e);
+        }
+
         DoingScript = false;
 
         if (onlyTesting) { return (true, string.Empty, script); }
@@ -414,102 +421,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
                     CellSet(Database.Column.SysCorrect, cols.Count == 0);
                 }
             }
-            OnRowChecked(new RowCheckedEventArgs(this, cols));
+            OnRowChecked(new RowCheckedEventArgs(this, eventname ?? 0, cols));
         } else {
             infoTxt += "Kein Skript vorhanden.";
-            OnRowChecked(new RowCheckedEventArgs(this, null));
+            OnRowChecked(new RowCheckedEventArgs(this, eventname ?? 0, null));
         }
 
         return (true, infoTxt, script);
-    }
-
-    public Script? DoRules(Events? eventname, bool onlyTesting, string scriptname) {
-        try {
-            if (Database == null || Database.IsDisposed) { return null; }
-
-            if (eventname != null && !string.IsNullOrEmpty(scriptname)) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Event und Skript angekommen!");
-                return null;
-            }
-
-            if (eventname == null && string.IsNullOrEmpty(scriptname)) { return null; }
-
-            if (string.IsNullOrEmpty(scriptname)) {
-                foreach (var thisEvent in Database.EventScript) {
-                    if (thisEvent != null && thisEvent.Events.HasFlag(eventname)) {
-                        scriptname = thisEvent.Name;
-                        break;
-                    }
-                }
-            }
-
-            if (scriptname == null || string.IsNullOrWhiteSpace(scriptname)) { return null; }
-
-            var script = Database.EventScript.Get(scriptname);
-            if (script == null) { return null; }
-
-            if (!script.NeedRow) { return null; }
-
-            return DoRules(script.Script, onlyTesting);
-        } catch {
-            return DoRules(eventname, onlyTesting, scriptname);
-        }
-    }
-
-    /// <summary>
-    /// Führt alle Regeln aus und löst das Ereignis DoSpecialRules aus. Setzt ansonsten keine Änderungen, wie z.B. SysCorrect oder Runden-Befehle.
-    /// </summary>
-    /// <returns>Gibt Regeln, die einen Fehler verursachen zurück. z.B. SPALTE1|Die Splate darf nicht leer sein.</returns>
-    public Script? DoRules(string scripttext, bool onlyTesting) {
-        try {
-            List<Variable> vars = new() {
-                //new VariableString("Startroutine", startRoutine, true, false, "ACHTUNG: Keinesfalls dürfen Startroutinenabhängig Werte verändert werden.\r\nMögliche Werte:\r\nnew row\r\nvalue changed\r\nscript testing\r\nmanual check\r\nto be sure\r\nimport\r\nexport\r\nscript"),
-                //new VariableBool("CellChangesEnabled", true, true, true, "Nur wenn TRUE werden nach dem Skript die Änderungen\r\nin die Datenbank aufgenommen.\r\nKann mit DisableCellChanges umgesetzt werden.")
-            };
-
-            #region Variablen für Skript erstellen
-
-            foreach (var thisCol in Database.Column) {
-                var v = CellToVariable(thisCol, this);
-                if (v != null) { vars.AddRange(v); }
-            }
-            vars.Add(new VariableString("User", Database.UserName, true, false, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
-            vars.Add(new VariableString("Usergroup", Database.UserGroup, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
-            vars.Add(new VariableBool("Administrator", Database.IsAdministrator(), true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
-            vars.Add(new VariableDatabase("Database", Database, true, true, string.Empty));
-
-            if (!string.IsNullOrEmpty(Database.AdditionalFilesPfadWhole())) {
-                vars.Add(new VariableString("AdditionalFilesPfad", Database.AdditionalFilesPfadWhole(), true, false, "Der Dateipfad der Datenbank, in dem zusäzliche Daten gespeichert werden."));
-            }
-            //vars.GenerateAndAdd(new VariableString("DatabasePath", Database.Filename2.FilePath(), true, false, "Der Dateipfad der Datenbank."));
-
-            #endregion Variablen für Skript erstellen
-
-            #region Script ausführen
-
-            Script sc = new(vars, Database.AdditionalFilesPfadWhole(), onlyTesting) {
-                ScriptText = scripttext
-            };
-            sc.Parse();
-
-            #endregion
-
-            if (!onlyTesting) {
-
-                #region Variablen zurückschreiben und Special Rules ausführen
-
-                if (!string.IsNullOrEmpty(sc.Error)) { return sc; }
-                foreach (var thisCol in Database.Column) { VariableToCell(thisCol, vars); }
-                // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
-                DoRowAutomaticEventArgs e = new(this);
-                OnDoSpecialRules(e);
-
-                #endregion
-            }
-            return sc;
-        } catch {
-            return DoRules(scripttext, onlyTesting);
-        }
     }
 
     public bool IsNullOrEmpty() => Database.Column.All(thisColumnItem => thisColumnItem != null && CellIsNullOrEmpty(thisColumnItem));
@@ -596,6 +514,51 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
         return erg;
     }
 
+    public void VariableToCell(ColumnItem? column, ICollection<Variable> vars) {
+        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return; }
+
+        var columnVar = vars.Get(column.Name);
+        if (columnVar == null || columnVar.ReadOnly) { return; }
+        if (!column.SaveContent || !column.Format.CanBeChangedByRules()) { return; }
+
+        //if (column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+        //    var columnLinkVar = vars.GetSystem(column.Name + "_Link");
+        //    if (columnLinkVar != null) {
+        //        column.Database.Cell.SetValueBehindLinkedValue(column, this, columnLinkVar.ValueString);
+        //    }
+        //}
+
+        if (columnVar is VariableFloat vf) {
+            CellSet(column, vf.ValueNum);
+            return;
+        }
+
+        if (columnVar is VariableListString vl) {
+            CellSet(column, vl.ValueList);
+            return;
+        }
+
+        if (columnVar is VariableBool vb) {
+            CellSet(column, vb.ValueBool);
+            return;
+        }
+        if (columnVar is VariableString vs) {
+            CellSet(column, vs.ValueString);
+            return;
+        }
+        if (columnVar is VariableDateTime vd) {
+            var x = vd.ValueDate.ToString(Constants.Format_Date7);
+            x = x.TrimEnd(".000");
+            x = x.TrimEnd(".0");
+            x = x.TrimEnd("00:00:00");
+            x = x.TrimEnd(" ");
+            CellSet(column, x);
+            return;
+        }
+
+        Develop.DebugPrint("Typ nicht erkannt: " + columnVar.MyClassId);
+    }
+
     internal void OnDoSpecialRules(DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
 
     internal void OnRowChecked(RowCheckedEventArgs e) => RowChecked?.Invoke(this, e);
@@ -643,51 +606,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
             }
         }
         return false;
-    }
-
-    private void VariableToCell(ColumnItem? column, ICollection<Variable> vars) {
-        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return; }
-
-        var columnVar = vars.Get(column.Name);
-        if (columnVar == null || columnVar.ReadOnly) { return; }
-        if (!column.SaveContent || !column.Format.CanBeChangedByRules()) { return; }
-
-        //if (column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-        //    var columnLinkVar = vars.GetSystem(column.Name + "_Link");
-        //    if (columnLinkVar != null) {
-        //        column.Database.Cell.SetValueBehindLinkedValue(column, this, columnLinkVar.ValueString);
-        //    }
-        //}
-
-        if (columnVar is VariableFloat vf) {
-            CellSet(column, vf.ValueNum);
-            return;
-        }
-
-        if (columnVar is VariableListString vl) {
-            CellSet(column, vl.ValueList);
-            return;
-        }
-
-        if (columnVar is VariableBool vb) {
-            CellSet(column, vb.ValueBool);
-            return;
-        }
-        if (columnVar is VariableString vs) {
-            CellSet(column, vs.ValueString);
-            return;
-        }
-        if (columnVar is VariableDateTime vd) {
-            var x = vd.ValueDate.ToString(Constants.Format_Date7);
-            x = x.TrimEnd(".000");
-            x = x.TrimEnd(".0");
-            x = x.TrimEnd("00:00:00");
-            x = x.TrimEnd(" ");
-            CellSet(column, x);
-            return;
-        }
-
-        Develop.DebugPrint("Typ nicht erkannt: " + columnVar.MyClassId);
     }
 
     #endregion

@@ -27,6 +27,8 @@ public enum Events {
 
     value_changed = 2,
 
+    error_check = 4
+
     //manual_check =3,
     //import
     //export

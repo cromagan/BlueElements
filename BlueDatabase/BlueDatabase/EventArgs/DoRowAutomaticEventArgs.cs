@@ -17,19 +17,23 @@
 
 #nullable enable
 
+using BlueDatabase.Enums;
+
 namespace BlueDatabase.EventArgs;
 
 public class DoRowAutomaticEventArgs : RowEventArgs {
 
     #region Constructors
 
-    public DoRowAutomaticEventArgs(RowItem row) : base(row) { }
+    public DoRowAutomaticEventArgs(RowItem row, Events? eventn) : base(row) => Event = eventn;
 
     #endregion
 
     #region Properties
 
     public bool Done { get; set; }
+
+    public Events? Event { get; set; }
 
     #endregion
 }

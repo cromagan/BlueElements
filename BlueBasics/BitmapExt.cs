@@ -253,7 +253,9 @@ public class BitmapExt : IDisposableExtended {
                 }
             }
         }
-        bool IsWhite(int x, int y) => x < 0 || y < 0 || x >= pic.Width || y >= pic.Height || pic.GetPixel(x, y).IsNearWhite(0.9);
+        bool IsWhite(int x, int y) {
+            return x < 0 || y < 0 || x >= pic.Width || y >= pic.Height || pic.GetPixel(x, y).IsNearWhite(0.9);
+        }
     }
 
     public static Bitmap? AutoCrop(Bitmap? pic, double minBrightness) {
@@ -416,7 +418,7 @@ public class BitmapExt : IDisposableExtended {
         ImageAttributes attributes = new();
         attributes.SetColorMatrix(colorMatrix);
         g.DrawImage(original, new Rectangle(0, 0, original.Width, original.Height), 0, 0, original.Width, original.Height, GraphicsUnit.Pixel, attributes);
-        g?.Dispose();
+        g.Dispose();
         return newBitmap;
     }
 
@@ -441,7 +443,7 @@ public class BitmapExt : IDisposableExtended {
             FileStream fs = new(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
             var im = Image.FromStream(fs);
             fs.Close();
-            fs?.Dispose();
+            fs.Dispose();
             return im;
         } catch (Exception) {
             return null;

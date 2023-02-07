@@ -21,7 +21,6 @@ using BlueBasics;
 using BlueDatabase;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Linq;
 
 namespace BlueControls;
@@ -76,6 +75,16 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
         return tableVariablen.Database.Row[variable.Name];
     }
 
+    public void WriteVariablesToTable(IList<VariableString>? variables) {
+        if (variables == null) { return; }
+
+        var l = new List<Variable>();
+        foreach (var thisv in variables) {
+            l.Add(thisv);
+        }
+        WriteVariablesToTable(l);
+    }
+
     public void WriteVariablesToTable(IList<Variable>? variables) {
         if (!_inited) {
             _inited = true;
@@ -88,15 +97,19 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
         foreach (var thisv in variables) {
             var ro = RowOfVariable(thisv) ?? tableVariablen.Database.Row.GenerateAndAdd(thisv.Name, "Neue Variable");
 
-            ro.CellSet("typ", thisv.MyClassId);
-            ro.CellSet("RO", thisv.ReadOnly);
-            ro.CellSet("System", thisv.SystemVariable);
+            if (ro != null) {
+                ro.CellSet("typ", thisv.MyClassId);
+                ro.CellSet("RO", thisv.ReadOnly);
+                ro.CellSet("System", thisv.SystemVariable);
 
-            var tmpi = thisv.ReadableText;
-            if (!Editabe && tmpi.Length > 500) { tmpi = tmpi.Substring(0, 500) + "..."; }
+                var tmpi = thisv.ReadableText;
+                if (!Editabe && tmpi.Length > 500) {
+                    tmpi = tmpi.Substring(0, 500) + "...";
+                }
 
-            ro.CellSet("Inhalt", tmpi);
-            ro.CellSet("Kommentar", thisv.Comment);
+                ro.CellSet("Inhalt", tmpi);
+                ro.CellSet("Kommentar", thisv.Comment);
+            }
         }
     }
 
@@ -145,16 +158,18 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
         }
 
         x.RepairAfterParse();
-        var car = x.ColumnArrangements.CloneWithClones();
+        var car = x.ColumnArrangements?.CloneWithClones();
 
-        if (Editabe) {
-            car[1].ShowColumns("Name", "Inhalt", "Kommentar");
-        } else {
-            car[1].ShowColumns("Name", "Typ", "RO", "System", "Inhalt", "Kommentar");
+        if (car != null) {
+            if (Editabe) {
+                car[1].ShowColumns("Name", "Inhalt", "Kommentar");
+            } else {
+                car[1].ShowColumns("Name", "Typ", "RO", "System", "Inhalt", "Kommentar");
+            }
+            //car[1].HideSystemColumns();
+            x.ColumnArrangements = new(car);
         }
 
-        //car[1].HideSystemColumns();
-        x.ColumnArrangements = new(car);
         x.SortDefinition = new RowSortDefinition(x, "Name", true);
         tableVariablen.DatabaseSet(x, string.Empty);
         tableVariablen.Arrangement = 1;

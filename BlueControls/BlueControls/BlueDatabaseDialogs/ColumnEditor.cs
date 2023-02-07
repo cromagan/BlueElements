@@ -168,12 +168,14 @@ internal sealed partial class ColumnEditor {
     }
 
     private void btnSchnellText_Click(object sender, System.EventArgs e) {
+        if (_column?.Database == null || _column.Database.IsDisposed) { return; }
         if (!AllOk()) { return; }
         _column.GetStyleFrom(ColumnFormatHolder.Text);
         Column_DatenAuslesen(_column);
     }
 
     private void btnStandard_Click(object sender, System.EventArgs e) {
+        if (_column?.Database == null || _column.Database.IsDisposed) { return; }
         if (!AllOk()) { return; }
         _column.ResetSystemToDefault(true);
         Column_DatenAuslesen(_column);
@@ -188,11 +190,13 @@ internal sealed partial class ColumnEditor {
     private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(_column.Database.Column_UsedIn(_column));
 
     private void butAktuellVor_Click(object sender, System.EventArgs e) {
+        if (_column?.Database == null || _column.Database.IsDisposed) { return; }
         if (!AllOk()) { return; }
         Column_DatenAuslesen(_table.CurrentArrangement[_column].NextVisible().Column);
     }
 
     private void butAktuellZurueck_Click(object sender, System.EventArgs e) {
+        if (_column?.Database == null || _column.Database.IsDisposed) { return; }
         if (!AllOk()) { return; }
         Column_DatenAuslesen(_table.CurrentArrangement[_column].PreviewsVisible().Column);
     }
@@ -500,7 +504,7 @@ internal sealed partial class ColumnEditor {
     }
 
     private void GeneratFilterListe() {
-        //GetLinkedCellFilter();
+        if (_column?.Database == null || _column.Database.IsDisposed) { return; }
 
         _column.LinkedDatabaseFile = cbxLinkedDatabase.Text;
 
@@ -592,6 +596,7 @@ internal sealed partial class ColumnEditor {
 
     private void GetLinkedCellFilter() {
         if (tblFilterliste.Database == null) { return; }
+        if (_column?.Database == null || _column.Database.IsDisposed) { return; }
 
         var nf = new List<string>();
         foreach (var thisr in tblFilterliste.Database.Row) {
@@ -627,6 +632,8 @@ internal sealed partial class ColumnEditor {
     }
 
     private void tabControl_SelectedIndexChanged(object sender, System.EventArgs e) {
+        if (_column?.Database == null || _column.Database.IsDisposed) { return; }
+
         if (tabControl.SelectedTab == tabSpaltenVerlinkung && cbxLinkedDatabase.Item.Count == 0) {
             var l = DatabaseAbstract.AllAvailableTables();
 

@@ -314,7 +314,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     public void DoSpecialFormats(ColumnItem? column, RowItem? row, string previewsValue, bool doAlways) {
         if (_database == null || _database.IsDisposed) { return; }
         if (row == null) { return; }
-        if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database.ConnectionData.TableName); }
+        if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + _database?.ConnectionData.TableName); }
 
         var currentValue = GetString(column, row);
 
@@ -413,7 +413,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (key == null) { return null; }
 
-        if (Sizes.ContainsKey(key)) { return Sizes[key]; };
+        if (Sizes.ContainsKey(key)) { return Sizes[key]; }
 
         return null;
     }
@@ -496,7 +496,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             // Tatsächlichen String ermitteln --------------------------------------------
             var txt = string.Empty;
             var fColumn = column;
-            if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (column != null && column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 var (columnItem, rowItem, _) = LinkedCellData(column, row, false, false);
                 if (columnItem != null && rowItem != null) {
                     txt = rowItem.CellGetString(columnItem);
@@ -651,6 +651,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     internal static List<RowItem?> ConnectedRowsOfRelations(string completeRelationText, RowItem? row) {
         List<RowItem?> allRows = new();
+        if (row?.Database?.Column.First == null || row.Database.IsDisposed) { return allRows; }
+
         var names = row.Database.Column.First.GetUcaseNamesSortedByLenght();
         var relationTextLine = completeRelationText.ToUpper().SplitAndCutByCr();
         foreach (var thisTextLine in relationTextLine) {
@@ -670,6 +672,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     internal string CompareKey(ColumnItem? column, RowItem? row) => GetString(column, row).CompareKey(column.SortType);
 
     internal void InvalidateAllSizes() {
+        if (_database == null || _database.IsDisposed) { return; }
         foreach (var thisColumn in _database.Column) {
             thisColumn.Invalidate_ColumAndContent();
         }
@@ -691,13 +694,14 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     //    return Size.Empty;
     //}
     internal void OnCellValueChanged(CellEventArgs e) {
+        if (e.Column == null) { return; }
         e.Column.UcaseNamesSortedByLenght = null;
         CellValueChanged?.Invoke(this, e);
     }
 
     internal void RemoveOrphans() {
         try {
-            List<string?> removeKeys = new();
+            List<string> removeKeys = new();
 
             foreach (var pair in this.Where(pair => !string.IsNullOrEmpty(pair.Value.Value))) {
                 DataOfCellKey(pair.Key, out var column, out var row);
@@ -713,11 +717,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                     return;
                 }
             }
-
-            return;
         } catch {
             Develop.CheckStackForOverflow(); // Um Rauszufinden, ob endlos-Schleifen öfters  vorkommen. Zuletzt 24.11.2020
-            return;
         }
     }
 
@@ -867,11 +868,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     private static (ColumnItem? column, RowItem? row, string info) RepairLinkedCellValue(DatabaseAbstract linkedDatabase, ColumnItem column, RowItem? row, bool addRowIfNotExists) {
         RowItem? targetRow = null;
 
-        /// Spalte aus der Ziel-Datenbank ermitteln
+        // Spalte aus der Ziel-Datenbank ermitteln
         var targetColumn = linkedDatabase.Column.Exists(column.LinkedCell_ColumnNameOfLinkedDatabase);
         if (targetColumn == null) { return Ergebnis("Die Spalte ist in der Zieldatenbank nicht vorhanden."); }
 
-        /// Zeile aus der Ziel-Datenbank ermitteln
+        // Zeile aus der Ziel-Datenbank ermitteln
         if (row == null) { return Ergebnis("Keine Zeile zum finden des Zeilenschlüssels angegeben."); }
 
         //if (column.Format != DataFormat.Verknüpfung_zu_anderer_Datenbank) {
@@ -890,16 +891,21 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (column?.Database == null || column.Database.IsDisposed) { return Ergebnis("Verknüpfte Datenbank verworfen."); }
 
         var r = linkedDatabase.Row.CalculateFilteredRows(filter);
-        if (r.Count > 1) { return Ergebnis("Suchergebnis liefert mehrere Ergebnisse."); }
+        switch (r.Count) {
+            case > 1:
+                return Ergebnis("Suchergebnis liefert mehrere Ergebnisse.");
 
-        if (r.Count == 1) {
-            targetRow = r[0];
-        } else {
-            if (addRowIfNotExists) {
-                targetRow = linkedDatabase.Row.GenerateAndAdd(filter, "LinkedCell aus " + column.Database.TableName);
-            }
+            case 1:
+                targetRow = r[0];
+                break;
+
+            default: {
+                    if (addRowIfNotExists) {
+                        targetRow = linkedDatabase.Row.GenerateAndAdd(filter, "LinkedCell aus " + column.Database.TableName);
+                    }
+                    break;
+                }
         }
-        //   }
 
         return targetRow == null ? Ergebnis("Die Zeile ist in der Zieldatenbank nicht vorhanden.") : Ergebnis(string.Empty);
 

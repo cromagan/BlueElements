@@ -50,7 +50,6 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         if (sldHelligkeit.Value != 1) {
             var picPreview = AdjustBrightness(originalPic, sldHelligkeit.Value);
             e.DrawImage(picPreview);
-            return;
         }
     }
 

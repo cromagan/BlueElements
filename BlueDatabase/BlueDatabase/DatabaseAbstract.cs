@@ -23,6 +23,7 @@ using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
+using BlueScript;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
@@ -72,10 +73,15 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     private readonly List<ExportDefinition?> _export = new();
 
     private readonly LayoutCollection _layouts = new();
+
     private readonly List<string> _permissionGroupsNewRow = new();
+
     private readonly long _startTick = DateTime.UtcNow.Ticks;
+
     private readonly List<string> _tags = new();
-    private readonly List<Variable> _variables = new();
+
+    private readonly List<VariableString> _variables = new();
+
     private string _additionalFilesPfad = string.Empty;
 
     private BackgroundWorker? _backgroundWorker;
@@ -99,10 +105,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     private DateTime _lastUserActionUtc = new(1900, 1, 1);
 
-    //private string _rulesScript = string.Empty;
-
     private RowSortDefinition? _sortDefinition;
 
+    //private string _rulesScript = string.Empty;
     /// <summary>
     /// Die Eingabe des Benutzers. Ist der Pfad gewünscht, muss FormulaFileName benutzt werden.
     /// </summary>
@@ -114,8 +119,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     private string _zeilenQuickInfo = string.Empty;
 
     #endregion
-
-    //public DatabaseAbstract(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) : this(ci.TableName, readOnly) { }
 
     #region Constructors
 
@@ -143,6 +146,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     #region Delegates
 
+    //public DatabaseAbstract(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) : this(ci.TableName, readOnly) { }
     public delegate string NeedPassword();
 
     #endregion
@@ -368,7 +372,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
     }
 
-    public ReadOnlyCollection<Variable> Variables {
+    public ReadOnlyCollection<VariableString> Variables {
         get => new(_variables);
         set {
             if (_variables.ToString(true) == value.ToString(true)) { return; }
@@ -455,10 +459,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
     }
 
-    /// <summary>
-    /// Sucht die Datenbank im Speicher. Wird sie nicht gefunden, wird sie geladen.
-    /// </summary>
-
     public static DatabaseAbstract? GetById(ConnectionInfo? ci, NeedPassword? needPassword) {
         if (ci is null) { return null; }
 
@@ -525,6 +525,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return null;
     }
 
+    /// <summary>
+    /// Sucht die Datenbank im Speicher. Wird sie nicht gefunden, wird sie geladen.
+    /// </summary>
     public static DatabaseAbstract? LoadResource(Assembly assembly, string name, string blueBasicsSubDir, bool fehlerAusgeben, bool mustBeStream) {
         if (Develop.IsHostRunning() && !mustBeStream) {
             var x = -1;
@@ -669,13 +672,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return string.Empty;
     }
 
-    /// <summary>
-    /// Einstellungen der Quell-Datenbank auf diese hier übertragen
-    /// </summary>
-    /// <param name="sourceDatabase"></param>
-    /// <param name="cellDataToo"></param>
-    /// <param name="tagsToo"></param>
-
     public void CloneFrom(DatabaseAbstract sourceDatabase, bool cellDataToo, bool tagsToo) {
         _ = sourceDatabase.Save();
         sourceDatabase.SetReadOnly();
@@ -726,6 +722,12 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         UndoCount = sourceDatabase.UndoCount;
     }
 
+    /// <summary>
+    /// Einstellungen der Quell-Datenbank auf diese hier übertragen
+    /// </summary>
+    /// <param name="sourceDatabase"></param>
+    /// <param name="cellDataToo"></param>
+    /// <param name="tagsToo"></param>
     public string Column_UsedIn(ColumnItem? column) {
         if (column == null) { return string.Empty; }
 
@@ -798,6 +800,118 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(true);
         GC.SuppressFinalize(this);
+    }
+
+    public Script? DoScript(Events? eventname, bool onlyTesting, string? scriptname, RowItem? row) {
+        try {
+            if (IsDisposed) { return null; }
+
+            if (eventname != null && !string.IsNullOrEmpty(scriptname)) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Event und Skript angekommen!");
+                return null;
+            }
+
+            if (eventname == null && string.IsNullOrEmpty(scriptname)) { return null; }
+
+            if (string.IsNullOrEmpty(scriptname)) {
+                foreach (var thisEvent in EventScript) {
+                    if (thisEvent != null && thisEvent.Events.HasFlag(eventname)) {
+                        scriptname = thisEvent.Name;
+                        break;
+                    }
+                }
+            }
+
+            if (scriptname == null || string.IsNullOrWhiteSpace(scriptname)) { return null; }
+
+            var script = EventScript.Get(scriptname);
+            if (script == null) { return null; }
+
+            if (script.NeedRow && row == null) { return null; }
+
+            if (!script.NeedRow) { row = null; }
+
+            return DoScript(script.Script, onlyTesting, row);
+        } catch {
+            return DoScript(eventname, onlyTesting, scriptname, row);
+        }
+    }
+
+    /// <summary>
+    /// Führt alle Regeln aus und löst das Ereignis DoSpecialRules aus. Setzt ansonsten keine Änderungen, wie z.B. SysCorrect oder Runden-Befehle.
+    /// </summary>
+    /// <returns>Gibt Regeln, die einen Fehler verursachen zurück. z.B. SPALTE1|Die Splate darf nicht leer sein.</returns>
+    public Script? DoScript(string scripttext, bool onlyTesting, RowItem? row) {
+        if (IsDisposed) { return null; }
+
+        try {
+            List<Variable> vars = new();
+
+            #region Variablen für Skript erstellen
+
+            if (row != null) {
+                foreach (var thisCol in Column) {
+                    var v = RowItem.CellToVariable(thisCol, row);
+                    if (v != null) {
+                        vars.AddRange(v);
+                    }
+                }
+            }
+
+            foreach (var thisvar in Variables) {
+                var v = new VariableString("DB_" + thisvar.Name, thisvar.ValueString, false, false,
+                    "Datenbank-Kopf-Variable\r\n" + thisvar.Comment);
+            }
+
+            vars.Add(new VariableString("User", UserName, true, false, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
+            vars.Add(new VariableString("Usergroup", UserGroup, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
+            vars.Add(new VariableBool("Administrator", IsAdministrator(), true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
+            vars.Add(new VariableDatabase("Database", this, true, true, string.Empty));
+
+            if (!string.IsNullOrEmpty(AdditionalFilesPfadWhole())) {
+                vars.Add(new VariableString("AdditionalFilesPfad", AdditionalFilesPfadWhole(), true, false, "Der Dateipfad der Datenbank, in dem zusäzliche Daten gespeichert werden."));
+            }
+
+            #endregion
+
+            #region Script ausführen
+
+            Script sc = new(vars, AdditionalFilesPfadWhole(), onlyTesting) {
+                ScriptText = scripttext
+            };
+            sc.Parse();
+
+            #endregion
+
+            if (!onlyTesting) {
+
+                #region Variablen zurückschreiben und Special Rules ausführen
+
+                if (!string.IsNullOrEmpty(sc.Error)) {
+                    return sc;
+                }
+
+                if (row != null) {
+                    foreach (var thisCol in Column) {
+                        row.VariableToCell(thisCol, vars);
+                    }
+                }
+
+                foreach (var thisvar in Variables) {
+                    var v = vars.Get("DB_" + thisvar.Name);
+
+                    if (v is VariableString vs) {
+                        thisvar.ValueString = vs.ValueString;
+                    }
+                }
+            }
+
+            #endregion
+
+            return sc;
+        } catch {
+            return DoScript(scripttext, onlyTesting, row);
+        }
     }
 
     public string ErrorReason(ErrorReason mode) {
@@ -1535,7 +1649,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 _variables.Clear();
                 List<string> va = new(value.SplitAndCutByCr());
                 foreach (var t in va) {
-                    _variables.Add(ParsebleItem.NewByParsing<Variable>(t));
+                    _variables.Add(ParsebleItem.NewByParsing<VariableString>(t));
                 }
                 break;
 

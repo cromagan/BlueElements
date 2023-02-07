@@ -1,7 +1,6 @@
 ﻿using BlueBasics;
 using BlueControls;
 using System;
-using System.Globalization;
 using System.Windows.Forms;
 
 namespace BeCreative;

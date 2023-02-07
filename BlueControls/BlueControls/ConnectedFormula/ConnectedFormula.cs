@@ -42,10 +42,10 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
     public static readonly float Umrechnungsfaktor2 = MmToPixel(StandardHöhe, 300) / 22;
     public readonly ListExt<string> DatabaseFiles = new();
     public readonly ListExt<string> NotAllowedChilds = new();
-    public string _loadedVersion = "0.00";
     private string _createDate;
     private string _creator;
     private int _id = -1;
+    private string _loadedVersion = "0.00";
     private BlueBasics.MultiUserFile.MultiUserFile? _muf;
     private ItemCollectionPad? _padData;
 
@@ -108,7 +108,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
     #region Properties
 
-    public string Filename => _muf.Filename;
+    public string Filename => _muf?.Filename ?? string.Empty;
 
     // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
     // ~ConnectedFormula()
@@ -133,7 +133,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
                 _padData.Changed += PadData_Changed;
             }
 
-            if (_saving || _muf.IsLoading) { return; }
+            if (_saving || (_muf?.IsLoading ?? false)) { return; }
 
             _saved = false;
         }
@@ -185,7 +185,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
     public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
-    public void Save() => _muf.Save(true);
+    public void Save() => _muf?.Save(true);
 
     /// <summary>
     /// Prüft, ob das Formular sichtbare Elemente hat.
@@ -212,13 +212,13 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         return false;
     }
 
-    internal void SaveAsAndChangeTo(string fileName) => _muf.SaveAsAndChangeTo(fileName);
+    internal void SaveAsAndChangeTo(string fileName) => _muf?.SaveAsAndChangeTo(fileName);
 
     protected virtual void Dispose(bool disposing) {
         if (!IsDisposed) {
             AllFiles.Remove(this);
             if (disposing) {
-                _ = _muf.Save(true);
+                _ = _muf?.Save(true);
                 _muf?.Dispose();
                 _muf = null;
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
@@ -291,7 +291,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
     }
 
     private void DatabaseFiles_Changed(object sender, System.EventArgs e) {
-        if (_saving || _muf.IsLoading) { return; }
+        if (_saving || (_muf?.IsLoading ?? true)) { return; }
 
         foreach (var thisfile in DatabaseFiles) {
             _ = DatabaseAbstract.GetById(new ConnectionInfo(thisfile, null), null);
@@ -301,7 +301,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
     }
 
     private void NotAllowedChilds_Changed(object sender, System.EventArgs e) {
-        if (_saving || _muf.IsLoading) { return; }
+        if (_saving || (_muf?.IsLoading ?? true)) { return; }
         _saved = false;
     }
 
@@ -328,7 +328,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
     }
 
     private void PadData_Changed(object sender, System.EventArgs e) {
-        if (_saving || _muf.IsLoading) { return; }
+        if (_saving || (_muf?.IsLoading ?? true)) { return; }
 
         _saved = false;
     }
