@@ -52,6 +52,8 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
 
     public List<FlexiControl>? AdditionalStyleOptions = null;
 
+    public List<string> Tags = new();
+
     /// <summary>
     /// Soll es gedruckt werden?
     /// </summary>
@@ -419,6 +421,16 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
                 _page = value.FromNonCritical();
                 return true;
 
+            case "tags":
+                value = value.Replace("\r", "|");
+
+                var tmp = value.FromNonCritical().SplitBy("|");
+                Tags.Clear();
+                foreach (var thiss in tmp) {
+                    Tags.Add(thiss.FromNonCritical());
+                }
+                return true;
+
             default:
                 return false;
         }
@@ -449,6 +461,8 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
         if (!string.IsNullOrEmpty(Gruppenzugehörigkeit)) {
             result.ParseableAdd("RemoveTooGroup", Gruppenzugehörigkeit);
         }
+
+        result.ParseableAdd("Tags", Tags);
 
         return result.Parseable(base.ToString());
     }

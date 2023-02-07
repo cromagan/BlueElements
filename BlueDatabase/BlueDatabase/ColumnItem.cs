@@ -1460,7 +1460,11 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             var c = LinkedDatabase.Column.Exists(_linkedCell_ColumnNameOfLinkedDatabase);
             if (c == null) { return "Die verknüpfte Schlüsselspalte existiert nicht."; }
             //var (filter, info) = CellCollection.GetFilterFromLinkedCellData(LinkedDatabase, column, row);
-            if (_linkedCellFilter == null || _linkedCellFilter.Count == 0) { return "Keine Filter für verknüpfte Datenbank definiert."; }
+            if (_linkedCellFilter == null || _linkedCellFilter.Count == 0) {
+                if (Format != DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) {
+                    return "Keine Filter für verknüpfte Datenbank definiert.";
+                }
+            }
         } else {
             if (!string.IsNullOrEmpty(_linkedCell_ColumnNameOfLinkedDatabase)) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
         }

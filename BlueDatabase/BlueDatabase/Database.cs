@@ -652,7 +652,6 @@ public sealed class Database : DatabaseAbstract {
     }
 
     public override bool Save() {
-        return true;
         if (ReadOnly) { return false; }
         if (string.IsNullOrEmpty(Filename)) { return false; }
 

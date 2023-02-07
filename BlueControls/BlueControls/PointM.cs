@@ -38,6 +38,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable {
     #region Fields
 
     private object? _parent;
+    private string _tag;
     private float _x;
     private float _y;
 
@@ -107,6 +108,15 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable {
         set {
             if (_parent == value) { return; }
             _parent = value;
+            OnChanged();
+        }
+    }
+
+    public string Tag {
+        get => _tag;
+        set {
+            if (_tag == value) { return; }
+            _tag = value;
             OnChanged();
         }
     }
@@ -182,8 +192,8 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable {
                     KeyName = pair.Value.FromNonCritical();
                     break;
 
-                case "tag": // TODO: Entfernt, 06.02.2023
-                    //Tag = pair.Value.FromNonCritical();
+                case "tag":
+                    _tag = pair.Value.FromNonCritical();
                     break;
 
                 case "x":
@@ -260,7 +270,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable {
         result.ParseableAdd("Name", KeyName);
         result.ParseableAdd("X", _x);
         result.ParseableAdd("Y", _y);
-        //result.ParseableAdd("Tag", Tag);
+        result.ParseableAdd("Tag", _tag);
         return result.Parseable();
     }
 

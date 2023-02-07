@@ -106,12 +106,14 @@ public static class Allgemein {
         }
 
         var did = false;
-        foreach (var thisf in FormManager.Forms) {
-            if (thisf is IHasStatusbar fd) {
-                var x = fd.UpdateStatus(type, text, did);
-                if (x) { did = true; }
+        try {
+            foreach (var thisf in FormManager.Forms) {
+                if (thisf is IHasStatusbar fd) {
+                    var x = fd.UpdateStatus(type, text, did);
+                    if (x) { did = true; }
+                }
             }
-        }
+        } catch { }
     }
 
     private static void AllFiles_ItemAdded(object sender, ListEventArgs e) {
