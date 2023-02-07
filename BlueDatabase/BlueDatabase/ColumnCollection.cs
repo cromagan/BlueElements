@@ -463,13 +463,13 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     internal void ChangeName(string oldName, string newName) {
         if (oldName == newName) { return; }
 
-        var x = _internal.TryRemove(oldName, out var vcol);
+        var x = _internal.TryRemove(oldName.ToUpper(), out var vcol);
         if (!x) {
             Develop.DebugPrint(FehlerArt.Fehler, "Schlüsselfehler 1");
             return;
         }
 
-        x = _internal.TryAdd(newName, vcol);
+        x = _internal.TryAdd(newName.ToUpper(), vcol);
         if (!x) {
             Develop.DebugPrint(FehlerArt.Fehler, "Schlüsselfehler 2");
         }

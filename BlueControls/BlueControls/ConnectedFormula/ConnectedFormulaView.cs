@@ -330,6 +330,10 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
         foreach (var fcfc in listf) {
             fcfc.PauseValueChanged = false;
         }
+
+        if (Database?.Row.SearchByKey(RowKey) is RowItem r) {
+            r.DoAutomatic(BlueDatabase.Enums.Events.error_check, false, string.Empty);
+        }
     }
 
     #endregion

@@ -335,7 +335,12 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     private void DoÄhnlich() {
         //_TableView.Database.Column.Count == 0 Ist eine nigelnagelneue Datenbank
         if (_tableView?.Database == null || _tableView.Database.Column.Count == 0) { return; }
-        List<FilterItem> fl = new() { new FilterItem(_tableView.Database.Column.First, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
+
+        var col = _tableView.Database.Column.First;
+
+        if (col == null) { return; } // Neue Datenbank?
+
+        List<FilterItem> fl = new() { new FilterItem(col, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
 
         var r = _tableView.Database.Row.CalculateFilteredRows(fl);
         if (_ähnliche != null) {

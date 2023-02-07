@@ -905,12 +905,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public void ImportClipboard() {
         Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-        if (!System.Windows.Forms.Clipboard.ContainsText()) {
+        if (!System.Windows.Clipboard.ContainsText()) {
             Notification.Show("Abbruch,<br>kein Text im Zwischenspeicher!", ImageCode.Information);
             return;
         }
 
-        var nt = System.Windows.Forms.Clipboard.GetText();
+        var nt = System.Windows.Clipboard.GetText();
         ImportCsv(nt);
     }
 
@@ -1429,12 +1429,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                                 _isinKeyDown = false;
                                 return;
                             }
-                            if (!System.Windows.Forms.Clipboard.ContainsText()) {
+                            if (!System.Windows.Clipboard.ContainsText()) {
                                 NotEditableInfo("Kein Text in der Zwischenablage.");
                                 _isinKeyDown = false;
                                 return;
                             }
-                            var ntxt = System.Windows.Forms.Clipboard.GetText();
+                            var ntxt = System.Windows.Clipboard.GetText();
                             if (CursorPosRow?.Row.CellGetString(CursorPosColumn) == ntxt) {
                                 _isinKeyDown = false;
                                 return;
@@ -1926,7 +1926,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             //    }
 
             case "doclipboard": {
-                    var clipTmp = System.Windows.Forms.Clipboard.GetText();
+                    var clipTmp = System.Windows.Clipboard.GetText();
                     clipTmp = clipTmp.RemoveChars(Constants.Char_NotFromClip);
                     clipTmp = clipTmp.TrimEnd("\r\n");
                     var searchValue = new List<string>(clipTmp.SplitAndCutByCr()).SortedDistinctList();
@@ -1938,7 +1938,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 }
 
             case "donotclipboard": {
-                    var clipTmp = System.Windows.Forms.Clipboard.GetText();
+                    var clipTmp = System.Windows.Clipboard.GetText();
                     clipTmp = clipTmp.RemoveChars(Constants.Char_NotFromClip);
                     clipTmp = clipTmp.TrimEnd("\r\n");
                     var columInhalt = Database.Export_CSV(FirstRow.Without, e.Column, null).SplitAndCutByCrToList().SortedDistinctList();

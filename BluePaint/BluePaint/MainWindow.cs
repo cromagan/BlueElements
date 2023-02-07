@@ -133,18 +133,19 @@ public partial class MainWindow {
 
     private void btnCopy_Click(object sender, System.EventArgs e) {
         SetTool(null); // um OnToolChangeAuszulösen
-        if (P.Bmp == null) {
-            MessageBox.Show("Kein Bild vorhanden.");
+        if (P.Bmp is Bitmap pic) {
+            System.Windows.Forms.Clipboard.SetImage(pic);
+            //System.Windows.Clipboard.SetDataObject(P.Bmp, false);
+            Notification.Show("Das Bild ist nun<br>in der Zwischenablage.", ImageCode.Clipboard);
+
             return;
         }
-        System.Windows.Forms.Clipboard.SetImage(P.Bmp);
-        //System.Windows.Forms.Clipboard.SetDataObject(P.Bmp, false);
-        Notification.Show("Das Bild ist nun<br>in der Zwischenablage.", ImageCode.Clipboard);
+        MessageBox.Show("Kein Bild vorhanden.");
     }
 
     private void btnEinfügen_Click(object sender, System.EventArgs e) {
         if (!IsSaved()) { return; }
-        if (!System.Windows.Forms.Clipboard.ContainsImage()) {
+        if (!System.Windows.Clipboard.ContainsImage()) {
             Notification.Show("Abbruch,<br>kein Bild im Zwischenspeicher!", ImageCode.Information);
             return;
         }

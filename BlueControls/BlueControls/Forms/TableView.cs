@@ -257,6 +257,8 @@ public partial class TableView : Form, IHasStatusbar {
 
     protected virtual void btnDrucken_ItemClicked(object sender, BasicListItemEventArgs e) {
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+        DatabaseAbstract.ForceSaveAll();
+
         switch (e.Item.KeyName) {
             case "erweitert":
                 Visible = false;
@@ -433,6 +435,8 @@ public partial class TableView : Form, IHasStatusbar {
     protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
         DatabaseSet(null, string.Empty);
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(true);
+        DatabaseAbstract.ForceSaveAll();
+
         base.OnFormClosing(e);
     }
 
@@ -664,7 +668,7 @@ public partial class TableView : Form, IHasStatusbar {
 
                 //case "ContentPaste":
                 //    d
-                //    row.CellSet(column, System.Windows.Forms.Clipboard.GetText());
+                //    row.CellSet(column, System.Windows.Clipboard.GetText());
                 //    break;
 
                 //case "ColumnContentDelete":
@@ -759,6 +763,8 @@ public partial class TableView : Form, IHasStatusbar {
 
     private void btnLetzteDateien_ItemClicked(object sender, BasicListItemEventArgs e) {
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+        DatabaseAbstract.ForceSaveAll();
+
         _ = SwitchTabToDatabase(new ConnectionInfo(e.Item.KeyName, PreveredDatabaseID));
     }
 
@@ -794,6 +800,7 @@ public partial class TableView : Form, IHasStatusbar {
 
     private void btnNeuDB_Click(object sender, System.EventArgs e) {
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+        DatabaseAbstract.ForceSaveAll();
 
         _ = SaveTab.ShowDialog();
         if (!DirectoryExists(SaveTab.FileName.FilePath())) {
@@ -818,6 +825,7 @@ public partial class TableView : Form, IHasStatusbar {
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+        DatabaseAbstract.ForceSaveAll();
         _ = LoadTab.ShowDialog();
     }
 
@@ -828,11 +836,9 @@ public partial class TableView : Form, IHasStatusbar {
 
     private void btnSaveAs_Click(object sender, System.EventArgs e) {
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-        Database.ForceSaveAll();
+        DatabaseAbstract.ForceSaveAll();
 
         if (Table.Database is Database db) {
-            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-
             _ = SaveTab.ShowDialog();
             if (!DirectoryExists(SaveTab.FileName.FilePath())) {
                 return;
@@ -851,8 +857,10 @@ public partial class TableView : Form, IHasStatusbar {
         }
     }
 
-    private void btnSaveLoad_Click(object sender, System.EventArgs e) =>
+    private void btnSaveLoad_Click(object sender, System.EventArgs e) {
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(true);
+        DatabaseAbstract.ForceSaveAll();
+    }
 
     private void btnSpaltenanordnung_Click(object sender, System.EventArgs e) {
         var x = new ColumnArrangementPadEditor(Table.Database);

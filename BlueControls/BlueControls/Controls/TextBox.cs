@@ -383,7 +383,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         if (this is not ComboBox cbx || cbx.DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
             _ = items.Add(ContextMenuComands.Ausschneiden, Convert.ToBoolean(_markStart >= 0) && Enabled);
             _ = items.Add(ContextMenuComands.Kopieren, Convert.ToBoolean(_markStart >= 0));
-            _ = items.Add(ContextMenuComands.Einfügen, System.Windows.Forms.Clipboard.ContainsText() && Enabled);
+            _ = items.Add(ContextMenuComands.Einfügen, System.Windows.Clipboard.ContainsText() && Enabled);
             if (_formatierungErlaubt) {
                 _ = items.AddSeparator();
                 _ = items.Add("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(ImageCode.Sonne, 16), _cursorCharPos > -1);
@@ -862,9 +862,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         // Anscheinend wird bei den Clipboard operationen ein DoEventXsx ausgelöst.
         // Dadurch kommt es zum Refresh des übergeordneten Steuerelementes, warscheinlich der Textbox.
         // Deshalb  muss 'Char_DelBereich' NACH den Clipboard-Operationen stattfinden.
-        if (!System.Windows.Forms.Clipboard.ContainsText()) { return; }
+        if (!System.Windows.Clipboard.ContainsText()) { return; }
         Char_DelBereich(-1, -1);
-        InsertText(System.Windows.Forms.Clipboard.GetText());
+        InsertText(System.Windows.Clipboard.GetText());
     }
 
     /// <summary>
