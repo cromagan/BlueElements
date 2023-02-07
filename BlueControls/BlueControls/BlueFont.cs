@@ -250,12 +250,12 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName {
 
     public static BlueFont Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, Color colorMain, Color colorOutline, bool kapitälchen, bool onlyUpper, bool onlyLower) => Get(fontName, fontSize, bold, italic, underline, strikeout, outLine, colorMain.ToHtmlCode(), colorOutline.ToHtmlCode(), kapitälchen, onlyUpper, onlyLower);
 
-    public static BlueFont Get(string code) {
-        if (string.IsNullOrEmpty(code) || !code.Contains("{")) { code = "{Name=Arial, Size=10, Color=ff0000}"; }
+    public static BlueFont Get(string toParse) {
+        if (string.IsNullOrEmpty(toParse) || !toParse.Contains("{")) { toParse = "{Name=Arial, Size=10, Color=ff0000}"; }
 
-        if (FontsAll.Get(code.ToUpper().Replace(" ", string.Empty)) is BlueFont found) { return found; }
+        if (FontsAll.Get(toParse.ToUpper().Replace(" ", string.Empty)) is BlueFont found) { return found; }
 
-        BlueFont f = new(code);
+        BlueFont f = new(toParse);
         FontsAll.Add(f);
 
         return f;

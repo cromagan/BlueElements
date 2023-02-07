@@ -221,7 +221,14 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
                 return true;
 
             case "embedded":
-                Eingebettete_Ansichten = value.FromNonCritical().SplitAndCutByCrToList();
+
+                value = value.Replace("\r", "|");
+
+                var tmp = value.FromNonCritical().SplitBy("|");
+                Eingebettete_Ansichten.Clear();
+                foreach (var thiss in tmp) {
+                    Eingebettete_Ansichten.Add(thiss.FromNonCritical());
+                }
                 return true;
 
             case "color":

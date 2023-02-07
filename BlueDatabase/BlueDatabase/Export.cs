@@ -457,7 +457,7 @@ public static class Export {
     //        //  If Not tmpBody.Contains("{Type=BlueBasics.TextItem, InternalName=05.03.2015 12:31:071741881, Dpi=300,") Then Stop
     //    } while (true);
     //}
-    //private static string GenerateLayoutString(string Code, RowItem vRow, string Art) {
+    //private static string GenerateLayoutString(string toParse, RowItem vRow, string Art) {
     //    var Wi = 8;
     //    var He = 8;
     //    Code = Code.TrimStart("//" + Art + "/");

@@ -286,7 +286,6 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
         #endregion
     }
 
-    //    if (code.StartsWith("[I]")) { code = code.FromNonCritical(); }
     /// <summary>
     /// Zeichnet die UsedArea. mehr für Debugging gedacht.
     /// </summary>
@@ -297,9 +296,6 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
     /// <param name="c"></param>
     public void DrawOutline(Graphics gr, float zoom, float shiftX, float shiftY, Color c) => gr.DrawRectangle(new Pen(c), UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false));
 
-    //public static BasicPadItem? NewByParsing(string code) {
-    //    var ding = string.Empty;
-    //    var name = string.Empty;
     /// <summary>
     /// Gibt für das aktuelle Item das "Kontext-Menü" zurück.
     /// Alle Elemente für dieses Menü müssen neu erzeugt werden

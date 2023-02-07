@@ -46,7 +46,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
     public static BlueFont? CaptionFnt = Skin.GetBlueFont(Design.Caption, States.Standard);
 
     public List<string> VisibleFor = new();
-    private string _getValueFromkey = null;
+    private string? _getValueFromkey = null;
     private ICalculateRowsItemLevel? _tmpgetValueFrom;
 
     #endregion
@@ -86,7 +86,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
 
     public string Datenbank {
         get {
-            if (GetRowFrom?.Database == null) { return "?"; }
+            if (GetRowFrom?.Database == null || GetRowFrom.Database.IsDisposed) { return "?"; }
 
             return GetRowFrom.Database.TableName;
         }
@@ -96,6 +96,8 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
     public string Datenquelle_wählen {
         get => string.Empty;
         set {
+            if (Parent is null) { return; }
+
             var x = new ItemCollectionList.ItemCollectionList(true);
             foreach (var thisR in Parent) {
                 if (thisR.IsVisibleOnPage(Page) && thisR is ICalculateRowsItemLevel rfp) {
@@ -125,13 +127,17 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
 
     public ICalculateRowsItemLevel? GetRowFrom {
         get {
+            if (Parent == null || _getValueFromkey == null) { return null; }
+
             _tmpgetValueFrom ??= Parent[_getValueFromkey] as ICalculateRowsItemLevel;
 
             return _tmpgetValueFrom;
         }
         set {
-            if (value.KeyName == _getValueFromkey) { return; }
-            _getValueFromkey = value.KeyName;
+            var kn = value?.KeyName ?? string.Empty;
+
+            if (kn == _getValueFromkey) { return; }
+            _getValueFromkey = kn;
             _tmpgetValueFrom = null;
             RepairConnections();
             RaiseVersion();
@@ -256,8 +262,13 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
                 return true;
 
             case "visiblefor":
+                value = value.Replace("\r", "|");
+
+                var tmp = value.FromNonCritical().SplitBy("|");
                 VisibleFor.Clear();
-                VisibleFor.AddRange(value.FromNonCritical().SplitAndCutByCr());
+                foreach (var thiss in tmp) {
+                    VisibleFor.Add(thiss.FromNonCritical());
+                }
                 if (VisibleFor.Count == 0) { VisibleFor.Add("#Everybody"); }
                 return true;
         }
@@ -272,8 +283,6 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
     }
 
     public override string ToString() {
-        var t = base.ToString();
-        t = t.Substring(0, t.Length - 1);
         var result = new List<string>();
 
         result.ParseableAdd("Version", Version);
@@ -281,9 +290,9 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
         if (VisibleFor.Count == 0) { VisibleFor.Add("#Everybody"); }
 
         result.ParseableAdd("VisibleFor", VisibleFor);
-        result.ParseableAdd("GetValueFrom", GetRowFrom?.KeyName);
+        result.ParseableAdd("GetValueFrom", _getValueFromkey);
 
-        return t.Trim(", ") + "}";
+        return result.Parseable(base.ToString());
     }
 
     internal bool IsVisibleForMe(string? myGroup, string? myName) {

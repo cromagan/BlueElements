@@ -108,7 +108,7 @@ public class ItemConnection : IStringable, IChangedFeedback {
         result.ParseableAdd("Arrow2", ArrowOnOtherItem);
         result.ParseableAdd("Type2", OtherItemType);
         result.ParseableAdd("Print", _beiExportSichtbar);
-        return result.Parseable(base.ToString());
+        return result.Parseable();
     }
 
     #endregion

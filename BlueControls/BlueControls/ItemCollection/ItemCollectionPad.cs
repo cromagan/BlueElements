@@ -168,7 +168,11 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
 
                     break;
 
-                case "connections":
+                case "connection":
+                    CreateConnection(pair.Value);
+                    break;
+
+                case "connections": // TODO: Obsolet ab 07.02.2023
                     ParseConnections(pair.Value);
                     break;
 
@@ -715,8 +719,10 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         OnChanged();
     }
 
-    private void CreateConnection(string toparse) {
-        var x = toparse.GetAllTags();
+    private void CreateConnection(string toParse) {
+        if (toParse.StartsWith("[I]")) { toParse = toParse.FromNonCritical(); }
+
+        var x = toParse.GetAllTags();
 
         BasicPadItem? item1 = null;
         BasicPadItem? item2 = null;
@@ -764,6 +770,11 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
     private void CreateItems(string toParse) {
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key.ToLower()) {
+                case "dpi":
+                case "sheetstylescale":
+                case "sheetstyle":
+                    break;
+
                 case "item":
                     var i = BlueBasics.ParsebleItem.NewByParsing<BasicPadItem>(pair.Value);
                     if (i != null) { Add(i); }
@@ -846,6 +857,8 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
     }
 
     private void ParseConnections(string toParse) {
+        if (toParse.StartsWith("[I]")) { toParse = toParse.FromNonCritical(); }
+
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key.ToLower()) {
                 case "connection":
@@ -863,6 +876,11 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
     private void ParseItems(string toParse) {
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key.ToLower()) {
+                case "dpi":
+                case "sheetstyle":
+                case "sheetstylescale":
+                    break;
+
                 case "item":
                     var x = pair.Value.GetAllTags();
                     foreach (var thisIt in x) {

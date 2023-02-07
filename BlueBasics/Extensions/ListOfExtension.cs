@@ -188,10 +188,10 @@ public static partial class Extensions {
 
         foreach (var thisString in value) {
             l.Append(thisString.ToNonCritical());
-            l.Append(",");
+            l.Append("|");
         }
 
-        col.Add(tagname + "=" + l.ToString().TrimEnd(",").ToNonCritical());
+        col.Add(tagname + "=" + l.ToString().TrimEnd("|"));
     }
 
     public static void ParseableAdd<T>(this ICollection<string> col, string tagname, T? value) where T : System.Enum {

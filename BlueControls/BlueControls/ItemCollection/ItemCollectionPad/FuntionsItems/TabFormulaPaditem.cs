@@ -168,9 +168,11 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
                 return true;
 
             case "childs":
-                var tmp = value.FromNonCritical().SplitAndCutBy("|");
+                var tmp = value.FromNonCritical().SplitBy("|");
                 _childs.Clear();
-                _childs.AddRange(tmp);
+                foreach (var thiss in tmp) {
+                    _childs.Add(thiss.FromNonCritical());
+                }
                 return true;
 
             case "notallowedchilds":

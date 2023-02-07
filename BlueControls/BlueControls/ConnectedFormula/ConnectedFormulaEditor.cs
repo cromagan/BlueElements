@@ -72,6 +72,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
         var l = Pad.LastClickedItem;
 
         var x = new EditFieldPadItem(string.Empty);
+        Pad.AddCentered(x);
 
         if (l is ICalculateRowsItemLevel ri) {
             x.GetRowFrom = ri;
@@ -79,8 +80,6 @@ public partial class ConnectedFormulaEditor : PadEditor {
         if (l is CustomizableShowPadItem efi && efi.GetRowFrom != null) {
             x.GetRowFrom = efi.GetRowFrom;
         }
-
-        Pad.AddCentered(x);
 
         if (x.GetRowFrom != null && x.GetRowFrom.Database != null) {
             x.Spalte_wählen = string.Empty; // Dummy setzen

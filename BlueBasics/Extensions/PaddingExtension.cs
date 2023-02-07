@@ -23,9 +23,9 @@ public static partial class Extensions {
 
     #region Methods
 
-    public static System.Windows.Forms.Padding PaddingParse(this string code) {
-        code = code.FromNonCritical().RemoveChars("{}LeftTopRightBm= ");
-        var w = code.Split(',');
+    public static System.Windows.Forms.Padding PaddingParse(this string toParse) {
+        toParse = toParse.FromNonCritical().RemoveChars("{}LeftTopRightBm= ");
+        var w = toParse.Split(',');
         System.Windows.Forms.Padding p = new() {
             Left = IntParse(w[0]),
             Top = IntParse(w[1]),

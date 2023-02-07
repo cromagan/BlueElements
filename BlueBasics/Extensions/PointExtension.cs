@@ -24,15 +24,15 @@ public static partial class Extensions {
 
     #region Methods
 
-    public static Point PointParse(this string code) {
-        code = code.RemoveChars("{}XYxy= ");
+    public static Point PointParse(this string toParse) {
+        toParse = toParse.RemoveChars("{}XYxy= ");
         Point p = new();
-        if (string.IsNullOrEmpty(code)) {
+        if (string.IsNullOrEmpty(toParse)) {
             p.X = 0;
             p.Y = 0;
             return p;
         }
-        var w = code.Split(',');
+        var w = toParse.Split(',');
         p.X = IntParse(w[0]);
         p.Y = IntParse(w[1]);
         return p;

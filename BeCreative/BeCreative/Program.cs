@@ -1,4 +1,5 @@
-﻿using BlueControls;
+﻿using BlueBasics;
+using BlueControls;
 using System;
 using System.Globalization;
 using System.Windows.Forms;
@@ -15,10 +16,8 @@ internal static class Program {
     [STAThread]
     private static void Main() {
         Application.EnableVisualStyles();
-        var culture = new CultureInfo("de-DE");
-        CultureInfo.DefaultThreadCurrentCulture = culture;
-        CultureInfo.DefaultThreadCurrentUICulture = culture;
-        Application.SetCompatibleTextRenderingDefault(false);
+
+        Develop.StartService();
 
         FormManager.NewModeSelectionForm = Start.NewForm;
         FormManager.ExecuteAtEnd = Start.Ende;

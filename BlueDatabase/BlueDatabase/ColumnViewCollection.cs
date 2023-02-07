@@ -38,17 +38,17 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem?>, IParseable,
 
     #region Constructors
 
-    public ColumnViewCollection(DatabaseAbstract database, string code) {
+    public ColumnViewCollection(DatabaseAbstract database, string toParse) {
         Database = database;
         Database.Disposing += Database_Disposing;
         _name = string.Empty;
-        Parse(code);
+        Parse(toParse);
     }
 
-    public ColumnViewCollection(DatabaseAbstract database, string code, string newname) {
+    public ColumnViewCollection(DatabaseAbstract database, string toParse, string newname) {
         Database = database;
         Database.Disposing += Database_Disposing;
-        Parse(code);
+        Parse(toParse);
         _name = newname;
     }
 

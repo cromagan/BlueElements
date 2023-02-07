@@ -40,9 +40,9 @@ public sealed class RowSortDefinition : IParseable {
 
     #region Constructors
 
-    public RowSortDefinition(DatabaseAbstract database, string code) {
+    public RowSortDefinition(DatabaseAbstract database, string toParse) {
         Database = database;
-        Parse(code);
+        Parse(toParse);
     }
 
     public RowSortDefinition(DatabaseAbstract database, string columnName, bool reverse) {

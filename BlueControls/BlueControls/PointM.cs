@@ -57,7 +57,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable {
 
     public PointM(PointF startPoint, float laenge, float alpha) : this(null, string.Empty, startPoint.X, startPoint.Y, laenge, alpha) { }
 
-    public PointM(object? parent, string codeToParse) : this(parent) => Parse(codeToParse);
+    public PointM(object? parent, string toParse) : this(parent) => Parse(toParse);
 
     public PointM(object? parent, string name, float x, float y) {
         Parent = parent;
@@ -172,8 +172,8 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable {
 
     public void OnMoving(MoveEventArgs e) => Moving?.Invoke(this, e);
 
-    public void Parse(string codeToParse) {
-        foreach (var pair in codeToParse.GetAllTags()) {
+    public void Parse(string toParse) {
+        foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key) {
                 case "parentname":
                     break;

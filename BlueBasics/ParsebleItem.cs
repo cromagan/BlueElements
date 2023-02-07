@@ -67,7 +67,7 @@ public abstract class ParsebleItem : IHasKeyName, IParseable {
 
     #region Methods
 
-    public static T? NewByParsing<T>(string code) where T : ParsebleItem {
+    public static T? NewByParsing<T>(string toParse) where T : ParsebleItem {
         var ding = string.Empty;
         var name = string.Empty;
 
@@ -75,9 +75,9 @@ public abstract class ParsebleItem : IHasKeyName, IParseable {
 
         if (types.Count == 0) { return default; }
 
-        if (code.StartsWith("[I]")) { code = code.FromNonCritical(); }
+        if (toParse.StartsWith("[I]")) { toParse = toParse.FromNonCritical(); }
 
-        var x = code.GetAllTags();
+        var x = toParse.GetAllTags();
 
         foreach (var thisIt in x) {
             switch (thisIt.Key) {
@@ -93,11 +93,11 @@ public abstract class ParsebleItem : IHasKeyName, IParseable {
             }
         }
         if (string.IsNullOrEmpty(ding)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Type unbekannt: " + code);
+            Develop.DebugPrint(FehlerArt.Fehler, "Type unbekannt: " + toParse);
             return default;
         }
         if (string.IsNullOrEmpty(name)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Name unbekannt: " + code);
+            Develop.DebugPrint(FehlerArt.Fehler, "Name unbekannt: " + toParse);
             return default;
         }
 
@@ -121,7 +121,7 @@ public abstract class ParsebleItem : IHasKeyName, IParseable {
             //    if (property.Name == "ClassId") {
             if (v.Equals(ding, StringComparison.OrdinalIgnoreCase)) {
                 var ni = (T)Activator.CreateInstance(thist, name);
-                ni.Parse(code);
+                ni.Parse(toParse);
                 return ni;
             }
             //    }

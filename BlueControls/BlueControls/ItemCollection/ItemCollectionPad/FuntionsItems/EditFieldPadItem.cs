@@ -69,12 +69,14 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
 
     public ColumnItem? Column {
         get {
-            _column ??= GetRowFrom?.Database?.Column[_columnName];
+            _column ??= GetRowFrom?.Database?.Column.Exists(_columnName);
 
             return _column;
         }
         set {
-            _columnName = value.Name;
+            var tmpn = value?.Name ?? string.Empty;
+            if (_columnName == tmpn) { return; }
+            _columnName = tmpn;
             _column = null;
             OnChanged();
         }
@@ -206,6 +208,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         cy.CaptionPosition = CaptionPosition;
         cy.DisabledReason = "Keine Verknüpfung vorhanden.";
         cy.Tag = KeyName;
+        cy.Name = DefaultItemToControlName();
         return cy;
     }
 
