@@ -163,11 +163,11 @@ public sealed partial class DatabaseHeadEditor {
         var neu = work.ChangedTo;
         var aenderung = work.Comand.ToString();
         switch (work.Comand) {
-            case DatabaseDataType.UTF8Value_withoutSizeData:
-            case DatabaseDataType.Value_withoutSizeData:
-                symb = ImageCode.Textfeld;
-                aenderung = "Wert geändert";
-                break;
+            //case DatabaseDataType.UTF8Value_withoutSizeData:
+            //case DatabaseDataType.Value_withoutSizeData:
+            //    symb = ImageCode.Textfeld;
+            //    aenderung = "Wert geändert";
+            //    break;
 
             case DatabaseDataType.AutoExport:
                 aenderung = "Export ausgeführt oder geändert";

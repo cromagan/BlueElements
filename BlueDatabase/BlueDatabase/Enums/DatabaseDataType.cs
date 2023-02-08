@@ -280,7 +280,7 @@ public enum DatabaseDataType : byte {
     //co_AutoFilter_Dauerfilter = 192,
     //co_Intelligenter_Multifilter = 193,
 
-    ColumnKey = 194,   //    co_DauerFilterPos = 194,
+    //ColumnKey = 194,   //    co_DauerFilterPos = 194,
 
     AutoReplaceAfterEdit = 195,
     FilterOptions = 196,
@@ -289,11 +289,11 @@ public enum DatabaseDataType : byte {
     TextFormatingAllowed = 199,
 
     Value_withoutSizeData = 200,
-    Value_withSizeData = 201,
+    //Value_withSizeData = 201,
 
-    UTF8Value_withoutSizeData = 202,
+    //UTF8Value_withoutSizeData = 202,
 
-    UTF8Value_withSizeData = 203,
+    //UTF8Value_withSizeData = 203,
 
     //Dummy_ce_ValueWithoutSizeUncrypted = 204,
 
@@ -307,11 +307,11 @@ public enum DatabaseDataType : byte {
     //AddColumnKeyInfo = 224,
     //AddColumnNameInfo = 225,
 
-    [Obsolete("Nur noch Comand_AddColumnByName benutzen", false)]
-    Comand_AddColumn = 226,
+    //[Obsolete("Nur noch Comand_AddColumnByName benutzen", false)]
+    //Comand_AddColumn = 226,
 
-    [Obsolete("Nur noch Comand_AddColumnByName benutzen", false)]
-    Comand_AddColumnByKey = 227,
+    //[Obsolete("Nur noch Comand_AddColumnByName benutzen", false)]
+    //Comand_AddColumnByKey = 227,
 
     Comand_AddColumnByName = 228,
 

@@ -23,28 +23,27 @@ namespace BlueDatabase.Enums;
 /// In welchem Datenformat die Daten gelesen werden.
 /// </summary>
 public enum Routinen : byte {
+    //[Obsolete("Wird zukünftig entfernt werden", false)]
+    //Column = 0,
 
-    [Obsolete("Wird zukünftig entfernt werden", false)]
-    Column = 0,
+    //[Obsolete("Wird zukünftig entfernt werden", false)]
+    //DatenAllgemein = 1,
 
-    [Obsolete("Wird zukünftig entfernt werden", false)]
-    DatenAllgemein = 1,
-
-    [Obsolete("Wird zukünftig entfernt werden", false)]
-    CellFormat = 2,
+    //[Obsolete("Wird zukünftig entfernt werden", false)]
+    //CellFormat = 2,
 
     DatenAllgemeinUTF8 = 3,
 
-    [Obsolete("Wird zukünftig entfernt werden", false)]
-    CellFormatUTF8 = 4,
+    //[Obsolete("Wird zukünftig entfernt werden", false)]
+    //CellFormatUTF8 = 4,
 
-    [Obsolete("Wird zukünftig entfernt werden", false)]
-    ColumnUTF8 = 5,
+    //[Obsolete("Wird zukünftig entfernt werden", false)]
+    //ColumnUTF8 = 5,
 
-    [Obsolete("Wird zukünftig entfernt werden", false)]
-    CellFormatUTF8_V400 = 6,
+    //[Obsolete("Wird zukünftig entfernt werden", false)]
+    //CellFormatUTF8_V400 = 6,
 
-    ColumnUTF8_V400 = 7,
+    //ColumnUTF8_V400 = 7,
 
     CellFormatUTF8_V401 = 8,
 

@@ -210,7 +210,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
 
     public int CellGetColorBgr(ColumnItem? column) => Database.Cell.GetColorBgr(column, this);
 
-    public string CellGetCompareKey(ColumnItem? column) => Database.Cell.CompareKey(column, this);
+    public string CellGetCompareKey(ColumnItem column) => Database.Cell.CompareKey(column, this);
 
     public DateTime CellGetDateTime(string columnName) => Database.Cell.GetDateTime(Database.Column[columnName], this);
 
@@ -308,10 +308,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     /// <summary>
     /// Erstellt einen sortierfähigen String eine Zeile mit der Standard sortierung
     /// </summary>
-    /// <param name="columns">Nur diese Spalten in deser Reihenfolge werden berücksichtigt</param>
     /// <returns>Den String mit dem abschluß <<>key<>> und dessen Key.</returns>
 
-    public string CompareKey() => CompareKey(Database.SortDefinition?.Columns);
+    public string CompareKey() => CompareKey(Database?.SortDefinition?.Columns);
 
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.

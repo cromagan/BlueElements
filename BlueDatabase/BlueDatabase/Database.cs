@@ -84,45 +84,45 @@ public sealed class Database : DatabaseAbstract {
         rowKey = -1;
 
         switch ((Routinen)bLoaded[pointer]) {
-            case Routinen.CellFormat: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    var les = NummerCode3(bLoaded, pointer + 2);
-                    //colKey = NummerCode3(bLoaded, pointer + 5);
-                    rowKey = NummerCode3(bLoaded, pointer + 8);
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
-                    value = b.ToStringWin1252();
-                    //var width = NummerCode2(bLoaded, pointer + 11 + les);
-                    //var height = NummerCode2(bLoaded, pointer + 11 + les + 2);
-                    pointer += 11 + les + 4;
-                    break;
-                }
-            case Routinen.CellFormatUTF8: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    var les = NummerCode3(bLoaded, pointer + 2);
-                    //colKey = NummerCode3(bLoaded, pointer + 5);
-                    rowKey = NummerCode3(bLoaded, pointer + 8);
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
-                    value = b.ToStringUtf8();
-                    //var width = NummerCode2(bLoaded, pointer + 11 + les);
-                    // var height = NummerCode2(bLoaded, pointer + 11 + les + 2);
-                    pointer += 11 + les + 4;
-                    break;
-                }
-            case Routinen.CellFormatUTF8_V400: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    var les = NummerCode3(bLoaded, pointer + 2);
-                    //colKey = NummerCode7(bLoaded, pointer + 5);
-                    rowKey = NummerCode7(bLoaded, pointer + 12);
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 19, b, 0, les);
-                    value = b.ToStringUtf8();
-                    //var  width = NummerCode2(bLoaded, pointer + 19 + les);
-                    //var  height = NummerCode2(bLoaded, pointer + 19 + les + 2);
-                    pointer += 19 + les + 4;
-                    break;
-                }
+            //case Routinen.CellFormat: {
+            //        type = (DatabaseDataType)bLoaded[pointer + 1];
+            //        var les = NummerCode3(bLoaded, pointer + 2);
+            //        //colKey = NummerCode3(bLoaded, pointer + 5);
+            //        rowKey = NummerCode3(bLoaded, pointer + 8);
+            //        var b = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
+            //        value = b.ToStringWin1252();
+            //        //var width = NummerCode2(bLoaded, pointer + 11 + les);
+            //        //var height = NummerCode2(bLoaded, pointer + 11 + les + 2);
+            //        pointer += 11 + les + 4;
+            //        break;
+            //    }
+            //case Routinen.CellFormatUTF8: {
+            //        type = (DatabaseDataType)bLoaded[pointer + 1];
+            //        var les = NummerCode3(bLoaded, pointer + 2);
+            //        //colKey = NummerCode3(bLoaded, pointer + 5);
+            //        rowKey = NummerCode3(bLoaded, pointer + 8);
+            //        var b = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
+            //        value = b.ToStringUtf8();
+            //        //var width = NummerCode2(bLoaded, pointer + 11 + les);
+            //        // var height = NummerCode2(bLoaded, pointer + 11 + les + 2);
+            //        pointer += 11 + les + 4;
+            //        break;
+            //    }
+            //case Routinen.CellFormatUTF8_V400: {
+            //        type = (DatabaseDataType)bLoaded[pointer + 1];
+            //        var les = NummerCode3(bLoaded, pointer + 2);
+            //        //colKey = NummerCode7(bLoaded, pointer + 5);
+            //        rowKey = NummerCode7(bLoaded, pointer + 12);
+            //        var b = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 19, b, 0, les);
+            //        value = b.ToStringUtf8();
+            //        //var  width = NummerCode2(bLoaded, pointer + 19 + les);
+            //        //var  height = NummerCode2(bLoaded, pointer + 19 + les + 2);
+            //        pointer += 19 + les + 4;
+            //        break;
+            //    }
             case Routinen.CellFormatUTF8_V401: {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
                     var les = NummerCode3(bLoaded, pointer + 2);
@@ -135,19 +135,19 @@ public sealed class Database : DatabaseAbstract {
                     break;
                 }
 
-            case Routinen.DatenAllgemein: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    var les = NummerCode3(bLoaded, pointer + 2);
-                    //colKey = -1;
-                    rowKey = -1;
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 5, b, 0, les);
-                    value = b.ToStringWin1252();
-                    //width = 0;
-                    //height = 0;
-                    pointer += 5 + les;
-                    break;
-                }
+            //case Routinen.DatenAllgemein: {
+            //        type = (DatabaseDataType)bLoaded[pointer + 1];
+            //        var les = NummerCode3(bLoaded, pointer + 2);
+            //        //colKey = -1;
+            //        rowKey = -1;
+            //        var b = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 5, b, 0, les);
+            //        value = b.ToStringWin1252();
+            //        //width = 0;
+            //        //height = 0;
+            //        pointer += 5 + les;
+            //        break;
+            //    }
             case Routinen.DatenAllgemeinUTF8: {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
                     var les = NummerCode3(bLoaded, pointer + 2);
@@ -161,45 +161,45 @@ public sealed class Database : DatabaseAbstract {
                     pointer += 5 + les;
                     break;
                 }
-            case Routinen.Column: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    var les = NummerCode3(bLoaded, pointer + 2);
-                    //colKey = NummerCode3(bLoaded, pointer + 5);
-                    rowKey = NummerCode3(bLoaded, pointer + 8);
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
-                    value = b.ToStringWin1252();
-                    //width = 0;
-                    //height = 0;
-                    pointer += 11 + les;
-                    break;
-                }
-            case Routinen.ColumnUTF8: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    var les = NummerCode3(bLoaded, pointer + 2);
-                    //colKey = NummerCode3(bLoaded, pointer + 5);
-                    rowKey = NummerCode3(bLoaded, pointer + 8);
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
-                    value = b.ToStringUtf8();
-                    //width = 0;
-                    //height = 0;
-                    pointer += 11 + les;
-                    break;
-                }
-            case Routinen.ColumnUTF8_V400: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    var les = NummerCode3(bLoaded, pointer + 2);
-                    //colKey = NummerCode7(bLoaded, pointer + 5);
-                    rowKey = NummerCode7(bLoaded, pointer + 12);
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 19, b, 0, les);
-                    value = b.ToStringUtf8();
-                    //width = 0;
-                    //height = 0;
-                    pointer += 19 + les;
-                    break;
-                }
+            //case Routinen.Column: {
+            //        type = (DatabaseDataType)bLoaded[pointer + 1];
+            //        var les = NummerCode3(bLoaded, pointer + 2);
+            //        //colKey = NummerCode3(bLoaded, pointer + 5);
+            //        rowKey = NummerCode3(bLoaded, pointer + 8);
+            //        var b = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
+            //        value = b.ToStringWin1252();
+            //        //width = 0;
+            //        //height = 0;
+            //        pointer += 11 + les;
+            //        break;
+            //    }
+            //case Routinen.ColumnUTF8: {
+            //        type = (DatabaseDataType)bLoaded[pointer + 1];
+            //        var les = NummerCode3(bLoaded, pointer + 2);
+            //        //colKey = NummerCode3(bLoaded, pointer + 5);
+            //        rowKey = NummerCode3(bLoaded, pointer + 8);
+            //        var b = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
+            //        value = b.ToStringUtf8();
+            //        //width = 0;
+            //        //height = 0;
+            //        pointer += 11 + les;
+            //        break;
+            //    }
+            //case Routinen.ColumnUTF8_V400: {
+            //        type = (DatabaseDataType)bLoaded[pointer + 1];
+            //        var les = NummerCode3(bLoaded, pointer + 2);
+            //        //colKey = NummerCode7(bLoaded, pointer + 5);
+            //        rowKey = NummerCode7(bLoaded, pointer + 12);
+            //        var b = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 19, b, 0, les);
+            //        value = b.ToStringUtf8();
+            //        //width = 0;
+            //        //height = 0;
+            //        pointer += 19 + les;
+            //        break;
+            //    }
             case Routinen.ColumnUTF8_V401: {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
 

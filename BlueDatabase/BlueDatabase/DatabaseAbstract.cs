@@ -1515,11 +1515,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             //        case DatabaseDataType.Value_withSizeData:
             //case DatabaseDataType.UTF8Value_withSizeData:
             //case DatabaseDataType.Value_withoutSizeData:
-            if (type == DatabaseDataType.UTF8Value_withSizeData) {
-                //Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-                var enc1252 = Encoding.GetEncoding(1252);
-                value = Encoding.UTF8.GetString(enc1252.GetBytes(value));
-            }
+            //if (type == DatabaseDataType.UTF8Value_withSizeData) {
+            //    //Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            //    var enc1252 = Encoding.GetEncoding(1252);
+            //    value = Encoding.UTF8.GetString(enc1252.GetBytes(value));
+            //}
             return Cell.SetValueInternal(columnName, (long)rowkey, value, isLoading);
         }
 
