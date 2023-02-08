@@ -58,8 +58,8 @@ public sealed class ColumnViewItem {
                     break;
 
                 case "columnkey":
-                    Column = database.Column.SearchByKey(LongParse(pair.Value));
-                    Column?.Repair(); // Alte Formate reparieren
+                    //Column = database.Column.SearchByKey(LongParse(pair.Value));
+                    //Column?.Repair(); // Alte Formate reparieren
                     break;
 
                 //case "x":

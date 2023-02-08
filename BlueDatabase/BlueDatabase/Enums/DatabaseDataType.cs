@@ -31,7 +31,7 @@ public static class DatabaseDataTypeExtension {
 
     public static bool IsDatabaseTag(this DatabaseDataType type) => (int)type is < 100 or >= 249;
 
-    public static bool IsObsolete(this DatabaseDataType type) => (int)type is 0 or 2 or 3 or 22 or 33 or 34 or 35 or 52 or 53 or 58 or 59 or 60 or 61 or 62 or 65 or 70 or 123 or 151 or 178 or 185;
+    public static bool IsObsolete(this DatabaseDataType type) => (int)type is 0 or 2 or 3 or 22 or 30 or 33 or 34 or 35 or 52 or 53 or 58 or 59 or 60 or 61 or 62 or 65 or 70 or 123 or 151 or 178 or 185;
 
     public static bool Nameless(this DatabaseDataType type) => type.ToString() == ((int)type).ToString();
 
@@ -280,7 +280,7 @@ public enum DatabaseDataType : byte {
     //co_AutoFilter_Dauerfilter = 192,
     //co_Intelligenter_Multifilter = 193,
 
-    ColumnKey = 194,   //    co_DauerFilterPos = 194,
+    //ColumnKey = 194,   //    co_DauerFilterPos = 194,
 
     AutoReplaceAfterEdit = 195,
     FilterOptions = 196,
@@ -307,11 +307,11 @@ public enum DatabaseDataType : byte {
     //AddColumnKeyInfo = 224,
     //AddColumnNameInfo = 225,
 
-    [Obsolete("Nur noch Comand_AddColumnByName benutzen", false)]
-    Comand_AddColumn = 226,
+    //[Obsolete("Nur noch Comand_AddColumnByName benutzen", false)]
+    //Comand_AddColumn = 226,
 
-    [Obsolete("Nur noch Comand_AddColumnByName benutzen", false)]
-    Comand_AddColumnByKey = 227,
+    //[Obsolete("Nur noch Comand_AddColumnByName benutzen", false)]
+    //Comand_AddColumnByKey = 227,
 
     Comand_AddColumnByName = 228,
 

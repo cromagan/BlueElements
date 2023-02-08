@@ -251,7 +251,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
                     break;
 
                 case "columnkey":
-                    _column = Database.Column.SearchByKey(LongParse(pair.Value));
+                    //_column = Database.Column.SearchByKey(LongParse(pair.Value));
                     break;
 
                 case "value":

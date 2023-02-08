@@ -244,18 +244,18 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
             case "filterdb":
                 _ = FilterDefiniton.Row.Clear("Neue Filter-Datenbank per Parse");
                 FilterDatabaseUpdate();
-                _ = FilterDefiniton.Import(value.FromNonCritical(), true, false, ";", false, false, false, string.Empty);
+                _ = FilterDefiniton.Import(value.FromNonCritical(), true, false, ";", false, false, false);
 
-                foreach (var thisRow in FilterDefiniton.Row) {
-                    var n = thisRow.CellGetString("Spalte");
-                    if (n.IsLong()) {
-                        var k = LongParse(n);
-                        var c = Database?.Column.SearchByKey(k);
-                        if (c != null) {
-                            thisRow.CellSet("Spalte", c.Name);
-                        }
-                    }
-                }
+                //foreach (var thisRow in FilterDefiniton.Row) {
+                //    var n = thisRow.CellGetString("Spalte");
+                //    if (n.IsLong()) {
+                //        var k = LongParse(n);
+                //        var c = Database?.Column.SearchByKey(k);
+                //        if (c != null) {
+                //            thisRow.CellSet("Spalte", c.Name);
+                //        }
+                //    }
+                //}
 
                 return true;
 

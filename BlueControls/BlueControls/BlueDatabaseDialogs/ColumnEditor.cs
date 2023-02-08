@@ -317,10 +317,10 @@ internal sealed partial class ColumnEditor {
         }
         if (!_column.IsSystemColumn()) {
             btnStandard.Enabled = false;
-            capInfo.Text = "<Imagecode=" + _column.SymbolForReadableText() + "> Normale Spalte (Key: " + _column.Key + ")";
+            capInfo.Text = "<Imagecode=" + _column.SymbolForReadableText() + "> Normale Spalte";
         } else {
             btnStandard.Enabled = true;
-            capInfo.Text = "<Imagecode=" + _column.SymbolForReadableText() + "> System Spalte (Key: " + _column.Key + ")";
+            capInfo.Text = "<Imagecode=" + _column.SymbolForReadableText() + "> System Spalte";
         }
         tbxName.Text = _column.Name;
         tbxName.Enabled = !_column.Name.StartsWith("SYS_");

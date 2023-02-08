@@ -123,17 +123,16 @@ public abstract class SQLBackAbstract {
         return SetStyleData(tablename, DatabaseDataType.ColumnName, columnName.ToUpper(), columnName.ToUpper());
     }
 
-    public string AddUndo(string tablename, DatabaseDataType comand, long? columnKey, string? columname, long? rowKey, string previousValue, string changedTo, string userName, string comment) {
+    public string AddUndo(string tablename, DatabaseDataType comand, string? columname, long? rowKey, string previousValue, string changedTo, string userName, string comment) {
         if (!OpenConnection()) { return "Verbindung fehlgeschlagen"; }
 
-        var ck = columnKey is not null and > (-1) ? columnKey.ToString() : string.Empty;
+        //var ck = columnKey is not null and > (-1) ? columnKey.ToString() : string.Empty;
         var rk = rowKey is not null and > (-1) ? rowKey.ToString() : string.Empty;
 
         var cmdString = "INSERT INTO " + SYS_UNDO +
-            " (TABLENAME, COMAND, COLUMNKEY, COLUMNNAME, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, TIMECODEUTC, CMT) VALUES (" +
+            " (TABLENAME, COMAND, COLUMNNAME, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, TIMECODEUTC, CMT) VALUES (" +
              DBVAL(tablename.ToUpper()) + "," +
              DBVAL(comand.ToString()) + "," +
-             DBVAL(ck) + "," +
              DBVAL(columname) + "," +
              DBVAL(rk) + "," +
              DBVAL(previousValue) + "," +
@@ -717,14 +716,14 @@ public abstract class SQLBackAbstract {
     /// <param name="fromDate"></param>
     /// <param name="toDate"></param>
     /// <returns>Gibt NULL zurück, wenn die Daten nicht geladen werden konnten</returns>
-    internal List<(string tablename, string comand, string columnkey, string columname, string rowkey, DateTime timecode)>? GetLastChanges(List<DatabaseSQLLite> db, DateTime fromDate, DateTime toDate) {
+    internal List<(string tablename, string comand, string columname, string rowkey, DateTime timecode)>? GetLastChanges(List<DatabaseSQLLite> db, DateTime fromDate, DateTime toDate) {
         if (!OpenConnection()) { return null; }
 
         try {
             lock (getChanges) {
                 //using var q = _connection.CreateCommand();
 
-                var CommandText = @"select TABLENAME, COMAND, COLUMNKEY, COLUMNNAME, ROWKEY, TIMECODEUTC from " + SYS_UNDO + " ";
+                var CommandText = @"select TABLENAME, COMAND, COLUMNNAME, ROWKEY, TIMECODEUTC from " + SYS_UNDO + " ";
 
                 // nur bestimmte Tabellen
                 CommandText += "WHERE (";
@@ -740,7 +739,7 @@ public abstract class SQLBackAbstract {
                 // Sortierung nach Tabellen
                 CommandText += " ORDER BY TIMECODEUTC ASC";
 
-                var fb = new List<(string tablename, string comand, string columnkey, string columnname, string rowid, DateTime timecode)>();
+                var fb = new List<(string tablename, string comand, string columnname, string rowid, DateTime timecode)>();
 
                 var dt = Fill_Table(CommandText);
 
@@ -752,7 +751,7 @@ public abstract class SQLBackAbstract {
 
                 foreach (var thisRow in dt.Rows) {
                     var reader = (DataRow)thisRow;
-                    fb.Add((reader[0].ToString(), reader[1].ToString(), reader[2].ToString(), reader[3].ToString(), reader[4].ToString(), DateTimeParse(reader[5].ToString())));
+                    fb.Add((reader[0].ToString(), reader[1].ToString(), reader[2].ToString(), reader[3].ToString(), DateTimeParse(reader[4].ToString())));
                 }
 
                 //CloseConnection();
@@ -769,34 +768,34 @@ public abstract class SQLBackAbstract {
         }
     }
 
-    internal string? GetLastColumnName(string tablename, long key) {
-        if (!OpenConnection()) { return null; }
+    //internal string? GetLastColumnName(string tablename, long key) {
+    //    if (!OpenConnection()) { return null; }
 
-        try {
-            using var q = _connection.CreateCommand();
+    //    try {
+    //        using var q = _connection.CreateCommand();
 
-            q.CommandText = @"select CHANGEDTO from " + SYS_UNDO + " ";
-            q.CommandText += "WHERE TABLENAME=" + DBVAL(tablename.ToUpper()) + " AND ";
-            q.CommandText += "COMAND=" + DBVAL(DatabaseDataType.ColumnName.ToString()) + " AND ";
-            q.CommandText += "COLUMNKEY=" + DBVAL(key);
-            q.CommandText += " ORDER BY TIMECODEUTC DESC";
+    //        q.CommandText = @"select CHANGEDTO from " + SYS_UNDO + " ";
+    //        q.CommandText += "WHERE TABLENAME=" + DBVAL(tablename.ToUpper()) + " AND ";
+    //        q.CommandText += "COMAND=" + DBVAL(DatabaseDataType.ColumnName.ToString()) + " AND ";
+    //        q.CommandText += "COLUMNKEY=" + DBVAL(key);
+    //        q.CommandText += " ORDER BY TIMECODEUTC DESC";
 
-            if (!OpenConnection()) { return null; }
-            using var reader = q.ExecuteReader();
-            var value = string.Empty;
-            while (reader.Read()) {
-                value = reader[0].ToString();
-                break;
-            }
+    //        if (!OpenConnection()) { return null; }
+    //        using var reader = q.ExecuteReader();
+    //        var value = string.Empty;
+    //        while (reader.Read()) {
+    //            value = reader[0].ToString();
+    //            break;
+    //        }
 
-            _ = CloseConnection();
-            return value;
-        } catch {
-            _ = CloseConnection();
-            Develop.CheckStackForOverflow();
-            return GetLastColumnName(tablename, key);
-        }
-    }
+    //        _ = CloseConnection();
+    //        return value;
+    //    } catch {
+    //        _ = CloseConnection();
+    //        Develop.CheckStackForOverflow();
+    //        return GetLastColumnName(tablename, key);
+    //    }
+    //}
 
     internal SQLBackAbstract? HandleMe(ConnectionInfo ci) {
         if (ci is null) { return null; }

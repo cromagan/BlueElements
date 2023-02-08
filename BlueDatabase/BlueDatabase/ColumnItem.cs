@@ -86,8 +86,10 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     private DataFormat _format;
     private bool _formatierungErlaubt;
     private bool _ignoreAtRowFilter;
-    private long _key;
+
+    //private long _key;
     private ColumnLineStyle _lineLeft;
+
     private ColumnLineStyle _lineRight;
 
     /// <summary>
@@ -113,98 +115,98 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
     #endregion
 
-    #region Constructors
+    //public ColumnItem(DatabaseAbstract database, long columnkey) {
+    //    //if (!IsValidColumnName(columnname)) {
+    //    //    Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht erlaubt!");
+    //    //}
 
-    public ColumnItem(DatabaseAbstract database, long columnkey) {
-        //if (!IsValidColumnName(columnname)) {
-        //    Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht erlaubt!");
-        //}
+    //    Database = database;
+    //    Database.Disposing += Database_Disposing;
+    //    if (columnkey < 0) {
+    //        Develop.DebugPrint(FehlerArt.Fehler, "ColumnKey < 0");
+    //    }
 
-        Database = database;
-        Database.Disposing += Database_Disposing;
-        if (columnkey < 0) {
-            Develop.DebugPrint(FehlerArt.Fehler, "ColumnKey < 0");
-        }
+    //    var ex = database.Column.SearchByKey(columnkey);
+    //    if (ex != null) {
+    //        Develop.DebugPrint(FehlerArt.Fehler, "Key existiert bereits");
+    //    }
 
-        var ex = database.Column.SearchByKey(columnkey);
-        if (ex != null) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Key existiert bereits");
-        }
+    //    _key = columnkey;
 
-        _key = columnkey;
+    //    #region Standard-Werte
 
-        #region Standard-Werte
+    //    KeyName = TmpNewDummy;
+    //    _caption = string.Empty;
+    //    //_CaptionBitmapCode = null;
+    //    _format = DataFormat.Text;
+    //    _lineLeft = ColumnLineStyle.Dünn;
+    //    _lineRight = ColumnLineStyle.Ohne;
+    //    _multiLine = false;
+    //    _quickInfo = string.Empty;
+    //    _captionGroup1 = string.Empty;
+    //    _captionGroup2 = string.Empty;
+    //    _captionGroup3 = string.Empty;
+    //    //_Intelligenter_Multifilter = string.Empty;
+    //    _foreColor = Color.Black;
+    //    _backColor = Color.White;
+    //    _cellInitValue = string.Empty;
+    //    //_linkedCellRowKeyIsInColumn = -1;
+    //    _linkedCell_ColumnNameOfLinkedDatabase = string.Empty;
+    //    _sortType = SortierTyp.Original_String;
+    //    //_ZellenZusammenfassen = false;
+    //    //_dropDownKey = -1;
+    //    //_vorschlagsColumn = -1;
+    //    _align = AlignmentHorizontal.Links;
+    //    //_keyColumnKey = -1;
+    //    _allowedChars = string.Empty;
+    //    _adminInfo = string.Empty;
+    //    _maxTextLenght = 4000;
+    //    _contentwidth = -1;
+    //    _unsavedContentWidth = -1;
+    //    _captionBitmapCode = string.Empty;
+    //    _filterOptions = FilterOptions.Enabled | FilterOptions.TextFilterEnabled | FilterOptions.ExtendedFilterEnabled;
+    //    //_AutofilterErlaubt = true;
+    //    //_AutofilterTextFilterErlaubt = true;
+    //    //_AutoFilterErweitertErlaubt = true;
+    //    _ignoreAtRowFilter = false;
+    //    _dropdownBearbeitungErlaubt = false;
+    //    _dropdownAllesAbwählenErlaubt = false;
+    //    _textBearbeitungErlaubt = false;
+    //    _dropdownWerteAndererZellenAnzeigen = false;
+    //    _afterEditQuickSortRemoveDouble = false;
+    //    _afterEditRunden = -1;
+    //    _afterEditAutoCorrect = false;
+    //    _afterEditDoUCase = false;
+    //    _formatierungErlaubt = false;
+    //    _additionalFormatCheck = AdditionalCheck.None;
+    //    _scriptType = ScriptType.undefiniert;
+    //    _autoRemove = string.Empty;
+    //    _autoFilterJoker = string.Empty;
+    //    _saveContent = true;
+    //    //_AutoFilter_Dauerfilter = enDauerfilter.ohne;
+    //    _spellCheckingEnabled = false;
+    //    //_CompactView = true;
+    //    _showUndo = true;
+    //    _doOpticalTranslation = TranslationType.Original_Anzeigen;
+    //    _showMultiLineInOneLine = false;
+    //    _editAllowedDespiteLock = false;
+    //    _suffix = string.Empty;
+    //    _linkedDatabaseFile = string.Empty;
+    //    _behaviorOfImageAndText = BildTextVerhalten.Nur_Text;
+    //    _constantHeightOfImageCode = string.Empty;
+    //    _prefix = string.Empty;
+    //    UcaseNamesSortedByLenght = null;
+    //    Am_A_Key_For_Other_Column = string.Empty;
 
-        KeyName = TmpNewDummy;
-        _caption = string.Empty;
-        //_CaptionBitmapCode = null;
-        _format = DataFormat.Text;
-        _lineLeft = ColumnLineStyle.Dünn;
-        _lineRight = ColumnLineStyle.Ohne;
-        _multiLine = false;
-        _quickInfo = string.Empty;
-        _captionGroup1 = string.Empty;
-        _captionGroup2 = string.Empty;
-        _captionGroup3 = string.Empty;
-        //_Intelligenter_Multifilter = string.Empty;
-        _foreColor = Color.Black;
-        _backColor = Color.White;
-        _cellInitValue = string.Empty;
-        //_linkedCellRowKeyIsInColumn = -1;
-        _linkedCell_ColumnNameOfLinkedDatabase = string.Empty;
-        _sortType = SortierTyp.Original_String;
-        //_ZellenZusammenfassen = false;
-        //_dropDownKey = -1;
-        //_vorschlagsColumn = -1;
-        _align = AlignmentHorizontal.Links;
-        //_keyColumnKey = -1;
-        _allowedChars = string.Empty;
-        _adminInfo = string.Empty;
-        _maxTextLenght = 4000;
-        _contentwidth = -1;
-        _unsavedContentWidth = -1;
-        _captionBitmapCode = string.Empty;
-        _filterOptions = FilterOptions.Enabled | FilterOptions.TextFilterEnabled | FilterOptions.ExtendedFilterEnabled;
-        //_AutofilterErlaubt = true;
-        //_AutofilterTextFilterErlaubt = true;
-        //_AutoFilterErweitertErlaubt = true;
-        _ignoreAtRowFilter = false;
-        _dropdownBearbeitungErlaubt = false;
-        _dropdownAllesAbwählenErlaubt = false;
-        _textBearbeitungErlaubt = false;
-        _dropdownWerteAndererZellenAnzeigen = false;
-        _afterEditQuickSortRemoveDouble = false;
-        _afterEditRunden = -1;
-        _afterEditAutoCorrect = false;
-        _afterEditDoUCase = false;
-        _formatierungErlaubt = false;
-        _additionalFormatCheck = AdditionalCheck.None;
-        _scriptType = ScriptType.undefiniert;
-        _autoRemove = string.Empty;
-        _autoFilterJoker = string.Empty;
-        _saveContent = true;
-        //_AutoFilter_Dauerfilter = enDauerfilter.ohne;
-        _spellCheckingEnabled = false;
-        //_CompactView = true;
-        _showUndo = true;
-        _doOpticalTranslation = TranslationType.Original_Anzeigen;
-        _showMultiLineInOneLine = false;
-        _editAllowedDespiteLock = false;
-        _suffix = string.Empty;
-        _linkedDatabaseFile = string.Empty;
-        _behaviorOfImageAndText = BildTextVerhalten.Nur_Text;
-        _constantHeightOfImageCode = string.Empty;
-        _prefix = string.Empty;
-        UcaseNamesSortedByLenght = null;
-        Am_A_Key_For_Other_Column = string.Empty;
+    //    #endregion Standard-Werte
 
-        #endregion Standard-Werte
-
-        Invalidate_Head();
-        Invalidate_LinkedDatabase();
-    }
+    //    Invalidate_Head();
+    //    Invalidate_LinkedDatabase();
+    //}
 
     //private string _vorschlagsColumn;
+
+    #region Constructors
 
     public ColumnItem(DatabaseAbstract database, string name) {
         if (!IsValidColumnName(name)) {
@@ -219,7 +221,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             Develop.DebugPrint(FehlerArt.Fehler, "Key existiert bereits");
         }
 
-        _key = database.Column.NextColumnKey();
+        //_key = database.Column.NextColumnKey();
 
         #region Standard-Werte
 
@@ -284,7 +286,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         _constantHeightOfImageCode = string.Empty;
         _prefix = string.Empty;
         UcaseNamesSortedByLenght = null;
-        Am_A_Key_For_Other_Column = string.Empty;
+        //Am_A_Key_For_Other_Column = string.Empty;
 
         #endregion Standard-Werte
 
@@ -423,7 +425,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
-    public string Am_A_Key_For_Other_Column { get; private set; }
+    //public string Am_A_Key_For_Other_Column { get; private set; }
 
     public string AutoFilterJoker {
         get => _autoFilterJoker;
@@ -693,17 +695,17 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
     public bool IsDisposed { get; private set; }
 
-    public long Key {
-        get => _key;
-        set {
-            if (_key == value) {
-                return;
-            }
+    //public long Key {
+    //    get => _key;
+    //    set {
+    //        if (_key == value) {
+    //            return;
+    //        }
 
-            _ = (Database?.ChangeData(DatabaseDataType.ColumnKey, Name, null, Key.ToString(), value.ToString(), string.Empty));
-            OnChanged();
-        }
-    }
+    //        _ = (Database?.ChangeData(DatabaseDataType.ColumnKey, Name, null, Key.ToString(), value.ToString(), string.Empty));
+    //        OnChanged();
+    //    }
+    //}
 
     public string KeyName { get; private set; }
 
@@ -1255,7 +1257,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             Name = source.Name;
             //Database?.ChangeData(DatabaseDataType.ColumnKey, this, null, this.Key.ToString(false), source.Key.ToString(false));
 
-            Key = source.Key;
+            //Key = source.Key;
         }
 
         Caption = source.Caption;
@@ -1438,7 +1440,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
     public string ErrorReason() {
         if (Database == null || Database.IsDisposed) { return "Datenbank verworfen"; }
-        if (Key < 0) { return "Interner Fehler: ID nicht definiert"; }
+        //if (Key < 0) { return "Interner Fehler: ID nicht definiert"; }
         if (string.IsNullOrEmpty(KeyName)) { return "Der Spaltenname ist nicht definiert."; }
 
         if (!IsValidColumnName(KeyName)) { return "Der Spaltenname ist ungültig."; }
@@ -1751,7 +1753,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         //// bis 999 wird geprüft
         ///
 
-        CheckIfIAmAKeyColumn();
+        //CheckIfIAmAKeyColumn();
 
         try {
             switch ((int)_format) {
@@ -2203,7 +2205,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (this == null) { return "NULL"; }
         if (IsDisposed) { return "Disposed"; }
 
-        return Name + " -> " + Caption + " (Key: " + Key + ")";
+        return Name + " -> " + Caption;
     }
 
     public bool UserEditDialogTypeInFormula(EditTypeFormula editTypeToCheck) {
@@ -2305,23 +2307,23 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     //    return EditTypeFormula.None;
     //}
 
-    internal void CheckIfIAmAKeyColumn() {
-        Am_A_Key_For_Other_Column = string.Empty;
-        foreach (var thisColumn in Database.Column) {
-            //if (thisColumn.KeyColumnKey == Key) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // Werte Gleichhalten
-            //if (thisColumn.LinkedCell_RowKeyIsInColumn == Key) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
-            //if (ThisColumn.LinkedCell_ColumnValueFoundIn == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
+    //internal void CheckIfIAmAKeyColumn() {
+    //    Am_A_Key_For_Other_Column = string.Empty;
+    //    foreach (var thisColumn in Database.Column) {
+    //        //if (thisColumn.KeyColumnKey == Key) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // Werte Gleichhalten
+    //        //if (thisColumn.LinkedCell_RowKeyIsInColumn == Key) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
+    //        //if (ThisColumn.LinkedCell_ColumnValueFoundIn == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
 
-            if (thisColumn.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-                foreach (var thisV in thisColumn._linkedCellFilter) {
-                    if (IntTryParse(thisV, out var key)) {
-                        if (key == Key) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; }
-                    }
-                }
-            }
-        }
-        //if (_format == DataFormat.Columns_für_LinkedCellDropdown) { Am_A_Key_For_Other_Column = "Die Spalte selbst durch das Format"; }
-    }
+    //        if (thisColumn.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+    //            foreach (var thisV in thisColumn._linkedCellFilter) {
+    //                if (IntTryParse(thisV, out var key)) {
+    //                    if (key == Key) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; }
+    //                }
+    //            }
+    //        }
+    //    }
+    //    //if (_format == DataFormat.Columns_für_LinkedCellDropdown) { Am_A_Key_For_Other_Column = "Die Spalte selbst durch das Format"; }
+    //}
 
     /// <summary>
     /// Wenn sich ein Zelleninhalt verändert hat, muss die Spalte neu berechnet werden.
@@ -2353,17 +2355,17 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (type.IsObsolete()) { return string.Empty; }
 
         switch (type) {
-            case DatabaseDataType.ColumnKey:
-                var nkey = LongParse(newvalue);
+            //case DatabaseDataType.ColumnKey:
+            //    var nkey = LongParse(newvalue);
 
-                if (nkey == 0 && newvalue.Contains(",")) {
-                    // Wiederverwendeter wert:  co_DauerFilterPos = 194 {x=0, y=0}
-                    return string.Empty;
-                }
+            //    if (nkey == 0 && newvalue.Contains(",")) {
+            //        // Wiederverwendeter wert:  co_DauerFilterPos = 194 {x=0, y=0}
+            //        return string.Empty;
+            //    }
 
-                _key = nkey;
-                //Invalidate_TmpVariablesx();
-                break;
+            //    _key = nkey;
+            //    //Invalidate_TmpVariablesx();
+            //    break;
 
             case DatabaseDataType.ColumnName:
                 var nname = newvalue.ToUpper();

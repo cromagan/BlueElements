@@ -61,7 +61,7 @@ public sealed partial class Import {
     #region Methods
 
     protected override void OnClosing(CancelEventArgs e) {
-      if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
+        if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
         base.OnClosing(e);
     }
 
@@ -86,7 +86,7 @@ public sealed partial class Import {
             MessageBox.Show("Bitte Trennzeichen angeben.", ImageCode.Information, "OK");
             return;
         }
-        var m = Database.Import(_originalImportText, SpalteZuordnen.Checked, ZeilenZuorden.Checked, TR, Aufa.Checked, AnfTre.Checked, false, txbScript.Text);
+        var m = Database.Import(_originalImportText, SpalteZuordnen.Checked, ZeilenZuorden.Checked, TR, Aufa.Checked, AnfTre.Checked, false);
 
         if (!string.IsNullOrEmpty(m)) {
             MessageBox.Show(m, ImageCode.Information, "OK");

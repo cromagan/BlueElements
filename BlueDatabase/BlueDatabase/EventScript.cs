@@ -198,7 +198,7 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
 
                 case "manualexecutable":
 
-                    _needRow = pair.Value.FromPlusMinus();
+                    _executable = pair.Value.FromPlusMinus();
                     break;
 
                 case "changevalues":

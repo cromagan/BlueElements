@@ -79,16 +79,15 @@ public sealed class Database : DatabaseAbstract {
 
     #region Methods
 
-    public static void Parse(byte[] bLoaded, ref int pointer, out DatabaseDataType type, out long colKey, out long rowKey, out string value, out string colName) {
+    public static void Parse(byte[] bLoaded, ref int pointer, out DatabaseDataType type, out long rowKey, out string value, out string colName) {
         colName = string.Empty;
-        colKey = -1;
         rowKey = -1;
 
         switch ((Routinen)bLoaded[pointer]) {
             case Routinen.CellFormat: {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
                     var les = NummerCode3(bLoaded, pointer + 2);
-                    colKey = NummerCode3(bLoaded, pointer + 5);
+                    //colKey = NummerCode3(bLoaded, pointer + 5);
                     rowKey = NummerCode3(bLoaded, pointer + 8);
                     var b = new byte[les];
                     Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
@@ -101,7 +100,7 @@ public sealed class Database : DatabaseAbstract {
             case Routinen.CellFormatUTF8: {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
                     var les = NummerCode3(bLoaded, pointer + 2);
-                    colKey = NummerCode3(bLoaded, pointer + 5);
+                    //colKey = NummerCode3(bLoaded, pointer + 5);
                     rowKey = NummerCode3(bLoaded, pointer + 8);
                     var b = new byte[les];
                     Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
@@ -114,7 +113,7 @@ public sealed class Database : DatabaseAbstract {
             case Routinen.CellFormatUTF8_V400: {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
                     var les = NummerCode3(bLoaded, pointer + 2);
-                    colKey = NummerCode7(bLoaded, pointer + 5);
+                    //colKey = NummerCode7(bLoaded, pointer + 5);
                     rowKey = NummerCode7(bLoaded, pointer + 12);
                     var b = new byte[les];
                     Buffer.BlockCopy(bLoaded, pointer + 19, b, 0, les);
@@ -132,14 +131,14 @@ public sealed class Database : DatabaseAbstract {
                     Buffer.BlockCopy(bLoaded, pointer + 12, b, 0, les);
                     value = b.ToStringUtf8();
                     pointer += 12 + les;
-                    colKey = -1;
+                    //colKey = -1;
                     break;
                 }
 
             case Routinen.DatenAllgemein: {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
                     var les = NummerCode3(bLoaded, pointer + 2);
-                    colKey = -1;
+                    //colKey = -1;
                     rowKey = -1;
                     var b = new byte[les];
                     Buffer.BlockCopy(bLoaded, pointer + 5, b, 0, les);
@@ -152,7 +151,7 @@ public sealed class Database : DatabaseAbstract {
             case Routinen.DatenAllgemeinUTF8: {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
                     var les = NummerCode3(bLoaded, pointer + 2);
-                    colKey = -1;
+                    //colKey = -1;
                     rowKey = -1;
                     var b = new byte[les];
                     Buffer.BlockCopy(bLoaded, pointer + 5, b, 0, les);
@@ -165,7 +164,7 @@ public sealed class Database : DatabaseAbstract {
             case Routinen.Column: {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
                     var les = NummerCode3(bLoaded, pointer + 2);
-                    colKey = NummerCode3(bLoaded, pointer + 5);
+                    //colKey = NummerCode3(bLoaded, pointer + 5);
                     rowKey = NummerCode3(bLoaded, pointer + 8);
                     var b = new byte[les];
                     Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
@@ -178,7 +177,7 @@ public sealed class Database : DatabaseAbstract {
             case Routinen.ColumnUTF8: {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
                     var les = NummerCode3(bLoaded, pointer + 2);
-                    colKey = NummerCode3(bLoaded, pointer + 5);
+                    //colKey = NummerCode3(bLoaded, pointer + 5);
                     rowKey = NummerCode3(bLoaded, pointer + 8);
                     var b = new byte[les];
                     Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
@@ -191,7 +190,7 @@ public sealed class Database : DatabaseAbstract {
             case Routinen.ColumnUTF8_V400: {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
                     var les = NummerCode3(bLoaded, pointer + 2);
-                    colKey = NummerCode7(bLoaded, pointer + 5);
+                    //colKey = NummerCode7(bLoaded, pointer + 5);
                     rowKey = NummerCode7(bLoaded, pointer + 12);
                     var b = new byte[les];
                     Buffer.BlockCopy(bLoaded, pointer + 19, b, 0, les);
@@ -248,7 +247,7 @@ public sealed class Database : DatabaseAbstract {
         do {
             if (pointer >= data.Length) { break; }
 
-            Parse(data, ref pointer, out var art, out var colKey, out var rowKey, out var inhalt, out var columname);
+            Parse(data, ref pointer, out var art, out var rowKey, out var inhalt, out var columname);
             //Console.WriteLine(art);
             if (!art.IsObsolete()) {
 
@@ -272,27 +271,27 @@ public sealed class Database : DatabaseAbstract {
 
                 #region Spalte suchen oder erstellen
 
-                if (colKey > -1 && string.IsNullOrEmpty(columname)) {
-                    column = db.Column.SearchByKey(colKey);
-                    if (column == null) {
-                        if (art != DatabaseDataType.ColumnName) { Develop.DebugPrint(art + " an erster Stelle!"); }
-                        _ = db.Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByKey, colKey, true, string.Empty);
-                        column = db.Column.SearchByKey(colKey);
-                    }
-                    if (column == null) {
-                        Develop.DebugPrint(FehlerArt.Fehler, "Spalte hinzufügen Fehler");
-                        db.SetReadOnly();
-                        return;
-                    }
-                    column.IsInCache = DateTime.UtcNow;
-                    columnUsed.Add(column);
-                }
+                //if (colKey > -1 && string.IsNullOrEmpty(columname)) {
+                //    column = db.Column.SearchByKey(colKey);
+                //    if (column == null) {
+                //        if (art != DatabaseDataType.ColumnName) { Develop.DebugPrint(art + " an erster Stelle!"); }
+                //        _ = db.Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByKey, true, string.Empty);
+                //        column = db.Column.SearchByKey(colKey);
+                //    }
+                //    if (column == null) {
+                //        Develop.DebugPrint(FehlerArt.Fehler, "Spalte hinzufügen Fehler");
+                //        db.SetReadOnly();
+                //        return;
+                //    }
+                //    column.IsInCache = DateTime.UtcNow;
+                //    columnUsed.Add(column);
+                //}
 
-                if (colKey < 0 && !string.IsNullOrEmpty(columname)) {
+                if (!string.IsNullOrEmpty(columname)) {
                     column = db.Column.Exists(columname);
                     if (column == null) {
                         if (art != DatabaseDataType.ColumnName) { Develop.DebugPrint(art + " an erster Stelle!"); }
-                        _ = db.Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByName, db.Column.NextColumnKey(), true, columname);
+                        _ = db.Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByName, true, columname);
                         column = db.Column.Exists(columname);
                     }
                     if (column == null) {
@@ -340,7 +339,7 @@ public sealed class Database : DatabaseAbstract {
 
         foreach (var thisColumn in l) {
             if (!columnUsed.Contains(thisColumn)) {
-                _ = db.SetValueInternal(DatabaseDataType.Comand_RemoveColumn, thisColumn.Key.ToString(), thisColumn.Name, null, true);
+                _ = db.SetValueInternal(DatabaseDataType.Comand_RemoveColumn, thisColumn.Name, thisColumn.Name, null, true);
             }
         }
 
@@ -655,7 +654,7 @@ public sealed class Database : DatabaseAbstract {
         if (ReadOnly) { return false; }
         if (string.IsNullOrEmpty(Filename)) { return false; }
 
-        if (!HasPendingChanges) { return false; }
+        //if (!HasPendingChanges) { return false; }
 
         var tmpFileName = WriteTempFileToDisk();
 

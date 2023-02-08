@@ -58,6 +58,8 @@
     <Compile Include="Methods\Method_ContainsWhich.cs" />
     <Compile Include="Methods\Method_DirectoryExists.cs" />
     <Compile Include="Methods\Method_FreeDirectoryName.cs" />
+    <Compile Include="Methods\Method_DeleteFile.cs" />
+    <Compile Include="Methods\Method_LoadTextFile.cs" />
     <Compile Include="Methods\Method_MoveDirectory.cs" />
     <Compile Include="Methods\Method_MoveFile.cs" />
     <Compile Include="Methods\Method_FreeFileName.cs" />
