@@ -96,6 +96,8 @@ public class VariableFloat : Variable {
     protected override void SetValue(object? x) {
         if (x is float val) {
             _double = val;
+        } else if (x is double vald) {
+            _double = vald;
         } else {
             Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Variablenfehler!");
         }

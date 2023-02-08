@@ -487,10 +487,10 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
             switch (pair.Key) {
                 case "key":
                 case "name":
-                    if (pair.Value.FromNonCritical() != KeyName) {
-                        Develop.DebugPrint(FehlerArt.Fehler, "Variablenfehler: " + toParse);
-                    }
-                    //_name = pair.Value.FromNonCritical();
+                    //if (pair.Value.FromNonCritical() != KeyName) {
+                    //    Develop.DebugPrint(FehlerArt.Fehler, "Variablenfehler: " + toParse);
+                    //}
+                    KeyName = pair.Value.FromNonCritical();
                     break;
 
                 case "classid":

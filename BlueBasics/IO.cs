@@ -271,7 +271,8 @@ public static class IO {
         : filename.FileSuffix().ToUpper() switch {
             "DOC" or "DOCX" or "RTF" or "ODT" => FileFormat.WordKind,
             "TXT" or "INI" or "INFO" => FileFormat.Textdocument,
-            "XLS" or "CSV" or "XLA" or "XLSX" or "XLSM" or "ODS" => FileFormat.ExcelKind,
+            "XLS" or "XLA" or "XLSX" or "XLSM" or "ODS" => FileFormat.ExcelKind,
+            "CSV" => FileFormat.CSV,
             "PPT" or "PPS" or "PPA" => FileFormat.PowerPointKind,
             "MSG" or "EML" => FileFormat.EMail,
             "PDF" => FileFormat.Pdf,

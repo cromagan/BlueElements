@@ -74,7 +74,9 @@ internal class Method_BerechneVariable : Method {
             return new DoItFeedback("Variable " + varnam + " nicht vorhanden.");
         }
 
-        var attvar = SplitAttributeToVars(newcommand.Substring(pos + 1, newcommand.Length - pos - 2), s, _args, SEndlessArgs);
+        var value = newcommand.Substring(pos + 1, newcommand.Length - pos - 2);
+
+        var attvar = SplitAttributeToVars(value, s, _args, SEndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(new Method_BerechneVariable(), attvar); }
 
         if (generateVariable) {

@@ -102,7 +102,7 @@ public class VariableString : Variable {
 
     protected override void SetValue(object? x) {
         if (x is string val) {
-            _valueString = val;
+            _valueString = val.RestoreCriticalVariableChars();
         } else {
             Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Variablenfehler!");
         }

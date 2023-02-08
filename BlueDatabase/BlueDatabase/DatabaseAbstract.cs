@@ -861,6 +861,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             foreach (var thisvar in Variables) {
                 var v = new VariableString("DB_" + thisvar.Name, thisvar.ValueString, false, false,
                     "Datenbank-Kopf-Variable\r\n" + thisvar.Comment);
+                vars.Add(v);
             }
 
             vars.Add(new VariableString("User", UserName, true, false, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
@@ -1147,7 +1148,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return GetById(x, null);// new DatabaseSQL(_sql, readOnly, tablename);
     }
 
-    public string Import(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart, bool dorowautmatic, string scriptnameeverychangedrow) {
+    public string Import(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart, bool dorowautmatic) {
         // Vorbereitung des Textes -----------------------------
         importText = importText.Replace("\r\n", "\r").Trim("\r");
 
@@ -1247,7 +1248,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 } else {
                     row?.CellSet(columns[spaltNo], zeil[zeilNo][spaltNo].SplitAndCutBy("|").JoinWithCr());
                 }
-                if (row != null && dorowautmatic) { _ = row.DoAutomatic(true, true, null, false, scriptnameeverychangedrow); }
+                if (row != null && dorowautmatic) { _ = row.DoAutomatic(true, true, null, false, string.Empty); }
             }
         }
 
@@ -1255,7 +1256,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return string.Empty;
     }
 
-    public string ImportCsv(string filename, string script) {
+    public string ImportCsv(string filename) {
         if (!FileExists(filename)) { return "Datei nicht gefunden"; }
         var importText = File.ReadAllText(filename, Constants.Win1252);
 
@@ -1274,7 +1275,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             importText = x.JoinWithCr();
         }
 
-        return Import(importText, true, true, sep, false, false, true, script);
+        return Import(importText, true, true, sep, false, false, true);
     }
 
     public void InvalidateExports(string layoutId) {
@@ -1526,13 +1527,13 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             switch (type) {
                 case DatabaseDataType.Comand_RemoveColumn:
                     var c = Column.Exists(value);
-                    return Column.SetValueInternal(type, c.Key, isLoading, c.Name);
+                    return Column.SetValueInternal(type, isLoading, c.Name);
 
-                case DatabaseDataType.Comand_AddColumnByKey:
-                    return Column.SetValueInternal(type, LongParse(value), isLoading, string.Empty);
+                //case DatabaseDataType.Comand_AddColumnByKey:
+                //    return Column.SetValueInternal(type, LongParse(value), isLoading, string.Empty);
 
                 case DatabaseDataType.Comand_AddColumnByName:
-                    return Column.SetValueInternal(type, Column.Database.Column.NextColumnKey(), isLoading, value);
+                    return Column.SetValueInternal(type, isLoading, value);
 
                 case DatabaseDataType.Comand_AddRow:
                 case DatabaseDataType.Comand_RemoveRow:
@@ -1649,7 +1650,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 _variables.Clear();
                 List<string> va = new(value.SplitAndCutByCr());
                 foreach (var t in va) {
-                    _variables.Add(ParsebleItem.NewByParsing<VariableString>(t));
+                    var l = new VariableString("dummy");
+                    l.Parse(t);
+                    _variables.Add(l);
                 }
                 break;
 

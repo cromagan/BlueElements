@@ -102,7 +102,7 @@ public sealed class RowSortDefinition : IParseable {
                     break;
 
                 case "columnkey":
-                    if (Database.Column.SearchByKey(LongParse(pair.Value)) is ColumnItem c2) { Columns.Add(c2); }
+                    //if (Database.Column.SearchByKey(LongParse(pair.Value)) is ColumnItem c2) { Columns.Add(c2); }
                     break;
 
                 default:

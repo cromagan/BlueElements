@@ -58,7 +58,7 @@ public class Method_AddRow : MethodDatabase {
         var db = DatabaseOf(s, ((VariableString)attvar.Attributes[0]).ValueString);
         if (db == null) { return new DoItFeedback("Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden"); }
 
-        if (db.ReadOnly) { return DoItFeedback.Falsch(); }
+        if (db?.ReadOnly ?? true) { return new DoItFeedback("Datenbank schreibgeschützt."); }
 
         if (string.IsNullOrEmpty(((VariableString)attvar.Attributes[1]).ValueString)) { return new DoItFeedback("KeyValue muss einen Wert enthalten."); }
         //var r = db.Row[((VariableString)attvar.Attributes[1]).ValueString];

@@ -246,7 +246,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
 
         switch (tag) {
             case "column":
-                Column = GetRowFrom?.Database?.Column.SearchByKey(LongParse(value));
+                //Column = GetRowFrom?.Database?.Column.SearchByKey(LongParse(value));
                 return true;
 
             case "columnname":

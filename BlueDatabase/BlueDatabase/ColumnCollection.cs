@@ -225,21 +225,17 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         return testName;
     }
 
-    public ColumnItem? GenerateAndAdd(string internalName, string caption, string suffix, IColumnInputFormat format) => GenerateAndAdd(NextColumnKey(), internalName, caption, suffix, format, string.Empty);
+    public ColumnItem? GenerateAndAdd(string internalName, string caption, string suffix, IColumnInputFormat format) => GenerateAndAdd(internalName, caption, suffix, format, string.Empty);
 
-    public ColumnItem? GenerateAndAdd(string internalName, string caption, IColumnInputFormat format, string quickinfo) => GenerateAndAdd(NextColumnKey(), internalName, caption, string.Empty, format, quickinfo);
+    public ColumnItem? GenerateAndAdd(string internalName, string caption, IColumnInputFormat format, string quickinfo) => GenerateAndAdd(internalName, caption, string.Empty, format, quickinfo);
 
-    public ColumnItem? GenerateAndAdd(string internalName, string caption, IColumnInputFormat format) => GenerateAndAdd(NextColumnKey(), internalName, caption, string.Empty, format, string.Empty);
+    public ColumnItem? GenerateAndAdd(string internalName, string caption, IColumnInputFormat format) => GenerateAndAdd(internalName, caption, string.Empty, format, string.Empty);
 
-    public ColumnItem? GenerateAndAdd(long colKey) => GenerateAndAdd(colKey, Freename(string.Empty), string.Empty, string.Empty, null, string.Empty);
+    public ColumnItem? GenerateAndAdd(string internalName) => GenerateAndAdd(internalName, string.Empty, string.Empty, null, string.Empty);
 
-    public ColumnItem? GenerateAndAdd(long colKey, string internalName) => GenerateAndAdd(colKey, internalName, string.Empty, string.Empty, null, string.Empty);
+    public ColumnItem? GenerateAndAdd() => GenerateAndAdd(Freename(string.Empty), string.Empty, string.Empty, null, string.Empty);
 
-    public ColumnItem? GenerateAndAdd() => GenerateAndAdd(NextColumnKey(), Freename(string.Empty), string.Empty, string.Empty, null, string.Empty);
-
-    public ColumnItem? GenerateAndAdd(string internalName) => GenerateAndAdd(NextColumnKey(), internalName, internalName, string.Empty, null, string.Empty);
-
-    public ColumnItem? GenerateAndAdd(long key, string internalName, string caption, string suffix, IColumnInputFormat? format, string quickinfo) {
+    public ColumnItem? GenerateAndAdd(string internalName, string caption, string suffix, IColumnInputFormat? format, string quickinfo) {
         if (!ColumnItem.IsValidColumnName(internalName)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht erlaubt!");
             return null;
@@ -247,20 +243,19 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         if (Database == null || Database.IsDisposed) { return null; }
 
-        var item = SearchByKey(key);
-        if (item != null) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!");
-            return null;
-        }
+        //var item = SearchByKey(key);
+        //if (item != null) {
+        //    Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!");
+        //    return null;
+        //}
         _ = (Database?.ChangeData(DatabaseDataType.Comand_AddColumnByName, internalName, null, string.Empty, internalName, string.Empty));
-        item = Exists(internalName);
+        var item = Exists(internalName);
         if (item == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen.");
             return null;
         }
 
         item.Name = internalName;
-        item.Key = key;
         item.Caption = caption;
 
         item.GetStyleFrom(format);
@@ -445,18 +440,18 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         }
     }
 
-    public ColumnItem? SearchByKey(long? key) {
-        if (Database == null || Database.IsDisposed) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Database ist null bei " + key.ToString());
-            return null;
-        }
-        if (key is null or < 0) {
-            //             Develop.DebugPrint(enFehlerArt.Warnung, "Leerer Spaltenname"); Neue Spalten haben noch keinen Namen
-            return null;
-        }
+    //public ColumnItem? SearchByKey(long? key) {
+    //    if (Database == null || Database.IsDisposed) {
+    //        Develop.DebugPrint(FehlerArt.Fehler, "Database ist null bei " + key.ToString());
+    //        return null;
+    //    }
+    //    if (key is null or < 0) {
+    //        //             Develop.DebugPrint(enFehlerArt.Warnung, "Leerer Spaltenname"); Neue Spalten haben noch keinen Namen
+    //        return null;
+    //    }
 
-        return this.FirstOrDefault(thisColumn => thisColumn != null && thisColumn.Key == key);
-    }
+    //    return this.FirstOrDefault(thisColumn => thisColumn != null && thisColumn.Key == key);
+    //}
 
     //internal static string ParsableColumnName(ColumnItem? column) => column == null ? "ColumnName=?" : "ColumnName=" + column.Name;
 
@@ -489,7 +484,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         // Spalten erzeugen und Format übertragen
         foreach (var thisColumn in sourceDatabase.Column) {
             var l = Exists(thisColumn.Name) ??
-                GenerateAndAdd(thisColumn.Key, thisColumn.Name, thisColumn.Caption, thisColumn.Suffix, null, thisColumn.Quickinfo);
+                GenerateAndAdd(thisColumn.Name, thisColumn.Caption, thisColumn.Suffix, null, thisColumn.Quickinfo);
 
             if (l != null) {
                 l.CloneFrom(thisColumn, true);
@@ -498,25 +493,25 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                     Develop.DebugPrint(FehlerArt.Fehler, "Name nicht korrekt!");
                 }
 
-                if (l.Key != thisColumn.Key) {
-                    Develop.DebugPrint(FehlerArt.Fehler, "Key nicht korrekt!");
-                }
+                //if (l.Key != thisColumn.Key) {
+                //    Develop.DebugPrint(FehlerArt.Fehler, "Key nicht korrekt!");
+                //}
             } else {
                 Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht erzeugt!");
             }
         }
     }
 
-    internal long NextColumnKey() {
-        var tmp = 0;
-        long key;
+    //internal long NextColumnKey() {
+    //    var tmp = 0;
+    //    long key;
 
-        do {
-            key = Generic.GetUniqueKey(tmp, "column");
-            tmp++;
-        } while (SearchByKey(key) != null);
-        return key;
-    }
+    //    do {
+    //        key = Generic.GetUniqueKey(tmp, "column");
+    //        tmp++;
+    //    } while (SearchByKey(key) != null);
+    //    return key;
+    //}
 
     internal void OnColumnRemoving(ColumnEventArgs e) {
         e.Column.Changed -= OnColumnChanged;
@@ -525,24 +520,24 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         ColumnRemoving?.Invoke(this, e);
     }
 
-    internal string SetValueInternal(DatabaseDataType type, long? key, bool isLoading, string name) {
+    internal string SetValueInternal(DatabaseDataType type, bool isLoading, string name) {
         if (Database == null || Database.IsDisposed) { return "Datenbank verworfen!"; }
-        if (key is null or < 0) { return "Schlüsselfehler"; }
+        //if (key is null or < 0) { return "Schlüsselfehler"; }
 
-        if (type == DatabaseDataType.Comand_AddColumnByKey) {
-            var c = SearchByKey(key);
-            if (c != null) { return "Bereits vorhanden!"; }
+        //if (type == DatabaseDataType.Comand_AddColumnByKey) {
+        //    var c = SearchByKey(key);
+        //    if (c != null) { return "Bereits vorhanden!"; }
 
-            c = new ColumnItem(Database, (long)key);
-            _ = Add(c);
+        //    c = new ColumnItem(Database, (long)key);
+        //    _ = Add(c);
 
-            if (!isLoading) {
-                Database.RepairColumnArrangements();
-                Database.RepairViews();
-            }
+        //    if (!isLoading) {
+        //        Database.RepairColumnArrangements();
+        //        Database.RepairViews();
+        //    }
 
-            return string.Empty;
-        }
+        //    return string.Empty;
+        //}
 
         if (type == DatabaseDataType.Comand_AddColumnByName) {
             var c = Exists(name);

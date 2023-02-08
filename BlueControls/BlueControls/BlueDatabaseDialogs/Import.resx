@@ -117,7 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="caption1.Text" xml:space="preserve">
-    <value>Falls hier ein Skript eingegebn wird, kann damit der Original-Text modifizert werden. Es wird dabei jeder Zeile einzeln durch die Variable Row übergeben. Die Variable isCaption ist True, wenn des um die Überschriftenzeile handelt. Die Variable Seperator gibt das Trennungszeichen zurück. Wichtig: Das Skript wird als erstes ausgeführt!</value>
-  </data>
 </root>

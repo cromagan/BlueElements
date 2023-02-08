@@ -215,8 +215,8 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     }
 
     protected override void AddUndo(string tableName, DatabaseDataType comand, string? columnName, long? rowKey, string previousValue, string changedTo, string userName, string comment) {
-        var ck = Column.Exists(columnName)?.Key ?? -1;
-        _ = _sql.AddUndo(tableName, comand, ck, columnName, rowKey, previousValue, changedTo, UserName, comment);
+        //var ck = Column.Exists(columnName)?.Key ?? -1;
+        _ = _sql.AddUndo(tableName, comand, columnName, rowKey, previousValue, changedTo, UserName, comment);
     }
 
     protected override void SetUserDidSomething() { }
@@ -273,7 +273,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         return oo;
     }
 
-    private void DoLastChanges(List<(string tablename, string comand, string columnkey, string columnname, string rowkey, DateTime timecode)>? data) {
+    private void DoLastChanges(List<(string tablename, string comand, string columnname, string rowkey, DateTime timecode)>? data) {
         if (data == null) { return; }
         if (IsDisposed) { return; }
 
@@ -285,48 +285,48 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         try {
             var rk = new List<long>();
 
-            foreach (var (tablename, comand, columnkey, columnname, rowkey, timecode) in data) {
+            foreach (var (tablename, comand, columnname, rowkey, timecode) in data) {
                 if (TableName == tablename && timecode > IsInCache) {
                     _ = Enum.TryParse(comand, out DatabaseDataType t);
 
                     if (t.IsObsolete()) {
                         // Nix tun
-                    } else if (t == DatabaseDataType.ColumnName) {
+                    }
+                     //else if (t == DatabaseDataType.ColumnName) {
+                     //    #region Sonderbehandlung: ColumnName
 
-                        #region Sonderbehandlung: ColumnName
+                     //    // Sonderbehandlung!
+                     //    var c = Column.SearchByKey(LongParse(columnkey));
 
-                        // Sonderbehandlung!
-                        var c = Column.SearchByKey(LongParse(columnkey));
+                     //    if (c != null) {
+                     //        var newn = _sql.GetLastColumnName(tablename, c.Key);
+                     //        c.Name = newn;
+                     //    }
 
-                        if (c != null) {
-                            var newn = _sql.GetLastColumnName(tablename, c.Key);
-                            c.Name = newn;
-                        }
-
-                        #endregion
-                    } else if (t.IsCommand()) {
+                     //    #endregion
+                     else if (t.IsCommand()) {
 
                         #region Befehle
 
                         switch (t) {
                             case DatabaseDataType.Comand_RemoveColumn:
-                                _ = Column.SetValueInternal(t, LongParse(columnkey), true, columnname);
+                                _ = Column.SetValueInternal(t, true, columnname);
                                 break;
 
-                            case DatabaseDataType.Comand_AddColumnByKey:
-                            case DatabaseDataType.Comand_AddColumn:
-                                _ = Column.SetValueInternal(t, LongParse(columnkey), true, columnname);
-                                var c = Column.SearchByKey(LongParse(columnkey));
-                                var name = _sql.GetLastColumnName(TableName, c.Key);
-                                _ = SetValueInternal(DatabaseDataType.ColumnName, name, c.Name, null, true);
-                                c.RefreshColumnsData(); // muss sein, alternativ alle geladenen Zeilen neu laden
-                                break;
+                            //case DatabaseDataType.Comand_AddColumnByKey:
+                            //case DatabaseDataType.Comand_AddColumn:
+                            //    _ = Column.SetValueInternal(t, true, columnname);
+                            //    var c = Column.SearchByKey(LongParse(columnkey));
+                            //    var name = _sql.GetLastColumnName(TableName, c.Key);
+                            //    _ = SetValueInternal(DatabaseDataType.ColumnName, name, c.Name, null, true);
+                            //    c.RefreshColumnsData(); // muss sein, alternativ alle geladenen Zeilen neu laden
+                            //    break;
 
                             case DatabaseDataType.Comand_AddColumnByName:
-                                _ = Column.SetValueInternal(t, -1, true, columnname);
+                                _ = Column.SetValueInternal(t, true, columnname);
                                 var c2 = Column.Exists(columnname);
                                 //var columnname = _sql.GetLastColumnName(TableName, c.Key);
-                                _ = SetValueInternal(DatabaseDataType.ColumnKey, columnkey, c2.Name, null, true);
+                                //_ = SetValueInternal(DatabaseDataType.ColumnKey, columnkey, c2.Name, null, true);
                                 c2.RefreshColumnsData(); // muss sein, alternativ alle geladenen Zeilen neu laden
                                 break;
 
@@ -375,7 +375,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
                         #region Spalten-Styles
 
-                        var c = Column.SearchByKey(LongParse(columnkey));
+                        var c = Column.Exists(columnname);
                         if (c != null) {
                             var v = _sql.GetStyleData(tablename, comand, c.Name);
                             if (v != null) { _ = SetValueInternal(t, v, c.Name, null, true); }
@@ -435,13 +435,13 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
             foreach (var thisCol in columnsToLoad) {
                 var column = Column.Exists(thisCol);
                 if (column == null) {
-                    var ck = Column.NextColumnKey();
-                    _ = Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByName, ck, true, thisCol);
+                    //var ck = Column.NextColumnKey();
+                    _ = Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByName, true, thisCol);
                     var co = Column.Exists(thisCol);
-                    _ = SetValueInternal(DatabaseDataType.ColumnKey, ck.ToString(), co?.Name, null, true);
+                    //_ = SetValueInternal(DatabaseDataType.ColumnKey, ck.ToString(), co?.Name, null, true);
                     column = Column.Exists(thisCol);
                     if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht gefunden"); return; }
-                    column = Column.SearchByKey(ck);
+                    //column = Column.SearchByKey(ck);
 
                     //column = new ColumnItem(this, thisCol, Column.NextColumnKey()); // Column.GenerateAndAdd(Column.NextColumnKey(), thisCol);
                 }
