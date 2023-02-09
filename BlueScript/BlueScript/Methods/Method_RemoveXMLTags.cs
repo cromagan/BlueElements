@@ -20,38 +20,33 @@
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
+using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods;
 
-internal class Method_ClipboardText : Method {
+internal class Method_RemoveXMLTags : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new();
-    public override string Description => "Gibt den Inhalt des Windows Clipboards als Text zurück. Falls kein Text im Clipboard enthalten ist, wird ein leerer String zurückgegeben.";
+    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain } };
+    public override string Description => "Entfernt aus dem Text < > Tags.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "ClipboardText()";
+    public override string Syntax => "RemoveXMLTags()";
 
     #endregion
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "clipboardtext" };
+    public override List<string> Comand(Script? s) => new() { "removexmltags" };
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) {
-            return DoItFeedback.AttributFehler(this, attvar);
-        }
-
-        if (System.Windows.Clipboard.ContainsText()) {
-            return new DoItFeedback(System.Windows.Clipboard.GetText(), string.Empty);
-        }
-        return new DoItFeedback(string.Empty, string.Empty);
+        return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.AttributFehler(this, attvar)
+            : new DoItFeedback(((VariableString)attvar.Attributes[0]).ValueString.RemoveXmlTags(), string.Empty);
     }
 
     #endregion

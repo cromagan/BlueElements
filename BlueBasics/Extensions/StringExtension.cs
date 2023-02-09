@@ -173,7 +173,7 @@ public static partial class Extensions {
         return tXt;
     }
 
-    public static string CutToUTF8Length(this string str, int byteLength) {
+    public static string CutToUtf8Length(this string str, int byteLength) {
         // https://stackoverflow.com/questions/1225052/best-way-to-shorten-utf8-string-based-on-byte-length
         var byteArray = Encoding.UTF8.GetBytes(str);
 
@@ -209,6 +209,7 @@ public static partial class Extensions {
     /// <param name="klammern"></param>
     /// <param name="geschklammern"></param>
     /// <param name="gänsef"></param>
+    /// <param name="trimspace"></param>
     /// <returns></returns>
     public static string DeKlammere(this string txt, bool klammern, bool geschklammern, bool gänsef, bool trimspace) {
         if (trimspace) { txt = txt.Trim(); }
@@ -273,8 +274,14 @@ public static partial class Extensions {
 
     public static string GenerateSlash(this string txt) => txt.Replace("[Slash]", "/");
 
-    public static T? Get<T>(this IEnumerable<T?>? items, string name) where T : IHasKeyName
-           => items.FirstOrDefault(thisp => thisp != null && string.Equals(thisp.KeyName, name, StringComparison.OrdinalIgnoreCase));
+    public static T? Get<T>(this IEnumerable<T?>? items, string name) where T : IHasKeyName {
+        if (items != null) {
+            return items.FirstOrDefault(thisp =>
+                thisp != null && string.Equals(thisp.KeyName, name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        return default;
+    }
 
     /// <summary>
     /// Teilt einen String, der geparsed werden kann in seine Bestandteile auf.
@@ -397,7 +404,7 @@ public static partial class Extensions {
 
     public static bool IsDouble(this string? txt) => txt is not null && DoubleTryParse(txt, out _);
 
-    public static bool IsHtmlColorCode(this string? txt) => !string.IsNullOrEmpty(txt) && txt.Length is 6 or 8 && txt.ContainsOnlyChars(Constants.Char_Numerals + "abcdefABCDEF");
+    public static bool IsHtmlColorCode(this string? txt) => txt != null && !string.IsNullOrEmpty(txt) && txt.Length is 6 or 8 && txt.ContainsOnlyChars(Constants.Char_Numerals + "abcdefABCDEF");
 
     public static bool IsLong(this string? txt) => txt is not null && LongTryParse(txt, out _);
 
@@ -512,24 +519,26 @@ public static partial class Extensions {
     }
 
     /// <summary>
-    /// Reduziert den Text auf ein Minimum, Trennzeichen ist \r\n
+    /// Gibt eine Liste von Textstellen zurück, die dem Sternchen entsprechen
     /// </summary>
-    /// <param name="vText">Beispiel: Hund frißt Knochen, Hund vergräbt knochen.</param>
-    /// <param name="vSearch">Beispiel: Hund * Kochen.</param>
-    /// <returns>Beispiel: frißt \r\n vergräbt</returns>
+    /// <param name="text">Beispiel: Hund frisst Knochen, Hund vergräbt Knochen.</param>
+    /// <param name="search">Beispiel: Hund * Kochen.</param>
+    /// <param name="compare"></param>
+    /// <returns>Beispiel: Eine Liste mit: {"frisst", "vergräbt"}</returns>
     /// <remarks></remarks>
-    public static List<string>? ReduceToMulti(this string vText, string vSearch) {
-        if (vSearch.CountString("*") != 1) { return null; }
-        var e = vSearch.Split('*');
+    public static List<string>? ReduceToMulti(this string text, string search, StringComparison compare) {
+        if (search.CountString("*") != 1) { return null; }
+        var e = search.Split('*');
         if (e.Length != 2) { return null; }
+
         List<string> txt = new();
         var enx = 0;
         while (true) {
-            var bgx = vText.ToUpper().IndexOf(e[0].ToUpper(), enx, StringComparison.Ordinal);
+            var bgx = text.IndexOf(e[0], enx, compare);
             if (bgx < 0) { break; }
-            enx = vText.ToUpper().IndexOf(e[1].ToUpper(), bgx + e[0].Length, StringComparison.Ordinal);
+            enx = text.IndexOf(e[1], bgx + e[0].Length, compare);
             if (bgx + e[0].Length > enx) { break; }
-            txt.Add(vText.Substring(bgx + e[0].Length, enx - bgx - e[0].Length));
+            txt.Add(text.Substring(bgx + e[0].Length, enx - bgx - e[0].Length));
         }
         return txt;
     }
@@ -551,7 +560,12 @@ public static partial class Extensions {
         return tXt;
     }
 
-    public static string RemoveHtmlCodes(this string html) => Regex.Replace(html, "<.*?>", string.Empty);
+    /// <summary>
+    /// Entfernt alle < > aus dem gegebenen Text.
+    /// </summary>
+    /// <param name="text"></param>
+    /// <returns></returns>
+    public static string RemoveXmlTags(this string text) => Regex.Replace(text, "<.*?>", string.Empty);
 
     public static string Replace(this string tXt, string alt, string neu, RegexOptions options) {
         if (options != RegexOptions.IgnoreCase) { Develop.DebugPrint(FehlerArt.Fehler, "Regex option nicht erlaubt."); }

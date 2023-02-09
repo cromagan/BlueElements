@@ -71,7 +71,7 @@ public static partial class Extensions {
 
     // .TrimEnd(JoinChar);
 
-    public static void RemoveRange<Tt>(this ICollection<Tt> iC, List<Tt> remove) {
+    public static void RemoveRange<T>(this ICollection<T> iC, List<T> remove) {
         foreach (var thisItem in remove) {
             _ = iC.Remove(thisItem);
         }

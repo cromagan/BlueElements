@@ -71,7 +71,7 @@ internal class Method_Do : Method {
 
         s.BreakFired = false;
         s.Line = tmpline + infos.LineBreakInCodeBlock;
-        return new DoItFeedback(string.Empty);
+        return DoItFeedback.Null();
     }
 
     #endregion

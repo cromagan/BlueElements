@@ -17,41 +17,40 @@
 
 #nullable enable
 
+using static BlueBasics.Generic;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
-internal class Method_ClipboardText : Method {
+internal class Method_SetClipboard : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new();
-    public override string Description => "Gibt den Inhalt des Windows Clipboards als Text zurück. Falls kein Text im Clipboard enthalten ist, wird ein leerer String zurückgegeben.";
+    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain } };
+    public override string Description => "Speichert den Text im Clipboard.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
+    public override string EndSequence => ");";
     public override bool GetCodeBlockAfter => false;
-    public override string Returns => VariableString.ShortName_Plain;
+    public override string Returns => string.Empty;
     public override string StartSequence => "(";
-    public override string Syntax => "ClipboardText()";
+    public override string Syntax => "SetClipboard(Text);";
 
     #endregion
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "clipboardtext" };
+    public override List<string> Comand(Script? s) => new() { "setclipboard" };
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) {
-            return DoItFeedback.AttributFehler(this, attvar);
-        }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-        if (System.Windows.Clipboard.ContainsText()) {
-            return new DoItFeedback(System.Windows.Clipboard.GetText(), string.Empty);
-        }
-        return new DoItFeedback(string.Empty, string.Empty);
+        var vs = (VariableString)attvar.Attributes[0];
+        CopytoClipboard(vs.ValueString);
+
+        return DoItFeedback.Null();
     }
 
     #endregion

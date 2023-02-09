@@ -17,41 +17,47 @@
 
 #nullable enable
 
+using System;
+using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
-internal class Method_ClipboardText : Method {
+internal class Method_ExtractText : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new();
-    public override string Description => "Gibt den Inhalt des Windows Clipboards als Text zurück. Falls kein Text im Clipboard enthalten ist, wird ein leerer String zurückgegeben.";
+    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain } };
+
+    public override string Description => "Extrahiert aus dem gegebenen String Textstellen und gibt eine List mit allen Funden zurück.\r\n" +
+                                          "Beispiel: Extract(\"Ein guter Tag\", \"Ein * Tag\"); erstellt liste mit dem Inhalt \"guter\"";
+
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
-    public override string Returns => VariableString.ShortName_Plain;
+    public override string Returns => VariableListString.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "ClipboardText()";
+    public override string Syntax => "ExtractText(String, SearchPattern);";
 
     #endregion
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "clipboardtext" };
+    public override List<string> Comand(Script? s) => new() { "extracttext" };
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) {
-            return DoItFeedback.AttributFehler(this, attvar);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+
+        var tags = ((VariableString)attvar.Attributes[0]).ValueString.ReduceToMulti(((VariableString)attvar.Attributes[1]).ValueString, StringComparison.OrdinalIgnoreCase);
+
+        if (tags == null) {
+            return new DoItFeedback("Searchpattern fehlerhaft.");
         }
 
-        if (System.Windows.Clipboard.ContainsText()) {
-            return new DoItFeedback(System.Windows.Clipboard.GetText(), string.Empty);
-        }
-        return new DoItFeedback(string.Empty, string.Empty);
+        return new DoItFeedback(tags);
     }
 
     #endregion

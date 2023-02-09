@@ -1196,7 +1196,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             value = l.JoinWithCr();
         }
 
-        value = value.CutToUTF8Length(_maxTextLenght);
+        value = value.CutToUtf8Length(_maxTextLenght);
 
         return value;
     }

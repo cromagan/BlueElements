@@ -163,10 +163,10 @@ public static class VariableExtensions {
     public static Variable? GetSystem(this ICollection<Variable> vars, string name) => vars.FirstOrDefault(thisv =>
         thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper());
 
-    public static void RemoveWithComment(this List<Variable> vars, string Comment) {
+    public static void RemoveWithComment(this List<Variable> vars, string comment) {
         var z = 0;
         do {
-            if (vars[z].Comment.Contains(Comment)) {
+            if (vars[z].Comment.Contains(comment)) {
                 vars.RemoveAt(z);
             } else {
                 z++;

@@ -22,7 +22,6 @@ using BlueBasics.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 
 namespace BlueScript.Methods;

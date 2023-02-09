@@ -28,7 +28,6 @@ using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
-using BlueScript;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -997,27 +996,21 @@ public partial class TableView : Form, IHasStatusbar {
         if (e.Item is not ReadableListItem bli) { return; }
         if (bli.Item is not EventScript sc) { return; }
 
-
         string m = string.Empty;
 
         if (sc.NeedRow) {
             m = Table.Database.Row.ExecuteScript(null, e.Item.KeyName, Table.Filter, Table.PinnedRows, true, true);
-
-
         } else {
             //public Script? ExecuteScript(Events? eventname, string? scriptname, bool onlyTesting, RowItem? row) {
             var s = Table.Database.ExecuteScript(sc.Script, sc.ChangeValues, null);
             m = s?.Error ?? "Skript konnte nicht ausgeführt werden.";
         }
 
-            if (!string.IsNullOrEmpty(m)) {
-                MessageBox.Show("Skript abgebrochen:\r\n" + m, ImageCode.Kreuz,"OK");
-            } else {
-            MessageBox.Show("Skript erfolgreich!", ImageCode.Häkchen,"OK");
+        if (!string.IsNullOrEmpty(m)) {
+            MessageBox.Show("Skript abgebrochen:\r\n" + m, ImageCode.Kreuz, "OK");
+        } else {
+            MessageBox.Show("Skript erfolgreich!", ImageCode.Häkchen, "OK");
         }
-        
-
-
     }
 
     private void ChangeDatabase(DatabaseAbstract? database) {

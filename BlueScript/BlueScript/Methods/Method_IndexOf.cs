@@ -17,41 +17,43 @@
 
 #nullable enable
 
+using System;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
-internal class Method_ClipboardText : Method {
+internal class Method_IndexOf : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new();
-    public override string Description => "Gibt den Inhalt des Windows Clipboards als Text zurück. Falls kein Text im Clipboard enthalten ist, wird ein leerer String zurückgegeben.";
+    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain } };
+    public override string Description => "Sucht im ersten String nach dem zweiten Strin und gibt dessen Position zurück. Wird er nicht gefunden, wird -1 zurück gegeben. Wird er an erster Position gefunden, wird 0 zurück gegeben. Groß und Kleinschreibung wird ignoriert.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "ClipboardText()";
+    public override string Syntax => "IndexOf(String, Search)";
 
     #endregion
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "clipboardtext" };
+    public override List<string> Comand(Script? s) => new() { "indexof" };
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) {
-            return DoItFeedback.AttributFehler(this, attvar);
-        }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-        if (System.Windows.Clipboard.ContainsText()) {
-            return new DoItFeedback(System.Windows.Clipboard.GetText(), string.Empty);
-        }
-        return new DoItFeedback(string.Empty, string.Empty);
+        var val = ((VariableString)attvar.Attributes[0]).ValueString;
+
+        var search = ((VariableString)attvar.Attributes[1]).ValueString;
+
+        var f = val.IndexOf(search, StringComparison.OrdinalIgnoreCase);
+
+        return new DoItFeedback(f);
     }
 
     #endregion

@@ -75,7 +75,7 @@ public class Method_Lookup : MethodDatabase {
                 return new DoItFeedback(new List<string> { ((VariableString)attvar.Attributes[3]).ValueString });
             }
 
-            return new DoItFeedback(string.Empty);
+            return DoItFeedback.Null();
         }
 
         if (r.Count > 1) {
@@ -83,7 +83,7 @@ public class Method_Lookup : MethodDatabase {
                 return new DoItFeedback(new List<string> { ((VariableString)attvar.Attributes[4]).ValueString });
             }
 
-            return new DoItFeedback(string.Empty);
+            return DoItFeedback.Null();
         }
 
         var v = RowItem.CellToVariable(c, r[0]);

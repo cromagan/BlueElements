@@ -91,7 +91,7 @@ internal class Method_CallByFilename : Method {
         s.Line = weiterLine;
         s.BreakFired = false;
 
-        return new DoItFeedback(string.Empty);
+        return DoItFeedback.Null();
     }
 
     #endregion

@@ -45,6 +45,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enums\ScriptIssueType.cs" />
@@ -54,9 +55,14 @@
     <Compile Include="Methods\Method_BerechneVariable_Tilde.cs" />
     <Compile Include="Methods\Method_AddSuffix.cs" />
     <Compile Include="Methods\Method_BitmapToBase64.cs" />
+    <Compile Include="Methods\Method_SetClipbard.cs" />
     <Compile Include="Methods\Method_CallByFilename.cs" />
     <Compile Include="Methods\Method_ContainsWhich.cs" />
     <Compile Include="Methods\Method_DirectoryExists.cs" />
+    <Compile Include="Methods\Method_ExtractText.cs" />
+    <Compile Include="Methods\Method_IndexOf.cs" />
+    <Compile Include="Methods\Method_RemoveXMLTags.cs" />
+    <Compile Include="Methods\Method_Xml.cs" />
     <Compile Include="Methods\Method_FreeDirectoryName.cs" />
     <Compile Include="Methods\Method_DeleteFile.cs" />
     <Compile Include="Methods\Method_LoadTextFile.cs" />
@@ -131,6 +137,7 @@
     <Compile Include="Methods\Method_Var.cs" />
     <Compile Include="Variables\VariableBitmap.cs" />
     <Compile Include="Variables\VariableBool.cs" />
+    <Compile Include="Variables\VariableXml.cs" />
     <Compile Include="Variables\VariableListString.cs" />
     <Compile Include="Variables\VariableFloat.cs" />
     <Compile Include="Variables\VariableDateTime.cs" />

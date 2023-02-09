@@ -17,41 +17,51 @@
 
 #nullable enable
 
+using System;
+using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
+using System.Xml.Linq;
+using BlueScript.Methods;
 
-namespace BlueScript.Methods;
+namespace BlueDatabase.AdditionalScriptComands;
 
-internal class Method_ClipboardText : Method {
+public class Method_Xml : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new();
-    public override string Description => "Gibt den Inhalt des Windows Clipboards als Text zurück. Falls kein Text im Clipboard enthalten ist, wird ein leerer String zurückgegeben.";
-    public override bool EndlessArgs => false;
+    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain } };
+    public override string Description => "Erstellt ein XML-Dokument, der für andere Befehle verwendet werden kann.";
+
+    public override bool EndlessArgs => true;
+
     public override string EndSequence => ")";
+
     public override bool GetCodeBlockAfter => false;
-    public override string Returns => VariableString.ShortName_Plain;
+
+    public override string Returns => VariableXml.ShortName_Variable;
+
     public override string StartSequence => "(";
-    public override string Syntax => "ClipboardText()";
+
+    public override string Syntax => "XML(XMLText)";
 
     #endregion
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "clipboardtext" };
+    public override List<string> Comand(Script? s) => new() { "xml" };
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) {
-            return DoItFeedback.AttributFehler(this, attvar);
-        }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-        if (System.Windows.Clipboard.ContainsText()) {
-            return new DoItFeedback(System.Windows.Clipboard.GetText(), string.Empty);
+        try {
+            var x = XDocument.Parse(((VariableString)attvar.Attributes[0]).ValueString);
+            return new DoItFeedback(new VariableXml(x));
+        } catch (Exception e) {
+            return new DoItFeedback(string.Empty, "XML-Parsen fehlgeschlagen: " + e.Message);
         }
-        return new DoItFeedback(string.Empty, string.Empty);
     }
 
     #endregion

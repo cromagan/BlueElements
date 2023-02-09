@@ -533,7 +533,7 @@ public abstract class SQLBackAbstract {
 
         do {
             c++;
-            var tmp = utf8.CutToUTF8Length(MaxStringLenght);
+            var tmp = utf8.CutToUtf8Length(MaxStringLenght);
 
             var ok2 = SetStyleData(tablename, ty, columnName, tmp, c);
             if (!string.IsNullOrEmpty(ok2)) { ok = ok2; }
@@ -941,7 +941,7 @@ public abstract class SQLBackAbstract {
     private string DBVAL(string? original) {
         if (original == null) { return "''"; }
 
-        original = original.CutToUTF8Length(MaxStringLenght);
+        original = original.CutToUtf8Length(MaxStringLenght);
         original = original.Replace("'", "''");
         return "'" + original + "'";
     }

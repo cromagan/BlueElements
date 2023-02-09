@@ -1,6 +1,7 @@
 ﻿using BlueScript;
 using BlueScript.Methods;
 using System.Windows.Forms;
+using BlueControls.ItemCollection.ItemCollectionList;
 
 namespace BlueControls;
 
@@ -10,7 +11,6 @@ public partial class Befehlsreferenz : Form {
 
     public Befehlsreferenz() {
         InitializeComponent();
-
         WriteComandsToList();
     }
 
@@ -20,7 +20,7 @@ public partial class Befehlsreferenz : Form {
 
     private void lstComands_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) {
         var co = string.Empty;
-        if (e.Item?.Tag is Method thisc) {
+        if (e.Item is ReadableListItem r && r.Item is Method thisc) {
             co += thisc.HintText();
         }
         txbComms.Text = co;
@@ -34,8 +34,6 @@ public partial class Befehlsreferenz : Form {
         foreach (var thisc in Script.Comands) {
             _ = lstComands.Item.Add(thisc);
         }
-
-        //lstComands.Item.Sort();
     }
 
     #endregion

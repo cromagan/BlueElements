@@ -333,7 +333,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
 
         var (pos, which) = NextText(scriptText, startpos, new List<string> { EndSequence }, false, false, KlammernStd);
         if (pos < startpos) {
-            return new GetEndFeedback("Keinen Endpunkt gefunden.");
+            return new GetEndFeedback("Endpunkt '" + EndSequence + "' nicht gefunden.");
         }
 
         var txtBTW = scriptText.Substring(startpos + lenghtStartSequence, pos - startpos - lenghtStartSequence);

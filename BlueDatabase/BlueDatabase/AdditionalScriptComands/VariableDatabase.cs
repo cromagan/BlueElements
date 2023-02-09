@@ -33,7 +33,7 @@ public class VariableDatabase : Variable {
 
     #region Constructors
 
-    public VariableDatabase(string name, DatabaseAbstract? value, bool ronly, bool system, string Comment) : base(name, ronly, system, Comment) => _db = value;
+    public VariableDatabase(string name, DatabaseAbstract? value, bool ronly, bool system, string comment) : base(name, ronly, system, comment) => _db = value;
 
     public VariableDatabase(string name) : this(name, null, true, false, string.Empty) { }
 
