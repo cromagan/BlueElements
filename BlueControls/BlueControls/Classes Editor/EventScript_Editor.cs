@@ -90,6 +90,9 @@ internal sealed partial class EventScript_Editor : AbstractClassEditor<EventScri
         scriptEditor.ScriptText = data.Script;
         chkAuslöser_newrow.Checked = data.Events.HasFlag(BlueDatabase.Enums.Events.new_row);
         chkAuslöser_valuechanged.Checked = data.Events.HasFlag(BlueDatabase.Enums.Events.value_changed);
+        chkAuslöser_errorcheck.Checked = data.Events.HasFlag(BlueDatabase.Enums.Events.error_check);
+
+
         chkExternVerfügbar.Checked = data.ManualExecutable;
         chkAendertWerte.Checked = data.ChangeValues;
     }
@@ -114,9 +117,9 @@ internal sealed partial class EventScript_Editor : AbstractClassEditor<EventScri
     private void chkAuslöser_newrow_CheckedChanged(object sender, System.EventArgs e) {
         CheckEvents();
 
-        if (chkAuslöser_errorcheck.Checked) {
-            chkAendertWerte.Checked = false;
-        }
+        //if (chkAuslöser_errorcheck.Checked) {
+        //    chkAendertWerte.Checked = false;
+        //}
     }
 
     private void chkExternVerfügbar_CheckedChanged(object sender, System.EventArgs e) {

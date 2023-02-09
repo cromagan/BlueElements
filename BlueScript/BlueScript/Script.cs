@@ -41,7 +41,7 @@ public class Script {
     /// </summary>
     public readonly string AdditionalFilesPath;
 
-    public readonly bool OnlyTesting;
+    public readonly bool ChangeValues;
     public readonly List<Variable> Variables;
     public bool EndScript;
 
@@ -90,7 +90,7 @@ public class Script {
     //    //   //objects.Sort();
     //    return objects;
     //}
-    public Script(List<Variable>? variablen, string additionalFilesPath, bool onlyTesting) {
+    public Script(List<Variable>? variablen, string additionalFilesPath, bool changevalues) {
         Comands ??= GetInstaceOfType<Method>();
         if (VarTypes == null) {
             VarTypes = GetInstaceOfType<Variable>("NAME");
@@ -98,7 +98,7 @@ public class Script {
         }
 
         ReducedScriptText = string.Empty;
-        OnlyTesting = onlyTesting;
+        ChangeValues = changevalues;
         Variables = variablen ?? new();
 
         AdditionalFilesPath = (additionalFilesPath.Trim("\\") + "\\").CheckPath();

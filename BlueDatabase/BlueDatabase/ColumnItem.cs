@@ -2641,7 +2641,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 //CellCollection.Invalidate_CellContentSize(this, thisRow);
                 Invalidate_ContentWidth();
                 Database.Cell.OnCellValueChanged(new CellEventArgs(this, thisRow));
-                _ = thisRow.DoAutomatic(true, false, 5, Events.value_changed, false, string.Empty);
+                _ = thisRow.ExecuteScript(Events.value_changed, string.Empty, true, false, true, 5);
             }
         }
     }

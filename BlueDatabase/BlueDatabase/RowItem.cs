@@ -318,8 +318,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
         GC.SuppressFinalize(this);
     }
 
-    public (bool checkPerformed, string error, Script? script) DoAutomatic(Events? eventname, bool onlyTesting, string scriptname) => DoAutomatic(false, false, eventname, onlyTesting, scriptname);
-
     /// <summary>
     /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initalwerte der Zellen.
     /// Z.b: Runden, Großschreibung wird nur bei einem FullCheck korrigiert, das wird normalerweise vor dem Setzen bei CellSet bereits korrigiert.
@@ -329,11 +327,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     /// <param name="tryforsceonds"></param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
 
-    public (bool checkPerformed, string error, Script? script) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, float tryforsceonds, Events? eventname, bool onlyTesting, string scriptname) {
+    public (bool checkPerformed, string error, Script? script) ExecuteScript(Events? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues, float tryforsceonds) {
         if (Database == null || Database.IsDisposed || Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
         var t = DateTime.Now;
         do {
-            var erg = DoAutomatic(doFemdZelleInvalidate, fullCheck, eventname, onlyTesting, scriptname);
+            var erg = ExecuteScript(doFemdZelleInvalidate, fullCheck, eventname, changevalues, scriptname);
             if (erg.checkPerformed) { return erg; }
             if (DateTime.Now.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
         } while (true);
@@ -347,93 +345,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgeführt</param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
 
-    public (bool checkPerformed, string error, Script? skript) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, Events? eventname, bool onlyTesting, string scriptname) {
-        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
-
-        var feh = Database.ErrorReason(ErrorReason.EditAcut);
-        if (!string.IsNullOrEmpty(feh)) { return (false, feh, null); }
-
-        // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
-        DoingScript = true;
-        var script = Database.DoScript(eventname, onlyTesting, scriptname, this);
-
-        if (!onlyTesting) {
-            // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
-            DoRowAutomaticEventArgs e = new(this, eventname);
-            OnDoSpecialRules(e);
-        }
-
-        DoingScript = false;
-
-        if (onlyTesting) { return (true, string.Empty, script); }
-
-        // checkPerformed geht von Dateisystemfehlern aus
-        if (script != null) {
-            if (!string.IsNullOrEmpty(script.Error)) {
-                Database.OnScriptError(new RowCancelEventArgs(this, "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode));
-                return (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
-            }
-            //if (script?.Variables?.GetSystem("CellChangesEnabled") is not VariableBool doch || !doch.ValueBool) { return (true, string.Empty, script); }
-        }
-        // Dann die Abschließenden Korrekturen vornehmen
-        foreach (var thisColum in Database.Column.Where(thisColum => thisColum != null)) {
-            if (fullCheck) {
-                var x = CellGetString(thisColum);
-                var x2 = thisColum.AutoCorrect(x, true);
-                if (thisColum.Format is not DataFormat.Verknüpfung_zu_anderer_Datenbank && x != x2) {
-                    Database.Cell.Set(thisColum, this, x2);
-                } else {
-                    if (!thisColum.IsFirst()) {
-                        Database.Cell.DoSpecialFormats(thisColum, this, CellGetString(thisColum), true);
-                    }
-                }
-                //CellCollection.Invalidate_CellContentSize(thisColum, this);
-                //thisColum.Invalidate_ContentWidth();
-                doFemdZelleInvalidate = false; // Hier ja schon bei jedem gemacht
-            }
-            if (doFemdZelleInvalidate && thisColum.LinkedDatabase != null) {
-                //CellCollection.Invalidate_CellContentSize(thisColum, this);
-                thisColum.Invalidate_ContentWidth();
-            }
-        }
-
-        var infoTxt = "<b><u>" + CellGetString(Database.Column.First) + "</b></u><br><br>";
-
-        if (script != null) {
-            List<string> cols = new();
-            var fs = script.Feedback.SplitAndCutByCrToList().SortedDistinctList();
-            foreach (var thiss in fs) {
-                cols.AddIfNotExists(thiss);
-                var t = thiss.SplitBy("|");
-                var thisc = Database.Column[t[0]];
-                if (thisc != null) {
-                    infoTxt = infoTxt + "<b>" + thisc.ReadableText() + ":</b> " + t[1] + "<br><hr><br>";
-                }
-            }
-
-            if (cols.Count == 0) {
-                infoTxt += "Diese Zeile ist fehlerfrei.";
-            }
-
-            if (Database.Column.SysCorrect.SaveContent) {
-                if (IsNullOrEmpty(Database.Column.SysCorrect) || cols.Count == 0 != CellGetBoolean(Database.Column.SysCorrect)) {
-                    CellSet(Database.Column.SysCorrect, cols.Count == 0);
-                }
-            }
-            OnRowChecked(new RowCheckedEventArgs(this, eventname ?? 0, cols));
-        } else {
-            infoTxt += "Kein Skript vorhanden.";
-            OnRowChecked(new RowCheckedEventArgs(this, eventname ?? 0, null));
-        }
-
-        return (true, infoTxt, script);
-    }
-
     public bool IsNullOrEmpty() => Database.Column.All(thisColumnItem => thisColumnItem != null && CellIsNullOrEmpty(thisColumnItem));
 
     public bool IsNullOrEmpty(ColumnItem? column) => Database.Cell.IsNullOrEmpty(column, this);
-
-    public bool IsNullOrEmpty(string columnName) => Database.Cell.IsNullOrEmpty(Database.Column[columnName], this);
 
     public bool MatchesTo(FilterItem filter) {
         if (Database == null) { return false; }
@@ -468,13 +382,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
         }
         return true;
     }
-
-    /// <summary>
-    /// Ersetzt Spaltennamen mit dem dementsprechenden Wert der Zelle. Format: &Spaltenname; oder &Spaltenname(L,8);
-    /// </summary>
-    /// <param name="formel"></param>
-    /// <param name="fulltext">Bei TRUE wird der Text so zurückgegeben, wie er in der Zelle angezeigt werden würde: Mit Suffix und Ersetzungen. Zeilenumbrüche werden eleminiert!</param>
-    /// <returns></returns>
 
     public string ReplaceVariables(string formel, bool fulltext, bool removeLineBreaks) {
         if (Database == null) { return formel; }
@@ -513,6 +420,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
         return erg;
     }
 
+    /// <summary>
+    /// Ersetzt Spaltennamen mit dem dementsprechenden Wert der Zelle. Format: &Spaltenname; oder &Spaltenname(L,8);
+    /// </summary>
+    /// <param name="formel"></param>
+    /// <param name="fulltext">Bei TRUE wird der Text so zurückgegeben, wie er in der Zelle angezeigt werden würde: Mit Suffix und Ersetzungen. Zeilenumbrüche werden eleminiert!</param>
+    /// <returns></returns>
     public void VariableToCell(ColumnItem? column, ICollection<Variable> vars) {
         if (Database == null || Database.IsDisposed || Database.ReadOnly) { return; }
 
@@ -585,6 +498,88 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
             _tmpQuickInfo = null;
             IsDisposed = true;
         }
+    }
+
+    private (bool checkPerformed, string error, Script? skript) ExecuteScript(bool doFemdZelleInvalidate, bool fullCheck, Events? eventname, bool changevalues, string scriptname) {
+        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
+
+        var feh = Database.ErrorReason(ErrorReason.EditAcut);
+        if (!string.IsNullOrEmpty(feh)) { return (false, feh, null); }
+
+        // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
+        DoingScript = true;
+        var script = Database.ExecuteScript(eventname, scriptname, changevalues, this);
+
+        if (changevalues) {
+            // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
+            DoRowAutomaticEventArgs e = new(this, eventname);
+            OnDoSpecialRules(e);
+        }
+
+        DoingScript = false;
+
+        if (!changevalues) { return (true, string.Empty, script); }
+
+        // checkPerformed geht von Dateisystemfehlern aus
+        if (script != null) {
+            if (!string.IsNullOrEmpty(script.Error)) {
+                Database.OnScriptError(new RowCancelEventArgs(this, "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode));
+                return (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
+            }
+        }
+
+        // Dann die Abschließenden Korrekturen vornehmen
+        foreach (var thisColum in Database.Column.Where(thisColum => thisColum != null)) {
+            if (fullCheck) {
+                var x = CellGetString(thisColum);
+                var x2 = thisColum.AutoCorrect(x, true);
+                if (thisColum.Format is not DataFormat.Verknüpfung_zu_anderer_Datenbank && x != x2) {
+                    Database.Cell.Set(thisColum, this, x2);
+                } else {
+                    if (!thisColum.IsFirst()) {
+                        Database.Cell.DoSpecialFormats(thisColum, this, CellGetString(thisColum), true);
+                    }
+                }
+                //CellCollection.Invalidate_CellContentSize(thisColum, this);
+                //thisColum.Invalidate_ContentWidth();
+                doFemdZelleInvalidate = false; // Hier ja schon bei jedem gemacht
+            }
+            if (doFemdZelleInvalidate && thisColum.LinkedDatabase != null) {
+                //CellCollection.Invalidate_CellContentSize(thisColum, this);
+                thisColum.Invalidate_ContentWidth();
+            }
+        }
+
+        var infoTxt = "<b><u>" + CellGetString(Database.Column.First) + "</b></u><br><br>";
+
+        if (script != null) {
+            List<string> cols = new();
+            var fs = script.Feedback.SplitAndCutByCrToList().SortedDistinctList();
+            foreach (var thiss in fs) {
+                cols.AddIfNotExists(thiss);
+                var t = thiss.SplitBy("|");
+                var thisc = Database.Column[t[0]];
+                if (thisc != null) {
+                    infoTxt = infoTxt + "<b>" + thisc.ReadableText() + ":</b> " + t[1] + "<br><hr><br>";
+                }
+            }
+
+            if (cols.Count == 0) {
+                infoTxt += "Diese Zeile ist fehlerfrei.";
+            }
+
+            if (Database.Column.SysCorrect.SaveContent) {
+                if (IsNullOrEmpty(Database.Column.SysCorrect) || cols.Count == 0 != CellGetBoolean(Database.Column.SysCorrect)) {
+                    CellSet(Database.Column.SysCorrect, cols.Count == 0);
+                }
+            }
+            OnRowChecked(new RowCheckedEventArgs(this, eventname ?? 0, cols));
+        } else {
+            infoTxt += "Kein Skript vorhanden.";
+            OnRowChecked(new RowCheckedEventArgs(this, eventname ?? 0, null));
+        }
+
+        return (true, infoTxt, script);
     }
 
     private void GenerateQuickInfo() {

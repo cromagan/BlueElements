@@ -58,7 +58,7 @@ internal class Method_ImportCSV : MethodDatabase {
         var db = MyDatabase(s);
 
         if (db?.ReadOnly ?? true) { return new DoItFeedback("Datenbank schreibgeschützt."); }
-        if (s.OnlyTesting) { return new DoItFeedback("Import im Testmodus deaktiviert."); }
+        if (!s.ChangeValues) { return new DoItFeedback("Import im Testmodus deaktiviert."); }
 
         var sx = db?.Import(txt, true, true, sep, false, false, true);
 

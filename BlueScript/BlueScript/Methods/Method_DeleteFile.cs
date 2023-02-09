@@ -55,7 +55,7 @@ internal class Method_DeleteFile : Method {
             return new DoItFeedback(true);
         }
 
-        if (s.OnlyTesting) { return new DoItFeedback("Löschen im Testmodus deaktiviert."); }
+        if (!s.ChangeValues) { return new DoItFeedback("Löschen im Testmodus deaktiviert."); }
 
         try {
             return new DoItFeedback(BlueBasics.IO.DeleteFile(((VariableString)attvar.Attributes[0]).ValueString, false));

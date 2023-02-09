@@ -279,7 +279,7 @@ public partial class RelationDiagram : PadEditor {
         List<string> l = new();
         foreach (var thisR in Pad.Item) {
             if (thisR is RowFormulaPadItem r) {
-                //_ = r.Row.DoAutomatic(true, true, "to be sure");
+                //_ = r.Row.ExecuteScript(true, true, "to be sure");
                 l.Add("#######################################################################");
                 l.Add(" ");
                 l.Add(r.Row.CellFirstString());

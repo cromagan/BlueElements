@@ -404,7 +404,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (v[0] == "Cancel") { return; } // =Aktueller Eintrag angeklickt
         row.CellSet(column, v[0].Substring(5));
         //Database.Cell.Set(column, row, v[0].Substring(5), false);
-        _ = row.DoAutomatic(true, true, 5, BlueDatabase.Enums.Events.value_changed, false, string.Empty);
+        _ = row.ExecuteScript(BlueDatabase.Enums.Events.value_changed, string.Empty, true, true, true, 5);
     }
 
     /// <summary>
@@ -1758,7 +1758,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 row.CellSet(column, newValue);
             }
             if (table.Database == column.Database) { table.CursorPos_Set(column, row, false, chapter); }
-            _ = row.DoAutomatic(true, false, 5, BlueDatabase.Enums.Events.value_changed, false, string.Empty);
+            _ = row.ExecuteScript(BlueDatabase.Enums.Events.value_changed, string.Empty, true, false, true, 5);
 
             // EnsureVisible ganz schlecht: Daten verändert, keine Positionen bekannt - und da soll sichtbar gemacht werden?
             // CursorPos.EnsureVisible(SliderX, SliderY, DisplayRectangle)

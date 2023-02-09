@@ -60,7 +60,7 @@ public class Method_CellSetRow : MethodDatabase {
         if (columnToSet == null) { return new DoItFeedback("Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[1]).ValueString); }
 
         if (row?.Database?.ReadOnly ?? true) { return new DoItFeedback("Datenbank schreibgeschützt."); }
-        if (s.OnlyTesting) { return new DoItFeedback("Zellen setzen Testmodus deaktiviert."); }
+        if (!s.ChangeValues) { return new DoItFeedback("Zellen setzen Testmodus deaktiviert."); }
 
         row.CellSet(columnToSet, ((VariableString)attvar.Attributes[0]).ValueString);
 

@@ -413,7 +413,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         #region Zeilen Prüfen
 
         foreach (var thisrow in FilterDefiniton.Row) {
-            _ = thisrow.DoAutomatic(Events.new_row, false, string.Empty);
+            _ = thisrow.ExecuteScript(Events.new_row, string.Empty, false, false, true, 0);
         }
 
         #endregion

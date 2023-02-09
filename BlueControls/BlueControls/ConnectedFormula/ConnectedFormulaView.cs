@@ -332,7 +332,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
         }
 
         if (Database?.Row.SearchByKey(RowKey) is RowItem r) {
-            r.DoAutomatic(BlueDatabase.Enums.Events.error_check, false, string.Empty);
+            r.ExecuteScript(BlueDatabase.Enums.Events.error_check, string.Empty, false, false, true, 0);
         }
     }
 

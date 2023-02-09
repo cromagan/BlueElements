@@ -80,9 +80,10 @@
     <Compile Include="AdditionalScriptComands\MethodDatabase.cs" />
     <Compile Include="AdditionalScriptComands\Method_AddRow.cs" />
     <Compile Include="AdditionalScriptComands\Method_Call.cs" />
-    <Compile Include="AdditionalScriptComands\Method_CheckRow.cs" />
+    <Compile Include="AdditionalScriptComands\Method_CallRow.cs" />
     <Compile Include="AdditionalScriptComands\Method_CellSetRow.cs" />
     <Compile Include="AdditionalScriptComands\Method_CellSetFilter.cs" />
+    <Compile Include="AdditionalScriptComands\Method_CallFilter.cs" />
     <Compile Include="AdditionalScriptComands\Method_ContentsFilter.cs" />
     <Compile Include="AdditionalScriptComands\Method_ImportCSV.cs" />
     <Compile Include="AdditionalScriptComands\Method_IsDropDownItem.cs" />

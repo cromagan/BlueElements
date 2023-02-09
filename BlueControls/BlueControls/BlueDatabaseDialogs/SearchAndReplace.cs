@@ -161,7 +161,7 @@ internal sealed partial class SearchAndReplace : Form {
                     }
                 }
             }
-            if (rowChanged) { _ = thisRow.DoAutomatic(true, false, 10, BlueDatabase.Enums.Events.value_changed, false, string.Empty); }
+            if (rowChanged) { _ = thisRow.ExecuteScript(BlueDatabase.Enums.Events.value_changed, string.Empty, true, false, true, 10); }
         }
         p?.Close();
         MessageBox.Show(count + " Ersetzung(en) vorgenommen.", ImageCode.Information, "OK");

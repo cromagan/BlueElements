@@ -28,6 +28,7 @@ using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
+using BlueScript;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -585,7 +586,7 @@ public partial class TableView : Form, IHasStatusbar {
 
             case "Skript":
                 if (row != null) {
-                    MessageBox.Show(row.DoAutomatic(true, true, 10, null, false, ev[1]).error);
+                    MessageBox.Show(row.ExecuteScript(null, ev[1], true, true, true, 10).error);
                 }
 
                 break;
@@ -996,15 +997,27 @@ public partial class TableView : Form, IHasStatusbar {
         if (e.Item is not ReadableListItem bli) { return; }
         if (bli.Item is not EventScript sc) { return; }
 
+
+        string m = string.Empty;
+
         if (sc.NeedRow) {
-            var m = Table.Database.Row.DoAutomatic(Table.Filter, true, Table.PinnedRows, null, false, e.Item.KeyName);
+            m = Table.Database.Row.ExecuteScript(null, e.Item.KeyName, Table.Filter, Table.PinnedRows, true, true);
+
+
+        } else {
+            //public Script? ExecuteScript(Events? eventname, string? scriptname, bool onlyTesting, RowItem? row) {
+            var s = Table.Database.ExecuteScript(sc.Script, sc.ChangeValues, null);
+            m = s?.Error ?? "Skript konnte nicht ausgeführt werden.";
+        }
 
             if (!string.IsNullOrEmpty(m)) {
-                MessageBox.Show(m);
-            }
-        } else {
-            Develop.DebugPrint_NichtImplementiert();
+                MessageBox.Show("Skript abgebrochen:\r\n" + m, ImageCode.Kreuz,"OK");
+            } else {
+            MessageBox.Show("Skript erfolgreich!", ImageCode.Häkchen,"OK");
         }
+        
+
+
     }
 
     private void ChangeDatabase(DatabaseAbstract? database) {

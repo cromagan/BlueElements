@@ -17,72 +17,73 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using BlueBasics;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
-internal class Method_Call : MethodDatabase {
+public class Method_CallFilter : MethodDatabase {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableBool.ShortName_Plain } };
-    public override string Description => "Ruft eine Subroutine auf. Mit KeepVariables kann bestimmt werden, ob die Variablen aus der Subroutine behalten werden sollen.";
-    public override bool EndlessArgs => false;
+    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableFilterItem.ShortName_Variable } };
+    public override string Description => "Suchte Zeilen und ruft in dessen Datenbank ein Skript für jede Zeile aus. Über den Filten kann bestimmt werden, welche Zeilen es betrifft.";
+
+    public override bool EndlessArgs => true;
+
     public override string EndSequence => ");";
+
     public override bool GetCodeBlockAfter => false;
+
     public override string Returns => string.Empty;
+
     public override string StartSequence => "(";
-    public override string Syntax => "Call(SubName, KeepVariables);";
+
+    public override string Syntax => "CallFilter(SubName, Filter, ...);";
 
     #endregion
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "call" };
+    public override List<string> Comand(Script? s) => new() { "callfilter" };
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
+        var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1);
+
+        if (allFi is null || allFi.Count == 0) { return new DoItFeedback("Fehler im Filter"); }
+
+        //var db = MyDatabase(s);
+        if (allFi[0].Database == null) { return new DoItFeedback("Datenbankfehler!"); }
+
+        var r = allFi[0].Database.Row.CalculateFilteredRows(allFi);
+        if (r == null || r.Count == 0) { return new DoItFeedback(); }
+
         var vs = (VariableString)attvar.Attributes[0];
-
-        var db = MyDatabase(s);
-        if (db == null) { return new DoItFeedback("Datenbankfehler!"); }
-
-        var sc = db.EventScript.Get(vs.ValueString);
-
-        if (sc == null) { return new DoItFeedback("Skript nicht vorhanden: " + vs.ValueString); }
-        var f = Script.ReduceText(sc.Script);
+        //var sc = r[0].Database.EventScript.Get(vs.ValueString);
 
         var weiterLine = s.Line;
-        s.Line = 1;
-        s.Sub++;
 
-        if (((VariableBool)attvar.Attributes[1]).ValueBool) {
-            var (err, _) = s.Parse(f);
-            if (!string.IsNullOrEmpty(err)) { return new DoItFeedback("Subroutine " + vs.ValueString + ": " + err); }
-        } else {
-            var tmpv = new List<Variable>();
-            tmpv.AddRange(s.Variables);
-
-            var (err, _) = s.Parse(f);
-            if (!string.IsNullOrEmpty(err)) { return new DoItFeedback("Subroutine " + vs.ValueString + ": " + err); }
-
-            s.Variables.Clear();
-            s.Variables.AddRange(tmpv);
+        foreach (var thisR in r) {
+            if (r != null) {
+                s.Line = 1;
+                s.Sub++;
+                _ = (thisR?.ExecuteScript(null, vs.ValueString, false, true, s.ChangeValues, 0));
+                s.Sub--;
+            }
         }
-        s.Sub--;
 
         if (s.Sub < 0) { return new DoItFeedback("Subroutinen-Fehler"); }
 
         s.Line = weiterLine;
         s.BreakFired = false;
 
-        return new DoItFeedback(string.Empty);
+        return DoItFeedback.Null();
     }
 
     #endregion

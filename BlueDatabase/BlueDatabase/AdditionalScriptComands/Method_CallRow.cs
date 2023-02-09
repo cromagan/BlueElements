@@ -24,12 +24,12 @@ using System.Collections.Generic;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
-public class Method_CheckRow : MethodDatabase {
+public class Method_CallRow : MethodDatabase {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableRowItem.ShortName_Variable, VariableString.ShortName_Plain, } };
-    public override string Description => "Prüft die angegebene Zeile. Wenn die Zeile Null ist, wird kein Fehler ausgegeben.";
+    public override List<List<string>> Args => new() { new List<string>() { VariableString.ShortName_Plain }, new List<string>() { VariableRowItem.ShortName_Variable } };
+    public override string Description => "Führt das Skript bei der angegebenen Zeile aus. Wenn die Zeile Null ist, wird kein Fehler ausgegeben.";
 
     public override bool EndlessArgs => false;
 
@@ -40,20 +40,20 @@ public class Method_CheckRow : MethodDatabase {
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
 
-    public override string Syntax => "CheckRow(Row, Scriptname);";
+    public override string Syntax => "CallRow(Scriptname, Row);";
 
     #endregion
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "checkrow" };
+    public override List<string> Comand(Script? s) => new() { "callrow" };
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-        var row = Method_Row.ObjectToRow(attvar.Attributes[0]);
-        _ = (row?.DoAutomatic(null, s.OnlyTesting, ((VariableString)attvar.Attributes[0]).ValueString));
+        var row = Method_Row.ObjectToRow(attvar.Attributes[1]);
+        _ = (row?.ExecuteScript(null, ((VariableString)attvar.Attributes[0]).ValueString, false, false, s.ChangeValues, 0));
         return DoItFeedback.Null();
     }
 

@@ -72,14 +72,12 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
 
     #region Methods
 
-    protected override Script? GenerateAndDoScript() {
+    protected override Script? GenerateAndExecuteScript() {
         if (_database == null || _database.IsDisposed) {
             Message("Keine Datenbank geladen.");
             return null;
         }
 
-        //string message = string.Empty;
-        //Script? sc = null;
         RowItem? r = null;
 
         if (_isRowSkript) {
@@ -97,8 +95,8 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
                 return null;
             }
         }
-        var s = _database.DoScript(base.ScriptText, true, r);
-        //var (_, m, s) = r.DoAutomatic(null, true, _skriptname);
+        var s = _database.ExecuteScript(base.ScriptText, false, r);
+        //var (_, m, s) = r.ExecuteScript(null, true, _skriptname);
         //message = m;
         //sc = s;
 

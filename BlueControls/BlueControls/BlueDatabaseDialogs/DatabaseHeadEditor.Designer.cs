@@ -442,22 +442,22 @@ namespace BlueControls.BlueDatabaseDialogs
             this.eventScriptEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.eventScriptEditor.Database = null;
             this.eventScriptEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.eventScriptEditor.Location = new System.Drawing.Point(3, 128);
+            this.eventScriptEditor.Location = new System.Drawing.Point(240, 3);
             this.eventScriptEditor.Name = "eventScriptEditor";
-            this.eventScriptEditor.Size = new System.Drawing.Size(1033, 485);
+            this.eventScriptEditor.Size = new System.Drawing.Size(796, 610);
             this.eventScriptEditor.TabIndex = 3;
             this.eventScriptEditor.TabStop = false;
-            this.eventScriptEditor.Text = "Verfügbare Exporte:";
+            this.eventScriptEditor.Text = "Skript-Editor";
             // 
             // grpVerfügbareSkripte
             // 
             this.grpVerfügbareSkripte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpVerfügbareSkripte.CausesValidation = false;
             this.grpVerfügbareSkripte.Controls.Add(this.lstEventScripts);
-            this.grpVerfügbareSkripte.Dock = System.Windows.Forms.DockStyle.Top;
+            this.grpVerfügbareSkripte.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpVerfügbareSkripte.Location = new System.Drawing.Point(3, 3);
             this.grpVerfügbareSkripte.Name = "grpVerfügbareSkripte";
-            this.grpVerfügbareSkripte.Size = new System.Drawing.Size(1033, 125);
+            this.grpVerfügbareSkripte.Size = new System.Drawing.Size(237, 610);
             this.grpVerfügbareSkripte.TabIndex = 2;
             this.grpVerfügbareSkripte.TabStop = false;
             this.grpVerfügbareSkripte.Text = "Verfügbare Skripte:";
@@ -472,7 +472,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lstEventScripts.Location = new System.Drawing.Point(8, 24);
             this.lstEventScripts.Name = "lstEventScripts";
             this.lstEventScripts.RemoveAllowed = true;
-            this.lstEventScripts.Size = new System.Drawing.Size(1018, 93);
+            this.lstEventScripts.Size = new System.Drawing.Size(222, 578);
             this.lstEventScripts.TabIndex = 0;
             this.lstEventScripts.AddClicked += new System.EventHandler(this.lstEventScripts_AddClicked);
             this.lstEventScripts.ItemCheckedChanged += new System.EventHandler(this.lstEventScripts_ItemCheckedChanged);

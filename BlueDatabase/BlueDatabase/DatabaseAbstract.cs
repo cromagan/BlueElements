@@ -802,52 +802,35 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         GC.SuppressFinalize(this);
     }
 
-    public Script? DoScript(Events? eventname, bool onlyTesting, string? scriptname, RowItem? row) {
-        try {
-            if (IsDisposed) { return null; }
+    public string ErrorReason(ErrorReason mode) {
+        //var f = SpecialErrorReason(mode);
 
-            if (eventname != null && !string.IsNullOrEmpty(scriptname)) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Event und Skript angekommen!");
-                return null;
-            }
+        //if (!string.IsNullOrEmpty(f)) { return f; }
+        if (mode == BlueBasics.Enums.ErrorReason.OnlyRead) { return string.Empty; }
 
-            if (eventname == null && string.IsNullOrEmpty(scriptname)) { return null; }
+        //if (mode.HasFlag(BlueBasics.Enums.ErrorReason.Load)) {
+        //    if (_backgroundWorker.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell das Neuladen."; }
+        //}
 
-            if (string.IsNullOrEmpty(scriptname)) {
-                foreach (var thisEvent in EventScript) {
-                    if (thisEvent != null && thisEvent.Events.HasFlag(eventname)) {
-                        scriptname = thisEvent.Name;
-                        break;
-                    }
-                }
-            }
+        if (ReadOnly) { return "Datenbank schreibgeschützt!"; }
 
-            if (scriptname == null || string.IsNullOrWhiteSpace(scriptname)) { return null; }
-
-            var script = EventScript.Get(scriptname);
-            if (script == null) { return null; }
-
-            if (script.NeedRow && row == null) { return null; }
-
-            if (!script.NeedRow) { row = null; }
-
-            return DoScript(script.Script, onlyTesting, row);
-        } catch {
-            return DoScript(eventname, onlyTesting, scriptname, row);
+        if (mode.HasFlag(BlueBasics.Enums.ErrorReason.EditGeneral) || mode.HasFlag(BlueBasics.Enums.ErrorReason.Save)) {
+            if (_backgroundWorker?.IsBusy ?? false) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
         }
+
+        return IntParse(LoadedVersion.Replace(".", string.Empty)) > IntParse(DatabaseVersion.Replace(".", string.Empty))
+            ? "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."
+            : string.Empty;
     }
 
-    /// <summary>
-    /// Führt alle Regeln aus und löst das Ereignis DoSpecialRules aus. Setzt ansonsten keine Änderungen, wie z.B. SysCorrect oder Runden-Befehle.
-    /// </summary>
-    /// <returns>Gibt Regeln, die einen Fehler verursachen zurück. z.B. SPALTE1|Die Splate darf nicht leer sein.</returns>
-    public Script? DoScript(string scripttext, bool onlyTesting, RowItem? row) {
+    public Script? ExecuteScript(string scripttext, bool changevalues, RowItem? row) {
         if (IsDisposed) { return null; }
 
         try {
-            List<Variable> vars = new();
 
             #region Variablen für Skript erstellen
+
+            List<Variable> vars = new();
 
             if (row != null) {
                 foreach (var thisCol in Column) {
@@ -877,17 +860,16 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
             #region Script ausführen
 
-            Script sc = new(vars, AdditionalFilesPfadWhole(), onlyTesting) {
+            Script sc = new(vars, AdditionalFilesPfadWhole(), changevalues) {
                 ScriptText = scripttext
             };
             sc.Parse();
 
             #endregion
 
-            if (!onlyTesting) {
+            #region Variablen zurückschreiben und Special Rules ausführen
 
-                #region Variablen zurückschreiben und Special Rules ausführen
-
+            if (changevalues) {
                 if (!string.IsNullOrEmpty(sc.Error)) {
                     return sc;
                 }
@@ -911,29 +893,52 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
             return sc;
         } catch {
-            return DoScript(scripttext, onlyTesting, row);
+            Develop.CheckStackForOverflow();
+            return ExecuteScript(scripttext, changevalues, row);
         }
     }
 
-    public string ErrorReason(ErrorReason mode) {
-        //var f = SpecialErrorReason(mode);
+    public Script? ExecuteScript(Events? eventname, string? scriptname, bool changevalues, RowItem? row) {
+        try {
+            if (IsDisposed) { return null; }
 
-        //if (!string.IsNullOrEmpty(f)) { return f; }
-        if (mode == BlueBasics.Enums.ErrorReason.OnlyRead) { return string.Empty; }
+            #region Script ermitteln
 
-        //if (mode.HasFlag(BlueBasics.Enums.ErrorReason.Load)) {
-        //    if (_backgroundWorker.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell das Neuladen."; }
-        //}
+            if (eventname != null && !string.IsNullOrEmpty(scriptname)) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Event und Skript angekommen!");
+                return null;
+            }
 
-        if (ReadOnly) { return "Datenbank schreibgeschützt!"; }
+            if (eventname == null && string.IsNullOrEmpty(scriptname)) { return null; }
 
-        if (mode.HasFlag(BlueBasics.Enums.ErrorReason.EditGeneral) || mode.HasFlag(BlueBasics.Enums.ErrorReason.Save)) {
-            if (_backgroundWorker?.IsBusy ?? false) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
+            if (string.IsNullOrEmpty(scriptname)) {
+                foreach (var thisEvent in EventScript) {
+                    if (thisEvent != null && thisEvent.Events.HasFlag(eventname)) {
+                        scriptname = thisEvent.Name;
+                        break;
+                    }
+                }
+            }
+
+            if (scriptname == null || string.IsNullOrWhiteSpace(scriptname)) { return null; }
+
+            var script = EventScript.Get(scriptname);
+
+            if (script == null) { return null; }
+
+            if (script.NeedRow && row == null) { return null; }
+
+            if (!script.NeedRow) { row = null; }
+
+            #endregion
+
+            if (!script.ChangeValues) { changevalues = false; }
+
+            return ExecuteScript(script.Script, changevalues, row);
+        } catch {
+            Develop.CheckStackForOverflow();
+            return ExecuteScript(eventname, scriptname, changevalues, row);
         }
-
-        return IntParse(LoadedVersion.Replace(".", string.Empty)) > IntParse(DatabaseVersion.Replace(".", string.Empty))
-            ? "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."
-            : string.Empty;
     }
 
     /// <summary>
@@ -1248,7 +1253,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 } else {
                     row?.CellSet(columns[spaltNo], zeil[zeilNo][spaltNo].SplitAndCutBy("|").JoinWithCr());
                 }
-                if (row != null && dorowautmatic) { _ = row.DoAutomatic(true, true, null, false, string.Empty); }
+                if (row != null && dorowautmatic) { _ = row.ExecuteScript(null, string.Empty, true, true, true, 0); }
             }
         }
 

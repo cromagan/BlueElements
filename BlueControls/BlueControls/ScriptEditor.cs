@@ -91,9 +91,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
 
     public void Message(string txt) => txbSkriptInfo.Text = "[" + DateTime.Now.ToLongTimeString() + "] " + txt;
 
-    public virtual void OnChanged() {
-        Changed?.Invoke(this, System.EventArgs.Empty);
-    }
+    public virtual void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
@@ -116,7 +114,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
         base.Dispose(disposing);
     }
 
-    protected virtual Script? GenerateAndDoScript() {
+    protected virtual Script? GenerateAndExecuteScript() {
         var s = new Script(null, string.Empty, true);
         _ = s.Parse();
         return s;
@@ -164,7 +162,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
 
         grpVariablen.Clear();
 
-        var s = GenerateAndDoScript();
+        var s = GenerateAndExecuteScript();
 
         if (s == null) {
             //Message("Interner Fehler. Skript nicht ausgeführt.");
@@ -188,9 +186,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
         }
     }
 
-    private void TxtSkript_TextChanged(object sender, FastColoredTextBoxNS.TextChangedEventArgs e) {
-        OnChanged();
-    }
+    private void TxtSkript_TextChanged(object sender, FastColoredTextBoxNS.TextChangedEventArgs e) => OnChanged();
 
     private void txtSkript_ToolTipNeeded(object sender, ToolTipNeededEventArgs e) {
         if (Script.Comands == null) { return; }
