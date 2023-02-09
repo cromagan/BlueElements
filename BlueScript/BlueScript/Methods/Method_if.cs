@@ -91,7 +91,7 @@ internal class Method_if : Method {
         } else {
             s.Line += infos.LineBreakInCodeBlock;
         }
-        return new DoItFeedback(string.Empty);
+        return DoItFeedback.Null();
     }
 
     #endregion
