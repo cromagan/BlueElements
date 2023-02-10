@@ -73,11 +73,11 @@ public class VariableXml : Variable {
         return v;
     }
 
-    public override DoItFeedback GetValueFrom(Variable variable) {
-        if (variable is not VariableXml v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
-        if (ReadOnly) { return DoItFeedback.Schreibgschützt(); }
+    public override DoItFeedback GetValueFrom(Variable variable, int line) {
+        if (variable is not VariableXml v) { return DoItFeedback.VerschiedeneTypen(this, variable, line); }
+        if (ReadOnly) { return DoItFeedback.Schreibgschützt(line); }
         XML = v._xml;
-        return DoItFeedback.Null();
+        return DoItFeedback.Null(line);
     }
 
     protected override Variable? NewWithThisValue(object x, Script s) => null;

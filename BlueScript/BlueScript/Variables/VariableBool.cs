@@ -78,11 +78,11 @@ public class VariableBool : Variable {
         return v;
     }
 
-    public override DoItFeedback GetValueFrom(Variable variable) {
-        if (variable is not VariableBool v) { return DoItFeedback.VerschiedeneTypen(this, variable); }
-        if (ReadOnly) { return DoItFeedback.Schreibgschützt(); }
+    public override DoItFeedback GetValueFrom(Variable variable, int line) {
+        if (variable is not VariableBool v) { return DoItFeedback.VerschiedeneTypen(this, variable, line); }
+        if (ReadOnly) { return DoItFeedback.Schreibgschützt(line); }
         ValueBool = v.ValueBool;
-        return DoItFeedback.Null();
+        return DoItFeedback.Null(line);
     }
 
     protected override Variable NewWithThisValue(object x, Script s) {
@@ -122,7 +122,7 @@ public class VariableBool : Variable {
             var s1 = txt.Substring(0, i);
             Variable? v1 = null;
             if (!string.IsNullOrEmpty(s1)) {
-                var tmp1 = GetVariableByParsing(s1, s);
+                var tmp1 = GetVariableByParsing(s1, s, -1);
                 if (!string.IsNullOrEmpty(tmp1.ErrorMessage)) { return false; }//new DoItFeedback("Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage);
 
                 v1 = tmp1.Variable;
@@ -137,7 +137,7 @@ public class VariableBool : Variable {
             var s2 = txt.Substring(i + check.Length);
             if (string.IsNullOrEmpty(s2)) { return false; }//new DoItFeedback("Wert nach Operator (" + check + ") nicht gefunden: " + txt);
 
-            var tmp2 = GetVariableByParsing(s2, s);
+            var tmp2 = GetVariableByParsing(s2, s, -1);
             if (!string.IsNullOrEmpty(tmp2.ErrorMessage)) {
                 return false;//new DoItFeedback("Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage);
             }

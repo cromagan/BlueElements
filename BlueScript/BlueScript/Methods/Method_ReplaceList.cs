@@ -47,20 +47,20 @@ internal class Method_ReplaceList : Method {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
-        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(); }
+        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(line); }
 
         var tmpList = ((VariableListString)attvar.Attributes[0]).ValueList;
 
-        if (((VariableString)attvar.Attributes[3]).ValueString == ((VariableString)attvar.Attributes[4]).ValueString) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch."); }
-        if (!((VariableBool)attvar.Attributes[1]).ValueBool && string.Equals(((VariableString)attvar.Attributes[3]).ValueString, ((VariableString)attvar.Attributes[4]).ValueString, StringComparison.OrdinalIgnoreCase)) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch."); }
+        if (((VariableString)attvar.Attributes[3]).ValueString == ((VariableString)attvar.Attributes[4]).ValueString) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch.", line); }
+        if (!((VariableBool)attvar.Attributes[1]).ValueBool && string.Equals(((VariableString)attvar.Attributes[3]).ValueString, ((VariableString)attvar.Attributes[4]).ValueString, StringComparison.OrdinalIgnoreCase)) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch.", line); }
 
         var ct = 0;
         bool again;
         do {
             ct++;
-            if (ct > 10000) { return new DoItFeedback("Überlauf bei ReplaceList."); }
+            if (ct > 10000) { return new DoItFeedback("Überlauf bei ReplaceList.", line); }
             again = false;
             for (var z = 0; z < tmpList.Count; z++) {
                 if (((VariableBool)attvar.Attributes[2]).ValueBool) {
@@ -95,7 +95,7 @@ internal class Method_ReplaceList : Method {
         } while (again);
 
         ((VariableListString)attvar.Attributes[0]).ValueList = tmpList;
-        return DoItFeedback.Null();
+        return DoItFeedback.Null(line);
     }
 
     #endregion

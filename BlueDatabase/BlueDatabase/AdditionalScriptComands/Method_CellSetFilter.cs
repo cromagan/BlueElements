@@ -51,22 +51,22 @@ public class Method_CellSetFilter : MethodDatabase {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 2);
-        if (allFi is null) { return new DoItFeedback("Fehler im Filter"); }
+        if (allFi is null) { return new DoItFeedback("Fehler im Filter", line); }
 
         var columnToSet = allFi[0].Database.Column.Exists(((VariableString)attvar.Attributes[1]).ValueString);
-        if (columnToSet == null) { return new DoItFeedback("Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[4]).ValueString); }
+        if (columnToSet == null) { return new DoItFeedback("Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[4]).ValueString, line); }
 
         var r = RowCollection.MatchesTo(allFi);
         if (r == null || r.Count is 0 or > 1) {
-            return DoItFeedback.Falsch();
+            return DoItFeedback.Falsch(line);
         }
 
         r[0].CellSet(columnToSet, ((VariableString)attvar.Attributes[0]).ValueString);
 
-        return r[0].CellGetString(columnToSet) == ((VariableString)attvar.Attributes[0]).ValueString ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
+        return r[0].CellGetString(columnToSet) == ((VariableString)attvar.Attributes[0]).ValueString ? DoItFeedback.Wahr(line) : DoItFeedback.Falsch(line);
     }
 
     #endregion

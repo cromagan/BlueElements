@@ -38,9 +38,9 @@ public class Method_StringToDateTime : Method {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
         var ok = DateTimeTryParse(attvar.Attributes[0].ReadableText, out var d);
         if (!ok) {
-            return new DoItFeedback("Der Wert '" + attvar.Attributes[0].ReadableText + "' wurde nicht als Zeitformat erkannt.");
+            return new DoItFeedback("Der Wert '" + attvar.Attributes[0].ReadableText + "' wurde nicht als Zeitformat erkannt.", line);
         }
-        return new DoItFeedback(d);
+        return new DoItFeedback(d, line);
     }
 
     #endregion

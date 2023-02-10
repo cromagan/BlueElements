@@ -106,17 +106,17 @@ public class VariableListString : Variable {
         return v;
     }
 
-    public override DoItFeedback GetValueFrom(Variable variable) {
+    public override DoItFeedback GetValueFrom(Variable variable, int line) {
         if (variable is not VariableListString v) {
-            return DoItFeedback.VerschiedeneTypen(this, variable);
+            return DoItFeedback.VerschiedeneTypen(this, variable, line);
         }
 
         if (ReadOnly) {
-            return DoItFeedback.Schreibgschützt();
+            return DoItFeedback.Schreibgschützt(line);
         }
 
         ValueList = v.ValueList;
-        return DoItFeedback.Null();
+        return DoItFeedback.Null(line);
     }
 
     protected override Variable NewWithThisValue(object x, Script s) {

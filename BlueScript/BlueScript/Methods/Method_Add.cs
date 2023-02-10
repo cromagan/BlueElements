@@ -44,9 +44,9 @@ internal class Method_Add : Method {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
-        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(); }
+        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(line); }
 
         var tmpList = ((VariableListString)attvar.Attributes[0]).ValueList;
         for (var z = 1; z < attvar.Attributes.Count; z++) {
@@ -58,7 +58,7 @@ internal class Method_Add : Method {
             }
         }
         ((VariableListString)attvar.Attributes[0]).ValueList = tmpList;
-        return DoItFeedback.Null();
+        return DoItFeedback.Null(line);
     }
 
     #endregion

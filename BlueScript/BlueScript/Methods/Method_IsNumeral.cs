@@ -45,12 +45,12 @@ internal class Method_IsNumeral : Method {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.Falsch(); }
-        if (attvar.Attributes[0] is VariableFloat) { return DoItFeedback.Wahr(); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.Falsch(line); }
+        if (attvar.Attributes[0] is VariableFloat) { return DoItFeedback.Wahr(line); }
         if (attvar.Attributes[0] is VariableString vs) {
-            if (vs.ValueString.IsNumeral()) { return DoItFeedback.Wahr(); }
+            if (vs.ValueString.IsNumeral()) { return DoItFeedback.Wahr(line); }
         }
-        return DoItFeedback.Falsch();
+        return DoItFeedback.Falsch(line);
     }
 
     #endregion

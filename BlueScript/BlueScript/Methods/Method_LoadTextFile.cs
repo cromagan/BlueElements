@@ -48,24 +48,24 @@ internal class Method_LoadTextFile : Method {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
         var ft = ((VariableString)attvar.Attributes[0]).ValueString.FileType();
 
         if (ft is not FileFormat.Textdocument and not FileFormat.CSV) {
-            return new DoItFeedback("Datei ist kein Textformat: " + ((VariableString)attvar.Attributes[0]).ValueString);
+            return new DoItFeedback("Datei ist kein Textformat: " + ((VariableString)attvar.Attributes[0]).ValueString, line);
         }
 
         if (!IO.FileExists(((VariableString)attvar.Attributes[0]).ValueString)) {
-            return new DoItFeedback("Datei nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString);
+            return new DoItFeedback("Datei nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString, line);
         }
 
         try {
             var importText = File.ReadAllText(((VariableString)attvar.Attributes[0]).ValueString, Constants.Win1252);
             //var bmp = (Bitmap)BitmapExt.Image_FromFile(((VariableString)attvar.Attributes[0]).ValueString)!;
-            return new DoItFeedback(importText, string.Empty);
+            return new DoItFeedback(importText, string.Empty, line);
         } catch {
-            return new DoItFeedback("Datei konnte nicht geladen werden: " + ((VariableString)attvar.Attributes[0]).ValueString);
+            return new DoItFeedback("Datei konnte nicht geladen werden: " + ((VariableString)attvar.Attributes[0]).ValueString, line);
         }
     }
 

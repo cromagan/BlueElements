@@ -539,11 +539,9 @@ public partial class TableView : Form, IHasStatusbar {
 
         _ = e.UserMenu.Add("Zeile", true);
         _ = e.UserMenu.Add(ContextMenuComands.ZeileLöschen, row != null && tbl.Database.IsAdministrator());
-
         foreach (var thiss in tbl.Database.EventScript) {
             if (thiss != null && thiss.ManualExecutable && thiss.NeedRow) {
-                _ = e.UserMenu.Add("Skript: " + thiss.ReadableText(), "Skript|" + thiss.KeyName, ImageCode.Zeile,
-                    row != null);
+                _ = e.UserMenu.Add("Skript: " + thiss.ReadableText(), "Skript|" + thiss.KeyName, ImageCode.Skript, row != null);
             }
         }
     }

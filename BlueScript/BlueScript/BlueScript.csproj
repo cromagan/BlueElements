@@ -52,7 +52,6 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="Methods\Method.cs" />
     <Compile Include="Methods\Method_AddPrefix.cs" />
-    <Compile Include="Methods\Method_BerechneVariable_Tilde.cs" />
     <Compile Include="Methods\Method_AddSuffix.cs" />
     <Compile Include="Methods\Method_BitmapToBase64.cs" />
     <Compile Include="Methods\Method_SetClipbard.cs" />

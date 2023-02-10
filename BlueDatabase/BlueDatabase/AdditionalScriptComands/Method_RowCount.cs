@@ -46,16 +46,16 @@ public class Method_RowCount : MethodDatabase {
 
     #region Methods
 
-    public static DoItFeedback RowToObjectFeedback(RowItem? row) => new(new VariableRowItem(row));
+    public static DoItFeedback RowToObjectFeedback(RowItem? row, int line) => new(new VariableRowItem(row), line);
 
     public override List<string> Comand(Script? s) => new() { "rowcount" };
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
-        if (allFi is null) { return new DoItFeedback("Fehler im Filter"); }
+        if (allFi is null) { return new DoItFeedback("Fehler im Filter", line); }
 
         var r = RowCollection.MatchesTo(allFi);
 

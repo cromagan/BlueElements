@@ -51,15 +51,15 @@ public class Method_SoftMessage : MethodDatabase {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
         var db = MyDatabase(s);
-        if (db == null) { return new DoItFeedback("Datenbankfehler!"); }
+        if (db == null) { return new DoItFeedback("Datenbankfehler!", line); }
 
         var txt = "<b>Skript:</b> " + ((VariableString)attvar.Attributes[0]).ValueString;
         db.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, txt);
 
-        return DoItFeedback.Null();
+        return DoItFeedback.Null(line);
     }
 
     #endregion

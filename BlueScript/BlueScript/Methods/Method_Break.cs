@@ -47,11 +47,11 @@ internal class Method_Break : Method {
     public override List<string> Comand(Script? s) => new() { "break" };
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        if (s.Schleife < 1 && s.Sub < 1) { return new DoItFeedback("Break nur innerhalb einer Schleife oder Subroutine erlaubt."); }
+        if (s.Schleife < 1 && s.Sub < 1) { return new DoItFeedback("Break nur innerhalb einer Schleife oder Subroutine erlaubt.", line); }
 
-        if (s.BreakFired) { return new DoItFeedback("Break doppelt ausgelöst."); }
+        if (s.BreakFired) { return new DoItFeedback("Break doppelt ausgelöst.", line); }
         s.BreakFired = true;
-        return DoItFeedback.Null();
+        return DoItFeedback.Null(line);
     }
 
     #endregion

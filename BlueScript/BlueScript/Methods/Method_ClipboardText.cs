@@ -45,13 +45,13 @@ internal class Method_ClipboardText : Method {
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) {
-            return DoItFeedback.AttributFehler(this, attvar);
+            return DoItFeedback.AttributFehler(this, attvar, line);
         }
 
         if (System.Windows.Clipboard.ContainsText()) {
-            return new DoItFeedback(System.Windows.Clipboard.GetText(), string.Empty);
+            return new DoItFeedback(System.Windows.Clipboard.GetText(), string.Empty, line);
         }
-        return new DoItFeedback(string.Empty, string.Empty);
+        return DoItFeedback.Null(line);
     }
 
     #endregion

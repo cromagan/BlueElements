@@ -48,22 +48,22 @@ internal class Method_LoadImage : Method {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
         if (((VariableString)attvar.Attributes[0]).ValueString.FileType() != FileFormat.Image) {
-            return new DoItFeedback("Datei ist kein Bildformat: " + ((VariableString)attvar.Attributes[0]).ValueString);
+            return new DoItFeedback("Datei ist kein Bildformat: " + ((VariableString)attvar.Attributes[0]).ValueString, line);
         }
 
         if (!IO.FileExists(((VariableString)attvar.Attributes[0]).ValueString)) {
-            return new DoItFeedback("Datei nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString);
+            return new DoItFeedback("Datei nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString, line);
         }
 
         try {
             Generic.CollectGarbage();
             var bmp = (Bitmap)BitmapExt.Image_FromFile(((VariableString)attvar.Attributes[0]).ValueString)!;
-            return new DoItFeedback(bmp);
+            return new DoItFeedback(bmp, line);
         } catch {
-            return new DoItFeedback("Datei konnte nicht geladen werden: " + ((VariableString)attvar.Attributes[0]).ValueString);
+            return new DoItFeedback("Datei konnte nicht geladen werden: " + ((VariableString)attvar.Attributes[0]).ValueString, line);
         }
     }
 

@@ -46,7 +46,7 @@ internal class Method_DateTimeToString : Method {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
         //var ok = DateTimeTryParse(attvar.Attributes[0].ReadableText, out var d);
         //if (!ok) {
         //    return new DoItFeedback("Der Wert '" + attvar.Attributes[0].ReadableText + "' wurde nicht als Zeitformat erkannt.");
@@ -57,9 +57,9 @@ internal class Method_DateTimeToString : Method {
         var d = ((VariableDateTime)attvar.Attributes[0]).ValueDate;
 
         try {
-            return new DoItFeedback(d.ToString(attvar.Attributes[1].ReadableText), string.Empty);
+            return new DoItFeedback(d.ToString(attvar.Attributes[1].ReadableText), string.Empty, line);
         } catch {
-            return new DoItFeedback("Der Umwandlungs-String '" + attvar.Attributes[1].ReadableText + "' ist fehlerhaft.");
+            return new DoItFeedback("Der Umwandlungs-String '" + attvar.Attributes[1].ReadableText + "' ist fehlerhaft.", line);
         }
     }
 

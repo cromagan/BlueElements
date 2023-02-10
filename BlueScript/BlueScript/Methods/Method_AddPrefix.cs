@@ -44,9 +44,9 @@ internal class Method_AddPrefix : Method {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
-        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(); }
+        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(line); }
 
         var tmp = ((VariableListString)attvar.Attributes[0]).ValueList;
 
@@ -56,7 +56,7 @@ internal class Method_AddPrefix : Method {
 
         ((VariableListString)attvar.Attributes[0]).ValueList = tmp;
 
-        return DoItFeedback.Null();
+        return DoItFeedback.Null(line);
     }
 
     #endregion

@@ -44,19 +44,19 @@ internal class Method_EndsWith : Method {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
         for (var z = 2; z < attvar.Attributes.Count; z++) {
             if (((VariableBool)attvar.Attributes[1]).ValueBool) {
                 if (((VariableString)attvar.Attributes[0]).ValueString.EndsWith(((VariableString)attvar.Attributes[z]).ValueString)) {
-                    return DoItFeedback.Wahr();
+                    return DoItFeedback.Wahr(line);
                 }
             } else {
                 if (((VariableString)attvar.Attributes[0]).ValueString.ToLower().EndsWith(((VariableString)attvar.Attributes[z]).ValueString.ToLower())) {
-                    return DoItFeedback.Wahr();
+                    return DoItFeedback.Wahr(line);
                 }
             }
         }
-        return DoItFeedback.Falsch();
+        return DoItFeedback.Falsch(line);
     }
 
     #endregion

@@ -44,11 +44,11 @@ internal class Method_Element : Method {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
         var i = ((VariableFloat)attvar.Attributes[1]).ValueInt;
         var list = ((VariableListString)attvar.Attributes[0]).ValueList;
-        return i < 0 || i >= list.Count ? new DoItFeedback("Element nicht in Liste")
-            : new DoItFeedback(list[i], string.Empty);
+        return i < 0 || i >= list.Count ? new DoItFeedback("Element nicht in Liste", line)
+            : new DoItFeedback(list[i], string.Empty, line);
     }
 
     #endregion

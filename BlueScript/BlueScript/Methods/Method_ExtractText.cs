@@ -49,15 +49,15 @@ internal class Method_ExtractText : Method {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
         var tags = ((VariableString)attvar.Attributes[0]).ValueString.ReduceToMulti(((VariableString)attvar.Attributes[1]).ValueString, StringComparison.OrdinalIgnoreCase);
 
         if (tags == null) {
-            return new DoItFeedback("Searchpattern fehlerhaft.");
+            return new DoItFeedback("Searchpattern fehlerhaft.", line);
         }
 
-        return new DoItFeedback(tags);
+        return new DoItFeedback(tags, line);
     }
 
     #endregion

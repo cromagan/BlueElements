@@ -46,8 +46,8 @@ internal class Method_CountString : Method {
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
         return !string.IsNullOrEmpty(attvar.ErrorMessage)
-            ? DoItFeedback.AttributFehler(this, attvar)
-            : new DoItFeedback(attvar.Attributes[0].ReadableText.CountString(attvar.Attributes[1].ReadableText));
+            ? DoItFeedback.AttributFehler(this, attvar, line)
+            : new DoItFeedback(attvar.Attributes[0].ReadableText.CountString(attvar.Attributes[1].ReadableText), line);
     }
 
     #endregion

@@ -122,7 +122,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
 
     protected virtual void OpenAdditionalFileFolder() { }
 
-    protected void WriteComandsToList(Script? s) {
+    protected void WriteComandsToList() {
         if (!_menuDone) {
             _menuDone = true;
             _popupMenu = new AutocompleteMenu(txtSkript) {
@@ -131,14 +131,14 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
                 AllowTabKey = true
             };
             List<AutocompleteItem> items = new();
-            if (s != null && Script.Comands != null) {
+            if (Script.Comands != null) {
                 foreach (var thisc in Script.Comands) {
                     items.Add(new SnippetAutocompleteItem(thisc.Syntax + " "));
                     if (!string.IsNullOrEmpty(thisc.Returns)) {
                         items.Add(new SnippetAutocompleteItem("var " + thisc.Returns + " = " + thisc.Syntax + "; "));
                     }
 
-                    items.AddRange(thisc.Comand(s).Select(thiscom => new AutocompleteItem(thiscom)));
+                    items.AddRange(thisc.Comand(null).Select(thiscom => new AutocompleteItem(thiscom)));
                 }
             }
             //set as autocomplete source
@@ -165,7 +165,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
         var s = GenerateAndExecuteScript();
 
         grpVariablen.WriteVariablesToTable(s.Variables);
-        WriteComandsToList(s);
+        WriteComandsToList();
 
         if (string.IsNullOrEmpty(s.ErrorMessage)) {
             Message("Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden.");

@@ -53,14 +53,14 @@ public class Method_AddRow : MethodDatabase {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
         var db = DatabaseOf(s, ((VariableString)attvar.Attributes[0]).ValueString);
-        if (db == null) { return new DoItFeedback("Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden"); }
+        if (db == null) { return new DoItFeedback("Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden", line); }
 
-        if (db?.ReadOnly ?? true) { return new DoItFeedback("Datenbank schreibgeschützt."); }
+        if (db?.ReadOnly ?? true) { return new DoItFeedback("Datenbank schreibgeschützt.", line); }
 
-        if (string.IsNullOrEmpty(((VariableString)attvar.Attributes[1]).ValueString)) { return new DoItFeedback("KeyValue muss einen Wert enthalten."); }
+        if (string.IsNullOrEmpty(((VariableString)attvar.Attributes[1]).ValueString)) { return new DoItFeedback("KeyValue muss einen Wert enthalten.", line); }
         //var r = db.Row[((VariableString)attvar.Attributes[1]).ValueString];
 
         //if (r != null && !((VariableBool)attvar.Attributes[2]).ValueBool) { return Method_Row?.RowToObject(r); }
@@ -69,15 +69,15 @@ public class Method_AddRow : MethodDatabase {
             StackTrace stackTrace = new();
 
             if (stackTrace.FrameCount > 400) {
-                return new DoItFeedback("Stapelspeicherüberlauf");
+                return new DoItFeedback("Stapelspeicherüberlauf", line);
             }
         }
 
-        if (!s.ChangeValues) { return new DoItFeedback("Zeile anlegen im Testmodus deaktiviert."); }
+        if (!s.ChangeValues) { return new DoItFeedback("Zeile anlegen im Testmodus deaktiviert.", line); }
 
         var r = db.Row.GenerateAndAdd(db.Row.NextRowKey(), ((VariableString)attvar.Attributes[1]).ValueString, ((VariableBool)attvar.Attributes[2]).ValueBool, true, "Script Command: Add Row");
 
-        return Method_Row.RowToObjectFeedback(r);
+        return Method_Row.RowToObjectFeedback(r, line);
     }
 
     #endregion

@@ -50,13 +50,13 @@ public class Method_SetError : MethodDatabase {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             var column = Column(s, attvar.Attributes[z].Name);
-            if (column == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[z].Name); }
+            if (column == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[z].Name, line); }
 
-            s.Feedback = s.Feedback + attvar.Attributes[z].Name.ToUpper() + "|" + ((VariableString)attvar.Attributes[0]).ValueString + "\r";
+            MyDatabase(s)?.Row.LastCheckedRowFeedback.Add(attvar.Attributes[z].Name.ToUpper() + "|" + ((VariableString)attvar.Attributes[0]).ValueString);
 
             //var n = attvar.Attributes[z].Name.ToLower() + "_error";
             //var ve = s.Variablen.GetSystem(n);
@@ -71,7 +71,7 @@ public class Method_SetError : MethodDatabase {
             //ve.Readonly = true;
         }
 
-        return DoItFeedback.Null();
+        return DoItFeedback.Null(line);
     }
 
     #endregion

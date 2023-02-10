@@ -27,6 +27,7 @@ public readonly struct DoItWithEndedPosFeedback {
 
     internal readonly string ErrorMessage;
 
+    internal readonly int Line;
     internal readonly int Position;
 
     internal readonly Variable? Variable;
@@ -35,16 +36,18 @@ public readonly struct DoItWithEndedPosFeedback {
 
     #region Constructors
 
-    public DoItWithEndedPosFeedback(string errormessage, Variable? variable, int endpos) {
+    public DoItWithEndedPosFeedback(string errormessage, Variable? variable, int endpos, int line) {
         ErrorMessage = errormessage;
         Variable = variable;
         Position = endpos;
+        Line = line;
     }
 
-    public DoItWithEndedPosFeedback(string errormessage) {
+    public DoItWithEndedPosFeedback(string errormessage, int line) {
         Position = -1;
         ErrorMessage = errormessage;
         Variable = null;
+        Line = line;
     }
 
     #endregion

@@ -52,8 +52,8 @@ public class Method_UniqueRowID : MethodDatabase {
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
         return !string.IsNullOrEmpty(attvar.ErrorMessage)
-            ? DoItFeedback.AttributFehler(this, attvar)
-            : new DoItFeedback(RowCollection.UniqueKeyValue(), string.Empty);
+            ? DoItFeedback.AttributFehler(this, attvar, line)
+            : new DoItFeedback(RowCollection.UniqueKeyValue(), string.Empty, line);
     }
 
     #endregion

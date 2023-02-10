@@ -46,8 +46,8 @@ internal class Method_Count : Method {
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
         return !string.IsNullOrEmpty(attvar.ErrorMessage)
-            ? DoItFeedback.AttributFehler(this, attvar)
-            : new DoItFeedback(((VariableListString)attvar.Attributes[0]).ValueList.Count);
+            ? DoItFeedback.AttributFehler(this, attvar, line)
+            : new DoItFeedback(((VariableListString)attvar.Attributes[0]).ValueList.Count, line);
     }
 
     #endregion

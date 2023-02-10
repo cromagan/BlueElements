@@ -45,9 +45,9 @@ internal class Method_Max : Method {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
         var val = attvar.Attributes.Select(thisval => ((VariableFloat)thisval).ValueNum).Prepend(float.MinValue).Max();
-        return new DoItFeedback(val);
+        return new DoItFeedback(val, line);
     }
 
     #endregion

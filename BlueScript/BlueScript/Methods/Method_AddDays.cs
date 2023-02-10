@@ -45,14 +45,14 @@ internal class Method_AddDays : Method {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
         // var ok = DateTimeTryParse(attvar.Attributes[0].ReadableText, out var d);
         //if (!ok) {
         //    return new DoItFeedback("Der Wert '" + attvar.Attributes[0].ReadableText + "' wurde nicht als Zeitformat erkannt.");
         //}
         var d = ((VariableDateTime)attvar.Attributes[0]).ValueDate;
         d = d.AddDays(((VariableFloat)attvar.Attributes[1]).ValueNum);
-        return new DoItFeedback(d);
+        return new DoItFeedback(d, line);
     }
 
     #endregion

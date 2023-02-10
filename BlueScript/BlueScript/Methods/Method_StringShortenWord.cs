@@ -46,10 +46,10 @@ internal class Method_StringShortenWord : Method {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
         var txt = ((VariableString)attvar.Attributes[0]).ValueString;
         if (string.IsNullOrEmpty(txt)) {
-            return new DoItFeedback(txt, string.Empty);
+            return new DoItFeedback(txt, string.Empty, line);
         }
         //TXT = TXT.HTMLSpecialToNormalChar();
         txt = txt.Replace("Sekunden", "Sek.");
@@ -109,7 +109,7 @@ internal class Method_StringShortenWord : Method {
         }
         txt = txt.Replace("Tiefkühl", "TK-");
         //TXT = TXT.CreateHtmlCodes(true);
-        return new DoItFeedback(txt, string.Empty);
+        return new DoItFeedback(txt, string.Empty, line);
     }
 
     #endregion

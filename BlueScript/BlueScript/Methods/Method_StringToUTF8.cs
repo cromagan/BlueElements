@@ -45,8 +45,8 @@ internal class Method_StringToUTF8 : Method {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.AttributFehler(this, attvar)
-            : new DoItFeedback(((VariableString)attvar.Attributes[0]).ValueString.StringtoUtf8(), string.Empty);
+        return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.AttributFehler(this, attvar, line)
+            : new DoItFeedback(((VariableString)attvar.Attributes[0]).ValueString.StringtoUtf8(), string.Empty, line);
     }
 
     #endregion

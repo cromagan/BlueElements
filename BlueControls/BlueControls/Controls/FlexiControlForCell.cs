@@ -398,7 +398,6 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     }
 
     private void Database_RowChecked(object sender, RowCheckedEventArgs e) {
-        if (e.Event != BlueDatabase.Enums.Events.error_check) { return; }
         if (e.Row != _tmpRow) { return; }
         if (e.ColumnsWithErrors == null) {
             InfoText = string.Empty;

@@ -41,9 +41,10 @@ public static partial class Extensions {
     public static readonly List<List<string>> KlammernStd = new() { new List<string> { "(", ")" }, new List<string> { "{", "}" }, new List<string> { "[", "]" } };
     public static readonly List<string> KlammerZu = new() { ")" };
     public static readonly List<string> Komma = new() { "," };
-    public static readonly List<string> Tilde = new() { "~" };
 
     #endregion
+
+    //public static readonly List<string> Tilde = new() { "~" };
 
     #region Methods
 

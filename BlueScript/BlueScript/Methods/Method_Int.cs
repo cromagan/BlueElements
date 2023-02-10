@@ -45,8 +45,8 @@ internal class Method_Int : Method {
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
         return !string.IsNullOrEmpty(attvar.ErrorMessage)
-            ? DoItFeedback.AttributFehler(this, attvar)
-            : new DoItFeedback(((VariableFloat)attvar.Attributes[0]).ValueInt);
+            ? DoItFeedback.AttributFehler(this, attvar, line)
+            : new DoItFeedback(((VariableFloat)attvar.Attributes[0]).ValueInt, line);
     }
 
     #endregion

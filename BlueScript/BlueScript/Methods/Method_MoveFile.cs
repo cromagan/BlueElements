@@ -48,27 +48,27 @@ internal class Method_MoveFile : Method {
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
 
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
         var sop = ((VariableString)attvar.Attributes[0]).ValueString;
 
         var dep = ((VariableString)attvar.Attributes[1]).ValueString;
 
         //if (!DirectoryExists(sop.FilePath())) { return new DoItFeedback("Verzeichnis existiert nicht"); }
-        if (!DirectoryExists(dep.FilePath())) { return new DoItFeedback("Ziel-Verzeichnis existiert nicht"); }
-        if (!FileExists(sop)) { return new DoItFeedback("Quelldatei existiert nicht."); }
+        if (!DirectoryExists(dep.FilePath())) { return new DoItFeedback("Ziel-Verzeichnis existiert nicht", line); }
+        if (!FileExists(sop)) { return new DoItFeedback("Quelldatei existiert nicht.", line); }
 
         if (FileExists(dep)) {
-            return new DoItFeedback("Zieldatei existiert bereits.");
+            return new DoItFeedback("Zieldatei existiert bereits.", line);
         }
 
-        if (!s.ChangeValues) { return new DoItFeedback("Verschieben im Testmodus deaktiviert."); }
+        if (!s.ChangeValues) { return new DoItFeedback("Verschieben im Testmodus deaktiviert.", line); }
 
         if (!MoveFile(sop, dep, false)) {
-            return new DoItFeedback("Verschieben fehlgeschlagen.");
+            return new DoItFeedback("Verschieben fehlgeschlagen.", line);
         }
 
-        return DoItFeedback.Null();
+        return DoItFeedback.Null(line);
     }
 
     #endregion

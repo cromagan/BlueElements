@@ -51,20 +51,20 @@ public class Method_CellSetRow : MethodDatabase {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
         var row = Method_Row.ObjectToRow(attvar.Attributes[2]);
-        if (row?.Database is null || row.Database.IsDisposed) { return new DoItFeedback("Fehler in der Zeile"); }
+        if (row?.Database is null || row.Database.IsDisposed) { return new DoItFeedback("Fehler in der Zeile", line); }
 
         var columnToSet = row.Database.Column.Exists(((VariableString)attvar.Attributes[1]).ValueString);
-        if (columnToSet == null) { return new DoItFeedback("Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[1]).ValueString); }
+        if (columnToSet == null) { return new DoItFeedback("Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[1]).ValueString, line); }
 
-        if (row?.Database?.ReadOnly ?? true) { return new DoItFeedback("Datenbank schreibgeschützt."); }
-        if (!s.ChangeValues) { return new DoItFeedback("Zellen setzen Testmodus deaktiviert."); }
+        if (row?.Database?.ReadOnly ?? true) { return new DoItFeedback("Datenbank schreibgeschützt.", line); }
+        if (!s.ChangeValues) { return new DoItFeedback("Zellen setzen Testmodus deaktiviert.", line); }
 
         row.CellSet(columnToSet, ((VariableString)attvar.Attributes[0]).ValueString);
 
-        return row.CellGetString(columnToSet) == ((VariableString)attvar.Attributes[0]).ValueString ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
+        return row.CellGetString(columnToSet) == ((VariableString)attvar.Attributes[0]).ValueString ? DoItFeedback.Wahr(line) : DoItFeedback.Falsch(line);
     }
 
     #endregion

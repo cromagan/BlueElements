@@ -54,13 +54,13 @@ public class Method_Xml : Method {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
         try {
             var x = XDocument.Parse(((VariableString)attvar.Attributes[0]).ValueString);
-            return new DoItFeedback(new VariableXml(x));
+            return new DoItFeedback(new VariableXml(x), line);
         } catch (Exception e) {
-            return new DoItFeedback(string.Empty, "XML-Parsen fehlgeschlagen: " + e.Message);
+            return new DoItFeedback(string.Empty, "XML-Parsen fehlgeschlagen: " + e.Message, line);
         }
     }
 

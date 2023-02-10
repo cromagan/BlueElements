@@ -48,42 +48,42 @@ internal class Method_IsNullOrZero : Method {
 
         if (attvar.Attributes.Count == 0) {
             if (attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden) {
-                return DoItFeedback.AttributFehler(this, attvar);
+                return DoItFeedback.AttributFehler(this, attvar, line);
             }
 
-            return DoItFeedback.Wahr();
+            return DoItFeedback.Wahr(line);
         }
 
-        if (attvar.Attributes[0].IsNullOrEmpty) { return DoItFeedback.Wahr(); }
-        if (attvar.Attributes[0] is VariableUnknown) { return DoItFeedback.Wahr(); }
+        if (attvar.Attributes[0].IsNullOrEmpty) { return DoItFeedback.Wahr(line); }
+        if (attvar.Attributes[0] is VariableUnknown) { return DoItFeedback.Wahr(line); }
 
         if (attvar.Attributes[0] is VariableFloat f) {
-            if (f.ValueNum == 0) { return DoItFeedback.Wahr(); }
+            if (f.ValueNum == 0) { return DoItFeedback.Wahr(line); }
 
-            return DoItFeedback.Falsch();
+            return DoItFeedback.Falsch(line);
         }
-        return new DoItFeedback("Variable existiert, ist aber nicht vom Datentyp Numeral.");
+        return new DoItFeedback("Variable existiert, ist aber nicht vom Datentyp Numeral.", line);
         //if (attvar.Attributes == null) {
         //    if (attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden) {
-        //        return DoItFeedback.AttributFehler(this, attvar);
+        //        return DoItFeedback.AttributFehler(this, attvar, line);
         //    } else {
-        //        return DoItFeedback.Wahr();
+        //        return DoItFeedback.Wahr(line);
         //    }
         //} else {
         //    if (string.IsNullOrEmpty(((VariableString)attvar.Attributes[0]).ValueString)) {
-        //        return DoItFeedback.Wahr();
+        //        return DoItFeedback.Wahr(line);
         //    } else {
         //        if (attvar.Attributes[0].Type is VariableDataType.Null or VariableDataType.Error
         //            or VariableDataType.NotDefinedYet) {
-        //            return DoItFeedback.Wahr();
+        //            return DoItFeedback.Wahr(line);
         //        } else {
         //            if (attvar.Attributes[0] is not VariableFloat) {
         //                return new DoItFeedback("Variable existiert, ist aber nicht vom Datentyp Numeral.");
         //            } else {
         //                if (((VariableFloat)attvar.Attributes[0]).ValueNum == 0) {
-        //                    return DoItFeedback.Wahr();
+        //                    return DoItFeedback.Wahr(line);
         //                } else {
-        //                    return DoItFeedback.Falsch();
+        //                    return DoItFeedback.Falsch(line);
         //                }
         //            }
         //        }

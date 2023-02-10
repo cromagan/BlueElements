@@ -279,6 +279,42 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     /// </summary>
     /// <param name="source"></param>
 
+    public string CheckRowData() {
+        if (Database is null || Database.IsDisposed) { return "Datenbank verworfen"; }
+        //if (r?.Database != Database) { return "Datenbank Konflikt"; }
+
+        if (Database.Row.LastCheckedRow != Key) {
+            Database.Row.LastCheckedRowFeedback.Clear();
+            ExecuteScript(BlueDatabase.Enums.Events.error_check, string.Empty, false, false, true, 0);
+        }
+
+        var infoTxt = "<b><u>" + CellGetString(Database.Column.First) + "</b></u><br><br>";
+
+        List<string> cols = new();
+        //var fs = script.Feedback.SplitAndCutByCrToList().SortedDistinctList();
+        foreach (var thiss in Database.Row.LastCheckedRowFeedback) {
+            cols.AddIfNotExists(thiss);
+            var t = thiss.SplitBy("|");
+            var thisc = Database.Column[t[0]];
+            if (thisc != null) {
+                infoTxt = infoTxt + "<b>" + thisc.ReadableText() + ":</b> " + t[1] + "<br><hr><br>";
+            }
+        }
+
+        if (cols.Count == 0) {
+            infoTxt += "Diese Zeile ist fehlerfrei.";
+        }
+
+        if (Database.Column.SysCorrect.SaveContent) {
+            if (IsNullOrEmpty(Database.Column.SysCorrect) || cols.Count == 0 != CellGetBoolean(Database.Column.SysCorrect)) {
+                CellSet(Database.Column.SysCorrect, cols.Count == 0);
+            }
+        }
+        OnRowChecked(new RowCheckedEventArgs(this, cols));
+
+        return infoTxt;
+    }
+
     public void CloneFrom(RowItem source, bool nameAndKeyToo) {
         if (nameAndKeyToo) {
             Key = source.Key;
@@ -548,35 +584,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
                 //CellCollection.Invalidate_CellContentSize(thisColum, this);
                 thisColum.Invalidate_ContentWidth();
             }
-        }
-
-        var infoTxt = "<b><u>" + CellGetString(Database.Column.First) + "</b></u><br><br>";
-
-        if (string.IsNullOrEmpty(script.ErrorMessage)) {
-            List<string> cols = new();
-            var fs = script.Feedback.SplitAndCutByCrToList().SortedDistinctList();
-            foreach (var thiss in fs) {
-                cols.AddIfNotExists(thiss);
-                var t = thiss.SplitBy("|");
-                var thisc = Database.Column[t[0]];
-                if (thisc != null) {
-                    infoTxt = infoTxt + "<b>" + thisc.ReadableText() + ":</b> " + t[1] + "<br><hr><br>";
-                }
-            }
-
-            if (cols.Count == 0) {
-                infoTxt += "Diese Zeile ist fehlerfrei.";
-            }
-
-            if (Database.Column.SysCorrect.SaveContent) {
-                if (IsNullOrEmpty(Database.Column.SysCorrect) || cols.Count == 0 != CellGetBoolean(Database.Column.SysCorrect)) {
-                    CellSet(Database.Column.SysCorrect, cols.Count == 0);
-                }
-            }
-            OnRowChecked(new RowCheckedEventArgs(this, eventname ?? 0, cols));
-        } else {
-            infoTxt += "Kein Skript vorhanden.";
-            OnRowChecked(new RowCheckedEventArgs(this, eventname ?? 0, null));
         }
 
         return script;

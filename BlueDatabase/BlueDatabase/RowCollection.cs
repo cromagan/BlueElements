@@ -22,6 +22,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
+using BlueScript;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -35,6 +36,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
     #region Fields
 
+    public readonly List<string> LastCheckedRowFeedback = new();
+    public long LastCheckedRow = -1;
     private readonly ConcurrentDictionary<long, RowItem?> _internal = new();
     private bool _throwEvents = true;
 

@@ -22,11 +22,11 @@ using System.Collections.Generic;
 
 namespace BlueDatabase.EventArgs;
 
-public class RowCheckedEventArgs : DoRowAutomaticEventArgs {
+public class RowCheckedEventArgs : RowEventArgs {
 
     #region Constructors
 
-    public RowCheckedEventArgs(RowItem row, Events eventn, List<string>? columnsWithErrors) : base(row, eventn) => ColumnsWithErrors = columnsWithErrors;
+    public RowCheckedEventArgs(RowItem row, List<string>? columnsWithErrors) : base(row) => ColumnsWithErrors = columnsWithErrors;
 
     #endregion
 

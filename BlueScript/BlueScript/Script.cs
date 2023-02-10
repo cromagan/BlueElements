@@ -117,42 +117,36 @@ public class Script {
 
     #region Methods
 
-    public static DoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, Script s, bool expectedvariablefeedback) {
-        if (Comands == null) { return new DoItWithEndedPosFeedback("Befehle nicht initialisiert"); }
+    public static DoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, Script s, bool expectedvariablefeedback, int line) {
+        if (Comands == null) { return new DoItWithEndedPosFeedback("Befehle nicht initialisiert", -1); }
 
         foreach (var thisC in Comands) {
-            var f = thisC.CanDo(txt, pos, expectedvariablefeedback, s);
-            if (f.MustAbort) { return new DoItWithEndedPosFeedback(f.ErrorMessage); }
+            var f = thisC.CanDo(txt, pos, expectedvariablefeedback, s, line);
+            if (f.MustAbort) { return new DoItWithEndedPosFeedback(f.ErrorMessage, line); }
 
             if (string.IsNullOrEmpty(f.ErrorMessage)) {
-                var fn = thisC.DoIt(f, s, f.ContinueOrErrorPosition);
-
-                var lb = 0;
-                if (!string.IsNullOrEmpty(f.CodeBlockAfterText)) {
-                    lb = f.CodeBlockAfterText.Count(c => c == '¶');
-                }
-
-                return new DoItWithEndedPosFeedback(fn.ErrorMessage, fn.Variable, f.ContinueOrErrorPosition + lb);
+                var fn = thisC.DoIt(f, s, f.Line);
+                return new DoItWithEndedPosFeedback(fn.ErrorMessage, fn.Variable, f.ContinueOrErrorPosition, fn.Line);
             }
         }
 
         #region Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
 
-        foreach (var f in Comands.Select(thisC => thisC.CanDo(txt, pos, !expectedvariablefeedback, s))) {
+        foreach (var f in Comands.Select(thisC => thisC.CanDo(txt, pos, !expectedvariablefeedback, s, line))) {
             if (f.MustAbort) {
-                return new DoItWithEndedPosFeedback(f.ErrorMessage);
+                return new DoItWithEndedPosFeedback(f.ErrorMessage, line);
             }
 
             if (string.IsNullOrEmpty(f.ErrorMessage)) {
                 return expectedvariablefeedback
-                    ? new DoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + txt.Substring(pos))
-                    : new DoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + txt.Substring(pos));
+                    ? new DoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + txt.Substring(pos), line)
+                    : new DoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + txt.Substring(pos), line);
             }
         }
 
         #endregion Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
 
-        return new DoItWithEndedPosFeedback("Kann nicht geparsed werden: " + txt.Substring(pos));
+        return new DoItWithEndedPosFeedback("Kann nicht geparsed werden: " + txt.Substring(pos), line);
     }
 
     public static string ReduceText(string txt) {
@@ -227,11 +221,12 @@ public class Script {
                 line++;
                 pos++;
             } else {
-                var f = ComandOnPosition(redScriptText, pos, this, false);
+                var f = ComandOnPosition(redScriptText, pos, this, false, line);
                 if (!string.IsNullOrEmpty(f.ErrorMessage)) {
-                    return new ScriptEndedFeedback(line, f.ErrorMessage, redScriptText.Substring(pos, Math.Min(30, redScriptText.Length - pos)), null);
+                    return new ScriptEndedFeedback(f.Line, f.ErrorMessage, redScriptText.Substring(pos, Math.Min(30, redScriptText.Length - pos)), null);
                 }
                 pos = f.Position;
+                line = f.Line;
             }
         } while (true);
     }

@@ -54,14 +54,14 @@ public class Method_CallFilter : MethodDatabase {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1);
 
-        if (allFi is null || allFi.Count == 0) { return new DoItFeedback("Fehler im Filter"); }
+        if (allFi is null || allFi.Count == 0) { return new DoItFeedback("Fehler im Filter", line); }
 
         //var db = MyDatabase(s);
-        if (allFi[0].Database == null) { return new DoItFeedback("Datenbankfehler!"); }
+        if (allFi[0].Database == null) { return new DoItFeedback("Datenbankfehler!", line); }
 
         var r = allFi[0].Database.Row.CalculateFilteredRows(allFi);
         if (r == null || r.Count == 0) { return new DoItFeedback(); }
@@ -72,16 +72,16 @@ public class Method_CallFilter : MethodDatabase {
             if (r != null) {
                 s.Sub++;
                 var s2 = thisR.ExecuteScript(null, vs.ValueString, false, true, s.ChangeValues, 0);
-                if (!string.IsNullOrEmpty(s2.ErrorMessage)) { return new DoItFeedback("Subroutine '" + vs.ValueString + "' bei Zeile '" + thisR.CellFirstString() + "': " + s2.ErrorMessage); }
+                if (!string.IsNullOrEmpty(s2.ErrorMessage)) { return new DoItFeedback("Subroutine '" + vs.ValueString + "' bei Zeile '" + thisR.CellFirstString() + "': " + s2.ErrorMessage, line); }
                 s.Sub--;
             }
         }
 
-        if (s.Sub < 0) { return new DoItFeedback("Subroutinen-Fehler"); }
+        if (s.Sub < 0) { return new DoItFeedback("Subroutinen-Fehler", line); }
 
         s.BreakFired = false;
 
-        return DoItFeedback.Null();
+        return DoItFeedback.Null(line);
     }
 
     #endregion

@@ -51,7 +51,7 @@ internal class Method_Contains : Method {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
         #region Wortliste erzeugen
 
@@ -68,27 +68,27 @@ internal class Method_Contains : Method {
         if (attvar.Attributes[0] is VariableListString vl) {
             var x = vl.ValueList;
             if (wordlist.Any(thisW => x.Contains(thisW, ((VariableBool)attvar.Attributes[1]).ValueBool))) {
-                return DoItFeedback.Wahr();
+                return DoItFeedback.Wahr(line);
             }
-            return DoItFeedback.Falsch();
+            return DoItFeedback.Falsch(line);
         }
 
         if (attvar.Attributes[0] is VariableString vs) {
             foreach (var thisW in wordlist) {
                 if (((VariableBool)attvar.Attributes[1]).ValueBool) {
                     if (vs.ValueString.Contains(thisW)) {
-                        return DoItFeedback.Wahr();
+                        return DoItFeedback.Wahr(line);
                     }
                 } else {
                     if (vs.ValueString.ToLower().Contains(thisW.ToLower())) {
-                        return DoItFeedback.Wahr();
+                        return DoItFeedback.Wahr(line);
                     }
                 }
             }
-            return DoItFeedback.Falsch();
+            return DoItFeedback.Falsch(line);
         }
 
-        return DoItFeedback.FalscherDatentyp();
+        return DoItFeedback.FalscherDatentyp(line);
     }
 
     #endregion

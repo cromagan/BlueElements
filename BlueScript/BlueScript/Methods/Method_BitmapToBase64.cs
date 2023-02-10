@@ -46,7 +46,7 @@ internal class Method_BitmapToBase64 : Method {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
         string x;
 
@@ -60,10 +60,10 @@ internal class Method_BitmapToBase64 : Method {
                 break;
 
             default:
-                return new DoItFeedback("Es wir als zweites Attribut ein String mit dem Inhalt jpg oder png erwartet.");
+                return new DoItFeedback("Es wir als zweites Attribut ein String mit dem Inhalt jpg oder png erwartet.", line);
         }
 
-        return new DoItFeedback(x, string.Empty);
+        return new DoItFeedback(x, string.Empty, line);
     }
 
     #endregion

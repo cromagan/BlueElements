@@ -53,19 +53,19 @@ internal class Method_IsNullOrEmpty : Method {
 
         if (attvar.Attributes.Count == 0) {
             if (attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden) {
-                return DoItFeedback.AttributFehler(this, attvar);
+                return DoItFeedback.AttributFehler(this, attvar, line);
             }
 
-            return DoItFeedback.Wahr();
+            return DoItFeedback.Wahr(line);
         }
 
-        if (attvar.Attributes[0].IsNullOrEmpty) { return DoItFeedback.Wahr(); }
+        if (attvar.Attributes[0].IsNullOrEmpty) { return DoItFeedback.Wahr(line); }
 
         if (attvar.Attributes[0] is VariableUnknown) {
-            return DoItFeedback.Wahr();
+            return DoItFeedback.Wahr(line);
         }
 
-        return DoItFeedback.Falsch();
+        return DoItFeedback.Falsch(line);
     }
 
     #endregion

@@ -53,7 +53,7 @@ internal class Method_ContainsWhitch : Method {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
         var found = new List<string>();
 
@@ -86,7 +86,7 @@ internal class Method_ContainsWhitch : Method {
             }
         }
 
-        return new DoItFeedback(found);
+        return new DoItFeedback(found, line);
     }
 
     #endregion

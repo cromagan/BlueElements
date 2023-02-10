@@ -49,10 +49,10 @@ internal class Method_IsDropDownItem : MethodDatabase {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
         var column = Column(s, attvar.Attributes[1].Name);
-        if (column == null) { return new DoItFeedback("Spalte in Datenbank nicht gefunden"); }
+        if (column == null) { return new DoItFeedback("Spalte in Datenbank nicht gefunden", line); }
 
         var tocheck = new List<string>();
         if (attvar.Attributes[0] is VariableListString vl) { tocheck.AddRange(vl.ValueList); }
@@ -61,10 +61,10 @@ internal class Method_IsDropDownItem : MethodDatabase {
         tocheck = tocheck.SortedDistinctList();
 
         if (tocheck.Any(thisstring => !column.DropDownItems.Contains(thisstring))) {
-            return DoItFeedback.Falsch();
+            return DoItFeedback.Falsch(line);
         }
 
-        return DoItFeedback.Wahr();
+        return DoItFeedback.Wahr(line);
     }
 
     #endregion

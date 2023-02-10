@@ -47,19 +47,19 @@ internal class Method_ImportCSV : MethodDatabase {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
         var txt = ((VariableString)attvar.Attributes[0]).ValueString;
         var sep = ((VariableString)attvar.Attributes[1]).ValueString;
 
         var db = MyDatabase(s);
 
-        if (db?.ReadOnly ?? true) { return new DoItFeedback("Datenbank schreibgeschützt."); }
-        if (!s.ChangeValues) { return new DoItFeedback("Import im Testmodus deaktiviert."); }
+        if (db?.ReadOnly ?? true) { return new DoItFeedback("Datenbank schreibgeschützt.", line); }
+        if (!s.ChangeValues) { return new DoItFeedback("Import im Testmodus deaktiviert.", line); }
 
         var sx = db?.Import(txt, true, true, sep, false, false, true);
 
-        return new DoItFeedback(sx ?? "Datenbank nicht gefunden");
+        return new DoItFeedback(sx ?? "Datenbank nicht gefunden", line);
     }
 
     #endregion

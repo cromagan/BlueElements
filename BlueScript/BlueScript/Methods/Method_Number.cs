@@ -45,18 +45,18 @@ internal class Method_Number : Method {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
-        if (attvar.Attributes[0] is VariableFloat vf) { return new DoItFeedback(vf.ValueNum); }
+        if (attvar.Attributes[0] is VariableFloat vf) { return new DoItFeedback(vf.ValueNum, line); }
 
         if (attvar.Attributes[0] is VariableString vs) {
             if (Converter.DoubleTryParse(vs.ValueString, out var dbl)) {
-                return new DoItFeedback(dbl);
+                return new DoItFeedback(dbl, line);
             }
             //return new DoItFeedback("'" + vs.ValueString + "' kann nicht als Zahl interpretiert werden.");
         }
 
-        return new DoItFeedback(attvar.Attributes[1]);
+        return new DoItFeedback(attvar.Attributes[1], line);
     }
 
     #endregion

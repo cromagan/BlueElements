@@ -50,16 +50,16 @@ internal class Method_Call : MethodDatabase {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
         var vs = (VariableString)attvar.Attributes[0];
 
         var db = MyDatabase(s);
-        if (db == null) { return new DoItFeedback("Datenbankfehler!"); }
+        if (db == null) { return new DoItFeedback("Datenbankfehler!", line); }
 
         var sc = db.EventScript.Get(vs.ValueString);
 
-        if (sc == null) { return new DoItFeedback("Skript nicht vorhanden: " + vs.ValueString); }
+        if (sc == null) { return new DoItFeedback("Skript nicht vorhanden: " + vs.ValueString, line); }
         var f = Script.ReduceText(sc.Script);
 
         //var weiterLine = s.Line;
@@ -68,25 +68,25 @@ internal class Method_Call : MethodDatabase {
 
         if (((VariableBool)attvar.Attributes[1]).ValueBool) {
             var scx = s.Parse(f, line);
-            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback("Subroutine '" + vs.ValueString + "' Zeile " + scx.LastlineNo + ": " + scx.ErrorMessage); }
+            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback("Subroutine '" + vs.ValueString + "' Zeile " + scx.LastlineNo + ": " + scx.ErrorMessage, line); }
         } else {
             var tmpv = new List<Variable>();
             tmpv.AddRange(s.Variables);
 
             var scx = s.Parse(f, line);
-            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback("Subroutine '" + vs.ValueString + "' Zeile " + scx.LastlineNo + ": " + scx.ErrorMessage); }
+            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback("Subroutine '" + vs.ValueString + "' Zeile " + scx.LastlineNo + ": " + scx.ErrorMessage, line); }
 
             s.Variables.Clear();
             s.Variables.AddRange(tmpv);
         }
         s.Sub--;
 
-        if (s.Sub < 0) { return new DoItFeedback("Subroutinen-Fehler"); }
+        if (s.Sub < 0) { return new DoItFeedback("Subroutinen-Fehler", line); }
 
         //s.Line = weiterLine;
         s.BreakFired = false;
 
-        return DoItFeedback.Null();
+        return DoItFeedback.Null(line);
     }
 
     #endregion

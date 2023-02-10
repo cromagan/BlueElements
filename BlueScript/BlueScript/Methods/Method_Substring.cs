@@ -45,7 +45,7 @@ internal class Method_Substring : Method {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
         var st = ((VariableFloat)attvar.Attributes[1]).ValueInt;
         var en = ((VariableFloat)attvar.Attributes[2]).ValueInt;
         if (st < 0) {
@@ -56,13 +56,13 @@ internal class Method_Substring : Method {
         var t = ((VariableString)attvar.Attributes[0]).ValueString;
 
         if (st > t.Length) {
-            return new DoItFeedback(string.Empty, string.Empty);
+            return DoItFeedback.Null(line);
         }
 
         if (st + en > t.Length) {
             en = t.Length - st;
         }
-        return new DoItFeedback(t.Substring(st, en), string.Empty);
+        return new DoItFeedback(t.Substring(st, en), string.Empty, line);
     }
 
     #endregion

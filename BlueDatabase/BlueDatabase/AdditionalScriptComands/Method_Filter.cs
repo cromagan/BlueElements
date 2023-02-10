@@ -72,15 +72,15 @@ public class Method_Filter : MethodDatabase {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
         var db = DatabaseOf(s, ((VariableString)attvar.Attributes[0]).ValueString);
-        if (db == null) { return new DoItFeedback("Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden"); }
+        if (db == null) { return new DoItFeedback("Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden", line); }
 
         #region Spalte ermitteln
 
         var filterColumn = db.Column.Exists(((VariableString)attvar.Attributes[1]).ValueString);
-        if (filterColumn == null) { return new DoItFeedback("Spalte '" + ((VariableString)attvar.Attributes[1]).ValueString + "' in Ziel-Datenbank nicht gefunden"); }
+        if (filterColumn == null) { return new DoItFeedback("Spalte '" + ((VariableString)attvar.Attributes[1]).ValueString + "' in Ziel-Datenbank nicht gefunden", line); }
 
         #endregion
 
@@ -93,13 +93,13 @@ public class Method_Filter : MethodDatabase {
                 break;
 
             default:
-                return new DoItFeedback("Filtertype unbekannt: " + ((VariableString)attvar.Attributes[2]).ValueString);
+                return new DoItFeedback("Filtertype unbekannt: " + ((VariableString)attvar.Attributes[2]).ValueString, line);
         }
 
         #endregion
 
         var fii = new FilterItem(filterColumn, filtertype, ((VariableString)attvar.Attributes[3]).ValueString);
-        return new DoItFeedback(new VariableFilterItem(fii));
+        return new DoItFeedback(new VariableFilterItem(fii), line);
     }
 
     #endregion
