@@ -45,12 +45,12 @@ internal class Method_IsType : Method {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
         if (string.Equals(attvar.Attributes[1].ReadableText, attvar.Attributes[0].MyClassId, System.StringComparison.OrdinalIgnoreCase)) {
-            return DoItFeedback.Wahr();
+            return DoItFeedback.Wahr(line);
         }
-        return DoItFeedback.Falsch();
+        return DoItFeedback.Falsch(line);
     }
 
     #endregion

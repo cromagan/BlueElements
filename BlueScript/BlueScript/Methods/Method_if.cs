@@ -84,12 +84,13 @@ internal class Method_if : Method {
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
         if (((VariableBool)attvar.Attributes[0]).ValueBool) {
             var scx = s.Parse(infos.CodeBlockAfterText, line);
-            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback(scx.ErrorMessage); }
+            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback(scx.ErrorMessage, scx.LastlineNo); }
         }
-        return DoItFeedback.Null();
+
+        return DoItFeedback.Null(line + infos.CodeBlockLines());
     }
 
     #endregion
