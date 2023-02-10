@@ -141,7 +141,7 @@ public class VariableListString : Variable {
                 return new List<string>();
             } // Leere Liste
 
-            var l = Method.SplitAttributeToVars(t, s, new List<List<string>>() { new() { VariableString.ShortName_Plain } }, true);
+            var l = Method.SplitAttributeToVars(t, s, new List<List<string>>() { new() { VariableString.ShortName_Plain } }, true, 1);
             if (!string.IsNullOrEmpty(l.ErrorMessage)) {
                 return null;
             }

@@ -23,6 +23,7 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueScript;
+using BlueScript.Structures;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
@@ -327,12 +328,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     /// <param name="tryforsceonds"></param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
 
-    public (bool checkPerformed, string error, Script? script) ExecuteScript(Events? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues, float tryforsceonds) {
-        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
+    public ScriptEndedFeedback ExecuteScript(Events? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues, float tryforsceonds) {
+        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist"); }
         var t = DateTime.Now;
         do {
             var erg = ExecuteScript(doFemdZelleInvalidate, fullCheck, eventname, changevalues, scriptname);
-            if (erg.checkPerformed) { return erg; }
+            if (string.IsNullOrWhiteSpace(erg.ErrorMessage)) { return erg; }
             if (DateTime.Now.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
         } while (true);
     }
@@ -500,11 +501,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
         }
     }
 
-    private (bool checkPerformed, string error, Script? skript) ExecuteScript(bool doFemdZelleInvalidate, bool fullCheck, Events? eventname, bool changevalues, string scriptname) {
-        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
+    private ScriptEndedFeedback ExecuteScript(bool doFemdZelleInvalidate, bool fullCheck, Events? eventname, bool changevalues, string scriptname) {
+        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist"); }
 
         var feh = Database.ErrorReason(ErrorReason.EditAcut);
-        if (!string.IsNullOrEmpty(feh)) { return (false, feh, null); }
+        if (!string.IsNullOrEmpty(feh)) { return new ScriptEndedFeedback(feh); }
 
         // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
         DoingScript = true;
@@ -518,14 +519,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
 
         DoingScript = false;
 
-        if (!changevalues) { return (true, string.Empty, script); }
+        if (!changevalues) { return new ScriptEndedFeedback(); }
 
         // checkPerformed geht von Dateisystemfehlern aus
-        if (script != null) {
-            if (!string.IsNullOrEmpty(script.Error)) {
-                Database.OnScriptError(new RowCancelEventArgs(this, "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode));
-                return (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
-            }
+
+        if (!string.IsNullOrEmpty(script.ErrorMessage)) {
+            Database.OnScriptError(new RowCancelEventArgs(this, "Zeile: " + script.LastlineNo + "\r\n" + script.ErrorMessage + "\r\n" + script.ErrorCode));
+            return script;// (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
         }
 
         // Dann die Abschließenden Korrekturen vornehmen
@@ -552,7 +552,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
 
         var infoTxt = "<b><u>" + CellGetString(Database.Column.First) + "</b></u><br><br>";
 
-        if (script != null) {
+        if (string.IsNullOrEmpty(script.ErrorMessage)) {
             List<string> cols = new();
             var fs = script.Feedback.SplitAndCutByCrToList().SortedDistinctList();
             foreach (var thiss in fs) {
@@ -579,7 +579,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
             OnRowChecked(new RowCheckedEventArgs(this, eventname ?? 0, null));
         }
 
-        return (true, infoTxt, script);
+        return script;
     }
 
     private void GenerateQuickInfo() {

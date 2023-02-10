@@ -24,6 +24,7 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueScript;
+using BlueScript.Structures;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
@@ -823,8 +824,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             : string.Empty;
     }
 
-    public Script? ExecuteScript(string scripttext, bool changevalues, RowItem? row) {
-        if (IsDisposed) { return null; }
+    public ScriptEndedFeedback ExecuteScript(string scripttext, bool changevalues, RowItem? row) {
+        if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen"); }
 
         try {
 
@@ -863,17 +864,13 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             Script sc = new(vars, AdditionalFilesPfadWhole(), changevalues) {
                 ScriptText = scripttext
             };
-            sc.Parse();
+            var scf = sc.Parse();
 
             #endregion
 
             #region Variablen zurückschreiben und Special Rules ausführen
 
-            if (changevalues) {
-                if (!string.IsNullOrEmpty(sc.Error)) {
-                    return sc;
-                }
-
+            if (changevalues && !string.IsNullOrEmpty(scf.ErrorMessage)) {
                 if (row != null) {
                     foreach (var thisCol in Column) {
                         row.VariableToCell(thisCol, vars);
@@ -891,25 +888,25 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
             #endregion
 
-            return sc;
+            return scf;
         } catch {
             Develop.CheckStackForOverflow();
             return ExecuteScript(scripttext, changevalues, row);
         }
     }
 
-    public Script? ExecuteScript(Events? eventname, string? scriptname, bool changevalues, RowItem? row) {
+    public ScriptEndedFeedback ExecuteScript(Events? eventname, string? scriptname, bool changevalues, RowItem? row) {
         try {
-            if (IsDisposed) { return null; }
+            if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen"); }
 
             #region Script ermitteln
 
             if (eventname != null && !string.IsNullOrEmpty(scriptname)) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Event und Skript angekommen!");
-                return null;
+                return new ScriptEndedFeedback("Event und Skript angekommen!");
             }
 
-            if (eventname == null && string.IsNullOrEmpty(scriptname)) { return null; }
+            if (eventname == null && string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback("Kein Eventname oder Skript angekommen"); }
 
             if (string.IsNullOrEmpty(scriptname)) {
                 foreach (var thisEvent in EventScript) {
@@ -920,13 +917,13 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 }
             }
 
-            if (scriptname == null || string.IsNullOrWhiteSpace(scriptname)) { return null; }
+            if (scriptname == null || string.IsNullOrWhiteSpace(scriptname)) { return new ScriptEndedFeedback("Skriptname nicht gefunden"); }
 
             var script = EventScript.Get(scriptname);
 
-            if (script == null) { return null; }
+            if (script == null) { return new ScriptEndedFeedback("Skript nicht gefunden."); }
 
-            if (script.NeedRow && row == null) { return null; }
+            if (script.NeedRow && row == null) { return new ScriptEndedFeedback("Zeilenskript aber keine Zeile angekommen."); }
 
             if (!script.NeedRow) { row = null; }
 

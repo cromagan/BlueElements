@@ -327,16 +327,16 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         while (rows.Count > 0) {
             Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, all - rows.Count, all, false, false));
 
-            var (checkPerformed, _, s) = rows[0].ExecuteScript(eventname, scriptname, true, fullCheck, changevalues, 0);
+            var scx = rows[0].ExecuteScript(eventname, scriptname, true, fullCheck, changevalues, 0);
 
-            if (s != null && !string.IsNullOrEmpty(s.Error)) {
+            if (!string.IsNullOrEmpty(scx.ErrorMessage)) {
                 var w = rows[0].CellFirstString();
                 rows.Clear();
                 Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, rows.Count, rows.Count, false, true));
-                Database.OnDropMessage(FehlerArt.Warnung, "Skript fehlerhaft bei " + w + "\r\n" + s.Error);
-                return "Skript fehlerhaft bei " + w + "\r\n" + s.Error;
+                Database.OnDropMessage(FehlerArt.Warnung, "Skript fehlerhaft bei " + w + "\r\n" + scx.ErrorMessage);
+                return "Skript fehlerhaft bei " + w + "\r\n" + scx.ErrorMessage;
             }
-            if (checkPerformed) { rows.RemoveAt(0); }
+            if (string.IsNullOrEmpty(scx.ErrorMessage)) { rows.RemoveAt(0); }
         }
         Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, rows.Count, rows.Count, false, true));
         return string.Empty;

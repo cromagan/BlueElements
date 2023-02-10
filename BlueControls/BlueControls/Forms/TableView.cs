@@ -585,7 +585,7 @@ public partial class TableView : Form, IHasStatusbar {
 
             case "Skript":
                 if (row != null) {
-                    MessageBox.Show(row.ExecuteScript(null, ev[1], true, true, true, 10).error);
+                    MessageBox.Show(row.ExecuteScript(null, ev[1], true, true, true, 10).ErrorMessage);
                 }
 
                 break;
@@ -996,14 +996,14 @@ public partial class TableView : Form, IHasStatusbar {
         if (e.Item is not ReadableListItem bli) { return; }
         if (bli.Item is not EventScript sc) { return; }
 
-        string m = string.Empty;
+        var m = string.Empty;
 
         if (sc.NeedRow) {
             m = Table.Database.Row.ExecuteScript(null, e.Item.KeyName, Table.Filter, Table.PinnedRows, true, true);
         } else {
             //public Script? ExecuteScript(Events? eventname, string? scriptname, bool onlyTesting, RowItem? row) {
             var s = Table.Database.ExecuteScript(sc.Script, sc.ChangeValues, null);
-            m = s?.Error ?? "Skript konnte nicht ausgeführt werden.";
+            m = s.ErrorMessage;
         }
 
         if (!string.IsNullOrEmpty(m)) {

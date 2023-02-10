@@ -43,8 +43,8 @@ internal class Method_IsDateTime : Method {
 
     public override List<string> Comand(Script? s) => new() { "isdatetime" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.Falsch(); }
         var ok = DateTimeTryParse(((VariableString)attvar.Attributes[0]).ValueString, out _);
         return ok ? DoItFeedback.Wahr() : DoItFeedback.Falsch();

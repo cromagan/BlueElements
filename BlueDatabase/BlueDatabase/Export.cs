@@ -526,15 +526,16 @@ public static class Export {
                 if (thisRow != null) {
                     var tmpBody = body;
 
-                    var (_, _, script) = thisRow.ExecuteScript(null, scriptname, false, false, true, 0);
-                    if (script == null) { return "Script Fehler!"; }
+                    var script = thisRow.ExecuteScript(null, scriptname, false, false, true, 0);
 
-                    if (!string.IsNullOrEmpty(script.Error)) {
+                    if (!string.IsNullOrEmpty(script.ErrorMessage)) {
                         f = f + thisRow.CellFirstString() + "\r\n";
                     }
 
-                    foreach (var thisV in script.Variables) {
-                        tmpBody = thisV.ReplaceInText(tmpBody);
+                    if (script.Variables != null) {
+                        foreach (var thisV in script.Variables) {
+                            tmpBody = thisV.ReplaceInText(tmpBody);
+                        }
                     }
 
                     tmpSave += tmpBody;

@@ -48,8 +48,8 @@ internal class Method_IsNullOrEmpty : Method {
 
     public override List<string> Comand(Script? s) => new() { "isnullorempty" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
 
         if (attvar.Attributes.Count == 0) {
             if (attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden) {

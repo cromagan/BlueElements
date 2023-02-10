@@ -17,40 +17,49 @@
 
 #nullable enable
 
-using BlueBasics;
+using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
-namespace BlueScript.Methods;
+namespace BlueDatabase.AdditionalScriptComands;
 
-internal class Method_IsNumeral : Method {
+public class Method_SoftMessage : MethodDatabase {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain, VariableFloat.ShortName_Plain } };
-    public override string Description => "Prüft, ob der Inhalt der Variable eine gültige Zahl ist. ";
-    public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
+    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain } };
+    public override string Description => "Gibt in der Statusleiste einen Nachricht aus, wenn ein Steuerelement vorhanden ist, dass diese anzeigen kann.";
+
+    public override bool EndlessArgs => true;
+
+    public override string EndSequence => ");";
+
     public override bool GetCodeBlockAfter => false;
-    public override string Returns => VariableBool.ShortName_Plain;
+
+    public override string Returns => string.Empty;
+
     public override string StartSequence => "(";
-    public override string Syntax => "isNumeral(Value)";
+
+    public override string Syntax => "SoftMessage(Text);";
 
     #endregion
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "isnumeral" };
+    public override List<string> Comand(Script? s) => new() { "softmessage" };
 
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.Falsch(); }
-        if (attvar.Attributes[0] is VariableFloat) { return DoItFeedback.Wahr(); }
-        if (attvar.Attributes[0] is VariableString vs) {
-            if (vs.ValueString.IsNumeral()) { return DoItFeedback.Wahr(); }
-        }
-        return DoItFeedback.Falsch();
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+
+        var db = MyDatabase(s);
+        if (db == null) { return new DoItFeedback("Datenbankfehler!"); }
+
+        var txt = "<b>Skript:</b> " + ((VariableString)attvar.Attributes[0]).ValueString;
+        db.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, txt);
+
+        return DoItFeedback.Null();
     }
 
     #endregion

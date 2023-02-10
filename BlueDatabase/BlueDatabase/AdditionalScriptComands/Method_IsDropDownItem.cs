@@ -47,8 +47,8 @@ internal class Method_IsDropDownItem : MethodDatabase {
 
     public override List<string> Comand(Script? s) => new() { "isdropdownitem" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
         var column = Column(s, attvar.Attributes[1].Name);

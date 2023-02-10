@@ -185,17 +185,17 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         return attributes;
     }
 
-    public static SplittedAttributesFeedback SplitAttributeToVars(string attributtext, Script s, List<List<string>> types, bool endlessArgs) {
+    public static SplittedAttributesFeedback SplitAttributeToVars(string attributtext, Script s, List<List<string>> types, bool endlessArgs, int line) {
         if (types.Count == 0) {
             return string.IsNullOrEmpty(attributtext)
-                ? new SplittedAttributesFeedback(new List<Variable>())
-                : new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Keine Attribute erwartet, aber erhalten.");
+                ? new SplittedAttributesFeedback(new List<Variable>(), line)
+                : new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Keine Attribute erwartet, aber erhalten.", line);
         }
 
         var attributes = SplitAttributeToString(attributtext);
-        if (attributes == null || attributes.Count == 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Allgemeiner Fehler."); }
-        if (attributes.Count < types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
-        if (!endlessArgs && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu viele Attribute erhalten."); }
+        if (attributes == null || attributes.Count == 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Allgemeiner Fehler.", line); }
+        if (attributes.Count < types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten.", line); }
+        if (!endlessArgs && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu viele Attribute erhalten.", line); }
 
         //  Variablen und Routinen ersetzen
         List<Variable> feedbackVariables = new();
@@ -214,17 +214,17 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
                 var varn = attributes[n];
                 if (varn.StartsWith("~") && varn.EndsWith("~")) {
                     var tmp2 = Variable.GetVariableByParsing(varn.Substring(1, varn.Length - 2), s);
-                    if (tmp2.Variable is not VariableString x) { return new SplittedAttributesFeedback(ScriptIssueType.VariablenNamenBerechnungFehler, "Variablenname konnte nicht berechnet werden bei Attribut " + (n + 1)); }
+                    if (tmp2.Variable is not VariableString x) { return new SplittedAttributesFeedback(ScriptIssueType.VariablenNamenBerechnungFehler, "Variablenname konnte nicht berechnet werden bei Attribut " + (n + 1), line); }
                     varn = x.ValueString;
                 }
 
-                if (!Variable.IsValidName(varn)) { return new SplittedAttributesFeedback(ScriptIssueType.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1)); }
+                if (!Variable.IsValidName(varn)) { return new SplittedAttributesFeedback(ScriptIssueType.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1), line); }
 
                 if (s != null) { v = s.Variables.Get(varn); }
-                if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1)); }
+                if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1), line); }
             } else {
                 var tmp2 = Variable.GetVariableByParsing(attributes[n], s);
-                if (tmp2.Variable == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1) + "\r\n" + " - " + tmp2.ErrorMessage); }
+                if (tmp2.Variable == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1) + "\r\n" + " - " + tmp2.ErrorMessage, line); }
                 v = tmp2.Variable;
             }
 
@@ -233,28 +233,16 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
 
             foreach (var thisAt in exceptetType) {
                 if (thisAt.TrimStart("*") == v.MyClassId) { ok = true; break; }
-
                 if (thisAt.TrimStart("*") == Variable.Any_Plain) { ok = true; break; }
-
-                //if (!exceptetType.HasFlag(v.Type)) {
-                //    //if (v.Type == VariableDataType.Error) {
-                //    //    return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Attribut " + (n + 1) + ": " + v.Comment);
-                //    //}
-                //    //if (exceptetType == VariableDataType.Integer) {
-                //    //    if (v is not VariableFloat vn) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
-                //    //    if (vn.ValueNum != vn.ValueInt) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
-                //    //} else {
-                //    //}
-                //}
             }
 
-            if (!ok) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht einer der erwarteten Typen '" + exceptetType.JoinWith("' oder '") + "', sondern " + v.MyClassId); }
+            if (!ok) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht einer der erwarteten Typen '" + exceptetType.JoinWith("' oder '") + "', sondern " + v.MyClassId, line); }
 
             feedbackVariables.Add(v);
 
-            if (s != null) { s.Line += lb; }
+            if (s != null) { line += lb; }
         }
-        return new SplittedAttributesFeedback(feedbackVariables);
+        return new SplittedAttributesFeedback(feedbackVariables, line);
     }
 
     public CanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, Script s) {
@@ -292,7 +280,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
 
     public abstract List<string> Comand(Script? s);
 
-    public abstract DoItFeedback DoIt(CanDoFeedback infos, Script s);
+    public abstract DoItFeedback DoIt(CanDoFeedback infos, Script s, int line);
 
     public string HintText() {
         var co = "Syntax:\r\n";

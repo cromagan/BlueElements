@@ -29,7 +29,10 @@ public class Method_CallFilter : MethodDatabase {
     #region Properties
 
     public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableFilterItem.ShortName_Variable } };
-    public override string Description => "Suchte Zeilen und ruft in dessen Datenbank ein Skript für jede Zeile aus. Über den Filten kann bestimmt werden, welche Zeilen es betrifft.";
+
+    public override string Description => "Sucht Zeilen und ruft in dessen Datenbank ein Skript für jede Zeile aus.\r\n" +
+                                            "Über den Filtern kann bestimmt werden, welche Zeilen es betrifft.\r\n" +
+                                            "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.";
 
     public override bool EndlessArgs => true;
 
@@ -49,8 +52,8 @@ public class Method_CallFilter : MethodDatabase {
 
     public override List<string> Comand(Script? s) => new() { "callfilter" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1);
@@ -64,22 +67,18 @@ public class Method_CallFilter : MethodDatabase {
         if (r == null || r.Count == 0) { return new DoItFeedback(); }
 
         var vs = (VariableString)attvar.Attributes[0];
-        //var sc = r[0].Database.EventScript.Get(vs.ValueString);
-
-        var weiterLine = s.Line;
 
         foreach (var thisR in r) {
             if (r != null) {
-                s.Line = 1;
                 s.Sub++;
-                _ = (thisR?.ExecuteScript(null, vs.ValueString, false, true, s.ChangeValues, 0));
+                var s2 = thisR.ExecuteScript(null, vs.ValueString, false, true, s.ChangeValues, 0);
+                if (!string.IsNullOrEmpty(s2.ErrorMessage)) { return new DoItFeedback("Subroutine '" + vs.ValueString + "' bei Zeile '" + thisR.CellFirstString() + "': " + s2.ErrorMessage); }
                 s.Sub--;
             }
         }
 
         if (s.Sub < 0) { return new DoItFeedback("Subroutinen-Fehler"); }
 
-        s.Line = weiterLine;
         s.BreakFired = false;
 
         return DoItFeedback.Null();

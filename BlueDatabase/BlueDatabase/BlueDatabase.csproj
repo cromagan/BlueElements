@@ -79,6 +79,7 @@
   <ItemGroup>
     <Compile Include="AdditionalScriptComands\MethodDatabase.cs" />
     <Compile Include="AdditionalScriptComands\Method_AddRow.cs" />
+    <Compile Include="AdditionalScriptComands\Method_SoftMessage.cs" />
     <Compile Include="AdditionalScriptComands\Method_Call.cs" />
     <Compile Include="AdditionalScriptComands\Method_CallRow.cs" />
     <Compile Include="AdditionalScriptComands\Method_CellSetRow.cs" />

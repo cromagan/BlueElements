@@ -45,18 +45,12 @@ public class Script {
     public readonly List<Variable> Variables;
     public bool EndScript;
 
-    /// <summary>
-    /// Dieses Feld enthält informationen, die nach dem Skript-Lauf abgegriffen werden können.
-    /// </summary>
-    public string Feedback = string.Empty;
-
-    //internal readonly List<Bitmap> BitmapCache;
-    //internal Method_BerechneVariable? BerechneVariable; // Paralellisierung löscht ab und zu die Variable
-
-    private string _error = string.Empty;
-    private string _errorCode = string.Empty;
-
     #endregion
+
+    ///// <summary>
+    ///// Dieses Feld enthält informationen, die nach dem Skript-Lauf abgegriffen werden können.
+    ///// </summary>
+    //public string Feedback = string.Empty;
 
     #region Constructors
 
@@ -112,24 +106,6 @@ public class Script {
 
     public bool BreakFired { get; set; }
 
-    /// <summary>
-    /// Es sind keine {} in diesem Text erlaubt und werden eliminiert
-    /// </summary>
-    public string Error {
-        get => _error;
-        private set => _error = value.Replace("{", string.Empty).Replace("}", string.Empty);
-    }
-
-    /// <summary>
-    /// Es sind keine {} in diesem Text erlaubt und werden eliminiert
-    /// </summary>
-    public string ErrorCode {
-        get => _errorCode;
-        private set => _errorCode = value.Replace("{", string.Empty).Replace("}", string.Empty);
-    }
-
-    public int Line { get; set; }
-
     public string ReducedScriptText { get; private set; }
     public int Schleife { get; internal set; }
 
@@ -149,8 +125,14 @@ public class Script {
             if (f.MustAbort) { return new DoItWithEndedPosFeedback(f.ErrorMessage); }
 
             if (string.IsNullOrEmpty(f.ErrorMessage)) {
-                var fn = thisC.DoIt(f, s);
-                return new DoItWithEndedPosFeedback(fn.ErrorMessage, fn.Variable, f.ContinueOrErrorPosition);
+                var fn = thisC.DoIt(f, s, f.ContinueOrErrorPosition);
+
+                var lb = 0;
+                if (!string.IsNullOrEmpty(f.CodeBlockAfterText)) {
+                    lb = f.CodeBlockAfterText.Count(c => c == '¶');
+                }
+
+                return new DoItWithEndedPosFeedback(fn.ErrorMessage, fn.Variable, f.ContinueOrErrorPosition + lb);
             }
         }
 
@@ -216,30 +198,13 @@ public class Script {
         return s.ToString();
     }
 
-    public bool Parse() {
+    public ScriptEndedFeedback Parse() {
         ReducedScriptText = ReduceText(ScriptText);
-        Line = 1;
         BreakFired = false;
         Schleife = 0;
         Sub = 0;
-        Feedback = string.Empty;
 
-        //BerechneVariable = null;
-
-        //if (Comands != null) {
-        //    foreach (var thisC in Comands) {
-        //        if (thisC is Method_BerechneVariable bv) {
-        //            BerechneVariable = bv;
-        //        }
-        //    }
-        //}
-
-        //if (BerechneVariable == null) {
-        //    Develop.DebugPrint(enFehlerArt.Fehler, "Method_BerechneVariable ist nicht definiet.");
-        //}
-
-        (Error, ErrorCode) = Parse(ReducedScriptText);
-        return string.IsNullOrEmpty(Error);
+        return Parse(ReducedScriptText, 1);
     }
 
     //internal int AddBitmapToCache(Bitmap? bmp) {
@@ -247,24 +212,24 @@ public class Script {
     //    return BitmapCache.IndexOf(bmp);
     //}
 
-    public (string, string) Parse(string redScriptText) {
+    public ScriptEndedFeedback Parse(string redScriptText, int line) {
         var pos = 0;
         EndScript = false;
 
         do {
             if (pos >= redScriptText.Length || EndScript) {
-                return (string.Empty, string.Empty);
+                return new ScriptEndedFeedback(Variables, line);
             }
 
-            if (BreakFired) { return (string.Empty, string.Empty); }
+            if (BreakFired) { return new ScriptEndedFeedback(Variables, line); }
 
             if (redScriptText.Substring(pos, 1) == "¶") {
-                Line++;
+                line++;
                 pos++;
             } else {
                 var f = ComandOnPosition(redScriptText, pos, this, false);
                 if (!string.IsNullOrEmpty(f.ErrorMessage)) {
-                    return (f.ErrorMessage, redScriptText.Substring(pos, Math.Min(30, redScriptText.Length - pos)));
+                    return new ScriptEndedFeedback(line, f.ErrorMessage, redScriptText.Substring(pos, Math.Min(30, redScriptText.Length - pos)), null);
                 }
                 pos = f.Position;
             }

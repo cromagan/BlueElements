@@ -234,10 +234,10 @@ public sealed partial class DatabaseHeadEditor {
             ok = _database.Save();
         }
         if (ok) {
-            MessageBox.Show("Speichern erfolgreich.");
+            MessageBox.Show("Speichern erfolgreich.", ImageCode.Häkchen, "Ok");
         } else {
             //scriptEditor.Message("Speichern fehlgeschlagen!");
-            MessageBox.Show("Speichern fehlgeschlagen!");
+            MessageBox.Show("Speichern fehlgeschlagen!", ImageCode.Kreuz, "Ok");
         }
         btnSave.Enabled = true;
     }

@@ -43,8 +43,8 @@ internal class Method_TrimSuffix : Method {
 
     public override List<string> Comand(Script? s) => new() { "trimsuffix" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
         var val = ((VariableString)attvar.Attributes[0]).ValueString;
 

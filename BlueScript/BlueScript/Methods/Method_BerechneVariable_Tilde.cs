@@ -43,7 +43,7 @@ internal class Method_BerechneVariable_Tilde : Method {
 
     public override List<string> Comand(Script? s) => new() { "~" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         if (infos.AttributText.Length < 5) { return new DoItFeedback("Variablen-Namen-Berechung kann nicht durchgeführt werden."); }
 
         var (postilde, _) = NextText(infos.AttributText, 0, Tilde, false, false, KlammernStd);
@@ -56,7 +56,7 @@ internal class Method_BerechneVariable_Tilde : Method {
 
         var newcommand = vs.ValueString + infos.AttributText.Substring(posgleich) + ";";
 
-        return Method_BerechneVariable.VariablenBerechnung(newcommand, s, false);
+        return Method_BerechneVariable.VariablenBerechnung(newcommand, s, false, line);
 
         //return s.BerechneVariable.DoitKomplett(newcommand, s, infos, false);
     }

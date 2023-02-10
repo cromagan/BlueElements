@@ -21,6 +21,7 @@ using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
@@ -29,7 +30,10 @@ public class Method_CallRow : MethodDatabase {
     #region Properties
 
     public override List<List<string>> Args => new() { new List<string>() { VariableString.ShortName_Plain }, new List<string>() { VariableRowItem.ShortName_Variable } };
-    public override string Description => "Führt das Skript bei der angegebenen Zeile aus. Wenn die Zeile Null ist, wird kein Fehler ausgegeben.";
+
+    public override string Description => "Führt das Skript bei der angegebenen Zeile aus.\r\n" +
+        "Wenn die Zeile Null ist, wird kein Fehler ausgegeben.\r\n" +
+        "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.";
 
     public override bool EndlessArgs => false;
 
@@ -48,12 +52,21 @@ public class Method_CallRow : MethodDatabase {
 
     public override List<string> Comand(Script? s) => new() { "callrow" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
         var row = Method_Row.ObjectToRow(attvar.Attributes[1]);
-        _ = (row?.ExecuteScript(null, ((VariableString)attvar.Attributes[0]).ValueString, false, false, s.ChangeValues, 0));
+
+        if (row == null) {
+            return new DoItFeedback("Zeile nicht gefunden");
+        }
+
+        var vs = (VariableString)attvar.Attributes[0];
+        s.Sub++;
+        var s2 = row.ExecuteScript(null, vs.ValueString, false, false, s.ChangeValues, 0);
+        if (!string.IsNullOrEmpty(s2.ErrorMessage)) { return new DoItFeedback("Subroutine '" + vs.ValueString + "': " + s2.ErrorMessage); }
+        s.Sub--;
         return DoItFeedback.Null();
     }
 

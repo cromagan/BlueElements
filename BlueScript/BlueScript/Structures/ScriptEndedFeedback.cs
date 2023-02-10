@@ -15,40 +15,46 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueScript.Enums;
-using BlueScript.Variables;
+#nullable enable
+
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BlueScript.Structures;
 
-public readonly struct SplittedAttributesFeedback {
+public readonly struct ScriptEndedFeedback {
 
     #region Fields
 
-    public readonly List<Variable> Attributes;
-
+    public readonly string ErrorCode;
     public readonly string ErrorMessage;
+    public readonly int LastlineNo;
 
-    public readonly ScriptIssueType FehlerTyp;
-
-    public readonly int NextLine;
+    public readonly List<Variables.Variable>? Variables;
 
     #endregion
 
     #region Constructors
 
-    public SplittedAttributesFeedback(List<Variable> atts, int line) {
-        Attributes = atts;
-        ErrorMessage = string.Empty;
-        FehlerTyp = ScriptIssueType.ohne;
-        NextLine = line;
+    public ScriptEndedFeedback(int lastlineNo, string errormessage, string errorcode, List<Variables.Variable> variables) {
+        ErrorMessage = errormessage;
+        ErrorCode = errorcode;
+        LastlineNo = lastlineNo;
+        Variables = variables;
     }
 
-    public SplittedAttributesFeedback(ScriptIssueType type, string error, int line) {
-        Attributes = new List<Variable>();
-        ErrorMessage = error;
-        FehlerTyp = type;
-        NextLine = line;
+    public ScriptEndedFeedback(string errormessage) {
+        ErrorMessage = errormessage;
+        ErrorCode = string.Empty;
+        LastlineNo = -1;
+        Variables = null;
+    }
+
+    public ScriptEndedFeedback(List<Variables.Variable> variables, int lastlineNo) {
+        ErrorMessage = string.Empty;
+        ErrorCode = string.Empty;
+        LastlineNo = lastlineNo;
+        Variables = variables;
     }
 
     #endregion

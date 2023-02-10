@@ -477,8 +477,8 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
     public void ParseVariable(RowItem? row) {
         if (row == null) { return; }
 
-        var (_, _, script) = row.ExecuteScript(null, _scriptName, false, false, true, 0);
-        if (script?.Variables == null) { return; }
+        var script = row.ExecuteScript(null, _scriptName, false, false, true, 0);
+        if (script.Variables == null) { return; }
         foreach (var thisV in script.Variables) {
             _ = ParseVariable(thisV);
         }

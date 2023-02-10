@@ -45,8 +45,8 @@ internal class Method_ImportCSV : MethodDatabase {
 
     public override List<string> Comand(Script? s) => new() { "importcsv" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
         var txt = ((VariableString)attvar.Attributes[0]).ValueString;

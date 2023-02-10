@@ -30,7 +30,11 @@ internal class Method_Call : MethodDatabase {
     #region Properties
 
     public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableBool.ShortName_Plain } };
-    public override string Description => "Ruft eine Subroutine auf. Mit KeepVariables kann bestimmt werden, ob die Variablen aus der Subroutine behalten werden sollen.";
+
+    public override string Description => "Ruft eine Subroutine auf.\r\n" +
+        "Mit KeepVariables kann bestimmt werden, ob die Variablen aus der Subroutine behalten werden sollen.\r\n" +
+        "Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.";
+
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";
     public override bool GetCodeBlockAfter => false;
@@ -44,8 +48,8 @@ internal class Method_Call : MethodDatabase {
 
     public override List<string> Comand(Script? s) => new() { "call" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
         var vs = (VariableString)attvar.Attributes[0];
@@ -58,19 +62,19 @@ internal class Method_Call : MethodDatabase {
         if (sc == null) { return new DoItFeedback("Skript nicht vorhanden: " + vs.ValueString); }
         var f = Script.ReduceText(sc.Script);
 
-        var weiterLine = s.Line;
-        s.Line = 1;
+        //var weiterLine = s.Line;
+        //s.Line = 1;
         s.Sub++;
 
         if (((VariableBool)attvar.Attributes[1]).ValueBool) {
-            var (err, _) = s.Parse(f);
-            if (!string.IsNullOrEmpty(err)) { return new DoItFeedback("Subroutine " + vs.ValueString + ": " + err); }
+            var scx = s.Parse(f, line);
+            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback("Subroutine '" + vs.ValueString + "' Zeile " + scx.LastlineNo + ": " + scx.ErrorMessage); }
         } else {
             var tmpv = new List<Variable>();
             tmpv.AddRange(s.Variables);
 
-            var (err, _) = s.Parse(f);
-            if (!string.IsNullOrEmpty(err)) { return new DoItFeedback("Subroutine " + vs.ValueString + ": " + err); }
+            var scx = s.Parse(f, line);
+            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback("Subroutine '" + vs.ValueString + "' Zeile " + scx.LastlineNo + ": " + scx.ErrorMessage); }
 
             s.Variables.Clear();
             s.Variables.AddRange(tmpv);
@@ -79,7 +83,7 @@ internal class Method_Call : MethodDatabase {
 
         if (s.Sub < 0) { return new DoItFeedback("Subroutinen-Fehler"); }
 
-        s.Line = weiterLine;
+        //s.Line = weiterLine;
         s.BreakFired = false;
 
         return DoItFeedback.Null();

@@ -43,8 +43,8 @@ internal class Method_Substring : Method {
 
     public override List<string> Comand(Script? s) => new() { "substring" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
         var st = ((VariableFloat)attvar.Attributes[1]).ValueInt;
         var en = ((VariableFloat)attvar.Attributes[2]).ValueInt;

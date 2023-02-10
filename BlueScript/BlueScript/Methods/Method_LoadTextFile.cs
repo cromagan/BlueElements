@@ -46,8 +46,8 @@ internal class Method_LoadTextFile : Method {
 
     public override List<string> Comand(Script? s) => new() { "loadtextfile" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
         var ft = ((VariableString)attvar.Attributes[0]).ValueString.FileType();

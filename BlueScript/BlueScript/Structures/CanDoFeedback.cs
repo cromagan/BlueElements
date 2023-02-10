@@ -45,7 +45,7 @@ public readonly struct CanDoFeedback {
 
     public readonly string ErrorMessage;
 
-    public readonly int LineBreakInCodeBlock;
+    //public readonly int LineBreakInCodeBlock;
 
     /// <summary>
     /// TRUE, wenn der Befehl erkannt wurde, aber nicht ausgeführt werden kann.
@@ -63,7 +63,6 @@ public readonly struct CanDoFeedback {
         ComandText = string.Empty;
         AttributText = string.Empty;
         CodeBlockAfterText = string.Empty;
-        LineBreakInCodeBlock = 0;
     }
 
     public CanDoFeedback(int continuePosition, string comandText, string attributtext, string codeblockaftertext) {
@@ -73,7 +72,6 @@ public readonly struct CanDoFeedback {
         ComandText = comandText;
         AttributText = attributtext;
         CodeBlockAfterText = codeblockaftertext;
-        LineBreakInCodeBlock = codeblockaftertext.Count(c => c == '¶');
     }
 
     #endregion

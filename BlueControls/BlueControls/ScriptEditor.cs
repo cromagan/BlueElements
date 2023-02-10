@@ -25,6 +25,7 @@ using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueScript;
+using BlueScript.Structures;
 using FastColoredTextBoxNS;
 using System;
 using System.Collections.Generic;
@@ -114,10 +115,9 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
         base.Dispose(disposing);
     }
 
-    protected virtual Script? GenerateAndExecuteScript() {
+    protected virtual ScriptEndedFeedback GenerateAndExecuteScript() {
         var s = new Script(null, string.Empty, true);
-        _ = s.Parse();
-        return s;
+        return s.Parse();
     }
 
     protected virtual void OpenAdditionalFileFolder() { }
@@ -164,17 +164,13 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
 
         var s = GenerateAndExecuteScript();
 
-        if (s == null) {
-            //Message("Interner Fehler. Skript nicht ausgeführt.");
-            return;
-        }
         grpVariablen.WriteVariablesToTable(s.Variables);
         WriteComandsToList(s);
 
-        if (string.IsNullOrEmpty(s.Error)) {
+        if (string.IsNullOrEmpty(s.ErrorMessage)) {
             Message("Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden.");
         } else {
-            Message("Fehler in Zeile: " + s.Line + "\r\n" + s.Error + "\r\n >>> " + s.ErrorCode.RestoreEscape());
+            Message("Fehler in Zeile: " + s.LastlineNo + "\r\n" + s.ErrorMessage + "\r\n >>> " + s.ErrorCode.RestoreEscape());
         }
     }
 

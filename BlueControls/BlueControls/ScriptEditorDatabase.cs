@@ -21,6 +21,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueDatabase;
 using BlueScript;
+using BlueScript.Structures;
 using static BlueBasics.IO;
 
 namespace BlueControls;
@@ -72,18 +73,16 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
 
     #region Methods
 
-    protected override Script? GenerateAndExecuteScript() {
+    protected override ScriptEndedFeedback GenerateAndExecuteScript() {
         if (_database == null || _database.IsDisposed) {
-            Message("Keine Datenbank geladen.");
-            return null;
+            return new ScriptEndedFeedback("Keine Datenbank geladen.");
         }
 
         RowItem? r = null;
 
         if (_isRowSkript) {
             if (_isRowSkript && _database.Row.Count == 0) {
-                Message("Zum Test wird zumindest eine Zeile benötigt.");
-                return null;
+                return new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.");
             }
             if (string.IsNullOrEmpty(txbTestZeile.Text)) {
                 txbTestZeile.Text = _database.Row.First().CellFirstString();
@@ -91,8 +90,7 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
 
             r = _database.Row[txbTestZeile.Text];
             if (r == null) {
-                Message("Zeile nicht gefunden.");
-                return null;
+                return new ScriptEndedFeedback("Zeile nicht gefunden.");
             }
         }
         var s = _database.ExecuteScript(base.ScriptText, false, r);
