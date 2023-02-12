@@ -29,7 +29,10 @@ public class Method_Row : Method_Database {
     #region Properties
 
     public override List<List<string>> Args => new() { new List<string> { VariableFilterItem.ShortName_Variable } };
-    public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.";
+    public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.\r\n" +
+                                          "Wird keine Zeile gefunden, wird ein leeres Zeilenobjekt erstellt. Es wird keine neue Zeile erstellt.\r\n" +
+                                          "Mit RowIsNull kann abgefragt werden, ob die Zeile gefunden wurde.\r\n" +
+                                          "Werden mehrere Zeilen gefunden, wird das Programm abgebrochen. Um das zu verhindern, kann RowCount benutzt werden.";
 
     public override bool EndlessArgs => true;
 

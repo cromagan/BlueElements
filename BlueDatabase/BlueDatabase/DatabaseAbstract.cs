@@ -825,7 +825,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     }
 
     public ScriptEndedFeedback ExecuteScript(EventScript s, bool changevalues, RowItem? row) {
-        if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen"); }
+        if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false); }
 
         try {
 
@@ -897,16 +897,16 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     public ScriptEndedFeedback ExecuteScript(EventTypes? eventname, string? scriptname, bool changevalues, RowItem? row) {
         try {
-            if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen"); }
+            if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false); }
 
             #region Script ermitteln
 
             if (eventname != null && !string.IsNullOrEmpty(scriptname)) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Event und Skript angekommen!");
-                return new ScriptEndedFeedback("Event und Skript angekommen!");
+                return new ScriptEndedFeedback("Event und Skript angekommen!", false);
             }
 
-            if (eventname == null && string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback("Kein Eventname oder Skript angekommen"); }
+            if (eventname == null && string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback("Kein Eventname oder Skript angekommen", false); }
 
             if (string.IsNullOrEmpty(scriptname) && eventname != null) {
                 foreach (var thisEvent in EventScript) {
@@ -917,13 +917,13 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 }
             }
 
-            if (scriptname == null || string.IsNullOrWhiteSpace(scriptname)) { return new ScriptEndedFeedback("Skriptname nicht gefunden"); }
+            if (scriptname == null || string.IsNullOrWhiteSpace(scriptname)) { return new ScriptEndedFeedback("Skriptname nicht gefunden", false); }
 
             var script = EventScript.Get(scriptname);
 
-            if (script == null) { return new ScriptEndedFeedback("Skript nicht gefunden."); }
+            if (script == null) { return new ScriptEndedFeedback("Skript nicht gefunden.", false); }
 
-            if (script.NeedRow && row == null) { return new ScriptEndedFeedback("Zeilenskript aber keine Zeile angekommen."); }
+            if (script.NeedRow && row == null) { return new ScriptEndedFeedback("Zeilenskript aber keine Zeile angekommen.", false); }
 
             if (!script.NeedRow) { row = null; }
 

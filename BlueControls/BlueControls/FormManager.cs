@@ -90,6 +90,8 @@ public class FormManager : ApplicationContext {
     }
 
     public void RegisterForm(Form frm) {
+        if (Forms.Contains(frm)) { return; }
+
         frm.FormClosed += onFormClosed;
         Forms.Add(frm);
     }

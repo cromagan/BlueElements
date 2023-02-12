@@ -361,12 +361,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     /// <param name="eventname"></param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
     public ScriptEndedFeedback ExecuteScript(EventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues, float tryforsceonds) {
-        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist"); }
+        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", false); }
         var t = DateTime.Now;
         do {
             var erg = ExecuteScript(doFemdZelleInvalidate, fullCheck, eventname, changevalues, scriptname);
             if (string.IsNullOrWhiteSpace(erg.ErrorMessage)) { return erg; }
-            if (DateTime.Now.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
+            if (!erg.GiveItAnotherTry || DateTime.Now.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
         } while (true);
     }
 
@@ -526,10 +526,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     }
 
     private ScriptEndedFeedback ExecuteScript(bool doFemdZelleInvalidate, bool fullCheck, EventTypes? eventname, bool changevalues, string scriptname) {
-        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist"); }
+        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", false); }
 
         var feh = Database.ErrorReason(ErrorReason.EditAcut);
-        if (!string.IsNullOrEmpty(feh)) { return new ScriptEndedFeedback(feh); }
+        if (!string.IsNullOrEmpty(feh)) { return new ScriptEndedFeedback(feh, true); }
 
         // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
         DoingScript = true;
@@ -543,7 +543,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
 
         DoingScript = false;
 
-        if (!changevalues) { return new ScriptEndedFeedback(string.Empty); }
+        if (!changevalues) { return new ScriptEndedFeedback(string.Empty, false); }
 
         // checkPerformed geht von Dateisystemfehlern aus
 

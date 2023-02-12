@@ -28,8 +28,8 @@ public class ScriptEndedFeedback {
 
     public readonly string ErrorCode;
     public readonly string ErrorMessage;
+    public readonly bool GiveItAnotherTry;
     public readonly int LastlineNo;
-
     public readonly List<Variable>? Variables;
 
     #endregion
@@ -41,13 +41,15 @@ public class ScriptEndedFeedback {
         ErrorCode = errorcode;
         LastlineNo = lastlineNo;
         Variables = variables;
+        GiveItAnotherTry = false;
     }
 
-    public ScriptEndedFeedback(string errormessage) {
+    public ScriptEndedFeedback(string errormessage, bool giveitanothertry) {
         ErrorMessage = errormessage;
         ErrorCode = string.Empty;
         LastlineNo = -1;
         Variables = null;
+        GiveItAnotherTry = giveitanothertry;
     }
 
     public ScriptEndedFeedback(List<Variable> variables, int lastlineNo) {

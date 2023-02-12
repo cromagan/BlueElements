@@ -36,6 +36,8 @@ namespace BlueControls.BlueDatabaseDialogs;
 public sealed partial class DatabaseScriptEditor {
     #region Fields
 
+    #region Fields
+
     private DatabaseAbstract? _database;
     private EventScript? _item;
 
@@ -50,7 +52,11 @@ public sealed partial class DatabaseScriptEditor {
         eventScriptEditor.Enabled = false;
         _database = database;
         _database.Disposing += Database_Disposing;
+
+        FormManager.Current.RegisterForm(this);
     }
+
+    #endregion
 
     #endregion
 
@@ -173,17 +179,17 @@ public sealed partial class DatabaseScriptEditor {
 
     private void eventScriptEditor_ExecuteScript(object sender, BlueScript.EventArgs.ScriptEventArgs e) {
         if (_database == null || _database.IsDisposed) {
-            e.Feedback = new ScriptEndedFeedback("Keine Datenbank geladen.");
+            e.Feedback = new ScriptEndedFeedback("Keine Datenbank geladen.", false);
             return;
         }
 
         if (_item == null) {
-            e.Feedback = new ScriptEndedFeedback("Kein Skript gewählt.");
+            e.Feedback = new ScriptEndedFeedback("Kein Skript gewählt.", false);
             return;
         }
 
         if (!_item.IsOk()) {
-            e.Feedback = new ScriptEndedFeedback("Bitte zuerst den Fehler korrigieren: " + _item.ErrorReason());
+            e.Feedback = new ScriptEndedFeedback("Bitte zuerst den Fehler korrigieren: " + _item.ErrorReason(), false);
             return;
         }
 
@@ -193,7 +199,7 @@ public sealed partial class DatabaseScriptEditor {
 
         if (_item.NeedRow) {
             if (_database.Row.Count == 0) {
-                e.Feedback = new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.");
+                e.Feedback = new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.", false);
                 return;
             }
             if (string.IsNullOrEmpty(txbTestZeile.Text)) {
@@ -202,7 +208,7 @@ public sealed partial class DatabaseScriptEditor {
 
             r = _database?.Row?[txbTestZeile.Text];
             if (r == null) {
-                e.Feedback = new ScriptEndedFeedback("Zeile nicht gefunden.");
+                e.Feedback = new ScriptEndedFeedback("Zeile nicht gefunden.", false);
                 return;
             }
         }
